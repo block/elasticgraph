@@ -144,8 +144,6 @@ module ElasticGraph
         :as_date_time, :as_date, :as_time_of_day, :as_day_of_week,
         # Date/time grouping aggregation arguments
         :offset, :amount, :unit, :time_zone, :truncation_unit,
-        # TODO: Drop support for legacy grouping schema that uses `granularity` and `offset_days`
-        :granularity, :offset_days,
         # For aggregation counts.
         :approximate_value, :exact_value, :upper_bound,
         # For pagination.

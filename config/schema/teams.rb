@@ -104,9 +104,7 @@ ElasticGraph.define_schema do |schema|
     t.field "wins", "Int", name_in_index: "win_count"
     t.field "losses", "Int", name_in_index: "loss_count"
     t.field "last_win_on", "Date", name_in_index: "last_win_date"
-    t.field "last_win_on_legacy", "Date", name_in_index: "last_win_date", graphql_only: true, legacy_grouping_schema: true
     t.field "first_win_on", "Date"
-    t.field "first_win_on_legacy", "Date", name_in_index: "first_win_on", graphql_only: true, legacy_grouping_schema: true
   end
 
   schema.object_type "TeamSeason" do |t|
@@ -118,9 +116,7 @@ ElasticGraph.define_schema do |schema|
     # even while it also offers a `count` operator on all list fields.
     t.field schema.state.schema_elements.count, "Int"
     t.field "started_at", "DateTime"
-    t.field "started_at_legacy", "DateTime", name_in_index: "started_at", graphql_only: true, legacy_grouping_schema: true
     t.field "won_games_at", "[DateTime!]!", singular: "won_game_at"
-    t.field "won_games_at_legacy", "[DateTime!]!", singular: "won_game_at_legacy", name_in_index: "won_games_at", graphql_only: true, legacy_grouping_schema: true
     t.field "was_shortened", "Boolean"
 
     t.field "players_nested", "[Player!]!" do |f|

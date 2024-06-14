@@ -1829,36 +1829,6 @@ type DateGroupedBy @shareable {
 }
 
 """
-Enumerates the supported granularities of a `Date`.
-"""
-enum DateGroupingGranularityInput {
-  """
-  The exact day of a `Date`.
-  """
-  DAY
-
-  """
-  The month a `Date` falls in.
-  """
-  MONTH
-
-  """
-  The quarter a `Date` falls in.
-  """
-  QUARTER
-
-  """
-  The week, beginning on Monday, a `Date` falls in.
-  """
-  WEEK
-
-  """
-  The year a `Date` falls in.
-  """
-  YEAR
-}
-
-"""
 Input type offered when grouping on `Date` fields, representing the amount of offset
 (positive or negative) to shift the `Date` boundaries of each grouping bucket.
 
@@ -2236,51 +2206,6 @@ type DateTimeGroupedBy @shareable {
     """
     truncation_unit: LocalTimeGroupingTruncationUnitInput!
   ): LocalTime
-}
-
-"""
-Enumerates the supported granularities of a `DateTime`.
-"""
-enum DateTimeGroupingGranularityInput {
-  """
-  The day a `DateTime` falls in.
-  """
-  DAY
-
-  """
-  The hour a `DateTime` falls in.
-  """
-  HOUR
-
-  """
-  The minute a `DateTime` falls in.
-  """
-  MINUTE
-
-  """
-  The month a `DateTime` falls in.
-  """
-  MONTH
-
-  """
-  The quarter a `DateTime` falls in.
-  """
-  QUARTER
-
-  """
-  The second a `DateTime` falls in.
-  """
-  SECOND
-
-  """
-  The week, beginning on Monday, a `DateTime` falls in.
-  """
-  WEEK
-
-  """
-  The year a `DateTime` falls in.
-  """
-  YEAR
 }
 
 """
@@ -5465,16 +5390,6 @@ type NamedEntityAggregatedValues {
   created_at2: DateTimeAggregatedValues
 
   """
-  Computed aggregate values for the `created_at2_legacy` field.
-  """
-  created_at2_legacy: DateTimeAggregatedValues
-
-  """
-  Computed aggregate values for the `created_at_legacy` field.
-  """
-  created_at_legacy: DateTimeAggregatedValues
-
-  """
   Computed aggregate values for the `created_at_time_of_day` field.
   """
   created_at_time_of_day: LocalTimeAggregatedValues
@@ -5483,11 +5398,6 @@ type NamedEntityAggregatedValues {
   Computed aggregate values for the `created_on` field.
   """
   created_on: DateAggregatedValues
-
-  """
-  Computed aggregate values for the `created_on_legacy` field.
-  """
-  created_on_legacy: DateAggregatedValues
 
   """
   Computed aggregate values for the `fees` field.
@@ -5826,20 +5736,6 @@ input NamedEntityFilterInput {
   created_at2: DateTimeFilterInput
 
   """
-  Used to filter on the `created_at2_legacy` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  created_at2_legacy: DateTimeFilterInput
-
-  """
-  Used to filter on the `created_at_legacy` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  created_at_legacy: DateTimeFilterInput
-
-  """
   Used to filter on the `created_at_time_of_day` field.
 
   When `null` or an empty object is passed, matches all documents.
@@ -5852,13 +5748,6 @@ input NamedEntityFilterInput {
   When `null` or an empty object is passed, matches all documents.
   """
   created_on: DateFilterInput
-
-  """
-  Used to filter on the `created_on_legacy` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  created_on_legacy: DateFilterInput
 
   """
   Used to filter on the `fees` field.
@@ -6099,52 +5988,6 @@ type NamedEntityGroupedBy {
   created_at2: DateTimeGroupedBy
 
   """
-  The `created_at2_legacy` field value for this group.
-  """
-  created_at2_legacy(
-    """
-    Determines the grouping granularity for this field.
-    """
-    granularity: DateTimeGroupingGranularityInput!
-
-    """
-    Amount of offset (positive or negative) to shift the `DateTime` boundaries of each grouping bucket.
-
-    For example, when grouping by `WEEK`, you can shift by 24 hours to change
-    what day-of-week weeks are considered to start on.
-    """
-    offset: DateTimeGroupingOffsetInput
-
-    """
-    The time zone to use when determining which grouping a `DateTime` value falls in.
-    """
-    time_zone: TimeZone = "UTC"
-  ): DateTime
-
-  """
-  The `created_at_legacy` field value for this group.
-  """
-  created_at_legacy(
-    """
-    Determines the grouping granularity for this field.
-    """
-    granularity: DateTimeGroupingGranularityInput!
-
-    """
-    Amount of offset (positive or negative) to shift the `DateTime` boundaries of each grouping bucket.
-
-    For example, when grouping by `WEEK`, you can shift by 24 hours to change
-    what day-of-week weeks are considered to start on.
-    """
-    offset: DateTimeGroupingOffsetInput
-
-    """
-    The time zone to use when determining which grouping a `DateTime` value falls in.
-    """
-    time_zone: TimeZone = "UTC"
-  ): DateTime
-
-  """
   The `created_at_time_of_day` field value for this group.
   """
   created_at_time_of_day: LocalTime
@@ -6153,24 +5996,6 @@ type NamedEntityGroupedBy {
   Offers the different grouping options for the `created_on` value within this group.
   """
   created_on: DateGroupedBy
-
-  """
-  The `created_on_legacy` field value for this group.
-  """
-  created_on_legacy(
-    """
-    Determines the grouping granularity for this field.
-    """
-    granularity: DateGroupingGranularityInput!
-
-    """
-    Number of days (positive or negative) to shift the `Date` boundaries of each date grouping bucket.
-
-    For example, when grouping by `YEAR`, this can be used to align the buckets
-    with fiscal or school years instead of calendar years.
-    """
-    offset_days: Int
-  ): Date
 
   """
   The `fees` field value for this group.
@@ -6414,16 +6239,6 @@ enum NamedEntitySortOrderInput {
   created_at2_DESC
 
   """
-  Sorts ascending by the `created_at2_legacy` field.
-  """
-  created_at2_legacy_ASC
-
-  """
-  Sorts descending by the `created_at2_legacy` field.
-  """
-  created_at2_legacy_DESC
-
-  """
   Sorts ascending by the `created_at` field.
   """
   created_at_ASC
@@ -6432,16 +6247,6 @@ enum NamedEntitySortOrderInput {
   Sorts descending by the `created_at` field.
   """
   created_at_DESC
-
-  """
-  Sorts ascending by the `created_at_legacy` field.
-  """
-  created_at_legacy_ASC
-
-  """
-  Sorts descending by the `created_at_legacy` field.
-  """
-  created_at_legacy_DESC
 
   """
   Sorts ascending by the `created_at_time_of_day` field.
@@ -6462,16 +6267,6 @@ enum NamedEntitySortOrderInput {
   Sorts descending by the `created_on` field.
   """
   created_on_DESC
-
-  """
-  Sorts ascending by the `created_on_legacy` field.
-  """
-  created_on_legacy_ASC
-
-  """
-  Sorts descending by the `created_on_legacy` field.
-  """
-  created_on_legacy_DESC
 
   """
   Sorts ascending by the `id` field.
@@ -11230,9 +11025,7 @@ type TeamPlayerSubAggregationSubAggregations {
 
 type TeamRecord {
   first_win_on: Date
-  first_win_on_legacy: Date
   last_win_on: Date
-  last_win_on_legacy: Date
   losses: Int
   wins: Int
 }
@@ -11247,19 +11040,9 @@ type TeamRecordAggregatedValues {
   first_win_on: DateAggregatedValues
 
   """
-  Computed aggregate values for the `first_win_on_legacy` field.
-  """
-  first_win_on_legacy: DateAggregatedValues
-
-  """
   Computed aggregate values for the `last_win_on` field.
   """
   last_win_on: DateAggregatedValues
-
-  """
-  Computed aggregate values for the `last_win_on_legacy` field.
-  """
-  last_win_on_legacy: DateAggregatedValues
 
   """
   Computed aggregate values for the `losses` field.
@@ -11316,25 +11099,11 @@ input TeamRecordFieldsListFilterInput {
   first_win_on: DateListFilterInput
 
   """
-  Used to filter on the `first_win_on_legacy` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  first_win_on_legacy: DateListFilterInput
-
-  """
   Used to filter on the `last_win_on` field.
 
   When `null` or an empty object is passed, matches all documents.
   """
   last_win_on: DateListFilterInput
-
-  """
-  Used to filter on the `last_win_on_legacy` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  last_win_on_legacy: DateListFilterInput
 
   """
   Used to filter on the `losses` field.
@@ -11394,25 +11163,11 @@ input TeamRecordFilterInput {
   first_win_on: DateFilterInput
 
   """
-  Used to filter on the `first_win_on_legacy` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  first_win_on_legacy: DateFilterInput
-
-  """
   Used to filter on the `last_win_on` field.
 
   When `null` or an empty object is passed, matches all documents.
   """
   last_win_on: DateFilterInput
-
-  """
-  Used to filter on the `last_win_on_legacy` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  last_win_on_legacy: DateFilterInput
 
   """
   Used to filter on the `losses` field.
@@ -11447,45 +11202,9 @@ type TeamRecordGroupedBy {
   first_win_on: DateGroupedBy
 
   """
-  The `first_win_on_legacy` field value for this group.
-  """
-  first_win_on_legacy(
-    """
-    Determines the grouping granularity for this field.
-    """
-    granularity: DateGroupingGranularityInput!
-
-    """
-    Number of days (positive or negative) to shift the `Date` boundaries of each date grouping bucket.
-
-    For example, when grouping by `YEAR`, this can be used to align the buckets
-    with fiscal or school years instead of calendar years.
-    """
-    offset_days: Int
-  ): Date
-
-  """
   Offers the different grouping options for the `last_win_on` value within this group.
   """
   last_win_on: DateGroupedBy
-
-  """
-  The `last_win_on_legacy` field value for this group.
-  """
-  last_win_on_legacy(
-    """
-    Determines the grouping granularity for this field.
-    """
-    granularity: DateGroupingGranularityInput!
-
-    """
-    Number of days (positive or negative) to shift the `Date` boundaries of each date grouping bucket.
-
-    For example, when grouping by `YEAR`, this can be used to align the buckets
-    with fiscal or school years instead of calendar years.
-    """
-    offset_days: Int
-  ): Date
 
   """
   The `losses` field value for this group.
@@ -11505,10 +11224,8 @@ type TeamSeason {
   players_object: [Player!]!
   record: TeamRecord
   started_at: DateTime
-  started_at_legacy: DateTime
   was_shortened: Boolean
   won_games_at: [DateTime!]!
-  won_games_at_legacy: [DateTime!]!
   year: Int
 }
 
@@ -11542,11 +11259,6 @@ type TeamSeasonAggregatedValues {
   started_at: DateTimeAggregatedValues
 
   """
-  Computed aggregate values for the `started_at_legacy` field.
-  """
-  started_at_legacy: DateTimeAggregatedValues
-
-  """
   Computed aggregate values for the `was_shortened` field.
   """
   was_shortened: NonNumericAggregatedValues
@@ -11555,11 +11267,6 @@ type TeamSeasonAggregatedValues {
   Computed aggregate values for the `won_games_at` field.
   """
   won_games_at: DateTimeAggregatedValues
-
-  """
-  Computed aggregate values for the `won_games_at_legacy` field.
-  """
-  won_games_at_legacy: DateTimeAggregatedValues
 
   """
   Computed aggregate values for the `year` field.
@@ -11647,13 +11354,6 @@ input TeamSeasonFieldsListFilterInput {
   started_at: DateTimeListFilterInput
 
   """
-  Used to filter on the `started_at_legacy` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  started_at_legacy: DateTimeListFilterInput
-
-  """
   Used to filter on the `was_shortened` field.
 
   When `null` or an empty object is passed, matches all documents.
@@ -11666,13 +11366,6 @@ input TeamSeasonFieldsListFilterInput {
   When `null` or an empty object is passed, matches all documents.
   """
   won_games_at: DateTimeListFilterInput
-
-  """
-  Used to filter on the `won_games_at_legacy` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  won_games_at_legacy: DateTimeListFilterInput
 
   """
   Used to filter on the `year` field.
@@ -11760,13 +11453,6 @@ input TeamSeasonFilterInput {
   started_at: DateTimeFilterInput
 
   """
-  Used to filter on the `started_at_legacy` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  started_at_legacy: DateTimeFilterInput
-
-  """
   Used to filter on the `was_shortened` field.
 
   When `null` or an empty object is passed, matches all documents.
@@ -11779,13 +11465,6 @@ input TeamSeasonFilterInput {
   When `null` or an empty object is passed, matches all documents.
   """
   won_games_at: DateTimeListFilterInput
-
-  """
-  Used to filter on the `won_games_at_legacy` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  won_games_at_legacy: DateTimeListFilterInput
 
   """
   Used to filter on the `year` field.
@@ -11838,29 +11517,6 @@ type TeamSeasonGroupedBy {
   started_at: DateTimeGroupedBy
 
   """
-  The `started_at_legacy` field value for this group.
-  """
-  started_at_legacy(
-    """
-    Determines the grouping granularity for this field.
-    """
-    granularity: DateTimeGroupingGranularityInput!
-
-    """
-    Amount of offset (positive or negative) to shift the `DateTime` boundaries of each grouping bucket.
-
-    For example, when grouping by `WEEK`, you can shift by 24 hours to change
-    what day-of-week weeks are considered to start on.
-    """
-    offset: DateTimeGroupingOffsetInput
-
-    """
-    The time zone to use when determining which grouping a `DateTime` value falls in.
-    """
-    time_zone: TimeZone = "UTC"
-  ): DateTime
-
-  """
   The `was_shortened` field value for this group.
   """
   was_shortened: Boolean
@@ -11875,36 +11531,6 @@ type TeamSeasonGroupedBy {
   once.
   """
   won_game_at: DateTimeGroupedBy
-
-  """
-  The individual value from `won_games_at_legacy` for this group.
-
-  Note: `won_games_at_legacy` is a collection field, but selecting this field
-  will group on individual values of `won_games_at_legacy`.
-  That means that a document may be grouped into multiple aggregation groupings (i.e. when its `won_games_at_legacy`
-  field has multiple values) leading to some data duplication in the response. However, if a value shows
-  up in `won_games_at_legacy` multiple times for a single document, that document will only be included in the group
-  once.
-  """
-  won_game_at_legacy(
-    """
-    Determines the grouping granularity for this field.
-    """
-    granularity: DateTimeGroupingGranularityInput!
-
-    """
-    Amount of offset (positive or negative) to shift the `DateTime` boundaries of each grouping bucket.
-
-    For example, when grouping by `WEEK`, you can shift by 24 hours to change
-    what day-of-week weeks are considered to start on.
-    """
-    offset: DateTimeGroupingOffsetInput
-
-    """
-    The time zone to use when determining which grouping a `DateTime` value falls in.
-    """
-    time_zone: TimeZone = "UTC"
-  ): DateTime
 
   """
   The `year` field value for this group.
@@ -12650,11 +12276,8 @@ type Widget implements NamedEntity @key(fields: "id") {
   cost_currency_unit: String
   created_at: DateTime!
   created_at2: DateTime!
-  created_at2_legacy: DateTime!
-  created_at_legacy: DateTime!
   created_at_time_of_day: LocalTime
   created_on: Date
-  created_on_legacy: Date
   fees: [Money!]!
   id: ID!
   inventor: Inventor
@@ -12735,16 +12358,6 @@ type WidgetAggregatedValues {
   created_at2: DateTimeAggregatedValues
 
   """
-  Computed aggregate values for the `created_at2_legacy` field.
-  """
-  created_at2_legacy: DateTimeAggregatedValues
-
-  """
-  Computed aggregate values for the `created_at_legacy` field.
-  """
-  created_at_legacy: DateTimeAggregatedValues
-
-  """
   Computed aggregate values for the `created_at_time_of_day` field.
   """
   created_at_time_of_day: LocalTimeAggregatedValues
@@ -12753,11 +12366,6 @@ type WidgetAggregatedValues {
   Computed aggregate values for the `created_on` field.
   """
   created_on: DateAggregatedValues
-
-  """
-  Computed aggregate values for the `created_on_legacy` field.
-  """
-  created_on_legacy: DateAggregatedValues
 
   """
   Computed aggregate values for the `fees` field.
@@ -13593,20 +13201,6 @@ input WidgetFilterInput {
   created_at2: DateTimeFilterInput
 
   """
-  Used to filter on the `created_at2_legacy` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  created_at2_legacy: DateTimeFilterInput
-
-  """
-  Used to filter on the `created_at_legacy` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  created_at_legacy: DateTimeFilterInput
-
-  """
   Used to filter on the `created_at_time_of_day` field.
 
   When `null` or an empty object is passed, matches all documents.
@@ -13619,13 +13213,6 @@ input WidgetFilterInput {
   When `null` or an empty object is passed, matches all documents.
   """
   created_on: DateFilterInput
-
-  """
-  Used to filter on the `created_on_legacy` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  created_on_legacy: DateFilterInput
 
   """
   Used to filter on the `fees` field.
@@ -13810,52 +13397,6 @@ type WidgetGroupedBy {
   created_at2: DateTimeGroupedBy
 
   """
-  The `created_at2_legacy` field value for this group.
-  """
-  created_at2_legacy(
-    """
-    Determines the grouping granularity for this field.
-    """
-    granularity: DateTimeGroupingGranularityInput!
-
-    """
-    Amount of offset (positive or negative) to shift the `DateTime` boundaries of each grouping bucket.
-
-    For example, when grouping by `WEEK`, you can shift by 24 hours to change
-    what day-of-week weeks are considered to start on.
-    """
-    offset: DateTimeGroupingOffsetInput
-
-    """
-    The time zone to use when determining which grouping a `DateTime` value falls in.
-    """
-    time_zone: TimeZone = "UTC"
-  ): DateTime
-
-  """
-  The `created_at_legacy` field value for this group.
-  """
-  created_at_legacy(
-    """
-    Determines the grouping granularity for this field.
-    """
-    granularity: DateTimeGroupingGranularityInput!
-
-    """
-    Amount of offset (positive or negative) to shift the `DateTime` boundaries of each grouping bucket.
-
-    For example, when grouping by `WEEK`, you can shift by 24 hours to change
-    what day-of-week weeks are considered to start on.
-    """
-    offset: DateTimeGroupingOffsetInput
-
-    """
-    The time zone to use when determining which grouping a `DateTime` value falls in.
-    """
-    time_zone: TimeZone = "UTC"
-  ): DateTime
-
-  """
   The `created_at_time_of_day` field value for this group.
   """
   created_at_time_of_day: LocalTime
@@ -13864,24 +13405,6 @@ type WidgetGroupedBy {
   Offers the different grouping options for the `created_on` value within this group.
   """
   created_on: DateGroupedBy
-
-  """
-  The `created_on_legacy` field value for this group.
-  """
-  created_on_legacy(
-    """
-    Determines the grouping granularity for this field.
-    """
-    granularity: DateGroupingGranularityInput!
-
-    """
-    Number of days (positive or negative) to shift the `Date` boundaries of each date grouping bucket.
-
-    For example, when grouping by `YEAR`, this can be used to align the buckets
-    with fiscal or school years instead of calendar years.
-    """
-    offset_days: Int
-  ): Date
 
   """
   The `fees` field value for this group.
@@ -14238,16 +13761,6 @@ type WidgetOrAddressAggregatedValues {
   created_at2: DateTimeAggregatedValues
 
   """
-  Computed aggregate values for the `created_at2_legacy` field.
-  """
-  created_at2_legacy: DateTimeAggregatedValues
-
-  """
-  Computed aggregate values for the `created_at_legacy` field.
-  """
-  created_at_legacy: DateTimeAggregatedValues
-
-  """
   Computed aggregate values for the `created_at_time_of_day` field.
   """
   created_at_time_of_day: LocalTimeAggregatedValues
@@ -14256,11 +13769,6 @@ type WidgetOrAddressAggregatedValues {
   Computed aggregate values for the `created_on` field.
   """
   created_on: DateAggregatedValues
-
-  """
-  Computed aggregate values for the `created_on_legacy` field.
-  """
-  created_on_legacy: DateAggregatedValues
 
   """
   Computed aggregate values for the `fees` field.
@@ -14579,20 +14087,6 @@ input WidgetOrAddressFilterInput {
   created_at2: DateTimeFilterInput
 
   """
-  Used to filter on the `created_at2_legacy` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  created_at2_legacy: DateTimeFilterInput
-
-  """
-  Used to filter on the `created_at_legacy` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  created_at_legacy: DateTimeFilterInput
-
-  """
   Used to filter on the `created_at_time_of_day` field.
 
   When `null` or an empty object is passed, matches all documents.
@@ -14605,13 +14099,6 @@ input WidgetOrAddressFilterInput {
   When `null` or an empty object is passed, matches all documents.
   """
   created_on: DateFilterInput
-
-  """
-  Used to filter on the `created_on_legacy` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  created_on_legacy: DateFilterInput
 
   """
   Used to filter on the `fees` field.
@@ -14817,52 +14304,6 @@ type WidgetOrAddressGroupedBy {
   created_at2: DateTimeGroupedBy
 
   """
-  The `created_at2_legacy` field value for this group.
-  """
-  created_at2_legacy(
-    """
-    Determines the grouping granularity for this field.
-    """
-    granularity: DateTimeGroupingGranularityInput!
-
-    """
-    Amount of offset (positive or negative) to shift the `DateTime` boundaries of each grouping bucket.
-
-    For example, when grouping by `WEEK`, you can shift by 24 hours to change
-    what day-of-week weeks are considered to start on.
-    """
-    offset: DateTimeGroupingOffsetInput
-
-    """
-    The time zone to use when determining which grouping a `DateTime` value falls in.
-    """
-    time_zone: TimeZone = "UTC"
-  ): DateTime
-
-  """
-  The `created_at_legacy` field value for this group.
-  """
-  created_at_legacy(
-    """
-    Determines the grouping granularity for this field.
-    """
-    granularity: DateTimeGroupingGranularityInput!
-
-    """
-    Amount of offset (positive or negative) to shift the `DateTime` boundaries of each grouping bucket.
-
-    For example, when grouping by `WEEK`, you can shift by 24 hours to change
-    what day-of-week weeks are considered to start on.
-    """
-    offset: DateTimeGroupingOffsetInput
-
-    """
-    The time zone to use when determining which grouping a `DateTime` value falls in.
-    """
-    time_zone: TimeZone = "UTC"
-  ): DateTime
-
-  """
   The `created_at_time_of_day` field value for this group.
   """
   created_at_time_of_day: LocalTime
@@ -14871,24 +14312,6 @@ type WidgetOrAddressGroupedBy {
   Offers the different grouping options for the `created_on` value within this group.
   """
   created_on: DateGroupedBy
-
-  """
-  The `created_on_legacy` field value for this group.
-  """
-  created_on_legacy(
-    """
-    Determines the grouping granularity for this field.
-    """
-    granularity: DateGroupingGranularityInput!
-
-    """
-    Number of days (positive or negative) to shift the `Date` boundaries of each date grouping bucket.
-
-    For example, when grouping by `YEAR`, this can be used to align the buckets
-    with fiscal or school years instead of calendar years.
-    """
-    offset_days: Int
-  ): Date
 
   """
   The `fees` field value for this group.
@@ -15107,16 +14530,6 @@ enum WidgetOrAddressSortOrderInput {
   created_at2_DESC
 
   """
-  Sorts ascending by the `created_at2_legacy` field.
-  """
-  created_at2_legacy_ASC
-
-  """
-  Sorts descending by the `created_at2_legacy` field.
-  """
-  created_at2_legacy_DESC
-
-  """
   Sorts ascending by the `created_at` field.
   """
   created_at_ASC
@@ -15125,16 +14538,6 @@ enum WidgetOrAddressSortOrderInput {
   Sorts descending by the `created_at` field.
   """
   created_at_DESC
-
-  """
-  Sorts ascending by the `created_at_legacy` field.
-  """
-  created_at_legacy_ASC
-
-  """
-  Sorts descending by the `created_at_legacy` field.
-  """
-  created_at_legacy_DESC
 
   """
   Sorts ascending by the `created_at_time_of_day` field.
@@ -15155,16 +14558,6 @@ enum WidgetOrAddressSortOrderInput {
   Sorts descending by the `created_on` field.
   """
   created_on_DESC
-
-  """
-  Sorts ascending by the `created_on_legacy` field.
-  """
-  created_on_legacy_ASC
-
-  """
-  Sorts descending by the `created_on_legacy` field.
-  """
-  created_on_legacy_DESC
 
   """
   Sorts ascending by the `full_address` field.
@@ -15492,16 +14885,6 @@ enum WidgetSortOrderInput {
   created_at2_DESC
 
   """
-  Sorts ascending by the `created_at2_legacy` field.
-  """
-  created_at2_legacy_ASC
-
-  """
-  Sorts descending by the `created_at2_legacy` field.
-  """
-  created_at2_legacy_DESC
-
-  """
   Sorts ascending by the `created_at` field.
   """
   created_at_ASC
@@ -15510,16 +14893,6 @@ enum WidgetSortOrderInput {
   Sorts descending by the `created_at` field.
   """
   created_at_DESC
-
-  """
-  Sorts ascending by the `created_at_legacy` field.
-  """
-  created_at_legacy_ASC
-
-  """
-  Sorts descending by the `created_at_legacy` field.
-  """
-  created_at_legacy_DESC
 
   """
   Sorts ascending by the `created_at_time_of_day` field.
@@ -15540,16 +14913,6 @@ enum WidgetSortOrderInput {
   Sorts descending by the `created_on` field.
   """
   created_on_DESC
-
-  """
-  Sorts ascending by the `created_on_legacy` field.
-  """
-  created_on_legacy_ASC
-
-  """
-  Sorts descending by the `created_on_legacy` field.
-  """
-  created_on_legacy_DESC
 
   """
   Sorts ascending by the `id` field.

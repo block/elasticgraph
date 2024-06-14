@@ -515,55 +515,6 @@ module ElasticGraph
               ])])
             end
 
-            it "builds legacy date time `groupings` at any level of sub-aggregation when `groupedBy` is present in the query at that level" do
-              aggregations = aggregations_from_datastore_query("Query", :team_aggregations, <<~QUERY)
-                query {
-                  team_aggregations {
-                    #{before_nodes}
-                      sub_aggregations {
-                        seasons_nested {
-                          nodes {
-                            grouped_by {
-                              year
-                              note
-                              started_at_legacy(granularity: YEAR)
-                            }
-
-                            sub_aggregations {
-                              players_nested {
-                                nodes {
-                                  grouped_by {
-                                    name
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    #{after_nodes}
-                  }
-                }
-              QUERY
-
-              expect(aggregations).to eq([aggregation_query_of(name: "team_aggregations", sub_aggregations: [
-                nested_sub_aggregation_of(path_in_index: ["seasons_nested"], query: sub_aggregation_query_of(
-                  name: "seasons_nested",
-                  groupings: [
-                    field_term_grouping_of("seasons_nested", "year"),
-                    field_term_grouping_of("seasons_nested", "notes", field_names_in_graphql_query: ["seasons_nested", "note"]),
-                    date_histogram_grouping_of("seasons_nested", "started_at", "year", field_names_in_graphql_query: ["seasons_nested", "started_at_legacy"])
-                  ],
-                  sub_aggregations: [
-                    nested_sub_aggregation_of(path_in_index: ["seasons_nested", "players_nested"], query: sub_aggregation_query_of(
-                      name: "players_nested",
-                      groupings: [field_term_grouping_of("seasons_nested", "players_nested", "name")]
-                    ))
-                  ]
-                ))
-              ])])
-            end
-
             it "does not support multiple aliases on `nodes` or `grouped_by` because if different `grouped_by` fields are selected we can have conflicting grouping requirements" do
               error = single_graphql_error_for(<<~QUERY)
                 query {
@@ -771,148 +722,7 @@ module ElasticGraph
             end
           end
 
-          context "aggregations with `legacy_grouping_schema`" do
-            before(:context) do
-              self.schema_artifacts = generate_schema_artifacts { |schema| define_schema(schema, legacy_grouping_schema: true) }
-            end
-            it "can build an aggregations object with multiple groupings and computations" do
-              aggregations = aggregations_from_datastore_query("Query", :widget_aggregations, <<~QUERY)
-                query {
-                  widget_aggregations {
-                    #{before_nodes}
-                      grouped_by {
-                        size
-                        color
-                        created_at(granularity: DAY)
-                      }
-
-                      aggregated_values {
-                        amount_cents {
-                          approximate_avg
-                          exact_max
-                        }
-                      }
-                    #{after_nodes}
-                  }
-                }
-              QUERY
-
-              expect(aggregations).to eq([aggregation_query_of(
-                name: "widget_aggregations",
-                computations: [
-                  computation_of("amount_cents", :avg, computed_field_name: "approximate_avg"),
-                  computation_of("amount_cents", :max, computed_field_name: "exact_max")
-                ],
-                groupings: [
-                  field_term_grouping_of("size"),
-                  field_term_grouping_of("color"),
-                  date_histogram_grouping_of("created_at", "day")
-                ]
-              )])
-            end
-
-            it "respects the `time_zone` option" do
-              aggregations = aggregations_from_datastore_query("Query", :widget_aggregations, <<~QUERY)
-                query {
-                  widget_aggregations {
-                    #{before_nodes}
-                      grouped_by {
-                        created_at(granularity: DAY, time_zone: "America/Los_Angeles")
-                      }
-
-                      count
-                    #{after_nodes}
-                  }
-                }
-              QUERY
-
-              expect(aggregations).to eq([aggregation_query_of(
-                name: "widget_aggregations",
-                computations: [],
-                needs_doc_count: true,
-                groupings: [
-                  date_histogram_grouping_of("created_at", "day", time_zone: "America/Los_Angeles")
-                ]
-              )])
-            end
-
-            it "respects the `offset` option" do
-              aggregations = aggregations_from_datastore_query("Query", :widget_aggregations, <<~QUERY)
-                query {
-                  widget_aggregations {
-                    #{before_nodes}
-                      grouped_by {
-                        created_at(granularity: DAY, offset: {amount: -12, unit: HOUR})
-                      }
-
-                      count
-                    #{after_nodes}
-                  }
-                }
-              QUERY
-
-              expect(aggregations).to eq([aggregation_query_of(
-                name: "widget_aggregations",
-                computations: [],
-                needs_doc_count: true,
-                groupings: [
-                  date_histogram_grouping_of("created_at", "day", time_zone: "UTC", offset: "-12h")
-                ]
-              )])
-            end
-
-            it "supports `Date` field groupings, allowing them to have no `time_zone` argument" do
-              aggregations = aggregations_from_datastore_query("Query", :widget_aggregations, <<~QUERY)
-                query {
-                  widget_aggregations {
-                    #{before_nodes}
-                      grouped_by {
-                        created_on(granularity: MONTH)
-                      }
-
-                      count
-                    #{after_nodes}
-                  }
-                }
-              QUERY
-
-              expect(aggregations).to eq([aggregation_query_of(
-                name: "widget_aggregations",
-                computations: [],
-                needs_doc_count: true,
-                groupings: [
-                  date_histogram_grouping_of("created_on", "month", time_zone: nil)
-                ]
-              )])
-            end
-
-            it "supports `offsetDays` on `Date` field groupings" do
-              aggregations = aggregations_from_datastore_query("Query", :widget_aggregations, <<~QUERY)
-                query {
-                  widget_aggregations {
-                    #{before_nodes}
-                      grouped_by {
-                        created_on(granularity: MONTH, offset_days: -12)
-                      }
-
-                      count
-                    #{after_nodes}
-                  }
-                }
-              QUERY
-
-              expect(aggregations).to eq([aggregation_query_of(
-                name: "widget_aggregations",
-                computations: [],
-                needs_doc_count: true,
-                groupings: [
-                  date_histogram_grouping_of("created_on", "month", time_zone: nil, offset: "-12d")
-                ]
-              )])
-            end
-          end
-
-          context "aggregations without `legacy_grouping_schema`" do
+          context "aggregations" do
             it "can build an aggregations object with multiple groupings and computations" do
               aggregations = aggregations_from_datastore_query("Query", :widget_aggregations, <<~QUERY)
                 query {
@@ -2140,7 +1950,7 @@ module ElasticGraph
           errors.first
         end
 
-        def define_schema(schema, amount_cents_opts: {}, cost_opts: {}, legacy_grouping_schema: false)
+        def define_schema(schema, amount_cents_opts: {}, cost_opts: {})
           schema.object_type "Money" do |t|
             t.field "currency", "String!"
             t.field "amount_cents", "Int!"
@@ -2150,8 +1960,8 @@ module ElasticGraph
           schema.object_type "Widget" do |t|
             t.field "id", "ID"
             t.field "name", "String"
-            t.field "created_at", "DateTime", legacy_grouping_schema: legacy_grouping_schema
-            t.field "created_on", "Date", legacy_grouping_schema: legacy_grouping_schema
+            t.field "created_at", "DateTime"
+            t.field "created_on", "Date"
             t.field "size", "String"
             t.field "color", "String"
             t.field "amount_cents", "Int", **amount_cents_opts

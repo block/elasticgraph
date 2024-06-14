@@ -275,58 +275,6 @@ module ElasticGraph
           team_seasons_nodes = aggregate_season_counts_grouped_by("record { wins, last_win_on { as_date(truncation_unit: MONTH) }, first_win_on { as_date(truncation_unit: MONTH) }}", first: 0)
           expect(team_seasons_nodes).to eq []
 
-          # LEGACY Group on some date fields (with no term grouping).
-          team_seasons_nodes = aggregate_season_counts_grouped_by("record { last_win_on_legacy(granularity: MONTH), first_win_on_legacy(granularity: MONTH) }")
-          expect(indexed_counts_from(team_seasons_nodes)).to eq({
-            {"record" => {case_correctly("first_win_on_legacy") => "2019-04-01", case_correctly("last_win_on_legacy") => "2019-07-01"}} => count_detail_of(1),
-            {"record" => {case_correctly("first_win_on_legacy") => "2020-03-01", case_correctly("last_win_on_legacy") => "2020-11-01"}} => count_detail_of(1),
-            {"record" => {case_correctly("first_win_on_legacy") => "2020-05-01", case_correctly("last_win_on_legacy") => "2020-12-01"}} => count_detail_of(1),
-            {"record" => {case_correctly("first_win_on_legacy") => "2022-06-01", case_correctly("last_win_on_legacy") => "2022-08-01"}} => count_detail_of(1),
-            {"record" => {case_correctly("first_win_on_legacy") => "2023-01-01", case_correctly("last_win_on_legacy") => nil}} => count_detail_of(1),
-            {"record" => {case_correctly("first_win_on_legacy") => nil, case_correctly("last_win_on_legacy") => "2021-12-01"}} => count_detail_of(1)
-          })
-
-          # Group on sub-fields of an object, some date fields, and some fields with alternate `name_in_index`.
-          team_seasons_nodes = aggregate_season_counts_grouped_by("record { wins, last_win_on_legacy(granularity: MONTH), first_win_on_legacy(granularity: MONTH) }")
-          expect(indexed_counts_from(team_seasons_nodes)).to eq({
-            {"record" => {case_correctly("first_win_on_legacy") => "2019-04-01", case_correctly("last_win_on_legacy") => "2019-07-01", "wins" => 40}} => count_detail_of(1),
-            {"record" => {case_correctly("first_win_on_legacy") => "2020-03-01", case_correctly("last_win_on_legacy") => "2020-11-01", "wins" => 50}} => count_detail_of(1),
-            {"record" => {case_correctly("first_win_on_legacy") => "2020-05-01", case_correctly("last_win_on_legacy") => "2020-12-01", "wins" => 30}} => count_detail_of(1),
-            {"record" => {case_correctly("first_win_on_legacy") => "2022-06-01", case_correctly("last_win_on_legacy") => "2022-08-01", "wins" => 40}} => count_detail_of(1),
-            {"record" => {case_correctly("first_win_on_legacy") => "2023-01-01", case_correctly("last_win_on_legacy") => nil, "wins" => 50}} => count_detail_of(1),
-            {"record" => {case_correctly("first_win_on_legacy") => nil, case_correctly("last_win_on_legacy") => "2021-12-01", "wins" => nil}} => count_detail_of(1)
-          })
-
-          # Test using groupings on sibling and deeply nested sub-aggs.
-          verify_aggregate_sibling_and_deeply_nested_grouped_counts_and_aggregated_values
-
-          # Test `first: positive-value` arg on a grouped sub-aggregation (single term)
-          team_seasons_nodes = aggregate_season_counts_grouped_by("year", first: 2, seasons_has_next_page: true)
-          expect(indexed_counts_from(team_seasons_nodes)).to eq({
-            {"year" => 2020} => count_detail_of(2),
-            {"year" => 2019} => count_detail_of(1)
-          })
-
-          # Test `first: positive-value` arg on a grouped sub-aggregation (multiple terms)
-          team_seasons_nodes = aggregate_season_counts_grouped_by("year", "note", first: 2, seasons_has_next_page: true)
-          expect(indexed_counts_from(team_seasons_nodes)).to eq(first_two_counts_grouped_by_year_and_note)
-
-          # Test `first: positive-value` arg on a grouped sub-aggregation (single term + multiple date fields)
-          team_seasons_nodes = aggregate_season_counts_grouped_by("record { wins, last_win_on_legacy(granularity: MONTH), first_win_on_legacy(granularity: MONTH) }", first: 2, seasons_has_next_page: true)
-          expect(indexed_counts_from(team_seasons_nodes)).to eq(legacy_first_two_counts_grouped_by_wins_last_win_on_month_first_win_on_month)
-
-          # Test `first: 0` arg on a grouped sub-aggregation (single term)
-          team_seasons_nodes = aggregate_season_counts_grouped_by("year", first: 0)
-          expect(team_seasons_nodes).to eq []
-
-          # Test `first: 0` arg on a grouped sub-aggregation (multiple terms)
-          team_seasons_nodes = aggregate_season_counts_grouped_by("year", "note", first: 0)
-          expect(team_seasons_nodes).to eq []
-
-          # Test `first: 0` arg on a grouped sub-aggregation (single term + multiple date fields)
-          team_seasons_nodes = aggregate_season_counts_grouped_by("record { wins, last_win_on_legacy(granularity: MONTH), first_win_on_legacy(granularity: MONTH) }", first: 0)
-          expect(team_seasons_nodes).to eq []
-
           # Verify date/time aggregations
           # DateTime:as_date_time()
           team_seasons_nodes = aggregate_season_counts_grouped_by("started_at {as_date_time(truncation_unit: DAY)}")
@@ -468,12 +416,6 @@ module ElasticGraph
             {"record" => {case_correctly("first_win_on") => {case_correctly("as_date") => "2020-05-01"}, case_correctly("last_win_on") => {case_correctly("as_date") => "2020-12-01"}, "wins" => 30}} => count_detail_of(1)
           }
         end
-        let(:legacy_first_two_counts_grouped_by_wins_last_win_on_month_first_win_on_month) do
-          {
-            {"record" => {case_correctly("first_win_on_legacy") => nil, case_correctly("last_win_on_legacy") => "2021-12-01", "wins" => nil}} => count_detail_of(1),
-            {"record" => {case_correctly("first_win_on_legacy") => "2020-05-01", case_correctly("last_win_on_legacy") => "2020-12-01", "wins" => 30}} => count_detail_of(1)
-          }
-        end
       end
 
       context "when sub-aggregations use the `NonCompositeGroupingAdapter`" do
@@ -498,12 +440,6 @@ module ElasticGraph
           {
             {"record" => {case_correctly("first_win_on") => {case_correctly("as_date") => "2019-04-01"}, case_correctly("last_win_on") => {case_correctly("as_date") => "2019-07-01"}, "wins" => 40}} => count_detail_of(1),
             {"record" => {case_correctly("first_win_on") => {case_correctly("as_date") => "2020-03-01"}, case_correctly("last_win_on") => {case_correctly("as_date") => "2020-11-01"}, "wins" => 50}} => count_detail_of(1)
-          }
-        end
-        let(:legacy_first_two_counts_grouped_by_wins_last_win_on_month_first_win_on_month) do
-          {
-            {"record" => {case_correctly("first_win_on_legacy") => "2019-04-01", case_correctly("last_win_on_legacy") => "2019-07-01", "wins" => 40}} => count_detail_of(1),
-            {"record" => {case_correctly("first_win_on_legacy") => "2020-03-01", case_correctly("last_win_on_legacy") => "2020-11-01", "wins" => 50}} => count_detail_of(1)
           }
         end
       end

@@ -42,12 +42,10 @@ module ElasticGraph
           CursorListFilterInput
           DateAggregatedValues
           DateGroupedBy
-          DateGroupingGranularityListFilterInput
           DateGroupingTruncationUnitListFilterInput
           DateListFilterInput
           DateTimeAggregatedValues
           DateTimeGroupedBy
-          DateTimeGroupingGranularityListFilterInput
           DateTimeGroupingTruncationUnitListFilterInput
           DateTimeListFilterInput
           DateTimeUnitListFilterInput

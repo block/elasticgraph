@@ -102,18 +102,6 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: widget_workspace_id3
-  DateGroupingGranularityInput:
-    values_by_name:
-      DAY:
-        datastore_value: day
-      MONTH:
-        datastore_value: month
-      QUARTER:
-        datastore_value: quarter
-      WEEK:
-        datastore_value: week
-      YEAR:
-        datastore_value: year
   DateGroupingTruncationUnitInput:
     values_by_name:
       DAY:
@@ -122,24 +110,6 @@ enum_types_by_name:
         datastore_value: month
       QUARTER:
         datastore_value: quarter
-      WEEK:
-        datastore_value: week
-      YEAR:
-        datastore_value: year
-  DateTimeGroupingGranularityInput:
-    values_by_name:
-      DAY:
-        datastore_value: day
-      HOUR:
-        datastore_value: hour
-      MINUTE:
-        datastore_value: minute
-      MONTH:
-        datastore_value: month
-      QUARTER:
-        datastore_value: quarter
-      SECOND:
-        datastore_value: second
       WEEK:
         datastore_value: week
       YEAR:
@@ -412,27 +382,11 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: created_at
-      created_at2_legacy_ASC:
-        sort_field:
-          direction: asc
-          field_path: created_at
-      created_at2_legacy_DESC:
-        sort_field:
-          direction: desc
-          field_path: created_at
       created_at_ASC:
         sort_field:
           direction: asc
           field_path: created_at
       created_at_DESC:
-        sort_field:
-          direction: desc
-          field_path: created_at
-      created_at_legacy_ASC:
-        sort_field:
-          direction: asc
-          field_path: created_at
-      created_at_legacy_DESC:
         sort_field:
           direction: desc
           field_path: created_at
@@ -449,14 +403,6 @@ enum_types_by_name:
           direction: asc
           field_path: created_on
       created_on_DESC:
-        sort_field:
-          direction: desc
-          field_path: created_on
-      created_on_legacy_ASC:
-        sort_field:
-          direction: asc
-          field_path: created_on
-      created_on_legacy_DESC:
         sort_field:
           direction: desc
           field_path: created_on
@@ -950,27 +896,11 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: created_at
-      created_at2_legacy_ASC:
-        sort_field:
-          direction: asc
-          field_path: created_at
-      created_at2_legacy_DESC:
-        sort_field:
-          direction: desc
-          field_path: created_at
       created_at_ASC:
         sort_field:
           direction: asc
           field_path: created_at
       created_at_DESC:
-        sort_field:
-          direction: desc
-          field_path: created_at
-      created_at_legacy_ASC:
-        sort_field:
-          direction: asc
-          field_path: created_at
-      created_at_legacy_DESC:
         sort_field:
           direction: desc
           field_path: created_at
@@ -987,14 +917,6 @@ enum_types_by_name:
           direction: asc
           field_path: created_on
       created_on_DESC:
-        sort_field:
-          direction: desc
-          field_path: created_on
-      created_on_legacy_ASC:
-        sort_field:
-          direction: asc
-          field_path: created_on
-      created_on_legacy_DESC:
         sort_field:
           direction: desc
           field_path: created_on
@@ -1256,27 +1178,11 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: created_at
-      created_at2_legacy_ASC:
-        sort_field:
-          direction: asc
-          field_path: created_at
-      created_at2_legacy_DESC:
-        sort_field:
-          direction: desc
-          field_path: created_at
       created_at_ASC:
         sort_field:
           direction: asc
           field_path: created_at
       created_at_DESC:
-        sort_field:
-          direction: desc
-          field_path: created_at
-      created_at_legacy_ASC:
-        sort_field:
-          direction: asc
-          field_path: created_at
-      created_at_legacy_DESC:
         sort_field:
           direction: desc
           field_path: created_at
@@ -1293,14 +1199,6 @@ enum_types_by_name:
           direction: asc
           field_path: created_on
       created_on_DESC:
-        sort_field:
-          direction: desc
-          field_path: created_on
-      created_on_legacy_ASC:
-        sort_field:
-          direction: asc
-          field_path: created_on
-      created_on_legacy_DESC:
         sort_field:
           direction: desc
           field_path: created_on
@@ -3725,18 +3623,9 @@ object_types_by_name:
       created_at2:
         name_in_index: created_at
         resolver: get_record_field_value
-      created_at2_legacy:
-        name_in_index: created_at
-        resolver: get_record_field_value
-      created_at_legacy:
-        name_in_index: created_at
-        resolver: get_record_field_value
       created_at_time_of_day:
         resolver: get_record_field_value
       created_on:
-        resolver: get_record_field_value
-      created_on_legacy:
-        name_in_index: created_on
         resolver: get_record_field_value
       dollar_widget:
         relation:
@@ -3873,18 +3762,9 @@ object_types_by_name:
       created_at2:
         name_in_index: created_at
         resolver: object_with_lookahead
-      created_at2_legacy:
-        name_in_index: created_at
-        resolver: object_with_lookahead
-      created_at_legacy:
-        name_in_index: created_at
-        resolver: object_with_lookahead
       created_at_time_of_day:
         resolver: object_with_lookahead
       created_on:
-        resolver: object_with_lookahead
-      created_on_legacy:
-        name_in_index: created_on
         resolver: object_with_lookahead
       fees:
         resolver: object_with_lookahead
@@ -3988,12 +3868,6 @@ object_types_by_name:
         name_in_index: amount_cents
       created_at2:
         name_in_index: created_at
-      created_at2_legacy:
-        name_in_index: created_at
-      created_at_legacy:
-        name_in_index: created_at
-      created_on_legacy:
-        name_in_index: created_on
       size:
         name_in_index: options.size
       the_options:
@@ -4026,18 +3900,9 @@ object_types_by_name:
       created_at2:
         name_in_index: created_at
         resolver: object_with_lookahead
-      created_at2_legacy:
-        name_in_index: created_at
-        resolver: object_with_lookahead
-      created_at_legacy:
-        name_in_index: created_at
-        resolver: object_with_lookahead
       created_at_time_of_day:
         resolver: object_with_lookahead
       created_on:
-        resolver: object_with_lookahead
-      created_on_legacy:
-        name_in_index: created_on
         resolver: object_with_lookahead
       fees:
         resolver: object_with_lookahead
@@ -4904,13 +4769,7 @@ object_types_by_name:
     graphql_fields_by_name:
       first_win_on:
         resolver: get_record_field_value
-      first_win_on_legacy:
-        name_in_index: first_win_on
-        resolver: get_record_field_value
       last_win_on:
-        name_in_index: last_win_date
-        resolver: get_record_field_value
-      last_win_on_legacy:
         name_in_index: last_win_date
         resolver: get_record_field_value
       losses:
@@ -4923,13 +4782,7 @@ object_types_by_name:
     graphql_fields_by_name:
       first_win_on:
         resolver: object_with_lookahead
-      first_win_on_legacy:
-        name_in_index: first_win_on
-        resolver: object_with_lookahead
       last_win_on:
-        name_in_index: last_win_date
-        resolver: object_with_lookahead
-      last_win_on_legacy:
         name_in_index: last_win_date
         resolver: object_with_lookahead
       losses:
@@ -4942,11 +4795,7 @@ object_types_by_name:
     graphql_fields_by_name:
       count:
         name_in_index: __counts
-      first_win_on_legacy:
-        name_in_index: first_win_on
       last_win_on:
-        name_in_index: last_win_date
-      last_win_on_legacy:
         name_in_index: last_win_date
       losses:
         name_in_index: loss_count
@@ -4954,11 +4803,7 @@ object_types_by_name:
         name_in_index: win_count
   TeamRecordFilterInput:
     graphql_fields_by_name:
-      first_win_on_legacy:
-        name_in_index: first_win_on
       last_win_on:
-        name_in_index: last_win_date
-      last_win_on_legacy:
         name_in_index: last_win_date
       losses:
         name_in_index: loss_count
@@ -4968,13 +4813,7 @@ object_types_by_name:
     graphql_fields_by_name:
       first_win_on:
         resolver: object_with_lookahead
-      first_win_on_legacy:
-        name_in_index: first_win_on
-        resolver: object_with_lookahead
       last_win_on:
-        name_in_index: last_win_date
-        resolver: object_with_lookahead
-      last_win_on_legacy:
         name_in_index: last_win_date
         resolver: object_with_lookahead
       losses:
@@ -4998,15 +4837,9 @@ object_types_by_name:
         resolver: get_record_field_value
       started_at:
         resolver: get_record_field_value
-      started_at_legacy:
-        name_in_index: started_at
-        resolver: get_record_field_value
       was_shortened:
         resolver: get_record_field_value
       won_games_at:
-        resolver: get_record_field_value
-      won_games_at_legacy:
-        name_in_index: won_games_at
         resolver: get_record_field_value
       year:
         resolver: get_record_field_value
@@ -5023,15 +4856,9 @@ object_types_by_name:
         resolver: object_with_lookahead
       started_at:
         resolver: object_with_lookahead
-      started_at_legacy:
-        name_in_index: started_at
-        resolver: object_with_lookahead
       was_shortened:
         resolver: object_with_lookahead
       won_games_at:
-        resolver: object_with_lookahead
-      won_games_at_legacy:
-        name_in_index: won_games_at
         resolver: object_with_lookahead
       year:
         resolver: object_with_lookahead
@@ -5039,18 +4866,10 @@ object_types_by_name:
     graphql_fields_by_name:
       record:
         name_in_index: the_record
-      started_at_legacy:
-        name_in_index: started_at
-      won_games_at_legacy:
-        name_in_index: won_games_at
   TeamSeasonFilterInput:
     graphql_fields_by_name:
       record:
         name_in_index: the_record
-      started_at_legacy:
-        name_in_index: started_at
-      won_games_at_legacy:
-        name_in_index: won_games_at
   TeamSeasonGroupedBy:
     graphql_fields_by_name:
       count:
@@ -5065,15 +4884,9 @@ object_types_by_name:
         resolver: object_with_lookahead
       started_at:
         resolver: object_with_lookahead
-      started_at_legacy:
-        name_in_index: started_at
-        resolver: object_with_lookahead
       was_shortened:
         resolver: object_with_lookahead
       won_game_at:
-        name_in_index: won_games_at
-        resolver: object_with_lookahead
-      won_game_at_legacy:
         name_in_index: won_games_at
         resolver: object_with_lookahead
       year:
@@ -5253,18 +5066,9 @@ object_types_by_name:
       created_at2:
         name_in_index: created_at
         resolver: get_record_field_value
-      created_at2_legacy:
-        name_in_index: created_at
-        resolver: get_record_field_value
-      created_at_legacy:
-        name_in_index: created_at
-        resolver: get_record_field_value
       created_at_time_of_day:
         resolver: get_record_field_value
       created_on:
-        resolver: get_record_field_value
-      created_on_legacy:
-        name_in_index: created_on
         resolver: get_record_field_value
       fees:
         resolver: get_record_field_value
@@ -5468,18 +5272,9 @@ object_types_by_name:
       created_at2:
         name_in_index: created_at
         resolver: object_with_lookahead
-      created_at2_legacy:
-        name_in_index: created_at
-        resolver: object_with_lookahead
-      created_at_legacy:
-        name_in_index: created_at
-        resolver: object_with_lookahead
       created_at_time_of_day:
         resolver: object_with_lookahead
       created_on:
-        resolver: object_with_lookahead
-      created_on_legacy:
-        name_in_index: created_on
         resolver: object_with_lookahead
       fees:
         resolver: object_with_lookahead
@@ -5734,12 +5529,6 @@ object_types_by_name:
         name_in_index: amount_cents
       created_at2:
         name_in_index: created_at
-      created_at2_legacy:
-        name_in_index: created_at
-      created_at_legacy:
-        name_in_index: created_at
-      created_on_legacy:
-        name_in_index: created_on
       size:
         name_in_index: options.size
       the_options:
@@ -5770,18 +5559,9 @@ object_types_by_name:
       created_at2:
         name_in_index: created_at
         resolver: object_with_lookahead
-      created_at2_legacy:
-        name_in_index: created_at
-        resolver: object_with_lookahead
-      created_at_legacy:
-        name_in_index: created_at
-        resolver: object_with_lookahead
       created_at_time_of_day:
         resolver: object_with_lookahead
       created_on:
-        resolver: object_with_lookahead
-      created_on_legacy:
-        name_in_index: created_on
         resolver: object_with_lookahead
       fees:
         resolver: object_with_lookahead
@@ -5904,18 +5684,9 @@ object_types_by_name:
       created_at2:
         name_in_index: created_at
         resolver: get_record_field_value
-      created_at2_legacy:
-        name_in_index: created_at
-        resolver: get_record_field_value
-      created_at_legacy:
-        name_in_index: created_at
-        resolver: get_record_field_value
       created_at_time_of_day:
         resolver: get_record_field_value
       created_on:
-        resolver: get_record_field_value
-      created_on_legacy:
-        name_in_index: created_on
         resolver: get_record_field_value
       fees:
         resolver: get_record_field_value
@@ -5998,18 +5769,9 @@ object_types_by_name:
       created_at2:
         name_in_index: created_at
         resolver: object_with_lookahead
-      created_at2_legacy:
-        name_in_index: created_at
-        resolver: object_with_lookahead
-      created_at_legacy:
-        name_in_index: created_at
-        resolver: object_with_lookahead
       created_at_time_of_day:
         resolver: object_with_lookahead
       created_on:
-        resolver: object_with_lookahead
-      created_on_legacy:
-        name_in_index: created_on
         resolver: object_with_lookahead
       fees:
         resolver: object_with_lookahead
@@ -6104,12 +5866,6 @@ object_types_by_name:
         name_in_index: amount_cents
       created_at2:
         name_in_index: created_at
-      created_at2_legacy:
-        name_in_index: created_at
-      created_at_legacy:
-        name_in_index: created_at
-      created_on_legacy:
-        name_in_index: created_on
       size:
         name_in_index: options.size
       the_options:
@@ -6140,18 +5896,9 @@ object_types_by_name:
       created_at2:
         name_in_index: created_at
         resolver: object_with_lookahead
-      created_at2_legacy:
-        name_in_index: created_at
-        resolver: object_with_lookahead
-      created_at_legacy:
-        name_in_index: created_at
-        resolver: object_with_lookahead
       created_at_time_of_day:
         resolver: object_with_lookahead
       created_on:
-        resolver: object_with_lookahead
-      created_on_legacy:
-        name_in_index: created_on
         resolver: object_with_lookahead
       fees:
         resolver: object_with_lookahead

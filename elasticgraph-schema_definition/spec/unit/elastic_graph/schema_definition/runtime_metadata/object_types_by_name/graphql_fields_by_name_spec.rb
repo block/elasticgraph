@@ -174,8 +174,8 @@ module ElasticGraph
         # It's not expected that this be kept in sync as we add new types to ElasticGraph over time--we just want
         # to verify that we're covering a wide swath of different kinds of types here.
         expected_minimum_list_filter_types = %w[
-          BooleanListFilterInput ColorListFilterInput CursorListFilterInput DateListFilterInput DateGroupingGranularityListFilterInput DateTimeListFilterInput
-          DateTimeGroupingGranularityListFilterInput DateTimeUnitListFilterInput DistanceUnitListFilterInput DurationListFilterInput FloatListFilterInput
+          BooleanListFilterInput ColorListFilterInput CursorListFilterInput DateListFilterInput DateTimeListFilterInput
+          DateTimeUnitListFilterInput DistanceUnitListFilterInput DurationListFilterInput FloatListFilterInput
           GeoLocationListFilterInput GrabBagListFilterInput IDListFilterInput IntListFilterInput JsonSafeLongListFilterInput LocalTimeListFilterInput
           LongStringListFilterInput OptionsListFilterInput StringListFilterInput TextListFilterInput TimeZoneListFilterInput UntypedListFilterInput
           GrabBagFieldsListFilterInput OptionsFieldsListFilterInput

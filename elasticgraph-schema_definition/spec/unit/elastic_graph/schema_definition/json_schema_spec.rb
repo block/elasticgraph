@@ -41,7 +41,7 @@ module ElasticGraph
 
         after(:context) do
           built_in_types = @json_schema.fetch("$defs").keys - ["Widget"]
-          input_enum_types = %w[DateGroupingGranularityInput DateTimeGroupingGranularityInput DateTimeUnitInput DistanceUnitInput MatchesQueryAllowedEditsPerTerm]
+          input_enum_types = %w[DateTimeUnitInput DistanceUnitInput MatchesQueryAllowedEditsPerTerm]
 
           # Input enum types are named with an `Input` suffix. The JSON schema only contains the types we index, which are output types,
           # and therefore it does not have the input enum types.
@@ -186,13 +186,6 @@ module ElasticGraph
             .and_fails_to_match(0, nil, true, "literally any other string")
         end
 
-        example "for `DateGroupingGranularity`" do
-          expect(json_schema).to have_json_schema_like("DateGroupingGranularity", {
-            "enum" => %w[YEAR QUARTER MONTH WEEK DAY], "type" => "string"
-          }).which_matches(*%w[YEAR QUARTER MONTH WEEK DAY])
-            .and_fails_to_match(0, nil, true, "literally any other string")
-        end
-
         example "for `DateGroupingTruncationUnit`" do
           expect(json_schema).to have_json_schema_like("DateGroupingTruncationUnit", {
             "enum" => %w[YEAR QUARTER MONTH WEEK DAY], "type" => "string"
@@ -211,13 +204,6 @@ module ElasticGraph
           expect(json_schema).to have_json_schema_like("DateTimeUnit", {
             "enum" => %w[DAY HOUR MINUTE SECOND MILLISECOND], "type" => "string"
           }).which_matches(*%w[DAY HOUR MINUTE SECOND MILLISECOND])
-            .and_fails_to_match(0, nil, true, "literally any other string")
-        end
-
-        example "for `DateTimeGroupingGranularity`" do
-          expect(json_schema).to have_json_schema_like("DateTimeGroupingGranularity", {
-            "enum" => %w[YEAR QUARTER MONTH WEEK DAY HOUR MINUTE SECOND], "type" => "string"
-          }).which_matches(*%w[YEAR QUARTER MONTH WEEK DAY HOUR MINUTE SECOND])
             .and_fails_to_match(0, nil, true, "literally any other string")
         end
 

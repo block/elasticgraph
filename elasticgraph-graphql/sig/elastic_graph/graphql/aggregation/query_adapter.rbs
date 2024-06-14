@@ -106,17 +106,9 @@ module ElasticGraph
           node: ::GraphQL::Execution::Lookahead,
         ) -> ::Array[DateHistogramGrouping | ScriptTermGrouping]
 
-        def legacy_date_histogram_groupings_from: (
-          field_path: ::Array[PathSegment],
-          node: ::GraphQL::Execution::Lookahead,
-          get_time_zone: ^(::Hash[::String, untyped]) -> ::String?,
-          get_offset: ^(::Hash[::String, untyped]) -> ::String?
-        ) -> ::Array[DateHistogramGrouping]
-
         def interval_from: (
           ::GraphQL::Execution::Lookahead,
-          ::Hash[::String, untyped],
-          interval_unit_key: ::String
+          ::Hash[::String, untyped]
         ) -> timeGroupingInterval
 
         def datetime_offset_from: (

@@ -338,60 +338,6 @@ module ElasticGraph
           ]
         end
 
-        it "resolves legacy aggregated Date/DateTime/LocalTime values" do
-          aggs = {
-            aggregated_value_key_of("created_at_legacy", "exact_min") => {"value" => 1696854612000.0, "value_as_string" => "2023-10-09T12:30:12.000Z"},
-            aggregated_value_key_of("created_at_legacy", "exact_max") => {"value" => 1704792612000.0, "value_as_string" => "2024-01-09T09:30:12.000Z"},
-            aggregated_value_key_of("created_at_legacy", "approximate_avg") => {"value" => 1701039012530.0, "value_as_string" => "2023-11-26T22:50:12.530Z"},
-            aggregated_value_key_of("created_on_legacy", "exact_min") => {"value" => 1696809600000.0, "value_as_string" => "2023-10-09"},
-            aggregated_value_key_of("created_on_legacy", "exact_max") => {"value" => 1704758400000.0, "value_as_string" => "2024-01-09"},
-            aggregated_value_key_of("created_on_legacy", "approximate_avg") => {"value" => 1700985600000.0, "value_as_string" => "2023-11-26"},
-            aggregated_value_key_of("created_at_time_of_day", "exact_min") => {"value" => 34212000.0, "value_as_string" => "09:30:12"},
-            aggregated_value_key_of("created_at_time_of_day", "exact_max") => {"value" => 81012000.0, "value_as_string" => "22:30:12"},
-            aggregated_value_key_of("created_at_time_of_day", "approximate_avg") => {"value" => 53412000.0, "value_as_string" => "14:50:12"},
-            aggregated_value_key_of("created_on_legacy", "approximate_distinct_value_count") => {"value" => 3.0},
-            aggregated_value_key_of("created_at_legacy", "approximate_distinct_value_count") => {"value" => 3.0},
-            aggregated_value_key_of("created_at_time_of_day", "approximate_distinct_value_count") => {"value" => 3.0}
-          }
-
-          response = resolve_target_nodes(<<~QUERY, aggs: aggs)
-            target: widget_aggregations {
-              nodes {
-                aggregated_values {
-                  created_at_legacy { exact_min, exact_max, approximate_avg, approximate_distinct_value_count }
-                  created_on_legacy { exact_min, exact_max, approximate_avg, approximate_distinct_value_count }
-                  created_at_time_of_day { exact_min, exact_max, approximate_avg, approximate_distinct_value_count }
-                }
-              }
-            }
-          QUERY
-
-          expect(response).to eq [
-            {
-              "aggregated_values" => {
-                "created_at_legacy" => {
-                  "exact_min" => "2023-10-09T12:30:12.000Z",
-                  "exact_max" => "2024-01-09T09:30:12.000Z",
-                  "approximate_avg" => "2023-11-26T22:50:12.530Z",
-                  "approximate_distinct_value_count" => 3
-                },
-                "created_on_legacy" => {
-                  "exact_min" => "2023-10-09",
-                  "exact_max" => "2024-01-09",
-                  "approximate_avg" => "2023-11-26",
-                  "approximate_distinct_value_count" => 3
-                },
-                "created_at_time_of_day" => {
-                  "exact_min" => "09:30:12",
-                  "exact_max" => "22:30:12",
-                  "approximate_avg" => "14:50:12",
-                  "approximate_distinct_value_count" => 3
-                }
-              }
-            }
-          ]
-        end
-
         it "resolves the `cursor` on an ungrouped aggregation" do
           response = resolve_target_nodes(<<~QUERY, aggs: nil, path: ["data", "target", "edges"])
             target: widget_aggregations {

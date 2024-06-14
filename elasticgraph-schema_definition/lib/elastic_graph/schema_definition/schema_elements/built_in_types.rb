@@ -109,14 +109,8 @@ module ElasticGraph
       # ElasticGraph defines these enum types. Most of these are intended for usage as an _input_
       # argument, but they could be used as a return type in your schema if they meet your needs.
       #
-      # DateGroupingGranularity
-      # : Enumerates the supported granularities of a `Date`.
-      #
       # DateGroupingTruncationUnit
       # : Enumerates the supported truncation units of a `Date`.
-      #
-      # DateTimeGroupingGranularity
-      # : Enumerates the supported granularities of a `DateTime`.
       #
       # DateTimeGroupingTruncationUnit
       # : Enumerates the supported truncation units of a `DateTime`.
@@ -953,38 +947,6 @@ module ElasticGraph
           # elasticgraph-graphql/spec/acceptance/elasticgraph_graphql_spec.rb
           es_first_day_of_week = "Monday"
 
-          # TODO: Drop support for legacy grouping schema
-          schema_def_api.enum_type "DateGroupingGranularity" do |t|
-            t.documentation <<~EOS
-              Enumerates the supported granularities of a `Date`.
-            EOS
-
-            t.value "YEAR" do |v|
-              v.documentation "The year a `Date` falls in."
-              v.update_runtime_metadata datastore_value: "year"
-            end
-
-            t.value "QUARTER" do |v|
-              v.documentation "The quarter a `Date` falls in."
-              v.update_runtime_metadata datastore_value: "quarter"
-            end
-
-            t.value "MONTH" do |v|
-              v.documentation "The month a `Date` falls in."
-              v.update_runtime_metadata datastore_value: "month"
-            end
-
-            t.value "WEEK" do |v|
-              v.documentation "The week, beginning on #{es_first_day_of_week}, a `Date` falls in."
-              v.update_runtime_metadata datastore_value: "week"
-            end
-
-            t.value "DAY" do |v|
-              v.documentation "The exact day of a `Date`."
-              v.update_runtime_metadata datastore_value: "day"
-            end
-          end
-
           schema_def_api.enum_type "DateGroupingTruncationUnit" do |t|
             t.documentation <<~EOS
               Enumerates the supported truncation units of a `Date`.
@@ -1013,53 +975,6 @@ module ElasticGraph
             t.value "DAY" do |v|
               v.documentation "The exact day of a `Date`."
               v.update_runtime_metadata datastore_value: "day"
-            end
-          end
-
-          # TODO: Drop support for legacy grouping schema
-          schema_def_api.enum_type "DateTimeGroupingGranularity" do |t|
-            t.documentation <<~EOS
-              Enumerates the supported granularities of a `DateTime`.
-            EOS
-
-            t.value "YEAR" do |v|
-              v.documentation "The year a `DateTime` falls in."
-              v.update_runtime_metadata datastore_value: "year"
-            end
-
-            t.value "QUARTER" do |v|
-              v.documentation "The quarter a `DateTime` falls in."
-              v.update_runtime_metadata datastore_value: "quarter"
-            end
-
-            t.value "MONTH" do |v|
-              v.documentation "The month a `DateTime` falls in."
-              v.update_runtime_metadata datastore_value: "month"
-            end
-
-            t.value "WEEK" do |v|
-              v.documentation "The week, beginning on #{es_first_day_of_week}, a `DateTime` falls in."
-              v.update_runtime_metadata datastore_value: "week"
-            end
-
-            t.value "DAY" do |v|
-              v.documentation "The day a `DateTime` falls in."
-              v.update_runtime_metadata datastore_value: "day"
-            end
-
-            t.value "HOUR" do |v|
-              v.documentation "The hour a `DateTime` falls in."
-              v.update_runtime_metadata datastore_value: "hour"
-            end
-
-            t.value "MINUTE" do |v|
-              v.documentation "The minute a `DateTime` falls in."
-              v.update_runtime_metadata datastore_value: "minute"
-            end
-
-            t.value "SECOND" do |v|
-              v.documentation "The second a `DateTime` falls in."
-              v.update_runtime_metadata datastore_value: "second"
             end
           end
 

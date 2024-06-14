@@ -115,8 +115,8 @@ module ElasticGraph
               DateAggregatedValues DateTimeAggregatedValues LocalTimeAggregatedValues
               Company Cursor PageInfo Person Query TextFilterInput GeoLocation
               DateTimeGroupingOffsetInput DateTimeUnitInput DateTimeTimeOfDayFilterInput
-              DateGroupedBy DateGroupingGranularityInput DateGroupingOffsetInput DateGroupingTruncationUnitInput DateUnitInput
-              DateTimeGroupedBy DateTimeGroupingGranularityInput DateTimeGroupingTruncationUnitInput TimeZone
+              DateGroupedBy DateGroupingOffsetInput DateGroupingTruncationUnitInput DateUnitInput
+              DateTimeGroupedBy DateTimeGroupingTruncationUnitInput TimeZone
               DayOfWeek DayOfWeekGroupingOffsetInput DistanceUnitInput GeoLocationFilterInput GeoLocationDistanceFilterInput
               IntListFilterInput IntListElementFilterInput AggregationCountDetail
               LocalTimeGroupingOffsetInput LocalTimeGroupingTruncationUnitInput LocalTimeUnitInput MatchesQueryFilterInput

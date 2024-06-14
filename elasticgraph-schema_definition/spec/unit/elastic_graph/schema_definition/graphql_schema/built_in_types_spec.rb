@@ -1333,36 +1333,6 @@ module ElasticGraph
         end
 
         describe "standard enum types" do
-          it "generates a `DateGroupingGranularity` enum" do
-            expect(type_named("DateGroupingGranularity", include_docs: true)).to eq(<<~EOS.strip)
-              """
-              Enumerates the supported granularities of a `Date`.
-              """
-              enum DateGroupingGranularity {
-                """
-                The year a `Date` falls in.
-                """
-                YEAR
-                """
-                The quarter a `Date` falls in.
-                """
-                QUARTER
-                """
-                The month a `Date` falls in.
-                """
-                MONTH
-                """
-                The week, beginning on Monday, a `Date` falls in.
-                """
-                WEEK
-                """
-                The exact day of a `Date`.
-                """
-                DAY
-              }
-            EOS
-          end
-
           it "generates a `DateGroupingTruncationUnit` enum" do
             expect(type_named("DateGroupingTruncationUnit", include_docs: true)).to eq(<<~EOS.strip)
               """
@@ -1389,48 +1359,6 @@ module ElasticGraph
                 The exact day of a `Date`.
                 """
                 DAY
-              }
-            EOS
-          end
-
-          it "generates a `DateTimeGroupingGranularity` enum" do
-            expect(type_named("DateTimeGroupingGranularity", include_docs: true)).to eq(<<~EOS.strip)
-              """
-              Enumerates the supported granularities of a `DateTime`.
-              """
-              enum DateTimeGroupingGranularity {
-                """
-                The year a `DateTime` falls in.
-                """
-                YEAR
-                """
-                The quarter a `DateTime` falls in.
-                """
-                QUARTER
-                """
-                The month a `DateTime` falls in.
-                """
-                MONTH
-                """
-                The week, beginning on Monday, a `DateTime` falls in.
-                """
-                WEEK
-                """
-                The day a `DateTime` falls in.
-                """
-                DAY
-                """
-                The hour a `DateTime` falls in.
-                """
-                HOUR
-                """
-                The minute a `DateTime` falls in.
-                """
-                MINUTE
-                """
-                The second a `DateTime` falls in.
-                """
-                SECOND
               }
             EOS
           end

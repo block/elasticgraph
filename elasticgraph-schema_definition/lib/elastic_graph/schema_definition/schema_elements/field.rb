@@ -84,15 +84,13 @@ module ElasticGraph
       #   @private
       # @!attribute [rw] as_input
       #   @private
-      # @!attribute [rw] legacy_grouping_schema
-      #   @private
       class Field < Struct.new(
         :name, :original_type, :parent_type, :original_type_for_derived_types, :schema_def_state, :accuracy_confidence,
         :filter_customizations, :grouped_by_customizations, :sub_aggregations_customizations,
         :aggregated_values_customizations, :sort_order_enum_value_customizations,
         :args, :sortable, :filterable, :aggregatable, :groupable, :graphql_only, :source, :runtime_field_script, :relationship, :singular_name,
         :computation_detail, :non_nullable_in_json_schema, :backing_indexing_field, :as_input,
-        :legacy_grouping_schema, :name_in_index, :resolver
+        :name_in_index, :resolver
       )
         include Mixins::HasDocumentation
         include Mixins::HasDirectives
@@ -105,7 +103,7 @@ module ElasticGraph
           accuracy_confidence: :high, name_in_index: name,
           type_for_derived_types: nil, graphql_only: nil, singular: nil,
           sortable: nil, filterable: nil, aggregatable: nil, groupable: nil,
-          backing_indexing_field: nil, as_input: false, legacy_grouping_schema: false, resolver: nil
+          backing_indexing_field: nil, as_input: false, resolver: nil
         )
           type_ref = schema_def_state.type_ref(type)
           super(
@@ -136,7 +134,6 @@ module ElasticGraph
             non_nullable_in_json_schema: false,
             backing_indexing_field: backing_indexing_field,
             as_input: as_input,
-            legacy_grouping_schema: legacy_grouping_schema,
             resolver: resolver
           )
 
@@ -672,8 +669,6 @@ module ElasticGraph
           parent_type.field field_name, grouped_by_field_type_name, name_in_index: name_in_index, graphql_only: true do |f|
             add_grouped_by_field_documentation(f)
 
-            define_legacy_timestamp_grouping_arguments_if_needed(f) if legacy_grouping_schema
-
             grouped_by_customizations.each { |block| block.call(f) }
           end
         end
@@ -681,7 +676,7 @@ module ElasticGraph
         # @private
         def grouped_by_field_type_name
           unwrapped_type = type_for_derived_types.fully_unwrapped
-          if unwrapped_type.scalar_type_needing_grouped_by_object? && !legacy_grouping_schema
+          if unwrapped_type.scalar_type_needing_grouped_by_object?
             unwrapped_type.with_reverted_override.as_grouped_by.name
           elsif unwrapped_type.leaf?
             unwrapped_type.name
@@ -702,7 +697,7 @@ module ElasticGraph
               "The `#{name}` field value for this group",
               list_field_grouped_by_doc_note("the selected subfields of `#{name}`")
             )
-          elsif type_for_derived_types.fully_unwrapped.scalar_type_needing_grouped_by_object? && !legacy_grouping_schema
+          elsif type_for_derived_types.fully_unwrapped.scalar_type_needing_grouped_by_object?
             derived_documentation("Offers the different grouping options for the `#{name}` value within this group")
           else
             derived_documentation("The `#{name}` field value for this group")
@@ -946,40 +941,6 @@ module ElasticGraph
         # Indicates if the field uses the `text` mapping type.
         def text?
           mapping_type == "text"
-        end
-
-        def define_legacy_timestamp_grouping_arguments_if_needed(grouping_field)
-          case type.fully_unwrapped.name
-          when "Date"
-            grouping_field.argument schema_def_state.schema_elements.granularity, "DateGroupingGranularity!" do |a|
-              a.documentation "Determines the grouping granularity for this field."
-            end
-
-            grouping_field.argument schema_def_state.schema_elements.offset_days, "Int" do |a|
-              a.documentation <<~EOS
-                Number of days (positive or negative) to shift the `Date` boundaries of each date grouping bucket.
-
-                For example, when grouping by `YEAR`, this can be used to align the buckets with fiscal or school years instead of calendar years.
-              EOS
-            end
-          when "DateTime"
-            grouping_field.argument schema_def_state.schema_elements.granularity, "DateTimeGroupingGranularity!" do |a|
-              a.documentation "Determines the grouping granularity for this field."
-            end
-
-            grouping_field.argument schema_def_state.schema_elements.time_zone, "TimeZone" do |a|
-              a.documentation "The time zone to use when determining which grouping a `DateTime` value falls in."
-              a.default "UTC"
-            end
-
-            grouping_field.argument schema_def_state.schema_elements.offset, "DateTimeGroupingOffsetInput" do |a|
-              a.documentation <<~EOS
-                Amount of offset (positive or negative) to shift the `DateTime` boundaries of each grouping bucket.
-
-                For example, when grouping by `WEEK`, you can shift by 24 hours to change what day-of-week weeks are considered to start on.
-              EOS
-            end
-          end
         end
 
         def list_field_grouped_by_doc_note(individual_value_selection_description)

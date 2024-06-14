@@ -209,29 +209,9 @@ module ElasticGraph
             # New date/time grouping API (DateGroupedBy, DateTimeGroupedBy)
             if field.type.elasticgraph_category == :date_grouped_by_object
               date_time_groupings_from(field_path: field_path, node: node)
-
             elsif !field.type.object?
-              case field.type.name
-              # Legacy date grouping API
-              when "Date"
-                legacy_date_histogram_groupings_from(
-                  field_path: field_path,
-                  node: node,
-                  get_time_zone: ->(args) {},
-                  get_offset: ->(args) { args[element_names.offset_days]&.then { |days| "#{days}d" } }
-                )
-              # Legacy datetime grouping API
-              when "DateTime"
-                legacy_date_histogram_groupings_from(
-                  field_path: field_path,
-                  node: node,
-                  get_time_zone: ->(args) { args.fetch(element_names.time_zone) },
-                  get_offset: ->(args) { datetime_offset_from(node, args) }
-                )
               # Non-date/time grouping
-              else
-                [FieldTermGrouping.new(field_path: field_path)]
-              end
+              [FieldTermGrouping.new(field_path: field_path)]
             end
           end
         end
@@ -264,7 +244,7 @@ module ElasticGraph
                 field_path: child_field_path,
                 script_id: runtime_metadata.static_script_ids_by_scoped_name.fetch("field/as_time_of_day"),
                 params: {
-                  "interval" => interval_from(child_node, schema_args, interval_unit_key: element_names.truncation_unit),
+                  "interval" => interval_from(child_node, schema_args),
                   "offset_ms" => datetime_offset_as_ms_from(child_node, schema_args),
                   "time_zone" => time_zone
                 }
@@ -272,7 +252,7 @@ module ElasticGraph
             else
               DateHistogramGrouping.new(
                 field_path: child_field_path,
-                interval: interval_from(child_node, schema_args, interval_unit_key: element_names.truncation_unit),
+                interval: interval_from(child_node, schema_args),
                 offset: datetime_offset_from(child_node, schema_args),
                 time_zone: time_zone
               )
@@ -280,22 +260,10 @@ module ElasticGraph
           end
         end
 
-        def legacy_date_histogram_groupings_from(field_path:, node:, get_time_zone:, get_offset:)
-          schema_args = Schema::Arguments.to_schema_form(node.arguments, node.field)
-
-          [DateHistogramGrouping.new(
-            field_path: field_path,
-            interval: interval_from(node, schema_args, interval_unit_key: element_names.granularity),
-            time_zone: get_time_zone.call(schema_args),
-            offset: get_offset.call(schema_args)
-          )]
-        end
-
         # Figure out the Date histogram grouping interval for the given node based on the `grouped_by` argument.
-        # Until `legacy_grouping_schema` is removed, we need to check both `granularity` and `truncation_unit`.
-        def interval_from(node, schema_args, interval_unit_key:)
-          enum_type_name = node.field.arguments.fetch(interval_unit_key).type.unwrap.graphql_name
-          enum_value_name = schema_args.fetch(interval_unit_key)
+        def interval_from(node, schema_args)
+          enum_type_name = node.field.arguments.fetch(element_names.truncation_unit).type.unwrap.graphql_name
+          enum_value_name = schema_args.fetch(element_names.truncation_unit)
           enum_value = schema.type_named(enum_type_name).enum_value_named(enum_value_name)
 
           _ = enum_value.runtime_metadata.datastore_value

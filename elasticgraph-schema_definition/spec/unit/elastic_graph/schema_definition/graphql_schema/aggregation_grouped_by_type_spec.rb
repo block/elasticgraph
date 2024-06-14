@@ -305,300 +305,91 @@ module ElasticGraph
           EOS
         end
 
-        context "with `legacy_grouping_schema: true`" do
-          it "defines legacy grouping arguments for Date and DateTime fields with full documentation" do
-            results = define_schema do |schema|
-              schema.object_type "Widget" do |t|
-                t.field "id", "ID", groupable: true
-                t.field "created_on", "Date", legacy_grouping_schema: true
-                t.field "created_at", "DateTime", legacy_grouping_schema: true
-                t.index "widgets"
-              end
+        it "defines grouping arguments for Date and DateTime fields with full documentation" do
+          results = define_schema do |schema|
+            schema.object_type "Widget" do |t|
+              t.field "id", "ID", groupable: true
+              t.field "created_on", "Date"
+              t.field "created_at", "DateTime"
+              t.index "widgets"
             end
-
-            expect(grouped_by_type_from(results, "Widget", include_docs: true)).to eq(<<~EOS.strip)
-              """
-              Type used to specify the `Widget` fields to group by for aggregations.
-              """
-              type WidgetGroupedBy {
-                """
-                The `id` field value for this group.
-                """
-                id: ID
-                """
-                The `created_on` field value for this group.
-                """
-                created_on(
-                  """
-                  Determines the grouping granularity for this field.
-                  """
-                  #{schema_elements.granularity}: DateGroupingGranularityInput!
-                  """
-                  Number of days (positive or negative) to shift the `Date` boundaries of each date grouping bucket.
-
-                  For example, when grouping by `YEAR`, this can be used to align the buckets with fiscal or school years instead of calendar years.
-                  """
-                  #{schema_elements.offset_days}: Int): Date
-                """
-                The `created_at` field value for this group.
-                """
-                created_at(
-                  """
-                  Determines the grouping granularity for this field.
-                  """
-                  #{schema_elements.granularity}: DateTimeGroupingGranularityInput!
-                  """
-                  The time zone to use when determining which grouping a `DateTime` value falls in.
-                  """
-                  #{schema_elements.time_zone}: TimeZone = "UTC"
-                  """
-                  Amount of offset (positive or negative) to shift the `DateTime` boundaries of each grouping bucket.
-
-                  For example, when grouping by `WEEK`, you can shift by 24 hours to change what day-of-week weeks are considered to start on.
-                  """
-                  offset: DateTimeGroupingOffsetInput): DateTime
-              }
-            EOS
           end
 
-          it "makes fields of all leaf types groupable except when it has a `text` mapping since that can't be grouped on efficiently" do
-            results = define_schema do |schema|
-              schema.enum_type "Color" do |t|
-                t.values "RED", "GREEN", "YELLOW"
-              end
-
-              schema.object_type "Widget" do |t|
-                t.field "id", "ID"
-                t.field "name", "String!"
-                t.field "workspace_id", "ID"
-                t.field "size", "String!"
-                t.field "cost", "Int!"
-                t.field "cost_byte", "Int" do |f|
-                  f.mapping type: "byte"
-                end
-                t.field "cost_short", "Int" do |f|
-                  f.mapping type: "short"
-                end
-                t.field "cost_float", "Float!"
-                t.field "cost_json_safe_long", "JsonSafeLong"
-                t.field "cost_long_string", "LongString"
-                t.field "metadata", "Untyped"
-                t.field "zone", "TimeZone!"
-                t.field "sold", "Boolean"
-                t.field "color", "Color"
-                t.field "created_on", "Date!", legacy_grouping_schema: true
-                t.field "created_at", "DateTime", legacy_grouping_schema: true
-                t.field "description", "String" do |f|
-                  f.mapping type: "text"
-                end
-
-                t.index "widgets"
-              end
-            end
-
-            expect(grouped_by_type_from(results, "Widget")).to eq(<<~EOS.strip)
-              type WidgetGroupedBy {
-                name: String
-                workspace_id: ID
-                size: String
-                cost: Int
-                cost_byte: Int
-                cost_short: Int
-                cost_float: Float
-                cost_json_safe_long: JsonSafeLong
-                cost_long_string: LongString
-                metadata: Untyped
-                zone: TimeZone
-                sold: Boolean
-                color: Color
-                created_on(
-                  granularity: DateGroupingGranularityInput!
-                  #{schema_elements.offset_days}: Int): Date
-                created_at(
-                  granularity: DateTimeGroupingGranularityInput!
-                  #{schema_elements.time_zone}: TimeZone = "UTC"
-                  offset: DateTimeGroupingOffsetInput): DateTime
-              }
-            EOS
-          end
+          expect(grouped_by_type_from(results, "Widget", include_docs: true)).to eq(<<~EOS.strip)
+            """
+            Type used to specify the `Widget` fields to group by for aggregations.
+            """
+            type WidgetGroupedBy {
+              """
+              The `id` field value for this group.
+              """
+              id: ID
+              """
+              Offers the different grouping options for the `created_on` value within this group.
+              """
+              created_on: DateGroupedBy
+              """
+              Offers the different grouping options for the `created_at` value within this group.
+              """
+              created_at: DateTimeGroupedBy
+            }
+          EOS
         end
 
-        context "with `legacy_grouping_schema: false`" do
-          it "defines grouping arguments for Date and DateTime fields with full documentation" do
-            results = define_schema do |schema|
-              schema.object_type "Widget" do |t|
-                t.field "id", "ID", groupable: true
-                t.field "created_on", "Date", legacy_grouping_schema: false
-                t.field "created_at", "DateTime", legacy_grouping_schema: false
-                t.index "widgets"
-              end
+        it "makes fields of all leaf types groupable except when it has a `text` mapping since that can't be grouped on efficiently" do
+          results = define_schema do |schema|
+            schema.enum_type "Color" do |t|
+              t.values "RED", "GREEN", "YELLOW"
             end
 
-            expect(grouped_by_type_from(results, "Widget", include_docs: true)).to eq(<<~EOS.strip)
-              """
-              Type used to specify the `Widget` fields to group by for aggregations.
-              """
-              type WidgetGroupedBy {
-                """
-                The `id` field value for this group.
-                """
-                id: ID
-                """
-                Offers the different grouping options for the `created_on` value within this group.
-                """
-                created_on: DateGroupedBy
-                """
-                Offers the different grouping options for the `created_at` value within this group.
-                """
-                created_at: DateTimeGroupedBy
-              }
-            EOS
-          end
-
-          it "makes fields of all leaf types groupable except when it has a `text` mapping since that can't be grouped on efficiently" do
-            results = define_schema do |schema|
-              schema.enum_type "Color" do |t|
-                t.values "RED", "GREEN", "YELLOW"
+            schema.object_type "Widget" do |t|
+              t.field "id", "ID"
+              t.field "name", "String!"
+              t.field "workspace_id", "ID"
+              t.field "size", "String!"
+              t.field "cost", "Int!"
+              t.field "cost_byte", "Int" do |f|
+                f.mapping type: "byte"
+              end
+              t.field "cost_short", "Int" do |f|
+                f.mapping type: "short"
+              end
+              t.field "cost_float", "Float!"
+              t.field "cost_json_safe_long", "JsonSafeLong"
+              t.field "cost_long_string", "LongString"
+              t.field "metadata", "Untyped"
+              t.field "zone", "TimeZone!"
+              t.field "sold", "Boolean"
+              t.field "color", "Color"
+              t.field "created_on", "Date!"
+              t.field "created_at", "DateTime"
+              t.field "description", "String" do |f|
+                f.mapping type: "text"
               end
 
-              schema.object_type "Widget" do |t|
-                t.field "id", "ID"
-                t.field "name", "String!"
-                t.field "workspace_id", "ID"
-                t.field "size", "String!"
-                t.field "cost", "Int!"
-                t.field "cost_byte", "Int" do |f|
-                  f.mapping type: "byte"
-                end
-                t.field "cost_short", "Int" do |f|
-                  f.mapping type: "short"
-                end
-                t.field "cost_float", "Float!"
-                t.field "cost_json_safe_long", "JsonSafeLong"
-                t.field "cost_long_string", "LongString"
-                t.field "metadata", "Untyped"
-                t.field "zone", "TimeZone!"
-                t.field "sold", "Boolean"
-                t.field "color", "Color"
-                t.field "created_on", "Date!", legacy_grouping_schema: false
-                t.field "created_at", "DateTime", legacy_grouping_schema: false
-                t.field "description", "String" do |f|
-                  f.mapping type: "text"
-                end
-
-                t.index "widgets"
-              end
+              t.index "widgets"
             end
-
-            expect(grouped_by_type_from(results, "Widget")).to eq(<<~EOS.strip)
-              type WidgetGroupedBy {
-                name: String
-                workspace_id: ID
-                size: String
-                cost: Int
-                cost_byte: Int
-                cost_short: Int
-                cost_float: Float
-                cost_json_safe_long: JsonSafeLong
-                cost_long_string: LongString
-                metadata: Untyped
-                zone: TimeZone
-                sold: Boolean
-                color: Color
-                created_on: DateGroupedBy
-                created_at: DateTimeGroupedBy
-              }
-            EOS
-          end
-        end
-
-        context "with `legacy_grouping_schema` not specified" do
-          it "defines grouping arguments for Date and DateTime fields with full documentation" do
-            results = define_schema do |schema|
-              schema.object_type "Widget" do |t|
-                t.field "id", "ID", groupable: true
-                t.field "created_on", "Date"
-                t.field "created_at", "DateTime"
-                t.index "widgets"
-              end
-            end
-
-            expect(grouped_by_type_from(results, "Widget", include_docs: true)).to eq(<<~EOS.strip)
-              """
-              Type used to specify the `Widget` fields to group by for aggregations.
-              """
-              type WidgetGroupedBy {
-                """
-                The `id` field value for this group.
-                """
-                id: ID
-                """
-                Offers the different grouping options for the `created_on` value within this group.
-                """
-                created_on: DateGroupedBy
-                """
-                Offers the different grouping options for the `created_at` value within this group.
-                """
-                created_at: DateTimeGroupedBy
-              }
-            EOS
           end
 
-          it "makes fields of all leaf types groupable except when it has a `text` mapping since that can't be grouped on efficiently" do
-            results = define_schema do |schema|
-              schema.enum_type "Color" do |t|
-                t.values "RED", "GREEN", "YELLOW"
-              end
-
-              schema.object_type "Widget" do |t|
-                t.field "id", "ID"
-                t.field "name", "String!"
-                t.field "workspace_id", "ID"
-                t.field "size", "String!"
-                t.field "cost", "Int!"
-                t.field "cost_byte", "Int" do |f|
-                  f.mapping type: "byte"
-                end
-                t.field "cost_short", "Int" do |f|
-                  f.mapping type: "short"
-                end
-                t.field "cost_float", "Float!"
-                t.field "cost_json_safe_long", "JsonSafeLong"
-                t.field "cost_long_string", "LongString"
-                t.field "metadata", "Untyped"
-                t.field "zone", "TimeZone!"
-                t.field "sold", "Boolean"
-                t.field "color", "Color"
-                t.field "created_on", "Date!"
-                t.field "created_at", "DateTime"
-                t.field "description", "String" do |f|
-                  f.mapping type: "text"
-                end
-
-                t.index "widgets"
-              end
-            end
-
-            expect(grouped_by_type_from(results, "Widget")).to eq(<<~EOS.strip)
-              type WidgetGroupedBy {
-                name: String
-                workspace_id: ID
-                size: String
-                cost: Int
-                cost_byte: Int
-                cost_short: Int
-                cost_float: Float
-                cost_json_safe_long: JsonSafeLong
-                cost_long_string: LongString
-                metadata: Untyped
-                zone: TimeZone
-                sold: Boolean
-                color: Color
-                created_on: DateGroupedBy
-                created_at: DateTimeGroupedBy
-              }
-            EOS
-          end
+          expect(grouped_by_type_from(results, "Widget")).to eq(<<~EOS.strip)
+            type WidgetGroupedBy {
+              name: String
+              workspace_id: ID
+              size: String
+              cost: Int
+              cost_byte: Int
+              cost_short: Int
+              cost_float: Float
+              cost_json_safe_long: JsonSafeLong
+              cost_long_string: LongString
+              metadata: Untyped
+              zone: TimeZone
+              sold: Boolean
+              color: Color
+              created_on: DateGroupedBy
+              created_at: DateTimeGroupedBy
+            }
+          EOS
         end
 
         it "does not make object fields with a custom mapping type groupable" do

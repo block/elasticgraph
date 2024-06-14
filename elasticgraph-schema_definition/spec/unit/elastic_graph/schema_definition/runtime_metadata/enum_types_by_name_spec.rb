@@ -30,33 +30,6 @@ module ElasticGraph
         )
       end
 
-      it "dumps `DateGroupingGranularity` metadata" do
-        metadata = enum_type_metadata_for "DateGroupingGranularity", expect_matching_input: true
-
-        expect(metadata.values_by_name.transform_values(&:datastore_value)).to eq(
-          "YEAR" => "year",
-          "QUARTER" => "quarter",
-          "MONTH" => "month",
-          "WEEK" => "week",
-          "DAY" => "day"
-        )
-      end
-
-      it "dumps `DateTimeGroupingGranularity` metadata" do
-        metadata = enum_type_metadata_for "DateTimeGroupingGranularity", expect_matching_input: true
-
-        expect(metadata.values_by_name.transform_values(&:datastore_value)).to eq(
-          "YEAR" => "year",
-          "QUARTER" => "quarter",
-          "MONTH" => "month",
-          "WEEK" => "week",
-          "DAY" => "day",
-          "HOUR" => "hour",
-          "MINUTE" => "minute",
-          "SECOND" => "second"
-        )
-      end
-
       it "dumps `DistanceUnit` metadata" do
         metadata = enum_type_metadata_for "DistanceUnit", expect_matching_input: true
 
@@ -157,9 +130,7 @@ module ElasticGraph
 
         runtime_metadata = SchemaArtifacts::RuntimeMetadata::Schema.from_hash(results.runtime_metadata.to_dumpable_hash)
         expect(runtime_metadata.enum_types_by_name.keys).to contain_exactly(
-          "DateGroupingGranularity", "DateGroupingGranularityInput",
           "DateGroupingTruncationUnit", "DateGroupingTruncationUnitInput",
-          "DateTimeGroupingGranularity", "DateTimeGroupingGranularityInput",
           "DateTimeGroupingTruncationUnit", "DateTimeGroupingTruncationUnitInput",
           "DateTimeUnit", "DateTimeUnitInput",
           "DateUnit", "DateUnitInput",

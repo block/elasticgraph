@@ -95,14 +95,11 @@ ElasticGraph.define_schema do |schema|
       f.mapping type: "text"
     end
     t.field "created_at", "DateTime!"
-    t.field "created_at_legacy", "DateTime!", name_in_index: "created_at", graphql_only: true, legacy_grouping_schema: true
     # `created_at2` is defined with a different `name_in_index` so we can demonstrate grouping works
     # when a selected grouping field has a different name in the index vs GraphQL.
     t.field "created_at2", "DateTime!", name_in_index: "created_at", graphql_only: true
-    t.field "created_at2_legacy", "DateTime!", name_in_index: "created_at", graphql_only: true, legacy_grouping_schema: true
     t.field "created_at_time_of_day", "LocalTime"
     t.field "created_on", "Date"
-    t.field "created_on_legacy", "Date", name_in_index: "created_on", graphql_only: true, legacy_grouping_schema: true
     t.field "release_timestamps", "[DateTime!]!", singular: "release_timestamp"
     t.field "release_dates", "[Date!]!", singular: "release_date"
     t.relates_to_many "components", "Component", via: "component_ids", dir: :out, singular: "component"

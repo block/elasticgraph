@@ -54,9 +54,6 @@ module ElasticGraph
         attr_reader time_zone: ::String
         attr_reader truncation_unit: ::String
 
-        attr_reader offset_days: ::String
-        attr_reader granularity: ::String
-
         attr_reader approximate_value: ::String
         attr_reader exact_value: ::String
         attr_reader upper_bound: ::String

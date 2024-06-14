@@ -101,10 +101,6 @@ module ElasticGraph
                 "id_ASC" => Enum::Value.new(SortField.new("id", :asc), nil, nil, nil),
                 "id_DESC" => Enum::Value.new(SortField.new("id", :desc), nil, nil, nil)
               }),
-              "DateGroupingGranularity" => Enum::Type.new({
-                "DAY" => Enum::Value.new(nil, "day", nil, "DAILY"),
-                "YEAR" => Enum::Value.new(nil, "year", nil, "YEARLY")
-              }),
               "DistanceUnit" => Enum::Type.new({
                 "MILE" => Enum::Value.new(nil, nil, :mi, nil),
                 "KILOMETER" => Enum::Value.new(nil, nil, :km, nil)
@@ -235,12 +231,6 @@ module ElasticGraph
                     "field_path" => "id",
                     "direction" => "desc"
                   }}
-                }
-              },
-              "DateGroupingGranularity" => {
-                "values_by_name" => {
-                  "DAY" => {"datastore_value" => "day", "alternate_original_name" => "DAILY"},
-                  "YEAR" => {"datastore_value" => "year", "alternate_original_name" => "YEARLY"}
                 }
               },
               "DistanceUnit" => {
