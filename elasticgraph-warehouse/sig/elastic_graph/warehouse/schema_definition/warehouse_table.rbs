@@ -1,0 +1,25 @@
+module ElasticGraph
+  module Warehouse
+    module SchemaDefinition
+      class WarehouseTableSupertype
+        attr_accessor name: ::String
+        attr_accessor indexed_type: _IndexedTypeInterface
+
+        def initialize: (::String, _IndexedTypeInterface) -> void
+      end
+
+      class WarehouseTable < WarehouseTableSupertype
+        def to_config: () -> ::Hash[::String, ::String]
+        def table_schema: () -> ::String
+
+        private
+
+        def table_field: (::ElasticGraph::SchemaDefinition::Indexing::Field) -> ::String
+      end
+
+      interface _IndexedTypeInterface
+        def indexing_fields_by_name_in_index: () -> ::Hash[::String, ::ElasticGraph::SchemaDefinition::SchemaElements::Field]
+      end
+    end
+  end
+end

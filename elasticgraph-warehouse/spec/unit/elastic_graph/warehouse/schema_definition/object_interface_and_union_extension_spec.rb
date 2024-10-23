@@ -34,7 +34,19 @@ module ElasticGraph
               end
             end
 
-            expect(warehouse_column_type_for(results, "Venue")).to eq("STRUCT<id STRING, name STRING, location STRUCT<latitude DOUBLE, longitude DOUBLE>>")
+            # GeoLocation uses name_in_index: "lat" and "lon" for its fields
+            expect(warehouse_column_type_for(results, "Venue")).to eq("STRUCT<id STRING, name STRING, location STRUCT<lat DOUBLE, lon DOUBLE>>")
+          end
+
+          it "respects name_in_index for nested object fields" do
+            results = define_warehouse_schema do |s|
+              s.object_type "Address" do |t|
+                t.field "street_name", "String", name_in_index: "street"
+                t.field "city_name", "String", name_in_index: "city"
+              end
+            end
+
+            expect(warehouse_column_type_for(results, "Address")).to eq("STRUCT<street STRING, city STRING>")
           end
         end
 

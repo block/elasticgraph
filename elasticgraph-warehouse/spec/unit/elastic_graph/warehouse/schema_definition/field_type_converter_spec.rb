@@ -142,17 +142,10 @@ module ElasticGraph
           expect(convert_field_type(results, "Event", "occurred_at")).to eq "TIMESTAMP"
         end
 
-        def convert_field_type(results, type, field)
-          field_type = results
-            .state
-            .types_by_name
-            .fetch(type)
-            .indexing_fields_by_name_in_index
-            .fetch(field)
-            .to_indexing_field
-            .type
-
-          FieldTypeConverter.convert(field_type)
+        def convert_field_type(results, type_name, field_name)
+          type = results.state.types_by_name.fetch(type_name)
+          field = type.indexing_fields_by_name_in_index.fetch(field_name).to_indexing_field
+          FieldTypeConverter.convert(field.type)
         end
       end
     end

@@ -1,0 +1,19 @@
+module ElasticGraph
+  module Warehouse
+    module SchemaDefinition
+      module SchemaArtifactManagerExtension : _SchemaArtifactManagerExtensionInterface
+        private
+
+        def artifacts_from_schema_def: () -> ::Array[ElasticGraph::SchemaDefinition::SchemaArtifact[untyped]]
+
+        @schema_artifacts_directory: ::String
+      end
+
+      interface _SchemaArtifactManagerExtensionInterface
+        def schema_definition_results: () -> (::ElasticGraph::SchemaDefinition::Results & ResultsExtension)
+        def artifacts_from_schema_def: () -> ::Array[ElasticGraph::SchemaDefinition::SchemaArtifact[untyped]]
+        def new_yaml_artifact: (::String, ::Hash[::String, untyped], ?extra_comment_lines: ::Array[::String]) -> ElasticGraph::SchemaDefinition::SchemaArtifact[::Hash[::String, untyped]]
+      end
+    end
+  end
+end

@@ -17,15 +17,17 @@ module ElasticGraph
         # the resolved type's `to_warehouse_column_type` method. Supports
         # nested arrays like `[[String!]]` which become `ARRAY<ARRAY<STRING>>`.
         #
-        # @param field_type [Object] the field type to convert
+        # @param field_type [ElasticGraph::SchemaDefinition::SchemaElements::TypeReference] the field type to convert
         # @return [String] the warehouse column type (e.g., "STRING", "ARRAY<INT>", "ARRAY<ARRAY<DOUBLE>>")
+        # @raise [ArgumentError] if the type cannot be resolved to a warehouse column type
         def self.convert(field_type)
           unwrapped_type = field_type.unwrap_non_null
 
           if unwrapped_type.list?
             "ARRAY<#{convert(unwrapped_type.unwrap_list)}>"
           else
-            unwrapped_type.resolved.to_warehouse_column_type
+            resolved_type = unwrapped_type.resolved
+            resolved_type.to_warehouse_column_type
           end
         end
       end
