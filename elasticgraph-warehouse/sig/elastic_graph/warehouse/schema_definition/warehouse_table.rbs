@@ -1,0 +1,21 @@
+module ElasticGraph
+  module Warehouse
+    module SchemaDefinition
+      class WarehouseTableSupertype
+        attr_accessor name: ::String
+        attr_accessor indexed_type: untyped
+
+        def initialize: (::String, untyped) -> void
+      end
+
+      class WarehouseTable < WarehouseTableSupertype
+        def to_config: () -> ::Hash[::String, ::String]
+        def table_schema: () -> ::String
+
+        private
+
+        def table_field: (untyped) -> ::String
+      end
+    end
+  end
+end
