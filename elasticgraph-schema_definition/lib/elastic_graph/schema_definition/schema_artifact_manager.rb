@@ -57,7 +57,8 @@ module ElasticGraph
           new_yaml_artifact(DATASTORE_CONFIG_FILE, schema_definition_results.datastore_config),
           new_yaml_artifact(RUNTIME_METADATA_FILE, pruned_runtime_metadata(graphql_schema).to_dumpable_hash),
           @json_schemas_artifact,
-          new_raw_artifact(GRAPHQL_SCHEMA_FILE, "\n" + graphql_schema)
+          new_raw_artifact(GRAPHQL_SCHEMA_FILE, "\n" + graphql_schema),
+          new_yaml_artifact(DATA_WAREHOUSE_FILE, schema_definition_results.warehouse_config)
         ]
 
         versioned_artifacts = build_desired_versioned_json_schemas(@json_schemas_artifact.desired_contents).values.map do |versioned_schema|

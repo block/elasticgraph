@@ -8,6 +8,7 @@
 
 require "elastic_graph/schema_artifacts/runtime_metadata/enum"
 require "elastic_graph/schema_definition/indexing/field_type/enum"
+require "elastic_graph/schema_definition/warehouse_config/field_type/enum"
 require "elastic_graph/schema_definition/mixins/can_be_graphql_only"
 require "elastic_graph/schema_definition/mixins/has_derived_graphql_type_customizations"
 require "elastic_graph/schema_definition/mixins/has_directives"
@@ -159,6 +160,10 @@ module ElasticGraph
         # @return [Indexing::FieldType::Enum] indexing representation of this enum type
         def to_indexing_field_type
           Indexing::FieldType::Enum.new(values_by_name.keys)
+        end
+
+        def to_warehouse_field_type
+          WarehouseConfig::FieldType::Enum.new(values_by_name.keys)
         end
 
         # @return [false] enum types are never directly indexed

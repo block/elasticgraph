@@ -10,6 +10,7 @@ require "elastic_graph/errors"
 require "elastic_graph/schema_artifacts/runtime_metadata/relation"
 require "elastic_graph/schema_definition/indexing/field"
 require "elastic_graph/schema_definition/indexing/field_type/object"
+require "elastic_graph/schema_definition/warehouse_config/field_type/object"
 require "elastic_graph/schema_definition/mixins/can_be_graphql_only"
 require "elastic_graph/schema_definition/mixins/has_derived_graphql_type_customizations"
 require "elastic_graph/schema_definition/mixins/has_directives"
@@ -478,6 +479,15 @@ module ElasticGraph
         # @private
         def to_indexing_field_type
           Indexing::FieldType::Object.new(
+            type_name: name,
+            subfields: indexing_fields_by_name_in_index.values.map(&:to_indexing_field).compact,
+            mapping_options: mapping_options,
+            json_schema_options: json_schema_options
+          )
+        end
+
+        def to_warehouse_field_type
+          WarehouseConfig::FieldType::Object.new(
             type_name: name,
             subfields: indexing_fields_by_name_in_index.values.map(&:to_indexing_field).compact,
             mapping_options: mapping_options,

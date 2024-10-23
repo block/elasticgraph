@@ -12,6 +12,7 @@ require "elastic_graph/schema_definition/mixins/has_derived_graphql_type_customi
 require "elastic_graph/schema_definition/mixins/has_directives"
 require "elastic_graph/schema_definition/mixins/has_documentation"
 require "elastic_graph/schema_definition/mixins/has_indices"
+require "elastic_graph/schema_definition/mixins/has_warehouse_tables"
 require "elastic_graph/schema_definition/mixins/has_readable_to_s_and_inspect"
 require "elastic_graph/schema_definition/mixins/has_subtypes"
 require "elastic_graph/schema_definition/mixins/supports_filtering_and_aggregation"
@@ -55,6 +56,7 @@ module ElasticGraph
         include Mixins::HasDirectives
         include Mixins::SupportsFilteringAndAggregation
         include Mixins::HasIndices
+        include Mixins::HasWarehouseTables
         include Mixins::HasSubtypes
         include Mixins::HasDerivedGraphQLTypeCustomizations
         include Mixins::HasReadableToSAndInspect.new { |t| t.name }

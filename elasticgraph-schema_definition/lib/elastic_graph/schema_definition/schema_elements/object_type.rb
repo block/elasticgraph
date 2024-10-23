@@ -32,6 +32,7 @@ module ElasticGraph
         # `include HasIndices` provides the following methods:
         # @dynamic runtime_metadata, derived_indexed_types, indices, indexed?, abstract?
         include Mixins::HasIndices
+        include Mixins::HasWarehouseTables
 
         # `include ImplementsInterfaces` provides the following methods:
         # @dynamic verify_graphql_correctness!

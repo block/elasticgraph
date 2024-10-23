@@ -8,6 +8,7 @@
 
 require "elastic_graph/schema_artifacts/runtime_metadata/scalar_type"
 require "elastic_graph/schema_definition/indexing/field_type/scalar"
+require "elastic_graph/schema_definition/warehouse_config/field_type/scalar"
 require "elastic_graph/schema_definition/mixins/can_be_graphql_only"
 require "elastic_graph/schema_definition/mixins/has_derived_graphql_type_customizations"
 require "elastic_graph/schema_definition/mixins/has_directives"
@@ -185,6 +186,10 @@ module ElasticGraph
         # @private
         def to_indexing_field_type
           Indexing::FieldType::Scalar.new(scalar_type: self)
+        end
+
+        def to_warehouse_field_type
+          WarehouseConfig::FieldType::Scalar.new(scalar_type: self)
         end
 
         # @private

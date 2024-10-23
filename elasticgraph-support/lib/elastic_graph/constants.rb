@@ -103,6 +103,8 @@ module ElasticGraph
   # @private
   RUNTIME_METADATA_FILE = "runtime_metadata.yaml"
 
+  DATA_WAREHOUSE_FILE = "data_warehouse.yaml"
+
   # Name for directory that contains versioned json_schemas files.
   # @private
   JSON_SCHEMAS_BY_VERSION_DIRECTORY = "json_schemas_by_version"

@@ -665,11 +665,13 @@ module ElasticGraph
           schema_def_api.scalar_type "Boolean" do |t|
             t.mapping type: "boolean"
             t.json_schema type: "boolean"
+            t.warehouse_table table_type: "BOOLEAN"
           end
 
           schema_def_api.scalar_type "Float" do |t|
             t.mapping type: "double"
             t.json_schema type: "number"
+            t.warehouse_table table_type: "FLOAT"
 
             t.customize_aggregated_values_type do |avt|
               # not nullable, since sum(empty_set) == 0
@@ -710,11 +712,13 @@ module ElasticGraph
           schema_def_api.scalar_type "ID" do |t|
             t.mapping type: "keyword"
             t.json_schema type: "string"
+            t.warehouse_table table_type: "STRING"
           end
 
           schema_def_api.scalar_type "Int" do |t|
             t.mapping type: "integer"
             t.json_schema type: "integer", minimum: INT_MIN, maximum: INT_MAX
+            t.warehouse_table table_type: "INT"
 
             t.prepare_for_indexing_with "ElasticGraph::Indexer::IndexingPreparers::Integer",
               defined_at: "elastic_graph/indexer/indexing_preparers/integer"
@@ -743,6 +747,8 @@ module ElasticGraph
                 EOS
               end
             end
+
+            t.warehouse_table table_type: "STRING"
           end
         end
 
@@ -767,6 +773,7 @@ module ElasticGraph
           schema_def_api.scalar_type "Date" do |t|
             t.mapping type: "date", format: DATASTORE_DATE_FORMAT
             t.json_schema type: "string", format: "date"
+            t.warehouse_table table_type: "DATE"
             t.coerce_with "ElasticGraph::GraphQL::ScalarCoercionAdapters::Date",
               defined_at: "elastic_graph/graphql/scalar_coercion_adapters/date"
 
@@ -787,6 +794,7 @@ module ElasticGraph
           schema_def_api.scalar_type "DateTime" do |t|
             t.mapping type: "date", format: DATASTORE_DATE_TIME_FORMAT
             t.json_schema type: "string", format: "date-time"
+            t.warehouse_table table_type: "TIMESTAMP"
             t.coerce_with "ElasticGraph::GraphQL::ScalarCoercionAdapters::DateTime",
               defined_at: "elastic_graph/graphql/scalar_coercion_adapters/date_time"
 
@@ -876,6 +884,7 @@ module ElasticGraph
             t.mapping type: "date", format: "HH:mm:ss||HH:mm:ss.S||HH:mm:ss.SS||HH:mm:ss.SSS"
 
             t.json_schema type: "string", pattern: VALID_LOCAL_TIME_JSON_SCHEMA_PATTERN
+            t.warehouse_table table_type: "TIMESTAMP"
 
             t.customize_aggregated_values_type do |avt|
               define_exact_min_max_and_approx_avg_on_aggregated_values(avt, "LocalTime") do |adjective:, full_name:|
@@ -890,6 +899,7 @@ module ElasticGraph
           schema_def_api.scalar_type "TimeZone" do |t|
             t.mapping type: "keyword"
             t.json_schema type: "string", enum: GraphQL::ScalarCoercionAdapters::VALID_TIME_ZONES.to_a
+            t.warehouse_table table_type: "STRING"
             t.coerce_with "ElasticGraph::GraphQL::ScalarCoercionAdapters::TimeZone",
               defined_at: "elastic_graph/graphql/scalar_coercion_adapters/time_zone"
 
@@ -910,6 +920,7 @@ module ElasticGraph
 
             # In the index we store this as a JSON string in a `keyword` field.
             t.mapping type: "keyword"
+            t.warehouse_table table_type: "VARIANT"
 
             t.coerce_with "ElasticGraph::GraphQL::ScalarCoercionAdapters::Untyped",
               defined_at: "elastic_graph/graphql/scalar_coercion_adapters/untyped"
@@ -933,6 +944,7 @@ module ElasticGraph
           schema_def_api.scalar_type "JsonSafeLong" do |t|
             t.mapping type: "long"
             t.json_schema type: "integer", minimum: JSON_SAFE_LONG_MIN, maximum: JSON_SAFE_LONG_MAX
+            t.warehouse_table table_type: "BIGINT"
             t.coerce_with "ElasticGraph::GraphQL::ScalarCoercionAdapters::JsonSafeLong",
               defined_at: "elastic_graph/graphql/scalar_coercion_adapters/longs"
 
@@ -977,6 +989,8 @@ module ElasticGraph
             # would be *extremely* complicated).
             t.mapping type: "long"
             t.json_schema type: "integer", minimum: LONG_STRING_MIN, maximum: LONG_STRING_MAX
+            t.warehouse_table table_type: "BIGINT"
+
             t.coerce_with "ElasticGraph::GraphQL::ScalarCoercionAdapters::LongString",
               defined_at: "elastic_graph/graphql/scalar_coercion_adapters/longs"
             t.prepare_for_indexing_with "ElasticGraph::Indexer::IndexingPreparers::Integer",

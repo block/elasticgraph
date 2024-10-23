@@ -40,6 +40,10 @@ module ElasticGraph
         @datastore_config ||= generate_datastore_config
       end
 
+      def warehouse_config
+        @warehouse_config ||= generate_warehouse_config
+      end
+
       # @return [Hash<String, Object>] runtime metadata used by other parts of ElasticGraph and dumped as `runtime_metadata.yaml`
       def runtime_metadata
         @runtime_metadata ||= build_runtime_metadata
@@ -191,6 +195,15 @@ module ElasticGraph
           "indices" => indices.to_h { |i| [i.name, i.to_index_config] },
           "scripts" => datastore_scripts.to_h { |s| [s.id, s.to_artifact_payload] }
         }
+      end
+
+      def generate_warehouse_config
+        tables = state.object_types_by_name.values
+                                        .filter_map(&:warehouse_table_def)
+                                        .sort_by(&:name)
+
+
+        tables.to_h { |i| [i.name, i.to_config] }
       end
 
       def build_dynamic_scripts

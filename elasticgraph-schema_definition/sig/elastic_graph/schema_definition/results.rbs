@@ -39,6 +39,7 @@ module ElasticGraph
       def aggregation_efficiency_hints_for: (::Array[Indexing::DerivedIndexedType]) -> ::String?
       def json_schema_with_metadata_merger: () -> Indexing::JSONSchemaWithMetadata::Merger
       def generate_datastore_config: () -> ::Hash[::String, untyped]
+      def warehouse_config: -> ::Hash[::String, untyped]
       def build_dynamic_scripts: () -> ::Array[Scripting::Script]
       def build_runtime_metadata: () -> SchemaArtifacts::RuntimeMetadata::Schema
       def identify_extra_update_targets_by_object_type_name: () -> ::Hash[::String, ::Array[SchemaArtifacts::RuntimeMetadata::UpdateTarget]]
