@@ -8,7 +8,9 @@
 
 require "elastic_graph/warehouse/schema_definition/enum_type_extension"
 require "elastic_graph/warehouse/schema_definition/object_and_interface_extension"
+require "elastic_graph/warehouse/schema_definition/results_extension"
 require "elastic_graph/warehouse/schema_definition/scalar_type_extension"
+require "elastic_graph/warehouse/schema_definition/schema_artifact_manager_extension"
 
 module ElasticGraph
   module Warehouse
@@ -70,6 +72,36 @@ module ElasticGraph
             # :nocov: -- currently all invocations have a block
             yield type if block_given?
             # :nocov:
+          end
+        end
+
+        # Creates a new Results instance with warehouse extensions.
+        #
+        # @return [ElasticGraph::SchemaDefinition::Results] the created results instance
+        def new_results
+          super.tap do |results|
+            results.extend ResultsExtension
+          end
+        end
+
+        # Creates a new SchemaArtifactManager instance with warehouse extensions.
+        #
+        # @param schema_definition_results [ElasticGraph::SchemaDefinition::Results] the schema definition results
+        # @param schema_artifacts_directory [String] directory where schema artifacts are stored
+        # @param enforce_json_schema_version [Boolean] whether to enforce JSON schema version
+        # @param output [IO, nil] output stream for warnings and messages
+        # @param max_diff_lines [Integer] maximum number of diff lines to display
+        # @return [ElasticGraph::SchemaDefinition::SchemaArtifactManager] the created artifact manager
+        def new_schema_artifact_manager(
+          schema_definition_results:,
+          schema_artifacts_directory:,
+          enforce_json_schema_version:,
+          output:,
+          max_diff_lines: 50
+        )
+          super.tap do |manager|
+            manager.extend SchemaArtifactManagerExtension
+            manager.add_warehouse_artifact
           end
         end
       end

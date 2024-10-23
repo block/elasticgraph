@@ -7,13 +7,24 @@
 # frozen_string_literal: true
 
 require "elastic_graph/warehouse/schema_definition/field_type_converter"
+require "elastic_graph/warehouse/schema_definition/warehouse_table"
 
 module ElasticGraph
   module Warehouse
     module SchemaDefinition
       # Extends {ElasticGraph::SchemaDefinition::SchemaElements::ObjectType} and
-      # {ElasticGraph::SchemaDefinition::SchemaElements::InterfaceType} to add warehouse column type conversion.
+      # {ElasticGraph::SchemaDefinition::SchemaElements::InterfaceType} to add warehouse table definition support.
       module ObjectAndInterfaceExtension
+        attr_reader :warehouse_table_def
+
+        # Defines a warehouse table for this object or interface type.
+        #
+        # @param name [String] name of the warehouse table
+        # @return [void]
+        def warehouse_table(name)
+          @warehouse_table_def = WarehouseTable.new(name, schema_def_state, self)
+        end
+
         # Returns the warehouse column type representation for this object or interface type.
         #
         # @return [String] a STRUCT SQL type containing all subfields

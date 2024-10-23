@@ -19,13 +19,20 @@ module ElasticGraph
         #
         # @param field_type [Object] the field type to convert
         # @return [String] the warehouse column type (e.g., "STRING", "ARRAY<INT>", "ARRAY<ARRAY<DOUBLE>>")
+        # @raise [ArgumentError] if the type cannot be resolved to a warehouse column type
         def self.convert(field_type)
           unwrapped_type = field_type.unwrap_non_null
 
           if unwrapped_type.list?
             "ARRAY<#{convert(unwrapped_type.unwrap_list)}>"
           else
-            unwrapped_type.resolved.to_warehouse_column_type
+            resolved_type = unwrapped_type.resolved
+
+            unless resolved_type&.respond_to?(:to_warehouse_column_type)
+              raise ArgumentError, "Cannot convert type to warehouse column: type #{resolved_type.inspect} does not respond to :to_warehouse_column_type"
+            end
+
+            resolved_type.to_warehouse_column_type
           end
         end
       end

@@ -116,6 +116,45 @@ module ElasticGraph
           expect(convert_field_type(results, "Event", "occurred_at")).to eq "TIMESTAMP"
         end
 
+        it "raises an error when the resolved type does not respond to :to_warehouse_column_type" do
+          results = define_warehouse_schema(extension_modules: []) do |s|
+            s.scalar_type "CustomType" do |t|
+              t.mapping type: "keyword"
+              t.json_schema type: "string"
+            end
+
+            s.object_type "Doc" do |t|
+              t.field "custom_field", "CustomType"
+            end
+          end
+
+          field_type = results
+            .state
+            .types_by_name
+            .fetch("Doc")
+            .indexing_fields_by_name_in_index
+            .fetch("custom_field")
+            .to_indexing_field
+            .type
+
+          expect {
+            FieldTypeConverter.convert(field_type)
+          }.to raise_error(ArgumentError, /Cannot convert type to warehouse column.*does not respond to :to_warehouse_column_type/)
+        end
+
+        it "raises an error when the resolved type is nil" do
+          results = define_warehouse_schema do |s|
+            # Create schema with no types
+          end
+
+          # Create a type reference to a non-existent type
+          non_existent_type = results.state.type_ref("NonExistentType")
+
+          expect {
+            FieldTypeConverter.convert(non_existent_type)
+          }.to raise_error(ArgumentError, /Cannot convert type to warehouse column.*does not respond to :to_warehouse_column_type/)
+        end
+
         def convert_field_type(results, type, field)
           field_type = results
             .state
