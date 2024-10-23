@@ -14,10 +14,18 @@ module ElasticGraph
     module SchemaSupport
       include ElasticGraph::SchemaDefinition::TestSupport
 
+      # Override define_schema to include APIExtension by default for all warehouse specs
+      def define_schema(**options, &block)
+        super(
+          extension_modules: [SchemaDefinition::APIExtension],
+          **options,
+          &block
+        )
+      end
+
       def define_warehouse_schema(**options, &block)
         results = define_schema(
           schema_element_name_form: :snake_case,
-          extension_modules: [SchemaDefinition::APIExtension],
           **options,
           &block
         )
@@ -37,7 +45,7 @@ module ElasticGraph
     end
 
     RSpec.configure do |config|
-      config.include SchemaSupport, :warehouse_schema
+      config.include SchemaSupport
     end
   end
 end
