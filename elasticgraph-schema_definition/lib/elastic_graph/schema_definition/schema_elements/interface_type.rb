@@ -8,6 +8,7 @@
 
 require "delegate"
 require "elastic_graph/schema_definition/mixins/has_indices"
+require "elastic_graph/schema_definition/mixins/has_warehouse_tables"
 require "elastic_graph/schema_definition/mixins/has_subtypes"
 require "elastic_graph/schema_definition/mixins/implements_interfaces"
 require "elastic_graph/schema_definition/mixins/supports_filtering_and_aggregation"
@@ -31,6 +32,7 @@ module ElasticGraph
         include Mixins::ImplementsInterfaces
         include Mixins::SupportsFilteringAndAggregation
         include Mixins::HasIndices
+        include Mixins::HasWarehouseTables
         include Mixins::HasSubtypes
         include Mixins::HasReadableToSAndInspect.new { |t| t.name }
 

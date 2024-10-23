@@ -29,6 +29,10 @@ module ElasticGraph
           @json_schema_options ||= {}
         end
 
+        def warehouse_table_options
+          @warehouse_table_options ||= {}
+        end
+
         # Set of mapping parameters that it makes sense to allow customization of, based on
         # [the Elasticsearch docs](https://www.elastic.co/guide/en/elasticsearch/reference/8.15/mapping-params.html).
         CUSTOMIZABLE_DATASTORE_PARAMS = Set[
@@ -174,6 +178,11 @@ module ElasticGraph
           end
 
           json_schema_options.update(options)
+        end
+
+
+        def warehouse_table(**options)
+          warehouse_table_options.update(options)
         end
       end
     end
