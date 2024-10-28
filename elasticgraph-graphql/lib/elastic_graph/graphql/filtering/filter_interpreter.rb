@@ -195,12 +195,16 @@ module ElasticGraph
             end
           end
 
-          # When our `shoulds` array is empty, the filtering semantics we want is to match no documents.
-          # However, that's not the behavior the datastore will give us if we have an empty array in the
-          # query under `should`. To get the behavior we want, we need to pass the datastore some filter
-          # criteria that will evaluate to false for every document.
-          bool_query = shoulds.empty? ? BooleanQuery::ALWAYS_FALSE_FILTER : BooleanQuery.should(*shoulds)
-          bool_query.merge_into(bool_node)
+          # We want to match the following spemantics for `any_of`:
+          # * filter: {anyOf: []} -> return no results
+          # * filter: {anyOf: [{field: null}]} -> return all results
+          #
+          # Hence, when our `expressions` array is empty, we want to match no documents. However, that's
+          # not the behavior the datastore will give us if we have an empty array in the query under
+          # `should`. To get the behavior we want, we need to pass the datastore some filter criteria
+          # that will evaluate to false for every document.
+          bool_query = expressions.empty? ? BooleanQuery::ALWAYS_FALSE_FILTER : BooleanQuery.should(*shoulds)
+          bool_query.merge_into(bool_node) if expressions.empty? || !shoulds.empty?
         end
 
         def process_all_of_expression(bool_node, expressions, field_path)
