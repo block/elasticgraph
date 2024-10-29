@@ -25,7 +25,8 @@ module ElasticGraph
           queue_urls: event.fetch("queue_urls"),
           min_cpu_target: event.fetch("min_cpu_target"),
           max_cpu_target: event.fetch("max_cpu_target"),
-          event_source_mapping_uuids: event.fetch("event_source_mapping_uuids")
+          maximum_concurrency: event.fetch("maximum_concurrency"),
+          indexer_function_name: event.fetch("indexer_function_name")
         )
       end
     end

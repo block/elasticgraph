@@ -19,12 +19,9 @@ module ElasticGraph
         @lambda_client = lambda_client
       end
 
-      # AWS requires the value be in this range:
-      # https://docs.aws.amazon.com/lambda/latest/api/API_ScalingConfig.html#API_ScalingConfig_Contents
-      MAXIMUM_CONCURRENCY = 1000
       MINIMUM_CONCURRENCY = 2
 
-      def tune_indexer_concurrency(queue_urls:, min_cpu_target:, max_cpu_target:, event_source_mapping_uuids:)
+      def tune_indexer_concurrency(queue_urls:, min_cpu_target:, max_cpu_target:, maximum_concurrency:, indexer_function_name:)
         queue_attributes = get_queue_attributes(queue_urls)
         queue_arns = queue_attributes.fetch(:queue_arns)
         num_messages = queue_attributes.fetch(:total_messages)
@@ -43,7 +40,7 @@ module ElasticGraph
             cpu_utilization = get_max_cpu_utilization
             cpu_midpoint = (max_cpu_target + min_cpu_target) / 2.0
 
-            current_concurrency = get_total_concurrency(event_source_mapping_uuids)
+            current_concurrency = get_concurrency(indexer_function_name)
 
             if current_concurrency.nil?
               details_logger.log_unset
@@ -79,9 +76,10 @@ module ElasticGraph
           end
 
         if new_target_concurrency && new_target_concurrency != current_concurrency
-          update_event_source_mapping(
-            event_source_mapping_uuids: event_source_mapping_uuids,
-            concurrency: new_target_concurrency
+          update_concurrency(
+            indexer_function_name: indexer_function_name,
+            concurrency: new_target_concurrency,
+            maximum_concurrency: maximum_concurrency
           )
         end
       end
@@ -116,29 +114,18 @@ module ElasticGraph
         }
       end
 
-      def get_total_concurrency(event_source_mapping_uuids)
-        maximum_concurrencies = event_source_mapping_uuids.map do |event_source_mapping_uuid|
-          @lambda_client.get_event_source_mapping(
-            uuid: event_source_mapping_uuid
-          ).scaling_config&.maximum_concurrency
-        end.compact
-        maximum_concurrencies.empty? ? nil : maximum_concurrencies.sum
+      def get_concurrency(indexer_function_name)
+        @lambda_client.get_function_concurrency(
+          function_name: indexer_function_name
+        ).reserved_concurrent_executions
       end
 
-      def update_event_source_mapping(concurrency:, event_source_mapping_uuids:)
-        concurrency_per_queue = concurrency / event_source_mapping_uuids.length
-
-        target_concurrency =
-          concurrency_per_queue.clamp(MINIMUM_CONCURRENCY, MAXIMUM_CONCURRENCY)
-
-        event_source_mapping_uuids.map do |event_source_mapping_uuid|
-          @lambda_client.update_event_source_mapping(
-            uuid: event_source_mapping_uuid,
-            scaling_config: {
-              maximum_concurrency: target_concurrency
-            }
-          )
-        end
+      def update_concurrency(indexer_function_name:, concurrency:, maximum_concurrency:)
+        target_concurrency = concurrency.clamp(MINIMUM_CONCURRENCY, maximum_concurrency)
+        @lambda_client.put_function_concurrency(
+          function_name: indexer_function_name,
+          reserved_concurrent_executions: target_concurrency
+        )
       end
     end
   end

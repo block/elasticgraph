@@ -7,14 +7,14 @@ module ElasticGraph
         lambda_client: Aws::Lambda::Client
       ) -> void
 
-      MAXIMUM_CONCURRENCY: ::Integer
       MINIMUM_CONCURRENCY: ::Integer
 
       def tune_indexer_concurrency: (
         queue_urls: ::Array[::String],
         min_cpu_target: ::Integer,
         max_cpu_target: ::Integer,
-        event_source_mapping_uuids: ::Array[::String]
+        maximum_concurrency: ::Integer,
+        indexer_function_name: ::String
       ) -> void
 
       private
@@ -26,11 +26,12 @@ module ElasticGraph
 
       def get_max_cpu_utilization: () -> ::Float
       def get_queue_attributes: (::Array[::String]) -> { total_messages: ::Integer, queue_arns: ::Array[::String] }
-      def get_total_concurrency: (::Array[::String]) -> ::Integer?
+      def get_concurrency: (::String) -> ::Integer?
 
-      def update_event_source_mapping: (
+      def update_concurrency: (
+        indexer_function_name: ::String,
         concurrency: ::Integer,
-        event_source_mapping_uuids: ::Array[::String]
+        maximum_concurrency: ::Integer
       ) -> void
     end
   end
