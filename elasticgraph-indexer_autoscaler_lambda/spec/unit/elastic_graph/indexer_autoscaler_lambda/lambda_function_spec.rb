@@ -36,7 +36,8 @@ RSpec.describe "Autoscale indexer lambda function" do
         "queue_urls" => ["https://sqs.us-west-2.amazonaws.com/000000000/some-eg-app-queue-name"],
         "min_cpu_target" => 70,
         "max_cpu_target" => 80,
-        "event_source_mapping_uuids" => ["12345678-1234-1234-1234-123456789012"]
+        "maximum_concurrency" => 1000,
+        "indexer_function_name" => "some-eg-app-indexer"
       }
       lambda_function.handle_request(event: event, context: {})
     end
