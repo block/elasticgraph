@@ -6,7 +6,7 @@ To build the site and documentation locally, run `bundle exec rake -T | grep sit
 
 ## CSS Styling
 
-CSS Styling is powerd by [Tailwind CSS](https://tailwindcss.com/) via the `package.json` script: `npm run build:css`.
+CSS Styling is powered by [Tailwind CSS](https://tailwindcss.com/) via the `package.json` script: `npm run build:css`.
 
 Tip: most LLM's do a good job of generating Tailwind CSS classes.
 
