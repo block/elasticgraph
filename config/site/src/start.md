@@ -1,6 +1,6 @@
 ---
 layout: markdown
-title: Getting Started with ElasticGraph
+title: Get Started with ElasticGraph
 permalink: /start/
 ---
 
