@@ -7,6 +7,8 @@ github_url: https://github.com/block/elasticgraph
 x_url: https://x.com/elasticgraph
 x_username: "@ElasticGraph"
 support_email: elasticgraph@squareup.com
+description: ElasticGraph is an open-source framework for indexing, searching, grouping, and aggregating data
+
 
 # Reusable CSS styling for the site, available via the `site.style` variable, ex: `{{ site.style.body }}`
 style:
