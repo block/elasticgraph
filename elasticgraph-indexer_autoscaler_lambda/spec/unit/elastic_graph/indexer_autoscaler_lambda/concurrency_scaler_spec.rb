@@ -8,6 +8,7 @@
 
 require "aws-sdk-lambda"
 require "aws-sdk-sqs"
+require "aws-sdk-cloudwatch"
 require "elastic_graph/indexer_autoscaler_lambda/concurrency_scaler"
 require "support/builds_indexer_autoscaler"
 
@@ -22,13 +23,16 @@ module ElasticGraph
         let(:max_cpu_target) { 80 }
         let(:cpu_midpoint) { 75 }
         let(:maximum_concurrency) { 1000 }
+        let(:minimum_free_storage) { 100.0 }
 
         it "1.5x the concurrency when the CPU usage is significantly below the minimum target" do
           lambda_client = lambda_client_with_concurrency(200)
+          cloudwatch_client = cloudwatch_client_with_storage_metrics(minimum_free_storage + 1)
           concurrency_scaler = build_concurrency_scaler(
             datastore_client: datastore_client_with_cpu_usage(10.0),
             sqs_client: sqs_client_with_number_of_messages(1),
-            lambda_client: lambda_client
+            lambda_client: lambda_client,
+            cloudwatch_client: cloudwatch_client
           )
 
           tune_indexer_concurrency(concurrency_scaler)
@@ -39,10 +43,12 @@ module ElasticGraph
         it "increases concurrency by a factor CPU usage when CPU is slightly below the minimum target" do
           # CPU is at 50% and our target range is 70-80. 75 / 50 = 1.5, so increase it by 50%.
           lambda_client = lambda_client_with_concurrency(200)
+          cloudwatch_client = cloudwatch_client_with_storage_metrics(minimum_free_storage + 1)
           concurrency_scaler = build_concurrency_scaler(
             datastore_client: datastore_client_with_cpu_usage(50.0),
             sqs_client: sqs_client_with_number_of_messages(1),
-            lambda_client: lambda_client
+            lambda_client: lambda_client,
+            cloudwatch_client: cloudwatch_client
           )
 
           tune_indexer_concurrency(concurrency_scaler)
@@ -53,10 +59,12 @@ module ElasticGraph
         it "sets concurrency to the max when it cannot be increased anymore when CPU usage is under the limit" do
           current_concurrency = maximum_concurrency - 1
           lambda_client = lambda_client_with_concurrency(current_concurrency)
+          cloudwatch_client = cloudwatch_client_with_storage_metrics(minimum_free_storage + 1)
           concurrency_scaler = build_concurrency_scaler(
             datastore_client: datastore_client_with_cpu_usage(10),
             sqs_client: sqs_client_with_number_of_messages(1),
-            lambda_client: lambda_client
+            lambda_client: lambda_client,
+            cloudwatch_client: cloudwatch_client
           )
 
           tune_indexer_concurrency(concurrency_scaler)
@@ -67,10 +75,12 @@ module ElasticGraph
         it "decreases concurrency by a factor of the CPU when the CPU usage is over the limit" do
           # CPU is at 90% and our target range is 70-80. 90 / 75 = 1.2, so decrease it by 20%.
           lambda_client = lambda_client_with_concurrency(500)
+          cloudwatch_client = cloudwatch_client_with_storage_metrics(minimum_free_storage + 1)
           concurrency_scaler = build_concurrency_scaler(
             datastore_client: datastore_client_with_cpu_usage(90.0),
             sqs_client: sqs_client_with_number_of_messages(1),
-            lambda_client: lambda_client
+            lambda_client: lambda_client,
+            cloudwatch_client: cloudwatch_client
           )
 
           tune_indexer_concurrency(concurrency_scaler)
@@ -81,10 +91,12 @@ module ElasticGraph
         it "leaves concurrency unchanged when it cannot be decreased anymore when CPU utilization is over the limit" do
           current_concurrency = 0
           lambda_client = lambda_client_with_concurrency(current_concurrency)
+          cloudwatch_client = cloudwatch_client_with_storage_metrics(minimum_free_storage + 1)
           concurrency_scaler = build_concurrency_scaler(
             datastore_client: datastore_client_with_cpu_usage(100),
             sqs_client: sqs_client_with_number_of_messages(1),
-            lambda_client: lambda_client
+            lambda_client: lambda_client,
+            cloudwatch_client: cloudwatch_client
           )
 
           tune_indexer_concurrency(concurrency_scaler)
@@ -94,11 +106,13 @@ module ElasticGraph
 
         it "does not adjust concurrency when the CPU is within the target range" do
           lambda_client = lambda_client_with_concurrency(500)
+          cloudwatch_client = cloudwatch_client_with_storage_metrics(minimum_free_storage + 1)
           [min_cpu_target, cpu_midpoint, max_cpu_target].each do |cpu_usage|
             concurrency_scaler = build_concurrency_scaler(
               datastore_client: datastore_client_with_cpu_usage(cpu_usage),
               sqs_client: sqs_client_with_number_of_messages(1),
-              lambda_client: lambda_client
+              lambda_client: lambda_client,
+              cloudwatch_client: cloudwatch_client
             )
 
             tune_indexer_concurrency(concurrency_scaler)
@@ -113,10 +127,12 @@ module ElasticGraph
           expect(high_cpu_usage).to be > max_cpu_target
 
           lambda_client = lambda_client_with_concurrency(current_concurrency)
+          cloudwatch_client = cloudwatch_client_with_storage_metrics(minimum_free_storage + 1)
           concurrency_scaler = build_concurrency_scaler(
             datastore_client: datastore_client_with_cpu_usage(min_cpu_target, high_cpu_usage),
             sqs_client: sqs_client_with_number_of_messages(1),
-            lambda_client: lambda_client
+            lambda_client: lambda_client,
+            cloudwatch_client: cloudwatch_client
           )
 
           tune_indexer_concurrency(concurrency_scaler)
@@ -125,13 +141,30 @@ module ElasticGraph
           expect(updated_concurrency_requested_from(lambda_client)).to eq [460] # 500 - 8% since 81/75 = 1.08
         end
 
+        it "resets the concurrency when free storage space drops below the minimum regardless of cpu" do
+          lambda_client = lambda_client_with_concurrency(500)
+          cloudwatch_client = cloudwatch_client_with_storage_metrics(minimum_free_storage + 1, minimum_free_storage - 1)
+          concurrency_scaler = build_concurrency_scaler(
+            datastore_client: datastore_client_with_cpu_usage(min_cpu_target - 1),
+            sqs_client: sqs_client_with_number_of_messages(1),
+            lambda_client: lambda_client,
+            cloudwatch_client: cloudwatch_client
+          )
+
+          tune_indexer_concurrency(concurrency_scaler)
+
+          expect(updated_concurrency_requested_from(lambda_client)).to eq [2] # 2 is the minimum
+        end
+
         it "sets concurrency to the min when there are no messages in the queue" do
           current_concurrency = 500
           lambda_client = lambda_client_with_concurrency(current_concurrency)
+          cloudwatch_client = cloudwatch_client_with_storage_metrics(minimum_free_storage + 1)
           concurrency_scaler = build_concurrency_scaler(
             datastore_client: datastore_client_with_cpu_usage(min_cpu_target - 1),
             sqs_client: sqs_client_with_number_of_messages(0),
-            lambda_client: lambda_client
+            lambda_client: lambda_client,
+            cloudwatch_client: cloudwatch_client
           )
 
           tune_indexer_concurrency(concurrency_scaler)
@@ -141,12 +174,14 @@ module ElasticGraph
 
         it "leaves concurrency unset if it is currently unset" do
           lambda_client = lambda_client_without_concurrency
+          cloudwatch_client = cloudwatch_client_with_storage_metrics(minimum_free_storage + 1)
 
           # CPU is at 50% and our target range is 70-80.
           concurrency_scaler = build_concurrency_scaler(
             datastore_client: datastore_client_with_cpu_usage(50),
             sqs_client: sqs_client_with_number_of_messages(1),
-            lambda_client: lambda_client
+            lambda_client: lambda_client,
+            cloudwatch_client: cloudwatch_client
           )
 
           tune_indexer_concurrency(concurrency_scaler)
@@ -165,24 +200,34 @@ module ElasticGraph
       end
 
       def datastore_client_with_cpu_usage(percent, percent2 = percent)
-        stubbed_datastore_client(get_node_os_stats: {
-          "nodes" => {
-            "node1" => {
-              "os" => {
-                "cpu" => {
-                  "percent" => percent
+        stubbed_datastore_client(
+          get_node_os_stats: {
+            "nodes" => {
+              "node1" => {
+                "os" => {
+                  "cpu" => {
+                    "percent" => percent
+                  }
                 }
-              }
-            },
-            "node2" => {
-              "os" => {
-                "cpu" => {
-                  "percent" => percent2
+              },
+              "node2" => {
+                "os" => {
+                  "cpu" => {
+                    "percent" => percent2
+                  }
                 }
               }
             }
+          }, 
+          get_node_roles: {
+            "node1" => {
+              "roles" => ["data"]
+            },
+            "node2" => {
+              "roles" => ["data"]
+            }
           }
-        })
+        )
       end
 
       def sqs_client_with_number_of_messages(num_messages)
@@ -204,6 +249,25 @@ module ElasticGraph
         end
       end
 
+      def cloudwatch_client_with_storage_metrics(free_storage, free_storage2 = free_storage)
+        ::Aws::CloudWatch::Client.new(stub_responses: true).tap do |cloudwatch_client|
+          cloudwatch_client.stub_responses(:get_metric_data, {
+            metric_data_results: [
+              {
+                id: "node1",
+                values: [free_storage],
+                timestamps: [::Time.parse("2024-10-30T12:00:00Z")]
+              },
+              {
+                id: "node2",
+                values: [free_storage2],
+                timestamps: [::Time.parse("2024-10-30T12:00:00Z")]
+              }
+            ]
+          })
+        end
+      end
+
       # If the lambda is using unreserved concurrency, reserved_concurrent_executions on the Lambda client will be nil.
       def lambda_client_without_concurrency
         ::Aws::Lambda::Client.new(stub_responses: true).tap do |lambda_client|
@@ -213,11 +277,12 @@ module ElasticGraph
         end
       end
 
-      def build_concurrency_scaler(datastore_client:, sqs_client:, lambda_client:)
+      def build_concurrency_scaler(datastore_client:, sqs_client:, lambda_client:, cloudwatch_client:)
         build_indexer_autoscaler(
           clients_by_name: {"main" => datastore_client},
           sqs_client: sqs_client,
-          lambda_client: lambda_client
+          lambda_client: lambda_client,
+          cloudwatch_client: cloudwatch_client
         ).concurrency_scaler
       end
 
@@ -227,6 +292,7 @@ module ElasticGraph
           min_cpu_target: min_cpu_target,
           max_cpu_target: max_cpu_target,
           maximum_concurrency: maximum_concurrency,
+          minimum_free_storage: 100,
           indexer_function_name: indexer_function_name
         )
       end
