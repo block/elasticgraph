@@ -68,17 +68,24 @@ You can skip this part for now if you want to play with the sample schema. Other
    Define your schema in this file. Here's a basic example:
 
    ```ruby
-   module Schema
-     module Customers
-       extend ElasticGraph::Schema
+    ElasticGraph.define_schema do |schema|
+      schema.json_schema_version 1
 
-       type :customer do
-         field :id, :string
-         field :name, :string
-         field :email, :string
-       end
-     end
-   end
+      schema.object_type "Artist" do |t|
+        t.field "id", "ID"
+        t.field "name", "String"
+        t.field "lifetimeSales", "Int"
+        t.field "bio", "ArtistBio"
+
+        t.field "albums", "[Album!]!" do |f|
+          f.mapping type: "nested"
+        end
+
+        t.index "artists"
+      end
+    end
+
+    # ...
    ```
 
 3. **Update Configuration**:
