@@ -24,8 +24,6 @@ module ElasticGraph
               stub.get("/_cluster/health") { |env| response_for(body, env) }
             in :get_node_os_stats
               stub.get("/_nodes/stats/os") { |env| response_for(body, env) }
-            in :get_node_roles
-              stub.get("/_nodes/stats/roles") { |env| response_for(body, env) }
             in :get_flat_cluster_settings
               stub.get("/_cluster/settings?flat_settings=true") { |env| response_for(body, env) }
             in :put_persistent_cluster_settings

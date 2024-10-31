@@ -75,10 +75,6 @@ module ElasticGraph
         transform_errors { |c| c.nodes.stats(metric: "os") }
       end
 
-      def get_node_roles
-        transform_errors { |c| c.nodes.stats(metric: "roles") }
-      end
-
       def get_flat_cluster_settings
         transform_errors { |c| c.cluster.get_settings(flat_settings: true) }
       end

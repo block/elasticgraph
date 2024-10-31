@@ -143,7 +143,7 @@ module ElasticGraph
 
         it "resets the concurrency when free storage space drops below the minimum regardless of cpu" do
           lambda_client = lambda_client_with_concurrency(500)
-          cloudwatch_client = cloudwatch_client_with_storage_metrics(minimum_free_storage + 1, minimum_free_storage - 1)
+          cloudwatch_client = cloudwatch_client_with_storage_metrics(minimum_free_storage - 1)
           concurrency_scaler = build_concurrency_scaler(
             datastore_client: datastore_client_with_cpu_usage(min_cpu_target - 1),
             sqs_client: sqs_client_with_number_of_messages(1),
@@ -200,34 +200,24 @@ module ElasticGraph
       end
 
       def datastore_client_with_cpu_usage(percent, percent2 = percent)
-        stubbed_datastore_client(
-          get_node_os_stats: {
-            "nodes" => {
-              "node1" => {
-                "os" => {
-                  "cpu" => {
-                    "percent" => percent
-                  }
+        stubbed_datastore_client(get_node_os_stats: {
+          "nodes" => {
+            "node1" => {
+              "os" => {
+                "cpu" => {
+                  "percent" => percent
                 }
-              },
-              "node2" => {
-                "os" => {
-                  "cpu" => {
-                    "percent" => percent2
-                  }
+              }
+            },
+            "node2" => {
+              "os" => {
+                "cpu" => {
+                  "percent" => percent2
                 }
               }
             }
-          }, 
-          get_node_roles: {
-            "node1" => {
-              "roles" => ["data"]
-            },
-            "node2" => {
-              "roles" => ["data"]
-            }
           }
-        )
+        })
       end
 
       def sqs_client_with_number_of_messages(num_messages)
@@ -249,19 +239,14 @@ module ElasticGraph
         end
       end
 
-      def cloudwatch_client_with_storage_metrics(free_storage, free_storage2 = free_storage)
+      def cloudwatch_client_with_storage_metrics(free_storage)
         ::Aws::CloudWatch::Client.new(stub_responses: true).tap do |cloudwatch_client|
           cloudwatch_client.stub_responses(:get_metric_data, {
             # return values are in bytes
             metric_data_results: [
               {
-                id: "node1",
+                id: "minFreeStorageAcrossNodes",
                 values: [(free_storage * 1024 * 1024).to_f],
-                timestamps: [::Time.parse("2024-10-30T12:00:00Z")]
-              },
-              {
-                id: "node2",
-                values: [(free_storage2 * 1024 * 1024).to_f],
                 timestamps: [::Time.parse("2024-10-30T12:00:00Z")]
               }
             ]

@@ -29,7 +29,6 @@ module ElasticGraph
 
       def get_max_cpu_utilization: () -> ::Float
       def get_min_free_storage: () -> ::Float
-      def get_data_node_ids_by_cluster_name: () -> ::Hash[::String, ::String]
       def get_queue_attributes: (::Array[::String]) -> { total_messages: ::Integer, queue_arns: ::Array[::String] }
       def get_concurrency: (::String) -> ::Integer?
 
