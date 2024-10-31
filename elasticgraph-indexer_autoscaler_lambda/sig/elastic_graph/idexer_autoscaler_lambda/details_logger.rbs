@@ -12,20 +12,25 @@ module ElasticGraph
 
       def log_increase: (
         cpu_utilization: ::Float,
+        min_free_storage: ::Float,
         current_concurrency: ::Integer,
         new_concurrency: ::Integer
       ) -> void
 
       def log_decrease: (
         cpu_utilization: ::Float,
+        min_free_storage: ::Float,
         current_concurrency: ::Integer,
         new_concurrency: ::Integer
       ) -> void
 
       def log_no_change: (
         cpu_utilization: ::Float,
+        min_free_storage: ::Float,
         current_concurrency: ::Integer
       ) -> void
+
+      def log_pause: (::String) -> void
 
       def log_reset: () -> void
 

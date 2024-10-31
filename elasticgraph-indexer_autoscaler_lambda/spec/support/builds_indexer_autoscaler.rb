@@ -16,6 +16,7 @@ module ElasticGraph
     def build_indexer_autoscaler(
       sqs_client: nil,
       lambda_client: nil,
+      cloudwatch_client: nil,
       **datastore_core_options,
       &customize_datastore_config
     )
@@ -28,6 +29,7 @@ module ElasticGraph
       IndexerAutoscalerLambda.new(
         sqs_client: sqs_client,
         lambda_client: lambda_client,
+        cloudwatch_client: cloudwatch_client,
         datastore_core: datastore_core
       )
     end
