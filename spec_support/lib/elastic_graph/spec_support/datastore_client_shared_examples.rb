@@ -41,12 +41,6 @@ module ElasticGraph
         expect(client.get_node_os_stats).to eq "Node stats"
       end
 
-      it "supports `get_node_roles`" do
-        client = build_client({get_node_roles: "Node roles"})
-
-        expect(client.get_node_roles).to eq "Node roles"
-      end
-
       it "supports `get_flat_cluster_settings`" do
         client = build_client({get_flat_cluster_settings: "Flat cluster settings!"})
 

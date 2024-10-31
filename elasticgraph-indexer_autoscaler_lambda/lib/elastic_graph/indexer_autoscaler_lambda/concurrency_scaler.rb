@@ -103,41 +103,20 @@ module ElasticGraph
         end.max.to_f
       end
 
-      def get_min_free_storage
-        metric_data_queries = get_data_node_ids_by_cluster_name.map(&:first).map do |cluster_name, node_id|
-          {
-            id: node_id,
-            metric_stat: {
-              metric: {
-                namespace: 'AWS/ES',
-                metric_name: 'FreeStorageSpace',
-                dimensions: [
-                  { name: 'DomainName', value: cluster_name },
-                  { name: 'NodeId', value: node_id }
-                ]
-              },
-              period: 30, # seconds
-              stat: 'Minimum'
-            },
-            return_data: true
-          }
-        end
-        
+      def get_min_free_storage        
         metric_response = @cloudwatch_client.get_metric_data({
           start_time: ::Time.now - 900, # past 15 minutes
           end_time: ::Time.now,
-          metric_data_queries: metric_data_queries
+          metric_data_queries: [
+            {
+              id: 'minFreeStorageAcrossNodes',
+              expression: 'SEARCH({AWS/ES,DomainName,NodeId} MetricName="FreeStorageSpace", "Minimum", 30)',
+              return_data: true
+            }
+          ]
         })
         
-        metric_response.metric_data_results.map { |result| result.values.first }.min / (1024 * 1024) # result is in bytes
-      end
-
-      def get_data_node_ids_by_cluster_name
-        @datastore_core.clients_by_name.flat_map do |name, client|
-          client.get_node_roles.map do |id, roles|
-            roles["roles"].include?("data") ? { name => id } : nil
-          end
-        end.compact
+        metric_response.metric_data_results.first.values.first / (1024 * 1024) # result is in bytes
       end
 
       def get_queue_attributes(queue_urls)
