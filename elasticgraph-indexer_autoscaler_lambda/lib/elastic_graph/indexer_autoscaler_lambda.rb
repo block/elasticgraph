@@ -32,11 +32,13 @@ module ElasticGraph
     def initialize(
       datastore_core:,
       sqs_client: nil,
-      lambda_client: nil
+      lambda_client: nil,
+      cloudwatch_client: nil
     )
       @datastore_core = datastore_core
       @sqs_client = sqs_client
       @lambda_client = lambda_client
+      @cloudwatch_client = cloudwatch_client
     end
 
     def sqs_client
@@ -53,13 +55,21 @@ module ElasticGraph
       end
     end
 
+    def cloudwatch_client
+      @cloudwatch_client ||= begin
+        require "aws-sdk-cloudwatch"
+        Aws::CloudWatch::Client.new
+      end
+    end
+
     def concurrency_scaler
       @concurrency_scaler ||= begin
         require "elastic_graph/indexer_autoscaler_lambda/concurrency_scaler"
         ConcurrencyScaler.new(
           datastore_core: @datastore_core,
           sqs_client: sqs_client,
-          lambda_client: lambda_client
+          lambda_client: lambda_client,
+          cloudwatch_client: cloudwatch_client
         )
       end
     end

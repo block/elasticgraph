@@ -9,6 +9,7 @@ module ElasticGraph
 
       def get_cluster_health: () -> ::Hash[::String, untyped]
       def get_node_os_stats: () -> ::Hash[::String, untyped]
+      def get_node_os_roles: () -> ::Hash[::String, untyped]
       def get_flat_cluster_settings: () -> ::Hash[::String, untyped]
       def put_persistent_cluster_settings: (::Hash[::Symbol | ::String, untyped]) -> void
 

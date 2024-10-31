@@ -11,6 +11,7 @@ module ElasticGraph
       datastore_core: DatastoreCore,
       ?sqs_client: Aws::SQS::Client?,
       ?lambda_client: Aws::Lambda::Client?,
+      ?cloudwatch_client: Aws::CloudWatch::Client?,
     ) -> void
 
     @sqs_client: Aws::SQS::Client?
@@ -18,6 +19,9 @@ module ElasticGraph
 
     @lambda_client: Aws::Lambda::Client?
     def lambda_client: () -> Aws::Lambda::Client
+
+    @cloudwatch_client: Aws::CloudWatch::Client?
+    def cloudwatch_client: () -> Aws::CloudWatch::Client
 
     @concurrency_scaler: ConcurrencyScaler?
     def concurrency_scaler: () -> ConcurrencyScaler

@@ -30,29 +30,39 @@ module ElasticGraph
         }
       end
 
-      def log_increase(cpu_utilization:, current_concurrency:, new_concurrency:)
+      def log_increase(cpu_utilization:, min_free_storage:, current_concurrency:, new_concurrency:)
         log_result({
           "action" => "increase",
           "cpu_utilization" => cpu_utilization,
+          "min_free_storage" => min_free_storage,
           "current_concurrency" => current_concurrency,
           "new_concurrency" => new_concurrency
         })
       end
 
-      def log_decrease(cpu_utilization:, current_concurrency:, new_concurrency:)
+      def log_decrease(cpu_utilization:, min_free_storage:, current_concurrency:, new_concurrency:)
         log_result({
           "action" => "decrease",
           "cpu_utilization" => cpu_utilization,
+          "min_free_storage" => min_free_storage,
           "current_concurrency" => current_concurrency,
           "new_concurrency" => new_concurrency
         })
       end
 
-      def log_no_change(cpu_utilization:, current_concurrency:)
+      def log_no_change(cpu_utilization:, min_free_storage:, current_concurrency:)
         log_result({
           "action" => "no_change",
           "cpu_utilization" => cpu_utilization,
-          "current_concurrency" => current_concurrency
+          "min_free_storage" => min_free_storage,
+          "current_concurrency" => current_concurrency,
+        })
+      end
+
+      def log_pause(min_free_storage)
+        log_result({
+          "action" => "pause",
+          "min_free_storage" => min_free_storage
         })
       end
 
