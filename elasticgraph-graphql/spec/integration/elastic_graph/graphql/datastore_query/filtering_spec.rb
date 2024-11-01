@@ -909,6 +909,7 @@ module ElasticGraph
         expect(search_with_filter("name_text", "matches_query", nil)).to eq ids_of(widget1, widget2)
         expect(search_with_filter("name_text", "matches_phrase", nil)).to eq ids_of(widget1, widget2)
         expect(search_with_freeform_filter({"id" => {}})).to eq ids_of(widget1, widget2)
+        expect(search_with_freeform_filter({"any_of" => [{"id" => nil}]})).to eq ids_of(widget1, widget2)
       end
 
       it "`equal_to_any_of:` with `nil` matches documents with null values or not null values" do

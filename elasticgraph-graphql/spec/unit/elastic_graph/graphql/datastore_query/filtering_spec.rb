@@ -1359,6 +1359,24 @@ module ElasticGraph
           expect(datastore_body_of(query)).to filter_datastore_with(terms: {"name" => []})
         end
 
+        it "returns the standard always false filter for `any_of: []`" do
+          query = new_query(filter: {
+            "any_of" => []
+          })
+
+          expect(datastore_body_of(query)).to query_datastore_with(always_false_condition)
+        end
+
+        it "returns the standard always false filter for `any_of: [{any_of: []}]`" do
+          query = new_query(filter: {
+            "any_of" => [{"any_of" => []}]
+          })
+
+          expect(datastore_body_of(query)).to query_datastore_with({bool: {minimum_should_match: 1, should: [
+            always_false_condition
+          ]}})
+        end
+
         it "does not prune out `any_of: []` to be consistent with `equal_to_any_of: []`, instead providing an 'always false' condition to achieve the same behavior" do
           query = new_query(filter: {
             "age" => {"gt" => 18},
@@ -1371,12 +1389,12 @@ module ElasticGraph
           ]})
         end
 
-        it "reduces an `any_of` composed entirely of empty predicates to a false condition" do
+        it "applies no filtering to an `any_of` composed entirely of empty predicates" do
           query = new_query(filter: {
             "age" => {"any_of" => [{"gt" => nil}, {"lt" => nil}]}
           })
 
-          expect(datastore_body_of(query)).to filter_datastore_with(always_false_condition)
+          expect(datastore_body_of(query)).to not_filter_datastore_at_all
         end
 
         it "does not filter at all when given only `any_of: nil` on a root field" do

@@ -630,6 +630,10 @@ module ElasticGraph
           }}}})
           expect(results).to eq [{"id" => "t1"}, {"id" => "t2"}, {"id" => "t3"}]
 
+          # Verify `any_of: [{forbes_valuations: nil}]` returns all results.
+          results = query_teams_with(filter: {any_of: [{forbes_valuations: nil}]})
+          expect(results).to eq [{"id" => "t1"}, {"id" => "t2"}, {"id" => "t3"}, {"id" => "t4"}]
+
           # Verify we can use `any_of` directly under `any_satisfy` on a nested field.
           results = query_teams_with(filter: {current_players_nested: {any_satisfy: {any_of: [
             {name: {equal_to_any_of: ["Johnny Rocket"]}},
