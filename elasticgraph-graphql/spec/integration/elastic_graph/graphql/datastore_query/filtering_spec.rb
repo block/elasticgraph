@@ -889,7 +889,7 @@ module ElasticGraph
         expect(results).to match_array(ids_of(widget2, widget4))
       end
 
-      specify "`equal_to_any_of: []` or `any_of: []` matches no documents, but `any_predicate: nil` or `field: {}` is ignored, matching all documents" do
+      specify "`equal_to_any_of: []` or `any_of: []` matches no documents, but `any_predicate: nil` or `field: {}` is treated as `true`, matching all documents" do
         index_into(
           graphql,
           widget1 = build(:widget),
@@ -898,6 +898,8 @@ module ElasticGraph
 
         expect(search_with_filter("id", "equal_to_any_of", [])).to eq []
         expect(search_with_filter("id", "any_of", [])).to eq []
+        expect(search_with_freeform_filter({"not" => {"any_of" => []}})).to eq ids_of(widget1, widget2)
+        expect(search_with_freeform_filter({"any_of" => [{"any_of" => []}]})).to eq []
 
         expect(search_with_filter("id", "equal_to_any_of", nil)).to eq ids_of(widget1, widget2)
         expect(search_with_filter("amount_cents", "lt", nil)).to eq ids_of(widget1, widget2)
@@ -909,6 +911,10 @@ module ElasticGraph
         expect(search_with_filter("name_text", "matches_query", nil)).to eq ids_of(widget1, widget2)
         expect(search_with_filter("name_text", "matches_phrase", nil)).to eq ids_of(widget1, widget2)
         expect(search_with_freeform_filter({"id" => {}})).to eq ids_of(widget1, widget2)
+        expect(search_with_freeform_filter({"any_of" => [{"id" => nil}]})).to eq ids_of(widget1, widget2)
+        expect(search_with_freeform_filter({"not" => {"any_of" => [{"id" => nil}]}})).to eq []
+        expect(search_with_freeform_filter({"any_of" => [{"id" => nil}, {"amount_cents" => {"lt" => 1000}}]})).to eq ids_of(widget1, widget2)
+        expect(search_with_freeform_filter({"not" => {"any_of" => [{"id" => nil}, {"amount_cents" => {"lt" => 1000}}]}})).to eq []
       end
 
       it "`equal_to_any_of:` with `nil` matches documents with null values or not null values" do
@@ -1160,9 +1166,9 @@ module ElasticGraph
         it "returns the standard always false filter when set to nil" do
           index_into(
             graphql,
-            widget1 = build(:widget, amount_cents: 100),
-            widget2 = build(:widget, amount_cents: 205),
-            widget3 = build(:widget, amount_cents: 400)
+            build(:widget, amount_cents: 100),
+            build(:widget, amount_cents: 205),
+            build(:widget, amount_cents: 400)
           )
 
           inner_not_result1 = search_with_freeform_filter({"amount_cents" => {
@@ -1204,8 +1210,8 @@ module ElasticGraph
           index_into(
             graphql,
             widget1 = build(:widget, amount_cents: 100),
-            widget2 = build(:widget, amount_cents: 205),
-            widget3 = build(:widget, amount_cents: 400)
+            build(:widget, amount_cents: 205),
+            build(:widget, amount_cents: 400)
           )
 
           inner_not_result1 = search_with_freeform_filter({"amount_cents" => {

@@ -14,9 +14,8 @@ module ElasticGraph
     RSpec.describe DatastoreQuery, "filtering" do
       include_context "DatastoreQueryUnitSupport"
 
-      # TODO: RENAME
       let(:always_false_condition) do
-        {bool: {filter: Filtering::BooleanQuery::MATCH_NONE_FILTER.clauses}}
+        {bool: {filter: [Filtering::BooleanQuery::MATCH_NONE]}}
       end
 
       it "builds a `nil` datastore body when given no filters (passed as `nil`)" do
@@ -1316,7 +1315,8 @@ module ElasticGraph
               {
                 "age" => {
                   "gt" => 25
-              }}
+                }
+              }
             ]
           }))
 
@@ -1405,9 +1405,35 @@ module ElasticGraph
           ]})
         end
 
-        it "reduces an `any_of` composed entirely of empty predicates to a false condition" do
+        it "returns the standard always false filter for `any_of: []`" do
+          query = new_query(filter: {
+            "any_of" => []
+          })
+
+          expect(datastore_body_of(query)).to query_datastore_with(always_false_condition)
+        end
+
+        it "returns the standard always false filter for `any_of: [{any_of: []}]`" do
+          query = new_query(filter: {
+            "any_of" => [{"any_of" => []}]
+          })
+
+          expect(datastore_body_of(query)).to query_datastore_with({bool: {minimum_should_match: 1, should: [
+            always_false_condition
+          ]}})
+        end
+
+        it "applies no filtering to an `any_of` composed entirely of empty predicates" do
           query = new_query(filter: {
             "age" => {"any_of" => [{"gt" => nil}, {"lt" => nil}]}
+          })
+
+          expect(datastore_body_of(query)).to not_filter_datastore_at_all
+        end
+
+        it "applies no filtering to an `any_of` composed of empty predicate and non empty predicate" do
+          query = new_query(filter: {
+            "age" => {"any_of" => [{"gt" => nil}, {"lt" => 36}]}
           })
 
           expect(datastore_body_of(query)).to not_filter_datastore_at_all
@@ -1427,6 +1453,30 @@ module ElasticGraph
           })
 
           expect(datastore_body_of(query)).to not_filter_datastore_at_all
+        end
+
+        it "filters to a false condition when given `not: {any_of: {age: nil}}` on a root field" do
+          query = new_query(filter: {
+            "not" => {"any_of" => [{"age" => nil}]}
+          })
+
+          expect(datastore_body_of(query)).to query_datastore_with(always_false_condition)
+        end
+
+        it "filters to a false condition when given `not: {any_of: nil}` on a sub field" do
+          query = new_query(filter: {
+            "age" => {"not" => {"any_of" => nil}}
+          })
+
+          expect(datastore_body_of(query)).to query_datastore_with(always_false_condition)
+        end
+
+        it "filters to a true condition when given `not: {any_of: []}` on a sub field" do
+          query = new_query(filter: {
+            "age" => {"not" => {"any_of" => []}}
+          })
+
+          expect(datastore_body_of(query)).to query_datastore_with({bool: {must_not: [always_false_condition]}})
         end
 
         # Note: the GraphQL schema does not allow `any_of: {}` (`any_of` is a list field). However, we're testing

@@ -310,6 +310,28 @@ module ElasticGraph
           string_hash_of(widget3, :id, :amount_cents)
         ])
 
+        # Test `not: {any_of: []}` results in all matching documents
+        widgets = list_widgets_with(:amount_cents,
+          filter: {not: {any_of: []}})
+
+        expect(widgets).to match([
+          string_hash_of(widget3, :id, :amount_cents),
+          string_hash_of(widget2, :id, :amount_cents),
+          string_hash_of(widget1, :id, :amount_cents)
+        ])
+
+        # Test `not: {any_of: emptyPredicate}` results in no matching documents
+        widgets = list_widgets_with(:amount_cents,
+          filter: {not: {any_of: [{name: {equal_to_any_of: nil}}]}})
+
+        expect(widgets).to eq []
+
+        # Test `not: {any_of: emptyPredicate && <non emptyPredicate>}` results in no matching documents
+        widgets = list_widgets_with(:amount_cents,
+          filter: {not: {any_of: [{name: {equal_to_any_of: nil}}, {amount_cents: {gt: 150}}]}})
+
+        expect(widgets).to eq []
+
         # Test `equal_to_any_of` with `[nil, other_value]`
         widgets = list_widgets_with(:amount_cents,
           filter: {name: {equal_to_any_of: [nil, "thing2", "", " ", "\n"]}}, # empty strings should be ignored.,
@@ -753,7 +775,7 @@ module ElasticGraph
 
           # Verify `all_of: [{not: null}]` works as expected.
           results = query_teams_with(filter: {seasons_nested: {all_of: [{not: nil}]}})
-          # All teams should be returned since the `nil` part of the filter expression is pruned.
+          # No teams should be returned since the `nil` part of the filter expression evaluates to `true`.
           expect(results).to eq []
 
           # Verify `all_of: [{not: null}]` works as expected.
