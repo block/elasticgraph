@@ -369,6 +369,24 @@ module ElasticGraph
 
               expect(parts).to target_all_widget_indices
             end
+
+            it "excludes no indices when we have an `any_of: [{anyof: []}]` filter because that will match all results" do
+              parts = search_index_expression_parts_for({"any_of" => [{"any_of" => []}]})
+
+              expect(parts).to target_all_widget_indices
+            end
+
+            it "excludes no indices when we have an `any_of: [{field: nil}]` filter because that will match all results" do
+              parts = search_index_expression_parts_for({"any_of" => [{"created_at" => nil}]})
+
+              expect(parts).to target_all_widget_indices
+            end
+
+            it "excludes no indices when we have an `any_of: [{field: nil}, {...}]` filter because that will match all results" do
+              parts = search_index_expression_parts_for({"any_of" => [{"created_at" => nil}, {"id" => {"equal_to_any_of" => "some-id"}}]})
+
+              expect(parts).to target_all_widget_indices
+            end
           end
 
           context "for a query that includes aggregations" do

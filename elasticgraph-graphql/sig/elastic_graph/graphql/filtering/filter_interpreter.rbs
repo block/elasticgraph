@@ -29,8 +29,15 @@ module ElasticGraph
 
         private
 
+        def reduce_query: (stringOrSymbolHash?) -> stringOrSymbolHash?
+        def reduce_must: (stringOrSymbolHash?) -> bool
+        def reduce_filter: (stringOrSymbolHash?) -> bool
+        def reduce_should: (stringOrSymbolHash?) -> bool
+        def reduce_must_not: (stringOrSymbolHash?) -> bool
+        def reduce_nested: (stringOrSymbolHash?) -> bool
         def process_filter_hash: (stringOrSymbolHash, stringHash, FieldPath) -> void
         def filters_on_sub_fields?: (stringHash) -> bool
+        def process_empty_or_nil_expression: (stringOrSymbolHash, ::String) -> void
         def process_not_expression: (stringOrSymbolHash, stringHash, FieldPath) -> void
         def process_list_any_filter_expression: (stringOrSymbolHash, stringHash, FieldPath) -> void
         def process_any_satisfy_filter_expression_on_nested_object_list: (stringOrSymbolHash, stringHash, FieldPath) -> void

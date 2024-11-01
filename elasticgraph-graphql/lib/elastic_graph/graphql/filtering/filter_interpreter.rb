@@ -38,11 +38,13 @@ module ElasticGraph
         #
         # https://www.elastic.co/guide/en/elasticsearch/reference/8.11/query-dsl.html
         def build_query(filter_hashes, from_field_path: FieldPath.empty)
-          build_bool_hash do |bool_node|
+          query = build_bool_hash do |bool_node|
             filter_hashes.each do |filter_hash|
               process_filter_hash(bool_node, filter_hash, from_field_path)
             end
           end
+
+          reduce_query(query)
         end
 
         def to_s
@@ -57,11 +59,104 @@ module ElasticGraph
 
         private
 
+        def reduce_query(bool_node)
+          return bool_node if bool_node.nil? || bool_node == {}
+
+          inner_node = bool_node[:bool]
+          nested_node = bool_node[:nested]
+          return bool_node if inner_node.nil? && nested_node.nil?
+
+          # `reduce_must_not` must be called before `reduce_filter`, as the method can add an `expression` to `:filter`.
+          if reduce_must(inner_node) && reduce_must_not(inner_node) && reduce_filter(inner_node) && reduce_should(inner_node) && reduce_nested(nested_node)
+            bool_node = nil
+          end
+
+          bool_node
+        end
+
+        def reduce_must(inner_node)
+          if !inner_node.nil? && inner_node.key?(:must)
+            # must should always have a expression, that cannot be reduced
+            return false
+          end
+
+          true
+        end
+
+        def reduce_filter(inner_node)
+          if !inner_node.nil? && inner_node.key?(:filter)
+            expressions = inner_node[:filter]
+            expressions.delete(BooleanQuery::MATCH_ALL)
+
+            if expressions.include?(BooleanQuery::MATCH_NONE)
+              inner_node[:filter] = expressions = [BooleanQuery::MATCH_NONE]
+            else
+              expressions = expressions.filter_map do |expression|
+                reduce_query(expression)
+              end
+            end
+
+            return false unless expressions.empty?
+          end
+
+          true
+        end
+
+        def reduce_should(inner_node)
+          if !inner_node.nil? && inner_node.key?(:should)
+            expressions = inner_node[:should]
+            if expressions.count(BooleanQuery::MATCH_NONE_FILTER_HASH) != expressions.size
+              expressions.delete(BooleanQuery::MATCH_NONE_FILTER_HASH)
+            end
+            if expressions.include?(BooleanQuery::MATCH_ALL_FILTER_HASH)
+              expressions.clear
+            else
+              expressions = expressions.filter_map do |expression|
+                reduce_query(expression)
+              end
+            end
+
+            return false unless expressions.empty?
+          end
+
+          true
+        end
+
+        def reduce_must_not(inner_node)
+          if !inner_node.nil? && inner_node.key?(:must_not)
+            expressions = inner_node[:must_not]
+            expressions = expressions.filter_map do |expression|
+              reduce_query(expression)
+            end
+
+            if expressions.empty?
+              inner_node[:filter] << BooleanQuery::MATCH_NONE
+              inner_node.delete(:must_not)
+              return true
+            end
+            return false
+          end
+
+          true
+        end
+
+        def reduce_nested(nested_node)
+          if !nested_node.nil? && nested_node.key?(:query)
+            expression = nested_node[:query]
+            expression = reduce_query(expression)
+
+            return false unless expression.nil?
+          end
+
+          true
+        end
+
         def process_filter_hash(bool_node, filter_hash, field_path)
           filter_hash.each do |field_or_op, expression|
             case filter_node_interpreter.identify_node_type(field_or_op, expression)
             when :empty
-              # This is an "empty" filter predicate and we can ignore it.
+              # This is an "empty" filter predicate and we can treat it as `true`.
+              process_empty_or_nil_expression(bool_node, field_or_op)
             when :not
               process_not_expression(bool_node, expression, field_path)
             when :list_any_filter
@@ -102,12 +197,19 @@ module ElasticGraph
           end
         end
 
+        def process_empty_or_nil_expression(bool_node, field_or_op)
+          if field_or_op == schema_names.not
+            BooleanQuery::MATCH_NONE_FILTER.merge_into(bool_node)
+          else
+            BooleanQuery::MATCH_ALL_FILTER.merge_into(bool_node)
+          end
+        end
+
         def process_not_expression(bool_node, expression, field_path)
+          # @type var sub_filter: untyped
           sub_filter = build_bool_hash do |inner_node|
             process_filter_hash(inner_node, expression, field_path)
           end
-
-          return unless sub_filter
 
           # Prevent any negated filters from being unnecessarily double-negated by
           # converting them to a positive filter (i.e., !!A == A).
@@ -145,16 +247,15 @@ module ElasticGraph
             process_filter_hash(inner_node, filter, field_path.nested)
           end
 
-          if sub_filter
-            bool_node[:filter] << {nested: {path: field_path.from_root.join("."), query: sub_filter}}
-          end
+          bool_node[:filter] << {nested: {path: field_path.from_root.join("."), query: sub_filter}}
         end
 
         # On a list-of-leaf-values field, `any_satisfy` doesn't _do_ anything: it just expresses
         # the fact that documents with any list element values matching the predicates will match
         # the overall filter.
         def process_any_satisfy_filter_expression_on_scalar_list(bool_node, filter, field_path)
-          return unless (processed = build_bool_hash { |node| process_filter_hash(node, filter, field_path) })
+          # @type var processed: untyped
+          processed = build_bool_hash { |node| process_filter_hash(node, filter, field_path) }
 
           processed_bool_query = processed.fetch(:bool)
 
@@ -194,7 +295,7 @@ module ElasticGraph
           # However, that's not the behavior the datastore will give us if we have an empty array in the
           # query under `should`. To get the behavior we want, we need to pass the datastore some filter
           # criteria that will evaluate to false for every document.
-          bool_query = shoulds.empty? ? BooleanQuery::ALWAYS_FALSE_FILTER : BooleanQuery.should(*shoulds)
+          bool_query = shoulds.empty? ? BooleanQuery::MATCH_NONE_FILTER : BooleanQuery.should(*shoulds)
           bool_query.merge_into(bool_node)
         end
 
@@ -287,7 +388,7 @@ module ElasticGraph
               process_filter_hash(inner_node, expression, field_path)
             end
 
-            bool_node[:filter] << sub_filter if sub_filter
+            bool_node[:filter] << sub_filter
           else
             process_filter_hash(bool_node, expression, field_path)
           end
@@ -321,7 +422,7 @@ module ElasticGraph
         def build_bool_hash(&block)
           bool_node = Hash.new { |h, k| h[k] = [] }.tap(&block)
 
-          # To ignore "empty" filter predicates we need to return `nil` here.
+          # To threat "empty" filter predicates as `true` we need to return `nil` here.
           return nil if bool_node.empty?
 
           # According to https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html#bool-min-should-match,
