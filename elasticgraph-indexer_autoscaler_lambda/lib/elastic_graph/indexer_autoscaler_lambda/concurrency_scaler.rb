@@ -12,16 +12,17 @@ module ElasticGraph
   class IndexerAutoscalerLambda
     # @private
     class ConcurrencyScaler
-      def initialize(datastore_core:, sqs_client:, lambda_client:)
+      def initialize(datastore_core:, sqs_client:, lambda_client:, cloudwatch_client:)
         @logger = datastore_core.logger
         @datastore_core = datastore_core
         @sqs_client = sqs_client
         @lambda_client = lambda_client
+        @cloudwatch_client = cloudwatch_client
       end
 
       MINIMUM_CONCURRENCY = 2
 
-      def tune_indexer_concurrency(queue_urls:, min_cpu_target:, max_cpu_target:, maximum_concurrency:, indexer_function_name:)
+      def tune_indexer_concurrency(queue_urls:, min_cpu_target:, max_cpu_target:, maximum_concurrency:, minimum_free_storage:, indexer_function_name:)
         queue_attributes = get_queue_attributes(queue_urls)
         queue_arns = queue_attributes.fetch(:queue_arns)
         num_messages = queue_attributes.fetch(:total_messages)
@@ -37,6 +38,8 @@ module ElasticGraph
 
         new_target_concurrency =
           if num_messages.positive?
+            free_storage = get_min_free_storage
+
             cpu_utilization = get_max_cpu_utilization
             cpu_midpoint = (max_cpu_target + min_cpu_target) / 2.0
 
@@ -45,13 +48,17 @@ module ElasticGraph
             if current_concurrency.nil?
               details_logger.log_unset
               nil
+            elsif free_storage < minimum_free_storage
+              details_logger.log_pause(free_storage)
+              0
             elsif cpu_utilization < min_cpu_target
               increase_factor = (cpu_midpoint / cpu_utilization).clamp(0.0, 1.5)
               (current_concurrency * increase_factor).round.tap do |new_concurrency|
                 details_logger.log_increase(
                   cpu_utilization: cpu_utilization,
+                  min_free_storage: free_storage,
                   current_concurrency: current_concurrency,
-                  new_concurrency: new_concurrency
+                  new_concurrency: new_concurrency,
                 )
               end
             elsif cpu_utilization > max_cpu_target
@@ -59,6 +66,7 @@ module ElasticGraph
               (current_concurrency - (current_concurrency * decrease_factor)).round.tap do |new_concurrency|
                 details_logger.log_decrease(
                   cpu_utilization: cpu_utilization,
+                  min_free_storage: free_storage,
                   current_concurrency: current_concurrency,
                   new_concurrency: new_concurrency
                 )
@@ -66,6 +74,7 @@ module ElasticGraph
             else
               details_logger.log_no_change(
                 cpu_utilization: cpu_utilization,
+                min_free_storage: free_storage,
                 current_concurrency: current_concurrency
               )
               current_concurrency
@@ -92,6 +101,22 @@ module ElasticGraph
             node.dig("os", "cpu", "percent")
           end
         end.max.to_f
+      end
+
+      def get_min_free_storage        
+        metric_response = @cloudwatch_client.get_metric_data({
+          start_time: ::Time.now - 900, # past 15 minutes
+          end_time: ::Time.now,
+          metric_data_queries: [
+            {
+              id: 'minFreeStorageAcrossNodes',
+              expression: 'SEARCH({AWS/ES,DomainName,NodeId} MetricName="FreeStorageSpace", "Minimum", 30)',
+              return_data: true
+            }
+          ]
+        })
+        
+        metric_response.metric_data_results.first.values.first / (1024 * 1024) # result is in bytes
       end
 
       def get_queue_attributes(queue_urls)

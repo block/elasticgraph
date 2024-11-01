@@ -1,0 +1,14 @@
+module Aws
+  module CloudWatch
+    class Client
+      def initialize: () -> void
+      def get_metric_data: (::Hash[::Symbol, (::Time | ::Array[::Hash[::Symbol, (::String | bool)]])]) -> Types::MetricDataResponse
+    end
+
+    module Types
+      class MetricDataResponse
+        attr_accessor metric_data_results: ::Array[{values: ::Float}]
+      end
+    end
+  end
+end

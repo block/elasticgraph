@@ -8,6 +8,7 @@
 
 require "aws-sdk-lambda"
 require "aws-sdk-sqs"
+require "aws-sdk-cloudwatch"
 require "elastic_graph/spec_support/lambda_function"
 
 RSpec.describe "Autoscale indexer lambda function" do
@@ -24,9 +25,11 @@ RSpec.describe "Autoscale indexer lambda function" do
     end
 
     lambda_client = ::Aws::Lambda::Client.new(stub_responses: true)
+    cloudwatch_client = ::Aws::CloudWatch::Client.new(stub_responses: true)
 
     allow(::Aws::SQS::Client).to receive(:new).and_return(sqs_client)
     allow(::Aws::Lambda::Client).to receive(:new).and_return(lambda_client)
+    allow(::Aws::CloudWatch::Client).to receive(:new).and_return(cloudwatch_client)
 
     expect_loading_lambda_to_define_constant(
       lambda: "elastic_graph/indexer_autoscaler_lambda/lambda_function.rb",
@@ -37,6 +40,7 @@ RSpec.describe "Autoscale indexer lambda function" do
         "min_cpu_target" => 70,
         "max_cpu_target" => 80,
         "maximum_concurrency" => 1000,
+        "minimum_free_storage" => 100,
         "indexer_function_name" => "some-eg-app-indexer"
       }
       lambda_function.handle_request(event: event, context: {})
