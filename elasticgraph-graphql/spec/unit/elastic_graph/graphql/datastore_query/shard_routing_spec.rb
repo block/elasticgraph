@@ -259,6 +259,24 @@ module ElasticGraph
         })).to search_all_shards
       end
 
+      it "searches all shards when we have an `any_of: [{anyof: []}]` filter because that will match all results" do
+        expect(shard_routing_for(["name"], {
+          "any_of" => [{"any_of" => []}]
+        })).to search_all_shards
+      end
+
+      it "searches all shards when we have an `any_of: [{field: nil}]` filter because that will match all results" do
+        expect(shard_routing_for(["name"], {
+          "any_of" => [{"name" => nil}]
+        })).to search_all_shards
+      end
+
+      it "searches all shards when we have an `any_of: [{field: nil}, {...}]` filter because that will match all results" do
+        expect(shard_routing_for(["name"], {
+          "any_of" => [{"name" => nil}, {"id" => {"equal_to_any_of" => ["abc"]}}]
+        })).to search_all_shards
+      end
+
       describe "not" do
         it "searches all shards when there are values in an `equal_to_any_of` filter" do
           expect(shard_routing_for(["name"],
