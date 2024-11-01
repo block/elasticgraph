@@ -30,7 +30,7 @@ module ElasticGraph
         current_concurrency: ::Integer
       ) -> void
 
-      def log_pause: (::String) -> void
+      def log_pause: (::Float) -> void
 
       def log_reset: () -> void
 

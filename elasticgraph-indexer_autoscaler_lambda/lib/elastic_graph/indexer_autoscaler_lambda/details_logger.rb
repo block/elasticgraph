@@ -55,7 +55,7 @@ module ElasticGraph
           "action" => "no_change",
           "cpu_utilization" => cpu_utilization,
           "min_free_storage" => min_free_storage,
-          "current_concurrency" => current_concurrency,
+          "current_concurrency" => current_concurrency
         })
       end
 

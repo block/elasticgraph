@@ -98,7 +98,7 @@ These libraries wrap the the core ElasticGraph libraries so that they can be dep
 graph LR;
     elasticgraph-admin_lambda --> rake & elasticgraph-admin & elasticgraph-lambda_support
     elasticgraph-graphql_lambda --> elasticgraph-graphql & elasticgraph-lambda_support
-    elasticgraph-indexer_autoscaler_lambda --> elasticgraph-datastore_core & elasticgraph-lambda_support & aws-sdk-lambda & aws-sdk-sqs & ox
+    elasticgraph-indexer_autoscaler_lambda --> elasticgraph-datastore_core & elasticgraph-lambda_support & aws-sdk-lambda & aws-sdk-sqs & aws-sdk-cloudwatch & ox
     elasticgraph-indexer_lambda --> elasticgraph-indexer & elasticgraph-lambda_support & aws-sdk-s3 & ox
     elasticgraph-lambda_support --> elasticgraph-opensearch & faraday_middleware-aws-sigv4
     style elasticgraph-admin_lambda color: DodgerBlue;
@@ -112,11 +112,13 @@ graph LR;
     style elasticgraph-datastore_core color: Green;
     style aws-sdk-lambda color: Red;
     style aws-sdk-sqs color: Red;
+    style aws-sdk-cloudwatch color: Red;
     style ox color: Red;
     style elasticgraph-indexer color: Green;
     style aws-sdk-s3 color: Red;
     style elasticgraph-opensearch color: Green;
     style faraday_middleware-aws-sigv4 color: Red;
+click aws-sdk-cloudwatch href "https://rubygems.org/gems/aws-sdk-cloudwatch"
 click aws-sdk-lambda href "https://rubygems.org/gems/aws-sdk-lambda"
 click aws-sdk-s3 href "https://rubygems.org/gems/aws-sdk-s3"
 click aws-sdk-sqs href "https://rubygems.org/gems/aws-sdk-sqs"

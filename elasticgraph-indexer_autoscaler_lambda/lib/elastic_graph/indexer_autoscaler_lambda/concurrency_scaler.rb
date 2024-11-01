@@ -58,7 +58,7 @@ module ElasticGraph
                   cpu_utilization: cpu_utilization,
                   min_free_storage: free_storage,
                   current_concurrency: current_concurrency,
-                  new_concurrency: new_concurrency,
+                  new_concurrency: new_concurrency
                 )
               end
             elsif cpu_utilization > max_cpu_target
@@ -103,19 +103,19 @@ module ElasticGraph
         end.max.to_f
       end
 
-      def get_min_free_storage        
+      def get_min_free_storage
         metric_response = @cloudwatch_client.get_metric_data({
           start_time: ::Time.now - 900, # past 15 minutes
           end_time: ::Time.now,
           metric_data_queries: [
             {
-              id: 'minFreeStorageAcrossNodes',
-              expression: 'SEARCH({AWS/ES,DomainName,NodeId} MetricName="FreeStorageSpace", "Minimum", 30)',
+              id: "minFreeStorageAcrossNodes",
+              expression: "SEARCH({AWS/ES,DomainName,NodeId} MetricName=\"FreeStorageSpace\", \"Minimum\", 30)",
               return_data: true
             }
           ]
         })
-        
+
         metric_response.metric_data_results.first.values.first / (1024 * 1024) # result is in bytes
       end
 
