@@ -26,7 +26,12 @@ module ElasticGraph
         def self.should: (*stringOrSymbolHash) -> BooleanQuery
         def merge_into: (stringOrSymbolHash) -> void
 
-        ALWAYS_FALSE_FILTER: BooleanQuery
+        MATCH_ALL: ::Hash[Symbol, untyped]
+        MATCH_ALL_FILTER: BooleanQuery
+        MATCH_ALL_FILTER_HASH: ::Hash[Symbol, untyped]
+        MATCH_NONE: ::Hash[Symbol, untyped]
+        MATCH_NONE_FILTER: BooleanQuery
+        MATCH_NONE_FILTER_HASH: ::Hash[Symbol, untyped]
       end
     end
   end

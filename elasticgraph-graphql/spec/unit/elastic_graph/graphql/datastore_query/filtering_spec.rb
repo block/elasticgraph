@@ -14,8 +14,9 @@ module ElasticGraph
     RSpec.describe DatastoreQuery, "filtering" do
       include_context "DatastoreQueryUnitSupport"
 
+      # TODO: RENAME
       let(:always_false_condition) do
-        {bool: {filter: Filtering::BooleanQuery::ALWAYS_FALSE_FILTER.clauses}}
+        {bool: {filter: Filtering::BooleanQuery::MATCH_NONE_FILTER.clauses}}
       end
 
       it "builds a `nil` datastore body when given no filters (passed as `nil`)" do
@@ -1271,14 +1272,21 @@ module ElasticGraph
           }})
         end
 
-        it "is ignored when set to nil" do
+        it "returns the standard always false filter when set to nil" do
           body_for_inner_not = datastore_body_of(new_query(filter: {"age" => {"not" => nil}}))
           body_for_outer_not = datastore_body_of(new_query(filter: {"not" => {"age" => nil}}))
 
-          expect(body_for_inner_not).to eq(body_for_outer_not).and not_filter_datastore_at_all
+          expect(body_for_inner_not).to eq(body_for_outer_not).and query_datastore_with(always_false_condition)
         end
 
-        it "is ignored when set to nil when alongside other filters" do
+        it "returns the standard always false filter when set to an emptyPredicate" do
+          body_for_inner_not = datastore_body_of(new_query(filter: {"age" => {"not" => {}}}))
+          body_for_outer_not = datastore_body_of(new_query(filter: {"not" => {"age" => {}}}))
+
+          expect(body_for_inner_not).to eq(body_for_outer_not).and query_datastore_with(always_false_condition)
+        end
+
+        it "returns the standard always false filter when set to nil alongside other filters" do
           body_for_inner_not = datastore_body_of(new_query(filter: {"age" => {
             "not" => nil,
             "gt" => 25
@@ -1291,14 +1299,40 @@ module ElasticGraph
             }
           }))
 
-          expect(body_for_inner_not).to eq(body_for_outer_not).and query_datastore_with({bool: {filter: [{range: {"age" => {gt: 25}}}]}})
+          expect(body_for_inner_not).to eq(body_for_outer_not).and query_datastore_with(always_false_condition)
+        end
+
+        it "is ignored set to nil alongside other filters inside `any_of`" do
+          body_for_inner_not = datastore_body_of(new_query(filter: {"age" => {
+            "any_of" => [
+              {"not" => nil},
+              {"gt" => 25}
+            ]
+          }}))
+
+          body_for_outer_not = datastore_body_of(new_query(filter: {
+            "any_of" => [
+              {"not" => nil},
+              {
+                "age" => {
+                  "gt" => 25
+              }}
+            ]
+          }))
+
+          expect(body_for_inner_not).to query_datastore_with({bool: {filter: [{bool: {minimum_should_match: 1, should: [{
+            bool: {filter: [{range: {"age" => {gt: 25}}}]}
+          }]}}]}})
+          expect(body_for_outer_not).to query_datastore_with({bool: {minimum_should_match: 1, should: [{
+            bool: {filter: [{range: {"age" => {gt: 25}}}]}
+          }]}})
         end
 
         it "is ignored when the inner filter is also ignored" do
           body_for_inner_not = datastore_body_of(new_query(filter: {"age" => {"not" => {"equal_to_any_of" => nil}}}))
           body_for_outer_not = datastore_body_of(new_query(filter: {"not" => {"age" => {"equal_to_any_of" => nil}}}))
 
-          expect(body_for_inner_not).to eq(body_for_outer_not).and not_filter_datastore_at_all
+          expect(body_for_inner_not).to eq(body_for_outer_not).and query_datastore_with(always_false_condition)
         end
       end
 
@@ -1376,7 +1410,7 @@ module ElasticGraph
             "age" => {"any_of" => [{"gt" => nil}, {"lt" => nil}]}
           })
 
-          expect(datastore_body_of(query)).to filter_datastore_with(always_false_condition)
+          expect(datastore_body_of(query)).to not_filter_datastore_at_all
         end
 
         it "does not filter at all when given only `any_of: nil` on a root field" do

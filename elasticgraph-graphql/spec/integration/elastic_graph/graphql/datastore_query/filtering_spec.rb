@@ -1157,7 +1157,7 @@ module ElasticGraph
           expect(triple_nested_not).to match_array(ids_of(widget1, widget3))
         end
 
-        it "is ignored when set to nil" do
+        it "returns the standard always false filter when set to nil" do
           index_into(
             graphql,
             widget1 = build(:widget, amount_cents: 100),
@@ -1195,9 +1195,42 @@ module ElasticGraph
             "amount_cents" => {"equal_to_any_of" => nil}
           }})
 
-          expect(inner_not_result1).to eq(outer_not_result1).and match_array(ids_of(widget1, widget2, widget3))
-          expect(inner_not_result2).to eq(outer_not_result2).and match_array(ids_of(widget1))
-          expect(inner_not_result3).to eq(outer_not_result3).and match_array(ids_of(widget1, widget2, widget3))
+          expect(inner_not_result1).to eq(outer_not_result1).and eq []
+          expect(inner_not_result2).to eq(outer_not_result2).and eq []
+          expect(inner_not_result3).to eq(outer_not_result3).and eq []
+        end
+
+        it "is ignored when set to nil inside `any_of`" do
+          index_into(
+            graphql,
+            widget1 = build(:widget, amount_cents: 100),
+            widget2 = build(:widget, amount_cents: 205),
+            widget3 = build(:widget, amount_cents: 400)
+          )
+
+          inner_not_result1 = search_with_freeform_filter({"amount_cents" => {
+            "any_of" => [
+              {"not" => nil},
+              {"lt" => 200}
+            ]
+          }})
+
+          outer_not_result1 = search_with_freeform_filter({
+            "any_of" => [
+              {
+                "not" => {
+                  "amount_cents" => nil
+                }
+              },
+              {
+                "amount_cents" => {
+                  "lt" => 200
+                }
+              }
+            ]
+          })
+
+          expect(inner_not_result1).to eq(outer_not_result1).and match_array(ids_of(widget1))
         end
       end
 

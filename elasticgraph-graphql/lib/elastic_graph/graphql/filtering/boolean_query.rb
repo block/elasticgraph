@@ -33,12 +33,12 @@ module ElasticGraph
           bool_node[occurrence].concat(clauses)
         end
 
-        # For `any_of: []` we need a way to force the datastore to match no documents, but
-        # I haven't found any sort of literal `false` we can pass in the compound expression
-        # or even a literal `1 = 0` as is sometimes used in SQL. Instead, we use this for that
-        # case.
-        empty_array = [] # : ::Array[untyped]
-        ALWAYS_FALSE_FILTER = filter({ids: {values: empty_array}})
+        MATCH_ALL = {match_all: {}}
+        MATCH_ALL_FILTER = filter(MATCH_ALL)
+        MATCH_ALL_FILTER_HASH = {bool: {filter: [MATCH_ALL]}}
+        MATCH_NONE = {match_none: {}}
+        MATCH_NONE_FILTER = filter(MATCH_NONE)
+        MATCH_NONE_FILTER_HASH = {bool: {filter: [MATCH_NONE]}}
       end
     end
   end

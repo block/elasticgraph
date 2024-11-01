@@ -350,17 +350,13 @@ module ElasticGraph
           string_hash_of(widget3, :id, :amount_cents)
         ])
 
-        # The negation of an ignored filter is an ignored filter: `{not: {equal_to_any_of: nil}}`
-        # evaluates to {not: {}} which will be ignored, therefore the filter will match all documents.
+        # The negation of an empty predicate is an always false filter. `{not: {equal_to_any_of: nil}}`
+        # evaluates to `{not: {true}}`, therefore the filter will match no documents.
         widgets = list_widgets_with(:amount_cents,
           filter: {id: {not: {equal_to_any_of: nil}}},
           order_by: [:amount_cents_ASC])
 
-        expect(widgets).to match([
-          string_hash_of(widget1, :id, :amount_cents),
-          string_hash_of(widget2, :id, :amount_cents),
-          string_hash_of(widget3, :id, :amount_cents)
-        ])
+        expect(widgets).to match []
 
         # Test that sorting by the same field twice in different directions doesn't fail.
         # (The extra sort should be effectively ignored).
@@ -758,7 +754,7 @@ module ElasticGraph
           # Verify `all_of: [{not: null}]` works as expected.
           results = query_teams_with(filter: {seasons_nested: {all_of: [{not: nil}]}})
           # All teams should be returned since the `nil` part of the filter expression is pruned.
-          expect(results).to eq [{"id" => "t1"}, {"id" => "t2"}, {"id" => "t3"}, {"id" => "t4"}]
+          expect(results).to eq []
 
           # Verify `all_of: [{not: null}]` works as expected.
           results = query_teams_with(filter: {seasons_nested: {all_of: [{all_of: nil}]}})
@@ -865,14 +861,15 @@ module ElasticGraph
             filter: {options: {color: {equal_to_any_of: nil}}}
           )).to contain_exactly(expected_widget1, expected_widget2)
 
+          # not used with an empty predicate should result in an always false filter
           expect(list_widgets_with_options_and_inventor(
             filter: {options: {color: {not: {equal_to_any_of: nil}}}}
-          )).to contain_exactly(expected_widget1, expected_widget2)
+          )).to eq []
 
-          # not set to 'nil' should not cause any filtering on that value.
+          # not set to 'nil' should result in an always false filter
           expect(list_widgets_with_options_and_inventor(
             filter: {options: {color: {not: nil}}}
-          )).to contain_exactly(expected_widget1, expected_widget2)
+          )).to eq []
 
           # On type unions you can filter on a subfield that is present on all subtypes...
           expect(list_widgets_with_options_and_inventor(
