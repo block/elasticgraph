@@ -19,6 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
-
-Part of the distributed code (elasticgraph-rack/lib/elastic_graph/rack/graphiql/index.html)
-comes from the GraphiQL project, licensed under the MIT License. Copyright (c) GraphQL Contributors.

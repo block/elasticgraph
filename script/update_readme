@@ -216,3 +216,11 @@ to follow SemVer with a `0.MAJOR.MINOR.PATCH` versioning scheme.
 Note that _all_ gems in this repository share the same version number. Every time we cut a release, we increment the version
 for _all_ gems and release _all_ gems, even if a gem has had no changes since the last release. This is simpler to work with
 than the alternatives.
+
+## License
+
+ElasticGraph is released under the [MIT License](https://opensource.org/licenses/MIT).
+
+[Part of the distributed code](elasticgraph-rack/lib/elastic_graph/rack/graphiql/index.html)
+comes from the [GraphiQL project](https://github.com/graphql/graphiql), also licensed under the
+MIT License, Copyright (c) GraphQL Contributors.
