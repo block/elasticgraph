@@ -34,3 +34,11 @@ run ElasticGraph::Rack::GraphiQL.new(graphql)
 ```
 
 Run this with `rackup` (after installing the `rackup` gem) or any other rack-compatible server.
+
+## License
+
+elasticgraph-rack is released under the [MIT License](https://opensource.org/licenses/MIT).
+
+[Part of the distributed code](lib/elastic_graph/rack/graphiql/index.html)
+comes from the [GraphiQL project](https://github.com/graphql/graphiql), also licensed under the
+MIT License, Copyright (c) GraphQL Contributors.

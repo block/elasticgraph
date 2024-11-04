@@ -1,10 +1,7 @@
 ## GraphiQL for ElasticGraph
 
 This directory provides the GraphiQL in browser UI for working with ElasticGraph
-applications. The GraphiQL license is included in `LICENSE.txt`, copied verbatim
-from:
-
-https://github.com/graphql/graphiql/blob/graphiql%402.4.0/LICENSE
+applications.
 
 The `index.html` file is copied from:
 
@@ -36,3 +33,8 @@ index 55cf5d05..a672ead9 100644
            defaultEditorToolsVisibility: true,
          }),
 ```
+
+## License
+
+[index.html](index.html) comes from the [GraphiQL project](https://github.com/graphql/graphiql),
+licensed under the MIT License, Copyright (c) GraphQL Contributors.

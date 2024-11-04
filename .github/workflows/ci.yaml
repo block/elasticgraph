@@ -17,7 +17,7 @@ env:
   NO_VCR: "1"
 
 jobs:
-  test:
+  ci-check:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -66,3 +66,22 @@ jobs:
       # We've found that there is a minor race condition where the shards aren't fully ready for the tests
       # to hit them if we don't wait a bit after booting.
       - run: script/ci_parts/${{ matrix.build_part }} ${{ matrix.datastore }} 10
+
+  # An extra job that runs after all the others and provides a single summary status.
+  # This is used by our branch protection rule to block merge until all CI checks passed,
+  # without requiring us to individually list each CI check in the branch protection rule.
+  #
+  # https://github.com/orgs/community/discussions/26822#discussioncomment-3305794
+  all-ci-checks-passed:
+    if: ${{ always() }} # so it runs even if the workflow was cancelled
+    runs-on: ubuntu-latest
+    name: All CI Checks Passed
+    needs: [ci-check]
+    steps:
+      - run: |
+          result="${{ needs.ci-check.result }}"
+          if [[ $result == "success" || $result == "skipped" ]]; then
+            exit 0
+          else
+            exit 1
+          fi
