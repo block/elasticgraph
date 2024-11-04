@@ -29,6 +29,8 @@ module ElasticGraph
         ) -> void
 
         def identify_node_type: (::String, stringHash) -> nodeType
+        def identify_by_field_or_op: (::String) -> nodeType?
+        def identify_by_sub_expr: (stringHash) -> nodeType?
 
         attr_reader filter_operators: ::Hash[::String, ^(::String, untyped) -> queryClause?]
 

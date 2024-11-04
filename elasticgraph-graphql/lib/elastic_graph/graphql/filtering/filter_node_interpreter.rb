@@ -25,15 +25,7 @@ module ElasticGraph
         end
 
         def identify_node_type(field_or_op, sub_expression)
-          return :empty if sub_expression.nil? || sub_expression == {}
-          return :not if field_or_op == schema_names.not
-          return :list_any_filter if field_or_op == schema_names.any_satisfy
-          return :all_of if field_or_op == schema_names.all_of
-          return :any_of if field_or_op == schema_names.any_of
-          return :operator if filter_operators.key?(field_or_op)
-          return :list_count if field_or_op == LIST_COUNTS_FIELD
-          return :sub_field if sub_expression.is_a?(::Hash)
-          :unknown
+          identify_by_field_or_op(field_or_op) || identify_by_sub_expr(sub_expression) || :unknown
         end
 
         def filter_operators
@@ -41,6 +33,24 @@ module ElasticGraph
         end
 
         private
+
+        def identify_by_field_or_op(field_or_op)
+          return :not if field_or_op == schema_names.not
+          return :list_any_filter if field_or_op == schema_names.any_satisfy
+          return :all_of if field_or_op == schema_names.all_of
+          return :any_of if field_or_op == schema_names.any_of
+          return :operator if filter_operators.key?(field_or_op)
+          return :list_count if field_or_op == LIST_COUNTS_FIELD
+
+          nil
+        end
+
+        def identify_by_sub_expr(sub_expression)
+          return :empty if sub_expression.nil? || sub_expression == {}
+          return :sub_field if sub_expression.is_a?(::Hash)
+
+          nil
+        end
 
         def build_filter_operators(runtime_metadata)
           filter_by_time_of_day_script_id = runtime_metadata
