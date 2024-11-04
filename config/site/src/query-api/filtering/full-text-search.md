@@ -39,3 +39,11 @@ are supported to control both aspects to make matching stricter:
 {% highlight graphql %}
 {{ site.data.music_queries.filtering.PhraseSearch }}
 {% endhighlight %}
+
+### Bypassing matchesPhrase and matchesQuery
+
+In order to ignore a `matchesPhrase` or `matchesQuery` filter, you can supply `null` to the `MatchesQueryFilterInput` parameter, as such:
+
+{% highlight graphql %}
+{{ site.data.music_queries.filtering.OptionalMatchingFilter }}
+{% endhighlight %}
