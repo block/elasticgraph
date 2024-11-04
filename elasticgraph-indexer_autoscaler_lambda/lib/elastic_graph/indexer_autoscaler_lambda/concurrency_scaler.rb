@@ -50,7 +50,7 @@ module ElasticGraph
               nil
             elsif free_storage < minimum_free_storage
               details_logger.log_pause(free_storage)
-              0
+              MINIMUM_CONCURRENCY
             elsif cpu_utilization < min_cpu_target
               increase_factor = (cpu_midpoint / cpu_utilization).clamp(0.0, 1.5)
               (current_concurrency * increase_factor).round.tap do |new_concurrency|
@@ -81,7 +81,7 @@ module ElasticGraph
             end
           else
             details_logger.log_reset
-            0
+            MINIMUM_CONCURRENCY
           end
 
         if new_target_concurrency && new_target_concurrency != current_concurrency
@@ -110,7 +110,7 @@ module ElasticGraph
           metric_data_queries: [
             {
               id: "minFreeStorageAcrossNodes",
-              expression: "SEARCH({AWS/ES,DomainName,NodeId} MetricName=\"FreeStorageSpace\", \"Minimum\", 30)",
+              expression: "SEARCH('{AWS/ES,ClientId,DomainName,NodeId} MetricName=\"FreeStorageSpace\"', 'Minimum', 30)",
               return_data: true
             }
           ]
