@@ -786,7 +786,13 @@ module ElasticGraph
             })
           end
 
-          it "ignores `count` filter predicates that have a `nil` value" do
+          it "ignores `count` filter predicates that have a `nil` or `{}` value" do
+            query = new_query(filter: {"past_names" => {LIST_COUNTS_FIELD => nil}})
+            expect(datastore_body_of(query)).to not_filter_datastore_at_all
+
+            query = new_query(filter: {"past_names" => {LIST_COUNTS_FIELD => {}}})
+            expect(datastore_body_of(query)).to not_filter_datastore_at_all
+
             query = new_query(filter: {"past_names" => {LIST_COUNTS_FIELD => {"gt" => nil}}})
             expect(datastore_body_of(query)).to not_filter_datastore_at_all
 
