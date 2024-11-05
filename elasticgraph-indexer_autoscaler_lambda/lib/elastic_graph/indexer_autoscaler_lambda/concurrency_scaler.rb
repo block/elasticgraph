@@ -116,7 +116,7 @@ module ElasticGraph
           ]
         })
 
-        metric_response.metric_data_results.first.values.first / (1024 * 1024) # result is in bytes
+        metric_response.metric_data_results.first.values.first
       end
 
       def get_queue_attributes(queue_urls)

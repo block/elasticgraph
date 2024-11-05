@@ -242,11 +242,10 @@ module ElasticGraph
       def cloudwatch_client_with_storage_metrics(free_storage)
         ::Aws::CloudWatch::Client.new(stub_responses: true).tap do |cloudwatch_client|
           cloudwatch_client.stub_responses(:get_metric_data, {
-            # return values are in bytes
             metric_data_results: [
               {
                 id: "minFreeStorageAcrossNodes",
-                values: [(free_storage * 1024 * 1024).to_f],
+                values: [free_storage.to_f],
                 timestamps: [::Time.parse("2024-10-30T12:00:00Z")]
               }
             ]
