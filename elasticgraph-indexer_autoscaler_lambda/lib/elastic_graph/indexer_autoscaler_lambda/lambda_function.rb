@@ -27,7 +27,8 @@ module ElasticGraph
           max_cpu_target: event.fetch("max_cpu_target"),
           maximum_concurrency: event.fetch("maximum_concurrency"),
           minimum_free_storage: event.fetch("minimum_free_storage"),
-          indexer_function_name: event.fetch("indexer_function_name")
+          indexer_function_name: event.fetch("indexer_function_name"),
+          cluster_name: event.fetch("cluster_name")
         )
       end
     end

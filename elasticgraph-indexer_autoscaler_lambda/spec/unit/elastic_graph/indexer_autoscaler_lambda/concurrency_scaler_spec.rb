@@ -279,7 +279,8 @@ module ElasticGraph
           max_cpu_target: max_cpu_target,
           maximum_concurrency: maximum_concurrency,
           minimum_free_storage: minimum_free_storage,
-          indexer_function_name: indexer_function_name
+          indexer_function_name: indexer_function_name,
+          cluster_name: "some-eg-cluster"
         )
       end
     end

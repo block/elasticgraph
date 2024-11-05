@@ -22,7 +22,7 @@ module ElasticGraph
 
       MINIMUM_CONCURRENCY = 2
 
-      def tune_indexer_concurrency(queue_urls:, min_cpu_target:, max_cpu_target:, maximum_concurrency:, minimum_free_storage:, indexer_function_name:)
+      def tune_indexer_concurrency(queue_urls:, min_cpu_target:, max_cpu_target:, maximum_concurrency:, minimum_free_storage:, indexer_function_name:, cluster_name:)
         queue_attributes = get_queue_attributes(queue_urls)
         queue_arns = queue_attributes.fetch(:queue_arns)
         num_messages = queue_attributes.fetch(:total_messages)
@@ -38,7 +38,7 @@ module ElasticGraph
 
         new_target_concurrency =
           if num_messages.positive?
-            free_storage = get_min_free_storage
+            free_storage = get_min_free_storage(cluster_name)
 
             cpu_utilization = get_max_cpu_utilization
             cpu_midpoint = (max_cpu_target + min_cpu_target) / 2.0
@@ -103,14 +103,14 @@ module ElasticGraph
         end.max.to_f
       end
 
-      def get_min_free_storage
+      def get_min_free_storage(cluster_name)
         metric_response = @cloudwatch_client.get_metric_data({
-          start_time: ::Time.now - 900, # past 15 minutes
+          start_time: ::Time.now - 1200, # past 20 minutes
           end_time: ::Time.now,
           metric_data_queries: [
             {
               id: "minFreeStorageAcrossNodes",
-              expression: "SEARCH('{AWS/ES,ClientId,DomainName,NodeId} MetricName=\"FreeStorageSpace\"', 'Minimum', 30)",
+              expression: "SEARCH('{AWS/ES,ClientId,DomainName} MetricName=\"FreeStorageSpace\" AND DomainName=\"#{cluster_name}\"', 'Minimum', 60)",
               return_data: true
             }
           ]
