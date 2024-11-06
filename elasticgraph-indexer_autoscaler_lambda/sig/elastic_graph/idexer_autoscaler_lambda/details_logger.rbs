@@ -7,30 +7,36 @@ module ElasticGraph
         queue_urls: ::Array[::String],
         min_cpu_target: ::Integer,
         max_cpu_target: ::Integer,
-        num_messages: ::Integer,
+        num_messages: ::Integer
       ) -> void
 
       def log_increase: (
         cpu_utilization: ::Float,
-        min_free_storage: ::Float,
+        lowest_node_free_storage_in_mb: ::Float,
+        required_free_storage_in_mb: ::Integer,
         current_concurrency: ::Integer,
         new_concurrency: ::Integer
       ) -> void
 
       def log_decrease: (
         cpu_utilization: ::Float,
-        min_free_storage: ::Float,
+        lowest_node_free_storage_in_mb: ::Float,
+        required_free_storage_in_mb: ::Integer,
         current_concurrency: ::Integer,
         new_concurrency: ::Integer
       ) -> void
 
       def log_no_change: (
         cpu_utilization: ::Float,
-        min_free_storage: ::Float,
+        lowest_node_free_storage_in_mb: ::Float,
+        required_free_storage_in_mb: ::Integer,
         current_concurrency: ::Integer
       ) -> void
 
-      def log_pause: (::Float) -> void
+      def log_pause: (
+        lowest_node_free_storage_in_mb: ::Float,
+        required_free_storage_in_mb: ::Integer
+      ) -> void
 
       def log_reset: () -> void
 

@@ -24,6 +24,8 @@ gems:
     ignore: true
 
   # Use `ignore: false` to tell rbs collection to pull the RBS signatures from these gems.
+  - name: aws-sdk-cloudwatch
+    ignore: false
   - name: aws-sdk-lambda
     ignore: false
   - name: aws-sdk-sqs

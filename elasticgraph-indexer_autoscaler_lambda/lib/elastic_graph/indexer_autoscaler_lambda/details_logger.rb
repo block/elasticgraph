@@ -30,39 +30,43 @@ module ElasticGraph
         }
       end
 
-      def log_increase(cpu_utilization:, min_free_storage:, current_concurrency:, new_concurrency:)
+      def log_increase(cpu_utilization:, lowest_node_free_storage_in_mb:, required_free_storage_in_mb:, current_concurrency:, new_concurrency:)
         log_result({
           "action" => "increase",
           "cpu_utilization" => cpu_utilization,
-          "min_free_storage" => min_free_storage,
+          "lowest_node_free_storage_in_mb" => lowest_node_free_storage_in_mb,
+          "required_free_storage_in_mb" => required_free_storage_in_mb,
           "current_concurrency" => current_concurrency,
           "new_concurrency" => new_concurrency
         })
       end
 
-      def log_decrease(cpu_utilization:, min_free_storage:, current_concurrency:, new_concurrency:)
+      def log_decrease(cpu_utilization:, lowest_node_free_storage_in_mb:, required_free_storage_in_mb:, current_concurrency:, new_concurrency:)
         log_result({
           "action" => "decrease",
           "cpu_utilization" => cpu_utilization,
-          "min_free_storage" => min_free_storage,
+          "lowest_node_free_storage_in_mb" => lowest_node_free_storage_in_mb,
+          "required_free_storage_in_mb" => required_free_storage_in_mb,
           "current_concurrency" => current_concurrency,
           "new_concurrency" => new_concurrency
         })
       end
 
-      def log_no_change(cpu_utilization:, min_free_storage:, current_concurrency:)
+      def log_no_change(cpu_utilization:, lowest_node_free_storage_in_mb:, required_free_storage_in_mb:, current_concurrency:)
         log_result({
           "action" => "no_change",
           "cpu_utilization" => cpu_utilization,
-          "min_free_storage" => min_free_storage,
+          "lowest_node_free_storage_in_mb" => lowest_node_free_storage_in_mb,
+          "required_free_storage_in_mb" => required_free_storage_in_mb,
           "current_concurrency" => current_concurrency
         })
       end
 
-      def log_pause(min_free_storage)
+      def log_pause(lowest_node_free_storage_in_mb:, required_free_storage_in_mb:)
         log_result({
           "action" => "pause",
-          "min_free_storage" => min_free_storage
+          "lowest_node_free_storage_in_mb" => lowest_node_free_storage_in_mb,
+          "required_free_storage_in_mb" => required_free_storage_in_mb
         })
       end
 

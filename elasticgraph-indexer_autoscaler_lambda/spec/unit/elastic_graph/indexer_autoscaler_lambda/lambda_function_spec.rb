@@ -40,7 +40,7 @@ RSpec.describe "Autoscale indexer lambda function" do
         "min_cpu_target" => 70,
         "max_cpu_target" => 80,
         "maximum_concurrency" => 1000,
-        "minimum_free_storage" => 100,
+        "required_free_storage_in_mb" => 100,
         "cluster_name" => "some-eg-cluster",
         "indexer_function_name" => "some-eg-app-indexer"
       }

@@ -15,7 +15,7 @@ module ElasticGraph
         min_cpu_target: ::Integer,
         max_cpu_target: ::Integer,
         maximum_concurrency: ::Integer,
-        minimum_free_storage: ::Integer,
+        required_free_storage_in_mb: ::Integer,
         indexer_function_name: ::String,
         cluster_name: ::String
       ) -> void
@@ -29,7 +29,7 @@ module ElasticGraph
       @cloudwatch_client: Aws::CloudWatch::Client
 
       def get_max_cpu_utilization: () -> ::Float
-      def get_min_free_storage: (::String) -> ::Float
+      def get_lowest_node_free_storage_in_mb: (::String) -> ::Float
       def get_queue_attributes: (::Array[::String]) -> { total_messages: ::Integer, queue_arns: ::Array[::String] }
       def get_concurrency: (::String) -> ::Integer?
 
