@@ -1,18 +1,18 @@
 query OptionalMatchingFilter(
-    $optionalMatchQuery: MatchesQueryFilterInput = null
+  $optionalMatchQuery: MatchesQueryFilterInput = null
 ) {
-    artists(filter: {
-        bio: {
-            description:{
-                matchesQuery: $optionalMatchQuery
-            }
-        }
-    }) {
-        nodes {
-            name
-            bio {
-                description
-            }
-        }
+  artists(filter: {
+    bio: {
+      description: {
+        matchesQuery: $optionalMatchQuery
+      }
     }
+  }) {
+    nodes {
+      name
+      bio {
+        description
+      }
+    }
+  }
 }

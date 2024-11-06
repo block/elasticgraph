@@ -42,7 +42,7 @@ are supported to control both aspects to make matching stricter:
 
 ### Bypassing matchesPhrase and matchesQuery
 
-In order to ignore a `matchesPhrase` or `matchesQuery` filter, you can supply `null` to the `MatchesQueryFilterInput` parameter, as such:
+In order to make a `matchesPhrase` or `matchesQuery` filter optional, you can supply `null` to the `MatchesQueryFilterInput` parameter, like this:
 
 {% highlight graphql %}
 {{ site.data.music_queries.filtering.OptionalMatchingFilter }}
