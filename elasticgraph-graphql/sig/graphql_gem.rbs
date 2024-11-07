@@ -168,6 +168,9 @@ module GraphQL
     class Printer
       def self.print_schema: (Schema, **untyped) -> ::String
     end
+
+    class Visibility
+    end
   end
 
   module StaticValidation
