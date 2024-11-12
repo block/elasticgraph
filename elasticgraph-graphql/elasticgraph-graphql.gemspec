@@ -13,7 +13,7 @@ ElasticGraphGemspecHelper.define_elasticgraph_gem(gemspec_file: __FILE__, catego
 
   spec.add_dependency "elasticgraph-datastore_core", eg_version
   spec.add_dependency "elasticgraph-schema_artifacts", eg_version
-  spec.add_dependency "graphql", "~> 2.3.19"
+  spec.add_dependency "graphql", "~> 2.4.3"
 
   spec.add_development_dependency "elasticgraph-admin", eg_version
   spec.add_development_dependency "elasticgraph-elasticsearch", eg_version

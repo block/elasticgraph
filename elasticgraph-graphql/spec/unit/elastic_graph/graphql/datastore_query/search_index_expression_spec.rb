@@ -170,7 +170,7 @@ module ElasticGraph
               expect(parts).to eq []
             end
 
-            it "ignores `nil` when `equal_to_any_of` includes `nil` with other timestamps" do
+            it "treats `nil` when `equal_to_any_of` includes `nil` with other timestamps as `true`" do
               parts = search_index_expression_parts_for({"created_at" => {"equal_to_any_of" => [
                 "2021-01-15T12:30:00Z",
                 nil,
@@ -325,7 +325,7 @@ module ElasticGraph
           end
 
           %w[equal_to_any_of gt gte lt lte any_of].each do |operator|
-            it "ignores a `nil` value for a `#{operator}` filter" do
+            it "treats a `nil` value for a `#{operator}` filter as `true`" do
               parts = search_index_expression_parts_for({"created_at" => {operator => nil}})
 
               expect(parts).to target_all_widget_indices
@@ -364,8 +364,28 @@ module ElasticGraph
               expect(parts).to target_all_widget_indices
             end
 
-            it "excludes no indices when we have an `any_of: []` filter because that will match all results" do
+            # TODO: Change behaviour so no indices are matched when given `anyOf => []`
+            it "excludes all indices when we have an `any_of: []` filter because that will match no results" do
               parts = search_index_expression_parts_for({"any_of" => []})
+
+              expect(parts).to target_all_widget_indices
+            end
+
+            # TODO: Change behaviour so no indices are matched when given `anyOf => {anyOf => []}`
+            it "excludes all indices when we have an `any_of: [{anyof: []}]` filter because that will match no results" do
+              parts = search_index_expression_parts_for({"any_of" => [{"any_of" => []}]})
+
+              expect(parts).to target_all_widget_indices
+            end
+
+            it "excludes no indices when we have an `any_of: [{field: nil}]` filter because that will match all results" do
+              parts = search_index_expression_parts_for({"any_of" => [{"created_at" => nil}]})
+
+              expect(parts).to target_all_widget_indices
+            end
+
+            it "excludes no indices when we have an `any_of: [{field: nil}, {...}]` filter because that will match all results" do
+              parts = search_index_expression_parts_for({"any_of" => [{"created_at" => nil}, {"id" => {"equal_to_any_of" => "some-id"}}]})
 
               expect(parts).to target_all_widget_indices
             end

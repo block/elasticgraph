@@ -83,7 +83,7 @@ module ElasticGraph
         # to a particular field.
         def filter_value_set_for_filter_hash_entry(field_or_op, filter_value, target_field_path_parts, traversed_field_path_parts, negate:)
           if filter_value.nil?
-            # Any filter with a `nil` value is effectively ignored by our filtering logic, so we need
+            # Any filter with a `nil` value is effectively treated as `true` by our filtering logic, so we need
             # to return our `@all_values_set` to indicate this filter matches all documents.
             @all_values_set
           elsif field_or_op == @schema_names.not

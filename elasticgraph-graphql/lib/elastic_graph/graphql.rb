@@ -142,7 +142,13 @@ module ElasticGraph
     def graphql_gem_plugins
       @graphql_gem_plugins ||= begin
         require "graphql"
-        {::GraphQL::Dataloader => {}}
+        {
+          # We depend on this to avoid N+1 calls to the datastore.
+          ::GraphQL::Dataloader => {},
+          # This is new in the graphql-ruby 2.4 release, and will be required in the future.
+          # We pass `preload: true` because the way we handle the schema depends on it being preloaded.
+          ::GraphQL::Schema::Visibility => {preload: true}
+        }
       end
     end
 

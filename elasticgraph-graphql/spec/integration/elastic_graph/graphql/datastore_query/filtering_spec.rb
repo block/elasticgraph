@@ -283,7 +283,7 @@ module ElasticGraph
             expect(results).to match_array(ids_of(team2))
           end
 
-          it "correctly ignores nil filters under `any_satisfy`" do
+          it "correctly treats nil filters under `any_satisfy` treating as `true`" do
             results = search_with_filter("current_players_nested", "any_satisfy", {
               "name" => {"equal_to_any_of" => nil},
               "nicknames" => {"any_satisfy" => {"equal_to_any_of" => nil}}
@@ -889,7 +889,7 @@ module ElasticGraph
         expect(results).to match_array(ids_of(widget2, widget4))
       end
 
-      specify "`equal_to_any_of: []` or `any_of: []` matches no documents, but `any_predicate: nil` or `field: {}` is ignored, matching all documents" do
+      specify "`equal_to_any_of: []` or `any_of: []` matches no documents, but `any_predicate: nil` or `field: {}` is treated as `true`, matching all documents" do
         index_into(
           graphql,
           widget1 = build(:widget),
@@ -898,6 +898,7 @@ module ElasticGraph
 
         expect(search_with_filter("id", "equal_to_any_of", [])).to eq []
         expect(search_with_filter("id", "any_of", [])).to eq []
+        expect(search_with_filter("id", "any_of", [{"any_of" => []}])).to eq []
 
         expect(search_with_filter("id", "equal_to_any_of", nil)).to eq ids_of(widget1, widget2)
         expect(search_with_filter("amount_cents", "lt", nil)).to eq ids_of(widget1, widget2)
@@ -909,6 +910,22 @@ module ElasticGraph
         expect(search_with_filter("name_text", "matches_query", nil)).to eq ids_of(widget1, widget2)
         expect(search_with_filter("name_text", "matches_phrase", nil)).to eq ids_of(widget1, widget2)
         expect(search_with_freeform_filter({"id" => {}})).to eq ids_of(widget1, widget2)
+        expect(search_with_freeform_filter({"any_of" => [{"id" => nil}]})).to eq ids_of(widget1, widget2)
+        expect(search_with_freeform_filter({"any_of" => [{"id" => nil}, {"amount_cents" => {"lt" => 0}}]})).to eq ids_of(widget1, widget2)
+      end
+
+      specify "`not: {any_of: []}` matches all documents, but `not: {any_of: [field: nil, ...]}` is treated as `false` matching no documents" do
+        index_into(
+          graphql,
+          widget1 = build(:widget, id: "one"),
+          widget2 = build(:widget, id: "two")
+        )
+
+        expect(search_with_freeform_filter({"not" => {"any_of" => []}})).to eq ids_of(widget1, widget2)
+        expect(search_with_freeform_filter({"not" => {"not" => {"any_of" => []}}})).to eq []
+
+        expect(search_with_freeform_filter({"not" => {"any_of" => [{"id" => nil}]}})).to eq []
+        expect(search_with_freeform_filter({"not" => {"any_of" => [{"id" => nil}, {"amount_cents" => {"lt" => 1000}}]}})).to eq []
       end
 
       it "`equal_to_any_of:` with `nil` matches documents with null values or not null values" do
@@ -1157,12 +1174,12 @@ module ElasticGraph
           expect(triple_nested_not).to match_array(ids_of(widget1, widget3))
         end
 
-        it "is ignored when set to nil" do
+        it "matches no documents when set to `nil`" do
           index_into(
             graphql,
-            widget1 = build(:widget, amount_cents: 100),
-            widget2 = build(:widget, amount_cents: 205),
-            widget3 = build(:widget, amount_cents: 400)
+            build(:widget, amount_cents: 100),
+            build(:widget, amount_cents: 205),
+            build(:widget, amount_cents: 400)
           )
 
           inner_not_result1 = search_with_freeform_filter({"amount_cents" => {
@@ -1195,9 +1212,51 @@ module ElasticGraph
             "amount_cents" => {"equal_to_any_of" => nil}
           }})
 
-          expect(inner_not_result1).to eq(outer_not_result1).and match_array(ids_of(widget1, widget2, widget3))
-          expect(inner_not_result2).to eq(outer_not_result2).and match_array(ids_of(widget1))
-          expect(inner_not_result3).to eq(outer_not_result3).and match_array(ids_of(widget1, widget2, widget3))
+          inner_not_result4 = search_with_freeform_filter({"amount_cents" => {
+            "not" => {}
+          }})
+
+          outer_not_result4 = search_with_freeform_filter({"not" => {
+            "amount_cents" => {}
+          }})
+
+          expect(inner_not_result1).to eq(outer_not_result1).and eq []
+          expect(inner_not_result2).to eq(outer_not_result2).and eq []
+          expect(inner_not_result3).to eq(outer_not_result3).and eq []
+          expect(inner_not_result4).to eq(outer_not_result4).and eq []
+        end
+
+        it "is treated as `true` when set to nil inside `any_of`" do
+          index_into(
+            graphql,
+            widget1 = build(:widget, amount_cents: 100),
+            build(:widget, amount_cents: 205),
+            build(:widget, amount_cents: 400)
+          )
+
+          inner_not_result1 = search_with_freeform_filter({"amount_cents" => {
+            "any_of" => [
+              {"not" => nil},
+              {"lt" => 200}
+            ]
+          }})
+
+          outer_not_result1 = search_with_freeform_filter({
+            "any_of" => [
+              {
+                "not" => {
+                  "amount_cents" => nil
+                }
+              },
+              {
+                "amount_cents" => {
+                  "lt" => 200
+                }
+              }
+            ]
+          })
+
+          expect(inner_not_result1).to eq(outer_not_result1).and match_array(ids_of(widget1))
         end
       end
 

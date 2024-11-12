@@ -13,7 +13,7 @@ ElasticGraphGemspecHelper.define_elasticgraph_gem(gemspec_file: __FILE__, catego
 
   spec.add_dependency "elasticgraph-graphql", eg_version
   spec.add_dependency "elasticgraph-support", eg_version
-  spec.add_dependency "graphql", "~> 2.3.19"
+  spec.add_dependency "graphql", "~> 2.4.3"
   spec.add_dependency "apollo-federation", "~> 3.8"
 
   # Note: technically, this is not purely a development dependency, but since `eg-schema_def`

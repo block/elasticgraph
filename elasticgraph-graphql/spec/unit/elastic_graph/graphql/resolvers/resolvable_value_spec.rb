@@ -35,6 +35,10 @@ module ElasticGraph
                   favorite_quote(truncate_to: Int, foo_bar_bazz: Int): String
                   favorite_quote2(trunc_to: Int): String
                 }
+
+                type Query {
+                  person: Person
+                }
               EOS
             end
           end

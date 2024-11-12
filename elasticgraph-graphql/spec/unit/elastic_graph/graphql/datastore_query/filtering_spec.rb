@@ -378,13 +378,13 @@ module ElasticGraph
           ]}})
         end
 
-        it "is ignored when `null` is passed" do
+        it "is treated as `true` when `null` is passed" do
           query = new_query(filter: {"tags" => {"all_of" => nil}})
 
           expect(datastore_body_of(query)).to not_filter_datastore_at_all
         end
 
-        it "is ignored when `[]` is passed" do
+        it "is treated as `true` when `[]` is passed" do
           query = new_query(filter: {"tags" => {"all_of" => []}})
 
           expect(datastore_body_of(query)).to not_filter_datastore_at_all
@@ -786,7 +786,7 @@ module ElasticGraph
             })
           end
 
-          it "ignores `count` filter predicates that have a `nil` or `{}` value" do
+          it "treats `count` filter predicates that have a `nil` or `{}` value as `true`" do
             query = new_query(filter: {"past_names" => {LIST_COUNTS_FIELD => nil}})
             expect(datastore_body_of(query)).to not_filter_datastore_at_all
 
@@ -1277,14 +1277,21 @@ module ElasticGraph
           }})
         end
 
-        it "is ignored when set to nil" do
+        it "returns the standard always false filter when set to nil" do
           body_for_inner_not = datastore_body_of(new_query(filter: {"age" => {"not" => nil}}))
           body_for_outer_not = datastore_body_of(new_query(filter: {"not" => {"age" => nil}}))
 
-          expect(body_for_inner_not).to eq(body_for_outer_not).and not_filter_datastore_at_all
+          expect(body_for_inner_not).to eq(body_for_outer_not).and query_datastore_with(always_false_condition)
         end
 
-        it "is ignored when set to nil when alongside other filters" do
+        it "returns the standard always false filter when set to an emptyPredicate" do
+          body_for_inner_not = datastore_body_of(new_query(filter: {"age" => {"not" => {}}}))
+          body_for_outer_not = datastore_body_of(new_query(filter: {"not" => {"age" => {}}}))
+
+          expect(body_for_inner_not).to eq(body_for_outer_not).and query_datastore_with(always_false_condition)
+        end
+
+        it "returns the standard always false filter when set to nil alongside other filters" do
           body_for_inner_not = datastore_body_of(new_query(filter: {"age" => {
             "not" => nil,
             "gt" => 25
@@ -1297,19 +1304,46 @@ module ElasticGraph
             }
           }))
 
-          expect(body_for_inner_not).to eq(body_for_outer_not).and query_datastore_with({bool: {filter: [{range: {"age" => {gt: 25}}}]}})
+          expect(body_for_inner_not).to eq(body_for_outer_not).and query_datastore_with({bool: {filter: [{match_none: {}}, {range: {"age" => {gt: 25}}}]}})
         end
 
-        it "is ignored when the inner filter is also ignored" do
+        it "returns the standard always false filter when set to nil alongside other filters inside `any_of`" do
+          body_for_inner_not = datastore_body_of(new_query(filter: {"age" => {
+            "any_of" => [
+              {"not" => nil},
+              {"gt" => 25}
+            ]
+          }}))
+
+          body_for_outer_not = datastore_body_of(new_query(filter: {
+            "any_of" => [
+              {"not" => nil},
+              {
+                "age" => {
+                  "gt" => 25
+                }
+              }
+            ]
+          }))
+
+          expect(body_for_inner_not).to query_datastore_with({bool: {filter: [{bool: {minimum_should_match: 1, should: [
+            {bool: {filter: [{match_none: {}}]}}, {bool: {filter: [{range: {"age" => {gt: 25}}}]}}
+          ]}}]}})
+          expect(body_for_outer_not).to query_datastore_with({bool: {minimum_should_match: 1, should: [
+            {bool: {filter: [{match_none: {}}]}}, {bool: {filter: [{range: {"age" => {gt: 25}}}]}}
+          ]}})
+        end
+
+        it "returns the standard always false filter when the inner filter evaluates to true" do
           body_for_inner_not = datastore_body_of(new_query(filter: {"age" => {"not" => {"equal_to_any_of" => nil}}}))
           body_for_outer_not = datastore_body_of(new_query(filter: {"not" => {"age" => {"equal_to_any_of" => nil}}}))
 
-          expect(body_for_inner_not).to eq(body_for_outer_not).and not_filter_datastore_at_all
+          expect(body_for_inner_not).to eq(body_for_outer_not).and query_datastore_with(always_false_condition)
         end
       end
 
       describe "behavior of empty/null filter values" do
-        it "prunes out filtering predicates that are empty no-ops on root fields" do
+        it "treats filtering predicates that are empty no-ops on root fields as `true`" do
           query = new_query(filter: {
             "age" => {"gt" => nil},
             "name" => {"equal_to_any_of" => ["Jane"]},
@@ -1320,7 +1354,7 @@ module ElasticGraph
           expect(datastore_body_of(query)).to filter_datastore_with(terms: {"name" => ["Jane"]})
         end
 
-        it "prunes out filtering predicates that are empty no-ops on subfields" do
+        it "treats filtering predicates that are empty no-ops on subfields as `true`" do
           query = new_query(filter: {
             "bio" => {
               "age" => {"gt" => nil},
@@ -1365,6 +1399,24 @@ module ElasticGraph
           expect(datastore_body_of(query)).to filter_datastore_with(terms: {"name" => []})
         end
 
+        it "returns the standard always false filter for `any_of: []`" do
+          query = new_query(filter: {
+            "any_of" => []
+          })
+
+          expect(datastore_body_of(query)).to query_datastore_with(always_false_condition)
+        end
+
+        it "returns an always false filter for `any_of: [{any_of: []}]`" do
+          query = new_query(filter: {
+            "any_of" => [{"any_of" => []}]
+          })
+
+          expect(datastore_body_of(query)).to query_datastore_with({bool: {minimum_should_match: 1, should: [
+            always_false_condition
+          ]}})
+        end
+
         it "does not prune out `any_of: []` to be consistent with `equal_to_any_of: []`, instead providing an 'always false' condition to achieve the same behavior" do
           query = new_query(filter: {
             "age" => {"gt" => 18},
@@ -1377,12 +1429,20 @@ module ElasticGraph
           ]})
         end
 
-        it "reduces an `any_of` composed entirely of empty predicates to a false condition" do
+        it "applies no filtering to an `any_of` composed entirely of empty predicates" do
           query = new_query(filter: {
             "age" => {"any_of" => [{"gt" => nil}, {"lt" => nil}]}
           })
 
-          expect(datastore_body_of(query)).to filter_datastore_with(always_false_condition)
+          expect(datastore_body_of(query)).to not_filter_datastore_at_all
+        end
+
+        it "applies no filtering for an `any_of` composed of an empty predicate and non empty predicate" do
+          query = new_query(filter: {
+            "any_of" => [{"age" => {}}, {"equal_to_any_of" => [36]}]
+          })
+
+          expect(datastore_body_of(query)).to not_filter_datastore_at_all
         end
 
         it "does not filter at all when given only `any_of: nil` on a root field" do
@@ -1399,6 +1459,38 @@ module ElasticGraph
           })
 
           expect(datastore_body_of(query)).to not_filter_datastore_at_all
+        end
+
+        it "filters to a false condition when given `not: {any_of: {age: nil}}` on a root field" do
+          query = new_query(filter: {
+            "not" => {"any_of" => [{"age" => nil}]}
+          })
+
+          expect(datastore_body_of(query)).to query_datastore_with(always_false_condition)
+        end
+
+        it "filters to a false condition when given `not: {any_of: nil}` on a sub field" do
+          query = new_query(filter: {
+            "age" => {"not" => {"any_of" => nil}}
+          })
+
+          expect(datastore_body_of(query)).to query_datastore_with(always_false_condition)
+        end
+
+        it "filters to a true condition when given `not: {any_of: []}` on a sub field" do
+          query = new_query(filter: {
+            "age" => {"not" => {"any_of" => []}}
+          })
+
+          expect(datastore_body_of(query)).to query_datastore_with({bool: {must_not: [always_false_condition]}})
+        end
+
+        it "filters to a false condition when given `not: {not: {any_of: []}}` on a sub field" do
+          query = new_query(filter: {
+            "age" => {"not" => {"not" => {"any_of" => []}}}
+          })
+
+          expect(datastore_body_of(query)).to query_datastore_with(always_false_condition)
         end
 
         # Note: the GraphQL schema does not allow `any_of: {}` (`any_of` is a list field). However, we're testing

@@ -253,7 +253,7 @@ module ElasticGraph
           }]
         end
 
-        it "ignores an empty filter" do
+        it "treats an empty filter treating as `true`" do
           aggs = {
             "target:seasons_nested" => {"doc_count" => 423, "meta" => outer_meta}
           }

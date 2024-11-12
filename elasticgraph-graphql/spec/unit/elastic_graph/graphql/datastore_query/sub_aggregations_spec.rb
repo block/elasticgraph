@@ -178,7 +178,7 @@ module ElasticGraph
         })
       end
 
-      it "ignores empty filters" do
+      it "treats empty filters treating as `true`" do
         query = new_query(aggregations: [aggregation_query_of(name: "teams", sub_aggregations: [
           nested_sub_aggregation_of(path_in_index: ["current_players_nested"], query: sub_aggregation_query_of(name: "current_players_nested", filter: {
             "name" => {"equal_to_any_of" => nil}

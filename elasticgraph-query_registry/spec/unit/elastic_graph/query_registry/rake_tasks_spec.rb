@@ -116,7 +116,7 @@ module ElasticGraph
             For client `client_bob`:
               - CountComponents.graphql (2 operations):
                 - CountComponents: 🛑. Got 2 validation errors:
-                  1) Field 'total_edge_count2' doesn't exist on type 'ComponentConnection'
+                  1) Field 'total_edge_count2' doesn't exist on type 'ComponentConnection' (Did you mean `total_edge_count`?)
                      path: query CountComponents.components.total_edge_count2
                      source: query_registry/client_bob/CountComponents.graphql:3:5
                      code: undefinedField

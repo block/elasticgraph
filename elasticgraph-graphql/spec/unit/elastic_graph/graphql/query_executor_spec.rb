@@ -42,6 +42,7 @@ module ElasticGraph
               }
 
               type Query {
+                float: Float # so the Float type exists
                 colors(args: ColorArgs): [Color!]!
                 colors2(args: ColorArgs): [Color2!]!
               }

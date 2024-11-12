@@ -161,7 +161,9 @@ module ElasticGraph
           def generate_schema_artifacts(**options)
             super(**options) do |schema|
               schema.object_type "Widget" do |t|
+                t.field "id", "ID"
                 t.paginated_collection_field "natural_numbers", "Int"
+                t.index "widgets"
               end
             end
           end

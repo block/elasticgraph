@@ -533,7 +533,7 @@ module ElasticGraph
           end
 
           describe "`null` leaves" do
-            it "ignores `filter: null`" do
+            it "treats `filter: null` as true" do
               query = datastore_query_for(:Query, :components, <<~QUERY)
                 query {
                   components(filter: null) {
@@ -547,7 +547,7 @@ module ElasticGraph
               expect(query.filters).to contain_exactly(exclude_incomplete_docs_filter)
             end
 
-            it "ignores a `field: null` filter since it will get pruned" do
+            it "treats `field: null` filter as `true`" do
               query = datastore_query_for(:Query, :components, <<~QUERY)
                 query {
                   components(filter: {cost: null}) {
@@ -579,7 +579,7 @@ module ElasticGraph
               expect(query.filters).to contain_exactly({"cost" => nil, "name" => {"equal_to_any_of" => ["thingy"]}})
             end
 
-            it "ignores a `field: {predicate: null}` filter since it will get pruned" do
+            it "treats `field: {predicate: null}` filter as `true`" do
               query = datastore_query_for(:Query, :components, <<~QUERY)
                 query {
                   components(filter: {cost: {equal_to_any_of: null}}) {
@@ -614,7 +614,7 @@ module ElasticGraph
               })
             end
 
-            it "ignores a `null` filter since it will get pruned" do
+            it "treats `null` filter as `true`" do
               query = datastore_query_for(:Query, :components, <<~QUERY)
                 query {
                   components(filter: {options: null}) {
@@ -649,7 +649,7 @@ module ElasticGraph
               })
             end
 
-            it "ignores a `parent_field: {child_field: null}` filter since it will get pruned" do
+            it "treats `parent_field: {child_field: null}` as true" do
               query = datastore_query_for(:Query, :components, <<~QUERY)
                 query {
                   components(filter: {options: {size: null}}) {
@@ -684,7 +684,7 @@ module ElasticGraph
               })
             end
 
-            it "ignores a `parent_field: {child_field: {predicate: null}}` filter since it will get pruned" do
+            it "treats `parent_field: {child_field: {predicate: null}}` as true" do
               query = datastore_query_for(:Query, :components, <<~QUERY)
                 query {
                   components(filter: {options: {size: {equal_to_any_of: null}}}) {
@@ -932,7 +932,7 @@ module ElasticGraph
               )
             end
 
-            it "includes the incomplete doc exclusion filter when there are no sub-clauses, because the filter is ignored" do
+            it "includes the incomplete doc exclusion filter when there are no sub-clauses, because the filter is treated as `false` for being empty" do
               query = datastore_query_for(:Query, :components, <<~QUERY)
                 query {
                   components(filter: {any_of: []}) {

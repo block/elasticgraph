@@ -61,7 +61,7 @@ module ElasticGraph
           filter_hash.each do |field_or_op, expression|
             case filter_node_interpreter.identify_node_type(field_or_op, expression)
             when :empty
-              # This is an "empty" filter predicate and we can ignore it.
+              # This is an "empty" filter predicate and can be treated as `true`.
             when :not
               process_not_expression(bool_node, expression, field_path)
             when :list_any_filter
@@ -103,13 +103,15 @@ module ElasticGraph
         end
 
         def process_not_expression(bool_node, expression, field_path)
-          return if expression.nil? || expression == {}
-
           sub_filter = build_bool_hash do |inner_node|
-            process_filter_hash(inner_node, expression, field_path)
+            process_filter_hash(inner_node, expression || {}, field_path)
           end
 
-          return unless sub_filter
+          unless sub_filter
+            # Since an empty expression is treated as `true`, convert to `false` when negating.
+            BooleanQuery::ALWAYS_FALSE_FILTER.merge_into(bool_node)
+            return
+          end
 
           # Prevent any negated filters from being unnecessarily double-negated by
           # converting them to a positive filter (i.e., !!A == A).
@@ -187,8 +189,22 @@ module ElasticGraph
           end
         end
 
+        # We want to provide the following semantics for `any_of`:
+        #
+        # * `filter: {anyOf: []}` -> return no results
+        # * `filter: {anyOf: [{field: null}]}` -> return all results
+        # * `filter: {anyOf: [{field: null}, {field: ...}]}` -> return all results
         def process_any_of_expression(bool_node, expressions, field_path)
           return if expressions.nil? || expressions == {}
+
+          if expressions.empty?
+            # When our `expressions` array is empty, we want to match no documents. However, that's
+            # not the behavior the datastore will give us if we have an empty array in the query under
+            # `should`. To get the behavior we want, we need to pass the datastore some filter criteria
+            # that will evaluate to false for every document.
+            BooleanQuery::ALWAYS_FALSE_FILTER.merge_into(bool_node)
+            return
+          end
 
           shoulds = expressions.filter_map do |expression|
             build_bool_hash do |inner_bool_node|
@@ -196,12 +212,9 @@ module ElasticGraph
             end
           end
 
-          # When our `shoulds` array is empty, the filtering semantics we want is to match no documents.
-          # However, that's not the behavior the datastore will give us if we have an empty array in the
-          # query under `should`. To get the behavior we want, we need to pass the datastore some filter
-          # criteria that will evaluate to false for every document.
-          bool_query = shoulds.empty? ? BooleanQuery::ALWAYS_FALSE_FILTER : BooleanQuery.should(*shoulds)
-          bool_query.merge_into(bool_node)
+          return if shoulds.size < expressions.size
+
+          BooleanQuery.should(*shoulds).merge_into(bool_node)
         end
 
         def process_all_of_expression(bool_node, expressions, field_path)
@@ -333,7 +346,7 @@ module ElasticGraph
         def build_bool_hash(&block)
           bool_node = Hash.new { |h, k| h[k] = [] }.tap(&block)
 
-          # To ignore "empty" filter predicates we need to return `nil` here.
+          # To treat "empty" filter predicates as `true` we need to return `nil` here.
           return nil if bool_node.empty?
 
           # According to https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html#bool-min-should-match,

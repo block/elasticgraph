@@ -27,6 +27,7 @@ module ElasticGraph
             end
 
             schema.object_type "Person" do |t|
+              t.field "id", "ID"
               t.field "name", "String"
               t.field "identifiers", "PersonIdentifiers"
               t.field "ssn", "String", name_in_index: "identifiers.ssn", graphql_only: true
@@ -36,6 +37,7 @@ module ElasticGraph
               t.field "nicknames", "[String!]"
               t.field "alt_nicknames", "[String!]", name_in_index: "nicknames", graphql_only: true
               t.field "doc_count", "Int"
+              t.index "people"
             end
           end
         end

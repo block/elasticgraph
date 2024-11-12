@@ -11,7 +11,7 @@ require "elastic_graph/support/monotonic_clock"
 
 module ElasticGraph
   class GraphQL
-    RSpec.describe Schema do
+    RSpec.describe Schema, :ensure_no_orphaned_types do
       it "can be instantiated with directives that have custom scalar arguments" do
         define_schema do |schema|
           schema.scalar_type "_FieldSet" do |t|
@@ -71,6 +71,7 @@ module ElasticGraph
       end
 
       describe "#defined_types" do
+        # Note: `defined_type` isn't used internally by ElasticGraph itself, but it's exposed for use by extensions.
         it "returns a list containing all explicitly defined types (excluding built-ins)" do
           schema = define_schema do |s|
             s.enum_type "Options" do |t|
@@ -79,17 +80,9 @@ module ElasticGraph
             s.object_type "Color"
           end
 
-          expect(schema.defined_types).to include(
-            schema.type_named(:Options),
-            schema.type_named(:Color),
-            schema.type_named(:Query)
-          ).and exclude(
-            schema.type_named(:Int),
-            schema.type_named(:Float),
-            schema.type_named(:Boolean),
-            schema.type_named(:String),
-            schema.type_named(:ID)
-          )
+          expect(schema.defined_types).to all be_a Schema::Type
+          expect(schema.defined_types.map(&:name)).to include(:Options, :Color, :Query)
+            .and exclude(:Int, :Float, :Boolean, :String, :ID)
         end
       end
 

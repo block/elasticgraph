@@ -181,7 +181,7 @@ module ElasticGraph
           string_hash_of(widget1, :id, :amount_cents)
         ])
 
-        # Verify that we can filter on `DateTime` fields (and that `nil` DateTime filter values are ignored)
+        # Verify that we can filter on `DateTime` fields (and that `nil` DateTime filter values are treated as `true`)
         widgets = list_widgets_with(:created_at,
           filter: {created_at: {gte: "2019-07-02T12:00:00Z", lt: nil}},
           order_by: [:created_at_ASC])
@@ -229,7 +229,7 @@ module ElasticGraph
           string_hash_of(widget2, :id, created_at: "2019-07-02T12:00:00.000Z")
         ])
 
-        # Verify that we can filter on `Date` fields (and that `nil` Date filter values are ignored)
+        # Verify that we can filter on `Date` fields (and that `nil` Date filter values are treated as `true`)
         widgets = list_widgets_with(:created_on,
           filter: {created_on: {lte: "2019-07-02", gte: nil}},
           order_by: [:created_on_ASC])
@@ -310,6 +310,28 @@ module ElasticGraph
           string_hash_of(widget3, :id, :amount_cents)
         ])
 
+        # Test `not: {any_of: []}` results in all matching documents
+        widgets = list_widgets_with(:amount_cents,
+          filter: {not: {any_of: []}})
+
+        expect(widgets).to match([
+          string_hash_of(widget3, :id, :amount_cents),
+          string_hash_of(widget2, :id, :amount_cents),
+          string_hash_of(widget1, :id, :amount_cents)
+        ])
+
+        # Test `not: {any_of: [emptyPredicate]}` results in no matching documents
+        widgets = list_widgets_with(:amount_cents,
+          filter: {not: {any_of: [{name: {equal_to_any_of: nil}}]}})
+
+        expect(widgets).to eq []
+
+        # Test `not: {any_of: [emptyPredicate, nonEmptyPredicate]}` results in no matching documents
+        widgets = list_widgets_with(:amount_cents,
+          filter: {not: {any_of: [{name: {equal_to_any_of: nil}}, {amount_cents: {gt: 150}}]}})
+
+        expect(widgets).to eq []
+
         # Test `equal_to_any_of` with `[nil, other_value]`
         widgets = list_widgets_with(:amount_cents,
           filter: {name: {equal_to_any_of: [nil, "thing2", "", " ", "\n"]}}, # empty strings should be ignored.,
@@ -350,17 +372,13 @@ module ElasticGraph
           string_hash_of(widget3, :id, :amount_cents)
         ])
 
-        # The negation of an ignored filter is an ignored filter: `{not: {equal_to_any_of: nil}}`
-        # evaluates to {not: {}} which will be ignored, therefore the filter will match all documents.
+        # The negation of an empty predicate is an always false filter. `{not: {equal_to_any_of: nil}}`
+        # evaluates to `{not: {true}}`, therefore the filter will match no documents.
         widgets = list_widgets_with(:amount_cents,
           filter: {id: {not: {equal_to_any_of: nil}}},
           order_by: [:amount_cents_ASC])
 
-        expect(widgets).to match([
-          string_hash_of(widget1, :id, :amount_cents),
-          string_hash_of(widget2, :id, :amount_cents),
-          string_hash_of(widget3, :id, :amount_cents)
-        ])
+        expect(widgets).to match []
 
         # Test that sorting by the same field twice in different directions doesn't fail.
         # (The extra sort should be effectively ignored).
@@ -630,6 +648,14 @@ module ElasticGraph
           }}}})
           expect(results).to eq [{"id" => "t1"}, {"id" => "t2"}, {"id" => "t3"}]
 
+          # Verify `any_of: [emptyPredicate]` returns all results.
+          results = query_teams_with(filter: {any_of: [{forbes_valuations: nil}]})
+          expect(results).to eq [{"id" => "t1"}, {"id" => "t2"}, {"id" => "t3"}, {"id" => "t4"}]
+
+          # Verify `any_of: [emptyPredicate, nonEmptyPredicate]` returns all results.
+          results = query_teams_with(filter: {any_of: [{forbes_valuations: nil}, {id: {equal_to_any_of: ["t3"]}}]})
+          expect(results).to eq [{"id" => "t1"}, {"id" => "t2"}, {"id" => "t3"}, {"id" => "t4"}]
+
           # Verify we can use `any_of` directly under `any_satisfy` on a nested field.
           results = query_teams_with(filter: {current_players_nested: {any_satisfy: {any_of: [
             {name: {equal_to_any_of: ["Johnny Rocket"]}},
@@ -757,17 +783,17 @@ module ElasticGraph
 
           # Verify `all_of: [{not: null}]` works as expected.
           results = query_teams_with(filter: {seasons_nested: {all_of: [{not: nil}]}})
-          # All teams should be returned since the `nil` part of the filter expression is pruned.
-          expect(results).to eq [{"id" => "t1"}, {"id" => "t2"}, {"id" => "t3"}, {"id" => "t4"}]
+          # No teams should be returned since the `nil` part of the filter expression evaluates to `true`.
+          expect(results).to eq []
 
           # Verify `all_of: [{not: null}]` works as expected.
           results = query_teams_with(filter: {seasons_nested: {all_of: [{all_of: nil}]}})
-          # All teams should be returned since the `nil` part of the filter expression is pruned.
+          # All teams should be returned since the `nil` part of the filter expression is treated as `true`.
           expect(results).to eq [{"id" => "t1"}, {"id" => "t2"}, {"id" => "t3"}, {"id" => "t4"}]
 
           # Verify `all_of: [{}]` works as expected.
           results = query_teams_with(filter: {seasons_nested: {all_of: [{}]}})
-          # All teams should be returned since the `nil` part of the filter expression is pruned.
+          # All teams should be returned since the `nil` part of the filter expression is treated as `true`.
           expect(results).to eq [{"id" => "t1"}, {"id" => "t2"}, {"id" => "t3"}, {"id" => "t4"}]
         end
 
@@ -865,14 +891,15 @@ module ElasticGraph
             filter: {options: {color: {equal_to_any_of: nil}}}
           )).to contain_exactly(expected_widget1, expected_widget2)
 
+          # `{not: emptyPredicate}` should result in an always false filter
           expect(list_widgets_with_options_and_inventor(
             filter: {options: {color: {not: {equal_to_any_of: nil}}}}
-          )).to contain_exactly(expected_widget1, expected_widget2)
+          )).to eq []
 
-          # not set to 'nil' should not cause any filtering on that value.
+          # `{not: nil}` should result in an always false filter
           expect(list_widgets_with_options_and_inventor(
             filter: {options: {color: {not: nil}}}
-          )).to contain_exactly(expected_widget1, expected_widget2)
+          )).to eq []
 
           # On type unions you can filter on a subfield that is present on all subtypes...
           expect(list_widgets_with_options_and_inventor(

@@ -12,7 +12,7 @@ require "elastic_graph/graphql/schema"
 module ElasticGraph
   class GraphQL
     class Schema
-      RSpec.describe Type do
+      RSpec.describe Type, :ensure_no_orphaned_types do
         it "exposes the name as a capitalized symbol" do
           type = define_schema do |schema|
             schema.object_type "Color"
@@ -102,15 +102,6 @@ module ElasticGraph
                 t.field "node", "Color!"
               end
 
-              # This must be raw SDL because our schema definition API provides no way to define custom `input` types--it
-              # generates them based on our indexed types. Using `raw_sdl` lets us define what the test expects. We may want
-              # to update what the test expects to use generated filter types in the future so we don't have to use `raw_sdl`
-              # here.
-              %w[Some PersonEdge PersonConnection].each do |type|
-                schema.raw_sdl "input #{type}FilterInput { foo: Int }"
-                schema.raw_sdl "input #{type}ListFilterInput { foo: Int }"
-              end
-
               schema.object_type "WrappedTypes" do |t|
                 t.field "int", "Int"
                 t.field "non_null_int", "Int!"
@@ -147,6 +138,9 @@ module ElasticGraph
                 t.field "non_null_list_of_indexed_aggregation", "[PersonAggregation]!", filterable: false, groupable: false do |f|
                   f.mapping type: "object"
                 end
+
+                t.field "id", "ID"
+                t.index "wrapped_types"
               end
             end
           end
@@ -395,9 +389,9 @@ module ElasticGraph
           end
 
           it "can model an input type" do
-            type = schema.type_named(:SomeFilterInput)
+            type = schema.type_named(:IntFilterInput)
 
-            expect(type.name).to eq :SomeFilterInput
+            expect(type.name).to eq :IntFilterInput
             expect(type).to only_satisfy_predicates(:nullable?, :object?)
             expect(type.unwrap_fully).to be type
             expect(type.unwrap_non_null).to be type

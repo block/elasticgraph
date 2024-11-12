@@ -2,7 +2,7 @@
 
 There are many ways to be an open source contributor, and we're here to help you on your way! You may:
 
-* Propose ideas in our [discord](https://discord.com/invite/c79mzZnu)
+* Propose ideas in our [discord](https://discord.gg/8m9FqJ7a7F)
 * Raise an issue or feature request in our [issue tracker](https://github.com/block/elasticgraph/issues)
 * Help another contributor with one of their questions, or a code review
 * Suggest improvements to our Getting Started documentation by supplying a Pull Request
@@ -54,7 +54,7 @@ Anyone from the community is welcome (and encouraged!) to raise issues via
 
 ### Discussions
 
-Design discussions and proposals take place in our [discord](https://discord.com/invite/c79mzZnu).
+Design discussions and proposals take place in our [discord](https://discord.gg/8m9FqJ7a7F).
 
 We advocate an asynchronous, written debate model - so write up your thoughts and invite the community to join in!
 

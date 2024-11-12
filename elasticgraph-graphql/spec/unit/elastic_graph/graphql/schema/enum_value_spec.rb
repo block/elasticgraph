@@ -12,7 +12,7 @@ require "elastic_graph/graphql/schema/enum_value"
 module ElasticGraph
   class GraphQL
     class Schema
-      RSpec.describe EnumValue do
+      RSpec.describe EnumValue, :ensure_no_orphaned_types do
         it "inspects well" do
           enum_value = define_schema do |s|
             s.enum_type "ColorSpace" do |t|

@@ -29,7 +29,7 @@ module ElasticGraph
         scalar_types.to_set.union(introspection_types)
       )
 
-      attr_reader :element_names, :defined_types, :config, :graphql_schema, :runtime_metadata
+      attr_reader :element_names, :config, :graphql_schema, :runtime_metadata
 
       def initialize(
         graphql_schema_string:,
@@ -53,7 +53,6 @@ module ElasticGraph
           )
         end
 
-        @types_by_name = Hash.new { |hash, key| hash[key] = lookup_type_by_name(key) }
         @build_resolver = build_resolver
 
         # Note: as part of loading the schema, the GraphQL gem may use the resolver (such
@@ -68,7 +67,7 @@ module ElasticGraph
 
         # Pre-load all defined types so that all field extras can get configured as part
         # of loading the schema, before we execute the first query.
-        @defined_types = build_defined_types_array(@graphql_schema)
+        @types_by_name = build_types_by_name
       end
 
       def type_from(graphql_type)
@@ -80,7 +79,11 @@ module ElasticGraph
       # get type objects for wrapped types, but you need to get it from a field object of that
       # type.
       def type_named(type_name)
-        @types_by_name[type_name.to_s]
+        @types_by_name.fetch(type_name.to_s)
+      rescue KeyError => e
+        msg = "No type named #{type_name} could be found"
+        msg += "; Possible alternatives: [#{e.corrections.join(", ").delete('"')}]." if e.corrections.any?
+        raise Errors::NotFoundError, msg
       end
 
       def document_type_stored_in(index_definition_name)
@@ -106,6 +109,10 @@ module ElasticGraph
         @indexed_document_types ||= defined_types.select(&:indexed_document?)
       end
 
+      def defined_types
+        @defined_types ||= @types_by_name.except(*BUILT_IN_TYPE_NAMES).values
+      end
+
       def to_s
         "#<#{self.class.name} 0x#{__id__.to_s(16)} indexed_document_types=#{indexed_document_types.map(&:name).sort.to_s.delete(":")}>"
       end
@@ -128,24 +135,14 @@ module ElasticGraph
         def_delegators :resolver, :call, :resolve_type, :coerce_input, :coerce_result
       end
 
-      def lookup_type_by_name(type_name)
-        type_from(@graphql_schema.types.fetch(type_name))
-      rescue KeyError => e
-        msg = "No type named #{type_name} could be found"
-        msg += "; Possible alternatives: [#{e.corrections.join(", ").delete('"')}]." if e.corrections.any?
-        raise Errors::NotFoundError, msg
-      end
-
       def resolver
         @resolver ||= @build_resolver.call(self)
       end
 
-      def build_defined_types_array(graphql_schema)
-        graphql_schema
-          .types
-          .values
-          .reject { |t| BUILT_IN_TYPE_NAMES.include?(t.graphql_name) }
-          .map { |t| type_named(t.graphql_name) }
+      def build_types_by_name
+        graphql_schema.types.transform_values do |graphql_type|
+          @types_by_graphql_type[graphql_type]
+        end
       end
 
       def indexed_document_types_by_index_definition_name

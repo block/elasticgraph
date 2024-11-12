@@ -28,8 +28,9 @@ RSpec.configure do |config|
     meta[:builds_graphql] = true
   end
 
-  config.when_first_matching_example_defined(:resolver) { require_relative "support/resolver" }
+  config.when_first_matching_example_defined(:ensure_no_orphaned_types) { require_relative "support/ensure_no_orphaned_types" }
   config.when_first_matching_example_defined(:query_adapter) { require_relative "support/query_adapter" }
+  config.when_first_matching_example_defined(:resolver) { require_relative "support/resolver" }
   config.prepend ElasticGraph::GraphQLSpecHelpers, absolute_file_path: %r{/elasticgraph-graphql/}
 end
 

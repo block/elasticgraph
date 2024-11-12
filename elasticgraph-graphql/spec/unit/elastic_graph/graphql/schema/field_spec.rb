@@ -12,7 +12,7 @@ require "support/aggregations_helpers"
 module ElasticGraph
   class GraphQL
     class Schema
-      RSpec.describe Field do
+      RSpec.describe Field, :ensure_no_orphaned_types do
         it "exposes the name as a lowercase symbol" do
           field = define_schema do |schema|
             schema.object_type "Color" do |t|

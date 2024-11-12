@@ -253,9 +253,31 @@ module ElasticGraph
         ]})).to search_all_shards
       end
 
-      it "searches all shards when we have an `any_of: []` filter because that will match all results" do
+      # TODO: Change behaviour so no shards are matched when given `anyOf => []`.
+      #       Updated references of ignore and prune to use language such as "treated ... as `true`"
+      it "searches no shards when we have an `any_of: []` filter because that will match no results" do
         expect(shard_routing_for(["name"], {
           "any_of" => []
+        })).to search_all_shards
+      end
+
+      # TODO: Change behaviour so no shards are matched when given `anyOf => {anyOf => []}`
+      #       Updated references of ignore and prune to use language such as "treated ... as `true`"
+      it "searches no shards when we have an `any_of: [{anyof: []}]` filter because that will match no results" do
+        expect(shard_routing_for(["name"], {
+          "any_of" => [{"any_of" => []}]
+        })).to search_all_shards
+      end
+
+      it "searches all shards when we have an `any_of: [{field: nil}]` filter because that will match all results" do
+        expect(shard_routing_for(["name"], {
+          "any_of" => [{"name" => nil}]
+        })).to search_all_shards
+      end
+
+      it "searches all shards when we have an `any_of: [{field: nil}, {...}]` filter because that will match all results" do
+        expect(shard_routing_for(["name"], {
+          "any_of" => [{"name" => nil}, {"id" => {"equal_to_any_of" => ["abc"]}}]
         })).to search_all_shards
       end
 
