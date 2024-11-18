@@ -43,6 +43,70 @@ Once you have Ruby installed, install the development dependencies by running `b
 This project uses Docker Engine and Docker Compose to run Elasticsearch and OpenSearch locally. We recommend installing
 [Docker Desktop](https://docs.docker.com/desktop/) to get both Docker dependencies.
 
+## Customizing the Development Environment
+
+Additional gems can be included in the bundle by defining `Gemfile-custom`.
+See [Gemfile-custom.example](Gemfile-custom.example) for an example.
+
+## Build Scripts and Executables
+
+The codebase includes a variety of build scripts and executables which are useful for local development:
+
+* `script/quick_build`: Performs an abridged version of the CI build. This is generally the most complete CI build we run locally.
+* `script/type_check`: Runs a [steep](https://github.com/soutaro/steep) type check.
+* `script/spellcheck`: Spellchecks the codebase using [codespell](https://github.com/codespell-project/codespell).
+* `script/run_specs`: Runs the test suite.
+* `script/run_gem_specs [gem_name]`: Runs the test suite for one ElasticGraph gem.
+
+### Running Tests
+
+We use [RSpec](https://rspec.info/) as our test framework.
+
+Each of the ElasticGraph gems has its own test suite in `spec` (e.g. `elasticgraph-support/spec` contains the tests for
+`elasticgraph-support`).
+
+Run the entire suite:
+
+```bash
+script/run_specs
+```
+
+To test a single gem (e.g., `elasticgraph-support`):
+
+```bash
+# From the root:
+bundle exec rspec elasticgraph-support/spec
+
+# Alternatively run a gem's specs within the context of that gem's bundle, with code coverage tracked:
+script/run_gem_specs elasticgraph-support
+
+# Alternatively, you can run tests within a subdirectory:
+cd elasticgraph-support
+bundle exec rspec
+```
+
+The RSpec CLI is extremely flexible. Here are some useful options:
+
+```bash
+# See RSpec CLI options
+bundle exec rspec --help
+
+# Run all specs in one directory
+bundle exec rspec path/to/dir
+
+# Run all specs in one file
+bundle exec rspec path/to/dir/file_spec.rb
+
+# Run the spec defined at a specific line in a file
+bundle exec rspec path/to/dir/file_spec.rb:47
+
+# Run only the tests that failed the last time they ran
+bundle exec rspec --only-failures
+
+# Run just failures, and halt after the first failure (designed to be run repeatedly)
+bundle exec rspec --next-failure
+```
+
 ---
 
 ## Communications

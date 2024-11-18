@@ -362,7 +362,7 @@ module ElasticGraph
         self.enforce_json_schema_version = true
         self.env_port_mapping = {}
         self.output = $stdout
-        self.daemon_timeout = 120
+        self.daemon_timeout = 300
 
         datastore_versions = ::YAML.load_file("#{__dir__}/tested_datastore_versions.yaml")
         self.elasticsearch_versions = datastore_versions.fetch("elasticsearch")

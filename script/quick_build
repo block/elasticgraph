@@ -34,7 +34,7 @@ bundle exec standardrb
 script/type_check
 
 bundle exec rake schema_artifacts:check
-COVERAGE=1 script/run_most_specs --backtrace
+COVERAGE=1 script/run_specs --backtrace
 
 bundle exec rake site:validate
 

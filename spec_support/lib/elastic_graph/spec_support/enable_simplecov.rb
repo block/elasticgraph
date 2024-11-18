@@ -96,7 +96,7 @@ SimpleCov.start do
 
   add_filter "/bundle"
 
-  # When we use `script/run_most_specs` we avoid running the `elasticgraph-local` specs, but some of the
+  # When we use `script/run_specs` we avoid running the `elasticgraph-local` specs, but some of the
   # elasticgraph-local code gets loaded and used as a dependency. We don't want to consider its coverage
   # status if we're not running it's test suite.
   add_filter "/elasticgraph-local/" unless spec_files_to_run.any? { |f| f.include?("/elasticgraph-local/") }

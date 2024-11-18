@@ -121,7 +121,7 @@ jobs:
           - build_part: "run_misc_checks"
             ruby: "3.3"
             datastore: "<%= primary_datastore_version %>"
-          - build_part: "run_most_specs_with_vcr"
+          - build_part: "run_specs_with_vcr"
             ruby: "3.3"
             datastore: "<%= primary_datastore_version %>"
           - build_part: "run_specs_file_by_file"
