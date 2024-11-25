@@ -159,29 +159,29 @@ type AddressEdge {
 """
 Input type used to specify filters on `Address` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input AddressFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [AddressFilterInput!]
 
   """
   Used to filter on the `full_address` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   full_address: StringFilterInput
 
   """
   Used to filter on the `geo_location` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   geo_location: GeoLocationFilterInput
 
@@ -189,14 +189,14 @@ input AddressFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: AddressFilterInput
 
   """
   Used to filter on the `timestamps` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   timestamps: AddressTimestampsFilterInput
 }
@@ -258,22 +258,22 @@ type AddressTimestampsAggregatedValues {
 """
 Input type used to specify filters on `AddressTimestamps` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input AddressTimestampsFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [AddressTimestampsFilterInput!]
 
   """
   Used to filter on the `created_at` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   created_at: DateTimeFilterInput
 
@@ -281,7 +281,7 @@ input AddressTimestampsFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: AddressTimestampsFilterInput
 }
@@ -316,22 +316,22 @@ Input type used to specify filters on a `Affiliations` object referenced directl
 or transitively from a list field that has been configured to index each leaf field as
 its own flattened list of values.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input AffiliationsFieldsListFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [AffiliationsFieldsListFilterInput!]
 
   """
   Used to filter on the number of non-null elements in this list field.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   count: IntFilterInput
 
@@ -339,21 +339,21 @@ input AffiliationsFieldsListFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: AffiliationsFieldsListFilterInput
 
   """
   Used to filter on the `sponsorships_nested` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   sponsorships_nested: SponsorshipListFilterInput
 
   """
   Used to filter on the `sponsorships_object` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   sponsorships_object: SponsorshipFieldsListFilterInput
 }
@@ -361,15 +361,15 @@ input AffiliationsFieldsListFilterInput {
 """
 Input type used to specify filters on `Affiliations` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input AffiliationsFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [AffiliationsFilterInput!]
 
@@ -377,21 +377,21 @@ input AffiliationsFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: AffiliationsFilterInput
 
   """
   Used to filter on the `sponsorships_nested` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   sponsorships_nested: SponsorshipListFilterInput
 
   """
   Used to filter on the `sponsorships_object` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   sponsorships_object: SponsorshipFieldsListFilterInput
 }
@@ -460,15 +460,15 @@ enum Color {
 """
 Input type used to specify filters on `Color` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input ColorFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [ColorFilterInput!]
 
@@ -476,9 +476,9 @@ input ColorFilterInput {
   Matches records where the field value is equal to any of the provided values.
   This works just like an IN operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents. When `null` is passed in the list, will
-  match records where the field value is `null`.
+  When `null` is passed, matches all documents. When an empty list is passed,
+  this part of the filter matches no documents. When `null` is passed in the
+  list, this part of the filter matches records where the field value is `null`.
   """
   equal_to_any_of: [ColorInput]
 
@@ -486,7 +486,7 @@ input ColorFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: ColorFilterInput
 }
@@ -500,15 +500,15 @@ enum ColorInput {
 """
 Input type used to specify filters on elements of a `[Color]` field.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input ColorListElementFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [ColorListElementFilterInput!]
 
@@ -516,9 +516,9 @@ input ColorListElementFilterInput {
   Matches records where the field value is equal to any of the provided values.
   This works just like an IN operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents. When `null` is passed in the list, will
-  match records where the field value is `null`.
+  When `null` is passed, matches all documents. When an empty list is passed,
+  this part of the filter matches no documents. When `null` is passed in the
+  list, this part of the filter matches records where the field value is `null`.
   """
   equal_to_any_of: [ColorInput!]
 }
@@ -526,7 +526,7 @@ input ColorListElementFilterInput {
 """
 Input type used to specify filters on `[Color]` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input ColorListFilterInput {
   """
@@ -537,7 +537,7 @@ input ColorListFilterInput {
   between key names. For example, if you want to provide
   multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
 
-  Will be ignored when `null` or an empty list is passed.
+  When `null` or an empty list is passed, matches all documents.
   """
   all_of: [ColorListFilterInput!]
 
@@ -545,22 +545,22 @@ input ColorListFilterInput {
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [ColorListFilterInput!]
 
   """
   Matches records where any of the list elements match the provided sub-filter.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   any_satisfy: ColorListElementFilterInput
 
   """
   Used to filter on the number of non-null elements in this list field.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   count: IntFilterInput
 
@@ -568,7 +568,7 @@ input ColorListFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: ColorListFilterInput
 }
@@ -956,36 +956,36 @@ type ComponentEdge {
 """
 Input type used to specify filters on `Component` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input ComponentFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [ComponentFilterInput!]
 
   """
   Used to filter on the `created_at` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   created_at: DateTimeFilterInput
 
   """
   Used to filter on the `id` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   id: IDFilterInput
 
   """
   Used to filter on the `name` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   name: StringFilterInput
 
@@ -993,56 +993,56 @@ input ComponentFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: ComponentFilterInput
 
   """
   Used to filter on the `position` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   position: PositionFilterInput
 
   """
   Used to filter on the `tags` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   tags: StringListFilterInput
 
   """
   Used to filter on the `widget_cost` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   widget_cost: MoneyFilterInput
 
   """
   Used to filter on the `widget_name` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   widget_name: StringFilterInput
 
   """
   Used to filter on the `widget_size` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   widget_size: SizeFilterInput
 
   """
   Used to filter on the `widget_tags` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   widget_tags: StringListFilterInput
 
   """
   Used to filter on the `widget_workspace_id` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   widget_workspace_id: IDFilterInput
 }
@@ -1215,15 +1215,15 @@ type CurrencyDetailsAggregatedValues {
 """
 Input type used to specify filters on `CurrencyDetails` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input CurrencyDetailsFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [CurrencyDetailsFilterInput!]
 
@@ -1231,21 +1231,21 @@ input CurrencyDetailsFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: CurrencyDetailsFilterInput
 
   """
   Used to filter on the `symbol` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   symbol: StringFilterInput
 
   """
   Used to filter on the `unit` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   unit: StringFilterInput
 }
@@ -1317,15 +1317,15 @@ type DateAggregatedValues {
 """
 Input type used to specify filters on `Date` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input DateFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [DateFilterInput!]
 
@@ -1333,37 +1333,37 @@ input DateFilterInput {
   Matches records where the field value is equal to any of the provided values.
   This works just like an IN operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents. When `null` is passed in the list, will
-  match records where the field value is `null`.
+  When `null` is passed, matches all documents. When an empty list is passed,
+  this part of the filter matches no documents. When `null` is passed in the
+  list, this part of the filter matches records where the field value is `null`.
   """
   equal_to_any_of: [Date]
 
   """
   Matches records where the field value is greater than (>) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   gt: Date
 
   """
   Matches records where the field value is greater than or equal to (>=) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   gte: Date
 
   """
   Matches records where the field value is less than (<) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   lt: Date
 
   """
   Matches records where the field value is less than or equal to (<=) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   lte: Date
 
@@ -1371,7 +1371,7 @@ input DateFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: DateFilterInput
 }
@@ -1494,15 +1494,15 @@ enum DateGroupingTruncationUnitInput {
 """
 Input type used to specify filters on elements of a `[Date]` field.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input DateListElementFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [DateListElementFilterInput!]
 
@@ -1510,37 +1510,37 @@ input DateListElementFilterInput {
   Matches records where the field value is equal to any of the provided values.
   This works just like an IN operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents. When `null` is passed in the list, will
-  match records where the field value is `null`.
+  When `null` is passed, matches all documents. When an empty list is passed,
+  this part of the filter matches no documents. When `null` is passed in the
+  list, this part of the filter matches records where the field value is `null`.
   """
   equal_to_any_of: [Date!]
 
   """
   Matches records where the field value is greater than (>) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   gt: Date
 
   """
   Matches records where the field value is greater than or equal to (>=) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   gte: Date
 
   """
   Matches records where the field value is less than (<) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   lt: Date
 
   """
   Matches records where the field value is less than or equal to (<=) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   lte: Date
 }
@@ -1548,7 +1548,7 @@ input DateListElementFilterInput {
 """
 Input type used to specify filters on `[Date]` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input DateListFilterInput {
   """
@@ -1559,7 +1559,7 @@ input DateListFilterInput {
   between key names. For example, if you want to provide
   multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
 
-  Will be ignored when `null` or an empty list is passed.
+  When `null` or an empty list is passed, matches all documents.
   """
   all_of: [DateListFilterInput!]
 
@@ -1567,22 +1567,22 @@ input DateListFilterInput {
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [DateListFilterInput!]
 
   """
   Matches records where any of the list elements match the provided sub-filter.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   any_satisfy: DateListElementFilterInput
 
   """
   Used to filter on the number of non-null elements in this list field.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   count: IntFilterInput
 
@@ -1590,7 +1590,7 @@ input DateListFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: DateListFilterInput
 }
@@ -1640,15 +1640,15 @@ type DateTimeAggregatedValues {
 """
 Input type used to specify filters on `DateTime` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input DateTimeFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [DateTimeFilterInput!]
 
@@ -1656,37 +1656,37 @@ input DateTimeFilterInput {
   Matches records where the field value is equal to any of the provided values.
   This works just like an IN operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents. When `null` is passed in the list, will
-  match records where the field value is `null`.
+  When `null` is passed, matches all documents. When an empty list is passed,
+  this part of the filter matches no documents. When `null` is passed in the
+  list, this part of the filter matches records where the field value is `null`.
   """
   equal_to_any_of: [DateTime]
 
   """
   Matches records where the field value is greater than (>) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   gt: DateTime
 
   """
   Matches records where the field value is greater than or equal to (>=) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   gte: DateTime
 
   """
   Matches records where the field value is less than (<) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   lt: DateTime
 
   """
   Matches records where the field value is less than or equal to (<=) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   lte: DateTime
 
@@ -1694,14 +1694,14 @@ input DateTimeFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: DateTimeFilterInput
 
   """
   Matches records based on the time-of-day of the `DateTime` values.
 
-  Will be ignored when `null` or an empty list is passed.
+  When `null` is passed, matches all documents.
   """
   time_of_day: DateTimeTimeOfDayFilterInput
 }
@@ -1910,15 +1910,15 @@ enum DateTimeGroupingTruncationUnitInput {
 """
 Input type used to specify filters on elements of a `[DateTime]` field.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input DateTimeListElementFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [DateTimeListElementFilterInput!]
 
@@ -1926,44 +1926,44 @@ input DateTimeListElementFilterInput {
   Matches records where the field value is equal to any of the provided values.
   This works just like an IN operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents. When `null` is passed in the list, will
-  match records where the field value is `null`.
+  When `null` is passed, matches all documents. When an empty list is passed,
+  this part of the filter matches no documents. When `null` is passed in the
+  list, this part of the filter matches records where the field value is `null`.
   """
   equal_to_any_of: [DateTime!]
 
   """
   Matches records where the field value is greater than (>) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   gt: DateTime
 
   """
   Matches records where the field value is greater than or equal to (>=) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   gte: DateTime
 
   """
   Matches records where the field value is less than (<) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   lt: DateTime
 
   """
   Matches records where the field value is less than or equal to (<=) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   lte: DateTime
 
   """
   Matches records based on the time-of-day of the `DateTime` values.
 
-  Will be ignored when `null` or an empty list is passed.
+  When `null` is passed, matches all documents.
   """
   time_of_day: DateTimeTimeOfDayFilterInput
 }
@@ -1971,7 +1971,7 @@ input DateTimeListElementFilterInput {
 """
 Input type used to specify filters on `[DateTime]` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input DateTimeListFilterInput {
   """
@@ -1982,7 +1982,7 @@ input DateTimeListFilterInput {
   between key names. For example, if you want to provide
   multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
 
-  Will be ignored when `null` or an empty list is passed.
+  When `null` or an empty list is passed, matches all documents.
   """
   all_of: [DateTimeListFilterInput!]
 
@@ -1990,22 +1990,22 @@ input DateTimeListFilterInput {
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [DateTimeListFilterInput!]
 
   """
   Matches records where any of the list elements match the provided sub-filter.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   any_satisfy: DateTimeListElementFilterInput
 
   """
   Used to filter on the number of non-null elements in this list field.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   count: IntFilterInput
 
@@ -2013,7 +2013,7 @@ input DateTimeListFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: DateTimeListFilterInput
 }
@@ -2021,44 +2021,44 @@ input DateTimeListFilterInput {
 """
 Input type used to specify filters on the time-of-day of `DateTime` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input DateTimeTimeOfDayFilterInput {
   """
   Matches records where the time of day of the `DateTime` field value is equal to any of the provided values.
   This works just like an IN operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents. When `null` is passed in the list, will
-  match records where the field value is `null`.
+  When `null` is passed, matches all documents. When an empty list is passed,
+  this part of the filter matches no documents. When `null` is passed in the
+  list, this part of the filter matches records where the field value is `null`.
   """
   equal_to_any_of: [LocalTime!]
 
   """
   Matches records where the time of day of the `DateTime` field value is greater than (>) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   gt: LocalTime
 
   """
   Matches records where the time of day of the `DateTime` field value is greater than or equal to (>=) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   gte: LocalTime
 
   """
   Matches records where the time of day of the `DateTime` field value is less than (<) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   lt: LocalTime
 
   """
   Matches records where the time of day of the `DateTime` field value is less than or equal to (<=) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   lte: LocalTime
 
@@ -2460,36 +2460,36 @@ type ElectricalPartEdge {
 """
 Input type used to specify filters on `ElectricalPart` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input ElectricalPartFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [ElectricalPartFilterInput!]
 
   """
   Used to filter on the `created_at` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   created_at: DateTimeFilterInput
 
   """
   Used to filter on the `id` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   id: IDFilterInput
 
   """
   Used to filter on the `name` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   name: StringFilterInput
 
@@ -2497,14 +2497,14 @@ input ElectricalPartFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: ElectricalPartFilterInput
 
   """
   Used to filter on the `voltage` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   voltage: IntFilterInput
 }
@@ -2629,15 +2629,15 @@ type FloatAggregatedValues {
 """
 Input type used to specify filters on `Float` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input FloatFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [FloatFilterInput!]
 
@@ -2645,37 +2645,37 @@ input FloatFilterInput {
   Matches records where the field value is equal to any of the provided values.
   This works just like an IN operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents. When `null` is passed in the list, will
-  match records where the field value is `null`.
+  When `null` is passed, matches all documents. When an empty list is passed,
+  this part of the filter matches no documents. When `null` is passed in the
+  list, this part of the filter matches records where the field value is `null`.
   """
   equal_to_any_of: [Float]
 
   """
   Matches records where the field value is greater than (>) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   gt: Float
 
   """
   Matches records where the field value is greater than or equal to (>=) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   gte: Float
 
   """
   Matches records where the field value is less than (<) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   lt: Float
 
   """
   Matches records where the field value is less than or equal to (<=) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   lte: Float
 
@@ -2683,7 +2683,7 @@ input FloatFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: FloatFilterInput
 }
@@ -2732,15 +2732,15 @@ input GeoLocationDistanceFilterInput {
 """
 Input type used to specify filters on `GeoLocation` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input GeoLocationFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [GeoLocationFilterInput!]
 
@@ -2748,7 +2748,7 @@ input GeoLocationFilterInput {
   Matches records where the field's geographic location is within a specified distance from the
   location identified by `latitude` and `longitude`.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   near: GeoLocationDistanceFilterInput
 
@@ -2756,7 +2756,7 @@ input GeoLocationFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: GeoLocationFilterInput
 }
@@ -2769,15 +2769,15 @@ type GeoShape {
 """
 Input type used to specify filters on `ID` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input IDFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [IDFilterInput!]
 
@@ -2785,9 +2785,9 @@ input IDFilterInput {
   Matches records where the field value is equal to any of the provided values.
   This works just like an IN operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents. When `null` is passed in the list, will
-  match records where the field value is `null`.
+  When `null` is passed, matches all documents. When an empty list is passed,
+  this part of the filter matches no documents. When `null` is passed in the
+  list, this part of the filter matches records where the field value is `null`.
   """
   equal_to_any_of: [ID]
 
@@ -2795,7 +2795,7 @@ input IDFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: IDFilterInput
 }
@@ -2803,15 +2803,15 @@ input IDFilterInput {
 """
 Input type used to specify filters on elements of a `[ID]` field.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input IDListElementFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [IDListElementFilterInput!]
 
@@ -2819,9 +2819,9 @@ input IDListElementFilterInput {
   Matches records where the field value is equal to any of the provided values.
   This works just like an IN operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents. When `null` is passed in the list, will
-  match records where the field value is `null`.
+  When `null` is passed, matches all documents. When an empty list is passed,
+  this part of the filter matches no documents. When `null` is passed in the
+  list, this part of the filter matches records where the field value is `null`.
   """
   equal_to_any_of: [ID!]
 }
@@ -2829,7 +2829,7 @@ input IDListElementFilterInput {
 """
 Input type used to specify filters on `[ID]` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input IDListFilterInput {
   """
@@ -2840,7 +2840,7 @@ input IDListFilterInput {
   between key names. For example, if you want to provide
   multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
 
-  Will be ignored when `null` or an empty list is passed.
+  When `null` or an empty list is passed, matches all documents.
   """
   all_of: [IDListFilterInput!]
 
@@ -2848,22 +2848,22 @@ input IDListFilterInput {
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [IDListFilterInput!]
 
   """
   Matches records where any of the list elements match the provided sub-filter.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   any_satisfy: IDListElementFilterInput
 
   """
   Used to filter on the number of non-null elements in this list field.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   count: IntFilterInput
 
@@ -2871,7 +2871,7 @@ input IDListFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: IDListFilterInput
 }
@@ -2937,15 +2937,15 @@ type IntAggregatedValues {
 """
 Input type used to specify filters on `Int` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input IntFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [IntFilterInput!]
 
@@ -2953,37 +2953,37 @@ input IntFilterInput {
   Matches records where the field value is equal to any of the provided values.
   This works just like an IN operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents. When `null` is passed in the list, will
-  match records where the field value is `null`.
+  When `null` is passed, matches all documents. When an empty list is passed,
+  this part of the filter matches no documents. When `null` is passed in the
+  list, this part of the filter matches records where the field value is `null`.
   """
   equal_to_any_of: [Int]
 
   """
   Matches records where the field value is greater than (>) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   gt: Int
 
   """
   Matches records where the field value is greater than or equal to (>=) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   gte: Int
 
   """
   Matches records where the field value is less than (<) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   lt: Int
 
   """
   Matches records where the field value is less than or equal to (<=) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   lte: Int
 
@@ -2991,7 +2991,7 @@ input IntFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: IntFilterInput
 }
@@ -2999,15 +2999,15 @@ input IntFilterInput {
 """
 Input type used to specify filters on elements of a `[Int]` field.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input IntListElementFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [IntListElementFilterInput!]
 
@@ -3015,37 +3015,37 @@ input IntListElementFilterInput {
   Matches records where the field value is equal to any of the provided values.
   This works just like an IN operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents. When `null` is passed in the list, will
-  match records where the field value is `null`.
+  When `null` is passed, matches all documents. When an empty list is passed,
+  this part of the filter matches no documents. When `null` is passed in the
+  list, this part of the filter matches records where the field value is `null`.
   """
   equal_to_any_of: [Int!]
 
   """
   Matches records where the field value is greater than (>) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   gt: Int
 
   """
   Matches records where the field value is greater than or equal to (>=) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   gte: Int
 
   """
   Matches records where the field value is less than (<) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   lt: Int
 
   """
   Matches records where the field value is less than or equal to (<=) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   lte: Int
 }
@@ -3053,7 +3053,7 @@ input IntListElementFilterInput {
 """
 Input type used to specify filters on `[Int]` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input IntListFilterInput {
   """
@@ -3064,7 +3064,7 @@ input IntListFilterInput {
   between key names. For example, if you want to provide
   multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
 
-  Will be ignored when `null` or an empty list is passed.
+  When `null` or an empty list is passed, matches all documents.
   """
   all_of: [IntListFilterInput!]
 
@@ -3072,22 +3072,22 @@ input IntListFilterInput {
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [IntListFilterInput!]
 
   """
   Matches records where any of the list elements match the provided sub-filter.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   any_satisfy: IntListElementFilterInput
 
   """
   Used to filter on the number of non-null elements in this list field.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   count: IntFilterInput
 
@@ -3095,7 +3095,7 @@ input IntListFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: IntListFilterInput
 }
@@ -3125,29 +3125,29 @@ type InventorAggregatedValues {
 """
 Input type used to specify filters on `Inventor` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input InventorFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [InventorFilterInput!]
 
   """
   Used to filter on the `name` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   name: StringFilterInput
 
   """
   Used to filter on the `nationality` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   nationality: StringFilterInput
 
@@ -3155,14 +3155,14 @@ input InventorFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: InventorFilterInput
 
   """
   Used to filter on the `stock_ticker` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   stock_ticker: StringFilterInput
 }
@@ -3275,15 +3275,15 @@ type JsonSafeLongAggregatedValues {
 """
 Input type used to specify filters on `JsonSafeLong` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input JsonSafeLongFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [JsonSafeLongFilterInput!]
 
@@ -3291,37 +3291,37 @@ input JsonSafeLongFilterInput {
   Matches records where the field value is equal to any of the provided values.
   This works just like an IN operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents. When `null` is passed in the list, will
-  match records where the field value is `null`.
+  When `null` is passed, matches all documents. When an empty list is passed,
+  this part of the filter matches no documents. When `null` is passed in the
+  list, this part of the filter matches records where the field value is `null`.
   """
   equal_to_any_of: [JsonSafeLong]
 
   """
   Matches records where the field value is greater than (>) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   gt: JsonSafeLong
 
   """
   Matches records where the field value is greater than or equal to (>=) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   gte: JsonSafeLong
 
   """
   Matches records where the field value is less than (<) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   lt: JsonSafeLong
 
   """
   Matches records where the field value is less than or equal to (<=) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   lte: JsonSafeLong
 
@@ -3329,7 +3329,7 @@ input JsonSafeLongFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: JsonSafeLongFilterInput
 }
@@ -3337,15 +3337,15 @@ input JsonSafeLongFilterInput {
 """
 Input type used to specify filters on elements of a `[JsonSafeLong]` field.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input JsonSafeLongListElementFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [JsonSafeLongListElementFilterInput!]
 
@@ -3353,37 +3353,37 @@ input JsonSafeLongListElementFilterInput {
   Matches records where the field value is equal to any of the provided values.
   This works just like an IN operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents. When `null` is passed in the list, will
-  match records where the field value is `null`.
+  When `null` is passed, matches all documents. When an empty list is passed,
+  this part of the filter matches no documents. When `null` is passed in the
+  list, this part of the filter matches records where the field value is `null`.
   """
   equal_to_any_of: [JsonSafeLong!]
 
   """
   Matches records where the field value is greater than (>) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   gt: JsonSafeLong
 
   """
   Matches records where the field value is greater than or equal to (>=) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   gte: JsonSafeLong
 
   """
   Matches records where the field value is less than (<) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   lt: JsonSafeLong
 
   """
   Matches records where the field value is less than or equal to (<=) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   lte: JsonSafeLong
 }
@@ -3391,7 +3391,7 @@ input JsonSafeLongListElementFilterInput {
 """
 Input type used to specify filters on `[JsonSafeLong]` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input JsonSafeLongListFilterInput {
   """
@@ -3402,7 +3402,7 @@ input JsonSafeLongListFilterInput {
   collisions between key names. For example, if you want to provide
   multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
 
-  Will be ignored when `null` or an empty list is passed.
+  When `null` or an empty list is passed, matches all documents.
   """
   all_of: [JsonSafeLongListFilterInput!]
 
@@ -3410,22 +3410,22 @@ input JsonSafeLongListFilterInput {
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [JsonSafeLongListFilterInput!]
 
   """
   Matches records where any of the list elements match the provided sub-filter.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   any_satisfy: JsonSafeLongListElementFilterInput
 
   """
   Used to filter on the number of non-null elements in this list field.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   count: IntFilterInput
 
@@ -3433,7 +3433,7 @@ input JsonSafeLongListFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: JsonSafeLongListFilterInput
 }
@@ -3484,15 +3484,15 @@ type LocalTimeAggregatedValues {
 """
 Input type used to specify filters on `LocalTime` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input LocalTimeFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [LocalTimeFilterInput!]
 
@@ -3500,37 +3500,37 @@ input LocalTimeFilterInput {
   Matches records where the field value is equal to any of the provided values.
   This works just like an IN operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents. When `null` is passed in the list, will
-  match records where the field value is `null`.
+  When `null` is passed, matches all documents. When an empty list is passed,
+  this part of the filter matches no documents. When `null` is passed in the
+  list, this part of the filter matches records where the field value is `null`.
   """
   equal_to_any_of: [LocalTime]
 
   """
   Matches records where the field value is greater than (>) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   gt: LocalTime
 
   """
   Matches records where the field value is greater than or equal to (>=) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   gte: LocalTime
 
   """
   Matches records where the field value is less than (<) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   lt: LocalTime
 
   """
   Matches records where the field value is less than or equal to (<=) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   lte: LocalTime
 
@@ -3538,7 +3538,7 @@ input LocalTimeFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: LocalTimeFilterInput
 }
@@ -3708,15 +3708,15 @@ type LongStringAggregatedValues {
 """
 Input type used to specify filters on `LongString` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input LongStringFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [LongStringFilterInput!]
 
@@ -3724,37 +3724,37 @@ input LongStringFilterInput {
   Matches records where the field value is equal to any of the provided values.
   This works just like an IN operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents. When `null` is passed in the list, will
-  match records where the field value is `null`.
+  When `null` is passed, matches all documents. When an empty list is passed,
+  this part of the filter matches no documents. When `null` is passed in the
+  list, this part of the filter matches records where the field value is `null`.
   """
   equal_to_any_of: [LongString]
 
   """
   Matches records where the field value is greater than (>) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   gt: LongString
 
   """
   Matches records where the field value is greater than or equal to (>=) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   gte: LongString
 
   """
   Matches records where the field value is less than (<) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   lt: LongString
 
   """
   Matches records where the field value is less than or equal to (<=) the provided value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   lte: LongString
 
@@ -3762,7 +3762,7 @@ input LongStringFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: LongStringFilterInput
 }
@@ -4005,36 +4005,36 @@ type ManufacturerEdge {
 """
 Input type used to specify filters on `Manufacturer` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input ManufacturerFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [ManufacturerFilterInput!]
 
   """
   Used to filter on the `created_at` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   created_at: DateTimeFilterInput
 
   """
   Used to filter on the `id` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   id: IDFilterInput
 
   """
   Used to filter on the `name` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   name: StringFilterInput
 
@@ -4042,7 +4042,7 @@ input ManufacturerFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: ManufacturerFilterInput
 }
@@ -4100,7 +4100,7 @@ enum ManufacturerSortOrderInput {
 """
 Input type used to specify parameters for the `matches_phrase` filtering operator.
 
-Will be ignored if passed as `null`.
+When `null` is passed, matches all documents.
 """
 input MatchesPhraseFilterInput {
   """
@@ -4137,7 +4137,7 @@ enum MatchesQueryAllowedEditsPerTermInput {
 """
 Input type used to specify parameters for the `matches_query` filtering operator.
 
-Will be ignored if passed as `null`.
+When `null` is passed, matches all documents.
 """
 input MatchesQueryFilterInput {
   """
@@ -4166,15 +4166,15 @@ enum Material {
 """
 Input type used to specify filters on `Material` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input MaterialFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [MaterialFilterInput!]
 
@@ -4182,9 +4182,9 @@ input MaterialFilterInput {
   Matches records where the field value is equal to any of the provided values.
   This works just like an IN operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents. When `null` is passed in the list, will
-  match records where the field value is `null`.
+  When `null` is passed, matches all documents. When an empty list is passed,
+  this part of the filter matches no documents. When `null` is passed in the
+  list, this part of the filter matches records where the field value is `null`.
   """
   equal_to_any_of: [MaterialInput]
 
@@ -4192,7 +4192,7 @@ input MaterialFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: MaterialFilterInput
 }
@@ -4445,43 +4445,43 @@ type MechanicalPartEdge {
 """
 Input type used to specify filters on `MechanicalPart` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input MechanicalPartFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [MechanicalPartFilterInput!]
 
   """
   Used to filter on the `created_at` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   created_at: DateTimeFilterInput
 
   """
   Used to filter on the `id` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   id: IDFilterInput
 
   """
   Used to filter on the `material` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   material: MaterialFilterInput
 
   """
   Used to filter on the `name` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   name: StringFilterInput
 
@@ -4489,7 +4489,7 @@ input MechanicalPartFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: MechanicalPartFilterInput
 }
@@ -4584,13 +4584,13 @@ Input type used to specify filters on a `Money` object referenced directly
 or transitively from a list field that has been configured to index each leaf field as
 its own flattened list of values.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input MoneyFieldsListFilterInput {
   """
   Used to filter on the `amount_cents` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   amount_cents: IntListFilterInput
 
@@ -4598,22 +4598,22 @@ input MoneyFieldsListFilterInput {
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [MoneyFieldsListFilterInput!]
 
   """
   Used to filter on the number of non-null elements in this list field.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   count: IntFilterInput
 
   """
   Used to filter on the `currency` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   currency: StringListFilterInput
 
@@ -4621,7 +4621,7 @@ input MoneyFieldsListFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: MoneyFieldsListFilterInput
 }
@@ -4629,13 +4629,13 @@ input MoneyFieldsListFilterInput {
 """
 Input type used to specify filters on `Money` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input MoneyFilterInput {
   """
   Used to filter on the `amount_cents` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   amount_cents: IntFilterInput
 
@@ -4643,15 +4643,15 @@ input MoneyFilterInput {
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [MoneyFilterInput!]
 
   """
   Used to filter on the `currency` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   currency: StringFilterInput
 
@@ -4659,7 +4659,7 @@ input MoneyFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: MoneyFilterInput
 }
@@ -4682,7 +4682,7 @@ type MoneyGroupedBy {
 """
 Input type used to specify filters on `[Money]` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input MoneyListFilterInput {
   """
@@ -4693,7 +4693,7 @@ input MoneyListFilterInput {
   between key names. For example, if you want to provide
   multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
 
-  Will be ignored when `null` or an empty list is passed.
+  When `null` or an empty list is passed, matches all documents.
   """
   all_of: [MoneyListFilterInput!]
 
@@ -4701,22 +4701,22 @@ input MoneyListFilterInput {
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [MoneyListFilterInput!]
 
   """
   Matches records where any of the list elements match the provided sub-filter.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   any_satisfy: MoneyFilterInput
 
   """
   Used to filter on the number of non-null elements in this list field.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   count: IntFilterInput
 
@@ -4724,7 +4724,7 @@ input MoneyListFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: MoneyListFilterInput
 }
@@ -5053,27 +5053,27 @@ type NamedEntityEdge {
 """
 Input type used to specify filters on `NamedEntity` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input NamedEntityFilterInput {
   """
   Used to filter on the `amount_cents` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   amount_cents: IntFilterInput
 
   """
   Used to filter on the `amount_cents2` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   amount_cents2: IntFilterInput
 
   """
   Used to filter on the `amounts` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   amounts: IntListFilterInput
 
@@ -5081,155 +5081,155 @@ input NamedEntityFilterInput {
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [NamedEntityFilterInput!]
 
   """
   Used to filter on the `cost` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   cost: MoneyFilterInput
 
   """
   Used to filter on the `cost_currency_introduced_on` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   cost_currency_introduced_on: DateFilterInput
 
   """
   Used to filter on the `cost_currency_name` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   cost_currency_name: StringFilterInput
 
   """
   Used to filter on the `cost_currency_primary_continent` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   cost_currency_primary_continent: StringFilterInput
 
   """
   Used to filter on the `cost_currency_symbol` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   cost_currency_symbol: StringFilterInput
 
   """
   Used to filter on the `cost_currency_unit` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   cost_currency_unit: StringFilterInput
 
   """
   Used to filter on the `created_at` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   created_at: DateTimeFilterInput
 
   """
   Used to filter on the `created_at2` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   created_at2: DateTimeFilterInput
 
   """
   Used to filter on the `created_at2_legacy` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   created_at2_legacy: DateTimeFilterInput
 
   """
   Used to filter on the `created_at_legacy` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   created_at_legacy: DateTimeFilterInput
 
   """
   Used to filter on the `created_at_time_of_day` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   created_at_time_of_day: LocalTimeFilterInput
 
   """
   Used to filter on the `created_on` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   created_on: DateFilterInput
 
   """
   Used to filter on the `created_on_legacy` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   created_on_legacy: DateFilterInput
 
   """
   Used to filter on the `fees` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   fees: MoneyFieldsListFilterInput
 
   """
   Used to filter on the `id` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   id: IDFilterInput
 
   """
   Used to filter on the `inventor` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   inventor: InventorFilterInput
 
   """
   Used to filter on the `material` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   material: MaterialFilterInput
 
   """
   Used to filter on the `metadata` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   metadata: UntypedFilterInput
 
   """
   Used to filter on the `name` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   name: StringFilterInput
 
   """
   Used to filter on the `name_text` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   name_text: TextFilterInput
 
   """
   Used to filter on the `named_inventor` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   named_inventor: NamedInventorFilterInput
 
@@ -5237,126 +5237,126 @@ input NamedEntityFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: NamedEntityFilterInput
 
   """
   Used to filter on the `options` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   options: WidgetOptionsFilterInput
 
   """
   Used to filter on the `position` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   position: PositionFilterInput
 
   """
   Used to filter on the `release_dates` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   release_dates: DateListFilterInput
 
   """
   Used to filter on the `release_timestamps` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   release_timestamps: DateTimeListFilterInput
 
   """
   Used to filter on the `size` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   size: SizeFilterInput
 
   """
   Used to filter on the `tags` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   tags: StringListFilterInput
 
   """
   Used to filter on the `the_options` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   the_options: WidgetOptionsFilterInput
 
   """
   Used to filter on the `voltage` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   voltage: IntFilterInput
 
   """
   Used to filter on the `weight_in_ng` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   weight_in_ng: JsonSafeLongFilterInput
 
   """
   Used to filter on the `weight_in_ng_str` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   weight_in_ng_str: LongStringFilterInput
 
   """
   Used to filter on the `widget_cost` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   widget_cost: MoneyFilterInput
 
   """
   Used to filter on the `widget_name` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   widget_name: StringFilterInput
 
   """
   Used to filter on the `widget_size` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   widget_size: SizeFilterInput
 
   """
   Used to filter on the `widget_tags` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   widget_tags: StringListFilterInput
 
   """
   Used to filter on the `widget_workspace_id` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   widget_workspace_id: IDFilterInput
 
   """
   Used to filter on the `workspace_id` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   workspace_id: IDFilterInput
 
   """
   Used to filter on the `workspace_name` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   workspace_name: StringFilterInput
 }
@@ -6108,29 +6108,29 @@ type NamedInventorAggregatedValues {
 """
 Input type used to specify filters on `NamedInventor` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input NamedInventorFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [NamedInventorFilterInput!]
 
   """
   Used to filter on the `name` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   name: StringFilterInput
 
   """
   Used to filter on the `nationality` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   nationality: StringFilterInput
 
@@ -6138,14 +6138,14 @@ input NamedInventorFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: NamedInventorFilterInput
 
   """
   Used to filter on the `stock_ticker` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   stock_ticker: StringFilterInput
 }
@@ -6360,43 +6360,43 @@ type PartEdge {
 """
 Input type used to specify filters on `Part` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input PartFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [PartFilterInput!]
 
   """
   Used to filter on the `created_at` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   created_at: DateTimeFilterInput
 
   """
   Used to filter on the `id` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   id: IDFilterInput
 
   """
   Used to filter on the `material` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   material: MaterialFilterInput
 
   """
   Used to filter on the `name` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   name: StringFilterInput
 
@@ -6404,14 +6404,14 @@ input PartFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: PartFilterInput
 
   """
   Used to filter on the `voltage` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   voltage: IntFilterInput
 }
@@ -6539,13 +6539,13 @@ Input type used to specify filters on a `Player` object referenced directly
 or transitively from a list field that has been configured to index each leaf field as
 its own flattened list of values.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input PlayerFieldsListFilterInput {
   """
   Used to filter on the `affiliations` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   affiliations: AffiliationsFieldsListFilterInput
 
@@ -6553,29 +6553,29 @@ input PlayerFieldsListFilterInput {
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [PlayerFieldsListFilterInput!]
 
   """
   Used to filter on the number of non-null elements in this list field.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   count: IntFilterInput
 
   """
   Used to filter on the `name` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   name: StringListFilterInput
 
   """
   Used to filter on the `nicknames` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   nicknames: StringListFilterInput
 
@@ -6583,21 +6583,21 @@ input PlayerFieldsListFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: PlayerFieldsListFilterInput
 
   """
   Used to filter on the `seasons_nested` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   seasons_nested: PlayerSeasonListFilterInput
 
   """
   Used to filter on the `seasons_object` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   seasons_object: PlayerSeasonFieldsListFilterInput
 }
@@ -6605,13 +6605,13 @@ input PlayerFieldsListFilterInput {
 """
 Input type used to specify filters on `Player` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input PlayerFilterInput {
   """
   Used to filter on the `affiliations` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   affiliations: AffiliationsFilterInput
 
@@ -6619,22 +6619,22 @@ input PlayerFilterInput {
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [PlayerFilterInput!]
 
   """
   Used to filter on the `name` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   name: StringFilterInput
 
   """
   Used to filter on the `nicknames` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   nicknames: StringListFilterInput
 
@@ -6642,21 +6642,21 @@ input PlayerFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: PlayerFilterInput
 
   """
   Used to filter on the `seasons_nested` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   seasons_nested: PlayerSeasonListFilterInput
 
   """
   Used to filter on the `seasons_object` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   seasons_object: PlayerSeasonFieldsListFilterInput
 }
@@ -6691,7 +6691,7 @@ type PlayerGroupedBy {
 """
 Input type used to specify filters on `[Player]` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input PlayerListFilterInput {
   """
@@ -6702,7 +6702,7 @@ input PlayerListFilterInput {
   between key names. For example, if you want to provide
   multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
 
-  Will be ignored when `null` or an empty list is passed.
+  When `null` or an empty list is passed, matches all documents.
   """
   all_of: [PlayerListFilterInput!]
 
@@ -6710,22 +6710,22 @@ input PlayerListFilterInput {
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [PlayerListFilterInput!]
 
   """
   Matches records where any of the list elements match the provided sub-filter.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   any_satisfy: PlayerFilterInput
 
   """
   Used to filter on the number of non-null elements in this list field.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   count: IntFilterInput
 
@@ -6733,7 +6733,7 @@ input PlayerListFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: PlayerListFilterInput
 }
@@ -6807,36 +6807,36 @@ Input type used to specify filters on a `PlayerSeason` object referenced directl
 or transitively from a list field that has been configured to index each leaf field as
 its own flattened list of values.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input PlayerSeasonFieldsListFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [PlayerSeasonFieldsListFilterInput!]
 
   """
   Used to filter on the `awards` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   awards: StringListFilterInput
 
   """
   Used to filter on the number of non-null elements in this list field.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   count: IntFilterInput
 
   """
   Used to filter on the `games_played` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   games_played: IntListFilterInput
 
@@ -6844,14 +6844,14 @@ input PlayerSeasonFieldsListFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: PlayerSeasonFieldsListFilterInput
 
   """
   Used to filter on the `year` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   year: IntListFilterInput
 }
@@ -6859,29 +6859,29 @@ input PlayerSeasonFieldsListFilterInput {
 """
 Input type used to specify filters on `PlayerSeason` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input PlayerSeasonFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [PlayerSeasonFilterInput!]
 
   """
   Used to filter on the `awards` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   awards: StringListFilterInput
 
   """
   Used to filter on the `games_played` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   games_played: IntFilterInput
 
@@ -6889,14 +6889,14 @@ input PlayerSeasonFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: PlayerSeasonFilterInput
 
   """
   Used to filter on the `year` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   year: IntFilterInput
 }
@@ -6919,7 +6919,7 @@ type PlayerSeasonGroupedBy {
 """
 Input type used to specify filters on `[PlayerSeason]` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input PlayerSeasonListFilterInput {
   """
@@ -6930,7 +6930,7 @@ input PlayerSeasonListFilterInput {
   collisions between key names. For example, if you want to provide
   multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
 
-  Will be ignored when `null` or an empty list is passed.
+  When `null` or an empty list is passed, matches all documents.
   """
   all_of: [PlayerSeasonListFilterInput!]
 
@@ -6938,22 +6938,22 @@ input PlayerSeasonListFilterInput {
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [PlayerSeasonListFilterInput!]
 
   """
   Matches records where any of the list elements match the provided sub-filter.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   any_satisfy: PlayerSeasonFilterInput
 
   """
   Used to filter on the number of non-null elements in this list field.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   count: IntFilterInput
 
@@ -6961,7 +6961,7 @@ input PlayerSeasonListFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: PlayerSeasonListFilterInput
 }
@@ -6989,15 +6989,15 @@ type PositionAggregatedValues {
 """
 Input type used to specify filters on `Position` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input PositionFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [PositionFilterInput!]
 
@@ -7005,21 +7005,21 @@ input PositionFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: PositionFilterInput
 
   """
   Used to filter on the `x` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   x: FloatFilterInput
 
   """
   Used to filter on the `y` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   y: FloatFilterInput
 }
@@ -8397,15 +8397,15 @@ enum Size {
 """
 Input type used to specify filters on `Size` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input SizeFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [SizeFilterInput!]
 
@@ -8413,9 +8413,9 @@ input SizeFilterInput {
   Matches records where the field value is equal to any of the provided values.
   This works just like an IN operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents. When `null` is passed in the list, will
-  match records where the field value is `null`.
+  When `null` is passed, matches all documents. When an empty list is passed,
+  this part of the filter matches no documents. When `null` is passed in the
+  list, this part of the filter matches records where the field value is `null`.
   """
   equal_to_any_of: [SizeInput]
 
@@ -8423,7 +8423,7 @@ input SizeFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: SizeFilterInput
 }
@@ -8437,15 +8437,15 @@ enum SizeInput {
 """
 Input type used to specify filters on elements of a `[Size]` field.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input SizeListElementFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [SizeListElementFilterInput!]
 
@@ -8453,9 +8453,9 @@ input SizeListElementFilterInput {
   Matches records where the field value is equal to any of the provided values.
   This works just like an IN operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents. When `null` is passed in the list, will
-  match records where the field value is `null`.
+  When `null` is passed, matches all documents. When an empty list is passed,
+  this part of the filter matches no documents. When `null` is passed in the
+  list, this part of the filter matches records where the field value is `null`.
   """
   equal_to_any_of: [SizeInput!]
 }
@@ -8463,7 +8463,7 @@ input SizeListElementFilterInput {
 """
 Input type used to specify filters on `[Size]` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input SizeListFilterInput {
   """
@@ -8474,7 +8474,7 @@ input SizeListFilterInput {
   between key names. For example, if you want to provide
   multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
 
-  Will be ignored when `null` or an empty list is passed.
+  When `null` or an empty list is passed, matches all documents.
   """
   all_of: [SizeListFilterInput!]
 
@@ -8482,22 +8482,22 @@ input SizeListFilterInput {
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [SizeListFilterInput!]
 
   """
   Matches records where any of the list elements match the provided sub-filter.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   any_satisfy: SizeListElementFilterInput
 
   """
   Used to filter on the number of non-null elements in this list field.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   count: IntFilterInput
 
@@ -8505,7 +8505,7 @@ input SizeListFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: SizeListFilterInput
 }
@@ -8843,29 +8843,29 @@ type SponsorEdge {
 """
 Input type used to specify filters on `Sponsor` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input SponsorFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [SponsorFilterInput!]
 
   """
   Used to filter on the `id` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   id: IDFilterInput
 
   """
   Used to filter on the `name` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   name: StringFilterInput
 
@@ -8873,7 +8873,7 @@ input SponsorFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: SponsorFilterInput
 }
@@ -8938,13 +8938,13 @@ Input type used to specify filters on a `Sponsorship` object referenced directly
 or transitively from a list field that has been configured to index each leaf field as
 its own flattened list of values.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input SponsorshipFieldsListFilterInput {
   """
   Used to filter on the `annual_total` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   annual_total: MoneyFieldsListFilterInput
 
@@ -8952,15 +8952,15 @@ input SponsorshipFieldsListFilterInput {
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [SponsorshipFieldsListFilterInput!]
 
   """
   Used to filter on the number of non-null elements in this list field.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   count: IntFilterInput
 
@@ -8968,14 +8968,14 @@ input SponsorshipFieldsListFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: SponsorshipFieldsListFilterInput
 
   """
   Used to filter on the `sponsor_id` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   sponsor_id: IDListFilterInput
 }
@@ -8983,13 +8983,13 @@ input SponsorshipFieldsListFilterInput {
 """
 Input type used to specify filters on `Sponsorship` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input SponsorshipFilterInput {
   """
   Used to filter on the `annual_total` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   annual_total: MoneyFilterInput
 
@@ -8997,8 +8997,8 @@ input SponsorshipFilterInput {
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [SponsorshipFilterInput!]
 
@@ -9006,14 +9006,14 @@ input SponsorshipFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: SponsorshipFilterInput
 
   """
   Used to filter on the `sponsor_id` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   sponsor_id: IDFilterInput
 }
@@ -9036,7 +9036,7 @@ type SponsorshipGroupedBy {
 """
 Input type used to specify filters on `[Sponsorship]` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input SponsorshipListFilterInput {
   """
@@ -9047,7 +9047,7 @@ input SponsorshipListFilterInput {
   collisions between key names. For example, if you want to provide
   multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
 
-  Will be ignored when `null` or an empty list is passed.
+  When `null` or an empty list is passed, matches all documents.
   """
   all_of: [SponsorshipListFilterInput!]
 
@@ -9055,22 +9055,22 @@ input SponsorshipListFilterInput {
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [SponsorshipListFilterInput!]
 
   """
   Matches records where any of the list elements match the provided sub-filter.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   any_satisfy: SponsorshipFilterInput
 
   """
   Used to filter on the number of non-null elements in this list field.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   count: IntFilterInput
 
@@ -9078,7 +9078,7 @@ input SponsorshipListFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: SponsorshipListFilterInput
 }
@@ -9134,15 +9134,15 @@ type StringEdge {
 """
 Input type used to specify filters on `String` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input StringFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [StringFilterInput!]
 
@@ -9150,9 +9150,9 @@ input StringFilterInput {
   Matches records where the field value is equal to any of the provided values.
   This works just like an IN operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents. When `null` is passed in the list, will
-  match records where the field value is `null`.
+  When `null` is passed, matches all documents. When an empty list is passed,
+  this part of the filter matches no documents. When `null` is passed in the
+  list, this part of the filter matches records where the field value is `null`.
   """
   equal_to_any_of: [String]
 
@@ -9160,7 +9160,7 @@ input StringFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: StringFilterInput
 }
@@ -9168,15 +9168,15 @@ input StringFilterInput {
 """
 Input type used to specify filters on elements of a `[String]` field.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input StringListElementFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [StringListElementFilterInput!]
 
@@ -9184,9 +9184,9 @@ input StringListElementFilterInput {
   Matches records where the field value is equal to any of the provided values.
   This works just like an IN operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents. When `null` is passed in the list, will
-  match records where the field value is `null`.
+  When `null` is passed, matches all documents. When an empty list is passed,
+  this part of the filter matches no documents. When `null` is passed in the
+  list, this part of the filter matches records where the field value is `null`.
   """
   equal_to_any_of: [String!]
 }
@@ -9194,7 +9194,7 @@ input StringListElementFilterInput {
 """
 Input type used to specify filters on `[String]` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input StringListFilterInput {
   """
@@ -9205,7 +9205,7 @@ input StringListFilterInput {
   between key names. For example, if you want to provide
   multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
 
-  Will be ignored when `null` or an empty list is passed.
+  When `null` or an empty list is passed, matches all documents.
   """
   all_of: [StringListFilterInput!]
 
@@ -9213,22 +9213,22 @@ input StringListFilterInput {
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [StringListFilterInput!]
 
   """
   Matches records where any of the list elements match the provided sub-filter.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   any_satisfy: StringListElementFilterInput
 
   """
   Used to filter on the number of non-null elements in this list field.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   count: IntFilterInput
 
@@ -9236,7 +9236,7 @@ input StringListFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: StringListFilterInput
 }
@@ -9739,22 +9739,22 @@ type TeamDetailsAggregatedValues {
 """
 Input type used to specify filters on `TeamDetails` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input TeamDetailsFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [TeamDetailsFilterInput!]
 
   """
   Used to filter on the `count` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   count: IntFilterInput
 
@@ -9762,14 +9762,14 @@ input TeamDetailsFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: TeamDetailsFilterInput
 
   """
   Used to filter on the `uniform_colors` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   uniform_colors: StringListFilterInput
 }
@@ -9807,106 +9807,106 @@ type TeamEdge {
 """
 Input type used to specify filters on `Team` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input TeamFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [TeamFilterInput!]
 
   """
   Used to filter on the `country_code` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   country_code: IDFilterInput
 
   """
   Used to filter on the `current_name` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   current_name: StringFilterInput
 
   """
   Used to filter on the `current_players_nested` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   current_players_nested: PlayerListFilterInput
 
   """
   Used to filter on the `current_players_object` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   current_players_object: PlayerFieldsListFilterInput
 
   """
   Used to filter on the `details` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   details: TeamDetailsFilterInput
 
   """
   Used to filter on the `forbes_valuation_moneys_nested` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   forbes_valuation_moneys_nested: MoneyListFilterInput
 
   """
   Used to filter on the `forbes_valuation_moneys_object` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   forbes_valuation_moneys_object: MoneyFieldsListFilterInput
 
   """
   Used to filter on the `forbes_valuations` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   forbes_valuations: JsonSafeLongListFilterInput
 
   """
   Used to filter on the `formed_on` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   formed_on: DateFilterInput
 
   """
   Used to filter on the `id` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   id: IDFilterInput
 
   """
   Used to filter on the `league` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   league: StringFilterInput
 
   """
   Used to filter on the `nested_fields` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   nested_fields: TeamNestedFieldsFilterInput
 
   """
   Used to filter on the `nested_fields2` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   nested_fields2: TeamNestedFieldsFilterInput
 
@@ -9914,42 +9914,42 @@ input TeamFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: TeamFilterInput
 
   """
   Used to filter on the `past_names` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   past_names: StringListFilterInput
 
   """
   Used to filter on the `seasons_nested` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   seasons_nested: TeamSeasonListFilterInput
 
   """
   Used to filter on the `seasons_object` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   seasons_object: TeamSeasonFieldsListFilterInput
 
   """
   Used to filter on the `stadium_location` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   stadium_location: GeoLocationFilterInput
 
   """
   Used to filter on the `won_championships_at` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   won_championships_at: DateTimeListFilterInput
 }
@@ -10063,29 +10063,29 @@ type TeamNestedFields {
 """
 Input type used to specify filters on `TeamNestedFields` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input TeamNestedFieldsFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [TeamNestedFieldsFilterInput!]
 
   """
   Used to filter on the `current_players` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   current_players: PlayerListFilterInput
 
   """
   Used to filter on the `forbes_valuation_moneys` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   forbes_valuation_moneys: MoneyListFilterInput
 
@@ -10093,14 +10093,14 @@ input TeamNestedFieldsFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: TeamNestedFieldsFilterInput
 
   """
   Used to filter on the `seasons` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   seasons: TeamSeasonListFilterInput
 }
@@ -10324,57 +10324,57 @@ Input type used to specify filters on a `TeamRecord` object referenced directly
 or transitively from a list field that has been configured to index each leaf field as
 its own flattened list of values.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input TeamRecordFieldsListFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [TeamRecordFieldsListFilterInput!]
 
   """
   Used to filter on the number of non-null elements in this list field.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   count: IntFilterInput
 
   """
   Used to filter on the `first_win_on` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   first_win_on: DateListFilterInput
 
   """
   Used to filter on the `first_win_on_legacy` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   first_win_on_legacy: DateListFilterInput
 
   """
   Used to filter on the `last_win_on` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   last_win_on: DateListFilterInput
 
   """
   Used to filter on the `last_win_on_legacy` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   last_win_on_legacy: DateListFilterInput
 
   """
   Used to filter on the `losses` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   losses: IntListFilterInput
 
@@ -10382,14 +10382,14 @@ input TeamRecordFieldsListFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: TeamRecordFieldsListFilterInput
 
   """
   Used to filter on the `wins` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   wins: IntListFilterInput
 }
@@ -10397,50 +10397,50 @@ input TeamRecordFieldsListFilterInput {
 """
 Input type used to specify filters on `TeamRecord` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input TeamRecordFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [TeamRecordFilterInput!]
 
   """
   Used to filter on the `first_win_on` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   first_win_on: DateFilterInput
 
   """
   Used to filter on the `first_win_on_legacy` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   first_win_on_legacy: DateFilterInput
 
   """
   Used to filter on the `last_win_on` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   last_win_on: DateFilterInput
 
   """
   Used to filter on the `last_win_on_legacy` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   last_win_on_legacy: DateFilterInput
 
   """
   Used to filter on the `losses` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   losses: IntFilterInput
 
@@ -10448,14 +10448,14 @@ input TeamRecordFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: TeamRecordFilterInput
 
   """
   Used to filter on the `wins` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   wins: IntFilterInput
 }
@@ -10589,22 +10589,22 @@ Input type used to specify filters on a `TeamSeason` object referenced directly
 or transitively from a list field that has been configured to index each leaf field as
 its own flattened list of values.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input TeamSeasonFieldsListFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [TeamSeasonFieldsListFilterInput!]
 
   """
   Used to filter on the `count` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   count: IntListFilterInput
 
@@ -10612,70 +10612,70 @@ input TeamSeasonFieldsListFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: TeamSeasonFieldsListFilterInput
 
   """
   Used to filter on the `notes` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   notes: StringListFilterInput
 
   """
   Used to filter on the `players_nested` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   players_nested: PlayerListFilterInput
 
   """
   Used to filter on the `players_object` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   players_object: PlayerFieldsListFilterInput
 
   """
   Used to filter on the `record` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   record: TeamRecordFieldsListFilterInput
 
   """
   Used to filter on the `started_at` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   started_at: DateTimeListFilterInput
 
   """
   Used to filter on the `started_at_legacy` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   started_at_legacy: DateTimeListFilterInput
 
   """
   Used to filter on the `won_games_at` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   won_games_at: DateTimeListFilterInput
 
   """
   Used to filter on the `won_games_at_legacy` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   won_games_at_legacy: DateTimeListFilterInput
 
   """
   Used to filter on the `year` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   year: IntListFilterInput
 }
@@ -10683,22 +10683,22 @@ input TeamSeasonFieldsListFilterInput {
 """
 Input type used to specify filters on `TeamSeason` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input TeamSeasonFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [TeamSeasonFilterInput!]
 
   """
   Used to filter on the `count` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   count: IntFilterInput
 
@@ -10706,70 +10706,70 @@ input TeamSeasonFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: TeamSeasonFilterInput
 
   """
   Used to filter on the `notes` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   notes: StringListFilterInput
 
   """
   Used to filter on the `players_nested` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   players_nested: PlayerListFilterInput
 
   """
   Used to filter on the `players_object` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   players_object: PlayerFieldsListFilterInput
 
   """
   Used to filter on the `record` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   record: TeamRecordFilterInput
 
   """
   Used to filter on the `started_at` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   started_at: DateTimeFilterInput
 
   """
   Used to filter on the `started_at_legacy` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   started_at_legacy: DateTimeFilterInput
 
   """
   Used to filter on the `won_games_at` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   won_games_at: DateTimeListFilterInput
 
   """
   Used to filter on the `won_games_at_legacy` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   won_games_at_legacy: DateTimeListFilterInput
 
   """
   Used to filter on the `year` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   year: IntFilterInput
 }
@@ -10889,7 +10889,7 @@ type TeamSeasonGroupedBy {
 """
 Input type used to specify filters on `[TeamSeason]` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input TeamSeasonListFilterInput {
   """
@@ -10900,7 +10900,7 @@ input TeamSeasonListFilterInput {
   collisions between key names. For example, if you want to provide
   multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
 
-  Will be ignored when `null` or an empty list is passed.
+  When `null` or an empty list is passed, matches all documents.
   """
   all_of: [TeamSeasonListFilterInput!]
 
@@ -10908,22 +10908,22 @@ input TeamSeasonListFilterInput {
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [TeamSeasonListFilterInput!]
 
   """
   Matches records where any of the list elements match the provided sub-filter.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   any_satisfy: TeamSeasonFilterInput
 
   """
   Used to filter on the number of non-null elements in this list field.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   count: IntFilterInput
 
@@ -10931,7 +10931,7 @@ input TeamSeasonListFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: TeamSeasonListFilterInput
 }
@@ -11342,15 +11342,15 @@ type TeamTeamSeasonSubAggregationSubAggregations {
 """
 Input type used to specify filters on `String` fields that have been indexed for full text search.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input TextFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [TextFilterInput!]
 
@@ -11358,16 +11358,16 @@ input TextFilterInput {
   Matches records where the field value is equal to any of the provided values.
   This works just like an IN operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents. When `null` is passed in the list, will
-  match records where the field value is `null`.
+  When `null` is passed, matches all documents. When an empty list is passed,
+  this part of the filter matches no documents. When `null` is passed in the
+  list, this part of the filter matches records where the field value is `null`.
   """
   equal_to_any_of: [String]
 
   """
   Matches records where the field value matches the provided value using full text search.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   matches: String @deprecated(reason: "Use `matches_query` instead.")
 
@@ -11376,7 +11376,7 @@ input TextFilterInput {
   full text search. This is stricter than `matches_query`: all terms must match
   and be in the same order as the provided phrase.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   matches_phrase: MatchesPhraseFilterInput
 
@@ -11385,7 +11385,7 @@ input TextFilterInput {
   This is more lenient than `matches_phrase`: the order of terms is ignored, and,
   by default, only one search term is required to be in the field value.
 
-  Will be ignored when `null` is passed.
+  When `null` is passed, matches all documents.
   """
   matches_query: MatchesQueryFilterInput
 
@@ -11393,7 +11393,7 @@ input TextFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: TextFilterInput
 }
@@ -11422,15 +11422,15 @@ scalar Untyped
 """
 Input type used to specify filters on `Untyped` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input UntypedFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [UntypedFilterInput!]
 
@@ -11438,9 +11438,9 @@ input UntypedFilterInput {
   Matches records where the field value is equal to any of the provided values.
   This works just like an IN operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents. When `null` is passed in the list, will
-  match records where the field value is `null`.
+  When `null` is passed, matches all documents. When an empty list is passed,
+  this part of the filter matches no documents. When `null` is passed in the
+  list, this part of the filter matches records where the field value is `null`.
   """
   equal_to_any_of: [Untyped]
 
@@ -11448,7 +11448,7 @@ input UntypedFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: UntypedFilterInput
 }
@@ -12075,50 +12075,50 @@ type WidgetCurrencyEdge {
 """
 Input type used to specify filters on `WidgetCurrency` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input WidgetCurrencyFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [WidgetCurrencyFilterInput!]
 
   """
   Used to filter on the `details` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   details: CurrencyDetailsFilterInput
 
   """
   Used to filter on the `id` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   id: IDFilterInput
 
   """
   Used to filter on the `introduced_on` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   introduced_on: DateFilterInput
 
   """
   Used to filter on the `name` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   name: StringFilterInput
 
   """
   Used to filter on the `nested_fields` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   nested_fields: WidgetCurrencyNestedFieldsFilterInput
 
@@ -12126,49 +12126,49 @@ input WidgetCurrencyFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: WidgetCurrencyFilterInput
 
   """
   Used to filter on the `oldest_widget_created_at` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   oldest_widget_created_at: DateTimeFilterInput
 
   """
   Used to filter on the `primary_continent` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   primary_continent: StringFilterInput
 
   """
   Used to filter on the `widget_fee_currencies` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   widget_fee_currencies: StringListFilterInput
 
   """
   Used to filter on the `widget_names` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   widget_names: StringListFilterInput
 
   """
   Used to filter on the `widget_options` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   widget_options: WidgetOptionSetsFilterInput
 
   """
   Used to filter on the `widget_tags` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   widget_tags: StringListFilterInput
 }
@@ -12236,22 +12236,22 @@ type WidgetCurrencyNestedFieldsAggregatedValues {
 """
 Input type used to specify filters on `WidgetCurrencyNestedFields` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input WidgetCurrencyNestedFieldsFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [WidgetCurrencyNestedFieldsFilterInput!]
 
   """
   Used to filter on the `max_widget_cost` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   max_widget_cost: IntFilterInput
 
@@ -12259,7 +12259,7 @@ input WidgetCurrencyNestedFieldsFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: WidgetCurrencyNestedFieldsFilterInput
 }
@@ -12382,27 +12382,27 @@ type WidgetEdge {
 """
 Input type used to specify filters on `Widget` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input WidgetFilterInput {
   """
   Used to filter on the `amount_cents` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   amount_cents: IntFilterInput
 
   """
   Used to filter on the `amount_cents2` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   amount_cents2: IntFilterInput
 
   """
   Used to filter on the `amounts` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   amounts: IntListFilterInput
 
@@ -12410,148 +12410,148 @@ input WidgetFilterInput {
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [WidgetFilterInput!]
 
   """
   Used to filter on the `cost` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   cost: MoneyFilterInput
 
   """
   Used to filter on the `cost_currency_introduced_on` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   cost_currency_introduced_on: DateFilterInput
 
   """
   Used to filter on the `cost_currency_name` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   cost_currency_name: StringFilterInput
 
   """
   Used to filter on the `cost_currency_primary_continent` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   cost_currency_primary_continent: StringFilterInput
 
   """
   Used to filter on the `cost_currency_symbol` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   cost_currency_symbol: StringFilterInput
 
   """
   Used to filter on the `cost_currency_unit` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   cost_currency_unit: StringFilterInput
 
   """
   Used to filter on the `created_at` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   created_at: DateTimeFilterInput
 
   """
   Used to filter on the `created_at2` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   created_at2: DateTimeFilterInput
 
   """
   Used to filter on the `created_at2_legacy` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   created_at2_legacy: DateTimeFilterInput
 
   """
   Used to filter on the `created_at_legacy` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   created_at_legacy: DateTimeFilterInput
 
   """
   Used to filter on the `created_at_time_of_day` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   created_at_time_of_day: LocalTimeFilterInput
 
   """
   Used to filter on the `created_on` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   created_on: DateFilterInput
 
   """
   Used to filter on the `created_on_legacy` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   created_on_legacy: DateFilterInput
 
   """
   Used to filter on the `fees` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   fees: MoneyFieldsListFilterInput
 
   """
   Used to filter on the `id` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   id: IDFilterInput
 
   """
   Used to filter on the `inventor` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   inventor: InventorFilterInput
 
   """
   Used to filter on the `metadata` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   metadata: UntypedFilterInput
 
   """
   Used to filter on the `name` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   name: StringFilterInput
 
   """
   Used to filter on the `name_text` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   name_text: TextFilterInput
 
   """
   Used to filter on the `named_inventor` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   named_inventor: NamedInventorFilterInput
 
@@ -12559,77 +12559,77 @@ input WidgetFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: WidgetFilterInput
 
   """
   Used to filter on the `options` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   options: WidgetOptionsFilterInput
 
   """
   Used to filter on the `release_dates` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   release_dates: DateListFilterInput
 
   """
   Used to filter on the `release_timestamps` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   release_timestamps: DateTimeListFilterInput
 
   """
   Used to filter on the `size` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   size: SizeFilterInput
 
   """
   Used to filter on the `tags` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   tags: StringListFilterInput
 
   """
   Used to filter on the `the_options` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   the_options: WidgetOptionsFilterInput
 
   """
   Used to filter on the `weight_in_ng` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   weight_in_ng: JsonSafeLongFilterInput
 
   """
   Used to filter on the `weight_in_ng_str` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   weight_in_ng_str: LongStringFilterInput
 
   """
   Used to filter on the `workspace_id` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   workspace_id: IDFilterInput
 
   """
   Used to filter on the `workspace_name` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   workspace_name: StringFilterInput
 }
@@ -12887,22 +12887,22 @@ type WidgetOptionSetsAggregatedValues {
 """
 Input type used to specify filters on `WidgetOptionSets` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input WidgetOptionSetsFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [WidgetOptionSetsFilterInput!]
 
   """
   Used to filter on the `colors` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   colors: ColorListFilterInput
 
@@ -12910,14 +12910,14 @@ input WidgetOptionSetsFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: WidgetOptionSetsFilterInput
 
   """
   Used to filter on the `sizes` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   sizes: SizeListFilterInput
 }
@@ -12951,22 +12951,22 @@ type WidgetOptionsAggregatedValues {
 """
 Input type used to specify filters on `WidgetOptions` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input WidgetOptionsFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [WidgetOptionsFilterInput!]
 
   """
   Used to filter on the `color` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   color: ColorFilterInput
 
@@ -12974,21 +12974,21 @@ input WidgetOptionsFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: WidgetOptionsFilterInput
 
   """
   Used to filter on the `size` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   size: SizeFilterInput
 
   """
   Used to filter on the `the_size` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   the_size: SizeFilterInput
 }
@@ -13314,27 +13314,27 @@ type WidgetOrAddressEdge {
 """
 Input type used to specify filters on `WidgetOrAddress` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input WidgetOrAddressFilterInput {
   """
   Used to filter on the `amount_cents` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   amount_cents: IntFilterInput
 
   """
   Used to filter on the `amount_cents2` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   amount_cents2: IntFilterInput
 
   """
   Used to filter on the `amounts` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   amounts: IntListFilterInput
 
@@ -13342,162 +13342,162 @@ input WidgetOrAddressFilterInput {
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [WidgetOrAddressFilterInput!]
 
   """
   Used to filter on the `cost` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   cost: MoneyFilterInput
 
   """
   Used to filter on the `cost_currency_introduced_on` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   cost_currency_introduced_on: DateFilterInput
 
   """
   Used to filter on the `cost_currency_name` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   cost_currency_name: StringFilterInput
 
   """
   Used to filter on the `cost_currency_primary_continent` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   cost_currency_primary_continent: StringFilterInput
 
   """
   Used to filter on the `cost_currency_symbol` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   cost_currency_symbol: StringFilterInput
 
   """
   Used to filter on the `cost_currency_unit` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   cost_currency_unit: StringFilterInput
 
   """
   Used to filter on the `created_at` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   created_at: DateTimeFilterInput
 
   """
   Used to filter on the `created_at2` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   created_at2: DateTimeFilterInput
 
   """
   Used to filter on the `created_at2_legacy` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   created_at2_legacy: DateTimeFilterInput
 
   """
   Used to filter on the `created_at_legacy` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   created_at_legacy: DateTimeFilterInput
 
   """
   Used to filter on the `created_at_time_of_day` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   created_at_time_of_day: LocalTimeFilterInput
 
   """
   Used to filter on the `created_on` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   created_on: DateFilterInput
 
   """
   Used to filter on the `created_on_legacy` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   created_on_legacy: DateFilterInput
 
   """
   Used to filter on the `fees` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   fees: MoneyFieldsListFilterInput
 
   """
   Used to filter on the `full_address` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   full_address: StringFilterInput
 
   """
   Used to filter on the `geo_location` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   geo_location: GeoLocationFilterInput
 
   """
   Used to filter on the `id` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   id: IDFilterInput
 
   """
   Used to filter on the `inventor` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   inventor: InventorFilterInput
 
   """
   Used to filter on the `metadata` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   metadata: UntypedFilterInput
 
   """
   Used to filter on the `name` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   name: StringFilterInput
 
   """
   Used to filter on the `name_text` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   name_text: TextFilterInput
 
   """
   Used to filter on the `named_inventor` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   named_inventor: NamedInventorFilterInput
 
@@ -13505,84 +13505,84 @@ input WidgetOrAddressFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: WidgetOrAddressFilterInput
 
   """
   Used to filter on the `options` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   options: WidgetOptionsFilterInput
 
   """
   Used to filter on the `release_dates` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   release_dates: DateListFilterInput
 
   """
   Used to filter on the `release_timestamps` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   release_timestamps: DateTimeListFilterInput
 
   """
   Used to filter on the `size` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   size: SizeFilterInput
 
   """
   Used to filter on the `tags` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   tags: StringListFilterInput
 
   """
   Used to filter on the `the_options` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   the_options: WidgetOptionsFilterInput
 
   """
   Used to filter on the `timestamps` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   timestamps: AddressTimestampsFilterInput
 
   """
   Used to filter on the `weight_in_ng` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   weight_in_ng: JsonSafeLongFilterInput
 
   """
   Used to filter on the `weight_in_ng_str` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   weight_in_ng_str: LongStringFilterInput
 
   """
   Used to filter on the `workspace_id` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   workspace_id: IDFilterInput
 
   """
   Used to filter on the `workspace_name` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   workspace_name: StringFilterInput
 }
@@ -14717,29 +14717,29 @@ type WidgetWorkspaceEdge {
 """
 Input type used to specify filters on `WidgetWorkspace` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input WidgetWorkspaceFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [WidgetWorkspaceFilterInput!]
 
   """
   Used to filter on the `id` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   id: IDFilterInput
 
   """
   Used to filter on the `name` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   name: StringFilterInput
 
@@ -14747,14 +14747,14 @@ input WidgetWorkspaceFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: WidgetWorkspaceFilterInput
 
   """
   Used to filter on the `widget` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   widget: WorkspaceWidgetFilterInput
 }
@@ -14842,29 +14842,29 @@ type WorkspaceWidgetAggregatedValues {
 """
 Input type used to specify filters on `WorkspaceWidget` fields.
 
-Will be ignored if passed as an empty object (or as `null`).
+Will match all documents if passed as an empty object (or as `null`).
 """
 input WorkspaceWidgetFilterInput {
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
-  Will be ignored when `null` is passed. When an empty list is passed, will cause this
-  part of the filter to match no documents.
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [WorkspaceWidgetFilterInput!]
 
   """
   Used to filter on the `created_at` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   created_at: DateTimeFilterInput
 
   """
   Used to filter on the `id` field.
 
-  Will be ignored if `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches all documents.
   """
   id: IDFilterInput
 
@@ -14872,7 +14872,7 @@ input WorkspaceWidgetFilterInput {
   Matches records where the provided sub-filter evaluates to false.
   This works just like a NOT operator in SQL.
 
-  Will be ignored when `null` or an empty object is passed.
+  When `null` or an empty object is passed, matches no documents.
   """
   not: WorkspaceWidgetFilterInput
 }

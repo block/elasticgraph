@@ -141,7 +141,7 @@ module ElasticGraph
           t.documentation <<~EOS
             Input type used to specify filters on `#{source_type}` fields.
 
-            Will be ignored if passed as an empty object (or as `null`).
+            Will match all documents if passed as an empty object (or as `null`).
           EOS
 
           t.field @state.schema_elements.any_of, "[#{t.name}!]" do |f|
@@ -149,8 +149,8 @@ module ElasticGraph
               Matches records where any of the provided sub-filters evaluate to true.
               This works just like an OR operator in SQL.
 
-              Will be ignored when `null` is passed. When an empty list is passed, will cause this
-              part of the filter to match no documents.
+              When `null` is passed, matches all documents.
+              When an empty list is passed, this part of the filter matches no documents.
             EOS
           end
 
@@ -159,7 +159,7 @@ module ElasticGraph
               Matches records where the provided sub-filter evaluates to false.
               This works just like a NOT operator in SQL.
 
-              Will be ignored when `null` or an empty object is passed.
+              When `null` or an empty object is passed, matches no documents.
             EOS
           end
 
@@ -303,7 +303,7 @@ module ElasticGraph
             f.documentation <<~EOS
               Matches records where any of the list elements match the provided sub-filter.
 
-              Will be ignored when `null` or an empty object is passed.
+              When `null` or an empty object is passed, matches all documents.
             EOS
           end
 
@@ -315,7 +315,7 @@ module ElasticGraph
               be provided on a single `#{t.name}` input because of collisions between key names. For example, if you want to provide
               multiple `#{any_satisfy}: ...` filters, you could do `#{all_of}: [{#{any_satisfy}: ...}, {#{any_satisfy}: ...}]`.
 
-              Will be ignored when `null` or an empty list is passed.
+              When `null` or an empty list is passed, matches all documents.
             EOS
           end
 
@@ -330,7 +330,7 @@ module ElasticGraph
           t.documentation <<~EOS
             Input type used to specify filters on elements of a `[#{source_type}]` field.
 
-            Will be ignored if passed as an empty object (or as `null`).
+            Will match all documents if passed as an empty object (or as `null`).
           EOS
 
           # While we support `not: {any_satisfy: ...}` we do not support `any_satisfy: {not ...}` at this time.
@@ -374,7 +374,7 @@ module ElasticGraph
             or transitively from a list field that has been configured to index each leaf field as
             its own flattened list of values.
 
-            Will be ignored if passed as an empty object (or as `null`).
+            Will match all documents if passed as an empty object (or as `null`).
           EOS
 
           source_type.graphql_fields_by_name.each do |field_name, field|
@@ -424,7 +424,7 @@ module ElasticGraph
           f.documentation <<~EOS
             Used to filter on the number of non-null elements in this list field.
 
-            Will be ignored when `null` or an empty object is passed.
+            When `null` or an empty object is passed, matches all documents.
           EOS
         end
       end

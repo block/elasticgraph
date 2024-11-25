@@ -96,29 +96,29 @@ module ElasticGraph
             """
             Input type used to specify filters on `GeoLocation` fields.
 
-            Will be ignored if passed as an empty object (or as `null`).
+            Will match all documents if passed as an empty object (or as `null`).
             """
             input GeoLocationFilterInput {
               """
               Matches records where any of the provided sub-filters evaluate to true.
               This works just like an OR operator in SQL.
 
-              Will be ignored when `null` is passed. When an empty list is passed, will cause this
-              part of the filter to match no documents.
+              When `null` is passed, matches all documents.
+              When an empty list is passed, this part of the filter matches no documents.
               """
               #{schema_elements.any_of}: [GeoLocationFilterInput!]
               """
               Matches records where the provided sub-filter evaluates to false.
               This works just like a NOT operator in SQL.
 
-              Will be ignored when `null` or an empty object is passed.
+              When `null` or an empty object is passed, matches no documents.
               """
               not: GeoLocationFilterInput
               """
               Matches records where the field's geographic location is within a specified distance from the
               location identified by `latitude` and `longitude`.
 
-              Will be ignored when `null` or an empty object is passed.
+              When `null` or an empty object is passed, matches all documents.
               """
               near: GeoLocationDistanceFilterInput
             }
@@ -128,22 +128,22 @@ module ElasticGraph
             """
             Input type used to specify filters on elements of a `[GeoLocation]` field.
 
-            Will be ignored if passed as an empty object (or as `null`).
+            Will match all documents if passed as an empty object (or as `null`).
             """
             input GeoLocationListElementFilterInput {
               """
               Matches records where any of the provided sub-filters evaluate to true.
               This works just like an OR operator in SQL.
 
-              Will be ignored when `null` is passed. When an empty list is passed, will cause this
-              part of the filter to match no documents.
+              When `null` is passed, matches all documents.
+              When an empty list is passed, this part of the filter matches no documents.
               """
               #{schema_elements.any_of}: [GeoLocationListElementFilterInput!]
               """
               Matches records where the field's geographic location is within a specified distance from the
               location identified by `latitude` and `longitude`.
 
-              Will be ignored when `null` or an empty object is passed.
+              When `null` or an empty object is passed, matches all documents.
               """
               near: GeoLocationDistanceFilterInput
             }
@@ -244,40 +244,40 @@ module ElasticGraph
             """
             Input type used to specify filters on the time-of-day of `DateTime` fields.
 
-            Will be ignored if passed as an empty object (or as `null`).
+            Will match all documents if passed as an empty object (or as `null`).
             """
             input DateTimeTimeOfDayFilterInput {
               """
               Matches records where the time of day of the `DateTime` field value is equal to any of the provided values.
               This works just like an IN operator in SQL.
 
-              Will be ignored when `null` is passed. When an empty list is passed, will cause this
-              part of the filter to match no documents. When `null` is passed in the list, will
-              match records where the field value is `null`.
+              When `null` is passed, matches all documents. When an empty list is passed,
+              this part of the filter matches no documents. When `null` is passed in the
+              list, this part of the filter matches records where the field value is `null`.
               """
               #{schema_elements.equal_to_any_of}: [LocalTime!]
               """
               Matches records where the time of day of the `DateTime` field value is greater than (>) the provided value.
 
-              Will be ignored when `null` is passed.
+              When `null` is passed, matches all documents.
               """
               #{schema_elements.gt}: LocalTime
               """
               Matches records where the time of day of the `DateTime` field value is greater than or equal to (>=) the provided value.
 
-              Will be ignored when `null` is passed.
+              When `null` is passed, matches all documents.
               """
               #{schema_elements.gte}: LocalTime
               """
               Matches records where the time of day of the `DateTime` field value is less than (<) the provided value.
 
-              Will be ignored when `null` is passed.
+              When `null` is passed, matches all documents.
               """
               #{schema_elements.lt}: LocalTime
               """
               Matches records where the time of day of the `DateTime` field value is less than or equal to (<=) the provided value.
 
-              Will be ignored when `null` is passed.
+              When `null` is passed, matches all documents.
               """
               lte: LocalTime
               """
@@ -625,37 +625,37 @@ module ElasticGraph
             """
             Input type used to specify filters on `String` fields that have been indexed for full text search.
 
-            Will be ignored if passed as an empty object (or as `null`).
+            Will match all documents if passed as an empty object (or as `null`).
             """
             input TextFilterInput {
               """
               Matches records where any of the provided sub-filters evaluate to true.
               This works just like an OR operator in SQL.
 
-              Will be ignored when `null` is passed. When an empty list is passed, will cause this
-              part of the filter to match no documents.
+              When `null` is passed, matches all documents.
+              When an empty list is passed, this part of the filter matches no documents.
               """
               #{schema_elements.any_of}: [TextFilterInput!]
               """
               Matches records where the provided sub-filter evaluates to false.
               This works just like a NOT operator in SQL.
 
-              Will be ignored when `null` or an empty object is passed.
+              When `null` or an empty object is passed, matches no documents.
               """
               #{schema_elements.not}: TextFilterInput
               """
               Matches records where the field value is equal to any of the provided values.
               This works just like an IN operator in SQL.
 
-              Will be ignored when `null` is passed. When an empty list is passed, will cause this
-              part of the filter to match no documents. When `null` is passed in the list, will
-              match records where the field value is `null`.
+              When `null` is passed, matches all documents. When an empty list is passed,
+              this part of the filter matches no documents. When `null` is passed in the
+              list, this part of the filter matches records where the field value is `null`.
               """
               #{schema_elements.equal_to_any_of}: [String]
               """
               Matches records where the field value matches the provided value using full text search.
 
-              Will be ignored when `null` is passed.
+              When `null` is passed, matches all documents.
               """
               #{schema_elements.matches}: String @deprecated(reason: "Use `#{schema_elements.matches_query}` instead.")
               """
@@ -663,7 +663,7 @@ module ElasticGraph
               This is more lenient than `#{schema_elements.matches_phrase}`: the order of terms is ignored, and,
               by default, only one search term is required to be in the field value.
 
-              Will be ignored when `null` is passed.
+              When `null` is passed, matches all documents.
               """
               #{schema_elements.matches_query}: MatchesQueryFilterInput
               """
@@ -671,7 +671,7 @@ module ElasticGraph
               full text search. This is stricter than `#{schema_elements.matches_query}`: all terms must match
               and be in the same order as the provided phrase.
 
-              Will be ignored when `null` is passed.
+              When `null` is passed, matches all documents.
               """
               #{schema_elements.matches_phrase}: MatchesPhraseFilterInput
             }
@@ -681,30 +681,30 @@ module ElasticGraph
             """
             Input type used to specify filters on `String` fields that have been indexed for full text search.
 
-            Will be ignored if passed as an empty object (or as `null`).
+            Will match all documents if passed as an empty object (or as `null`).
             """
             input TextListElementFilterInput {
               """
               Matches records where any of the provided sub-filters evaluate to true.
               This works just like an OR operator in SQL.
 
-              Will be ignored when `null` is passed. When an empty list is passed, will cause this
-              part of the filter to match no documents.
+              When `null` is passed, matches all documents.
+              When an empty list is passed, this part of the filter matches no documents.
               """
               #{schema_elements.any_of}: [TextListElementFilterInput!]
               """
               Matches records where the field value is equal to any of the provided values.
               This works just like an IN operator in SQL.
 
-              Will be ignored when `null` is passed. When an empty list is passed, will cause this
-              part of the filter to match no documents. When `null` is passed in the list, will
-              match records where the field value is `null`.
+              When `null` is passed, matches all documents. When an empty list is passed,
+              this part of the filter matches no documents. When `null` is passed in the
+              list, this part of the filter matches records where the field value is `null`.
               """
               #{schema_elements.equal_to_any_of}: [String!]
               """
               Matches records where the field value matches the provided value using full text search.
 
-              Will be ignored when `null` is passed.
+              When `null` is passed, matches all documents.
               """
               #{schema_elements.matches}: String @deprecated(reason: "Use `#{schema_elements.matches_query}` instead.")
               """
@@ -712,7 +712,7 @@ module ElasticGraph
               This is more lenient than `#{schema_elements.matches_phrase}`: the order of terms is ignored, and,
               by default, only one search term is required to be in the field value.
 
-              Will be ignored when `null` is passed.
+              When `null` is passed, matches all documents.
               """
               #{schema_elements.matches_query}: MatchesQueryFilterInput
               """
@@ -720,7 +720,7 @@ module ElasticGraph
               full text search. This is stricter than `#{schema_elements.matches_query}`: all terms must match
               and be in the same order as the provided phrase.
 
-              Will be ignored when `null` is passed.
+              When `null` is passed, matches all documents.
               """
               #{schema_elements.matches_phrase}: MatchesPhraseFilterInput
             }
@@ -763,28 +763,28 @@ module ElasticGraph
               """
               Input type used to specify filters on #{fields_description}.
 
-              Will be ignored if passed as an empty object (or as `null`).
+              Will match all documents if passed as an empty object (or as `null`).
               """
               input #{scalar}ListFilterInput {
                 """
                 Matches records where any of the provided sub-filters evaluate to true.
                 This works just like an OR operator in SQL.
 
-                Will be ignored when `null` is passed. When an empty list is passed, will cause this
-                part of the filter to match no documents.
+                When `null` is passed, matches all documents.
+                When an empty list is passed, this part of the filter matches no documents.
                 """
                 #{schema_elements.any_of}: [#{scalar}ListFilterInput!]
                 """
                 Matches records where the provided sub-filter evaluates to false.
                 This works just like a NOT operator in SQL.
 
-                Will be ignored when `null` or an empty object is passed.
+                When `null` or an empty object is passed, matches no documents.
                 """
                 #{schema_elements.not}: #{scalar}ListFilterInput
                 """
                 Matches records where any of the list elements match the provided sub-filter.
 
-                Will be ignored when `null` or an empty object is passed.
+                When `null` or an empty object is passed, matches all documents.
                 """
                 #{schema_elements.any_satisfy}: #{scalar}ListElementFilterInput
                 """
@@ -794,13 +794,13 @@ module ElasticGraph
                 be provided on a single `#{scalar}ListFilterInput` input because of collisions between key names. For example, if you want to provide
                 multiple `#{schema_elements.any_satisfy}: ...` filters, you could do `#{schema_elements.all_of}: [{#{schema_elements.any_satisfy}: ...}, {#{schema_elements.any_satisfy}: ...}]`.
 
-                Will be ignored when `null` or an empty list is passed.
+                When `null` or an empty list is passed, matches all documents.
                 """
                 #{schema_elements.all_of}: [#{scalar}ListFilterInput!]
                 """
                 Used to filter on the number of non-null elements in this list field.
 
-                Will be ignored when `null` or an empty object is passed.
+                When `null` or an empty object is passed, matches all documents.
                 """
                 #{schema_elements.count}: IntFilterInput
               }
@@ -813,7 +813,7 @@ module ElasticGraph
             """
             Input type used to specify parameters for the `#{schema_elements.matches_query}` filtering operator.
 
-            Will be ignored if passed as `null`.
+            When `null` is passed, matches all documents.
             """
             input MatchesQueryFilterInput {
               """
@@ -839,7 +839,7 @@ module ElasticGraph
             """
             Input type used to specify parameters for the `#{schema_elements.matches_phrase}` filtering operator.
 
-            Will be ignored if passed as `null`.
+            When `null` is passed, matches all documents.
             """
             input MatchesPhraseFilterInput {
               """

@@ -168,28 +168,28 @@ module ElasticGraph
             """
             Input type used to specify filters on `[Short]` fields.
 
-            Will be ignored if passed as an empty object (or as `null`).
+            Will match all documents if passed as an empty object (or as `null`).
             """
             input ShortListFilterInput {
               """
               Matches records where any of the provided sub-filters evaluate to true.
               This works just like an OR operator in SQL.
 
-              Will be ignored when `null` is passed. When an empty list is passed, will cause this
-              part of the filter to match no documents.
+              When `null` is passed, matches all documents.
+              When an empty list is passed, this part of the filter matches no documents.
               """
               #{schema_elements.any_of}: [ShortListFilterInput!]
               """
               Matches records where the provided sub-filter evaluates to false.
               This works just like a NOT operator in SQL.
 
-              Will be ignored when `null` or an empty object is passed.
+              When `null` or an empty object is passed, matches no documents.
               """
               #{schema_elements.not}: ShortListFilterInput
               """
               Matches records where any of the list elements match the provided sub-filter.
 
-              Will be ignored when `null` or an empty object is passed.
+              When `null` or an empty object is passed, matches all documents.
               """
               #{schema_elements.any_satisfy}: ShortListElementFilterInput
               """
@@ -199,13 +199,13 @@ module ElasticGraph
               be provided on a single `ShortListFilterInput` input because of collisions between key names. For example, if you want to provide
               multiple `#{schema_elements.any_satisfy}: ...` filters, you could do `#{schema_elements.all_of}: [{#{schema_elements.any_satisfy}: ...}, {#{schema_elements.any_satisfy}: ...}]`.
 
-              Will be ignored when `null` or an empty list is passed.
+              When `null` or an empty list is passed, matches all documents.
               """
               #{schema_elements.all_of}: [ShortListFilterInput!]
               """
               Used to filter on the number of non-null elements in this list field.
 
-              Will be ignored when `null` or an empty object is passed.
+              When `null` or an empty object is passed, matches all documents.
               """
               count: IntFilterInput
             }
@@ -222,55 +222,55 @@ module ElasticGraph
             """
             Input type used to specify filters on `Byte` fields.
 
-            Will be ignored if passed as an empty object (or as `null`).
+            Will match all documents if passed as an empty object (or as `null`).
             """
             input ByteFilterInput {
               """
               Matches records where any of the provided sub-filters evaluate to true.
               This works just like an OR operator in SQL.
 
-              Will be ignored when `null` is passed. When an empty list is passed, will cause this
-              part of the filter to match no documents.
+              When `null` is passed, matches all documents.
+              When an empty list is passed, this part of the filter matches no documents.
               """
               #{schema_elements.any_of}: [ByteFilterInput!]
               """
               Matches records where the provided sub-filter evaluates to false.
               This works just like a NOT operator in SQL.
 
-              Will be ignored when `null` or an empty object is passed.
+              When `null` or an empty object is passed, matches no documents.
               """
               #{schema_elements.not}: ByteFilterInput
               """
               Matches records where the field value is equal to any of the provided values.
               This works just like an IN operator in SQL.
 
-              Will be ignored when `null` is passed. When an empty list is passed, will cause this
-              part of the filter to match no documents. When `null` is passed in the list, will
-              match records where the field value is `null`.
+              When `null` is passed, matches all documents. When an empty list is passed,
+              this part of the filter matches no documents. When `null` is passed in the
+              list, this part of the filter matches records where the field value is `null`.
               """
               #{schema_elements.equal_to_any_of}: [Byte]
               """
               Matches records where the field value is greater than (>) the provided value.
 
-              Will be ignored when `null` is passed.
+              When `null` is passed, matches all documents.
               """
               #{schema_elements.gt}: Byte
               """
               Matches records where the field value is greater than or equal to (>=) the provided value.
 
-              Will be ignored when `null` is passed.
+              When `null` is passed, matches all documents.
               """
               #{schema_elements.gte}: Byte
               """
               Matches records where the field value is less than (<) the provided value.
 
-              Will be ignored when `null` is passed.
+              When `null` is passed, matches all documents.
               """
               #{schema_elements.lt}: Byte
               """
               Matches records where the field value is less than or equal to (<=) the provided value.
 
-              Will be ignored when `null` is passed.
+              When `null` is passed, matches all documents.
               """
               #{schema_elements.lte}: Byte
             }

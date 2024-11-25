@@ -40,22 +40,22 @@ module ElasticGraph
             """
             Input type used to specify filters on `Widget` fields.
 
-            Will be ignored if passed as an empty object (or as `null`).
+            Will match all documents if passed as an empty object (or as `null`).
             """
             input WidgetFilterInput {
               """
               Matches records where any of the provided sub-filters evaluate to true.
               This works just like an OR operator in SQL.
 
-              Will be ignored when `null` is passed. When an empty list is passed, will cause this
-              part of the filter to match no documents.
+              When `null` is passed, matches all documents.
+              When an empty list is passed, this part of the filter matches no documents.
               """
               #{schema_elements.any_of}: [WidgetFilterInput!]
               """
               Matches records where the provided sub-filter evaluates to false.
               This works just like a NOT operator in SQL.
 
-              Will be ignored when `null` or an empty object is passed.
+              When `null` or an empty object is passed, matches no documents.
               """
               #{schema_elements.not}: WidgetFilterInput
               """
@@ -65,19 +65,19 @@ module ElasticGraph
               >
               > Another paragraph.
 
-              Will be ignored if `null` or an empty object is passed.
+              When `null` or an empty object is passed, matches all documents.
               """
               id: IDFilterInput
               """
               Used to filter on the `the_options` field.
 
-              Will be ignored if `null` or an empty object is passed.
+              When `null` or an empty object is passed, matches all documents.
               """
               the_options: WidgetOptionsFilterInput
               """
               Used to filter on the `cost` field.
 
-              Will be ignored if `null` or an empty object is passed.
+              When `null` or an empty object is passed, matches all documents.
               """
               cost: IntFilterInput
             }
@@ -99,22 +99,22 @@ module ElasticGraph
             """
             Input type used to specify filters on `WidgetOptions` fields.
 
-            Will be ignored if passed as an empty object (or as `null`).
+            Will match all documents if passed as an empty object (or as `null`).
             """
             input WidgetOptionsFilterInput {
               """
               Matches records where any of the provided sub-filters evaluate to true.
               This works just like an OR operator in SQL.
 
-              Will be ignored when `null` is passed. When an empty list is passed, will cause this
-              part of the filter to match no documents.
+              When `null` is passed, matches all documents.
+              When an empty list is passed, this part of the filter matches no documents.
               """
               #{schema_elements.any_of}: [WidgetOptionsFilterInput!]
               """
               Matches records where the provided sub-filter evaluates to false.
               This works just like a NOT operator in SQL.
 
-              Will be ignored when `null` or an empty object is passed.
+              When `null` or an empty object is passed, matches no documents.
               """
               #{schema_elements.not}: WidgetOptionsFilterInput
               """
@@ -122,13 +122,13 @@ module ElasticGraph
 
               > The size of the widget.
 
-              Will be ignored if `null` or an empty object is passed.
+              When `null` or an empty object is passed, matches all documents.
               """
               size: IntFilterInput
               """
               Used to filter on the `main_color` field.
 
-              Will be ignored if `null` or an empty object is passed.
+              When `null` or an empty object is passed, matches all documents.
               """
               main_color: StringFilterInput
             }
@@ -138,28 +138,28 @@ module ElasticGraph
             """
             Input type used to specify filters on `[WidgetOptions]` fields.
 
-            Will be ignored if passed as an empty object (or as `null`).
+            Will match all documents if passed as an empty object (or as `null`).
             """
             input WidgetOptionsListFilterInput {
               """
               Matches records where any of the provided sub-filters evaluate to true.
               This works just like an OR operator in SQL.
 
-              Will be ignored when `null` is passed. When an empty list is passed, will cause this
-              part of the filter to match no documents.
+              When `null` is passed, matches all documents.
+              When an empty list is passed, this part of the filter matches no documents.
               """
               #{schema_elements.any_of}: [WidgetOptionsListFilterInput!]
               """
               Matches records where the provided sub-filter evaluates to false.
               This works just like a NOT operator in SQL.
 
-              Will be ignored when `null` or an empty object is passed.
+              When `null` or an empty object is passed, matches no documents.
               """
               #{schema_elements.not}: WidgetOptionsListFilterInput
               """
               Matches records where any of the list elements match the provided sub-filter.
 
-              Will be ignored when `null` or an empty object is passed.
+              When `null` or an empty object is passed, matches all documents.
               """
               #{schema_elements.any_satisfy}: WidgetOptionsFilterInput
               """
@@ -169,13 +169,13 @@ module ElasticGraph
               be provided on a single `WidgetOptionsListFilterInput` input because of collisions between key names. For example, if you want to provide
               multiple `#{schema_elements.any_satisfy}: ...` filters, you could do `#{schema_elements.all_of}: [{#{schema_elements.any_satisfy}: ...}, {#{schema_elements.any_satisfy}: ...}]`.
 
-              Will be ignored when `null` or an empty list is passed.
+              When `null` or an empty list is passed, matches all documents.
               """
               #{schema_elements.all_of}: [WidgetOptionsListFilterInput!]
               """
               Used to filter on the number of non-null elements in this list field.
 
-              Will be ignored when `null` or an empty object is passed.
+              When `null` or an empty object is passed, matches all documents.
               """
               #{schema_elements.count}: IntFilterInput
             }
@@ -389,31 +389,31 @@ module ElasticGraph
             """
             Input type used to specify filters on `Color` fields.
 
-            Will be ignored if passed as an empty object (or as `null`).
+            Will match all documents if passed as an empty object (or as `null`).
             """
             input ColorFilterInput {
               """
               Matches records where any of the provided sub-filters evaluate to true.
               This works just like an OR operator in SQL.
 
-              Will be ignored when `null` is passed. When an empty list is passed, will cause this
-              part of the filter to match no documents.
+              When `null` is passed, matches all documents.
+              When an empty list is passed, this part of the filter matches no documents.
               """
               #{schema_elements.any_of}: [ColorFilterInput!]
               """
               Matches records where the provided sub-filter evaluates to false.
               This works just like a NOT operator in SQL.
 
-              Will be ignored when `null` or an empty object is passed.
+              When `null` or an empty object is passed, matches no documents.
               """
               #{schema_elements.not}: ColorFilterInput
               """
               Matches records where the field value is equal to any of the provided values.
               This works just like an IN operator in SQL.
 
-              Will be ignored when `null` is passed. When an empty list is passed, will cause this
-              part of the filter to match no documents. When `null` is passed in the list, will
-              match records where the field value is `null`.
+              When `null` is passed, matches all documents. When an empty list is passed,
+              this part of the filter matches no documents. When `null` is passed in the
+              list, this part of the filter matches records where the field value is `null`.
               """
               #{schema_elements.equal_to_any_of}: [ColorInput]
             }
@@ -423,24 +423,24 @@ module ElasticGraph
             """
             Input type used to specify filters on elements of a `[Color]` field.
 
-            Will be ignored if passed as an empty object (or as `null`).
+            Will match all documents if passed as an empty object (or as `null`).
             """
             input ColorListElementFilterInput {
               """
               Matches records where any of the provided sub-filters evaluate to true.
               This works just like an OR operator in SQL.
 
-              Will be ignored when `null` is passed. When an empty list is passed, will cause this
-              part of the filter to match no documents.
+              When `null` is passed, matches all documents.
+              When an empty list is passed, this part of the filter matches no documents.
               """
               #{schema_elements.any_of}: [ColorListElementFilterInput!]
               """
               Matches records where the field value is equal to any of the provided values.
               This works just like an IN operator in SQL.
 
-              Will be ignored when `null` is passed. When an empty list is passed, will cause this
-              part of the filter to match no documents. When `null` is passed in the list, will
-              match records where the field value is `null`.
+              When `null` is passed, matches all documents. When an empty list is passed,
+              this part of the filter matches no documents. When `null` is passed in the
+              list, this part of the filter matches records where the field value is `null`.
               """
               #{schema_elements.equal_to_any_of}: [ColorInput!]
             }
@@ -450,28 +450,28 @@ module ElasticGraph
             """
             Input type used to specify filters on `[Color]` fields.
 
-            Will be ignored if passed as an empty object (or as `null`).
+            Will match all documents if passed as an empty object (or as `null`).
             """
             input ColorListFilterInput {
               """
               Matches records where any of the provided sub-filters evaluate to true.
               This works just like an OR operator in SQL.
 
-              Will be ignored when `null` is passed. When an empty list is passed, will cause this
-              part of the filter to match no documents.
+              When `null` is passed, matches all documents.
+              When an empty list is passed, this part of the filter matches no documents.
               """
               #{schema_elements.any_of}: [ColorListFilterInput!]
               """
               Matches records where the provided sub-filter evaluates to false.
               This works just like a NOT operator in SQL.
 
-              Will be ignored when `null` or an empty object is passed.
+              When `null` or an empty object is passed, matches no documents.
               """
               #{schema_elements.not}: ColorListFilterInput
               """
               Matches records where any of the list elements match the provided sub-filter.
 
-              Will be ignored when `null` or an empty object is passed.
+              When `null` or an empty object is passed, matches all documents.
               """
               #{schema_elements.any_satisfy}: ColorListElementFilterInput
               """
@@ -481,13 +481,13 @@ module ElasticGraph
               be provided on a single `ColorListFilterInput` input because of collisions between key names. For example, if you want to provide
               multiple `#{schema_elements.any_satisfy}: ...` filters, you could do `#{schema_elements.all_of}: [{#{schema_elements.any_satisfy}: ...}, {#{schema_elements.any_satisfy}: ...}]`.
 
-              Will be ignored when `null` or an empty list is passed.
+              When `null` or an empty list is passed, matches all documents.
               """
               #{schema_elements.all_of}: [ColorListFilterInput!]
               """
               Used to filter on the number of non-null elements in this list field.
 
-              Will be ignored when `null` or an empty object is passed.
+              When `null` or an empty object is passed, matches all documents.
               """
               #{schema_elements.count}: IntFilterInput
             }
@@ -643,7 +643,7 @@ module ElasticGraph
               """
               Used to filter on the `tags` field.
 
-              Will be ignored if `null` or an empty object is passed.
+              When `null` or an empty object is passed, matches all documents.
               """
               tags: StringListFilterInput
             }
@@ -905,7 +905,7 @@ module ElasticGraph
               or transitively from a list field that has been configured to index each leaf field as
               its own flattened list of values.
 
-              Will be ignored if passed as an empty object (or as `null`).
+              Will match all documents if passed as an empty object (or as `null`).
               """
               input WidgetOptionsFieldsListFilterInput {
             EOS

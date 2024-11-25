@@ -200,33 +200,33 @@ module ElasticGraph
           Matches records where the field value is equal to any of the provided values.
           This works just like an IN operator in SQL.
 
-          Will be ignored when `null` is passed. When an empty list is passed, will cause this
-          part of the filter to match no documents. When `null` is passed in the list, will
-          match records where the field value is `null`.
+          When `null` is passed, matches all documents. When an empty list is passed,
+          this part of the filter matches no documents. When `null` is passed in the
+          list, this part of the filter matches records where the field value is `null`.
         EOS
 
         GT_DOC = <<~EOS
           Matches records where the field value is greater than (>) the provided value.
 
-          Will be ignored when `null` is passed.
+          When `null` is passed, matches all documents.
         EOS
 
         GTE_DOC = <<~EOS
           Matches records where the field value is greater than or equal to (>=) the provided value.
 
-          Will be ignored when `null` is passed.
+          When `null` is passed, matches all documents.
         EOS
 
         LT_DOC = <<~EOS
           Matches records where the field value is less than (<) the provided value.
 
-          Will be ignored when `null` is passed.
+          When `null` is passed, matches all documents.
         EOS
 
         LTE_DOC = <<~EOS
           Matches records where the field value is less than or equal to (<=) the provided value.
 
-          Will be ignored when `null` is passed.
+          When `null` is passed, matches all documents.
         EOS
 
         def to_input_filters

@@ -742,7 +742,7 @@ module ElasticGraph
           schema_def_state.factory.new_field(**params).tap do |f|
             f.documentation derived_documentation(
               "Used to filter on the `#{name}` field",
-              "Will be ignored if `null` or an empty object is passed"
+              "When `null` or an empty object is passed, matches all documents"
             )
 
             filter_customizations.each { |c| c.call(f) }

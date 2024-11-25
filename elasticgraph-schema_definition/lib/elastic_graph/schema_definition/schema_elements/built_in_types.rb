@@ -216,7 +216,7 @@ module ElasticGraph
               f.documentation <<~EOS
                 Matches records where the field value matches the provided value using full text search.
 
-                Will be ignored when `null` is passed.
+                When `null` is passed, matches all documents.
               EOS
 
               f.directive "deprecated", reason: "Use `#{names.matches_query}` instead."
@@ -228,7 +228,7 @@ module ElasticGraph
                 This is more lenient than `#{names.matches_phrase}`: the order of terms is ignored, and,
                 by default, only one search term is required to be in the field value.
 
-                Will be ignored when `null` is passed.
+                When `null` is passed, matches all documents.
               EOS
             end
 
@@ -238,7 +238,7 @@ module ElasticGraph
                 full text search. This is stricter than `#{names.matches_query}`: all terms must match
                 and be in the same order as the provided phrase.
 
-                Will be ignored when `null` is passed.
+                When `null` is passed, matches all documents.
               EOS
             end
           end.each do |input_type|
@@ -246,7 +246,7 @@ module ElasticGraph
             input_type.documentation <<~EOS
               Input type used to specify filters on `#{field_type}` fields that have been indexed for full text search.
 
-              Will be ignored if passed as an empty object (or as `null`).
+              Will match all documents if passed as an empty object (or as `null`).
             EOS
 
             register_input_type(input_type)
@@ -256,7 +256,7 @@ module ElasticGraph
             t.documentation <<~EOS
               Input type used to specify parameters for the `#{names.matches_query}` filtering operator.
 
-              Will be ignored if passed as `null`.
+              When `null` is passed, matches all documents.
             EOS
 
             t.field names.query, "String!" do |f|
@@ -292,7 +292,7 @@ module ElasticGraph
             t.documentation <<~EOS
               Input type used to specify parameters for the `#{names.matches_phrase}` filtering operator.
 
-              Will be ignored if passed as `null`.
+              When `null` is passed, matches all documents.
             EOS
 
             t.field names.phrase, "String!" do |f|
@@ -341,7 +341,7 @@ module ElasticGraph
                 Matches records where the field's geographic location is within a specified distance from the
                 location identified by `#{names.latitude}` and `#{names.longitude}`.
 
-                Will be ignored when `null` or an empty object is passed.
+                When `null` or an empty object is passed, matches all documents.
               EOS
             end
           end.each { |input_filter| register_input_type(input_filter) }
@@ -675,7 +675,7 @@ module ElasticGraph
                 f.documentation <<~EOS
                   Matches records based on the time-of-day of the `DateTime` values.
 
-                  Will be ignored when `null` or an empty list is passed.
+                  When `null` is passed, matches all documents.
                 EOS
               end
             end
@@ -693,7 +693,7 @@ module ElasticGraph
               t.documentation <<~EOS
                 Input type used to specify filters on the time-of-day of `DateTime` fields.
 
-                Will be ignored if passed as an empty object (or as `null`).
+                Will match all documents if passed as an empty object (or as `null`).
               EOS
 
               fixup_doc = ->(doc_string) do
