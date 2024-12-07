@@ -79,7 +79,7 @@ jobs:
       # Note: this must come after we release the gem because it resets git back to the same SHA we started on
       # (before bumping the version), but the RubyGems release depends on the version having been bumped.
       - name: Create pull request for the version bump
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c # v6.1.0
         with:
           branch: release-v${{ inputs.version }}
           title: "Release v${{ inputs.version }}"
@@ -89,7 +89,7 @@ jobs:
             - [ ] Review and edit the [GitHub Draft Release](https://github.com/${{ github.repository }}/releases) (can be done after this PR is merged)
 
       - name: Create GitHub Release
-        uses: ncipollo/release-action@v1
+        uses: ncipollo/release-action@2c591bcc8ecdcd2db72b97d6147f871fcd833ba5 # v1.14.0
         with:
           draft: true
           generateReleaseNotes: true

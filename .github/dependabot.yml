@@ -1,0 +1,146 @@
+version: 2
+updates:
+  - package-ecosystem: bundler
+    directory: /
+    schedule:
+      interval: daily
+
+  - package-ecosystem: bundler
+    directory: /config/release
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /config/site
+    schedule:
+      interval: daily
+
+  - package-ecosystem: bundler
+    directory: /elasticgraph-admin
+    schedule:
+      interval: daily
+
+  - package-ecosystem: bundler
+    directory: /elasticgraph-admin_lambda
+    schedule:
+      interval: daily
+
+  - package-ecosystem: bundler
+    directory: /elasticgraph-apollo
+    schedule:
+      interval: daily
+
+  - package-ecosystem: docker
+    directory: /elasticgraph-apollo/apollo_tests_implementation
+    schedule:
+      interval: daily
+
+  - package-ecosystem: bundler
+    directory: /elasticgraph-apollo/apollo_tests_implementation
+    schedule:
+      interval: daily
+
+  - package-ecosystem: bundler
+    directory: /elasticgraph-datastore_core
+    schedule:
+      interval: daily
+
+  - package-ecosystem: bundler
+    directory: /elasticgraph-elasticsearch
+    schedule:
+      interval: daily
+
+  - package-ecosystem: bundler
+    directory: /elasticgraph-graphql
+    schedule:
+      interval: daily
+
+  - package-ecosystem: bundler
+    directory: /elasticgraph-graphql_lambda
+    schedule:
+      interval: daily
+
+  - package-ecosystem: bundler
+    directory: /elasticgraph-health_check
+    schedule:
+      interval: daily
+
+  - package-ecosystem: bundler
+    directory: /elasticgraph-indexer
+    schedule:
+      interval: daily
+
+  - package-ecosystem: bundler
+    directory: /elasticgraph-indexer_autoscaler_lambda
+    schedule:
+      interval: daily
+
+  - package-ecosystem: bundler
+    directory: /elasticgraph-indexer_lambda
+    schedule:
+      interval: daily
+
+  - package-ecosystem: bundler
+    directory: /elasticgraph-json_schema
+    schedule:
+      interval: daily
+
+  - package-ecosystem: bundler
+    directory: /elasticgraph-lambda_support
+    schedule:
+      interval: daily
+
+  - package-ecosystem: bundler
+    directory: /elasticgraph-local
+    schedule:
+      interval: daily
+
+  - package-ecosystem: docker
+    directory: /elasticgraph-local/lib/elastic_graph/local/elasticsearch
+    schedule:
+      interval: daily
+
+  - package-ecosystem: docker
+    directory: /elasticgraph-local/lib/elastic_graph/local/opensearch
+    schedule:
+      interval: daily
+
+  - package-ecosystem: bundler
+    directory: /elasticgraph-opensearch
+    schedule:
+      interval: daily
+
+  - package-ecosystem: bundler
+    directory: /elasticgraph-query_interceptor
+    schedule:
+      interval: daily
+
+  - package-ecosystem: bundler
+    directory: /elasticgraph-query_registry
+    schedule:
+      interval: daily
+
+  - package-ecosystem: bundler
+    directory: /elasticgraph-rack
+    schedule:
+      interval: daily
+
+  - package-ecosystem: bundler
+    directory: /elasticgraph-schema_artifacts
+    schedule:
+      interval: daily
+
+  - package-ecosystem: bundler
+    directory: /elasticgraph-schema_definition
+    schedule:
+      interval: daily
+
+  - package-ecosystem: bundler
+    directory: /elasticgraph-support
+    schedule:
+      interval: daily
+
+  - package-ecosystem: bundler
+    directory: /elasticgraph
+    schedule:
+      interval: daily
