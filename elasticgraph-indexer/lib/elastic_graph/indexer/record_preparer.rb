@@ -31,7 +31,7 @@ module ElasticGraph
 
         # Gets the `RecordPreparer` for the given JSON schema version.
         def for_json_schema_version(json_schema_version)
-          @preparers_by_json_schema_version[json_schema_version]
+          @preparers_by_json_schema_version[json_schema_version] # : RecordPreparer
         end
 
         # Gets the `RecordPreparer` for the latest JSON schema version. Intended primarily

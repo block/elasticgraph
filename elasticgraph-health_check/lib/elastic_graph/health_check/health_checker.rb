@@ -169,7 +169,7 @@ module ElasticGraph
         #
         # So below, filter to types that have all of their datastore clusters available for querying.
         available_type_names, unavailable_type_names = valid_type_names.partition do |type_name|
-          @indexed_document_types_by_name[type_name].search_index_definitions.all? do |search_index_definition|
+          @indexed_document_types_by_name.fetch(type_name).search_index_definitions.all? do |search_index_definition|
             @datastore_clients_by_name.key?(search_index_definition.cluster_to_query.to_s)
           end
         end
@@ -190,6 +190,7 @@ module ElasticGraph
             .fields_by_name[check.timestamp_field]
 
           if field&.type&.unwrap_fully&.name.to_s == "DateTime"
+            # @type var field: GraphQL::Schema::Field
             # Convert the config so that we have a reference to the index field name.
             normalized_data_recency_checks[type] = check.with(timestamp_field: field.name_in_index.to_s)
           else

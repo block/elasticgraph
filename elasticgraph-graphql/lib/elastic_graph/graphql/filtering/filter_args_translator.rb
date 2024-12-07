@@ -26,7 +26,7 @@ module ElasticGraph
         # vs GraphQL.
         def translate_filter_args(field:, args:)
           return nil unless (filter_hash = args[filter_arg_name])
-          filter_type = field.schema.type_from(field.graphql_field.arguments[filter_arg_name].type)
+          filter_type = field.schema.type_from(field.graphql_field.arguments.fetch(filter_arg_name).type)
           convert(filter_type, filter_hash)
         end
 

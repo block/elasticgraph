@@ -25,7 +25,7 @@ module ElasticGraph
         def fetch(queries)
           responses_by_query = @datastore_router.msearch(queries, query_tracker: @query_tracker)
           @query_tracker.record_datastore_queries_for_single_request(queries)
-          queries.map { |q| responses_by_query[q] }
+          queries.map { |q| responses_by_query.fetch(q) }
         end
 
         def self.execute_many(queries, for_context:)

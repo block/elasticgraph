@@ -130,7 +130,8 @@ module ElasticGraph
           ]
         })
 
-        metric_response.metric_data_results.first.values.first
+        results = metric_response.metric_data_results.first # : ::Aws::CloudWatch::Types::MetricDataResult
+        results.values.first.to_f
       end
 
       def get_queue_attributes(queue_urls)

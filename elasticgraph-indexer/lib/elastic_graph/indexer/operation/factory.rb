@@ -96,7 +96,7 @@ module ElasticGraph
         end
 
         def validator(type, selected_json_schema_version)
-          factory = validator_factories_by_version[selected_json_schema_version]
+          factory = validator_factories_by_version[selected_json_schema_version] # : JSONSchema::ValidatorFactory
           factory.validator_for(type)
         end
 

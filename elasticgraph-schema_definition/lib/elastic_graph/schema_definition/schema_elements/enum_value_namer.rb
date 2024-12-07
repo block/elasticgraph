@@ -29,7 +29,8 @@ module ElasticGraph
 
         # Returns the name that should be used for the given `type_name` and `value_name`.
         def name_for(type_name, value_name)
-          @used_value_names_by_type_name[type_name] << value_name
+          used_value_names = @used_value_names_by_type_name[type_name] # : ::Array[::String]
+          used_value_names << value_name
           overrides_by_type_name.dig(type_name, value_name) || value_name
         end
 

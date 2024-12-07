@@ -117,7 +117,7 @@ module ElasticGraph
           # @type var file_name: ::String?
           # @type var line_number: ::Integer?
           file_name, line_number = object.instance_method(method_name).source_location
-          ::File.read(file_name.to_s).split("\n")[line_number.to_i - 1].strip
+          ::File.read(file_name.to_s).split("\n").fetch(line_number.to_i - 1).strip
         end
       end
     end

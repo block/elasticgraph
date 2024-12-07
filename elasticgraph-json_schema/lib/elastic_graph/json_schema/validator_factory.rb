@@ -55,7 +55,7 @@ module ElasticGraph
       # @param type_name [String] name of an ElasticGraph type
       # @return [Validator]
       def validator_for(type_name)
-        @validators_by_type_name[type_name]
+        @validators_by_type_name[type_name] # : Validator
       end
 
       # Returns a new factory configured to disallow unknown properties. By default, JSON schema

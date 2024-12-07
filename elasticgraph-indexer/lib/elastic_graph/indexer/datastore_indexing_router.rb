@@ -77,10 +77,8 @@ module ElasticGraph
         # Before writing these operations, verify their destination index mapping are consistent.
         validate_mapping_completeness_of!(:accessible_cluster_names_to_index_into, *operations.map(&:destination_index_def).uniq)
 
-        # @type var ops_by_client: ::Hash[DatastoreCore::_Client, ::Array[_Operation]]
-        ops_by_client = ::Hash.new { |h, k| h[k] = [] }
-        # @type var unsupported_ops: ::Set[_Operation]
-        unsupported_ops = ::Set.new
+        ops_by_client = ::Hash.new { |h, k| h[k] = [] } # : ::Hash[DatastoreCore::_Client, ::Array[_Operation]]
+        unsupported_ops = ::Set.new # : ::Set[_Operation]
 
         operations.reject { |op| op.to_datastore_bulk.empty? }.each do |op|
           # Note: this intentionally does not use `accessible_cluster_names_to_index_into`.
@@ -90,7 +88,8 @@ module ElasticGraph
 
           cluster_names.each do |cluster_name|
             if (client = @datastore_clients_by_name[cluster_name])
-              ops_by_client[client] << op
+              ops = ops_by_client[client] # : ::Array[::ElasticGraph::Indexer::_Operation]
+              ops << op
             else
               unsupported_ops << op
             end
@@ -293,8 +292,7 @@ module ElasticGraph
         if failures.empty?
           client_names_and_results.each_with_object(_ = {}) do |(client_name, _success_or_failure, results), accum|
             results.each do |op, version|
-              accum[op] ||= _ = {}
-              accum[op][client_name] = version
+              (accum[op] ||= {})[client_name] = version
             end
           end
         else

@@ -60,7 +60,10 @@ module ElasticGraphGemspecHelper
 
       # Steep is our type checker. Only needed if there's a `sig` directory.
       if ::Dir.exist?(::File.join(gem_dir, "sig"))
-        spec.add_development_dependency "steep", "~> 1.8"
+        # New steep minor versions often introduce stricter type checks that we may initially fail,
+        # so we don't want to automatically upgrade when a new steep minor version is released.
+        # Therefore, we list 3 digits (in contrast to most gems).
+        spec.add_development_dependency "steep", "~> 1.9.0"
       end
 
       # If the gem has a `spec` directory then it needs our standard set of testing gems.

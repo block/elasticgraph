@@ -139,7 +139,8 @@ module ElasticGraph
       end
 
       def register_renamed_field(type_name, from:, to:, defined_at:, defined_via:)
-        renamed_fields_by_type_name_and_old_field_name[type_name][from] = factory.new_deprecated_element(
+        renamed_fields_by_old_field_name = renamed_fields_by_type_name_and_old_field_name[type_name] # : ::Hash[::String, SchemaElements::DeprecatedElement]
+        renamed_fields_by_old_field_name[from] = factory.new_deprecated_element(
           to,
           defined_at: defined_at,
           defined_via: defined_via
@@ -147,7 +148,8 @@ module ElasticGraph
       end
 
       def register_deleted_field(type_name, field_name, defined_at:, defined_via:)
-        deleted_fields_by_type_name_and_old_field_name[type_name][field_name] = factory.new_deprecated_element(
+        deleted_fields_by_old_field_name = deleted_fields_by_type_name_and_old_field_name[type_name] # : ::Hash[::String, SchemaElements::DeprecatedElement]
+        deleted_fields_by_old_field_name[field_name] = factory.new_deprecated_element(
           field_name,
           defined_at: defined_at,
           defined_via: defined_via

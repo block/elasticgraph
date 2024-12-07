@@ -185,7 +185,7 @@ module ElasticGraph
             return matching_custom_range.index_name_suffix
           end
 
-          timestamp_value.strftime(ROLLOVER_SUFFIX_FORMATS_BY_FREQUENCY[frequency])
+          timestamp_value.strftime(ROLLOVER_SUFFIX_FORMATS_BY_FREQUENCY.fetch(frequency))
         end
 
         def concrete_rollover_index_for(index_name, setting_overrides, time_set = nil)

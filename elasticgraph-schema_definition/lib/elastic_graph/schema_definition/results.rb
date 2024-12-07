@@ -329,7 +329,7 @@ module ElasticGraph
 
       def recursively_add_referenced_types_to(source_type_ref, references_cache)
         return unless (source_type = source_type_ref.as_object_type)
-        references_set = references_cache[source_type_ref.name]
+        references_set = references_cache[source_type_ref.name] # : ::Set[::String]
 
         # Recursive references are allowed only when its a relation, so skip that case.
         source_type.graphql_fields_by_name.values.reject { |f| f.relationship }.each do |field|
@@ -339,7 +339,8 @@ module ElasticGraph
             recursively_add_referenced_types_to(field_type, references_cache)
           end
 
-          references_set.merge(references_cache[field_type.name])
+          field_type_references_set = references_cache[field_type.name] # : ::Set[::String]
+          references_set.merge(field_type_references_set)
         end
       end
 

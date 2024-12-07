@@ -43,7 +43,8 @@ module ElasticGraph
         def implements(*interface_names)
           interface_refs = interface_names.map do |interface_name|
             schema_def_state.type_ref(interface_name).to_final_form.tap do |interface_ref|
-              schema_def_state.implementations_by_interface_ref[interface_ref] << self
+              implementations = schema_def_state.implementations_by_interface_ref[interface_ref] # : ::Set[SchemaElements::TypeWithSubfields]
+              implementations << self
             end
           end
 

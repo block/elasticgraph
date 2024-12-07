@@ -197,7 +197,7 @@ module ElasticGraph
       end
 
       def content_type
-        @content_type ||= normalized_headers["CONTENT-TYPE"]
+        normalized_headers["CONTENT-TYPE"]
       end
 
       def self.normalize_header_name(header)

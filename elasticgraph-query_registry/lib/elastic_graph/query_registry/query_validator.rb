@@ -60,8 +60,8 @@ module ElasticGraph
           return [{"message" => "No dumped variables for this operation exist. Correct by running: `#{rake_task}`"}]
         end
 
-        old_op_vars = old_dumped_variables[operation_name]
-        new_op_vars = new_dumped_variables[operation_name]
+        old_op_vars = old_dumped_variables.fetch(operation_name)
+        new_op_vars = new_dumped_variables.fetch(operation_name)
 
         if old_op_vars == new_op_vars
           # The previously dumped variables are up-to-date. No errors in this case.

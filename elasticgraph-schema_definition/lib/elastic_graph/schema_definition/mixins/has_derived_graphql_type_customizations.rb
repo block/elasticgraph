@@ -50,7 +50,8 @@ module ElasticGraph
             derived_type_customizations_for_all_types << customization_block
           else
             type_names.each do |t|
-              derived_type_customizations_by_name[t.to_s] << customization_block
+              derived_type_customizations = derived_type_customizations_by_name[t.to_s] # : ::Array[^(::ElasticGraph::SchemaDefinition::_Type) -> void]
+              derived_type_customizations << customization_block
             end
           end
         end
@@ -75,21 +76,23 @@ module ElasticGraph
         #     end
         #   end
         def customize_derived_type_fields(type_name, *field_names, &customization_block)
-          customizations_by_field = derived_field_customizations_by_type_and_field_name[type_name]
+          customizations_by_field = derived_field_customizations_by_type_and_field_name[type_name] # : ::Hash[::String, ::Array[^(::ElasticGraph::SchemaDefinition::SchemaElements::Field) -> void]]
 
           field_names.each do |field_name|
-            customizations_by_field[field_name] << customization_block
+            customizations = customizations_by_field[field_name] # : ::Array[^(::ElasticGraph::SchemaDefinition::SchemaElements::Field) -> void]
+            customizations << customization_block
           end
         end
 
         # @private
         def derived_type_customizations_for_type(type)
-          derived_type_customizations_by_name[type.name] + derived_type_customizations_for_all_types
+          derived_type_customizations = derived_type_customizations_by_name[type.name] # : ::Array[^(::ElasticGraph::SchemaDefinition::_Type) -> void]
+          derived_type_customizations + derived_type_customizations_for_all_types
         end
 
         # @private
         def derived_field_customizations_by_name_for_type(type)
-          derived_field_customizations_by_type_and_field_name[type.name]
+          derived_field_customizations_by_type_and_field_name[type.name] # : ::Hash[::String, ::Array[^(SchemaElements::Field) -> void]]
         end
 
         # @private

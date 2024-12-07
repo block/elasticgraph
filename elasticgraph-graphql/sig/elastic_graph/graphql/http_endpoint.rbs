@@ -84,8 +84,7 @@ module ElasticGraph
       @normalized_headers: ::Hash[::String, ::String]?
       def normalized_headers: () -> ::Hash[::String, ::String]
 
-      @content_type: ::String?
-      def content_type: () -> ::String
+      def content_type: () -> ::String?
 
       def self.normalize_header_name: (::String) -> ::String
     end

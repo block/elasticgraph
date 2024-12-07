@@ -47,7 +47,7 @@ module ElasticGraph
             "Available versions: #{available_json_schema_versions.sort.join(", ")}."
         end
 
-        json_schemas_by_version[version]
+        json_schemas_by_version[version] # : ::Hash[::String, untyped]
       end
 
       def available_json_schema_versions

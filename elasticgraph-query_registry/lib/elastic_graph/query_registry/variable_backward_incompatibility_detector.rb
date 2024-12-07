@@ -32,12 +32,12 @@ module ElasticGraph
         end
 
         incompatible_commonalities = commonalities.flat_map do |name|
-          incompatibilities_for("#{path}#{name}", normalize_type_info(old[name]), normalize_type_info(new[name]))
+          incompatibilities_for("#{path}#{name}", normalize_type_info(old.fetch(name)), normalize_type_info(new.fetch(name)))
         end
 
         incompatible_additions = additions.filter_map do |name|
           # Additions are only incompatible if it's required (non-nullable).
-          _ = if normalize_type_info(new[name]).fetch("type").end_with?("!")
+          _ = if normalize_type_info(new.fetch(name)).fetch("type").end_with?("!")
             Incompatibility.new("#{path}#{name}", "new required #{entry_type}")
           end
         end

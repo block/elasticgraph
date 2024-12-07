@@ -154,7 +154,7 @@ module ElasticGraph
           # If there are no aggregations, there's nothing to unmerge--just return it as is.
           return response_from_merged_query unless (aggs = response_from_merged_query["aggregations"])
 
-          prefix = @unique_prefix_by_query[original_query]
+          prefix = @unique_prefix_by_query[original_query] # : ::String
           agg_names = original_query.aggregations.keys.map { |name| "#{prefix}#{name}" }.to_set
 
           filtered_aggs = aggs

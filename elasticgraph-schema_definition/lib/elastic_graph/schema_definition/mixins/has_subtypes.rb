@@ -75,8 +75,9 @@ module ElasticGraph
             fields_by_name.merge(yield subtype) do |field_name, def1, def2|
               if (def1.name_in_index == def2.name_in_index && def1.resolve_mapping != def2.resolve_mapping) || (def1.type.unwrap_non_null != def2.type.unwrap_non_null)
                 def_strings = resolved_subtypes.each_with_object([]) do |st, defs|
-                  field = st.graphql_fields_by_name[field_name]
-                  defs << "on #{st.name}:\n#{field.to_sdl.strip} mapping: #{field.resolve_mapping.inspect}" if st.graphql_fields_by_name.key?(field_name)
+                  if (field = st.graphql_fields_by_name[field_name])
+                    defs << "on #{st.name}:\n#{field.to_sdl.strip} mapping: #{field.resolve_mapping.inspect}"
+                  end
                 end
 
                 raise Errors::SchemaError,
