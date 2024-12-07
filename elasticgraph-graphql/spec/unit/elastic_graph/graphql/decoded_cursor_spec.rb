@@ -25,7 +25,7 @@ module ElasticGraph
         it "encodes the provided sort fields and values to a URL-safe string" do
           cursor = DecodedCursor.new(sort_values).encode
 
-          expect(cursor).to match(/\A[a-zA-z0-9_-]{32,128}\z/)
+          expect(cursor).to match(/\A[a-zA-Z0-9_-]{32,128}\z/)
         end
 
         it "returns the special singleton cursor string when called on the singleton cursor" do
