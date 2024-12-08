@@ -26,11 +26,6 @@ jobs:
         ruby-version: "3.3"
         bundler-cache: true # runs 'bundle install' and caches installed gems automatically
 
-    - name: Set up Node
-      uses: actions/setup-node@v3
-      with:
-        node-version: "23.x"
-
     - name: Build YARD docs and Jekyll site
       run: bundle exec rake site:build
 

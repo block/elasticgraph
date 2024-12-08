@@ -31,7 +31,7 @@ module ElasticGraphGemspecHelper
         "documentation_uri" => "https://block.github.io/elasticgraph/docs/main/", # TODO(#2): update this URL to link to the exact doc version
         "homepage_uri" => "https://block.github.io/elasticgraph/",
         "source_code_uri" => "https://github.com/block/elasticgraph/tree/v#{ElasticGraph::VERSION}/#{spec.name}",
-        "gem_category" => category.to_s # used by script/update_readme
+        "gem_category" => category.to_s # used by script/update_codebase_overview
       }
 
       # Specify which files should be added to the gem when it is released.

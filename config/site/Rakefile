@@ -40,7 +40,7 @@ module ElasticGraph
 
     def initialize
       namespace :site do
-        task build_docs: :render_mermaid do
+        task :build_docs do
           # Clean the docs output directory
           FileUtils.rm_rf(YARD_OUTPUT_DIR)
           run_yard_doc_ignoring_expected_warnings
@@ -117,12 +117,6 @@ module ElasticGraph
         task :npm_install do
           ::Dir.chdir(SITE_CONFIG_DIR) do
             sh "npm install"
-          end
-        end
-
-        task render_mermaid: :npm_install do
-          ::Dir.chdir(SITE_CONFIG_DIR) do
-            sh "npx -p @mermaid-js/mermaid-cli mmdc -i ../../README.md -o ../../tmp/README.md"
           end
         end
 
@@ -280,17 +274,12 @@ module ElasticGraph
     YARD_DOC_OPTS = [
       "--output-dir #{YARD_OUTPUT_DIR}",
       "--db #{SITE_CONFIG_DIR}/.yardoc",
-      "--main tmp/README.md",
       *yardopts_from_file,
       *DOCUMENTED_GEMS
     ].join(" ")
 
     def yard_cmd(subcmd)
-      assets = Dir.glob("tmp/README-*.svg").map do |svg_file|
-        "--asset #{svg_file}:#{::File.basename(svg_file)}"
-      end
-
-      "bundle exec yard #{subcmd} #{YARD_DOC_OPTS} #{assets.join(" ")}"
+      "bundle exec yard #{subcmd} #{YARD_DOC_OPTS}"
     end
   end
 end

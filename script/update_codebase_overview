@@ -1,0 +1,158 @@
+#!/usr/bin/env ruby
+
+require "erb"
+require_relative "list_eg_gems"
+
+module ElasticGraph
+  class CodebaseOverviewRenderer
+    PROJECT_ROOT = File.expand_path("..", __dir__)
+
+    def initialize(template)
+      @erb = ::ERB.new(template, trim_mode: "-")
+    end
+
+    def render
+      @erb.result(binding)
+    end
+
+    def gem_specs
+      @gem_specs ||= ::ElasticGraphGems.list.map do |gem_name|
+        ::Gem::Specification.load("#{PROJECT_ROOT}/#{gem_name}/#{gem_name}.gemspec")
+      end
+    end
+
+    def gem_categories
+      @gem_categories ||= gem_specs.group_by do |spec|
+        spec.metadata.fetch("gem_category") do
+          raise "No category set for #{spec.name}."
+        end
+      end.map do |category, specs|
+        category_info = CategoryInfo::BY_NAME.fetch(category) do
+          raise "Unrecognized category: `#{category}` found on gems: #{specs.map(&:name)}."
+        end
+        GemCategory.new(category, category_info, specs, gem_specs)
+      end
+    end
+  end
+
+  class GemCategory < ::Data.define(:category_name, :info, :gem_specs, :all_eg_gem_specs)
+    def mermaid_definition
+      <<~MERMAID
+        ```mermaid
+        graph LR;
+        #{mermaid_deps.join("\n")}
+        #{mermaid_styles.join("\n")}
+        #{mermaid_clicks.join("\n")}
+        ```
+      MERMAID
+    end
+
+    private
+
+    def mermaid_deps
+      gem_specs.filter_map do |spec|
+        unless spec.runtime_dependencies.empty?
+          deps = spec.runtime_dependencies.map(&:name).join(" & ")
+          "    #{spec.name} --> #{deps}"
+        end
+      end
+    end
+
+    def mermaid_styles
+      all_nodes = gem_specs.map(&:name) | gem_specs.flat_map { |spec| spec.runtime_dependencies.map(&:name) }
+      all_nodes.map do |node|
+        "    style #{node} #{style_for(node)};"
+      end
+    end
+
+    def style_for(gem_name)
+      # These colors were chosen to look good on GitHub in both light mode and dark mode.
+      if gem_specs.any? { |spec| spec.name == gem_name }
+        "color: DodgerBlue" # Basic "Blue" doesn't look good in dark mode.
+      elsif all_eg_gem_specs.any? { |spec| spec.name == gem_name }
+        "color: Green"
+      else
+        "color: Red"
+      end
+    end
+
+    def mermaid_clicks
+      gem_specs.flat_map { |spec| spec.runtime_dependencies.map(&:name) }.uniq.sort.filter_map do |gem_name|
+        unless all_eg_gem_specs.any? { |spec| spec.name == gem_name }
+          "click #{gem_name} href \"https://rubygems.org/gems/#{gem_name}\""
+        end
+      end
+    end
+  end
+
+  class CategoryInfo < ::Data.define(:description, :discussion)
+    BY_NAME = {
+      "core" => new("Core Libraries", <<~EOS),
+        These libraries form the core backbone of ElasticGraph that is designed to run in a production deployment. Every ElasticGraph deployment will need to use all of these.
+      EOS
+
+      "datastore_adapter" => new("Datastore Adapters", <<~EOS),
+        These libraries adapt ElasticGraph to your choice of datastore (Elasticsearch or OpenSearch).
+      EOS
+
+      "extension" => new("Extensions", <<~EOS),
+        These libraries extend ElasticGraph to provide optional but commonly needed functionality.
+      EOS
+
+      "lambda" => new("AWS Lambda Integration Libraries", <<~EOS),
+        These libraries wrap the the core ElasticGraph libraries so that they can be deployed using AWS Lambda.
+      EOS
+
+      "local" => new("Local Development Libraries", <<~EOS)
+        These libraries are used for local development of ElasticGraph applications, but are not intended to be deployed to production (except for `elasticgraph-rack`).
+        `elasticgraph-rack` is used to boot ElasticGraph locally but can also be used to run ElasticGraph in any rack-compatible server (including a Rails application).
+      EOS
+    }
+  end
+end
+
+renderer = ElasticGraph::CodebaseOverviewRenderer.new(DATA.read)
+contents = renderer.render
+readme_path = ::File.join(__dir__, "..", "CODEBASE_OVERVIEW.md")
+
+case ARGV.first
+when "--verify"
+  if ::File.read(readme_path) == contents
+    puts "✅ CODEBASE_OVERVIEW is up-to-date."
+  else
+    tmp_path = ::File.join(__dir__, "..", "tmp", "CODEBASE_OVERVIEW.md")
+    ::File.write(tmp_path, contents)
+
+    diff = `git diff --no-index #{readme_path} #{tmp_path} #{" --color" unless ENV["CI"]}`
+
+    puts "❌ CODEBASE_OVERVIEW is out-of-date. Run `#{__FILE__}` to update it. Diff:"
+    puts
+    puts diff
+    exit(1)
+  end
+when nil
+  ::File.write(readme_path, contents)
+  puts "CODEBASE_OVERVIEW.md updated."
+else
+  raise "Unknown argument: #{ARGV.first}. Expected `--verify` or nothing."
+end
+
+__END__
+# ElasticGraph Codebase Overview
+
+ElasticGraph is designed to be modular, with a small core, and many built-in extensions that extend that core
+for specific use cases. This minimizes exposure to vulnerabilities, reduces bloat, and makes ongoing upgrades
+easier. The libraries that ship with ElasticGraph can be broken down into several categories.
+
+<% gem_categories.each do |category| -%>
+### <%= category.info.description %> (<%= category.gem_specs.size %> gems)
+
+<%= category.info.discussion %>
+<% category.gem_specs.each do |spec| -%>
+* [<%= spec.name %>](<%= spec.name %>/README.md): <%= spec.summary %>
+<% end -%>
+
+#### Dependency Diagram
+
+<%= category.mermaid_definition %>
+<% end -%>

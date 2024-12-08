@@ -5,7 +5,7 @@ source "script/ci_parts/setup_env" "local" $1 $2
 
 script/spellcheck
 script/type_check
-script/update_readme --verify
+script/update_codebase_overview --verify
 script/update_ci_yaml --verify
 
 bundle _$bundler_version\_ exec standardrb

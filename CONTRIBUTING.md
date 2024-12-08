@@ -48,6 +48,10 @@ This project uses Docker Engine and Docker Compose to run Elasticsearch and Open
 Additional gems can be included in the bundle by defining `Gemfile-custom`.
 See [Gemfile-custom.example](Gemfile-custom.example) for an example.
 
+## Codebase Overview
+
+To understand how the different parts of the codebase fit together, see the [codebase overview](CODEBASE_OVERVIEW.md).
+
 ## Build Scripts and Executables
 
 The codebase includes a variety of build scripts and executables which are useful for local development:
