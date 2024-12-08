@@ -87,24 +87,32 @@ module ElasticGraph
         # the key could identify either a field we are filtering on or a filtering operator to apply
         # to a particular field.
         def filter_value_set_for_filter_hash_entry(field_or_op, filter_value, target_field_path_parts, traversed_field_path_parts, negate:)
-          if filter_value.nil?
-            # Any filter with a `nil` value is effectively treated as `true` by our filtering logic, so we need
+          node_type = @filter_node_interpreter.identify_node_type(field_or_op, filter_value)
+          case node_type
+          when :empty
+            # Any empty filter is effectively treated as `true` by our filtering logic, so we need
             # to return our `@all_values_set` to indicate this filter matches all documents.
             @all_values_set
-          elsif field_or_op == @schema_names.not
-            filter_value_set_for_filter_hash(filter_value, target_field_path_parts, traversed_field_path_parts, negate: !negate)
-          elsif filter_value.is_a?(::Hash)
-            # the only time `value` is a hash is when `field_or_op` is a field name.
-            # In that case, `value` is a hash of filters that apply to that field.
+          when :not
+            filter_value_set_for_filter_hash(filter_value || {}, target_field_path_parts, traversed_field_path_parts, negate: !negate)
+          when :sub_field
             filter_value_set_for_filter_hash(filter_value, target_field_path_parts, traversed_field_path_parts + [field_or_op], negate: negate)
-          elsif field_or_op == @schema_names.any_of
+          when :any_of
             filter_value_set_for_any_of(filter_value, target_field_path_parts, traversed_field_path_parts, negate: negate)
-          elsif target_field_path_parts == traversed_field_path_parts
+          when :operator
+            # Check to make sure the operator applies to the target field. If not, we have no information
+            # in this clause. The set is unbounded, and may have exclusions.
+            return UnboundedSetWithExclusions unless target_field_path_parts == traversed_field_path_parts
+
             set = filter_value_set_for_field_filter(field_or_op, filter_value)
             negate ? set.negate : set
-          else
-            # Otherwise, we have no information in this clause. The set is unbounded, and may have exclusions.
+          when :all_of, :list_any_filter, :list_count, :unknown
+            # We have no information in this clause. The set is unbounded, and may have exclusions.
             UnboundedSetWithExclusions
+          else
+            # :nocov: -- not possible to cover without mocking `@filter_node_interpreter` to return a node type outside the allowed values.
+            raise "`FilterValueSetExtractor` must be updated to handle `:#{node_type}` nodes."
+            # :nocov:
           end
         end
 
