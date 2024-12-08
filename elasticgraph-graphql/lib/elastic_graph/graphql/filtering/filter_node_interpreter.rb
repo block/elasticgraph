@@ -25,7 +25,22 @@ module ElasticGraph
         end
 
         def identify_node_type(field_or_op, sub_expression)
-          identify_by_field_or_op(field_or_op) || identify_by_sub_expr(sub_expression) || :unknown
+          # `:not` must go before `:empty`, because `not: empty_filter` must be inverted from just  `empty_filter`.
+          return :not if field_or_op == schema_names.not
+
+          # The `:empty` check can go before all other checks; besides `not`, none of the other operators require special
+          # handling when the filter is empty, and we want to detect this as early as possible.
+          # Note: `any_of: [empty_filter]` does have special handling, but `any_of: empty_filter` does not.
+          return :empty if sub_expression.nil? || sub_expression == {}
+
+          return :list_any_filter if field_or_op == schema_names.any_satisfy
+          return :all_of if field_or_op == schema_names.all_of
+          return :any_of if field_or_op == schema_names.any_of
+          return :operator if filter_operators.key?(field_or_op)
+          return :list_count if field_or_op == LIST_COUNTS_FIELD
+          return :sub_field if sub_expression.is_a?(::Hash)
+
+          :unknown
         end
 
         def filter_operators
@@ -33,24 +48,6 @@ module ElasticGraph
         end
 
         private
-
-        def identify_by_field_or_op(field_or_op)
-          return :not if field_or_op == schema_names.not
-          return :list_any_filter if field_or_op == schema_names.any_satisfy
-          return :all_of if field_or_op == schema_names.all_of
-          return :any_of if field_or_op == schema_names.any_of
-          return :operator if filter_operators.key?(field_or_op)
-          return :list_count if field_or_op == LIST_COUNTS_FIELD
-
-          nil
-        end
-
-        def identify_by_sub_expr(sub_expression)
-          return :empty if sub_expression.nil? || sub_expression == {}
-          return :sub_field if sub_expression.is_a?(::Hash)
-
-          nil
-        end
 
         def build_filter_operators(runtime_metadata)
           filter_by_time_of_day_script_id = runtime_metadata

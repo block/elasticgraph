@@ -137,8 +137,6 @@ module ElasticGraph
         # this because we do not generate `any_satisfy` filters on `object` list fields (instead,
         # they get generated on their leaf fields).
         def process_list_any_filter_expression(bool_node, filter, field_path)
-          return if filter.nil? || filter == {}
-
           if filters_on_sub_fields?(filter)
             process_any_satisfy_filter_expression_on_nested_object_list(bool_node, filter, field_path)
           else
@@ -195,8 +193,6 @@ module ElasticGraph
         # * `filter: {anyOf: [{field: null}]}` -> return all results
         # * `filter: {anyOf: [{field: null}, {field: ...}]}` -> return all results
         def process_any_of_expression(bool_node, expressions, field_path)
-          return if expressions.nil? || expressions == {}
-
           if expressions.empty?
             # When our `expressions` array is empty, we want to match no documents. However, that's
             # not the behavior the datastore will give us if we have an empty array in the query under
@@ -218,8 +214,6 @@ module ElasticGraph
         end
 
         def process_all_of_expression(bool_node, expressions, field_path)
-          return if expressions.nil? || expressions == {}
-
           # `all_of` represents an AND. AND is the default way that `process_filter_hash` combines
           # filters so we just have to call it for each sub-expression.
           expressions.each do |sub_expression|
@@ -228,8 +222,6 @@ module ElasticGraph
         end
 
         def process_operator_expression(bool_node, operator, expression, field_path)
-          return if expression.nil? || expression == {}
-
           # `operator` is a filtering operator, and `expression` is the value the filtering
           # operator should be applied to. The `op_applicator` lambda, when called, will
           # return a Clause instance (defined in this module).
@@ -317,8 +309,6 @@ module ElasticGraph
         end
 
         def process_list_count_expression(bool_node, expression, field_path)
-          return if expression.nil? || expression == {}
-
           # Normally, we don't have to do anything special for list count expressions.
           # That's the case, for example, for an expression like:
           #
