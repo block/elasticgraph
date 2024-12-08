@@ -12,7 +12,8 @@ module ElasticGraph
       # Responsible for extracting a set of values from query filters, based on a using a custom
       # set type that is able to efficiently model the "all values" case.
       class FilterValueSetExtractor
-        def initialize(schema_names, all_values_set, empty_set, &build_set_for_filter)
+        def initialize(filter_node_interpreter, schema_names, all_values_set, empty_set, &build_set_for_filter)
+          @filter_node_interpreter = filter_node_interpreter
           @schema_names = schema_names
           @all_values_set = all_values_set
           @empty_set = empty_set

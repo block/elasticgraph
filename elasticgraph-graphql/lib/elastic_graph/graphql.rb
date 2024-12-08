@@ -129,9 +129,10 @@ module ElasticGraph
       @datastore_query_builder ||= begin
         require "elastic_graph/graphql/datastore_query"
         DatastoreQuery::Builder.with(
-          filter_interpreter: filter_interpreter,
-          runtime_metadata: runtime_metadata,
-          logger: logger,
+          filter_interpreter:,
+          filter_node_interpreter:,
+          runtime_metadata:,
+          logger:,
           default_page_size: @config.default_page_size,
           max_page_size: @config.max_page_size
         )

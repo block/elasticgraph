@@ -102,7 +102,12 @@ module ElasticGraph
 
         def filter_value_set_extractor
           @filter_value_set_extractor ||=
-            Filtering::FilterValueSetExtractor.new(schema_element_names, IncludesNilSet, ExcludesNilSet) do |operator, filter_value|
+            Filtering::FilterValueSetExtractor.new(
+              filter_node_interpreter,
+              schema_element_names,
+              IncludesNilSet,
+              ExcludesNilSet
+            ) do |operator, filter_value|
               if operator == :equal_to_any_of && filter_value.include?(nil)
                 IncludesNilSet
               else

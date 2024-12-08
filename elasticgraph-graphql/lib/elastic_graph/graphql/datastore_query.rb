@@ -344,17 +344,23 @@ module ElasticGraph
 
       # Encapsulates dependencies of `Query`, giving us something we can expose off of `application`
       # to build queries when desired.
-      class Builder < Support::MemoizableData.define(:runtime_metadata, :logger, :query_defaults)
-        def self.with(runtime_metadata:, logger:, **query_defaults)
-          new(runtime_metadata: runtime_metadata, logger: logger, query_defaults: query_defaults)
+      class Builder < Support::MemoizableData.define(:runtime_metadata, :logger, :filter_node_interpreter, :query_defaults)
+        def self.with(runtime_metadata:, logger:, filter_node_interpreter:, **query_defaults)
+          new(runtime_metadata:, logger:, filter_node_interpreter:, query_defaults:)
         end
 
         def routing_picker
-          @routing_picker ||= RoutingPicker.new(schema_names: runtime_metadata.schema_element_names)
+          @routing_picker ||= RoutingPicker.new(
+            filter_node_interpreter: filter_node_interpreter,
+            schema_names: runtime_metadata.schema_element_names
+          )
         end
 
         def index_expression_builder
-          @index_expression_builder ||= IndexExpressionBuilder.new(schema_names: runtime_metadata.schema_element_names)
+          @index_expression_builder ||= IndexExpressionBuilder.new(
+            filter_node_interpreter: filter_node_interpreter,
+            schema_names: runtime_metadata.schema_element_names
+          )
         end
 
         def new_query(**options)

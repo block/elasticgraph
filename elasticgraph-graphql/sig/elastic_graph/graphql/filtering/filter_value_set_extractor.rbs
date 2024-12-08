@@ -4,11 +4,18 @@ module ElasticGraph
       class FilterValueSetExtractor[S < Support::_NegatableSet[S]]
         type setType[out S] = S | singleton(UnboundedSetWithExclusions)
 
-        def initialize: (SchemaArtifacts::RuntimeMetadata::SchemaElementNames, setType[S], setType[S]) { (::Symbol, untyped) -> S? } -> void
+        def initialize: (
+          FilterNodeInterpreter,
+          SchemaArtifacts::RuntimeMetadata::SchemaElementNames,
+          setType[S],
+          setType[S]
+        ) { (::Symbol, untyped) -> S? } -> void
+
         def extract_filter_value_set: (::Array[::Hash[::String, untyped]], ::Array[::String]) -> S?
 
         private
 
+        @filter_node_interpreter: FilterNodeInterpreter
         @schema_names: SchemaArtifacts::RuntimeMetadata::SchemaElementNames
         @all_values_set: setType[S]
         @empty_set: setType[S]

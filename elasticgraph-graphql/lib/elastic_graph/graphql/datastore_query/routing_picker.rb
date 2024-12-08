@@ -13,11 +13,16 @@ module ElasticGraph
     class DatastoreQuery
       # Responsible for picking routing values for a specific query based on the filters.
       class RoutingPicker
-        def initialize(schema_names:)
+        def initialize(filter_node_interpreter:, schema_names:)
           all_values_set = RoutingValueSet::ALL
           empty_set = RoutingValueSet::EMPTY
 
-          @filter_value_set_extractor = Filtering::FilterValueSetExtractor.new(schema_names, all_values_set, empty_set) do |operator, filter_value|
+          @filter_value_set_extractor = Filtering::FilterValueSetExtractor.new(
+            filter_node_interpreter,
+            schema_names,
+            all_values_set,
+            empty_set
+          ) do |operator, filter_value|
             if operator == :equal_to_any_of
               # This calls `.compact` to remove `nil` filter_value values
               RoutingValueSet.of(filter_value.compact)

@@ -2,7 +2,11 @@ module ElasticGraph
   class GraphQL
     class DatastoreQuery
       class RoutingPicker
-        def initialize: (schema_names: SchemaArtifacts::RuntimeMetadata::SchemaElementNames) -> void
+        def initialize: (
+          filter_node_interpreter: Filtering::FilterNodeInterpreter,
+          schema_names: SchemaArtifacts::RuntimeMetadata::SchemaElementNames
+        ) -> void
+
         def extract_eligible_routing_values: (
           ::Array[::Hash[::String, untyped]],
           ::Array[::String]
