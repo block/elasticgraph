@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.0
+    environment:
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - "9334:9200"
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    tmpfs:
+      - /var/cache/apt/archives
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9200"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  elasticgraph:
+    image: ruby:3.2-slim
+    working_dir: /app
+    volumes:
+      - .:/app
+      - bundle-cache:/usr/local/bundle
+      - apt-cache:/var/cache/apt/archives
+    tmpfs:
+      - /tmp
+    environment:
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    command: >
+      bash -c "
+        apt-get update -qq &&
+        apt-get install -y --no-install-recommends build-essential git nodejs &&
+        apt-get clean &&
+        rm -rf /var/lib/apt/lists/* &&
+        bundle install &&
+        bundle exec rake boot_locally
+      "
+
+volumes:
+  elasticsearch-data:
+  bundle-cache:
+  apt-cache:
