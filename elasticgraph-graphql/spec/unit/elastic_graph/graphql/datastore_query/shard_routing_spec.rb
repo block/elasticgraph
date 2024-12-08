@@ -338,6 +338,18 @@ module ElasticGraph
           })).to search_all_shards
         end
 
+        it "correctly identifies shards when combined with an `equal_to_any_of` on the same field" do
+          expect(shard_routing_for(["name"], {"name" => {
+            "equal_to_any_of" => ["def", "ghi", "jkl"],
+            "not" => {
+              "any_of" => [
+                {"equal_to_any_of" => ["abc", "def"]},
+                {"equal_to_any_of" => ["def", "ghi"]}
+              ]
+            }
+          }})).to search_shards_identified_by "jkl"
+        end
+
         it "searches all shards when the query filters with `equal_to_any_of: []`" do
           expect(shard_routing_for(["name"], {
             "name" => {
@@ -362,7 +374,7 @@ module ElasticGraph
           })).to search_all_shards
         end
 
-        it "searches all shards when set to nil`" do
+        it "searches all shards when set to nil" do
           expect(shard_routing_for(["name"], {
             "name" => {"not" => nil}
           })).to search_all_shards

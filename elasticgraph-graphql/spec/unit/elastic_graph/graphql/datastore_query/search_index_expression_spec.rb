@@ -181,6 +181,30 @@ module ElasticGraph
             end
           end
 
+          context "when `time_of_day` filtering is used" do
+            it "targets all indices since it filters only on the time but rollover uses full DateTime values" do
+              parts = search_index_expression_parts_for({"created_at" => {
+                "time_of_day" => {"gt" => "12:30:00Z"}
+              }})
+
+              expect(parts).to target_all_widget_indices
+            end
+
+            it "targets all indices when it is negated since matching documents could live in any index" do
+              parts = search_index_expression_parts_for({"created_at" => {
+                "not" => {"time_of_day" => {"gt" => "12:30:00Z"}}
+              }})
+
+              expect(parts).to target_all_widget_indices
+
+              parts = search_index_expression_parts_for({"not" => {
+                "created_at" => {"time_of_day" => {"gt" => "12:30:00Z"}}
+              }})
+
+              expect(parts).to target_all_widget_indices
+            end
+          end
+
           context "when `not` is used" do
             it "excludes indices targeted by a filter without both an upper and lower bound" do
               parts = search_index_expression_parts_for({"created_at" => {"not" => {
