@@ -2,29 +2,61 @@ module ElasticGraph
   class GraphQL
     module Filtering
       class FilterValueSetExtractor[S < Support::_NegatableSet[S]]
-        def initialize: (SchemaArtifacts::RuntimeMetadata::SchemaElementNames, S, S) { (::Symbol, untyped) -> S? } -> void
-        def extract_filter_value_set: (::Array[::Hash[::String, untyped]], ::Array[::String]) -> S
+        type setType[out S] = S | singleton(UnboundedSetWithExclusions)
+
+        def initialize: (SchemaArtifacts::RuntimeMetadata::SchemaElementNames, setType[S], setType[S]) { (::Symbol, untyped) -> S? } -> void
+        def extract_filter_value_set: (::Array[::Hash[::String, untyped]], ::Array[::String]) -> S?
 
         private
 
         @schema_names: SchemaArtifacts::RuntimeMetadata::SchemaElementNames
-        @all_values_set: S
-        @empty_set: S
+        @all_values_set: setType[S]
+        @empty_set: setType[S]
         @build_set_for_filter: ^(::Symbol, untyped) -> S?
 
-        def filter_value_set_for_target_field_path: (::String, ::Array[::Hash[::String, untyped]]) -> S
-        def filter_value_set_for_filter_hash: (::Hash[::String, untyped], ::Array[::String], ?::Array[::String], negate: bool) -> S
-        def filter_value_set_for_filter_hash_entry: (::String, untyped, ::Array[::String], ::Array[::String], negate: bool) -> S
-        def filter_value_set_for_any_of: (::Array[::Hash[::String, untyped]], ::Array[::String], ::Array[::String], negate: bool) -> S
-        def filter_value_set_for_field_filter: (::String, untyped) -> S
+        def filter_value_set_for_target_field_path: (
+          ::String,
+          ::Array[::Hash[::String, untyped]]
+        ) -> setType[S]
+
+        def filter_value_set_for_filter_hash: (
+          ::Hash[::String, untyped],
+          ::Array[::String],
+          ?::Array[::String],
+          negate: bool
+        ) -> setType[S]
+
+        def filter_value_set_for_filter_hash_entry: (
+          ::String,
+          untyped,
+          ::Array[::String],
+          ::Array[::String],
+          negate: bool
+        ) -> setType[S]
+
+        def filter_value_set_for_any_of: (
+          ::Array[::Hash[::String, untyped]],
+          ::Array[::String],
+          ::Array[::String],
+          negate: bool
+        ) -> setType[S]
+
+        def filter_value_set_for_field_filter: (
+          ::String,
+          untyped
+        ) -> setType[S]
 
         type setReductionOperator = :union | :intersection
 
         def map_reduce_sets:
-          [E] (::Array[E], setReductionOperator, negate: bool) { (E) -> S } -> S |
-          [K, V] (::Hash[K, V], setReductionOperator, negate: bool) { ([K, V]) -> S } -> S
+          [E] (::Array[E], setReductionOperator, negate: bool) { (E) -> setType[S] } -> setType[S] |
+          [K, V] (::Hash[K, V], setReductionOperator, negate: bool) { ([K, V]) -> setType[S] } -> setType[S]
 
         REDUCTION_INVERSIONS: ::Hash[setReductionOperator, setReductionOperator]
+
+        module UnboundedSetWithExclusions
+          extend Support::_NegatableSet[untyped]
+        end
       end
     end
   end

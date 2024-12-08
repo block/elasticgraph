@@ -10,16 +10,10 @@ module ElasticGraph
 
         private
 
-        @filter_value_set_extractor: Filtering::FilterValueSetExtractor[_RoutingValueSet]
+        @filter_value_set_extractor: Filtering::FilterValueSetExtractor[RoutingValueSet]
       end
 
       type routingValue = untyped
-
-      interface _RoutingValueSet
-        include Support::_NegatableSet[_RoutingValueSet]
-        def to_return_value: () -> ::Array[routingValue]?
-        def ==: (untyped) -> bool
-      end
 
       type routingValueSetType = :inclusive | :exclusive
 
@@ -40,13 +34,15 @@ module ElasticGraph
       end
 
       class RoutingValueSet < RoutingValueSetSupertype
-        include _RoutingValueSet
+        include Support::_NegatableSet[RoutingValueSet]
         def self.of: (::Enumerable[routingValue]) -> RoutingValueSet
         def self.of_all_except: (::Enumerable[routingValue]) -> RoutingValueSet
 
         ALL: RoutingValueSet
         EMPTY: RoutingValueSet
         INVERTED_TYPES: ::Hash[routingValueSetType, routingValueSetType]
+
+        def to_return_value: () -> ::Array[routingValue]?
 
         def inclusive?: () -> bool
         def exclusive?: () -> bool
@@ -56,10 +52,6 @@ module ElasticGraph
         def get_included_and_excluded_values: (
           RoutingValueSet
         ) -> [::Set[routingValue], ::Set[routingValue]]
-
-        module UnboundedWithExclusions
-          extend _RoutingValueSet
-        end
       end
     end
   end

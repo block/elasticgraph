@@ -315,6 +315,23 @@ module ElasticGraph
           }})).to search_shards_identified_by "def"
         end
 
+        it "correctly handles filters with `not` at multiple levels" do
+          expect(shard_routing_for(["name"], {"name" => {
+            "not" => {
+              "not" => {"equal_to_any_of" => ["abc"]},
+              "equal_to_any_of" => ["abc", "def"]
+            }
+          }})).to search_all_shards
+
+          # nil value shouldn't matter
+          expect(shard_routing_for(["name"], {"name" => {
+            "not" => {
+              "not" => {"equal_to_any_of" => ["abc", nil]},
+              "equal_to_any_of" => ["abc", "def"]
+            }
+          }})).to search_all_shards
+        end
+
         it "searches all shards when `any_of` is an empty set" do
           expect(shard_routing_for(["name"], {
             "not" => {"any_of" => []}

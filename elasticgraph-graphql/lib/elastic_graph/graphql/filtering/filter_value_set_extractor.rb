@@ -41,9 +41,12 @@ module ElasticGraph
           # routing values causes no adverse behavior (although it may introduce an inefficiency)
           # but if we fail to route to a shard that contains a matching document, the search results
           # will be incorrect.
-          map_reduce_sets(target_field_paths, :union, negate: false) do |target_field_path|
+          value_set = map_reduce_sets(target_field_paths, :union, negate: false) do |target_field_path|
             filter_value_set_for_target_field_path(target_field_path, filter_hashes)
           end
+
+          return nil if (_ = value_set) == UnboundedSetWithExclusions
+          _ = value_set
         end
 
         private
@@ -99,8 +102,8 @@ module ElasticGraph
             set = filter_value_set_for_field_filter(field_or_op, filter_value)
             negate ? set.negate : set
           else
-            # Otherwise, we have no information in this clause to limit our filter value set.
-            @all_values_set
+            # Otherwise, we have no information in this clause. The set is unbounded, and may have exclusions.
+            UnboundedSetWithExclusions
           end
         end
 
@@ -125,7 +128,7 @@ module ElasticGraph
         # Determines the set of filter values for a single filter on a single field.
         def filter_value_set_for_field_filter(filter_op, filter_value)
           operator_name = @schema_names.canonical_name_for(filter_op)
-          @build_set_for_filter.call(operator_name, filter_value) || @all_values_set
+          @build_set_for_filter.call(operator_name, filter_value) || UnboundedSetWithExclusions
         end
 
         # Maps over the provided `collection` by applying the given `map_transform`
@@ -144,10 +147,49 @@ module ElasticGraph
           # of each set is the difference between @all_values_set and the given set)--and vice versa.
           reduction = REDUCTION_INVERSIONS.fetch(reduction) if negate
 
-          collection.map(&map_transform).reduce(reduction)
+          collection.map(&map_transform).reduce do |s1, s2|
+            receiver, argument = ((_ = s2) == UnboundedSetWithExclusions) ? [s2, s1] : [s1, s2]
+            (reduction == :union) ? receiver.union(argument) : receiver.intersection(argument)
+          end
         end
 
         REDUCTION_INVERSIONS = {union: :intersection, intersection: :union}
+
+        # This minimal set implementation is used for otherwise unrepresentable cases. We use it when
+        # a filter on a `target_field_path` uses an inequality like:
+        #
+        #     {field: {gt: "abc"}}
+        #
+        # In a case like that, the set is unbounded (there's an infinite number of values that are greater
+        # than `"abc"`...), but it's not `@all_values_set`--since it's based on an inequality, there are
+        # _some_ values that are excluded from the set. We also can't represent this case with an
+        # `all_values_except(...)` set implementation because the set of exclusions is also unbounded!
+        #
+        # When our filter value extraction results in this set, we cannot limit what shards or indices we must hit based
+        # on the filters.
+        module UnboundedSetWithExclusions
+          def self.intersection(other)
+            # Technically, the accurate intersection would be `other - values_of(self)` but as we don't have
+            # any known values from this unbounded set, we just return `other`. It's OK to include extra values
+            # in the set (we'll search additional shards or indices) but not OK to fail to include necessary values
+            # in the set (we'd avoid searching a shard that may have matching documents) so we err on the side of
+            # including more values.
+            other
+          end
+
+          def self.union(other)
+            # Since our set here is unbounded, the resulting union is also unbounded.
+            self
+          end
+
+          def self.negate
+            # The negation of an `UnboundedSetWithExclusions` is still an `UnboundedSetWithExclusions`. While it would flip
+            # which values are in or out of the set, this object is still the representation in our data model for that case.
+            self
+          end
+        end
+
+        private_constant :UnboundedSetWithExclusions
       end
     end
   end

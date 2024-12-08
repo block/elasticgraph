@@ -14,7 +14,6 @@ module ElasticGraph
       # Responsible for picking routing values for a specific query based on the filters.
       class RoutingPicker
         def initialize(schema_names:)
-          # @type var all_values_set: _RoutingValueSet
           all_values_set = RoutingValueSet::ALL
           empty_set = RoutingValueSet::EMPTY
 
@@ -22,12 +21,6 @@ module ElasticGraph
             if operator == :equal_to_any_of
               # This calls `.compact` to remove `nil` filter_value values
               RoutingValueSet.of(filter_value.compact)
-            else # gt, lt, gte, lte, matches
-              # With one of these inexact/inequality operators, we don't have a way to precisely represent
-              # the set of values. Instead, we represent it with the special UnboundedWithExclusions
-              # implementation since when these operators are used the set is unbounded (there's an infinite
-              # number of values in the set) but it doesn't contain all values (it has some exclusions).
-              RoutingValueSet::UnboundedWithExclusions
             end
           end
         end
@@ -55,13 +48,11 @@ module ElasticGraph
         # end
         # ```
         def extract_eligible_routing_values(filter_hashes, routing_field_paths)
-          @filter_value_set_extractor.extract_filter_value_set(filter_hashes, routing_field_paths).to_return_value
+          @filter_value_set_extractor.extract_filter_value_set(filter_hashes, routing_field_paths)&.to_return_value
         end
       end
 
       class RoutingValueSet < Data.define(:type, :routing_values)
-        # @dynamic ==
-
         def self.of(routing_values)
           new(:inclusive, routing_values.to_set)
         end
@@ -73,15 +64,7 @@ module ElasticGraph
         ALL = of_all_except([])
         EMPTY = of([])
 
-        def intersection(other_set)
-          # Here we return `self` to preserve the commutative property of `intersection`. Returning `self`
-          # here matches the behavior of `UnboundedWithExclusions.intersection`. See the comment there for
-          # rationale.
-          return self if other_set == UnboundedWithExclusions
-
-          # @type var other: RoutingValueSet
-          other = _ = other_set
-
+        def intersection(other)
           if inclusive? && other.inclusive?
             # Since both sets are inclusive, we can just delegate to `Set#intersection` here.
             RoutingValueSet.of(routing_values.intersection(other.routing_values))
@@ -111,15 +94,7 @@ module ElasticGraph
           end
         end
 
-        def union(other_set)
-          # Here we return `other` to preserve the commutative property of `union`. Returning `other`
-          # here matches the behavior of `UnboundedWithExclusions.union`. See the comment there for
-          # rationale.
-          return other_set if other_set == UnboundedWithExclusions
-
-          # @type var other: RoutingValueSet
-          other = _ = other_set
-
+        def union(other)
           if inclusive? && other.inclusive?
             # Since both sets are inclusive, we can just delegate to `Set#union` here.
             RoutingValueSet.of(routing_values.union(other.routing_values))
@@ -179,52 +154,6 @@ module ElasticGraph
 
         def get_included_and_excluded_values(other)
           inclusive? ? [routing_values, other.routing_values] : [other.routing_values, routing_values]
-        end
-
-        # This `RoutingValueSet` implementation is used for otherwise unrepresentable cases. We use it when
-        # a filter on one of the `routing_field_paths` uses an inequality like:
-        #
-        #     {routing_field: {gt: "abc"}}
-        #
-        # In a case like that, the set is unbounded (there's an infinite number of values that are greater
-        # than `"abc"`...), but it's not `RoutingValueSet::ALL`--since it's based on an inequality, there are
-        # _some_ values that are excluded from the set. But we can't use `RoutingValueSet.of_all_except(...)`
-        # because the set of exclusions is also unbounded!
-        #
-        # When our filter value extraction results in this set, we must search all shards of the index and
-        # cannot pass any `routing` value to the datastore at all.
-        module UnboundedWithExclusions
-          # @dynamic self.==
-
-          def self.intersection(other)
-            # Technically, the "true" intersection would be `other - values_of(self)` but as we don't have
-            # any known values from this unbounded set, we just return `other`. It's OK to include extra values
-            # in the set (we'll search additional shards) but not OK to fail to include necessary values in
-            # the set (we'd avoid searching a shard that may have matching documents) so we err on the side of
-            # including more values.
-            other
-          end
-
-          def self.union(other)
-            # Since our set here is unbounded, the resulting union is also unbounded. This errs on the side
-            # of safety since this set's `to_return_value` returns `nil` to cause the datastore to search
-            # all shards.
-            self
-          end
-
-          def self.negate
-            # This here is the only difference in behavior of this set implementation vs `RoutingValueSet::ALL`.
-            # Where as `ALL.negate` returns an empty set, we treat `negate` as a no-op. We do that because the
-            # negation of an inexact unbounded set is still an inexact unbounded set. While it flips which values
-            # are in or out of the set, this object is still the representation in our datamodel for that case.
-            self
-          end
-
-          def self.to_return_value
-            # Here we return `nil` to make sure that the datastore searches all shards, since we don't have
-            # any information we can use to safely limit what shards it searches.
-            nil
-          end
         end
       end
 

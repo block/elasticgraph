@@ -73,6 +73,8 @@ module ElasticGraph
 
           time_set = @filter_value_set_extractor.extract_filter_value_set(filter_hashes, [index_def.timestamp_field_path])
 
+          return IndexExpression.only(index_def.index_expression_for_search) if time_set.nil?
+
           if time_set.empty?
             return require_indices ?
               # Indices are required. Given the time set is empty, it's impossible for any documents to match our search.

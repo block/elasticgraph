@@ -96,7 +96,8 @@ module ElasticGraph
         # on `filter_value_set_extractor` to determine it, since it understands the semantics
         # of `any_of`, `not`, etc.
         def can_match_nil_values_at?(path, filter)
-          filter_value_set_extractor.extract_filter_value_set([filter], [path]).includes_nil?
+          value_set = filter_value_set_extractor.extract_filter_value_set([filter], [path])
+          (_ = value_set).nil? || value_set.includes_nil?
         end
 
         def filter_value_set_extractor
