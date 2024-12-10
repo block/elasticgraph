@@ -91,90 +91,6 @@ growing data sets. Modern APIs allow us to:</p>
   <li>Push filtering complex calculations to the backend.</li>
 </ul>
 
-<h2 id="libraries">Libraries</h2>
-
-<p>ElasticGraph is designed to be modular, with a small core, and many built-in extensions that extend that core
-for specific use cases. This minimizes exposure to vulnerabilities, reduces bloat, and makes ongoing upgrades
-easier. The libraries that ship with ElasticGraph can be broken down into several categories.</p>
-
-<h3 id="core-libraries-8-gems">Core Libraries (8 gems)</h3>
-
-<p>These libraries form the core backbone of ElasticGraph that is designed to run in a production deployment. Every ElasticGraph deployment will need to use all of these.</p>
-
-<ul>
-  <li><a href="elasticgraph/README.md">elasticgraph</a>: ElasticGraph meta-gem that pulls in all the core ElasticGraph gems.</li>
-  <li><a href="elasticgraph-admin/README.md">elasticgraph-admin</a>: ElasticGraph gem that provides datastore administrative tasks, to keep a datastore up-to-date with an ElasticGraph schema.</li>
-  <li><a href="elasticgraph-datastore_core/README.md">elasticgraph-datastore_core</a>: ElasticGraph gem containing the core datastore support types and logic.</li>
-  <li><a href="elasticgraph-graphql/README.md">elasticgraph-graphql</a>: The ElasticGraph GraphQL query engine.</li>
-  <li><a href="elasticgraph-indexer/README.md">elasticgraph-indexer</a>: ElasticGraph gem that provides APIs to robustly index data into a datastore.</li>
-  <li><a href="elasticgraph-json_schema/README.md">elasticgraph-json_schema</a>: ElasticGraph gem that provides JSON Schema validation.</li>
-  <li><a href="elasticgraph-schema_artifacts/README.md">elasticgraph-schema_artifacts</a>: ElasticGraph gem containing code related to generated schema artifacts.</li>
-  <li><a href="elasticgraph-support/README.md">elasticgraph-support</a>: ElasticGraph gem providing support utilities to the other ElasticGraph gems.</li>
-</ul>
-
-<h4 id="dependency-diagram">Dependency Diagram</h4>
-
-<p><img src="./README-1.svg" alt="diagram" /></p>
-
-<h3 id="aws-lambda-integration-libraries-5-gems">AWS Lambda Integration Libraries (5 gems)</h3>
-
-<p>These libraries wrap the the core ElasticGraph libraries so that they can be deployed using AWS Lambda.</p>
-
-<ul>
-  <li><a href="elasticgraph-admin_lambda/README.md">elasticgraph-admin_lambda</a>: ElasticGraph gem that wraps elasticgraph-admin in an AWS Lambda.</li>
-  <li><a href="elasticgraph-graphql_lambda/README.md">elasticgraph-graphql_lambda</a>: ElasticGraph gem that wraps elasticgraph-graphql in an AWS Lambda.</li>
-  <li><a href="elasticgraph-indexer_autoscaler_lambda/README.md">elasticgraph-indexer_autoscaler_lambda</a>: ElasticGraph gem that monitors OpenSearch CPU utilization to autoscale indexer lambda concurrency.</li>
-  <li><a href="elasticgraph-indexer_lambda/README.md">elasticgraph-indexer_lambda</a>: Provides an AWS Lambda interface for an elasticgraph API</li>
-  <li><a href="elasticgraph-lambda_support/README.md">elasticgraph-lambda_support</a>: ElasticGraph gem that supports running ElasticGraph using AWS Lambda.</li>
-</ul>
-
-<h4 id="dependency-diagram-1">Dependency Diagram</h4>
-
-<p><img src="./README-2.svg" alt="diagram" /></p>
-
-<h3 id="extensions-4-gems">Extensions (4 gems)</h3>
-
-<p>These libraries extend ElasticGraph to provide optional but commonly needed functionality.</p>
-
-<ul>
-  <li><a href="elasticgraph-apollo/README.md">elasticgraph-apollo</a>: An ElasticGraph extension that implements the Apollo federation spec.</li>
-  <li><a href="elasticgraph-health_check/README.md">elasticgraph-health_check</a>: An ElasticGraph extension that provides a health check for high availability deployments.</li>
-  <li><a href="elasticgraph-query_interceptor/README.md">elasticgraph-query_interceptor</a>: An ElasticGraph extension for intercepting datastore queries.</li>
-  <li><a href="elasticgraph-query_registry/README.md">elasticgraph-query_registry</a>: An ElasticGraph extension that supports safer schema evolution by limiting GraphQL queries based on a registry and validating registered queries against the schema.</li>
-</ul>
-
-<h4 id="dependency-diagram-2">Dependency Diagram</h4>
-
-<p><img src="./README-3.svg" alt="diagram" /></p>
-
-<h3 id="datastore-adapters-2-gems">Datastore Adapters (2 gems)</h3>
-
-<p>These libraries adapt ElasticGraph to your choice of datastore (Elasticsearch or OpenSearch).</p>
-
-<ul>
-  <li><a href="elasticgraph-elasticsearch/README.md">elasticgraph-elasticsearch</a>: Wraps the Elasticsearch client for use by ElasticGraph.</li>
-  <li><a href="elasticgraph-opensearch/README.md">elasticgraph-opensearch</a>: Wraps the OpenSearch client for use by ElasticGraph.</li>
-</ul>
-
-<h4 id="dependency-diagram-3">Dependency Diagram</h4>
-
-<p><img src="./README-4.svg" alt="diagram" /></p>
-
-<h3 id="local-development-libraries-3-gems">Local Development Libraries (3 gems)</h3>
-
-<p>These libraries are used for local development of ElasticGraph applications, but are not intended to be deployed to production (except for <code>elasticgraph-rack</code>).
-<code>elasticgraph-rack</code> is used to boot ElasticGraph locally but can also be used to run ElasticGraph in any rack-compatible server (including a Rails application).</p>
-
-<ul>
-  <li><a href="elasticgraph-local/README.md">elasticgraph-local</a>: Provides support for developing and running ElasticGraph applications locally.</li>
-  <li><a href="elasticgraph-rack/README.md">elasticgraph-rack</a>: ElasticGraph gem for serving an ElasticGraph GraphQL endpoint using rack.</li>
-  <li><a href="elasticgraph-schema_definition/README.md">elasticgraph-schema_definition</a>: ElasticGraph gem that provides the schema definition API and generates schema artifacts.</li>
-</ul>
-
-<h4 id="dependency-diagram-4">Dependency Diagram</h4>
-
-<p><img src="./README-5.svg" alt="diagram" /></p>
-
 <h2 id="versioning-policy">Versioning Policy</h2>
 
 <p>ElasticGraph does <em>not</em> strictly follow the <a href="https://semver.org/">SemVer</a> spec. We followed that early in the project’s life
@@ -234,7 +150,7 @@ MIT License, Copyright (c) GraphQL Contributors.</p>
 </div></div>
 
       <div id="footer">
-  Generated on Thu Dec  5 03:53:14 2024 by
+  Generated on Tue Dec 10 15:10:13 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.37 (ruby-3.3.6).
 </div>

@@ -401,8 +401,8 @@
       <pre class="code"><span class="info file"># File 'elasticgraph-json_schema/lib/elastic_graph/json_schema/validator_factory.rb', line 57</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_validator_for'>validator_for</span><span class='lparen'>(</span><span class='id identifier rubyid_type_name'>type_name</span><span class='rparen'>)</span>
-  <span class='ivar'>@validators_by_type_name</span><span class='lbracket'>[</span><span class='id identifier rubyid_type_name'>type_name</span><span class='rbracket'>]</span>
-<span class='kw'>end</span></pre>
+  <span class='ivar'>@validators_by_type_name</span><span class='lbracket'>[</span><span class='id identifier rubyid_type_name'>type_name</span><span class='rbracket'>]</span> <span class='comment'># : Validator
+</span><span class='kw'>end</span></pre>
     </td>
   </tr>
 </table>
@@ -498,7 +498,7 @@ the JSON schema gets validation errors.</p>
 </div>
 
       <div id="footer">
-  Generated on Thu Dec  5 03:53:15 2024 by
+  Generated on Tue Dec 10 15:10:13 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.37 (ruby-3.3.6).
 </div>

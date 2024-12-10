@@ -252,22 +252,24 @@ named fields of the named derived GraphQL type, allowing them to be customized.<
       <pre class="lines">
 
 
-77
 78
 79
 80
 81
 82
-83</pre>
+83
+84
+85</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/has_derived_graphql_type_customizations.rb', line 77</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/has_derived_graphql_type_customizations.rb', line 78</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_customize_derived_type_fields'>customize_derived_type_fields</span><span class='lparen'>(</span><span class='id identifier rubyid_type_name'>type_name</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_field_names'>field_names</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_customization_block'>customization_block</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_customizations_by_field'>customizations_by_field</span> <span class='op'>=</span> <span class='id identifier rubyid_derived_field_customizations_by_type_and_field_name'>derived_field_customizations_by_type_and_field_name</span><span class='lbracket'>[</span><span class='id identifier rubyid_type_name'>type_name</span><span class='rbracket'>]</span>
-
+  <span class='id identifier rubyid_customizations_by_field'>customizations_by_field</span> <span class='op'>=</span> <span class='id identifier rubyid_derived_field_customizations_by_type_and_field_name'>derived_field_customizations_by_type_and_field_name</span><span class='lbracket'>[</span><span class='id identifier rubyid_type_name'>type_name</span><span class='rbracket'>]</span> <span class='comment'># : ::Hash[::String, ::Array[^(::ElasticGraph::SchemaDefinition::SchemaElements::Field) -&gt; void]]
+</span>
   <span class='id identifier rubyid_field_names'>field_names</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_field_name'>field_name</span><span class='op'>|</span>
-    <span class='id identifier rubyid_customizations_by_field'>customizations_by_field</span><span class='lbracket'>[</span><span class='id identifier rubyid_field_name'>field_name</span><span class='rbracket'>]</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_customization_block'>customization_block</span>
+    <span class='id identifier rubyid_customizations'>customizations</span> <span class='op'>=</span> <span class='id identifier rubyid_customizations_by_field'>customizations_by_field</span><span class='lbracket'>[</span><span class='id identifier rubyid_field_name'>field_name</span><span class='rbracket'>]</span> <span class='comment'># : ::Array[^(::ElasticGraph::SchemaDefinition::SchemaElements::Field) -&gt; void]
+</span>    <span class='id identifier rubyid_customizations'>customizations</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_customization_block'>customization_block</span>
   <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -365,7 +367,8 @@ types, allowing them to be customized.</p>
 53
 54
 55
-56</pre>
+56
+57</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/has_derived_graphql_type_customizations.rb', line 48</span>
@@ -375,7 +378,8 @@ types, allowing them to be customized.</p>
     <span class='id identifier rubyid_derived_type_customizations_for_all_types'>derived_type_customizations_for_all_types</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_customization_block'>customization_block</span>
   <span class='kw'>else</span>
     <span class='id identifier rubyid_type_names'>type_names</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span>
-      <span class='id identifier rubyid_derived_type_customizations_by_name'>derived_type_customizations_by_name</span><span class='lbracket'>[</span><span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rbracket'>]</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_customization_block'>customization_block</span>
+      <span class='id identifier rubyid_derived_type_customizations'>derived_type_customizations</span> <span class='op'>=</span> <span class='id identifier rubyid_derived_type_customizations_by_name'>derived_type_customizations_by_name</span><span class='lbracket'>[</span><span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rbracket'>]</span> <span class='comment'># : ::Array[^(::ElasticGraph::SchemaDefinition::_Type) -&gt; void]
+</span>      <span class='id identifier rubyid_derived_type_customizations'>derived_type_customizations</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_customization_block'>customization_block</span>
     <span class='kw'>end</span>
   <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
@@ -389,7 +393,7 @@ types, allowing them to be customized.</p>
 </div>
 
       <div id="footer">
-  Generated on Thu Dec  5 03:53:15 2024 by
+  Generated on Tue Dec 10 15:10:13 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.37 (ruby-3.3.6).
 </div>

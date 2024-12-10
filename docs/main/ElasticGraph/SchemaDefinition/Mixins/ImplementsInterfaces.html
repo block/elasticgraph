@@ -233,12 +233,12 @@
       <pre class="lines">
 
 
-54
 55
-56</pre>
+56
+57</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/implements_interfaces.rb', line 54</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/implements_interfaces.rb', line 55</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_implemented_interfaces'>implemented_interfaces</span>
   <span class='ivar'>@implemented_interfaces</span> <span class='op'>||=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
@@ -331,7 +331,8 @@ current type must define all of the fields of the named interface, with the exac
 48
 49
 50
-51</pre>
+51
+52</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/implements_interfaces.rb', line 43</span>
@@ -339,7 +340,8 @@ current type must define all of the fields of the named interface, with the exac
 <span class='kw'>def</span> <span class='id identifier rubyid_implements'>implements</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_interface_names'>interface_names</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_interface_refs'>interface_refs</span> <span class='op'>=</span> <span class='id identifier rubyid_interface_names'>interface_names</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_interface_name'>interface_name</span><span class='op'>|</span>
     <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_type_ref'>type_ref</span><span class='lparen'>(</span><span class='id identifier rubyid_interface_name'>interface_name</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_final_form'>to_final_form</span><span class='period'>.</span><span class='id identifier rubyid_tap'>tap</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_interface_ref'>interface_ref</span><span class='op'>|</span>
-      <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_implementations_by_interface_ref'>implementations_by_interface_ref</span><span class='lbracket'>[</span><span class='id identifier rubyid_interface_ref'>interface_ref</span><span class='rbracket'>]</span> <span class='op'>&lt;&lt;</span> <span class='kw'>self</span>
+      <span class='id identifier rubyid_implementations'>implementations</span> <span class='op'>=</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_implementations_by_interface_ref'>implementations_by_interface_ref</span><span class='lbracket'>[</span><span class='id identifier rubyid_interface_ref'>interface_ref</span><span class='rbracket'>]</span> <span class='comment'># : ::Set[SchemaElements::TypeWithSubfields]
+</span>      <span class='id identifier rubyid_implementations'>implementations</span> <span class='op'>&lt;&lt;</span> <span class='kw'>self</span>
     <span class='kw'>end</span>
   <span class='kw'>end</span>
 
@@ -426,7 +428,6 @@ current type must define all of the fields of the named interface, with the exac
       <pre class="lines">
 
 
-109
 110
 111
 112
@@ -435,10 +436,11 @@ current type must define all of the fields of the named interface, with the exac
 115
 116
 117
-118</pre>
+118
+119</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/implements_interfaces.rb', line 109</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/implements_interfaces.rb', line 110</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_sdl'>to_sdl</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_field_arg_selector'>field_arg_selector</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_name_section'>name_section</span> <span class='op'>=</span>
@@ -460,7 +462,7 @@ current type must define all of the fields of the named interface, with the exac
 </div>
 
       <div id="footer">
-  Generated on Thu Dec  5 03:53:15 2024 by
+  Generated on Tue Dec 10 15:10:13 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.37 (ruby-3.3.6).
 </div>
