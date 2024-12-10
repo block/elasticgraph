@@ -1,0 +1,23 @@
+name: Security and License Scans
+
+on:
+  pull_request:
+  pull_request_target:
+    branches:
+      - main
+
+  push:
+    branches:
+      - main
+
+  # Run every day at 5am UTC
+  schedule:
+    - cron: "0 5 * * *"
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  security-license-scan:
+    uses: block/ospo/.github/workflows/security.yml@main
+    secrets: inherit

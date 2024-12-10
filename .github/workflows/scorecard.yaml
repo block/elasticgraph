@@ -1,0 +1,27 @@
+name: Open Source Security Foundation Scorecard
+on:
+  pull_request:
+  # For Branch-Protection check. Only the default branch is supported. See
+  # https://github.com/ossf/scorecard/blob/main/docs/checks.md#branch-protection
+  branch_protection_rule:
+
+  # Manual trigger
+  workflow_dispatch:
+
+  # To guarantee Maintained check is occasionally updated. See
+  # https://github.com/ossf/scorecard/blob/main/docs/checks.md#maintained
+  schedule:
+    - cron: "0 5 * * 1"
+  push:
+    branches: ["main"]
+
+# Declare default permissions as read only.
+permissions: read-all
+
+jobs:
+  ossf:
+    uses: block/ospo/.github/workflows/scorecard.yml@main
+    secrets: inherit
+    permissions:
+      security-events: write
+      id-token: write
