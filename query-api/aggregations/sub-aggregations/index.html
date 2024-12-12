@@ -105,7 +105,7 @@ within the overall <code class="language-plaintext highlighter-rouge">Artist</co
 </ul>
 
 <p>ElasticGraph supports aggregations on these nested fields via <code class="language-plaintext highlighter-rouge">subAggregations</code>. This can be used
-to aggregation directly on the data of one of these fields. For example, this query returns the
+to aggregate directly on the data of one of these fields. For example, this query returns the
 total sales for all albums of all artists:</p>
 
 <figure class="highlight"><pre><code class="language-graphql" data-lang="graphql"><span class="k">query</span><span class="w"> </span><span class="n">TotalAlbumSales</span><span class="w"> </span><span class="p">{</span><span class="w">
@@ -126,7 +126,7 @@ total sales for all albums of all artists:</p>
   </span><span class="p">}</span><span class="w">
 </span><span class="p">}</span></code></pre></figure>
 
-<p>Sub-aggregations can also be performed under the groupings of an outer aggregations. For example,
+<p>Sub-aggregations can also be performed under the groupings of an outer aggregation. For example,
 this query returns the total album sales grouped by the home country of the artist:</p>
 
 <figure class="highlight"><pre><code class="language-graphql" data-lang="graphql"><span class="k">query</span><span class="w"> </span><span class="n">TotalAlbumSalesByArtistHomeCountry</span><span class="w"> </span><span class="p">{</span><span class="w">
