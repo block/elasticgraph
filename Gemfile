@@ -24,7 +24,7 @@ group :development do
   gem "rspec-retry", "~> 0.6"
   gem "simplecov", "~> 0.22"
   gem "simplecov-console", "~> 0.9"
-  gem "standard", "~> 1.41.0"
+  gem "standard", "~> 1.43.0"
   gem "steep", "~> 1.9.0"
   gem "super_diff", "~> 0.13"
   gem "vcr", "~> 6.3", ">= 6.3.1"
