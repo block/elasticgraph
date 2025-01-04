@@ -109,6 +109,7 @@ jobs:
         ruby:
           - "3.2"
           - "3.3"
+          - "3.4"
         datastore:
 <% datastore_versions.each do |datastore_version| -%>
           - "<%= datastore_version %>"
@@ -119,13 +120,13 @@ jobs:
           # these others against every combination of `ruby` and `datastore` so we just run each with one
           # configuration here.
           - build_part: "run_misc_checks"
-            ruby: "3.3"
+            ruby: "3.4"
             datastore: "<%= primary_datastore_version %>"
           - build_part: "run_specs_with_vcr"
-            ruby: "3.3"
+            ruby: "3.4"
             datastore: "<%= primary_datastore_version %>"
           - build_part: "run_specs_file_by_file"
-            ruby: "3.3"
+            ruby: "3.4"
             datastore: "<%= primary_datastore_version %>"
 
     steps:

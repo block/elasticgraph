@@ -14,7 +14,7 @@ group :development do
   gem "coderay", "~> 1.1"
   gem "factory_bot", "~> 6.4"
   gem "faker", "~> 3.5"
-  gem "flatware-rspec", "~> 2.3"
+  gem "flatware-rspec", "~> 2.3", ">= 2.3.4"
   gem "httpx", "~> 1.3"
   gem "method_source", "~> 1.1"
   gem "rubocop-factory_bot", "~> 2.26"
@@ -44,6 +44,7 @@ repo_root = ::Pathname.new(__dir__).ascend.find { |dir| ::Dir.exist?("#{dir}/ela
 
 # `tmp` and `log` are git-ignored but many of our build tasks and scripts expect them to exist.
 # We create them here since `Gemfile` evaluation happens before anything else.
+require "fileutils"
 ::FileUtils.mkdir_p("#{repo_root}/log")
 ::FileUtils.mkdir_p("#{repo_root}/tmp")
 

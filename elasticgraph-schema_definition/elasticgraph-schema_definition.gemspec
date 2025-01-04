@@ -39,7 +39,7 @@ Gem::Specification.new do |spec|
     end - [".rspec", "Gemfile", ".yardopts"]
   end
 
-  spec.required_ruby_version = "~> 3.2"
+  spec.required_ruby_version = [">= 3.2", "< 3.5"]
 
   spec.add_dependency "elasticgraph-graphql", ElasticGraph::VERSION # needed since we validate that scalar `coerce_with` options are valid (which loads scalar coercion adapters)
   spec.add_dependency "elasticgraph-indexer", ElasticGraph::VERSION # needed since we validate that scalar `prepare_for_indexing_with` options are valid (which loads indexing preparer adapters)
