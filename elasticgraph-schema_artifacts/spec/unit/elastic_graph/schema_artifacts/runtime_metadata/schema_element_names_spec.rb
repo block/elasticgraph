@@ -105,7 +105,7 @@ module ElasticGraph
         it "inspects nicely" do
           names = new_with(form: :camelCase, overrides: {foo: :bar})
 
-          expect(names.inspect).to eq "#<ElasticGraph::SchemaArtifacts::RuntimeMetadata::ExampleElementNames form=camelCase, overrides={:foo=>:bar}>"
+          expect(names.inspect).to eq inspect_output_of("#<ElasticGraph::SchemaArtifacts::RuntimeMetadata::ExampleElementNames form=camelCase, overrides={foo: :bar}>")
           expect(names.to_s).to eq names.inspect
         end
 

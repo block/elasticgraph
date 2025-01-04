@@ -325,6 +325,26 @@ module ElasticGraph
       CommonSpecHelpers.parsed_test_settings_yaml
     end
 
+    # Ruby 3.4 improved the `#inspect` output of a `Hash`:
+    # - `{foo: 1}` inspects as `{foo: 1}` instead of `{:foo=>1}`
+    # - `{"foo" => 1}` inspects as `{"foo" => 1}` instead of `{"foo"=>1}`
+    #
+    # Some of our specs expect `#inspect` output or an error message generated from `#inspect` output.
+    # We've updated those expectations to match the new Ruby 3.4 formatting. To pass against older
+    # Rubies, `#inspect_output_of` downgrades the output to match the old output seen on Ruby 3.3 and before.
+    # :nocov: -- only one side of this branch is covered on a given test suite run (based on the Ruby version)
+    if RUBY_VERSION >= "3.4"
+      def inspect_output_of(output) = output
+    else
+      def inspect_output_of(output)
+        output
+          .gsub(/(\S) =>/, '\1=>')
+          .gsub(/=> (\S)/, '=>\1')
+          .gsub(/(\w+): /, ':\1=>')
+      end
+    end
+    # :nocov:
+
     module_function
 
     def expect_to_return_non_nil_values_from_all_attributes(object)

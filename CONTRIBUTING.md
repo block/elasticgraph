@@ -12,11 +12,11 @@ This guide is for you.
 
 ## Development Prerequisites
 
-| Requirement    | Tested Version | Installation Instructions                                                 |
-|----------------|----------------|---------------------------------------------------------------------------|
-| Ruby           | 3.2.x, 3.3.x   | [ruby-lang.org](https://www.ruby-lang.org/en/documentation/installation/) |
-| Docker Engine  | 27.x           | [docker.com](https://docs.docker.com/engine/install/)                     |
-| Docker Compose | 2.29.x         | [docker.com](https://docs.docker.com/compose/install/)                    |
+| Requirement    | Tested Version      | Installation Instructions                                                 |
+|----------------|---------------------|---------------------------------------------------------------------------|
+| Ruby           | 3.2.x, 3.3.x, 3.4.x | [ruby-lang.org](https://www.ruby-lang.org/en/documentation/installation/) |
+| Docker Engine  | 27.x                | [docker.com](https://docs.docker.com/engine/install/)                     |
+| Docker Compose | 2.29.x              | [docker.com](https://docs.docker.com/compose/install/)                    |
 
 ### Ruby
 
@@ -26,7 +26,7 @@ You may verify your `ruby` installation via the terminal:
 
 ```bash
 $ ruby -v
-ruby 3.3.4 (2024-07-09 revision be1089c8ec) [arm64-darwin23]
+ruby 3.4.1 (2024-12-25 revision 48d4efcb85) +PRISM [arm64-darwin24]
 ```
 
 If you do not have Ruby, we recommend installing it using one of the following:

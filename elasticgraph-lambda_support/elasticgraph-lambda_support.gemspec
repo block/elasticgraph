@@ -39,7 +39,7 @@ Gem::Specification.new do |spec|
     end - [".rspec", "Gemfile", ".yardopts"]
   end
 
-  spec.required_ruby_version = "~> 3.2"
+  spec.required_ruby_version = [">= 3.2", "< 3.5"]
 
   spec.add_dependency "elasticgraph-opensearch", ElasticGraph::VERSION
   spec.add_dependency "faraday_middleware-aws-sigv4", "~> 1.0"

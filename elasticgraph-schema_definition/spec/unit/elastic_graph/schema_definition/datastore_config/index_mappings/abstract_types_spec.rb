@@ -164,7 +164,15 @@ module ElasticGraph
                   t.index "things"
                 end
               end
-            }.to raise_error(Errors::SchemaError, a_string_including("Conflicting definitions", "field `owner_id`", "subtypes of `Thing`", "Widget", "Component", '"type"=>"keyword"', '"type"=>"integer"').and(excluding("Animal")))
+            }.to raise_error(Errors::SchemaError, a_string_including(
+              "Conflicting definitions",
+              "field `owner_id`",
+              "subtypes of `Thing`",
+              "Widget",
+              "Component",
+              inspect_output_of('"type" => "keyword"'),
+              inspect_output_of('"type" => "integer"')
+            ).and(excluding("Animal")))
           end
 
           it "allows the different mapping setting issue to be resolved by configuring a different index field name for one field" do
