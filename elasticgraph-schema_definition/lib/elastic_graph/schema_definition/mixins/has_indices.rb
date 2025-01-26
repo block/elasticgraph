@@ -158,7 +158,8 @@ module ElasticGraph
             graphql_fields_by_name: runtime_metadata_graphql_fields_by_name,
             elasticgraph_category: nil,
             source_type: nil,
-            graphql_only_return_type: graphql_only?
+            graphql_only_return_type: graphql_only?,
+            default_graphql_resolver: nil
           ).with(**runtime_metadata_overrides)
         end
 

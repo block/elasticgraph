@@ -925,7 +925,8 @@ module ElasticGraph
           SchemaArtifacts::RuntimeMetadata::GraphQLField.new(
             name_in_index: name_in_index,
             computation_detail: computation_detail,
-            relation: relationship&.runtime_metadata
+            relation: relationship&.runtime_metadata,
+            resolver: nil
           )
         end
 
