@@ -23,7 +23,8 @@ module ElasticGraph
         # imply that this type was user-defined; we have recently introduced this metadata and are not yet setting
         # it for all generated GraphQL types. For now, we are only setting it for specific cases where we need it.
         :source_type,
-        :graphql_only_return_type
+        :graphql_only_return_type,
+        :default_graphql_resolver
       )
         UPDATE_TARGETS = "update_targets"
         INDEX_DEFINITION_NAMES = "index_definition_names"
@@ -31,9 +32,10 @@ module ElasticGraph
         ELASTICGRAPH_CATEGORY = "elasticgraph_category"
         SOURCE_TYPE = "source_type"
         GRAPHQL_ONLY_RETURN_TYPE = "graphql_only_return_type"
+        DEFAULT_GRAPHQL_RESOLVER = "default_graphql_resolver"
 
-        def initialize(update_targets:, index_definition_names:, graphql_fields_by_name:, elasticgraph_category:, source_type:, graphql_only_return_type:)
-          graphql_fields_by_name = graphql_fields_by_name.select { |name, field| field.needed?(name) }
+        def initialize(update_targets:, index_definition_names:, graphql_fields_by_name:, elasticgraph_category:, source_type:, graphql_only_return_type:, default_graphql_resolver:)
+          graphql_fields_by_name = graphql_fields_by_name.select { |name, field| field.needed?(name, default_graphql_resolver) }
 
           super(
             update_targets: update_targets,
@@ -41,7 +43,8 @@ module ElasticGraph
             graphql_fields_by_name: graphql_fields_by_name,
             elasticgraph_category: elasticgraph_category,
             source_type: source_type,
-            graphql_only_return_type: graphql_only_return_type
+            graphql_only_return_type: graphql_only_return_type,
+            default_graphql_resolver: default_graphql_resolver
           )
         end
 
@@ -60,13 +63,15 @@ module ElasticGraph
             graphql_fields_by_name: graphql_fields_by_name,
             elasticgraph_category: hash[ELASTICGRAPH_CATEGORY]&.to_sym || nil,
             source_type: hash[SOURCE_TYPE] || nil,
-            graphql_only_return_type: !!hash[GRAPHQL_ONLY_RETURN_TYPE]
+            graphql_only_return_type: !!hash[GRAPHQL_ONLY_RETURN_TYPE],
+            default_graphql_resolver: hash[DEFAULT_GRAPHQL_RESOLVER]&.to_sym
           )
         end
 
         def to_dumpable_hash
           {
             # Keys here are ordered alphabetically; please keep them that way.
+            DEFAULT_GRAPHQL_RESOLVER => default_graphql_resolver&.to_s,
             ELASTICGRAPH_CATEGORY => elasticgraph_category&.to_s,
             GRAPHQL_FIELDS_BY_NAME => HashDumper.dump_hash(graphql_fields_by_name, &:to_dumpable_hash),
             GRAPHQL_ONLY_RETURN_TYPE => graphql_only_return_type ? true : nil,

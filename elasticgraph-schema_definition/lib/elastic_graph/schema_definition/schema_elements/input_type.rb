@@ -47,7 +47,8 @@ module ElasticGraph
             graphql_fields_by_name: graphql_fields_by_name.transform_values(&:runtime_metadata_graphql_field),
             elasticgraph_category: nil,
             source_type: nil,
-            graphql_only_return_type: false
+            graphql_only_return_type: false,
+            default_graphql_resolver: nil
           )
         end
 
