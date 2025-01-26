@@ -5,22 +5,25 @@ module ElasticGraph
         attr_reader name_in_index: ::String?
         attr_reader relation: Relation?
         attr_reader computation_detail: ComputationDetail?
+        attr_reader resolver: ::Symbol?
 
         def initialize: (
           name_in_index: ::String?,
           relation: Relation?,
-          computation_detail: ComputationDetail?
+          computation_detail: ComputationDetail?,
+          resolver: ::Symbol?
         ) -> void
 
         def with: (
           ?name_in_index: ::String?,
           ?relation: Relation?,
-          ?computation_detail: ComputationDetail?
+          ?computation_detail: ComputationDetail?,
+          ?resolver: ::Symbol?
         ) -> instance
 
         def self.new:
-          (name_in_index: ::String?, relation: Relation?, computation_detail: ComputationDetail?) -> instance
-          | (::String?, Relation?, ::Symbol?) -> instance
+          (name_in_index: ::String?, relation: Relation?, computation_detail: ComputationDetail?, resolver: ::Symbol?) -> instance
+          | (::String?, Relation?, ComputationDetail?, ::Symbol?) -> instance
       end
 
       class GraphQLField < GraphQLFieldSupertype
@@ -28,6 +31,8 @@ module ElasticGraph
         NAME_IN_INDEX: "name_in_index"
         RELATION: "relation"
         AGGREGATION_DETAIL: "computation_detail"
+        RESOLVER: "resolver"
+
         def self.from_hash: (::Hash[::String, untyped]) -> GraphQLField
         def to_dumpable_hash: () -> ::Hash[::String, untyped]
         def needed?: (::String) -> bool
