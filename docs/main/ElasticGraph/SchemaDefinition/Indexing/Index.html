@@ -649,7 +649,9 @@ further customization of the index.</p>
 63
 64
 65
-66</pre>
+66
+67
+68</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/indexing/index.rb', line 48</span>
@@ -664,12 +666,14 @@ further customization of the index.</p>
 
   <span class='kw'>super</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_settings'>settings</span><span class='comma'>,</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='comma'>,</span> <span class='id identifier rubyid_indexed_type'>indexed_type</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='kw'>nil</span><span class='rparen'>)</span>
 
-  <span class='comment'># `id` is the field Elasticsearch/OpenSearch use for routing by default:
-</span>  <span class='comment'># https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-routing-field.html
-</span>  <span class='comment'># By using it here, it will cause queries to pass a `routing` parameter when
-</span>  <span class='comment'># searching with id filtering on an index that does not use custom shard routing, giving
-</span>  <span class='comment'># us a nice efficiency boost.
-</span>  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_routing_field_path'>routing_field_path</span> <span class='op'>=</span> <span class='id identifier rubyid_public_field_path'>public_field_path</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>id</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>explanation:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>indexed types must have an `id` field</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_after_user_definition_complete'>after_user_definition_complete</span> <span class='kw'>do</span>
+    <span class='comment'># `id` is the field Elasticsearch/OpenSearch use for routing by default:
+</span>    <span class='comment'># https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-routing-field.html
+</span>    <span class='comment'># By using it here, it will cause queries to pass a `routing` parameter when
+</span>    <span class='comment'># searching with id filtering on an index that does not use custom shard routing, giving
+</span>    <span class='comment'># us a nice efficiency boost.
+</span>    <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_routing_field_path'>routing_field_path</span> <span class='op'>=</span> <span class='id identifier rubyid_public_field_path'>public_field_path</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>id</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>explanation:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>indexed types must have an `id` field</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
 
   <span class='kw'>yield</span> <span class='kw'>self</span> <span class='kw'>if</span> <span class='id identifier rubyid_block_given?'>block_given?</span>
 <span class='kw'>end</span></pre>
@@ -1007,7 +1011,9 @@ further customization of the index.</p>
 316
 317
 318
-319</pre>
+319
+320
+321</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/indexing/index.rb', line 39</span>
@@ -1031,12 +1037,14 @@ further customization of the index.</p>
 
     <span class='kw'>super</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_settings'>settings</span><span class='comma'>,</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='comma'>,</span> <span class='id identifier rubyid_indexed_type'>indexed_type</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='kw'>nil</span><span class='rparen'>)</span>
 
-    <span class='comment'># `id` is the field Elasticsearch/OpenSearch use for routing by default:
-</span>    <span class='comment'># https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-routing-field.html
-</span>    <span class='comment'># By using it here, it will cause queries to pass a `routing` parameter when
-</span>    <span class='comment'># searching with id filtering on an index that does not use custom shard routing, giving
-</span>    <span class='comment'># us a nice efficiency boost.
-</span>    <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_routing_field_path'>routing_field_path</span> <span class='op'>=</span> <span class='id identifier rubyid_public_field_path'>public_field_path</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>id</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>explanation:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>indexed types must have an `id` field</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_after_user_definition_complete'>after_user_definition_complete</span> <span class='kw'>do</span>
+      <span class='comment'># `id` is the field Elasticsearch/OpenSearch use for routing by default:
+</span>      <span class='comment'># https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-routing-field.html
+</span>      <span class='comment'># By using it here, it will cause queries to pass a `routing` parameter when
+</span>      <span class='comment'># searching with id filtering on an index that does not use custom shard routing, giving
+</span>      <span class='comment'># us a nice efficiency boost.
+</span>      <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_routing_field_path'>routing_field_path</span> <span class='op'>=</span> <span class='id identifier rubyid_public_field_path'>public_field_path</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>id</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>explanation:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>indexed types must have an `id` field</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
 
     <span class='kw'>yield</span> <span class='kw'>self</span> <span class='kw'>if</span> <span class='id identifier rubyid_block_given?'>block_given?</span>
   <span class='kw'>end</span>
@@ -1266,7 +1274,7 @@ further customization of the index.</p>
 
   <span class='kw'>def</span> <span class='id identifier rubyid_public_field_path'>public_field_path</span><span class='lparen'>(</span><span class='id identifier rubyid_public_path_string'>public_path_string</span><span class='comma'>,</span> <span class='label'>explanation:</span><span class='rparen'>)</span>
     <span class='id identifier rubyid_parent_is_not_list'>parent_is_not_list</span> <span class='op'>=</span> <span class='tlambda'>-&gt;</span><span class='lparen'>(</span><span class='id identifier rubyid_parent_field'>parent_field</span><span class='rparen'>)</span> <span class='tlambeg'>{</span> <span class='op'>!</span><span class='id identifier rubyid_parent_field'>parent_field</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_list?'>list?</span> <span class='rbrace'>}</span>
-    <span class='id identifier rubyid_resolver'>resolver</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../SchemaElements.html" title="ElasticGraph::SchemaDefinition::SchemaElements (module)">SchemaElements</a></span></span><span class='op'>::</span><span class='const'>FieldPath</span><span class='op'>::</span><span class='const'>Resolver</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+    <span class='id identifier rubyid_resolver'>resolver</span> <span class='op'>=</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_field_path_resolver'>field_path_resolver</span>
     <span class='id identifier rubyid_resolved_path'>resolved_path</span> <span class='op'>=</span> <span class='id identifier rubyid_resolver'>resolver</span><span class='period'>.</span><span class='id identifier rubyid_resolve_public_path'>resolve_public_path</span><span class='lparen'>(</span><span class='id identifier rubyid_indexed_type'>indexed_type</span><span class='comma'>,</span> <span class='id identifier rubyid_public_path_string'>public_path_string</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_parent_is_not_list'>parent_is_not_list</span><span class='rparen'>)</span>
     <span class='kw'>return</span> <span class='id identifier rubyid_resolved_path'>resolved_path</span> <span class='kw'>if</span> <span class='id identifier rubyid_resolved_path'>resolved_path</span>
 
@@ -1622,7 +1630,9 @@ further customization of the index.</p>
 316
 317
 318
-319</pre>
+319
+320
+321</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/indexing/index.rb', line 39</span>
@@ -1646,12 +1656,14 @@ further customization of the index.</p>
 
     <span class='kw'>super</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_settings'>settings</span><span class='comma'>,</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='comma'>,</span> <span class='id identifier rubyid_indexed_type'>indexed_type</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='kw'>nil</span><span class='rparen'>)</span>
 
-    <span class='comment'># `id` is the field Elasticsearch/OpenSearch use for routing by default:
-</span>    <span class='comment'># https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-routing-field.html
-</span>    <span class='comment'># By using it here, it will cause queries to pass a `routing` parameter when
-</span>    <span class='comment'># searching with id filtering on an index that does not use custom shard routing, giving
-</span>    <span class='comment'># us a nice efficiency boost.
-</span>    <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_routing_field_path'>routing_field_path</span> <span class='op'>=</span> <span class='id identifier rubyid_public_field_path'>public_field_path</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>id</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>explanation:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>indexed types must have an `id` field</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_after_user_definition_complete'>after_user_definition_complete</span> <span class='kw'>do</span>
+      <span class='comment'># `id` is the field Elasticsearch/OpenSearch use for routing by default:
+</span>      <span class='comment'># https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-routing-field.html
+</span>      <span class='comment'># By using it here, it will cause queries to pass a `routing` parameter when
+</span>      <span class='comment'># searching with id filtering on an index that does not use custom shard routing, giving
+</span>      <span class='comment'># us a nice efficiency boost.
+</span>      <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_routing_field_path'>routing_field_path</span> <span class='op'>=</span> <span class='id identifier rubyid_public_field_path'>public_field_path</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>id</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>explanation:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>indexed types must have an `id` field</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
 
     <span class='kw'>yield</span> <span class='kw'>self</span> <span class='kw'>if</span> <span class='id identifier rubyid_block_given?'>block_given?</span>
   <span class='kw'>end</span>
@@ -1881,7 +1893,7 @@ further customization of the index.</p>
 
   <span class='kw'>def</span> <span class='id identifier rubyid_public_field_path'>public_field_path</span><span class='lparen'>(</span><span class='id identifier rubyid_public_path_string'>public_path_string</span><span class='comma'>,</span> <span class='label'>explanation:</span><span class='rparen'>)</span>
     <span class='id identifier rubyid_parent_is_not_list'>parent_is_not_list</span> <span class='op'>=</span> <span class='tlambda'>-&gt;</span><span class='lparen'>(</span><span class='id identifier rubyid_parent_field'>parent_field</span><span class='rparen'>)</span> <span class='tlambeg'>{</span> <span class='op'>!</span><span class='id identifier rubyid_parent_field'>parent_field</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_list?'>list?</span> <span class='rbrace'>}</span>
-    <span class='id identifier rubyid_resolver'>resolver</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../SchemaElements.html" title="ElasticGraph::SchemaDefinition::SchemaElements (module)">SchemaElements</a></span></span><span class='op'>::</span><span class='const'>FieldPath</span><span class='op'>::</span><span class='const'>Resolver</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+    <span class='id identifier rubyid_resolver'>resolver</span> <span class='op'>=</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_field_path_resolver'>field_path_resolver</span>
     <span class='id identifier rubyid_resolved_path'>resolved_path</span> <span class='op'>=</span> <span class='id identifier rubyid_resolver'>resolver</span><span class='period'>.</span><span class='id identifier rubyid_resolve_public_path'>resolve_public_path</span><span class='lparen'>(</span><span class='id identifier rubyid_indexed_type'>indexed_type</span><span class='comma'>,</span> <span class='id identifier rubyid_public_path_string'>public_path_string</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_parent_is_not_list'>parent_is_not_list</span><span class='rparen'>)</span>
     <span class='kw'>return</span> <span class='id identifier rubyid_resolved_path'>resolved_path</span> <span class='kw'>if</span> <span class='id identifier rubyid_resolved_path'>resolved_path</span>
 
@@ -2237,7 +2249,9 @@ further customization of the index.</p>
 316
 317
 318
-319</pre>
+319
+320
+321</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/indexing/index.rb', line 39</span>
@@ -2261,12 +2275,14 @@ further customization of the index.</p>
 
     <span class='kw'>super</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_settings'>settings</span><span class='comma'>,</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='comma'>,</span> <span class='id identifier rubyid_indexed_type'>indexed_type</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='kw'>nil</span><span class='rparen'>)</span>
 
-    <span class='comment'># `id` is the field Elasticsearch/OpenSearch use for routing by default:
-</span>    <span class='comment'># https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-routing-field.html
-</span>    <span class='comment'># By using it here, it will cause queries to pass a `routing` parameter when
-</span>    <span class='comment'># searching with id filtering on an index that does not use custom shard routing, giving
-</span>    <span class='comment'># us a nice efficiency boost.
-</span>    <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_routing_field_path'>routing_field_path</span> <span class='op'>=</span> <span class='id identifier rubyid_public_field_path'>public_field_path</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>id</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>explanation:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>indexed types must have an `id` field</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_after_user_definition_complete'>after_user_definition_complete</span> <span class='kw'>do</span>
+      <span class='comment'># `id` is the field Elasticsearch/OpenSearch use for routing by default:
+</span>      <span class='comment'># https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-routing-field.html
+</span>      <span class='comment'># By using it here, it will cause queries to pass a `routing` parameter when
+</span>      <span class='comment'># searching with id filtering on an index that does not use custom shard routing, giving
+</span>      <span class='comment'># us a nice efficiency boost.
+</span>      <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_routing_field_path'>routing_field_path</span> <span class='op'>=</span> <span class='id identifier rubyid_public_field_path'>public_field_path</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>id</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>explanation:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>indexed types must have an `id` field</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
 
     <span class='kw'>yield</span> <span class='kw'>self</span> <span class='kw'>if</span> <span class='id identifier rubyid_block_given?'>block_given?</span>
   <span class='kw'>end</span>
@@ -2496,7 +2512,7 @@ further customization of the index.</p>
 
   <span class='kw'>def</span> <span class='id identifier rubyid_public_field_path'>public_field_path</span><span class='lparen'>(</span><span class='id identifier rubyid_public_path_string'>public_path_string</span><span class='comma'>,</span> <span class='label'>explanation:</span><span class='rparen'>)</span>
     <span class='id identifier rubyid_parent_is_not_list'>parent_is_not_list</span> <span class='op'>=</span> <span class='tlambda'>-&gt;</span><span class='lparen'>(</span><span class='id identifier rubyid_parent_field'>parent_field</span><span class='rparen'>)</span> <span class='tlambeg'>{</span> <span class='op'>!</span><span class='id identifier rubyid_parent_field'>parent_field</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_list?'>list?</span> <span class='rbrace'>}</span>
-    <span class='id identifier rubyid_resolver'>resolver</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../SchemaElements.html" title="ElasticGraph::SchemaDefinition::SchemaElements (module)">SchemaElements</a></span></span><span class='op'>::</span><span class='const'>FieldPath</span><span class='op'>::</span><span class='const'>Resolver</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+    <span class='id identifier rubyid_resolver'>resolver</span> <span class='op'>=</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_field_path_resolver'>field_path_resolver</span>
     <span class='id identifier rubyid_resolved_path'>resolved_path</span> <span class='op'>=</span> <span class='id identifier rubyid_resolver'>resolver</span><span class='period'>.</span><span class='id identifier rubyid_resolve_public_path'>resolve_public_path</span><span class='lparen'>(</span><span class='id identifier rubyid_indexed_type'>indexed_type</span><span class='comma'>,</span> <span class='id identifier rubyid_public_path_string'>public_path_string</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_parent_is_not_list'>parent_is_not_list</span><span class='rparen'>)</span>
     <span class='kw'>return</span> <span class='id identifier rubyid_resolved_path'>resolved_path</span> <span class='kw'>if</span> <span class='id identifier rubyid_resolved_path'>resolved_path</span>
 
@@ -2852,7 +2868,9 @@ further customization of the index.</p>
 316
 317
 318
-319</pre>
+319
+320
+321</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/indexing/index.rb', line 39</span>
@@ -2876,12 +2894,14 @@ further customization of the index.</p>
 
     <span class='kw'>super</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_settings'>settings</span><span class='comma'>,</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='comma'>,</span> <span class='id identifier rubyid_indexed_type'>indexed_type</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='kw'>nil</span><span class='rparen'>)</span>
 
-    <span class='comment'># `id` is the field Elasticsearch/OpenSearch use for routing by default:
-</span>    <span class='comment'># https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-routing-field.html
-</span>    <span class='comment'># By using it here, it will cause queries to pass a `routing` parameter when
-</span>    <span class='comment'># searching with id filtering on an index that does not use custom shard routing, giving
-</span>    <span class='comment'># us a nice efficiency boost.
-</span>    <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_routing_field_path'>routing_field_path</span> <span class='op'>=</span> <span class='id identifier rubyid_public_field_path'>public_field_path</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>id</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>explanation:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>indexed types must have an `id` field</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_after_user_definition_complete'>after_user_definition_complete</span> <span class='kw'>do</span>
+      <span class='comment'># `id` is the field Elasticsearch/OpenSearch use for routing by default:
+</span>      <span class='comment'># https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-routing-field.html
+</span>      <span class='comment'># By using it here, it will cause queries to pass a `routing` parameter when
+</span>      <span class='comment'># searching with id filtering on an index that does not use custom shard routing, giving
+</span>      <span class='comment'># us a nice efficiency boost.
+</span>      <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_routing_field_path'>routing_field_path</span> <span class='op'>=</span> <span class='id identifier rubyid_public_field_path'>public_field_path</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>id</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>explanation:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>indexed types must have an `id` field</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
 
     <span class='kw'>yield</span> <span class='kw'>self</span> <span class='kw'>if</span> <span class='id identifier rubyid_block_given?'>block_given?</span>
   <span class='kw'>end</span>
@@ -3111,7 +3131,7 @@ further customization of the index.</p>
 
   <span class='kw'>def</span> <span class='id identifier rubyid_public_field_path'>public_field_path</span><span class='lparen'>(</span><span class='id identifier rubyid_public_path_string'>public_path_string</span><span class='comma'>,</span> <span class='label'>explanation:</span><span class='rparen'>)</span>
     <span class='id identifier rubyid_parent_is_not_list'>parent_is_not_list</span> <span class='op'>=</span> <span class='tlambda'>-&gt;</span><span class='lparen'>(</span><span class='id identifier rubyid_parent_field'>parent_field</span><span class='rparen'>)</span> <span class='tlambeg'>{</span> <span class='op'>!</span><span class='id identifier rubyid_parent_field'>parent_field</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_list?'>list?</span> <span class='rbrace'>}</span>
-    <span class='id identifier rubyid_resolver'>resolver</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../SchemaElements.html" title="ElasticGraph::SchemaDefinition::SchemaElements (module)">SchemaElements</a></span></span><span class='op'>::</span><span class='const'>FieldPath</span><span class='op'>::</span><span class='const'>Resolver</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+    <span class='id identifier rubyid_resolver'>resolver</span> <span class='op'>=</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_field_path_resolver'>field_path_resolver</span>
     <span class='id identifier rubyid_resolved_path'>resolved_path</span> <span class='op'>=</span> <span class='id identifier rubyid_resolver'>resolver</span><span class='period'>.</span><span class='id identifier rubyid_resolve_public_path'>resolve_public_path</span><span class='lparen'>(</span><span class='id identifier rubyid_indexed_type'>indexed_type</span><span class='comma'>,</span> <span class='id identifier rubyid_public_path_string'>public_path_string</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_parent_is_not_list'>parent_is_not_list</span><span class='rparen'>)</span>
     <span class='kw'>return</span> <span class='id identifier rubyid_resolved_path'>resolved_path</span> <span class='kw'>if</span> <span class='id identifier rubyid_resolved_path'>resolved_path</span>
 
@@ -3467,7 +3487,9 @@ further customization of the index.</p>
 316
 317
 318
-319</pre>
+319
+320
+321</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/indexing/index.rb', line 39</span>
@@ -3491,12 +3513,14 @@ further customization of the index.</p>
 
     <span class='kw'>super</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_settings'>settings</span><span class='comma'>,</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='comma'>,</span> <span class='id identifier rubyid_indexed_type'>indexed_type</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='kw'>nil</span><span class='rparen'>)</span>
 
-    <span class='comment'># `id` is the field Elasticsearch/OpenSearch use for routing by default:
-</span>    <span class='comment'># https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-routing-field.html
-</span>    <span class='comment'># By using it here, it will cause queries to pass a `routing` parameter when
-</span>    <span class='comment'># searching with id filtering on an index that does not use custom shard routing, giving
-</span>    <span class='comment'># us a nice efficiency boost.
-</span>    <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_routing_field_path'>routing_field_path</span> <span class='op'>=</span> <span class='id identifier rubyid_public_field_path'>public_field_path</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>id</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>explanation:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>indexed types must have an `id` field</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_after_user_definition_complete'>after_user_definition_complete</span> <span class='kw'>do</span>
+      <span class='comment'># `id` is the field Elasticsearch/OpenSearch use for routing by default:
+</span>      <span class='comment'># https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-routing-field.html
+</span>      <span class='comment'># By using it here, it will cause queries to pass a `routing` parameter when
+</span>      <span class='comment'># searching with id filtering on an index that does not use custom shard routing, giving
+</span>      <span class='comment'># us a nice efficiency boost.
+</span>      <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_routing_field_path'>routing_field_path</span> <span class='op'>=</span> <span class='id identifier rubyid_public_field_path'>public_field_path</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>id</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>explanation:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>indexed types must have an `id` field</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
 
     <span class='kw'>yield</span> <span class='kw'>self</span> <span class='kw'>if</span> <span class='id identifier rubyid_block_given?'>block_given?</span>
   <span class='kw'>end</span>
@@ -3726,7 +3750,7 @@ further customization of the index.</p>
 
   <span class='kw'>def</span> <span class='id identifier rubyid_public_field_path'>public_field_path</span><span class='lparen'>(</span><span class='id identifier rubyid_public_path_string'>public_path_string</span><span class='comma'>,</span> <span class='label'>explanation:</span><span class='rparen'>)</span>
     <span class='id identifier rubyid_parent_is_not_list'>parent_is_not_list</span> <span class='op'>=</span> <span class='tlambda'>-&gt;</span><span class='lparen'>(</span><span class='id identifier rubyid_parent_field'>parent_field</span><span class='rparen'>)</span> <span class='tlambeg'>{</span> <span class='op'>!</span><span class='id identifier rubyid_parent_field'>parent_field</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_list?'>list?</span> <span class='rbrace'>}</span>
-    <span class='id identifier rubyid_resolver'>resolver</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../SchemaElements.html" title="ElasticGraph::SchemaDefinition::SchemaElements (module)">SchemaElements</a></span></span><span class='op'>::</span><span class='const'>FieldPath</span><span class='op'>::</span><span class='const'>Resolver</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+    <span class='id identifier rubyid_resolver'>resolver</span> <span class='op'>=</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_field_path_resolver'>field_path_resolver</span>
     <span class='id identifier rubyid_resolved_path'>resolved_path</span> <span class='op'>=</span> <span class='id identifier rubyid_resolver'>resolver</span><span class='period'>.</span><span class='id identifier rubyid_resolve_public_path'>resolve_public_path</span><span class='lparen'>(</span><span class='id identifier rubyid_indexed_type'>indexed_type</span><span class='comma'>,</span> <span class='id identifier rubyid_public_path_string'>public_path_string</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_parent_is_not_list'>parent_is_not_list</span><span class='rparen'>)</span>
     <span class='kw'>return</span> <span class='id identifier rubyid_resolved_path'>resolved_path</span> <span class='kw'>if</span> <span class='id identifier rubyid_resolved_path'>resolved_path</span>
 
@@ -4082,7 +4106,9 @@ further customization of the index.</p>
 316
 317
 318
-319</pre>
+319
+320
+321</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/indexing/index.rb', line 39</span>
@@ -4106,12 +4132,14 @@ further customization of the index.</p>
 
     <span class='kw'>super</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_settings'>settings</span><span class='comma'>,</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='comma'>,</span> <span class='id identifier rubyid_indexed_type'>indexed_type</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='kw'>nil</span><span class='rparen'>)</span>
 
-    <span class='comment'># `id` is the field Elasticsearch/OpenSearch use for routing by default:
-</span>    <span class='comment'># https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-routing-field.html
-</span>    <span class='comment'># By using it here, it will cause queries to pass a `routing` parameter when
-</span>    <span class='comment'># searching with id filtering on an index that does not use custom shard routing, giving
-</span>    <span class='comment'># us a nice efficiency boost.
-</span>    <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_routing_field_path'>routing_field_path</span> <span class='op'>=</span> <span class='id identifier rubyid_public_field_path'>public_field_path</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>id</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>explanation:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>indexed types must have an `id` field</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_after_user_definition_complete'>after_user_definition_complete</span> <span class='kw'>do</span>
+      <span class='comment'># `id` is the field Elasticsearch/OpenSearch use for routing by default:
+</span>      <span class='comment'># https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-routing-field.html
+</span>      <span class='comment'># By using it here, it will cause queries to pass a `routing` parameter when
+</span>      <span class='comment'># searching with id filtering on an index that does not use custom shard routing, giving
+</span>      <span class='comment'># us a nice efficiency boost.
+</span>      <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_routing_field_path'>routing_field_path</span> <span class='op'>=</span> <span class='id identifier rubyid_public_field_path'>public_field_path</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>id</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>explanation:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>indexed types must have an `id` field</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
 
     <span class='kw'>yield</span> <span class='kw'>self</span> <span class='kw'>if</span> <span class='id identifier rubyid_block_given?'>block_given?</span>
   <span class='kw'>end</span>
@@ -4341,7 +4369,7 @@ further customization of the index.</p>
 
   <span class='kw'>def</span> <span class='id identifier rubyid_public_field_path'>public_field_path</span><span class='lparen'>(</span><span class='id identifier rubyid_public_path_string'>public_path_string</span><span class='comma'>,</span> <span class='label'>explanation:</span><span class='rparen'>)</span>
     <span class='id identifier rubyid_parent_is_not_list'>parent_is_not_list</span> <span class='op'>=</span> <span class='tlambda'>-&gt;</span><span class='lparen'>(</span><span class='id identifier rubyid_parent_field'>parent_field</span><span class='rparen'>)</span> <span class='tlambeg'>{</span> <span class='op'>!</span><span class='id identifier rubyid_parent_field'>parent_field</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_list?'>list?</span> <span class='rbrace'>}</span>
-    <span class='id identifier rubyid_resolver'>resolver</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../SchemaElements.html" title="ElasticGraph::SchemaDefinition::SchemaElements (module)">SchemaElements</a></span></span><span class='op'>::</span><span class='const'>FieldPath</span><span class='op'>::</span><span class='const'>Resolver</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+    <span class='id identifier rubyid_resolver'>resolver</span> <span class='op'>=</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_field_path_resolver'>field_path_resolver</span>
     <span class='id identifier rubyid_resolved_path'>resolved_path</span> <span class='op'>=</span> <span class='id identifier rubyid_resolver'>resolver</span><span class='period'>.</span><span class='id identifier rubyid_resolve_public_path'>resolve_public_path</span><span class='lparen'>(</span><span class='id identifier rubyid_indexed_type'>indexed_type</span><span class='comma'>,</span> <span class='id identifier rubyid_public_path_string'>public_path_string</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_parent_is_not_list'>parent_is_not_list</span><span class='rparen'>)</span>
     <span class='kw'>return</span> <span class='id identifier rubyid_resolved_path'>resolved_path</span> <span class='kw'>if</span> <span class='id identifier rubyid_resolved_path'>resolved_path</span>
 
@@ -4697,7 +4725,9 @@ further customization of the index.</p>
 316
 317
 318
-319</pre>
+319
+320
+321</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/indexing/index.rb', line 39</span>
@@ -4721,12 +4751,14 @@ further customization of the index.</p>
 
     <span class='kw'>super</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_settings'>settings</span><span class='comma'>,</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='comma'>,</span> <span class='id identifier rubyid_indexed_type'>indexed_type</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='kw'>nil</span><span class='rparen'>)</span>
 
-    <span class='comment'># `id` is the field Elasticsearch/OpenSearch use for routing by default:
-</span>    <span class='comment'># https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-routing-field.html
-</span>    <span class='comment'># By using it here, it will cause queries to pass a `routing` parameter when
-</span>    <span class='comment'># searching with id filtering on an index that does not use custom shard routing, giving
-</span>    <span class='comment'># us a nice efficiency boost.
-</span>    <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_routing_field_path'>routing_field_path</span> <span class='op'>=</span> <span class='id identifier rubyid_public_field_path'>public_field_path</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>id</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>explanation:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>indexed types must have an `id` field</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_after_user_definition_complete'>after_user_definition_complete</span> <span class='kw'>do</span>
+      <span class='comment'># `id` is the field Elasticsearch/OpenSearch use for routing by default:
+</span>      <span class='comment'># https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-routing-field.html
+</span>      <span class='comment'># By using it here, it will cause queries to pass a `routing` parameter when
+</span>      <span class='comment'># searching with id filtering on an index that does not use custom shard routing, giving
+</span>      <span class='comment'># us a nice efficiency boost.
+</span>      <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_routing_field_path'>routing_field_path</span> <span class='op'>=</span> <span class='id identifier rubyid_public_field_path'>public_field_path</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>id</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>explanation:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>indexed types must have an `id` field</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
 
     <span class='kw'>yield</span> <span class='kw'>self</span> <span class='kw'>if</span> <span class='id identifier rubyid_block_given?'>block_given?</span>
   <span class='kw'>end</span>
@@ -4956,7 +4988,7 @@ further customization of the index.</p>
 
   <span class='kw'>def</span> <span class='id identifier rubyid_public_field_path'>public_field_path</span><span class='lparen'>(</span><span class='id identifier rubyid_public_path_string'>public_path_string</span><span class='comma'>,</span> <span class='label'>explanation:</span><span class='rparen'>)</span>
     <span class='id identifier rubyid_parent_is_not_list'>parent_is_not_list</span> <span class='op'>=</span> <span class='tlambda'>-&gt;</span><span class='lparen'>(</span><span class='id identifier rubyid_parent_field'>parent_field</span><span class='rparen'>)</span> <span class='tlambeg'>{</span> <span class='op'>!</span><span class='id identifier rubyid_parent_field'>parent_field</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_list?'>list?</span> <span class='rbrace'>}</span>
-    <span class='id identifier rubyid_resolver'>resolver</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../SchemaElements.html" title="ElasticGraph::SchemaDefinition::SchemaElements (module)">SchemaElements</a></span></span><span class='op'>::</span><span class='const'>FieldPath</span><span class='op'>::</span><span class='const'>Resolver</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+    <span class='id identifier rubyid_resolver'>resolver</span> <span class='op'>=</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_field_path_resolver'>field_path_resolver</span>
     <span class='id identifier rubyid_resolved_path'>resolved_path</span> <span class='op'>=</span> <span class='id identifier rubyid_resolver'>resolver</span><span class='period'>.</span><span class='id identifier rubyid_resolve_public_path'>resolve_public_path</span><span class='lparen'>(</span><span class='id identifier rubyid_indexed_type'>indexed_type</span><span class='comma'>,</span> <span class='id identifier rubyid_public_path_string'>public_path_string</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_parent_is_not_list'>parent_is_not_list</span><span class='rparen'>)</span>
     <span class='kw'>return</span> <span class='id identifier rubyid_resolved_path'>resolved_path</span> <span class='kw'>if</span> <span class='id identifier rubyid_resolved_path'>resolved_path</span>
 
@@ -5068,12 +5100,12 @@ fields must exist when this is called.</p>
       <pre class="lines">
 
 
-88
-89
-90</pre>
+90
+91
+92</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/indexing/index.rb', line 88</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/indexing/index.rb', line 90</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_default_sort'>default_sort</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_field_name_direction_pairs'>field_name_direction_pairs</span><span class='rparen'>)</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_default_sort_pairs'>default_sort_pairs</span> <span class='op'>=</span> <span class='id identifier rubyid_field_name_direction_pairs'>field_name_direction_pairs</span>
@@ -5185,8 +5217,6 @@ fields must exist when this is called.</p>
       <pre class="lines">
 
 
-122
-123
 124
 125
 126
@@ -5205,10 +5235,12 @@ fields must exist when this is called.</p>
 139
 140
 141
-142</pre>
+142
+143
+144</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/indexing/index.rb', line 122</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/indexing/index.rb', line 124</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_rollover'>rollover</span><span class='lparen'>(</span><span class='id identifier rubyid_frequency'>frequency</span><span class='comma'>,</span> <span class='id identifier rubyid_timestamp_field_path_name'>timestamp_field_path_name</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_after_user_definition_complete'>after_user_definition_complete</span> <span class='kw'>do</span>
@@ -5328,8 +5360,6 @@ fields must exist when this is called.</p>
       <pre class="lines">
 
 
-173
-174
 175
 176
 177
@@ -5342,10 +5372,12 @@ fields must exist when this is called.</p>
 184
 185
 186
-187</pre>
+187
+188
+189</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/indexing/index.rb', line 173</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/indexing/index.rb', line 175</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_route_with'>route_with</span><span class='lparen'>(</span><span class='id identifier rubyid_routing_field_path_name'>routing_field_path_name</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_after_user_definition_complete'>after_user_definition_complete</span> <span class='kw'>do</span>
@@ -5409,8 +5441,6 @@ fields must exist when this is called.</p>
       <pre class="lines">
 
 
-217
-218
 219
 220
 221
@@ -5422,10 +5452,12 @@ fields must exist when this is called.</p>
 227
 228
 229
-230</pre>
+230
+231
+232</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/indexing/index.rb', line 217</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/indexing/index.rb', line 219</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_runtime_metadata'>runtime_metadata</span>
   <span class='const'>SchemaArtifacts</span><span class='op'>::</span><span class='const'>RuntimeMetadata</span><span class='op'>::</span><span class='const'>IndexDefinition</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span>
@@ -5488,16 +5520,16 @@ fields must exist when this is called.</p>
       <pre class="lines">
 
 
-196
-197
 198
 199
 200
 201
-202</pre>
+202
+203
+204</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/indexing/index.rb', line 196</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/indexing/index.rb', line 198</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_index_config'>to_index_config</span>
   <span class='lbrace'>{</span>
@@ -5553,8 +5585,6 @@ fields must exist when this is called.</p>
       <pre class="lines">
 
 
-205
-206
 207
 208
 209
@@ -5562,10 +5592,12 @@ fields must exist when this is called.</p>
 211
 212
 213
-214</pre>
+214
+215
+216</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/indexing/index.rb', line 205</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/indexing/index.rb', line 207</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_index_template_config'>to_index_template_config</span>
   <span class='lbrace'>{</span>
@@ -5631,12 +5663,12 @@ fields must exist when this is called.</p>
       <pre class="lines">
 
 
-191
-192
-193</pre>
+193
+194
+195</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/indexing/index.rb', line 191</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/indexing/index.rb', line 193</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_uses_custom_routing?'>uses_custom_routing?</span>
   <span class='id identifier rubyid_routing_field_path'>routing_field_path</span><span class='period'>.</span><span class='id identifier rubyid_path_in_index'>path_in_index</span> <span class='op'>!=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>id</span><span class='tstring_end'>&quot;</span></span>
@@ -5651,7 +5683,7 @@ fields must exist when this is called.</p>
 </div>
 
       <div id="footer">
-  Generated on Mon Jan 27 21:57:38 2025 by
+  Generated on Mon Jan 27 21:58:16 2025 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.37 (ruby-3.3.6).
 </div>
