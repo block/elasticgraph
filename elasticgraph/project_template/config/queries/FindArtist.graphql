@@ -1,0 +1,23 @@
+query FindArtist {
+  byName: artists(filter: {
+    name: {equalToAnyOf: ["U2"]}
+  }) {
+    nodes {
+      name
+      bio {
+        yearFormed
+      }
+    }
+  }
+
+  byBioYearFounded: artists(filter: {
+    bio: {yearFormed: {gt: 2000}}
+  }) {
+    nodes {
+      name
+      bio {
+        yearFormed
+      }
+    }
+  }
+}

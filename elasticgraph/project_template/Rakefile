@@ -1,0 +1,14 @@
+# frozen_string_literal: true
+
+project_root = File.expand_path("..", __FILE__)
+
+require "delegate"
+require "json"
+require "yaml"
+
+require "elastic_graph/local/rake_tasks"
+
+local_config_yaml = "#{project_root}/config/settings/local.yaml"
+path_to_schema = ::File.join(project_root.to_s, "config/schema/main.rb")
+
+ElasticGraph::Local::RakeTasks.new(local_config_yaml: local_config_yaml, path_to_schema: path_to_schema)

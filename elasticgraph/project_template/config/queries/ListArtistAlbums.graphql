@@ -1,0 +1,15 @@
+query ListArtistAlbums {
+  artists {
+    nodes {
+      name
+      albums {
+        name
+        releasedOn
+
+        tracks {
+          name
+        }
+      }
+    }
+  }
+}

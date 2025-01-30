@@ -39,10 +39,18 @@ Gem::Specification.new do |spec|
     end - [".rspec", "Gemfile", ".yardopts"]
   end
 
+  # ElasticGraph CLI
+  spec.require_paths = ["lib"]
+
   spec.required_ruby_version = [">= 3.2", "< 3.5"]
+
+  spec.add_dependency "thor", "~> 1.2"
 
   spec.add_dependency "elasticgraph-admin", ElasticGraph::VERSION
   spec.add_dependency "elasticgraph-graphql", ElasticGraph::VERSION
   spec.add_dependency "elasticgraph-indexer", ElasticGraph::VERSION
   spec.add_dependency "elasticgraph-local", ElasticGraph::VERSION
+
+  # Expose 'elasticgraph' as a binary
+  spec.executables = ["elasticgraph"]
 end

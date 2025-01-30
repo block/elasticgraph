@@ -1,0 +1,49 @@
+# This settings file will be used by your staging AWS lambda functions.
+datastore:
+  client_faraday_adapter:
+    name: httpx
+    require: httpx/adapters/faraday
+  clusters: {} # will be populated by an ENV var at boot time
+  index_definitions:
+    # TODO: replace "people" with your indexed type (and add a definition for each indexed type)
+    people: &people_index_settings
+      # TODO: replace "customers" with your dataset name
+      query_cluster: "customers"
+      # TODO: replace "customers" with your dataset name
+      index_into_clusters: ["customers"]
+      ignore_routing_values: []
+      custom_timestamp_ranges: []
+      setting_overrides:
+        number_of_shards: 3
+      setting_overrides_by_timestamp: {}
+    companies: *people_index_settings
+  log_traffic: false
+indexer:
+  latency_slo_thresholds_by_timestamp_in_ms:
+    sqs_received_at: 10000
+schema_artifacts:
+  directory: config/schema/artifacts
+logger:
+  device: stdout
+graphql:
+  default_page_size: 50
+  max_page_size: 500
+  extension_modules: []
+  # client_resolver:
+  #   require_path:
+  #   extension_name: 
+# health_check:
+#   clusters_to_consider: ["customers"] # TODO: replace "customers" with your dataset name
+#   data_recency_checks:
+#     People: # TODO: replace "people" with your indexed type
+#       timestamp_field: createdAt
+#       expected_max_recency_seconds: 30 # TODO: replace 30 based on the expected frequency of indexing for your dataset.
+query_registry:
+  allow_unregistered_clients: false
+  allow_any_query_for_clients:
+  # To support Block engineers writing queries in egproxy, we need to allow unregistered queries from it:
+  - egproxy
+  # graphql-gateway has its own auth system and integrates into Apollo studio to verify schema changes against recent
+  # queries. We don't want to require queries coming through the gateway to be registered.
+  - graphql-gateway
+  path_to_registry: config/queries
