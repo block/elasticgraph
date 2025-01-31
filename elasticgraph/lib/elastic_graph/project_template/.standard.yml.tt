@@ -1,0 +1,8 @@
+ruby_version: <%= ElasticGraph.setup_env.ruby_major_minor %>
+format: progress
+ignore:
+  - bin/**/*
+  - bundle/**/*
+  - .bundle/**/*
+  - log/**/*
+  - tmp/**/*

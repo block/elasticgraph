@@ -5,7 +5,7 @@ parts of ElasticGraph are used from the same deployed app.
 
 ## Getting Started
 
-Run this command to bootsrap a new local project with a default template
+Run this command to bootstrap a new local project with a default template
 
 ```bash
 elasticgraph new my_app

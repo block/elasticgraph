@@ -1,0 +1,189 @@
+# <%= ElasticGraph.setup_env.app_name %> ElasticGraph Project
+
+This repository contains the files for creating and maintaining the <%= ElasticGraph.setup_env.app_name %> ElasticGraph Project.
+
+## Development Environment
+
+Here's what you need:
+
+| Requirement    | Version | Installation Instructions                                                 |
+|----------------|---------|---------------------------------------------------------------------------|
+| Ruby           | <%= ElasticGraph.setup_env.ruby_major_minor %>.x   | [ruby-lang.org](https://www.ruby-lang.org/en/documentation/installation/) |
+| Docker Engine  | 27.x    | [docker.com](https://docs.docker.com/engine/install/)                     |
+| Docker Compose | 2.29.x  | [docker.com](https://docs.docker.com/compose/install/)                    |
+
+### Ruby
+
+This project is written in Ruby, a dynamic, open source programming language with a focus on simplicity and productivity.
+
+You may verify your `ruby` installation via the terminal:
+
+```bash
+$ ruby -v
+ruby 3.4.1 (2024-12-25 revision 48d4efcb85) +PRISM [arm64-darwin24]
+```
+
+If you do not have Ruby, we recommend installing it using one of the following:
+
+* [RVM](https://rvm.io/)
+* [asdf](https://asdf-vm.com/)
+* [rbenv](https://rbenv.org/)
+* [ruby-install](https://github.com/postmodern/ruby-install)
+
+### Ruby Dependencies
+
+Ruby dependencies are managed using [bundler](https://bundler.io/), which comes installed with Ruby.
+To install Ruby dependencies, run:
+
+```bash
+$ bundle install
+```
+
+Once that is done, prefix Ruby commands with `bundle exec` in order to run them in the context of the project bundle.
+
+### Docker and Docker Compose
+
+This project uses Docker Engine and Docker Compose to run <%= ElasticGraph.setup_env.datastore_name %> locally. We recommend installing
+[Docker Desktop](https://docs.docker.com/desktop/) to get both Docker dependencies.
+
+## Local Development
+
+Some useful commands to try:
+
+```bash
+# The build rake task can be used after making changes to rebuild everything
+bundle exec rake build
+
+# See all tasks available for managing your project and schemas
+bundle exec rake -T
+
+# Boot a local instance prepopulated with fake data, useful for experimenting
+bundle exec rake boot_locally
+
+# The GraphiQL UI should open automatically
+open http://localhost:9393/
+
+# You can also visit <%= ElasticGraph.setup_env.datastore_ui_name %> via:
+open http://localhost:19293/
+```
+
+### Run Build Tasks
+
+Run a complete suite of build tasks with the build `rake` task:
+
+```bash
+bundle exec rake build
+```
+
+This will:
+1. (Re)generate your schema artifacts
+2. Validate all registered queries against the latest schema
+3. Lint everything (use `bundle exec standardrb --fix` to fix most issues)
+4. Run tests (including the common shared ElasticGraph tests)
+
+Note: on CI, you'll want to use `bundle exec rake check` instead of `bundle exec rake build`,
+so that it verifies that schema artifacts are up-to-date (rather than dumping them).
+
+### Upgrading ElasticGraph
+
+Upgrades to the ElasticGraph gems will come with [release notes](https://github.com/block/elasticgraph/releases/tag/v0.19.0.0) that include upgrade instructions, if necessary.
+
+Here's the bare minimum upgrade process:
+
+1. Modify `elasticgraph_details` in the root `Gemfile` and run `bundle install`.
+2. Run `bundle exec rake`.
+3. Commit the results.
+
+### Managing <%= ElasticGraph.setup_env.datastore_name %>
+
+The `<%= ElasticGraph.setup_env.datastore %>:` tasks will boot the desired <%= ElasticGraph.setup_env.datastore_name %> version using docker. You can
+use either the `:boot` or `:daemon` tasks:
+
+* The `:boot` task will keep <%= ElasticGraph.setup_env.datastore_name %> in the foreground, allowing you to see the logs.
+* The `:daemon` task runs <%= ElasticGraph.setup_env.datastore_name %> as a background daemon task. Notably, it waits to return
+  until <%= ElasticGraph.setup_env.datastore_name %> is ready to receive traffic.
+
+If you use a `:daemon` task, you can later use the corresponding `:halt` task to stop the daemon.
+
+### Using the GraphiQL interactive GraphQL query editor
+
+When running `bundle exec rake boot_locally` the GraphiQL editor should open automatically
+(`open http://localhost:9393/`). Using it you can query your ElasticGraph cluster using GraphQL.
+
+### Seeding Fake Data
+
+The `bundle exec rake index_fake_data:<type_name>` tasks generate and index a batch of fake data.
+You can pass an arg (note quotes) to seed more batches of data:
+`bundle exec rake "index_fake_data:<type_name>[10]"`.
+
+### Using <%= ElasticGraph.setup_env.datastore_ui_name %>
+
+After running `bundle exec rake boot_locally` and opening <%= ElasticGraph.setup_env.datastore_ui_name %>
+`open http://localhost:19293/` click "Dev Tools" to open the <%= ElasticGraph.setup_env.datastore_name %> console.
+
+Here are some queries to get you started:
+
+```
+# Cluster info
+GET /_cat/indices?v
+GET /_cat/shards?v
+GET /_cat/templates?v
+GET /_cat/nodes?v
+GET /_cat/allocation?v
+
+# Or with a pattern
+GET /_cat/shards/*_rollover__202*?v
+
+# More cluster info
+GET /_cluster/health
+GET /_cluster/settings
+
+# Test queries (change from `artists` to your dataset's name)
+GET /artists_rollover__*/_search
+{
+  "from": 0,
+  "size": 1
+}
+
+GET /people_rollover__*/_search
+{
+  "from": 0,
+  "size": 1,
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "bio": "accordion"
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+### Query Registry
+
+This project uses the ElasticGraph query registry extension. This is an optional piece you can choose to remove,
+but provides many benefits--see the [elasticgraph-query_registry
+README](https://github.com/block/elasticgraph/tree/main/elasticgraph-query_registry#elasticgraphqueryregistry)
+for details.
+
+With the registry in place, clients must register their queries in a directory under
+[config/queries](config/queries) that matches their resolved application name.
+The CI build will validate that all schema changes are compatible with all registered queries, and
+your deployed GraphQL endpoints will reject any unregistered queries.
+
+Clients can also write tests for registered queries. See
+[config/queries/data_verification_tests](config/queries/data_verification_tests) (described below)
+for an example.
+
+To run the query tests, use this command:
+
+```bash
+$ bundle exec rspec config/queries
+```
+
+Note: these tests won't pass until you first update the list of tested endpoints
+in `spec/support/query_spec_support.rb` to match your endpoints.

@@ -1,0 +1,14 @@
+require_relative "factories"
+
+module <%= ElasticGraph.setup_env.app_module %>
+  module FakeDataBatchGenerator
+    def self.generate(artists:, venues:)
+      venue_list = FactoryBot.build_list(:venue, venues)
+      venue_ids = venue_list.map { |v| v.fetch(:id) }
+
+      artist_list = FactoryBot.build_list(:artist, artists, venueIds: venue_ids)
+
+      venue_list + artist_list
+    end
+  end
+end

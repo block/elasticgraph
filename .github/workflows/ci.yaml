@@ -64,6 +64,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Configure Git
+        run: |
+          git config --global user.name "GitHub Action Bot"
+          git config --global user.email "action@github.com"
+          git config --global init.defaultBranch main
+
       # Note: the `10` argument on the end is a number of seconds to sleep after booting the datastore.
       # We've found that there is a minor race condition where the shards aren't fully ready for the tests
       # to hit them if we don't wait a bit after booting.

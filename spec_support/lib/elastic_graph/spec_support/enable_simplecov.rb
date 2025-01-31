@@ -96,6 +96,8 @@ SimpleCov.start do
 
   add_filter "/bundle"
 
+  add_filter "/elastic_graph/project_template/"
+
   # When we use `script/run_specs` we avoid running the `elasticgraph-local` specs, but some of the
   # elasticgraph-local code gets loaded and used as a dependency. We don't want to consider its coverage
   # status if we're not running it's test suite.

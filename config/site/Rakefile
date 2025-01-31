@@ -24,6 +24,7 @@ module ElasticGraph
 
     # The list of currently undocumented gems. Over time we're going to shrink this until it's empty.
     undocumented_gems = %w[
+      elasticgraph
       elasticgraph-admin
       elasticgraph-datastore_core
       elasticgraph-graphql

@@ -52,6 +52,11 @@ target :elasticgraph_gems do
     elasticgraph-indexer/lib/elastic_graph/indexer/spec_support/event_matcher.rb
   ])
 
+  # elasticgraph-local: existing files that don't type check yet.
+  ignore(*%w[
+    elasticgraph-local/lib/elastic_graph/local/spec_support/common_project_specs.rb
+  ])
+
   # elasticgraph-schema_artifacts: existing files that don't type check yet.
   ignore(*%w[
     elasticgraph-schema_artifacts/lib/elastic_graph/schema_artifacts/runtime_metadata/schema_element_names.rb

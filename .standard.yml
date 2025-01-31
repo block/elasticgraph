@@ -8,6 +8,10 @@ ignore:
   - log/**/*
   - tmp/**/*
   - "*/vendor/**/*"
+  - "elasticgraph/lib/elastic_graph/project_template/**/*":
+    # We don't want the standard comment header to be required on project template files,
+    # as they don't need to be on the end files of an ElasticGraph project.
+    - ElasticGraph/RequireStandardCommentHeader
   - "**/*.rb":
     # This cop forces syntax that steep does not yet support. (e.g. `def foo(**); bar(**); end`)
     # Once steep supports that, we can stop ignoring this one.

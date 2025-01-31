@@ -8,7 +8,7 @@ easier. The libraries that ship with ElasticGraph can be broken down into severa
 
 These libraries form the core backbone of ElasticGraph that is designed to run in a production deployment. Every ElasticGraph deployment will need to use all of these.
 
-* [elasticgraph](elasticgraph/README.md): ElasticGraph meta-gem that pulls in all the core ElasticGraph gems.
+* [elasticgraph](elasticgraph/README.md): Bootstraps ElasticGraph.
 * [elasticgraph-admin](elasticgraph-admin/README.md): ElasticGraph gem that provides datastore administrative tasks, to keep a datastore up-to-date with an ElasticGraph schema.
 * [elasticgraph-datastore_core](elasticgraph-datastore_core/README.md): ElasticGraph gem containing the core datastore support types and logic.
 * [elasticgraph-graphql](elasticgraph-graphql/README.md): The ElasticGraph GraphQL query engine.
@@ -21,7 +21,7 @@ These libraries form the core backbone of ElasticGraph that is designed to run i
 
 ```mermaid
 graph LR;
-    elasticgraph --> elasticgraph-admin & elasticgraph-graphql & elasticgraph-indexer & elasticgraph-local
+    elasticgraph --> elasticgraph-support & thor
     elasticgraph-admin --> elasticgraph-datastore_core & elasticgraph-indexer & elasticgraph-schema_artifacts & elasticgraph-support & rake
     elasticgraph-datastore_core --> elasticgraph-schema_artifacts & elasticgraph-support
     elasticgraph-graphql --> elasticgraph-datastore_core & elasticgraph-schema_artifacts & graphql
@@ -37,7 +37,7 @@ graph LR;
     style elasticgraph-json_schema color: DodgerBlue;
     style elasticgraph-schema_artifacts color: DodgerBlue;
     style elasticgraph-support color: DodgerBlue;
-    style elasticgraph-local color: Green;
+    style thor color: Red;
     style rake color: Red;
     style graphql color: Red;
     style hashdiff color: Red;
@@ -48,6 +48,7 @@ click hashdiff href "https://rubygems.org/gems/hashdiff"
 click json_schemer href "https://rubygems.org/gems/json_schemer"
 click logger href "https://rubygems.org/gems/logger"
 click rake href "https://rubygems.org/gems/rake"
+click thor href "https://rubygems.org/gems/thor"
 ```
 
 ### AWS Lambda Integration Libraries (5 gems)

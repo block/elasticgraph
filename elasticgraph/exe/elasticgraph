@@ -1,3 +1,4 @@
+#!/usr/bin/env ruby
 # Copyright 2024 Block, Inc.
 #
 # Use of this source code is governed by an MIT-style
@@ -6,9 +7,5 @@
 #
 # frozen_string_literal: true
 
-require "thor"
-require_relative "elasticgraph/cli"
-
-module ElasticGraph
-  # The main entry point for our CLI is in elasticgraph/cli.rb
-end
+require "elastic_graph/cli"
+ElasticGraph::CLI.start(ARGV)

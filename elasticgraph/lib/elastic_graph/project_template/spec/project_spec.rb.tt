@@ -1,0 +1,18 @@
+require "elastic_graph/local/spec_support/common_project_specs"
+require "<%= ElasticGraph.setup_env.app_name %>/factories"
+require "<%= ElasticGraph.setup_env.app_name %>/fake_data_batch_generator"
+
+RSpec.describe "ElasticGraph project" do
+  ignored_factories = [
+    # List any factories to ignore
+  ]
+
+  include_examples "an ElasticGraph project",
+    use_settings_yaml: "local.yaml",
+    ignored_factories: ignored_factories
+
+  it "generates a batch of valid records from `FakeDataBatchGenerator`" do
+    batch = <%= ElasticGraph.setup_env.app_module %>::FakeDataBatchGenerator.generate(artists: 20, venues: 5)
+    expect(batch.size).to eq(25)
+  end
+end

@@ -50,6 +50,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "rake", "~> 13.2"
   spec.add_dependency "webrick", "~> 1.9"
 
+  spec.add_development_dependency "elasticgraph-apollo", ElasticGraph::VERSION
   spec.add_development_dependency "elasticgraph-elasticsearch", ElasticGraph::VERSION
   spec.add_development_dependency "elasticgraph-opensearch", ElasticGraph::VERSION
 end

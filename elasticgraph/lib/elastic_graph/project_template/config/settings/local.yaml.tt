@@ -4,20 +4,19 @@ datastore:
     require: httpx/adapters/faraday
   clusters:
     main:
-      backend: opensearch
+      backend: <%= ElasticGraph.setup_env.datastore %>
       url: http://localhost:9293
       settings: {}
   index_definitions:
     # TODO: replace this `artists:` key with your dataset's name (e.g. `customers:`)
     artists: &main_index_settings
-      # The local cluster name is hard-coded to "main" to make it
-      # easy for you to start a local instance for testing:
+      # elasticgraph-local relies on the cluster being named "main".
       query_cluster: "main"
       index_into_clusters: ["main"]
       ignore_routing_values: []
       custom_timestamp_ranges: []
       setting_overrides:
-        number_of_shards: 1
+        number_of_shards: 10
       setting_overrides_by_timestamp: {}
     venues: *main_index_settings
   max_client_retries: 3
