@@ -1889,8 +1889,8 @@ registered callback.</p>
   <span class='label'>local_config_yaml:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>config/settings/local.yaml</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
   <span class='label'>path_to_schema:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>config/schema.rb</span><span class='tstring_end'>&quot;</span></span>
 <span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_tasks'>tasks</span><span class='op'>|</span>
-  <span class='id identifier rubyid_tasks'>tasks</span><span class='period'>.</span><span class='id identifier rubyid_define_fake_data_batch_for'>define_fake_data_batch_for</span> <span class='symbol'>:campaigns</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_batch'>batch</span><span class='op'>|</span>
-    <span class='id identifier rubyid_batch'>batch</span><span class='period'>.</span><span class='id identifier rubyid_concat'>concat</span><span class='lparen'>(</span><span class='const'>FactoryBot</span><span class='period'>.</span><span class='id identifier rubyid_build_list'>build_list</span><span class='lparen'>(</span><span class='symbol'>:campaigns</span><span class='rparen'>)</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_tasks'>tasks</span><span class='period'>.</span><span class='id identifier rubyid_define_fake_data_batch_for'>define_fake_data_batch_for</span> <span class='symbol'>:campaigns</span> <span class='kw'>do</span>
+    <span class='const'>FactoryBot</span><span class='period'>.</span><span class='id identifier rubyid_build_list'>build_list</span><span class='lparen'>(</span><span class='symbol'>:campaigns</span><span class='rparen'>)</span>
   <span class='kw'>end</span>
 <span class='kw'>end</span></code></pre>
     
@@ -1972,7 +1972,7 @@ registered callback.</p>
 </div>
 
       <div id="footer">
-  Generated on Tue Feb  4 15:56:57 2025 by
+  Generated on Tue Feb  4 15:57:43 2025 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.37 (ruby-3.3.6).
 </div>
