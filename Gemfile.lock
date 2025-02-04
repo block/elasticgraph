@@ -1,3 +1,11 @@
+GIT
+  remote: https://gitlab.com/os85/httpx.git
+  revision: 29c8584bf869e73e1eda2333e92c43e15d2c33b0
+  ref: 29c8584bf869e73e1eda2333e92c43e15d2c33b0
+  specs:
+    httpx (1.4.0)
+      http-2 (>= 1.0.0)
+
 PATH
   remote: elasticgraph-admin_lambda
   specs:
@@ -297,8 +305,6 @@ GEM
     hashdiff (1.1.2)
     http-2 (1.0.2)
     http_parser.rb (0.8.0)
-    httpx (1.4.0)
-      http-2 (>= 1.0.0)
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
     jekyll (4.4.1)
@@ -558,7 +564,7 @@ DEPENDENCIES
   faraday (~> 2.12)
   filewatcher (~> 2.1)
   flatware-rspec (~> 2.3, >= 2.3.4)
-  httpx (~> 1.3)
+  httpx (~> 1.3)!
   jekyll (~> 4.4)
   method_source (~> 1.1)
   rack-test (~> 2.1)
