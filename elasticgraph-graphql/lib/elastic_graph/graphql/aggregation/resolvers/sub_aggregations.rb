@@ -29,6 +29,7 @@ module ElasticGraph
             new_field_path = field_path + [path_segment]
             return with(field_path: new_field_path) unless field.type.elasticgraph_category == :nested_sub_aggregation_connection
 
+            args = field.args_to_schema_form(args.except(:lookahead))
             sub_agg_key = FieldPathEncoder.encode(new_field_path.map(&:name_in_graphql_query))
             sub_agg_query = Support::HashUtil.verbose_fetch(sub_aggregations, sub_agg_key).query
 

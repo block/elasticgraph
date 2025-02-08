@@ -400,8 +400,8 @@ module ElasticGraph
 
               def resolve(field:, object:, args:, context:, lookahead:)
                 [
-                  args.dig("operands", "x"),
-                  args.dig("operands", "y"),
+                  args.dig(:operands, "x"),
+                  args.dig(:operands, "y"),
                   context[:additional_operand]
                 ].compact.reduce(:*)
               end

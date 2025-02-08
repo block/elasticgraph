@@ -35,6 +35,8 @@ module ElasticGraph
             build_filter(join.filter_id_field_name, nil, join.foreign_key_nested_paths, Array(id_or_ids)),
             join.additional_filter
           ].reject(&:empty?)
+
+          args = field.args_to_schema_form(args.except(:lookahead))
           query = @resolver_query_adapter
             .build_query_from(field: field, args: args, lookahead: lookahead, context: context)
             .merge_with(filters: filters)

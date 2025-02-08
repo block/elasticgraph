@@ -131,7 +131,6 @@ module ElasticGraph
 
             def resolve(args: {}, **options)
               person, field = person_object_and_schema_field(**options)
-              args = field.args_to_schema_form(args)
               lookahead = instance_double("GraphQL::Execution::Lookahead")
               person.resolve(field: field, object: person, context: {}, args: args, lookahead: lookahead)
             end

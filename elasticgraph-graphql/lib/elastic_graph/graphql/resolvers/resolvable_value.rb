@@ -28,6 +28,7 @@ module ElasticGraph
         end
 
         def resolve(field:, object:, context:, args:, lookahead:)
+          args = field.args_to_schema_form(args.except(:lookahead))
           method_name = canonical_name_for(field.name, "Field")
           public_send(method_name, **args_to_canonical_form(args))
         end

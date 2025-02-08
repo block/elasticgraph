@@ -35,9 +35,6 @@ module ElasticGraph
           # It is not a "real" arg in the schema and breaks `args_to_schema_form` when we call that
           # so we need to peel it off here.
           lookahead = args[:lookahead]
-          # Convert args to the form they were defined in the schema, undoing the normalization
-          # the GraphQL gem does to convert them to Ruby keyword args form.
-          args = schema_field.args_to_schema_form(args.except(:lookahead))
 
           resolver = resolver_for(schema_field, object) do
             raise <<~ERROR
