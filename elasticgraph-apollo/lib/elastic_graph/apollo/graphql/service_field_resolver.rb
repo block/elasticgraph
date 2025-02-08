@@ -17,7 +17,7 @@ module ElasticGraph
           field.parent_type.name == :Query && field.name == :_service
         end
 
-        def resolve(field:, object:, args:, context:)
+        def call(parent_type, field, object, args, context)
           {"sdl" => service_sdl(context.fetch(:elastic_graph_schema).graphql_schema)}
         end
 

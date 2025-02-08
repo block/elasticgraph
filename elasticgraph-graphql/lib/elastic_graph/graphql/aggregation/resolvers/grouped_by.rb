@@ -18,7 +18,8 @@ module ElasticGraph
             true
           end
 
-          def resolve(field:, object:, args:, context:)
+          def call(parent_type, graphql_field, object, args, context)
+            field = context.fetch(:elastic_graph_schema).field_named(parent_type.graphql_name, graphql_field.name)
             new_field_path = field_path + [PathSegment.for(field: field, lookahead: args.fetch(:lookahead))]
             return with(field_path: new_field_path) if field.type.object?
 

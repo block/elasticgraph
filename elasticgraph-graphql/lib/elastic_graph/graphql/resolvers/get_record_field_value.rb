@@ -23,7 +23,8 @@ module ElasticGraph
           object.is_a?(DatastoreResponse::Document) || object.is_a?(::Hash)
         end
 
-        def resolve(field:, object:, args:, context:)
+        def call(parent_type, graphql_field, object, args, context)
+          field = context.fetch(:elastic_graph_schema).field_named(parent_type.graphql_name, graphql_field.name)
           field_name = field.name_in_index.to_s
           data =
             case object
