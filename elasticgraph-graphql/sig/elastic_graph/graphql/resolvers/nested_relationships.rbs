@@ -5,6 +5,7 @@ module ElasticGraph
         include _Resolver
 
         def initialize: (
+          resolver_query_adapter: Resolvers::QueryAdapter,
           schema_element_names: SchemaArtifacts::RuntimeMetadata::SchemaElementNames,
           logger: ::Logger
         ) -> void

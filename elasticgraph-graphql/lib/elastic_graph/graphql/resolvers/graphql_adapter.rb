@@ -13,9 +13,8 @@ module ElasticGraph
       # our resolvers. Responsible for routing a resolution request to the appropriate
       # resolver.
       class GraphQLAdapter
-        def initialize(schema:, query_adapter:, runtime_metadata:, resolvers:)
+        def initialize(schema:, runtime_metadata:, resolvers:)
           @schema = schema
-          @query_adapter = query_adapter
           @resolvers = resolvers
 
           scalar_types_by_name = runtime_metadata.scalar_types_by_name
@@ -56,9 +55,7 @@ module ElasticGraph
             ERROR
           end
 
-          result = resolver.resolve(field: schema_field, object: object, args: args, context: context, lookahead: lookahead) do
-            @query_adapter.build_query_from(field: schema_field, args: args, lookahead: lookahead, context: context)
-          end
+          result = resolver.resolve(field: schema_field, object: object, args: args, context: context, lookahead: lookahead)
 
           # Give the field a chance to coerce the result before returning it. Initially, this is only used to deal with
           # enum value overrides (e.g. so that if `DayOfWeek.MONDAY` has been overridden to `DayOfWeek.MON`, we can coerce
