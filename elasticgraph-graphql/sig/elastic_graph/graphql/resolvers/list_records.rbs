@@ -3,6 +3,8 @@ module ElasticGraph
     module Resolvers
       class ListRecords
         include _Resolver
+
+        def initialize: (resolver_query_adapter: Resolvers::QueryAdapter) -> void
       end
     end
   end
