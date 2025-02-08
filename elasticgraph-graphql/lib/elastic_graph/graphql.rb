@@ -101,8 +101,7 @@ module ElasticGraph
             require "elastic_graph/graphql/resolvers/graphql_adapter"
             Resolvers::GraphQLAdapter.new(
               schema: schema,
-              datastore_query_builder: datastore_query_builder,
-              datastore_query_adapters: datastore_query_adapters,
+              query_adapter: resolver_query_adapter,
               runtime_metadata: runtime_metadata,
               resolvers: graphql_resolvers
             )
@@ -120,6 +119,17 @@ module ElasticGraph
           logger: logger,
           monotonic_clock: monotonic_clock,
           config: @config
+        )
+      end
+    end
+
+    # @private
+    def resolver_query_adapter
+      @resolver_query_adapter ||= begin
+        require "elastic_graph/graphql/resolvers/query_adapter"
+        Resolvers::QueryAdapter.new(
+          datastore_query_builder: datastore_query_builder,
+          datastore_query_adapters: datastore_query_adapters
         )
       end
     end

@@ -6,8 +6,6 @@
 #
 # frozen_string_literal: true
 
-require "elastic_graph/graphql/resolvers/query_adapter"
-
 module ElasticGraph
   class GraphQL
     module Resolvers
@@ -15,13 +13,9 @@ module ElasticGraph
       # our resolvers. Responsible for routing a resolution request to the appropriate
       # resolver.
       class GraphQLAdapter
-        def initialize(schema:, datastore_query_builder:, datastore_query_adapters:, runtime_metadata:, resolvers:)
+        def initialize(schema:, query_adapter:, runtime_metadata:, resolvers:)
           @schema = schema
-          @query_adapter = QueryAdapter.new(
-            datastore_query_builder: datastore_query_builder,
-            datastore_query_adapters: datastore_query_adapters
-          )
-
+          @query_adapter = query_adapter
           @resolvers = resolvers
 
           scalar_types_by_name = runtime_metadata.scalar_types_by_name

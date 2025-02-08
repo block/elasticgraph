@@ -18,8 +18,7 @@ module ElasticGraph
         it "raises a clear error when no resolver can be found" do
           adapter = GraphQLAdapter.new(
             schema: schema,
-            datastore_query_builder: graphql.datastore_query_builder,
-            datastore_query_adapters: graphql.datastore_query_adapters,
+            query_adapter: graphql.resolver_query_adapter,
             runtime_metadata: graphql.runtime_metadata,
             resolvers: graphql.graphql_resolvers
           )
