@@ -46,7 +46,7 @@ module ElasticGraph
             ERROR
           end
 
-          result = resolver.resolve(field: schema_field, object: object, args: args, context: context)
+          result = resolver.call(parent_type, field, object, args, context)
 
           # Give the field a chance to coerce the result before returning it. Initially, this is only used to deal with
           # enum value overrides (e.g. so that if `DayOfWeek.MONDAY` has been overridden to `DayOfWeek.MON`, we can coerce

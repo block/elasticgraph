@@ -5,11 +5,12 @@ module ElasticGraph
 
       interface _Resolver
         def can_resolve?: (field: Schema::Field, object: untyped) -> bool
-        def resolve: (
-          field: Schema::Field,
-          object: untyped,
-          context: ::GraphQL::Query::Context,
-          args: fieldArgs
+        def call: (
+          ::GraphQL::Schema::_Type,
+          ::GraphQL::Schema::Field,
+          untyped,
+          fieldArgs,
+          ::GraphQL::Query::Context
         ) -> untyped
       end
     end

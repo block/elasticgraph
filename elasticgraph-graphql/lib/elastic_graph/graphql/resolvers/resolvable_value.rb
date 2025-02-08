@@ -27,7 +27,8 @@ module ElasticGraph
           end
         end
 
-        def resolve(field:, object:, context:, args:)
+        def call(parent_type, graphql_field, object, args, context)
+          field = context.fetch(:elastic_graph_schema).field_named(parent_type.graphql_name, graphql_field.name)
           args = field.args_to_schema_form(args.except(:lookahead))
           method_name = canonical_name_for(field.name, "Field")
           public_send(method_name, **args_to_canonical_form(args))
