@@ -28,33 +28,11 @@ module ElasticGraph
         # See https://graphql-ruby.org/api-doc/1.9.6/GraphQL/Schema.html#from_definition-class_method
         # (specifically, the `default_resolve` argument) for the API documentation.
         def call(parent_type, field, object, args, context)
-          schema_field = @schema.field_named(parent_type.graphql_name, field.name)
-
-          resolver = resolver_for(schema_field, object) do
-            raise <<~ERROR
-              No resolver yet implemented for this case.
-
-              parent_type: #{schema_field.parent_type}
-
-              field: #{schema_field}
-
-              obj: #{object.inspect}
-
-              args: #{args.inspect}
-
-              ctx: #{context.inspect}
-            ERROR
+          resolver = resolver_for(parent_type, field, object) do
+            raise "No resolver yet implemented for `#{parent_type.graphql_name}.#{field.name}`."
           end
 
-          result = resolver.call(parent_type, field, object, args, context)
-
-          # Give the field a chance to coerce the result before returning it. Initially, this is only used to deal with
-          # enum value overrides (e.g. so that if `DayOfWeek.MONDAY` has been overridden to `DayOfWeek.MON`, we can coerce
-          # a `MONDAY` value being returned by a painless script to `MON`), but this is designed to be general purpose
-          # and we may use it for other coercions in the future.
-          #
-          # Note that coercion of scalar values is handled by the `coerce_result` callback below.
-          schema_field.coerce_result(result)
+          resolver.call(parent_type, field, object, args, context)
         end
 
         # In order to support unions and interfaces, we must implement `resolve_type`.
@@ -85,7 +63,8 @@ module ElasticGraph
           @coercion_adapters_by_scalar_type_name[type.graphql_name]
         end
 
-        def resolver_for(field, object)
+        def resolver_for(parent_type, graphql_field, object)
+          field = @schema.field_named(parent_type.graphql_name, graphql_field.name)
           return object if object.respond_to?(:can_resolve?) && object.can_resolve?(field: field, object: object)
           resolver = @resolvers.find { |r| r.can_resolve?(field: field, object: object) }
           resolver || yield

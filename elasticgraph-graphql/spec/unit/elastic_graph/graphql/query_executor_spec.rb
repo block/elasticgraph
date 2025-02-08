@@ -189,11 +189,11 @@ module ElasticGraph
 
           expect {
             execute_expecting_no_errors(query_string)
-          }.to raise_error(a_string_including("No resolver yet implemented for this case"))
+          }.to raise_error(a_string_including("No resolver yet implemented for `Query.foo`."))
             .and log a_string_including(
               "Query Foo[1] for client (anonymous) failed with an exception[2]",
               query_string.to_s,
-              "RuntimeError: No resolver yet implemented for this case"
+              "RuntimeError: No resolver yet implemented for `Query.foo`."
             )
         end
 
