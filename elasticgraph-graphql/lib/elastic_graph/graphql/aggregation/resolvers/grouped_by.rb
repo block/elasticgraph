@@ -18,8 +18,8 @@ module ElasticGraph
             true
           end
 
-          def resolve(field:, object:, args:, context:, lookahead:)
-            new_field_path = field_path + [PathSegment.for(field: field, lookahead: lookahead)]
+          def resolve(field:, object:, args:, context:)
+            new_field_path = field_path + [PathSegment.for(field: field, lookahead: args.fetch(:lookahead))]
             return with(field_path: new_field_path) if field.type.object?
 
             bucket_entry = Support::HashUtil.verbose_fetch(bucket, "key")

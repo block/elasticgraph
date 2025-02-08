@@ -24,8 +24,8 @@ module ElasticGraph
             true
           end
 
-          def resolve(field:, object:, args:, context:, lookahead:)
-            path_segment = PathSegment.for(field: field, lookahead: lookahead)
+          def resolve(field:, object:, args:, context:)
+            path_segment = PathSegment.for(field: field, lookahead: args.fetch(:lookahead))
             new_field_path = field_path + [path_segment]
             return with(field_path: new_field_path) unless field.type.elasticgraph_category == :nested_sub_aggregation_connection
 

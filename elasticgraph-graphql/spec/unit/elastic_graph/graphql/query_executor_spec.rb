@@ -398,7 +398,7 @@ module ElasticGraph
                 field.name == :multiply
               end
 
-              def resolve(field:, object:, args:, context:, lookahead:)
+              def resolve(field:, object:, args:, context:)
                 [
                   args.dig(:operands, "x"),
                   args.dig(:operands, "y"),

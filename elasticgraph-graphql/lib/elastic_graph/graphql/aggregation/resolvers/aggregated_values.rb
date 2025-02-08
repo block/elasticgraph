@@ -19,8 +19,8 @@ module ElasticGraph
             true
           end
 
-          def resolve(field:, object:, args:, context:, lookahead:)
-            return with(field_path: field_path + [PathSegment.for(field: field, lookahead: lookahead)]) if field.type.object?
+          def resolve(field:, object:, args:, context:)
+            return with(field_path: field_path + [PathSegment.for(field: field, lookahead: args.fetch(:lookahead))]) if field.type.object?
 
             key = Key::AggregatedValue.new(
               aggregation_name: aggregation_name,

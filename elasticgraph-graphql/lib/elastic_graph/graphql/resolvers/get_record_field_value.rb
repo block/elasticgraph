@@ -23,7 +23,7 @@ module ElasticGraph
           object.is_a?(DatastoreResponse::Document) || object.is_a?(::Hash)
         end
 
-        def resolve(field:, object:, args:, context:, lookahead:)
+        def resolve(field:, object:, args:, context:)
           field_name = field.name_in_index.to_s
           data =
             case object
