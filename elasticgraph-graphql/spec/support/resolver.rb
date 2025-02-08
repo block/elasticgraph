@@ -11,10 +11,10 @@ require "elastic_graph/graphql/resolvers/query_source"
 require "graphql"
 
 module ResolverHelperMethods
-  def resolve(type_name, field_name, document = nil, lookahead: nil, query_overrides: {}, **args)
+  def resolve(type_name, field_name, document = nil, query_overrides: {}, **args)
     query_override_adapter.query_overrides = query_overrides
     field = graphql.schema.field_named(type_name, field_name)
-    lookahead ||= GraphQL::Execution::Lookahead::NULL_LOOKAHEAD
+    args[:lookahead] ||= GraphQL::Execution::Lookahead::NULL_LOOKAHEAD
     query_details_tracker = ElasticGraph::GraphQL::QueryDetailsTracker.empty
 
     ::GraphQL::Dataloader.with_dataloading do |dataloader|
@@ -38,7 +38,7 @@ module ResolverHelperMethods
         # [^1]: https://github.com/rmosolgo/graphql-ruby/blob/v2.1.0/lib/graphql/pagination/connection.rb#L94-L96
         # [^2]: https://github.com/rmosolgo/graphql-ruby/blob/v2.1.0/lib/graphql/execution/interpreter/runtime.rb#L935-L941
         ::Thread.current[:__graphql_runtime_info] = ::Hash.new { |h, k| h[k] = ::GraphQL::Execution::Interpreter::Runtime::CurrentState.new }
-        resolver.resolve(field: field, object: document, context: context, args: args, lookahead: lookahead)
+        resolver.resolve(field: field, object: document, context: context, args: args)
       ensure
         ::Thread.current[:__graphql_runtime_info] = nil
       end

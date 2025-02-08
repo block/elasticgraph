@@ -22,7 +22,8 @@ module ElasticGraph
           field.parent_type.name == :Query && field.type.collection?
         end
 
-        def resolve(field:, context:, lookahead:, args:, object:)
+        def resolve(field:, context:, args:, object:)
+          lookahead = args.fetch(:lookahead)
           args = field.args_to_schema_form(args.except(:lookahead))
           query = @resolver_query_adapter.build_query_from(field: field, args: args, lookahead: lookahead, context: context)
           response = QuerySource.execute_one(query, for_context: context)

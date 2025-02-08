@@ -28,7 +28,7 @@ module ElasticGraph
           field.parent_type.name == :Query && field.name == :_entities
         end
 
-        def resolve(field:, object:, args:, context:, lookahead:)
+        def resolve(field:, object:, args:, context:)
           schema = context.fetch(:elastic_graph_schema)
 
           representations = args.fetch(:representations).map.with_index do |rep, index|
@@ -43,7 +43,7 @@ module ElasticGraph
           # so we build the hash of those attributes once here.
           query_attributes = ElasticGraph::GraphQL::QueryAdapter::RequestedFields
             .new(schema)
-            .query_attributes_for(field: field, lookahead: lookahead)
+            .query_attributes_for(field: field, lookahead: args.fetch(:lookahead))
             .merge(monotonic_clock_deadline: context[:monotonic_clock_deadline])
 
           # Build a separate query per adapter instance since each adapter instance is capable of building

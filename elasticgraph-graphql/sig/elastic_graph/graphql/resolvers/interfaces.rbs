@@ -9,8 +9,8 @@ module ElasticGraph
           field: Schema::Field,
           object: untyped,
           context: ::GraphQL::Query::Context,
-          args: fieldArgs,
-          lookahead: ::GraphQL::Execution::Lookahead) -> untyped
+          args: fieldArgs
+        ) -> untyped
       end
     end
   end

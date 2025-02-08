@@ -27,7 +27,7 @@ module ElasticGraph
           !!field.relation_join
         end
 
-        def resolve(object:, field:, context:, lookahead:, args:)
+        def resolve(object:, field:, context:, args:)
           log_warning = ->(**options) { log_field_problem_warning(field: field, **options) }
           join = field.relation_join
           id_or_ids = join.extract_id_or_ids_from(object, log_warning)
@@ -36,6 +36,7 @@ module ElasticGraph
             join.additional_filter
           ].reject(&:empty?)
 
+          lookahead = args.fetch(:lookahead)
           args = field.args_to_schema_form(args.except(:lookahead))
           query = @resolver_query_adapter
             .build_query_from(field: field, args: args, lookahead: lookahead, context: context)

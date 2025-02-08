@@ -30,12 +30,6 @@ module ElasticGraph
         def call(parent_type, field, object, args, context)
           schema_field = @schema.field_named(parent_type.graphql_name, field.name)
 
-          # Extract the `:lookahead` extra that we have configured all fields to provide.
-          # See https://graphql-ruby.org/api-doc/1.10.8/GraphQL/Execution/Lookahead.html for more info.
-          # It is not a "real" arg in the schema and breaks `args_to_schema_form` when we call that
-          # so we need to peel it off here.
-          lookahead = args[:lookahead]
-
           resolver = resolver_for(schema_field, object) do
             raise <<~ERROR
               No resolver yet implemented for this case.
@@ -52,7 +46,7 @@ module ElasticGraph
             ERROR
           end
 
-          result = resolver.resolve(field: schema_field, object: object, args: args, context: context, lookahead: lookahead)
+          result = resolver.resolve(field: schema_field, object: object, args: args, context: context)
 
           # Give the field a chance to coerce the result before returning it. Initially, this is only used to deal with
           # enum value overrides (e.g. so that if `DayOfWeek.MONDAY` has been overridden to `DayOfWeek.MON`, we can coerce
