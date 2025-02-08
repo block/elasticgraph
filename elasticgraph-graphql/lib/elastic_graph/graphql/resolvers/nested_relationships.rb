@@ -17,7 +17,8 @@ module ElasticGraph
       #
       # Most of the logic for this lives in ElasticGraph::Schema::RelationJoin.
       class NestedRelationships
-        def initialize(schema_element_names:, logger:)
+        def initialize(resolver_query_adapter:, schema_element_names:, logger:)
+          @resolver_query_adapter = resolver_query_adapter
           @schema_element_names = schema_element_names
           @logger = logger
         end
@@ -26,7 +27,7 @@ module ElasticGraph
           !!field.relation_join
         end
 
-        def resolve(object:, field:, context:, lookahead:, **)
+        def resolve(object:, field:, context:, lookahead:, args:)
           log_warning = ->(**options) { log_field_problem_warning(field: field, **options) }
           join = field.relation_join
           id_or_ids = join.extract_id_or_ids_from(object, log_warning)
@@ -34,7 +35,9 @@ module ElasticGraph
             build_filter(join.filter_id_field_name, nil, join.foreign_key_nested_paths, Array(id_or_ids)),
             join.additional_filter
           ].reject(&:empty?)
-          query = yield.merge_with(filters: filters)
+          query = @resolver_query_adapter
+            .build_query_from(field: field, args: args, lookahead: lookahead, context: context)
+            .merge_with(filters: filters)
 
           response =
             case id_or_ids

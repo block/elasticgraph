@@ -7,16 +7,15 @@
 # frozen_string_literal: true
 
 require "elastic_graph/graphql/query_details_tracker"
-require "elastic_graph/graphql/resolvers/query_adapter"
 require "elastic_graph/graphql/resolvers/query_source"
 require "graphql"
 
 module ResolverHelperMethods
-  def resolve(type_name, field_name, document = nil, **options)
+  def resolve(type_name, field_name, document = nil, lookahead: nil, query_overrides: {}, **options)
+    query_override_adapter.query_overrides = query_overrides
     field = graphql.schema.field_named(type_name, field_name)
-    query_overrides = options.fetch(:query_overrides) { {} }
-    args = field.args_to_schema_form(options.except(:query_overrides, :lookahead))
-    lookahead = options[:lookahead] || GraphQL::Execution::Lookahead::NULL_LOOKAHEAD
+    args = field.args_to_schema_form(options)
+    lookahead ||= GraphQL::Execution::Lookahead::NULL_LOOKAHEAD
     query_details_tracker = ElasticGraph::GraphQL::QueryDetailsTracker.empty
 
     ::GraphQL::Dataloader.with_dataloading do |dataloader|
@@ -33,11 +32,6 @@ module ResolverHelperMethods
 
       expect(document).to satisfy { |doc| resolver.can_resolve?(field: field, object: doc) }
 
-      query = nil
-      query_builder = -> {
-        query ||= query_adapter.build_query_from(field: field, lookahead: lookahead, args: args, context: context).with(**query_overrides)
-      }
-
       begin
         # In the 2.1.0 release of the GraphQL gem, `GraphQL::Pagination::Connection#initialize` expects a particular thread local[^1].
         # Here we initialize the thread local in a similar way to how the GraphQL gem does it[^2].
@@ -45,10 +39,18 @@ module ResolverHelperMethods
         # [^1]: https://github.com/rmosolgo/graphql-ruby/blob/v2.1.0/lib/graphql/pagination/connection.rb#L94-L96
         # [^2]: https://github.com/rmosolgo/graphql-ruby/blob/v2.1.0/lib/graphql/execution/interpreter/runtime.rb#L935-L941
         ::Thread.current[:__graphql_runtime_info] = ::Hash.new { |h, k| h[k] = ::GraphQL::Execution::Interpreter::Runtime::CurrentState.new }
-        resolver.resolve(field: field, object: document, context: context, args: args, lookahead: lookahead, &query_builder)
+        resolver.resolve(field: field, object: document, context: context, args: args, lookahead: lookahead)
       ensure
         ::Thread.current[:__graphql_runtime_info] = nil
       end
+    end
+  end
+
+  class QueryOverrideAdapter
+    attr_accessor :query_overrides
+
+    def call(query:, **)
+      query.merge_with(**query_overrides)
     end
   end
 end
@@ -80,6 +82,8 @@ RSpec.shared_context "resolver support" do
       deps[dep_name] =
         if dep_name == :schema_element_names
           graphql.runtime_metadata.schema_element_names
+        elsif dep_name == :resolver_query_adapter
+          resolver_query_adapter
         else
           graphql.public_send(dep_name)
         end
@@ -88,10 +92,12 @@ RSpec.shared_context "resolver support" do
     described_class.new(**dependencies)
   end
 
-  let(:query_adapter) do
+  let(:query_override_adapter) { ResolverHelperMethods::QueryOverrideAdapter.new }
+
+  let(:resolver_query_adapter) do
     ElasticGraph::GraphQL::Resolvers::QueryAdapter.new(
       datastore_query_builder: graphql.datastore_query_builder,
-      datastore_query_adapters: graphql.datastore_query_adapters
+      datastore_query_adapters: graphql.datastore_query_adapters + [query_override_adapter]
     )
   end
 end

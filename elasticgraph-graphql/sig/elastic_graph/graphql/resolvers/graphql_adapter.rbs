@@ -4,7 +4,6 @@ module ElasticGraph
       class GraphQLAdapter
         def initialize: (
           schema: Schema,
-          query_adapter: Resolvers::QueryAdapter,
           runtime_metadata: SchemaArtifacts::RuntimeMetadata::Schema,
           resolvers: ::Array[Resolvers::_Resolver]
         ) -> void

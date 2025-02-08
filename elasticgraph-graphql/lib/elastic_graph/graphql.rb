@@ -101,7 +101,6 @@ module ElasticGraph
             require "elastic_graph/graphql/resolvers/graphql_adapter"
             Resolvers::GraphQLAdapter.new(
               schema: schema,
-              query_adapter: resolver_query_adapter,
               runtime_metadata: runtime_metadata,
               resolvers: graphql_resolvers
             )
@@ -171,11 +170,14 @@ module ElasticGraph
         require "elastic_graph/graphql/resolvers/nested_relationships"
 
         nested_relationships = Resolvers::NestedRelationships.new(
+          resolver_query_adapter: resolver_query_adapter,
           schema_element_names: runtime_metadata.schema_element_names,
           logger: logger
         )
 
-        list_records = Resolvers::ListRecords.new
+        list_records = Resolvers::ListRecords.new(
+          resolver_query_adapter: resolver_query_adapter
+        )
 
         get_record_field_value = Resolvers::GetRecordFieldValue.new(
           schema_element_names: runtime_metadata.schema_element_names
