@@ -24,7 +24,13 @@ module ElasticGraph
             return with(field_path: new_field_path) if field.type.object?
 
             bucket_entry = Support::HashUtil.verbose_fetch(bucket, "key")
-            Support::HashUtil.verbose_fetch(bucket_entry, FieldPathEncoder.encode(new_field_path.map(&:name_in_graphql_query)))
+            result = Support::HashUtil.verbose_fetch(bucket_entry, FieldPathEncoder.encode(new_field_path.map(&:name_in_graphql_query)))
+
+            # Give the field a chance to coerce the result before returning it. Initially, this is only used to deal with
+            # enum value overrides (e.g. so that if `DayOfWeek.MONDAY` has been overridden to `DayOfWeek.MON`, we can coerce
+            # a `MONDAY` value being returned by a painless script to `MON`), but this is designed to be general purpose
+            # and we may use it for other coercions in the future.
+            field.coerce_result(result)
           end
         end
       end
