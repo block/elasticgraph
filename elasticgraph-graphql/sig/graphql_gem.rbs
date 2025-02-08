@@ -18,7 +18,7 @@ module GraphQL
       attr_reader name: ::String
       attr_reader field: Schema::Field
       attr_reader owner_type: Schema::_Type
-      attr_reader arguments: ::Hash[::String, untyped]
+      attr_reader arguments: ::Hash[::Symbol, untyped]
 
       def initialize: (
         query: Query,

@@ -23,6 +23,7 @@ module ElasticGraph
         end
 
         def resolve(field:, context:, lookahead:, args:, object:)
+          args = field.args_to_schema_form(args.except(:lookahead))
           query = @resolver_query_adapter.build_query_from(field: field, args: args, lookahead: lookahead, context: context)
           response = QuerySource.execute_one(query, for_context: context)
           RelayConnection.maybe_wrap(response, field: field, context: context, lookahead: lookahead, query: query)

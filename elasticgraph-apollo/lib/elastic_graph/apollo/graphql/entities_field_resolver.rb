@@ -31,7 +31,7 @@ module ElasticGraph
         def resolve(field:, object:, args:, context:, lookahead:)
           schema = context.fetch(:elastic_graph_schema)
 
-          representations = args.fetch("representations").map.with_index do |rep, index|
+          representations = args.fetch(:representations).map.with_index do |rep, index|
             try_parse_representation(rep, schema) do |error_description|
               context.add_error(::GraphQL::ExecutionError.new("Representation at index #{index} #{error_description}."))
             end

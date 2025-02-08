@@ -38,6 +38,7 @@ module ElasticGraph
           end
 
           if field.type.relay_connection?
+            args = field.args_to_schema_form(args.except(:lookahead))
             RelayConnection::ArrayAdapter.build(value, args, @schema_element_names, context)
           else
             value

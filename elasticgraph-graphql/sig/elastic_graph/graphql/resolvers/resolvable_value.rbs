@@ -9,7 +9,7 @@ module ElasticGraph
 
         private
 
-        def args_to_canonical_form: (fieldArgs) -> ::Hash[::Symbol, untyped]
+        def args_to_canonical_form: (::Hash[::String, untyped]) -> ::Hash[::Symbol, untyped]
         def canonical_name_for: (::String | ::Symbol, ::String) -> ::Symbol
       end
 

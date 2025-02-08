@@ -11,10 +11,9 @@ require "elastic_graph/graphql/resolvers/query_source"
 require "graphql"
 
 module ResolverHelperMethods
-  def resolve(type_name, field_name, document = nil, lookahead: nil, query_overrides: {}, **options)
+  def resolve(type_name, field_name, document = nil, lookahead: nil, query_overrides: {}, **args)
     query_override_adapter.query_overrides = query_overrides
     field = graphql.schema.field_named(type_name, field_name)
-    args = field.args_to_schema_form(options)
     lookahead ||= GraphQL::Execution::Lookahead::NULL_LOOKAHEAD
     query_details_tracker = ElasticGraph::GraphQL::QueryDetailsTracker.empty
 

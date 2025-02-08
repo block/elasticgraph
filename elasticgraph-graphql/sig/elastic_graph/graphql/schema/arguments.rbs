@@ -3,7 +3,7 @@ module ElasticGraph
     class Schema
       module Arguments
         def self.to_schema_form: (
-          ::Hash[::String, untyped],
+          ::Hash[::Symbol, untyped],
           untyped
         ) -> ::Hash[::String, untyped]
       end

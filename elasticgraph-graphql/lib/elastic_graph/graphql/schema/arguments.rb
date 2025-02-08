@@ -42,7 +42,7 @@ module ElasticGraph
         def self.to_schema_form(args_value, args_owner)
           # For custom scalar types (such as `_Any` for apollo federation), `args_owner` won't
           # response to `arguments`.
-          return args_value unless args_owner.respond_to?(:arguments)
+          return (_ = args_value) unless args_owner.respond_to?(:arguments)
 
           __skip__ = case args_value
           when Hash, ::GraphQL::Schema::InputObject

@@ -1,7 +1,7 @@
 module ElasticGraph
   class GraphQL
     module Resolvers
-      type fieldArgs = ::Hash[::String, untyped]
+      type fieldArgs = ::Hash[::Symbol, untyped]
 
       interface _Resolver
         def can_resolve?: (field: Schema::Field, object: untyped) -> bool
