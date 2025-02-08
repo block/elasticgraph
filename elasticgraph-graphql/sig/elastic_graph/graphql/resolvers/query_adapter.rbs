@@ -1,0 +1,12 @@
+module ElasticGraph
+  class GraphQL
+    module Resolvers
+      class QueryAdapter
+        def initialize: (
+          datastore_query_builder: DatastoreQuery::Builder,
+          datastore_query_adapters: ::Array[_QueryAdapter]
+        ) -> void
+      end
+    end
+  end
+end
