@@ -19,10 +19,6 @@ module ElasticGraph
           @hash_resolver = hash_resolver
         end
 
-        def can_resolve?(field:, object:)
-          object.is_a?(DatastoreResponse::Document)
-        end
-
         def call(parent_type, graphql_field, object, args, context)
           @hash_resolver.call(parent_type, graphql_field, object.payload, args, context)
         end
