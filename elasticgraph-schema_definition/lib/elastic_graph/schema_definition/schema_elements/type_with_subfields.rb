@@ -540,6 +540,7 @@ module ElasticGraph
             yield relationship if block_given?
 
             field.relationship = relationship
+            field.resolver = :nested_relationships
 
             if dir == :out
               register_inferred_foreign_key_fields(from_type: [via, foreign_key_type], to_other: ["id", "ID!"], related_type: relationship.related_type)

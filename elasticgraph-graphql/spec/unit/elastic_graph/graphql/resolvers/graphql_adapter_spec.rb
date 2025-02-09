@@ -19,6 +19,7 @@ module ElasticGraph
           adapter = GraphQLAdapter.new(
             schema: schema,
             runtime_metadata: graphql.runtime_metadata,
+            named_resolvers: graphql.named_graphql_resolvers,
             resolvers: graphql.graphql_resolvers
           )
 

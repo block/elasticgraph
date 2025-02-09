@@ -32,7 +32,8 @@ module QueryAdapterSpecSupport
       # put those into an array so that we can mimic the behavior in this `QueryProbe` and only
       # build an `DatastoreQuery` for the same fields.
       resolvers_module = ::ElasticGraph::GraphQL::Resolvers
-      @resolvers_that_yield_for_datastore_query = @graphql.graphql_resolvers.select do |resolver|
+
+      @resolvers_that_build_datastore_query = (@graphql.graphql_resolvers + @graphql.named_graphql_resolvers.values).select do |resolver|
         case resolver
         when resolvers_module::ListRecords, resolvers_module::NestedRelationships
           true
@@ -69,7 +70,7 @@ module QueryAdapterSpecSupport
       lookahead = args[:lookahead]
       args = schema_field.args_to_schema_form(args.except(:lookahead))
 
-      if @resolvers_that_yield_for_datastore_query.any? { |res| res.can_resolve?(field: schema_field, object: object) }
+      if resolved_with_resolver_that_builds_datastore_query?(schema_field, object)
         field_key = "#{schema_field.parent_type.name}.#{lookahead.ast_nodes.first.alias || schema_field.name}"
         @datastore_queries_by_field[field_key] << query_adapter.build_query_from(
           field: schema_field,
@@ -80,6 +81,17 @@ module QueryAdapterSpecSupport
       end
 
       default_value_for(schema_field)
+    end
+
+    def resolved_with_resolver_that_builds_datastore_query?(schema_field, object)
+      if (resolver_name = schema_field.resolver)
+        resolver = @graphql.named_graphql_resolvers.fetch(resolver_name)
+        @resolvers_that_build_datastore_query.include?(resolver)
+      else
+        @resolvers_that_build_datastore_query.any? do |res|
+          res.respond_to?(:can_resolve?) && res.can_resolve?(field: schema_field, object: object)
+        end
+      end
     end
 
     def coerce_input(type, value, ctx)

@@ -30,8 +30,6 @@ module ResolverHelperMethods
         }
       )
 
-      expect(document).to satisfy { |doc| resolver.can_resolve?(field: field, object: doc) }
-
       begin
         # In the 2.1.0 release of the GraphQL gem, `GraphQL::Pagination::Connection#initialize` expects a particular thread local[^1].
         # Here we initialize the thread local in a similar way to how the GraphQL gem does it[^2].
