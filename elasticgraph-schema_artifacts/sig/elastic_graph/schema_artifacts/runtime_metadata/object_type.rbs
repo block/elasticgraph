@@ -10,6 +10,7 @@ module ElasticGraph
         attr_reader elasticgraph_category: elasticGraphCategory?
         attr_reader source_type: ::String?
         attr_reader graphql_only_return_type: bool
+        attr_reader default_graphql_resolver: ::Symbol?
 
         def initialize: (
           update_targets: ::Array[UpdateTarget],
@@ -17,7 +18,8 @@ module ElasticGraph
           graphql_fields_by_name: ::Hash[::String, GraphQLField],
           elasticgraph_category: elasticGraphCategory?,
           source_type: ::String?,
-          graphql_only_return_type: bool
+          graphql_only_return_type: bool,
+          default_graphql_resolver: ::Symbol?
         ) -> void
 
         def with: (
@@ -26,7 +28,8 @@ module ElasticGraph
           ?graphql_fields_by_name: ::Hash[::String, GraphQLField],
           ?elasticgraph_category: elasticGraphCategory?,
           ?source_type: ::String?,
-          ?graphql_only_return_type: bool
+          ?graphql_only_return_type: bool,
+          ?default_graphql_resolver: ::Symbol?
         ) -> ObjectType
       end
 
@@ -37,6 +40,7 @@ module ElasticGraph
         ELASTICGRAPH_CATEGORY: "elasticgraph_category"
         SOURCE_TYPE: "source_type"
         GRAPHQL_ONLY_RETURN_TYPE: "graphql_only_return_type"
+        DEFAULT_GRAPHQL_RESOLVER: "default_graphql_resolver"
         def self.from_hash: (::Hash[::String, untyped]) -> ObjectType
         def to_dumpable_hash: () -> ::Hash[::String, untyped]
       end
