@@ -25,6 +25,7 @@ module ElasticGraph
         expect(metadata.graphql_fields_by_name).to eq({
           "parent" => graphql_field_with(
             name_in_index: nil,
+            resolver: :nested_relationships,
             relation: SchemaArtifacts::RuntimeMetadata::Relation.new(
               foreign_key: "parent_id",
               direction: :out,
@@ -46,6 +47,7 @@ module ElasticGraph
 
         expected_relation_field = graphql_field_with(
           name_in_index: nil,
+          resolver: :nested_relationships,
           relation: SchemaArtifacts::RuntimeMetadata::Relation.new(
             foreign_key: "parent_id",
             direction: :in,
@@ -81,6 +83,7 @@ module ElasticGraph
 
         expected_relation_field = graphql_field_with(
           name_in_index: nil,
+          resolver: :nested_relationships,
           relation: SchemaArtifacts::RuntimeMetadata::Relation.new(
             foreign_key: "parent_id",
             direction: :in,
@@ -117,6 +120,7 @@ module ElasticGraph
 
         expected_relation_field = graphql_field_with(
           name_in_index: nil,
+          resolver: :nested_relationships,
           relation: SchemaArtifacts::RuntimeMetadata::Relation.new(
             foreign_key: "parent_id",
             direction: :in,
@@ -162,6 +166,7 @@ module ElasticGraph
 
         expected_relation_field = graphql_field_with(
           name_in_index: nil,
+          resolver: :nested_relationships,
           relation: SchemaArtifacts::RuntimeMetadata::Relation.new(
             foreign_key: "parent_id",
             direction: :in,
@@ -243,6 +248,7 @@ module ElasticGraph
 
           expected_relation_field = graphql_field_with(
             name_in_index: nil,
+            resolver: :nested_relationships,
             relation: SchemaArtifacts::RuntimeMetadata::Relation.new(
               foreign_key: "players.affiliations.sponsorships.sponsor_id",
               direction: :in,

@@ -25,6 +25,7 @@ module ElasticGraph
         attr_reader non_nullable_in_json_schema: bool
         attr_reader source: FieldSource?
         attr_accessor relationship: Relationship?
+        attr_accessor resolver: ::Symbol?
         attr_reader singular_name: ::String?
         attr_reader as_input: bool
 

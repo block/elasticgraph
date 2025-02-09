@@ -23,10 +23,6 @@ module ElasticGraph
           @logger = logger
         end
 
-        def can_resolve?(field:, object:)
-          !!field.relation_join
-        end
-
         def resolve(object:, field:, context:, lookahead:, **)
           log_warning = ->(**options) { log_field_problem_warning(field: field, **options) }
           join = field.relation_join

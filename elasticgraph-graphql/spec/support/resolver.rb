@@ -31,8 +31,6 @@ module ResolverHelperMethods
         }
       )
 
-      expect(document).to satisfy { |doc| resolver.can_resolve?(field: field, object: doc) }
-
       query = nil
       query_builder = -> {
         query ||= query_adapter.build_query_from(field: field, lookahead: lookahead, args: args, context: context).with(**query_overrides)
