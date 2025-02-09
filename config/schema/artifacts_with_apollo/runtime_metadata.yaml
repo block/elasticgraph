@@ -2710,12 +2710,16 @@ object_types_by_name:
     elasticgraph_category: indexed_aggregation
     source_type: Address
   AddressAggregationConnection:
+    default_graphql_resolver: object
     elasticgraph_category: relay_connection
   AddressAggregationEdge:
+    default_graphql_resolver: object
     elasticgraph_category: relay_edge
   AddressConnection:
+    default_graphql_resolver: object
     elasticgraph_category: relay_connection
   AddressEdge:
+    default_graphql_resolver: object
     elasticgraph_category: relay_edge
   AddressGroupedBy:
     default_graphql_resolver: object
@@ -2817,12 +2821,16 @@ object_types_by_name:
     elasticgraph_category: indexed_aggregation
     source_type: Component
   ComponentAggregationConnection:
+    default_graphql_resolver: object
     elasticgraph_category: relay_connection
   ComponentAggregationEdge:
+    default_graphql_resolver: object
     elasticgraph_category: relay_edge
   ComponentConnection:
+    default_graphql_resolver: object
     elasticgraph_category: relay_connection
   ComponentEdge:
+    default_graphql_resolver: object
     elasticgraph_category: relay_edge
   ComponentFilterInput:
     graphql_fields_by_name:
@@ -2953,12 +2961,16 @@ object_types_by_name:
     elasticgraph_category: indexed_aggregation
     source_type: ElectricalPart
   ElectricalPartAggregationConnection:
+    default_graphql_resolver: object
     elasticgraph_category: relay_connection
   ElectricalPartAggregationEdge:
+    default_graphql_resolver: object
     elasticgraph_category: relay_edge
   ElectricalPartConnection:
+    default_graphql_resolver: object
     elasticgraph_category: relay_connection
   ElectricalPartEdge:
+    default_graphql_resolver: object
     elasticgraph_category: relay_edge
   ElectricalPartGroupedBy:
     default_graphql_resolver: object
@@ -3156,12 +3168,16 @@ object_types_by_name:
     elasticgraph_category: indexed_aggregation
     source_type: Manufacturer
   ManufacturerAggregationConnection:
+    default_graphql_resolver: object
     elasticgraph_category: relay_connection
   ManufacturerAggregationEdge:
+    default_graphql_resolver: object
     elasticgraph_category: relay_edge
   ManufacturerConnection:
+    default_graphql_resolver: object
     elasticgraph_category: relay_connection
   ManufacturerEdge:
+    default_graphql_resolver: object
     elasticgraph_category: relay_edge
   ManufacturerGroupedBy:
     default_graphql_resolver: object
@@ -3217,12 +3233,16 @@ object_types_by_name:
     elasticgraph_category: indexed_aggregation
     source_type: MechanicalPart
   MechanicalPartAggregationConnection:
+    default_graphql_resolver: object
     elasticgraph_category: relay_connection
   MechanicalPartAggregationEdge:
+    default_graphql_resolver: object
     elasticgraph_category: relay_edge
   MechanicalPartConnection:
+    default_graphql_resolver: object
     elasticgraph_category: relay_connection
   MechanicalPartEdge:
+    default_graphql_resolver: object
     elasticgraph_category: relay_edge
   MechanicalPartGroupedBy:
     default_graphql_resolver: object
@@ -3354,12 +3374,16 @@ object_types_by_name:
     elasticgraph_category: indexed_aggregation
     source_type: NamedEntity
   NamedEntityAggregationConnection:
+    default_graphql_resolver: object
     elasticgraph_category: relay_connection
   NamedEntityAggregationEdge:
+    default_graphql_resolver: object
     elasticgraph_category: relay_edge
   NamedEntityConnection:
+    default_graphql_resolver: object
     elasticgraph_category: relay_connection
   NamedEntityEdge:
+    default_graphql_resolver: object
     elasticgraph_category: relay_edge
   NamedEntityFilterInput:
     graphql_fields_by_name:
@@ -3422,6 +3446,7 @@ object_types_by_name:
           function: cardinality
     graphql_only_return_type: true
   PageInfo:
+    default_graphql_resolver: object
     graphql_only_return_type: true
   Part:
     graphql_fields_by_name:
@@ -3447,12 +3472,16 @@ object_types_by_name:
     elasticgraph_category: indexed_aggregation
     source_type: Part
   PartAggregationConnection:
+    default_graphql_resolver: object
     elasticgraph_category: relay_connection
   PartAggregationEdge:
+    default_graphql_resolver: object
     elasticgraph_category: relay_edge
   PartConnection:
+    default_graphql_resolver: object
     elasticgraph_category: relay_connection
   PartEdge:
+    default_graphql_resolver: object
     elasticgraph_category: relay_edge
   PartGroupedBy:
     default_graphql_resolver: object
@@ -3545,12 +3574,16 @@ object_types_by_name:
     elasticgraph_category: indexed_aggregation
     source_type: Sponsor
   SponsorAggregationConnection:
+    default_graphql_resolver: object
     elasticgraph_category: relay_connection
   SponsorAggregationEdge:
+    default_graphql_resolver: object
     elasticgraph_category: relay_edge
   SponsorConnection:
+    default_graphql_resolver: object
     elasticgraph_category: relay_connection
   SponsorEdge:
+    default_graphql_resolver: object
     elasticgraph_category: relay_edge
   SponsorGroupedBy:
     default_graphql_resolver: object
@@ -3567,8 +3600,10 @@ object_types_by_name:
       count:
         name_in_index: __counts
   StringConnection:
+    default_graphql_resolver: object
     elasticgraph_category: relay_connection
   StringEdge:
+    default_graphql_resolver: object
     elasticgraph_category: relay_edge
   StringListFilterInput:
     graphql_fields_by_name:
@@ -3640,12 +3675,14 @@ object_types_by_name:
     elasticgraph_category: indexed_aggregation
     source_type: Team
   TeamAggregationConnection:
+    default_graphql_resolver: object
     elasticgraph_category: relay_connection
   TeamAggregationCurrentPlayersObjectAffiliationsSubAggregations:
     default_graphql_resolver: object
   TeamAggregationCurrentPlayersObjectSubAggregations:
     default_graphql_resolver: object
   TeamAggregationEdge:
+    default_graphql_resolver: object
     elasticgraph_category: relay_edge
   TeamAggregationNestedFields2SubAggregations:
     default_graphql_resolver: object
@@ -3669,12 +3706,14 @@ object_types_by_name:
       nested_fields:
         name_in_index: the_nested_fields
   TeamConnection:
+    default_graphql_resolver: object
     elasticgraph_category: relay_connection
   TeamDetailsAggregatedValues:
     default_graphql_resolver: object
   TeamDetailsGroupedBy:
     default_graphql_resolver: object
   TeamEdge:
+    default_graphql_resolver: object
     elasticgraph_category: relay_edge
   TeamFilterInput:
     graphql_fields_by_name:
@@ -3685,6 +3724,7 @@ object_types_by_name:
   TeamMoneySubAggregation:
     default_graphql_resolver: object
   TeamMoneySubAggregationConnection:
+    default_graphql_resolver: object
     elasticgraph_category: nested_sub_aggregation_connection
   TeamNestedFields:
     graphql_fields_by_name:
@@ -3697,20 +3737,24 @@ object_types_by_name:
   TeamPlayerPlayerSeasonSubAggregation:
     default_graphql_resolver: object
   TeamPlayerPlayerSeasonSubAggregationConnection:
+    default_graphql_resolver: object
     elasticgraph_category: nested_sub_aggregation_connection
   TeamPlayerSeasonSubAggregation:
     default_graphql_resolver: object
   TeamPlayerSeasonSubAggregationConnection:
+    default_graphql_resolver: object
     elasticgraph_category: nested_sub_aggregation_connection
   TeamPlayerSponsorshipSubAggregation:
     default_graphql_resolver: object
   TeamPlayerSponsorshipSubAggregationConnection:
+    default_graphql_resolver: object
     elasticgraph_category: nested_sub_aggregation_connection
   TeamPlayerSubAggregation:
     default_graphql_resolver: object
   TeamPlayerSubAggregationAffiliationsSubAggregations:
     default_graphql_resolver: object
   TeamPlayerSubAggregationConnection:
+    default_graphql_resolver: object
     elasticgraph_category: nested_sub_aggregation_connection
   TeamPlayerSubAggregationSubAggregations:
     default_graphql_resolver: object
@@ -3831,34 +3875,41 @@ object_types_by_name:
   TeamSponsorshipSubAggregation:
     default_graphql_resolver: object
   TeamSponsorshipSubAggregationConnection:
+    default_graphql_resolver: object
     elasticgraph_category: nested_sub_aggregation_connection
   TeamTeamSeasonPlayerPlayerSeasonSubAggregation:
     default_graphql_resolver: object
   TeamTeamSeasonPlayerPlayerSeasonSubAggregationConnection:
+    default_graphql_resolver: object
     elasticgraph_category: nested_sub_aggregation_connection
   TeamTeamSeasonPlayerSeasonSubAggregation:
     default_graphql_resolver: object
   TeamTeamSeasonPlayerSeasonSubAggregationConnection:
+    default_graphql_resolver: object
     elasticgraph_category: nested_sub_aggregation_connection
   TeamTeamSeasonPlayerSponsorshipSubAggregation:
     default_graphql_resolver: object
   TeamTeamSeasonPlayerSponsorshipSubAggregationConnection:
+    default_graphql_resolver: object
     elasticgraph_category: nested_sub_aggregation_connection
   TeamTeamSeasonPlayerSubAggregation:
     default_graphql_resolver: object
   TeamTeamSeasonPlayerSubAggregationAffiliationsSubAggregations:
     default_graphql_resolver: object
   TeamTeamSeasonPlayerSubAggregationConnection:
+    default_graphql_resolver: object
     elasticgraph_category: nested_sub_aggregation_connection
   TeamTeamSeasonPlayerSubAggregationSubAggregations:
     default_graphql_resolver: object
   TeamTeamSeasonSponsorshipSubAggregation:
     default_graphql_resolver: object
   TeamTeamSeasonSponsorshipSubAggregationConnection:
+    default_graphql_resolver: object
     elasticgraph_category: nested_sub_aggregation_connection
   TeamTeamSeasonSubAggregation:
     default_graphql_resolver: object
   TeamTeamSeasonSubAggregationConnection:
+    default_graphql_resolver: object
     elasticgraph_category: nested_sub_aggregation_connection
   TeamTeamSeasonSubAggregationPlayersObjectAffiliationsSubAggregations:
     default_graphql_resolver: object
@@ -4057,10 +4108,13 @@ object_types_by_name:
     elasticgraph_category: indexed_aggregation
     source_type: Widget
   WidgetAggregationConnection:
+    default_graphql_resolver: object
     elasticgraph_category: relay_connection
   WidgetAggregationEdge:
+    default_graphql_resolver: object
     elasticgraph_category: relay_edge
   WidgetConnection:
+    default_graphql_resolver: object
     elasticgraph_category: relay_connection
   WidgetCurrency:
     graphql_fields_by_name:
@@ -4117,12 +4171,16 @@ object_types_by_name:
     elasticgraph_category: indexed_aggregation
     source_type: WidgetCurrency
   WidgetCurrencyAggregationConnection:
+    default_graphql_resolver: object
     elasticgraph_category: relay_connection
   WidgetCurrencyAggregationEdge:
+    default_graphql_resolver: object
     elasticgraph_category: relay_edge
   WidgetCurrencyConnection:
+    default_graphql_resolver: object
     elasticgraph_category: relay_connection
   WidgetCurrencyEdge:
+    default_graphql_resolver: object
     elasticgraph_category: relay_edge
   WidgetCurrencyFilterInput:
     graphql_fields_by_name:
@@ -4138,6 +4196,7 @@ object_types_by_name:
   WidgetCurrencyNestedFieldsGroupedBy:
     default_graphql_resolver: object
   WidgetEdge:
+    default_graphql_resolver: object
     elasticgraph_category: relay_edge
   WidgetFilterInput:
     graphql_fields_by_name:
@@ -4264,12 +4323,16 @@ object_types_by_name:
     elasticgraph_category: indexed_aggregation
     source_type: WidgetOrAddress
   WidgetOrAddressAggregationConnection:
+    default_graphql_resolver: object
     elasticgraph_category: relay_connection
   WidgetOrAddressAggregationEdge:
+    default_graphql_resolver: object
     elasticgraph_category: relay_edge
   WidgetOrAddressConnection:
+    default_graphql_resolver: object
     elasticgraph_category: relay_connection
   WidgetOrAddressEdge:
+    default_graphql_resolver: object
     elasticgraph_category: relay_edge
   WidgetOrAddressFilterInput:
     graphql_fields_by_name:
@@ -4367,12 +4430,16 @@ object_types_by_name:
     elasticgraph_category: indexed_aggregation
     source_type: WidgetWorkspace
   WidgetWorkspaceAggregationConnection:
+    default_graphql_resolver: object
     elasticgraph_category: relay_connection
   WidgetWorkspaceAggregationEdge:
+    default_graphql_resolver: object
     elasticgraph_category: relay_edge
   WidgetWorkspaceConnection:
+    default_graphql_resolver: object
     elasticgraph_category: relay_connection
   WidgetWorkspaceEdge:
+    default_graphql_resolver: object
     elasticgraph_category: relay_edge
   WidgetWorkspaceGroupedBy:
     default_graphql_resolver: object
