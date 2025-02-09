@@ -393,7 +393,7 @@ module ElasticGraph
           # to go from non-null to null, but is not a breaking change to make it non-null
           # in the future.
           register_framework_object_type "PageInfo" do |t|
-            t.runtime_metadata_overrides = {default_graphql_resolver: :object}
+            t.override_runtime_metadata default_graphql_resolver: :object
 
             t.documentation <<~EOS
               Provides information about the specific fetched page. This implements the `PageInfo`
@@ -511,7 +511,7 @@ module ElasticGraph
 
           register_framework_object_type "AggregationCountDetail" do |t|
             t.documentation "Provides detail about an aggregation `#{names.count}`."
-            t.runtime_metadata_overrides = {default_graphql_resolver: :object}
+            t.override_runtime_metadata default_graphql_resolver: :object
 
             t.field names.approximate_value, "JsonSafeLong!", graphql_only: true do |f|
               f.documentation <<~EOS
@@ -1293,10 +1293,10 @@ module ElasticGraph
           date = schema_def_state.type_ref("Date")
           register_framework_object_type date.as_grouped_by.name do |t|
             t.documentation "Allows for grouping `Date` values based on the desired return type."
-            t.runtime_metadata_overrides = {
+            t.override_runtime_metadata(
               elasticgraph_category: :date_grouped_by_object,
               default_graphql_resolver: :object
-            }
+            )
 
             t.field names.as_date, "Date", graphql_only: true do |f|
               f.documentation "Used when grouping on the full `Date` value."
@@ -1313,10 +1313,10 @@ module ElasticGraph
           date_time = schema_def_state.type_ref("DateTime")
           register_framework_object_type date_time.as_grouped_by.name do |t|
             t.documentation "Allows for grouping `DateTime` values based on the desired return type."
-            t.runtime_metadata_overrides = {
+            t.override_runtime_metadata(
               elasticgraph_category: :date_grouped_by_object,
               default_graphql_resolver: :object
-            }
+            )
 
             t.field names.as_date_time, "DateTime", graphql_only: true do |f|
               f.documentation "Used when grouping on the full `DateTime` value."

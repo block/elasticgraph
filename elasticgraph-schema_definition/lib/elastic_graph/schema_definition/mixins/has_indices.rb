@@ -16,12 +16,12 @@ module ElasticGraph
       module HasIndices
         # @dynamic runtime_metadata_overrides
         # @private
-        attr_accessor :runtime_metadata_overrides
+        attr_reader :runtime_metadata_overrides
 
         # @private
         def initialize(*args, **options)
           super(*args, **options)
-          self.runtime_metadata_overrides = {}
+          @runtime_metadata_overrides = {}
           yield self
 
           # Freeze `indices` so that the indexable status of a type does not change after instantiation.
@@ -148,6 +148,22 @@ module ElasticGraph
         # @return [Array<Indexing::DerivedIndexedType>] list of derived types for this source type
         def derived_indexed_types
           @derived_indexed_types ||= []
+        end
+
+        # Configures overrides for runtime metadata. The provided runtime metadata values will be persisted in the
+        # `runtime_metadata.yaml` schema artifact and made available at runtime to `elasticgraph-graphql` and
+        # `elasticgraph-indexer`.
+        #
+        # @example Configure the `default_graphql_resolver` to use for a type
+        #   ElasticGraph.define_schema do |schema|
+        #     schema.object_type "Person" do |t|
+        #       t.override_runtime_metadata default_graphql_resolver: :object
+        #     end
+        #   end
+        #
+        # @return [void]
+        def override_runtime_metadata(**overrides)
+          @runtime_metadata_overrides.merge!(overrides)
         end
 
         # @private
