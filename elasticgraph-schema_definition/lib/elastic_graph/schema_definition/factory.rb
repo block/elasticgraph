@@ -272,7 +272,10 @@ module ElasticGraph
         new_object_type @state.type_ref(index_leaf_type).as_aggregated_values.name do |type|
           type.graphql_only true
           type.documentation "A return type used from aggregations to provided aggregated values over `#{index_leaf_type}` fields."
-          type.runtime_metadata_overrides = {elasticgraph_category: :scalar_aggregated_values}
+          type.runtime_metadata_overrides = {
+            elasticgraph_category: :scalar_aggregated_values,
+            default_graphql_resolver: :object
+          }
 
           type.field @state.schema_elements.approximate_distinct_value_count, "JsonSafeLong", graphql_only: true do |f|
             # Note: the 1-6% accuracy figure comes from the Elasticsearch docs:
