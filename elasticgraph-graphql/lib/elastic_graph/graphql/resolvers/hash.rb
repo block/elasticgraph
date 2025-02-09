@@ -13,28 +13,21 @@ require "elastic_graph/support/hash_util"
 module ElasticGraph
   class GraphQL
     module Resolvers
-      # Responsible for fetching a single field value from a document.
-      class GetRecordFieldValue
+      # Responsible for fetching a single field value from a Ruby hash.
+      class Hash
         def initialize(schema_element_names:)
           @schema_element_names = schema_element_names
         end
 
         def can_resolve?(field:, object:)
-          object.is_a?(DatastoreResponse::Document) || object.is_a?(::Hash)
+          object.is_a?(::Hash)
         end
 
         def call(parent_type, graphql_field, object, args, context)
           field = context.fetch(:elastic_graph_schema).field_named(parent_type.graphql_name, graphql_field.name)
           field_name = field.name_in_index.to_s
-          data =
-            case object
-            when DatastoreResponse::Document
-              object.payload
-            else
-              object
-            end
 
-          value = Support::HashUtil.fetch_value_at_path(data, field_name) do
+          value = Support::HashUtil.fetch_value_at_path(object, field_name) do
             field.type.list? ? [] : nil
           end
 

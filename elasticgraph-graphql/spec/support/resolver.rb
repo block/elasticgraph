@@ -82,6 +82,10 @@ RSpec.shared_context "resolver support" do
           graphql.runtime_metadata.schema_element_names
         elsif dep_name == :resolver_query_adapter
           resolver_query_adapter
+        elsif dep_name == :hash_resolver
+          ElasticGraph::GraphQL::Resolvers::Hash.new(
+            schema_element_names: graphql.runtime_metadata.schema_element_names
+          )
         else
           graphql.public_send(dep_name)
         end

@@ -166,18 +166,15 @@ module ElasticGraph
     # @private
     def graphql_resolvers
       @graphql_resolvers ||= begin
-        require "elastic_graph/graphql/resolvers/get_record_field_value"
+        require "elastic_graph/graphql/resolvers/document"
+        require "elastic_graph/graphql/resolvers/hash"
         require "elastic_graph/graphql/resolvers/list_records"
 
-        list_records = Resolvers::ListRecords.new(
-          resolver_query_adapter: resolver_query_adapter
-        )
+        list_records = Resolvers::ListRecords.new(resolver_query_adapter: resolver_query_adapter)
+        hash = Resolvers::Hash.new(schema_element_names: runtime_metadata.schema_element_names)
+        document = Resolvers::Document.new(hash_resolver: hash)
 
-        get_record_field_value = Resolvers::GetRecordFieldValue.new(
-          schema_element_names: runtime_metadata.schema_element_names
-        )
-
-        [list_records, get_record_field_value]
+        [list_records, hash, document]
       end
     end
 

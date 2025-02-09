@@ -36,7 +36,6 @@ target :elasticgraph_gems do
     elasticgraph-graphql/lib/elastic_graph/graphql/datastore_search_router.rb
     elasticgraph-graphql/lib/elastic_graph/graphql/monkey_patches/schema_field.rb
     elasticgraph-graphql/lib/elastic_graph/graphql/monkey_patches/schema_object.rb
-    elasticgraph-graphql/lib/elastic_graph/graphql/resolvers/get_record_field_value.rb
     elasticgraph-graphql/lib/elastic_graph/graphql/resolvers/graphql_adapter.rb
     elasticgraph-graphql/lib/elastic_graph/graphql/resolvers/list_records.rb
     elasticgraph-graphql/lib/elastic_graph/graphql/resolvers/nested_relationships.rb

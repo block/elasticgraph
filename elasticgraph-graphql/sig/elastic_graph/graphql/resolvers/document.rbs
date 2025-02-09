@@ -1,0 +1,15 @@
+module ElasticGraph
+  class GraphQL
+    module Resolvers
+      class Document
+        include _Resolver
+
+        @hash_resolver: Resolvers::Hash
+
+        def initialize: (
+          hash_resolver: Resolvers::Hash
+        ) -> void
+      end
+    end
+  end
+end

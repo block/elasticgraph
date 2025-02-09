@@ -1,8 +1,10 @@
 module ElasticGraph
   class GraphQL
     module Resolvers
-      class GetRecordFieldValue
+      class Hash
         include _Resolver
+
+        @schema_element_names: SchemaArtifacts::RuntimeMetadata::SchemaElementNames
 
         def initialize: (
           schema_element_names: SchemaArtifacts::RuntimeMetadata::SchemaElementNames
