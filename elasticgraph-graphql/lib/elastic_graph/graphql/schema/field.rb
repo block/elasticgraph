@@ -27,7 +27,7 @@ module ElasticGraph
           @graphql_field = graphql_field
           @relation = runtime_metadata&.relation
           @computation_detail = runtime_metadata&.computation_detail
-          @resolver = runtime_metadata&.resolver
+          @resolver = runtime_metadata&.resolver || parent_type.default_graphql_resolver
           @name_in_index = runtime_metadata&.name_in_index&.to_sym || name
 
           # Adds the :extras required by ElasticGraph. For now, this blindly adds `:lookahead`

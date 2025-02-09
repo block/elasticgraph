@@ -15,10 +15,6 @@ module ElasticGraph
     module Aggregation
       module Resolvers
         class AggregatedValues < ::Data.define(:aggregation_name, :bucket, :field_path)
-          def can_resolve?(field:, object:)
-            true
-          end
-
           def call(parent_type, graphql_field, object, args, context)
             field = context.fetch(:elastic_graph_schema).field_named(parent_type.graphql_name, graphql_field.name)
             return with(field_path: field_path + [PathSegment.for(field: field, lookahead: args.fetch(:lookahead))]) if field.type.object?

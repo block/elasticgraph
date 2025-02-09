@@ -185,6 +185,7 @@ module ElasticGraph
     def named_graphql_resolvers
       @named_graphql_resolvers ||= begin
         require "elastic_graph/graphql/resolvers/nested_relationships"
+        require "elastic_graph/graphql/resolvers/object"
 
         nested_relationships = Resolvers::NestedRelationships.new(
           resolver_query_adapter: resolver_query_adapter,
@@ -192,7 +193,10 @@ module ElasticGraph
           logger: logger
         )
 
-        {nested_relationships: nested_relationships}
+        {
+          nested_relationships: nested_relationships,
+          object: Resolvers::Object.new
+        }
       end
     end
 

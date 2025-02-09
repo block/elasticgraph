@@ -17,7 +17,7 @@ module ElasticGraph
     class Schema
       # Represents a GraphQL type.
       class Type
-        attr_reader :graphql_type, :fields_by_name, :index_definitions, :elasticgraph_category, :graphql_only_return_type
+        attr_reader :graphql_type, :fields_by_name, :index_definitions, :elasticgraph_category, :graphql_only_return_type, :default_graphql_resolver
 
         def initialize(
           schema,
@@ -36,6 +36,7 @@ module ElasticGraph
           @object_runtime_metadata = object_runtime_metadata
           @elasticgraph_category = object_runtime_metadata&.elasticgraph_category
           @graphql_only_return_type = object_runtime_metadata&.graphql_only_return_type
+          @default_graphql_resolver = object_runtime_metadata&.default_graphql_resolver
           @enum_runtime_metadata = enum_runtime_metadata
           @enum_value_names_by_original_name = (enum_runtime_metadata&.values_by_name || {}).to_h do |name, value|
             [value.alternate_original_name || name, name]

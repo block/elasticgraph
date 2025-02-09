@@ -4,7 +4,6 @@ module ElasticGraph
       type fieldArgs = ::Hash[::Symbol, untyped]
 
       interface _Resolver
-        def can_resolve?: (field: Schema::Field, object: untyped) -> bool
         def call: (
           ::GraphQL::Schema::_Type,
           ::GraphQL::Schema::Field,

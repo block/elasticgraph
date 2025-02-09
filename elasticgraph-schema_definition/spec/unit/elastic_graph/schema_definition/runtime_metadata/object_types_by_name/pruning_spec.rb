@@ -71,7 +71,9 @@ module ElasticGraph
           LongStringAggregatedValues
           LongStringListFilterInput
           MatchesQueryAllowedEditsPerTermListFilterInput
+          NoCustomizationsAggregatedValues
           NoCustomizationsFieldsListFilterInput
+          NoCustomizationsGroupedBy
           NoCustomizationsListFilterInput
           NonNumericAggregatedValues
           PageInfo

@@ -1,0 +1,9 @@
+module ElasticGraph
+  class GraphQL
+    module Resolvers
+      class Object
+        include _Resolver
+      end
+    end
+  end
+end
