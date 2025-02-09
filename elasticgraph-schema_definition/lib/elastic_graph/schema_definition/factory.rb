@@ -436,7 +436,10 @@ module ElasticGraph
         type_ref = @state.type_ref(type_name)
         new_object_type type_ref.as_edge.name do |t|
           t.relay_pagination_type = true
-          t.runtime_metadata_overrides = {elasticgraph_category: :relay_edge}
+          t.runtime_metadata_overrides = {
+            elasticgraph_category: :relay_edge,
+            default_graphql_resolver: :object
+          }
 
           t.documentation <<~EOS
             Represents a specific `#{type_name}` in the context of a `#{type_ref.as_connection.name}`,
@@ -463,7 +466,10 @@ module ElasticGraph
         type_ref = @state.type_ref(type_name)
         new_object_type type_ref.as_connection.name do |t|
           t.relay_pagination_type = true
-          t.runtime_metadata_overrides = {elasticgraph_category: :relay_connection}
+          t.runtime_metadata_overrides = {
+            elasticgraph_category: :relay_connection,
+            default_graphql_resolver: :object
+          }
 
           if support_pagination
             t.documentation <<~EOS
