@@ -6,13 +6,10 @@
 #
 # frozen_string_literal: true
 
-require "elastic_graph/graphql/datastore_response/document"
-require "elastic_graph/graphql/resolvers/get_record_field_value"
-
 module ElasticGraph
   class GraphQL
     module Resolvers
-      RSpec.describe GetRecordFieldValue, :capture_logs, :resolver do
+      RSpec.shared_examples_for "Hash or Document resolver", :capture_logs, :resolver do
         attr_accessor :schema_artifacts
 
         before(:context) do
@@ -47,13 +44,6 @@ module ElasticGraph
         context "for a field without customizations" do
           it "fetches a requested scalar field from the document" do
             value = resolve(:Person, :name, {"id" => 1, "name" => "Napoleon"})
-
-            expect(value).to eq "Napoleon"
-          end
-
-          it "works with an `DatastoreResponse::Document`" do
-            doc = DatastoreResponse::Document.with_payload("id" => 1, "name" => "Napoleon")
-            value = resolve(:Person, :name, doc)
 
             expect(value).to eq "Napoleon"
           end
@@ -102,13 +92,6 @@ module ElasticGraph
 
             expect(value1).to eq "Napoleon"
             expect(value2).to eq "Napoleon"
-          end
-
-          it "works with an `DatastoreResponse::Document`" do
-            doc = DatastoreResponse::Document.with_payload("id" => 1, "name" => "Napoleon")
-            value = resolve(:Person, :alt_name1, doc)
-
-            expect(value).to eq "Napoleon"
           end
 
           it "returns `nil` for a scalar when the directive field name is missing" do

@@ -6,19 +6,19 @@
 #
 # frozen_string_literal: true
 
-require "elastic_graph/graphql/resolvers/get_record_field_value"
+require "elastic_graph/graphql/resolvers/hash"
 
 module ElasticGraph
   class GraphQL
     module Resolvers
       module RelayConnection
         # Note: while this file is `array_adapter_spec.rb`, the describe block below
-        # must use `GetRecordFieldValue` so we can leverage the handy `resolver` support
-        # (since `GetRecordFieldValue` is a resolver, but `ArrayAdapter` is not).
+        # must use `Hash` so we can leverage the handy `resolver` support
+        # (since `Hash` is a resolver, but `ArrayAdapter` is not).
         # It still primarily exercises the `ArrayAdapter` class defined in `array_adapter.rb`,
-        # but does so via the `GetRecordFieldValue` resolver, which has the added benefit
-        # of also verifying that `GetRecordFieldValue` builds `ArrayAdapter` properly.
-        RSpec.describe GetRecordFieldValue, "on a paginated collection field", :resolver do
+        # but does so via the `Hash` resolver, which has the added benefit
+        # of also verifying that `Hash` builds `ArrayAdapter` properly.
+        RSpec.describe Hash, "on a paginated collection field", :resolver do
           attr_accessor :schema_artifacts
 
           before(:context) do
