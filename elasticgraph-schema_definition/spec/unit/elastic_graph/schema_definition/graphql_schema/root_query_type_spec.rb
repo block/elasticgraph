@@ -372,6 +372,25 @@ module ElasticGraph
           EOS
         end
 
+        it "does not generate derived types from the `Query` type, even if customized" do
+          result = define_schema do |api|
+            api.object_type "Person" do |t|
+              t.root_query_fields plural: "people"
+              t.field "id", "ID!", sortable: false, filterable: false
+              t.index "people"
+            end
+
+            api.on_built_in_types do |t|
+              if t.name == "Query"
+                t.field "time", "String"
+              end
+            end
+          end
+
+          type_names = ::GraphQL::Schema.from_definition(result).types.keys
+          expect(type_names.grep(/\AQuery/)).to eq ["Query"]
+        end
+
         it "can be overridden via `raw_sdl` to support ElasticGraph tests that require a custom `Query` type" do
           query_type_def = <<~EOS.strip
             type Query {

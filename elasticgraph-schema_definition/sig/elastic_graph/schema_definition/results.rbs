@@ -34,6 +34,8 @@ module ElasticGraph
 
       private
 
+      def define_root_graphql_type: () -> void
+      def aggregation_efficiency_hints_for: (::Array[Indexing::DerivedIndexedType]) -> ::String?
       def json_schema_with_metadata_merger: () -> Indexing::JSONSchemaWithMetadata::Merger
       def generate_datastore_config: () -> ::Hash[::String, untyped]
       def build_dynamic_scripts: () -> ::Array[Scripting::Script]
@@ -46,8 +48,8 @@ module ElasticGraph
       def check_for_circular_dependencies!: () -> void
       def recursively_add_referenced_types_to: (SchemaElements::TypeReference, ::Hash[::String, ::Set[::String]]) -> void
 
-      @all_types_except_root_query_type: Array[SchemaElements::graphQLType]?
-      def all_types_except_root_query_type: () -> ::Array[SchemaElements::graphQLType]
+      @all_types: Array[SchemaElements::graphQLType]?
+      def all_types: () -> ::Array[SchemaElements::graphQLType]
       def apply_customizations_to: (::Array[SchemaElements::graphQLType], SchemaElements::graphQLType) -> void
     end
   end

@@ -10,7 +10,6 @@ require "elastic_graph/apollo/schema_definition/argument_extension"
 require "elastic_graph/apollo/schema_definition/enum_type_extension"
 require "elastic_graph/apollo/schema_definition/enum_value_extension"
 require "elastic_graph/apollo/schema_definition/field_extension"
-require "elastic_graph/apollo/schema_definition/graphql_sdl_enumerator_extension"
 require "elastic_graph/apollo/schema_definition/input_type_extension"
 require "elastic_graph/apollo/schema_definition/interface_type_extension"
 require "elastic_graph/apollo/schema_definition/object_type_extension"
@@ -31,12 +30,6 @@ module ElasticGraph
                        yield field if block_given?
                      end
                    end
-
-        def new_graphql_sdl_enumerator(all_types_except_root_query_type)
-          super.tap do |enum|
-            enum.extend GraphQLSDLEnumeratorExtension
-          end
-        end
 
         def new_argument(field, name, value_type)
           super(field, name, value_type) do |type|

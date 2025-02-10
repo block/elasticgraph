@@ -37,14 +37,18 @@ module ElasticGraph
       #     end
       #   end
       class Relationship < DelegateClass(Field)
-        # @dynamic related_type
+        # @dynamic related_type, hide_relationship_runtime_metadata, hide_relationship_runtime_metadata=
 
         # @return [ObjectType, InterfaceType, UnionType] the type this relationship relates to
         attr_reader :related_type
 
         # @private
+        attr_accessor :hide_relationship_runtime_metadata
+
+        # @private
         def initialize(field, cardinality:, related_type:, foreign_key:, direction:)
           super(field)
+          self.hide_relationship_runtime_metadata = false
           @cardinality = cardinality
           @related_type = related_type
           @foreign_key = foreign_key
@@ -192,6 +196,8 @@ module ElasticGraph
 
         # @private
         def runtime_metadata
+          return nil if hide_relationship_runtime_metadata
+
           resolved_related_type = (_ = related_type.unwrap_list.as_object_type) # : indexableType
           foreign_key_nested_paths = schema_def_state.field_path_resolver.determine_nested_paths(resolved_related_type, @foreign_key)
           foreign_key_nested_paths ||= [] # : ::Array[::String]

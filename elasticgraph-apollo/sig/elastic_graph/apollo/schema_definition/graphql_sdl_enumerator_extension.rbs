@@ -1,8 +1,0 @@
-module ElasticGraph
-  module Apollo
-    module SchemaDefinition
-      module GraphQLSDLEnumeratorExtension: ElasticGraph::SchemaDefinition::SchemaElements::GraphQLSDLEnumerator
-      end
-    end
-  end
-end

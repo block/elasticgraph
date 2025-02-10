@@ -115,8 +115,8 @@ module ElasticGraph
                  end
       @@field_new = prevent_non_factory_instantiation_of(SchemaElements::Field)
 
-      def new_graphql_sdl_enumerator(all_types_except_root_query_type)
-        @@graphql_sdl_enumerator_new.call(@state, all_types_except_root_query_type)
+      def new_graphql_sdl_enumerator(all_types)
+        @@graphql_sdl_enumerator_new.call(@state, all_types)
       end
       @@graphql_sdl_enumerator_new = prevent_non_factory_instantiation_of(SchemaElements::GraphQLSDLEnumerator)
 
