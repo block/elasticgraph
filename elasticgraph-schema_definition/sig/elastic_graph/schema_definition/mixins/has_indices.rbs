@@ -3,9 +3,10 @@ module ElasticGraph
     module Mixins
       module HasIndices
         attr_reader indices: ::Array[Indexing::Index]
-        attr_accessor runtime_metadata_overrides: ::Hash[::Symbol, untyped]
+        attr_reader runtime_metadata_overrides: ::Hash[::Symbol, untyped]
         def index: (::String, ::Hash[::Symbol, ::String | ::Integer]) ?{ (Indexing::Index) -> void } -> ::Array[Indexing::Index]
         def indexed?: () -> bool
+        def override_runtime_metadata: (**untyped) -> void
         def runtime_metadata: (::Array[SchemaArtifacts::RuntimeMetadata::UpdateTarget]) -> SchemaArtifacts::RuntimeMetadata::ObjectType
         def derived_indexed_types: () -> ::Array[Indexing::DerivedIndexedType]
         def derive_indexed_type_fields: (
