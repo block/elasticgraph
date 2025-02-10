@@ -8,6 +8,7 @@ module ElasticGraph
       class Relationship < RelationshipSupertype
         type cardinality = :one | :many
         attr_reader related_type: TypeReference
+        attr_accessor hide_relationship_runtime_metadata: bool
 
         @cardinality: cardinality
         @related_type: TypeReference
@@ -30,7 +31,7 @@ module ElasticGraph
         def rollover_timestamp_value_source_for_index: [T] (Indexing::Index) { (::String) -> bot } -> ::String?
         def validate_equivalent_fields: (SchemaElements::FieldPath::Resolver) -> ::Array[::String]
         def many?: () -> bool
-        def runtime_metadata: () -> SchemaArtifacts::RuntimeMetadata::Relation
+        def runtime_metadata: () -> SchemaArtifacts::RuntimeMetadata::Relation?
 
         private
 

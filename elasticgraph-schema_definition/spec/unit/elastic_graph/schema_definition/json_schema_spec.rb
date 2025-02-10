@@ -45,7 +45,7 @@ module ElasticGraph
 
           # Input enum types are named with an `Input` suffix. The JSON schema only contains the types we index, which are output types,
           # and therefore it does not have the input enum types.
-          untested_types = built_in_types - @tested_types.to_a - input_enum_types
+          untested_types = built_in_types - @tested_types.to_a - input_enum_types - ["Query"]
 
           expect(untested_types).to be_empty,
             "It appears that #{untested_types.size} built-in type(s) lack test coverage in `json_schema_spec.rb`. " \
@@ -285,6 +285,10 @@ module ElasticGraph
           })
             .which_matches(0, LONG_STRING_MAX, LONG_STRING_MIN)
             .and_fails_to_match(0.5, nil, true, LONG_STRING_MIN - 1, LONG_STRING_MAX + 1)
+        end
+
+        it "excludes `Query`" do
+          expect(json_schema.fetch("$defs").keys).to exclude "Query"
         end
 
         def have_json_schema_like(type_name, *args, **kwargs)

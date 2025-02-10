@@ -117,7 +117,12 @@ module ElasticGraph
           api.on_built_in_types do |type|
             # Built-in types like `PageInfo` need to be tagged with `@shareable` on Federation V2 since other subgraphs may
             # have them and they aren't entity types. `Query`, as the root, is a special case that must be skipped.
-            (_ = type).apollo_shareable if type.respond_to?(:apollo_shareable) && type.name != "Query"
+            # We also need to customize it.
+            if type.name == "Query"
+              customize_root_query_type(_ = type)
+            elsif type.respond_to?(:apollo_shareable)
+              (_ = type).apollo_shareable
+            end
           end
 
           api.register_graphql_extension GraphQL::EngineExtension, defined_at: "elastic_graph/apollo/graphql/engine_extension"
@@ -442,6 +447,53 @@ module ElasticGraph
 
           if unresolvable_field_errors.any?
             raise Errors::SchemaError, unresolvable_field_errors.join("\n#{"-" * 100}\n")
+          end
+        end
+
+        private_class_method def self.customize_root_query_type(type)
+          if type.schema_def_state.object_types_by_name.values.any?(&:indexed?)
+            type.field "_entities", "[_Entity]!" do |f|
+              f.documentation <<~EOS
+                A field required by the [Apollo Federation subgraph
+                spec](https://www.apollographql.com/docs/federation/subgraph-spec/#query_entities):
+
+                > The graph router uses this root-level `Query` field to directly fetch fields of entities defined by a subgraph.
+                >
+                > This field must take a `representations` argument of type `[_Any!]!` (a non-nullable list of non-nullable
+                > [`_Any` scalars](https://www.apollographql.com/docs/federation/subgraph-spec/#scalar-_any)). Its return type must be `[_Entity]!` (a non-nullable list of _nullable_
+                > objects that belong to the [`_Entity` union](https://www.apollographql.com/docs/federation/subgraph-spec/#union-_entity)).
+                >
+                > Each entry in the `representations` list  must be validated with the following rules:
+                >
+                > - A representation must include a `__typename` string field.
+                > - A representation must contain all fields included in the fieldset of a `@key` directive applied to the corresponding entity definition.
+                >
+                > For details, see [Resolving entity fields with `Query._entities`](https://www.apollographql.com/docs/federation/subgraph-spec/#resolving-entity-fields-with-query_entities).
+
+                Not intended for use by clients other than Apollo.
+              EOS
+
+              f.argument "representations", "[_Any!]!" do |a|
+                a.documentation <<~EOS
+                  A list of entity data blobs from other apollo subgraphs. For more information (and
+                  to see an example of what form this argument takes), see the [Apollo Federation subgraph
+                  spec](https://www.apollographql.com/docs/federation/subgraph-spec/#resolve-requests-for-entities).
+                EOS
+              end
+            end
+          end
+
+          type.field "_service", "_Service!" do |f|
+            f.documentation <<~EOS
+              A field required by the [Apollo Federation subgraph
+              spec](https://www.apollographql.com/docs/federation/subgraph-spec/#query_service):
+
+              > This field of the root `Query` type must return a non-nullable [`_Service` type](https://www.apollographql.com/docs/federation/subgraph-spec/#type-_service).
+
+              > For details, see [Enhanced introspection with `Query._service`](https://www.apollographql.com/docs/federation/subgraph-spec/#enhanced-introspection-with-query_service).
+
+              Not intended for use by clients other than Apollo.
+            EOS
           end
         end
       end

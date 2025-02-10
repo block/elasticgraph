@@ -361,24 +361,14 @@ module ElasticGraph
 
         context "when the schema has been customized (as in an extension like elasticgraph-apollo)" do
           before(:context) do
-            enumerator_extension = Module.new do
-              def root_query_type
-                super.tap do |type|
+            self.schema_artifacts = generate_schema_artifacts do |schema|
+              schema.on_built_in_types do |type|
+                if type.name == "Query"
                   type.field "multiply", "Int" do |f|
                     f.argument("operands", "Operands!")
                   end
                 end
               end
-            end
-
-            self.schema_artifacts = generate_schema_artifacts do |schema|
-              schema.factory.extend(Module.new {
-                define_method :new_graphql_sdl_enumerator do |all_types_except_root_query_type|
-                  super(all_types_except_root_query_type).tap do |enum|
-                    enum.extend enumerator_extension
-                  end
-                end
-              })
 
               schema.scalar_type "Operands" do |t|
                 t.mapping type: nil

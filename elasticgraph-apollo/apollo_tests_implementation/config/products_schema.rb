@@ -8,7 +8,28 @@
 
 # @private
 module ApolloTestImpl
-  module GraphQLSDLEnumeratorExtension
+  federation_version = ENV["TARGET_APOLLO_FEDERATION_VERSION"]
+
+  # Note: this includes many "manual" schema elements (directives, raw SDL, etc) that the
+  # `elasticgraph-apollo` library will generate on our behalf in the future. For now, this
+  # includes all these schema elements just to make it as close as possible to an apollo
+  # compatible schema without further changes to elasticgraph-apollo.
+  #
+  # https://github.com/apollographql/apollo-federation-subgraph-compatibility/blob/2.0.0/COMPATIBILITY.md#products-schema-to-be-implemented-by-library-maintainers
+  ElasticGraph.define_schema do |schema|
+    schema.json_schema_version 1
+    schema.target_apollo_federation_version(federation_version) if federation_version
+
+    unless federation_version == "2.0"
+      schema.raw_sdl <<~EOS
+        extend schema
+          @link(url: "https://myspecs.dev/myCustomDirective/v1.0", import: ["@custom"])
+          @composeDirective(name: "@custom")
+
+        directive @custom on OBJECT
+      EOS
+    end
+
     # The `apollo-federation-subgraph-compatibility` project requires[^1] that each tested implementation provide
     # specific `Query` fields:
     #
@@ -24,8 +45,8 @@ module ApolloTestImpl
     # `Query` type to add the required fields.
     #
     # [^1]: https://github.com/apollographql/apollo-federation-subgraph-compatibility/blob/2.0.0/COMPATIBILITY.md#products-schema-to-be-implemented-by-library-maintainers
-    def root_query_type
-      super.tap do |type|
+    schema.on_built_in_types do |type|
+      if type.name == "Query"
         type.field "product", "Product" do |f|
           f.argument "id", "ID!"
         end
@@ -36,40 +57,6 @@ module ApolloTestImpl
           f.directive "deprecated", reason: "Use product query instead"
         end
       end
-    end
-  end
-
-  # @private
-  module SchemaDefFactoryExtension
-    def new_graphql_sdl_enumerator(all_types_except_root_query_type)
-      super(all_types_except_root_query_type).tap do |enum|
-        enum.extend GraphQLSDLEnumeratorExtension
-      end
-    end
-  end
-
-  federation_version = ENV["TARGET_APOLLO_FEDERATION_VERSION"]
-
-  # Note: this includes many "manual" schema elements (directives, raw SDL, etc) that the
-  # `elasticgraph-apollo` library will generate on our behalf in the future. For now, this
-  # includes all these schema elements just to make it as close as possible to an apollo
-  # compatible schema without further changes to elasticgraph-apollo.
-  #
-  # https://github.com/apollographql/apollo-federation-subgraph-compatibility/blob/2.0.0/COMPATIBILITY.md#products-schema-to-be-implemented-by-library-maintainers
-  ElasticGraph.define_schema do |schema|
-    schema.factory.extend SchemaDefFactoryExtension
-
-    schema.json_schema_version 1
-    schema.target_apollo_federation_version(federation_version) if federation_version
-
-    unless federation_version == "2.0"
-      schema.raw_sdl <<~EOS
-        extend schema
-          @link(url: "https://myspecs.dev/myCustomDirective/v1.0", import: ["@custom"])
-          @composeDirective(name: "@custom")
-
-        directive @custom on OBJECT
-      EOS
     end
 
     schema.object_type "Product" do |t|

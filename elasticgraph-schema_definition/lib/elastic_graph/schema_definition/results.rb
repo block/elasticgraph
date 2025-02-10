@@ -110,6 +110,68 @@ module ElasticGraph
         # Record that we are now generating results so that caching can kick in.
         state.user_definition_complete = true
         state.user_definition_complete_callbacks.each(&:call)
+        define_root_graphql_type
+      end
+
+      def define_root_graphql_type
+        # Some of our tests need to define their own root `Query` type, so here we avoid
+        # generating `Query` if an sdl part exists that already defines it.
+        return if state.sdl_parts.flat_map { |sdl| sdl.lines }.any? { |line| line.start_with?("type Query") }
+
+        state.api.object_type "Query" do |query_type|
+          query_type.documentation "The query entry point for the entire schema."
+          query_type.override_runtime_metadata default_graphql_resolver: nil
+
+          state.types_by_name.values.select(&:indexed?).sort_by(&:name).each do |type|
+            # @type var indexed_type: Mixins::HasIndices & _Type
+            indexed_type = _ = type
+
+            query_type.relates_to_many(
+              indexed_type.plural_root_query_field_name,
+              indexed_type.name,
+              via: "ignore",
+              dir: :in,
+              singular: indexed_type.singular_root_query_field_name
+            ) do |f|
+              f.documentation "Fetches `#{indexed_type.name}`s based on the provided arguments."
+              f.resolver = nil
+              f.hide_relationship_runtime_metadata = true
+              indexed_type.root_query_fields_customizations&.call(f)
+            end
+
+            # Add additional efficiency hints to the aggregation field documentation if we have any such hints.
+            # This needs to be outside the `relates_to_many` block because `relates_to_many` adds its own "suffix" to
+            # the field documentation, and here we add another one.
+            if (agg_efficiency_hint = aggregation_efficiency_hints_for(indexed_type.derived_indexed_types))
+              agg_name = state.schema_elements.normalize_case("#{indexed_type.singular_root_query_field_name}_aggregations")
+              agg_field = query_type.graphql_fields_by_name.fetch(agg_name)
+              agg_field.documentation "#{agg_field.doc_comment}\n\n#{agg_efficiency_hint}"
+            end
+          end
+
+          state.built_in_types_customization_blocks.each do |customization_block|
+            customization_block.call(query_type)
+          end
+        end
+      end
+
+      def aggregation_efficiency_hints_for(derived_indexed_types)
+        return nil if derived_indexed_types.empty?
+
+        hints = derived_indexed_types.map do |type|
+          derived_indexing_type = state.types_by_name.fetch(type.destination_type_ref.name)
+          alternate_field_name = (_ = derived_indexing_type).plural_root_query_field_name
+          grouping_field = type.id_source
+
+          "  - The root `#{alternate_field_name}` field groups by `#{grouping_field}`"
+        end
+
+        <<~EOS
+          Note: aggregation queries are relatively expensive, and some fields have been pre-aggregated to allow
+          more efficient queries for some common aggregation cases:
+
+          #{hints.join("\n")}
+        EOS
       end
 
       def json_schema_with_metadata_merger
@@ -144,7 +206,7 @@ module ElasticGraph
       def build_runtime_metadata
         extra_update_targets_by_object_type_name = identify_extra_update_targets_by_object_type_name
 
-        object_types_by_name = all_types_except_root_query_type
+        object_types_by_name = all_types
           .select { |t| t.respond_to?(:graphql_fields_by_name) }
           .to_h { |type| [type.name, (_ = type).runtime_metadata(extra_update_targets_by_object_type_name.fetch(type.name) { [] })] }
 
@@ -157,7 +219,7 @@ module ElasticGraph
           .filter_map { |type| enum_generator.sort_order_enum_for(_ = type) }
           .to_h { |enum_type| [(_ = enum_type).name, (_ = enum_type).runtime_metadata] }
 
-        enum_types_by_name = all_types_except_root_query_type
+        enum_types_by_name = all_types
           .grep(SchemaElements::EnumType) # : ::Array[SchemaElements::EnumType]
           .to_h { |t| [t.name, t.runtime_metadata] }
           .merge(indexed_enum_types_by_name)
@@ -183,7 +245,7 @@ module ElasticGraph
         sourced_field_errors = [] # : ::Array[::String]
         relationship_errors = [] # : ::Array[::String]
 
-        state.object_types_by_name.values.each_with_object(::Hash.new { |h, k| h[k] = [] }) do |object_type, accum|
+        state.object_types_by_name.except("Query").values.each_with_object(::Hash.new { |h, k| h[k] = [] }) do |object_type, accum|
           fields_with_sources_by_relationship_name =
             if object_type.indices.empty?
               # only indexed types can have `sourced_from` fields, and resolving `fields_with_sources` on an unindexed union type
@@ -251,7 +313,7 @@ module ElasticGraph
         state.object_types_by_name.values.each(&:verify_graphql_correctness!)
 
         type_defs = state.factory
-          .new_graphql_sdl_enumerator(all_types_except_root_query_type)
+          .new_graphql_sdl_enumerator(all_types)
           .map { |sdl| strip_trailing_whitespace(sdl) }
 
         [type_defs + state.sdl_parts].join("\n\n")
@@ -283,7 +345,9 @@ module ElasticGraph
 
       def json_schema_indexing_field_types_by_name
         @json_schema_indexing_field_types_by_name ||= state
-          .types_by_name.values
+          .types_by_name
+          .except("Query")
+          .values
           .reject do |t|
             derived_indexing_type_names.include?(t.name) ||
               # Skip graphql framework types
@@ -341,9 +405,15 @@ module ElasticGraph
         end
       end
 
-      def all_types_except_root_query_type
-        @all_types_except_root_query_type ||= state.types_by_name.values.flat_map do |registered_type|
-          related_types = [registered_type] + registered_type.derived_graphql_types
+      def all_types
+        @all_types ||= state.types_by_name.values.flat_map do |registered_type|
+          related_types =
+            if registered_type.name == "Query"
+              [registered_type]
+            else
+              [registered_type] + registered_type.derived_graphql_types
+            end
+
           apply_customizations_to(related_types, registered_type)
           related_types
         end

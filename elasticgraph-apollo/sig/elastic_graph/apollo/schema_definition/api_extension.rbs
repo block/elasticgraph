@@ -19,6 +19,7 @@ module ElasticGraph
         def validate_entity_types_can_all_be_resolved: (::Array[ElasticGraph::SchemaDefinition::indexableType]) -> void
 
         def self.extended: (ElasticGraph::SchemaDefinition::API & APIExtension) -> void
+        def self.customize_root_query_type: (ElasticGraph::SchemaDefinition::SchemaElements::ObjectType) -> void
       end
     end
   end

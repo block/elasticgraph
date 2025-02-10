@@ -71,8 +71,8 @@ module ElasticGraph
           ?singular: ::String?
         ) ?{ (Field) -> void } -> Field
 
-        def relates_to_one: (::String, ::String, via: ::String, dir: foreignKeyDirection) ?{ (Field) -> void } -> void
-        def relates_to_many: (::String, ::String, via: ::String, dir: foreignKeyDirection, singular: ::String) ?{ (Field) -> void } -> void
+        def relates_to_one: (::String, ::String, via: ::String, dir: foreignKeyDirection) ?{ (Relationship) -> void } -> void
+        def relates_to_many: (::String, ::String, via: ::String, dir: foreignKeyDirection, singular: ::String) ?{ (Relationship) -> void } -> void
 
         def generate_sdl: (name_section: ::String) ?{ (Field::argument) -> boolish } -> String
         def current_sources: () -> ::Array[::String]
@@ -101,7 +101,7 @@ module ElasticGraph
           dir: foreignKeyDirection,
           foreign_key_type: ::String,
           cardinality: Relationship::cardinality,
-          related_type: ::String) ?{ (Field) -> void } -> void
+          related_type: ::String) ?{ (Relationship) -> void } -> void
 
         def register_inferred_foreign_key_fields: (
           from_type: [::String, ::String],

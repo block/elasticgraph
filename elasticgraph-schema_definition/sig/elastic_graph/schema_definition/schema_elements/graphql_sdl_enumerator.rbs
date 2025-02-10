@@ -11,13 +11,7 @@ module ElasticGraph
         private
 
         @schema_def_state: State
-        @all_types_except_root_query_type: ::Array[graphQLType]
-
-        def enumerate_all_types: () -> ::Array[graphQLType]
-        def aggregation_efficiency_hints_for: (::Array[Indexing::DerivedIndexedType]) -> ::String?
-        def root_query_type: () -> ObjectType?
-        def new_built_in_object_type: (::String) { (ObjectType) -> void } -> ObjectType
-        def new_object_type: (::String) { (ObjectType) -> void } -> ObjectType
+        @all_types: ::Array[graphQLType]
       end
     end
   end
