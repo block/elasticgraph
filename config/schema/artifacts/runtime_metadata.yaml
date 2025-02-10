@@ -2664,6 +2664,7 @@ index_definitions_by_name:
     route_with: workspace_id2
 object_types_by_name:
   Address:
+    default_graphql_resolver: get_record_field_value
     graphql_fields_by_name:
       manufacturer:
         relation:
@@ -2720,10 +2721,14 @@ object_types_by_name:
     elasticgraph_category: relay_edge
   AddressGroupedBy:
     default_graphql_resolver: object
+  AddressTimestamps:
+    default_graphql_resolver: get_record_field_value
   AddressTimestampsAggregatedValues:
     default_graphql_resolver: object
   AddressTimestampsGroupedBy:
     default_graphql_resolver: object
+  Affiliations:
+    default_graphql_resolver: get_record_field_value
   AffiliationsAggregatedValues:
     default_graphql_resolver: object
   AffiliationsFieldsListFilterInput:
@@ -2739,7 +2744,10 @@ object_types_by_name:
     graphql_fields_by_name:
       count:
         name_in_index: __counts
+  Company:
+    default_graphql_resolver: get_record_field_value
   Component:
+    default_graphql_resolver: get_record_field_value
     graphql_fields_by_name:
       dollar_widget:
         relation:
@@ -2838,6 +2846,8 @@ object_types_by_name:
     graphql_fields_by_name:
       widget_workspace_id:
         name_in_index: widget_workspace_id3
+  CurrencyDetails:
+    default_graphql_resolver: get_record_field_value
   CurrencyDetailsAggregatedValues:
     default_graphql_resolver: object
   CurrencyDetailsGroupedBy:
@@ -2895,6 +2905,7 @@ object_types_by_name:
       count:
         name_in_index: __counts
   ElectricalPart:
+    default_graphql_resolver: get_record_field_value
     graphql_fields_by_name:
       component_aggregations:
         relation:
@@ -2982,11 +2993,14 @@ object_types_by_name:
           function: min
     graphql_only_return_type: true
   GeoLocation:
+    default_graphql_resolver: get_record_field_value
     graphql_fields_by_name:
       latitude:
         name_in_index: lat
       longitude:
         name_in_index: lon
+  GeoShape:
+    default_graphql_resolver: get_record_field_value
   IDListFilterInput:
     graphql_fields_by_name:
       count:
@@ -3021,6 +3035,8 @@ object_types_by_name:
     graphql_fields_by_name:
       count:
         name_in_index: __counts
+  Inventor:
+    default_graphql_resolver: get_record_field_value
   InventorAggregatedValues:
     default_graphql_resolver: object
   InventorGroupedBy:
@@ -3106,6 +3122,7 @@ object_types_by_name:
           function: sum
     graphql_only_return_type: true
   Manufacturer:
+    default_graphql_resolver: get_record_field_value
     graphql_fields_by_name:
       address:
         relation:
@@ -3167,6 +3184,7 @@ object_types_by_name:
   ManufacturerGroupedBy:
     default_graphql_resolver: object
   MechanicalPart:
+    default_graphql_resolver: get_record_field_value
     graphql_fields_by_name:
       component_aggregations:
         relation:
@@ -3231,6 +3249,8 @@ object_types_by_name:
     elasticgraph_category: relay_edge
   MechanicalPartGroupedBy:
     default_graphql_resolver: object
+  Money:
+    default_graphql_resolver: get_record_field_value
   MoneyAggregatedValues:
     default_graphql_resolver: object
   MoneyFieldsListFilterInput:
@@ -3244,6 +3264,7 @@ object_types_by_name:
       count:
         name_in_index: __counts
   NamedEntity:
+    default_graphql_resolver: get_record_field_value
     graphql_fields_by_name:
       address:
         relation:
@@ -3417,6 +3438,8 @@ object_types_by_name:
         name_in_index: widget_workspace_id3
       workspace_id:
         name_in_index: workspace_id2
+  NamedInventor:
+    default_graphql_resolver: get_record_field_value
   NamedInventorAggregatedValues:
     default_graphql_resolver: object
   NamedInventorGroupedBy:
@@ -3434,6 +3457,7 @@ object_types_by_name:
     default_graphql_resolver: object
     graphql_only_return_type: true
   Part:
+    default_graphql_resolver: get_record_field_value
     graphql_fields_by_name:
       component_aggregations:
         relation:
@@ -3470,6 +3494,10 @@ object_types_by_name:
     elasticgraph_category: relay_edge
   PartGroupedBy:
     default_graphql_resolver: object
+  Person:
+    default_graphql_resolver: get_record_field_value
+  Player:
+    default_graphql_resolver: get_record_field_value
   PlayerAggregatedValues:
     default_graphql_resolver: object
   PlayerFieldsListFilterInput:
@@ -3482,6 +3510,8 @@ object_types_by_name:
     graphql_fields_by_name:
       count:
         name_in_index: __counts
+  PlayerSeason:
+    default_graphql_resolver: get_record_field_value
   PlayerSeasonAggregatedValues:
     default_graphql_resolver: object
   PlayerSeasonFieldsListFilterInput:
@@ -3494,6 +3524,8 @@ object_types_by_name:
     graphql_fields_by_name:
       count:
         name_in_index: __counts
+  Position:
+    default_graphql_resolver: get_record_field_value
   PositionAggregatedValues:
     default_graphql_resolver: object
   PositionGroupedBy:
@@ -3503,6 +3535,7 @@ object_types_by_name:
       count:
         name_in_index: __counts
   Sponsor:
+    default_graphql_resolver: get_record_field_value
     graphql_fields_by_name:
       affiliated_team_from_nested_aggregations:
         relation:
@@ -3572,6 +3605,8 @@ object_types_by_name:
     elasticgraph_category: relay_edge
   SponsorGroupedBy:
     default_graphql_resolver: object
+  Sponsorship:
+    default_graphql_resolver: get_record_field_value
   SponsorshipAggregatedValues:
     default_graphql_resolver: object
   SponsorshipFieldsListFilterInput:
@@ -3595,6 +3630,7 @@ object_types_by_name:
       count:
         name_in_index: __counts
   Team:
+    default_graphql_resolver: get_record_field_value
     graphql_fields_by_name:
       nested_fields:
         name_in_index: the_nested_fields
@@ -3693,6 +3729,8 @@ object_types_by_name:
   TeamConnection:
     default_graphql_resolver: object
     elasticgraph_category: relay_connection
+  TeamDetails:
+    default_graphql_resolver: get_record_field_value
   TeamDetailsAggregatedValues:
     default_graphql_resolver: object
   TeamDetailsGroupedBy:
@@ -3712,6 +3750,7 @@ object_types_by_name:
     default_graphql_resolver: object
     elasticgraph_category: nested_sub_aggregation_connection
   TeamNestedFields:
+    default_graphql_resolver: get_record_field_value
     graphql_fields_by_name:
       seasons:
         name_in_index: the_seasons
@@ -3744,6 +3783,7 @@ object_types_by_name:
   TeamPlayerSubAggregationSubAggregations:
     default_graphql_resolver: object
   TeamRecord:
+    default_graphql_resolver: get_record_field_value
     graphql_fields_by_name:
       first_win_on_legacy:
         name_in_index: first_win_on
@@ -3808,6 +3848,7 @@ object_types_by_name:
       wins:
         name_in_index: win_count
   TeamSeason:
+    default_graphql_resolver: get_record_field_value
     graphql_fields_by_name:
       record:
         name_in_index: the_record
@@ -3903,6 +3944,7 @@ object_types_by_name:
   TeamTeamSeasonSubAggregationSubAggregations:
     default_graphql_resolver: object
   Widget:
+    default_graphql_resolver: get_record_field_value
     graphql_fields_by_name:
       amount_cents2:
         name_in_index: amount_cents
@@ -4102,6 +4144,7 @@ object_types_by_name:
     default_graphql_resolver: object
     elasticgraph_category: relay_connection
   WidgetCurrency:
+    default_graphql_resolver: get_record_field_value
     graphql_fields_by_name:
       widget_names:
         name_in_index: widget_names2
@@ -4176,6 +4219,8 @@ object_types_by_name:
     graphql_fields_by_name:
       widget_name:
         name_in_index: widget_names2
+  WidgetCurrencyNestedFields:
+    default_graphql_resolver: get_record_field_value
   WidgetCurrencyNestedFieldsAggregatedValues:
     default_graphql_resolver: object
   WidgetCurrencyNestedFieldsGroupedBy:
@@ -4226,9 +4271,12 @@ object_types_by_name:
         name_in_index: the_opts
       workspace_id:
         name_in_index: workspace_id2
+  WidgetOptionSets:
+    default_graphql_resolver: get_record_field_value
   WidgetOptionSetsAggregatedValues:
     default_graphql_resolver: object
   WidgetOptions:
+    default_graphql_resolver: get_record_field_value
     graphql_fields_by_name:
       the_size:
         name_in_index: the_sighs
@@ -4247,6 +4295,7 @@ object_types_by_name:
       the_size:
         name_in_index: the_sighs
   WidgetOrAddress:
+    default_graphql_resolver: get_record_field_value
     graphql_fields_by_name:
       amount_cents2:
         name_in_index: amount_cents
@@ -4363,6 +4412,7 @@ object_types_by_name:
       workspace_id:
         name_in_index: workspace_id2
   WidgetWorkspace:
+    default_graphql_resolver: get_record_field_value
     index_definition_names:
     - widget_workspaces
     update_targets:
@@ -4428,6 +4478,8 @@ object_types_by_name:
     elasticgraph_category: relay_edge
   WidgetWorkspaceGroupedBy:
     default_graphql_resolver: object
+  WorkspaceWidget:
+    default_graphql_resolver: get_record_field_value
   WorkspaceWidgetAggregatedValues:
     default_graphql_resolver: object
   WorkspaceWidgetGroupedBy:
