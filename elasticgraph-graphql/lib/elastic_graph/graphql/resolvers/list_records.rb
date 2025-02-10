@@ -18,10 +18,6 @@ module ElasticGraph
           @resolver_query_adapter = resolver_query_adapter
         end
 
-        def can_resolve?(field:, object:)
-          field.parent_type.name == :Query && field.type.collection?
-        end
-
         def call(parent_type, graphql_field, object, args, context)
           field = context.fetch(:elastic_graph_schema).field_named(parent_type.graphql_name, graphql_field.name)
           lookahead = args.fetch(:lookahead)

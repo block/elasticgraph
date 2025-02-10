@@ -84,14 +84,8 @@ module QueryAdapterSpecSupport
     end
 
     def resolved_with_resolver_that_builds_datastore_query?(schema_field, object)
-      if (resolver_name = schema_field.resolver)
-        resolver = @graphql.named_graphql_resolvers.fetch(resolver_name)
-        @resolvers_that_build_datastore_query.include?(resolver)
-      else
-        @resolvers_that_build_datastore_query.any? do |res|
-          res.respond_to?(:can_resolve?) && res.can_resolve?(field: schema_field, object: object)
-        end
-      end
+      resolver = @graphql.named_graphql_resolvers.fetch(schema_field.resolver)
+      @resolvers_that_build_datastore_query.include?(resolver)
     end
 
     def coerce_input(type, value, ctx)

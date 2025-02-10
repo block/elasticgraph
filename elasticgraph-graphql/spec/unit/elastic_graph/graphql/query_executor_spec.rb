@@ -45,9 +45,11 @@ module ElasticGraph
                 type.field "float", "Float"  # so the Float type exists
                 type.field "colors", "[Color!]!" do |f|
                   f.argument "args", "ColorArgs"
+                  f.resolver = :list_records
                 end
                 type.field "colors2", "[Color2!]!" do |f|
                   f.argument "args", "ColorArgs"
+                  f.resolver = :list_records
                 end
               end
             end
