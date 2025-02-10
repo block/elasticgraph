@@ -26,7 +26,6 @@ module ElasticGraph
             t.field "size", "Int", name_in_index: "size_in_index"
           end
 
-          # NoCustomizations should not be dumped because it needs no runtime metadata
           s.object_type "NoCustomizations" do |t|
             t.field "size", "Int", graphql_only: true
           end
@@ -71,6 +70,7 @@ module ElasticGraph
           LongStringAggregatedValues
           LongStringListFilterInput
           MatchesQueryAllowedEditsPerTermListFilterInput
+          NoCustomizations
           NoCustomizationsAggregatedValues
           NoCustomizationsFieldsListFilterInput
           NoCustomizationsGroupedBy

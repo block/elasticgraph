@@ -21,7 +21,7 @@ module ElasticGraph
         # @private
         def initialize(*args, **options)
           super(*args, **options)
-          @runtime_metadata_overrides = {}
+          @runtime_metadata_overrides = {default_graphql_resolver: :hash}
           yield self
 
           # Freeze `indices` so that the indexable status of a type does not change after instantiation.
@@ -64,6 +64,7 @@ module ElasticGraph
         #   end
         def index(name, **settings, &block)
           indices.replace([Indexing::Index.new(name, settings, schema_def_state, self, &block)])
+          override_runtime_metadata default_graphql_resolver: :document
         end
 
         # List of indices. (Currently we only store one but we may support multiple in the future).

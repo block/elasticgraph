@@ -166,21 +166,17 @@ module ElasticGraph
     # @private
     def graphql_resolvers
       @graphql_resolvers ||= begin
-        require "elastic_graph/graphql/resolvers/document"
-        require "elastic_graph/graphql/resolvers/hash"
         require "elastic_graph/graphql/resolvers/list_records"
 
-        list_records = Resolvers::ListRecords.new(resolver_query_adapter: resolver_query_adapter)
-        hash = Resolvers::Hash.new(schema_element_names: runtime_metadata.schema_element_names)
-        document = Resolvers::Document.new(hash_resolver: hash)
-
-        [list_records, hash, document]
+        [Resolvers::ListRecords.new(resolver_query_adapter: resolver_query_adapter)]
       end
     end
 
     # @private
     def named_graphql_resolvers
       @named_graphql_resolvers ||= begin
+        require "elastic_graph/graphql/resolvers/document"
+        require "elastic_graph/graphql/resolvers/hash"
         require "elastic_graph/graphql/resolvers/nested_relationships"
         require "elastic_graph/graphql/resolvers/object"
 
@@ -190,7 +186,11 @@ module ElasticGraph
           logger: logger
         )
 
+        hash = Resolvers::Hash.new(schema_element_names: runtime_metadata.schema_element_names)
+
         {
+          document: Resolvers::Document.new(hash_resolver: hash),
+          hash: hash,
           nested_relationships: nested_relationships,
           object: Resolvers::Object.new
         }
