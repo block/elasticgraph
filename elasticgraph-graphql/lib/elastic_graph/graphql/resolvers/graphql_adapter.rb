@@ -13,10 +13,9 @@ module ElasticGraph
       # our resolvers. Responsible for routing a resolution request to the appropriate
       # resolver.
       class GraphQLAdapter
-        def initialize(schema:, runtime_metadata:, named_resolvers:, resolvers:)
+        def initialize(schema:, runtime_metadata:, named_resolvers:)
           @schema = schema
           @named_resolvers = named_resolvers
-          @resolvers = resolvers
 
           scalar_types_by_name = runtime_metadata.scalar_types_by_name
           @coercion_adapters_by_scalar_type_name = ::Hash.new do |hash, name|
@@ -29,7 +28,9 @@ module ElasticGraph
         # See https://graphql-ruby.org/api-doc/1.9.6/GraphQL/Schema.html#from_definition-class_method
         # (specifically, the `default_resolve` argument) for the API documentation.
         def call(parent_type, field, object, args, context)
-          resolver = resolver_for(parent_type, field, object) do
+          schema_field = @schema.field_named(parent_type.graphql_name, field.name)
+
+          resolver = @named_resolvers.fetch(schema_field.resolver) do
             raise "No resolver yet implemented for `#{parent_type.graphql_name}.#{field.name}`."
           end
 
@@ -62,17 +63,6 @@ module ElasticGraph
 
         def scalar_coercion_adapter_for(type)
           @coercion_adapters_by_scalar_type_name[type.graphql_name]
-        end
-
-        def resolver_for(parent_type, graphql_field, object)
-          field = @schema.field_named(parent_type.graphql_name, graphql_field.name)
-
-          if (resolver_name = field.resolver)
-            return @named_resolvers.fetch(resolver_name)
-          end
-
-          resolver = @resolvers.find { |r| r.can_resolve?(field: field, object: object) }
-          resolver || yield
         end
       end
     end

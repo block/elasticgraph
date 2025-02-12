@@ -102,8 +102,7 @@ module ElasticGraph
             Resolvers::GraphQLAdapter.new(
               schema: schema,
               runtime_metadata: runtime_metadata,
-              named_resolvers: named_graphql_resolvers,
-              resolvers: graphql_resolvers
+              named_resolvers: named_graphql_resolvers
             )
           end
         end
@@ -161,11 +160,6 @@ module ElasticGraph
           ::GraphQL::Schema::Visibility => {preload: true}
         }
       end
-    end
-
-    # @private
-    def graphql_resolvers
-      []
     end
 
     # @private

@@ -5,8 +5,7 @@ module ElasticGraph
         def initialize: (
           schema: Schema,
           runtime_metadata: SchemaArtifacts::RuntimeMetadata::Schema,
-          named_resolvers: ::Hash[::Symbol, Resolvers::_Resolver],
-          resolvers: ::Array[Resolvers::_Resolver]
+          named_resolvers: ::Hash[::Symbol, Resolvers::_Resolver]
         ) -> void
       end
     end

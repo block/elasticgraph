@@ -372,6 +372,7 @@ module ElasticGraph
                 if type.name == "Query"
                   type.field "multiply", "Int" do |f|
                     f.argument("operands", "Operands!")
+                    f.resolver = :multiply
                   end
                 end
               end
@@ -390,10 +391,6 @@ module ElasticGraph
 
           let(:graphql) do
             multiply_resolver = Class.new do
-              def can_resolve?(field:, object:)
-                field.name == :multiply
-              end
-
               def call(parent_type, field, object, args, context)
                 [
                   args.dig(:operands, "x"),
@@ -405,8 +402,8 @@ module ElasticGraph
 
             build_graphql(schema_artifacts: schema_artifacts, extension_modules: [
               Module.new do
-                define_method :graphql_resolvers do
-                  @graphql_resolvers ||= [multiply_resolver] + super()
+                define_method :named_graphql_resolvers do
+                  @named_graphql_resolvers ||= super().merge({multiply: multiply_resolver})
                 end
               end
             ])

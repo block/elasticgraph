@@ -42,9 +42,6 @@ module ElasticGraph
     @graphql_gem_plugins: ::Hash[::Class, ::Hash[::Symbol, untyped]]?
     def graphql_gem_plugins: () -> ::Hash[::Class, ::Hash[::Symbol, untyped]]
 
-    @graphql_resolvers: ::Array[Resolvers::_Resolver]?
-    def graphql_resolvers: () -> ::Array[Resolvers::_Resolver]
-
     @named_graphql_resolvers: ::Hash[::Symbol, Resolvers::_Resolver]?
     def named_graphql_resolvers: () -> ::Hash[::Symbol, Resolvers::_Resolver]
 
