@@ -24,10 +24,6 @@ module ElasticGraph
           @schema_element_names = schema_element_names
         end
 
-        def can_resolve?(field:, object:)
-          field.parent_type.name == :Query && field.name == :_entities
-        end
-
         def call(parent_type, graphql_field, object, args, context)
           schema = context.fetch(:elastic_graph_schema)
           field = schema.field_named(parent_type.graphql_name, graphql_field.name)

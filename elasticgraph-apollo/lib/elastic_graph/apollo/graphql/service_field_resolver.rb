@@ -13,10 +13,6 @@ module ElasticGraph
       #
       # @private
       class ServiceFieldResolver
-        def can_resolve?(field:, object:)
-          field.parent_type.name == :Query && field.name == :_service
-        end
-
         def call(parent_type, field, object, args, context)
           {"sdl" => service_sdl(context.fetch(:elastic_graph_schema).graphql_schema)}
         end

@@ -19,18 +19,19 @@ module ElasticGraph
       # @private
       module EngineExtension
         # @private
-        def graphql_resolvers
-          @graphql_resolvers ||= begin
+        def named_graphql_resolvers
+          @named_graphql_resolvers ||= begin
             require "elastic_graph/apollo/graphql/entities_field_resolver"
             require "elastic_graph/apollo/graphql/service_field_resolver"
 
-            [
-              EntitiesFieldResolver.new(
-                datastore_query_builder: datastore_query_builder,
-                schema_element_names: runtime_metadata.schema_element_names
-              ),
-              ServiceFieldResolver.new
-            ] + super
+            apollo_entities = EntitiesFieldResolver.new(
+              datastore_query_builder: datastore_query_builder,
+              schema_element_names: runtime_metadata.schema_element_names
+            )
+
+            apollo_service = ServiceFieldResolver.new
+
+            super.merge({apollo_entities: apollo_entities, apollo_service: apollo_service})
           end
         end
 

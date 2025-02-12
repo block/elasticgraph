@@ -424,7 +424,15 @@ module ElasticGraph
           with_apollo_runtime_metadata = SchemaArtifacts::RuntimeMetadata::Schema.from_hash(with_apollo_results.runtime_metadata.to_dumpable_hash, for_context: :graphql)
           without_apollo_runtime_metadata = SchemaArtifacts::RuntimeMetadata::Schema.from_hash(without_apollo_results.runtime_metadata.to_dumpable_hash, for_context: :graphql)
           expect(with_apollo_runtime_metadata.enum_types_by_name).to eq(without_apollo_runtime_metadata.enum_types_by_name)
-          expect(with_apollo_runtime_metadata.object_types_by_name.except("_Entity", "_Service")).to eq(without_apollo_runtime_metadata.object_types_by_name)
+          expect(with_apollo_runtime_metadata.object_types_by_name.except("_Entity", "_Service", "Query")).to eq(without_apollo_runtime_metadata.object_types_by_name.except("Query"))
+        end
+
+        it "avoids defining `name_in_index` on the runtime metadata of the Query `_entities` and `_service` fields" do
+          results = define_schema(with_apollo: true) { |s| define_some_types_on(s) }
+          query_type = results.runtime_metadata.object_types_by_name.fetch("Query")
+
+          expect(query_type.graphql_fields_by_name.fetch("_entities").name_in_index).to eq nil
+          expect(query_type.graphql_fields_by_name.fetch("_service").name_in_index).to eq nil
         end
 
         # We use `dont_validate_graphql_schema` here because the validation triggers the example exceptions we assert on from

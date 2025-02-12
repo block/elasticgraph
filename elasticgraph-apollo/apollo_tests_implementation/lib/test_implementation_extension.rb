@@ -15,8 +15,8 @@
 # This defines an extension that injects a custom resolver that supports the field.
 # @private
 module ApolloTestImplementationExtension
-  def graphql_resolvers
-    @graphql_resolvers ||= [product_field_resolver] + super
+  def named_graphql_resolvers
+    @named_graphql_resolvers ||= super.merge({product: product_field_resolver})
   end
 
   def product_field_resolver
@@ -33,10 +33,6 @@ module ApolloTestImplementationExtension
       @datastore_query_builder = datastore_query_builder
       @product_index_def = product_index_def
       @datastore_router = datastore_router
-    end
-
-    def can_resolve?(field:, object:)
-      field.parent_type.name == :Query && field.name == :product
     end
 
     def call(parent_type, graphql_field, object, args, context)
