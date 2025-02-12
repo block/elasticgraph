@@ -49,6 +49,7 @@ module ApolloTestImpl
       if type.name == "Query"
         type.field "product", "Product" do |f|
           f.argument "id", "ID!"
+          f.resolver = :product
         end
 
         type.field "deprecatedProduct", "DeprecatedProduct" do |f|

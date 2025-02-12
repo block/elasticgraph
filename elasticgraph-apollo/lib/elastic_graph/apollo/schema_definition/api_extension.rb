@@ -452,7 +452,7 @@ module ElasticGraph
 
         private_class_method def self.customize_root_query_type(type)
           if type.schema_def_state.object_types_by_name.values.any?(&:indexed?)
-            type.field "_entities", "[_Entity]!" do |f|
+            type.field "_entities", "[_Entity]!", graphql_only: true do |f|
               f.documentation <<~EOS
                 A field required by the [Apollo Federation subgraph
                 spec](https://www.apollographql.com/docs/federation/subgraph-spec/#query_entities):
@@ -480,10 +480,12 @@ module ElasticGraph
                   spec](https://www.apollographql.com/docs/federation/subgraph-spec/#resolve-requests-for-entities).
                 EOS
               end
+
+              f.resolver = :apollo_entities
             end
           end
 
-          type.field "_service", "_Service!" do |f|
+          type.field "_service", "_Service!", graphql_only: true do |f|
             f.documentation <<~EOS
               A field required by the [Apollo Federation subgraph
               spec](https://www.apollographql.com/docs/federation/subgraph-spec/#query_service):
@@ -494,6 +496,8 @@ module ElasticGraph
 
               Not intended for use by clients other than Apollo.
             EOS
+
+            f.resolver = :apollo_service
           end
         end
       end
