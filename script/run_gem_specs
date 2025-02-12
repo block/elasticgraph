@@ -29,5 +29,5 @@ pushd $gem
   #      each gem subdirectory, we pass the ENV var here. If the file does not exist, we'll get an error.
   cp ../Gemfile.lock Gemfile.lock
   BUNDLE_GEMFILE=Gemfile bundle check || (rm -rf Gemfile.lock && bundle install)
-  BUNDLE_GEMFILE=Gemfile bundle exec rspec --backtrace --format progress
+  BUNDLE_GEMFILE=Gemfile bundle exec flatware rspec --backtrace --format progress
 popd
