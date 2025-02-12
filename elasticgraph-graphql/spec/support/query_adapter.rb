@@ -33,7 +33,7 @@ module QueryAdapterSpecSupport
       # build an `DatastoreQuery` for the same fields.
       resolvers_module = ::ElasticGraph::GraphQL::Resolvers
 
-      @resolvers_that_build_datastore_query = (@graphql.graphql_resolvers + @graphql.named_graphql_resolvers.values).select do |resolver|
+      @resolvers_that_build_datastore_query = @graphql.named_graphql_resolvers.values.select do |resolver|
         case resolver
         when resolvers_module::ListRecords, resolvers_module::NestedRelationships
           true
