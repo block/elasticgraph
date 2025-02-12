@@ -19,6 +19,7 @@ module ElasticGraph
         before(:context) do
           self.schema_artifacts = generate_schema_artifacts do |s|
             s.object_type "Color" do |t|
+              t.root_query_fields plural: "ignored"
               t.field "id", "ID"
               t.field "red", "Int"
               t.field "green", "Int"
@@ -34,19 +35,22 @@ module ElasticGraph
               t.index "alt_colors"
             end
 
-            # The tests below require some custom GraphQL schema elements that we need to define by
-            # hand in order for them to be available, so we use `raw_sdl` here for that.
-            s.raw_sdl <<~EOS
-              input ColorArgs {
-                red: Int
-              }
+            s.factory.new_input_type "ColorArgs" do |t|
+              t.field "red", "Int"
+              s.state.register_input_type(t)
+            end
 
-              type Query {
-                float: Float # so the Float type exists
-                colors(args: ColorArgs): [Color!]!
-                colors2(args: ColorArgs): [Color2!]!
-              }
-            EOS
+            s.on_built_in_types do |type|
+              if type.name == "Query"
+                type.field "float", "Float"  # so the Float type exists
+                type.field "colors", "[Color!]!" do |f|
+                  f.argument "args", "ColorArgs"
+                end
+                type.field "colors2", "[Color2!]!" do |f|
+                  f.argument "args", "ColorArgs"
+                end
+              end
+            end
           end
         end
 
