@@ -34,7 +34,7 @@ module ElasticGraph
             raise "No resolver yet implemented for `#{parent_type.graphql_name}.#{field.name}`."
           end
 
-          resolver.call(parent_type, field, object, args, context)
+          resolver.call(schema_field, object, args, context)
         end
 
         # In order to support unions and interfaces, we must implement `resolve_type`.

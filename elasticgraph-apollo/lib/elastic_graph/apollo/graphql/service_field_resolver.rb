@@ -13,7 +13,7 @@ module ElasticGraph
       #
       # @private
       class ServiceFieldResolver
-        def call(parent_type, field, object, args, context)
+        def call(field, object, args, context)
           {"sdl" => service_sdl(context.fetch(:elastic_graph_schema).graphql_schema)}
         end
 

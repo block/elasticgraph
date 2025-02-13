@@ -391,7 +391,7 @@ module ElasticGraph
 
           let(:graphql) do
             multiply_resolver = Class.new do
-              def call(parent_type, field, object, args, context)
+              def call(field, object, args, context)
                 [
                   args.dig(:operands, "x"),
                   args.dig(:operands, "y"),

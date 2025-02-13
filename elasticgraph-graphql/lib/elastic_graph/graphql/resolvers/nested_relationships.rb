@@ -23,8 +23,7 @@ module ElasticGraph
           @logger = logger
         end
 
-        def call(parent_type, graphql_field, object, args, context)
-          field = context.fetch(:elastic_graph_schema).field_named(parent_type.graphql_name, graphql_field.name)
+        def call(field, object, args, context)
           log_warning = ->(**options) { log_field_problem_warning(field: field, **options) }
           join = field.relation_join
           id_or_ids = join.extract_id_or_ids_from(object, log_warning)
