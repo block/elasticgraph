@@ -211,7 +211,7 @@ module ElasticGraph
             context = ::GraphQL::Query::Context.new(
               query: nil,
               schema: graphql.schema.graphql_schema,
-              values: context
+              values: context.merge(elastic_graph_schema: graphql.schema)
             )
 
             query_adapter.build_query_from(

@@ -24,12 +24,39 @@ module ElasticGraph
       # Responsible for taking in the incoming GraphQL request context, arguments, and the GraphQL
       # schema and directives and populating the `aggregations` portion of `query`.
       class QueryAdapter < Support::MemoizableData.define(:schema, :config, :filter_args_translator, :runtime_metadata, :sub_aggregation_grouping_adapter)
+        # Partially applied `QueryAdapter` -- essentially the `QueryAdapter` without the schema,
+        # so that it can be instantiated before the `Schema` instance exists, instead providing it from
+        # `context` at query time.
+        class WithoutSchema
+          def initialize(config:, filter_args_translator:, runtime_metadata:, sub_aggregation_grouping_adapter:)
+            @build_adapter = ->(schema) do
+              QueryAdapter.new(
+                schema: schema,
+                config: config,
+                filter_args_translator: filter_args_translator,
+                runtime_metadata: runtime_metadata,
+                sub_aggregation_grouping_adapter: sub_aggregation_grouping_adapter
+              )
+            end
+          end
+
+          def call(query:, lookahead:, args:, field:, context:)
+            return query unless field.type.unwrap_fully.indexed_aggregation?
+
+            @build_adapter.call(context.fetch(:elastic_graph_schema)).call(
+              query: query,
+              lookahead: lookahead,
+              args: args,
+              field: field,
+              context: context
+            )
+          end
+        end
+
         # @dynamic element_names
         attr_reader :element_names
 
         def call(query:, lookahead:, args:, field:, context:)
-          return query unless field.type.unwrap_fully.indexed_aggregation?
-
           aggregations_node = extract_aggregation_node(lookahead, field, context.query)
           return query unless aggregations_node
 

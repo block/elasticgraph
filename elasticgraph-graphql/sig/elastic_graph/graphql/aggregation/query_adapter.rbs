@@ -27,6 +27,19 @@ module ElasticGraph
 
       class QueryAdapter < QueryAdapterSupertype
         include _QueryAdapter
+
+        class WithoutSchema
+          include _QueryAdapter
+          @build_adapter: ^(Schema) -> QueryAdapter
+
+          def initialize: (
+            config: Config,
+            filter_args_translator: Filtering::FilterArgsTranslator,
+            runtime_metadata: SchemaArtifacts::RuntimeMetadata::Schema,
+            sub_aggregation_grouping_adapter: groupingAdapter
+          ) -> void
+        end
+
         attr_reader element_names: SchemaArtifacts::RuntimeMetadata::SchemaElementNames
 
         private

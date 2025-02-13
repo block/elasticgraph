@@ -2,6 +2,10 @@ module ElasticGraph
   class GraphQL
     class QueryAdapter
       class RequestedFields
+        class WithoutSchema
+          include _QueryAdapter
+        end
+
         include _QueryAdapter
         def initialize: (Schema) -> void
 

@@ -14,13 +14,28 @@ module ElasticGraph
       # need to satisfy the GraphQL query. This results in more efficient datastore queries,
       # similar to doing `SELECT f1, f2, ...` instead of `SELECT *` for a SQL query.
       class RequestedFields
+        # Partially applied `RequestedFields` -- essentially the `RequestedFields` without the schema,
+        # so that it can be instantiated before the `Schema` instance exists, instead providing it from
+        # `context` at query time.
+        class WithoutSchema
+          def call(field:, query:, lookahead:, args:, context:)
+            return query if field.type.unwrap_fully.indexed_aggregation?
+
+            RequestedFields.new(context.fetch(:elastic_graph_schema)).call(
+              field: field,
+              query: query,
+              lookahead: lookahead,
+              args: args,
+              context: context
+            )
+          end
+        end
+
         def initialize(schema)
           @schema = schema
         end
 
         def call(field:, query:, lookahead:, args:, context:)
-          return query if field.type.unwrap_fully.indexed_aggregation?
-
           attributes = query_attributes_for(field: field, lookahead: lookahead)
           query.merge_with(**attributes)
         end
