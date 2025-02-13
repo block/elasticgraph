@@ -11,8 +11,8 @@ module ElasticGraph
     module Resolvers
       # Resolver which just delegates to `object` for resolving.
       class Object
-        def call(parent_type, graphql_field, object, args, context)
-          object.call(parent_type, graphql_field, object, args, context)
+        def call(field, object, args, context)
+          object.call(field, object, args, context)
         end
       end
     end

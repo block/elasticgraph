@@ -5,8 +5,7 @@ module ElasticGraph
 
       interface _Resolver
         def call: (
-          ::GraphQL::Schema::_Type,
-          ::GraphQL::Schema::Field,
+          Schema::Field,
           untyped,
           fieldArgs,
           ::GraphQL::Query::Context

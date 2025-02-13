@@ -134,8 +134,7 @@ module ElasticGraph
               lookahead = instance_double("GraphQL::Execution::Lookahead")
 
               person.call(
-                schema_field.parent_type.graphql_type,
-                schema_field.graphql_field,
+                schema_field,
                 person,
                 args.merge(lookahead: lookahead),
                 {elastic_graph_schema: schema_field.schema}

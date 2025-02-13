@@ -19,8 +19,7 @@ module ElasticGraph
           @schema_element_names = schema_element_names
         end
 
-        def call(parent_type, graphql_field, object, args, context)
-          field = context.fetch(:elastic_graph_schema).field_named(parent_type.graphql_name, graphql_field.name)
+        def call(field, object, args, context)
           field_name = field.name_in_index.to_s
           data =
             case object

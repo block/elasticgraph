@@ -35,7 +35,7 @@ module ApolloTestImplementationExtension
       @datastore_router = datastore_router
     end
 
-    def call(parent_type, graphql_field, object, args, context)
+    def call(field, object, args, context)
       query = @datastore_query_builder.new_query(
         search_index_definitions: [@product_index_def],
         monotonic_clock_deadline: context[:monotonic_clock_deadline],

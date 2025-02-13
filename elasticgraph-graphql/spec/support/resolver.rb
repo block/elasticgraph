@@ -37,7 +37,7 @@ module ResolverHelperMethods
         # [^1]: https://github.com/rmosolgo/graphql-ruby/blob/v2.1.0/lib/graphql/pagination/connection.rb#L94-L96
         # [^2]: https://github.com/rmosolgo/graphql-ruby/blob/v2.1.0/lib/graphql/execution/interpreter/runtime.rb#L935-L941
         ::Thread.current[:__graphql_runtime_info] = ::Hash.new { |h, k| h[k] = ::GraphQL::Execution::Interpreter::Runtime::CurrentState.new }
-        resolver.call(field.parent_type.graphql_type, field.graphql_field, document, args, context)
+        resolver.call(field, document, args, context)
       ensure
         ::Thread.current[:__graphql_runtime_info] = nil
       end

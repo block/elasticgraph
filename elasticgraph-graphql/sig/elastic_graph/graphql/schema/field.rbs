@@ -16,6 +16,7 @@ module ElasticGraph
         def sort_clauses_for: (::Array[::String]) -> ::Array[::Hash[::String, ::Hash[::String, ::String]]]
         def args_to_schema_form: (::Hash[::Symbol, untyped]) -> ::Hash[::String, untyped]
         def index_field_names_for_resolution: () -> ::Array[::String]
+        def coerce_result: (untyped) -> untyped
       end
     end
   end

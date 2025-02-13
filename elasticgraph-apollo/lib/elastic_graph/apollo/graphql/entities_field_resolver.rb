@@ -24,9 +24,8 @@ module ElasticGraph
           @schema_element_names = schema_element_names
         end
 
-        def call(parent_type, graphql_field, object, args, context)
+        def call(field, object, args, context)
           schema = context.fetch(:elastic_graph_schema)
-          field = schema.field_named(parent_type.graphql_name, graphql_field.name)
 
           representations = args.fetch(:representations).map.with_index do |rep, index|
             try_parse_representation(rep, schema) do |error_description|
