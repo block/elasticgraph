@@ -212,14 +212,13 @@ module ElasticGraph
             filter_node_interpreter: filter_node_interpreter
           ),
           GraphQL::QueryAdapter::Sort.new(order_by_arg_name: schema_element_names.order_by),
-          Aggregation::QueryAdapter.new(
-            schema: schema,
+          Aggregation::QueryAdapter::WithoutSchema.new(
             config: config,
             filter_args_translator: filter_args_translator,
             runtime_metadata: runtime_metadata,
             sub_aggregation_grouping_adapter: sub_aggregation_grouping_adapter
           ),
-          GraphQL::QueryAdapter::RequestedFields.new(schema)
+          GraphQL::QueryAdapter::RequestedFields::WithoutSchema.new
         ]
       end
     end
