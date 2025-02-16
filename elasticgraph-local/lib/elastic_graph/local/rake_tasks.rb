@@ -375,7 +375,8 @@ module ElasticGraph
         yield self if block_given?
 
         # Default the local port from the local_config_yaml file.
-        self.env_port_mapping = {"local" => local_datastore_port}.merge(env_port_mapping || {})
+        local_port = local_datastore_url[/localhost:(\d+)$/, 1].then { |port_str| Integer(port_str) }
+        self.env_port_mapping = {"local" => local_port}.merge(env_port_mapping || {})
         if (invalid_port_mapping = env_port_mapping.reject { |env, port| VALID_PORT_RANGE.cover?(port) }).any?
           raise "`env_port_mapping` has invalid ports: #{invalid_port_mapping.inspect}. Valid ports must be in the #{VALID_PORT_RANGE} range."
         end
@@ -495,7 +496,7 @@ module ElasticGraph
         end
 
         task :ensure_local_datastore_running do
-          unless /200 OK/.match?(`curl -is localhost:#{local_datastore_port}`)
+          unless /200 OK/.match?(`curl -is #{local_datastore_url}`)
             if elasticsearch_versions.empty?
               raise <<~EOS
                 OpenSearch is not running locally. You need to start it in another terminal using this command:
@@ -533,13 +534,12 @@ module ElasticGraph
         end
       end
 
-      def local_datastore_port
-        @local_datastore_port ||= local_config
+      def local_datastore_url
+        @local_datastore_url ||= local_config
           .fetch("datastore")
           .fetch("clusters")
           .fetch("main")
-          .fetch("url")[/localhost:(\d+)$/, 1]
-          .then { |port_str| Integer(port_str) }
+          .fetch("url")
       end
 
       def local_cluster_backends
