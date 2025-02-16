@@ -4,7 +4,7 @@ datastore:
     require: httpx/adapters/faraday
   clusters:
     main:
-      url: http://localhost:9334
+      url: http://elasticsearch:9200
       backend: elasticsearch
       settings: {}
   index_definitions:
