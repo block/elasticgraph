@@ -375,8 +375,7 @@ module ElasticGraph
         yield self if block_given?
 
         # Default the local port from the local_config_yaml file.
-        local_port = local_datastore_url[/localhost:(\d+)$/, 1].then { |port_str| Integer(port_str) }
-        self.env_port_mapping = {"local" => local_port}.merge(env_port_mapping || {})
+        local_port = 9200
         if (invalid_port_mapping = env_port_mapping.reject { |env, port| VALID_PORT_RANGE.cover?(port) }).any?
           raise "`env_port_mapping` has invalid ports: #{invalid_port_mapping.inspect}. Valid ports must be in the #{VALID_PORT_RANGE} range."
         end
@@ -467,9 +466,13 @@ module ElasticGraph
         desc "Boots ElasticGraph locally from scratch: boots #{datastore_to_boot}, configures it, indexes fake data, and boots GraphiQL"
         task :boot_locally, [:port, :rackup_args, :no_open] => ["#{datastore_to_boot.downcase}:local:daemon", *index_fake_data_tasks, "boot_graphiql"]
 
+        desc "Boots ElasticGraph locally from and connects to #{datastore_to_boot} cluster: configures it, indexes fake data, and boots GraphiQL"
+        task :boot_in_container, [:port, :rackup_args, :no_open] => [*index_fake_data_tasks, "boot_graphiql"]
+
+
         desc "Boots ElasticGraph locally with the GraphiQL UI, and opens it in a browser."
         task :boot_graphiql, [:port, :rackup_args, :no_open] => :ensure_datastore_ready_for_indexing_and_querying do |task, args|
-          args.with_defaults(port: 9393, rackup_args: "", no_open: false)
+          args.with_defaults(port: 9393, host: "localhost", rackup_args: "", no_open: false)
           port = args.fetch(:port)
 
           # :nocov: -- we can't test `open` behavior through a test

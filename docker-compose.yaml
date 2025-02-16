@@ -1,0 +1,90 @@
+---
+networks:
+  default:
+    name: elastic
+    external: false
+services:
+  elasticsearch:
+    build:
+      context: ./elasticgraph-local/lib/elastic_graph/local/elasticsearch/.
+      dockerfile: Dockerfile
+      args:
+        VERSION: ${VERSION}
+    container_name: elasticsearch-${VERSION}-${ENV}
+    healthcheck:
+      interval: 10s
+      retries: 80
+      test: curl --write-out 'HTTP %{http_code}' --fail --silent --output /dev/null http://localhost:9200/
+    environment:
+    # Note: we use `discovery.type=single-node` to ensure that the Elasticsearch node does not
+    # try to join a cluster (or let another node join it). This prevents problems when you
+    # have multiple projects using elasticgraph-local at the same time. You do not want
+    # their Elasticsearch nodes to try to join into a single cluster.
+    - discovery.type=single-node
+    # Note: we use `xpack.security.enabled=false` to silence an annoying warning Elasticsearch 7.13 has
+    # started spewing (as in hundreds of times!) as we run our test suite:
+    #
+    # > warning: 299 Elasticsearch-7.13.0-5ca8591c6fcdb1260ce95b08a8e023559635c6f3 "Elasticsearch built-in
+    # > security features are not enabled. Without authentication, your cluster could be accessible to anyone.
+    # > See https://www.elastic.co/guide/en/elasticsearch/reference/7.13/security-minimal-setup.html to enable
+    # > security."
+    #
+    # Since this is only used in local dev/test environments where the added security would make things harder
+    # (we'd have to setup credentials in our tests), it's simpler/better just to explicitly disable the security,
+    # which silences the warning.
+    - xpack.security.enabled=false
+    # We disable `xpack.ml` because it's not compatible with the `darwin-aarch64` distribution we use on M1 Macs.
+    # Without that flag, we get this error:
+    #
+    # > [2022-01-20T10:06:54,582][ERROR][o.e.b.ElasticsearchUncaughtExceptionHandler] [myron-macbookpro.local] uncaught exception in thread [main]
+    # > org.elasticsearch.bootstrap.StartupException: ElasticsearchException[Failure running machine learning native code. This could be due to running
+    # > on an unsupported OS or distribution, missing OS libraries, or a problem with the temp directory. To bypass this problem by running Elasticsearch
+    # > without machine learning functionality set [xpack.ml.enabled: false].]
+    #
+    # See also this github issue: https://github.com/elastic/elasticsearch/pull/68068
+    - xpack.ml.enabled=false
+    # We don't want Elasticsearch to block writes when the disk allocation passes a threshold for our local/test
+    # Elasticsearch we run using this docker setup.
+    # https://stackoverflow.com/a/75962819
+    #
+    # Without this, I frequently get `FORBIDDEN/10/cluster create-index blocked (api)` errors when running tests.
+    - cluster.routing.allocation.disk.threshold_enabled=false
+    # Necessary on Elasticsearch 8 since our test suites indiscriminately deletes all documents
+    # between tests to sandbox the state of each test. Without this setting, we get errors like:
+    #
+    # > illegal_argument_exception: Wildcard expressions or all indices are not allowed
+    - action.destructive_requires_name=false
+    - ES_JAVA_OPTS=-Xms4g -Xmx4g
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+    - elasticsearch:/usr/share/elasticsearch/data
+    ports:
+    - ${PORT:-9200}:9200
+  kibana:
+    build:
+      context: ./elasticgraph-local/lib/elastic_graph/local/elasticsearch/.
+      dockerfile: UI-Dockerfile
+      args:
+        VERSION: ${VERSION}
+    container_name: kibana-${VERSION}-${ENV}
+    environment:
+    - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+    - ${UI_PORT:-5601}:5601
+  elasticgraph:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VERSION: ${VERSION}
+        container_name: elasticgraph-${ENV}
+    ports:
+    - 9393:9393
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+volumes:
+  elasticsearch:
