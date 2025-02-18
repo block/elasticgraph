@@ -714,7 +714,8 @@ the schema.</p>
 400
 401
 402
-403</pre>
+403
+404</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'elasticgraph-local/lib/elastic_graph/local/rake_tasks.rb', line 354</span>
@@ -743,7 +744,8 @@ the schema.</p>
   <span class='kw'>yield</span> <span class='kw'>self</span> <span class='kw'>if</span> <span class='id identifier rubyid_block_given?'>block_given?</span>
 
   <span class='comment'># Default the local port from the local_config_yaml file.
-</span>  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_env_port_mapping'>env_port_mapping</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>local</span><span class='tstring_end'>&quot;</span></span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_local_datastore_port'>local_datastore_port</span><span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_env_port_mapping'>env_port_mapping</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+</span>  <span class='id identifier rubyid_local_port'>local_port</span> <span class='op'>=</span> <span class='id identifier rubyid_local_datastore_url'>local_datastore_url</span><span class='lbracket'>[</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>.*:(\d+)$</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='int'>1</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_then'>then</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_port_str'>port_str</span><span class='op'>|</span> <span class='const'>Integer</span><span class='lparen'>(</span><span class='id identifier rubyid_port_str'>port_str</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_env_port_mapping'>env_port_mapping</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>local</span><span class='tstring_end'>&quot;</span></span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_local_port'>local_port</span><span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_env_port_mapping'>env_port_mapping</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='lparen'>(</span><span class='id identifier rubyid_invalid_port_mapping'>invalid_port_mapping</span> <span class='op'>=</span> <span class='id identifier rubyid_env_port_mapping'>env_port_mapping</span><span class='period'>.</span><span class='id identifier rubyid_reject'>reject</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_env'>env</span><span class='comma'>,</span> <span class='id identifier rubyid_port'>port</span><span class='op'>|</span> <span class='const'>VALID_PORT_RANGE</span><span class='period'>.</span><span class='id identifier rubyid_cover?'>cover?</span><span class='lparen'>(</span><span class='id identifier rubyid_port'>port</span><span class='rparen'>)</span> <span class='rbrace'>}</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span>
     <span class='id identifier rubyid_raise'>raise</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>`env_port_mapping` has invalid ports: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_invalid_port_mapping'>invalid_port_mapping</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_content'>. Valid ports must be in the </span><span class='embexpr_beg'>#{</span><span class='const'>VALID_PORT_RANGE</span><span class='embexpr_end'>}</span><span class='tstring_content'> range.</span><span class='tstring_end'>&quot;</span></span>
   <span class='kw'>end</span>
@@ -1972,7 +1974,7 @@ registered callback.</p>
 </div>
 
       <div id="footer">
-  Generated on Wed Feb 12 16:38:25 2025 by
+  Generated on Tue Feb 18 17:21:53 2025 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.37 (ruby-3.3.6).
 </div>
