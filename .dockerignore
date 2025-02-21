@@ -1,0 +1,18 @@
+# Mac OSX file.
+.DS_Store
+/*/.DS_Store
+
+#Git
+/.git/*
+
+# Documentation
+*.md
+
+# Ignore log and temp files.
+/log/*
+/tmp/*
+/*/log/*
+/*/tmp/*
+
+# Ignore dockerfile
+Dockerfile
