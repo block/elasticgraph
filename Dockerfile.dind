@@ -1,0 +1,49 @@
+# Use Ruby 3.x as the base image
+FROM ruby:3.2
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies and clean up in a single layer
+RUN mkdir -p ~/.gnupg && \
+    chmod 700 ~/.gnupg && \
+    apt-get update -qq && \
+    apt-get install -y --no-install-recommends \
+    build-essential \
+    git \
+    nodejs \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg \
+    lsb-release \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && mkdir -p log tmp
+
+# Install Docker using the convenience script
+RUN curl -fsSL https://get.docker.com -o get-docker.sh && \
+    sh get-docker.sh && \
+    rm get-docker.sh && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install Docker Compose
+RUN curl -L "https://github.com/docker/compose/releases/download/v2.23.3/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose && \
+    chmod +x /usr/local/bin/docker-compose
+
+# Create docker group and add root user to it
+RUN groupadd docker || true && usermod -aG docker root
+
+# Copy the Gemfile and Gemfile.lock
+COPY Gemfile Gemfile.lock ./
+COPY Gemfile-custom.example Gemfile-custom
+
+# Install Ruby dependencies
+RUN bundle install
+
+# Copy the entire project
+COPY . .
+
+# Set the default command to run the application
+CMD ["bundle", "exec", "rake", "boot_locally"]
