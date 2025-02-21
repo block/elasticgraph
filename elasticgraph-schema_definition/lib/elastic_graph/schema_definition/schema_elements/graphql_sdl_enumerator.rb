@@ -79,7 +79,9 @@ module ElasticGraph
                 singular: indexed_type.singular_root_query_field_name
               ) do |f|
                 f.documentation "Fetches `#{indexed_type.name}`s based on the provided arguments."
-                indexed_type.root_query_fields_customizations&.call(f)
+                indexed_type.root_query_fields_customizations.each do |customization|
+                  customization.call(f)
+                end
               end
 
               # Add additional efficiency hints to the aggregation field documentation if we have any such hints.
