@@ -14,10 +14,10 @@ module ElasticGraph
           ?route_with: ::String,
           ?rollover_with: ::String
         ) ?{ ( Indexing::DerivedIndexedType) -> void } -> Indexing::DerivedIndexedType
-        def root_query_fields: (plural: ::String, ?singular: ::String?) ?{ (SchemaElements::Field) -> void } -> void
+        def root_query_fields: (?plural: ::String?, ?singular: ::String?) ?{ (SchemaElements::Field) -> void } -> void
         def plural_root_query_field_name: () -> ::String
         def singular_root_query_field_name: () -> ::String
-        def root_query_fields_customizations: () -> (^(SchemaElements::Field) -> void)?
+        def root_query_fields_customizations: () -> ::Array[^(SchemaElements::Field) -> void]
         def fields_with_sources: () -> ::Array[SchemaElements::Field]
         def indexing_fields_by_name_in_index: () -> ::Hash[::String, SchemaElements::Field]
       end

@@ -197,10 +197,10 @@ module ElasticGraph
         #       t.index "people"
         #     end
         #   end
-        def root_query_fields(plural:, singular: nil, &customization_block)
-          @plural_root_query_field_name = plural
-          @singular_root_query_field_name = singular
-          @root_query_fields_customizations = customization_block
+        def root_query_fields(plural: nil, singular: nil, &customization_block)
+          @plural_root_query_field_name = plural if plural
+          @singular_root_query_field_name = singular if singular
+          root_query_fields_customizations << customization_block if customization_block
         end
 
         # @return [String] the plural name of the entity; used for the root `Query` field that queries documents of this indexed type
@@ -217,7 +217,7 @@ module ElasticGraph
 
         # @private
         def root_query_fields_customizations
-          @root_query_fields_customizations
+          @root_query_fields_customizations ||= []
         end
 
         # @private
