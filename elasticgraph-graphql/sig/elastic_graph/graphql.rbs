@@ -33,6 +33,9 @@ module ElasticGraph
     @datastore_search_router: DatastoreSearchRouter?
     def datastore_search_router: () -> DatastoreSearchRouter
 
+    @resolver_query_adapter: Resolvers::QueryAdapter?
+    def resolver_query_adapter: () -> Resolvers::QueryAdapter
+
     @datastore_query_builder: DatastoreQuery::Builder?
     def datastore_query_builder: () -> DatastoreQuery::Builder
 
