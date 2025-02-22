@@ -39,11 +39,25 @@ module ElasticGraph
         raise ::Thor::Error, "Invalid datastore option: #{options[:datastore]}. Must be #{VALID_DATASTORES.join(" or ")}."
       end
 
+      # This determines where the ElasticGraph gems are sourced from. By default, we source them from the
+      # released gems (using the current `VERSION`). However, we also need to be able to use the local
+      # unreleased gems in some specific situations:
+      #
+      # - From our cli acceptance spec -- we want to test against our local gems, not the released gems.
+      # - From our Dockerfile -- we want it to build the docker image from our local gems.
+      gemfile_elasticgraph_details_code_snippet = %(["#{VERSION}"])
+      if (eg_gems_path = ENV["ELASTICGRAPH_GEMS_PATH"])
+        gemfile_elasticgraph_details_code_snippet = %([path: "#{eg_gems_path}"])
+        # :nocov: -- our tests always override `gemfile_elasticgraph_details_code_snippet` using the ENV var.
+      else
+        # :nocov:
+      end
+
       setup_env = SetupEnv.new(
         app_name: app_name,
         app_module: app_name.split("_").map(&:capitalize).join,
         datastore: options.fetch(:datastore),
-        gemfile_elasticgraph_details_code_snippet: %(["#{VERSION}"])
+        gemfile_elasticgraph_details_code_snippet: gemfile_elasticgraph_details_code_snippet
       )
 
       say "Creating a new #{setup_env.datastore_name} ElasticGraph project called '#{app_name}' at: #{new_app_path}", :green

@@ -1,0 +1,16 @@
+# Copyright 2024 Block, Inc.
+#
+# Use of this source code is governed by an MIT-style
+# license that can be found in the LICENSE file or at
+# https://opensource.org/licenses/MIT.
+#
+# frozen_string_literal: true
+
+source "https://rubygems.org"
+
+# This minimal Gemfile is used by the docker image and intentionally only contains
+# what is needed to be able to run `bundle exec elasticgraph new`. The resulting
+# demo project has its own `Gemfile` which will pull in the rest of the ElasticGraph
+# gems.
+gemspec path: "elasticgraph"
+gemspec path: "elasticgraph-support"

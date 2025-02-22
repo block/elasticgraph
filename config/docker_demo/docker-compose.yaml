@@ -6,11 +6,11 @@ networks:
 services:
   opensearch:
     build:
-      context: ./elasticgraph-local/lib/elastic_graph/local/opensearch/.
+      context: ../../elasticgraph-local/lib/elastic_graph/local/opensearch/.
       dockerfile: Dockerfile
       args:
-        VERSION: 2.18.0
-    container_name: opensearch-2.18.0-${ENV}
+        VERSION: ${OPENSEARCH_VERSION}
+    container_name: opensearch-${OPENSEARCH_VERSION}-${ENV}
     healthcheck:
       interval: 10s
       retries: 80
@@ -38,22 +38,10 @@ services:
     - opensearch:/usr/share/opensearch/data
     ports:
     - 9200:9200
-  dashboards:
-    build:
-      context: ./elasticgraph-local/lib/elastic_graph/local/opensearch/.
-      dockerfile: UI-Dockerfile
-      args:
-        VERSION: ${OPENSEARCH_VERSION}
-    container_name: dashboards-${OPENSEARCH_VERSION}-${ENV}
-    environment:
-    - OPENSEARCH_HOSTS=http://opensearch:9200
-    - DISABLE_SECURITY_DASHBOARDS_PLUGIN=true
-    ports:
-    - 5601:5601
   elasticgraph:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ../..
+      dockerfile: config/docker_demo/Dockerfile
       args:
         container_name: elasticgraph-${ENV}
     environment:

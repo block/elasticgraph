@@ -14,5 +14,8 @@
 /*/log/*
 /*/tmp/*
 
+# Ignore spec files.
+/*/spec/*
+
 # Ignore dockerfile
 Dockerfile

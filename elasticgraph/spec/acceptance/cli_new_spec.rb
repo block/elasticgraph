@@ -12,68 +12,68 @@ require "tempfile"
 module ElasticGraph
   ::RSpec.describe CLI, "new command", :in_temp_dir do
     it "initializes a new ElasticGraph project" do
-      override_gemfile_to_use_local_elasticgraph_gems
+      override_gemfile_to_use_local_elasticgraph_gems do
+        output = run_new("musical_artists1")
 
-      output = run_new("musical_artists1")
+        expect(output.lines.first(18).join).to eq <<~EOS
+          Creating a new OpenSearch ElasticGraph project called 'musical_artists1' at: #{::Dir.pwd}/musical_artists1
+                create  musical_artists1
+                create  musical_artists1/.gitignore
+                create  musical_artists1/.standard.yml
+                create  musical_artists1/Gemfile
+                create  musical_artists1/README.md
+                create  musical_artists1/Rakefile
+                create  musical_artists1/config/queries/example_client/FindArtist.graphql
+                create  musical_artists1/config/queries/example_client/ListArtistAlbums.graphql
+                create  musical_artists1/config/schema.rb
+                create  musical_artists1/config/schema/artists.rb
+                create  musical_artists1/config/settings/local.yaml
+                create  musical_artists1/spec/project_spec.rb
+                create  musical_artists1/lib/musical_artists1
+                create  musical_artists1/lib/musical_artists1/factories.rb
+                create  musical_artists1/lib/musical_artists1/fake_data_batch_generator.rb
+                create  musical_artists1/lib/musical_artists1/shared_factories.rb
+                   run  bundle install from "./musical_artists1"
+        EOS
 
-      expect(output.lines.first(18).join).to eq <<~EOS
-        Creating a new OpenSearch ElasticGraph project called 'musical_artists1' at: #{::Dir.pwd}/musical_artists1
-              create  musical_artists1
-              create  musical_artists1/.gitignore
-              create  musical_artists1/.standard.yml
-              create  musical_artists1/Gemfile
-              create  musical_artists1/README.md
-              create  musical_artists1/Rakefile
-              create  musical_artists1/config/queries/example_client/FindArtist.graphql
-              create  musical_artists1/config/queries/example_client/ListArtistAlbums.graphql
-              create  musical_artists1/config/schema.rb
-              create  musical_artists1/config/schema/artists.rb
-              create  musical_artists1/config/settings/local.yaml
-              create  musical_artists1/spec/project_spec.rb
-              create  musical_artists1/lib/musical_artists1
-              create  musical_artists1/lib/musical_artists1/factories.rb
-              create  musical_artists1/lib/musical_artists1/fake_data_batch_generator.rb
-              create  musical_artists1/lib/musical_artists1/shared_factories.rb
-                 run  bundle install from "./musical_artists1"
-      EOS
+        bundle_exec_rake_line = output.lines.index { |l| l =~ /bundle exec rake/ }
+        expect(output.lines[bundle_exec_rake_line..(bundle_exec_rake_line + 16)].join).to eq <<~EOS
+                   run  bundle exec rake schema_artifacts:dump query_registry:dump_variables:all build from "./musical_artists1"
+          Dumped schema artifact to `config/schema/artifacts/datastore_config.yaml`.
+          Dumped schema artifact to `config/schema/artifacts/json_schemas.yaml`.
+          Dumped schema artifact to `config/schema/artifacts/json_schemas_by_version/v1.yaml`.
+          Dumped schema artifact to `config/schema/artifacts/runtime_metadata.yaml`.
+          Dumped schema artifact to `config/schema/artifacts/schema.graphql`.
+          - Dumped `config/queries/example_client/FindArtist.variables.yaml`.
+          - Dumped `config/queries/example_client/ListArtistAlbums.variables.yaml`.
+          Inspecting 8 files
+          ........
 
-      bundle_exec_rake_line = output.lines.index { |l| l =~ /bundle exec rake/ }
-      expect(output.lines[bundle_exec_rake_line..(bundle_exec_rake_line + 16)].join).to eq <<~EOS
-                 run  bundle exec rake schema_artifacts:dump query_registry:dump_variables:all build from "./musical_artists1"
-        Dumped schema artifact to `config/schema/artifacts/datastore_config.yaml`.
-        Dumped schema artifact to `config/schema/artifacts/json_schemas.yaml`.
-        Dumped schema artifact to `config/schema/artifacts/json_schemas_by_version/v1.yaml`.
-        Dumped schema artifact to `config/schema/artifacts/runtime_metadata.yaml`.
-        Dumped schema artifact to `config/schema/artifacts/schema.graphql`.
-        - Dumped `config/queries/example_client/FindArtist.variables.yaml`.
-        - Dumped `config/queries/example_client/ListArtistAlbums.variables.yaml`.
-        Inspecting 8 files
-        ........
+          8 files inspected, no offenses detected
+          For client `example_client`:
+            - FindArtist.graphql (1 operation):
+              - FindArtist: ✅
+            - ListArtistAlbums.graphql (1 operation):
+              - ListArtistAlbums: ✅
+        EOS
 
-        8 files inspected, no offenses detected
-        For client `example_client`:
-          - FindArtist.graphql (1 operation):
-            - FindArtist: ✅
-          - ListArtistAlbums.graphql (1 operation):
-            - ListArtistAlbums: ✅
-      EOS
+        expect(output.lines.last(6).join).to eq <<~EOS
+          Successfully bootstrapped 'musical_artists1' as a new OpenSearch ElasticGraph project.
+          Next steps:
+            1. cd musical_artists1
+            2. Run `bundle exec rake boot_locally` to try it out in your browser.
+            3. Run `bundle exec rake -T` to view other available tasks.
+            4. Customize your new project as needed. (Search for `TODO` to find things that need updating.)
+        EOS
 
-      expect(output.lines.last(6).join).to eq <<~EOS
-        Successfully bootstrapped 'musical_artists1' as a new OpenSearch ElasticGraph project.
-        Next steps:
-          1. cd musical_artists1
-          2. Run `bundle exec rake boot_locally` to try it out in your browser.
-          3. Run `bundle exec rake -T` to view other available tasks.
-          4. Customize your new project as needed. (Search for `TODO` to find things that need updating.)
-      EOS
+        # Verify that all ERB templates rendered properly. If any files had ERB template tags (e.g. `<%= foo %>`)
+        # but were not named with the proper `.tt` file extension, then thor would copy them without rendering them
+        # as ERB. This would catch it.
+        expect(all_committed_code_in("musical_artists1")).to exclude("<%", "%>")
 
-      # Verify that all ERB templates rendered properly. If any files had ERB template tags (e.g. `<%= foo %>`)
-      # but were not named with the proper `.tt` file extension, then thor would copy them without rendering them
-      # as ERB. This would catch it.
-      expect(all_committed_code_in("musical_artists1")).to exclude("<%", "%>")
-
-      # Verify that the only TODO comments in the project comte from our template, not from our generated artifacts.
-      expect(todo_comments_in("musical_artists1").join("\n")).to eq(todo_comments_in(CLI.source_root).join("\n"))
+        # Verify that the only TODO comments in the project comte from our template, not from our generated artifacts.
+        expect(todo_comments_in("musical_artists1").join("\n")).to eq(todo_comments_in(CLI.source_root).join("\n"))
+      end
     end
 
     it "aborts if given an invalid datastore option" do
@@ -171,10 +171,8 @@ module ElasticGraph
     # Here we hook into the call to `ElasticGraph.setup_env` in order to override its
     # `gemfile_elasticgraph_details_code_snippet`, to force it to use oru local gems.
     def override_gemfile_to_use_local_elasticgraph_gems
-      allow(::ElasticGraph).to receive(:setup_env).and_wrap_original do |original|
-        original.call&.with(
-          gemfile_elasticgraph_details_code_snippet: %([path: "#{CommonSpecHelpers::REPO_ROOT}"])
-        )
+      with_env "ELASTICGRAPH_GEMS_PATH" => CommonSpecHelpers::REPO_ROOT do
+        yield
       end
     end
 
