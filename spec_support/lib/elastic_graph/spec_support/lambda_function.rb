@@ -85,17 +85,18 @@ RSpec.shared_context "lambda function" do |config_overrides_in_yaml: {}|
   # it was discovered during a failed deploy that the AWS lambda Ruby runtime breaks logger 1.6.0 due to how it monkey patches it!
   # This caught us off guard since our CI build didn't fail with the same kind of error.
   #
-  # We've fixed it by pinning logger < 1.6.0. To prevent a regression, and to identify future incompatibilities, here we load the
+  # We've fixed it by avoiding logger 1.6.0. To prevent a regression, and to identify future incompatibilities, here we load the
   # AWS Lambda Ruby runtime and install its monkey patches. We observed that this lead to the same kind of error as we saw during
   # the failed deploy before we pinned the logger version.
   #
   # Note: this method is only intended to be called from an `in_sub_process` block since it mutates the runtime environment.
   def install_aws_lambda_runtime_monkey_patches
+    require "aws_lambda_ric/logger_patch"
     require "aws_lambda_ric"
 
     # The monkey patches are triggered by the act of instantiating this class:
-    # https://github.com/aws/aws-lambda-ruby-runtime-interface-client/blob/2.0.0/lib/aws_lambda_ric.rb#L136-L147
-    AwsLambdaRuntimeInterfaceClient::TelemetryLoggingHelper.new("lambda_logs.log", @tmp_dir)
+    # https://github.com/aws/aws-lambda-ruby-runtime-interface-client/blob/3.0.0/lib/aws_lambda_ric.rb#L141-L152
+    AwsLambdaRIC::TelemetryLogger.new("1") # File descriptor is required but not used in test env
 
     # Here we verify that the Logger monkey patch was indeed installed. The installation of the monkey patch
     # gets bypassed when certain errors are encountered (which are silently swallowed), so the mere act of
@@ -103,7 +104,7 @@ RSpec.shared_context "lambda function" do |config_overrides_in_yaml: {}|
     #
     # Plus, new versions of the `aws_lambda_ric` may change how the monkey patches are installed.
     #
-    # https://github.com/aws/aws-lambda-ruby-runtime-interface-client/blob/2.0.0/lib/aws_lambda_ric.rb#L145-L147
+    # https://github.com/aws/aws-lambda-ruby-runtime-interface-client/blob/3.0.0/lib/aws_lambda_ric.rb#L150-L152
     expect(::Logger.ancestors).to include(::LoggerPatch)
 
     # Log a message--this is what triggers a `NoMethodError` when logger 1.6.0 is used.

@@ -43,9 +43,6 @@ Gem::Specification.new do |spec|
 
   # Ruby 3.4 warns about using `logger` being moved out of the standard library, and in Ruby 3.5
   # it'll no longer be available without declaring a dependency.
-  #
-  # Note: Logger 1.6.0 has an issue that impacts our ElasticGraph lambdas, but 1.6.1 avoids the issue:
-  # https://github.com/aws/aws-lambda-ruby-runtime-interface-client/issues/33
   spec.add_dependency "logger", "~> 1.6", ">= 1.6.6"
 
   spec.add_development_dependency "faraday", "~> 2.12", ">= 2.12.2"

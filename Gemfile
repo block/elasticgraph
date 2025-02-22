@@ -10,7 +10,7 @@ source "https://rubygems.org"
 
 # Gems needed by the test suite and other CI checks.
 group :development do
-  gem "aws_lambda_ric", "~> 2.0"
+  gem "aws_lambda_ric", "~> 3.0"
   gem "coderay", "~> 1.1", ">= 1.1.3"
   gem "factory_bot", "~> 6.5", ">= 6.5.1"
   gem "faker", "~> 3.5", ">= 3.5.1"
