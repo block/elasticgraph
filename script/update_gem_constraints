@@ -1,0 +1,141 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "bundler"
+require "rubygems/version"
+
+# This script updates version constraints in Gemfile and gemspec files to match
+# the versions in Gemfile.lock, while preserving the specificity level of the
+# version constraints.
+#
+# For example:
+# - "~> 1.2" with version 1.2.3 becomes "~> 1.2", ">= 1.2.3"
+# - "~> 1.2.3" with version 1.2.3 becomes "~> 1.2.3"
+# - "~> 1.2.3" with version 1.2.4 becomes "~> 1.2.3", ">= 1.2.4"
+#
+# After updating version constraints, it runs bundle install to update Gemfile.lock.
+#
+# This script was created by Goose (https://block.github.io/goose/) and can be updated using Goose.
+class DependencyUpdater
+  def initialize
+    @changes = Hash.new do |hash, key|
+      hash[key] = []
+    end
+  end
+
+  def run
+    update_gemfile
+    update_gemspecs
+    run_bundle_install if @changes.any?
+    display_changes
+  end
+
+  private
+
+  def update_gemfile
+    content = versions.reduce(File.read("Gemfile")) do |gemfile, (gem_name, version)|
+      # Look for gem lines with version constraints
+      gemfile.gsub(/^(\s*gem\s+['"]#{gem_name}['"])\s*,\s*((?:['"][~><=\s\d.]+['"](?:\s*,\s*['"][~><=\s\d.]+['"])*))/) do |match|
+        old_constraint = $2.strip
+        new_constraint = format_version_constraint(version, old_constraint)
+        record_change("Gemfile", gem_name, old_constraint, new_constraint) if old_constraint != new_constraint
+        "#{$1}, #{new_constraint}"
+      end
+    end
+
+    File.write("Gemfile", content)
+  end
+
+  def update_gemspecs
+    `git ls-files "*.gemspec"`.split("\n").each do |gemspec_path|
+      content = versions.reduce(File.read(gemspec_path)) do |gemspec, (gem_name, version)|
+        # Look for add_dependency lines with version constraints
+        gemspec.gsub(/^(\s*spec\.add(?:_development)?_dependency\s+['"]#{gem_name}['"])\s*,\s*((?:['"][~><=\s\d.]+['"](?:\s*,\s*['"][~><=\s\d.]+['"])*))/) do |match|
+          old_constraint = $2.strip
+          new_constraint = format_version_constraint(version, old_constraint)
+          record_change(gemspec_path, gem_name, old_constraint, new_constraint) if old_constraint != new_constraint
+          "#{$1}, #{new_constraint}"
+        end
+      end
+
+      File.write(gemspec_path, content)
+    end
+  end
+
+  def run_bundle_install
+    puts "\nRunning bundle install..."
+    system("bundle install")
+    puts # Add a blank line after bundle install output
+  end
+
+  def display_changes
+    if @changes.empty?
+      puts "\nNo version constraint changes were needed."
+      return
+    end
+
+    puts "Updated version constraints in #{@changes.size} #{pluralize("file", @changes.size)}:"
+    @changes.each do |file, changes|
+      puts "\n\e[1m#{file}:\e[0m"
+      changes.each do |change|
+        puts "  \e[32m#{change[:gem].ljust(30)}\e[0m \e[31m#{change[:old]}\e[0m → \e[32m#{change[:new]}\e[0m"
+      end
+    end
+  end
+
+  def versions
+    @versions ||= Bundler::LockfileParser.new(File.read("Gemfile.lock")).specs.to_h do |spec|
+      [spec.name, spec.version.to_s]
+    end
+  end
+
+  def format_version_constraint(version, original_constraint)
+    # Extract the original ~> version and any >= version if present
+    tilde_match = original_constraint.match(/["']~>\s*(\d+\.\d+(?:\.\d+)?)["']/)
+    return "\"~> #{version}\"" unless tilde_match # fallback if no ~> found
+
+    original_tilde_version = tilde_match[1]
+    dots = original_tilde_version.count(".")
+
+    # Extract the same level of specificity from the new version
+    parts = version.split(".")
+    new_tilde_version = case dots
+    when 1 # major.minor
+      parts[0..1].join(".")
+    when 2 # major.minor.patch
+      parts[0..2].join(".")
+    else # fallback to major.minor
+      parts[0..1].join(".")
+    end
+
+    # For ~> major.minor.patch, the >= constraint is redundant if it's the same version
+    # For ~> major.minor, we need the >= constraint if it's not just major.minor.0
+    if dots == 2
+      # Using patch-level specificity, only need >= if it's a different version
+      if new_tilde_version == version
+        "\"~> #{new_tilde_version}\""
+      else
+        "\"~> #{new_tilde_version}\", \">= #{version}\""
+      end
+    elsif version.end_with?(".0")
+      # Using major.minor specificity, need >= unless it's major.minor.0
+      "\"~> #{new_tilde_version}\""
+    else
+      "\"~> #{new_tilde_version}\", \">= #{version}\""
+    end
+  end
+
+  def record_change(file, gem_name, old_constraint, new_constraint)
+    @changes[file] << {
+      gem: gem_name,
+      old: old_constraint,
+      new: new_constraint
+    }
+  end
+
+  def pluralize(word, count)
+    (count == 1) ? word : "#{word}s"
+  end
+end
+
+DependencyUpdater.new.run

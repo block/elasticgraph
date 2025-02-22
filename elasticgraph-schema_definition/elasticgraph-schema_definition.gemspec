@@ -46,8 +46,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency "elasticgraph-json_schema", ElasticGraph::VERSION
   spec.add_dependency "elasticgraph-schema_artifacts", ElasticGraph::VERSION
   spec.add_dependency "elasticgraph-support", ElasticGraph::VERSION
-  spec.add_dependency "graphql", "~> 2.4.8"
-  spec.add_dependency "rake", "~> 13.2"
+  spec.add_dependency "graphql", "~> 2.4.10"
+  spec.add_dependency "rake", "~> 13.2", ">= 13.2.1"
 
   spec.add_development_dependency "elasticgraph-admin", ElasticGraph::VERSION
   spec.add_development_dependency "elasticgraph-datastore_core", ElasticGraph::VERSION

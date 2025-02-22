@@ -4,7 +4,7 @@ PATH
     elasticgraph-admin_lambda (0.19.1.1)
       elasticgraph-admin (= 0.19.1.1)
       elasticgraph-lambda_support (= 0.19.1.1)
-      rake (~> 13.2)
+      rake (~> 13.2, >= 13.2.1)
 
 PATH
   remote: elasticgraph-admin
@@ -14,16 +14,16 @@ PATH
       elasticgraph-indexer (= 0.19.1.1)
       elasticgraph-schema_artifacts (= 0.19.1.1)
       elasticgraph-support (= 0.19.1.1)
-      rake (~> 13.2)
+      rake (~> 13.2, >= 13.2.1)
 
 PATH
   remote: elasticgraph-apollo
   specs:
     elasticgraph-apollo (0.19.1.1)
-      apollo-federation (~> 3.8)
+      apollo-federation (~> 3.10)
       elasticgraph-graphql (= 0.19.1.1)
       elasticgraph-support (= 0.19.1.1)
-      graphql (~> 2.4.8)
+      graphql (~> 2.4.10)
 
 PATH
   remote: elasticgraph-datastore_core
@@ -37,9 +37,9 @@ PATH
   specs:
     elasticgraph-elasticsearch (0.19.1.1)
       elasticgraph-support (= 0.19.1.1)
-      elasticsearch (~> 8.16)
-      faraday (~> 2.12)
-      faraday-retry (~> 2.2)
+      elasticsearch (~> 8.17, >= 8.17.1)
+      faraday (~> 2.12, >= 2.12.2)
+      faraday-retry (~> 2.2, >= 2.2.1)
 
 PATH
   remote: elasticgraph-graphql_lambda
@@ -54,7 +54,7 @@ PATH
     elasticgraph-graphql (0.19.1.1)
       elasticgraph-datastore_core (= 0.19.1.1)
       elasticgraph-schema_artifacts (= 0.19.1.1)
-      graphql (~> 2.4.8)
+      graphql (~> 2.4.10)
 
 PATH
   remote: elasticgraph-health_check
@@ -68,21 +68,21 @@ PATH
   remote: elasticgraph-indexer_autoscaler_lambda
   specs:
     elasticgraph-indexer_autoscaler_lambda (0.19.1.1)
-      aws-sdk-cloudwatch (~> 1.108)
-      aws-sdk-lambda (~> 1.144)
-      aws-sdk-sqs (~> 1.89)
+      aws-sdk-cloudwatch (~> 1.111)
+      aws-sdk-lambda (~> 1.147)
+      aws-sdk-sqs (~> 1.92)
       elasticgraph-datastore_core (= 0.19.1.1)
       elasticgraph-lambda_support (= 0.19.1.1)
-      ox (~> 2.14, >= 2.14.18)
+      ox (~> 2.14, >= 2.14.22)
 
 PATH
   remote: elasticgraph-indexer_lambda
   specs:
     elasticgraph-indexer_lambda (0.19.1.1)
-      aws-sdk-s3 (~> 1.176)
+      aws-sdk-s3 (~> 1.182)
       elasticgraph-indexer (= 0.19.1.1)
       elasticgraph-lambda_support (= 0.19.1.1)
-      ox (~> 2.14)
+      ox (~> 2.14, >= 2.14.22)
 
 PATH
   remote: elasticgraph-indexer
@@ -92,7 +92,7 @@ PATH
       elasticgraph-json_schema (= 0.19.1.1)
       elasticgraph-schema_artifacts (= 0.19.1.1)
       elasticgraph-support (= 0.19.1.1)
-      hashdiff (~> 1.1)
+      hashdiff (~> 1.1, >= 1.1.2)
 
 PATH
   remote: elasticgraph-json_schema
@@ -106,7 +106,7 @@ PATH
   specs:
     elasticgraph-lambda_support (0.19.1.1)
       elasticgraph-opensearch (= 0.19.1.1)
-      faraday_middleware-aws-sigv4 (~> 1.0)
+      faraday_middleware-aws-sigv4 (~> 1.0, >= 1.0.1)
 
 PATH
   remote: elasticgraph-local
@@ -117,17 +117,17 @@ PATH
       elasticgraph-indexer (= 0.19.1.1)
       elasticgraph-rack (= 0.19.1.1)
       elasticgraph-schema_definition (= 0.19.1.1)
-      rackup (~> 2.2)
-      rake (~> 13.2)
-      webrick (~> 1.9)
+      rackup (~> 2.2, >= 2.2.1)
+      rake (~> 13.2, >= 13.2.1)
+      webrick (~> 1.9, >= 1.9.1)
 
 PATH
   remote: elasticgraph-opensearch
   specs:
     elasticgraph-opensearch (0.19.1.1)
       elasticgraph-support (= 0.19.1.1)
-      faraday (~> 2.12)
-      faraday-retry (~> 2.2)
+      faraday (~> 2.12, >= 2.12.2)
+      faraday-retry (~> 2.2, >= 2.2.1)
       opensearch-ruby (~> 3.4)
 
 PATH
@@ -143,15 +143,15 @@ PATH
     elasticgraph-query_registry (0.19.1.1)
       elasticgraph-graphql (= 0.19.1.1)
       elasticgraph-support (= 0.19.1.1)
-      graphql (~> 2.4.8)
-      rake (~> 13.2)
+      graphql (~> 2.4.10)
+      rake (~> 13.2, >= 13.2.1)
 
 PATH
   remote: elasticgraph-rack
   specs:
     elasticgraph-rack (0.19.1.1)
       elasticgraph-graphql (= 0.19.1.1)
-      rack (~> 3.1)
+      rack (~> 3.1, >= 3.1.10)
 
 PATH
   remote: elasticgraph-schema_artifacts
@@ -168,21 +168,21 @@ PATH
       elasticgraph-json_schema (= 0.19.1.1)
       elasticgraph-schema_artifacts (= 0.19.1.1)
       elasticgraph-support (= 0.19.1.1)
-      graphql (~> 2.4.8)
-      rake (~> 13.2)
+      graphql (~> 2.4.10)
+      rake (~> 13.2, >= 13.2.1)
 
 PATH
   remote: elasticgraph-support
   specs:
     elasticgraph-support (0.19.1.1)
-      logger (~> 1.6, >= 1.6.2)
+      logger (~> 1.6, >= 1.6.6)
 
 PATH
   remote: elasticgraph
   specs:
     elasticgraph (0.19.1.1)
       elasticgraph-support (= 0.19.1.1)
-      thor (~> 1.3)
+      thor (~> 1.3, >= 1.3.2)
 
 GEM
   remote: https://rubygems.org/
@@ -535,7 +535,7 @@ PLATFORMS
 
 DEPENDENCIES
   aws_lambda_ric (~> 2.0)
-  coderay (~> 1.1)
+  coderay (~> 1.1, >= 1.1.3)
   elasticgraph (= 0.19.1.1)!
   elasticgraph-admin (= 0.19.1.1)!
   elasticgraph-admin_lambda (= 0.19.1.1)!
@@ -558,28 +558,28 @@ DEPENDENCIES
   elasticgraph-schema_artifacts (= 0.19.1.1)!
   elasticgraph-schema_definition (= 0.19.1.1)!
   elasticgraph-support (= 0.19.1.1)!
-  factory_bot (~> 6.5)
-  faker (~> 3.5)
-  faraday (~> 2.12)
+  factory_bot (~> 6.5, >= 6.5.1)
+  faker (~> 3.5, >= 3.5.1)
+  faraday (~> 2.12, >= 2.12.2)
   filewatcher (~> 2.1)
   flatware-rspec (~> 2.3, >= 2.3.4)
-  httpx (~> 1.3)
-  jekyll (~> 4.4)
+  httpx (~> 1.4)
+  jekyll (~> 4.4, >= 4.4.1)
   method_source (~> 1.1)
-  rack-test (~> 2.1)
-  rake (~> 13.2)
+  rack-test (~> 2.2)
+  rake (~> 13.2, >= 13.2.1)
   rspec (~> 3.13)
-  rspec-retry (~> 0.6)
-  rubocop-factory_bot (~> 2.26)
+  rspec-retry (~> 0.6, >= 0.6.2)
+  rubocop-factory_bot (~> 2.26, >= 2.26.1)
   rubocop-rake (~> 0.6)
   rubocop-rspec (~> 3.4)
   simplecov (~> 0.22)
-  simplecov-console (~> 0.9)
+  simplecov-console (~> 0.9, >= 0.9.3)
   standard (~> 1.45.0)
   steep (~> 1.9.4)
   super_diff (~> 0.15)
   vcr (~> 6.3, >= 6.3.1)
-  yard (~> 0.9, >= 0.9.36)
+  yard (~> 0.9, >= 0.9.37)
   yard-doctest (~> 0.1, >= 0.1.17)
 
 BUNDLED WITH

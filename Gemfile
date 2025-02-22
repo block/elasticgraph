@@ -11,19 +11,19 @@ source "https://rubygems.org"
 # Gems needed by the test suite and other CI checks.
 group :development do
   gem "aws_lambda_ric", "~> 2.0"
-  gem "coderay", "~> 1.1"
-  gem "factory_bot", "~> 6.5"
-  gem "faker", "~> 3.5"
+  gem "coderay", "~> 1.1", ">= 1.1.3"
+  gem "factory_bot", "~> 6.5", ">= 6.5.1"
+  gem "faker", "~> 3.5", ">= 3.5.1"
   gem "flatware-rspec", "~> 2.3", ">= 2.3.4"
-  gem "httpx", "~> 1.3"
+  gem "httpx", "~> 1.4"
   gem "method_source", "~> 1.1"
-  gem "rubocop-factory_bot", "~> 2.26"
+  gem "rubocop-factory_bot", "~> 2.26", ">= 2.26.1"
   gem "rubocop-rake", "~> 0.6"
   gem "rubocop-rspec", "~> 3.4"
   gem "rspec", "~> 3.13"
-  gem "rspec-retry", "~> 0.6"
+  gem "rspec-retry", "~> 0.6", ">= 0.6.2"
   gem "simplecov", "~> 0.22"
-  gem "simplecov-console", "~> 0.9"
+  gem "simplecov-console", "~> 0.9", ">= 0.9.3"
   gem "standard", "~> 1.45.0"
   gem "steep", "~> 1.9.4"
   gem "super_diff", "~> 0.15"
@@ -33,8 +33,8 @@ end
 # Documentation generation gems
 group :site do
   gem "filewatcher", "~> 2.1"
-  gem "jekyll", "~> 4.4"
-  gem "yard", "~> 0.9", ">= 0.9.36"
+  gem "jekyll", "~> 4.4", ">= 4.4.1"
+  gem "yard", "~> 0.9", ">= 0.9.37"
   gem "yard-doctest", "~> 0.1", ">= 0.1.17"
 end
 

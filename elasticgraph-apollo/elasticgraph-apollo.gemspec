@@ -43,8 +43,8 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "elasticgraph-graphql", ElasticGraph::VERSION
   spec.add_dependency "elasticgraph-support", ElasticGraph::VERSION
-  spec.add_dependency "graphql", "~> 2.4.8"
-  spec.add_dependency "apollo-federation", "~> 3.8"
+  spec.add_dependency "graphql", "~> 2.4.10"
+  spec.add_dependency "apollo-federation", "~> 3.10"
 
   # Note: technically, this is not purely a development dependency, but since `eg-schema_def`
   # isn't intended to be used in production (or even included in a deployed bundle) we don't

@@ -46,9 +46,9 @@ Gem::Specification.new do |spec|
   spec.add_dependency "elasticgraph-indexer", ElasticGraph::VERSION
   spec.add_dependency "elasticgraph-rack", ElasticGraph::VERSION
   spec.add_dependency "elasticgraph-schema_definition", ElasticGraph::VERSION
-  spec.add_dependency "rackup", "~> 2.2"
-  spec.add_dependency "rake", "~> 13.2"
-  spec.add_dependency "webrick", "~> 1.9"
+  spec.add_dependency "rackup", "~> 2.2", ">= 2.2.1"
+  spec.add_dependency "rake", "~> 13.2", ">= 13.2.1"
+  spec.add_dependency "webrick", "~> 1.9", ">= 1.9.1"
 
   spec.add_development_dependency "elasticgraph-apollo", ElasticGraph::VERSION
   spec.add_development_dependency "elasticgraph-elasticsearch", ElasticGraph::VERSION
