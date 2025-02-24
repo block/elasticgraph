@@ -15,13 +15,14 @@ module ElasticGraph
       # our resolvers. Responsible for routing a resolution request to the appropriate
       # resolver.
       class GraphQLAdapter
-        def initialize(schema:, datastore_query_builder:, datastore_query_adapters:, runtime_metadata:, resolvers:)
+        def initialize(schema:, datastore_query_builder:, datastore_query_adapters:, runtime_metadata:, named_resolvers:, resolvers:)
           @schema = schema
           @query_adapter = QueryAdapter.new(
             datastore_query_builder: datastore_query_builder,
             datastore_query_adapters: datastore_query_adapters
           )
 
+          @named_resolvers = named_resolvers
           @resolvers = resolvers
 
           scalar_types_by_name = runtime_metadata.scalar_types_by_name
@@ -104,6 +105,10 @@ module ElasticGraph
         end
 
         def resolver_for(field, object)
+          if (resolver_name = field.resolver)
+            return @named_resolvers.fetch(resolver_name)
+          end
+
           return object if object.respond_to?(:can_resolve?) && object.can_resolve?(field: field, object: object)
           resolver = @resolvers.find { |r| r.can_resolve?(field: field, object: object) }
           resolver || yield

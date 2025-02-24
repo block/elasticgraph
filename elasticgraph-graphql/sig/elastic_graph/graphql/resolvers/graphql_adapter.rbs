@@ -7,6 +7,7 @@ module ElasticGraph
           datastore_query_builder: DatastoreQuery::Builder,
           datastore_query_adapters: ::Array[_QueryAdapter],
           runtime_metadata: SchemaArtifacts::RuntimeMetadata::Schema,
+          named_resolvers: ::Hash[::Symbol, Resolvers::_Resolver],
           resolvers: ::Array[Resolvers::_Resolver]
         ) -> void
       end

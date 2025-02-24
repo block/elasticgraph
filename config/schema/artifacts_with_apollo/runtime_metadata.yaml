@@ -2672,6 +2672,7 @@ object_types_by_name:
         relation:
           direction: out
           foreign_key: manufacturer_id
+        resolver: nested_relationships
     index_definition_names:
     - addresses
     update_targets:
@@ -2734,28 +2735,34 @@ object_types_by_name:
                 - 100
           direction: in
           foreign_key: component_ids
+        resolver: nested_relationships
       part_aggregations:
         relation:
           direction: out
           foreign_key: part_ids
+        resolver: nested_relationships
       parts:
         relation:
           direction: out
           foreign_key: part_ids
+        resolver: nested_relationships
       widget:
         relation:
           direction: in
           foreign_key: component_ids
+        resolver: nested_relationships
       widget_aggregations:
         relation:
           direction: in
           foreign_key: component_ids
+        resolver: nested_relationships
       widget_workspace_id:
         name_in_index: widget_workspace_id3
       widgets:
         relation:
           direction: in
           foreign_key: component_ids
+        resolver: nested_relationships
     index_definition_names:
     - components
     update_targets:
@@ -2815,10 +2822,12 @@ object_types_by_name:
         relation:
           direction: in
           foreign_key: country_code
+        resolver: nested_relationships
       teams:
         relation:
           direction: in
           foreign_key: country_code
+        resolver: nested_relationships
   DateAggregatedValues:
     elasticgraph_category: scalar_aggregated_values
     graphql_fields_by_name:
@@ -2873,14 +2882,17 @@ object_types_by_name:
         relation:
           direction: in
           foreign_key: part_ids
+        resolver: nested_relationships
       components:
         relation:
           direction: in
           foreign_key: part_ids
+        resolver: nested_relationships
       manufacturer:
         relation:
           direction: out
           foreign_key: manufacturer_id
+        resolver: nested_relationships
     index_definition_names:
     - electrical_parts
     update_targets:
@@ -3063,14 +3075,17 @@ object_types_by_name:
         relation:
           direction: in
           foreign_key: manufacturer_id
+        resolver: nested_relationships
       manufactured_part_aggregations:
         relation:
           direction: in
           foreign_key: manufacturer_id
+        resolver: nested_relationships
       manufactured_parts:
         relation:
           direction: in
           foreign_key: manufacturer_id
+        resolver: nested_relationships
     index_definition_names:
     - manufacturers
     update_targets:
@@ -3112,14 +3127,17 @@ object_types_by_name:
         relation:
           direction: in
           foreign_key: part_ids
+        resolver: nested_relationships
       components:
         relation:
           direction: in
           foreign_key: part_ids
+        resolver: nested_relationships
       manufacturer:
         relation:
           direction: out
           foreign_key: manufacturer_id
+        resolver: nested_relationships
     index_definition_names:
     - mechanical_parts
     update_targets:
@@ -3173,16 +3191,19 @@ object_types_by_name:
         relation:
           direction: in
           foreign_key: manufacturer_id
+        resolver: nested_relationships
       amount_cents2:
         name_in_index: amount_cents
       component_aggregations:
         relation:
           direction: out
           foreign_key: component_ids
+        resolver: nested_relationships
       components:
         relation:
           direction: out
           foreign_key: component_ids
+        resolver: nested_relationships
       created_at2:
         name_in_index: created_at
       created_at2_legacy:
@@ -3200,26 +3221,32 @@ object_types_by_name:
                 - 100
           direction: in
           foreign_key: component_ids
+        resolver: nested_relationships
       manufactured_part_aggregations:
         relation:
           direction: in
           foreign_key: manufacturer_id
+        resolver: nested_relationships
       manufactured_parts:
         relation:
           direction: in
           foreign_key: manufacturer_id
+        resolver: nested_relationships
       manufacturer:
         relation:
           direction: out
           foreign_key: manufacturer_id
+        resolver: nested_relationships
       part_aggregations:
         relation:
           direction: out
           foreign_key: part_ids
+        resolver: nested_relationships
       parts:
         relation:
           direction: out
           foreign_key: part_ids
+        resolver: nested_relationships
       size:
         name_in_index: options.size
       the_options:
@@ -3228,20 +3255,24 @@ object_types_by_name:
         relation:
           direction: in
           foreign_key: component_ids
+        resolver: nested_relationships
       widget_aggregations:
         relation:
           direction: in
           foreign_key: component_ids
+        resolver: nested_relationships
       widget_workspace_id:
         name_in_index: widget_workspace_id3
       widgets:
         relation:
           direction: in
           foreign_key: component_ids
+        resolver: nested_relationships
       workspace:
         relation:
           direction: in
           foreign_key: widget.id
+        resolver: nested_relationships
       workspace_id:
         name_in_index: workspace_id2
   NamedEntityAggregatedValues:
@@ -3337,14 +3368,17 @@ object_types_by_name:
         relation:
           direction: in
           foreign_key: part_ids
+        resolver: nested_relationships
       components:
         relation:
           direction: in
           foreign_key: part_ids
+        resolver: nested_relationships
       manufacturer:
         relation:
           direction: out
           foreign_key: manufacturer_id
+        resolver: nested_relationships
   PartAggregation:
     elasticgraph_category: indexed_aggregation
     source_type: Part
@@ -3385,10 +3419,12 @@ object_types_by_name:
           foreign_key_nested_paths:
           - current_players_nested
           - current_players_nested.affiliations.sponsorships_nested
+        resolver: nested_relationships
       affiliated_team_from_object_aggregations:
         relation:
           direction: in
           foreign_key: current_players_object.affiliations.sponsorships_object.sponsor_id
+        resolver: nested_relationships
       affiliated_teams_from_nested:
         relation:
           direction: in
@@ -3396,10 +3432,12 @@ object_types_by_name:
           foreign_key_nested_paths:
           - current_players_nested
           - current_players_nested.affiliations.sponsorships_nested
+        resolver: nested_relationships
       affiliated_teams_from_object:
         relation:
           direction: in
           foreign_key: current_players_object.affiliations.sponsorships_object.sponsor_id
+        resolver: nested_relationships
     index_definition_names:
     - sponsors
     update_targets:
@@ -3685,10 +3723,12 @@ object_types_by_name:
         relation:
           direction: out
           foreign_key: component_ids
+        resolver: nested_relationships
       components:
         relation:
           direction: out
           foreign_key: component_ids
+        resolver: nested_relationships
       created_at2:
         name_in_index: created_at
       created_at2_legacy:
@@ -3705,6 +3745,7 @@ object_types_by_name:
         relation:
           direction: in
           foreign_key: widget.id
+        resolver: nested_relationships
       workspace_id:
         name_in_index: workspace_id2
     index_definition_names:
@@ -4004,10 +4045,12 @@ object_types_by_name:
         relation:
           direction: out
           foreign_key: component_ids
+        resolver: nested_relationships
       components:
         relation:
           direction: out
           foreign_key: component_ids
+        resolver: nested_relationships
       created_at2:
         name_in_index: created_at
       created_at2_legacy:
@@ -4020,6 +4063,7 @@ object_types_by_name:
         relation:
           direction: out
           foreign_key: manufacturer_id
+        resolver: nested_relationships
       size:
         name_in_index: options.size
       the_options:
@@ -4028,6 +4072,7 @@ object_types_by_name:
         relation:
           direction: in
           foreign_key: widget.id
+        resolver: nested_relationships
       workspace_id:
         name_in_index: workspace_id2
   WidgetOrAddressAggregatedValues:
