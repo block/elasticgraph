@@ -208,6 +208,29 @@
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#override_runtime_metadata-instance_method" title="#override_runtime_metadata (instance method)">#<strong>override_runtime_metadata</strong>(**overrides)  &#x21d2; void </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Configures overrides for runtime metadata.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#plural_root_query_field_name-instance_method" title="#plural_root_query_field_name (instance method)">#<strong>plural_root_query_field_name</strong>  &#x21d2; String </a>
     
 
@@ -733,6 +756,48 @@ for a list of valid settings, but be sure to omit the <code>index.</code> prefix
 </div>
     
       <div class="method_details ">
+  <h3 class="signature " id="override_runtime_metadata-instance_method">
+  
+    #<strong>override_runtime_metadata</strong>(**overrides)  &#x21d2; <tt>void</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note returns_void">This method returns an undefined value.</p><p>Configures overrides for runtime metadata. The provided runtime metadata values will be persisted in the
+<code>runtime_metadata.yaml</code> schema artifact and made available at runtime to <code>elasticgraph-graphql</code> and
+<code>elasticgraph-indexer</code>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+158
+159
+160</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/has_indices.rb', line 158</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_override_runtime_metadata'>override_runtime_metadata</span><span class='lparen'>(</span><span class='op'>**</span><span class='id identifier rubyid_overrides'>overrides</span><span class='rparen'>)</span>
+  <span class='ivar'>@runtime_metadata_overrides</span><span class='period'>.</span><span class='id identifier rubyid_merge!'>merge!</span><span class='lparen'>(</span><span class='id identifier rubyid_overrides'>overrides</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
   <h3 class="signature " id="plural_root_query_field_name-instance_method">
   
     #<strong>plural_root_query_field_name</strong>  &#x21d2; <tt>String</tt> 
@@ -774,12 +839,12 @@ for a list of valid settings, but be sure to omit the <code>index.</code> prefix
       <pre class="lines">
 
 
-207
-208
-209</pre>
+216
+217
+218</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/has_indices.rb', line 207</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/has_indices.rb', line 216</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_plural_root_query_field_name'>plural_root_query_field_name</span>
   <span class='ivar'>@plural_root_query_field_name</span> <span class='op'>||</span> <span class='id identifier rubyid_naively_pluralize_type_name'>naively_pluralize_type_name</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
@@ -907,14 +972,14 @@ or <code>snake_case</code>, depending on configuration).</p>
       <pre class="lines">
 
 
-200
-201
-202
-203
-204</pre>
+209
+210
+211
+212
+213</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/has_indices.rb', line 200</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/has_indices.rb', line 209</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_root_query_fields'>root_query_fields</span><span class='lparen'>(</span><span class='label'>plural:</span><span class='comma'>,</span> <span class='label'>singular:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_customization_block'>customization_block</span><span class='rparen'>)</span>
   <span class='ivar'>@plural_root_query_field_name</span> <span class='op'>=</span> <span class='id identifier rubyid_plural'>plural</span>
@@ -972,12 +1037,12 @@ aggregations of this indexed type. If not provided, will derive it from the type
       <pre class="lines">
 
 
-214
-215
-216</pre>
+223
+224
+225</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/has_indices.rb', line 214</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/has_indices.rb', line 223</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_singular_root_query_field_name'>singular_root_query_field_name</span>
   <span class='ivar'>@singular_root_query_field_name</span> <span class='op'>||</span> <span class='id identifier rubyid_to_field_name'>to_field_name</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
@@ -992,7 +1057,7 @@ aggregations of this indexed type. If not provided, will derive it from the type
 </div>
 
       <div id="footer">
-  Generated on Mon Feb 24 14:54:06 2025 by
+  Generated on Mon Feb 24 14:54:54 2025 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.37 (ruby-3.3.6).
 </div>
