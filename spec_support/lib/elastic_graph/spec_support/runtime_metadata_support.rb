@@ -93,6 +93,13 @@ module ElasticGraph
           )
         end
 
+        def computation_detail_with(empty_bucket_value: 0, function: :sum)
+          ComputationDetail.new(
+            empty_bucket_value: empty_bucket_value,
+            function: function
+          )
+        end
+
         def dynamic_param_with(source_path: "some_field", cardinality: :one)
           DynamicParam.new(source_path: source_path, cardinality: cardinality)
         end
@@ -130,11 +137,12 @@ module ElasticGraph
           Relation.new(foreign_key: foreign_key, direction: direction, additional_filter: additional_filter, foreign_key_nested_paths: foreign_key_nested_paths)
         end
 
-        def graphql_field_with(name_in_index: "name_index", relation: nil, computation_detail: nil)
+        def graphql_field_with(name_in_index: "name_index", relation: nil, computation_detail: nil, resolver: nil)
           GraphQLField.new(
+            computation_detail: computation_detail,
             name_in_index: name_in_index,
             relation: relation,
-            computation_detail: computation_detail
+            resolver: resolver
           )
         end
 
