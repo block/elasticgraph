@@ -302,7 +302,7 @@ GEM
     hashdiff (1.1.2)
     http-2 (1.0.2)
     http_parser.rb (0.8.0)
-    httpx (1.4.0)
+    httpx (1.4.1)
       http-2 (>= 1.0.0)
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
