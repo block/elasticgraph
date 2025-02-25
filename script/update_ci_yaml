@@ -89,6 +89,16 @@ on:
     branches:
       - main
   pull_request:
+  # To avoid infinite workflow loops, a PR update triggered by one workflow will not
+  # automatically run other workflows.
+  #
+  # The `Update Gem Version Artifacts` workflow pushes new commits to dependabot PRs,
+  # and we need to run the CI build on those commits so we can judge whether or not it
+  # is safe to merge. To enable that, we have to opt-in to having this CI workflow run
+  # when `Update Gem Version Artifacts` completes.
+  workflow_run:
+    workflows: ["Update Gem Version Artifacts"]
+    types: [completed]
 
 env:
   # It's recommended to run ElasticGraph with this option to get better performance. We want to run
