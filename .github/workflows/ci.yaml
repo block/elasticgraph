@@ -55,6 +55,19 @@ jobs:
 
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
+      - name: Cache Docker images
+        uses: actions/cache@v4
+        with:
+          path: /tmp/docker-save
+          key: ${{ runner.os }}-docker-${{ matrix.datastore }}-${{ hashFiles('**/Dockerfile') }}
+          restore-keys: |
+            ${{ runner.os }}-docker-${{ matrix.datastore }}-
+
+      - name: Load cached Docker images
+        if: steps.cache-docker.outputs.cache-hit == 'true'
+        run: |
+          docker load < /tmp/docker-save/images.tar || true
+
       - uses: ruby/setup-ruby@bfefad842bb982ff05b233bcbc1571d97a87e69f # v1.206.0
         with:
           ruby-version: ${{ matrix.ruby }}
@@ -74,7 +87,15 @@ jobs:
       # Note: the `10` argument on the end is a number of seconds to sleep after booting the datastore.
       # We've found that there is a minor race condition where the shards aren't fully ready for the tests
       # to hit them if we don't wait a bit after booting.
-      - run: script/ci_parts/${{ matrix.build_part }} ${{ matrix.datastore }} 10
+      - name: Run CI Checks
+        run: script/ci_parts/${{ matrix.build_part }} ${{ matrix.datastore }} 10
+
+      # Save Docker images for future runs
+      - name: Save Docker images
+        if: steps.cache-docker.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p /tmp/docker-save
+          docker save $(docker images -q) > /tmp/docker-save/images.tar
 
   # An extra job that runs after all the others and provides a single summary status.
   # This is used by our branch protection rule to block merge until all CI checks passed,
