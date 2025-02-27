@@ -4,6 +4,7 @@ module ElasticGraph
       module HasIndices
         attr_reader indices: ::Array[Indexing::Index]
         attr_reader runtime_metadata_overrides: ::Hash[::Symbol, untyped]
+        attr_accessor default_graphql_resolver: ::Symbol?
         def index: (::String, ::Hash[::Symbol, ::String | ::Integer]) ?{ (Indexing::Index) -> void } -> ::Array[Indexing::Index]
         def indexed?: () -> bool
         def override_runtime_metadata: (**untyped) -> void

@@ -92,7 +92,7 @@ module ElasticGraph
         :aggregated_values_customizations, :sort_order_enum_value_customizations,
         :args, :sortable, :filterable, :aggregatable, :groupable, :graphql_only, :source, :runtime_field_script, :relationship, :singular_name,
         :computation_detail, :non_nullable_in_json_schema, :backing_indexing_field, :as_input,
-        :legacy_grouping_schema, :name_in_index
+        :legacy_grouping_schema, :name_in_index, :resolver
       )
         include Mixins::HasDocumentation
         include Mixins::HasDirectives
@@ -106,7 +106,7 @@ module ElasticGraph
           runtime_metadata_graphql_field: SchemaArtifacts::RuntimeMetadata::GraphQLField::EMPTY,
           type_for_derived_types: nil, graphql_only: nil, singular: nil,
           sortable: nil, filterable: nil, aggregatable: nil, groupable: nil,
-          backing_indexing_field: nil, as_input: false, legacy_grouping_schema: false
+          backing_indexing_field: nil, as_input: false, legacy_grouping_schema: false, resolver: nil
         )
           type_ref = schema_def_state.type_ref(type)
           super(
@@ -137,7 +137,8 @@ module ElasticGraph
             non_nullable_in_json_schema: false,
             backing_indexing_field: backing_indexing_field,
             as_input: as_input,
-            legacy_grouping_schema: legacy_grouping_schema
+            legacy_grouping_schema: legacy_grouping_schema,
+            resolver: resolver
           )
 
           if name != name_in_index && name_in_index.include?(".") && !graphql_only
@@ -926,7 +927,7 @@ module ElasticGraph
             name_in_index: name_in_index,
             computation_detail: computation_detail,
             relation: relationship&.runtime_metadata,
-            resolver: nil
+            resolver: resolver
           )
         end
 

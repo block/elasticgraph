@@ -13,6 +13,32 @@ module ElasticGraph
     RSpec.describe "RuntimeMetadata #object_types_by_name #graphql_fields_by_name" do
       include_context "object type metadata support"
 
+      it "defaults the `resolver` of each individual field to the parent type's `default_graphql_resolver`" do
+        metadata = object_type_metadata_for "Widget" do |s|
+          s.object_type "Widget" do |t|
+            t.default_graphql_resolver = :parent_default
+
+            t.field "id", "ID"
+            t.field "description", "String"
+
+            t.field "name", "String" do |f|
+              f.resolver = :other1
+            end
+
+            t.field "title", "String" do |f|
+              f.resolver = :other2
+            end
+          end
+        end
+
+        expect(metadata.graphql_fields_by_name).to eq({
+          "id" => graphql_field_with(name_in_index: "id", resolver: :parent_default),
+          "description" => graphql_field_with(name_in_index: "description", resolver: :parent_default),
+          "name" => graphql_field_with(name_in_index: "name", resolver: :other1),
+          "title" => graphql_field_with(name_in_index: "title", resolver: :other2)
+        })
+      end
+
       context "on a normal indexed type" do
         it "dumps the `name_in_index` of any fields" do
           metadata = object_type_metadata_for "Widget" do |s|

@@ -18,6 +18,10 @@ module ElasticGraph
         # @private
         attr_reader :runtime_metadata_overrides
 
+        # @return [::Symbol, nil] the default GraphQL resolver to use for fields on this type
+        attr_accessor :default_graphql_resolver
+        # @dynamic default_graphql_resolver, default_graphql_resolver=
+
         # @private
         def initialize(*args, **options)
           super(*args, **options)
@@ -264,7 +268,15 @@ module ElasticGraph
         end
 
         def runtime_metadata_graphql_fields_by_name
-          graphql_fields_by_name.transform_values(&:runtime_metadata_graphql_field)
+          graphql_fields_by_name.transform_values do |field|
+            field_metadata = field.runtime_metadata_graphql_field
+
+            if default_graphql_resolver && !field_metadata.resolver
+              field_metadata.with(resolver: default_graphql_resolver)
+            else
+              field_metadata
+            end
+          end
         end
 
         # Provides a "best effort" conversion of a type name to the plural form.
