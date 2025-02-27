@@ -133,6 +133,7 @@ module ElasticGraph
               singular: indexed_type.singular_root_query_field_name
             ) do |f|
               f.documentation "Fetches `#{indexed_type.name}`s based on the provided arguments."
+              f.resolver = nil
               f.hide_relationship_runtime_metadata = true
               indexed_type.root_query_fields_customizations&.call(f)
             end

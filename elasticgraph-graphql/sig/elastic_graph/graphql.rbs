@@ -42,6 +42,9 @@ module ElasticGraph
     @graphql_resolvers: ::Array[Resolvers::_Resolver]?
     def graphql_resolvers: () -> ::Array[Resolvers::_Resolver]
 
+    @named_graphql_resolvers: ::Hash[::Symbol, Resolvers::_Resolver]?
+    def named_graphql_resolvers: () -> ::Hash[::Symbol, Resolvers::_Resolver]
+
     @datastore_query_adapters: ::Array[_QueryAdapter]?
     def datastore_query_adapters: () -> ::Array[_QueryAdapter]
 

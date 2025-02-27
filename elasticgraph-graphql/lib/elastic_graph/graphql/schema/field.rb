@@ -18,7 +18,7 @@ module ElasticGraph
         # The type in which the field resides.
         attr_reader :parent_type
 
-        attr_reader :schema, :schema_element_names, :graphql_field, :name_in_index, :relation, :computation_detail
+        attr_reader :schema, :schema_element_names, :graphql_field, :name_in_index, :relation, :computation_detail, :resolver
 
         def initialize(schema, parent_type, graphql_field, runtime_metadata)
           @schema = schema
@@ -27,6 +27,7 @@ module ElasticGraph
           @graphql_field = graphql_field
           @relation = runtime_metadata&.relation
           @computation_detail = runtime_metadata&.computation_detail
+          @resolver = runtime_metadata&.resolver
           @name_in_index = runtime_metadata&.name_in_index&.to_sym || name
 
           # Adds the :extras required by ElasticGraph. For now, this blindly adds `:lookahead`

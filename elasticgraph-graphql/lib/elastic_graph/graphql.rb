@@ -104,6 +104,7 @@ module ElasticGraph
               datastore_query_builder: datastore_query_builder,
               datastore_query_adapters: datastore_query_adapters,
               runtime_metadata: runtime_metadata,
+              named_resolvers: named_graphql_resolvers,
               resolvers: graphql_resolvers
             )
           end
@@ -158,12 +159,6 @@ module ElasticGraph
       @graphql_resolvers ||= begin
         require "elastic_graph/graphql/resolvers/get_record_field_value"
         require "elastic_graph/graphql/resolvers/list_records"
-        require "elastic_graph/graphql/resolvers/nested_relationships"
-
-        nested_relationships = Resolvers::NestedRelationships.new(
-          schema_element_names: runtime_metadata.schema_element_names,
-          logger: logger
-        )
 
         list_records = Resolvers::ListRecords.new
 
@@ -171,7 +166,21 @@ module ElasticGraph
           schema_element_names: runtime_metadata.schema_element_names
         )
 
-        [nested_relationships, list_records, get_record_field_value]
+        [list_records, get_record_field_value]
+      end
+    end
+
+    # @private
+    def named_graphql_resolvers
+      @named_graphql_resolvers ||= begin
+        require "elastic_graph/graphql/resolvers/nested_relationships"
+
+        nested_relationships = Resolvers::NestedRelationships.new(
+          schema_element_names: runtime_metadata.schema_element_names,
+          logger: logger
+        )
+
+        {nested_relationships: nested_relationships}
       end
     end
 

@@ -21,6 +21,7 @@ module ElasticGraph
             datastore_query_builder: graphql.datastore_query_builder,
             datastore_query_adapters: graphql.datastore_query_adapters,
             runtime_metadata: graphql.runtime_metadata,
+            named_resolvers: graphql.named_graphql_resolvers,
             resolvers: graphql.graphql_resolvers
           )
 
