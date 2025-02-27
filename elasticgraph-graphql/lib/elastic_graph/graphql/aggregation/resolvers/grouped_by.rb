@@ -14,10 +14,6 @@ module ElasticGraph
     module Aggregation
       module Resolvers
         class GroupedBy < ::Data.define(:bucket, :field_path)
-          def can_resolve?(field:, object:)
-            true
-          end
-
           def resolve(field:, object:, args:, context:, lookahead:)
             new_field_path = field_path + [PathSegment.for(field: field, lookahead: lookahead)]
             return with(field_path: new_field_path) if field.type.object?

@@ -20,10 +20,6 @@ module ElasticGraph
     module Aggregation
       module Resolvers
         class SubAggregations < ::Data.define(:schema_element_names, :sub_aggregations, :parent_queries, :sub_aggs_by_agg_key, :field_path)
-          def can_resolve?(field:, object:)
-            true
-          end
-
           def resolve(field:, object:, args:, context:, lookahead:)
             path_segment = PathSegment.for(field: field, lookahead: lookahead)
             new_field_path = field_path + [path_segment]

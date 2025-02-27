@@ -4,13 +4,13 @@ module ElasticGraph
       type fieldArgs = ::Hash[::String, untyped]
 
       interface _Resolver
-        def can_resolve?: (field: Schema::Field, object: untyped) -> bool
         def resolve: (
           field: Schema::Field,
           object: untyped,
           context: ::GraphQL::Query::Context,
           args: fieldArgs,
-          lookahead: ::GraphQL::Execution::Lookahead) -> untyped
+          lookahead: ::GraphQL::Execution::Lookahead
+        ) -> untyped
       end
     end
   end
