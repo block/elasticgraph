@@ -4059,6 +4059,60 @@ object_types_by_name:
         resolver: object
       "y":
         resolver: object
+  Query:
+    graphql_fields_by_name:
+      address_aggregations:
+        resolver: list_records
+      addresses:
+        resolver: list_records
+      component_aggregations:
+        resolver: list_records
+      components:
+        resolver: list_records
+      electrical_part_aggregations:
+        resolver: list_records
+      electrical_parts:
+        resolver: list_records
+      manufacturer_aggregations:
+        resolver: list_records
+      manufacturers:
+        resolver: list_records
+      mechanical_part_aggregations:
+        resolver: list_records
+      mechanical_parts:
+        resolver: list_records
+      named_entities:
+        resolver: list_records
+      named_entity_aggregations:
+        resolver: list_records
+      part_aggregations:
+        resolver: list_records
+      parts:
+        resolver: list_records
+      sponsor_aggregations:
+        resolver: list_records
+      sponsors:
+        resolver: list_records
+      team_aggregations:
+        resolver: list_records
+      teams:
+        resolver: list_records
+      widget_aggregations:
+        resolver: list_records
+      widget_currencies:
+        resolver: list_records
+      widget_currency_aggregations:
+        resolver: list_records
+      widget_or_address_aggregations:
+        resolver: list_records
+      widget_workspace_aggregations:
+        resolver: list_records
+      widget_workspaces:
+        resolver: list_records
+      widgets:
+        resolver: list_records
+      widgets_or_addresses:
+        resolver: list_records
   SizeListFilterInput:
     graphql_fields_by_name:
       count:

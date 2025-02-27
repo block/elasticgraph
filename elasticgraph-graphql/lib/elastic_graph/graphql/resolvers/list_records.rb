@@ -14,10 +14,6 @@ module ElasticGraph
     module Resolvers
       # Responsible for fetching a a list of records of a particular type
       class ListRecords
-        def can_resolve?(field:, object:)
-          field.parent_type.name == :Query && field.type.collection?
-        end
-
         def resolve(field:, context:, lookahead:, **)
           query = yield
           response = QuerySource.execute_one(query, for_context: context)
