@@ -2725,12 +2725,38 @@ object_types_by_name:
     source_type: Address
   AddressAggregationConnection:
     elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver: object
+      nodes:
+        resolver: object
+      page_info:
+        resolver: object
   AddressAggregationEdge:
     elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      cursor:
+        resolver: object
+      node:
+        resolver: object
   AddressConnection:
     elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver: object
+      nodes:
+        resolver: object
+      page_info:
+        resolver: object
+      total_edge_count:
+        resolver: object
   AddressEdge:
     elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      cursor:
+        resolver: object
+      node:
+        resolver: object
   AddressGroupedBy:
     graphql_fields_by_name:
       full_address:
@@ -2874,12 +2900,38 @@ object_types_by_name:
     source_type: Component
   ComponentAggregationConnection:
     elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver: object
+      nodes:
+        resolver: object
+      page_info:
+        resolver: object
   ComponentAggregationEdge:
     elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      cursor:
+        resolver: object
+      node:
+        resolver: object
   ComponentConnection:
     elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver: object
+      nodes:
+        resolver: object
+      page_info:
+        resolver: object
+      total_edge_count:
+        resolver: object
   ComponentEdge:
     elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      cursor:
+        resolver: object
+      node:
+        resolver: object
   ComponentFilterInput:
     graphql_fields_by_name:
       widget_workspace_id:
@@ -3062,12 +3114,38 @@ object_types_by_name:
     source_type: ElectricalPart
   ElectricalPartAggregationConnection:
     elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver: object
+      nodes:
+        resolver: object
+      page_info:
+        resolver: object
   ElectricalPartAggregationEdge:
     elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      cursor:
+        resolver: object
+      node:
+        resolver: object
   ElectricalPartConnection:
     elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver: object
+      nodes:
+        resolver: object
+      page_info:
+        resolver: object
+      total_edge_count:
+        resolver: object
   ElectricalPartEdge:
     elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      cursor:
+        resolver: object
+      node:
+        resolver: object
   ElectricalPartGroupedBy:
     graphql_fields_by_name:
       created_at:
@@ -3319,12 +3397,38 @@ object_types_by_name:
     source_type: Manufacturer
   ManufacturerAggregationConnection:
     elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver: object
+      nodes:
+        resolver: object
+      page_info:
+        resolver: object
   ManufacturerAggregationEdge:
     elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      cursor:
+        resolver: object
+      node:
+        resolver: object
   ManufacturerConnection:
     elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver: object
+      nodes:
+        resolver: object
+      page_info:
+        resolver: object
+      total_edge_count:
+        resolver: object
   ManufacturerEdge:
     elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      cursor:
+        resolver: object
+      node:
+        resolver: object
   ManufacturerGroupedBy:
     graphql_fields_by_name:
       created_at:
@@ -3398,12 +3502,38 @@ object_types_by_name:
     source_type: MechanicalPart
   MechanicalPartAggregationConnection:
     elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver: object
+      nodes:
+        resolver: object
+      page_info:
+        resolver: object
   MechanicalPartAggregationEdge:
     elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      cursor:
+        resolver: object
+      node:
+        resolver: object
   MechanicalPartConnection:
     elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver: object
+      nodes:
+        resolver: object
+      page_info:
+        resolver: object
+      total_edge_count:
+        resolver: object
   MechanicalPartEdge:
     elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      cursor:
+        resolver: object
+      node:
+        resolver: object
   MechanicalPartGroupedBy:
     graphql_fields_by_name:
       created_at:
@@ -3625,12 +3755,38 @@ object_types_by_name:
     source_type: NamedEntity
   NamedEntityAggregationConnection:
     elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver: object
+      nodes:
+        resolver: object
+      page_info:
+        resolver: object
   NamedEntityAggregationEdge:
     elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      cursor:
+        resolver: object
+      node:
+        resolver: object
   NamedEntityConnection:
     elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver: object
+      nodes:
+        resolver: object
+      page_info:
+        resolver: object
+      total_edge_count:
+        resolver: object
   NamedEntityEdge:
     elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      cursor:
+        resolver: object
+      node:
+        resolver: object
   NamedEntityFilterInput:
     graphql_fields_by_name:
       amount_cents2:
@@ -3765,6 +3921,15 @@ object_types_by_name:
         resolver: object
     graphql_only_return_type: true
   PageInfo:
+    graphql_fields_by_name:
+      end_cursor:
+        resolver: object
+      has_next_page:
+        resolver: object
+      has_previous_page:
+        resolver: object
+      start_cursor:
+        resolver: object
     graphql_only_return_type: true
   Part:
     graphql_fields_by_name:
@@ -3807,12 +3972,38 @@ object_types_by_name:
     source_type: Part
   PartAggregationConnection:
     elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver: object
+      nodes:
+        resolver: object
+      page_info:
+        resolver: object
   PartAggregationEdge:
     elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      cursor:
+        resolver: object
+      node:
+        resolver: object
   PartConnection:
     elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver: object
+      nodes:
+        resolver: object
+      page_info:
+        resolver: object
+      total_edge_count:
+        resolver: object
   PartEdge:
     elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      cursor:
+        resolver: object
+      node:
+        resolver: object
   PartGroupedBy:
     graphql_fields_by_name:
       created_at:
@@ -3955,12 +4146,38 @@ object_types_by_name:
     source_type: Sponsor
   SponsorAggregationConnection:
     elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver: object
+      nodes:
+        resolver: object
+      page_info:
+        resolver: object
   SponsorAggregationEdge:
     elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      cursor:
+        resolver: object
+      node:
+        resolver: object
   SponsorConnection:
     elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver: object
+      nodes:
+        resolver: object
+      page_info:
+        resolver: object
+      total_edge_count:
+        resolver: object
   SponsorEdge:
     elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      cursor:
+        resolver: object
+      node:
+        resolver: object
   SponsorGroupedBy:
     graphql_fields_by_name:
       name:
@@ -3987,8 +4204,22 @@ object_types_by_name:
         name_in_index: __counts
   StringConnection:
     elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver: object
+      nodes:
+        resolver: object
+      page_info:
+        resolver: object
+      total_edge_count:
+        resolver: object
   StringEdge:
     elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      cursor:
+        resolver: object
+      node:
+        resolver: object
   StringListFilterInput:
     graphql_fields_by_name:
       count:
@@ -4094,6 +4325,13 @@ object_types_by_name:
     source_type: Team
   TeamAggregationConnection:
     elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver: object
+      nodes:
+        resolver: object
+      page_info:
+        resolver: object
   TeamAggregationCurrentPlayersObjectAffiliationsSubAggregations:
     graphql_fields_by_name:
       sponsorships_nested:
@@ -4106,6 +4344,11 @@ object_types_by_name:
         resolver: object
   TeamAggregationEdge:
     elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      cursor:
+        resolver: object
+      node:
+        resolver: object
   TeamAggregationNestedFields2SubAggregations:
     graphql_fields_by_name:
       current_players:
@@ -4159,6 +4402,15 @@ object_types_by_name:
         resolver: object
   TeamConnection:
     elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver: object
+      nodes:
+        resolver: object
+      page_info:
+        resolver: object
+      total_edge_count:
+        resolver: object
   TeamDetailsAggregatedValues:
     graphql_fields_by_name:
       count:
@@ -4171,6 +4423,11 @@ object_types_by_name:
         resolver: object
   TeamEdge:
     elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      cursor:
+        resolver: object
+      node:
+        resolver: object
   TeamFilterInput:
     graphql_fields_by_name:
       nested_fields:
@@ -4203,6 +4460,9 @@ object_types_by_name:
         resolver: object
   TeamMoneySubAggregationConnection:
     elasticgraph_category: nested_sub_aggregation_connection
+    graphql_fields_by_name:
+      nodes:
+        resolver: object
   TeamNestedFields:
     graphql_fields_by_name:
       seasons:
@@ -4221,6 +4481,9 @@ object_types_by_name:
         resolver: object
   TeamPlayerPlayerSeasonSubAggregationConnection:
     elasticgraph_category: nested_sub_aggregation_connection
+    graphql_fields_by_name:
+      nodes:
+        resolver: object
   TeamPlayerSeasonSubAggregation:
     graphql_fields_by_name:
       aggregated_values:
@@ -4231,6 +4494,9 @@ object_types_by_name:
         resolver: object
   TeamPlayerSeasonSubAggregationConnection:
     elasticgraph_category: nested_sub_aggregation_connection
+    graphql_fields_by_name:
+      nodes:
+        resolver: object
   TeamPlayerSponsorshipSubAggregation:
     graphql_fields_by_name:
       aggregated_values:
@@ -4241,6 +4507,9 @@ object_types_by_name:
         resolver: object
   TeamPlayerSponsorshipSubAggregationConnection:
     elasticgraph_category: nested_sub_aggregation_connection
+    graphql_fields_by_name:
+      nodes:
+        resolver: object
   TeamPlayerSubAggregation:
     graphql_fields_by_name:
       aggregated_values:
@@ -4257,6 +4526,9 @@ object_types_by_name:
         resolver: object
   TeamPlayerSubAggregationConnection:
     elasticgraph_category: nested_sub_aggregation_connection
+    graphql_fields_by_name:
+      nodes:
+        resolver: object
   TeamPlayerSubAggregationSubAggregations:
     graphql_fields_by_name:
       affiliations:
@@ -4425,6 +4697,9 @@ object_types_by_name:
         resolver: object
   TeamSponsorshipSubAggregationConnection:
     elasticgraph_category: nested_sub_aggregation_connection
+    graphql_fields_by_name:
+      nodes:
+        resolver: object
   TeamTeamSeasonPlayerPlayerSeasonSubAggregation:
     graphql_fields_by_name:
       aggregated_values:
@@ -4435,6 +4710,9 @@ object_types_by_name:
         resolver: object
   TeamTeamSeasonPlayerPlayerSeasonSubAggregationConnection:
     elasticgraph_category: nested_sub_aggregation_connection
+    graphql_fields_by_name:
+      nodes:
+        resolver: object
   TeamTeamSeasonPlayerSeasonSubAggregation:
     graphql_fields_by_name:
       aggregated_values:
@@ -4445,6 +4723,9 @@ object_types_by_name:
         resolver: object
   TeamTeamSeasonPlayerSeasonSubAggregationConnection:
     elasticgraph_category: nested_sub_aggregation_connection
+    graphql_fields_by_name:
+      nodes:
+        resolver: object
   TeamTeamSeasonPlayerSponsorshipSubAggregation:
     graphql_fields_by_name:
       aggregated_values:
@@ -4455,6 +4736,9 @@ object_types_by_name:
         resolver: object
   TeamTeamSeasonPlayerSponsorshipSubAggregationConnection:
     elasticgraph_category: nested_sub_aggregation_connection
+    graphql_fields_by_name:
+      nodes:
+        resolver: object
   TeamTeamSeasonPlayerSubAggregation:
     graphql_fields_by_name:
       aggregated_values:
@@ -4471,6 +4755,9 @@ object_types_by_name:
         resolver: object
   TeamTeamSeasonPlayerSubAggregationConnection:
     elasticgraph_category: nested_sub_aggregation_connection
+    graphql_fields_by_name:
+      nodes:
+        resolver: object
   TeamTeamSeasonPlayerSubAggregationSubAggregations:
     graphql_fields_by_name:
       affiliations:
@@ -4487,6 +4774,9 @@ object_types_by_name:
         resolver: object
   TeamTeamSeasonSponsorshipSubAggregationConnection:
     elasticgraph_category: nested_sub_aggregation_connection
+    graphql_fields_by_name:
+      nodes:
+        resolver: object
   TeamTeamSeasonSubAggregation:
     graphql_fields_by_name:
       aggregated_values:
@@ -4499,6 +4789,9 @@ object_types_by_name:
         resolver: object
   TeamTeamSeasonSubAggregationConnection:
     elasticgraph_category: nested_sub_aggregation_connection
+    graphql_fields_by_name:
+      nodes:
+        resolver: object
   TeamTeamSeasonSubAggregationPlayersObjectAffiliationsSubAggregations:
     graphql_fields_by_name:
       sponsorships_nested:
@@ -4768,10 +5061,31 @@ object_types_by_name:
     source_type: Widget
   WidgetAggregationConnection:
     elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver: object
+      nodes:
+        resolver: object
+      page_info:
+        resolver: object
   WidgetAggregationEdge:
     elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      cursor:
+        resolver: object
+      node:
+        resolver: object
   WidgetConnection:
     elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver: object
+      nodes:
+        resolver: object
+      page_info:
+        resolver: object
+      total_edge_count:
+        resolver: object
   WidgetCurrency:
     graphql_fields_by_name:
       widget_names:
@@ -4854,12 +5168,38 @@ object_types_by_name:
     source_type: WidgetCurrency
   WidgetCurrencyAggregationConnection:
     elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver: object
+      nodes:
+        resolver: object
+      page_info:
+        resolver: object
   WidgetCurrencyAggregationEdge:
     elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      cursor:
+        resolver: object
+      node:
+        resolver: object
   WidgetCurrencyConnection:
     elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver: object
+      nodes:
+        resolver: object
+      page_info:
+        resolver: object
+      total_edge_count:
+        resolver: object
   WidgetCurrencyEdge:
     elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      cursor:
+        resolver: object
+      node:
+        resolver: object
   WidgetCurrencyFilterInput:
     graphql_fields_by_name:
       widget_names:
@@ -4891,6 +5231,11 @@ object_types_by_name:
         resolver: object
   WidgetEdge:
     elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      cursor:
+        resolver: object
+      node:
+        resolver: object
   WidgetFilterInput:
     graphql_fields_by_name:
       amount_cents2:
@@ -5146,12 +5491,38 @@ object_types_by_name:
     source_type: WidgetOrAddress
   WidgetOrAddressAggregationConnection:
     elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver: object
+      nodes:
+        resolver: object
+      page_info:
+        resolver: object
   WidgetOrAddressAggregationEdge:
     elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      cursor:
+        resolver: object
+      node:
+        resolver: object
   WidgetOrAddressConnection:
     elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver: object
+      nodes:
+        resolver: object
+      page_info:
+        resolver: object
+      total_edge_count:
+        resolver: object
   WidgetOrAddressEdge:
     elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      cursor:
+        resolver: object
+      node:
+        resolver: object
   WidgetOrAddressFilterInput:
     graphql_fields_by_name:
       amount_cents2:
@@ -5313,12 +5684,38 @@ object_types_by_name:
     source_type: WidgetWorkspace
   WidgetWorkspaceAggregationConnection:
     elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver: object
+      nodes:
+        resolver: object
+      page_info:
+        resolver: object
   WidgetWorkspaceAggregationEdge:
     elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      cursor:
+        resolver: object
+      node:
+        resolver: object
   WidgetWorkspaceConnection:
     elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver: object
+      nodes:
+        resolver: object
+      page_info:
+        resolver: object
+      total_edge_count:
+        resolver: object
   WidgetWorkspaceEdge:
     elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      cursor:
+        resolver: object
+      node:
+        resolver: object
   WidgetWorkspaceGroupedBy:
     graphql_fields_by_name:
       name:

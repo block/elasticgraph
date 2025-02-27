@@ -137,30 +137,6 @@ module ElasticGraph
             end
           end
 
-          describe "#can_resolve?" do
-            it "returns `false` if the field name is not defined in the schema elements" do
-              expect(can_resolve?(field: :last_name)).to be false
-            end
-
-            it "returns `false` if no method matching the field name is defined on the object" do
-              expect(can_resolve?(field: :age)).to be false
-            end
-
-            it "returns `true` if the field name is a defined schema element and the object has a matching method" do
-              expect(can_resolve?(field: :name)).to be true
-              expect(can_resolve?(field: :first_name)).to be true
-            end
-
-            it "considers if the method is defined using the canonical form of the field name" do
-              expect(can_resolve?(name_form: :camelCase, field: :firstName)).to be true
-            end
-
-            def can_resolve?(**options)
-              person, field = person_object_and_schema_field(**options)
-              person.can_resolve?(field: field, object: person)
-            end
-          end
-
           define_method :person_object_and_schema_field do |
             field:, name_form: :snake_case, overrides: {},
             name: "John", birth_date: "2002-09-01", quote: "To be, or not to be, that is the question."

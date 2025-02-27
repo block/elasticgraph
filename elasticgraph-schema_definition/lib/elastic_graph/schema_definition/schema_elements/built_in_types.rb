@@ -393,6 +393,8 @@ module ElasticGraph
           # to go from non-null to null, but is not a breaking change to make it non-null
           # in the future.
           register_framework_object_type "PageInfo" do |t|
+            t.default_graphql_resolver = :object
+
             t.documentation <<~EOS
               Provides information about the specific fetched page. This implements the `PageInfo`
               specification from the [Relay GraphQL Cursor Connections

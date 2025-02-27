@@ -109,7 +109,6 @@ module ElasticGraph
             return @named_resolvers.fetch(resolver_name)
           end
 
-          return object if object.respond_to?(:can_resolve?) && object.can_resolve?(field: field, object: object)
           resolver = @resolvers.find { |r| r.can_resolve?(field: field, object: object) }
           resolver || yield
         end

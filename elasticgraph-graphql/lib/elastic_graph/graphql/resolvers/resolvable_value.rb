@@ -32,11 +32,6 @@ module ElasticGraph
           public_send(method_name, **args_to_canonical_form(args))
         end
 
-        def can_resolve?(field:, object:)
-          method_name = schema_element_names.canonical_name_for(field.name)
-          !!method_name && respond_to?(method_name)
-        end
-
         private
 
         def args_to_canonical_form(args)

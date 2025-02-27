@@ -46,6 +46,7 @@ module ElasticGraph
               # Record metadata that is necessary for elasticgraph-graphql to correctly recognize and handle
               # this sub-aggregation correctly.
               t.override_runtime_metadata(elasticgraph_category: :nested_sub_aggregation_connection)
+              t.default_graphql_resolver = :object
             end
           end
 

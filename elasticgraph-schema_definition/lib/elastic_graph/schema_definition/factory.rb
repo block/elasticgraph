@@ -434,6 +434,7 @@ module ElasticGraph
         type_ref = @state.type_ref(type_name)
         new_object_type type_ref.as_edge.name do |t|
           t.relay_pagination_type = true
+          t.default_graphql_resolver = :object
           t.override_runtime_metadata(elasticgraph_category: :relay_edge)
 
           t.documentation <<~EOS
@@ -461,6 +462,7 @@ module ElasticGraph
         type_ref = @state.type_ref(type_name)
         new_object_type type_ref.as_connection.name do |t|
           t.relay_pagination_type = true
+          t.default_graphql_resolver = :object
           t.override_runtime_metadata(elasticgraph_category: :relay_connection)
 
           if support_pagination
