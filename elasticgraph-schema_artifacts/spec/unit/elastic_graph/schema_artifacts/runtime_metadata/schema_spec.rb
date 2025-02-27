@@ -54,27 +54,30 @@ module ElasticGraph
                 ],
                 graphql_fields_by_name: {
                   "name_graphql" => GraphQLField.new(
-                    name_in_index: "name_index",
                     computation_detail: nil,
-                    relation: nil
+                    name_in_index: "name_index",
+                    relation: nil,
+                    resolver: :self
                   ),
                   "parent" => GraphQLField.new(
-                    name_in_index: "parent",
                     computation_detail: nil,
+                    name_in_index: "parent",
                     relation: Relation.new(
                       foreign_key: "grandparents.parents.some_id",
                       direction: :out,
                       additional_filter: {"flag_field" => {"equalToAnyOf" => [true]}},
                       foreign_key_nested_paths: ["grandparents", "grandparents.parents"]
-                    )
+                    ),
+                    resolver: :self
                   ),
                   "sum" => GraphQLField.new(
-                    name_in_index: "sum",
                     computation_detail: ComputationDetail.new(
                       empty_bucket_value: 0,
                       function: :sum
                     ),
-                    relation: nil
+                    name_in_index: "sum",
+                    relation: nil,
+                    resolver: :self
                   )
                 },
                 elasticgraph_category: :some_category,
@@ -167,7 +170,8 @@ module ElasticGraph
                 ],
                 "graphql_fields_by_name" => {
                   "name_graphql" => {
-                    "name_in_index" => "name_index"
+                    "name_in_index" => "name_index",
+                    "resolver" => "self"
                   },
                   "parent" => {
                     "relation" => {
@@ -175,13 +179,15 @@ module ElasticGraph
                       "direction" => "out",
                       "additional_filter" => {"flag_field" => {"equalToAnyOf" => [true]}},
                       "foreign_key_nested_paths" => ["grandparents", "grandparents.parents"]
-                    }
+                    },
+                    "resolver" => "self"
                   },
                   "sum" => {
                     "computation_detail" => {
                       "empty_bucket_value" => 0,
                       "function" => "sum"
-                    }
+                    },
+                    "resolver" => "self"
                   }
                 },
                 "elasticgraph_category" => "some_category",
@@ -293,7 +299,8 @@ module ElasticGraph
               "name_graphql" => GraphQLField.new(
                 name_in_index: "name_index",
                 computation_detail: nil,
-                relation: nil
+                relation: nil,
+                resolver: :self
               )
             }),
             "NoMetadata" => object_type_with

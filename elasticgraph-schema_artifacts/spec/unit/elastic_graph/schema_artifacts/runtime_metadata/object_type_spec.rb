@@ -15,22 +15,6 @@ module ElasticGraph
       RSpec.describe ObjectType do
         include RuntimeMetadataSupport
 
-        it "ignores fields that have no meaningful runtime metadata" do
-          object_type = object_type_with(graphql_fields_by_name: {
-            "has_relation" => graphql_field_with(name_in_index: nil, relation: relation_with),
-            "has_computation_detail" => graphql_field_with(computation_detail: :sum),
-            "has_alternate_index_name" => graphql_field_with(name_in_index: "alternate"),
-            "has_nil_index_name" => graphql_field_with(name_in_index: nil),
-            "has_same_index_name" => graphql_field_with(name_in_index: "has_same_index_name")
-          })
-
-          expect(object_type.graphql_fields_by_name.keys).to contain_exactly(
-            "has_relation",
-            "has_computation_detail",
-            "has_alternate_index_name"
-          )
-        end
-
         it "builds from a minimal hash" do
           type = ObjectType.from_hash({})
 
@@ -80,6 +64,21 @@ module ElasticGraph
           })
 
           expect(ObjectType.from_hash(dumped)).to eq(type)
+        end
+
+        it "omits GraphQL fields that have no meaningful metadata" do
+          type = object_type_with(
+            graphql_fields_by_name: {
+              "foo1" => graphql_field_with(name_in_index: "foo1"),
+              "foo2" => graphql_field_with(name_in_index: "foo2_in_index"),
+              "foo3" => graphql_field_with(name_in_index: "foo3", relation: relation_with),
+              "foo4" => graphql_field_with(name_in_index: "foo4", computation_detail: computation_detail_with),
+              "foo5" => graphql_field_with(resolver: :other, name_in_index: "foo5"),
+              "foo6" => graphql_field_with(name_in_index: nil)
+            }
+          )
+
+          expect(type.graphql_fields_by_name.keys).to contain_exactly("foo2", "foo3", "foo4", "foo5")
         end
       end
     end
