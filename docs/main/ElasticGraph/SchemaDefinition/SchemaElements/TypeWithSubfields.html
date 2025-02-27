@@ -462,17 +462,17 @@ the call to this method can be removed.</p>
       <pre class="lines">
 
 
+236
+237
 238
 239
 240
 241
 242
-243
-244
-245</pre>
+243</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/type_with_subfields.rb', line 238</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/type_with_subfields.rb', line 236</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_deleted_field'>deleted_field</span><span class='lparen'>(</span><span class='id identifier rubyid_field_name'>field_name</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_register_deleted_field'>register_deleted_field</span><span class='lparen'>(</span>
@@ -822,9 +822,7 @@ ElasticGraph will infer field sortability based on the field’s GraphQL type an
 216
 217
 218
-219
-220
-221</pre>
+219</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/type_with_subfields.rb', line 192</span>
@@ -836,8 +834,6 @@ ElasticGraph will infer field sortability based on the field’s GraphQL type an
       <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>the `schema_element_name_overrides` option (on `ElasticGraph::SchemaDefinition::RakeTasks.new`) to </span><span class='tstring_end'>&quot;</span></span> \
       <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>configure an alternate name for the `</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>` operator.</span><span class='tstring_end'>&quot;</span></span>
   <span class='kw'>end</span>
-
-  <span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='label'>name_in_index:</span> <span class='kw'>nil</span><span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_graphql_only'>graphql_only</span>
 
   <span class='id identifier rubyid_field_factory'>field_factory</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span>
     <span class='label'>name:</span> <span class='id identifier rubyid_name'>name</span><span class='comma'>,</span>
@@ -1072,6 +1068,8 @@ differently named field in the index.</p>
       <pre class="lines">
 
 
+298
+299
 300
 301
 302
@@ -1092,12 +1090,10 @@ differently named field in the index.</p>
 317
 318
 319
-320
-321
-322</pre>
+320</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/type_with_subfields.rb', line 300</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/type_with_subfields.rb', line 298</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_paginated_collection_field'>paginated_collection_field</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_element_type'>element_type</span><span class='comma'>,</span> <span class='label'>name_in_index:</span> <span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='label'>singular:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_element_type_ref'>element_type_ref</span> <span class='op'>=</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_type_ref'>type_ref</span><span class='lparen'>(</span><span class='id identifier rubyid_element_type'>element_type</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_final_form'>to_final_form</span>
@@ -1291,6 +1287,8 @@ the generated aggregations field</p>
       <pre class="lines">
 
 
+395
+396
 397
 398
 399
@@ -1319,12 +1317,10 @@ the generated aggregations field</p>
 422
 423
 424
-425
-426
-427</pre>
+425</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/type_with_subfields.rb', line 397</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/type_with_subfields.rb', line 395</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_relates_to_many'>relates_to_many</span><span class='lparen'>(</span><span class='id identifier rubyid_field_name'>field_name</span><span class='comma'>,</span> <span class='id identifier rubyid_type'>type</span><span class='comma'>,</span> <span class='label'>via:</span><span class='comma'>,</span> <span class='label'>dir:</span><span class='comma'>,</span> <span class='label'>singular:</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_foreign_key_type'>foreign_key_type</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_dir'>dir</span> <span class='op'>==</span> <span class='symbol'>:out</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>[ID!]!</span><span class='tstring_end'>&quot;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ID</span><span class='tstring_end'>&quot;</span></span>
@@ -1505,13 +1501,13 @@ the related type.</p>
       <pre class="lines">
 
 
+353
+354
 355
-356
-357
-358</pre>
+356</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/type_with_subfields.rb', line 355</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/type_with_subfields.rb', line 353</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_relates_to_one'>relates_to_one</span><span class='lparen'>(</span><span class='id identifier rubyid_field_name'>field_name</span><span class='comma'>,</span> <span class='id identifier rubyid_type'>type</span><span class='comma'>,</span> <span class='label'>via:</span><span class='comma'>,</span> <span class='label'>dir:</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_foreign_key_type'>foreign_key_type</span> <span class='op'>=</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_type_ref'>type_ref</span><span class='lparen'>(</span><span class='id identifier rubyid_type'>type</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_non_null?'>non_null?</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ID!</span><span class='tstring_end'>&quot;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ID</span><span class='tstring_end'>&quot;</span></span>
@@ -1590,17 +1586,17 @@ the call to this method can be removed.</p>
       <pre class="lines">
 
 
+260
+261
 262
 263
 264
 265
 266
-267
-268
-269</pre>
+267</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/type_with_subfields.rb', line 262</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/type_with_subfields.rb', line 260</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_renamed_from'>renamed_from</span><span class='lparen'>(</span><span class='id identifier rubyid_old_name'>old_name</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_register_renamed_type'>register_renamed_type</span><span class='lparen'>(</span>
@@ -1620,7 +1616,7 @@ the call to this method can be removed.</p>
 </div>
 
       <div id="footer">
-  Generated on Wed Feb 26 15:39:31 2025 by
+  Generated on Thu Feb 27 16:52:13 2025 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.37 (ruby-3.3.6).
 </div>
