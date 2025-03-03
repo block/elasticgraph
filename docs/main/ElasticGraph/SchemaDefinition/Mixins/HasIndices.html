@@ -102,6 +102,37 @@
 
 
 
+  <h2>Instance Attribute Summary <small><a href="#" class="summary_toggle">collapse</a></small></h2>
+  <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#default_graphql_resolver-instance_method" title="#default_graphql_resolver (instance method)">#<strong>default_graphql_resolver</strong>  &#x21d2; ::Symbol<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>The default GraphQL resolver to use for fields on this type.</p>
+</div></span>
+  
+</li>
+
+    
+  </ul>
+
 
 
 
@@ -301,6 +332,70 @@
   
 
 
+  <div id="instance_attr_details" class="attr_details">
+    <h2>Instance Attribute Details</h2>
+    
+      
+      <span id="default_graphql_resolver=-instance_method"></span>
+      <div class="method_details first">
+  <h3 class="signature first" id="default_graphql_resolver-instance_method">
+  
+    #<strong>default_graphql_resolver</strong>  &#x21d2; <tt>::Symbol</tt><sup>?</sup> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns the default GraphQL resolver to use for fields on this type.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>::Symbol</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>the default GraphQL resolver to use for fields on this type</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+22
+23
+24</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/has_indices.rb', line 22</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_default_graphql_resolver'>default_graphql_resolver</span>
+  <span class='ivar'>@default_graphql_resolver</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
 
   <div id="instance_method_details" class="method_details_list">
     <h2>Instance Method Details</h2>
@@ -459,10 +554,6 @@ the source of the <code>id</code> of the derived type, and the provided block fo
       <pre class="lines">
 
 
-131
-132
-133
-134
 135
 136
 137
@@ -474,10 +565,14 @@ the source of the <code>id</code> of the derived type, and the provided block fo
 143
 144
 145
-146</pre>
+146
+147
+148
+149
+150</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/has_indices.rb', line 131</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/has_indices.rb', line 135</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_derive_indexed_type_fields'>derive_indexed_type_fields</span><span class='lparen'>(</span>
   <span class='id identifier rubyid_name'>name</span><span class='comma'>,</span>
@@ -542,12 +637,12 @@ the source of the <code>id</code> of the derived type, and the provided block fo
       <pre class="lines">
 
 
-149
-150
-151</pre>
+153
+154
+155</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/has_indices.rb', line 149</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/has_indices.rb', line 153</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_derived_indexed_types'>derived_indexed_types</span>
   <span class='ivar'>@derived_indexed_types</span> <span class='op'>||=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
@@ -683,12 +778,12 @@ for a list of valid settings, but be sure to omit the <code>index.</code> prefix
       <pre class="lines">
 
 
-65
-66
-67</pre>
+69
+70
+71</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/has_indices.rb', line 65</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/has_indices.rb', line 69</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_index'>index</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_settings'>settings</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_indices'>indices</span><span class='period'>.</span><span class='id identifier rubyid_replace'>replace</span><span class='lparen'>(</span><span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="../Indexing.html" title="ElasticGraph::SchemaDefinition::Indexing (module)">Indexing</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Indexing/Index.html" title="ElasticGraph::SchemaDefinition::Indexing::Index (class)">Index</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="../Indexing/Index.html#initialize-instance_method" title="ElasticGraph::SchemaDefinition::Indexing::Index#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_settings'>settings</span><span class='comma'>,</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='comma'>,</span> <span class='kw'>self</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -740,12 +835,12 @@ for a list of valid settings, but be sure to omit the <code>index.</code> prefix
       <pre class="lines">
 
 
-77
-78
-79</pre>
+81
+82
+83</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/has_indices.rb', line 77</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/has_indices.rb', line 81</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_indexed?'>indexed?</span>
   <span class='id identifier rubyid_indices'>indices</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span>
@@ -782,12 +877,12 @@ for a list of valid settings, but be sure to omit the <code>index.</code> prefix
       <pre class="lines">
 
 
-158
-159
-160</pre>
+162
+163
+164</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/has_indices.rb', line 158</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/has_indices.rb', line 162</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_override_runtime_metadata'>override_runtime_metadata</span><span class='lparen'>(</span><span class='op'>**</span><span class='id identifier rubyid_overrides'>overrides</span><span class='rparen'>)</span>
   <span class='ivar'>@runtime_metadata_overrides</span><span class='period'>.</span><span class='id identifier rubyid_merge!'>merge!</span><span class='lparen'>(</span><span class='id identifier rubyid_overrides'>overrides</span><span class='rparen'>)</span>
@@ -839,12 +934,12 @@ for a list of valid settings, but be sure to omit the <code>index.</code> prefix
       <pre class="lines">
 
 
-216
-217
-218</pre>
+220
+221
+222</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/has_indices.rb', line 216</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/has_indices.rb', line 220</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_plural_root_query_field_name'>plural_root_query_field_name</span>
   <span class='ivar'>@plural_root_query_field_name</span> <span class='op'>||</span> <span class='id identifier rubyid_naively_pluralize_type_name'>naively_pluralize_type_name</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
@@ -972,14 +1067,14 @@ or <code>snake_case</code>, depending on configuration).</p>
       <pre class="lines">
 
 
-209
-210
-211
-212
-213</pre>
+213
+214
+215
+216
+217</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/has_indices.rb', line 209</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/has_indices.rb', line 213</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_root_query_fields'>root_query_fields</span><span class='lparen'>(</span><span class='label'>plural:</span><span class='comma'>,</span> <span class='label'>singular:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_customization_block'>customization_block</span><span class='rparen'>)</span>
   <span class='ivar'>@plural_root_query_field_name</span> <span class='op'>=</span> <span class='id identifier rubyid_plural'>plural</span>
@@ -1037,12 +1132,12 @@ aggregations of this indexed type. If not provided, will derive it from the type
       <pre class="lines">
 
 
-223
-224
-225</pre>
+227
+228
+229</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/has_indices.rb', line 223</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/has_indices.rb', line 227</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_singular_root_query_field_name'>singular_root_query_field_name</span>
   <span class='ivar'>@singular_root_query_field_name</span> <span class='op'>||</span> <span class='id identifier rubyid_to_field_name'>to_field_name</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
@@ -1057,7 +1152,7 @@ aggregations of this indexed type. If not provided, will derive it from the type
 </div>
 
       <div id="footer">
-  Generated on Mon Mar  3 18:22:23 2025 by
+  Generated on Mon Mar  3 18:23:01 2025 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.37 (ruby-3.3.6).
 </div>

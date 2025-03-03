@@ -237,6 +237,32 @@
       <li class="public ">
   <span class="summary_signature">
     
+      <a href="#resolver-instance_method" title="#resolver (instance method)">#<strong>resolver</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Returns the value of attribute resolver.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#schema_def_state-instance_method" title="#schema_def_state (instance method)">#<strong>schema_def_state</strong>  &#x21d2; State </a>
     
 
@@ -1780,7 +1806,8 @@
 1099
 1100
 1101
-1102</pre>
+1102
+1103</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb', line 89</span>
@@ -1791,7 +1818,7 @@
   <span class='symbol'>:aggregated_values_customizations</span><span class='comma'>,</span> <span class='symbol'>:sort_order_enum_value_customizations</span><span class='comma'>,</span>
   <span class='symbol'>:args</span><span class='comma'>,</span> <span class='symbol'>:sortable</span><span class='comma'>,</span> <span class='symbol'>:filterable</span><span class='comma'>,</span> <span class='symbol'>:aggregatable</span><span class='comma'>,</span> <span class='symbol'>:groupable</span><span class='comma'>,</span> <span class='symbol'>:graphql_only</span><span class='comma'>,</span> <span class='symbol'>:source</span><span class='comma'>,</span> <span class='symbol'>:runtime_field_script</span><span class='comma'>,</span> <span class='symbol'>:relationship</span><span class='comma'>,</span> <span class='symbol'>:singular_name</span><span class='comma'>,</span>
   <span class='symbol'>:computation_detail</span><span class='comma'>,</span> <span class='symbol'>:non_nullable_in_json_schema</span><span class='comma'>,</span> <span class='symbol'>:backing_indexing_field</span><span class='comma'>,</span> <span class='symbol'>:as_input</span><span class='comma'>,</span>
-  <span class='symbol'>:legacy_grouping_schema</span><span class='comma'>,</span> <span class='symbol'>:name_in_index</span>
+  <span class='symbol'>:legacy_grouping_schema</span><span class='comma'>,</span> <span class='symbol'>:name_in_index</span><span class='comma'>,</span> <span class='symbol'>:resolver</span>
 <span class='rparen'>)</span>
   <span class='id identifier rubyid_include'>include</span> <span class='const'><span class='object_link'><a href="../Mixins.html" title="ElasticGraph::SchemaDefinition::Mixins (module)">Mixins</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Mixins/HasDocumentation.html" title="ElasticGraph::SchemaDefinition::Mixins::HasDocumentation (module)">HasDocumentation</a></span></span>
   <span class='id identifier rubyid_include'>include</span> <span class='const'><span class='object_link'><a href="../Mixins.html" title="ElasticGraph::SchemaDefinition::Mixins (module)">Mixins</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Mixins/HasDirectives.html" title="ElasticGraph::SchemaDefinition::Mixins::HasDirectives (module)">HasDirectives</a></span></span>
@@ -1805,7 +1832,7 @@
     <span class='label'>runtime_metadata_graphql_field:</span> <span class='const'>SchemaArtifacts</span><span class='op'>::</span><span class='const'>RuntimeMetadata</span><span class='op'>::</span><span class='const'>GraphQLField</span><span class='op'>::</span><span class='const'>EMPTY</span><span class='comma'>,</span>
     <span class='label'>type_for_derived_types:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>graphql_only:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>singular:</span> <span class='kw'>nil</span><span class='comma'>,</span>
     <span class='label'>sortable:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>filterable:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>aggregatable:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>groupable:</span> <span class='kw'>nil</span><span class='comma'>,</span>
-    <span class='label'>backing_indexing_field:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>as_input:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>legacy_grouping_schema:</span> <span class='kw'>false</span>
+    <span class='label'>backing_indexing_field:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>as_input:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>legacy_grouping_schema:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>resolver:</span> <span class='kw'>nil</span>
   <span class='rparen'>)</span>
     <span class='id identifier rubyid_type_ref'>type_ref</span> <span class='op'>=</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_type_ref'>type_ref</span><span class='lparen'>(</span><span class='id identifier rubyid_type'>type</span><span class='rparen'>)</span>
     <span class='kw'>super</span><span class='lparen'>(</span>
@@ -1836,7 +1863,8 @@
       <span class='label'>non_nullable_in_json_schema:</span> <span class='kw'>false</span><span class='comma'>,</span>
       <span class='label'>backing_indexing_field:</span> <span class='id identifier rubyid_backing_indexing_field'>backing_indexing_field</span><span class='comma'>,</span>
       <span class='label'>as_input:</span> <span class='id identifier rubyid_as_input'>as_input</span><span class='comma'>,</span>
-      <span class='label'>legacy_grouping_schema:</span> <span class='id identifier rubyid_legacy_grouping_schema'>legacy_grouping_schema</span>
+      <span class='label'>legacy_grouping_schema:</span> <span class='id identifier rubyid_legacy_grouping_schema'>legacy_grouping_schema</span><span class='comma'>,</span>
+      <span class='label'>resolver:</span> <span class='id identifier rubyid_resolver'>resolver</span>
     <span class='rparen'>)</span>
 
     <span class='kw'>if</span> <span class='id identifier rubyid_name'>name</span> <span class='op'>!=</span> <span class='id identifier rubyid_name_in_index'>name_in_index</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_name_in_index'>name_in_index</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='id identifier rubyid_graphql_only'>graphql_only</span>
@@ -2625,7 +2653,7 @@
       <span class='label'>name_in_index:</span> <span class='id identifier rubyid_name_in_index'>name_in_index</span><span class='comma'>,</span>
       <span class='label'>computation_detail:</span> <span class='id identifier rubyid_computation_detail'>computation_detail</span><span class='comma'>,</span>
       <span class='label'>relation:</span> <span class='id identifier rubyid_relationship'>relationship</span><span class='op'>&amp;.</span><span class='id identifier rubyid_runtime_metadata'>runtime_metadata</span><span class='comma'>,</span>
-      <span class='label'>resolver:</span> <span class='kw'>nil</span>
+      <span class='label'>resolver:</span> <span class='id identifier rubyid_resolver'>resolver</span>
     <span class='rparen'>)</span>
   <span class='kw'>end</span>
 
@@ -3861,7 +3889,8 @@
 1099
 1100
 1101
-1102</pre>
+1102
+1103</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb', line 89</span>
@@ -3872,7 +3901,7 @@
   <span class='symbol'>:aggregated_values_customizations</span><span class='comma'>,</span> <span class='symbol'>:sort_order_enum_value_customizations</span><span class='comma'>,</span>
   <span class='symbol'>:args</span><span class='comma'>,</span> <span class='symbol'>:sortable</span><span class='comma'>,</span> <span class='symbol'>:filterable</span><span class='comma'>,</span> <span class='symbol'>:aggregatable</span><span class='comma'>,</span> <span class='symbol'>:groupable</span><span class='comma'>,</span> <span class='symbol'>:graphql_only</span><span class='comma'>,</span> <span class='symbol'>:source</span><span class='comma'>,</span> <span class='symbol'>:runtime_field_script</span><span class='comma'>,</span> <span class='symbol'>:relationship</span><span class='comma'>,</span> <span class='symbol'>:singular_name</span><span class='comma'>,</span>
   <span class='symbol'>:computation_detail</span><span class='comma'>,</span> <span class='symbol'>:non_nullable_in_json_schema</span><span class='comma'>,</span> <span class='symbol'>:backing_indexing_field</span><span class='comma'>,</span> <span class='symbol'>:as_input</span><span class='comma'>,</span>
-  <span class='symbol'>:legacy_grouping_schema</span><span class='comma'>,</span> <span class='symbol'>:name_in_index</span>
+  <span class='symbol'>:legacy_grouping_schema</span><span class='comma'>,</span> <span class='symbol'>:name_in_index</span><span class='comma'>,</span> <span class='symbol'>:resolver</span>
 <span class='rparen'>)</span>
   <span class='id identifier rubyid_include'>include</span> <span class='const'><span class='object_link'><a href="../Mixins.html" title="ElasticGraph::SchemaDefinition::Mixins (module)">Mixins</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Mixins/HasDocumentation.html" title="ElasticGraph::SchemaDefinition::Mixins::HasDocumentation (module)">HasDocumentation</a></span></span>
   <span class='id identifier rubyid_include'>include</span> <span class='const'><span class='object_link'><a href="../Mixins.html" title="ElasticGraph::SchemaDefinition::Mixins (module)">Mixins</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Mixins/HasDirectives.html" title="ElasticGraph::SchemaDefinition::Mixins::HasDirectives (module)">HasDirectives</a></span></span>
@@ -3886,7 +3915,7 @@
     <span class='label'>runtime_metadata_graphql_field:</span> <span class='const'>SchemaArtifacts</span><span class='op'>::</span><span class='const'>RuntimeMetadata</span><span class='op'>::</span><span class='const'>GraphQLField</span><span class='op'>::</span><span class='const'>EMPTY</span><span class='comma'>,</span>
     <span class='label'>type_for_derived_types:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>graphql_only:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>singular:</span> <span class='kw'>nil</span><span class='comma'>,</span>
     <span class='label'>sortable:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>filterable:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>aggregatable:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>groupable:</span> <span class='kw'>nil</span><span class='comma'>,</span>
-    <span class='label'>backing_indexing_field:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>as_input:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>legacy_grouping_schema:</span> <span class='kw'>false</span>
+    <span class='label'>backing_indexing_field:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>as_input:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>legacy_grouping_schema:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>resolver:</span> <span class='kw'>nil</span>
   <span class='rparen'>)</span>
     <span class='id identifier rubyid_type_ref'>type_ref</span> <span class='op'>=</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_type_ref'>type_ref</span><span class='lparen'>(</span><span class='id identifier rubyid_type'>type</span><span class='rparen'>)</span>
     <span class='kw'>super</span><span class='lparen'>(</span>
@@ -3917,7 +3946,8 @@
       <span class='label'>non_nullable_in_json_schema:</span> <span class='kw'>false</span><span class='comma'>,</span>
       <span class='label'>backing_indexing_field:</span> <span class='id identifier rubyid_backing_indexing_field'>backing_indexing_field</span><span class='comma'>,</span>
       <span class='label'>as_input:</span> <span class='id identifier rubyid_as_input'>as_input</span><span class='comma'>,</span>
-      <span class='label'>legacy_grouping_schema:</span> <span class='id identifier rubyid_legacy_grouping_schema'>legacy_grouping_schema</span>
+      <span class='label'>legacy_grouping_schema:</span> <span class='id identifier rubyid_legacy_grouping_schema'>legacy_grouping_schema</span><span class='comma'>,</span>
+      <span class='label'>resolver:</span> <span class='id identifier rubyid_resolver'>resolver</span>
     <span class='rparen'>)</span>
 
     <span class='kw'>if</span> <span class='id identifier rubyid_name'>name</span> <span class='op'>!=</span> <span class='id identifier rubyid_name_in_index'>name_in_index</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_name_in_index'>name_in_index</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='id identifier rubyid_graphql_only'>graphql_only</span>
@@ -4706,7 +4736,7 @@
       <span class='label'>name_in_index:</span> <span class='id identifier rubyid_name_in_index'>name_in_index</span><span class='comma'>,</span>
       <span class='label'>computation_detail:</span> <span class='id identifier rubyid_computation_detail'>computation_detail</span><span class='comma'>,</span>
       <span class='label'>relation:</span> <span class='id identifier rubyid_relationship'>relationship</span><span class='op'>&amp;.</span><span class='id identifier rubyid_runtime_metadata'>runtime_metadata</span><span class='comma'>,</span>
-      <span class='label'>resolver:</span> <span class='kw'>nil</span>
+      <span class='label'>resolver:</span> <span class='id identifier rubyid_resolver'>resolver</span>
     <span class='rparen'>)</span>
   <span class='kw'>end</span>
 
@@ -5942,7 +5972,8 @@
 1099
 1100
 1101
-1102</pre>
+1102
+1103</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb', line 89</span>
@@ -5953,7 +5984,7 @@
   <span class='symbol'>:aggregated_values_customizations</span><span class='comma'>,</span> <span class='symbol'>:sort_order_enum_value_customizations</span><span class='comma'>,</span>
   <span class='symbol'>:args</span><span class='comma'>,</span> <span class='symbol'>:sortable</span><span class='comma'>,</span> <span class='symbol'>:filterable</span><span class='comma'>,</span> <span class='symbol'>:aggregatable</span><span class='comma'>,</span> <span class='symbol'>:groupable</span><span class='comma'>,</span> <span class='symbol'>:graphql_only</span><span class='comma'>,</span> <span class='symbol'>:source</span><span class='comma'>,</span> <span class='symbol'>:runtime_field_script</span><span class='comma'>,</span> <span class='symbol'>:relationship</span><span class='comma'>,</span> <span class='symbol'>:singular_name</span><span class='comma'>,</span>
   <span class='symbol'>:computation_detail</span><span class='comma'>,</span> <span class='symbol'>:non_nullable_in_json_schema</span><span class='comma'>,</span> <span class='symbol'>:backing_indexing_field</span><span class='comma'>,</span> <span class='symbol'>:as_input</span><span class='comma'>,</span>
-  <span class='symbol'>:legacy_grouping_schema</span><span class='comma'>,</span> <span class='symbol'>:name_in_index</span>
+  <span class='symbol'>:legacy_grouping_schema</span><span class='comma'>,</span> <span class='symbol'>:name_in_index</span><span class='comma'>,</span> <span class='symbol'>:resolver</span>
 <span class='rparen'>)</span>
   <span class='id identifier rubyid_include'>include</span> <span class='const'><span class='object_link'><a href="../Mixins.html" title="ElasticGraph::SchemaDefinition::Mixins (module)">Mixins</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Mixins/HasDocumentation.html" title="ElasticGraph::SchemaDefinition::Mixins::HasDocumentation (module)">HasDocumentation</a></span></span>
   <span class='id identifier rubyid_include'>include</span> <span class='const'><span class='object_link'><a href="../Mixins.html" title="ElasticGraph::SchemaDefinition::Mixins (module)">Mixins</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Mixins/HasDirectives.html" title="ElasticGraph::SchemaDefinition::Mixins::HasDirectives (module)">HasDirectives</a></span></span>
@@ -5967,7 +5998,7 @@
     <span class='label'>runtime_metadata_graphql_field:</span> <span class='const'>SchemaArtifacts</span><span class='op'>::</span><span class='const'>RuntimeMetadata</span><span class='op'>::</span><span class='const'>GraphQLField</span><span class='op'>::</span><span class='const'>EMPTY</span><span class='comma'>,</span>
     <span class='label'>type_for_derived_types:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>graphql_only:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>singular:</span> <span class='kw'>nil</span><span class='comma'>,</span>
     <span class='label'>sortable:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>filterable:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>aggregatable:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>groupable:</span> <span class='kw'>nil</span><span class='comma'>,</span>
-    <span class='label'>backing_indexing_field:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>as_input:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>legacy_grouping_schema:</span> <span class='kw'>false</span>
+    <span class='label'>backing_indexing_field:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>as_input:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>legacy_grouping_schema:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>resolver:</span> <span class='kw'>nil</span>
   <span class='rparen'>)</span>
     <span class='id identifier rubyid_type_ref'>type_ref</span> <span class='op'>=</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_type_ref'>type_ref</span><span class='lparen'>(</span><span class='id identifier rubyid_type'>type</span><span class='rparen'>)</span>
     <span class='kw'>super</span><span class='lparen'>(</span>
@@ -5998,7 +6029,8 @@
       <span class='label'>non_nullable_in_json_schema:</span> <span class='kw'>false</span><span class='comma'>,</span>
       <span class='label'>backing_indexing_field:</span> <span class='id identifier rubyid_backing_indexing_field'>backing_indexing_field</span><span class='comma'>,</span>
       <span class='label'>as_input:</span> <span class='id identifier rubyid_as_input'>as_input</span><span class='comma'>,</span>
-      <span class='label'>legacy_grouping_schema:</span> <span class='id identifier rubyid_legacy_grouping_schema'>legacy_grouping_schema</span>
+      <span class='label'>legacy_grouping_schema:</span> <span class='id identifier rubyid_legacy_grouping_schema'>legacy_grouping_schema</span><span class='comma'>,</span>
+      <span class='label'>resolver:</span> <span class='id identifier rubyid_resolver'>resolver</span>
     <span class='rparen'>)</span>
 
     <span class='kw'>if</span> <span class='id identifier rubyid_name'>name</span> <span class='op'>!=</span> <span class='id identifier rubyid_name_in_index'>name_in_index</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_name_in_index'>name_in_index</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='id identifier rubyid_graphql_only'>graphql_only</span>
@@ -6787,7 +6819,7 @@
       <span class='label'>name_in_index:</span> <span class='id identifier rubyid_name_in_index'>name_in_index</span><span class='comma'>,</span>
       <span class='label'>computation_detail:</span> <span class='id identifier rubyid_computation_detail'>computation_detail</span><span class='comma'>,</span>
       <span class='label'>relation:</span> <span class='id identifier rubyid_relationship'>relationship</span><span class='op'>&amp;.</span><span class='id identifier rubyid_runtime_metadata'>runtime_metadata</span><span class='comma'>,</span>
-      <span class='label'>resolver:</span> <span class='kw'>nil</span>
+      <span class='label'>resolver:</span> <span class='id identifier rubyid_resolver'>resolver</span>
     <span class='rparen'>)</span>
   <span class='kw'>end</span>
 
@@ -6960,6 +6992,65 @@
 </span><span class='heredoc_end'>      EOS
 </span>    <span class='kw'>end</span>
   <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id="resolver=-instance_method"></span>
+      <div class="method_details ">
+  <h3 class="signature " id="resolver-instance_method">
+  
+    #<strong>resolver</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns the value of attribute resolver</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Object</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>the current value of resolver</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+89
+90
+91</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb', line 89</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_resolver'>resolver</span>
+  <span class='ivar'>@resolver</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -8023,7 +8114,8 @@
 1099
 1100
 1101
-1102</pre>
+1102
+1103</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb', line 89</span>
@@ -8034,7 +8126,7 @@
   <span class='symbol'>:aggregated_values_customizations</span><span class='comma'>,</span> <span class='symbol'>:sort_order_enum_value_customizations</span><span class='comma'>,</span>
   <span class='symbol'>:args</span><span class='comma'>,</span> <span class='symbol'>:sortable</span><span class='comma'>,</span> <span class='symbol'>:filterable</span><span class='comma'>,</span> <span class='symbol'>:aggregatable</span><span class='comma'>,</span> <span class='symbol'>:groupable</span><span class='comma'>,</span> <span class='symbol'>:graphql_only</span><span class='comma'>,</span> <span class='symbol'>:source</span><span class='comma'>,</span> <span class='symbol'>:runtime_field_script</span><span class='comma'>,</span> <span class='symbol'>:relationship</span><span class='comma'>,</span> <span class='symbol'>:singular_name</span><span class='comma'>,</span>
   <span class='symbol'>:computation_detail</span><span class='comma'>,</span> <span class='symbol'>:non_nullable_in_json_schema</span><span class='comma'>,</span> <span class='symbol'>:backing_indexing_field</span><span class='comma'>,</span> <span class='symbol'>:as_input</span><span class='comma'>,</span>
-  <span class='symbol'>:legacy_grouping_schema</span><span class='comma'>,</span> <span class='symbol'>:name_in_index</span>
+  <span class='symbol'>:legacy_grouping_schema</span><span class='comma'>,</span> <span class='symbol'>:name_in_index</span><span class='comma'>,</span> <span class='symbol'>:resolver</span>
 <span class='rparen'>)</span>
   <span class='id identifier rubyid_include'>include</span> <span class='const'><span class='object_link'><a href="../Mixins.html" title="ElasticGraph::SchemaDefinition::Mixins (module)">Mixins</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Mixins/HasDocumentation.html" title="ElasticGraph::SchemaDefinition::Mixins::HasDocumentation (module)">HasDocumentation</a></span></span>
   <span class='id identifier rubyid_include'>include</span> <span class='const'><span class='object_link'><a href="../Mixins.html" title="ElasticGraph::SchemaDefinition::Mixins (module)">Mixins</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Mixins/HasDirectives.html" title="ElasticGraph::SchemaDefinition::Mixins::HasDirectives (module)">HasDirectives</a></span></span>
@@ -8048,7 +8140,7 @@
     <span class='label'>runtime_metadata_graphql_field:</span> <span class='const'>SchemaArtifacts</span><span class='op'>::</span><span class='const'>RuntimeMetadata</span><span class='op'>::</span><span class='const'>GraphQLField</span><span class='op'>::</span><span class='const'>EMPTY</span><span class='comma'>,</span>
     <span class='label'>type_for_derived_types:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>graphql_only:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>singular:</span> <span class='kw'>nil</span><span class='comma'>,</span>
     <span class='label'>sortable:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>filterable:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>aggregatable:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>groupable:</span> <span class='kw'>nil</span><span class='comma'>,</span>
-    <span class='label'>backing_indexing_field:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>as_input:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>legacy_grouping_schema:</span> <span class='kw'>false</span>
+    <span class='label'>backing_indexing_field:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>as_input:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>legacy_grouping_schema:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>resolver:</span> <span class='kw'>nil</span>
   <span class='rparen'>)</span>
     <span class='id identifier rubyid_type_ref'>type_ref</span> <span class='op'>=</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_type_ref'>type_ref</span><span class='lparen'>(</span><span class='id identifier rubyid_type'>type</span><span class='rparen'>)</span>
     <span class='kw'>super</span><span class='lparen'>(</span>
@@ -8079,7 +8171,8 @@
       <span class='label'>non_nullable_in_json_schema:</span> <span class='kw'>false</span><span class='comma'>,</span>
       <span class='label'>backing_indexing_field:</span> <span class='id identifier rubyid_backing_indexing_field'>backing_indexing_field</span><span class='comma'>,</span>
       <span class='label'>as_input:</span> <span class='id identifier rubyid_as_input'>as_input</span><span class='comma'>,</span>
-      <span class='label'>legacy_grouping_schema:</span> <span class='id identifier rubyid_legacy_grouping_schema'>legacy_grouping_schema</span>
+      <span class='label'>legacy_grouping_schema:</span> <span class='id identifier rubyid_legacy_grouping_schema'>legacy_grouping_schema</span><span class='comma'>,</span>
+      <span class='label'>resolver:</span> <span class='id identifier rubyid_resolver'>resolver</span>
     <span class='rparen'>)</span>
 
     <span class='kw'>if</span> <span class='id identifier rubyid_name'>name</span> <span class='op'>!=</span> <span class='id identifier rubyid_name_in_index'>name_in_index</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_name_in_index'>name_in_index</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='id identifier rubyid_graphql_only'>graphql_only</span>
@@ -8868,7 +8961,7 @@
       <span class='label'>name_in_index:</span> <span class='id identifier rubyid_name_in_index'>name_in_index</span><span class='comma'>,</span>
       <span class='label'>computation_detail:</span> <span class='id identifier rubyid_computation_detail'>computation_detail</span><span class='comma'>,</span>
       <span class='label'>relation:</span> <span class='id identifier rubyid_relationship'>relationship</span><span class='op'>&amp;.</span><span class='id identifier rubyid_runtime_metadata'>runtime_metadata</span><span class='comma'>,</span>
-      <span class='label'>resolver:</span> <span class='kw'>nil</span>
+      <span class='label'>resolver:</span> <span class='id identifier rubyid_resolver'>resolver</span>
     <span class='rparen'>)</span>
   <span class='kw'>end</span>
 
@@ -9094,7 +9187,6 @@
       <pre class="lines">
 
 
-584
 585
 586
 587
@@ -9106,10 +9198,11 @@
 593
 594
 595
-596</pre>
+596
+597</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb', line 584</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb', line 585</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_aggregatable?'>aggregatable?</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_aggregatable'>aggregatable</span> <span class='kw'>unless</span> <span class='id identifier rubyid_aggregatable'>aggregatable</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
@@ -9232,17 +9325,17 @@ federation subgraph spec</a>.</p>
       <pre class="lines">
 
 
-629
 630
 631
 632
 633
 634
 635
-636</pre>
+636
+637</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb', line 629</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb', line 630</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_argument'>argument</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_value_type'>value_type</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_args'>args</span><span class='lbracket'>[</span><span class='id identifier rubyid_name'>name</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_factory'>factory</span><span class='period'>.</span><span class='id identifier rubyid_new_argument'>new_argument</span><span class='lparen'>(</span>
@@ -9346,12 +9439,12 @@ this field.</p>
       <pre class="lines">
 
 
-232
 233
-234</pre>
+234
+235</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb', line 232</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb', line 233</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_customize_aggregated_values_field'>customize_aggregated_values_field</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_customization_block'>customization_block</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_aggregated_values_customizations'>aggregated_values_customizations</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_customization_block'>customization_block</span>
@@ -9450,12 +9543,12 @@ field.</p>
       <pre class="lines">
 
 
-200
 201
-202</pre>
+202
+203</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb', line 200</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb', line 201</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_customize_filter_field'>customize_filter_field</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_customization_block'>customization_block</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_filter_customizations'>filter_customizations</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_customization_block'>customization_block</span>
@@ -9554,12 +9647,12 @@ field.</p>
       <pre class="lines">
 
 
-264
 265
-266</pre>
+266
+267</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb', line 264</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb', line 265</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_customize_grouped_by_field'>customize_grouped_by_field</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_customization_block'>customization_block</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_grouped_by_customizations'>grouped_by_customizations</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_customization_block'>customization_block</span>
@@ -9658,12 +9751,12 @@ on the derived <code>SortOrder</code> enum type.</p>
       <pre class="lines">
 
 
-337
 338
-339</pre>
+339
+340</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb', line 337</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb', line 338</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_customize_sort_order_enum_values'>customize_sort_order_enum_values</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_customization_block'>customization_block</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_sort_order_enum_value_customizations'>sort_order_enum_value_customizations</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_customization_block'>customization_block</span>
@@ -9772,12 +9865,12 @@ this field.</p>
       <pre class="lines">
 
 
-305
 306
-307</pre>
+307
+308</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb', line 305</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb', line 306</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_customize_sub_aggregations_field'>customize_sub_aggregations_field</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_customization_block'>customization_block</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_sub_aggregations_customizations'>sub_aggregations_customizations</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_customization_block'>customization_block</span>
@@ -9833,7 +9926,6 @@ this field.</p>
       <pre class="lines">
 
 
-534
 535
 536
 537
@@ -9843,10 +9935,11 @@ this field.</p>
 541
 542
 543
-544</pre>
+544
+545</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb', line 534</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb', line 535</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_filterable?'>filterable?</span>
   <span class='comment'># Object types that use custom index mappings (as `GeoLocation` does) aren&#39;t filterable
@@ -9904,7 +9997,6 @@ this field.</p>
       <pre class="lines">
 
 
-551
 552
 553
 554
@@ -9930,10 +10022,11 @@ this field.</p>
 574
 575
 576
-577</pre>
+577
+578</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb', line 551</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb', line 552</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_groupable?'>groupable?</span>
   <span class='comment'># If the groupability of the field was specified explicitly when the field was defined, use the specified value.
@@ -10080,7 +10173,6 @@ GraphQL schema. If you think you might want to make a field non-nullable in the 
       <pre class="lines">
 
 
-398
 399
 400
 401
@@ -10093,10 +10185,11 @@ GraphQL schema. If you think you might want to make a field non-nullable in the 
 408
 409
 410
-411</pre>
+411
+412</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb', line 398</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb', line 399</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_json_schema'>json_schema</span><span class='lparen'>(</span><span class='label'>nullable:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='id identifier rubyid_options'>options</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='symbol'>:type</span><span class='rparen'>)</span>
@@ -10155,12 +10248,12 @@ GraphQL schema. If you think you might want to make a field non-nullable in the 
       <pre class="lines">
 
 
-641
 642
-643</pre>
+643
+644</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb', line 641</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb', line 642</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_mapping_type'>mapping_type</span>
   <span class='id identifier rubyid_backing_indexing_field'>backing_indexing_field</span><span class='op'>&amp;.</span><span class='id identifier rubyid_mapping_type'>mapping_type</span> <span class='op'>||</span> <span class='lparen'>(</span><span class='id identifier rubyid_resolve_mapping'>resolve_mapping</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>type</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span>
@@ -10272,17 +10365,17 @@ This is used by clients to apply aggregation functions (e.g. <code>sum</code>, <
       <pre class="lines">
 
 
-388
 389
 390
 391
 392
 393
 394
-395</pre>
+395
+396</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb', line 388</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb', line 389</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_on_each_generated_schema_element'>on_each_generated_schema_element</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_customization_block'>customization_block</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_customization_block'>customization_block</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='kw'>self</span><span class='rparen'>)</span>
@@ -10367,7 +10460,6 @@ indicating the call to this method can be removed.</p>
       <pre class="lines">
 
 
-473
 474
 475
 476
@@ -10375,10 +10467,11 @@ indicating the call to this method can be removed.</p>
 478
 479
 480
-481</pre>
+481
+482</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb', line 473</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb', line 474</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_renamed_from'>renamed_from</span><span class='lparen'>(</span><span class='id identifier rubyid_old_name'>old_name</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_register_renamed_field'>register_renamed_field</span><span class='lparen'>(</span>
@@ -10442,7 +10535,6 @@ and fields mapped as <code>text</code> are not sortable either. Fields are sorta
       <pre class="lines">
 
 
-502
 503
 504
 505
@@ -10463,10 +10555,11 @@ and fields mapped as <code>text</code> are not sortable either. Fields are sorta
 520
 521
 522
-523</pre>
+523
+524</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb', line 502</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb', line 503</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_sortable?'>sortable?</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_sortable'>sortable</span> <span class='kw'>unless</span> <span class='id identifier rubyid_sortable'>sortable</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
@@ -10588,15 +10681,15 @@ field</p>
       <pre class="lines">
 
 
-444
 445
 446
 447
 448
-449</pre>
+449
+450</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb', line 444</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb', line 445</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_sourced_from'>sourced_from</span><span class='lparen'>(</span><span class='id identifier rubyid_relationship'>relationship</span><span class='comma'>,</span> <span class='id identifier rubyid_field_path'>field_path</span><span class='rparen'>)</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_source'>source</span> <span class='op'>=</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_factory'>factory</span><span class='period'>.</span><span class='id identifier rubyid_new_field_source'>new_field_source</span><span class='lparen'>(</span>
@@ -10650,14 +10743,14 @@ field</p>
       <pre class="lines">
 
 
-604
 605
 606
 607
-608</pre>
+608
+609</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb', line 604</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb', line 605</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_sub_aggregatable?'>sub_aggregatable?</span>
   <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>if</span> <span class='id identifier rubyid_relationship'>relationship</span>
@@ -10711,15 +10804,15 @@ field</p>
       <pre class="lines">
 
 
-158
 159
 160
 161
 162
-163</pre>
+163
+164</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb', line 158</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb', line 159</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_type'>type</span>
   <span class='comment'># Here we lazily convert the `original_type` to an input type as needed. This must be lazy because
@@ -10737,7 +10830,7 @@ field</p>
 </div>
 
       <div id="footer">
-  Generated on Mon Mar  3 18:22:25 2025 by
+  Generated on Mon Mar  3 18:23:03 2025 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.37 (ruby-3.3.6).
 </div>
