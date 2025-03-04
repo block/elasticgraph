@@ -81,9 +81,8 @@
 
 <p>Begin by cloning the ElasticGraph project template from GitHub:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git clone &lt;COMING SOON&gt;!
-<span class="nb">cd </span>elasticgraph-project-template
-</code></pre></div></div>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>git clone &lt;COMING SOON&gt;!
+<span class="nv">$ </span><span class="nb">cd </span>elasticgraph-project-template</code></pre></figure>
 
 <h2 id="step-2-run-the-initialization-script">Step 2: Run the Initialization Script</h2>
 
@@ -91,8 +90,7 @@
 
 <p>Run the following command in your terminal:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-sL</span> https://raw.githubusercontent.com/&lt;COMING-SOON&gt;/elasticgraph-project-template/main/script/init_eg | bash <span class="nt">-s</span>
-</code></pre></div></div>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>curl <span class="nt">-sL</span> https://raw.githubusercontent.com/&lt;COMING-SOON&gt;/elasticgraph-project-template/main/script/init_eg | bash <span class="nt">-s</span></code></pre></figure>
 
 <p>This script will prompt you for some inputs:</p>
 
@@ -120,37 +118,41 @@
     <p><strong>Remove Sample Schema</strong>:</p>
 
     <p>Delete the sample schema file:</p>
-
-    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">rm </span>config/schema/people.rb
-</code></pre></div>    </div>
   </li>
+</ol>
+
+<figure class="highlight"><pre><code class="language-shell" data-lang="shell"><span class="nv">$ </span><span class="nb">rm </span>config/schema/people.rb</code></pre></figure>
+
+<ol>
   <li>
     <p><strong>Create Your Schema</strong>:</p>
 
     <p>Create a new file in <code class="language-plaintext highlighter-rouge">config/schema/</code> named after your dataset, for example, <code class="language-plaintext highlighter-rouge">config/schema/customers.rb</code>.</p>
 
     <p>Define your schema in this file. Here’s a basic example:</p>
-
-    <div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="no">ElasticGraph</span><span class="p">.</span><span class="nf">define_schema</span> <span class="k">do</span> <span class="o">|</span><span class="n">schema</span><span class="o">|</span>
-   <span class="n">schema</span><span class="p">.</span><span class="nf">json_schema_version</span> <span class="mi">1</span>
-
-   <span class="n">schema</span><span class="p">.</span><span class="nf">object_type</span> <span class="s2">"Artist"</span> <span class="k">do</span> <span class="o">|</span><span class="n">t</span><span class="o">|</span>
-     <span class="n">t</span><span class="p">.</span><span class="nf">field</span> <span class="s2">"id"</span><span class="p">,</span> <span class="s2">"ID"</span>
-     <span class="n">t</span><span class="p">.</span><span class="nf">field</span> <span class="s2">"name"</span><span class="p">,</span> <span class="s2">"String"</span>
-     <span class="n">t</span><span class="p">.</span><span class="nf">field</span> <span class="s2">"lifetimeSales"</span><span class="p">,</span> <span class="s2">"Int"</span>
-     <span class="n">t</span><span class="p">.</span><span class="nf">field</span> <span class="s2">"bio"</span><span class="p">,</span> <span class="s2">"ArtistBio"</span>
-
-     <span class="n">t</span><span class="p">.</span><span class="nf">field</span> <span class="s2">"albums"</span><span class="p">,</span> <span class="s2">"[Album!]!"</span> <span class="k">do</span> <span class="o">|</span><span class="n">f</span><span class="o">|</span>
-       <span class="n">f</span><span class="p">.</span><span class="nf">mapping</span> <span class="ss">type: </span><span class="s2">"nested"</span>
-     <span class="k">end</span>
-
-     <span class="n">t</span><span class="p">.</span><span class="nf">index</span> <span class="s2">"artists"</span>
-   <span class="k">end</span>
- <span class="k">end</span>
-
- <span class="c1"># ...</span>
-</code></pre></div>    </div>
   </li>
+</ol>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="no">ElasticGraph</span><span class="p">.</span><span class="nf">define_schema</span> <span class="k">do</span> <span class="o">|</span><span class="n">schema</span><span class="o">|</span>
+  <span class="n">schema</span><span class="p">.</span><span class="nf">json_schema_version</span> <span class="mi">1</span>
+
+  <span class="n">schema</span><span class="p">.</span><span class="nf">object_type</span> <span class="s2">"Artist"</span> <span class="k">do</span> <span class="o">|</span><span class="n">t</span><span class="o">|</span>
+    <span class="n">t</span><span class="p">.</span><span class="nf">field</span> <span class="s2">"id"</span><span class="p">,</span> <span class="s2">"ID"</span>
+    <span class="n">t</span><span class="p">.</span><span class="nf">field</span> <span class="s2">"name"</span><span class="p">,</span> <span class="s2">"String"</span>
+    <span class="n">t</span><span class="p">.</span><span class="nf">field</span> <span class="s2">"lifetimeSales"</span><span class="p">,</span> <span class="s2">"Int"</span>
+    <span class="n">t</span><span class="p">.</span><span class="nf">field</span> <span class="s2">"bio"</span><span class="p">,</span> <span class="s2">"ArtistBio"</span>
+
+    <span class="n">t</span><span class="p">.</span><span class="nf">field</span> <span class="s2">"albums"</span><span class="p">,</span> <span class="s2">"[Album!]!"</span> <span class="k">do</span> <span class="o">|</span><span class="n">f</span><span class="o">|</span>
+      <span class="n">f</span><span class="p">.</span><span class="nf">mapping</span> <span class="ss">type: </span><span class="s2">"nested"</span>
+    <span class="k">end</span>
+
+    <span class="n">t</span><span class="p">.</span><span class="nf">index</span> <span class="s2">"artists"</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="c1"># ...</span></code></pre></figure>
+
+<ol>
   <li>
     <p><strong>Update Configuration</strong>:</p>
 
@@ -169,22 +171,24 @@
 <h2 id="step-4-build-and-test-your-project">Step 4: Build and Test Your Project</h2>
 
 <ol>
-  <li>
-    <p><strong>Install Dependencies</strong>:</p>
+  <li><strong>Install Dependencies</strong>:</li>
+</ol>
 
-    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bundle <span class="nb">install</span>
-</code></pre></div>    </div>
-  </li>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>bundle <span class="nb">install</span></code></pre></figure>
+
+<ol>
   <li>
     <p><strong>Run Rake Tasks</strong>:</p>
 
     <p>Test your setup by running:</p>
-
-    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bundle <span class="nb">exec </span>rake
-</code></pre></div>    </div>
-
-    <p>This command runs all the default tasks to ensure everything is configured correctly.</p>
   </li>
+</ol>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>bundle <span class="nb">exec </span>rake</code></pre></figure>
+
+<p>This command runs all the default tasks to ensure everything is configured correctly.</p>
+
+<ol>
   <li>
     <p><strong>Fix Any Issues</strong>:</p>
 
@@ -196,8 +200,7 @@
 
 <p>With Docker running, start your local ElasticGraph instance:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bundle <span class="nb">exec </span>rake boot_locally
-</code></pre></div></div>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>bundle <span class="nb">exec </span>rake boot_locally</code></pre></figure>
 
 <p>This command will:</p>
 
@@ -218,7 +221,7 @@
 
 <p>Replace <code class="language-plaintext highlighter-rouge">customers</code> and fields with those relevant to your schema.</p>
 
-<div class="language-graphql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">query</span><span class="w"> </span><span class="n">Test</span><span class="w"> </span><span class="p">{</span><span class="w">
+<figure class="highlight"><pre><code class="language-graphql" data-lang="graphql"><span class="k">query</span><span class="w"> </span><span class="n">Test</span><span class="w"> </span><span class="p">{</span><span class="w">
   </span><span class="n">customers</span><span class="w"> </span><span class="p">{</span><span class="w">
     </span><span class="n">totalEdgeCount</span><span class="w">
     </span><span class="n">nodes</span><span class="w"> </span><span class="p">{</span><span class="w">
@@ -227,8 +230,7 @@
       </span><span class="n">email</span><span class="w">
     </span><span class="p">}</span><span class="w">
   </span><span class="p">}</span><span class="w">
-</span><span class="p">}</span><span class="w">
-</span></code></pre></div></div>
+</span><span class="p">}</span></code></pre></figure>
 
 <p><strong>Explanation</strong>:</p>
 
@@ -256,27 +258,26 @@
 
     <ul>
       <li>Click on <strong>“Dev Tools”</strong> in the Kibana sidebar.</li>
-      <li>
-        <p>Run the following commands to explore your indices:</p>
-
-        <pre><code class="language-elasticsearch">GET /_cat/indices?v
-GET /_cat/shards?v
-GET /_cat/templates?v
-</code></pre>
-      </li>
+      <li>Run the following commands to explore your indices:</li>
     </ul>
   </li>
+</ol>
+
+<figure class="highlight"><pre><code class="language-elasticsearch" data-lang="elasticsearch">GET /_cat/indices?v
+GET /_cat/shards?v
+GET /_cat/templates?v</code></pre></figure>
+
+<ol>
   <li>
     <p><strong>Search Your Data</strong>:</p>
 
     <p>Replace <code class="language-plaintext highlighter-rouge">your-index-name</code> with the name of your index (usually your dataset name).</p>
-
-    <pre><code class="language-elasticsearch">GET /your-index-name/_search
-</code></pre>
-
-    <p>This will return all documents in your index. Normally you’ll query via GraphiQL, but this is useful for debugging.</p>
   </li>
 </ol>
+
+<figure class="highlight"><pre><code class="language-elasticsearch" data-lang="elasticsearch">GET /your-index-name/_search</code></pre></figure>
+
+<p>This will return all documents in your index. Normally you’ll query via GraphiQL, but this is useful for debugging.</p>
 
 <h2 id="troubleshooting">Troubleshooting</h2>
 
