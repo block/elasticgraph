@@ -19,3 +19,48 @@
     border-color: var(--color-gray-200, currentColor);
   }
 }
+
+@layer components {
+  /* Note alert */
+  .alert-note {
+    @apply my-4 rounded-lg border-l-4 p-4 border-blue-400 bg-blue-50/30 dark:border-blue-500 dark:bg-blue-950/20;
+  }
+
+  .alert-note .alert-title {
+    @apply mb-2 flex items-center gap-2 text-lg font-semibold text-blue-700 dark:text-blue-400;
+  }
+
+  .alert-note .alert-title::before {
+    content: 'ⓘ';
+  }
+
+  /* Warning alert */
+  .alert-warning {
+    @apply my-4 rounded-lg border-l-4 p-4 border-amber-400 bg-amber-50/30 dark:border-amber-500 dark:bg-amber-950/20;
+  }
+
+  .alert-warning .alert-title {
+    @apply mb-2 flex items-center gap-2 text-lg font-semibold text-amber-700 dark:text-amber-400;
+  }
+
+  .alert-warning .alert-title::before {
+    content: '⚠';
+  }
+
+  /* Alert content */
+  .alert-note p:not(.alert-title),
+  .alert-warning p:not(.alert-title) {
+    @apply text-gray-700 dark:text-gray-300;
+  }
+
+  /* Code blocks within alerts */
+  .alert-note .highlight,
+  .alert-warning .highlight {
+    @apply my-4 mx-0;
+  }
+
+  .alert-note pre,
+  .alert-warning pre {
+    @apply bg-white/50 dark:bg-gray-900/50;
+  }
+}

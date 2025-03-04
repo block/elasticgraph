@@ -212,12 +212,13 @@ platinum-selling album–without requiring it to be the same album–you could d
 <code class="language-plaintext highlighter-rouge">albums: {anySatisfy: {...}, anySatisfy: {...}}</code> isn’t supported, but <code class="language-plaintext highlighter-rouge">allOf</code>
 enables this use case.</p>
 
-<h3 id="warning-always-pass-a-list">Warning: Always Pass a List</h3>
+<div class="alert-warning">
+  <p><strong class="alert-title">Warning: Always Pass a List</strong></p>
 
-<p>When using <code class="language-plaintext highlighter-rouge">allOf</code> or <code class="language-plaintext highlighter-rouge">anyOf</code>, be sure to pass the sub-filters as a list. If you instead
+  <p>When using <code class="language-plaintext highlighter-rouge">allOf</code> or <code class="language-plaintext highlighter-rouge">anyOf</code>, be sure to pass the sub-filters as a list. If you instead
 pass them as an object, it won’t work as expected. Consider this query:</p>
 
-<figure class="highlight"><pre><code class="language-graphql" data-lang="graphql"><span class="k">query</span><span class="w"> </span><span class="n">AnyOfGotcha</span><span class="w"> </span><span class="p">{</span><span class="w">
+  <figure class="highlight"><pre><code class="language-graphql" data-lang="graphql"><span class="k">query</span><span class="w"> </span><span class="n">AnyOfGotcha</span><span class="w"> </span><span class="p">{</span><span class="w">
   </span><span class="n">artists</span><span class="p">(</span><span class="n">filter</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
     </span><span class="n">bio</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
       </span><span class="n">anyOf</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
@@ -236,12 +237,12 @@ pass them as an object, it won’t work as expected. Consider this query:</p>
   </span><span class="p">}</span><span class="w">
 </span><span class="p">}</span></code></pre></figure>
 
-<p>While this query will return results, it doesn’t behave as it appears. The GraphQL
+  <p>While this query will return results, it doesn’t behave as it appears. The GraphQL
 spec mandates that list inputs <a href="https://spec.graphql.org/October2021/#sec-List.Input-Coercion">coerce non-list values into a list of one
 value</a>. In this case,
 that means that the <code class="language-plaintext highlighter-rouge">anyOf</code> expression is coerced into this:</p>
 
-<figure class="highlight"><pre><code class="language-graphql" data-lang="graphql"><span class="k">query</span><span class="w"> </span><span class="n">AnyOfGotcha</span><span class="w"> </span><span class="p">{</span><span class="w">
+  <figure class="highlight"><pre><code class="language-graphql" data-lang="graphql"><span class="k">query</span><span class="w"> </span><span class="n">AnyOfGotcha</span><span class="w"> </span><span class="p">{</span><span class="w">
   </span><span class="n">artists</span><span class="p">(</span><span class="n">filter</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
     </span><span class="n">bio</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
       </span><span class="n">anyOf</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w">
@@ -254,10 +255,10 @@ that means that the <code class="language-plaintext highlighter-rouge">anyOf</co
   </span><span class="p">}</span><span class="w">
 </span><span class="p">}</span></code></pre></figure>
 
-<p>Using <code class="language-plaintext highlighter-rouge">anyOf</code> with only a single sub-expression, as we have here, doesn’t do anything;
+  <p>Using <code class="language-plaintext highlighter-rouge">anyOf</code> with only a single sub-expression, as we have here, doesn’t do anything;
 the query is equivalent to:</p>
 
-<figure class="highlight"><pre><code class="language-graphql" data-lang="graphql"><span class="k">query</span><span class="w"> </span><span class="n">AnyOfGotcha</span><span class="w"> </span><span class="p">{</span><span class="w">
+  <figure class="highlight"><pre><code class="language-graphql" data-lang="graphql"><span class="k">query</span><span class="w"> </span><span class="n">AnyOfGotcha</span><span class="w"> </span><span class="p">{</span><span class="w">
   </span><span class="n">artists</span><span class="p">(</span><span class="n">filter</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
     </span><span class="n">bio</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
       </span><span class="n">yearFormed</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="n">gt</span><span class="p">:</span><span class="w"> </span><span class="mi">2000</span><span class="p">}</span><span class="w">
@@ -268,6 +269,7 @@ the query is equivalent to:</p>
   </span><span class="p">}</span><span class="w">
 </span><span class="p">}</span></code></pre></figure>
 
+</div>
 
       </article>
     </div>

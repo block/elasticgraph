@@ -128,7 +128,8 @@ This query, for example, will find artists that released a platinum-selling albu
   </span><span class="p">}</span><span class="w">
 </span><span class="p">}</span></code></pre></figure>
 
-<p>One thing to bear in mind: this query is selecting which <em>artists</em> to return,
+<p class="alert-warning"><strong class="alert-title">Warning</strong>
+One thing to bear in mind: this query is selecting which <em>artists</em> to return,
 not which <em>albums</em> to return. You might expect that the returned <code class="language-plaintext highlighter-rouge">nodes.albums</code> would
 all be platinum-selling 90s albums, but that’s not how the filtering API works. Only artists
 that had a platinum-selling 90s album will be returned, and for each returned artists, all
