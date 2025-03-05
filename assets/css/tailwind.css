@@ -63,4 +63,27 @@
   .alert-warning pre {
     @apply bg-white/50 dark:bg-gray-900/50;
   }
+
+  /* Heading anchors */
+  .has-anchor {
+    @apply scroll-mt-20;
+  }
+
+  .heading-anchor {
+    @apply float-left -ml-6 pr-2 opacity-0 transition-opacity no-underline;
+  }
+
+  .heading-anchor svg {
+    @apply inline-block align-middle fill-gray-500 dark:fill-gray-400;
+  }
+
+  .has-anchor:hover .heading-anchor,
+  .heading-anchor:focus {
+    @apply opacity-100;
+  }
+
+  /* When the heading is linked directly, always show the anchor */
+  :target .heading-anchor {
+    @apply opacity-100;
+  }
 }
