@@ -5,7 +5,33 @@
       <a href="{{ '/' | relative_url }}" class="font-bold hover:underline">ElasticGraph</a>
       <a href="{{ '/getting-started' | relative_url }}" class="{{ site.style.link }}">Get Started</a>
       <a href="{{ '/query-api' | relative_url }}" class="{{ site.style.link }}">Query API</a>
-      <a href="{{ '/docs/main' | relative_url }}" class="{{ site.style.link }}">Docs</a>
+
+      <!-- Docs dropdown -->
+      <div class="relative group">
+        <button class="{{ site.style.link }} flex items-center">
+          Docs
+          <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </button>
+        <!-- Added pt-2 to create space for hover and moved mt-2 to inner div -->
+        <div class="absolute left-0 pt-2 w-48 hidden group-hover:block z-50">
+          <div class="rounded-md shadow-lg bg-white dark:bg-gray-700 ring-1 ring-black ring-opacity-5">
+            <div class="py-1">
+              {% for version in site.data.doc_versions.versions %}
+                <a href="{{ '/docs/' | append: version | relative_url }}"
+                   class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600">
+                  {% if version == 'main' %}
+                    Development (main)
+                  {% else %}
+                    {{ version }}
+                  {% endif %}
+                </a>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
 
     </div>
     <div>
