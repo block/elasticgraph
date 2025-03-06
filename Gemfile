@@ -151,3 +151,5 @@ else
     register_gemspec_gems_with_path.call(loaded_gemspec.dependencies)
   end
 end
+
+gem "nokogiri", "~> 1.18"

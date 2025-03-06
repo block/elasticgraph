@@ -9,15 +9,14 @@ layout: null
       "content"  : {{ page.content | strip_html | strip_newlines | jsonify }}
     }{% unless forloop.last %},{% endunless %}
   {% endfor %}
-  {% for doc_version in site.data.doc_versions.versions %}
-    {% assign doc_files = site.static_files | where_exp: "file", "file.path contains '/docs/' and file.path contains doc_version and file.path contains '.html'" %}
-    {% for file in doc_files %}
-      {% capture file_content %}{% include_file file.path %}{% endcapture %}
-      ,{
-        "title"    : "API Documentation - {{ doc_version }} - {{ file.name | remove: '.html' | replace: '_', ' ' | capitalize }}",
-        "url"      : "{{ site.baseurl }}{{ file.path }}",
-        "content"  : {{ file_content | strip_html | strip_newlines | jsonify }}
-      }
+  {% if site.data.api_docs %}
+    ,
+    {% for doc in site.data.api_docs %}
+      {
+        "title"    : {{ doc.title | jsonify }},
+        "url"      : "{{ site.baseurl }}{{ doc.url }}",
+        "content"  : {{ doc.content | jsonify }}
+      }{% unless forloop.last %},{% endunless %}
     {% endfor %}
-  {% endfor %}
+  {% endif %}
 ]

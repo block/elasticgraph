@@ -11,6 +11,9 @@
 require "pathname"
 require "rake/tasklib"
 
+# Load custom tasks
+Dir.glob("lib/tasks/*.rake").each { |r| import r }
+
 module ElasticGraph
   class SiteRakeTasks < ::Rake::TaskLib
     SITE_CONFIG_DIR = ::Pathname.new(__dir__)
@@ -134,6 +137,73 @@ module ElasticGraph
 
         desc "Build Jekyll site with freshly generated YARD documentation"
         task build: [:build_docs, :build_css, "examples:compile_queries"] do
+          # Generate API docs search index
+          require "nokogiri"
+          require "json"
+          
+          def extract_content(file_path)
+            content = File.read(file_path)
+            doc = Nokogiri::HTML(content)
+            
+            # Remove script and style elements
+            doc.css('script, style').remove
+            
+            # Get the main content
+            main_content = doc.css('#main').text
+            
+            # Clean up the text
+            main_content.gsub!(/\s+/, ' ').strip
+            
+            # Get the title
+            title = doc.css('title').text.strip
+            title = title.split(' - ').first if title.include?(' - ')
+            
+            return title, main_content
+          end
+          
+          def process_directory(dir)
+            docs = []
+            Dir.glob(File.join(dir, '**', '*.html')).each do |file|
+              next if file.include?('/css/') || file.include?('/js/')
+              next if %w[frames.html file_list.html class_list.html method_list.html].include?(File.basename(file))
+              
+              begin
+                title, content = extract_content(file)
+                relative_path = file.sub(JEKYLL_SITE_DIR.to_s, '')
+                
+                docs << {
+                  "title" => title,
+                  "url" => relative_path,
+                  "content" => content
+                }
+              rescue => e
+                puts "Error processing #{file}: #{e.message}"
+              end
+            end
+            docs
+          end
+          
+          # Process all doc versions
+          docs_dir = JEKYLL_SITE_DIR / 'docs'
+          all_docs = []
+          
+          Dir.entries(docs_dir).each do |version|
+            next if version.start_with?('.')
+            version_dir = docs_dir / version
+            next unless File.directory?(version_dir)
+            
+            docs = process_directory(version_dir)
+            docs.each do |doc|
+              doc["title"] = "API Documentation - #{version} - #{doc["title"]}"
+            end
+            all_docs.concat(docs)
+          end
+          
+          # Write to data file
+          FileUtils.mkdir_p(JEKYLL_DATA_DIR)
+          File.write(JEKYLL_DATA_DIR / 'api_docs.json', JSON.pretty_generate(all_docs))
+          
+          # Build Jekyll site
           sh "bundle exec jekyll build #{common_jekyll_args}"
         end
 
