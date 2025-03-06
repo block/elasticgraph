@@ -137,7 +137,10 @@ module ElasticGraph
 
         desc "Build Jekyll site with freshly generated YARD documentation"
         task build: [:build_docs, :build_css, "examples:compile_queries"] do
-          # Generate API docs search index
+          # First Jekyll build to get the API docs in place
+          sh "bundle exec jekyll build #{common_jekyll_args}"
+          
+          # Now generate the API docs index
           require "nokogiri"
           require "json"
           
@@ -203,7 +206,7 @@ module ElasticGraph
           FileUtils.mkdir_p(JEKYLL_DATA_DIR)
           File.write(JEKYLL_DATA_DIR / 'api_docs.json', JSON.pretty_generate(all_docs))
           
-          # Build Jekyll site
+          # Build Jekyll again to include the API docs in search
           sh "bundle exec jekyll build #{common_jekyll_args}"
         end
 
