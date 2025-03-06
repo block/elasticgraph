@@ -3,6 +3,7 @@ GEM
   specs:
     gem-release (2.2.4)
     rake (13.2.1)
+    yard (0.9.37)
 
 PLATFORMS
   ruby
@@ -11,6 +12,7 @@ PLATFORMS
 DEPENDENCIES
   gem-release (~> 2.2)
   rake (~> 13.2)
+  yard (~> 0.9, >= 0.9.37)
 
 BUNDLED WITH
    2.5.22

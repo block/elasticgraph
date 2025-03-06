@@ -18,7 +18,8 @@ permissions:
   contents: read
 
 jobs:
-  push:
+  release:
+    name: Release Gems
     # Limit who can run run this action to core maintainers.
     if: github.repository == 'block/elasticgraph' && contains('["myronmarston", "BrianSigafoos-SQ"]', github.actor)
     runs-on: ubuntu-latest
@@ -62,8 +63,21 @@ jobs:
           git update-index --skip-worktree Rakefile
           echo "BUNDLE_GEMFILE=config/release/Gemfile" >> "$GITHUB_ENV"
 
+      - name: Archive Docs (for non-prerelease versions)
+        run: |
+          if [[ ! "${{ inputs.version }}" =~ [a-zA-Z] ]]; then
+            bundle exec rake "site:archive_docs[${{ inputs.version }}]"
+            git add config/site/archived_docs/v${{ inputs.version }}.tar.gz
+            git commit -m "Archive docs for v${{ inputs.version }}"
+          fi
+
       - name: Bump the ElasticGraph version
-        run: bundle exec rake bump_version[${{ inputs.version }}]
+        run: |
+          bundle exec rake bump_version[${{ inputs.version }}]
+          if [[ ! "${{ inputs.version }}" =~ [a-zA-Z] ]]; then
+            # For non-prerelease versions, squash the doc archive commit with the version bump
+            git reset --soft HEAD~2 && git commit -C ORIG_HEAD
+          fi
 
       # Note: we put this after bumping the version because really bumping the version is safe to do in dry-run mode.
       - name: Enable Dry Run Mode
