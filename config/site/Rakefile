@@ -151,17 +151,19 @@ module ElasticGraph
             # Remove script and style elements
             doc.css('script, style').remove
             
-            # Get the main content
+            # Get the main content - for YARD docs, we want the method details too
             main_content = doc.css('#main').text
+            method_list = doc.css('.method_details').text
+            content = [main_content, method_list].join(" ")
             
             # Clean up the text
-            main_content.gsub!(/\s+/, ' ').strip
+            content.gsub!(/\s+/, ' ').strip
             
             # Get the title
             title = doc.css('title').text.strip
             title = title.split(' - ').first if title.include?(' - ')
             
-            return title, main_content
+            return title, content
           end
           
           def process_directory(dir)
@@ -186,25 +188,29 @@ module ElasticGraph
             docs
           end
           
-          # Process all doc versions
+          # Find the latest released version
           docs_dir = JEKYLL_SITE_DIR / 'docs'
-          all_docs = []
+          versions = Dir.entries(docs_dir)
+            .reject { |f| f.start_with?('.') || f == 'main' }
+            .map { |v| v.sub('v', '') }
+            .sort_by { |v| v.split('.').map(&:to_i) }
           
-          Dir.entries(docs_dir).each do |version|
-            next if version.start_with?('.')
-            version_dir = docs_dir / version
-            next unless File.directory?(version_dir)
-            
+          latest_version = "v#{versions.last}"
+          puts "Indexing API docs from latest version: #{latest_version}"
+          
+          # Process only the latest version
+          version_dir = docs_dir / latest_version
+          if File.directory?(version_dir)
             docs = process_directory(version_dir)
             docs.each do |doc|
-              doc["title"] = "API Documentation - #{version} - #{doc["title"]}"
+              # Don't include version in title since we're only showing latest
+              doc["title"] = "API Documentation - #{doc["title"]}"
             end
-            all_docs.concat(docs)
+            
+            # Write to data file
+            FileUtils.mkdir_p(JEKYLL_DATA_DIR)
+            File.write(JEKYLL_DATA_DIR / 'api_docs.json', JSON.pretty_generate(docs))
           end
-          
-          # Write to data file
-          FileUtils.mkdir_p(JEKYLL_DATA_DIR)
-          File.write(JEKYLL_DATA_DIR / 'api_docs.json', JSON.pretty_generate(all_docs))
           
           # Build Jekyll again to include the API docs in search
           sh "bundle exec jekyll build #{common_jekyll_args}"

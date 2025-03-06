@@ -10,16 +10,27 @@ title: Search
 
 <script src="https://unpkg.com/lunr/lunr.js"></script>
 <script>
+// Initialize the store with regular pages
 window.store = {
     {% for page in site.pages %}
         "{{ page.url | slugify }}": {
             "title": "{{ page.title | xml_escape }}",
             "content": {{ page.content | strip_html | strip_newlines | jsonify }},
             "url": "{{ site.baseurl }}{{ page.url | xml_escape }}"
-        }
-        {% unless forloop.last %},{% endunless %}
+        }{% unless forloop.last %},{% endunless %}
     {% endfor %}
 };
+
+// Add API documentation
+{% if site.data.api_docs %}
+    {% for doc in site.data.api_docs %}
+        window.store["api-doc-{{ forloop.index }}"] = {
+            "title": {{ doc.title | jsonify }},
+            "content": {{ doc.content | jsonify }},
+            "url": "{{ site.baseurl }}{{ doc.url | xml_escape }}"
+        };
+    {% endfor %}
+{% endif %}
 
 (function() {
     function displaySearchResults(results, store) {
