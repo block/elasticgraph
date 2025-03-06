@@ -48,7 +48,6 @@ jobs:
           if [[ ! "${{ inputs.version }}" =~ [a-zA-Z] ]]; then
             bundle exec rake "site:archive_docs[${{ inputs.version }}]"
             git add config/site/archived_docs/v${{ inputs.version }}.tar.gz
-            git commit -m "Archive docs for v${{ inputs.version }}"
           fi
 
   release:
@@ -98,12 +97,7 @@ jobs:
           echo "BUNDLE_GEMFILE=config/release/Gemfile" >> "$GITHUB_ENV"
 
       - name: Bump the ElasticGraph version
-        run: |
-          bundle exec rake bump_version[${{ inputs.version }}]
-          if [[ ! "${{ inputs.version }}" =~ [a-zA-Z] ]]; then
-            # For non-prerelease versions, squash the doc archive commit with the version bump
-            git reset --soft HEAD^ && git commit -c ORIG_HEAD
-          fi
+        run: bundle exec rake bump_version[${{ inputs.version }}]
 
       # Note: we put this after bumping the version because really bumping the version is safe to do in dry-run mode.
       - name: Enable Dry Run Mode
