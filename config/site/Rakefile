@@ -133,7 +133,7 @@ module ElasticGraph
         ].join(" ")
 
         desc "Build Jekyll site with freshly generated YARD documentation"
-        task build: [:build_docs, :build_css, "examples:compile_queries"] do
+        task build: [:build_docs, :build_css, "examples:compile_queries", :generate_llm_docs] do
           sh "bundle exec jekyll build #{common_jekyll_args}"
         end
 
@@ -179,7 +179,7 @@ module ElasticGraph
         end
 
         desc "Serve Jekyll site locally"
-        task serve: [:build_docs, :build_css, "examples:compile_queries"] do
+        task serve: [:build_docs, :build_css, "examples:compile_queries", :generate_llm_docs] do
           require "filewatcher"
 
           # Regenerate the YARD docs anytime we change anything.
@@ -293,6 +293,12 @@ module ElasticGraph
               end
             end
           end
+        end
+
+        desc "Generate raw markdown documentation for LLMs"
+        task generate_llm_docs: ["examples:compile_queries"] do
+          script_path = SITE_CONFIG_DIR / "script" / "generate_llm_docs.rb"
+          sh "#{script_path} #{SITE_CONFIG_DIR}"
         end
       end
     end
