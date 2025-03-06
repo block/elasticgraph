@@ -27,15 +27,36 @@ window.store = {
         if (results.length) {
             let appendString = '';
 
-            for (let i = 0; i < results.length; i++) {
+            for (let i = 0; i < Math.min(results.length, 50); i++) {
                 let item = store[results[i].ref];
-                appendString += '<li><a href="' + item.url + '"><h3>' + item.title + '</h3></a>';
-                appendString += '<p>' + item.content.substring(0, 150) + '...</p></li>';
+                let score = results[i].score;
+                
+                // Find the matching text to show in the preview
+                let preview = item.content;
+                const searchTerm = document.getElementById('search-input').value.toLowerCase();
+                const matchIndex = preview.toLowerCase().indexOf(searchTerm);
+                if (matchIndex > -1) {
+                    const startIndex = Math.max(0, matchIndex - 75);
+                    const endIndex = Math.min(preview.length, matchIndex + 150);
+                    preview = '...' + preview.substring(startIndex, endIndex) + '...';
+                } else {
+                    preview = preview.substring(0, 150) + '...';
+                }
+
+                appendString += '<li class="result-item">';
+                appendString += '<a href="' + item.url + '"><h3>' + item.title + '</h3></a>';
+                appendString += '<p class="preview">' + preview + '</p>';
+                appendString += '<p class="url">' + item.url + '</p>';
+                appendString += '</li>';
+            }
+
+            if (results.length > 50) {
+                appendString += '<li class="more-results">Showing top 50 results of ' + results.length + ' total matches</li>';
             }
 
             searchResults.innerHTML = appendString;
         } else {
-            searchResults.innerHTML = '<li>No results found</li>';
+            searchResults.innerHTML = '<li class="no-results">No results found</li>';
         }
     }
 
@@ -107,16 +128,20 @@ window.store = {
 <style>
 .search-container {
     margin: 20px 0;
+    max-width: 960px;
+    margin: 20px auto;
+    padding: 0 20px;
 }
 
 #search-input {
     width: 100%;
     padding: 12px 20px;
-    margin: 8px 0;
+    margin: 8px 0 20px 0;
     box-sizing: border-box;
     border: 2px solid #ccc;
     border-radius: 4px;
     font-size: 16px;
+    background-color: white;
 }
 
 #search-results {
@@ -124,18 +149,83 @@ window.store = {
     padding: 0;
 }
 
-#search-results li {
-    margin-bottom: 20px;
-    padding: 10px;
-    border-bottom: 1px solid #eee;
+.result-item {
+    margin-bottom: 25px;
+    padding: 15px;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    background-color: white;
 }
 
-#search-results h3 {
+.result-item:hover {
+    border-color: #ddd;
+    background-color: #f9f9f9;
+}
+
+.result-item h3 {
     margin: 0 0 10px 0;
+    color: #2c5282;
 }
 
-#search-results p {
-    margin: 0;
+.result-item .preview {
+    margin: 10px 0;
+    color: #4a5568;
+    font-size: 0.95em;
+    line-height: 1.5;
+}
+
+.result-item .url {
+    margin: 5px 0 0 0;
+    color: #718096;
+    font-size: 0.85em;
+}
+
+.no-results {
+    text-align: center;
+    padding: 20px;
     color: #666;
+    font-style: italic;
+}
+
+.more-results {
+    text-align: center;
+    padding: 10px;
+    color: #666;
+    border-top: 1px solid #eee;
+    margin-top: 20px;
+}
+
+@media (prefers-color-scheme: dark) {
+    #search-input {
+        background-color: #2d3748;
+        border-color: #4a5568;
+        color: #e2e8f0;
+    }
+    
+    .result-item {
+        background-color: #2d3748;
+        border-color: #4a5568;
+    }
+    
+    .result-item:hover {
+        background-color: #283141;
+        border-color: #4a5568;
+    }
+    
+    .result-item h3 {
+        color: #90cdf4;
+    }
+    
+    .result-item .preview {
+        color: #e2e8f0;
+    }
+    
+    .result-item .url {
+        color: #a0aec0;
+    }
+    
+    .no-results, .more-results {
+        color: #a0aec0;
+    }
 }
 </style>
