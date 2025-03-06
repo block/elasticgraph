@@ -6,9 +6,10 @@
 #
 # frozen_string_literal: true
 
-require "elastic_graph/local/rake_tasks"
-require "elastic_graph/query_registry/rake_tasks"
+# Note: we need to avoid loading anything here except rake and standard library things, because
+# our release workflow loads this with a minimal Gemfile that lacks most of our dependencies.
 require "pathname"
+require "rake/tasklib"
 
 module ElasticGraph
   class SiteRakeTasks < ::Rake::TaskLib
@@ -254,34 +255,40 @@ module ElasticGraph
           end
         end
 
-        namespace :examples do
-          task compile_queries: EXAMPLE_SCHEMA_FILES_BY_NAME.keys.map { |schema| "#{schema}:compile_queries" }
+        # When we are releasing gems, these dependencies aren't available.
+        unless ENV["BUNDLE_GEMFILE"].to_s.end_with?("config/release/Gemfile")
+          require "elastic_graph/local/rake_tasks"
+          require "elastic_graph/query_registry/rake_tasks"
 
-          EXAMPLE_SCHEMA_FILES_BY_NAME.each do |schema_name, schema_file|
-            example_dir = schema_file.parent
-            settings_file = example_dir / "local_settings.yaml"
-            queries_dir = example_dir / "queries"
+          namespace :examples do
+            task compile_queries: EXAMPLE_SCHEMA_FILES_BY_NAME.keys.map { |schema| "#{schema}:compile_queries" }
 
-            namespace schema_name do
-              ::ElasticGraph::Local::RakeTasks.new(local_config_yaml: settings_file, path_to_schema: schema_file) do |tasks|
-                tasks.opensearch_versions = []
-                tasks.enforce_json_schema_version = false
-              end
-              ::ElasticGraph::QueryRegistry::RakeTasks.from_yaml_file(settings_file, queries_dir)
+            EXAMPLE_SCHEMA_FILES_BY_NAME.each do |schema_name, schema_file|
+              example_dir = schema_file.parent
+              settings_file = example_dir / "local_settings.yaml"
+              queries_dir = example_dir / "queries"
 
-              task "query_registry:validate_queries" => ["schema_artifacts:dump", "query_registry:dump_variables:all"]
+              namespace schema_name do
+                ::ElasticGraph::Local::RakeTasks.new(local_config_yaml: settings_file, path_to_schema: schema_file) do |tasks|
+                  tasks.opensearch_versions = []
+                  tasks.enforce_json_schema_version = false
+                end
+                ::ElasticGraph::QueryRegistry::RakeTasks.from_yaml_file(settings_file, queries_dir)
 
-              task compile_queries: "query_registry:validate_queries" do
-                queries_by_name_by_category = queries_dir.children.to_h do |category_path|
-                  queries_by_name = category_path.glob("*.graphql").to_h do |query_path|
-                    [query_path.basename.sub_ext("").to_s, query_path.read.strip]
+                task "query_registry:validate_queries" => ["schema_artifacts:dump", "query_registry:dump_variables:all"]
+
+                task compile_queries: "query_registry:validate_queries" do
+                  queries_by_name_by_category = queries_dir.children.to_h do |category_path|
+                    queries_by_name = category_path.glob("*.graphql").to_h do |query_path|
+                      [query_path.basename.sub_ext("").to_s, query_path.read.strip]
+                    end
+
+                    [category_path.basename.to_s, queries_by_name]
                   end
 
-                  [category_path.basename.to_s, queries_by_name]
+                  ::FileUtils.mkdir_p JEKYLL_DATA_DIR
+                  ::File.write(::File.join(JEKYLL_DATA_DIR, "#{schema_name}_queries.yaml"), ::YAML.dump(queries_by_name_by_category))
                 end
-
-                ::FileUtils.mkdir_p JEKYLL_DATA_DIR
-                ::File.write(::File.join(JEKYLL_DATA_DIR, "#{schema_name}_queries.yaml"), ::YAML.dump(queries_by_name_by_category))
               end
             end
           end

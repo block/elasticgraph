@@ -18,42 +18,8 @@ permissions:
   contents: read
 
 jobs:
-  archive_docs:
-    name: Archive Docs
-    runs-on: ubuntu-latest
-    steps:
-      # Set up
-      - name: Harden Runner
-        uses: step-security/harden-runner@4d991eb9b905ef189e4c376166672c3f2f230481 # v2.11.0
-        with:
-          egress-policy: audit
-
-      - name: Checkout Git Repo
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@2a18b06812b0e15bb916e1df298d3e740422c47e # v1.203.0
-        with:
-          bundler-cache: true
-          ruby-version: ruby
-
-      - name: Setup Git Config
-        # https://github.com/orgs/community/discussions/26560#discussioncomment-3531273
-        run: |
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git config user.name "github-actions[bot]"
-
-      - name: Archive Docs (for non-prerelease versions)
-        run: |
-          if [[ ! "${{ inputs.version }}" =~ [a-zA-Z] ]]; then
-            bundle exec rake "site:archive_docs[${{ inputs.version }}]"
-            git add config/site/archived_docs/v${{ inputs.version }}.tar.gz
-            git commit -m "Archive docs for v${{ inputs.version }}"
-          fi
-
   release:
     name: Release Gems
-    needs: archive_docs
     # Limit who can run run this action to core maintainers.
     if: github.repository == 'block/elasticgraph' && contains('["myronmarston", "BrianSigafoos-SQ"]', github.actor)
     runs-on: ubuntu-latest
@@ -96,6 +62,14 @@ jobs:
           cp config/release/Rakefile .
           git update-index --skip-worktree Rakefile
           echo "BUNDLE_GEMFILE=config/release/Gemfile" >> "$GITHUB_ENV"
+
+      - name: Archive Docs (for non-prerelease versions)
+        run: |
+          if [[ ! "${{ inputs.version }}" =~ [a-zA-Z] ]]; then
+            bundle exec rake "site:archive_docs[${{ inputs.version }}]"
+            git add config/site/archived_docs/v${{ inputs.version }}.tar.gz
+            git commit -m "Archive docs for v${{ inputs.version }}"
+          fi
 
       - name: Bump the ElasticGraph version
         run: |
