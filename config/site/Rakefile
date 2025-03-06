@@ -41,7 +41,7 @@ module ElasticGraph
 
     def initialize
       namespace :site do
-        task :build_docs do
+        task build_docs: [:unpack_doc_archives] do
           # Clean the docs output directory
           FileUtils.rm_rf(YARD_OUTPUT_DIR)
           run_yard_doc_ignoring_expected_warnings
@@ -132,6 +132,48 @@ module ElasticGraph
         desc "Build Jekyll site with freshly generated YARD documentation"
         task build: [:build_docs, :build_css, "examples:compile_queries"] do
           sh "bundle exec jekyll build #{common_jekyll_args}"
+        end
+
+        desc "Build YARD docs and create versioned archive"
+        task :archive_docs, [:version] => [:build_docs] do |_, args|
+          abort "Version argument is required (e.g., rake site:archive_docs[1.0.0])" unless args[:version]
+
+          archive_name = "v#{args[:version]}.tar.gz"
+          archived_docs_dir = File.join(SITE_CONFIG_DIR, "archived_docs")
+          archive_path = File.join(archived_docs_dir, archive_name)
+
+          FileUtils.mkdir_p(archived_docs_dir)
+
+          Dir.chdir(YARD_OUTPUT_DIR) do
+            # --no-xattrs is necessary to ensure that apple-specific attributes are excluded from the archive.
+            # When unpacking the archives on linux system, it produces warnings if we allow apple's extended
+            # attributes to be included.
+            sh "tar --no-xattrs -czf #{archive_path} ."
+          end
+
+          puts "Documentation archive created at: #{archive_path}"
+        end
+
+        desc "Unpack all documentation archives into src/docs"
+        task :unpack_doc_archives do
+          archived_docs_dir = File.join(SITE_CONFIG_DIR, "archived_docs")
+          docs_dir = File.join(SITE_SOURCE_DIR, "docs")
+
+          Dir.glob(File.join(archived_docs_dir, "*.tar.gz")).sort.each do |archive|
+            version_name = File.basename(archive, ".tar.gz")
+            target_dir = File.join(docs_dir, version_name)
+
+            # Remove existing directory if it exists
+            FileUtils.rm_rf(target_dir)
+            FileUtils.mkdir_p(target_dir)
+
+            puts "Unpacking #{version_name} documentation..."
+            Dir.chdir(target_dir) do
+              sh "tar -xzf #{archive}"
+            end
+          end
+
+          puts "All documentation archives have been unpacked"
         end
 
         desc "Serve Jekyll site locally"
