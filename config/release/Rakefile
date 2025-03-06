@@ -15,6 +15,9 @@ require "gem/release"
 require "#{project_root}/elasticgraph-support/lib/elastic_graph/version"
 require "#{project_root}/script/list_eg_gems"
 
+# Load tasks from config/site/Rakefile
+load "#{project_root}/config/site/Rakefile"
+
 desc "Bumps the ElasticGraph version to the specified new version number"
 task :bump_version, [:version] do |_, args|
   version = args.fetch(:version)
