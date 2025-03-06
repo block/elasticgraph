@@ -1,0 +1,1098 @@
+# ElasticGraph Documentation
+## Query Api
+
+
+ElasticGraph provides an extremely flexible GraphQL query API. As with every GraphQL API, you request the fields you want:
+
+```graphql
+query ListArtistAlbums {
+  artists {
+    nodes {
+      name
+      albums {
+        name
+        releasedOn
+
+        tracks {
+          name
+        }
+      }
+    }
+  }
+}
+```
+
+If you're just getting started with GraphQL, we recommend you review the [graphql.org learning materials](https://graphql.org/learn/queries/).
+
+ElasticGraph offers a number of query features that go far beyond a traditional GraphQL
+API. Each of these features is implemented directly by the ElasticGraph framework, ensuring
+consistent, predictable behavior across your entire schema.
+
+
+
+
+## Aggregations
+
+
+ElasticGraph offers a powerful aggregations API. Each indexed type gets a corresponding `*Aggregations` field.
+Here's a complete example:
+
+```graphql
+query BluegrassArtistAggregations($cursor: Cursor) {
+  artistAggregations(
+    first: 10
+    after: $cursor
+    filter: {bio: {description: {matchesQuery: {query: "bluegrass"}}}}
+  ) {
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+
+    nodes {
+      groupedBy {
+        bio { yearFormed }
+      }
+
+      aggregatedValues {
+        lifetimeSales {
+          approximateAvg
+          exactMin
+          exactMax
+        }
+      }
+
+      count
+
+      subAggregations {
+        albums(
+          first: 3
+          filter: {tracks: {count: {gt: 10}}}
+        ) {
+          nodes {
+            countDetail { approximateValue }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+Aggregation fields support [filtering]([filtering](#filtering)) and [pagination]([pagination](#pagination))
+but do _not_ support client-specified [sorting]([sorting](#sorting))[^1]. Under an aggregations field, each node
+represents a grouping of documents. When [`groupedBy` fields]([aggregations/grouping](#aggregations/grouping)) have been requested,
+each node represents the grouping of documents that have the `groupedBy` values. When no `groupedBy` fields have been requested,
+a single node will be returned containing a grouping for all documents matched by the filter.
+
+Aggregation nodes in turn offer 4 different aggregation features.
+
+[^1]: Aggregation sorting is implicitly controlled by the [groupings]([aggregations/grouping](#aggregations/grouping))--the
+      nodes will sort ascending by each of the grouping fields.
+
+
+
+## Counts
+
+
+The aggregations API allows you to count documents within a grouping:
+
+```graphql
+query ArtistCountsByCountry {
+  artistAggregations {
+    nodes {
+      groupedBy {
+        bio { homeCountry }
+      }
+
+      count
+    }
+  }
+}
+```
+
+This query, for example, returns a grouping for each country, and provides a count of how many artists
+call each country home.
+
+
+
+## Grouping
+
+
+When aggregating documents, the groupings are defined by `groupedBy`. Here's an example:
+
+```graphql
+query ArtistCountsByYearFormedAndHomeCountry {
+  artistAggregations {
+    nodes {
+      groupedBy {
+        bio {
+          yearFormed
+          homeCountry
+        }
+      }
+
+      count
+    }
+  }
+}
+```
+
+In this case, we're grouping by multiple fields; a grouping will be returned for each
+combination of `Artist.bio.yearFormed` and `Artist.bio.homeCountry` found in the data.
+
+### Date Grouping
+
+In the example above, the grouping was performed on the raw values of the `groupedBy` fields.
+However, for `Date` fields it's generally more useful to group by _truncated_ values.
+Here's an example:
+
+```graphql
+query AlbumSalesByReleaseYear {
+  artistAggregations {
+    nodes {
+      subAggregations {
+        albums {
+          nodes {
+            groupedBy {
+              releasedOn {
+                asDate(truncationUnit: YEAR)
+              }
+            }
+
+            aggregatedValues {
+              soldUnits {
+                exactSum
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+In this case, we're truncating the `Album.releaseOn` dates to the year to give us one grouping per
+year rather than one grouping per distinct date. The `truncationUnit` argument supports `DAY`, `MONTH`,
+`QUARTER`, `WEEK` and `YEAR` values. In addition, an `offset` argument is supported, which can be used
+to shift what grouping a `Date` falls into. This is particularly useful when using `WEEK`:
+
+```graphql
+query AlbumSalesByReleaseWeek {
+  artistAggregations {
+    nodes {
+      subAggregations {
+        albums {
+          nodes {
+            groupedBy {
+              releasedOn {
+                asDate(truncationUnit: WEEK, offset: {amount: -1, unit: DAY})
+              }
+            }
+
+            aggregatedValues {
+              soldUnits {
+                exactSum
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+With no offset, grouped weeks run Monday to Sunday, but we can shift it using `offset`. In this case, the weeks have been
+shifted to run Sunday to Saturday.
+
+Finally, we can also group `Date` fields by what day of week they fall into using `asDayOfWeek` instead of `asDate`:
+
+```graphql
+query AlbumSalesByReleaseDayOfWeek {
+  artistAggregations {
+    nodes {
+      subAggregations {
+        albums {
+          nodes {
+            groupedBy {
+              releasedOn {
+                asDayOfWeek
+              }
+            }
+
+            aggregatedValues {
+              soldUnits {
+                exactSum
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+### DateTime Grouping
+
+`DateTime` fields offer a similar grouping API. `asDate` and `asDayOfWeek` work the same, but they accept an optional `timeZone`
+argument (default is "UTC"):
+
+```graphql
+query TourAttendanceByYear {
+  artistAggregations {
+    nodes {
+      subAggregations {
+        tours {
+          nodes {
+            subAggregations {
+              shows {
+                nodes {
+                  groupedBy {
+                    startedAt {
+                      asDate(
+                        truncationUnit: YEAR
+                        timeZone: "America/Los_Angeles"
+                      )
+                    }
+                  }
+
+                  aggregatedValues {
+                    attendance {
+                      exactSum
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+Sub-day granualarities (`HOUR`, `MINUTE`, `SECOND`) are supported when you use `asDateTime` instead of `asDate`:
+
+```graphql
+query TourAttendanceByHour {
+  artistAggregations {
+    nodes {
+      subAggregations {
+        tours {
+          nodes {
+            subAggregations {
+              shows {
+                nodes {
+                  groupedBy {
+                    startedAt {
+                      asDateTime(truncationUnit: HOUR)
+                    }
+                  }
+
+                  aggregatedValues {
+                    attendance {
+                      exactSum
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+Finally, you can group by the time of day (while ignoring the date) by using `asTimeOfDay`:
+
+```graphql
+query TourAttendanceByHourOfDay {
+  artistAggregations {
+    nodes {
+      subAggregations {
+        tours {
+          nodes {
+            subAggregations {
+              shows {
+                nodes {
+                  groupedBy {
+                    startedAt {
+                      asTimeOfDay(truncationUnit: HOUR)
+                    }
+                  }
+
+                  aggregatedValues {
+                    attendance {
+                      exactSum
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+
+
+## Aggregated Values
+
+
+Aggregated values can be computed from all values of a particular field from all documents backing an aggregation node.
+Here's an example:
+
+```graphql
+query BluegrassArtistLifetimeSales {
+  artistAggregations(
+    filter: {bio: {description: {matchesQuery: {query: "bluegrass"}}}}
+  ) {
+    nodes {
+      groupedBy {
+        bio { yearFormed }
+      }
+
+      aggregatedValues {
+        lifetimeSales {
+          exactMin
+          exactMax
+
+          exactSum
+          approximateSum
+
+          approximateAvg
+        }
+      }
+    }
+  }
+}
+```
+
+This example query aggregates the values of the `Artist.lifetimeSales` field using all 4 of the standard numeric
+aggregated values: `min`, `max`, `avg`, and `sum`. These are qualified with `approximate` or `exact` to indicate
+the level of precision they offer. The documentation for `approximateSum` and `exactSum` provide more detail:
+
+`approximateSum`
+: The (approximate) sum of the field values within this grouping.
+
+  Sums of large `Int` values can result in overflow, where the exact sum cannot
+  fit in a `JsonSafeLong` return value. This field, as a double-precision `Float`, can
+  represent larger sums, but the value may only be approximate.
+
+`exactSum`
+: The exact sum of the field values within this grouping, if it fits in a `JsonSafeLong`.
+
+  Sums of large `Int` values can result in overflow, where the exact sum cannot
+  fit in a `JsonSafeLong`. In that case, `null` will be returned, and `approximateSum`
+  can be used to get an approximate value.
+
+Besides these standard numeric aggregated values, ElasticGraph offers one more:
+
+```graphql
+query SkaArtistHomeCountries {
+  artistAggregations(
+    filter: {bio: {description: {matchesQuery: {query: "ska"}}}}
+  ) {
+    nodes {
+      groupedBy {
+        bio { yearFormed }
+      }
+
+      aggregatedValues {
+        bio {
+          homeCountry {
+            approximateDistinctValueCount
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+The `approximateDistinctValueCount` field uses the [HyperLogLog++ algorithm](https://research.google.com/pubs/archive/40671.pdf)
+to provide an approximate count of distinct values for the field. In this case, it can give us an idea of how many countries ska
+bands were formed in, in each year.
+
+
+
+## Sub Aggregations
+
+
+The example schema used throughout this guide has a number of lists-of-object fields nested
+within the overall `Artist` type:
+
+* `Artist.albums`
+  * `Artist.albums[].tracks`
+* `Artist.tours`
+  * `Artist.tours[].shows`
+
+ElasticGraph supports aggregations on these nested fields via `subAggregations`. This can be used
+to aggregate directly on the data of one of these fields. For example, this query returns the
+total sales for all albums of all artists:
+
+```graphql
+query TotalAlbumSales {
+  artistAggregations {
+    nodes {
+      subAggregations {
+        albums {
+          nodes {
+            aggregatedValues {
+              soldUnits {
+                exactSum
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+Sub-aggregations can also be performed under the groupings of an outer aggregation. For example,
+this query returns the total album sales grouped by the home country of the artist:
+
+```graphql
+query TotalAlbumSalesByArtistHomeCountry {
+  artistAggregations {
+    nodes {
+      groupedBy {
+        bio {
+          homeCountry
+        }
+      }
+
+      subAggregations {
+        albums {
+          nodes {
+            aggregatedValues {
+              soldUnits {
+                exactSum
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+Sub-aggregation nodes offer the standard set of aggregation operations:
+
+* [Aggregated Values]([aggregations/aggregated-values](#aggregations/aggregated-values))
+* [Counts]([aggregations/counts](#aggregations/counts))
+* [Grouping]([aggregations/grouping](#aggregations/grouping))
+* Sub-aggregations
+
+### Filtering Sub-Aggregations
+
+The data included in a sub-aggregation can be filtered. For example, this query gets the total
+sales of all albums released in the 21st century:
+
+```graphql
+query TwentyFirstCenturyAlbumSales {
+  artistAggregations {
+    nodes {
+      subAggregations {
+        albums(filter: {
+          releasedOn: {gte: "2000-01-01"}
+        }) {
+          nodes {
+            aggregatedValues {
+              soldUnits {
+                exactSum
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+### Sub-Aggregation Limitations
+
+Sub-aggregation pagination support is limited. You can use `first` to request how many
+nodes are returned, but there is no `pageInfo` and you cannot request the next page of data:
+
+```graphql
+query AlbumSalesByReleaseMonth {
+  artistAggregations {
+    nodes {
+      subAggregations {
+        albums(first: 100) {
+          nodes {
+            groupedBy {
+              releasedOn {
+                asDate(truncationUnit: MONTH)
+              }
+            }
+
+            aggregatedValues {
+              soldUnits {
+                exactSum
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+Sub-aggregation counts are approximate. Instead of `count`, ElasticGraph offers `countDetail`
+with multiple subfields:
+
+```graphql
+query AlbumCount {
+  artistAggregations {
+    nodes {
+      subAggregations {
+        albums {
+          nodes {
+            countDetail {
+              approximateValue
+              exactValue
+              upperBound
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+`approximateValue`
+: The (approximate) count of documents in this aggregation bucket.
+
+  When documents in an aggregation bucket are sourced from multiple shards, the count may be only
+  approximate. The `upperBound` indicates the maximum value of the true count, but usually
+  the true count is much closer to this approximate value (which also provides a lower bound on the
+  true count).
+
+  When this approximation is known to be exact, the same value will be available from `exactValue`
+  and `upperBound`.
+
+`exactValue`
+: The exact count of documents in this aggregation bucket, if an exact value can be determined.
+
+  When documents in an aggregation bucket are sourced from multiple shards, it may not be possible to
+  efficiently determine an exact value. When no exact value can be determined, this field will be `null`.
+  The `approximateValue` field--which will never be `null`--can be used to get an approximation
+  for the count.
+
+`upperBound`
+: An upper bound on how large the true count of documents in this aggregation bucket could be.
+
+  When documents in an aggregation bucket are sourced from multiple shards, it may not be possible to
+  efficiently determine an exact value. The `approximateValue` field provides an approximation,
+  and this field puts an upper bound on the true count.
+
+
+
+## Filtering
+
+
+Use `filter:` on a root query field to narrow down the returned results:
+
+```graphql
+query FindArtist {
+  byName: artists(filter: {
+    name: {equalToAnyOf: ["U2"]}
+  }) {
+    nodes {
+      name
+      bio {
+        yearFormed
+      }
+    }
+  }
+
+  byBioYearFounded: artists(filter: {
+    bio: {yearFormed: {gt: 2000}}
+  }) {
+    nodes {
+      name
+      bio {
+        yearFormed
+      }
+    }
+  }
+}
+```
+
+As shown here, filters have two basic parts:
+
+* A _field path_: this specifies which field you want to filter on. When dealing with a nested field (e.g. `bio.yearFormed`),
+  you'll need to provide a nested object matching the field structure.
+* A _filtering predicate_: this specifies a filtering operator to apply at the field path.
+
+### Empty Filters
+
+Filters with a value of `null` or empty object (`{}`) match all documents. When negated with `not`, no documents are matched.
+The filters in this query match all documents:
+
+```graphql
+query EmptyFilters {
+  artists(filter: {
+    name: {equalToAnyOf: null}
+    bio: {yearFormed: {}}
+  }) {
+    nodes {
+      name
+      bio {
+        yearFormed
+      }
+    }
+  }
+}
+```
+
+This particularly comes in handy when using [query variables](https://graphql.org/learn/queries/#variables).
+It allows a query to flexibly support a wide array of filters without requiring them to all be used for an
+individual request.
+
+```graphql
+query FindArtists(
+  $names: [String!] = null
+  $yearFormed_gt: Int = null
+  $albumNames: [String!] = null
+) {
+  artists(filter: {
+    name: {equalToAnyOf: $names}
+    bio: {yearFormed: {gt: $yearFormed_gt}}
+    albums: {anySatisfy: {name: {equalToAnyOf: $albumNames}}}
+  }) {
+    nodes {
+      name
+      bio {
+        yearFormed
+      }
+      albums {
+        name
+      }
+    }
+  }
+}
+```
+
+
+
+
+## Available Predicates
+
+
+ElasticGraph offers a variety of filtering predicates:
+
+{% comment %}
+  Note: these are ordered so that the predicates are sorted alphabetically. The file
+  names are not alphabetical because they are named after "categories" rather than
+  the predicates themselves.
+{% endcomment %}
+
+
+
+
+## Comparison
+
+
+ElasticGraph offers a standard set of comparison filter predicates:
+
+```graphql
+query FindArtistsFormedIn90s {
+  artists(filter: {
+    bio: {yearFormed: {gte: 1990, lt: 2000}}
+  }) {
+    nodes {
+      name
+      bio {
+        yearFormed
+      }
+      albums {
+        name
+      }
+    }
+  }
+}
+```
+
+
+
+## Equality
+
+
+The most commonly used predicate supports equality filtering:
+
+Here's a basic example:
+
+```graphql
+query EqualityFilter {
+  artists(filter: {
+    name: {equalToAnyOf: ["U2", "Radiohead"]}
+  }) {
+    nodes {
+      name
+      bio {
+        yearFormed
+      }
+    }
+  }
+}
+```
+
+Unlike the SQL `IN` operator, you can find records with `null` values if you put `null` in the list:
+
+```graphql
+query EqualityFilterNull {
+  artists(filter: {
+    name: {equalToAnyOf: [null]}
+  }) {
+    nodes {
+      name
+      bio {
+        yearFormed
+      }
+    }
+  }
+}
+```
+
+
+
+## Full Text Search
+
+
+ElasticGraph supports two full-text search filtering predicates:
+
+### Matches Query
+
+`matchesQuery` is the more lenient of the two predicates. It's designed to match broadly. Here's an example:
+
+```graphql
+query AccordionOrViolinSearch {
+  artists(filter: {
+    bio: {
+      description: {
+        matchesQuery: {
+          query: "accordion violin"
+        }
+      }
+    }
+  }) {
+    nodes {
+      name
+      bio {
+        description
+      }
+    }
+  }
+}
+```
+
+This query will match artists with bios like:
+
+> Renowned for his mesmerizing performances, Luca "The Breeze" Fontana captivates audiences with his accordion,
+> weaving intricate melodies that dance between the notes of traditional folk and modern jazz.
+
+> Sylvia  Varela's avant-garde violin playing defies tradition, blending haunting dissonance with unexpected rhythms.
+
+Notably, the description needs `accordion` OR `violin`, but not both. In addition, it would match an artist bio that
+mentioned "viola" since it supports fuzzy matching by default and "viola" is only 2 edits away from "violin". Arguments
+are supported to control both aspects to make matching stricter:
+
+```graphql
+query AccordionAndViolinStrictSearch {
+  artists(filter: {
+    bio: {
+      description:{
+        matchesQuery: {
+          query: "accordion violin"
+          requireAllTerms: true
+          allowedEditsPerTerm: NONE
+        }
+      }
+    }
+  }) {
+    nodes {
+      name
+      bio {
+        description
+      }
+    }
+  }
+}
+```
+
+### Matches Phrase
+
+`matchesPhrase` is even stricter: it requires all terms _in the provided order_ (`matchesQuery` doesn't care about order). It's particularly useful when you want to search on a particular multi-word expression:
+
+```graphql
+query PhraseSearch {
+  artists(filter: {
+    bio: {
+      description:{
+        matchesPhrase: {
+          phrase: "Ed Sullivan Show"
+        }
+      }
+    }
+  }) {
+    nodes {
+      name
+      bio {
+        description
+      }
+    }
+  }
+}
+```
+
+### Bypassing matchesPhrase and matchesQuery
+
+In order to make a `matchesPhrase` or `matchesQuery` filter optional, you can supply `null` to the `MatchesQueryFilterInput` parameter, like this:
+
+```graphql
+query OptionalMatchingFilter(
+  $optionalMatchQuery: MatchesQueryFilterInput = null
+) {
+  artists(filter: {
+    bio: {
+      description: {
+        matchesQuery: $optionalMatchQuery
+      }
+    }
+  }) {
+    nodes {
+      name
+      bio {
+        description
+      }
+    }
+  }
+}
+```
+
+
+
+## Geographic
+
+
+The `GeoLocation` type supports a special predicate:
+
+```graphql
+query FindSeattleVenues {
+  venues(filter: {
+    location: {near: {
+      latitude: 47.621
+      longitude: -122.349
+      maxDistance: 10
+      unit: MILE
+    }}
+  }) {
+    nodes {
+      name
+      capacity
+    }
+  }
+}
+```
+
+
+
+## List
+
+
+ElasticGraph supports a couple predicates for filtering on list fields:
+
+### Filtering on list elements with `anySatisfy`
+
+When filtering on a list field, use `anySatisfy` to find records with matching list elements.
+This query, for example, will find artists that released a platinum-selling album in the 1990s:
+
+```graphql
+query ArtistsWithPlatinum90sAlbum {
+  artists(filter: {
+    albums: {
+      anySatisfy: {
+        soldUnits: {gte: 1000000}
+        releasedOn: {gte: "1990-01-01", lt: "2000-01-01"}
+      }
+    }
+  }) {
+    nodes {
+      name
+      albums {
+        name
+        releasedOn
+        soldUnits
+      }
+    }
+  }
+}
+```
+
+**Warning**
+One thing to bear in mind: this query is selecting which _artists_ to return,
+not which _albums_ to return. You might expect that the returned `nodes.albums` would
+all be platinum-selling 90s albums, but that's not how the filtering API works. Only artists
+that had a platinum-selling 90s album will be returned, and for each returned artists, all
+their albums will be returned--even ones that sold poorly or were released outside the 1990s.
+
+### Filtering on the list size with `count`
+
+If you'd rather filter on the _size_ of a list, use `count`:
+
+```graphql
+query FindProlificArtists {
+  artists(filter: {
+    albums: {count: {gte: 20}}
+  }) {
+    nodes {
+      name
+      albums {
+        name
+      }
+    }
+  }
+}
+```
+
+
+
+## Negation
+
+
+ElasticGraph supports a negation predicate:
+
+One of the more common use cases is to filter to non-null values:
+
+```graphql
+query FindArtistsWithBios {
+  artists(filter: {
+    bio: {description: {not: {equalToAnyOf: [null]}}}
+  }) {
+    nodes {
+      name
+      bio {
+        description
+      }
+    }
+  }
+}
+```
+
+`not` is available at any level of a `filter`. All of these are equivalent:
+
+* `bio: {description: {not: {equalToAnyOf: [null]}}}`
+* `bio: {not: {description: {equalToAnyOf: [null]}}}`
+* `not: {bio: {description: {equalToAnyOf: [null]}}}`
+
+
+
+## Pagination
+
+
+To provide pagination, ElasticGraph implements the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm). Here's an example query showing
+pagination in action:
+
+```graphql
+query PaginationExample($cursor: Cursor) {
+  artists(first: 10, after: $cursor) {
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+    edges {
+      node {
+        name
+        albums {
+          name
+        }
+      }
+    }
+  }
+}
+```
+
+In addition, ElasticGraph offers some additional features beyond the Relay spec.
+
+### Total Edge Count
+
+As an extension to the Relay spec, ElasticGraph offers a `totalEdgeCount` field alongside `edges` and `pageInfo`.
+It can be used to get a total count of matching records:
+
+```graphql
+query Count21stCenturyArtists {
+  artists(filter: {
+    bio: {yearFormed: {gte: 2000}}
+  }) {
+    totalEdgeCount
+  }
+}
+```
+
+Note: `totalEdgeCount` is not available under an [aggregations]([aggregations](#aggregations)) field.
+
+### Nodes
+
+As an alternative to `edges.node`, ElasticGraph offers `nodes`. This is recommended over `edges` except when you need
+a per-node `cursor` (which is available under `edges`) since it removes an extra layer of nesting, providing a simpler
+response structure:
+
+```graphql
+query PaginationNodes($cursor: Cursor) {
+  artists(first: 10, after: $cursor) {
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+    nodes {
+      name
+      albums {
+        name
+      }
+    }
+  }
+}
+```
+
+
+
+## Sorting
+
+
+Use `orderBy:` on a root query field to control how the results are sorted:
+
+```graphql
+query ListArtists {
+  artists(orderBy: [name_ASC, bio_yearFormed_DESC]) {
+    nodes {
+      name
+      albums {
+        name
+      }
+    }
+  }
+}
+```
+
+This query, for example, would sort by `name` (ascending), with `bio.yearFormed` (descending) as a tie breaker.
+
+
