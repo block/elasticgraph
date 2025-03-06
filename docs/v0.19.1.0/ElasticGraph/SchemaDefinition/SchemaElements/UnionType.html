@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: ElasticGraph::SchemaDefinition::SchemaElements::UnionType
+  
+    &mdash; Documentation by YARD 0.9.37
+  
+</title>
+
+  <link rel="stylesheet" href="../../../css/style.css" type="text/css" />
+
+  <link rel="stylesheet" href="../../../css/common.css" type="text/css" />
+
+<script type="text/javascript">
+  pathId = "ElasticGraph::SchemaDefinition::SchemaElements::UnionType";
+  relpath = '../../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../../_index.html">Index (U)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../../SchemaDefinition.html" title="ElasticGraph::SchemaDefinition (module)">SchemaDefinition</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../SchemaElements.html" title="ElasticGraph::SchemaDefinition::SchemaElements (module)">SchemaElements</a></span></span>
+     &raquo; 
+    <span class="title">UnionType</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: ElasticGraph::SchemaDefinition::SchemaElements::UnionType
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Struct</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Struct</li>
+          
+            <li class="next">ElasticGraph::SchemaDefinition::SchemaElements::UnionType</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  <dl>
+      <dt>Includes:</dt>
+      <dd><span class='object_link'><a href="../Mixins/CanBeGraphQLOnly.html" title="ElasticGraph::SchemaDefinition::Mixins::CanBeGraphQLOnly (module)">Mixins::CanBeGraphQLOnly</a></span>, <span class='object_link'><a href="../Mixins/HasDerivedGraphQLTypeCustomizations.html" title="ElasticGraph::SchemaDefinition::Mixins::HasDerivedGraphQLTypeCustomizations (module)">Mixins::HasDerivedGraphQLTypeCustomizations</a></span>, <span class='object_link'><a href="../Mixins/HasDirectives.html" title="ElasticGraph::SchemaDefinition::Mixins::HasDirectives (module)">Mixins::HasDirectives</a></span>, <span class='object_link'><a href="../Mixins/HasDocumentation.html" title="ElasticGraph::SchemaDefinition::Mixins::HasDocumentation (module)">Mixins::HasDocumentation</a></span>, <span class='object_link'><a href="../Mixins/HasIndices.html" title="ElasticGraph::SchemaDefinition::Mixins::HasIndices (module)">Mixins::HasIndices</a></span>, <span class='object_link'><a href="../Mixins/VerifiesGraphQLName.html" title="ElasticGraph::SchemaDefinition::Mixins::VerifiesGraphQLName (module)">Mixins::VerifiesGraphQLName</a></span></dd>
+  </dl>
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/union_type.rb</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Defines a <a href="https://graphql.org/learn/schema/#union-types">GraphQL union type</a>. Use it to define an abstract supertype with one or
+more concrete subtypes. Each subtype must be an <span class='object_link'><a href="ObjectType.html" title="ElasticGraph::SchemaDefinition::SchemaElements::ObjectType (class)">ObjectType</a></span>, but they do not have to share any fields in common.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Define a union type</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='const'><span class='object_link'><a href="../../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span><span class='period'>.</span><span class='id identifier rubyid_define_schema'><span class='object_link'><a href="../../../ElasticGraph.html#define_schema-class_method" title="ElasticGraph.define_schema (method)">define_schema</a></span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_schema'>schema</span><span class='op'>|</span>
+  <span class='id identifier rubyid_schema'>schema</span><span class='period'>.</span><span class='id identifier rubyid_object_type'>object_type</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Card</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span>
+    <span class='comment'># ...
+</span>  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_schema'>schema</span><span class='period'>.</span><span class='id identifier rubyid_object_type'>object_type</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>BankAccount</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span>
+    <span class='comment'># ...
+</span>  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_schema'>schema</span><span class='period'>.</span><span class='id identifier rubyid_object_type'>object_type</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>BitcoinWallet</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span>
+    <span class='comment'># ...
+</span>  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_schema'>schema</span><span class='period'>.</span><span class='id identifier rubyid_union_type'>union_type</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>FundingSource</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span>
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_subtype'>subtype</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Card</span><span class='tstring_end'>&quot;</span></span>
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_subtypes'>subtypes</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>BankAccount</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>BitcoinWallet</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></code></pre>
+    
+  </div>
+
+
+</div>
+
+
+
+  <h2>Instance Attribute Summary <small><a href="#" class="summary_toggle">collapse</a></small></h2>
+  <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#schema_def_state-instance_method" title="#schema_def_state (instance method)">#<strong>schema_def_state</strong>  &#x21d2; State </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>State of the schema.</p>
+</div></span>
+  
+</li>
+
+    
+  </ul>
+
+
+
+  
+  
+  <h3 class="inherited">Attributes included from <span class='object_link'><a href="../Mixins/HasDocumentation.html" title="ElasticGraph::SchemaDefinition::Mixins::HasDocumentation (module)">Mixins::HasDocumentation</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../Mixins/HasDocumentation.html#doc_comment-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::HasDocumentation#doc_comment (method)">#doc_comment</a></span></p>
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#name-instance_method" title="#name (instance method)">#<strong>name</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>The name of the union type.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#subtype-instance_method" title="#subtype (instance method)">#<strong>subtype</strong>(name)  &#x21d2; void </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Defines a subtype of this union type.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#subtypes-instance_method" title="#subtypes (instance method)">#<strong>subtypes</strong>(*names)  &#x21d2; void </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Defines multiple subtypes of this union type.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#to_sdl-instance_method" title="#to_sdl (instance method)">#<strong>to_sdl</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>The formatted GraphQL SDL of the union type.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="../Mixins/HasDerivedGraphQLTypeCustomizations.html" title="ElasticGraph::SchemaDefinition::Mixins::HasDerivedGraphQLTypeCustomizations (module)">Mixins::HasDerivedGraphQLTypeCustomizations</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../Mixins/HasDerivedGraphQLTypeCustomizations.html#customize_derived_type_fields-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::HasDerivedGraphQLTypeCustomizations#customize_derived_type_fields (method)">#customize_derived_type_fields</a></span>, <span class='object_link'><a href="../Mixins/HasDerivedGraphQLTypeCustomizations.html#customize_derived_types-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::HasDerivedGraphQLTypeCustomizations#customize_derived_types (method)">#customize_derived_types</a></span></p>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="../Mixins/HasIndices.html" title="ElasticGraph::SchemaDefinition::Mixins::HasIndices (module)">Mixins::HasIndices</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../Mixins/HasIndices.html#derive_indexed_type_fields-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::HasIndices#derive_indexed_type_fields (method)">#derive_indexed_type_fields</a></span>, <span class='object_link'><a href="../Mixins/HasIndices.html#derived_indexed_types-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::HasIndices#derived_indexed_types (method)">#derived_indexed_types</a></span>, <span class='object_link'><a href="../Mixins/HasIndices.html#index-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::HasIndices#index (method)">#index</a></span>, <span class='object_link'><a href="../Mixins/HasIndices.html#indexed%3F-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::HasIndices#indexed? (method)">#indexed?</a></span>, <span class='object_link'><a href="../Mixins/HasIndices.html#plural_root_query_field_name-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::HasIndices#plural_root_query_field_name (method)">#plural_root_query_field_name</a></span>, <span class='object_link'><a href="../Mixins/HasIndices.html#root_query_fields-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::HasIndices#root_query_fields (method)">#root_query_fields</a></span>, <span class='object_link'><a href="../Mixins/HasIndices.html#singular_root_query_field_name-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::HasIndices#singular_root_query_field_name (method)">#singular_root_query_field_name</a></span></p>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="../Mixins/HasDirectives.html" title="ElasticGraph::SchemaDefinition::Mixins::HasDirectives (module)">Mixins::HasDirectives</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../Mixins/HasDirectives.html#directive-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::HasDirectives#directive (method)">#directive</a></span>, <span class='object_link'><a href="../Mixins/HasDirectives.html#directives-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::HasDirectives#directives (method)">#directives</a></span>, <span class='object_link'><a href="../Mixins/HasDirectives.html#directives_sdl-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::HasDirectives#directives_sdl (method)">#directives_sdl</a></span></p>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="../Mixins/HasDocumentation.html" title="ElasticGraph::SchemaDefinition::Mixins::HasDocumentation (module)">Mixins::HasDocumentation</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../Mixins/HasDocumentation.html#append_to_documentation-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::HasDocumentation#append_to_documentation (method)">#append_to_documentation</a></span>, <span class='object_link'><a href="../Mixins/HasDocumentation.html#derived_documentation-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::HasDocumentation#derived_documentation (method)">#derived_documentation</a></span>, <span class='object_link'><a href="../Mixins/HasDocumentation.html#documentation-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::HasDocumentation#documentation (method)">#documentation</a></span>, <span class='object_link'><a href="../Mixins/HasDocumentation.html#formatted_documentation-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::HasDocumentation#formatted_documentation (method)">#formatted_documentation</a></span></p>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="../Mixins/CanBeGraphQLOnly.html" title="ElasticGraph::SchemaDefinition::Mixins::CanBeGraphQLOnly (module)">Mixins::CanBeGraphQLOnly</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../Mixins/CanBeGraphQLOnly.html#graphql_only-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::CanBeGraphQLOnly#graphql_only (method)">#graphql_only</a></span>, <span class='object_link'><a href="../Mixins/CanBeGraphQLOnly.html#graphql_only%3F-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::CanBeGraphQLOnly#graphql_only? (method)">#graphql_only?</a></span></p>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="../Mixins/VerifiesGraphQLName.html" title="ElasticGraph::SchemaDefinition::Mixins::VerifiesGraphQLName (module)">Mixins::VerifiesGraphQLName</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../Mixins/VerifiesGraphQLName.html#verify_name!-class_method" title="ElasticGraph::SchemaDefinition::Mixins::VerifiesGraphQLName.verify_name! (method)">verify_name!</a></span></p>
+
+  
+  <div id="instance_attr_details" class="attr_details">
+    <h2>Instance Attribute Details</h2>
+    
+      
+      <span id=""></span>
+      <div class="method_details first">
+  <h3 class="signature first" id="schema_def_state-instance_method">
+  
+    #<strong>schema_def_state</strong>  &#x21d2; <tt><span class='object_link'>State</span></tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns state of the schema.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'>State</span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>state of the schema</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/union_type.rb', line 51</span>
+
+<span class='kw'>class</span> <span class='const'><span class='object_link'><a href="" title="ElasticGraph::SchemaDefinition::SchemaElements::UnionType (class)">UnionType</a></span></span> <span class='op'>&lt;</span> <span class='const'>Struct</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='symbol'>:schema_def_state</span><span class='comma'>,</span> <span class='symbol'>:type_ref</span><span class='comma'>,</span> <span class='symbol'>:subtype_refs</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_prepend'>prepend</span> <span class='const'><span class='object_link'><a href="../Mixins.html" title="ElasticGraph::SchemaDefinition::Mixins (module)">Mixins</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Mixins/VerifiesGraphQLName.html" title="ElasticGraph::SchemaDefinition::Mixins::VerifiesGraphQLName (module)">VerifiesGraphQLName</a></span></span>
+  <span class='id identifier rubyid_include'>include</span> <span class='const'><span class='object_link'><a href="../Mixins.html" title="ElasticGraph::SchemaDefinition::Mixins (module)">Mixins</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Mixins/CanBeGraphQLOnly.html" title="ElasticGraph::SchemaDefinition::Mixins::CanBeGraphQLOnly (module)">CanBeGraphQLOnly</a></span></span>
+  <span class='id identifier rubyid_include'>include</span> <span class='const'><span class='object_link'><a href="../Mixins.html" title="ElasticGraph::SchemaDefinition::Mixins (module)">Mixins</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Mixins/HasDocumentation.html" title="ElasticGraph::SchemaDefinition::Mixins::HasDocumentation (module)">HasDocumentation</a></span></span>
+  <span class='id identifier rubyid_include'>include</span> <span class='const'><span class='object_link'><a href="../Mixins.html" title="ElasticGraph::SchemaDefinition::Mixins (module)">Mixins</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Mixins/HasDirectives.html" title="ElasticGraph::SchemaDefinition::Mixins::HasDirectives (module)">HasDirectives</a></span></span>
+  <span class='id identifier rubyid_include'>include</span> <span class='const'><span class='object_link'><a href="../Mixins.html" title="ElasticGraph::SchemaDefinition::Mixins (module)">Mixins</a></span></span><span class='op'>::</span><span class='const'>SupportsFilteringAndAggregation</span>
+  <span class='id identifier rubyid_include'>include</span> <span class='const'><span class='object_link'><a href="../Mixins.html" title="ElasticGraph::SchemaDefinition::Mixins (module)">Mixins</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Mixins/HasIndices.html" title="ElasticGraph::SchemaDefinition::Mixins::HasIndices (module)">HasIndices</a></span></span>
+  <span class='id identifier rubyid_include'>include</span> <span class='const'><span class='object_link'><a href="../Mixins.html" title="ElasticGraph::SchemaDefinition::Mixins (module)">Mixins</a></span></span><span class='op'>::</span><span class='const'>HasSubtypes</span>
+  <span class='id identifier rubyid_include'>include</span> <span class='const'><span class='object_link'><a href="../Mixins.html" title="ElasticGraph::SchemaDefinition::Mixins (module)">Mixins</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Mixins/HasDerivedGraphQLTypeCustomizations.html" title="ElasticGraph::SchemaDefinition::Mixins::HasDerivedGraphQLTypeCustomizations (module)">HasDerivedGraphQLTypeCustomizations</a></span></span>
+  <span class='id identifier rubyid_include'>include</span> <span class='const'><span class='object_link'><a href="../Mixins.html" title="ElasticGraph::SchemaDefinition::Mixins (module)">Mixins</a></span></span><span class='op'>::</span><span class='const'>HasReadableToSAndInspect</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span> <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span> <span class='rbrace'>}</span>
+
+  <span class='comment'># @private
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='comma'>,</span> <span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
+    <span class='kw'>super</span><span class='lparen'>(</span><span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='comma'>,</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_type_ref'>type_ref</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_final_form'>to_final_form</span><span class='comma'>,</span> <span class='const'>Set</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='rparen'>)</span> <span class='kw'>do</span>
+      <span class='kw'>yield</span> <span class='kw'>self</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># @return [String] the name of the union type
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_name'>name</span>
+    <span class='id identifier rubyid_type_ref'>type_ref</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># Defines a subtype of this union type.
+</span>  <span class='comment'>#
+</span>  <span class='comment'># @param name [String] the name of an object type which is a member of this union type
+</span>  <span class='comment'># @return [void]
+</span>  <span class='comment'>#
+</span>  <span class='comment'># @example
+</span>  <span class='comment'>#   ElasticGraph.define_schema do |schema|
+</span>  <span class='comment'>#     schema.object_type &quot;Card&quot; do |t|
+</span>  <span class='comment'>#       # ...
+</span>  <span class='comment'>#     end
+</span>  <span class='comment'>#
+</span>  <span class='comment'>#     schema.union_type &quot;FundingSource&quot; do |t|
+</span>  <span class='comment'>#       t.subtype &quot;Card&quot;
+</span>  <span class='comment'>#     end
+</span>  <span class='comment'>#   end
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_subtype'>subtype</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_type_ref'>type_ref</span> <span class='op'>=</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_type_ref'>type_ref</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_final_form'>to_final_form</span>
+
+    <span class='kw'>if</span> <span class='id identifier rubyid_subtype_refs'>subtype_refs</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_type_ref'>type_ref</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_raise'>raise</span> <span class='const'>Errors</span><span class='op'>::</span><span class='const'>SchemaError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Duplicate subtype on UnionType </span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_subtype_refs'>subtype_refs</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_type_ref'>type_ref</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># Defines multiple subtypes of this union type.
+</span>  <span class='comment'>#
+</span>  <span class='comment'># @param names [Array&lt;String&gt;] names of object types which are members of this union type
+</span>  <span class='comment'># @return [void]
+</span>  <span class='comment'>#
+</span>  <span class='comment'># @example Define a union type
+</span>  <span class='comment'>#   ElasticGraph.define_schema do |schema|
+</span>  <span class='comment'>#     schema.object_type &quot;BankAccount&quot; do |t|
+</span>  <span class='comment'>#       # ...
+</span>  <span class='comment'>#     end
+</span>  <span class='comment'>#
+</span>  <span class='comment'>#     schema.object_type &quot;BitcoinWallet&quot; do |t|
+</span>  <span class='comment'>#       # ...
+</span>  <span class='comment'>#     end
+</span>  <span class='comment'>#
+</span>  <span class='comment'>#     schema.union_type &quot;FundingSource&quot; do |t|
+</span>  <span class='comment'>#       t.subtypes &quot;BankAccount&quot;, &quot;BitcoinWallet&quot;
+</span>  <span class='comment'>#     end
+</span>  <span class='comment'>#   end
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_subtypes'>subtypes</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_names'>names</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_names'>names</span><span class='period'>.</span><span class='id identifier rubyid_flatten'>flatten</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_n'>n</span><span class='op'>|</span> <span class='id identifier rubyid_subtype'>subtype</span><span class='lparen'>(</span><span class='id identifier rubyid_n'>n</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># @return [String] the formatted GraphQL SDL of the union type
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_to_sdl'>to_sdl</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_subtype_refs'>subtype_refs</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+      <span class='id identifier rubyid_raise'>raise</span> <span class='const'>Errors</span><span class='op'>::</span><span class='const'>SchemaError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>UnionType type </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> has no subtypes, but must have at least one.</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>end</span>
+
+    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_formatted_documentation'>formatted_documentation</span><span class='embexpr_end'>}</span><span class='tstring_content'>union </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_directives_sdl'>directives_sdl</span><span class='lparen'>(</span><span class='label'>suffix_with:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> </span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>= </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_subtype_refs'>subtype_refs</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:name</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_a'>to_a</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> | </span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># @private
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_verify_graphql_correctness!'>verify_graphql_correctness!</span>
+    <span class='comment'># Nothing to verify. `verify_graphql_correctness!` will be called on each subtype automatically.
+</span>  <span class='kw'>end</span>
+
+  <span class='comment'># Various things check `mapping_options` on indexed types (usually object types, but can also happen on union types).
+</span>  <span class='comment'># We need to implement `mapping_options` here to satisfy those method calls, but we will never use custom mapping on
+</span>  <span class='comment'># a union type so we hardcode it to return nil.
+</span>  <span class='comment'>#
+</span>  <span class='comment'># @private
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_mapping_options'>mapping_options</span>
+    <span class='lbrace'>{</span><span class='rbrace'>}</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_private'>private</span>
+
+  <span class='kw'>def</span> <span class='id identifier rubyid_resolve_subtypes'>resolve_subtypes</span>
+    <span class='id identifier rubyid_subtype_refs'>subtype_refs</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_ref'>ref</span><span class='op'>|</span>
+      <span class='id identifier rubyid_ref'>ref</span><span class='period'>.</span><span class='id identifier rubyid_as_object_type'>as_object_type</span> <span class='op'>||</span> <span class='id identifier rubyid_raise'>raise</span><span class='lparen'>(</span>
+        <span class='const'>Errors</span><span class='op'>::</span><span class='const'>SchemaError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>The subtype `</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_ref'>ref</span><span class='embexpr_end'>}</span><span class='tstring_content'>` of the UnionType `</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>` is not a defined object type.</span><span class='tstring_end'>&quot;</span></span>
+      <span class='rparen'>)</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="name-instance_method">
+  
+    #<strong>name</strong>  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns the name of the union type.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>the name of the union type</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+70
+71
+72</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/union_type.rb', line 70</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_name'>name</span>
+  <span class='id identifier rubyid_type_ref'>type_ref</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="subtype-instance_method">
+  
+    #<strong>subtype</strong>(name)  &#x21d2; <tt>void</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note returns_void">This method returns an undefined value.</p><p>Defines a subtype of this union type.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+      <pre class="example code"><code><span class='const'><span class='object_link'><a href="../../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span><span class='period'>.</span><span class='id identifier rubyid_define_schema'><span class='object_link'><a href="../../../ElasticGraph.html#define_schema-class_method" title="ElasticGraph.define_schema (method)">define_schema</a></span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_schema'>schema</span><span class='op'>|</span>
+  <span class='id identifier rubyid_schema'>schema</span><span class='period'>.</span><span class='id identifier rubyid_object_type'>object_type</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Card</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span>
+    <span class='comment'># ...
+</span>  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_schema'>schema</span><span class='period'>.</span><span class='id identifier rubyid_union_type'>union_type</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>FundingSource</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span>
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_subtype'>subtype</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Card</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>name</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>the name of an object type which is a member of this union type</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+89
+90
+91
+92
+93
+94
+95
+96
+97</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/union_type.rb', line 89</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_subtype'>subtype</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_type_ref'>type_ref</span> <span class='op'>=</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_type_ref'>type_ref</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_final_form'>to_final_form</span>
+
+  <span class='kw'>if</span> <span class='id identifier rubyid_subtype_refs'>subtype_refs</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_type_ref'>type_ref</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='const'>Errors</span><span class='op'>::</span><span class='const'>SchemaError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Duplicate subtype on UnionType </span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_subtype_refs'>subtype_refs</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_type_ref'>type_ref</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="subtypes-instance_method">
+  
+    #<strong>subtypes</strong>(*names)  &#x21d2; <tt>void</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note returns_void">This method returns an undefined value.</p><p>Defines multiple subtypes of this union type.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Define a union type</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='const'><span class='object_link'><a href="../../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span><span class='period'>.</span><span class='id identifier rubyid_define_schema'><span class='object_link'><a href="../../../ElasticGraph.html#define_schema-class_method" title="ElasticGraph.define_schema (method)">define_schema</a></span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_schema'>schema</span><span class='op'>|</span>
+  <span class='id identifier rubyid_schema'>schema</span><span class='period'>.</span><span class='id identifier rubyid_object_type'>object_type</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>BankAccount</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span>
+    <span class='comment'># ...
+</span>  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_schema'>schema</span><span class='period'>.</span><span class='id identifier rubyid_object_type'>object_type</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>BitcoinWallet</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span>
+    <span class='comment'># ...
+</span>  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_schema'>schema</span><span class='period'>.</span><span class='id identifier rubyid_union_type'>union_type</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>FundingSource</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span>
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_subtypes'>subtypes</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>BankAccount</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>BitcoinWallet</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>names</span>
+      
+      
+        <span class='type'>(<tt>Array&lt;String&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>names of object types which are members of this union type</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+118
+119
+120</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/union_type.rb', line 118</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_subtypes'>subtypes</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_names'>names</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_names'>names</span><span class='period'>.</span><span class='id identifier rubyid_flatten'>flatten</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_n'>n</span><span class='op'>|</span> <span class='id identifier rubyid_subtype'>subtype</span><span class='lparen'>(</span><span class='id identifier rubyid_n'>n</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="to_sdl-instance_method">
+  
+    #<strong>to_sdl</strong>  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns the formatted GraphQL SDL of the union type.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>the formatted GraphQL SDL of the union type</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+123
+124
+125
+126
+127
+128
+129</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/union_type.rb', line 123</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_to_sdl'>to_sdl</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_subtype_refs'>subtype_refs</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='const'>Errors</span><span class='op'>::</span><span class='const'>SchemaError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>UnionType type </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> has no subtypes, but must have at least one.</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+
+  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_formatted_documentation'>formatted_documentation</span><span class='embexpr_end'>}</span><span class='tstring_content'>union </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_directives_sdl'>directives_sdl</span><span class='lparen'>(</span><span class='label'>suffix_with:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> </span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>= </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_subtype_refs'>subtype_refs</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:name</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_a'>to_a</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> | </span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Thu Mar  6 05:55:15 2025 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.37 (ruby-3.3.4).
+</div>
+
+    </div>
+  </body>
+</html>

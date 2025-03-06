@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: ElasticGraph::SchemaDefinition::Indexing::FieldReference
+  
+    &mdash; Documentation by YARD 0.9.37
+  
+</title>
+
+  <link rel="stylesheet" href="../../../css/style.css" type="text/css" />
+
+  <link rel="stylesheet" href="../../../css/common.css" type="text/css" />
+
+<script type="text/javascript">
+  pathId = "ElasticGraph::SchemaDefinition::Indexing::FieldReference";
+  relpath = '../../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../../_index.html">Index (F)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../../SchemaDefinition.html" title="ElasticGraph::SchemaDefinition (module)">SchemaDefinition</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Indexing.html" title="ElasticGraph::SchemaDefinition::Indexing (module)">Indexing</a></span></span>
+     &raquo; 
+    <span class="title">FieldReference</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: ElasticGraph::SchemaDefinition::Indexing::FieldReference
+  
+  
+  <span class="private note title">Private</span>
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Data</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Data</li>
+          
+            <li class="next">ElasticGraph::SchemaDefinition::Indexing::FieldReference</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>elasticgraph-schema_definition/lib/elastic_graph/schema_definition/indexing/field_reference.rb<span class="defines">,<br />
+  elasticgraph-schema_definition/lib/elastic_graph/schema_definition/indexing/field_reference.rb</span>
+</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p class="note private">
+  <strong>This class is part of a private API.</strong>
+  You should avoid using this class if possible, as it may be removed or be changed in the future.
+</p>
+<p>A lazy reference to a <span class='object_link'><a href="Field.html" title="ElasticGraph::SchemaDefinition::Indexing::Field (class)">Field</a></span>. It contains all attributes needed to build a <span class='object_link'><a href="Field.html" title="ElasticGraph::SchemaDefinition::Indexing::Field (class)">Field</a></span>, but the referenced <code>type</code> may not be
+resolvable yet (which is why this exists).</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#resolve-instance_method" title="#resolve (instance method)">#<strong>resolve</strong>  &#x21d2; Field<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  <span class="private note title">private</span>
+
+  
+    <span class="summary_desc"><div class='inline'><p>The <span class='object_link'><a href="Field.html" title="ElasticGraph::SchemaDefinition::Indexing::Field (class)">Field</a></span> this reference resolves to (if it can be resolved).</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="resolve-instance_method">
+  
+    #<strong>resolve</strong>  &#x21d2; <tt><span class='object_link'><a href="Field.html" title="ElasticGraph::SchemaDefinition::Indexing::Field (class)">Field</a></span></tt><sup>?</sup> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note private">
+  <strong>This method is part of a private API.</strong>
+  You should avoid using this method if possible, as it may be removed or be changed in the future.
+</p>
+<p>Returns the <span class='object_link'><a href="Field.html" title="ElasticGraph::SchemaDefinition::Indexing::Field (class)">ElasticGraph::SchemaDefinition::Indexing::Field</a></span> this reference resolves to (if it can be resolved).</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Field.html" title="ElasticGraph::SchemaDefinition::Indexing::Field (class)">Field</a></span></tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>the <span class='object_link'><a href="Field.html" title="ElasticGraph::SchemaDefinition::Indexing::Field (class)">ElasticGraph::SchemaDefinition::Indexing::Field</a></span> this reference resolves to (if it can be resolved)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/indexing/field_reference.rb', line 30</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_resolve'>resolve</span>
+  <span class='kw'>return</span> <span class='kw'>nil</span> <span class='kw'>unless</span> <span class='lparen'>(</span><span class='id identifier rubyid_resolved_type'>resolved_type</span> <span class='op'>=</span> <span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_fully_unwrapped'>fully_unwrapped</span><span class='period'>.</span><span class='id identifier rubyid_resolved'>resolved</span><span class='rparen'>)</span>
+
+  <span class='const'><span class='object_link'><a href="../Indexing.html" title="ElasticGraph::SchemaDefinition::Indexing (module)">Indexing</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Field.html" title="ElasticGraph::SchemaDefinition::Indexing::Field (class)">Field</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span>
+    <span class='label'>name:</span> <span class='id identifier rubyid_name'>name</span><span class='comma'>,</span>
+    <span class='label'>name_in_index:</span> <span class='id identifier rubyid_name_in_index'>name_in_index</span><span class='comma'>,</span>
+    <span class='label'>type:</span> <span class='id identifier rubyid_type'>type</span><span class='comma'>,</span>
+    <span class='label'>json_schema_layers:</span> <span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_json_schema_layers'>json_schema_layers</span><span class='comma'>,</span>
+    <span class='label'>indexing_field_type:</span> <span class='id identifier rubyid_resolved_type'>resolved_type</span><span class='period'>.</span><span class='id identifier rubyid_to_indexing_field_type'>to_indexing_field_type</span><span class='comma'>,</span>
+    <span class='label'>accuracy_confidence:</span> <span class='id identifier rubyid_accuracy_confidence'>accuracy_confidence</span><span class='comma'>,</span>
+    <span class='label'>json_schema_customizations:</span> <span class='id identifier rubyid_json_schema_options'>json_schema_options</span><span class='comma'>,</span>
+    <span class='label'>mapping_customizations:</span> <span class='id identifier rubyid_mapping_options'>mapping_options</span><span class='comma'>,</span>
+    <span class='label'>source:</span> <span class='id identifier rubyid_source'>source</span><span class='comma'>,</span>
+    <span class='label'>runtime_field_script:</span> <span class='id identifier rubyid_runtime_field_script'>runtime_field_script</span>
+  <span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Thu Mar  6 05:55:04 2025 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.37 (ruby-3.3.4).
+</div>
+
+    </div>
+  </body>
+</html>

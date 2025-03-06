@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  File: README
+  
+    &mdash; Documentation by YARD 0.9.37
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" />
+
+<script type="text/javascript">
+  pathId = "README";
+  relpath = '';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="file_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="_index.html">Index</a> &raquo; 
+    <span class="title">File: README</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><div id='filecontents'><h1 id="elasticgraph">ElasticGraph</h1>
+
+<p align="center">
+  <a href="https://github.com/block/elasticgraph/actions/workflows/ci.yaml?query=branch%3Amain" alt="CI Status">
+    <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/block/elasticgraph/ci.yaml?branch=main&amp;label=CI%20Status" /></a>
+  <a href="https://github.com/block/elasticgraph/blob/main/spec_support/lib/elastic_graph/spec_support/enable_simplecov.rb" alt="ElasticGraph maintains 100% Test Coverage">
+    <img src="https://img.shields.io/badge/Test%20Coverage-100%25-green" /></a>
+  <a href="https://github.com/block/elasticgraph/pulse" alt="Activity">
+    <img src="https://img.shields.io/github/commit-activity/m/block/elasticgraph" /></a>
+  <a href="https://github.com/block/elasticgraph/graphs/contributors" alt="GitHub Contributors">
+    <img src="https://img.shields.io/github/contributors/block/elasticgraph" /></a>
+  <a href="https://makeapullrequest.com" alt="PRs Welcome!">
+    <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" /></a>
+  <a href="https://rubygems.org/gems/elasticgraph" alt="RubyGems Release">
+    <img src="https://img.shields.io/gem/v/elasticgraph" /></a>
+  <a href="https://github.com/block/elasticgraph/blob/main/LICENSE.txt" alt="MIT License">
+    <img alt="MIT License" src="https://img.shields.io/github/license/block/elasticgraph" /></a>
+</p>
+
+<p>ElasticGraph is a general purpose, near real-time data query and search platform that is scalable and performant,
+serves rich interactive queries, and dramatically simplifies the creation of complex reports. The platform combines
+the power of indexing and search of Elasticsearch or OpenSearch with the query flexibility of GraphQL language.
+Optimized for AWS cloud, it also offers scale and reliability.</p>
+
+<p>ElasticGraph is a naturally flexible framework with many different possible applications. However, the main motivation we have for
+building it is to power various data APIs, UIs and reports. These modern reports require filtering and aggregations across a body of ever
+growing data sets. Modern APIs allow us to:</p>
+
+<ul>
+  <li>Minimize network trips to retrieve your data</li>
+  <li>Get exactly what you want in a single query. No over- or under-serving the data.</li>
+  <li>Push filtering complex calculations to the backend.</li>
+</ul>
+
+<h2 id="versioning-policy">Versioning Policy</h2>
+
+<p>ElasticGraph does <em>not</em> strictly follow the <a href="https://semver.org/">SemVer</a> spec. We followed that early in the project’s life
+cycle and realized that it obscures some important compatibility information.</p>
+
+<p>ElasticGraph’s versioning policy is designed to communicate compatibility information related to the following stakeholders:</p>
+
+<ul>
+  <li><strong>Application maintainers</strong>: engineers that define an ElasticGraph schema, maintain project configuration, and perform upgrades.</li>
+  <li><strong>Data publishers</strong>: systems that publish data into an ElasticGraph application for ingestion by an ElasticGraph indexer.</li>
+  <li><strong>GraphQL clients</strong>: clients of the GraphQL API of an ElasticGraph application.</li>
+</ul>
+
+<p>We use the following versioning scheme:</p>
+
+<ul>
+  <li>Version numbers are in a <code>0.MAJOR.MINOR.PATCH</code> format. (The <code>0.</code> prefix is there in order to reserve <code>1.0.0</code> and all later versions
+for after ElasticGraph has been open-sourced).</li>
+  <li>Increments to the PATCH version indicate that the new release contains no backwards incompatibilities for any stakeholders.
+It may contain bug fixes, new features, internal refactorings, and dependency upgrades, among other things. You can expect that
+PATCH level upgrades are always safe–just update the version in your bundle, generate new schema artifacts, and you should be done.</li>
+  <li>Increments to the MINOR version indicate that the new release contains some backwards incompatibilities that may impact the
+<strong>application maintainers</strong> of some ElasticGraph applications. MINOR releases may include renames to configuration settings,
+changes to the schema definition API, and new schema definition requirements, among other things. You can expect that MINOR
+level upgrades can usually be done in 30 minutes or less (usually in a single commit!), with release notes and clear errors
+from ElasticGraph command line tasks providing guidance on how to upgrade.</li>
+  <li>Increments to the MAJOR version indicate that the new release contains some backwards incompatibilities that may impact the
+<strong>data publishers</strong> or <strong>GraphQL clients</strong> of some ElasticGraph applications. MAJOR releases may include changes to the GraphQL
+schema that require careful migration of <strong>GraphQL clients</strong> or changes to how indexing is done that require a dataset to be
+re-indexed from scratch (e.g. by having <strong>data publishers</strong> republish their data into an ElasticGraph indexer running the new
+version). You can expect that the release notes will include detailed instructions on how to perform a MAJOR version upgrade.</li>
+</ul>
+
+<p>Deprecation warnings may be included at any of these levels–for example, a PATCH release may contain a deprecation warning
+for a breaking change that may impact <strong>application maintainers</strong> in an upcoming MINOR release, and a MINOR release may
+contain deprecation warnings for breaking changes that may impact <strong>data publishers</strong> or <strong>GraphQL clients</strong> in an upcoming
+MAJOR release.</p>
+
+<p>Each version level is cumulative over the prior levels. That is, a MINOR release may include PATCH-level changes in addition
+to backwards incompatibilities that may impact <strong>application maintainers</strong>. A MAJOR release may include PATCH-level or
+MINOR-level changes in addition to backwards incompatibilities that may impact <strong>data publishers</strong> or <strong>GraphQL clients</strong>.</p>
+
+<p>Note that this policy was first adopted in the <code>v0.15.1.0</code> release.  All prior releases aimed (with some occasional mistakes!)
+to follow SemVer with a <code>0.MAJOR.MINOR.PATCH</code> versioning scheme.</p>
+
+<p>Note that <em>all</em> gems in this repository share the same version number. Every time we cut a release, we increment the version
+for <em>all</em> gems and release <em>all</em> gems, even if a gem has had no changes since the last release. This is simpler to work with
+than the alternatives.</p>
+
+<h2 id="license">License</h2>
+
+<p>ElasticGraph is released under the <a href="https://opensource.org/licenses/MIT">MIT License</a>.</p>
+
+<p><a href="elasticgraph-rack/lib/elastic_graph/rack/graphiql/index.html">Part of the distributed code</a>
+comes from the <a href="https://github.com/graphql/graphiql">GraphiQL project</a>, also licensed under the
+MIT License, Copyright (c) GraphQL Contributors.</p>
+</div></div>
+
+      <div id="footer">
+  Generated on Thu Mar  6 06:00:36 2025 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.37 (ruby-3.3.4).
+</div>
+
+    </div>
+  </body>
+</html>

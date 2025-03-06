@@ -1,0 +1,2226 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: ElasticGraph::SchemaDefinition::SchemaElements::EnumType
+  
+    &mdash; Documentation by YARD 0.9.37
+  
+</title>
+
+  <link rel="stylesheet" href="../../../css/style.css" type="text/css" />
+
+  <link rel="stylesheet" href="../../../css/common.css" type="text/css" />
+
+<script type="text/javascript">
+  pathId = "ElasticGraph::SchemaDefinition::SchemaElements::EnumType";
+  relpath = '../../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../../_index.html">Index (E)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../../SchemaDefinition.html" title="ElasticGraph::SchemaDefinition (module)">SchemaDefinition</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../SchemaElements.html" title="ElasticGraph::SchemaDefinition::SchemaElements (module)">SchemaElements</a></span></span>
+     &raquo; 
+    <span class="title">EnumType</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: ElasticGraph::SchemaDefinition::SchemaElements::EnumType
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Struct</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Struct</li>
+          
+            <li class="next">ElasticGraph::SchemaDefinition::SchemaElements::EnumType</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  <dl>
+      <dt>Includes:</dt>
+      <dd><span class='object_link'><a href="../Mixins/CanBeGraphQLOnly.html" title="ElasticGraph::SchemaDefinition::Mixins::CanBeGraphQLOnly (module)">Mixins::CanBeGraphQLOnly</a></span>, <span class='object_link'><a href="../Mixins/HasDerivedGraphQLTypeCustomizations.html" title="ElasticGraph::SchemaDefinition::Mixins::HasDerivedGraphQLTypeCustomizations (module)">Mixins::HasDerivedGraphQLTypeCustomizations</a></span>, <span class='object_link'><a href="../Mixins/HasDirectives.html" title="ElasticGraph::SchemaDefinition::Mixins::HasDirectives (module)">Mixins::HasDirectives</a></span>, <span class='object_link'><a href="../Mixins/HasDocumentation.html" title="ElasticGraph::SchemaDefinition::Mixins::HasDocumentation (module)">Mixins::HasDocumentation</a></span>, <span class='object_link'><a href="../Mixins/VerifiesGraphQLName.html" title="ElasticGraph::SchemaDefinition::Mixins::VerifiesGraphQLName (module)">Mixins::VerifiesGraphQLName</a></span></dd>
+  </dl>
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/enum_type.rb</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Defines a <a href="https://graphql.org/learn/schema/#enumeration-types">GraphQL enum type</a>.
+The type is restricted to an enumerated set of values, each with a unique name.
+Use <code>value</code> or <code>values</code> to define the enum values in the passed block.</p>
+
+<p>Note: if required by your configuration, this may generate a pair of Enum types (an input
+enum and an output enum).</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Define an enum type</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='const'><span class='object_link'><a href="../../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span><span class='period'>.</span><span class='id identifier rubyid_define_schema'><span class='object_link'><a href="../../../ElasticGraph.html#define_schema-class_method" title="ElasticGraph.define_schema (method)">define_schema</a></span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_schema'>schema</span><span class='op'>|</span>
+  <span class='id identifier rubyid_schema'>schema</span><span class='period'>.</span><span class='id identifier rubyid_enum_type'>enum_type</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Currency</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span>
+    <span class='comment'># in the block, `t` is an EnumType
+</span>    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_value'>value</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>USD</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></code></pre>
+    
+  </div>
+
+
+</div>
+
+
+
+  <h2>Instance Attribute Summary <small><a href="#" class="summary_toggle">collapse</a></small></h2>
+  <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#for_output-instance_method" title="#for_output (instance method)">#<strong>for_output</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p><code>true</code> if this enum is used for both input and output; <code>false</code> if it is for input only.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#schema_def_state-instance_method" title="#schema_def_state (instance method)">#<strong>schema_def_state</strong>  &#x21d2; State </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>State of the schema.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#values_by_name-instance_method" title="#values_by_name (instance method)">#<strong>values_by_name</strong>  &#x21d2; Hash&lt;String, EnumValue&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Map of enum values, keyed by name.</p>
+</div></span>
+  
+</li>
+
+    
+  </ul>
+
+
+
+  
+  
+  <h3 class="inherited">Attributes included from <span class='object_link'><a href="../Mixins/HasDocumentation.html" title="ElasticGraph::SchemaDefinition::Mixins::HasDocumentation (module)">Mixins::HasDocumentation</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../Mixins/HasDocumentation.html#doc_comment-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::HasDocumentation#doc_comment (method)">#doc_comment</a></span></p>
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#aggregated_values_type-instance_method" title="#aggregated_values_type (instance method)">#<strong>aggregated_values_type</strong>  &#x21d2; TypeReference </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Reference to <code>AggregatedValues</code> type to use for this enum.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#as_input-instance_method" title="#as_input (instance method)">#<strong>as_input</strong>  &#x21d2; EnumType </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Converts the enum type to its input form for when different naming is used for input vs output enums.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#indexed%3F-instance_method" title="#indexed? (instance method)">#<strong>indexed?</strong>  &#x21d2; false </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Enum types are never directly indexed.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#name-instance_method" title="#name (instance method)">#<strong>name</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Name of the enum type.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#runtime_metadata-instance_method" title="#runtime_metadata (instance method)">#<strong>runtime_metadata</strong>  &#x21d2; SchemaArtifacts::RuntimeMetadata::Enum::Type </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Runtime metadata for this enum type.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#to_indexing_field_type-instance_method" title="#to_indexing_field_type (instance method)">#<strong>to_indexing_field_type</strong>  &#x21d2; Indexing::FieldType::Enum </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Indexing representation of this enum type.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#to_sdl-instance_method" title="#to_sdl (instance method)">#<strong>to_sdl</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>GraphQL SDL form of the enum type.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#value-instance_method" title="#value (instance method)">#<strong>value</strong>(value_name) {|EnumValue| ... } &#x21d2; void </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Defines an enum value for the current enum type.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#values-instance_method" title="#values (instance method)">#<strong>values</strong>(*value_names)  &#x21d2; void </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Defines multiple enum values.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="../Mixins/HasDerivedGraphQLTypeCustomizations.html" title="ElasticGraph::SchemaDefinition::Mixins::HasDerivedGraphQLTypeCustomizations (module)">Mixins::HasDerivedGraphQLTypeCustomizations</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../Mixins/HasDerivedGraphQLTypeCustomizations.html#customize_derived_type_fields-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::HasDerivedGraphQLTypeCustomizations#customize_derived_type_fields (method)">#customize_derived_type_fields</a></span>, <span class='object_link'><a href="../Mixins/HasDerivedGraphQLTypeCustomizations.html#customize_derived_types-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::HasDerivedGraphQLTypeCustomizations#customize_derived_types (method)">#customize_derived_types</a></span></p>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="../Mixins/HasDirectives.html" title="ElasticGraph::SchemaDefinition::Mixins::HasDirectives (module)">Mixins::HasDirectives</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../Mixins/HasDirectives.html#directive-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::HasDirectives#directive (method)">#directive</a></span>, <span class='object_link'><a href="../Mixins/HasDirectives.html#directives-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::HasDirectives#directives (method)">#directives</a></span>, <span class='object_link'><a href="../Mixins/HasDirectives.html#directives_sdl-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::HasDirectives#directives_sdl (method)">#directives_sdl</a></span></p>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="../Mixins/HasDocumentation.html" title="ElasticGraph::SchemaDefinition::Mixins::HasDocumentation (module)">Mixins::HasDocumentation</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../Mixins/HasDocumentation.html#append_to_documentation-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::HasDocumentation#append_to_documentation (method)">#append_to_documentation</a></span>, <span class='object_link'><a href="../Mixins/HasDocumentation.html#derived_documentation-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::HasDocumentation#derived_documentation (method)">#derived_documentation</a></span>, <span class='object_link'><a href="../Mixins/HasDocumentation.html#documentation-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::HasDocumentation#documentation (method)">#documentation</a></span>, <span class='object_link'><a href="../Mixins/HasDocumentation.html#formatted_documentation-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::HasDocumentation#formatted_documentation (method)">#formatted_documentation</a></span></p>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="../Mixins/CanBeGraphQLOnly.html" title="ElasticGraph::SchemaDefinition::Mixins::CanBeGraphQLOnly (module)">Mixins::CanBeGraphQLOnly</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../Mixins/CanBeGraphQLOnly.html#graphql_only-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::CanBeGraphQLOnly#graphql_only (method)">#graphql_only</a></span>, <span class='object_link'><a href="../Mixins/CanBeGraphQLOnly.html#graphql_only%3F-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::CanBeGraphQLOnly#graphql_only? (method)">#graphql_only?</a></span></p>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="../Mixins/VerifiesGraphQLName.html" title="ElasticGraph::SchemaDefinition::Mixins::VerifiesGraphQLName (module)">Mixins::VerifiesGraphQLName</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../Mixins/VerifiesGraphQLName.html#verify_name!-class_method" title="ElasticGraph::SchemaDefinition::Mixins::VerifiesGraphQLName.verify_name! (method)">verify_name!</a></span></p>
+
+  
+  <div id="instance_attr_details" class="attr_details">
+    <h2>Instance Attribute Details</h2>
+    
+      
+      <span id="for_output=-instance_method"></span>
+      <div class="method_details first">
+  <h3 class="signature first" id="for_output-instance_method">
+  
+    #<strong>for_output</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns <code>true</code> if this enum is used for both input and output; <code>false</code> if it is for input only.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p><code>true</code> if this enum is used for both input and output; <code>false</code> if it is for input only</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/enum_type.rb', line 39</span>
+
+<span class='kw'>class</span> <span class='const'><span class='object_link'><a href="" title="ElasticGraph::SchemaDefinition::SchemaElements::EnumType (class)">EnumType</a></span></span> <span class='op'>&lt;</span> <span class='const'>Struct</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='symbol'>:schema_def_state</span><span class='comma'>,</span> <span class='symbol'>:type_ref</span><span class='comma'>,</span> <span class='symbol'>:for_output</span><span class='comma'>,</span> <span class='symbol'>:values_by_name</span><span class='rparen'>)</span>
+  <span class='comment'># @dynamic type_ref, graphql_only?
+</span>  <span class='id identifier rubyid_prepend'>prepend</span> <span class='const'><span class='object_link'><a href="../Mixins.html" title="ElasticGraph::SchemaDefinition::Mixins (module)">Mixins</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Mixins/VerifiesGraphQLName.html" title="ElasticGraph::SchemaDefinition::Mixins::VerifiesGraphQLName (module)">VerifiesGraphQLName</a></span></span>
+  <span class='id identifier rubyid_include'>include</span> <span class='const'><span class='object_link'><a href="../Mixins.html" title="ElasticGraph::SchemaDefinition::Mixins (module)">Mixins</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Mixins/CanBeGraphQLOnly.html" title="ElasticGraph::SchemaDefinition::Mixins::CanBeGraphQLOnly (module)">CanBeGraphQLOnly</a></span></span>
+  <span class='id identifier rubyid_include'>include</span> <span class='const'><span class='object_link'><a href="../Mixins.html" title="ElasticGraph::SchemaDefinition::Mixins (module)">Mixins</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Mixins/HasDocumentation.html" title="ElasticGraph::SchemaDefinition::Mixins::HasDocumentation (module)">HasDocumentation</a></span></span>
+  <span class='id identifier rubyid_include'>include</span> <span class='const'><span class='object_link'><a href="../Mixins.html" title="ElasticGraph::SchemaDefinition::Mixins (module)">Mixins</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Mixins/HasDirectives.html" title="ElasticGraph::SchemaDefinition::Mixins::HasDirectives (module)">HasDirectives</a></span></span>
+  <span class='id identifier rubyid_include'>include</span> <span class='const'><span class='object_link'><a href="../Mixins.html" title="ElasticGraph::SchemaDefinition::Mixins (module)">Mixins</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Mixins/HasDerivedGraphQLTypeCustomizations.html" title="ElasticGraph::SchemaDefinition::Mixins::HasDerivedGraphQLTypeCustomizations (module)">HasDerivedGraphQLTypeCustomizations</a></span></span>
+  <span class='id identifier rubyid_include'>include</span> <span class='const'><span class='object_link'><a href="../Mixins.html" title="ElasticGraph::SchemaDefinition::Mixins (module)">Mixins</a></span></span><span class='op'>::</span><span class='const'>HasReadableToSAndInspect</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_e'>e</span><span class='op'>|</span> <span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span> <span class='rbrace'>}</span>
+
+  <span class='comment'># @private
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='comma'>,</span> <span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
+    <span class='comment'># @type var values_by_name: ::Hash[::String, EnumValue]
+</span>    <span class='id identifier rubyid_values_by_name'>values_by_name</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+    <span class='kw'>super</span><span class='lparen'>(</span><span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='comma'>,</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_type_ref'>type_ref</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_final_form'>to_final_form</span><span class='comma'>,</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='id identifier rubyid_values_by_name'>values_by_name</span><span class='rparen'>)</span>
+
+    <span class='comment'># :nocov: -- currently all invocations have a block
+</span>    <span class='kw'>yield</span> <span class='kw'>self</span> <span class='kw'>if</span> <span class='id identifier rubyid_block_given?'>block_given?</span>
+    <span class='comment'># :nocov:
+</span>  <span class='kw'>end</span>
+
+  <span class='comment'># @return [String] name of the enum type
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_name'>name</span>
+    <span class='id identifier rubyid_type_ref'>type_ref</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># @return [TypeReference] reference to `AggregatedValues` type to use for this enum.
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_aggregated_values_type'>aggregated_values_type</span>
+    <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_type_ref'>type_ref</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>NonNumeric</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_as_aggregated_values'>as_aggregated_values</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># Defines an enum value for the current enum type.
+</span>  <span class='comment'>#
+</span>  <span class='comment'># @param value_name [String] name of the enum value
+</span>  <span class='comment'># @yield [EnumValue] enum value so it can be further customized
+</span>  <span class='comment'># @return [void]
+</span>  <span class='comment'>#
+</span>  <span class='comment'># @example Define an enum type with multiple enum values
+</span>  <span class='comment'>#   ElasticGraph.define_schema do |schema|
+</span>  <span class='comment'>#     schema.enum_type &quot;Currency&quot; do |t|
+</span>  <span class='comment'>#       t.value &quot;USD&quot; do |v|
+</span>  <span class='comment'>#         v.documentation &quot;US Dollars.&quot;
+</span>  <span class='comment'>#       end
+</span>  <span class='comment'>#
+</span>  <span class='comment'>#       t.value &quot;JPY&quot; do |v|
+</span>  <span class='comment'>#         v.documentation &quot;Japanese Yen.&quot;
+</span>  <span class='comment'>#       end
+</span>  <span class='comment'>#     end
+</span>  <span class='comment'>#   end
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_value'>value</span><span class='lparen'>(</span><span class='id identifier rubyid_value_name'>value_name</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_alternate_original_name'>alternate_original_name</span> <span class='op'>=</span> <span class='id identifier rubyid_value_name'>value_name</span>
+    <span class='id identifier rubyid_value_name'>value_name</span> <span class='op'>=</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_enum_value_namer'>enum_value_namer</span><span class='period'>.</span><span class='id identifier rubyid_name_for'>name_for</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_value_name'>value_name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span>
+
+    <span class='kw'>if</span> <span class='id identifier rubyid_values_by_name'>values_by_name</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='id identifier rubyid_value_name'>value_name</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_raise'>raise</span> <span class='const'>Errors</span><span class='op'>::</span><span class='const'>SchemaError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Duplicate value on Enum::Type </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_value_name'>value_name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>end</span>
+
+    <span class='kw'>if</span> <span class='id identifier rubyid_value_name'>value_name</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span> <span class='op'>&gt;</span> <span class='const'>DEFAULT_MAX_KEYWORD_LENGTH</span>
+      <span class='id identifier rubyid_raise'>raise</span> <span class='const'>Errors</span><span class='op'>::</span><span class='const'>SchemaError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Enum value `</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_value_name'>value_name</span><span class='embexpr_end'>}</span><span class='tstring_content'>` is too long: it is </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_value_name'>value_name</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span><span class='embexpr_end'>}</span><span class='tstring_content'> characters but cannot exceed </span><span class='embexpr_beg'>#{</span><span class='const'>DEFAULT_MAX_KEYWORD_LENGTH</span><span class='embexpr_end'>}</span><span class='tstring_content'> characters.</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_values_by_name'>values_by_name</span><span class='lbracket'>[</span><span class='id identifier rubyid_value_name'>value_name</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_factory'>factory</span><span class='period'>.</span><span class='id identifier rubyid_new_enum_value'>new_enum_value</span><span class='lparen'>(</span><span class='id identifier rubyid_value_name'>value_name</span><span class='comma'>,</span> <span class='id identifier rubyid_alternate_original_name'>alternate_original_name</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># Defines multiple enum values. In contrast to {#value}, the enum values cannot be customized
+</span>  <span class='comment'># further via a block.
+</span>  <span class='comment'>#
+</span>  <span class='comment'># @param value_names [Array&lt;String&gt;] names of the enum values
+</span>  <span class='comment'># @return [void]
+</span>  <span class='comment'>#
+</span>  <span class='comment'># @example Define an enum type with multiple enum values
+</span>  <span class='comment'>#   ElasticGraph.define_schema do |schema|
+</span>  <span class='comment'>#     schema.enum_type &quot;Currency&quot; do |t|
+</span>  <span class='comment'>#       t.values &quot;USD&quot;, &quot;JPY&quot;, &quot;CAD&quot;, &quot;GBP&quot;
+</span>  <span class='comment'>#     end
+</span>  <span class='comment'>#   end
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_values'>values</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_value_names'>value_names</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_value_names'>value_names</span><span class='period'>.</span><span class='id identifier rubyid_flatten'>flatten</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_name'>name</span><span class='op'>|</span> <span class='id identifier rubyid_value'>value</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># @return [SchemaArtifacts::RuntimeMetadata::Enum::Type] runtime metadata for this enum type
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_runtime_metadata'>runtime_metadata</span>
+    <span class='id identifier rubyid_runtime_metadata_values_by_name'>runtime_metadata_values_by_name</span> <span class='op'>=</span> <span class='id identifier rubyid_values_by_name'>values_by_name</span>
+      <span class='period'>.</span><span class='id identifier rubyid_transform_values'>transform_values</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:runtime_metadata</span><span class='rparen'>)</span>
+      <span class='period'>.</span><span class='id identifier rubyid_compact'>compact</span>
+
+    <span class='const'>SchemaArtifacts</span><span class='op'>::</span><span class='const'>RuntimeMetadata</span><span class='op'>::</span><span class='const'>Enum</span><span class='op'>::</span><span class='const'>Type</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='label'>values_by_name:</span> <span class='id identifier rubyid_runtime_metadata_values_by_name'>runtime_metadata_values_by_name</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># @return [String] GraphQL SDL form of the enum type
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_to_sdl'>to_sdl</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_values_by_name'>values_by_name</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+      <span class='id identifier rubyid_raise'>raise</span> <span class='const'>Errors</span><span class='op'>::</span><span class='const'>SchemaError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Enum type </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> has no values, but enums must have at least one value.</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>end</span>
+
+    <span class='heredoc_beg'>&lt;&lt;~EOS</span>
+<span class='tstring_content'>      </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_formatted_documentation'>formatted_documentation</span><span class='embexpr_end'>}</span><span class='tstring_content'>enum </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_directives_sdl'>directives_sdl</span><span class='lparen'>(</span><span class='label'>suffix_with:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> </span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>{
+</span><span class='tstring_content'>        </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_values_by_name'>values_by_name</span><span class='period'>.</span><span class='id identifier rubyid_values'>values</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbeg'>:</span><span class='id identifier rubyid_to_sdl'>to_sdl</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_flat_map'>flat_map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_s'>s</span><span class='op'>|</span> <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n  </span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>
+</span><span class='tstring_content'>      }
+</span><span class='heredoc_end'>    EOS
+</span>  <span class='kw'>end</span>
+
+  <span class='comment'># @private
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_derived_graphql_types'>derived_graphql_types</span>
+    <span class='comment'># Derived GraphQL types must be generated for an output enum. For an enum type that is only
+</span>    <span class='comment'># used as an input, we do not need derived types.
+</span>    <span class='kw'>return</span> <span class='lbracket'>[</span><span class='rbracket'>]</span> <span class='kw'>unless</span> <span class='id identifier rubyid_for_output'>for_output</span>
+
+    <span class='id identifier rubyid_derived_scalar_types'>derived_scalar_types</span> <span class='op'>=</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_factory'>factory</span><span class='period'>.</span><span class='id identifier rubyid_new_scalar_type'>new_scalar_type</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span>
+      <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_mapping'>mapping</span> <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>keyword</span><span class='tstring_end'>&quot;</span></span>
+      <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_json_schema'>json_schema</span> <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>string</span><span class='tstring_end'>&quot;</span></span>
+      <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_graphql_only'>graphql_only</span> <span class='id identifier rubyid_graphql_only?'>graphql_only?</span>
+    <span class='kw'>end</span><span class='period'>.</span><span class='id identifier rubyid_derived_graphql_types'>derived_graphql_types</span>
+
+    <span class='kw'>if</span> <span class='lparen'>(</span><span class='id identifier rubyid_input_enum'>input_enum</span> <span class='op'>=</span> <span class='id identifier rubyid_as_input'>as_input</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_equal?'>equal?</span><span class='lparen'>(</span><span class='kw'>self</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_derived_scalar_types'>derived_scalar_types</span>
+    <span class='kw'>else</span>
+      <span class='lbracket'>[</span><span class='id identifier rubyid_input_enum'>input_enum</span><span class='rbracket'>]</span> <span class='op'>+</span> <span class='id identifier rubyid_derived_scalar_types'>derived_scalar_types</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># @return [Indexing::FieldType::Enum] indexing representation of this enum type
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_to_indexing_field_type'>to_indexing_field_type</span>
+    <span class='const'><span class='object_link'><a href="../Indexing.html" title="ElasticGraph::SchemaDefinition::Indexing (module)">Indexing</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Indexing/FieldType.html" title="ElasticGraph::SchemaDefinition::Indexing::FieldType (module)">FieldType</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Indexing/FieldType/Enum.html" title="ElasticGraph::SchemaDefinition::Indexing::FieldType::Enum (class)">Enum</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_values_by_name'>values_by_name</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># @return [false] enum types are never directly indexed
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_indexed?'>indexed?</span>
+    <span class='kw'>false</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># @return [EnumType] converts the enum type to its input form for when different naming is used for input vs output enums.
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_as_input'>as_input</span>
+    <span class='id identifier rubyid_input_name'>input_name</span> <span class='op'>=</span> <span class='id identifier rubyid_type_ref'>type_ref</span>
+      <span class='period'>.</span><span class='id identifier rubyid_as_input_enum'>as_input_enum</span> <span class='comment'># To apply the configured format for input enums.
+</span>      <span class='period'>.</span><span class='id identifier rubyid_to_final_form'>to_final_form</span> <span class='comment'># To handle a type name override of the input enum.
+</span>      <span class='period'>.</span><span class='id identifier rubyid_name'>name</span>
+
+    <span class='kw'>return</span> <span class='kw'>self</span> <span class='kw'>if</span> <span class='id identifier rubyid_input_name'>input_name</span> <span class='op'>==</span> <span class='id identifier rubyid_name'>name</span>
+
+    <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_factory'>factory</span><span class='period'>.</span><span class='id identifier rubyid_new_enum_type'>new_enum_type</span><span class='lparen'>(</span><span class='id identifier rubyid_input_name'>input_name</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span>
+      <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_for_output'>for_output</span> <span class='op'>=</span> <span class='kw'>false</span> <span class='comment'># flag that it&#39;s not used as an output enum, and therefore `derived_graphql_types` will be empty on it.
+</span>      <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_graphql_only'>graphql_only</span> <span class='kw'>true</span> <span class='comment'># input enums are always GraphQL-only.
+</span>      <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_documentation'>documentation</span> <span class='id identifier rubyid_doc_comment'>doc_comment</span>
+      <span class='id identifier rubyid_directives'>directives</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_dir'>dir</span><span class='op'>|</span> <span class='id identifier rubyid_dir'>dir</span><span class='period'>.</span><span class='id identifier rubyid_duplicate_on'>duplicate_on</span><span class='lparen'>(</span><span class='id identifier rubyid_t'>t</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+      <span class='id identifier rubyid_values_by_name'>values_by_name</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid__'>_</span><span class='comma'>,</span> <span class='id identifier rubyid_val'>val</span><span class='op'>|</span> <span class='id identifier rubyid_val'>val</span><span class='period'>.</span><span class='id identifier rubyid_duplicate_on'>duplicate_on</span><span class='lparen'>(</span><span class='id identifier rubyid_t'>t</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="schema_def_state-instance_method">
+  
+    #<strong>schema_def_state</strong>  &#x21d2; <tt><span class='object_link'>State</span></tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns state of the schema.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'>State</span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>state of the schema</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/enum_type.rb', line 39</span>
+
+<span class='kw'>class</span> <span class='const'><span class='object_link'><a href="" title="ElasticGraph::SchemaDefinition::SchemaElements::EnumType (class)">EnumType</a></span></span> <span class='op'>&lt;</span> <span class='const'>Struct</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='symbol'>:schema_def_state</span><span class='comma'>,</span> <span class='symbol'>:type_ref</span><span class='comma'>,</span> <span class='symbol'>:for_output</span><span class='comma'>,</span> <span class='symbol'>:values_by_name</span><span class='rparen'>)</span>
+  <span class='comment'># @dynamic type_ref, graphql_only?
+</span>  <span class='id identifier rubyid_prepend'>prepend</span> <span class='const'><span class='object_link'><a href="../Mixins.html" title="ElasticGraph::SchemaDefinition::Mixins (module)">Mixins</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Mixins/VerifiesGraphQLName.html" title="ElasticGraph::SchemaDefinition::Mixins::VerifiesGraphQLName (module)">VerifiesGraphQLName</a></span></span>
+  <span class='id identifier rubyid_include'>include</span> <span class='const'><span class='object_link'><a href="../Mixins.html" title="ElasticGraph::SchemaDefinition::Mixins (module)">Mixins</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Mixins/CanBeGraphQLOnly.html" title="ElasticGraph::SchemaDefinition::Mixins::CanBeGraphQLOnly (module)">CanBeGraphQLOnly</a></span></span>
+  <span class='id identifier rubyid_include'>include</span> <span class='const'><span class='object_link'><a href="../Mixins.html" title="ElasticGraph::SchemaDefinition::Mixins (module)">Mixins</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Mixins/HasDocumentation.html" title="ElasticGraph::SchemaDefinition::Mixins::HasDocumentation (module)">HasDocumentation</a></span></span>
+  <span class='id identifier rubyid_include'>include</span> <span class='const'><span class='object_link'><a href="../Mixins.html" title="ElasticGraph::SchemaDefinition::Mixins (module)">Mixins</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Mixins/HasDirectives.html" title="ElasticGraph::SchemaDefinition::Mixins::HasDirectives (module)">HasDirectives</a></span></span>
+  <span class='id identifier rubyid_include'>include</span> <span class='const'><span class='object_link'><a href="../Mixins.html" title="ElasticGraph::SchemaDefinition::Mixins (module)">Mixins</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Mixins/HasDerivedGraphQLTypeCustomizations.html" title="ElasticGraph::SchemaDefinition::Mixins::HasDerivedGraphQLTypeCustomizations (module)">HasDerivedGraphQLTypeCustomizations</a></span></span>
+  <span class='id identifier rubyid_include'>include</span> <span class='const'><span class='object_link'><a href="../Mixins.html" title="ElasticGraph::SchemaDefinition::Mixins (module)">Mixins</a></span></span><span class='op'>::</span><span class='const'>HasReadableToSAndInspect</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_e'>e</span><span class='op'>|</span> <span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span> <span class='rbrace'>}</span>
+
+  <span class='comment'># @private
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='comma'>,</span> <span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
+    <span class='comment'># @type var values_by_name: ::Hash[::String, EnumValue]
+</span>    <span class='id identifier rubyid_values_by_name'>values_by_name</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+    <span class='kw'>super</span><span class='lparen'>(</span><span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='comma'>,</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_type_ref'>type_ref</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_final_form'>to_final_form</span><span class='comma'>,</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='id identifier rubyid_values_by_name'>values_by_name</span><span class='rparen'>)</span>
+
+    <span class='comment'># :nocov: -- currently all invocations have a block
+</span>    <span class='kw'>yield</span> <span class='kw'>self</span> <span class='kw'>if</span> <span class='id identifier rubyid_block_given?'>block_given?</span>
+    <span class='comment'># :nocov:
+</span>  <span class='kw'>end</span>
+
+  <span class='comment'># @return [String] name of the enum type
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_name'>name</span>
+    <span class='id identifier rubyid_type_ref'>type_ref</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># @return [TypeReference] reference to `AggregatedValues` type to use for this enum.
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_aggregated_values_type'>aggregated_values_type</span>
+    <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_type_ref'>type_ref</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>NonNumeric</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_as_aggregated_values'>as_aggregated_values</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># Defines an enum value for the current enum type.
+</span>  <span class='comment'>#
+</span>  <span class='comment'># @param value_name [String] name of the enum value
+</span>  <span class='comment'># @yield [EnumValue] enum value so it can be further customized
+</span>  <span class='comment'># @return [void]
+</span>  <span class='comment'>#
+</span>  <span class='comment'># @example Define an enum type with multiple enum values
+</span>  <span class='comment'>#   ElasticGraph.define_schema do |schema|
+</span>  <span class='comment'>#     schema.enum_type &quot;Currency&quot; do |t|
+</span>  <span class='comment'>#       t.value &quot;USD&quot; do |v|
+</span>  <span class='comment'>#         v.documentation &quot;US Dollars.&quot;
+</span>  <span class='comment'>#       end
+</span>  <span class='comment'>#
+</span>  <span class='comment'>#       t.value &quot;JPY&quot; do |v|
+</span>  <span class='comment'>#         v.documentation &quot;Japanese Yen.&quot;
+</span>  <span class='comment'>#       end
+</span>  <span class='comment'>#     end
+</span>  <span class='comment'>#   end
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_value'>value</span><span class='lparen'>(</span><span class='id identifier rubyid_value_name'>value_name</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_alternate_original_name'>alternate_original_name</span> <span class='op'>=</span> <span class='id identifier rubyid_value_name'>value_name</span>
+    <span class='id identifier rubyid_value_name'>value_name</span> <span class='op'>=</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_enum_value_namer'>enum_value_namer</span><span class='period'>.</span><span class='id identifier rubyid_name_for'>name_for</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_value_name'>value_name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span>
+
+    <span class='kw'>if</span> <span class='id identifier rubyid_values_by_name'>values_by_name</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='id identifier rubyid_value_name'>value_name</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_raise'>raise</span> <span class='const'>Errors</span><span class='op'>::</span><span class='const'>SchemaError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Duplicate value on Enum::Type </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_value_name'>value_name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>end</span>
+
+    <span class='kw'>if</span> <span class='id identifier rubyid_value_name'>value_name</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span> <span class='op'>&gt;</span> <span class='const'>DEFAULT_MAX_KEYWORD_LENGTH</span>
+      <span class='id identifier rubyid_raise'>raise</span> <span class='const'>Errors</span><span class='op'>::</span><span class='const'>SchemaError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Enum value `</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_value_name'>value_name</span><span class='embexpr_end'>}</span><span class='tstring_content'>` is too long: it is </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_value_name'>value_name</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span><span class='embexpr_end'>}</span><span class='tstring_content'> characters but cannot exceed </span><span class='embexpr_beg'>#{</span><span class='const'>DEFAULT_MAX_KEYWORD_LENGTH</span><span class='embexpr_end'>}</span><span class='tstring_content'> characters.</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_values_by_name'>values_by_name</span><span class='lbracket'>[</span><span class='id identifier rubyid_value_name'>value_name</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_factory'>factory</span><span class='period'>.</span><span class='id identifier rubyid_new_enum_value'>new_enum_value</span><span class='lparen'>(</span><span class='id identifier rubyid_value_name'>value_name</span><span class='comma'>,</span> <span class='id identifier rubyid_alternate_original_name'>alternate_original_name</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># Defines multiple enum values. In contrast to {#value}, the enum values cannot be customized
+</span>  <span class='comment'># further via a block.
+</span>  <span class='comment'>#
+</span>  <span class='comment'># @param value_names [Array&lt;String&gt;] names of the enum values
+</span>  <span class='comment'># @return [void]
+</span>  <span class='comment'>#
+</span>  <span class='comment'># @example Define an enum type with multiple enum values
+</span>  <span class='comment'>#   ElasticGraph.define_schema do |schema|
+</span>  <span class='comment'>#     schema.enum_type &quot;Currency&quot; do |t|
+</span>  <span class='comment'>#       t.values &quot;USD&quot;, &quot;JPY&quot;, &quot;CAD&quot;, &quot;GBP&quot;
+</span>  <span class='comment'>#     end
+</span>  <span class='comment'>#   end
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_values'>values</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_value_names'>value_names</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_value_names'>value_names</span><span class='period'>.</span><span class='id identifier rubyid_flatten'>flatten</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_name'>name</span><span class='op'>|</span> <span class='id identifier rubyid_value'>value</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># @return [SchemaArtifacts::RuntimeMetadata::Enum::Type] runtime metadata for this enum type
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_runtime_metadata'>runtime_metadata</span>
+    <span class='id identifier rubyid_runtime_metadata_values_by_name'>runtime_metadata_values_by_name</span> <span class='op'>=</span> <span class='id identifier rubyid_values_by_name'>values_by_name</span>
+      <span class='period'>.</span><span class='id identifier rubyid_transform_values'>transform_values</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:runtime_metadata</span><span class='rparen'>)</span>
+      <span class='period'>.</span><span class='id identifier rubyid_compact'>compact</span>
+
+    <span class='const'>SchemaArtifacts</span><span class='op'>::</span><span class='const'>RuntimeMetadata</span><span class='op'>::</span><span class='const'>Enum</span><span class='op'>::</span><span class='const'>Type</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='label'>values_by_name:</span> <span class='id identifier rubyid_runtime_metadata_values_by_name'>runtime_metadata_values_by_name</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># @return [String] GraphQL SDL form of the enum type
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_to_sdl'>to_sdl</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_values_by_name'>values_by_name</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+      <span class='id identifier rubyid_raise'>raise</span> <span class='const'>Errors</span><span class='op'>::</span><span class='const'>SchemaError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Enum type </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> has no values, but enums must have at least one value.</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>end</span>
+
+    <span class='heredoc_beg'>&lt;&lt;~EOS</span>
+<span class='tstring_content'>      </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_formatted_documentation'>formatted_documentation</span><span class='embexpr_end'>}</span><span class='tstring_content'>enum </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_directives_sdl'>directives_sdl</span><span class='lparen'>(</span><span class='label'>suffix_with:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> </span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>{
+</span><span class='tstring_content'>        </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_values_by_name'>values_by_name</span><span class='period'>.</span><span class='id identifier rubyid_values'>values</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbeg'>:</span><span class='id identifier rubyid_to_sdl'>to_sdl</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_flat_map'>flat_map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_s'>s</span><span class='op'>|</span> <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n  </span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>
+</span><span class='tstring_content'>      }
+</span><span class='heredoc_end'>    EOS
+</span>  <span class='kw'>end</span>
+
+  <span class='comment'># @private
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_derived_graphql_types'>derived_graphql_types</span>
+    <span class='comment'># Derived GraphQL types must be generated for an output enum. For an enum type that is only
+</span>    <span class='comment'># used as an input, we do not need derived types.
+</span>    <span class='kw'>return</span> <span class='lbracket'>[</span><span class='rbracket'>]</span> <span class='kw'>unless</span> <span class='id identifier rubyid_for_output'>for_output</span>
+
+    <span class='id identifier rubyid_derived_scalar_types'>derived_scalar_types</span> <span class='op'>=</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_factory'>factory</span><span class='period'>.</span><span class='id identifier rubyid_new_scalar_type'>new_scalar_type</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span>
+      <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_mapping'>mapping</span> <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>keyword</span><span class='tstring_end'>&quot;</span></span>
+      <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_json_schema'>json_schema</span> <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>string</span><span class='tstring_end'>&quot;</span></span>
+      <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_graphql_only'>graphql_only</span> <span class='id identifier rubyid_graphql_only?'>graphql_only?</span>
+    <span class='kw'>end</span><span class='period'>.</span><span class='id identifier rubyid_derived_graphql_types'>derived_graphql_types</span>
+
+    <span class='kw'>if</span> <span class='lparen'>(</span><span class='id identifier rubyid_input_enum'>input_enum</span> <span class='op'>=</span> <span class='id identifier rubyid_as_input'>as_input</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_equal?'>equal?</span><span class='lparen'>(</span><span class='kw'>self</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_derived_scalar_types'>derived_scalar_types</span>
+    <span class='kw'>else</span>
+      <span class='lbracket'>[</span><span class='id identifier rubyid_input_enum'>input_enum</span><span class='rbracket'>]</span> <span class='op'>+</span> <span class='id identifier rubyid_derived_scalar_types'>derived_scalar_types</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># @return [Indexing::FieldType::Enum] indexing representation of this enum type
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_to_indexing_field_type'>to_indexing_field_type</span>
+    <span class='const'><span class='object_link'><a href="../Indexing.html" title="ElasticGraph::SchemaDefinition::Indexing (module)">Indexing</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Indexing/FieldType.html" title="ElasticGraph::SchemaDefinition::Indexing::FieldType (module)">FieldType</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Indexing/FieldType/Enum.html" title="ElasticGraph::SchemaDefinition::Indexing::FieldType::Enum (class)">Enum</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_values_by_name'>values_by_name</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># @return [false] enum types are never directly indexed
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_indexed?'>indexed?</span>
+    <span class='kw'>false</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># @return [EnumType] converts the enum type to its input form for when different naming is used for input vs output enums.
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_as_input'>as_input</span>
+    <span class='id identifier rubyid_input_name'>input_name</span> <span class='op'>=</span> <span class='id identifier rubyid_type_ref'>type_ref</span>
+      <span class='period'>.</span><span class='id identifier rubyid_as_input_enum'>as_input_enum</span> <span class='comment'># To apply the configured format for input enums.
+</span>      <span class='period'>.</span><span class='id identifier rubyid_to_final_form'>to_final_form</span> <span class='comment'># To handle a type name override of the input enum.
+</span>      <span class='period'>.</span><span class='id identifier rubyid_name'>name</span>
+
+    <span class='kw'>return</span> <span class='kw'>self</span> <span class='kw'>if</span> <span class='id identifier rubyid_input_name'>input_name</span> <span class='op'>==</span> <span class='id identifier rubyid_name'>name</span>
+
+    <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_factory'>factory</span><span class='period'>.</span><span class='id identifier rubyid_new_enum_type'>new_enum_type</span><span class='lparen'>(</span><span class='id identifier rubyid_input_name'>input_name</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span>
+      <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_for_output'>for_output</span> <span class='op'>=</span> <span class='kw'>false</span> <span class='comment'># flag that it&#39;s not used as an output enum, and therefore `derived_graphql_types` will be empty on it.
+</span>      <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_graphql_only'>graphql_only</span> <span class='kw'>true</span> <span class='comment'># input enums are always GraphQL-only.
+</span>      <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_documentation'>documentation</span> <span class='id identifier rubyid_doc_comment'>doc_comment</span>
+      <span class='id identifier rubyid_directives'>directives</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_dir'>dir</span><span class='op'>|</span> <span class='id identifier rubyid_dir'>dir</span><span class='period'>.</span><span class='id identifier rubyid_duplicate_on'>duplicate_on</span><span class='lparen'>(</span><span class='id identifier rubyid_t'>t</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+      <span class='id identifier rubyid_values_by_name'>values_by_name</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid__'>_</span><span class='comma'>,</span> <span class='id identifier rubyid_val'>val</span><span class='op'>|</span> <span class='id identifier rubyid_val'>val</span><span class='period'>.</span><span class='id identifier rubyid_duplicate_on'>duplicate_on</span><span class='lparen'>(</span><span class='id identifier rubyid_t'>t</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="values_by_name-instance_method">
+  
+    #<strong>values_by_name</strong>  &#x21d2; <tt>Hash&lt;String, <span class='object_link'><a href="EnumValue.html" title="ElasticGraph::SchemaDefinition::SchemaElements::EnumValue (class)">EnumValue</a></span>&gt;</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns map of enum values, keyed by name.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash&lt;String, <span class='object_link'><a href="EnumValue.html" title="ElasticGraph::SchemaDefinition::SchemaElements::EnumValue (class)">EnumValue</a></span>&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>map of enum values, keyed by name</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/enum_type.rb', line 39</span>
+
+<span class='kw'>class</span> <span class='const'><span class='object_link'><a href="" title="ElasticGraph::SchemaDefinition::SchemaElements::EnumType (class)">EnumType</a></span></span> <span class='op'>&lt;</span> <span class='const'>Struct</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='symbol'>:schema_def_state</span><span class='comma'>,</span> <span class='symbol'>:type_ref</span><span class='comma'>,</span> <span class='symbol'>:for_output</span><span class='comma'>,</span> <span class='symbol'>:values_by_name</span><span class='rparen'>)</span>
+  <span class='comment'># @dynamic type_ref, graphql_only?
+</span>  <span class='id identifier rubyid_prepend'>prepend</span> <span class='const'><span class='object_link'><a href="../Mixins.html" title="ElasticGraph::SchemaDefinition::Mixins (module)">Mixins</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Mixins/VerifiesGraphQLName.html" title="ElasticGraph::SchemaDefinition::Mixins::VerifiesGraphQLName (module)">VerifiesGraphQLName</a></span></span>
+  <span class='id identifier rubyid_include'>include</span> <span class='const'><span class='object_link'><a href="../Mixins.html" title="ElasticGraph::SchemaDefinition::Mixins (module)">Mixins</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Mixins/CanBeGraphQLOnly.html" title="ElasticGraph::SchemaDefinition::Mixins::CanBeGraphQLOnly (module)">CanBeGraphQLOnly</a></span></span>
+  <span class='id identifier rubyid_include'>include</span> <span class='const'><span class='object_link'><a href="../Mixins.html" title="ElasticGraph::SchemaDefinition::Mixins (module)">Mixins</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Mixins/HasDocumentation.html" title="ElasticGraph::SchemaDefinition::Mixins::HasDocumentation (module)">HasDocumentation</a></span></span>
+  <span class='id identifier rubyid_include'>include</span> <span class='const'><span class='object_link'><a href="../Mixins.html" title="ElasticGraph::SchemaDefinition::Mixins (module)">Mixins</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Mixins/HasDirectives.html" title="ElasticGraph::SchemaDefinition::Mixins::HasDirectives (module)">HasDirectives</a></span></span>
+  <span class='id identifier rubyid_include'>include</span> <span class='const'><span class='object_link'><a href="../Mixins.html" title="ElasticGraph::SchemaDefinition::Mixins (module)">Mixins</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Mixins/HasDerivedGraphQLTypeCustomizations.html" title="ElasticGraph::SchemaDefinition::Mixins::HasDerivedGraphQLTypeCustomizations (module)">HasDerivedGraphQLTypeCustomizations</a></span></span>
+  <span class='id identifier rubyid_include'>include</span> <span class='const'><span class='object_link'><a href="../Mixins.html" title="ElasticGraph::SchemaDefinition::Mixins (module)">Mixins</a></span></span><span class='op'>::</span><span class='const'>HasReadableToSAndInspect</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_e'>e</span><span class='op'>|</span> <span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span> <span class='rbrace'>}</span>
+
+  <span class='comment'># @private
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='comma'>,</span> <span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
+    <span class='comment'># @type var values_by_name: ::Hash[::String, EnumValue]
+</span>    <span class='id identifier rubyid_values_by_name'>values_by_name</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+    <span class='kw'>super</span><span class='lparen'>(</span><span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='comma'>,</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_type_ref'>type_ref</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_final_form'>to_final_form</span><span class='comma'>,</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='id identifier rubyid_values_by_name'>values_by_name</span><span class='rparen'>)</span>
+
+    <span class='comment'># :nocov: -- currently all invocations have a block
+</span>    <span class='kw'>yield</span> <span class='kw'>self</span> <span class='kw'>if</span> <span class='id identifier rubyid_block_given?'>block_given?</span>
+    <span class='comment'># :nocov:
+</span>  <span class='kw'>end</span>
+
+  <span class='comment'># @return [String] name of the enum type
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_name'>name</span>
+    <span class='id identifier rubyid_type_ref'>type_ref</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># @return [TypeReference] reference to `AggregatedValues` type to use for this enum.
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_aggregated_values_type'>aggregated_values_type</span>
+    <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_type_ref'>type_ref</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>NonNumeric</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_as_aggregated_values'>as_aggregated_values</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># Defines an enum value for the current enum type.
+</span>  <span class='comment'>#
+</span>  <span class='comment'># @param value_name [String] name of the enum value
+</span>  <span class='comment'># @yield [EnumValue] enum value so it can be further customized
+</span>  <span class='comment'># @return [void]
+</span>  <span class='comment'>#
+</span>  <span class='comment'># @example Define an enum type with multiple enum values
+</span>  <span class='comment'>#   ElasticGraph.define_schema do |schema|
+</span>  <span class='comment'>#     schema.enum_type &quot;Currency&quot; do |t|
+</span>  <span class='comment'>#       t.value &quot;USD&quot; do |v|
+</span>  <span class='comment'>#         v.documentation &quot;US Dollars.&quot;
+</span>  <span class='comment'>#       end
+</span>  <span class='comment'>#
+</span>  <span class='comment'>#       t.value &quot;JPY&quot; do |v|
+</span>  <span class='comment'>#         v.documentation &quot;Japanese Yen.&quot;
+</span>  <span class='comment'>#       end
+</span>  <span class='comment'>#     end
+</span>  <span class='comment'>#   end
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_value'>value</span><span class='lparen'>(</span><span class='id identifier rubyid_value_name'>value_name</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_alternate_original_name'>alternate_original_name</span> <span class='op'>=</span> <span class='id identifier rubyid_value_name'>value_name</span>
+    <span class='id identifier rubyid_value_name'>value_name</span> <span class='op'>=</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_enum_value_namer'>enum_value_namer</span><span class='period'>.</span><span class='id identifier rubyid_name_for'>name_for</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_value_name'>value_name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span>
+
+    <span class='kw'>if</span> <span class='id identifier rubyid_values_by_name'>values_by_name</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='id identifier rubyid_value_name'>value_name</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_raise'>raise</span> <span class='const'>Errors</span><span class='op'>::</span><span class='const'>SchemaError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Duplicate value on Enum::Type </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_value_name'>value_name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>end</span>
+
+    <span class='kw'>if</span> <span class='id identifier rubyid_value_name'>value_name</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span> <span class='op'>&gt;</span> <span class='const'>DEFAULT_MAX_KEYWORD_LENGTH</span>
+      <span class='id identifier rubyid_raise'>raise</span> <span class='const'>Errors</span><span class='op'>::</span><span class='const'>SchemaError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Enum value `</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_value_name'>value_name</span><span class='embexpr_end'>}</span><span class='tstring_content'>` is too long: it is </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_value_name'>value_name</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span><span class='embexpr_end'>}</span><span class='tstring_content'> characters but cannot exceed </span><span class='embexpr_beg'>#{</span><span class='const'>DEFAULT_MAX_KEYWORD_LENGTH</span><span class='embexpr_end'>}</span><span class='tstring_content'> characters.</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_values_by_name'>values_by_name</span><span class='lbracket'>[</span><span class='id identifier rubyid_value_name'>value_name</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_factory'>factory</span><span class='period'>.</span><span class='id identifier rubyid_new_enum_value'>new_enum_value</span><span class='lparen'>(</span><span class='id identifier rubyid_value_name'>value_name</span><span class='comma'>,</span> <span class='id identifier rubyid_alternate_original_name'>alternate_original_name</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># Defines multiple enum values. In contrast to {#value}, the enum values cannot be customized
+</span>  <span class='comment'># further via a block.
+</span>  <span class='comment'>#
+</span>  <span class='comment'># @param value_names [Array&lt;String&gt;] names of the enum values
+</span>  <span class='comment'># @return [void]
+</span>  <span class='comment'>#
+</span>  <span class='comment'># @example Define an enum type with multiple enum values
+</span>  <span class='comment'>#   ElasticGraph.define_schema do |schema|
+</span>  <span class='comment'>#     schema.enum_type &quot;Currency&quot; do |t|
+</span>  <span class='comment'>#       t.values &quot;USD&quot;, &quot;JPY&quot;, &quot;CAD&quot;, &quot;GBP&quot;
+</span>  <span class='comment'>#     end
+</span>  <span class='comment'>#   end
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_values'>values</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_value_names'>value_names</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_value_names'>value_names</span><span class='period'>.</span><span class='id identifier rubyid_flatten'>flatten</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_name'>name</span><span class='op'>|</span> <span class='id identifier rubyid_value'>value</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># @return [SchemaArtifacts::RuntimeMetadata::Enum::Type] runtime metadata for this enum type
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_runtime_metadata'>runtime_metadata</span>
+    <span class='id identifier rubyid_runtime_metadata_values_by_name'>runtime_metadata_values_by_name</span> <span class='op'>=</span> <span class='id identifier rubyid_values_by_name'>values_by_name</span>
+      <span class='period'>.</span><span class='id identifier rubyid_transform_values'>transform_values</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:runtime_metadata</span><span class='rparen'>)</span>
+      <span class='period'>.</span><span class='id identifier rubyid_compact'>compact</span>
+
+    <span class='const'>SchemaArtifacts</span><span class='op'>::</span><span class='const'>RuntimeMetadata</span><span class='op'>::</span><span class='const'>Enum</span><span class='op'>::</span><span class='const'>Type</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='label'>values_by_name:</span> <span class='id identifier rubyid_runtime_metadata_values_by_name'>runtime_metadata_values_by_name</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># @return [String] GraphQL SDL form of the enum type
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_to_sdl'>to_sdl</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_values_by_name'>values_by_name</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+      <span class='id identifier rubyid_raise'>raise</span> <span class='const'>Errors</span><span class='op'>::</span><span class='const'>SchemaError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Enum type </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> has no values, but enums must have at least one value.</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>end</span>
+
+    <span class='heredoc_beg'>&lt;&lt;~EOS</span>
+<span class='tstring_content'>      </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_formatted_documentation'>formatted_documentation</span><span class='embexpr_end'>}</span><span class='tstring_content'>enum </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_directives_sdl'>directives_sdl</span><span class='lparen'>(</span><span class='label'>suffix_with:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> </span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>{
+</span><span class='tstring_content'>        </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_values_by_name'>values_by_name</span><span class='period'>.</span><span class='id identifier rubyid_values'>values</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbeg'>:</span><span class='id identifier rubyid_to_sdl'>to_sdl</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_flat_map'>flat_map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_s'>s</span><span class='op'>|</span> <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n  </span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>
+</span><span class='tstring_content'>      }
+</span><span class='heredoc_end'>    EOS
+</span>  <span class='kw'>end</span>
+
+  <span class='comment'># @private
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_derived_graphql_types'>derived_graphql_types</span>
+    <span class='comment'># Derived GraphQL types must be generated for an output enum. For an enum type that is only
+</span>    <span class='comment'># used as an input, we do not need derived types.
+</span>    <span class='kw'>return</span> <span class='lbracket'>[</span><span class='rbracket'>]</span> <span class='kw'>unless</span> <span class='id identifier rubyid_for_output'>for_output</span>
+
+    <span class='id identifier rubyid_derived_scalar_types'>derived_scalar_types</span> <span class='op'>=</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_factory'>factory</span><span class='period'>.</span><span class='id identifier rubyid_new_scalar_type'>new_scalar_type</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span>
+      <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_mapping'>mapping</span> <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>keyword</span><span class='tstring_end'>&quot;</span></span>
+      <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_json_schema'>json_schema</span> <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>string</span><span class='tstring_end'>&quot;</span></span>
+      <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_graphql_only'>graphql_only</span> <span class='id identifier rubyid_graphql_only?'>graphql_only?</span>
+    <span class='kw'>end</span><span class='period'>.</span><span class='id identifier rubyid_derived_graphql_types'>derived_graphql_types</span>
+
+    <span class='kw'>if</span> <span class='lparen'>(</span><span class='id identifier rubyid_input_enum'>input_enum</span> <span class='op'>=</span> <span class='id identifier rubyid_as_input'>as_input</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_equal?'>equal?</span><span class='lparen'>(</span><span class='kw'>self</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_derived_scalar_types'>derived_scalar_types</span>
+    <span class='kw'>else</span>
+      <span class='lbracket'>[</span><span class='id identifier rubyid_input_enum'>input_enum</span><span class='rbracket'>]</span> <span class='op'>+</span> <span class='id identifier rubyid_derived_scalar_types'>derived_scalar_types</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># @return [Indexing::FieldType::Enum] indexing representation of this enum type
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_to_indexing_field_type'>to_indexing_field_type</span>
+    <span class='const'><span class='object_link'><a href="../Indexing.html" title="ElasticGraph::SchemaDefinition::Indexing (module)">Indexing</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Indexing/FieldType.html" title="ElasticGraph::SchemaDefinition::Indexing::FieldType (module)">FieldType</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Indexing/FieldType/Enum.html" title="ElasticGraph::SchemaDefinition::Indexing::FieldType::Enum (class)">Enum</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_values_by_name'>values_by_name</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># @return [false] enum types are never directly indexed
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_indexed?'>indexed?</span>
+    <span class='kw'>false</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># @return [EnumType] converts the enum type to its input form for when different naming is used for input vs output enums.
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_as_input'>as_input</span>
+    <span class='id identifier rubyid_input_name'>input_name</span> <span class='op'>=</span> <span class='id identifier rubyid_type_ref'>type_ref</span>
+      <span class='period'>.</span><span class='id identifier rubyid_as_input_enum'>as_input_enum</span> <span class='comment'># To apply the configured format for input enums.
+</span>      <span class='period'>.</span><span class='id identifier rubyid_to_final_form'>to_final_form</span> <span class='comment'># To handle a type name override of the input enum.
+</span>      <span class='period'>.</span><span class='id identifier rubyid_name'>name</span>
+
+    <span class='kw'>return</span> <span class='kw'>self</span> <span class='kw'>if</span> <span class='id identifier rubyid_input_name'>input_name</span> <span class='op'>==</span> <span class='id identifier rubyid_name'>name</span>
+
+    <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_factory'>factory</span><span class='period'>.</span><span class='id identifier rubyid_new_enum_type'>new_enum_type</span><span class='lparen'>(</span><span class='id identifier rubyid_input_name'>input_name</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span>
+      <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_for_output'>for_output</span> <span class='op'>=</span> <span class='kw'>false</span> <span class='comment'># flag that it&#39;s not used as an output enum, and therefore `derived_graphql_types` will be empty on it.
+</span>      <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_graphql_only'>graphql_only</span> <span class='kw'>true</span> <span class='comment'># input enums are always GraphQL-only.
+</span>      <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_documentation'>documentation</span> <span class='id identifier rubyid_doc_comment'>doc_comment</span>
+      <span class='id identifier rubyid_directives'>directives</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_dir'>dir</span><span class='op'>|</span> <span class='id identifier rubyid_dir'>dir</span><span class='period'>.</span><span class='id identifier rubyid_duplicate_on'>duplicate_on</span><span class='lparen'>(</span><span class='id identifier rubyid_t'>t</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+      <span class='id identifier rubyid_values_by_name'>values_by_name</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid__'>_</span><span class='comma'>,</span> <span class='id identifier rubyid_val'>val</span><span class='op'>|</span> <span class='id identifier rubyid_val'>val</span><span class='period'>.</span><span class='id identifier rubyid_duplicate_on'>duplicate_on</span><span class='lparen'>(</span><span class='id identifier rubyid_t'>t</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="aggregated_values_type-instance_method">
+  
+    #<strong>aggregated_values_type</strong>  &#x21d2; <tt><span class='object_link'>TypeReference</span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns reference to <code>AggregatedValues</code> type to use for this enum.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'>TypeReference</span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>reference to <code>AggregatedValues</code> type to use for this enum.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+65
+66
+67</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/enum_type.rb', line 65</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_aggregated_values_type'>aggregated_values_type</span>
+  <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_type_ref'>type_ref</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>NonNumeric</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_as_aggregated_values'>as_aggregated_values</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="as_input-instance_method">
+  
+    #<strong>as_input</strong>  &#x21d2; <tt><span class='object_link'><a href="" title="ElasticGraph::SchemaDefinition::SchemaElements::EnumType (class)">EnumType</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns converts the enum type to its input form for when different naming is used for input vs output enums.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="" title="ElasticGraph::SchemaDefinition::SchemaElements::EnumType (class)">EnumType</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>converts the enum type to its input form for when different naming is used for input vs output enums.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/enum_type.rb', line 170</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_as_input'>as_input</span>
+  <span class='id identifier rubyid_input_name'>input_name</span> <span class='op'>=</span> <span class='id identifier rubyid_type_ref'>type_ref</span>
+    <span class='period'>.</span><span class='id identifier rubyid_as_input_enum'>as_input_enum</span> <span class='comment'># To apply the configured format for input enums.
+</span>    <span class='period'>.</span><span class='id identifier rubyid_to_final_form'>to_final_form</span> <span class='comment'># To handle a type name override of the input enum.
+</span>    <span class='period'>.</span><span class='id identifier rubyid_name'>name</span>
+
+  <span class='kw'>return</span> <span class='kw'>self</span> <span class='kw'>if</span> <span class='id identifier rubyid_input_name'>input_name</span> <span class='op'>==</span> <span class='id identifier rubyid_name'>name</span>
+
+  <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_factory'>factory</span><span class='period'>.</span><span class='id identifier rubyid_new_enum_type'>new_enum_type</span><span class='lparen'>(</span><span class='id identifier rubyid_input_name'>input_name</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span>
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_for_output'>for_output</span> <span class='op'>=</span> <span class='kw'>false</span> <span class='comment'># flag that it&#39;s not used as an output enum, and therefore `derived_graphql_types` will be empty on it.
+</span>    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_graphql_only'>graphql_only</span> <span class='kw'>true</span> <span class='comment'># input enums are always GraphQL-only.
+</span>    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_documentation'>documentation</span> <span class='id identifier rubyid_doc_comment'>doc_comment</span>
+    <span class='id identifier rubyid_directives'>directives</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_dir'>dir</span><span class='op'>|</span> <span class='id identifier rubyid_dir'>dir</span><span class='period'>.</span><span class='id identifier rubyid_duplicate_on'>duplicate_on</span><span class='lparen'>(</span><span class='id identifier rubyid_t'>t</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+    <span class='id identifier rubyid_values_by_name'>values_by_name</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid__'>_</span><span class='comma'>,</span> <span class='id identifier rubyid_val'>val</span><span class='op'>|</span> <span class='id identifier rubyid_val'>val</span><span class='period'>.</span><span class='id identifier rubyid_duplicate_on'>duplicate_on</span><span class='lparen'>(</span><span class='id identifier rubyid_t'>t</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="indexed?-instance_method">
+  
+    #<strong>indexed?</strong>  &#x21d2; <tt>false</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns enum types are never directly indexed.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>false</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>enum types are never directly indexed</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+165
+166
+167</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/enum_type.rb', line 165</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_indexed?'>indexed?</span>
+  <span class='kw'>false</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="name-instance_method">
+  
+    #<strong>name</strong>  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns name of the enum type.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>name of the enum type</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+60
+61
+62</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/enum_type.rb', line 60</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_name'>name</span>
+  <span class='id identifier rubyid_type_ref'>type_ref</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="runtime_metadata-instance_method">
+  
+    #<strong>runtime_metadata</strong>  &#x21d2; <tt>SchemaArtifacts::RuntimeMetadata::Enum::Type</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns runtime metadata for this enum type.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>SchemaArtifacts::RuntimeMetadata::Enum::Type</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>runtime metadata for this enum type</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+119
+120
+121
+122
+123
+124
+125</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/enum_type.rb', line 119</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_runtime_metadata'>runtime_metadata</span>
+  <span class='id identifier rubyid_runtime_metadata_values_by_name'>runtime_metadata_values_by_name</span> <span class='op'>=</span> <span class='id identifier rubyid_values_by_name'>values_by_name</span>
+    <span class='period'>.</span><span class='id identifier rubyid_transform_values'>transform_values</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:runtime_metadata</span><span class='rparen'>)</span>
+    <span class='period'>.</span><span class='id identifier rubyid_compact'>compact</span>
+
+  <span class='const'>SchemaArtifacts</span><span class='op'>::</span><span class='const'>RuntimeMetadata</span><span class='op'>::</span><span class='const'>Enum</span><span class='op'>::</span><span class='const'>Type</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='label'>values_by_name:</span> <span class='id identifier rubyid_runtime_metadata_values_by_name'>runtime_metadata_values_by_name</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="to_indexing_field_type-instance_method">
+  
+    #<strong>to_indexing_field_type</strong>  &#x21d2; <tt><span class='object_link'><a href="../Indexing/FieldType/Enum.html" title="ElasticGraph::SchemaDefinition::Indexing::FieldType::Enum (class)">Indexing::FieldType::Enum</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns indexing representation of this enum type.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../Indexing/FieldType/Enum.html" title="ElasticGraph::SchemaDefinition::Indexing::FieldType::Enum (class)">Indexing::FieldType::Enum</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>indexing representation of this enum type</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+160
+161
+162</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/enum_type.rb', line 160</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_to_indexing_field_type'>to_indexing_field_type</span>
+  <span class='const'><span class='object_link'><a href="../Indexing.html" title="ElasticGraph::SchemaDefinition::Indexing (module)">Indexing</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Indexing/FieldType.html" title="ElasticGraph::SchemaDefinition::Indexing::FieldType (module)">FieldType</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Indexing/FieldType/Enum.html" title="ElasticGraph::SchemaDefinition::Indexing::FieldType::Enum (class)">Enum</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_values_by_name'>values_by_name</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="to_sdl-instance_method">
+  
+    #<strong>to_sdl</strong>  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns GraphQL SDL form of the enum type.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>GraphQL SDL form of the enum type</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/enum_type.rb', line 128</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_to_sdl'>to_sdl</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_values_by_name'>values_by_name</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='const'>Errors</span><span class='op'>::</span><span class='const'>SchemaError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Enum type </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> has no values, but enums must have at least one value.</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+
+  <span class='heredoc_beg'>&lt;&lt;~EOS</span>
+<span class='tstring_content'>    </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_formatted_documentation'>formatted_documentation</span><span class='embexpr_end'>}</span><span class='tstring_content'>enum </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_directives_sdl'>directives_sdl</span><span class='lparen'>(</span><span class='label'>suffix_with:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> </span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>{
+</span><span class='tstring_content'>      </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_values_by_name'>values_by_name</span><span class='period'>.</span><span class='id identifier rubyid_values'>values</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbeg'>:</span><span class='id identifier rubyid_to_sdl'>to_sdl</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_flat_map'>flat_map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_s'>s</span><span class='op'>|</span> <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n  </span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>
+</span><span class='tstring_content'>    }
+</span><span class='heredoc_end'>  EOS
+</span><span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="value-instance_method">
+  
+    #<strong>value</strong>(value_name) {|EnumValue| ... } &#x21d2; <tt>void</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note returns_void">This method returns an undefined value.</p><p>Defines an enum value for the current enum type.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Define an enum type with multiple enum values</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='const'><span class='object_link'><a href="../../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span><span class='period'>.</span><span class='id identifier rubyid_define_schema'><span class='object_link'><a href="../../../ElasticGraph.html#define_schema-class_method" title="ElasticGraph.define_schema (method)">define_schema</a></span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_schema'>schema</span><span class='op'>|</span>
+  <span class='id identifier rubyid_schema'>schema</span><span class='period'>.</span><span class='id identifier rubyid_enum_type'>enum_type</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Currency</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span>
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_value'>value</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>USD</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_v'>v</span><span class='op'>|</span>
+      <span class='id identifier rubyid_v'>v</span><span class='period'>.</span><span class='id identifier rubyid_documentation'>documentation</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>US Dollars.</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_value'>value</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>JPY</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_v'>v</span><span class='op'>|</span>
+      <span class='id identifier rubyid_v'>v</span><span class='period'>.</span><span class='id identifier rubyid_documentation'>documentation</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Japanese Yen.</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>value_name</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>name of the enum value</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Yields:</p>
+<ul class="yield">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="EnumValue.html" title="ElasticGraph::SchemaDefinition::SchemaElements::EnumValue (class)">EnumValue</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>enum value so it can be further customized</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/enum_type.rb', line 87</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_value'>value</span><span class='lparen'>(</span><span class='id identifier rubyid_value_name'>value_name</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_alternate_original_name'>alternate_original_name</span> <span class='op'>=</span> <span class='id identifier rubyid_value_name'>value_name</span>
+  <span class='id identifier rubyid_value_name'>value_name</span> <span class='op'>=</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_enum_value_namer'>enum_value_namer</span><span class='period'>.</span><span class='id identifier rubyid_name_for'>name_for</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_value_name'>value_name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span>
+
+  <span class='kw'>if</span> <span class='id identifier rubyid_values_by_name'>values_by_name</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='id identifier rubyid_value_name'>value_name</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='const'>Errors</span><span class='op'>::</span><span class='const'>SchemaError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Duplicate value on Enum::Type </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_value_name'>value_name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+
+  <span class='kw'>if</span> <span class='id identifier rubyid_value_name'>value_name</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span> <span class='op'>&gt;</span> <span class='const'>DEFAULT_MAX_KEYWORD_LENGTH</span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='const'>Errors</span><span class='op'>::</span><span class='const'>SchemaError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Enum value `</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_value_name'>value_name</span><span class='embexpr_end'>}</span><span class='tstring_content'>` is too long: it is </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_value_name'>value_name</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span><span class='embexpr_end'>}</span><span class='tstring_content'> characters but cannot exceed </span><span class='embexpr_beg'>#{</span><span class='const'>DEFAULT_MAX_KEYWORD_LENGTH</span><span class='embexpr_end'>}</span><span class='tstring_content'> characters.</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_values_by_name'>values_by_name</span><span class='lbracket'>[</span><span class='id identifier rubyid_value_name'>value_name</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_factory'>factory</span><span class='period'>.</span><span class='id identifier rubyid_new_enum_value'>new_enum_value</span><span class='lparen'>(</span><span class='id identifier rubyid_value_name'>value_name</span><span class='comma'>,</span> <span class='id identifier rubyid_alternate_original_name'>alternate_original_name</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="values-instance_method">
+  
+    #<strong>values</strong>(*value_names)  &#x21d2; <tt>void</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note returns_void">This method returns an undefined value.</p><p>Defines multiple enum values. In contrast to <span class='object_link'><a href="#value-instance_method" title="ElasticGraph::SchemaDefinition::SchemaElements::EnumType#value (method)">#value</a></span>, the enum values cannot be customized
+further via a block.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Define an enum type with multiple enum values</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='const'><span class='object_link'><a href="../../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span><span class='period'>.</span><span class='id identifier rubyid_define_schema'><span class='object_link'><a href="../../../ElasticGraph.html#define_schema-class_method" title="ElasticGraph.define_schema (method)">define_schema</a></span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_schema'>schema</span><span class='op'>|</span>
+  <span class='id identifier rubyid_schema'>schema</span><span class='period'>.</span><span class='id identifier rubyid_enum_type'>enum_type</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Currency</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span>
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_values'>values</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>USD</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>JPY</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>CAD</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>GBP</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>value_names</span>
+      
+      
+        <span class='type'>(<tt>Array&lt;String&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>names of the enum values</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+114
+115
+116</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/enum_type.rb', line 114</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_values'>values</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_value_names'>value_names</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_value_names'>value_names</span><span class='period'>.</span><span class='id identifier rubyid_flatten'>flatten</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_name'>name</span><span class='op'>|</span> <span class='id identifier rubyid_value'>value</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Thu Mar  6 06:00:38 2025 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.37 (ruby-3.3.4).
+</div>
+
+    </div>
+  </body>
+</html>

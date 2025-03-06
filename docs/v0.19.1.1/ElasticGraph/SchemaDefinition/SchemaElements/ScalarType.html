@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: ElasticGraph::SchemaDefinition::SchemaElements::ScalarType
+  
+    &mdash; Documentation by YARD 0.9.37
+  
+</title>
+
+  <link rel="stylesheet" href="../../../css/style.css" type="text/css" />
+
+  <link rel="stylesheet" href="../../../css/common.css" type="text/css" />
+
+<script type="text/javascript">
+  pathId = "ElasticGraph::SchemaDefinition::SchemaElements::ScalarType";
+  relpath = '../../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../../_index.html">Index (S)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../../SchemaDefinition.html" title="ElasticGraph::SchemaDefinition (module)">SchemaDefinition</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../SchemaElements.html" title="ElasticGraph::SchemaDefinition::SchemaElements (module)">SchemaElements</a></span></span>
+     &raquo; 
+    <span class="title">ScalarType</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: ElasticGraph::SchemaDefinition::SchemaElements::ScalarType
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Struct</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Struct</li>
+          
+            <li class="next">ElasticGraph::SchemaDefinition::SchemaElements::ScalarType</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  <dl>
+      <dt>Includes:</dt>
+      <dd><span class='object_link'><a href="../Mixins/CanBeGraphQLOnly.html" title="ElasticGraph::SchemaDefinition::Mixins::CanBeGraphQLOnly (module)">Mixins::CanBeGraphQLOnly</a></span>, <span class='object_link'><a href="../Mixins/HasDerivedGraphQLTypeCustomizations.html" title="ElasticGraph::SchemaDefinition::Mixins::HasDerivedGraphQLTypeCustomizations (module)">Mixins::HasDerivedGraphQLTypeCustomizations</a></span>, <span class='object_link'><a href="../Mixins/HasDirectives.html" title="ElasticGraph::SchemaDefinition::Mixins::HasDirectives (module)">Mixins::HasDirectives</a></span>, <span class='object_link'><a href="../Mixins/HasDocumentation.html" title="ElasticGraph::SchemaDefinition::Mixins::HasDocumentation (module)">Mixins::HasDocumentation</a></span>, <span class='object_link'><a href="../Mixins/HasTypeInfo.html" title="ElasticGraph::SchemaDefinition::Mixins::HasTypeInfo (module)">Mixins::HasTypeInfo</a></span>, <span class='object_link'><a href="../Mixins/VerifiesGraphQLName.html" title="ElasticGraph::SchemaDefinition::Mixins::VerifiesGraphQLName (module)">Mixins::VerifiesGraphQLName</a></span></dd>
+  </dl>
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/scalar_type.rb</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Defines a <a href="https://graphql.org/learn/schema/#scalar-types">GraphQL scalar type</a>. ElasticGraph itself uses this to define a few
+common scalar types (e.g. <code>Date</code> and <code>DateTime</code>), but it is also available to you to use to define your own custom scalar types.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Define a scalar type</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='const'><span class='object_link'><a href="../../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span><span class='period'>.</span><span class='id identifier rubyid_define_schema'><span class='object_link'><a href="../../../ElasticGraph.html#define_schema-class_method" title="ElasticGraph.define_schema (method)">define_schema</a></span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_schema'>schema</span><span class='op'>|</span>
+  <span class='id identifier rubyid_schema'>schema</span><span class='period'>.</span><span class='id identifier rubyid_scalar_type'>scalar_type</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>URL</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span>
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_mapping'>mapping</span> <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>keyword</span><span class='tstring_end'>&quot;</span></span>
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_json_schema'>json_schema</span> <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>string</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>format:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>uri</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></code></pre>
+    
+  </div>
+
+
+</div>
+
+
+  <h2>Constant Summary</h2>
+  
+  <h3 class="inherited">Constants included
+     from <span class='object_link'><a href="../Mixins/HasTypeInfo.html" title="ElasticGraph::SchemaDefinition::Mixins::HasTypeInfo (module)">Mixins::HasTypeInfo</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../Mixins/HasTypeInfo.html#CUSTOMIZABLE_DATASTORE_PARAMS-constant" title="ElasticGraph::SchemaDefinition::Mixins::HasTypeInfo::CUSTOMIZABLE_DATASTORE_PARAMS (constant)">Mixins::HasTypeInfo::CUSTOMIZABLE_DATASTORE_PARAMS</a></span></p>
+
+
+  <h2>Instance Attribute Summary <small><a href="#" class="summary_toggle">collapse</a></small></h2>
+  <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#schema_def_state-instance_method" title="#schema_def_state (instance method)">#<strong>schema_def_state</strong>  &#x21d2; State </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Schema definition state.</p>
+</div></span>
+  
+</li>
+
+    
+  </ul>
+
+
+
+  
+  
+  <h3 class="inherited">Attributes included from <span class='object_link'><a href="../Mixins/HasDocumentation.html" title="ElasticGraph::SchemaDefinition::Mixins::HasDocumentation (module)">Mixins::HasDocumentation</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../Mixins/HasDocumentation.html#doc_comment-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::HasDocumentation#doc_comment (method)">#doc_comment</a></span></p>
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#coerce_with-instance_method" title="#coerce_with (instance method)">#<strong>coerce_with</strong>(adapter_name, defined_at:)  &#x21d2; void </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Specifies the scalar coercion adapter that should be used for this scalar type.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#mapping-instance_method" title="#mapping (instance method)">#<strong>mapping</strong>(**options)  &#x21d2; void </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Defines the Elasticsearch/OpenSearch <a href="https://www.elastic.co/guide/en/elasticsearch/reference/7.10/mapping-types.html">field mapping type</a> and <a href="https://www.elastic.co/guide/en/elasticsearch/reference/7.10/mapping-params.html">mapping parameters</a> for a field or type.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#name-instance_method" title="#name (instance method)">#<strong>name</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Name of the scalar type.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#prepare_for_indexing_with-instance_method" title="#prepare_for_indexing_with (instance method)">#<strong>prepare_for_indexing_with</strong>(preparer_name, defined_at:)  &#x21d2; void </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Specifies an indexing preparer that should be used for this scalar type.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#to_sdl-instance_method" title="#to_sdl (instance method)">#<strong>to_sdl</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>The GraphQL SDL form of this scalar.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="../Mixins/HasTypeInfo.html" title="ElasticGraph::SchemaDefinition::Mixins::HasTypeInfo (module)">Mixins::HasTypeInfo</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../Mixins/HasTypeInfo.html#json_schema-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::HasTypeInfo#json_schema (method)">#json_schema</a></span>, <span class='object_link'><a href="../Mixins/HasTypeInfo.html#json_schema_options-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::HasTypeInfo#json_schema_options (method)">#json_schema_options</a></span>, <span class='object_link'><a href="../Mixins/HasTypeInfo.html#mapping_options-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::HasTypeInfo#mapping_options (method)">#mapping_options</a></span></p>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="../Mixins/HasDerivedGraphQLTypeCustomizations.html" title="ElasticGraph::SchemaDefinition::Mixins::HasDerivedGraphQLTypeCustomizations (module)">Mixins::HasDerivedGraphQLTypeCustomizations</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../Mixins/HasDerivedGraphQLTypeCustomizations.html#customize_derived_type_fields-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::HasDerivedGraphQLTypeCustomizations#customize_derived_type_fields (method)">#customize_derived_type_fields</a></span>, <span class='object_link'><a href="../Mixins/HasDerivedGraphQLTypeCustomizations.html#customize_derived_types-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::HasDerivedGraphQLTypeCustomizations#customize_derived_types (method)">#customize_derived_types</a></span></p>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="../Mixins/HasDirectives.html" title="ElasticGraph::SchemaDefinition::Mixins::HasDirectives (module)">Mixins::HasDirectives</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../Mixins/HasDirectives.html#directive-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::HasDirectives#directive (method)">#directive</a></span>, <span class='object_link'><a href="../Mixins/HasDirectives.html#directives-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::HasDirectives#directives (method)">#directives</a></span>, <span class='object_link'><a href="../Mixins/HasDirectives.html#directives_sdl-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::HasDirectives#directives_sdl (method)">#directives_sdl</a></span></p>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="../Mixins/HasDocumentation.html" title="ElasticGraph::SchemaDefinition::Mixins::HasDocumentation (module)">Mixins::HasDocumentation</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../Mixins/HasDocumentation.html#append_to_documentation-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::HasDocumentation#append_to_documentation (method)">#append_to_documentation</a></span>, <span class='object_link'><a href="../Mixins/HasDocumentation.html#derived_documentation-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::HasDocumentation#derived_documentation (method)">#derived_documentation</a></span>, <span class='object_link'><a href="../Mixins/HasDocumentation.html#documentation-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::HasDocumentation#documentation (method)">#documentation</a></span>, <span class='object_link'><a href="../Mixins/HasDocumentation.html#formatted_documentation-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::HasDocumentation#formatted_documentation (method)">#formatted_documentation</a></span></p>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="../Mixins/CanBeGraphQLOnly.html" title="ElasticGraph::SchemaDefinition::Mixins::CanBeGraphQLOnly (module)">Mixins::CanBeGraphQLOnly</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../Mixins/CanBeGraphQLOnly.html#graphql_only-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::CanBeGraphQLOnly#graphql_only (method)">#graphql_only</a></span>, <span class='object_link'><a href="../Mixins/CanBeGraphQLOnly.html#graphql_only%3F-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::CanBeGraphQLOnly#graphql_only? (method)">#graphql_only?</a></span></p>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="../Mixins/VerifiesGraphQLName.html" title="ElasticGraph::SchemaDefinition::Mixins::VerifiesGraphQLName (module)">Mixins::VerifiesGraphQLName</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../Mixins/VerifiesGraphQLName.html#verify_name!-class_method" title="ElasticGraph::SchemaDefinition::Mixins::VerifiesGraphQLName.verify_name! (method)">verify_name!</a></span></p>
+
+  
+  <div id="instance_attr_details" class="attr_details">
+    <h2>Instance Attribute Details</h2>
+    
+      
+      <span id=""></span>
+      <div class="method_details first">
+  <h3 class="signature first" id="schema_def_state-instance_method">
+  
+    #<strong>schema_def_state</strong>  &#x21d2; <tt><span class='object_link'>State</span></tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns schema definition state.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'>State</span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>schema definition state</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/scalar_type.rb', line 42</span>
+
+<span class='kw'>class</span> <span class='const'><span class='object_link'><a href="" title="ElasticGraph::SchemaDefinition::SchemaElements::ScalarType (class)">ScalarType</a></span></span> <span class='op'>&lt;</span> <span class='const'>Struct</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='symbol'>:schema_def_state</span><span class='comma'>,</span> <span class='symbol'>:type_ref</span><span class='comma'>,</span> <span class='symbol'>:mapping_type</span><span class='comma'>,</span> <span class='symbol'>:runtime_metadata</span><span class='comma'>,</span> <span class='symbol'>:aggregated_values_customizations</span><span class='rparen'>)</span>
+  <span class='comment'># `Struct.new` provides the following methods:
+</span>  <span class='comment'># @dynamic type_ref, runtime_metadata
+</span>  <span class='id identifier rubyid_prepend'>prepend</span> <span class='const'><span class='object_link'><a href="../Mixins.html" title="ElasticGraph::SchemaDefinition::Mixins (module)">Mixins</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Mixins/VerifiesGraphQLName.html" title="ElasticGraph::SchemaDefinition::Mixins::VerifiesGraphQLName (module)">VerifiesGraphQLName</a></span></span>
+  <span class='id identifier rubyid_include'>include</span> <span class='const'><span class='object_link'><a href="../Mixins.html" title="ElasticGraph::SchemaDefinition::Mixins (module)">Mixins</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Mixins/CanBeGraphQLOnly.html" title="ElasticGraph::SchemaDefinition::Mixins::CanBeGraphQLOnly (module)">CanBeGraphQLOnly</a></span></span>
+  <span class='id identifier rubyid_include'>include</span> <span class='const'><span class='object_link'><a href="../Mixins.html" title="ElasticGraph::SchemaDefinition::Mixins (module)">Mixins</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Mixins/HasDocumentation.html" title="ElasticGraph::SchemaDefinition::Mixins::HasDocumentation (module)">HasDocumentation</a></span></span>
+  <span class='id identifier rubyid_include'>include</span> <span class='const'><span class='object_link'><a href="../Mixins.html" title="ElasticGraph::SchemaDefinition::Mixins (module)">Mixins</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Mixins/HasDirectives.html" title="ElasticGraph::SchemaDefinition::Mixins::HasDirectives (module)">HasDirectives</a></span></span>
+  <span class='id identifier rubyid_include'>include</span> <span class='const'><span class='object_link'><a href="../Mixins.html" title="ElasticGraph::SchemaDefinition::Mixins (module)">Mixins</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Mixins/HasDerivedGraphQLTypeCustomizations.html" title="ElasticGraph::SchemaDefinition::Mixins::HasDerivedGraphQLTypeCustomizations (module)">HasDerivedGraphQLTypeCustomizations</a></span></span>
+  <span class='id identifier rubyid_include'>include</span> <span class='const'><span class='object_link'><a href="../Mixins.html" title="ElasticGraph::SchemaDefinition::Mixins (module)">Mixins</a></span></span><span class='op'>::</span><span class='const'>HasReadableToSAndInspect</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span> <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span> <span class='rbrace'>}</span>
+
+  <span class='comment'># `HasTypeInfo` provides the following methods:
+</span>  <span class='comment'># @dynamic mapping_options, json_schema_options
+</span>  <span class='id identifier rubyid_include'>include</span> <span class='const'><span class='object_link'><a href="../Mixins.html" title="ElasticGraph::SchemaDefinition::Mixins (module)">Mixins</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Mixins/HasTypeInfo.html" title="ElasticGraph::SchemaDefinition::Mixins::HasTypeInfo (module)">HasTypeInfo</a></span></span>
+
+  <span class='comment'># @dynamic graphql_only?
+</span>
+  <span class='comment'># @private
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='comma'>,</span> <span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
+    <span class='kw'>super</span><span class='lparen'>(</span><span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='comma'>,</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_type_ref'>type_ref</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_final_form'>to_final_form</span><span class='rparen'>)</span>
+
+    <span class='comment'># Default the runtime metadata before yielding, so it can be overridden as needed.
+</span>    <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_runtime_metadata'>runtime_metadata</span> <span class='op'>=</span> <span class='const'>SchemaArtifacts</span><span class='op'>::</span><span class='const'>RuntimeMetadata</span><span class='op'>::</span><span class='const'>ScalarType</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span>
+      <span class='label'>coercion_adapter_ref:</span> <span class='const'>SchemaArtifacts</span><span class='op'>::</span><span class='const'>RuntimeMetadata</span><span class='op'>::</span><span class='const'>ScalarType</span><span class='op'>::</span><span class='const'>DEFAULT_COERCION_ADAPTER_REF</span><span class='comma'>,</span>
+      <span class='label'>indexing_preparer_ref:</span> <span class='const'>SchemaArtifacts</span><span class='op'>::</span><span class='const'>RuntimeMetadata</span><span class='op'>::</span><span class='const'>ScalarType</span><span class='op'>::</span><span class='const'>DEFAULT_INDEXING_PREPARER_REF</span>
+    <span class='rparen'>)</span>
+
+    <span class='kw'>yield</span> <span class='kw'>self</span>
+
+    <span class='id identifier rubyid_missing'>missing</span> <span class='op'>=</span> <span class='lbracket'>[</span>
+      <span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>`mapping`</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_mapping_options'>mapping_options</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span><span class='rparen'>)</span><span class='comma'>,</span>
+      <span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>`json_schema`</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_json_schema_options'>json_schema_options</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span><span class='rparen'>)</span>
+    <span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_compact'>compact</span>
+
+    <span class='kw'>if</span> <span class='id identifier rubyid_missing'>missing</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span>
+      <span class='id identifier rubyid_raise'>raise</span> <span class='const'>Errors</span><span class='op'>::</span><span class='const'>SchemaError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Scalar types require `mapping` and `json_schema` to be configured, but `</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>` lacks </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_missing'>missing</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> and </span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># @return [String] name of the scalar type
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_name'>name</span>
+    <span class='id identifier rubyid_type_ref'>type_ref</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># (see Mixins::HasTypeInfo#mapping)
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_mapping'>mapping</span><span class='lparen'>(</span><span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+    <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_mapping_type'>mapping_type</span> <span class='op'>=</span> <span class='id identifier rubyid_options'>options</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:type</span><span class='rparen'>)</span> <span class='kw'>do</span>
+      <span class='id identifier rubyid_raise'>raise</span> <span class='const'>Errors</span><span class='op'>::</span><span class='const'>SchemaError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Must specify a mapping `type:` on custom scalars but was missing on the `</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>` type.</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>end</span>
+
+    <span class='kw'>super</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># Specifies the scalar coercion adapter that should be used for this scalar type. The scalar coercion adapter is responsible
+</span>  <span class='comment'># for validating and coercing scalar input values, and converting scalar return values to a form suitable for JSON serialization.
+</span>  <span class='comment'>#
+</span>  <span class='comment'># @note For examples of scalar coercion adapters, see `ElasticGraph::GraphQL::ScalarCoercionAdapters`.
+</span>  <span class='comment'># @note If the `defined_at` require path requires any directories be put on the Ruby `$LOAD_PATH`, you are responsible for doing
+</span>  <span class='comment'>#   that before booting {ElasticGraph::GraphQL}.
+</span>  <span class='comment'>#
+</span>  <span class='comment'># @param adapter_name [String] fully qualified Ruby class name of the adapter
+</span>  <span class='comment'># @param defined_at [String] the `require` path of the adapter
+</span>  <span class='comment'># @return [void]
+</span>  <span class='comment'>#
+</span>  <span class='comment'># @example Register a coercion adapter
+</span>  <span class='comment'>#   ElasticGraph.define_schema do |schema|
+</span>  <span class='comment'>#     schema.scalar_type &quot;PhoneNumber&quot; do |t|
+</span>  <span class='comment'>#       t.mapping type: &quot;keyword&quot;
+</span>  <span class='comment'>#       t.json_schema type: &quot;string&quot;, pattern: &quot;^\\+[1-9][0-9]{1,14}$&quot;
+</span>  <span class='comment'>#       t.coerce_with &quot;CoercionAdapters::PhoneNumber&quot;, defined_at: &quot;./coercion_adapters/phone_number&quot;
+</span>  <span class='comment'>#     end
+</span>  <span class='comment'>#   end
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_coerce_with'>coerce_with</span><span class='lparen'>(</span><span class='id identifier rubyid_adapter_name'>adapter_name</span><span class='comma'>,</span> <span class='label'>defined_at:</span><span class='rparen'>)</span>
+    <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_runtime_metadata'>runtime_metadata</span> <span class='op'>=</span> <span class='id identifier rubyid_runtime_metadata'>runtime_metadata</span><span class='period'>.</span><span class='id identifier rubyid_with'>with</span><span class='lparen'>(</span><span class='label'>coercion_adapter_ref:</span> <span class='lbrace'>{</span>
+      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>extension_name</span><span class='tstring_end'>&quot;</span></span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_adapter_name'>adapter_name</span><span class='comma'>,</span>
+      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>require_path</span><span class='tstring_end'>&quot;</span></span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_defined_at'>defined_at</span>
+    <span class='rbrace'>}</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_tap'>tap</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:load_coercion_adapter</span><span class='rparen'>)</span> <span class='comment'># verify the adapter is valid.
+</span>  <span class='kw'>end</span>
+
+  <span class='comment'># Specifies an indexing preparer that should be used for this scalar type. The indexing preparer is responsible for preparing
+</span>  <span class='comment'># scalar values before indexing them, performing any desired formatting or normalization.
+</span>  <span class='comment'>#
+</span>  <span class='comment'># @note For examples of scalar coercion adapters, see `ElasticGraph::Indexer::IndexingPreparers`.
+</span>  <span class='comment'># @note If the `defined_at` require path requires any directories be put on the Ruby `$LOAD_PATH`, you are responsible for doing
+</span>  <span class='comment'>#   that before booting {ElasticGraph::GraphQL}.
+</span>  <span class='comment'>#
+</span>  <span class='comment'># @param preparer_name [String] fully qualified Ruby class name of the indexing preparer
+</span>  <span class='comment'># @param defined_at [String] the `require` path of the preparer
+</span>  <span class='comment'># @return [void]
+</span>  <span class='comment'>#
+</span>  <span class='comment'># @example Register an indexing preparer
+</span>  <span class='comment'>#   ElasticGraph.define_schema do |schema|
+</span>  <span class='comment'>#     schema.scalar_type &quot;PhoneNumber&quot; do |t|
+</span>  <span class='comment'>#       t.mapping type: &quot;keyword&quot;
+</span>  <span class='comment'>#       t.json_schema type: &quot;string&quot;, pattern: &quot;^\\+[1-9][0-9]{1,14}$&quot;
+</span>  <span class='comment'>#
+</span>  <span class='comment'>#       t.prepare_for_indexing_with &quot;IndexingPreparers::PhoneNumber&quot;,
+</span>  <span class='comment'>#         defined_at: &quot;./indexing_preparers/phone_number&quot;
+</span>  <span class='comment'>#     end
+</span>  <span class='comment'>#   end
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_prepare_for_indexing_with'>prepare_for_indexing_with</span><span class='lparen'>(</span><span class='id identifier rubyid_preparer_name'>preparer_name</span><span class='comma'>,</span> <span class='label'>defined_at:</span><span class='rparen'>)</span>
+    <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_runtime_metadata'>runtime_metadata</span> <span class='op'>=</span> <span class='id identifier rubyid_runtime_metadata'>runtime_metadata</span><span class='period'>.</span><span class='id identifier rubyid_with'>with</span><span class='lparen'>(</span><span class='label'>indexing_preparer_ref:</span> <span class='lbrace'>{</span>
+      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>extension_name</span><span class='tstring_end'>&quot;</span></span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_preparer_name'>preparer_name</span><span class='comma'>,</span>
+      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>require_path</span><span class='tstring_end'>&quot;</span></span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_defined_at'>defined_at</span>
+    <span class='rbrace'>}</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_tap'>tap</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:load_indexing_preparer</span><span class='rparen'>)</span> <span class='comment'># verify the preparer is valid.
+</span>  <span class='kw'>end</span>
+
+  <span class='comment'># @return [String] the GraphQL SDL form of this scalar
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_to_sdl'>to_sdl</span>
+    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_formatted_documentation'>formatted_documentation</span><span class='embexpr_end'>}</span><span class='tstring_content'>scalar </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_directives_sdl'>directives_sdl</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># Registers a block which will be used to customize the derived `*AggregatedValues` object type.
+</span>  <span class='comment'>#
+</span>  <span class='comment'># @private
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_customize_aggregated_values_type'>customize_aggregated_values_type</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+    <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_aggregated_values_customizations'>aggregated_values_customizations</span> <span class='op'>=</span> <span class='id identifier rubyid_block'>block</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># @private
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_aggregated_values_type'>aggregated_values_type</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_aggregated_values_customizations'>aggregated_values_customizations</span>
+      <span class='id identifier rubyid_type_ref'>type_ref</span><span class='period'>.</span><span class='id identifier rubyid_as_aggregated_values'>as_aggregated_values</span>
+    <span class='kw'>else</span>
+      <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_type_ref'>type_ref</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>NonNumeric</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_as_aggregated_values'>as_aggregated_values</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># @private
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_to_indexing_field_type'>to_indexing_field_type</span>
+    <span class='const'><span class='object_link'><a href="../Indexing.html" title="ElasticGraph::SchemaDefinition::Indexing (module)">Indexing</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Indexing/FieldType.html" title="ElasticGraph::SchemaDefinition::Indexing::FieldType (module)">FieldType</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Indexing/FieldType/Scalar.html" title="ElasticGraph::SchemaDefinition::Indexing::FieldType::Scalar (class)">Scalar</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='label'>scalar_type:</span> <span class='kw'>self</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># @private
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_derived_graphql_types'>derived_graphql_types</span>
+    <span class='kw'>return</span> <span class='lbracket'>[</span><span class='rbracket'>]</span> <span class='kw'>if</span> <span class='id identifier rubyid_graphql_only?'>graphql_only?</span>
+
+    <span class='id identifier rubyid_pagination_types'>pagination_types</span> <span class='op'>=</span>
+      <span class='kw'>if</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_paginated_collection_element_types'>paginated_collection_element_types</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
+        <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_factory'>factory</span><span class='period'>.</span><span class='id identifier rubyid_build_relay_pagination_types'>build_relay_pagination_types</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='label'>include_total_edge_count:</span> <span class='kw'>true</span><span class='rparen'>)</span>
+      <span class='kw'>else</span>
+        <span class='lbracket'>[</span><span class='rbracket'>]</span> <span class='comment'># : ::Array[ObjectType]
+</span>      <span class='kw'>end</span>
+
+    <span class='lparen'>(</span><span class='id identifier rubyid_to_input_filters'>to_input_filters</span> <span class='op'>+</span> <span class='id identifier rubyid_pagination_types'>pagination_types</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_tap'>tap</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_derived_types'>derived_types</span><span class='op'>|</span>
+      <span class='kw'>if</span> <span class='lparen'>(</span><span class='id identifier rubyid_aggregated_values_type'>aggregated_values_type</span> <span class='op'>=</span> <span class='id identifier rubyid_to_aggregated_values_type'>to_aggregated_values_type</span><span class='rparen'>)</span>
+        <span class='id identifier rubyid_derived_types'>derived_types</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_aggregated_values_type'>aggregated_values_type</span>
+      <span class='kw'>end</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># @private
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_indexed?'>indexed?</span>
+    <span class='kw'>false</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_private'>private</span>
+
+  <span class='const'>EQUAL_TO_ANY_OF_DOC</span> <span class='op'>=</span> <span class='heredoc_beg'>&lt;&lt;~EOS</span>
+<span class='tstring_content'>    Matches records where the field value is equal to any of the provided values.
+</span><span class='tstring_content'>    This works just like an IN operator in SQL.
+</span><span class='tstring_content'>
+</span><span class='tstring_content'>    When `null` is passed, matches all documents. When an empty list is passed,
+</span><span class='tstring_content'>    this part of the filter matches no documents. When `null` is passed in the
+</span><span class='tstring_content'>    list, this part of the filter matches records where the field value is `null`.
+</span><span class='heredoc_end'>  EOS
+</span>
+  <span class='const'>GT_DOC</span> <span class='op'>=</span> <span class='heredoc_beg'>&lt;&lt;~EOS</span>
+<span class='tstring_content'>    Matches records where the field value is greater than (&gt;) the provided value.
+</span><span class='tstring_content'>
+</span><span class='tstring_content'>    When `null` is passed, matches all documents.
+</span><span class='heredoc_end'>  EOS
+</span>
+  <span class='const'>GTE_DOC</span> <span class='op'>=</span> <span class='heredoc_beg'>&lt;&lt;~EOS</span>
+<span class='tstring_content'>    Matches records where the field value is greater than or equal to (&gt;=) the provided value.
+</span><span class='tstring_content'>
+</span><span class='tstring_content'>    When `null` is passed, matches all documents.
+</span><span class='heredoc_end'>  EOS
+</span>
+  <span class='const'>LT_DOC</span> <span class='op'>=</span> <span class='heredoc_beg'>&lt;&lt;~EOS</span>
+<span class='tstring_content'>    Matches records where the field value is less than (&lt;) the provided value.
+</span><span class='tstring_content'>
+</span><span class='tstring_content'>    When `null` is passed, matches all documents.
+</span><span class='heredoc_end'>  EOS
+</span>
+  <span class='const'>LTE_DOC</span> <span class='op'>=</span> <span class='heredoc_beg'>&lt;&lt;~EOS</span>
+<span class='tstring_content'>    Matches records where the field value is less than or equal to (&lt;=) the provided value.
+</span><span class='tstring_content'>
+</span><span class='tstring_content'>    When `null` is passed, matches all documents.
+</span><span class='heredoc_end'>  EOS
+</span>
+  <span class='kw'>def</span> <span class='id identifier rubyid_to_input_filters'>to_input_filters</span>
+    <span class='comment'># Note: all fields on inputs should be nullable, to support parameterized queries where
+</span>    <span class='comment'># the parameters are allowed to be set to `null`. We also now support nulls within lists.
+</span>
+    <span class='comment'># For floats, we may want to remove the `equal_to_any_of` operator at some point.
+</span>    <span class='comment'># In many languages. checking exact equality with floats is problematic.
+</span>    <span class='comment'># For example, in IRB:
+</span>    <span class='comment'>#
+</span>    <span class='comment'># 2.7.1 :003 &gt; 0.3 == (0.1 + 0.2)
+</span>    <span class='comment'># =&gt; false
+</span>    <span class='comment'>#
+</span>    <span class='comment'># However, it&#39;s not yet clear if that issue will come up with GraphQL, because
+</span>    <span class='comment'># float values are serialized on the wire as JSON, using an exact decimal
+</span>    <span class='comment'># string representation. So for now we are keeping `equal_to_any_of`.
+</span>    <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_factory'>factory</span><span class='period'>.</span><span class='id identifier rubyid_build_standard_filter_input_types_for_index_leaf_type'>build_standard_filter_input_types_for_index_leaf_type</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span>
+      <span class='comment'># Normally, we use a nullable type for `equal_to_any_of`, to allow a filter expression like this:
+</span>      <span class='comment'>#
+</span>      <span class='comment'># filter: {optional_field: {equal_to_any_of: [null]}}
+</span>      <span class='comment'>#
+</span>      <span class='comment'># That filter expression matches documents where `optional_field == null`. However,
+</span>      <span class='comment'># we cannot support this:
+</span>      <span class='comment'>#
+</span>      <span class='comment'># filter: {tags: {any_satisfy: {equal_to_any_of: [null]}}}
+</span>      <span class='comment'>#
+</span>      <span class='comment'># We can&#39;t support that because we implement filtering on `null` using an `exists` query:
+</span>      <span class='comment'># https://www.elastic.co/guide/en/elasticsearch/reference/8.10/query-dsl-exists-query.html
+</span>      <span class='comment'>#
+</span>      <span class='comment'># ...but that works based on the field existing (or not), and does not let us filter on the
+</span>      <span class='comment'># presence or absence of `null` within a list.
+</span>      <span class='comment'>#
+</span>      <span class='comment'># So, here we make the field non-null if we&#39;re in an `any_satisfy` context (as indicated by
+</span>      <span class='comment'># the type ending with `ListElementFilterInput`).
+</span>      <span class='id identifier rubyid_equal_to_any_of_type'>equal_to_any_of_type</span> <span class='op'>=</span> <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_type_ref'>type_ref</span><span class='period'>.</span><span class='id identifier rubyid_list_element_filter_input?'>list_element_filter_input?</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>[</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>!]</span><span class='tstring_end'>&quot;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>[</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>]</span><span class='tstring_end'>&quot;</span></span>
+
+      <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_field'>field</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_schema_elements'>schema_elements</span><span class='period'>.</span><span class='id identifier rubyid_equal_to_any_of'>equal_to_any_of</span><span class='comma'>,</span> <span class='id identifier rubyid_equal_to_any_of_type'>equal_to_any_of_type</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_f'>f</span><span class='op'>|</span>
+        <span class='id identifier rubyid_f'>f</span><span class='period'>.</span><span class='id identifier rubyid_documentation'>documentation</span> <span class='const'>EQUAL_TO_ANY_OF_DOC</span>
+      <span class='kw'>end</span>
+
+      <span class='kw'>if</span> <span class='id identifier rubyid_mapping_type_efficiently_comparable?'>mapping_type_efficiently_comparable?</span>
+        <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_field'>field</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_schema_elements'>schema_elements</span><span class='period'>.</span><span class='id identifier rubyid_gt'>gt</span><span class='comma'>,</span> <span class='id identifier rubyid_name'>name</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_f'>f</span><span class='op'>|</span>
+          <span class='id identifier rubyid_f'>f</span><span class='period'>.</span><span class='id identifier rubyid_documentation'>documentation</span> <span class='const'>GT_DOC</span>
+        <span class='kw'>end</span>
+
+        <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_field'>field</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_schema_elements'>schema_elements</span><span class='period'>.</span><span class='id identifier rubyid_gte'>gte</span><span class='comma'>,</span> <span class='id identifier rubyid_name'>name</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_f'>f</span><span class='op'>|</span>
+          <span class='id identifier rubyid_f'>f</span><span class='period'>.</span><span class='id identifier rubyid_documentation'>documentation</span> <span class='const'>GTE_DOC</span>
+        <span class='kw'>end</span>
+
+        <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_field'>field</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_schema_elements'>schema_elements</span><span class='period'>.</span><span class='id identifier rubyid_lt'>lt</span><span class='comma'>,</span> <span class='id identifier rubyid_name'>name</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_f'>f</span><span class='op'>|</span>
+          <span class='id identifier rubyid_f'>f</span><span class='period'>.</span><span class='id identifier rubyid_documentation'>documentation</span> <span class='const'>LT_DOC</span>
+        <span class='kw'>end</span>
+
+        <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_field'>field</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_schema_elements'>schema_elements</span><span class='period'>.</span><span class='id identifier rubyid_lte'>lte</span><span class='comma'>,</span> <span class='id identifier rubyid_name'>name</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_f'>f</span><span class='op'>|</span>
+          <span class='id identifier rubyid_f'>f</span><span class='period'>.</span><span class='id identifier rubyid_documentation'>documentation</span> <span class='const'>LTE_DOC</span>
+        <span class='kw'>end</span>
+      <span class='kw'>end</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+
+  <span class='kw'>def</span> <span class='id identifier rubyid_to_aggregated_values_type'>to_aggregated_values_type</span>
+    <span class='kw'>return</span> <span class='kw'>nil</span> <span class='kw'>unless</span> <span class='lparen'>(</span><span class='id identifier rubyid_customization_block'>customization_block</span> <span class='op'>=</span> <span class='id identifier rubyid_aggregated_values_customizations'>aggregated_values_customizations</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_factory'>factory</span><span class='period'>.</span><span class='id identifier rubyid_new_aggregated_values_type_for_index_leaf_type'>new_aggregated_values_type_for_index_leaf_type</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_customization_block'>customization_block</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html
+</span>  <span class='comment'># https://www.elastic.co/guide/en/elasticsearch/reference/7.13/number.html#number
+</span>  <span class='const'>NUMERIC_TYPES</span> <span class='op'>=</span> <span class='qwords_beg'>%w[</span><span class='tstring_content'>long</span><span class='words_sep'> </span><span class='tstring_content'>integer</span><span class='words_sep'> </span><span class='tstring_content'>short</span><span class='words_sep'> </span><span class='tstring_content'>byte</span><span class='words_sep'> </span><span class='tstring_content'>double</span><span class='words_sep'> </span><span class='tstring_content'>float</span><span class='words_sep'> </span><span class='tstring_content'>half_float</span><span class='words_sep'> </span><span class='tstring_content'>scaled_float</span><span class='words_sep'> </span><span class='tstring_content'>unsigned_long</span><span class='tstring_end'>]</span></span><span class='period'>.</span><span class='id identifier rubyid_to_set'>to_set</span>
+  <span class='const'>DATE_TYPES</span> <span class='op'>=</span> <span class='qwords_beg'>%w[</span><span class='tstring_content'>date</span><span class='words_sep'> </span><span class='tstring_content'>date_nanos</span><span class='tstring_end'>]</span></span><span class='period'>.</span><span class='id identifier rubyid_to_set'>to_set</span>
+  <span class='comment'># The Elasticsearch/OpenSearch docs do not exhaustively give a list of types on which range queries are efficient,
+</span>  <span class='comment'># but the docs are clear that it is efficient on numeric and date types, and is inefficient on string
+</span>  <span class='comment'># types: https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-range-query.html
+</span>  <span class='const'>COMPARABLE_TYPES</span> <span class='op'>=</span> <span class='const'>NUMERIC_TYPES</span> <span class='op'>|</span> <span class='const'>DATE_TYPES</span>
+
+  <span class='kw'>def</span> <span class='id identifier rubyid_mapping_type_efficiently_comparable?'>mapping_type_efficiently_comparable?</span>
+    <span class='const'>COMPARABLE_TYPES</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_mapping_type'>mapping_type</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="coerce_with-instance_method">
+  
+    #<strong>coerce_with</strong>(adapter_name, defined_at:)  &#x21d2; <tt>void</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+  <div class="note notetag">
+    <strong>Note:</strong>
+    <div class='inline'><p>For examples of scalar coercion adapters, see <code>ElasticGraph::GraphQL::ScalarCoercionAdapters</code>.</p>
+</div>
+  </div>
+
+  <div class="note notetag">
+    <strong>Note:</strong>
+    <div class='inline'><p>If the <code>defined_at</code> require path requires any directories be put on the Ruby <code>$LOAD_PATH</code>, you are responsible for doing
+that before booting GraphQL.</p>
+</div>
+  </div>
+
+<p class="note returns_void">This method returns an undefined value.</p><p>Specifies the scalar coercion adapter that should be used for this scalar type. The scalar coercion adapter is responsible
+for validating and coercing scalar input values, and converting scalar return values to a form suitable for JSON serialization.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Register a coercion adapter</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='const'><span class='object_link'><a href="../../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span><span class='period'>.</span><span class='id identifier rubyid_define_schema'><span class='object_link'><a href="../../../ElasticGraph.html#define_schema-class_method" title="ElasticGraph.define_schema (method)">define_schema</a></span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_schema'>schema</span><span class='op'>|</span>
+  <span class='id identifier rubyid_schema'>schema</span><span class='period'>.</span><span class='id identifier rubyid_scalar_type'>scalar_type</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>PhoneNumber</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span>
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_mapping'>mapping</span> <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>keyword</span><span class='tstring_end'>&quot;</span></span>
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_json_schema'>json_schema</span> <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>string</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>pattern:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>^\\+[1-9][0-9]{1,14}$</span><span class='tstring_end'>&quot;</span></span>
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_coerce_with'>coerce_with</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>CoercionAdapters::PhoneNumber</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>defined_at:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>./coercion_adapters/phone_number</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>adapter_name</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>fully qualified Ruby class name of the adapter</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>defined_at</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>the <code>require</code> path of the adapter</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+113
+114
+115
+116
+117
+118</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/scalar_type.rb', line 113</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_coerce_with'>coerce_with</span><span class='lparen'>(</span><span class='id identifier rubyid_adapter_name'>adapter_name</span><span class='comma'>,</span> <span class='label'>defined_at:</span><span class='rparen'>)</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_runtime_metadata'>runtime_metadata</span> <span class='op'>=</span> <span class='id identifier rubyid_runtime_metadata'>runtime_metadata</span><span class='period'>.</span><span class='id identifier rubyid_with'>with</span><span class='lparen'>(</span><span class='label'>coercion_adapter_ref:</span> <span class='lbrace'>{</span>
+    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>extension_name</span><span class='tstring_end'>&quot;</span></span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_adapter_name'>adapter_name</span><span class='comma'>,</span>
+    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>require_path</span><span class='tstring_end'>&quot;</span></span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_defined_at'>defined_at</span>
+  <span class='rbrace'>}</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_tap'>tap</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:load_coercion_adapter</span><span class='rparen'>)</span> <span class='comment'># verify the adapter is valid.
+</span><span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="mapping-instance_method">
+  
+    #<strong>mapping</strong>(**options)  &#x21d2; <tt>void</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note returns_void">This method returns an undefined value.</p><p>Defines the Elasticsearch/OpenSearch <a href="https://www.elastic.co/guide/en/elasticsearch/reference/7.10/mapping-types.html">field mapping type</a>
+and <a href="https://www.elastic.co/guide/en/elasticsearch/reference/7.10/mapping-params.html">mapping parameters</a> for a field or type.
+The options passed here will be included in the generated <code>datastore_config.yaml</code> artifact that ElasticGraph uses to configure
+Elasticsearch/OpenSearch.</p>
+
+<p>Can be called multiple times; each time, the options will be merged into the existing options.</p>
+
+<p>This is required on a <span class='object_link'><a href="" title="ElasticGraph::SchemaDefinition::SchemaElements::ScalarType (class)">ElasticGraph::SchemaDefinition::SchemaElements::ScalarType</a></span>; without it, ElasticGraph would have no way to know how the datatype should be
+indexed in the datastore.</p>
+
+<p>On a <span class='object_link'><a href="Field.html" title="ElasticGraph::SchemaDefinition::SchemaElements::Field (class)">Field</a></span>, this can be used to customize how a field is indexed. For example, <code>String</code> fields are normally
+indexed as <a href="https://www.elastic.co/guide/en/elasticsearch/reference/7.10/keyword.html">keywords</a>; to instead index a <code>String</code>
+field for full text search, you’d need to configure <code>mapping type: "text"</code>.</p>
+
+<p>On a <span class='object_link'><a href="ObjectType.html" title="ElasticGraph::SchemaDefinition::SchemaElements::ObjectType (class)">ObjectType</a></span>, this can be used to use a specific Elasticsearch/OpenSearch data type for something that is
+modeled as an object in GraphQL. For example, we use it for the <code>GeoLocation</code> type so they get indexed in Elasticsearch using the
+<a href="https://www.elastic.co/guide/en/elasticsearch/reference/7.10/geo-point.html">geo_point type</a>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Define the mapping of a custom scalar type</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='const'><span class='object_link'><a href="../../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span><span class='period'>.</span><span class='id identifier rubyid_define_schema'><span class='object_link'><a href="../../../ElasticGraph.html#define_schema-class_method" title="ElasticGraph.define_schema (method)">define_schema</a></span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_schema'>schema</span><span class='op'>|</span>
+  <span class='id identifier rubyid_schema'>schema</span><span class='period'>.</span><span class='id identifier rubyid_scalar_type'>scalar_type</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>URL</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span>
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_mapping'>mapping</span> <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>keyword</span><span class='tstring_end'>&quot;</span></span>
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_json_schema'>json_schema</span> <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>string</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>format:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>uri</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></code></pre>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Customize the mapping of a field</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='const'><span class='object_link'><a href="../../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span><span class='period'>.</span><span class='id identifier rubyid_define_schema'><span class='object_link'><a href="../../../ElasticGraph.html#define_schema-class_method" title="ElasticGraph.define_schema (method)">define_schema</a></span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_schema'>schema</span><span class='op'>|</span>
+  <span class='id identifier rubyid_schema'>schema</span><span class='period'>.</span><span class='id identifier rubyid_object_type'>object_type</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Card</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span>
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_field'>field</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>id</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ID!</span><span class='tstring_end'>&quot;</span></span>
+
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_field'>field</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>cardholderName</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>String</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_f'>f</span><span class='op'>|</span>
+      <span class='comment'># index this field for full text search
+</span>      <span class='id identifier rubyid_f'>f</span><span class='period'>.</span><span class='id identifier rubyid_mapping'>mapping</span> <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>text</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_field'>field</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>expYear</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Int</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_f'>f</span><span class='op'>|</span>
+      <span class='comment'># Use a smaller numeric type to save space in the datastore
+</span>      <span class='id identifier rubyid_f'>f</span><span class='period'>.</span><span class='id identifier rubyid_mapping'>mapping</span> <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>short</span><span class='tstring_end'>&quot;</span></span>
+      <span class='id identifier rubyid_f'>f</span><span class='period'>.</span><span class='id identifier rubyid_json_schema'>json_schema</span> <span class='label'>minimum:</span> <span class='int'>2000</span><span class='comma'>,</span> <span class='label'>maximum:</span> <span class='int'>2099</span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_field'>field</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>expMonth</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Int</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_f'>f</span><span class='op'>|</span>
+      <span class='comment'># Use a smaller numeric type to save space in the datastore
+</span>      <span class='id identifier rubyid_f'>f</span><span class='period'>.</span><span class='id identifier rubyid_mapping'>mapping</span> <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>byte</span><span class='tstring_end'>&quot;</span></span>
+      <span class='id identifier rubyid_f'>f</span><span class='period'>.</span><span class='id identifier rubyid_json_schema'>json_schema</span> <span class='label'>minimum:</span> <span class='int'>1</span><span class='comma'>,</span> <span class='label'>maximum:</span> <span class='int'>12</span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_index'>index</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>cards</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>options</span>
+      
+      
+        <span class='type'>(<tt>Hash&lt;Symbol, Object&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>mapping options–must be limited to <span class='object_link'><a href="../Mixins/HasTypeInfo.html#CUSTOMIZABLE_DATASTORE_PARAMS-constant" title="ElasticGraph::SchemaDefinition::Mixins::HasTypeInfo::CUSTOMIZABLE_DATASTORE_PARAMS (constant)">Mixins::HasTypeInfo::CUSTOMIZABLE_DATASTORE_PARAMS</a></span></p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+86
+87
+88
+89
+90
+91
+92</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/scalar_type.rb', line 86</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_mapping'>mapping</span><span class='lparen'>(</span><span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_mapping_type'>mapping_type</span> <span class='op'>=</span> <span class='id identifier rubyid_options'>options</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:type</span><span class='rparen'>)</span> <span class='kw'>do</span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='const'>Errors</span><span class='op'>::</span><span class='const'>SchemaError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Must specify a mapping `type:` on custom scalars but was missing on the `</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>` type.</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+
+  <span class='kw'>super</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="name-instance_method">
+  
+    #<strong>name</strong>  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns name of the scalar type.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>name of the scalar type</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+81
+82
+83</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/scalar_type.rb', line 81</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_name'>name</span>
+  <span class='id identifier rubyid_type_ref'>type_ref</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="prepare_for_indexing_with-instance_method">
+  
+    #<strong>prepare_for_indexing_with</strong>(preparer_name, defined_at:)  &#x21d2; <tt>void</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+  <div class="note notetag">
+    <strong>Note:</strong>
+    <div class='inline'><p>For examples of scalar coercion adapters, see <code>ElasticGraph::Indexer::IndexingPreparers</code>.</p>
+</div>
+  </div>
+
+  <div class="note notetag">
+    <strong>Note:</strong>
+    <div class='inline'><p>If the <code>defined_at</code> require path requires any directories be put on the Ruby <code>$LOAD_PATH</code>, you are responsible for doing
+that before booting GraphQL.</p>
+</div>
+  </div>
+
+<p class="note returns_void">This method returns an undefined value.</p><p>Specifies an indexing preparer that should be used for this scalar type. The indexing preparer is responsible for preparing
+scalar values before indexing them, performing any desired formatting or normalization.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Register an indexing preparer</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='const'><span class='object_link'><a href="../../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span><span class='period'>.</span><span class='id identifier rubyid_define_schema'><span class='object_link'><a href="../../../ElasticGraph.html#define_schema-class_method" title="ElasticGraph.define_schema (method)">define_schema</a></span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_schema'>schema</span><span class='op'>|</span>
+  <span class='id identifier rubyid_schema'>schema</span><span class='period'>.</span><span class='id identifier rubyid_scalar_type'>scalar_type</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>PhoneNumber</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span>
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_mapping'>mapping</span> <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>keyword</span><span class='tstring_end'>&quot;</span></span>
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_json_schema'>json_schema</span> <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>string</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>pattern:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>^\\+[1-9][0-9]{1,14}$</span><span class='tstring_end'>&quot;</span></span>
+
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_prepare_for_indexing_with'>prepare_for_indexing_with</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>IndexingPreparers::PhoneNumber</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+      <span class='label'>defined_at:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>./indexing_preparers/phone_number</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>preparer_name</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>fully qualified Ruby class name of the indexing preparer</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>defined_at</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>the <code>require</code> path of the preparer</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+141
+142
+143
+144
+145
+146</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/scalar_type.rb', line 141</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_prepare_for_indexing_with'>prepare_for_indexing_with</span><span class='lparen'>(</span><span class='id identifier rubyid_preparer_name'>preparer_name</span><span class='comma'>,</span> <span class='label'>defined_at:</span><span class='rparen'>)</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_runtime_metadata'>runtime_metadata</span> <span class='op'>=</span> <span class='id identifier rubyid_runtime_metadata'>runtime_metadata</span><span class='period'>.</span><span class='id identifier rubyid_with'>with</span><span class='lparen'>(</span><span class='label'>indexing_preparer_ref:</span> <span class='lbrace'>{</span>
+    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>extension_name</span><span class='tstring_end'>&quot;</span></span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_preparer_name'>preparer_name</span><span class='comma'>,</span>
+    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>require_path</span><span class='tstring_end'>&quot;</span></span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_defined_at'>defined_at</span>
+  <span class='rbrace'>}</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_tap'>tap</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:load_indexing_preparer</span><span class='rparen'>)</span> <span class='comment'># verify the preparer is valid.
+</span><span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="to_sdl-instance_method">
+  
+    #<strong>to_sdl</strong>  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns the GraphQL SDL form of this scalar.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>the GraphQL SDL form of this scalar</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+149
+150
+151</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/scalar_type.rb', line 149</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_to_sdl'>to_sdl</span>
+  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_formatted_documentation'>formatted_documentation</span><span class='embexpr_end'>}</span><span class='tstring_content'>scalar </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_directives_sdl'>directives_sdl</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Thu Mar  6 06:00:38 2025 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.37 (ruby-3.3.4).
+</div>
+
+    </div>
+  </body>
+</html>

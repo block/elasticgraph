@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: ElasticGraph::SchemaDefinition::SchemaElements::BuiltInTypes
+  
+    &mdash; Documentation by YARD 0.9.37
+  
+</title>
+
+  <link rel="stylesheet" href="../../../css/style.css" type="text/css" />
+
+  <link rel="stylesheet" href="../../../css/common.css" type="text/css" />
+
+<script type="text/javascript">
+  pathId = "ElasticGraph::SchemaDefinition::SchemaElements::BuiltInTypes";
+  relpath = '../../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../../_index.html">Index (B)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../../SchemaDefinition.html" title="ElasticGraph::SchemaDefinition (module)">SchemaDefinition</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../SchemaElements.html" title="ElasticGraph::SchemaDefinition::SchemaElements (module)">SchemaElements</a></span></span>
+     &raquo; 
+    <span class="title">BuiltInTypes</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: ElasticGraph::SchemaDefinition::SchemaElements::BuiltInTypes
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">ElasticGraph::SchemaDefinition::SchemaElements::BuiltInTypes</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/built_in_types.rb</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Defines all built-in GraphQL types provided by ElasticGraph.</p>
+
+<h2 id="scalar-types">Scalar Types</h2>
+
+<h3 id="standard-graphql-scalars">Standard GraphQL Scalars</h3>
+
+<p>These are defined by the <a href="https://spec.graphql.org/October2021/#sec-Scalars.Built-in-Scalars">GraphQL spec</a>.</p>
+
+<dl>
+  <dt>Boolean</dt>
+  <dd>Represents <code>true</code> or <code>false</code> values.</dd>
+  <dt>Float</dt>
+  <dd>Represents signed double-precision fractional values as specified by
+<a href="https://en.wikipedia.org/wiki/IEEE_floating_point">IEEE 754</a>.</dd>
+  <dt>ID</dt>
+  <dd>Represents a unique identifier that is Base64 obfuscated. It is often used to
+refetch an object or as key for a cache. The ID type appears in a JSON response as a
+String; however, it is not intended to be human-readable. When expected as an input
+type, any string (such as <code>"VXNlci0xMA=="</code>) or integer (such as <code>4</code>) input value will
+be accepted as an ID.</dd>
+  <dt>Int</dt>
+  <dd>Represents non-fractional signed whole numeric values. Int can represent values between
+-(2^31) and 2^31 - 1.</dd>
+  <dt>String</dt>
+  <dd>Represents textual data as UTF-8 character sequences. This type is most often used by
+GraphQL to represent free-form human-readable text.</dd>
+</dl>
+
+<h3 id="additional-elasticgraph-scalars">Additional ElasticGraph Scalars</h3>
+
+<p>ElasticGraph defines these additional scalar types.</p>
+
+<dl>
+  <dt>Cursor</dt>
+  <dd>An opaque string value representing a specific location in a paginated connection type.
+Returned cursors can be passed back in the next query via the <code>before</code> or <code>after</code>
+arguments to continue paginating from that point.</dd>
+  <dt>Date</dt>
+  <dd>A date, represented as an <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601 date string</a>.</dd>
+  <dt>DateTime</dt>
+  <dd>A timestamp, represented as an <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601 time string</a>.</dd>
+  <dt>JsonSafeLong</dt>
+  <dd>A numeric type for large integer values that can serialize safely as JSON. While JSON
+itself has no hard limit on the size of integers, the RFC-7159 spec mentions that
+values outside of the range -9,007,199,254,740,991 (-(2^53) + 1) to 9,007,199,254,740,991
+(2^53 - 1) may not be interopable with all JSON implementations. As it turns out, the
+number implementation used by JavaScript has this issue. When you parse a JSON string that
+contains a numeric value like <code>4693522397653681111</code>, the parsed result will contain a
+rounded value like <code>4693522397653681000</code>. While this is entirely a client-side problem,
+we want to preserve maximum compatibility with common client languages. Given the ubiquity
+of GraphiQL as a GraphQL client, we want to avoid this problem. Our solution is to support
+two separate types:
+
+    <ul>
+      <li>This type (<code>JsonSafeLong</code>) is serialized as a number, but limits values to the safely
+serializable range.</li>
+      <li>The <code>LongString</code> type supports long values that use all 64 bits, but serializes as a
+string rather than a number, avoiding the JavaScript compatibility problems. For more
+background, see the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/MAX_SAFE_INTEGER">JavaScript <code>Number.MAX_SAFE_INTEGER</code>
+docs</a>.</li>
+    </ul>
+  </dd>
+  <dt>LocalTime</dt>
+  <dd>A local time such as <code>"23:59:33"</code> or <code>"07:20:47.454"</code> without a time zone or offset,
+formatted based on the <a href="https://datatracker.ietf.org/doc/html/rfc3339#section-5.6">partial-time portion of
+RFC3339</a>.</dd>
+  <dt>LongString</dt>
+  <dd>A numeric type for large integer values in the inclusive range -2^63 (-9,223,372,036,854,775,808)
+to (2^63 - 1) (9,223,372,036,854,775,807). Note that <code>LongString</code> values are serialized as strings
+within JSON, to avoid interopability problems with JavaScript. If you want a large integer type
+that serializes within JSON as a number, use <code>JsonSafeLong</code>.</dd>
+  <dt>TimeZone</dt>
+  <dd>An <a href="https://www.iana.org/time-zones">IANA time zone identifier</a>, such as <code>America/Los_Angeles</code>
+or <code>UTC</code>. For a full list of valid identifiers, see the
+<a href="https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List">wikipedia article</a>.</dd>
+  <dt>Untyped</dt>
+  <dd>A custom scalar type that allows any type of data, including:
+
+    <ul>
+      <li>strings</li>
+      <li>numbers</li>
+      <li>objects and arrays (nested as deeply as you like)</li>
+      <li>booleans</li>
+    </ul>
+
+    <p>Note: fields of this type are effectively untyped. We recommend it only be used for parts
+of your schema that can’t be statically typed.</p>
+  </dd>
+</dl>
+
+<h2 id="enum-types">Enum Types</h2>
+
+<p>ElasticGraph defines these enum types. Most of these are intended for usage as an <em>input</em>
+argument, but they could be used as a return type in your schema if they meet your needs.</p>
+
+<dl>
+  <dt>DateGroupingGranularity</dt>
+  <dd>Enumerates the supported granularities of a <code>Date</code>.</dd>
+  <dt>DateGroupingTruncationUnit</dt>
+  <dd>Enumerates the supported truncation units of a <code>Date</code>.</dd>
+  <dt>DateTimeGroupingGranularity</dt>
+  <dd>Enumerates the supported granularities of a <code>DateTime</code>.</dd>
+  <dt>DateTimeGroupingTruncationUnit</dt>
+  <dd>Enumerates the supported truncation units of a <code>DateTime</code>.</dd>
+  <dt>DateTimeUnit</dt>
+  <dd>Enumeration of <code>DateTime</code> units.</dd>
+  <dt>DateUnit</dt>
+  <dd>Enumeration of <code>Date</code> units.</dd>
+  <dt>DayOfWeek</dt>
+  <dd>Indicates the specific day of the week.</dd>
+  <dt>DistanceUnit</dt>
+  <dd>Enumerates the supported distance units.</dd>
+  <dt>LocalTimeGroupingTruncationUnit</dt>
+  <dd>Enumerates the supported truncation units of a <code>LocalTime</code>.</dd>
+  <dt>LocalTimeUnit</dt>
+  <dd>Enumeration of <code>LocalTime</code> units.</dd>
+  <dt>MatchesQueryAllowedEditsPerTerm</dt>
+  <dd>Enumeration of allowed values for the <code>matchesQuery: {allowedEditsPerTerm: ...}</code> filter option.</dd>
+</dl>
+
+<h2 id="object-types">Object Types</h2>
+
+<p>ElasticGraph defines these object types.</p>
+
+<dl>
+  <dt>AggregationCountDetail</dt>
+  <dd>Provides detail about an aggregation <code>count</code>.</dd>
+  <dt>GeoLocation</dt>
+  <dd>Geographic coordinates representing a location on the Earth’s surface.</dd>
+  <dt>PageInfo</dt>
+  <dd>Provides information about the specific fetched page. This implements the
+<code>PageInfo</code> specification from the <a href="https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo">Relay GraphQL Cursor Connections
+Specification</a>.</dd>
+</dl>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+
+
+
+
+
+
+
+
+</div>
+
+      <div id="footer">
+  Generated on Thu Mar  6 05:55:05 2025 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.37 (ruby-3.3.4).
+</div>
+
+    </div>
+  </body>
+</html>

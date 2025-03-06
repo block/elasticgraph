@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: ElasticGraph::SchemaDefinition::Results
+  
+    &mdash; Documentation by YARD 0.9.37
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css" />
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css" />
+
+<script type="text/javascript">
+  pathId = "ElasticGraph::SchemaDefinition::Results";
+  relpath = '../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../_index.html">Index (R)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../SchemaDefinition.html" title="ElasticGraph::SchemaDefinition (module)">SchemaDefinition</a></span></span>
+     &raquo; 
+    <span class="title">Results</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: ElasticGraph::SchemaDefinition::Results
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">ElasticGraph::SchemaDefinition::Results</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  <dl>
+      <dt>Includes:</dt>
+      <dd>SchemaArtifacts::ArtifactsHelperMethods</dd>
+  </dl>
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>elasticgraph-schema_definition/lib/elastic_graph/schema_definition/results.rb</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+  <div class="note notetag">
+    <strong>Note:</strong>
+    <div class='inline'><p>This class is designed to implement the same interface as <code>ElasticGraph::SchemaArtifacts::FromDisk</code>, so that it can be used</p>
+</div>
+  </div>
+
+<p>Provides the results of defining a schema.</p>
+
+<p>interchangeably with schema artifacts loaded from disk. This allows the artifacts to be used in tests without having to dump them or
+reload them.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#available_json_schema_versions-instance_method" title="#available_json_schema_versions (instance method)">#<strong>available_json_schema_versions</strong>  &#x21d2; Set&lt;Integer&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Set of available JSON schema versions.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#datastore_config-instance_method" title="#datastore_config (instance method)">#<strong>datastore_config</strong>  &#x21d2; Hash&lt;String, Object&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>The Elasticsearch/OpenSearch configuration dumped as <code>datastore_config.yaml</code>.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#graphql_schema_string-instance_method" title="#graphql_schema_string (instance method)">#<strong>graphql_schema_string</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>The generated GraphQL SDL schema string dumped as <code>schema.graphql</code>.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#json_schemas_for-instance_method" title="#json_schemas_for (instance method)">#<strong>json_schemas_for</strong>(version)  &#x21d2; Hash&lt;String, Object&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>The JSON schema for the requested version, if available.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#latest_json_schema_version-instance_method" title="#latest_json_schema_version (instance method)">#<strong>latest_json_schema_version</strong>  &#x21d2; Hash&lt;String, Object&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>The newly generated JSON schema.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#runtime_metadata-instance_method" title="#runtime_metadata (instance method)">#<strong>runtime_metadata</strong>  &#x21d2; Hash&lt;String, Object&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Runtime metadata used by other parts of ElasticGraph and dumped as <code>runtime_metadata.yaml</code>.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="available_json_schema_versions-instance_method">
+  
+    #<strong>available_json_schema_versions</strong>  &#x21d2; <tt>Set&lt;Integer&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns set of available JSON schema versions.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Set&lt;Integer&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>set of available JSON schema versions</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+60
+61
+62</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/results.rb', line 60</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_available_json_schema_versions'>available_json_schema_versions</span>
+  <span class='ivar'>@available_json_schema_versions</span> <span class='op'>||=</span> <span class='const'>Set</span><span class='lbracket'>[</span><span class='id identifier rubyid_latest_json_schema_version'>latest_json_schema_version</span><span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="datastore_config-instance_method">
+  
+    #<strong>datastore_config</strong>  &#x21d2; <tt>Hash&lt;String, Object&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns the Elasticsearch/OpenSearch configuration dumped as <code>datastore_config.yaml</code>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash&lt;String, Object&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>the Elasticsearch/OpenSearch configuration dumped as <code>datastore_config.yaml</code></p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+39
+40
+41</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/results.rb', line 39</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_datastore_config'>datastore_config</span>
+  <span class='ivar'>@datastore_config</span> <span class='op'>||=</span> <span class='id identifier rubyid_generate_datastore_config'>generate_datastore_config</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="graphql_schema_string-instance_method">
+  
+    #<strong>graphql_schema_string</strong>  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns the generated GraphQL SDL schema string dumped as <code>schema.graphql</code>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>the generated GraphQL SDL schema string dumped as <code>schema.graphql</code></p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+34
+35
+36</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/results.rb', line 34</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_graphql_schema_string'>graphql_schema_string</span>
+  <span class='ivar'>@graphql_schema_string</span> <span class='op'>||=</span> <span class='id identifier rubyid_generate_sdl'>generate_sdl</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="json_schemas_for-instance_method">
+  
+    #<strong>json_schemas_for</strong>(version)  &#x21d2; <tt>Hash&lt;String, Object&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns the JSON schema for the requested version, if available.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>version</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>desired JSON schema version</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash&lt;String, Object&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>the JSON schema for the requested version, if available</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'>Errors::NotFoundError</span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>if the requested JSON schema version is not available</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+51
+52
+53
+54
+55
+56
+57</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/results.rb', line 51</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_json_schemas_for'>json_schemas_for</span><span class='lparen'>(</span><span class='id identifier rubyid_version'>version</span><span class='rparen'>)</span>
+  <span class='kw'>unless</span> <span class='id identifier rubyid_available_json_schema_versions'>available_json_schema_versions</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_version'>version</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='const'>Errors</span><span class='op'>::</span><span class='const'>NotFoundError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>The requested json schema version (</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_version'>version</span><span class='embexpr_end'>}</span><span class='tstring_content'>) is not available. Available versions: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_available_json_schema_versions'>available_json_schema_versions</span><span class='period'>.</span><span class='id identifier rubyid_to_a'>to_a</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>, </span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+
+  <span class='ivar'>@latest_versioned_json_schema</span> <span class='op'>||=</span> <span class='id identifier rubyid_merge_field_metadata_into_json_schema'>merge_field_metadata_into_json_schema</span><span class='lparen'>(</span><span class='id identifier rubyid_current_public_json_schema'>current_public_json_schema</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_json_schema'>json_schema</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="latest_json_schema_version-instance_method">
+  
+    #<strong>latest_json_schema_version</strong>  &#x21d2; <tt>Hash&lt;String, Object&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns the newly generated JSON schema.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash&lt;String, Object&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>the newly generated JSON schema</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+65
+66
+67</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/results.rb', line 65</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_latest_json_schema_version'>latest_json_schema_version</span>
+  <span class='id identifier rubyid_current_public_json_schema'>current_public_json_schema</span><span class='lbracket'>[</span><span class='const'>JSON_SCHEMA_VERSION_KEY</span><span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="runtime_metadata-instance_method">
+  
+    #<strong>runtime_metadata</strong>  &#x21d2; <tt>Hash&lt;String, Object&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns runtime metadata used by other parts of ElasticGraph and dumped as <code>runtime_metadata.yaml</code>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash&lt;String, Object&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>runtime metadata used by other parts of ElasticGraph and dumped as <code>runtime_metadata.yaml</code></p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+44
+45
+46</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/results.rb', line 44</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_runtime_metadata'>runtime_metadata</span>
+  <span class='ivar'>@runtime_metadata</span> <span class='op'>||=</span> <span class='id identifier rubyid_build_runtime_metadata'>build_runtime_metadata</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Thu Mar  6 06:00:37 2025 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.37 (ruby-3.3.4).
+</div>
+
+    </div>
+  </body>
+</html>

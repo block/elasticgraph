@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Module: ElasticGraph::SchemaDefinition::Mixins::HasIndices
+  
+    &mdash; Documentation by YARD 0.9.37
+  
+</title>
+
+  <link rel="stylesheet" href="../../../css/style.css" type="text/css" />
+
+  <link rel="stylesheet" href="../../../css/common.css" type="text/css" />
+
+<script type="text/javascript">
+  pathId = "ElasticGraph::SchemaDefinition::Mixins::HasIndices";
+  relpath = '../../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../../_index.html">Index (H)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../../SchemaDefinition.html" title="ElasticGraph::SchemaDefinition (module)">SchemaDefinition</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Mixins.html" title="ElasticGraph::SchemaDefinition::Mixins (module)">Mixins</a></span></span>
+     &raquo; 
+    <span class="title">HasIndices</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Module: ElasticGraph::SchemaDefinition::Mixins::HasIndices
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+
+  
+  
+  
+  
+  
+
+  
+  <dl>
+    <dt>Included in:</dt>
+    <dd><span class='object_link'><a href="../SchemaElements/InterfaceType.html" title="ElasticGraph::SchemaDefinition::SchemaElements::InterfaceType (class)">SchemaElements::InterfaceType</a></span>, <span class='object_link'><a href="../SchemaElements/ObjectType.html" title="ElasticGraph::SchemaDefinition::SchemaElements::ObjectType (class)">SchemaElements::ObjectType</a></span>, <span class='object_link'><a href="../SchemaElements/UnionType.html" title="ElasticGraph::SchemaDefinition::SchemaElements::UnionType (class)">SchemaElements::UnionType</a></span></dd>
+  </dl>
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/has_indices.rb</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Provides APIs for defining datastore indices.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#derive_indexed_type_fields-instance_method" title="#derive_indexed_type_fields (instance method)">#<strong>derive_indexed_type_fields</strong>(name, from_id:, route_with: nil, rollover_with: nil) {|Indexing::DerivedIndexedType| ... } &#x21d2; void </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Configures the ElasticGraph indexer to derive another type from this indexed type, using the <code>from_id</code> field as the source of the <code>id</code> of the derived type, and the provided block for the definitions of the derived fields.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#derived_indexed_types-instance_method" title="#derived_indexed_types (instance method)">#<strong>derived_indexed_types</strong>  &#x21d2; Array&lt;Indexing::DerivedIndexedType&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>List of derived types for this source type.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#index-instance_method" title="#index (instance method)">#<strong>index</strong>(name, **settings) {|Indexing::Index| ... } &#x21d2; void </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Converts the current type from being an <em>embedded</em> type (that is, a type that is embedded within another indexed type) to an <em>indexed</em> type that resides in the named index definition.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#indexed%3F-instance_method" title="#indexed? (instance method)">#<strong>indexed?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>True if this type has an index.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#plural_root_query_field_name-instance_method" title="#plural_root_query_field_name (instance method)">#<strong>plural_root_query_field_name</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>The plural name of the entity; used for the root <code>Query</code> field that queries documents of this indexed type.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#root_query_fields-instance_method" title="#root_query_fields (instance method)">#<strong>root_query_fields</strong>(plural:, singular: nil) {|SchemaElements::Field| ... } &#x21d2; void </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Determines what the root <code>Query</code> fields will be to query this indexed type.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#singular_root_query_field_name-instance_method" title="#singular_root_query_field_name (instance method)">#<strong>singular_root_query_field_name</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>The singular name of the entity; used for the root <code>Query</code> field (with an <code>Aggregations</code> suffix) that queries aggregations of this indexed type.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="derive_indexed_type_fields-instance_method">
+  
+    #<strong>derive_indexed_type_fields</strong>(name, from_id:, route_with: nil, rollover_with: nil) {|Indexing::DerivedIndexedType| ... } &#x21d2; <tt>void</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note returns_void">This method returns an undefined value.</p><p>Configures the ElasticGraph indexer to derive another type from this indexed type, using the <code>from_id</code> field as
+the source of the <code>id</code> of the derived type, and the provided block for the definitions of the derived fields.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Derive a <code>Course</code> type from <code>StudentCourseEnrollment</code> events</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='const'><span class='object_link'><a href="../../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span><span class='period'>.</span><span class='id identifier rubyid_define_schema'><span class='object_link'><a href="../../../ElasticGraph.html#define_schema-class_method" title="ElasticGraph.define_schema (method)">define_schema</a></span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_schema'>schema</span><span class='op'>|</span>
+  <span class='comment'># `StudentCourseEnrollment` is a directly indexed type.
+</span>  <span class='id identifier rubyid_schema'>schema</span><span class='period'>.</span><span class='id identifier rubyid_object_type'>object_type</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>StudentCourseEnrollment</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span>
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_field'>field</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>id</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ID</span><span class='tstring_end'>&quot;</span></span>
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_field'>field</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>courseId</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ID</span><span class='tstring_end'>&quot;</span></span>
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_field'>field</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>courseName</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>String</span><span class='tstring_end'>&quot;</span></span>
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_field'>field</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>studentName</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>String</span><span class='tstring_end'>&quot;</span></span>
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_field'>field</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>courseStartDate</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Date</span><span class='tstring_end'>&quot;</span></span>
+
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_index'>index</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>student_course_enrollments</span><span class='tstring_end'>&quot;</span></span>
+
+    <span class='comment'># Here we define how the `Course` indexed type  is derived when we index `StudentCourseEnrollment` events.
+</span>    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_derive_indexed_type_fields'>derive_indexed_type_fields</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Course</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>from_id:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>courseId</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_derive'>derive</span><span class='op'>|</span>
+      <span class='comment'># `derive` is an instance of `DerivedIndexedType`.
+</span>      <span class='id identifier rubyid_derive'>derive</span><span class='period'>.</span><span class='id identifier rubyid_immutable_value'>immutable_value</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>name</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>from:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>courseName</span><span class='tstring_end'>&quot;</span></span>
+      <span class='id identifier rubyid_derive'>derive</span><span class='period'>.</span><span class='id identifier rubyid_append_only_set'>append_only_set</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>students</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>from:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>studentName</span><span class='tstring_end'>&quot;</span></span>
+      <span class='id identifier rubyid_derive'>derive</span><span class='period'>.</span><span class='id identifier rubyid_min_value'>min_value</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>firstOfferedDate</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>from:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>courseStartDate</span><span class='tstring_end'>&quot;</span></span>
+      <span class='id identifier rubyid_derive'>derive</span><span class='period'>.</span><span class='id identifier rubyid_max_value'>max_value</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>mostRecentlyOfferedDate</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>from:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>courseStartDate</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># `Course` is an indexed type that is derived entirely from `StudentCourseEnrollment` events.
+</span>  <span class='id identifier rubyid_schema'>schema</span><span class='period'>.</span><span class='id identifier rubyid_object_type'>object_type</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Course</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span>
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_field'>field</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>id</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ID</span><span class='tstring_end'>&quot;</span></span>
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_field'>field</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>name</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>String</span><span class='tstring_end'>&quot;</span></span>
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_field'>field</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>students</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>[String!]!</span><span class='tstring_end'>&quot;</span></span>
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_field'>field</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>firstOfferedDate</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Date</span><span class='tstring_end'>&quot;</span></span>
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_field'>field</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>mostRecentlyOfferedDate</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Date</span><span class='tstring_end'>&quot;</span></span>
+
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_index'>index</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>courses</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>name</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>name of the derived type</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>from_id</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>path to the source type field with <code>id</code> values for the derived type</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>route_with</span>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>path to the source type field with values for shard routing on the derived type</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>rollover_with</span>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>path to the source type field with values for index rollover on the derived type</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Yields:</p>
+<ul class="yield">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../Indexing/DerivedIndexedType.html" title="ElasticGraph::SchemaDefinition::Indexing::DerivedIndexedType (class)">Indexing::DerivedIndexedType</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>configuration object for field derivations</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/has_indices.rb', line 131</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_derive_indexed_type_fields'>derive_indexed_type_fields</span><span class='lparen'>(</span>
+  <span class='id identifier rubyid_name'>name</span><span class='comma'>,</span>
+  <span class='label'>from_id:</span><span class='comma'>,</span>
+  <span class='label'>route_with:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+  <span class='label'>rollover_with:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+  <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span>
+<span class='rparen'>)</span>
+  <span class='const'><span class='object_link'><a href="../Indexing.html" title="ElasticGraph::SchemaDefinition::Indexing (module)">Indexing</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Indexing/DerivedIndexedType.html" title="ElasticGraph::SchemaDefinition::Indexing::DerivedIndexedType (class)">DerivedIndexedType</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="../Indexing/DerivedIndexedType.html#initialize-instance_method" title="ElasticGraph::SchemaDefinition::Indexing::DerivedIndexedType#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+    <span class='label'>source_type:</span> <span class='kw'>self</span><span class='comma'>,</span>
+    <span class='label'>destination_type_ref:</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_type_ref'>type_ref</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_final_form'>to_final_form</span><span class='comma'>,</span>
+    <span class='label'>id_source:</span> <span class='id identifier rubyid_from_id'>from_id</span><span class='comma'>,</span>
+    <span class='label'>routing_value_source:</span> <span class='id identifier rubyid_route_with'>route_with</span><span class='comma'>,</span>
+    <span class='label'>rollover_timestamp_value_source:</span> <span class='id identifier rubyid_rollover_with'>rollover_with</span><span class='comma'>,</span>
+    <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span>
+  <span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_tap'>tap</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_dit'>dit</span><span class='op'>|</span> <span class='id identifier rubyid_derived_indexed_types'>derived_indexed_types</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_dit'>dit</span> <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="derived_indexed_types-instance_method">
+  
+    #<strong>derived_indexed_types</strong>  &#x21d2; <tt>Array&lt;<span class='object_link'><a href="../Indexing/DerivedIndexedType.html" title="ElasticGraph::SchemaDefinition::Indexing::DerivedIndexedType (class)">Indexing::DerivedIndexedType</a></span>&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns list of derived types for this source type.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;<span class='object_link'><a href="../Indexing/DerivedIndexedType.html" title="ElasticGraph::SchemaDefinition::Indexing::DerivedIndexedType (class)">Indexing::DerivedIndexedType</a></span>&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>list of derived types for this source type</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+149
+150
+151</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/has_indices.rb', line 149</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_derived_indexed_types'>derived_indexed_types</span>
+  <span class='ivar'>@derived_indexed_types</span> <span class='op'>||=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="index-instance_method">
+  
+    #<strong>index</strong>(name, **settings) {|Indexing::Index| ... } &#x21d2; <tt>void</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+  <div class="note notetag">
+    <strong>Note:</strong>
+    <div class='inline'><p>Use <span class='object_link'><a href="#root_query_fields-instance_method" title="ElasticGraph::SchemaDefinition::Mixins::HasIndices#root_query_fields (method)">#root_query_fields</a></span> on indexed types to name the field that will be exposed on <code>Query</code>.</p>
+</div>
+  </div>
+
+  <div class="note notetag">
+    <strong>Note:</strong>
+    <div class='inline'><p>Indexed types must also define an <code>id</code> field, which ElasticGraph will use as the primary key.</p>
+</div>
+  </div>
+
+  <div class="note notetag">
+    <strong>Note:</strong>
+    <div class='inline'><p>Datastore index settings can also be defined (or overridden) in an environment-specific settings YAML file. Index settings
+that you want to configure differently for different environments (such as <code>index.number_of_shards</code>—-production and staging
+will probably need different numbers!) should be configured in the per-environment YAML configuration files rather than here.</p>
+</div>
+  </div>
+
+<p class="note returns_void">This method returns an undefined value.</p><p>Converts the current type from being an <em>embedded</em> type (that is, a type that is embedded within another indexed type) to an
+<em>indexed</em> type that resides in the named index definition. Indexed types are directly indexed into the datastore, and will be
+queryable from the root <code>Query</code> type.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Define a <code>campaigns</code> index</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='const'><span class='object_link'><a href="../../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span><span class='period'>.</span><span class='id identifier rubyid_define_schema'><span class='object_link'><a href="../../../ElasticGraph.html#define_schema-class_method" title="ElasticGraph.define_schema (method)">define_schema</a></span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_schema'>schema</span><span class='op'>|</span>
+  <span class='id identifier rubyid_schema'>schema</span><span class='period'>.</span><span class='id identifier rubyid_object_type'>object_type</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Campaign</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span>
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_field'>field</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>id</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ID</span><span class='tstring_end'>&quot;</span></span>
+
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_index'>index</span><span class='lparen'>(</span>
+      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>campaigns</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+      <span class='comment'># Configure `index.refresh_interval`.
+</span>      <span class='label'>refresh_interval:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>1s</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+      <span class='comment'># Use `index.search` to log warnings for any search query that take more than five seconds.
+</span>      <span class='label'>search:</span> <span class='lbrace'>{</span><span class='label'>slowlog:</span> <span class='lbrace'>{</span><span class='label'>level:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>WARN</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>threshold:</span> <span class='lbrace'>{</span><span class='label'>query:</span> <span class='lbrace'>{</span><span class='label'>warn:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>5s</span><span class='tstring_end'>&quot;</span></span><span class='rbrace'>}</span><span class='rbrace'>}</span><span class='rbrace'>}</span><span class='rbrace'>}</span>
+    <span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_i'>i</span><span class='op'>|</span>
+      <span class='comment'># The index can be customized further here.
+</span>    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>name</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>name of the index. See the <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.15/indices-create-index.html#indices-create-api-path-params">Elasticsearch docs</a>
+for restrictions.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>settings</span>
+      
+      
+        <span class='type'>(<tt>Hash&lt;Symbol, Object&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>datastore index settings you want applied to every environment. See the <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.15/index-modules.html#index-modules-settings">Elasticsearch docs</a>
+for a list of valid settings, but be sure to omit the <code>index.</code> prefix here.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Yields:</p>
+<ul class="yield">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../Indexing/Index.html" title="ElasticGraph::SchemaDefinition::Indexing::Index (class)">Indexing::Index</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>the index, so it can be customized further</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+65
+66
+67</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/has_indices.rb', line 65</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_index'>index</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_settings'>settings</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_indices'>indices</span><span class='period'>.</span><span class='id identifier rubyid_replace'>replace</span><span class='lparen'>(</span><span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="../Indexing.html" title="ElasticGraph::SchemaDefinition::Indexing (module)">Indexing</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Indexing/Index.html" title="ElasticGraph::SchemaDefinition::Indexing::Index (class)">Index</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="../Indexing/Index.html#initialize-instance_method" title="ElasticGraph::SchemaDefinition::Indexing::Index#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_settings'>settings</span><span class='comma'>,</span> <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='comma'>,</span> <span class='kw'>self</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="indexed?-instance_method">
+  
+    #<strong>indexed?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns true if this type has an index.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>true if this type has an index</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+77
+78
+79</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/has_indices.rb', line 77</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_indexed?'>indexed?</span>
+  <span class='id identifier rubyid_indices'>indices</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="plural_root_query_field_name-instance_method">
+  
+    #<strong>plural_root_query_field_name</strong>  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns the plural name of the entity; used for the root <code>Query</code> field that queries documents of this indexed type.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>the plural name of the entity; used for the root <code>Query</code> field that queries documents of this indexed type</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+207
+208
+209</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/has_indices.rb', line 207</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_plural_root_query_field_name'>plural_root_query_field_name</span>
+  <span class='ivar'>@plural_root_query_field_name</span> <span class='op'>||</span> <span class='id identifier rubyid_naively_pluralize_type_name'>naively_pluralize_type_name</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="root_query_fields-instance_method">
+  
+    #<strong>root_query_fields</strong>(plural:, singular: nil) {|SchemaElements::Field| ... } &#x21d2; <tt>void</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note returns_void">This method returns an undefined value.</p><p>Determines what the root <code>Query</code> fields will be to query this indexed type. In addition, this method accepts a block, which you
+can use to customize the root query field (such as adding a GraphQL directive to it).</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Set <code>plural</code> and <code>singular</code> names</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='const'><span class='object_link'><a href="../../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span><span class='period'>.</span><span class='id identifier rubyid_define_schema'><span class='object_link'><a href="../../../ElasticGraph.html#define_schema-class_method" title="ElasticGraph.define_schema (method)">define_schema</a></span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_schema'>schema</span><span class='op'>|</span>
+  <span class='id identifier rubyid_schema'>schema</span><span class='period'>.</span><span class='id identifier rubyid_object_type'>object_type</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Person</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span>
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_field'>field</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>id</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ID</span><span class='tstring_end'>&quot;</span></span>
+
+    <span class='comment'># Results in `Query.people` and `Query.personAggregations`.
+</span>    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_root_query_fields'>root_query_fields</span> <span class='label'>plural:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>people</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>singular:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>person</span><span class='tstring_end'>&quot;</span></span>
+
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_index'>index</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>people</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></code></pre>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Customize <code>Query</code> fields</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='const'><span class='object_link'><a href="../../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span><span class='period'>.</span><span class='id identifier rubyid_define_schema'><span class='object_link'><a href="../../../ElasticGraph.html#define_schema-class_method" title="ElasticGraph.define_schema (method)">define_schema</a></span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_schema'>schema</span><span class='op'>|</span>
+  <span class='id identifier rubyid_schema'>schema</span><span class='period'>.</span><span class='id identifier rubyid_object_type'>object_type</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Person</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span>
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_field'>field</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>id</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ID</span><span class='tstring_end'>&quot;</span></span>
+
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_root_query_fields'>root_query_fields</span> <span class='label'>plural:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>people</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>singular:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>person</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_f'>f</span><span class='op'>|</span>
+      <span class='comment'># Marks `Query.people` and `Query.personAggregations` as deprecated.
+</span>      <span class='id identifier rubyid_f'>f</span><span class='period'>.</span><span class='id identifier rubyid_directive'>directive</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>deprecated</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_index'>index</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>people</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>plural</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>the plural name of the entity; used for the root <code>Query</code> field that queries documents of this indexed type</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>singular</span>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>the singular name of the entity; used for the root <code>Query</code> field (with an <code>Aggregations</code> suffix) that
+queries aggregations of this indexed type. If not provided, will derive it from the type name (e.g. converting it to <code>camelCase</code>
+or <code>snake_case</code>, depending on configuration).</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Yields:</p>
+<ul class="yield">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../SchemaElements/Field.html" title="ElasticGraph::SchemaDefinition::SchemaElements::Field (class)">SchemaElements::Field</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>field on the root <code>Query</code> type used to query this indexed type, to support customization</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+200
+201
+202
+203
+204</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/has_indices.rb', line 200</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_root_query_fields'>root_query_fields</span><span class='lparen'>(</span><span class='label'>plural:</span><span class='comma'>,</span> <span class='label'>singular:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_customization_block'>customization_block</span><span class='rparen'>)</span>
+  <span class='ivar'>@plural_root_query_field_name</span> <span class='op'>=</span> <span class='id identifier rubyid_plural'>plural</span>
+  <span class='ivar'>@singular_root_query_field_name</span> <span class='op'>=</span> <span class='id identifier rubyid_singular'>singular</span>
+  <span class='ivar'>@root_query_fields_customizations</span> <span class='op'>=</span> <span class='id identifier rubyid_customization_block'>customization_block</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="singular_root_query_field_name-instance_method">
+  
+    #<strong>singular_root_query_field_name</strong>  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns the singular name of the entity; used for the root <code>Query</code> field (with an <code>Aggregations</code> suffix) that queries
+aggregations of this indexed type. If not provided, will derive it from the type name (e.g. converting it to <code>camelCase</code> or
+<code>snake_case</code>, depending on configuration).</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>the singular name of the entity; used for the root <code>Query</code> field (with an <code>Aggregations</code> suffix) that queries
+aggregations of this indexed type. If not provided, will derive it from the type name (e.g. converting it to <code>camelCase</code> or
+<code>snake_case</code>, depending on configuration).</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+214
+215
+216</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/has_indices.rb', line 214</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_singular_root_query_field_name'>singular_root_query_field_name</span>
+  <span class='ivar'>@singular_root_query_field_name</span> <span class='op'>||</span> <span class='id identifier rubyid_to_field_name'>to_field_name</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Thu Mar  6 06:00:37 2025 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.37 (ruby-3.3.4).
+</div>
+
+    </div>
+  </body>
+</html>

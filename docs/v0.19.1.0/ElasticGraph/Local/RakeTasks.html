@@ -1,0 +1,1982 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: ElasticGraph::Local::RakeTasks
+  
+    &mdash; Documentation by YARD 0.9.37
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css" />
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css" />
+
+<script type="text/javascript">
+  pathId = "ElasticGraph::Local::RakeTasks";
+  relpath = '../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../_index.html">Index (R)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Local.html" title="ElasticGraph::Local (module)">Local</a></span></span>
+     &raquo; 
+    <span class="title">RakeTasks</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: ElasticGraph::Local::RakeTasks
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Rake::TaskLib</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Rake::TaskLib</li>
+          
+            <li class="next">ElasticGraph::Local::RakeTasks</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>elasticgraph-local/lib/elastic_graph/local/rake_tasks.rb</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+  <div class="note notetag">
+    <strong>Note:</strong>
+    <div class='inline'><p>All tasks (besides the <code>schema_artifacts</code> tasks) require <code>docker</code> and <code>docker-compose</code> to be available on your machine.</p>
+</div>
+  </div>
+
+<p>Defines tasks for local development. These tasks include:</p>
+
+<ul>
+  <li>Running OpenSearch and/or Elasticsearch locally (<code>(elasticsearch|opensearch):[env]:(boot|daemon|halt)</code>)</li>
+  <li>Managing schema artifacts (<code>schema_artifacts:(check|dump)</code>)</li>
+  <li>Configuring OpenSearch/Elasticsearch locally (<code>clusters:configure:(dry_run|perform)</code>)</li>
+  <li>Indexing fake data (<code>index_fake_data:[type]</code>)</li>
+  <li>Booting an ElasticGraph application locally (<code>boot_locally</code>)</li>
+</ul>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+  
+    <h2>
+      Constant Summary
+      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
+    </h2>
+
+    <dl class="constants">
+      
+        <dt id="UI_PORT_OFFSET-constant" class="">UI_PORT_OFFSET =
+          <div class="docstring">
+  <div class="discussion">
+    <p>Offset we add to a port number for the UI (e.g. Kibana or OpenSearch Dashboards).</p>
+
+<p>Example: if Elasticsearch/OpenSearch is running on port 9876, the UI for it will run on port 19876.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='int'>10_000</span></pre></dd>
+      
+    </dl>
+  
+
+
+
+
+  <h2>Instance Attribute Summary <small><a href="#" class="summary_toggle">collapse</a></small></h2>
+  <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#daemon_timeout-instance_method" title="#daemon_timeout (instance method)">#<strong>daemon_timeout</strong>  &#x21d2; Integer </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Maximum time (in seconds) to wait for the datastore to boot when booting it as a daemon.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#derived_type_name_formats-instance_method" title="#derived_type_name_formats (instance method)">#<strong>derived_type_name_formats</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Overrides for the naming formats used by ElasticGraph for derived GraphQL type names.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#elasticsearch_versions-instance_method" title="#elasticsearch_versions (instance method)">#<strong>elasticsearch_versions</strong>  &#x21d2; Array&lt;String&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>List of Elasticsearch versions you want to be able to boot.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#enforce_json_schema_version-instance_method" title="#enforce_json_schema_version (instance method)">#<strong>enforce_json_schema_version</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Whether or not to enforce the requirement that the JSON schema version is incremented every time dumping the JSON schemas results in a changed artifact.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#enum_value_overrides_by_type-instance_method" title="#enum_value_overrides_by_type (instance method)">#<strong>enum_value_overrides_by_type</strong>  &#x21d2; Hash&lt;Symbol, Hash&lt;Symbol, String&gt;&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Overrides for the names of specific GraphQL enum values for specific enum types.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#env_port_mapping-instance_method" title="#env_port_mapping (instance method)">#<strong>env_port_mapping</strong>  &#x21d2; Hash&lt;Symbol, Integer&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Hash mapping environments (e.g. <code>:test</code>, <code>:dev</code>, etc) to port numbers for use when booting Elasticsearch or OpenSearch.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#index_document_sizes-instance_method" title="#index_document_sizes (instance method)">#<strong>index_document_sizes</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>When enabled, ElasticGraph will configure the index mappings so that the datastore indexes a <code>_size</code> field in each index document.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#opensearch_versions-instance_method" title="#opensearch_versions (instance method)">#<strong>opensearch_versions</strong>  &#x21d2; Array&lt;String&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>List of OpenSearch versions you want to be able to boot.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#output-instance_method" title="#output (instance method)">#<strong>output</strong>  &#x21d2; IO </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>IO for printing output (defaults to stdout).</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#schema_definition_extension_modules-instance_method" title="#schema_definition_extension_modules (instance method)">#<strong>schema_definition_extension_modules</strong>  &#x21d2; Array&lt;Module&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>List of Ruby modules to extend onto the <span class='object_link'><a href="../SchemaDefinition/API.html" title="ElasticGraph::SchemaDefinition::API (class)">SchemaDefinition::API</a></span> instance.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#schema_element_name_form-instance_method" title="#schema_element_name_form (instance method)">#<strong>schema_element_name_form</strong>  &#x21d2; :camelCase, :snake_case </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>The form of names for schema elements (fields, arguments, directives) generated by ElasticGraph, either <code>:snake_case</code> or <code>:camelCase</code>.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#schema_element_name_overrides-instance_method" title="#schema_element_name_overrides (instance method)">#<strong>schema_element_name_overrides</strong>  &#x21d2; Hash&lt;Symbol, String&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Overrides for specific names of schema elements (fields, arguments, directives) generated by ElasticGraph.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#type_name_overrides-instance_method" title="#type_name_overrides (instance method)">#<strong>type_name_overrides</strong>  &#x21d2; Hash&lt;Symbol, String&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Overrides for the names of specific GraphQL types.</p>
+</div></span>
+  
+</li>
+
+    
+  </ul>
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#define_fake_data_batch_for-instance_method" title="#define_fake_data_batch_for (instance method)">#<strong>define_fake_data_batch_for</strong>(type) {|Array&lt;Hash&lt;String, Object&gt;&gt;, Array&lt;Hash&lt;Symbol, Object&gt;&gt;| ... } &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Register a callback for use when indexing a batch fake data.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(local_config_yaml:, path_to_schema:) {|RakeTasks| ... } &#x21d2; RakeTasks </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>A new instance of RakeTasks.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  <div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    #<strong>initialize</strong>(local_config_yaml:, path_to_schema:) {|RakeTasks| ... } &#x21d2; <tt><span class='object_link'><a href="" title="ElasticGraph::Local::RakeTasks (class)">RakeTasks</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+  <div class="note notetag">
+    <strong>Note:</strong>
+    <div class='inline'><p>This method uses keyword args for all required arguments. Optional task settings are instead specified using the block.</p>
+</div>
+  </div>
+
+<p>Returns a new instance of RakeTasks.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>local_config_yaml</span>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>Pathname</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>path to the settings YAML file for the local/development environment</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>path_to_schema</span>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>Pathname</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>path to the Ruby schema definition file–either the only file that defines the schema
+(using <code>ElasticGraph.define_schema</code>) or the “main” schema definition file, which loads other files which further define parts of
+the schema.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Yields:</p>
+<ul class="yield">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="" title="ElasticGraph::Local::RakeTasks (class)">RakeTasks</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>instance for further configuration</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Yield Returns:</p>
+<ul class="yieldreturn">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>void</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+354
+355
+356
+357
+358
+359
+360
+361
+362
+363
+364
+365
+366
+367
+368
+369
+370
+371
+372
+373
+374
+375
+376
+377
+378
+379
+380
+381
+382
+383
+384
+385
+386
+387
+388
+389
+390
+391
+392
+393
+394
+395
+396
+397
+398
+399
+400
+401
+402
+403</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-local/lib/elastic_graph/local/rake_tasks.rb', line 354</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>local_config_yaml:</span><span class='comma'>,</span> <span class='label'>path_to_schema:</span><span class='rparen'>)</span>
+  <span class='ivar'>@local_config_yaml</span> <span class='op'>=</span> <span class='id identifier rubyid_local_config_yaml'>local_config_yaml</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
+
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_index_document_sizes'>index_document_sizes</span> <span class='op'>=</span> <span class='kw'>false</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_schema_element_name_form'>schema_element_name_form</span> <span class='op'>=</span> <span class='symbol'>:camelCase</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_schema_element_name_overrides'>schema_element_name_overrides</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_derived_type_name_formats'>derived_type_name_formats</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_type_name_overrides'>type_name_overrides</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_enum_value_overrides_by_type'>enum_value_overrides_by_type</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_schema_definition_extension_modules'>schema_definition_extension_modules</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_enforce_json_schema_version'>enforce_json_schema_version</span> <span class='op'>=</span> <span class='kw'>true</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_env_port_mapping'>env_port_mapping</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_output'>output</span> <span class='op'>=</span> <span class='gvar'>$stdout</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_daemon_timeout'>daemon_timeout</span> <span class='op'>=</span> <span class='int'>300</span>
+
+  <span class='id identifier rubyid_datastore_versions'>datastore_versions</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'>YAML</span><span class='period'>.</span><span class='id identifier rubyid_load_file'>load_file</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid___dir__'>__dir__</span><span class='embexpr_end'>}</span><span class='tstring_content'>/tested_datastore_versions.yaml</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_elasticsearch_versions'>elasticsearch_versions</span> <span class='op'>=</span> <span class='id identifier rubyid_local_cluster_backends'>local_cluster_backends</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>elasticsearch</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_datastore_versions'>datastore_versions</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>elasticsearch</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='op'>:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_opensearch_versions'>opensearch_versions</span> <span class='op'>=</span> <span class='id identifier rubyid_local_cluster_backends'>local_cluster_backends</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>opensearch</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_datastore_versions'>datastore_versions</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>opensearch</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='op'>:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+
+  <span class='ivar'>@fake_data_batch_generator_by_type</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+
+  <span class='kw'>yield</span> <span class='kw'>self</span> <span class='kw'>if</span> <span class='id identifier rubyid_block_given?'>block_given?</span>
+
+  <span class='comment'># Default the local port from the local_config_yaml file.
+</span>  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_env_port_mapping'>env_port_mapping</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>local</span><span class='tstring_end'>&quot;</span></span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_local_datastore_port'>local_datastore_port</span><span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_env_port_mapping'>env_port_mapping</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+  <span class='kw'>if</span> <span class='lparen'>(</span><span class='id identifier rubyid_invalid_port_mapping'>invalid_port_mapping</span> <span class='op'>=</span> <span class='id identifier rubyid_env_port_mapping'>env_port_mapping</span><span class='period'>.</span><span class='id identifier rubyid_reject'>reject</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_env'>env</span><span class='comma'>,</span> <span class='id identifier rubyid_port'>port</span><span class='op'>|</span> <span class='const'>VALID_PORT_RANGE</span><span class='period'>.</span><span class='id identifier rubyid_cover?'>cover?</span><span class='lparen'>(</span><span class='id identifier rubyid_port'>port</span><span class='rparen'>)</span> <span class='rbrace'>}</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>`env_port_mapping` has invalid ports: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_invalid_port_mapping'>invalid_port_mapping</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_content'>. Valid ports must be in the </span><span class='embexpr_beg'>#{</span><span class='const'>VALID_PORT_RANGE</span><span class='embexpr_end'>}</span><span class='tstring_content'> range.</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># Load admin and schema def rake tasks...
+</span>  <span class='const'>Admin</span><span class='op'>::</span><span class='const'>RakeTasks</span><span class='period'>.</span><span class='id identifier rubyid_from_yaml_file'>from_yaml_file</span><span class='lparen'>(</span><span class='id identifier rubyid_local_config_yaml'>local_config_yaml</span><span class='comma'>,</span> <span class='label'>output:</span> <span class='id identifier rubyid_output'>output</span><span class='rparen'>)</span>
+  <span class='const'><span class='object_link'><a href="../SchemaDefinition.html" title="ElasticGraph::SchemaDefinition (module)">SchemaDefinition</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../SchemaDefinition/RakeTasks.html" title="ElasticGraph::SchemaDefinition::RakeTasks (class)">RakeTasks</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="../SchemaDefinition/RakeTasks.html#initialize-instance_method" title="ElasticGraph::SchemaDefinition::RakeTasks#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+    <span class='label'>index_document_sizes:</span> <span class='id identifier rubyid_index_document_sizes'>index_document_sizes</span><span class='comma'>,</span>
+    <span class='label'>path_to_schema:</span> <span class='id identifier rubyid_path_to_schema'>path_to_schema</span><span class='comma'>,</span>
+    <span class='label'>schema_artifacts_directory:</span> <span class='id identifier rubyid_local_config'>local_config</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>schema_artifacts</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>directory</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>schema_element_name_form:</span> <span class='id identifier rubyid_schema_element_name_form'>schema_element_name_form</span><span class='comma'>,</span>
+    <span class='label'>schema_element_name_overrides:</span> <span class='id identifier rubyid_schema_element_name_overrides'>schema_element_name_overrides</span><span class='comma'>,</span>
+    <span class='label'>derived_type_name_formats:</span> <span class='id identifier rubyid_derived_type_name_formats'>derived_type_name_formats</span><span class='comma'>,</span>
+    <span class='label'>type_name_overrides:</span> <span class='id identifier rubyid_type_name_overrides'>type_name_overrides</span><span class='comma'>,</span>
+    <span class='label'>enum_value_overrides_by_type:</span> <span class='id identifier rubyid_enum_value_overrides_by_type'>enum_value_overrides_by_type</span><span class='comma'>,</span>
+    <span class='label'>extension_modules:</span> <span class='id identifier rubyid_schema_definition_extension_modules'>schema_definition_extension_modules</span><span class='comma'>,</span>
+    <span class='label'>enforce_json_schema_version:</span> <span class='id identifier rubyid_enforce_json_schema_version'>enforce_json_schema_version</span><span class='comma'>,</span>
+    <span class='label'>output:</span> <span class='id identifier rubyid_output'>output</span>
+  <span class='rparen'>)</span>
+
+  <span class='comment'># ...then define a bunch of our own.
+</span>  <span class='id identifier rubyid_define_docker_tasks'>define_docker_tasks</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Elasticsearch</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Kibana</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_elasticsearch_versions'>elasticsearch_versions</span><span class='comma'>,</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>license \[[^\]]+\] mode \[[^\]]+\] - valid</span><span class='regexp_end'>/</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_define_docker_tasks'>define_docker_tasks</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>OpenSearch</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>OpenSearch Dashboards</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_opensearch_versions'>opensearch_versions</span><span class='comma'>,</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>o\.o\.n\.Node.+started</span><span class='regexp_end'>/</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_define_other_tasks'>define_other_tasks</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+  <div id="instance_attr_details" class="attr_details">
+    <h2>Instance Attribute Details</h2>
+    
+      
+      <span id="daemon_timeout=-instance_method"></span>
+      <div class="method_details first">
+  <h3 class="signature first" id="daemon_timeout-instance_method">
+  
+    #<strong>daemon_timeout</strong>  &#x21d2; <tt>Integer</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Maximum time (in seconds) to wait for the datastore to boot when booting it as a daemon. Defaults to 120.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>maximum time in seconds to wait when booting Elasticsearch/OpenSearch as a daemon</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+314
+315
+316</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-local/lib/elastic_graph/local/rake_tasks.rb', line 314</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_daemon_timeout'>daemon_timeout</span>
+  <span class='ivar'>@daemon_timeout</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id="derived_type_name_formats=-instance_method"></span>
+      <div class="method_details ">
+  <h3 class="signature " id="derived_type_name_formats-instance_method">
+  
+    #<strong>derived_type_name_formats</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Overrides for the naming formats used by ElasticGraph for derived GraphQL type names. For example, to use <code>Metrics</code> instead of
+<code>AggregatedValues</code> as the suffix for the generated types supporting getting aggregated metrid values, set to
+<code>{AggregatedValues: "%{base}Metrics"}</code>. See <span class='object_link'><a href="../SchemaDefinition/SchemaElements/TypeNamer.html#DEFAULT_FORMATS-constant" title="ElasticGraph::SchemaDefinition::SchemaElements::TypeNamer::DEFAULT_FORMATS (constant)">SchemaDefinition::SchemaElements::TypeNamer::DEFAULT_FORMATS</a></span> for the available
+formats.</p>
+
+<p>Defaults to an empty hash.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Change the <code>AggregatedValues</code> type suffix to <code>Metrics</code></p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='const'><span class='object_link'><a href="../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Local.html" title="ElasticGraph::Local (module)">Local</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="ElasticGraph::Local::RakeTasks (class)">RakeTasks</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="ElasticGraph::Local::RakeTasks#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+  <span class='label'>local_config_yaml:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>config/settings/local.yaml</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+  <span class='label'>path_to_schema:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>config/schema.rb</span><span class='tstring_end'>&quot;</span></span>
+<span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_tasks'>tasks</span><span class='op'>|</span>
+  <span class='id identifier rubyid_tasks'>tasks</span><span class='period'>.</span><span class='id identifier rubyid_derived_type_name_formats'>derived_type_name_formats</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='label'>AggregatedValues:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>%{base}Metrics</span><span class='tstring_end'>&quot;</span></span><span class='rbrace'>}</span>
+<span class='kw'>end</span></code></pre>
+    
+  </div>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+109
+110
+111</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-local/lib/elastic_graph/local/rake_tasks.rb', line 109</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_derived_type_name_formats'>derived_type_name_formats</span>
+  <span class='ivar'>@derived_type_name_formats</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id="elasticsearch_versions=-instance_method"></span>
+      <div class="method_details ">
+  <h3 class="signature " id="elasticsearch_versions-instance_method">
+  
+    #<strong>elasticsearch_versions</strong>  &#x21d2; <tt>Array&lt;String&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>List of Elasticsearch versions you want to be able to boot. Rake tasks will be defined for each version to support booting and
+halting Elasticsearch locally. If the configuration of <code>local_config_yaml</code> only configures <code>opensearch</code> as a cluster backend,
+will default to an empty array. Otherwise, defaults to the versions of Elasticsearch that are exercised by the ElasticGraph test suite, as
+defined by <code>lib/elastic_graph/local/tested_datastore_versions.yaml</code>:</p>
+
+<p># This file determines the versions the ElasticGraph CI build tests against, and is also<br/># used to provide the default versions offered by the `elasticgraph-local` rake tasks.<br/>elasticsearch:<br/>- 8.16.1 # latest version as of 2024-12-08.<br/>opensearch:<br/>- 2.18.0 # latest version as of 2024-12-08.<br/>- 2.7.0 # lowest version ElasticGraph currently supports</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Configure the Elasticsearch versions available to boot locally</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='const'><span class='object_link'><a href="../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Local.html" title="ElasticGraph::Local (module)">Local</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="ElasticGraph::Local::RakeTasks (class)">RakeTasks</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="ElasticGraph::Local::RakeTasks#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+  <span class='label'>local_config_yaml:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>config/settings/local.yaml</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+  <span class='label'>path_to_schema:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>config/schema.rb</span><span class='tstring_end'>&quot;</span></span>
+<span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_tasks'>tasks</span><span class='op'>|</span>
+  <span class='id identifier rubyid_tasks'>tasks</span><span class='period'>.</span><span class='id identifier rubyid_elasticsearch_versions'>elasticsearch_versions</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>8.16.1</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span>
+<span class='kw'>end</span></code></pre>
+    
+  </div>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;String&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>list of Elasticsearch versions</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li><span class='object_link'><a href="#opensearch_versions-instance_method" title="ElasticGraph::Local::RakeTasks#opensearch_versions (method)">#opensearch_versions</a></span></li>
+    
+  </ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+260
+261
+262</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-local/lib/elastic_graph/local/rake_tasks.rb', line 260</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_elasticsearch_versions'>elasticsearch_versions</span>
+  <span class='ivar'>@elasticsearch_versions</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id="enforce_json_schema_version=-instance_method"></span>
+      <div class="method_details ">
+  <h3 class="signature " id="enforce_json_schema_version-instance_method">
+  
+    #<strong>enforce_json_schema_version</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+  <div class="note notetag">
+    <strong>Note:</strong>
+    <div class='inline'><p>Generally speaking, you will want this to be <code>true</code> for any ElasticGraph application that is in
+production as the versioning of JSON schemas is what supports safe schema evolution as it allows
+ElasticGraph to identify which version of the JSON schema the publishing system was operating on
+when it published an event.</p>
+
+<p>It can be useful to set it to <code>false</code> before your application is in production, as you do not want
+to be forced to bump the version after every single schema change while you are building an initial
+prototype.</p>
+</div>
+  </div>
+
+<p>Whether or not to enforce the requirement that the JSON schema version is incremented every time
+dumping the JSON schemas results in a changed artifact. Defaults to <code>true</code>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Disable enforcement during initial prototyping</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='const'><span class='object_link'><a href="../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Local.html" title="ElasticGraph::Local (module)">Local</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="ElasticGraph::Local::RakeTasks (class)">RakeTasks</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="ElasticGraph::Local::RakeTasks#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+  <span class='label'>local_config_yaml:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>config/settings/local.yaml</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+  <span class='label'>path_to_schema:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>config/schema.rb</span><span class='tstring_end'>&quot;</span></span>
+<span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_tasks'>tasks</span><span class='op'>|</span>
+  <span class='comment'># TODO: remove this once we&#39;re past the prototyping stage
+</span>  <span class='id identifier rubyid_tasks'>tasks</span><span class='period'>.</span><span class='id identifier rubyid_enforce_json_schema_version'>enforce_json_schema_version</span> <span class='op'>=</span> <span class='kw'>false</span>
+<span class='kw'>end</span></code></pre>
+    
+  </div>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>whether to require <code>json_schema_version</code> to be incremented on changes that impact <code>json_schemas.yaml</code></p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li><span class='object_link'><a href="../SchemaDefinition/API.html#json_schema_version-instance_method" title="ElasticGraph::SchemaDefinition::API#json_schema_version (method)">SchemaDefinition::API#json_schema_version</a></span></li>
+    
+  </ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+239
+240
+241</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-local/lib/elastic_graph/local/rake_tasks.rb', line 239</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_enforce_json_schema_version'>enforce_json_schema_version</span>
+  <span class='ivar'>@enforce_json_schema_version</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id="enum_value_overrides_by_type=-instance_method"></span>
+      <div class="method_details ">
+  <h3 class="signature " id="enum_value_overrides_by_type-instance_method">
+  
+    #<strong>enum_value_overrides_by_type</strong>  &#x21d2; <tt>Hash&lt;Symbol, Hash&lt;Symbol, String&gt;&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Overrides for the names of specific GraphQL enum values for specific enum types. For example, to rename the <code>DayOfWeek.MONDAY</code>
+enum to <code>DayOfWeek.MON</code>, set to <code>{DayOfWeek: {MONDAY: "MON"}}</code>.</p>
+
+<p>Defaults to an empty hash.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Shorten the names of the <code>DayOfWeek</code> enum values</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='const'><span class='object_link'><a href="../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Local.html" title="ElasticGraph::Local (module)">Local</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="ElasticGraph::Local::RakeTasks (class)">RakeTasks</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="ElasticGraph::Local::RakeTasks#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+  <span class='label'>local_config_yaml:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>config/settings/local.yaml</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+  <span class='label'>path_to_schema:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>config/schema.rb</span><span class='tstring_end'>&quot;</span></span>
+<span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_tasks'>tasks</span><span class='op'>|</span>
+  <span class='id identifier rubyid_tasks'>tasks</span><span class='period'>.</span><span class='id identifier rubyid_enum_value_overrides_by_type'>enum_value_overrides_by_type</span> <span class='op'>=</span> <span class='lbrace'>{</span>
+    <span class='label'>DayOfWeek:</span> <span class='lbrace'>{</span>
+      <span class='label'>MONDAY:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>MON</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+      <span class='label'>TUESDAY:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>TUE</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+      <span class='label'>WEDNESDAY:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>WED</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+      <span class='label'>THURSDAY:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>THU</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+      <span class='label'>FRIDAY:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>FRI</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+      <span class='label'>SATURDAY:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>SAT</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+      <span class='label'>SUNDAY:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>SUN</span><span class='tstring_end'>&quot;</span></span>
+    <span class='rbrace'>}</span>
+  <span class='rbrace'>}</span>
+<span class='kw'>end</span></code></pre>
+    
+  </div>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash&lt;Symbol, Hash&lt;Symbol, String&gt;&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>overrides for the names of specific enum values for specific enum types</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+155
+156
+157</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-local/lib/elastic_graph/local/rake_tasks.rb', line 155</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_enum_value_overrides_by_type'>enum_value_overrides_by_type</span>
+  <span class='ivar'>@enum_value_overrides_by_type</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id="env_port_mapping=-instance_method"></span>
+      <div class="method_details ">
+  <h3 class="signature " id="env_port_mapping-instance_method">
+  
+    #<strong>env_port_mapping</strong>  &#x21d2; <tt>Hash&lt;Symbol, Integer&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+  <div class="note notetag">
+    <strong>Note:</strong>
+    <div class='inline'><p>When booting Elasticsearch/OpenSearch, Kibana (or its OpenSearch equivalent, “OpenSearch Dashboards”) will also get booted,
+selecting the port by adding <code>10000</code> to the configured port.</p>
+</div>
+  </div>
+
+<p>Hash mapping environments (e.g. <code>:test</code>, <code>:dev</code>, etc) to port numbers for use when booting Elasticsearch or OpenSearch. The hash
+automatically includes an entry for the <code>:local</code> environment, using a port number extracted from <code>local_config_yaml</code>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Define what port to use to boot the datastore for the <code>:test</code> environment</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='const'><span class='object_link'><a href="../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Local.html" title="ElasticGraph::Local (module)">Local</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="ElasticGraph::Local::RakeTasks (class)">RakeTasks</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="ElasticGraph::Local::RakeTasks#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+  <span class='label'>local_config_yaml:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>config/settings/local.yaml</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+  <span class='label'>path_to_schema:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>config/schema.rb</span><span class='tstring_end'>&quot;</span></span>
+<span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_tasks'>tasks</span><span class='op'>|</span>
+  <span class='id identifier rubyid_tasks'>tasks</span><span class='period'>.</span><span class='id identifier rubyid_env_port_mapping'>env_port_mapping</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='label'>test:</span> <span class='int'>9999</span><span class='rbrace'>}</span>
+<span class='kw'>end</span></code></pre>
+    
+  </div>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash&lt;Symbol, Integer&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>mapping from environment name to port number</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+300
+301
+302</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-local/lib/elastic_graph/local/rake_tasks.rb', line 300</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_env_port_mapping'>env_port_mapping</span>
+  <span class='ivar'>@env_port_mapping</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id="index_document_sizes=-instance_method"></span>
+      <div class="method_details ">
+  <h3 class="signature " id="index_document_sizes-instance_method">
+  
+    #<strong>index_document_sizes</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+  <div class="note notetag">
+    <strong>Note:</strong>
+    <div class='inline'><p>Enabling this requires the <a href="https://www.elastic.co/guide/en/elasticsearch/plugins/8.15/mapper-size.html">mapper-size plugin</a>
+to be installed on your datastore cluster. You are responsible for ensuring that is installed if you enable this feature. If you
+enable this and the plugin is not installed, you will get errors!</p>
+</div>
+  </div>
+
+<p>When enabled, ElasticGraph will configure the index mappings so that the datastore indexes a <code>_size</code> field in each index document.
+ElasticGraph itself does not do anything with this field, but it will be available for your use in any direct queries (e.g. via
+Kibana).</p>
+
+<p>Defaults to <code>false</code> since it requires a plugin.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Enable indexing document sizes</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='const'><span class='object_link'><a href="../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Local.html" title="ElasticGraph::Local (module)">Local</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="ElasticGraph::Local::RakeTasks (class)">RakeTasks</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="ElasticGraph::Local::RakeTasks#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+  <span class='label'>local_config_yaml:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>config/settings/local.yaml</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+  <span class='label'>path_to_schema:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>config/schema.rb</span><span class='tstring_end'>&quot;</span></span>
+<span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_tasks'>tasks</span><span class='op'>|</span>
+  <span class='id identifier rubyid_tasks'>tasks</span><span class='period'>.</span><span class='id identifier rubyid_index_document_sizes'>index_document_sizes</span> <span class='op'>=</span> <span class='kw'>true</span>
+<span class='kw'>end</span></code></pre>
+    
+  </div>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>whether or not the <code>_size</code> field should be indexed on each indexed type</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+49
+50
+51</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-local/lib/elastic_graph/local/rake_tasks.rb', line 49</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_index_document_sizes'>index_document_sizes</span>
+  <span class='ivar'>@index_document_sizes</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id="opensearch_versions=-instance_method"></span>
+      <div class="method_details ">
+  <h3 class="signature " id="opensearch_versions-instance_method">
+  
+    #<strong>opensearch_versions</strong>  &#x21d2; <tt>Array&lt;String&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>List of OpenSearch versions you want to be able to boot. Rake tasks will be defined for each version to support booting and
+halting OpenSearch locally. If the configuration of <code>local_config_yaml</code> only configures <code>elasticsearch</code> as a cluster backend,
+will default to an empty array. Otherwise, defaults to the versions of OpenSearch that are exercised by the ElasticGraph test suite, as
+defined by <code>lib/elastic_graph/local/tested_datastore_versions.yaml</code>:</p>
+
+<p># This file determines the versions the ElasticGraph CI build tests against, and is also<br/># used to provide the default versions offered by the `elasticgraph-local` rake tasks.<br/>elasticsearch:<br/>- 8.16.1 # latest version as of 2024-12-08.<br/>opensearch:<br/>- 2.18.0 # latest version as of 2024-12-08.<br/>- 2.7.0 # lowest version ElasticGraph currently supports</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Configure the OpenSearch versions available to boot locally</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='const'><span class='object_link'><a href="../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Local.html" title="ElasticGraph::Local (module)">Local</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="ElasticGraph::Local::RakeTasks (class)">RakeTasks</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="ElasticGraph::Local::RakeTasks#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+  <span class='label'>local_config_yaml:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>config/settings/local.yaml</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+  <span class='label'>path_to_schema:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>config/schema.rb</span><span class='tstring_end'>&quot;</span></span>
+<span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_tasks'>tasks</span><span class='op'>|</span>
+  <span class='id identifier rubyid_tasks'>tasks</span><span class='period'>.</span><span class='id identifier rubyid_opensearch_versions'>opensearch_versions</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>2.18.0</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span>
+<span class='kw'>end</span></code></pre>
+    
+  </div>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;String&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>list of OpenSearch versions</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li><span class='object_link'><a href="#elasticsearch_versions-instance_method" title="ElasticGraph::Local::RakeTasks#elasticsearch_versions (method)">#elasticsearch_versions</a></span></li>
+    
+  </ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+281
+282
+283</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-local/lib/elastic_graph/local/rake_tasks.rb', line 281</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_opensearch_versions'>opensearch_versions</span>
+  <span class='ivar'>@opensearch_versions</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id="output=-instance_method"></span>
+      <div class="method_details ">
+  <h3 class="signature " id="output-instance_method">
+  
+    #<strong>output</strong>  &#x21d2; <tt>IO</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>IO for printing output (defaults to stdout).</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>IO</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>IO object used for printing output.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+307
+308
+309</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-local/lib/elastic_graph/local/rake_tasks.rb', line 307</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_output'>output</span>
+  <span class='ivar'>@output</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id="schema_definition_extension_modules=-instance_method"></span>
+      <div class="method_details ">
+  <h3 class="signature " id="schema_definition_extension_modules-instance_method">
+  
+    #<strong>schema_definition_extension_modules</strong>  &#x21d2; <tt>Array&lt;Module&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>List of Ruby modules to extend onto the <span class='object_link'><a href="../SchemaDefinition/API.html" title="ElasticGraph::SchemaDefinition::API (class)">SchemaDefinition::API</a></span> instance. Designed to support ElasticGraph extensions (such as
+<span class='object_link'><a href="../Apollo/SchemaDefinition/APIExtension.html" title="ElasticGraph::Apollo::SchemaDefinition::APIExtension (module)">Apollo::SchemaDefinition::APIExtension</a></span>). Defaults to an empty list.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Use <code>elasticgraph-apollo</code></p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>elastic_graph/apollo/schema_definition/api_extension</span><span class='tstring_end'>&quot;</span></span>
+
+<span class='const'><span class='object_link'><a href="../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Local.html" title="ElasticGraph::Local (module)">Local</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="ElasticGraph::Local::RakeTasks (class)">RakeTasks</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="ElasticGraph::Local::RakeTasks#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+  <span class='label'>local_config_yaml:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>config/settings/local.yaml</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+  <span class='label'>path_to_schema:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>config/schema.rb</span><span class='tstring_end'>&quot;</span></span>
+<span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_tasks'>tasks</span><span class='op'>|</span>
+  <span class='id identifier rubyid_tasks'>tasks</span><span class='period'>.</span><span class='id identifier rubyid_schema_definition_extension_modules'>schema_definition_extension_modules</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Apollo.html" title="ElasticGraph::Apollo (module)">Apollo</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Apollo/SchemaDefinition.html" title="ElasticGraph::Apollo::SchemaDefinition (module)">SchemaDefinition</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Apollo/SchemaDefinition/APIExtension.html" title="ElasticGraph::Apollo::SchemaDefinition::APIExtension (module)">APIExtension</a></span></span><span class='rbracket'>]</span>
+<span class='kw'>end</span></code></pre>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Extension that defines a <code>@since</code> directive and offers a <code>since</code> API on fields</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='kw'>module</span> <span class='const'>SinceExtension</span>
+  <span class='comment'># `self.extended` is a standard Ruby hook that gets called when a module is extended onto an object.
+</span>  <span class='comment'># The argument is the object the module was extended onto (a `SchemaDefinition::API` instance in this case).
+</span>  <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_extended'>extended</span><span class='lparen'>(</span><span class='id identifier rubyid_api'>api</span><span class='rparen'>)</span>
+    <span class='comment'># Define our `@since` directive
+</span>    <span class='id identifier rubyid_api'>api</span><span class='period'>.</span><span class='id identifier rubyid_raw_sdl'>raw_sdl</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>directive @since(date: Date!) on FIELD_DEFINITION</span><span class='tstring_end'>&quot;</span></span>
+
+    <span class='comment'># In order to hook into fields, extend the `SchemaDefinition::Factory` with a module. The factory is used
+</span>    <span class='comment'># for creation of all schema definition objects.
+</span>    <span class='id identifier rubyid_api'>api</span><span class='period'>.</span><span class='id identifier rubyid_factory'>factory</span><span class='period'>.</span><span class='id identifier rubyid_extend'>extend</span> <span class='const'>FactoryExtension</span>
+  <span class='kw'>end</span>
+
+  <span class='kw'>module</span> <span class='const'>FactoryExtension</span>
+    <span class='comment'># Hook into the creation of all `SchemaDefinition::Field` objects so that we can extend each field
+</span>    <span class='comment'># instance with our `FieldExtension` module.
+</span>    <span class='kw'>def</span> <span class='id identifier rubyid_new_field'>new_field</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+      <span class='kw'>super</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_field'>field</span><span class='op'>|</span>
+        <span class='id identifier rubyid_field'>field</span><span class='period'>.</span><span class='id identifier rubyid_extend'>extend</span> <span class='const'>FieldExtension</span>
+        <span class='kw'>yield</span> <span class='id identifier rubyid_field'>field</span> <span class='kw'>if</span> <span class='id identifier rubyid_block_given?'>block_given?</span>
+      <span class='kw'>end</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># Offer a `f.since date` API on fields.
+</span>  <span class='kw'>module</span> <span class='const'>FieldExtension</span>
+    <span class='kw'>def</span> <span class='id identifier rubyid_since'>since</span><span class='lparen'>(</span><span class='id identifier rubyid_date'>date</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_directive'>directive</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>since</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>date:</span> <span class='id identifier rubyid_date'>date</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span>
+
+<span class='const'><span class='object_link'><a href="../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Local.html" title="ElasticGraph::Local (module)">Local</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="ElasticGraph::Local::RakeTasks (class)">RakeTasks</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="ElasticGraph::Local::RakeTasks#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+  <span class='label'>local_config_yaml:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>config/settings/local.yaml</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+  <span class='label'>path_to_schema:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>config/schema.rb</span><span class='tstring_end'>&quot;</span></span>
+<span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_tasks'>tasks</span><span class='op'>|</span>
+  <span class='id identifier rubyid_tasks'>tasks</span><span class='period'>.</span><span class='id identifier rubyid_schema_definition_extension_modules'>schema_definition_extension_modules</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='const'>SinceExtension</span><span class='rbracket'>]</span>
+<span class='kw'>end</span></code></pre>
+    
+  </div>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;Module&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>list of extension modules</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+212
+213
+214</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-local/lib/elastic_graph/local/rake_tasks.rb', line 212</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_schema_definition_extension_modules'>schema_definition_extension_modules</span>
+  <span class='ivar'>@schema_definition_extension_modules</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id="schema_element_name_form=-instance_method"></span>
+      <div class="method_details ">
+  <h3 class="signature " id="schema_element_name_form-instance_method">
+  
+    #<strong>schema_element_name_form</strong>  &#x21d2; <tt>:camelCase</tt>, <tt>:snake_case</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>The form of names for schema elements (fields, arguments, directives) generated by ElasticGraph, either <code>:snake_case</code> or
+<code>:camelCase</code>. For example, if set to <code>:camelCase</code>, ElasticGraph will generate a <code>groupedBy</code> field, but if set to <code>:snake_case</code>,
+ElasticGraph will generate a <code>grouped_by</code> field.</p>
+
+<p>Defaults to <code>:camelCase</code> since most GraphQL schemas use that casing.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Use <code>snake_case</code> names instead of <code>camelCase</code></p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='const'><span class='object_link'><a href="../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Local.html" title="ElasticGraph::Local (module)">Local</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="ElasticGraph::Local::RakeTasks (class)">RakeTasks</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="ElasticGraph::Local::RakeTasks#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+  <span class='label'>local_config_yaml:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>config/settings/local.yaml</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+  <span class='label'>path_to_schema:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>config/schema.rb</span><span class='tstring_end'>&quot;</span></span>
+<span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_tasks'>tasks</span><span class='op'>|</span>
+  <span class='id identifier rubyid_tasks'>tasks</span><span class='period'>.</span><span class='id identifier rubyid_schema_element_name_form'>schema_element_name_form</span> <span class='op'>=</span> <span class='symbol'>:snake_case</span>
+<span class='kw'>end</span></code></pre>
+    
+  </div>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>:camelCase</tt>, <tt>:snake_case</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>which form to use</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+68
+69
+70</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-local/lib/elastic_graph/local/rake_tasks.rb', line 68</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_schema_element_name_form'>schema_element_name_form</span>
+  <span class='ivar'>@schema_element_name_form</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id="schema_element_name_overrides=-instance_method"></span>
+      <div class="method_details ">
+  <h3 class="signature " id="schema_element_name_overrides-instance_method">
+  
+    #<strong>schema_element_name_overrides</strong>  &#x21d2; <tt>Hash&lt;Symbol, String&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Overrides for specific names of schema elements (fields, arguments, directives) generated by ElasticGraph. For example, to rename
+the <code>gt</code> filter field to <code>greaterThan</code>, set to <code>{gt: "greaterThan"}</code>.</p>
+
+<p>Defaults to an empty hash.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Spell out comparison operators instead of using shortened forms</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='const'><span class='object_link'><a href="../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Local.html" title="ElasticGraph::Local (module)">Local</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="ElasticGraph::Local::RakeTasks (class)">RakeTasks</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="ElasticGraph::Local::RakeTasks#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+  <span class='label'>local_config_yaml:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>config/settings/local.yaml</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+  <span class='label'>path_to_schema:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>config/schema.rb</span><span class='tstring_end'>&quot;</span></span>
+<span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_tasks'>tasks</span><span class='op'>|</span>
+  <span class='id identifier rubyid_tasks'>tasks</span><span class='period'>.</span><span class='id identifier rubyid_schema_element_name_overrides'>schema_element_name_overrides</span> <span class='op'>=</span> <span class='lbrace'>{</span>
+    <span class='label'>gt:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>greaterThan</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+    <span class='label'>gte:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>greaterThanOrEqualTo</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+    <span class='label'>lt:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>lessThan</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+    <span class='label'>lte:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>lessThanOrEqualTo</span><span class='tstring_end'>&quot;</span></span>
+  <span class='rbrace'>}</span>
+<span class='kw'>end</span></code></pre>
+    
+  </div>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash&lt;Symbol, String&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>overrides for specific field, argument, or directive names</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+91
+92
+93</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-local/lib/elastic_graph/local/rake_tasks.rb', line 91</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_schema_element_name_overrides'>schema_element_name_overrides</span>
+  <span class='ivar'>@schema_element_name_overrides</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id="type_name_overrides=-instance_method"></span>
+      <div class="method_details ">
+  <h3 class="signature " id="type_name_overrides-instance_method">
+  
+    #<strong>type_name_overrides</strong>  &#x21d2; <tt>Hash&lt;Symbol, String&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Overrides for the names of specific GraphQL types. For example, to rename the <code>JsonSafeLong</code> scalar to <code>BigInt</code>, set to
+<code>{JsonSafeLong: "BigInt}</code>.</p>
+
+<p>Defaults to an empty hash.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Rename <code>JsonSafeLong</code> to <code>BigInt</code></p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='const'><span class='object_link'><a href="../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Local.html" title="ElasticGraph::Local (module)">Local</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="ElasticGraph::Local::RakeTasks (class)">RakeTasks</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="ElasticGraph::Local::RakeTasks#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+  <span class='label'>local_config_yaml:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>config/settings/local.yaml</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+  <span class='label'>path_to_schema:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>config/schema.rb</span><span class='tstring_end'>&quot;</span></span>
+<span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_tasks'>tasks</span><span class='op'>|</span>
+  <span class='id identifier rubyid_tasks'>tasks</span><span class='period'>.</span><span class='id identifier rubyid_type_name_overrides'>type_name_overrides</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='label'>JsonSafeLong:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>BigInt</span><span class='tstring_end'>&quot;</span></span><span class='rbrace'>}</span>
+<span class='kw'>end</span></code></pre>
+    
+  </div>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash&lt;Symbol, String&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>overrides for specific type names</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+127
+128
+129</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-local/lib/elastic_graph/local/rake_tasks.rb', line 127</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_type_name_overrides'>type_name_overrides</span>
+  <span class='ivar'>@type_name_overrides</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="define_fake_data_batch_for-instance_method">
+  
+    #<strong>define_fake_data_batch_for</strong>(type) {|Array&lt;Hash&lt;String, Object&gt;&gt;, Array&lt;Hash&lt;Symbol, Object&gt;&gt;| ... } &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Register a callback for use when indexing a batch fake data. An <code>index_fake_data:[type]</code> rake task will be generated for each
+registered callback.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Register a callback to generate fake <code>campaigns</code> data</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='const'><span class='object_link'><a href="../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Local.html" title="ElasticGraph::Local (module)">Local</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="ElasticGraph::Local::RakeTasks (class)">RakeTasks</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="ElasticGraph::Local::RakeTasks#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+  <span class='label'>local_config_yaml:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>config/settings/local.yaml</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+  <span class='label'>path_to_schema:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>config/schema.rb</span><span class='tstring_end'>&quot;</span></span>
+<span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_tasks'>tasks</span><span class='op'>|</span>
+  <span class='id identifier rubyid_tasks'>tasks</span><span class='period'>.</span><span class='id identifier rubyid_define_fake_data_batch_for'>define_fake_data_batch_for</span> <span class='symbol'>:campaigns</span> <span class='kw'>do</span>
+    <span class='const'>FactoryBot</span><span class='period'>.</span><span class='id identifier rubyid_build_list'>build_list</span><span class='lparen'>(</span><span class='symbol'>:campaigns</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>type</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>type of data batch. Can be the name of a GraphQL type or any other name you want to give a batch of fake data</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Yields:</p>
+<ul class="yield">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;Hash&lt;String, Object&gt;&gt;</tt>, <tt>Array&lt;Hash&lt;Symbol, Object&gt;&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>list the block should append to when generating data</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Yield Returns:</p>
+<ul class="yieldreturn">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>void</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+343
+344
+345</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-local/lib/elastic_graph/local/rake_tasks.rb', line 343</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_define_fake_data_batch_for'>define_fake_data_batch_for</span><span class='lparen'>(</span><span class='id identifier rubyid_type'>type</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='ivar'>@fake_data_batch_generator_by_type</span><span class='lbracket'>[</span><span class='id identifier rubyid_type'>type</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_block'>block</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Thu Mar  6 05:55:14 2025 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.37 (ruby-3.3.4).
+</div>
+
+    </div>
+  </body>
+</html>

@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: ElasticGraph::Rack::GraphQLEndpoint
+  
+    &mdash; Documentation by YARD 0.9.37
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css" />
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css" />
+
+<script type="text/javascript">
+  pathId = "ElasticGraph::Rack::GraphQLEndpoint";
+  relpath = '../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../_index.html">Index (G)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Rack.html" title="ElasticGraph::Rack (module)">Rack</a></span></span>
+     &raquo; 
+    <span class="title">GraphQLEndpoint</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: ElasticGraph::Rack::GraphQLEndpoint
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">ElasticGraph::Rack::GraphQLEndpoint</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>elasticgraph-rack/lib/elastic_graph/rack/graphql_endpoint.rb</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>A simple <a href="https://github.com/rack/rack">Rack</a> wrapper around an ElasticGraph GraphQL endpoint.
+This can be used for local development, mounted in a <a href="https://rubyonrails.org/">Rails</a> application,
+or run in any other Rack-compatible context.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Simple config.ru to run an ElasticGraph endpoint as a Rack application</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>elastic_graph/graphql</span><span class='tstring_end'>&quot;</span></span>
+<span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>elastic_graph/rack/graphql_endpoint</span><span class='tstring_end'>&quot;</span></span>
+
+<span class='id identifier rubyid_graphql'>graphql</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span><span class='op'>::</span><span class='const'>GraphQL</span><span class='period'>.</span><span class='id identifier rubyid_from_yaml_file'>from_yaml_file</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>config/settings/development.yaml</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+<span class='id identifier rubyid_run'>run</span> <span class='const'><span class='object_link'><a href="../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Rack.html" title="ElasticGraph::Rack (module)">Rack</a></span></span><span class='op'>::</span><span class='const'>GraphQLEndpoint</span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="ElasticGraph::Rack::GraphQLEndpoint#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_graphql'>graphql</span><span class='rparen'>)</span></code></pre>
+    
+  </div>
+
+
+</div>
+
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#call-instance_method" title="#call (instance method)">#<strong>call</strong>(env)  &#x21d2; Array(Integer, Hash&lt;String, String&gt;, Array&lt;String&gt;) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Responds to a Rack request.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(graphql)  &#x21d2; GraphQLEndpoint </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>A new instance of GraphQLEndpoint.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+<div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    #<strong>initialize</strong>(graphql)  &#x21d2; <tt><span class='object_link'><a href="" title="ElasticGraph::Rack::GraphQLEndpoint (class)">GraphQLEndpoint</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns a new instance of GraphQLEndpoint.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>graphql</span>
+      
+      
+        <span class='type'>(<tt>ElasticGraph::GraphQL</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>ElasticGraph GraphQL instance</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+26
+27
+28
+29</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-rack/lib/elastic_graph/rack/graphql_endpoint.rb', line 26</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_graphql'>graphql</span><span class='rparen'>)</span>
+  <span class='ivar'>@logger</span> <span class='op'>=</span> <span class='id identifier rubyid_graphql'>graphql</span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span>
+  <span class='ivar'>@graphql_http_endpoint</span> <span class='op'>=</span> <span class='id identifier rubyid_graphql'>graphql</span><span class='period'>.</span><span class='id identifier rubyid_graphql_http_endpoint'>graphql_http_endpoint</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="call-instance_method">
+  
+    #<strong>call</strong>(env)  &#x21d2; <tt>Array(Integer, Hash&lt;String, String&gt;, Array&lt;String&gt;)</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Responds to a Rack request.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>env</span>
+      
+      
+        <span class='type'>(<tt>Hash&lt;String, Object&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Rack env</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array(Integer, Hash&lt;String, String&gt;, Array&lt;String&gt;)</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-rack/lib/elastic_graph/rack/graphql_endpoint.rb', line 35</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_env'>env</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_rack_request'>rack_request</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'>Rack</span><span class='op'>::</span><span class='const'>Request</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_env'>env</span><span class='rparen'>)</span>
+
+  <span class='comment'># Rack doesn&#39;t provide a nice method to provide all HTTP headers. In general,
+</span>  <span class='comment'># HTTP headers are prefixed with `HTTP_` as per https://stackoverflow.com/a/6318491/16481862,
+</span>  <span class='comment'># but `Content-Type`, as a &quot;standard&quot; header, isn&#39;t exposed that way, sadly.
+</span>  <span class='id identifier rubyid_headers'>headers</span> <span class='op'>=</span> <span class='id identifier rubyid_env'>env</span>
+    <span class='period'>.</span><span class='id identifier rubyid_select'>select</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_k'>k</span><span class='comma'>,</span> <span class='id identifier rubyid_v'>v</span><span class='op'>|</span> <span class='id identifier rubyid_k'>k</span><span class='period'>.</span><span class='id identifier rubyid_start_with?'>start_with?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>HTTP_</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+    <span class='period'>.</span><span class='id identifier rubyid_to_h'>to_h</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_k'>k</span><span class='comma'>,</span> <span class='id identifier rubyid_v'>v</span><span class='op'>|</span> <span class='lbracket'>[</span><span class='id identifier rubyid_k'>k</span><span class='period'>.</span><span class='id identifier rubyid_delete_prefix'>delete_prefix</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>HTTP_</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='comma'>,</span> <span class='id identifier rubyid_v'>v</span><span class='rbracket'>]</span> <span class='rbrace'>}</span>
+    <span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Content-Type</span><span class='tstring_end'>&quot;</span></span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_rack_request'>rack_request</span><span class='period'>.</span><span class='id identifier rubyid_content_type'>content_type</span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_request'>request</span> <span class='op'>=</span> <span class='const'>GraphQL</span><span class='op'>::</span><span class='const'>HTTPRequest</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span>
+    <span class='label'>http_method:</span> <span class='id identifier rubyid_rack_request'>rack_request</span><span class='period'>.</span><span class='id identifier rubyid_request_method'>request_method</span><span class='period'>.</span><span class='id identifier rubyid_downcase'>downcase</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span><span class='comma'>,</span>
+    <span class='label'>url:</span> <span class='id identifier rubyid_rack_request'>rack_request</span><span class='period'>.</span><span class='id identifier rubyid_url'>url</span><span class='comma'>,</span>
+    <span class='label'>headers:</span> <span class='id identifier rubyid_headers'>headers</span><span class='comma'>,</span>
+    <span class='label'>body:</span> <span class='id identifier rubyid_rack_request'>rack_request</span><span class='period'>.</span><span class='id identifier rubyid_body'>body</span><span class='op'>&amp;.</span><span class='id identifier rubyid_read'>read</span>
+  <span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_response'>response</span> <span class='op'>=</span> <span class='ivar'>@graphql_http_endpoint</span><span class='period'>.</span><span class='id identifier rubyid_process'>process</span><span class='lparen'>(</span><span class='id identifier rubyid_request'>request</span><span class='rparen'>)</span>
+
+  <span class='lbracket'>[</span><span class='id identifier rubyid_response'>response</span><span class='period'>.</span><span class='id identifier rubyid_status_code'>status_code</span><span class='comma'>,</span> <span class='id identifier rubyid_response'>response</span><span class='period'>.</span><span class='id identifier rubyid_headers'>headers</span><span class='period'>.</span><span class='id identifier rubyid_transform_keys'>transform_keys</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:downcase</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='id identifier rubyid_response'>response</span><span class='period'>.</span><span class='id identifier rubyid_body'>body</span><span class='rbracket'>]</span><span class='rbracket'>]</span>
+<span class='kw'>rescue</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='kw'>if</span> <span class='const'>ENV</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>RACK_ENV</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>test</span><span class='tstring_end'>&quot;</span></span>
+
+  <span class='ivar'>@logger</span><span class='period'>.</span><span class='id identifier rubyid_error'>error</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Got an exception: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span><span class='embexpr_end'>}</span><span class='tstring_content'>\n\n</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_backtrace'>backtrace</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+  <span class='id identifier rubyid_error'>error</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='label'>message:</span> <span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span><span class='comma'>,</span> <span class='label'>exception_class:</span> <span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='comma'>,</span> <span class='label'>backtrace:</span> <span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_backtrace'>backtrace</span><span class='rbrace'>}</span>
+  <span class='lbracket'>[</span><span class='int'>500</span><span class='comma'>,</span> <span class='lbrace'>{</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>content-type</span><span class='tstring_end'>&quot;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>application/json</span><span class='tstring_end'>&quot;</span></span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='op'>::</span><span class='const'>JSON</span><span class='period'>.</span><span class='id identifier rubyid_generate'>generate</span><span class='lparen'>(</span><span class='label'>errors:</span> <span class='lbracket'>[</span><span class='id identifier rubyid_error'>error</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='rbracket'>]</span><span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Thu Mar  6 06:00:37 2025 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.37 (ruby-3.3.4).
+</div>
+
+    </div>
+  </body>
+</html>

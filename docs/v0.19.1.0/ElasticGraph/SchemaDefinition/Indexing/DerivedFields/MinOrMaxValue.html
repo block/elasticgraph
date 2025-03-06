@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: ElasticGraph::SchemaDefinition::Indexing::DerivedFields::MinOrMaxValue
+  
+    &mdash; Documentation by YARD 0.9.37
+  
+</title>
+
+  <link rel="stylesheet" href="../../../../css/style.css" type="text/css" />
+
+  <link rel="stylesheet" href="../../../../css/common.css" type="text/css" />
+
+<script type="text/javascript">
+  pathId = "ElasticGraph::SchemaDefinition::Indexing::DerivedFields::MinOrMaxValue";
+  relpath = '../../../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../../../_index.html">Index (M)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../../../SchemaDefinition.html" title="ElasticGraph::SchemaDefinition (module)">SchemaDefinition</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../../Indexing.html" title="ElasticGraph::SchemaDefinition::Indexing (module)">Indexing</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../DerivedFields.html" title="ElasticGraph::SchemaDefinition::Indexing::DerivedFields (module)">DerivedFields</a></span></span>
+     &raquo; 
+    <span class="title">MinOrMaxValue</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: ElasticGraph::SchemaDefinition::Indexing::DerivedFields::MinOrMaxValue
+  
+  
+  <span class="private note title">Private</span>
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">ElasticGraph::SchemaDefinition::Indexing::DerivedFields::MinOrMaxValue</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>elasticgraph-schema_definition/lib/elastic_graph/schema_definition/indexing/derived_fields/min_or_max_value.rb</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p class="note private">
+  <strong>This class is part of a private API.</strong>
+  You should avoid using this class if possible, as it may be removed or be changed in the future.
+</p>
+<p>Responsible for providing bits of the painless script specific to a <span class='object_link'><a href="../DerivedIndexedType.html#min_value-instance_method" title="ElasticGraph::SchemaDefinition::Indexing::DerivedIndexedType#min_value (method)">ElasticGraph::SchemaDefinition::Indexing::DerivedIndexedType#min_value</a></span> or
+<span class='object_link'><a href="../DerivedIndexedType.html#max_value-instance_method" title="ElasticGraph::SchemaDefinition::Indexing::DerivedIndexedType#max_value (method)">ElasticGraph::SchemaDefinition::Indexing::DerivedIndexedType#max_value</a></span> field.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+
+
+
+
+
+
+  
+    <h2>
+      Class Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#function_def-class_method" title="function_def (class method)">.<strong>function_def</strong>(min_or_max)  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  <span class="private note title">private</span>
+
+  
+    <span class="summary_desc"><div class='inline'><p>Painless function for managing a min or max field.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#apply_operation_returning_update_status-instance_method" title="#apply_operation_returning_update_status (instance method)">#<strong>apply_operation_returning_update_status</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  <span class="private note title">private</span>
+
+  
+    <span class="summary_desc"><div class='inline'><p>A line of painless code to manage a min or max value field and return a boolean indicating if it was updated.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#function_definitions-instance_method" title="#function_definitions (instance method)">#<strong>function_definitions</strong>  &#x21d2; Array&lt;String&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  <span class="private note title">private</span>
+
+  
+    <span class="summary_desc"><div class='inline'><p>Painless functions required by a min or max value field.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#setup_statements-instance_method" title="#setup_statements (instance method)">#<strong>setup_statements</strong>  &#x21d2; Array&lt;String&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  <span class="private note title">private</span>
+
+  
+    <span class="summary_desc"><div class='inline'><p>A list of painless statements that must be called at the top of the script to set things up.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="function_def-class_method">
+  
+    .<strong>function_def</strong>(min_or_max)  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note private">
+  <strong>This method is part of a private API.</strong>
+  You should avoid using this method if possible, as it may be removed or be changed in the future.
+</p>
+<p>Returns painless function for managing a min or max field.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>min_or_max</span>
+      
+      
+        <span class='type'>(<tt>:min</tt>, <tt>:max</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>which type of function to generate.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>painless function for managing a min or max field.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/indexing/derived_fields/min_or_max_value.rb', line 41</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_function_def'>function_def</span><span class='lparen'>(</span><span class='id identifier rubyid_min_or_max'>min_or_max</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_operator'>operator</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_min_or_max'>min_or_max</span> <span class='op'>==</span> <span class='symbol'>:min</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>&lt;</span><span class='tstring_end'>&quot;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>&gt;</span><span class='tstring_end'>&quot;</span></span>
+
+  <span class='heredoc_beg'>&lt;&lt;~EOS</span>
+<span class='tstring_content'>    boolean </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_min_or_max'>min_or_max</span><span class='embexpr_end'>}</span><span class='tstring_content'>Value_idempotentlyUpdateValue(List values, def parentObject, String fieldName) {
+</span><span class='tstring_content'>      def currentFieldValue = parentObject[fieldName];
+</span><span class='tstring_content'>      def </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_min_or_max'>min_or_max</span><span class='embexpr_end'>}</span><span class='tstring_content'>NewValue = values.isEmpty() ? null : Collections.</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_min_or_max'>min_or_max</span><span class='embexpr_end'>}</span><span class='tstring_content'>(values);
+</span><span class='tstring_content'>
+</span><span class='tstring_content'>      if (currentFieldValue == null || (</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_min_or_max'>min_or_max</span><span class='embexpr_end'>}</span><span class='tstring_content'>NewValue != null &amp;&amp; </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_min_or_max'>min_or_max</span><span class='embexpr_end'>}</span><span class='tstring_content'>NewValue.compareTo(currentFieldValue) </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_operator'>operator</span><span class='embexpr_end'>}</span><span class='tstring_content'> 0)) {
+</span><span class='tstring_content'>        parentObject[fieldName] = </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_min_or_max'>min_or_max</span><span class='embexpr_end'>}</span><span class='tstring_content'>NewValue;
+</span><span class='tstring_content'>        return true;
+</span><span class='tstring_content'>      }
+</span><span class='tstring_content'>
+</span><span class='tstring_content'>      return false;
+</span><span class='tstring_content'>    }
+</span><span class='heredoc_end'>  EOS
+</span><span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="apply_operation_returning_update_status-instance_method">
+  
+    #<strong>apply_operation_returning_update_status</strong>  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note private">
+  <strong>This method is part of a private API.</strong>
+  You should avoid using this method if possible, as it may be removed or be changed in the future.
+</p>
+<p>Returns a line of painless code to manage a min or max value field and return a boolean indicating if it was updated.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>a line of painless code to manage a min or max value field and return a boolean indicating if it was updated.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+22
+23
+24
+25
+26
+27</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/indexing/derived_fields/min_or_max_value.rb', line 22</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_apply_operation_returning_update_status'>apply_operation_returning_update_status</span>
+  <span class='op'>*</span><span class='id identifier rubyid_parent_parts'>parent_parts</span><span class='comma'>,</span> <span class='id identifier rubyid_field'>field</span> <span class='op'>=</span> <span class='id identifier rubyid_destination_field'>destination_field</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_parent_parts'>parent_parts</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ctx</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>_source</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span> <span class='op'>+</span> <span class='id identifier rubyid_parent_parts'>parent_parts</span>
+
+  <span class='tstring'><span class='tstring_beg'>%{</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_min_or_max'>min_or_max</span><span class='embexpr_end'>}</span><span class='tstring_content'>Value_idempotentlyUpdateValue(data[&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_source_field'>source_field</span><span class='embexpr_end'>}</span><span class='tstring_content'>&quot;], </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_parent_parts'>parent_parts</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>, &quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_field'>field</span><span class='embexpr_end'>}</span><span class='tstring_content'>&quot;)</span><span class='tstring_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="function_definitions-instance_method">
+  
+    #<strong>function_definitions</strong>  &#x21d2; <tt>Array&lt;String&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note private">
+  <strong>This method is part of a private API.</strong>
+  You should avoid using this method if possible, as it may be removed or be changed in the future.
+</p>
+<p>Returns painless functions required by a min or max value field.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;String&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>painless functions required by a min or max value field.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+35
+36
+37</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/indexing/derived_fields/min_or_max_value.rb', line 35</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_function_definitions'>function_definitions</span>
+  <span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="" title="ElasticGraph::SchemaDefinition::Indexing::DerivedFields::MinOrMaxValue (class)">MinOrMaxValue</a></span></span><span class='period'>.</span><span class='id identifier rubyid_function_def'><span class='object_link'><a href="#function_def-class_method" title="ElasticGraph::SchemaDefinition::Indexing::DerivedFields::MinOrMaxValue.function_def (method)">function_def</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_min_or_max'>min_or_max</span><span class='rparen'>)</span><span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="setup_statements-instance_method">
+  
+    #<strong>setup_statements</strong>  &#x21d2; <tt>Array&lt;String&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note private">
+  <strong>This method is part of a private API.</strong>
+  You should avoid using this method if possible, as it may be removed or be changed in the future.
+</p>
+<p>Returns a list of painless statements that must be called at the top of the script to set things up.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;String&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>a list of painless statements that must be called at the top of the script to set things up.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+30
+31
+32</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/indexing/derived_fields/min_or_max_value.rb', line 30</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_setup_statements'>setup_statements</span>
+  <span class='const'><span class='object_link'><a href="FieldInitializerSupport.html" title="ElasticGraph::SchemaDefinition::Indexing::DerivedFields::FieldInitializerSupport (module)">FieldInitializerSupport</a></span></span><span class='period'>.</span><span class='id identifier rubyid_build_empty_value_initializers'><span class='object_link'><a href="FieldInitializerSupport.html#build_empty_value_initializers-class_method" title="ElasticGraph::SchemaDefinition::Indexing::DerivedFields::FieldInitializerSupport.build_empty_value_initializers (method)">build_empty_value_initializers</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_destination_field'>destination_field</span><span class='comma'>,</span> <span class='label'>leaf_value:</span> <span class='symbol'>:leave_unset</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Thu Mar  6 05:55:15 2025 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.37 (ruby-3.3.4).
+</div>
+
+    </div>
+  </body>
+</html>

@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Module: ElasticGraph::SchemaDefinition::Mixins::HasTypeInfo
+  
+    &mdash; Documentation by YARD 0.9.37
+  
+</title>
+
+  <link rel="stylesheet" href="../../../css/style.css" type="text/css" />
+
+  <link rel="stylesheet" href="../../../css/common.css" type="text/css" />
+
+<script type="text/javascript">
+  pathId = "ElasticGraph::SchemaDefinition::Mixins::HasTypeInfo";
+  relpath = '../../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../../_index.html">Index (H)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../../SchemaDefinition.html" title="ElasticGraph::SchemaDefinition (module)">SchemaDefinition</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Mixins.html" title="ElasticGraph::SchemaDefinition::Mixins (module)">Mixins</a></span></span>
+     &raquo; 
+    <span class="title">HasTypeInfo</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Module: ElasticGraph::SchemaDefinition::Mixins::HasTypeInfo
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+
+  
+  
+  
+  
+  
+
+  
+  <dl>
+    <dt>Included in:</dt>
+    <dd><span class='object_link'><a href="../SchemaElements/Field.html" title="ElasticGraph::SchemaDefinition::SchemaElements::Field (class)">SchemaElements::Field</a></span>, <span class='object_link'><a href="../SchemaElements/ScalarType.html" title="ElasticGraph::SchemaDefinition::SchemaElements::ScalarType (class)">SchemaElements::ScalarType</a></span>, <span class='object_link'><a href="../SchemaElements/TypeWithSubfields.html" title="ElasticGraph::SchemaDefinition::SchemaElements::TypeWithSubfields (class)">SchemaElements::TypeWithSubfields</a></span></dd>
+  </dl>
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/has_type_info.rb</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Mixin used to specify non-GraphQL type info (datastore index and JSON schema type info).
+Exists as a mixin so we can apply the same consistent API to every place we need to use this.
+Currently it’s used in 3 places:</p>
+
+<ul>
+  <li><span class='object_link'><a href="../SchemaElements/ScalarType.html" title="ElasticGraph::SchemaDefinition::SchemaElements::ScalarType (class)">SchemaElements::ScalarType</a></span>: allows specification of how scalars are represented in JSON schema and the index.</li>
+  <li><span class='object_link'><a href="../SchemaElements/TypeWithSubfields.html" title="ElasticGraph::SchemaDefinition::SchemaElements::TypeWithSubfields (class)">SchemaElements::TypeWithSubfields</a></span>: allows customization of how an object type is represented in JSON schema and the index.</li>
+  <li><span class='object_link'><a href="../SchemaElements/Field.html" title="ElasticGraph::SchemaDefinition::SchemaElements::Field (class)">SchemaElements::Field</a></span>: allows customization of a specific field over the field type’s standard JSON schema and the index mapping.</li>
+</ul>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+  
+    <h2>
+      Constant Summary
+      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
+    </h2>
+
+    <dl class="constants">
+      
+        <dt id="CUSTOMIZABLE_DATASTORE_PARAMS-constant" class="">CUSTOMIZABLE_DATASTORE_PARAMS =
+          <div class="docstring">
+  <div class="discussion">
+    <p>Set of mapping parameters that it makes sense to allow customization of, based on
+<a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.15/mapping-params.html">the Elasticsearch docs</a>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='const'>Set</span><span class='lbracket'>[</span>
+  <span class='symbol'>:analyzer</span><span class='comma'>,</span>
+  <span class='symbol'>:eager_global_ordinals</span><span class='comma'>,</span>
+  <span class='symbol'>:enabled</span><span class='comma'>,</span>
+  <span class='symbol'>:fields</span><span class='comma'>,</span>
+  <span class='symbol'>:format</span><span class='comma'>,</span>
+  <span class='symbol'>:index</span><span class='comma'>,</span>
+  <span class='symbol'>:meta</span><span class='comma'>,</span> <span class='comment'># not actually in the doc above. Added to support some `index_configurator` tests on 7.9+.
+</span>  <span class='symbol'>:norms</span><span class='comma'>,</span>
+  <span class='symbol'>:null_value</span><span class='comma'>,</span>
+  <span class='symbol'>:search_analyzer</span><span class='comma'>,</span>
+  <span class='symbol'>:type</span><span class='comma'>,</span>
+<span class='rbracket'>]</span></pre></dd>
+      
+    </dl>
+  
+
+
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#json_schema-instance_method" title="#json_schema (instance method)">#<strong>json_schema</strong>(**options)  &#x21d2; void </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Defines the <a href="https://json-schema.org/understanding-json-schema/">JSON schema</a> validations for this field or type.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#json_schema_options-instance_method" title="#json_schema_options (instance method)">#<strong>json_schema_options</strong>  &#x21d2; Hash&lt;Symbol, Object&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>JSON schema options.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#mapping-instance_method" title="#mapping (instance method)">#<strong>mapping</strong>(**options)  &#x21d2; void </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Defines the Elasticsearch/OpenSearch <a href="https://www.elastic.co/guide/en/elasticsearch/reference/7.10/mapping-types.html">field mapping type</a> and <a href="https://www.elastic.co/guide/en/elasticsearch/reference/7.10/mapping-params.html">mapping parameters</a> for a field or type.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#mapping_options-instance_method" title="#mapping_options (instance method)">#<strong>mapping_options</strong>  &#x21d2; Hash&lt;Symbol, Object&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Datastore mapping options.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="json_schema-instance_method">
+  
+    #<strong>json_schema</strong>(**options)  &#x21d2; <tt>void</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+  <div class="note notetag">
+    <strong>Note:</strong>
+    <div class='inline'><p>We recommend using JSON schema validations in a limited fashion. Validations that are appropriate to apply when data is
+entering the system-of-record are often not appropriate on a secondary index like ElasticGraph. Events that violate a JSON
+schema validation will fail to index (typically they will be sent to the dead letter queue and page an oncall engineer). If an
+ElasticGraph instance is meant to contain all the data of some source system, you probably don’t want it applying stricter
+validations than the source system itself has. We recommend limiting your JSON schema validations to situations where
+violations would prevent ElasticGraph from operating correctly.</p>
+</div>
+  </div>
+
+<p class="note returns_void">This method returns an undefined value.</p><p>Defines the <a href="https://json-schema.org/understanding-json-schema/">JSON schema</a> validations for this field or type. Validations
+defined here will be included in the generated <code>json_schemas.yaml</code> artifact, which is used by the ElasticGraph indexer to
+validate events before indexing their data in the datastore. In addition, the publisher may use <code>json_schemas.yaml</code> for code
+generation and to apply validation before publishing an event to ElasticGraph.</p>
+
+<p>Can be called multiple times; each time, the options will be merged into the existing options.</p>
+
+<p>This is <em>required</em> on a <span class='object_link'><a href="../SchemaElements/ScalarType.html" title="ElasticGraph::SchemaDefinition::SchemaElements::ScalarType (class)">SchemaElements::ScalarType</a></span> (since we don’t know how a custom scalar type should be represented in
+JSON!). On a <span class='object_link'><a href="../SchemaElements/Field.html" title="ElasticGraph::SchemaDefinition::SchemaElements::Field (class)">SchemaElements::Field</a></span>, this is optional, but can be used to make the JSON schema validation stricter then it
+would otherwise be. For example, you could use <code>json_schema maxLength: 30</code> on a <code>String</code> field to limit the length.</p>
+
+<p>You can use any of the JSON schema validation keywords here. In addition, <code>nullable: false</code> is supported to configure the
+generated JSON schema to disallow <code>null</code> values for the field. Note that if you define a field with a non-nullable GraphQL type
+(e.g. <code>Int!</code>), the JSON schema will automatically disallow nulls. However, as explained in the
+<span class='object_link'><a href="../SchemaElements/TypeWithSubfields.html#field-instance_method" title="ElasticGraph::SchemaDefinition::SchemaElements::TypeWithSubfields#field (method)">SchemaElements::TypeWithSubfields#field</a></span> documentation, we generally recommend against defining non-nullable GraphQL fields.
+<code>json_schema nullable: false</code> will disallow <code>null</code> values from being indexed, while still keeping the field nullable in the
+GraphQL schema. If you think you might want to make a field non-nullable in the GraphQL schema some day, it’s a good idea to use
+<code>json_schema nullable: false</code> now to ensure every indexed record has a non-null value for the field.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Define the JSON schema validations of a custom scalar type</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='const'><span class='object_link'><a href="../../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span><span class='period'>.</span><span class='id identifier rubyid_define_schema'><span class='object_link'><a href="../../../ElasticGraph.html#define_schema-class_method" title="ElasticGraph.define_schema (method)">define_schema</a></span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_schema'>schema</span><span class='op'>|</span>
+  <span class='id identifier rubyid_schema'>schema</span><span class='period'>.</span><span class='id identifier rubyid_scalar_type'>scalar_type</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>URL</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span>
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_mapping'>mapping</span> <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>keyword</span><span class='tstring_end'>&quot;</span></span>
+
+    <span class='comment'># JSON schema has a built-in URI format validator:
+</span>    <span class='comment'># https://json-schema.org/understanding-json-schema/reference/string.html#resource-identifiers
+</span>    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_json_schema'>json_schema</span> <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>string</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>format:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>uri</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></code></pre>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Define additional validations on a field</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='const'><span class='object_link'><a href="../../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span><span class='period'>.</span><span class='id identifier rubyid_define_schema'><span class='object_link'><a href="../../../ElasticGraph.html#define_schema-class_method" title="ElasticGraph.define_schema (method)">define_schema</a></span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_schema'>schema</span><span class='op'>|</span>
+  <span class='id identifier rubyid_schema'>schema</span><span class='period'>.</span><span class='id identifier rubyid_object_type'>object_type</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Card</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span>
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_field'>field</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>id</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ID!</span><span class='tstring_end'>&quot;</span></span>
+
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_field'>field</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>expYear</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Int</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_f'>f</span><span class='op'>|</span>
+      <span class='comment'># Use JSON schema to ensure the publisher is sending us 4 digit years, not 2 digit years.
+</span>      <span class='id identifier rubyid_f'>f</span><span class='period'>.</span><span class='id identifier rubyid_json_schema'>json_schema</span> <span class='label'>minimum:</span> <span class='int'>2000</span><span class='comma'>,</span> <span class='label'>maximum:</span> <span class='int'>2099</span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_field'>field</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>expMonth</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Int</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_f'>f</span><span class='op'>|</span>
+      <span class='id identifier rubyid_f'>f</span><span class='period'>.</span><span class='id identifier rubyid_json_schema'>json_schema</span> <span class='label'>minimum:</span> <span class='int'>1</span><span class='comma'>,</span> <span class='label'>maximum:</span> <span class='int'>12</span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_index'>index</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>cards</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>options</span>
+      
+      
+        <span class='type'>(<tt>Hash&lt;Symbol, Object&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>JSON schema options</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+169
+170
+171
+172
+173
+174
+175
+176
+177</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/has_type_info.rb', line 169</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_json_schema'>json_schema</span><span class='lparen'>(</span><span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_validatable_json_schema'>validatable_json_schema</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../../Support.html" title="ElasticGraph::Support (module)">Support</a></span></span><span class='op'>::</span><span class='const'>HashUtil</span><span class='period'>.</span><span class='id identifier rubyid_stringify_keys'>stringify_keys</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+
+  <span class='kw'>if</span> <span class='lparen'>(</span><span class='id identifier rubyid_error_msg'>error_msg</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../../JSONSchema.html" title="ElasticGraph::JSONSchema (module)">JSONSchema</a></span></span><span class='period'>.</span><span class='id identifier rubyid_strict_meta_schema_validator'><span class='object_link'><a href="../../JSONSchema.html#strict_meta_schema_validator-class_method" title="ElasticGraph::JSONSchema.strict_meta_schema_validator (method)">strict_meta_schema_validator</a></span></span><span class='period'>.</span><span class='id identifier rubyid_validate_with_error_message'><span class='object_link'><a href="../../JSONSchema/Validator.html#validate_with_error_message-instance_method" title="ElasticGraph::JSONSchema::Validator#validate_with_error_message (method)">validate_with_error_message</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_validatable_json_schema'>validatable_json_schema</span><span class='rparen'>)</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='const'>Errors</span><span class='op'>::</span><span class='const'>SchemaError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Invalid JSON schema options set on </span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='embexpr_end'>}</span><span class='tstring_content'>:\n\n</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_error_msg'>error_msg</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_json_schema_options'>json_schema_options</span><span class='period'>.</span><span class='id identifier rubyid_update'>update</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="json_schema_options-instance_method">
+  
+    #<strong>json_schema_options</strong>  &#x21d2; <tt>Hash&lt;Symbol, Object&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns JSON schema options.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash&lt;Symbol, Object&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>JSON schema options</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+28
+29
+30</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/has_type_info.rb', line 28</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_json_schema_options'>json_schema_options</span>
+  <span class='ivar'>@json_schema_options</span> <span class='op'>||=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="mapping-instance_method">
+  
+    #<strong>mapping</strong>(**options)  &#x21d2; <tt>void</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note returns_void">This method returns an undefined value.</p><p>Defines the Elasticsearch/OpenSearch <a href="https://www.elastic.co/guide/en/elasticsearch/reference/7.10/mapping-types.html">field mapping type</a>
+and <a href="https://www.elastic.co/guide/en/elasticsearch/reference/7.10/mapping-params.html">mapping parameters</a> for a field or type.
+The options passed here will be included in the generated <code>datastore_config.yaml</code> artifact that ElasticGraph uses to configure
+Elasticsearch/OpenSearch.</p>
+
+<p>Can be called multiple times; each time, the options will be merged into the existing options.</p>
+
+<p>This is required on a <span class='object_link'><a href="../SchemaElements/ScalarType.html" title="ElasticGraph::SchemaDefinition::SchemaElements::ScalarType (class)">SchemaElements::ScalarType</a></span>; without it, ElasticGraph would have no way to know how the datatype should be
+indexed in the datastore.</p>
+
+<p>On a <span class='object_link'><a href="../SchemaElements/Field.html" title="ElasticGraph::SchemaDefinition::SchemaElements::Field (class)">SchemaElements::Field</a></span>, this can be used to customize how a field is indexed. For example, <code>String</code> fields are normally
+indexed as <a href="https://www.elastic.co/guide/en/elasticsearch/reference/7.10/keyword.html">keywords</a>; to instead index a <code>String</code>
+field for full text search, you’d need to configure <code>mapping type: "text"</code>.</p>
+
+<p>On a <span class='object_link'><a href="../SchemaElements/ObjectType.html" title="ElasticGraph::SchemaDefinition::SchemaElements::ObjectType (class)">SchemaElements::ObjectType</a></span>, this can be used to use a specific Elasticsearch/OpenSearch data type for something that is
+modeled as an object in GraphQL. For example, we use it for the <code>GeoLocation</code> type so they get indexed in Elasticsearch using the
+<a href="https://www.elastic.co/guide/en/elasticsearch/reference/7.10/geo-point.html">geo_point type</a>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Define the mapping of a custom scalar type</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='const'><span class='object_link'><a href="../../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span><span class='period'>.</span><span class='id identifier rubyid_define_schema'><span class='object_link'><a href="../../../ElasticGraph.html#define_schema-class_method" title="ElasticGraph.define_schema (method)">define_schema</a></span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_schema'>schema</span><span class='op'>|</span>
+  <span class='id identifier rubyid_schema'>schema</span><span class='period'>.</span><span class='id identifier rubyid_scalar_type'>scalar_type</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>URL</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span>
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_mapping'>mapping</span> <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>keyword</span><span class='tstring_end'>&quot;</span></span>
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_json_schema'>json_schema</span> <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>string</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>format:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>uri</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></code></pre>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Customize the mapping of a field</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='const'><span class='object_link'><a href="../../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span><span class='period'>.</span><span class='id identifier rubyid_define_schema'><span class='object_link'><a href="../../../ElasticGraph.html#define_schema-class_method" title="ElasticGraph.define_schema (method)">define_schema</a></span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_schema'>schema</span><span class='op'>|</span>
+  <span class='id identifier rubyid_schema'>schema</span><span class='period'>.</span><span class='id identifier rubyid_object_type'>object_type</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Card</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span>
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_field'>field</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>id</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ID!</span><span class='tstring_end'>&quot;</span></span>
+
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_field'>field</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>cardholderName</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>String</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_f'>f</span><span class='op'>|</span>
+      <span class='comment'># index this field for full text search
+</span>      <span class='id identifier rubyid_f'>f</span><span class='period'>.</span><span class='id identifier rubyid_mapping'>mapping</span> <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>text</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_field'>field</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>expYear</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Int</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_f'>f</span><span class='op'>|</span>
+      <span class='comment'># Use a smaller numeric type to save space in the datastore
+</span>      <span class='id identifier rubyid_f'>f</span><span class='period'>.</span><span class='id identifier rubyid_mapping'>mapping</span> <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>short</span><span class='tstring_end'>&quot;</span></span>
+      <span class='id identifier rubyid_f'>f</span><span class='period'>.</span><span class='id identifier rubyid_json_schema'>json_schema</span> <span class='label'>minimum:</span> <span class='int'>2000</span><span class='comma'>,</span> <span class='label'>maximum:</span> <span class='int'>2099</span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_field'>field</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>expMonth</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Int</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_f'>f</span><span class='op'>|</span>
+      <span class='comment'># Use a smaller numeric type to save space in the datastore
+</span>      <span class='id identifier rubyid_f'>f</span><span class='period'>.</span><span class='id identifier rubyid_mapping'>mapping</span> <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>byte</span><span class='tstring_end'>&quot;</span></span>
+      <span class='id identifier rubyid_f'>f</span><span class='period'>.</span><span class='id identifier rubyid_json_schema'>json_schema</span> <span class='label'>minimum:</span> <span class='int'>1</span><span class='comma'>,</span> <span class='label'>maximum:</span> <span class='int'>12</span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_index'>index</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>cards</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>options</span>
+      
+      
+        <span class='type'>(<tt>Hash&lt;Symbol, Object&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>mapping options–must be limited to <span class='object_link'><a href="#CUSTOMIZABLE_DATASTORE_PARAMS-constant" title="ElasticGraph::SchemaDefinition::Mixins::HasTypeInfo::CUSTOMIZABLE_DATASTORE_PARAMS (constant)">CUSTOMIZABLE_DATASTORE_PARAMS</a></span></p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+102
+103
+104
+105
+106
+107
+108
+109
+110</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/has_type_info.rb', line 102</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_mapping'>mapping</span><span class='lparen'>(</span><span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_param_diff'>param_diff</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span><span class='period'>.</span><span class='id identifier rubyid_to_set'>to_set</span> <span class='op'>-</span> <span class='const'><span class='object_link'><a href="#CUSTOMIZABLE_DATASTORE_PARAMS-constant" title="ElasticGraph::SchemaDefinition::Mixins::HasTypeInfo::CUSTOMIZABLE_DATASTORE_PARAMS (constant)">CUSTOMIZABLE_DATASTORE_PARAMS</a></span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_a'>to_a</span>
+
+  <span class='kw'>unless</span> <span class='id identifier rubyid_param_diff'>param_diff</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='const'>Errors</span><span class='op'>::</span><span class='const'>SchemaError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Some configured mapping overrides are unsupported: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_param_diff'>param_diff</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_mapping_options'>mapping_options</span><span class='period'>.</span><span class='id identifier rubyid_update'>update</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="mapping_options-instance_method">
+  
+    #<strong>mapping_options</strong>  &#x21d2; <tt>Hash&lt;Symbol, Object&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns datastore mapping options.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash&lt;Symbol, Object&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>datastore mapping options</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+23
+24
+25</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/has_type_info.rb', line 23</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_mapping_options'>mapping_options</span>
+  <span class='ivar'>@mapping_options</span> <span class='op'>||=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Thu Mar  6 05:55:03 2025 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.37 (ruby-3.3.4).
+</div>
+
+    </div>
+  </body>
+</html>
