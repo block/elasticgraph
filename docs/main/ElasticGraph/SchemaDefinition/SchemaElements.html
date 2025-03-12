@@ -1291,7 +1291,11 @@
 1100
 1101
 1102
-1103</pre>
+1103
+1104
+1105
+1106
+1107</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb', line 89</span>
@@ -1946,9 +1950,13 @@
       <span class='period'>.</span><span class='id identifier rubyid_as_static_derived_type'>as_static_derived_type</span><span class='lparen'>(</span><span class='id identifier rubyid_filter_field_category'>filter_field_category</span><span class='lparen'>(</span><span class='id identifier rubyid_for_single_value'>for_single_value</span><span class='rparen'>)</span><span class='rparen'>)</span>
       <span class='period'>.</span><span class='id identifier rubyid_name'>name</span>
 
-    <span class='id identifier rubyid_params'>params</span> <span class='op'>=</span> <span class='id identifier rubyid_to_h'>to_h</span>
-      <span class='period'>.</span><span class='id identifier rubyid_slice'>slice</span><span class='lparen'>(</span><span class='op'>*</span><span class='cvar'>@@initialize_param_names</span><span class='rparen'>)</span>
-      <span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='label'>type:</span> <span class='id identifier rubyid_filter_type'>filter_type</span><span class='comma'>,</span> <span class='label'>parent_type:</span> <span class='id identifier rubyid_parent_type'>parent_type</span><span class='comma'>,</span> <span class='label'>name_in_index:</span> <span class='id identifier rubyid_name_in_index'>name_in_index</span><span class='comma'>,</span> <span class='label'>type_for_derived_types:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_params'>params</span> <span class='op'>=</span> <span class='id identifier rubyid_to_h'>to_h</span><span class='period'>.</span><span class='id identifier rubyid_slice'>slice</span><span class='lparen'>(</span><span class='op'>*</span><span class='cvar'>@@initialize_param_names</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span>
+      <span class='label'>type:</span> <span class='id identifier rubyid_filter_type'>filter_type</span><span class='comma'>,</span>
+      <span class='label'>parent_type:</span> <span class='id identifier rubyid_parent_type'>parent_type</span><span class='comma'>,</span>
+      <span class='label'>name_in_index:</span> <span class='id identifier rubyid_name_in_index'>name_in_index</span><span class='comma'>,</span>
+      <span class='label'>type_for_derived_types:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+      <span class='label'>resolver:</span> <span class='kw'>nil</span>
+    <span class='rparen'>)</span>
 
     <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_factory'>factory</span><span class='period'>.</span><span class='id identifier rubyid_new_field'>new_field</span><span class='lparen'>(</span><span class='op'>**</span><span class='id identifier rubyid_params'>params</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_tap'>tap</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_f'>f</span><span class='op'>|</span>
       <span class='id identifier rubyid_f'>f</span><span class='period'>.</span><span class='id identifier rubyid_documentation'>documentation</span> <span class='id identifier rubyid_derived_documentation'>derived_documentation</span><span class='lparen'>(</span>
@@ -3374,7 +3382,11 @@
 1100
 1101
 1102
-1103</pre>
+1103
+1104
+1105
+1106
+1107</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb', line 89</span>
@@ -4029,9 +4041,13 @@
       <span class='period'>.</span><span class='id identifier rubyid_as_static_derived_type'>as_static_derived_type</span><span class='lparen'>(</span><span class='id identifier rubyid_filter_field_category'>filter_field_category</span><span class='lparen'>(</span><span class='id identifier rubyid_for_single_value'>for_single_value</span><span class='rparen'>)</span><span class='rparen'>)</span>
       <span class='period'>.</span><span class='id identifier rubyid_name'>name</span>
 
-    <span class='id identifier rubyid_params'>params</span> <span class='op'>=</span> <span class='id identifier rubyid_to_h'>to_h</span>
-      <span class='period'>.</span><span class='id identifier rubyid_slice'>slice</span><span class='lparen'>(</span><span class='op'>*</span><span class='cvar'>@@initialize_param_names</span><span class='rparen'>)</span>
-      <span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='label'>type:</span> <span class='id identifier rubyid_filter_type'>filter_type</span><span class='comma'>,</span> <span class='label'>parent_type:</span> <span class='id identifier rubyid_parent_type'>parent_type</span><span class='comma'>,</span> <span class='label'>name_in_index:</span> <span class='id identifier rubyid_name_in_index'>name_in_index</span><span class='comma'>,</span> <span class='label'>type_for_derived_types:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_params'>params</span> <span class='op'>=</span> <span class='id identifier rubyid_to_h'>to_h</span><span class='period'>.</span><span class='id identifier rubyid_slice'>slice</span><span class='lparen'>(</span><span class='op'>*</span><span class='cvar'>@@initialize_param_names</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span>
+      <span class='label'>type:</span> <span class='id identifier rubyid_filter_type'>filter_type</span><span class='comma'>,</span>
+      <span class='label'>parent_type:</span> <span class='id identifier rubyid_parent_type'>parent_type</span><span class='comma'>,</span>
+      <span class='label'>name_in_index:</span> <span class='id identifier rubyid_name_in_index'>name_in_index</span><span class='comma'>,</span>
+      <span class='label'>type_for_derived_types:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+      <span class='label'>resolver:</span> <span class='kw'>nil</span>
+    <span class='rparen'>)</span>
 
     <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_factory'>factory</span><span class='period'>.</span><span class='id identifier rubyid_new_field'>new_field</span><span class='lparen'>(</span><span class='op'>**</span><span class='id identifier rubyid_params'>params</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_tap'>tap</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_f'>f</span><span class='op'>|</span>
       <span class='id identifier rubyid_f'>f</span><span class='period'>.</span><span class='id identifier rubyid_documentation'>documentation</span> <span class='id identifier rubyid_derived_documentation'>derived_documentation</span><span class='lparen'>(</span>
@@ -5457,7 +5473,11 @@
 1100
 1101
 1102
-1103</pre>
+1103
+1104
+1105
+1106
+1107</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb', line 89</span>
@@ -6112,9 +6132,13 @@
       <span class='period'>.</span><span class='id identifier rubyid_as_static_derived_type'>as_static_derived_type</span><span class='lparen'>(</span><span class='id identifier rubyid_filter_field_category'>filter_field_category</span><span class='lparen'>(</span><span class='id identifier rubyid_for_single_value'>for_single_value</span><span class='rparen'>)</span><span class='rparen'>)</span>
       <span class='period'>.</span><span class='id identifier rubyid_name'>name</span>
 
-    <span class='id identifier rubyid_params'>params</span> <span class='op'>=</span> <span class='id identifier rubyid_to_h'>to_h</span>
-      <span class='period'>.</span><span class='id identifier rubyid_slice'>slice</span><span class='lparen'>(</span><span class='op'>*</span><span class='cvar'>@@initialize_param_names</span><span class='rparen'>)</span>
-      <span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='label'>type:</span> <span class='id identifier rubyid_filter_type'>filter_type</span><span class='comma'>,</span> <span class='label'>parent_type:</span> <span class='id identifier rubyid_parent_type'>parent_type</span><span class='comma'>,</span> <span class='label'>name_in_index:</span> <span class='id identifier rubyid_name_in_index'>name_in_index</span><span class='comma'>,</span> <span class='label'>type_for_derived_types:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_params'>params</span> <span class='op'>=</span> <span class='id identifier rubyid_to_h'>to_h</span><span class='period'>.</span><span class='id identifier rubyid_slice'>slice</span><span class='lparen'>(</span><span class='op'>*</span><span class='cvar'>@@initialize_param_names</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span>
+      <span class='label'>type:</span> <span class='id identifier rubyid_filter_type'>filter_type</span><span class='comma'>,</span>
+      <span class='label'>parent_type:</span> <span class='id identifier rubyid_parent_type'>parent_type</span><span class='comma'>,</span>
+      <span class='label'>name_in_index:</span> <span class='id identifier rubyid_name_in_index'>name_in_index</span><span class='comma'>,</span>
+      <span class='label'>type_for_derived_types:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+      <span class='label'>resolver:</span> <span class='kw'>nil</span>
+    <span class='rparen'>)</span>
 
     <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_factory'>factory</span><span class='period'>.</span><span class='id identifier rubyid_new_field'>new_field</span><span class='lparen'>(</span><span class='op'>**</span><span class='id identifier rubyid_params'>params</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_tap'>tap</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_f'>f</span><span class='op'>|</span>
       <span class='id identifier rubyid_f'>f</span><span class='period'>.</span><span class='id identifier rubyid_documentation'>documentation</span> <span class='id identifier rubyid_derived_documentation'>derived_documentation</span><span class='lparen'>(</span>
@@ -7540,7 +7564,11 @@
 1100
 1101
 1102
-1103</pre>
+1103
+1104
+1105
+1106
+1107</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb', line 89</span>
@@ -8195,9 +8223,13 @@
       <span class='period'>.</span><span class='id identifier rubyid_as_static_derived_type'>as_static_derived_type</span><span class='lparen'>(</span><span class='id identifier rubyid_filter_field_category'>filter_field_category</span><span class='lparen'>(</span><span class='id identifier rubyid_for_single_value'>for_single_value</span><span class='rparen'>)</span><span class='rparen'>)</span>
       <span class='period'>.</span><span class='id identifier rubyid_name'>name</span>
 
-    <span class='id identifier rubyid_params'>params</span> <span class='op'>=</span> <span class='id identifier rubyid_to_h'>to_h</span>
-      <span class='period'>.</span><span class='id identifier rubyid_slice'>slice</span><span class='lparen'>(</span><span class='op'>*</span><span class='cvar'>@@initialize_param_names</span><span class='rparen'>)</span>
-      <span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='label'>type:</span> <span class='id identifier rubyid_filter_type'>filter_type</span><span class='comma'>,</span> <span class='label'>parent_type:</span> <span class='id identifier rubyid_parent_type'>parent_type</span><span class='comma'>,</span> <span class='label'>name_in_index:</span> <span class='id identifier rubyid_name_in_index'>name_in_index</span><span class='comma'>,</span> <span class='label'>type_for_derived_types:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_params'>params</span> <span class='op'>=</span> <span class='id identifier rubyid_to_h'>to_h</span><span class='period'>.</span><span class='id identifier rubyid_slice'>slice</span><span class='lparen'>(</span><span class='op'>*</span><span class='cvar'>@@initialize_param_names</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span>
+      <span class='label'>type:</span> <span class='id identifier rubyid_filter_type'>filter_type</span><span class='comma'>,</span>
+      <span class='label'>parent_type:</span> <span class='id identifier rubyid_parent_type'>parent_type</span><span class='comma'>,</span>
+      <span class='label'>name_in_index:</span> <span class='id identifier rubyid_name_in_index'>name_in_index</span><span class='comma'>,</span>
+      <span class='label'>type_for_derived_types:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+      <span class='label'>resolver:</span> <span class='kw'>nil</span>
+    <span class='rparen'>)</span>
 
     <span class='id identifier rubyid_schema_def_state'>schema_def_state</span><span class='period'>.</span><span class='id identifier rubyid_factory'>factory</span><span class='period'>.</span><span class='id identifier rubyid_new_field'>new_field</span><span class='lparen'>(</span><span class='op'>**</span><span class='id identifier rubyid_params'>params</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_tap'>tap</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_f'>f</span><span class='op'>|</span>
       <span class='id identifier rubyid_f'>f</span><span class='period'>.</span><span class='id identifier rubyid_documentation'>documentation</span> <span class='id identifier rubyid_derived_documentation'>derived_documentation</span><span class='lparen'>(</span>
@@ -8571,7 +8603,7 @@
 </div>
 
       <div id="footer">
-  Generated on Wed Mar 12 14:06:27 2025 by
+  Generated on Wed Mar 12 14:07:13 2025 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.37 (ruby-3.3.6).
 </div>

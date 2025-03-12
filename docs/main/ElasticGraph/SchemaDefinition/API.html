@@ -545,12 +545,12 @@
       <pre class="lines">
 
 
-51
 52
-53</pre>
+53
+54</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/api.rb', line 51</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/api.rb', line 52</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_factory'>factory</span>
   <span class='ivar'>@factory</span>
@@ -604,12 +604,12 @@
       <pre class="lines">
 
 
-48
 49
-50</pre>
+50
+51</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/api.rb', line 48</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/api.rb', line 49</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_state'>state</span>
   <span class='ivar'>@state</span>
@@ -692,17 +692,17 @@ indicating the call to this method can be removed.</p>
       <pre class="lines">
 
 
-261
 262
 263
 264
 265
 266
 267
-268</pre>
+268
+269</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/api.rb', line 261</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/api.rb', line 262</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_deleted_type'>deleted_type</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
   <span class='ivar'>@state</span><span class='period'>.</span><span class='id identifier rubyid_register_deleted_type'>register_deleted_type</span><span class='lparen'>(</span>
@@ -807,13 +807,13 @@ enum and an output enum).</p>
       <pre class="lines">
 
 
-193
 194
 195
-196</pre>
+196
+197</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/api.rb', line 193</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/api.rb', line 194</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_enum_type'>enum_type</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='ivar'>@state</span><span class='period'>.</span><span class='id identifier rubyid_register_enum_type'>register_enum_type</span> <span class='ivar'>@factory</span><span class='period'>.</span><span class='id identifier rubyid_new_enum_type'>new_enum_type</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
@@ -917,13 +917,13 @@ one or more fields that concrete implementations of the interface must also defi
       <pre class="lines">
 
 
-162
 163
 164
-165</pre>
+165
+166</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/api.rb', line 162</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/api.rb', line 163</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_interface_type'>interface_type</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='ivar'>@state</span><span class='period'>.</span><span class='id identifier rubyid_register_object_interface_or_union_type'>register_object_interface_or_union_type</span> <span class='ivar'>@factory</span><span class='period'>.</span><span class='id identifier rubyid_new_interface_type'>new_interface_type</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
@@ -1010,22 +1010,22 @@ was using. This avoids the need to deploy the publisher and ElasticGraph indexer
       <pre class="lines">
 
 
-348
-349
-350
-351
-352
-353
-354
-355
 356
 357
 358
 359
-360</pre>
+360
+361
+362
+363
+364
+365
+366
+367
+368</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/api.rb', line 348</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/api.rb', line 356</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_json_schema_version'>json_schema_version</span><span class='lparen'>(</span><span class='id identifier rubyid_version'>version</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='op'>!</span><span class='id identifier rubyid_version'>version</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Integer</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_version'>version</span> <span class='op'>&lt;</span> <span class='int'>1</span>
@@ -1133,13 +1133,13 @@ root <code>Query</code> object) or <em>embedded</em> in other indexed types.</p>
       <pre class="lines">
 
 
-128
 129
 130
-131</pre>
+131
+132</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/api.rb', line 128</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/api.rb', line 129</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_object_type'>object_type</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='ivar'>@state</span><span class='period'>.</span><span class='id identifier rubyid_register_object_interface_or_union_type'>register_object_interface_or_union_type</span> <span class='ivar'>@factory</span><span class='period'>.</span><span class='id identifier rubyid_new_object_type'>new_object_type</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
@@ -1208,13 +1208,13 @@ an opportunity to customize the built-in types (e.g. to add directives to them o
       <pre class="lines">
 
 
-374
-375
-376
-377</pre>
+382
+383
+384
+385</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/api.rb', line 374</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/api.rb', line 382</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_on_built_in_types'>on_built_in_types</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_customization_block'>customization_block</span><span class='rparen'>)</span>
   <span class='ivar'>@state</span><span class='period'>.</span><span class='id identifier rubyid_built_in_types_customization_blocks'>built_in_types_customization_blocks</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_customization_block'>customization_block</span>
@@ -1282,15 +1282,15 @@ an opportunity to customize the built-in types (e.g. to add directives to them o
       <pre class="lines">
 
 
-390
-391
-392
-393
-394
-395</pre>
+398
+399
+400
+401
+402
+403</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/api.rb', line 390</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/api.rb', line 398</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_on_root_query_type'>on_root_query_type</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_customization_block'>customization_block</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_on_built_in_types'>on_built_in_types</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_type'>type</span><span class='op'>|</span>
@@ -1367,13 +1367,13 @@ known use case is to define custom GraphQL directives.</p>
       <pre class="lines">
 
 
-99
 100
 101
-102</pre>
+102
+103</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/api.rb', line 99</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/api.rb', line 100</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_raw_sdl'>raw_sdl</span><span class='lparen'>(</span><span class='id identifier rubyid_string'>string</span><span class='rparen'>)</span>
   <span class='ivar'>@state</span><span class='period'>.</span><span class='id identifier rubyid_sdl_parts'>sdl_parts</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_string'>string</span>
@@ -1478,13 +1478,13 @@ GraphQL extension module is used since the custom schema elements would not work
       <pre class="lines">
 
 
-288
 289
 290
-291</pre>
+291
+292</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/api.rb', line 288</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/api.rb', line 289</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_register_graphql_extension'>register_graphql_extension</span><span class='lparen'>(</span><span class='id identifier rubyid_extension_module'>extension_module</span><span class='comma'>,</span> <span class='label'>defined_at:</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_extension_config'>extension_config</span><span class='rparen'>)</span>
   <span class='ivar'>@state</span><span class='period'>.</span><span class='id identifier rubyid_graphql_extension_modules'>graphql_extension_modules</span> <span class='op'>&lt;&lt;</span> <span class='const'>SchemaArtifacts</span><span class='op'>::</span><span class='const'>RuntimeMetadata</span><span class='op'>::</span><span class='const'>Extension</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_extension_module'>extension_module</span><span class='comma'>,</span> <span class='id identifier rubyid_defined_at'>defined_at</span><span class='comma'>,</span> <span class='id identifier rubyid_extension_config'>extension_config</span><span class='rparen'>)</span>
@@ -1523,8 +1523,13 @@ registered, set a field’s <code>resolver</code> to the name you provide when r
       
       <pre class="example code"><code><span class='comment'># In `add_resolver.rb`:
 </span><span class='kw'>class</span> <span class='const'>AddResolver</span>
-  <span class='comment'># ...
-</span><span class='kw'>end</span>
+  <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>elasticgraph_graphql:</span><span class='comma'>,</span> <span class='label'>config:</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='kw'>def</span> <span class='id identifier rubyid_resolve'>resolve</span><span class='lparen'>(</span><span class='label'>field:</span><span class='comma'>,</span> <span class='label'>object:</span><span class='comma'>,</span> <span class='label'>args:</span><span class='comma'>,</span> <span class='label'>context:</span><span class='comma'>,</span> <span class='label'>lookahead:</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_args'>args</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>x</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='op'>+</span> <span class='id identifier rubyid_args'>args</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>y</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span>
 
 <span class='comment'># In `config/schema.rb`:
 </span><span class='const'><span class='object_link'><a href="../../ElasticGraph.html" title="ElasticGraph (module)">ElasticGraph</a></span></span><span class='period'>.</span><span class='id identifier rubyid_define_schema'><span class='object_link'><a href="../../ElasticGraph.html#define_schema-class_method" title="ElasticGraph.define_schema (method)">define_schema</a></span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_schema'>schema</span><span class='op'>|</span>
@@ -1613,16 +1618,20 @@ registered, set a field’s <code>resolver</code> to the name you provide when r
       <pre class="lines">
 
 
-321
-322
-323
-324</pre>
+327
+328
+329
+330
+331
+332</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/api.rb', line 321</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/api.rb', line 327</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_register_graphql_resolver'>register_graphql_resolver</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_klass'>klass</span><span class='comma'>,</span> <span class='label'>defined_at:</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_resolver_config'>resolver_config</span><span class='rparen'>)</span>
-  <span class='ivar'>@state</span><span class='period'>.</span><span class='id identifier rubyid_graphql_resolvers_by_name'>graphql_resolvers_by_name</span><span class='lbracket'>[</span><span class='id identifier rubyid_name'>name</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='const'>SchemaArtifacts</span><span class='op'>::</span><span class='const'>RuntimeMetadata</span><span class='op'>::</span><span class='const'>Extension</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_klass'>klass</span><span class='comma'>,</span> <span class='id identifier rubyid_defined_at'>defined_at</span><span class='comma'>,</span> <span class='id identifier rubyid_resolver_config'>resolver_config</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_resolver'>resolver</span> <span class='op'>=</span> <span class='const'>SchemaArtifacts</span><span class='op'>::</span><span class='const'>RuntimeMetadata</span><span class='op'>::</span><span class='const'>Extension</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_klass'>klass</span><span class='comma'>,</span> <span class='id identifier rubyid_defined_at'>defined_at</span><span class='comma'>,</span> <span class='id identifier rubyid_resolver_config'>resolver_config</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_resolver'>resolver</span><span class='period'>.</span><span class='id identifier rubyid_verify_against'>verify_against</span><span class='lparen'>(</span><span class='const'>GraphQL</span><span class='op'>::</span><span class='const'>Resolvers</span><span class='op'>::</span><span class='const'>Interface</span><span class='rparen'>)</span>
+  <span class='ivar'>@state</span><span class='period'>.</span><span class='id identifier rubyid_graphql_resolvers_by_name'>graphql_resolvers_by_name</span><span class='lbracket'>[</span><span class='id identifier rubyid_name'>name</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_resolver'>resolver</span>
   <span class='kw'>nil</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1672,12 +1681,12 @@ registered, set a field’s <code>resolver</code> to the name you provide when r
       <pre class="lines">
 
 
-327
-328
-329</pre>
+335
+336
+337</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/api.rb', line 327</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/api.rb', line 335</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_results'>results</span>
   <span class='ivar'>@results</span> <span class='op'>||=</span> <span class='const'><span class='object_link'><a href="Results.html" title="ElasticGraph::SchemaDefinition::Results (class)">Results</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='ivar'>@state</span><span class='rparen'>)</span>
@@ -1765,13 +1774,13 @@ common scalar types (e.g. <code>Date</code> and <code>DateTime</code>), but it i
       <pre class="lines">
 
 
-243
 244
 245
-246</pre>
+246
+247</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/api.rb', line 243</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/api.rb', line 244</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_scalar_type'>scalar_type</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='ivar'>@state</span><span class='period'>.</span><span class='id identifier rubyid_register_scalar_type'>register_scalar_type</span> <span class='ivar'>@factory</span><span class='period'>.</span><span class='id identifier rubyid_new_scalar_type'>new_scalar_type</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
@@ -1872,13 +1881,13 @@ more concrete subtypes. Each subtype must be an <span class='object_link'><a hre
       <pre class="lines">
 
 
-224
 225
 226
-227</pre>
+227
+228</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/api.rb', line 224</span>
+      <pre class="code"><span class="info file"># File 'elasticgraph-schema_definition/lib/elastic_graph/schema_definition/api.rb', line 225</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_union_type'>union_type</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='ivar'>@state</span><span class='period'>.</span><span class='id identifier rubyid_register_object_interface_or_union_type'>register_object_interface_or_union_type</span> <span class='ivar'>@factory</span><span class='period'>.</span><span class='id identifier rubyid_new_union_type'>new_union_type</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
@@ -1894,7 +1903,7 @@ more concrete subtypes. Each subtype must be an <span class='object_link'><a hre
 </div>
 
       <div id="footer">
-  Generated on Wed Mar 12 14:06:27 2025 by
+  Generated on Wed Mar 12 14:07:14 2025 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.37 (ruby-3.3.6).
 </div>
