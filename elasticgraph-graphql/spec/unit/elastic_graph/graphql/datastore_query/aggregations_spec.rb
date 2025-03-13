@@ -15,11 +15,6 @@ module ElasticGraph
       include AggregationsHelpers
       include_context "DatastoreQueryUnitSupport"
 
-      it "excludes `aggs` if `aggregations` is `nil`" do
-        query = new_query(aggregations: nil)
-        expect(datastore_body_of(query)).to exclude(:aggs)
-      end
-
       it "excludes `aggs` if `aggregations` is not given" do
         expect(datastore_body_of(new_query)).to exclude(:aggs)
       end

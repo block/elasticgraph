@@ -20,11 +20,6 @@ module ElasticGraph
         expect(datastore_body_of(query)).to include_sort_with_tiebreaker
       end
 
-      it "uses only the tiebreaker sort clauses when given a nil `sort`" do
-        query = new_query(sort: nil, individual_docs_needed: true)
-        expect(datastore_body_of(query)).to include_sort_with_tiebreaker
-      end
-
       it "ignores duplicate sort fields, preferring whichever direction comes first" do
         query = new_query(sort: [{"foo" => {"order" => "asc"}}, {"foo" => {"order" => "desc"}}], individual_docs_needed: true)
         expect(datastore_body_of(query)).to include(sort: [{"foo" => {"order" => "asc", "missing" => "_first"}}, {"id" => {"order" => "asc", "missing" => "_first"}}])

@@ -284,12 +284,13 @@ module ElasticGraph
           end
         end
 
-        def new_widgets_query(**args)
+        def new_widgets_query(default_page_size: 50, **args)
           options = {
             search_index_definitions: [graphql.datastore_core.index_definitions_by_name.fetch("widgets")],
             sort: sort_list
           }.merge(args)
-          datastore_query_builder.new_query(**options)
+
+          datastore_query_builder.with(default_page_size: default_page_size).new_query(**options)
         end
       end
 

@@ -14,7 +14,7 @@ module ElasticGraph
       def to_datastore_msearch_header_and_body: () -> [::Hash[::String, untyped], ::Hash[::String, untyped]]
 
       class Builder
-        def self.with: (
+        def self.new: (
           runtime_metadata: SchemaArtifacts::RuntimeMetadata::Schema,
           logger: ::Logger,
           **untyped

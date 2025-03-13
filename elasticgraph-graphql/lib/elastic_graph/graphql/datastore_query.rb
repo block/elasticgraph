@@ -31,41 +31,7 @@ module ElasticGraph
       :index_expression_builder, :default_page_size, :search_index_definitions, :max_page_size,
       :filters, :sort, :document_pagination, :requested_fields, :individual_docs_needed,
       :monotonic_clock_deadline, :schema_element_names
-    ) {
-      def initialize(
-        filters: nil,
-        sort: nil,
-        document_pagination: nil,
-        aggregations: nil,
-        requested_fields: nil,
-        individual_docs_needed: false,
-        total_document_count_needed: false,
-        monotonic_clock_deadline: nil,
-        **kwargs
-      )
-        filters = ::Set.new(filters || [])
-        filters.freeze
-
-        aggregations ||= {}
-        requested_fields ||= []
-
-        super(
-          filters: filters,
-          sort: sort || [],
-          document_pagination: document_pagination || {},
-          aggregations: aggregations,
-          requested_fields: requested_fields.to_set,
-          individual_docs_needed: individual_docs_needed || !requested_fields.empty?,
-          total_document_count_needed: total_document_count_needed || aggregations.values.any?(&:needs_total_doc_count?),
-          monotonic_clock_deadline: monotonic_clock_deadline,
-          **kwargs
-        )
-
-        if search_index_definitions.empty?
-          raise Errors::SearchFailedError, "Query is invalid, since it contains no `search_index_definitions`."
-        end
-      end
-    }
+    )
       # Load these files after the `Query` class has been defined, to avoid
       # `TypeError: superclass mismatch for class Query`
       require "elastic_graph/graphql/datastore_query/document_paginator"
@@ -126,32 +92,27 @@ module ElasticGraph
         end
       end
 
-      # Merges the provided query, returning a new combined query object.
-      # Both query objects are left unchanged.
-      def merge(other_query)
-        if search_index_definitions != other_query.search_index_definitions
-          raise ElasticGraph::Errors::InvalidMergeError, "`search_index_definitions` conflict while merging between " \
-            "#{search_index_definitions} and #{other_query.search_index_definitions}"
-        end
-
+      # Merges in the provided attribute overrides, honoring the intended semantics and invariants of `DatastoreQuery`.
+      def merge_with(
+        individual_docs_needed: false,
+        total_document_count_needed: false,
+        filters: [],
+        sort: [],
+        requested_fields: [],
+        document_pagination: {},
+        monotonic_clock_deadline: nil,
+        aggregations: {}
+      )
         with(
-          individual_docs_needed: individual_docs_needed || other_query.individual_docs_needed,
-          total_document_count_needed: total_document_count_needed || other_query.total_document_count_needed,
-          filters: filters + other_query.filters,
-          sort: merge_attribute(other_query, :sort),
-          requested_fields: requested_fields + other_query.requested_fields,
-          document_pagination: merge_attribute(other_query, :document_pagination),
-          monotonic_clock_deadline: [monotonic_clock_deadline, other_query.monotonic_clock_deadline].compact.min,
-          aggregations: aggregations.merge(other_query.aggregations)
+          individual_docs_needed: self.individual_docs_needed || individual_docs_needed || !requested_fields.empty?,
+          total_document_count_needed: self.total_document_count_needed || total_document_count_needed || aggregations.values.any?(&:needs_total_doc_count?),
+          filters: self.filters + filters,
+          sort: merge_attribute(:sort, sort),
+          requested_fields: self.requested_fields + requested_fields,
+          document_pagination: merge_attribute(:document_pagination, document_pagination),
+          monotonic_clock_deadline: [self.monotonic_clock_deadline, monotonic_clock_deadline].compact.min,
+          aggregations: self.aggregations.merge(aggregations)
         )
-      end
-
-      # Convenience method for merging when you do not have access to an
-      # `DatastoreQuery::Builder`. Allows you to pass the query options you
-      # would like to merge. As with `#merge`, leaves the original query unchanged
-      # and returns a combined query object.
-      def merge_with(**query_options)
-        merge(with(**query_options))
       end
 
       # Pairs the multi-search headers and body into a tuple, as per the format required by the datastore:
@@ -267,9 +228,8 @@ module ElasticGraph
 
       private
 
-      def merge_attribute(other_query, attribute)
+      def merge_attribute(attribute, other_value)
         value = public_send(attribute)
-        other_value = other_query.public_send(attribute)
 
         if value.empty?
           other_value
@@ -278,7 +238,7 @@ module ElasticGraph
         elsif value == other_value
           value
         else
-          logger.warn("Tried to merge two queries that both define `#{attribute}`, using the value from the query being merged: #{value}, #{other_value}")
+          logger.warn("Tried to merge conflicting values of `#{attribute}`; using the value from the merge override: #{value} (vs. #{other_value})")
           other_value
         end
       end
@@ -341,11 +301,7 @@ module ElasticGraph
 
       # Encapsulates dependencies of `Query`, giving us something we can expose off of `application`
       # to build queries when desired.
-      class Builder < Support::MemoizableData.define(:runtime_metadata, :logger, :filter_node_interpreter, :query_defaults)
-        def self.with(runtime_metadata:, logger:, filter_node_interpreter:, **query_defaults)
-          new(runtime_metadata:, logger:, filter_node_interpreter:, query_defaults:)
-        end
-
+      class Builder < Support::MemoizableData.define(:runtime_metadata, :logger, :filter_interpreter, :filter_node_interpreter, :default_page_size, :max_page_size)
         def routing_picker
           @routing_picker ||= RoutingPicker.new(
             filter_node_interpreter: filter_node_interpreter,
@@ -360,13 +316,38 @@ module ElasticGraph
           )
         end
 
-        def new_query(**options)
+        def new_query(
+          search_index_definitions:,
+          filters: [],
+          sort: [],
+          document_pagination: {},
+          aggregations: {},
+          requested_fields: [],
+          individual_docs_needed: false,
+          total_document_count_needed: false,
+          monotonic_clock_deadline: nil
+        )
+          if search_index_definitions.empty?
+            raise Errors::SearchFailedError, "Query is invalid, since it contains no `search_index_definitions`."
+          end
+
           DatastoreQuery.new(
             routing_picker: routing_picker,
             index_expression_builder: index_expression_builder,
             logger: logger,
             schema_element_names: runtime_metadata.schema_element_names,
-            **query_defaults.merge(options)
+            search_index_definitions: search_index_definitions,
+            filters: filters.to_set,
+            sort: sort,
+            document_pagination: document_pagination,
+            aggregations: aggregations,
+            requested_fields: requested_fields.to_set,
+            individual_docs_needed: individual_docs_needed || !requested_fields.empty?,
+            total_document_count_needed: total_document_count_needed || aggregations.values.any?(&:needs_total_doc_count?),
+            monotonic_clock_deadline: monotonic_clock_deadline,
+            filter_interpreter: filter_interpreter,
+            default_page_size: default_page_size,
+            max_page_size: max_page_size
           )
         end
       end
