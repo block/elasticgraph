@@ -29,6 +29,7 @@ module ElasticGraph
         def initialize
           if block_given?
             define_method :to_s do
+              # @type self: HasReadableToSAndInspect
               "#<#{self.class.name} #{yield self}>"
             end
           else
