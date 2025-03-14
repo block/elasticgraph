@@ -34,7 +34,9 @@ module ResolverHelperMethods
 
       query = nil
       query_builder = -> {
-        query ||= query_adapter.build_query_from(field: field, lookahead: lookahead, args: args, context: context).with(**query_overrides)
+        query ||= query_adapter
+          .build_query_from(field: field, lookahead: lookahead, args: args, context: context)
+          .merge_with(**query_overrides)
       }
 
       begin

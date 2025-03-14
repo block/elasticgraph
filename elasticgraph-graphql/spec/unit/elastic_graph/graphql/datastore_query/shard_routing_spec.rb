@@ -536,7 +536,7 @@ module ElasticGraph
         end
       end
 
-      def shard_routing_for(route_with_field_paths, filter_or_filters, ignored_routing_values: [], aggregations: nil)
+      def shard_routing_for(route_with_field_paths, filter_or_filters, ignored_routing_values: [], aggregations: {})
         options = if filter_or_filters.is_a?(Array)
           {filters: filter_or_filters}
         else

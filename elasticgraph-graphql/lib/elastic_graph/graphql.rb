@@ -116,7 +116,7 @@ module ElasticGraph
     def datastore_query_builder
       @datastore_query_builder ||= begin
         require "elastic_graph/graphql/datastore_query"
-        DatastoreQuery::Builder.with(
+        DatastoreQuery::Builder.new(
           filter_interpreter:,
           filter_node_interpreter:,
           runtime_metadata:,

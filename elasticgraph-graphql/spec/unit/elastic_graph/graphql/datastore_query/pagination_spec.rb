@@ -16,8 +16,8 @@ module ElasticGraph
       let(:max_page_size) { 200 }
       let(:graphql) { build_graphql(default_page_size: default_page_size, max_page_size: max_page_size) }
 
-      it "excludes `search_after` when document_pagination is nil" do
-        query = new_query(document_pagination: nil)
+      it "excludes `search_after` when document_pagination is empty" do
+        query = new_query(document_pagination: {})
         expect(datastore_body_of(query).keys).to_not include(:search_after)
       end
 
