@@ -94,6 +94,7 @@ module ElasticGraph
 
             allowed_extra_props.each_with_object(object["properties"]) do |prop_name, props|
               # @type var empty_hash: ::Hash[::String, untyped]
+              # @type var props: untyped
               empty_hash = {}
               props[prop_name] ||= empty_hash
             end

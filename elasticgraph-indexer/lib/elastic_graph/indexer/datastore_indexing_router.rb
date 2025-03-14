@@ -241,7 +241,10 @@ module ElasticGraph
           errors = msearch_response.fetch("responses").select { |res| res["error"] }
 
           if errors.empty?
-            versions_by_op = ops.zip(msearch_response.fetch("responses")).to_h do |(op, response)|
+            # We assume the size of the ops and the other array is the same and it cannot have `nil`.
+            zip = ops.zip(msearch_response.fetch("responses")) #: Array[[_Operation, Hash[String, Hash[String, untyped]]]]
+
+            versions_by_op = zip.to_h do |(op, response)|
               hits = response.fetch("hits").fetch("hits")
 
               if hits.size > 1
