@@ -24,10 +24,11 @@ module ElasticGraph
         end
       end
 
-      def new_query(aggregations: [], **options)
+      def new_query(aggregations: [], filter: nil, filters: [], **options)
         builder.new_query(
           aggregations: aggregations.to_h { |agg| [agg.name, agg] },
           search_index_definitions: graphql.datastore_core.index_definitions_by_graphql_type.fetch("Widget"),
+          filters: filters + [filter].compact,
           **options
         )
       end

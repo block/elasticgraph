@@ -36,7 +36,7 @@ module ElasticGraph
             computations: [computation_of("amountMoney", "amount", :sum)]
           )
 
-          base_query = new_query(filter: {"age" => {"equal_to_any_of" => [0]}})
+          base_query = new_query(filters: [{"age" => {"equal_to_any_of" => [0]}}])
 
           by_size = with_aggs(base_query, [by_size_agg])
           by_color = with_aggs(base_query, [by_color_agg])
@@ -77,7 +77,7 @@ module ElasticGraph
             computations: [computation_of("amountMoney", "amount", :sum)]
           )
 
-          base_query = new_query(filter: {"age" => {"equal_to_any_of" => [0]}})
+          base_query = new_query(filters: [{"age" => {"equal_to_any_of" => [0]}}])
 
           by_size = with_aggs(base_query, [by_size_agg])
           by_color = with_aggs(base_query, [by_color_agg])
@@ -103,8 +103,8 @@ module ElasticGraph
         end
 
         it "can merge non-aggregation queries that are identical as well" do
-          q1 = new_query(filter: {"age" => {"equal_to_any_of" => [0]}})
-          q2 = new_query(filter: {"age" => {"equal_to_any_of" => [0]}})
+          q1 = new_query(filters: [{"age" => {"equal_to_any_of" => [0]}}])
+          q2 = new_query(filters: [{"age" => {"equal_to_any_of" => [0]}}])
           expect(q1).to eq(q2)
 
           results_by_query = optimize_queries(q1, q2)
@@ -122,8 +122,8 @@ module ElasticGraph
 
         it "keeps queries separate when they have non-aggregation differences" do
           optimize_queries(
-            base_query = new_query(filter: {"age" => {"equal_to_any_of" => [0]}}, individual_docs_needed: true),
-            alt_filter = base_query.with(filter: {"age" => {"equal_to_any_of" => [1]}}),
+            base_query = new_query(filters: [{"age" => {"equal_to_any_of" => [0]}}], individual_docs_needed: true),
+            alt_filter = base_query.with(filters: [{"age" => {"equal_to_any_of" => [1]}}]),
             alt_pagination = base_query.with(document_pagination: {first: 1}),
             alt_individual_docs_needed = base_query.with(individual_docs_needed: !base_query.individual_docs_needed),
             alt_sort = base_query.with(sort: [{"age" => {"order" => "desc"}}]),
@@ -156,14 +156,14 @@ module ElasticGraph
             groupings: [field_term_grouping_of("options", "color")]
           )
 
-          base_query = new_query(filter: {"age" => {"equal_to_any_of" => [0]}})
+          base_query = new_query(filters: [{"age" => {"equal_to_any_of" => [0]}}])
 
           by_size = base_query.with(
-            filter: {"age" => {"equal_to_any_of" => [0]}},
+            filters: [{"age" => {"equal_to_any_of" => [0]}}],
             aggregations: {by_size_agg.name => by_size_agg}
           )
           by_color = base_query.with(
-            filter: {"age" => {"equal_to_any_of" => [1]}},
+            filters: [{"age" => {"equal_to_any_of" => [1]}}],
             aggregations: {by_color_agg.name => by_color_agg}
           )
 

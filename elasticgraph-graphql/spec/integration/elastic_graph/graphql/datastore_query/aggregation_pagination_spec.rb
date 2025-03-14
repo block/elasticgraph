@@ -118,7 +118,7 @@ module ElasticGraph
             document_pagination: {first: 0}, # make sure we don't ask for any documents, just aggregations.
             aggregations: [aggregation_query],
             total_document_count_needed: groupings.empty?,
-            filter: ({"name" => {"equal_to_any_of" => ids_of(filter_to)}} if filter_to)
+            filters: [({"name" => {"equal_to_any_of" => ids_of(filter_to)}} if filter_to)].compact
           )
 
           connection = Aggregation::Resolvers::RelayConnectionBuilder.build_from_search_response(

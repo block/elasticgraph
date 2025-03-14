@@ -51,8 +51,8 @@ module ElasticGraph
       end
 
       it "can merge `equal_to_any_of` conditions from two separate queries that are on separate fields", covers: :filters do
-        query1 = new_query(filter: {"age" => {"equal_to_any_of" => [25, 30]}})
-        query2 = new_query(filter: {"size" => {"equal_to_any_of" => [10]}})
+        query1 = new_query(filters: [{"age" => {"equal_to_any_of" => [25, 30]}}])
+        query2 = new_query(filters: [{"size" => {"equal_to_any_of" => [10]}}])
 
         merged = merge(query1, query2)
 
@@ -63,8 +63,8 @@ module ElasticGraph
       end
 
       it "can merge `equal_to_any_of` conditions from two separate queries that are on the same field", covers: :filters do
-        query1 = new_query(filter: {"age" => {"equal_to_any_of" => [25, 30]}})
-        query2 = new_query(filter: {"age" => {"equal_to_any_of" => [35, 30]}})
+        query1 = new_query(filters: [{"age" => {"equal_to_any_of" => [25, 30]}}])
+        query2 = new_query(filters: [{"age" => {"equal_to_any_of" => [35, 30]}}])
 
         merged = merge(query1, query2)
 
@@ -75,12 +75,12 @@ module ElasticGraph
       end
 
       it "can merge using `merge_with(**query_options)` as well", covers: :filters do
-        query1 = new_query(filter: {"age" => {"equal_to_any_of" => [25, 30]}})
+        query1 = new_query(filters: [{"age" => {"equal_to_any_of" => [25, 30]}}])
 
         merged = nil
 
         expect {
-          merged = query1.merge_with(filter: {"age" => {"equal_to_any_of" => [35, 30]}, "size" => {"equal_to_any_of" => [10]}})
+          merged = query1.merge_with(filters: [{"age" => {"equal_to_any_of" => [35, 30]}, "size" => {"equal_to_any_of" => [10]}}])
         }.to maintain { query1 }.and maintain { query1.filters }
 
         expect(datastore_body_of(merged)).to filter_datastore_with(
@@ -91,7 +91,7 @@ module ElasticGraph
       end
 
       it "de-duplicates filters that are present in both queries", covers: :filters do
-        query1 = new_query(filter: {"age" => {"equal_to_any_of" => [25, 30]}})
+        query1 = new_query(filters: [{"age" => {"equal_to_any_of" => [25, 30]}}])
 
         merged = merge(query1, query1)
 
@@ -272,11 +272,10 @@ module ElasticGraph
       end
 
       specify "#merge_with can merge in an empty filter", covers: :filters do
-        query1 = new_query(filter: {"age" => {"equal_to_any_of" => [25, 30]}})
+        query1 = new_query(filters: [{"age" => {"equal_to_any_of" => [25, 30]}}])
 
         expect(query1.merge_with).to eq query1
-        expect(query1.merge_with(filter: nil)).to eq query1
-        expect(query1.merge_with(filter: {})).to eq query1
+        expect(query1.merge_with(filters: [])).to eq query1
       end
 
       it "prefers a set `monotonic_clock_deadline` value to an unset one", covers: :monotonic_clock_deadline do

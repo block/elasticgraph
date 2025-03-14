@@ -24,7 +24,7 @@ class ProductResolver
     query = @datastore_query_builder.new_query(
       search_index_definitions: [@product_index_def],
       monotonic_clock_deadline: context[:monotonic_clock_deadline],
-      filter: {"id" => {"equalToAnyOf" => [args.fetch("id")]}},
+      filters: [{"id" => {"equalToAnyOf" => [args.fetch("id")]}}],
       individual_docs_needed: true,
       requested_fields: %w[
         id sku package notes

@@ -24,7 +24,7 @@ module ElasticGraph
 
       let(:graphql) { build_graphql }
 
-      def search_datastore(index_def_name: "widgets", aggregations: [], graphql: self.graphql, **options, &before_msearch)
+      def search_datastore(index_def_name: "widgets", aggregations: [], graphql: self.graphql, filter: nil, filters: [], **options, &before_msearch)
         index_def = graphql.datastore_core.index_definitions_by_name.fetch(index_def_name)
 
         query = graphql.datastore_query_builder.new_query(
@@ -32,6 +32,7 @@ module ElasticGraph
           requested_fields: ["id"],
           sort: index_def.default_sort_clauses,
           aggregations: aggregations.to_h { |agg| [agg.name, agg] },
+          filters: filters + [filter].compact,
           **options
         )
 

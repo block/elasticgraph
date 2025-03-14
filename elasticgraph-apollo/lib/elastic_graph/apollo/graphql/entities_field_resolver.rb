@@ -166,7 +166,7 @@ module ElasticGraph
               query.merge_with(
                 document_pagination: {first: representations.length},
                 requested_fields: additional_requested_fields_for(representations),
-                filter: filter
+                filters: [filter]
               )
             end
 
@@ -242,7 +242,7 @@ module ElasticGraph
               # In the case of representations which don't query Id, we ask for 2 documents so that
               # if something weird is going on and it matches more than 1, we can detect that and return an error.
               document_pagination: {first: 2},
-              filter: build_filter_for_hash(fields)
+              filters: [build_filter_for_hash(fields)]
             )
           end
 

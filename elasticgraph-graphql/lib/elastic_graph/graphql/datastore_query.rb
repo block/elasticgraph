@@ -33,7 +33,6 @@ module ElasticGraph
       :monotonic_clock_deadline, :schema_element_names
     ) {
       def initialize(
-        filter: nil,
         filters: nil,
         sort: nil,
         document_pagination: nil,
@@ -44,9 +43,7 @@ module ElasticGraph
         monotonic_clock_deadline: nil,
         **kwargs
       )
-        # Deal with `:filter` vs `:filters` input and normalize it to a single `filters` set.
         filters = ::Set.new(filters || [])
-        filters << filter if filter && !filter.empty?
         filters.freeze
 
         aggregations ||= {}

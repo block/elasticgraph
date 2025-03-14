@@ -467,7 +467,7 @@ module ElasticGraph
           options = if filter_or_filters.is_a?(Array)
             {filters: filter_or_filters}
           else
-            {filter: filter_or_filters}
+            {filters: [filter_or_filters].compact}
           end
 
           index_def = graphql.datastore_core.index_definitions_by_name.fetch("widgets")
