@@ -1,10 +1,10 @@
 ---
 layout: markdown
-title: "ElasticGraph Query API: Aggregated Values"
-permalink: /query-api/aggregations/aggregated-values/
-subpage_title: "Aggregated Values"
+title: 'ElasticGraph Query API: Aggregated Values'
+permalink: "/query-api/aggregations/aggregated-values/"
+nav_title: Aggregated Values
+menu_order: 1
 ---
-
 Aggregated values can be computed from all values of a particular field from all documents backing an aggregation node.
 Here's an example:
 

@@ -1,10 +1,10 @@
 ---
 layout: markdown
-title: "ElasticGraph Query API: Aggregation Grouping"
-permalink: /query-api/aggregations/grouping/
-subpage_title: "Grouping"
+title: 'ElasticGraph Query API: Aggregation Grouping'
+permalink: "/query-api/aggregations/grouping/"
+nav_title: Grouping
+menu_order: 3
 ---
-
 When aggregating documents, the groupings are defined by `groupedBy`. Here's an example:
 
 {% highlight graphql %}

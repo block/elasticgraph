@@ -1,10 +1,10 @@
 ---
 layout: markdown
-title: "ElasticGraph Query API: Aggregation Counts"
-permalink: /query-api/aggregations/counts/
-subpage_title: "Counts"
+title: 'ElasticGraph Query API: Aggregation Counts'
+permalink: "/query-api/aggregations/counts/"
+nav_title: Counts
+menu_order: 2
 ---
-
 The aggregations API allows you to count documents within a grouping:
 
 {% highlight graphql %}

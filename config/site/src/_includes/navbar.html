@@ -4,20 +4,22 @@
     <div class="text-xl flex items-center space-x-4">
       <a href="{{ '/' | relative_url }}" class="font-bold hover:underline">ElasticGraph</a>
       <a href="{{ '/getting-started' | relative_url }}" class="{{ site.style.link }}">Get Started</a>
-      <a href="{{ '/query-api' | relative_url }}" class="{{ site.style.link }}">Query API</a>
+
+      {% include query_api_nav.html %}
 
       <!-- Docs dropdown -->
       <div class="relative group">
-        <button class="{{ site.style.link }} flex items-center">
+        <button class="text-blue-600 dark:text-blue-400 flex items-center">
           Docs
           <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
           </svg>
         </button>
-        <!-- Added pt-2 to create space for hover and moved mt-2 to inner div -->
         <div class="absolute left-0 pt-2 w-48 hidden group-hover:block z-50">
-          <div class="rounded-md shadow-lg bg-white dark:bg-gray-700 ring-1 ring-black ring-opacity-5">
-            <div class="py-1">
+          <div class="relative rounded-md shadow-lg bg-white dark:bg-gray-700 ring-1 ring-black ring-opacity-5 border border-gray-200 dark:border-gray-600">
+            <!-- Triangle pointer -->
+            <div class="absolute -top-1.5 left-4 h-3 w-3 bg-white dark:bg-gray-700 transform rotate-45 border-t border-l border-gray-200 dark:border-gray-600"></div>
+            <div class="relative py-1">
               {% for version in site.data.doc_versions.versions %}
                 <a href="{{ '/docs/' | append: version | relative_url }}"
                    class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600">
@@ -64,7 +66,7 @@
           {% assign page_title = nil %}
           {% for p in site.pages %}
             {% if p.url == link %}
-              {% assign page_title = p.subpage_title | default: p.title %}
+              {% assign page_title = p.nav_title | default: p.title %}
             {% endif %}
           {% endfor %}
 

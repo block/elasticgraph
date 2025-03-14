@@ -1,10 +1,10 @@
 ---
 layout: markdown
-title: "ElasticGraph Query API: Full Text Search"
-permalink: /query-api/filtering/full-text-search/
-subpage_title: "Full Text Search"
+title: 'ElasticGraph Query API: Full Text Search'
+permalink: "/query-api/filtering/full-text-search/"
+nav_title: Full Text Search
+menu_order: 5
 ---
-
 ElasticGraph supports two full-text search filtering predicates:
 
 {% include filtering_predicate_definitions/fulltext.md %}

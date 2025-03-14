@@ -1,10 +1,10 @@
 ---
 layout: markdown
-title: "ElasticGraph Query API: Filtering"
-permalink: /query-api/filtering/
-subpage_title: "Filtering"
+title: 'ElasticGraph Query API: Filtering'
+permalink: "/query-api/filtering/"
+nav_title: Filtering
+menu_order: 2
 ---
-
 Use `filter:` on a root query field to narrow down the returned results:
 
 {% highlight graphql %}
@@ -33,5 +33,3 @@ individual request.
 {% highlight graphql %}
 {{ site.data.music_queries.filtering.FindArtists }}
 {% endhighlight %}
-
-{% include subpages.html %}

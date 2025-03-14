@@ -1,10 +1,10 @@
 ---
 layout: markdown
-title: "ElasticGraph Query API: List Filtering"
-permalink: /query-api/filtering/list/
-subpage_title: "List Filtering"
+title: 'ElasticGraph Query API: List Filtering'
+permalink: "/query-api/filtering/list/"
+nav_title: List
+menu_order: 8
 ---
-
 ElasticGraph supports a couple predicates for filtering on list fields:
 
 {% include filtering_predicate_definitions/list.md %}

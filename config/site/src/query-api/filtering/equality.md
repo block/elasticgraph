@@ -1,10 +1,10 @@
 ---
 layout: markdown
-title: "ElasticGraph Query API: Equality Filtering"
-permalink: /query-api/filtering/equality/
-subpage_title: "Equality Filtering"
+title: 'ElasticGraph Query API: Equality Filtering'
+permalink: "/query-api/filtering/equality/"
+nav_title: Equality
+menu_order: 2
 ---
-
 The most commonly used predicate supports equality filtering:
 
 {% include filtering_predicate_definitions/equality.md %}

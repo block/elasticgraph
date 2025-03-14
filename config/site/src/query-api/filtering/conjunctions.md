@@ -1,10 +1,10 @@
 ---
 layout: markdown
-title: "ElasticGraph Query API: Filter Conjunctions"
-permalink: /query-api/filtering/conjunctions/
-subpage_title: "Conjunctions"
+title: 'ElasticGraph Query API: Filter Conjunctions'
+permalink: "/query-api/filtering/conjunctions/"
+nav_title: Conjunctions
+menu_order: 8
 ---
-
 ElasticGraph supports two conjunction predicates:
 
 {% include filtering_predicate_definitions/conjunctions.md %}

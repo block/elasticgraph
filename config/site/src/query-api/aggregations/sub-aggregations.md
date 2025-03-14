@@ -1,10 +1,10 @@
 ---
 layout: markdown
-title: "ElasticGraph Query API: Sub-Aggregations"
-permalink: /query-api/aggregations/sub-aggregations/
-subpage_title: "Sub-Aggregations"
+title: 'ElasticGraph Query API: Sub-Aggregations'
+permalink: "/query-api/aggregations/sub-aggregations/"
+nav_title: Sub-Aggregations
+menu_order: 4
 ---
-
 The example schema used throughout this guide has a number of lists-of-object fields nested
 within the overall `Artist` type:
 

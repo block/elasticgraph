@@ -1,10 +1,10 @@
 ---
 layout: markdown
-title: "ElasticGraph Query API: Filter Negation"
-permalink: /query-api/filtering/negation/
-subpage_title: "Negation"
+title: 'ElasticGraph Query API: Filter Negation'
+permalink: "/query-api/filtering/negation/"
+nav_title: Negation
+menu_order: 7
 ---
-
 ElasticGraph supports a negation predicate:
 
 {% include filtering_predicate_definitions/not.md %}

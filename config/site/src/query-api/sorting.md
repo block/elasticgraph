@@ -1,10 +1,10 @@
 ---
 layout: markdown
-title: "ElasticGraph Query API: Sorting"
-permalink: /query-api/sorting/
-subpage_title: "Sorting"
+title: 'ElasticGraph Query API: Sorting'
+permalink: "/query-api/sorting/"
+nav_title: Sorting
+menu_order: 5
 ---
-
 Use `orderBy:` on a root query field to control how the results are sorted:
 
 {% highlight graphql %}

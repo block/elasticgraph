@@ -79,7 +79,7 @@ Run some example queries in GraphiQL to confirm it's working. Here's an example 
 {{ site.data.music_queries.filtering.FindArtistsFormedIn90s }}
 {% endhighlight %}
 
-Visit the [Query API docs]({% link query-api.md %}) for other example queries that work against the example schema.
+Visit the [Query API docs]({% link query-api/overview.md %}) for other example queries that work against the example schema.
 
 ## Step 3: Add a new field to the Schema
 
@@ -181,7 +181,7 @@ can be used in your publishing system to validate the indexing payloads or for c
 
 ## Resources
 
-- **[ElasticGraph Query API Documentation]({% link query-api.md %})**
+- **[ElasticGraph Query API Documentation]({% link query-api/overview.md %})**
 - **[ElasticGraph Ruby API Documentation]({{ '/docs/' | append: site.data.doc_versions.latest_version | relative_url }})**
 - **[GraphQL Introduction](https://graphql.org/learn/)**
 

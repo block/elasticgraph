@@ -1,10 +1,10 @@
 ---
 layout: markdown
-title: "ElasticGraph Query API: DateTime Filtering"
-permalink: /query-api/filtering/date-time/
-subpage_title: "Date Time Filtering"
+title: 'ElasticGraph Query API: DateTime Filtering'
+permalink: "/query-api/filtering/date-time/"
+nav_title: DateTime
+menu_order: 4
 ---
-
 ElasticGraph supports three different date/time types:
 
 `Date`
