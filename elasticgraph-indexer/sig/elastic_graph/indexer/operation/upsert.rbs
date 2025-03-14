@@ -15,7 +15,6 @@ module ElasticGraph
         attr_reader prepared_record: ::Hash[::String, untyped]
 
         @to_datastore_bulk: datastoreBulkPayload?
-        @metadata: ::Hash[::Symbol, untyped]?
         @doc_id: ::String?
         @routing_value_for_event: ::String?
 
