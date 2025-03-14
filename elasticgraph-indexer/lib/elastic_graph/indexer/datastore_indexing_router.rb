@@ -204,6 +204,7 @@ module ElasticGraph
                 # We only care about the source versions, but the way we get it varies.
                 include_version =
                   if op.destination_index_def.use_updates_for_indexing?
+                    # @type var op: Operation::Update
                     {_source: {includes: [
                       "__versions.#{op.update_target.relationship}",
                       # The update_data script before ElasticGraph v0.8 used __sourceVersions[type] instead of __versions[relationship].
@@ -255,6 +256,7 @@ module ElasticGraph
               end
 
               if op.destination_index_def.use_updates_for_indexing?
+                # @type var op: Operation::Update
                 versions = hits.filter_map do |hit|
                   hit.dig("_source", "__versions", op.update_target.relationship, hit.fetch("_id")) ||
                     # The update_data script before ElasticGraph v0.8 used __sourceVersions[type] instead of __versions[relationship].
