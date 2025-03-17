@@ -2,19 +2,17 @@
 
 <p align="center">
   <a href="https://github.com/block/elasticgraph/actions/workflows/ci.yaml?query=branch%3Amain" alt="CI Status">
-    <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/block/elasticgraph/ci.yaml?branch=main&label=CI%20Status"></a>
+    <img alt="CI Status Badge" src="https://img.shields.io/github/actions/workflow/status/block/elasticgraph/ci.yaml?branch=main&label=CI%20Status"></a>
   <a href="https://github.com/block/elasticgraph/blob/main/spec_support/lib/elastic_graph/spec_support/enable_simplecov.rb" alt="ElasticGraph maintains 100% Test Coverage">
-    <img src="https://img.shields.io/badge/Test%20Coverage-100%25-green" /></a>
+    <img alt="Test Coverage Badge" src="https://img.shields.io/badge/Test%20Coverage-100%25-green" /></a>
   <a href="https://github.com/block/elasticgraph/pulse" alt="Activity">
-    <img src="https://img.shields.io/github/commit-activity/m/block/elasticgraph" /></a>
+    <img alt="Activity Badge" src="https://img.shields.io/github/commit-activity/m/block/elasticgraph" /></a>
   <a href="https://github.com/block/elasticgraph/graphs/contributors" alt="GitHub Contributors">
-    <img src="https://img.shields.io/github/contributors/block/elasticgraph" /></a>
-  <a href="https://makeapullrequest.com" alt="PRs Welcome!">
-    <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" /></a>
+    <img alt="Contributors Badge" src="https://img.shields.io/github/contributors/block/elasticgraph" /></a>
   <a href="https://rubygems.org/gems/elasticgraph" alt="RubyGems Release">
-    <img src="https://img.shields.io/gem/v/elasticgraph" /></a>
+    <img alt="Gem Version Badge" src="https://img.shields.io/gem/v/elasticgraph" /></a>
   <a href="https://github.com/block/elasticgraph/blob/main/LICENSE.txt" alt="MIT License">
-    <img alt="MIT License" src="https://img.shields.io/github/license/block/elasticgraph" /></a>
+    <img alt="License Badge" src="https://img.shields.io/github/license/block/elasticgraph" /></a>
 </p>
 
 ElasticGraph is a general purpose, near real-time data query and search platform that is scalable and performant,
@@ -79,6 +77,6 @@ than the alternatives.
 
 ElasticGraph is released under the [MIT License](https://opensource.org/licenses/MIT).
 
-[Part of the distributed code](elasticgraph-rack/lib/elastic_graph/rack/graphiql/index.html)
+[Part of the distributed code](https://github.com/block/elasticgraph/blob/main/elasticgraph-rack/lib/elastic_graph/rack/graphiql/index.html)
 comes from the [GraphiQL project](https://github.com/graphql/graphiql), also licensed under the
 MIT License, Copyright (c) GraphQL Contributors.

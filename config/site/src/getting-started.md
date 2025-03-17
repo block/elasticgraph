@@ -160,7 +160,7 @@ $ bundle exec rake check
 {% endhighlight %}
 
 This should be run on every commit (ideally before merging a pull request) using a CI system
-such as [GitHub Actions](https://github.com/features/actions), [Buildkite](http://buildkite.com/),
+such as [GitHub Actions](https://github.com/features/actions), [Buildkite](https://buildkite.com/),
 or [Circle CI](https://circleci.com/).
 
 ### Deploy

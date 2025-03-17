@@ -10,6 +10,11 @@ support_email: elasticgraph@squareup.com
 tagline: Schema-driven, scalable, cloud-native, batteries-included GraphQL with superpowers.
 description: ElasticGraph is an open-source framework for indexing, searching, and aggregating data powered by GraphQL and Elasticsearch / OpenSearch.
 
+# Include `_index.html` file from docs directories
+# https://github.com/lsegal/yard/issues/1027
+include:
+  - _index.html
+
 # Reusable CSS styling for the site, available via the `site.style` variable, ex: `{{ site.style.body }}`
 style:
   body: bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 flex flex-col h-screen

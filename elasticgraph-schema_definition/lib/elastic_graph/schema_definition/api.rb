@@ -131,7 +131,7 @@ module ElasticGraph
         nil
       end
 
-      # Defines a [GraphQL interface](https://graphql.org/learn/schema/#interfaces). Use it to define an abstract supertype with
+      # Defines a [GraphQL interface](https://graphql.org/learn/schema/#interface-types). Use it to define an abstract supertype with
       # one or more fields that concrete implementations of the interface must also define. Each implementation can be an
       # {SchemaElements::ObjectType} or {SchemaElements::InterfaceType}.
       #
@@ -165,7 +165,7 @@ module ElasticGraph
         nil
       end
 
-      # Defines a [GraphQL enum type](https://graphql.org/learn/schema/#enumeration-types).
+      # Defines a [GraphQL enum type](https://graphql.org/learn/schema/#enum-types).
       # The type is restricted to an enumerated set of values, each with a unique name.
       # Use `value` or `values` to define the enum values in the passed block.
       #
