@@ -311,7 +311,7 @@ GEM
     google-protobuf (4.29.3-arm64-darwin)
       bigdecimal
       rake (>= 13)
-    graphql (2.4.13)
+    graphql (2.4.14)
       base64
       fiber-storage
       logger
