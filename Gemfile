@@ -35,7 +35,7 @@ group :site do
   gem "filewatcher", "~> 2.1"
   gem "html-proofer", "~> 5.0", ">= 5.0.10"
   gem "jekyll", "~> 4.4", ">= 4.4.1"
-  gem "nokogiri", "~> 1.18", ">= 1.18.3"
+  gem "nokogiri", "~> 1.18"
   gem "yard", "~> 0.9", ">= 0.9.37"
   gem "yard-doctest", "~> 0.1", ">= 0.1.17"
 end
