@@ -15,7 +15,7 @@ group :development do
   gem "factory_bot", "~> 6.5", ">= 6.5.1"
   gem "faker", "~> 3.5", ">= 3.5.1"
   gem "flatware-rspec", "~> 2.3", ">= 2.3.4"
-  gem "httpx", "~> 1.4", ">= 1.4.1"
+  gem "httpx", "~> 1.4"
   gem "method_source", "~> 1.1"
   gem "rubocop-factory_bot", "~> 2.26", ">= 2.26.1"
   gem "rubocop-rake", "~> 0.6"
