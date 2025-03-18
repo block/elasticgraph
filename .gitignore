@@ -62,8 +62,7 @@ config/site/doc/
 config/site/_site
 config/site/src/docs
 config/site/src/_data/*_queries.yaml
-config/site/src/_data/searchable_content.yaml
-config/site/src/_data/llms_full_content.yaml
+config/site/src/_data/content.yaml
 config/site/.jekyll-metadata
 config/site/package-lock.json
 config/site/examples/*/schema_artifacts

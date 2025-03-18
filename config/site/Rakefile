@@ -144,22 +144,20 @@ module ElasticGraph
           )
 
           content = extractor.extract_content
+          output_file = JEKYLL_DATA_DIR / "content.yaml"
 
-          # Write searchable content
-          searchable_content_file = JEKYLL_DATA_DIR / "searchable_content.yaml"
-          puts "Writing searchable content from #{content["searchable_content"].size} pages to #{searchable_content_file}."
+          puts "Writing content to #{output_file}:"
+          puts " - #{content["searchable_content"].size} searchable pages"
+          puts " - LLM content: #{(content["llm_content"]["size"] / 1024.0).round(1)}KB"
+
+          # Write to data file
           ::FileUtils.mkdir_p(JEKYLL_DATA_DIR)
-          ::File.write(searchable_content_file, ::YAML.dump(content["searchable_content"]))
-
-          # Write LLM content
-          llm_content_file = JEKYLL_DATA_DIR / "llms_full_content.yaml"
-          puts "Writing LLM content (#{(content["llm_content"]["size"] / 1024.0).round(1)}KB) to #{llm_content_file}"
-          ::File.write(llm_content_file, ::YAML.dump(content["llm_content"]))
+          ::File.write(output_file, ::YAML.dump(content))
         end
 
         desc "Build YARD docs and create versioned archive"
         task :archive_docs, [:version] => [:build_docs] do |_, args|
-          abort "Version argument is required (e.g., rake site:archive_docs[1.0.0 ])" unless args[:version]
+          abort "Version argument is required (e.g., rake site:archive_docs[1.0.0])" unless args[:version]
 
           archive_name = "v#{args[:version]}.tar.gz"
           archive_path = ARCHIVED_DOCS_DIR / archive_name
@@ -349,12 +347,6 @@ module ElasticGraph
               end
             end
           end
-        end
-
-        desc "Generate raw markdown documentation for LLMs"
-        task generate_llm_docs: ["examples:compile_queries"] do
-          script_path = SITE_CONFIG_DIR / "script" / "generate_llm_docs.rb"
-          sh "#{script_path} #{SITE_CONFIG_DIR}"
         end
       end
     end

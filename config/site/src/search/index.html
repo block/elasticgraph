@@ -13,7 +13,7 @@ title: Search
 // Initialize the store with pre-processed content
 window.store = {};
 
-{% for doc in site.data.searchable_content %}
+{% for doc in site.data.content.searchable_content %}
     window.store["{{ doc.url }}"] = {
         "title": {{ doc.title | jsonify }},
         "content": {{ doc.content | jsonify }},

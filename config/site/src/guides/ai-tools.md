@@ -10,14 +10,14 @@ Build faster with ElasticGraph using AI tools. Here's how to get started with Ch
 
 ### Get the docs
 
-Visit [llms-full.txt]({% link llms-full.txt %}) to copy our API docs optimized for LLMs.
+[llms-full.txt]({% link llms-full.txt %}) contains our documentation optimized for LLMs.
 
 ### Copy the prompt
 
 {% highlight text %}
 I'm building with ElasticGraph. Here's the documentation:
 
-[paste the contents of llms-full.txt here]
+[the contents of llms-full.txt go here]
 {% endhighlight %}
 
 <button id="copy-button" class="btn-primary">Copy this prompt</button>
@@ -36,7 +36,7 @@ Ask your favorite LLM about:
 document.addEventListener('DOMContentLoaded', function() {
   const copyButton = document.getElementById('copy-button');
   const prefix = "I'm building with ElasticGraph. Here's the documentation:\n\n";
-  const docs = {{ site.data.llms_full_content.content | jsonify }};
+  const docs = {{ site.data.content.llm_content.content | jsonify }};
   const fullTemplate = prefix + docs;
 
   copyButton.addEventListener('click', async () => {

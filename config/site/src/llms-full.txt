@@ -2,4 +2,4 @@
 layout: none
 permalink: /llms-full.txt
 ---
-{{ site.data.llms_full_content.content }}
+{{ site.data.content.llm_content.content }}
