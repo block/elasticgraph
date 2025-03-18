@@ -21,6 +21,20 @@
 }
 
 @layer components {
+  /* NOTE: Be sure to include `dark:` prefixed styles for handling dark-mode UI */
+  /* Buttons */
+  .btn-primary {
+    @apply bg-blue-600 dark:bg-blue-500 text-white py-2 px-4 rounded-sm hover:bg-blue-500 dark:hover:bg-blue-400 transition;
+  }
+
+  .btn-secondary {
+    @apply bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 py-2 px-6 rounded-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition;
+  }
+
+  .btn-success {
+    @apply bg-green-600 dark:bg-green-500 text-white py-2 px-4 rounded-sm hover:bg-green-500 dark:hover:bg-green-400 transition;
+  }
+
   /* Note alert */
   .alert-note {
     @apply my-4 rounded-lg border-l-4 p-4 border-blue-400 bg-blue-50/30 dark:border-blue-500 dark:bg-blue-950/20;
