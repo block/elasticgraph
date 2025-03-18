@@ -1,3 +1,9 @@
+# Copyright 2024 Block, Inc.
+#
+# Use of this source code is governed by an MIT-style
+# license that can be found in the LICENSE file or at
+# https://opensource.org/licenses/MIT.
+#
 # frozen_string_literal: true
 
 require "nokogiri"
@@ -24,18 +30,18 @@ module ElasticGraph
       content << "## API Documentation\n"
       api_docs_content = process_docs_directory(@docs_dir / latest_docs_version, latest_docs_version)
       api_docs_content.each do |doc|
-        content << "### #{doc['title']}\n"
-        content << doc['content']
-        content << "\nURL: #{doc['url']}\n\n"
+        content << "### #{doc["title"]}\n"
+        content << doc["content"]
+        content << "\nURL: #{doc["url"]}\n\n"
       end
 
       # Process markdown pages
       content << "## Site Documentation\n"
       markdown_content = process_markdown_pages
       markdown_content.each do |page|
-        content << "### #{page['title']}\n"
-        content << page['content']
-        content << "\nURL: #{page['url']}\n\n"
+        content << "### #{page["title"]}\n"
+        content << page["content"]
+        content << "\nURL: #{page["url"]}\n\n"
       end
 
       # Write the final content

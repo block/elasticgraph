@@ -151,7 +151,7 @@ module ElasticGraph
           ::File.write(searchable_content_file, ::YAML.dump(searchable_content))
         end
 
-        desc "Extracts the site's documenation into one LLM-friendly file"
+        desc "Extracts the site's docs into one LLM-friendly file"
         task extract_llm_txt_content: [:build_docs] do
           require_relative "support/llm_content_extractor"
 
