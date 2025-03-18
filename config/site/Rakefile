@@ -151,7 +151,7 @@ module ElasticGraph
           ::File.write(searchable_content_file, ::YAML.dump(searchable_content))
         end
 
-        desc "Extracts the site's docs into one LLM-friendly file"
+        desc "Extracts the site's docs into LLM-friendly YAML"
         task extract_llm_txt_content: [:build_docs] do
           require_relative "support/llm_content_extractor"
 
@@ -159,20 +159,19 @@ module ElasticGraph
           # (We couldn't figure out a way to extract the rendered content within Jekyll itself).
           run_jekyll :build
 
-          output_file = SITE_SOURCE_DIR / "llms-full.txt"
-
           extractor = ElasticGraph::LLMContentExtractor.new(
             jekyll_site_dir: JEKYLL_SITE_DIR,
-            docs_dir: DOCS_DIR,
-            output_file: output_file
+            docs_dir: DOCS_DIR
           )
 
-          extractor.extract_and_write_content
+          llm_content = extractor.extract_llm_content
+          output_file = JEKYLL_DATA_DIR / "llms_full_content.yaml"
 
-          # Tell git to ignore changes to this file locally
-          sh "git update-index --skip-worktree #{output_file}"
-          puts "✓ Configured git to ignore changes to #{output_file}"
-          puts "  To track changes again, run: git update-index --no-skip-worktree #{output_file}"
+          puts "Writing LLM content (#{(llm_content['size'] / 1024.0).round(1)}KB) to #{output_file}"
+
+          # Write to data file
+          ::FileUtils.mkdir_p(JEKYLL_DATA_DIR)
+          ::File.write(output_file, ::YAML.dump(llm_content))
         end
 
         desc "Build YARD docs and create versioned archive"

@@ -17,58 +17,44 @@ Visit [llms-full.txt]({% link llms-full.txt %}) to copy our API docs optimized f
 {% highlight text %}
 I'm building with ElasticGraph. Here's the documentation:
 
-[Paste llms-full.txt content here]
+[paste the contents of llms-full.txt here]
 {% endhighlight %}
 
-<button id="copy-button" class="btn-primary">Copy AI Prompt</button>
+<button id="copy-button" class="btn-primary">Copy this prompt</button>
 
-_Use this button to copy the prompt above **including** the full [llms-full.txt]({% link llms-full.txt %}) documentation._
 
 ### Start building
 
 Ask your favorite LLM about:
 
-- Writing GraphQL queries
-- Setting up filters and aggregations
 - Defining your schema
 - Configuring Elasticsearch/OpenSearch
+- Writing ElasticGraph GraphQL queries
+- Searching and aggregating your data
 
 <script>
-   document.addEventListener('DOMContentLoaded', async function() {
-   const copyButton = document.getElementById('copy-button');
+document.addEventListener('DOMContentLoaded', function() {
+  const copyButton = document.getElementById('copy-button');
+  const prefix = "I'm building with ElasticGraph. Here's the documentation:\n\n";
+  const docs = {{ site.data.llms_full_content.content | jsonify }};
+  const fullTemplate = prefix + docs;
 
-   try {
-      // Fetch the documentation content
-      const response = await fetch('{% link llms-full.txt %}');
-      const docs = await response.text();
-
-      // Create the full template with the docs
-      const fullTemplate = `I'm building with ElasticGraph. Here's the documentation:
-
-   ${docs}`;
-
-
-      // Set up copy functionality
-      copyButton.addEventListener('click', async () => {
-         try {
-         await navigator.clipboard.writeText(fullTemplate);
-         const originalText = copyButton.textContent;
-         copyButton.textContent = 'Copied!';
-         copyButton.classList.remove('btn-primary');
-         copyButton.classList.add('btn-success');
-         setTimeout(() => {
-            copyButton.textContent = originalText;
-            copyButton.classList.remove('btn-success');
-            copyButton.classList.add('btn-primary');
-         }, 2000);
-         } catch (err) {
-         console.error('Failed to copy:', err);
-         copyButton.textContent = 'Failed to copy';
-         copyButton.classList.add('bg-red-500');
-         }
-      });
-   } catch (err) {
-      console.error('Failed to load documentation:', err);
-   }
-   });
+  copyButton.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(fullTemplate);
+      const originalText = copyButton.textContent;
+      copyButton.textContent = 'Copied!';
+      copyButton.classList.remove('btn-primary');
+      copyButton.classList.add('btn-success');
+      setTimeout(() => {
+        copyButton.textContent = originalText;
+        copyButton.classList.remove('btn-success');
+        copyButton.classList.add('btn-primary');
+      }, 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+      copyButton.textContent = 'Failed to copy';
+    }
+  });
+});
 </script>

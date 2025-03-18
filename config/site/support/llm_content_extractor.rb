@@ -6,17 +6,15 @@
 #
 # frozen_string_literal: true
 
-require "nokogiri"
 require_relative "content_extractor"
 
 module ElasticGraph
   class LLMContentExtractor < ContentExtractor
-    def initialize(jekyll_site_dir:, docs_dir:, output_file:)
+    def initialize(jekyll_site_dir:, docs_dir:)
       super(jekyll_site_dir: jekyll_site_dir, docs_dir: docs_dir)
-      @output_file = output_file
     end
 
-    def extract_and_write_content
+    def extract_llm_content
       content = []
       content << "# ElasticGraph API Documentation\n"
 
@@ -44,10 +42,14 @@ module ElasticGraph
         content << "\nURL: #{page["url"]}\n\n"
       end
 
-      # Write the final content
-      FileUtils.mkdir_p(File.dirname(@output_file))
-      File.write(@output_file, content.join("\n"))
-      puts "Generated LLM documentation at #{@output_file}"
+      full_content = content.join("\n")
+
+      {
+        "content" => full_content,
+        "size" => full_content.bytesize,
+        "version" => latest_docs_version,
+        "generated_at" => Time.now.utc.iso8601
+      }
     end
   end
 end
