@@ -168,6 +168,11 @@ module ElasticGraph
           )
 
           extractor.extract_and_write_content
+
+          # Tell git to ignore changes to this file locally
+          sh "git update-index --skip-worktree #{output_file}"
+          puts "✓ Configured git to ignore changes to #{output_file}"
+          puts "  To track changes again, run: git update-index --no-skip-worktree #{output_file}"
         end
 
         desc "Build YARD docs and create versioned archive"

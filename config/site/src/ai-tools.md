@@ -10,10 +10,9 @@ Build faster with ElasticGraph using AI tools. Here's how to get started with Ch
 
 ### Get the docs
 
-- Download [llms-full.txt]({% link llms-full.txt %}) - our LLM-optimized API documentation
-- Contains: Query API, filtering, aggregations, and working GraphQL examples
+Visit [llms-full.txt]({% link llms-full.txt %}) to copy our API docs optimized for LLMs.
 
-### Share with your LLM
+### Copy the prompt
 
 {% highlight text %}
 I'm building with ElasticGraph. Here's the documentation:
@@ -25,7 +24,9 @@ I'm building with ElasticGraph. Here's the documentation:
 
 _Use this button to copy the prompt above **including** the full [llms-full.txt]({% link llms-full.txt %}) documentation._
 
-### Start building! Ask about
+### Start building
+
+Ask your favorite LLM about:
 
 - Writing GraphQL queries
 - Setting up filters and aggregations
