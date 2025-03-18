@@ -36,15 +36,13 @@ module ElasticGraph
 
       api_docs_content.each do |doc|
         llm_content << "### #{doc["title"]}\n"
-        llm_content << doc["content"]
-        llm_content << "\nURL: #{doc["url"]}\n\n"
+        llm_content << "#{doc["content"]}\n\n"
       end
 
       llm_content << "## Site Documentation\n"
       markdown_content.each do |page|
         llm_content << "### #{page["title"]}\n"
-        llm_content << page["content"]
-        llm_content << "\nURL: #{page["url"]}\n\n"
+        llm_content << "#{page["content"]}\n\n"
       end
 
       full_llm_content = llm_content.join("\n")

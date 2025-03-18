@@ -147,14 +147,14 @@ module ElasticGraph
 
           # Write searchable content
           searchable_content_file = JEKYLL_DATA_DIR / "searchable_content.yaml"
-          puts "Writing searchable content from #{content['searchable_content'].size} pages to #{searchable_content_file}."
+          puts "Writing searchable content from #{content["searchable_content"].size} pages to #{searchable_content_file}."
           ::FileUtils.mkdir_p(JEKYLL_DATA_DIR)
-          ::File.write(searchable_content_file, ::YAML.dump(content['searchable_content']))
+          ::File.write(searchable_content_file, ::YAML.dump(content["searchable_content"]))
 
           # Write LLM content
           llm_content_file = JEKYLL_DATA_DIR / "llms_full_content.yaml"
-          puts "Writing LLM content (#{(content['llm_content']['size'] / 1024.0).round(1)}KB) to #{llm_content_file}"
-          ::File.write(llm_content_file, ::YAML.dump(content['llm_content']))
+          puts "Writing LLM content (#{(content["llm_content"]["size"] / 1024.0).round(1)}KB) to #{llm_content_file}"
+          ::File.write(llm_content_file, ::YAML.dump(content["llm_content"]))
         end
 
         desc "Build YARD docs and create versioned archive"
