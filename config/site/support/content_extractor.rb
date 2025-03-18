@@ -22,12 +22,15 @@ module ElasticGraph
 
       puts "Indexing API docs from latest version: #{latest_docs_version}"
 
-      # Extract docs content
+      # Extract docs content - without code blocks for search
       api_docs_content = process_docs_directory(@docs_dir / latest_docs_version, latest_docs_version)
       markdown_content = process_markdown_pages
 
       # Build the searchable content
       searchable_content = api_docs_content + markdown_content
+
+      # Get markdown content again - with code blocks for LLM
+      markdown_content_with_code = process_markdown_pages(include_code_blocks: true)
 
       # Build the LLM content
       llm_content = []
@@ -40,7 +43,7 @@ module ElasticGraph
       end
 
       llm_content << "## Site Documentation\n"
-      markdown_content.each do |page|
+      markdown_content_with_code.each do |page|
         llm_content << "### #{page.fetch("title")}\n"
         llm_content << "#{page.fetch("content")}\n\n"
       end
@@ -137,7 +140,7 @@ module ElasticGraph
     end
 
     # Process markdown pages
-    def process_markdown_pages
+    def process_markdown_pages(include_code_blocks: false)
       # Now process the rendered HTML files
       Dir.glob(File.join(@jekyll_site_dir, "**", "*.html")).filter_map do |file|
         # Skip files we don't want to index
@@ -152,12 +155,28 @@ module ElasticGraph
         # Remove navigation elements, scripts, etc
         doc.css("nav, script, style, footer").remove
 
-        # Get just the main content
-        main_content = doc.css("main").text
+        # Get code blocks if needed
+        code_blocks = include_code_blocks ? extract_code_blocks(doc) : []
+
+        # Get the main content
+        main = doc.css("main")
+
+        # Remove code blocks from main content to avoid duplication
+        main.css("figure.highlight").remove if include_code_blocks
+
+        # Get text content
+        text_content = main.text.strip
+        next if text_content.empty?
 
         # Clean up the content
-        text_content = main_content.gsub(/\s+/, " ").strip
-        next if text_content.empty?
+        text_content = text_content.gsub(/\s+/, " ").strip
+
+        # Add code blocks if requested
+        content = if include_code_blocks && !code_blocks.empty?
+          text_content + "\n\n" + code_blocks.join("\n")
+        else
+          text_content
+        end
 
         # Get the title
         title = doc.css("h1, h2").first&.text&.strip || doc.title
@@ -168,9 +187,23 @@ module ElasticGraph
         {
           "title" => title,
           "url" => relative_path,
-          "content" => text_content
+          "content" => content
         }
       end
+    end
+
+    def extract_code_blocks(doc)
+      code_blocks = []
+      doc.css("figure.highlight").each do |figure|
+        code = figure.css("code").first
+        next unless code
+
+        lang = code["data-lang"]
+        text = code.text.strip
+
+        code_blocks << "```#{lang}\n#{text}\n```\n"
+      end
+      code_blocks
     end
   end
 end
