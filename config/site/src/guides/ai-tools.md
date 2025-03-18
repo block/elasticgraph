@@ -1,7 +1,7 @@
 ---
 layout: markdown
 title: AI Tools
-permalink: /ai-tools/
+permalink: /guides/ai-tools/
 ---
 
 Build faster with ElasticGraph using AI tools. Here's how to get started with ChatGPT, Claude, or your preferred LLM.

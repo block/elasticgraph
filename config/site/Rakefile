@@ -159,7 +159,7 @@ module ElasticGraph
 
         desc "Build YARD docs and create versioned archive"
         task :archive_docs, [:version] => [:build_docs] do |_, args|
-          abort "Version argument is required (e.g., rake site:archive_docs[1.0.0])" unless args[:version]
+          abort "Version argument is required (e.g., rake site:archive_docs[1.0.0 ])" unless args[:version]
 
           archive_name = "v#{args[:version]}.tar.gz"
           archive_path = ARCHIVED_DOCS_DIR / archive_name
