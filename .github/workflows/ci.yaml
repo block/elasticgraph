@@ -76,6 +76,85 @@ jobs:
       # to hit them if we don't wait a bit after booting.
       - run: script/ci_parts/${{ matrix.build_part }} ${{ matrix.datastore }} 10
 
+  docker-demo:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    env:
+      OPENSEARCH_VERSION: "2.19.1"
+
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@4d991eb9b905ef189e4c376166672c3f2f230481 # v2.11.0
+        with:
+          egress-policy: audit
+
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@b5ca514318bd6ebac0fb2aedd5d36ec1b5c232a2 # v3.10.0
+
+      - name: Build OpenSearch image
+        uses: docker/build-push-action@471d1dc4e07e5cdedd4c2171150001c434f0b7a4 # v6.15.0
+        with:
+          context: elasticgraph-local/lib/elastic_graph/local/opensearch
+          file: elasticgraph-local/lib/elastic_graph/local/opensearch/Dockerfile
+          push: false
+          load: true
+          build-args: |
+            VERSION=${{ env.OPENSEARCH_VERSION }}
+          tags: |
+            elasticgraph-opensearch-demo:latest
+
+      - name: Build ElasticGraph image
+        uses: docker/build-push-action@471d1dc4e07e5cdedd4c2171150001c434f0b7a4 # v6.15.0
+        with:
+          context: .
+          file: config/docker_demo/Dockerfile
+          push: false
+          load: true
+          tags: |
+            elasticgraph-demo:latest
+
+      - name: Test docker images
+        env:
+          NO_BUILD: "true"
+        run: config/docker_demo/test
+
+      - name: Login to GitHub Container Registry
+        if: success() && github.ref == 'refs/heads/main'
+        uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3.4.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push OpenSearch image
+        if: success() && github.ref == 'refs/heads/main'
+        uses: docker/build-push-action@471d1dc4e07e5cdedd4c2171150001c434f0b7a4 # v6.15.0
+        with:
+          context: elasticgraph-local/lib/elastic_graph/local/opensearch
+          file: elasticgraph-local/lib/elastic_graph/local/opensearch/Dockerfile
+          push: true
+          build-args: |
+            VERSION=${{ env.OPENSEARCH_VERSION }}
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/elasticgraph-opensearch-demo:${{ github.sha }}
+            ghcr.io/${{ github.repository_owner }}/elasticgraph-opensearch-demo:latest
+
+      - name: Push ElasticGraph image
+        if: success() && github.ref == 'refs/heads/main'
+        uses: docker/build-push-action@471d1dc4e07e5cdedd4c2171150001c434f0b7a4 # v6.15.0
+        with:
+          context: .
+          file: config/docker_demo/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/elasticgraph-demo:${{ github.sha }}
+            ghcr.io/${{ github.repository_owner }}/elasticgraph-demo:latest
+
   # An extra job that runs after all the others and provides a single summary status.
   # This is used by our branch protection rule to block merge until all CI checks passed,
   # without requiring us to individually list each CI check in the branch protection rule.
@@ -85,7 +164,7 @@ jobs:
     if: ${{ always() }} # so it runs even if the workflow was cancelled
     runs-on: ubuntu-latest
     name: All CI Checks Passed
-    needs: [ci-check]
+    needs: [ci-check, docker-demo]
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@4d991eb9b905ef189e4c376166672c3f2f230481 # v2.11.0
@@ -94,7 +173,8 @@ jobs:
 
       - run: |
           result="${{ needs.ci-check.result }}"
-          if [[ $result == "success" || $result == "skipped" ]]; then
+          docker_result="${{ needs.docker-demo.result }}"
+          if [[ $result == "success" || $result == "skipped" ]] && [[ $docker_result == "success" || $docker_result == "skipped" ]]; then
             exit 0
           else
             exit 1

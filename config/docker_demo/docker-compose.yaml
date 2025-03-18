@@ -1,55 +1,46 @@
 ---
-networks:
-  default:
-    name: elasticgraph-docker-demo
-    external: false
 services:
   opensearch:
-    build:
-      context: ../../elasticgraph-local/lib/elastic_graph/local/opensearch/.
-      dockerfile: Dockerfile
-      args:
-        VERSION: ${OPENSEARCH_VERSION}
-    container_name: opensearch-${OPENSEARCH_VERSION}-${ENV}
+    image: ${OPENSEARCH_IMAGE:-ghcr.io/block/elasticgraph-opensearch-demo:latest}
     healthcheck:
       interval: 10s
       retries: 80
       test: curl --write-out 'HTTP %{http_code}' --fail --silent --output /dev/null http://localhost:9200/
     environment:
-    # Note: we use `discovery.type=single-node` to ensure that the OpenSearch node does not
-    # try to join a cluster (or let another node join it). This prevents problems when you
-    # have multiple projects using elasticgraph-local at the same time. You do not want
-    # their OpenSearch nodes to try to join into a single cluster.
-    - discovery.type=single-node
-    # recommended by https://opensearch.org/downloads.html#minimal
-    - bootstrap.memory_lock=true
-    # We don't want OpenSearch to block writes when the disk allocation passes a threshold for our local/test
-    # OpenSearch we run using this docker setup.
-    # https://stackoverflow.com/a/75962819
-    #
-    # Without this, I frequently get `FORBIDDEN/10/cluster create-index blocked (api)` errors when running tests.
-    - cluster.routing.allocation.disk.threshold_enabled=false
-    - OPENSEARCH_JAVA_OPTS=-Xms4g -Xmx4g
+      # Note: we use `discovery.type=single-node` to ensure that the OpenSearch node does not
+      # try to join a cluster (or let another node join it). This prevents problems when you
+      # have multiple projects using elasticgraph-local at the same time. You do not want
+      # their OpenSearch nodes to try to join into a single cluster.
+      - discovery.type=single-node
+      # recommended by https://opensearch.org/downloads.html#minimal
+      - bootstrap.memory_lock=true
+      # We don't want OpenSearch to block writes when the disk allocation passes a threshold for our local/test
+      # OpenSearch we run using this docker setup.
+      # https://stackoverflow.com/a/75962819
+      #
+      # Without this, I frequently get `FORBIDDEN/10/cluster create-index blocked (api)` errors when running tests.
+      - cluster.routing.allocation.disk.threshold_enabled=false
+      - OPENSEARCH_JAVA_OPTS=-Xms4g -Xmx4g
     ulimits:
       nofile:
         soft: 65536
         hard: 65536
     volumes:
-    - opensearch:/usr/share/opensearch/data
+      - opensearch:/usr/share/opensearch/data
     ports:
-    - 9200:9200
+      - 9200:9200
   elasticgraph:
-    build:
-      context: ../..
-      dockerfile: config/docker_demo/Dockerfile
-      args:
-        container_name: elasticgraph-${ENV}
+    image: ${ELASTICGRAPH_IMAGE:-ghcr.io/block/elasticgraph-demo:latest}
     environment:
-      - PORT=${ELASTICGRAPH_PORT}
+      - PORT=${ELASTICGRAPH_PORT:-9393}
     ports:
-    - ${ELASTICGRAPH_PORT}:${ELASTICGRAPH_PORT}
+      - "${ELASTICGRAPH_PORT:-9393}:${ELASTICGRAPH_PORT:-9393}"
     depends_on:
       opensearch:
         condition: service_healthy
 volumes:
   opensearch:
+networks:
+  default:
+    name: elasticgraph-docker-demo
+    external: false

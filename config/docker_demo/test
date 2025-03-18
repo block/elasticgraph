@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+
+set -e
+
+# Set default environment variables
+export OPENSEARCH_VERSION=${OPENSEARCH_VERSION:-2.19.1}
+export OPENSEARCH_IMAGE="elasticgraph-opensearch-demo:latest"
+export ELASTICGRAPH_IMAGE="elasticgraph-demo:latest"
+
+if [ -z "${NO_BUILD+x}" ]; then
+  echo "Building OpenSearch image..."
+  docker build \
+    -t "elasticgraph-opensearch-demo:latest" \
+    --build-arg VERSION="${OPENSEARCH_VERSION}" \
+    -f elasticgraph-local/lib/elastic_graph/local/opensearch/Dockerfile \
+    elasticgraph-local/lib/elastic_graph/local/opensearch
+
+  echo "Building ElasticGraph image..."
+  docker build -t elasticgraph-demo:latest -f config/docker_demo/Dockerfile .
+else
+  echo "Skipping image builds..."
+fi
+
+echo "Starting containers..."
+docker compose -f config/docker_demo/docker-compose.yaml up -d
+
+# Show logs in real time
+docker compose -f config/docker_demo/docker-compose.yaml logs -f &
+LOGS_PID=$!
+
+# Wait for ElasticGraph to be ready
+echo "Waiting for ElasticGraph to be ready..."
+for i in {1..30}; do
+  echo "Checking container status..."
+  docker compose -f config/docker_demo/docker-compose.yaml ps
+
+  if curl -s http://localhost:9393/graphiql >/dev/null; then
+    echo "ElasticGraph is ready"
+    kill $LOGS_PID
+    break
+  fi
+  if [ $i -eq 30 ]; then
+    echo "Timed out waiting for ElasticGraph"
+    kill $LOGS_PID
+    docker compose -f config/docker_demo/docker-compose.yaml down -v
+    exit 1
+  fi
+  echo "Waiting... ($i/30)"
+  sleep 2
+done
+
+# Run a test query
+echo "Running test query..."
+QUERY='{"query": "{ artists { totalEdgeCount } }"}'
+RESPONSE=$(curl -s -X POST -H "Content-Type: application/json" -d "$QUERY" http://localhost:9393/graphql)
+
+# Check if we got a positive number back
+if echo "$RESPONSE" | grep -q '"totalEdgeCount":[1-9][0-9]*'; then
+  COUNT=$(echo "$RESPONSE" | grep -o '"totalEdgeCount":[0-9]*' | cut -d':' -f2)
+  echo "Successfully got $COUNT artists"
+else
+  echo "Failed to get positive artist count. Response:"
+  echo "$RESPONSE"
+  docker compose -f config/docker_demo/docker-compose.yaml logs
+  docker compose -f config/docker_demo/docker-compose.yaml down -v
+  exit 1
+fi
+
+# Clean up
+echo "Cleaning up..."
+docker compose -f config/docker_demo/docker-compose.yaml down -v
