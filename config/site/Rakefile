@@ -127,51 +127,34 @@ module ElasticGraph
         end
 
         desc "Build Jekyll site with freshly generated YARD documentation"
-        task build: [:build_docs, :build_css, "examples:compile_queries", :extract_searchable_content, :extract_llm_txt_content] do
-          # First Jekyll build to get the API docs in place
+        task build: [:build_docs, :build_css, "examples:compile_queries", :extract_content] do
           run_jekyll :build
         end
 
-        desc "Extracts the site's searchable content"
-        task extract_searchable_content: [:build_docs] do
+        desc "Extract searchable and LLM-friendly content"
+        task extract_content: [:build_docs] do
           require_relative "support/content_extractor"
 
-          # Build Jekyll content so that we have parsable HTML to extarct content from.
-          # (We couldn't figure out a way to extract the rendered content within Jekyll itself).
+          # Build Jekyll content so that we have parsable HTML to extract content from
           run_jekyll :build
 
-          extractor = ContentExtractor.new(jekyll_site_dir: JEKYLL_SITE_DIR, docs_dir: DOCS_DIR)
-          searchable_content = extractor.extract_searchable_content
-          searchable_content_file = JEKYLL_DATA_DIR / "searchable_content.yaml"
-
-          puts "Writing searchable content from #{searchable_content.size} pages to #{searchable_content_file}."
-
-          # Write to data file
-          ::FileUtils.mkdir_p(JEKYLL_DATA_DIR)
-          ::File.write(searchable_content_file, ::YAML.dump(searchable_content))
-        end
-
-        desc "Extracts the site's docs into LLM-friendly YAML"
-        task extract_llm_txt_content: [:build_docs] do
-          require_relative "support/llm_content_extractor"
-
-          # Build Jekyll content so that we have parsable HTML to extract content from.
-          # (We couldn't figure out a way to extract the rendered content within Jekyll itself).
-          run_jekyll :build
-
-          extractor = ElasticGraph::LLMContentExtractor.new(
+          extractor = ContentExtractor.new(
             jekyll_site_dir: JEKYLL_SITE_DIR,
             docs_dir: DOCS_DIR
           )
 
-          llm_content = extractor.extract_llm_content
-          output_file = JEKYLL_DATA_DIR / "llms_full_content.yaml"
+          content = extractor.extract_content
 
-          puts "Writing LLM content (#{(llm_content['size'] / 1024.0).round(1)}KB) to #{output_file}"
-
-          # Write to data file
+          # Write searchable content
+          searchable_content_file = JEKYLL_DATA_DIR / "searchable_content.yaml"
+          puts "Writing searchable content from #{content['searchable_content'].size} pages to #{searchable_content_file}."
           ::FileUtils.mkdir_p(JEKYLL_DATA_DIR)
-          ::File.write(output_file, ::YAML.dump(llm_content))
+          ::File.write(searchable_content_file, ::YAML.dump(content['searchable_content']))
+
+          # Write LLM content
+          llm_content_file = JEKYLL_DATA_DIR / "llms_full_content.yaml"
+          puts "Writing LLM content (#{(content['llm_content']['size'] / 1024.0).round(1)}KB) to #{llm_content_file}"
+          ::File.write(llm_content_file, ::YAML.dump(content['llm_content']))
         end
 
         desc "Build YARD docs and create versioned archive"
@@ -216,7 +199,7 @@ module ElasticGraph
         end
 
         desc "Serve Jekyll site locally"
-        task serve: [:build_docs, :build_css, "examples:compile_queries", :extract_searchable_content, :extract_llm_txt_content] do
+        task serve: [:build_docs, :build_css, "examples:compile_queries", :extract_content] do
           require "filewatcher"
 
           # Regenerate the YARD docs anytime we change anything.

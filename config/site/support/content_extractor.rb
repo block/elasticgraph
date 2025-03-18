@@ -15,26 +15,115 @@ module ElasticGraph
       @docs_dir = docs_dir
     end
 
-    def extract_searchable_content
+    def extract_content
+      # Get the latest docs version
       latest_docs_version = Dir.entries(@docs_dir).grep(/^v/)
         .max_by { |v| Gem::Version.new(v.delete_prefix("v")) }
 
       puts "Indexing API docs from latest version: #{latest_docs_version}"
 
+      # Extract docs content
       api_docs_content = process_docs_directory(@docs_dir / latest_docs_version, latest_docs_version)
       markdown_content = process_markdown_pages
 
-      api_docs_content + markdown_content
+      # Build the searchable content
+      searchable_content = api_docs_content + markdown_content
+
+      # Build the LLM content
+      llm_content = []
+      llm_content << "# ElasticGraph API Documentation\n"
+      llm_content << "## API Documentation\n"
+
+      api_docs_content.each do |doc|
+        llm_content << "### #{doc["title"]}\n"
+        llm_content << doc["content"]
+        llm_content << "\nURL: #{doc["url"]}\n\n"
+      end
+
+      llm_content << "## Site Documentation\n"
+      markdown_content.each do |page|
+        llm_content << "### #{page["title"]}\n"
+        llm_content << page["content"]
+        llm_content << "\nURL: #{page["url"]}\n\n"
+      end
+
+      full_llm_content = llm_content.join("\n")
+
+      {
+        "searchable_content" => searchable_content,
+        "llm_content" => {
+          "content" => full_llm_content,
+          "size" => full_llm_content.bytesize,
+          "version" => latest_docs_version,
+          "generated_at" => Time.now.utc.iso8601
+        }
+      }
     end
 
     private
+
+    # Common YARD-generated phrases that we want to exclude from search indexing
+    YARD_PHRASES_TO_REMOVE = [
+      /Generated on.*?by yard.*?ruby.*?\)\./,
+      "Overview",
+      /This (?:class|method|module|constant) is part of a private API\. You should avoid using this (?:class|method|module|constant) if possible, as it may be removed or be changed in the future\./,
+      /This (?:class|method|module|constant) is private\./,
+      /This is a private (?:class|method|module|constant)\./,
+      "Returns:",
+      "Returns — ",
+      /(see .+? for more details)/,  # Regex to match cross-references
+      "Implementation from",
+      "Implementation detail:",
+      "Source:",
+      "File:",
+      "Defined in:",
+      /(also: #[a-zA-Z_]+)/,  # Regex to match "also: #method_name" references
+      "View source",
+      "Toggle source",
+      "Toggle Docs",
+      "Permalink"
+    ].freeze
+
+    def extract_file_content(file_path)
+      content = File.read(file_path)
+      doc = Nokogiri::HTML(content)
+
+      # Remove script, style, and line number elements
+      doc.css("script, style").remove
+
+      # Get the main content without line numbers and source code
+      doc.css(".line-numbers, .line, .source_code, .file").remove
+      main_content = doc.css("#main").text
+
+      # Get method details - just the signatures and docstrings
+      method_details = doc.css(".method_details .method_signature, .method_details .docstring").text
+
+      # Combine and clean up the text
+      content = [main_content, method_details].join(" ")
+      content.gsub!(/\s+/, " ") # normalize whitespace
+
+      # Remove common YARD-generated phrases
+      YARD_PHRASES_TO_REMOVE.each do |phrase|
+        content.gsub!(phrase, "")
+      end
+
+      content.gsub!(/\s+/, " ") # normalize whitespace again after removals
+      content.strip!
+
+      # Get the title
+      title = doc.css("title").text.strip
+      title = title.split(" - ").first if title.include?(" - ")
+      title = title.sub(/\s*— Documentation by YARD.*$/, "") # Remove YARD suffix
+
+      [title, content]
+    end
 
     def process_docs_directory(dir, version)
       Dir.glob(File.join(dir, "**", "*.html")).filter_map do |file|
         next if file.include?("/css/") || file.include?("/js/")
         next if %w[frames.html file_list.html class_list.html method_list.html].include?(File.basename(file))
 
-        title, content = extract_content(file)
+        title, content = extract_file_content(file)
         next if content.empty?
 
         # Generate URL with /docs/version/ prefix
@@ -84,62 +173,6 @@ module ElasticGraph
           "content" => text_content
         }
       end
-    end
-
-    # Common YARD-generated phrases that we want to exclude from search indexing
-    YARD_PHRASES_TO_REMOVE = [
-      /Generated on.*?by yard.*?ruby.*?\)\./,
-      "Overview",
-      /This (?:class|method|module|constant) is part of a private API\. You should avoid using this (?:class|method|module|constant) if possible, as it may be removed or be changed in the future\./,
-      /This (?:class|method|module|constant) is private\./,
-      /This is a private (?:class|method|module|constant)\./,
-      "Returns:",
-      "Returns — ",
-      /(see .+? for more details)/,  # Regex to match cross-references
-      "Implementation from",
-      "Implementation detail:",
-      "Source:",
-      "File:",
-      "Defined in:",
-      /(also: #[a-zA-Z_]+)/,  # Regex to match "also: #method_name" references
-      "View source",
-      "Toggle source",
-      "Toggle Docs",
-      "Permalink"
-    ].freeze
-
-    def extract_content(file_path)
-      content = File.read(file_path)
-      doc = Nokogiri::HTML(content)
-
-      # Remove script, style, and line number elements
-      doc.css("script, style").remove
-
-      # Get the main content without line numbers and source code
-      doc.css(".line-numbers, .line, .source_code, .file").remove
-      main_content = doc.css("#main").text
-
-      # Get method details - just the signatures and docstrings
-      method_details = doc.css(".method_details .method_signature, .method_details .docstring").text
-
-      # Combine and clean up the text
-      content = [main_content, method_details].join(" ")
-      content.gsub!(/\s+/, " ") # normalize whitespace
-
-      # Remove common YARD-generated phrases
-      YARD_PHRASES_TO_REMOVE.each do |phrase|
-        content.gsub!(phrase, "")
-      end
-
-      content.gsub!(/\s+/, " ") # normalize whitespace again after removals
-      content.strip!
-
-      # Get the title
-      title = doc.css("title").text.strip
-      title = title.split(" - ").first if title.include?(" - ")
-      title = title.sub(/\s*— Documentation by YARD.*$/, "") # Remove YARD suffix
-
-      [title, content]
     end
   end
 end
