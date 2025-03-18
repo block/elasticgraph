@@ -1,0 +1,7 @@
+---
+layout: none
+permalink: /llms-full.txt
+---
+# ElasticGraph API Documentation
+
+This is a placeholder file. The actual content will be generated during site build.

@@ -63,6 +63,7 @@ config/site/_site
 config/site/src/docs
 config/site/src/_data/*_queries.yaml
 config/site/src/_data/searchable_content.yaml
+config/site/src/llms-full.txt
 config/site/.jekyll-metadata
 config/site/package-lock.json
 config/site/examples/*/schema_artifacts
@@ -71,3 +72,4 @@ config/site/examples/*/queries/*/*.variables.yaml
 # Ignore the generated CSS
 config/site/src/assets/css/main.css
 config/site/src/assets/css/highlight.css
+config/site/src/llms-full.txt

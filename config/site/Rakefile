@@ -127,7 +127,7 @@ module ElasticGraph
         end
 
         desc "Build Jekyll site with freshly generated YARD documentation"
-        task build: [:build_docs, :build_css, "examples:compile_queries", :extract_searchable_content] do
+        task build: [:build_docs, :build_css, "examples:compile_queries", :extract_searchable_content, :extract_llm_txt_content] do
           # First Jekyll build to get the API docs in place
           run_jekyll :build
         end
@@ -149,6 +149,25 @@ module ElasticGraph
           # Write to data file
           ::FileUtils.mkdir_p(JEKYLL_DATA_DIR)
           ::File.write(searchable_content_file, ::YAML.dump(searchable_content))
+        end
+
+        desc "Extracts the site's documenation into one LLM-friendly file"
+        task extract_llm_txt_content: [:build_docs] do
+          require_relative "support/llm_content_extractor"
+
+          # Build Jekyll content so that we have parsable HTML to extract content from.
+          # (We couldn't figure out a way to extract the rendered content within Jekyll itself).
+          run_jekyll :build
+
+          output_file = SITE_SOURCE_DIR / "llms-full.txt"
+
+          extractor = ElasticGraph::LLMContentExtractor.new(
+            jekyll_site_dir: JEKYLL_SITE_DIR,
+            docs_dir: DOCS_DIR,
+            output_file: output_file
+          )
+
+          extractor.extract_and_write_content
         end
 
         desc "Build YARD docs and create versioned archive"
@@ -193,7 +212,7 @@ module ElasticGraph
         end
 
         desc "Serve Jekyll site locally"
-        task serve: [:build_docs, :build_css, "examples:compile_queries", :extract_searchable_content] do
+        task serve: [:build_docs, :build_css, "examples:compile_queries", :extract_searchable_content, :extract_llm_txt_content] do
           require "filewatcher"
 
           # Regenerate the YARD docs anytime we change anything.
@@ -343,6 +362,12 @@ module ElasticGraph
               end
             end
           end
+        end
+
+        desc "Generate raw markdown documentation for LLMs"
+        task generate_llm_docs: ["examples:compile_queries"] do
+          script_path = SITE_CONFIG_DIR / "script" / "generate_llm_docs.rb"
+          sh "#{script_path} #{SITE_CONFIG_DIR}"
         end
       end
     end
