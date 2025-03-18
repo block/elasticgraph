@@ -75,6 +75,12 @@ module ElasticGraph
 
             expect(value).to eq []
           end
+
+          it "returns a blank list when a list field was indexed with a `null` value" do
+            value = resolve("Person", "nicknames", {"id" => 2, "nicknames" => nil})
+
+            expect(value).to eq []
+          end
         end
 
         context "for a field with customizations" do

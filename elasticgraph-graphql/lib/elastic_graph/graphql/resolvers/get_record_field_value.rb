@@ -29,9 +29,8 @@ module ElasticGraph
               object
             end
 
-          value = Support::HashUtil.fetch_value_at_path(data, field_name) do
-            field.type.list? ? [] : nil
-          end
+          value = Support::HashUtil.fetch_value_at_path(data, field_name) { nil }
+          value = [] if value.nil? && field.type.list?
 
           if field.type.relay_connection?
             RelayConnection::ArrayAdapter.build(value, args, @schema_element_names, context)
