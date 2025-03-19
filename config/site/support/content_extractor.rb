@@ -193,17 +193,14 @@ module ElasticGraph
     end
 
     def extract_code_blocks(doc)
-      code_blocks = []
-      doc.css("figure.highlight").each do |figure|
-        code = figure.css("code").first
-        next unless code
+      doc.css("figure.highlight").filter_map do |figure|
+        if (code = figure.css("code").first)
+          lang = code["data-lang"]
+          text = code.text.strip
 
-        lang = code["data-lang"]
-        text = code.text.strip
-
-        code_blocks << "```#{lang}\n#{text}\n```\n"
+          "```#{lang}\n#{text}\n```\n"
+        end
       end
-      code_blocks
     end
   end
 end
