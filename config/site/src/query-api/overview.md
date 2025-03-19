@@ -1,5 +1,5 @@
 ---
-layout: markdown
+layout: query-api
 title: 'ElasticGraph Query API: Overview'
 permalink: "/query-api/overview/"
 nav_title: Overview

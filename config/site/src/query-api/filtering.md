@@ -1,5 +1,5 @@
 ---
-layout: markdown
+layout: query-api
 title: 'ElasticGraph Query API: Filtering'
 permalink: "/query-api/filtering/"
 nav_title: Filtering

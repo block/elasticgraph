@@ -51,11 +51,13 @@
     @apply my-4 rounded-lg border-l-4 p-4 border-blue-400 bg-blue-50/30 dark:border-blue-500 dark:bg-blue-950/20;
   }
 
-  .alert-note .alert-title {
+  .alert-note > p:first-of-type,
+  .alert-note > .alert-title {
     @apply mb-2 flex items-center gap-2 text-lg font-semibold text-blue-700 dark:text-blue-400;
   }
 
-  .alert-note .alert-title::before {
+  .alert-note > p:first-of-type::before,
+  .alert-note > .alert-title::before {
     content: 'ⓘ';
   }
 
@@ -64,18 +66,26 @@
     @apply my-4 rounded-lg border-l-4 p-4 border-amber-400 bg-amber-50/30 dark:border-amber-500 dark:bg-amber-950/20;
   }
 
-  .alert-warning .alert-title {
+  .alert-warning > p:first-of-type,
+  .alert-warning > .alert-title {
     @apply mb-2 flex items-center gap-2 text-lg font-semibold text-amber-700 dark:text-amber-400;
   }
 
-  .alert-warning .alert-title::before {
+  .alert-warning > p:first-of-type::before,
+  .alert-warning > .alert-title::before {
     content: '⚠';
   }
 
   /* Alert content */
-  .alert-note p:not(.alert-title),
-  .alert-warning p:not(.alert-title) {
+  .alert-note > p:not(:first-of-type),
+  .alert-warning > p:not(:first-of-type) {
     @apply text-gray-700 dark:text-gray-300;
+  }
+
+  /* Remove margin from last element in alerts to maintain consistent padding */
+  .alert-note > :last-child,
+  .alert-warning > :last-child {
+    @apply mb-0;
   }
 
   /* Code blocks within alerts */

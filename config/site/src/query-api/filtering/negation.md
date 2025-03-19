@@ -1,5 +1,5 @@
 ---
-layout: markdown
+layout: query-api
 title: 'ElasticGraph Query API: Filter Negation'
 permalink: "/query-api/filtering/negation/"
 nav_title: Negation

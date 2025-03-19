@@ -8,6 +8,17 @@
   <meta name="description" content="{{ site.description }}">
   <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
   <link rel="stylesheet" href="{{ '/assets/css/highlight.css' | relative_url }}">
+  <script>
+    function copyToClipboard(button, text) {
+      navigator.clipboard.writeText(text).then(() => {
+        const message = button.parentElement.querySelector('[data-copy-message]');
+        message.classList.remove('hidden');
+        setTimeout(() => {
+          message.classList.add('hidden');
+        }, 2000);
+      });
+    }
+  </script>
   {% if layout.use_anchor_headings %}
   <script src="{{ '/assets/js/anchor-headings.js' | relative_url }}" defer></script>
   {% endif %}

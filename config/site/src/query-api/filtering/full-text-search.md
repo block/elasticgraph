@@ -1,5 +1,5 @@
 ---
-layout: markdown
+layout: query-api
 title: 'ElasticGraph Query API: Full Text Search'
 permalink: "/query-api/filtering/full-text-search/"
 nav_title: Full Text Search

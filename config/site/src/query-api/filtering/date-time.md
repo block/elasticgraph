@@ -1,5 +1,5 @@
 ---
-layout: markdown
+layout: query-api
 title: 'ElasticGraph Query API: DateTime Filtering'
 permalink: "/query-api/filtering/date-time/"
 nav_title: DateTime

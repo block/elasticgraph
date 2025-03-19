@@ -1,5 +1,5 @@
 ---
-layout: markdown
+layout: query-api
 title: 'ElasticGraph Query API: Geographic Filtering'
 permalink: "/query-api/filtering/geographic/"
 nav_title: Geographic

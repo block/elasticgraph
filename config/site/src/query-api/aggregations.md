@@ -1,5 +1,5 @@
 ---
-layout: markdown
+layout: query-api
 title: 'ElasticGraph Query API: Aggregations'
 permalink: "/query-api/aggregations/"
 nav_title: Aggregations

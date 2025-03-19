@@ -1,5 +1,5 @@
 ---
-layout: markdown
+layout: query-api
 title: 'ElasticGraph Query API: Aggregation Counts'
 permalink: "/query-api/aggregations/counts/"
 nav_title: Counts

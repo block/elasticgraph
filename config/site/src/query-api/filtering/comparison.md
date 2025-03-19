@@ -1,5 +1,5 @@
 ---
-layout: markdown
+layout: query-api
 title: 'ElasticGraph Query API: Comparison Filtering'
 permalink: "/query-api/filtering/comparison/"
 nav_title: Comparison

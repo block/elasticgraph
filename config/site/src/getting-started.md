@@ -71,7 +71,7 @@ This will:
 * Configure the datastore using the dumped `datastore_config.yaml` schema artifact
 * Index some randomly generated artists/albums/tours/shows/venues data
 * Boot ElasticGraph and a [GraphiQL UI](https://github.com/graphql/graphiql)
-* [Open the GraphiQL UI](http://localhost:9000/) in your browser
+* Open the [local GraphiQL UI]({{ site.localhost_eg_url }}) in your browser
 
 Run some example queries in GraphiQL to confirm it's working. Here's an example query to get you started:
 

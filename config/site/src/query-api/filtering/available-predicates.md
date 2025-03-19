@@ -1,5 +1,5 @@
 ---
-layout: markdown
+layout: query-api
 title: 'ElasticGraph Query API: Available Filter Predicates'
 permalink: "/query-api/filtering/available-predicates/"
 nav_title: Available Predicates

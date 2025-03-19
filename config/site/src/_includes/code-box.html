@@ -1,0 +1,22 @@
+<div class="relative bg-gray-800 dark:bg-gray-900 text-white py-3 px-6 rounded-sm {% unless include.full_width %}w-full{% endunless %}">
+  <div class="flex items-center">
+    {% if include.full_width %}
+    <div class="font-mono text-xs font-normal">{{ include.command }}</div>
+    {% else %}
+    <div class="overflow-x-auto min-w-0 w-full">
+      <code class="font-mono text-xs font-normal whitespace-nowrap">{{ include.command }}</code>
+    </div>
+    {% endif %}
+    <div class="relative ml-4 shrink-0">
+      <button onclick="copyToClipboard(this, '{{ include.command }}')"
+        class="text-white hover:text-blue-300 transition-colors cursor-pointer"
+        aria-label="Copy command">
+        <span class="sr-only">Copy command</span>
+        {% include icons/document-duplicate.svg %}
+      </button>
+      <span class="hidden absolute -top-8 left-1/2 transform -translate-x-1/2 bg-blue-300 text-gray-900 text-xs py-1 px-2 rounded whitespace-nowrap" data-copy-message>
+        Copied!
+      </span>
+    </div>
+  </div>
+</div>

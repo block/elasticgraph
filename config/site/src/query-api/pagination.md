@@ -1,5 +1,5 @@
 ---
-layout: markdown
+layout: query-api
 title: 'ElasticGraph Query API: Pagination'
 permalink: "/query-api/pagination/"
 nav_title: Pagination

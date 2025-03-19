@@ -1,5 +1,5 @@
 ---
-layout: markdown
+layout: query-api
 title: 'ElasticGraph Query API: Sorting'
 permalink: "/query-api/sorting/"
 nav_title: Sorting

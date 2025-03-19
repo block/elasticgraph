@@ -1,5 +1,5 @@
 ---
-layout: markdown
+layout: query-api
 title: 'ElasticGraph Query API: Equality Filtering'
 permalink: "/query-api/filtering/equality/"
 nav_title: Equality

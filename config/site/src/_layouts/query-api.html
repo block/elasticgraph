@@ -1,0 +1,30 @@
+---
+layout: markdown
+---
+
+<div class="alert-note">
+  <div class="alert-title">
+    Try these example queries by visiting the <a href="{{ site.localhost_eg_url }}" class="underline hover:no-underline">GraphiQL UI</a> after booting locally.
+    <button onclick="toggleCommand(this)" class="ml-auto text-sm bg-blue-300 text-gray-900 w-6 h-6 rounded-full flex items-center justify-center hover:bg-blue-200 transition-colors shrink-0 float-right" aria-label="Show startup command">
+      {% include icons/command-chevron-down.svg %}
+      {% include icons/command-chevron-up.svg %}
+    </button>
+  </div>
+  <div class="hidden mt-3" data-command-container>
+    {% include code-box.html command=site.demo_oneliner %}
+  </div>
+</div>
+
+{{ content }}
+
+<script>
+function toggleCommand(button) {
+  const container = button.closest('.alert-note').querySelector('[data-command-container]');
+  const showIcon = button.querySelector('[data-show-icon]');
+  const hideIcon = button.querySelector('[data-hide-icon]');
+
+  container.classList.toggle('hidden');
+  showIcon.classList.toggle('hidden');
+  hideIcon.classList.toggle('hidden');
+}
+</script>

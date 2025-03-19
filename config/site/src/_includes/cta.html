@@ -5,18 +5,13 @@
       Try ElasticGraph Now
     </h2>
     <p class="text-lg text-blue-100 mb-4">
-      Get started by installing ElasticGraph with the following command:
+      Try some <a href="{% link query-api/overview.md %}" class="text-white underline hover:no-underline">example queries</a> by visiting the
+      <a href="{{ site.localhost_eg_url }}" class="text-white underline hover:no-underline">local GraphiQL UI</a> after booting locally with this command:
     </p>
-    <div
-      class="bg-gray-800 dark:bg-gray-900 text-white py-3 px-6 rounded-sm inline-block mb-6">
-      <code class="font-mono inline-flex items-center">
-        gem install elasticgraph
-        <button onclick="navigator.clipboard.writeText('gem install elasticgraph');"
-          class="ml-4 -mr-2 bg-transparent text-white p-0 inline-flex items-center">
-          <span class="sr-only">Copy command</span>
-          {% include svg/document-duplicate.svg %}
-        </button>
-      </code>
+    <div class="flex justify-center mb-4">
+      <div class="inline-block">
+        {% include code-box.html command=site.demo_oneliner full_width=true %}
+      </div>
     </div>
   </div>
 </section>

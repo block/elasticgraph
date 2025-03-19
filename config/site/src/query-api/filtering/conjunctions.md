@@ -1,5 +1,5 @@
 ---
-layout: markdown
+layout: query-api
 title: 'ElasticGraph Query API: Filter Conjunctions'
 permalink: "/query-api/filtering/conjunctions/"
 nav_title: Conjunctions
