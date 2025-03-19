@@ -359,12 +359,13 @@ module ElasticGraph
       def verify_runtime_metadata(runtime_metadata)
         registered_resolvers = runtime_metadata.graphql_resolvers_by_name
 
-        fields_by_resolvers = runtime_metadata
+        fields_by_resolvers = ::Hash.new { |h, k| h[k] = [] } # : ::Hash[::Symbol, ::Array[::String]]
+        runtime_metadata
           .object_types_by_name
-          .each_with_object(::Hash.new { |h, k| h[k] = [] }) do |(type_name, type), hash|
+          .each do |type_name, type|
             type.graphql_fields_by_name.each do |field_name, field|
               if (resolver = field.resolver)
-                hash[resolver] << "#{type_name}.#{field_name}"
+                fields_by_resolvers[resolver] << "#{type_name}.#{field_name}"
               end
             end
           end
@@ -410,10 +411,11 @@ module ElasticGraph
       def check_for_circular_dependencies!
         return if @no_circular_dependencies
 
-        referenced_types_by_source_type = state.types_by_name
+        referenced_types_by_source_type = ::Hash.new { |h, k| h[k] = ::Set.new } # : ::Hash[::String, ::Set[::String]]
+        state.types_by_name
           .reject { |_, type| type.graphql_only? }
-          .each_with_object(::Hash.new { |h, k| h[k] = ::Set.new }) do |(type_name, _), cache|
-            recursively_add_referenced_types_to(state.type_ref(type_name), cache)
+          .each do |type_name, _|
+            recursively_add_referenced_types_to(state.type_ref(type_name), referenced_types_by_source_type)
           end
 
         circular_reference_sets = referenced_types_by_source_type

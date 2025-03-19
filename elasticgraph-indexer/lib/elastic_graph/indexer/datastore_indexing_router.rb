@@ -186,12 +186,13 @@ module ElasticGraph
       # This nested structure is necessary because a single operation can target more than one datastore
       # cluster, and a document may have different source event versions in different datastore clusters.
       def source_event_versions_in_index(operations)
-        ops_by_client_name = operations.each_with_object(::Hash.new { |h, k| h[k] = [] }) do |op, ops_hash|
+        ops_by_client_name = ::Hash.new { |h, k| h[k] = [] } # : ::Hash[::String, ::Array[_Operation]]
+        operations.each do |op|
           # Note: this intentionally does not use `accessible_cluster_names_to_index_into`.
           # We want to fail with clear error if any clusters are inaccessible instead of silently ignoring
           # the named cluster. The `IndexingFailuresError` provides a clear error.
           cluster_names = op.destination_index_def.clusters_to_index_into
-          cluster_names.each { |cluster_name| ops_hash[cluster_name] << op }
+          cluster_names.each { |cluster_name| ops_by_client_name[cluster_name] << op }
         end
 
         client_names_and_results = Support::Threading.parallel_map(ops_by_client_name) do |(client_name, all_ops)|
@@ -323,9 +324,10 @@ module ElasticGraph
       # need to worry about it mutating during the lifetime of a single process (particularly given the expense of doing
       # so).
       def validate_mapping_completeness_of!(index_cluster_name_method, *index_definitions)
-        diffs_by_cluster_and_index_name = index_definitions.reduce(_ = {}) do |accum, index_def|
-          accum.merge(mapping_diffs_for(index_def, index_cluster_name_method))
-        end
+        diffs_by_cluster_and_index_name =
+          index_definitions.reduce({}) do |accum, index_def| # $ ::Hash[[::String, ::String], ::String]
+            accum.merge(mapping_diffs_for(index_def, index_cluster_name_method))
+          end
 
         if diffs_by_cluster_and_index_name.any?
           formatted_diffs = diffs_by_cluster_and_index_name.map do |(cluster_name, index_name), diff|
