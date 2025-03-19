@@ -6,7 +6,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from mcp_elasticgraph.helpers import COMMON_SCHEMA_PATHS, GRAPHQL_SCHEMA_FILENAME
+from mcp_elasticgraph.helpers import GRAPHQL_SCHEMA_FILENAME
 from mcp_elasticgraph.server import (
     get_graphql_schema,
     is_elasticgraph_project,
@@ -33,15 +33,20 @@ class TestProjectDetection:
         os.chdir(mock_elasticgraph_project)
         result = is_elasticgraph_project()
 
-        assert result["is_elasticgraph"] is True
-        assert "ElasticGraph gems found" in result["message"]
+        assert "content" in result
+        assert len(result["content"]) == 1
+        assert result["content"][0]["type"] == "text"
+        assert "This is an ElasticGraph project" in result["content"][0]["text"]
 
     def test_invalid_project(self, temp_dir: Path) -> None:
         """Test detecting an invalid project directory."""
         result = is_elasticgraph_project()
 
-        assert result["is_elasticgraph"] is False
-        assert "No Gemfile found" in result["message"]
+        assert "content" in result
+        assert len(result["content"]) == 1
+        assert result["content"][0]["type"] == "text"
+        assert "This is not an ElasticGraph project" in result["content"][0]["text"]
+        assert "No Gemfile found" in result["content"][0]["text"]
 
 
 class TestGraphQLSchema:
@@ -52,28 +57,34 @@ class TestGraphQLSchema:
         os.chdir(mock_elasticgraph_project)
         result = get_graphql_schema()
 
-        assert result["status"] == "success"
-        assert "schema" in result
-        assert "type Query" in result["schema"]
-        assert result["schema_path"] == COMMON_SCHEMA_PATHS[0]
-        assert result["mime_type"] == "application/graphql"
+        assert "contents" in result
+        assert len(result["contents"]) == 1
+        assert result["contents"][0]["uri"] == "schema://graphql"
+        assert result["contents"][0]["mimeType"] == "application/graphql"
+        assert "type Query" in result["contents"][0]["text"]
 
     def test_get_schema_not_in_project(self, temp_dir: Path) -> None:
         """Test getting schema when not in an ElasticGraph project."""
         os.chdir(temp_dir)
         result = get_graphql_schema()
 
-        assert result["status"] == "error"
-        assert "No Gemfile found" in result["message"]
+        assert "contents" in result
+        assert len(result["contents"]) == 1
+        assert result["contents"][0]["uri"] == "schema://graphql"
+        assert result["contents"][0]["mimeType"] == "text/plain"
+        assert "No Gemfile found" in result["contents"][0]["text"]
 
     def test_get_schema_file_not_found(self, mock_elasticgraph_project: Path) -> None:
         """Test getting schema when schema file doesn't exist."""
         os.chdir(mock_elasticgraph_project)
         result = get_graphql_schema()
 
-        assert result["status"] == "error"
-        assert GRAPHQL_SCHEMA_FILENAME in result["message"]
-        assert "not found" in result["message"]
+        assert "contents" in result
+        assert len(result["contents"]) == 1
+        assert result["contents"][0]["uri"] == "schema://graphql"
+        assert result["contents"][0]["mimeType"] == "text/plain"
+        assert GRAPHQL_SCHEMA_FILENAME in result["contents"][0]["text"]
+        assert "not found" in result["contents"][0]["text"]
 
     def test_get_schema_permission_error(self, mock_elasticgraph_project: Path, mock_schema_file: Path) -> None:
         """Test getting schema when permission denied."""
@@ -83,9 +94,12 @@ class TestGraphQLSchema:
 
         result = get_graphql_schema()
 
-        assert result["status"] == "error"
-        assert "Failed to read" in result["message"]
-        assert "Check file permissions" in result["hint"]
+        assert "contents" in result
+        assert len(result["contents"]) == 1
+        assert result["contents"][0]["uri"] == "schema://graphql"
+        assert result["contents"][0]["mimeType"] == "text/plain"
+        assert "Failed to read" in result["contents"][0]["text"]
+        assert "Check file permissions" in result["contents"][0]["text"]
 
         # Restore permissions for cleanup
         mock_schema_file.chmod(0o644)

@@ -2,8 +2,11 @@
 ElasticGraph MCP Server
 """
 
+import json
 import subprocess
+from functools import lru_cache
 
+import httpx
 from mcp.server.fastmcp import FastMCP
 from mcp.shared.exceptions import McpError
 
@@ -26,19 +29,60 @@ Elasticsearch / OpenSearch.
 Available Resources:
 - usage://commands: Common ElasticGraph commands and examples
 - docs://links: Documentation, API reference, and guides
+- docs://api: Full ElasticGraph API documentation
 - schema://graphql: Current project's GraphQL schema
 
 Available Tools:
 - is_elasticgraph_project: Validate if current directory is an ElasticGraph project
 
-For detailed command usage and examples, check the usage://commands resource.
-For documentation and guides, check the docs://links resource.
+For detailed command usage and examples, use the usage://commands resource.
+For documentation and guides, use the docs://links resource.
+For complete ElasticGraph API reference, use the docs://api resource.
 """.strip()
 
 mcp = FastMCP("mcp_elasticgraph", instructions=instructions)
 
 
+@lru_cache(maxsize=1)
+async def fetch_api_docs() -> str | None:
+    """
+    Fetch the ElasticGraph API docs with caching.
+    Returns None if fetch fails.
+    """
+    url = "https://block.github.io/elasticgraph/llms-full.txt"
+
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(url, timeout=10.0)
+            response.raise_for_status()
+            return response.text
+    except (httpx.HTTPError, httpx.TimeoutError):
+        return None
+
+
 # Resources
+@mcp.resource("docs://api")
+async def get_api_docs() -> ResponseDict:
+    """
+    Get the full ElasticGraph API documentation in one file.
+    Fetches from source: https://block.github.io/elasticgraph/llms-full.txt
+    """
+    docs = await fetch_api_docs()
+
+    if docs is None:
+        return {
+            "contents": [
+                {
+                    "uri": "docs://api",
+                    "mimeType": "text/plain",
+                    "text": "Error: Failed to fetch API documentation. Check your internet connection and try again.",
+                }
+            ]
+        }
+
+    return {"contents": [{"uri": "docs://api", "mimeType": "text/plain", "text": docs}]}
+
+
 @mcp.resource("usage://commands")
 def get_common_commands() -> ResponseDict:
     """
@@ -68,9 +112,9 @@ def get_common_commands() -> ResponseDict:
     ]
 
     return {
-        "status": "success",
-        "message": "Successfully retrieved common ElasticGraph commands",
-        "commands": commands,
+        "contents": [
+            {"uri": "usage://commands", "mimeType": "application/json", "text": json.dumps({"commands": commands})}
+        ]
     }
 
 
@@ -91,7 +135,7 @@ def get_documentation_links() -> ResponseDict:
         },
     }
 
-    return {"status": "success", "message": "Successfully retrieved documentation links", "links": links}
+    return {"contents": [{"uri": "docs://links", "mimeType": "application/json", "text": json.dumps({"links": links})}]}
 
 
 @mcp.resource("schema://graphql")
@@ -108,33 +152,33 @@ def get_graphql_schema() -> ResponseDict:
         with open(schema_path, encoding="utf-8") as f:
             schema_content = f.read()
 
-        return {
-            "status": "success",
-            "message": f"Successfully retrieved {GRAPHQL_SCHEMA_FILENAME}",
-            "schema_path": schema_path,
-            "schema": schema_content,
-            "mime_type": "application/graphql",
-        }
+        return {"contents": [{"uri": "schema://graphql", "mimeType": "application/graphql", "text": schema_content}]}
 
     except McpError as e:
-        return {
-            "status": "error",
-            "message": e.error.message,
-            "details": e.error.data.get("details", ""),
-            "hint": e.error.data.get("hint", ""),
-        }
+        message = (
+            f"Error: {e.error.message}\n"
+            f"Details: {e.error.data.get('details', '')}\nHint: {e.error.data.get('hint', '')}"
+        )
+        return {"contents": [{"uri": "schema://graphql", "mimeType": "text/plain", "text": message}]}
     except OSError as e:
+        message = (
+            f"Error: Failed to read {GRAPHQL_SCHEMA_FILENAME}\n"
+            f"Details: {str(e)}\nHint: Check file permissions and try again"
+        )
         return {
-            "status": "error",
-            "message": f"Failed to read {GRAPHQL_SCHEMA_FILENAME}",
-            "details": str(e),
-            "hint": "Check file permissions and try again",
+            "contents": [
+                {
+                    "uri": "schema://graphql",
+                    "mimeType": "text/plain",
+                    "text": message,
+                }
+            ]
         }
 
 
 # Tools
 @mcp.tool()
-def is_elasticgraph_project() -> dict[str, bool | str]:
+def is_elasticgraph_project() -> dict[str, list]:
     """
     Checks if the current directory is an ElasticGraph project by looking for
     elasticgraph gems in the Gemfile.
@@ -151,8 +195,12 @@ def is_elasticgraph_project() -> dict[str, bool | str]:
 
         if gemfile_check.returncode != 0:
             return {
-                "is_elasticgraph": False,
-                "message": "No Gemfile found in current directory",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": "No Gemfile found in current directory. This is not an ElasticGraph project.",
+                    }
+                ]
             }
 
         # Search for elasticgraph gems in Gemfile
@@ -161,12 +209,14 @@ def is_elasticgraph_project() -> dict[str, bool | str]:
             "Failed to search Gemfile",
         )
 
-        return {
-            "is_elasticgraph": grep_result.returncode == 0,
-            "message": "ElasticGraph gems found in Gemfile"
-            if grep_result.returncode == 0
-            else "No ElasticGraph gems found in Gemfile",
-        }
+        is_eg_project = grep_result.returncode == 0
+        message = (
+            "This is an ElasticGraph project - found ElasticGraph gems in Gemfile."
+            if is_eg_project
+            else "This is not an ElasticGraph project - no ElasticGraph gems found in Gemfile."
+        )
+
+        return {"content": [{"type": "text", "text": message}]}
 
     except subprocess.SubprocessError as e:
         raise create_command_error(
