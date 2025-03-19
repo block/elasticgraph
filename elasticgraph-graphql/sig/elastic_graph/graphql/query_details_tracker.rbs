@@ -7,6 +7,7 @@ module ElasticGraph
       attr_accessor query_counts_per_datastore_request: ::Array[::Integer]
       attr_accessor datastore_query_server_duration_ms: ::Integer
       attr_accessor datastore_query_client_duration_ms: ::Integer
+      attr_accessor queried_shard_count: ::Integer
       attr_accessor mutex: ::Thread::Mutex
 
       def initialize: (
@@ -16,6 +17,7 @@ module ElasticGraph
         query_counts_per_datastore_request: ::Array[::Integer],
         datastore_query_server_duration_ms: ::Integer,
         datastore_query_client_duration_ms: ::Integer,
+        queried_shard_count: ::Integer,
         mutex: ::Thread::Mutex
       ) -> void
     end
@@ -24,7 +26,13 @@ module ElasticGraph
       def self.empty: () -> QueryDetailsTracker
       def record_datastore_queries_for_single_request: (::Array[DatastoreQuery]) -> void
       def record_hidden_type: (::String) -> void
-      def record_datastore_query_duration_ms: (client: ::Integer, server: ::Integer?) -> void
+      def record_datastore_query_metrics: (
+        client_duration_ms: ::Integer,
+        server_duration_ms: ::Integer?,
+        queried_shard_count: ::Integer
+      ) -> void
+
+      def datastore_request_transport_duration_ms: () -> ::Integer
     end
   end
 end

@@ -78,9 +78,16 @@ module ElasticGraph
             [response["took"], queries_for_cluster.zip(ordered_responses)]
           end
 
-          query_tracker.record_datastore_query_duration_ms(
-            client: @monotonic_clock.now_in_ms - datastore_query_started_at,
-            server: server_took_and_results.map(&:first).compact.max
+          queried_shard_count = server_took_and_results.reduce(0) do |outer_accum, (_, queries_and_responses)|
+            outer_accum + queries_and_responses.reduce(0) do |inner_accum, (_, response)|
+              inner_accum + (response.dig("_shards", "total") || 0)
+            end
+          end
+
+          query_tracker.record_datastore_query_metrics(
+            client_duration_ms: @monotonic_clock.now_in_ms - datastore_query_started_at,
+            server_duration_ms: server_took_and_results.map(&:first).compact.max,
+            queried_shard_count: queried_shard_count
           )
 
           server_took_and_results.flat_map(&:last).to_h.tap do |responses_by_query|

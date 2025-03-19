@@ -61,6 +61,7 @@ module ElasticGraph
         let(:slow_query_threshold_ms) { 4000 }
         let(:datastore_query_client_duration_ms) { 75 }
         let(:datastore_query_server_duration_ms) { 50 }
+        let(:queried_shard_count) { 17 }
         let(:query_executor) { define_query_executor }
 
         it "executes the provided query and logs how long it took, including the query fingerprint, and some datastore query details" do
@@ -92,6 +93,8 @@ module ElasticGraph
             "duration_ms" => 240,
             "datastore_server_duration_ms" => datastore_query_server_duration_ms,
             "elasticgraph_overhead_ms" => 240 - datastore_query_client_duration_ms,
+            "datastore_request_transport_duration_ms" => datastore_query_client_duration_ms - datastore_query_server_duration_ms,
+            "queried_shard_count" => queried_shard_count,
             "unique_shard_routing_values" => "routing_value_1, routing_value_2",
             "unique_shard_routing_value_count" => 2,
             "unique_search_index_expressions" => "alt_colors, colors",
@@ -437,9 +440,10 @@ module ElasticGraph
         def define_graphql
           router = instance_double("ElasticGraph::GraphQL::DatastoreSearchRouter")
           allow(router).to receive(:msearch) do |queries, query_tracker:|
-            query_tracker.record_datastore_query_duration_ms(
-              client: datastore_query_client_duration_ms,
-              server: datastore_query_server_duration_ms
+            query_tracker.record_datastore_query_metrics(
+              client_duration_ms: datastore_query_client_duration_ms,
+              server_duration_ms: datastore_query_server_duration_ms,
+              queried_shard_count: queried_shard_count
             )
 
             queries.each_with_object({}) do |query, hash|

@@ -21,6 +21,7 @@ module ElasticGraph
       :query_counts_per_datastore_request,
       :datastore_query_server_duration_ms,
       :datastore_query_client_duration_ms,
+      :queried_shard_count,
       :mutex
     )
       def self.empty
@@ -31,6 +32,7 @@ module ElasticGraph
           query_counts_per_datastore_request: [],
           datastore_query_server_duration_ms: 0,
           datastore_query_client_duration_ms: 0,
+          queried_shard_count: 0,
           mutex: ::Thread::Mutex.new
         )
       end
@@ -49,11 +51,18 @@ module ElasticGraph
         end
       end
 
-      def record_datastore_query_duration_ms(client:, server:)
+      def record_datastore_query_metrics(client_duration_ms:, server_duration_ms:, queried_shard_count:)
         mutex.synchronize do
-          self.datastore_query_client_duration_ms += client
-          self.datastore_query_server_duration_ms += server if server
+          self.datastore_query_client_duration_ms += client_duration_ms
+          self.datastore_query_server_duration_ms += server_duration_ms if server_duration_ms
+          self.queried_shard_count += queried_shard_count
         end
+      end
+
+      # Indicates how long was spent on transport between the client and the datastore server, including
+      # network time, JSON serialization time, etc.
+      def datastore_request_transport_duration_ms
+        datastore_query_client_duration_ms - datastore_query_server_duration_ms
       end
     end
   end

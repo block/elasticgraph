@@ -257,6 +257,32 @@ module ElasticGraph
             .and change { query_tracker.datastore_query_client_duration_ms }.from(240).to(270)
         end
 
+        it "records how many shards were queried" do
+          allow(main_datastore_client).to receive(:msearch).and_return(
+            {
+              "took" => 47, "responses" => [
+                Support::HashUtil.deep_merge(empty_response, {"_shards" => {"total" => 7}}),
+                Support::HashUtil.deep_merge(empty_response, {"_shards" => {"total" => 12}})
+              ]
+            },
+            {
+              "took" => 12, "responses" => [
+                Support::HashUtil.deep_merge(empty_response, {"_shards" => {"total" => 200}})
+              ]
+            }
+          )
+
+          query_tracker = QueryDetailsTracker.empty
+
+          expect {
+            router.msearch([query1, query2], query_tracker: query_tracker)
+          }.to change { query_tracker.queried_shard_count }.from(0).to(19)
+
+          expect {
+            router.msearch([query2], query_tracker: query_tracker)
+          }.to change { query_tracker.queried_shard_count }.from(19).to(219)
+        end
+
         it "tolerates the datastore server response not indicating how long it took" do
           allow(main_datastore_client).to receive(:msearch).and_return("responses" => [
             empty_response.merge("r" => 1)

@@ -101,12 +101,16 @@ module ElasticGraph
             "query_fingerprint" => fingerprint_for(query),
             "query_name" => query.operation_name,
             "duration_ms" => duration,
-            # Here we log how long the datastore queries took according to what the datastore itself reported.
+            # How long the datastore queries took according to what the datastore itself reported.
             "datastore_server_duration_ms" => query_tracker.datastore_query_server_duration_ms,
-            # Here we log an estimate for how much overhead ElasticGraph added on top of how long the datastore took.
+            # An estimate for how much overhead ElasticGraph added on top of how long the datastore took.
             # This is based on the duration, excluding how long the datastore calls took from the client side
             # (e.g. accounting for network latency, serialization time, etc)
             "elasticgraph_overhead_ms" => duration - query_tracker.datastore_query_client_duration_ms,
+            # An estimate for the time spent on transport (network latency, JSON serialization, etc).
+            "datastore_request_transport_duration_ms" => query_tracker.datastore_request_transport_duration_ms,
+            # How many datastore shards were queried, in total. This is a measure of how much load the query caused on the datastore.
+            "queried_shard_count" => query_tracker.queried_shard_count,
             # According to https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/FilterAndPatternSyntax.html#metric-filters-extract-json,
             # > Value nodes can be strings or numbers...If a property selector points to an array or object, the metric filter won't match the log format.
             # So, to allow flexibility to deal with cloud watch metric filters, we coerce these values to a string here.
