@@ -1,21 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{ page.title }}</title>
-  <meta name="description" content="{{ site.description }}">
-  <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
-  <link rel="stylesheet" href="{{ '/assets/css/highlight.css' | relative_url }}">
-</head>
-
-<body class="{{ site.style.body }}">
-  {% include navbar.html %}
-
-  {{ content }}
-
-  {% include footer.html %}
-</body>
-
-</html>
+---
+layout: base
+---
+{{ content }}

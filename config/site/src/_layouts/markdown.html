@@ -1,29 +1,14 @@
-<!DOCTYPE html>
-<html lang="en" class="dark">
+---
+layout: base
+html_class: dark
+use_anchor_headings: true
+---
+<main class="grow">
+  <div class="container mx-auto px-4 py-8 lg:py-20">
+    <article class="prose dark:prose-invert lg:prose-xl">
+      <h2>{{ page.title }}</h2>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{ page.title }}</title>
-  <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
-  <link rel="stylesheet" href="{{ '/assets/css/highlight.css' | relative_url }}">
-  <script src="{{ '/assets/js/anchor-headings.js' | relative_url }}" defer></script>
-</head>
-
-<body class="{{ site.style.body }}">
-  {% include navbar.html %}
-
-  <main class="grow">
-    <div class="container mx-auto px-4 py-8 lg:py-20">
-      <article class="prose dark:prose-invert lg:prose-xl">
-        <h2>{{ page.title }}</h2>
-
-        {{ content }}
-      </article>
-    </div>
-  </main>
-
-  {% include footer.html %}
-</body>
-
-</html>
+      {{ content }}
+    </article>
+  </div>
+</main>

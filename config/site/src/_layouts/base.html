@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en"{% if layout.html_class %} class="{{ layout.html_class }}"{% endif %}>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ page.title }}</title>
+  <meta name="description" content="{{ site.description }}">
+  <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
+  <link rel="stylesheet" href="{{ '/assets/css/highlight.css' | relative_url }}">
+  {% if layout.use_anchor_headings %}
+  <script src="{{ '/assets/js/anchor-headings.js' | relative_url }}" defer></script>
+  {% endif %}
+</head>
+
+<body class="{{ site.style.body }}">
+  {% include navbar.html %}
+  {{ content }}
+  {% include footer.html %}
+</body>
+
+</html>
