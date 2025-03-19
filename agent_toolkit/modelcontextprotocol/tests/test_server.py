@@ -2,12 +2,14 @@
 
 import os
 from pathlib import Path
-from unittest.mock import Mock, patch
+from unittest.mock import AsyncMock, Mock, patch
 
+import httpx
 import pytest
 
 from mcp_elasticgraph.helpers import GRAPHQL_SCHEMA_FILENAME
 from mcp_elasticgraph.server import (
+    get_api_docs,
     get_graphql_schema,
     is_elasticgraph_project,
 )
@@ -103,3 +105,44 @@ class TestGraphQLSchema:
 
         # Restore permissions for cleanup
         mock_schema_file.chmod(0o644)
+
+
+class TestApiDocs:
+    """Tests for API documentation resource."""
+
+    @pytest.mark.asyncio
+    async def test_get_api_docs_success(self) -> None:
+        """Test successfully retrieving API docs."""
+        mock_docs = "# ElasticGraph API Documentation\n\n## Overview"
+        with patch("httpx.AsyncClient.get") as mock_get:
+            # Create mock response
+            mock_response = AsyncMock()
+            mock_response.text = mock_docs
+            mock_get.return_value = mock_response
+
+            result = await get_api_docs()
+
+            # Verify the response was properly awaited
+            mock_response.raise_for_status.assert_awaited_once()
+
+            assert "contents" in result
+            assert len(result["contents"]) == 1
+            assert result["contents"][0]["uri"] == "docs://api"
+            assert result["contents"][0]["mimeType"] == "text/plain"
+            assert result["contents"][0]["text"] == mock_docs
+
+    @pytest.mark.asyncio
+    async def test_get_api_docs_failure(self) -> None:
+        """Test handling API docs fetch failure."""
+        async def mock_fetch():
+            return None
+            
+        with patch("mcp_elasticgraph.server.fetch_api_docs", side_effect=mock_fetch):
+            result = await get_api_docs()
+
+            assert "contents" in result
+            assert len(result["contents"]) == 1
+            assert result["contents"][0]["uri"] == "docs://api"
+            assert result["contents"][0]["mimeType"] == "text/plain"
+            assert "Error: Failed to fetch API documentation" in result["contents"][0]["text"]
+            assert "check your internet connection" in result["contents"][0]["text"].lower()

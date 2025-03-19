@@ -54,7 +54,7 @@ async def fetch_api_docs() -> str | None:
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(url, timeout=10.0)
-            response.raise_for_status()
+            await response.raise_for_status()
             return response.text
     except (httpx.HTTPError, httpx.TimeoutError):
         return None
