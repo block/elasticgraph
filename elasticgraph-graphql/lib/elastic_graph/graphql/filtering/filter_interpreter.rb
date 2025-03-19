@@ -339,7 +339,8 @@ module ElasticGraph
         end
 
         def build_bool_hash(&block)
-          bool_node = Hash.new { |h, k| h[k] = [] }.tap(&block)
+          bool_node = Hash.new { |h, k| h[k] = [] } # : stringOrSymbolHash
+          bool_node.tap(&block)
 
           # To treat "empty" filter predicates as `true` we need to return `nil` here.
           return nil if bool_node.empty?

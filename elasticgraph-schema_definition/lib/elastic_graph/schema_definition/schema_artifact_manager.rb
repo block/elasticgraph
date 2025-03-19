@@ -178,9 +178,9 @@ module ElasticGraph
       end
 
       def report_json_schema_merge_errors(merged_results)
-        json_schema_versions_by_missing_field = ::Hash.new { |h, k| h[k] = [] }
-        json_schema_versions_by_missing_type = ::Hash.new { |h, k| h[k] = [] }
-        json_schema_versions_by_missing_necessary_field = ::Hash.new { |h, k| h[k] = [] }
+        json_schema_versions_by_missing_field = ::Hash.new { |h, k| h[k] = [] } # : ::Hash[::String, ::Array[::Integer]]
+        json_schema_versions_by_missing_type = ::Hash.new { |h, k| h[k] = [] } # : ::Hash[::String, ::Array[::Integer]]
+        json_schema_versions_by_missing_necessary_field = ::Hash.new { |h, k| h[k] = [] } # : ::Hash[Indexing::JSONSchemaWithMetadata::MissingNecessaryField, ::Array[::Integer]]
 
         merged_results.each do |result|
           result.missing_fields.each do |field|
