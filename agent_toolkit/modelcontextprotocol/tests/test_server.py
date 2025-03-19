@@ -4,7 +4,6 @@ import os
 from pathlib import Path
 from unittest.mock import AsyncMock, Mock, patch
 
-import httpx
 import pytest
 
 from mcp_elasticgraph.helpers import GRAPHQL_SCHEMA_FILENAME
@@ -134,9 +133,10 @@ class TestApiDocs:
     @pytest.mark.asyncio
     async def test_get_api_docs_failure(self) -> None:
         """Test handling API docs fetch failure."""
+
         async def mock_fetch():
             return None
-            
+
         with patch("mcp_elasticgraph.server.fetch_api_docs", side_effect=mock_fetch):
             result = await get_api_docs()
 

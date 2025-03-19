@@ -11,17 +11,36 @@ This module provides utility functions for:
 
 import os
 import subprocess
+from functools import lru_cache
+
+import httpx
 
 from mcp_elasticgraph.errors import create_command_error, create_not_in_project_error
 
 # Constants
 MIN_RUBY_VERSION = "3.2.0"
 GRAPHQL_SCHEMA_FILENAME = "schema.graphql"
+API_DOCS_URL = "https://block.github.io/elasticgraph/llms-full.txt"
 
 # Common locations for the schema file relative to project root
 COMMON_SCHEMA_PATHS = [
     f"config/schema/artifacts/{GRAPHQL_SCHEMA_FILENAME}",
 ]
+
+
+@lru_cache(maxsize=1)
+async def fetch_api_docs() -> str | None:
+    """
+    Fetch the ElasticGraph API docs with caching.
+    Returns None if fetch fails.
+    """
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(API_DOCS_URL, timeout=10.0)
+            await response.raise_for_status()
+            return response.text
+    except (httpx.HTTPError, httpx.ReadTimeout):
+        return None
 
 
 def run_command(command: list[str], error_message: str) -> subprocess.CompletedProcess:

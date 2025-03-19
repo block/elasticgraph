@@ -4,15 +4,14 @@ ElasticGraph MCP Server
 
 import json
 import subprocess
-from functools import lru_cache
 
-import httpx
 from mcp.server.fastmcp import FastMCP
 from mcp.shared.exceptions import McpError
 
 from mcp_elasticgraph.errors import create_command_error
 from mcp_elasticgraph.helpers import (
     GRAPHQL_SCHEMA_FILENAME,
+    fetch_api_docs,
     find_graphql_schema,
     run_command,
 )
@@ -41,23 +40,6 @@ For complete ElasticGraph API reference, use the docs://api resource.
 """.strip()
 
 mcp = FastMCP("mcp_elasticgraph", instructions=instructions)
-
-
-@lru_cache(maxsize=1)
-async def fetch_api_docs() -> str | None:
-    """
-    Fetch the ElasticGraph API docs with caching.
-    Returns None if fetch fails.
-    """
-    url = "https://block.github.io/elasticgraph/llms-full.txt"
-
-    try:
-        async with httpx.AsyncClient() as client:
-            response = await client.get(url, timeout=10.0)
-            await response.raise_for_status()
-            return response.text
-    except (httpx.HTTPError, httpx.TimeoutError):
-        return None
 
 
 # Resources
