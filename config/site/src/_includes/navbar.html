@@ -15,7 +15,7 @@
       <div class="hidden lg:flex lg:items-center lg:space-x-6 w-full justify-between ml-6">
         <!-- Left Side Nav Items -->
         <div class="flex items-center space-x-6">
-          <a href="{{ '/getting-started' | relative_url }}" class="text-base {{ site.style.link }}">Get Started</a>
+          <a href="{% link getting-started.md %}" class="text-base {{ site.style.link }}">Get Started</a>
 
           {% include query_api_nav.html %}
           {% include guides_nav.html %}
@@ -34,7 +34,7 @@
             {% include icons/github.svg %}
             <span>GitHub</span>
           </a>
-          <a href="{{ '/about' | relative_url }}" class="text-base {{ site.style.link }}">About</a>
+          <a href="{% link about.md %}" class="text-base {{ site.style.link }}">About</a>
         </div>
       </div>
     </div>
@@ -42,10 +42,10 @@
     <!-- Mobile Navigation Menu -->
     <div id="mobile-menu" class="hidden lg:hidden mt-4">
       <div class="flex flex-col space-y-4">
-        <a href="{{ '/getting-started' | relative_url }}" class="text-base {{ site.style.link }}">Get Started</a>
-        <a href="{{ '/query-api' | relative_url }}" class="text-base {{ site.style.link }}">Query API</a>
-        <a href="{{ '/guides' | relative_url }}" class="text-base {{ site.style.link }}">Guides</a>
-        <a href="{{ '/api-docs' | relative_url }}" class="text-base {{ site.style.link }}">API Docs</a>
+        <a href="{% link getting-started.md %}" class="text-base {{ site.style.link }}">Get Started</a>
+        <a href="{% link query-api.md %}" class="text-base {{ site.style.link }}">Query API</a>
+        <a href="{% link guides.md %}" class="text-base {{ site.style.link }}">Guides</a>
+        <a href="{% link api-docs.md %}" class="text-base {{ site.style.link }}">API Docs</a>
 
         <!-- Mobile Search -->
         <form action="{{ '/search/' | relative_url }}" method="get" class="relative">
@@ -61,7 +61,7 @@
             {% include icons/github.svg %}
             <span>GitHub</span>
           </a>
-          <a href="{{ '/about' | relative_url }}" class="text-base {{ site.style.link }}">About</a>
+          <a href="{% link about.md %}" class="text-base {{ site.style.link }}">About</a>
         </div>
       </div>
     </div>
