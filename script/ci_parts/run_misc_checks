@@ -7,6 +7,7 @@ script/spellcheck
 script/type_check
 script/update_codebase_overview --verify
 script/update_ci_yaml --verify
+script/update_licenses --verify
 
 bundle exec standardrb
 bundle exec rake schema_artifacts:check VERBOSE=true

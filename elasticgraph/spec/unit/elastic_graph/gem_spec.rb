@@ -43,7 +43,7 @@ module ElasticGraph
       it "has a non-symlinked `LICENSE.txt` file" do
         expect(::File.exist?("LICENSE.txt")).to be true
         expect(::File.ftype("LICENSE.txt")).to eq "file"
-        expect(::File.read("LICENSE.txt")).to include("MIT License", "Copyright (c) 2024 Block, Inc.")
+        expect(::File.read("LICENSE.txt")).to include("MIT License", /Copyright .* Block, Inc/)
       end
     end
 

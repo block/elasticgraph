@@ -201,16 +201,5 @@ module ElasticGraph
         puts "hello world"
       RUBY
     end
-
-    describe "LICENSE.txt" do
-      let(:expected_copyright) { "Copyright (c) 2024 - #{current_year} Block, Inc." }
-
-      it "has an up-to-date copyright notice" do
-        license_content = File.read(File.expand_path("../../../LICENSE.txt", __dir__))
-        copyright_line = license_content.lines.find { |line| line.include?("Copyright") }.to_s.strip
-
-        expect(copyright_line).to eq(expected_copyright)
-      end
-    end
   end
 end

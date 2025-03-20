@@ -1,0 +1,47 @@
+#!/usr/bin/env ruby
+
+require "date"
+require "optparse"
+
+# Parse command line options
+verify = false
+::OptionParser.new do |opts|
+  opts.banner = "Usage: #{$PROGRAM_NAME} [options]"
+  opts.on("--verify", "Verify licenses are up to date") do |v|
+    verify = v
+  end
+end.parse!
+
+# Get current year
+current_year = ::Date.today.year
+
+# Find all LICENSE files
+license_files = `git ls-files | grep LICENSE`.split("\n")
+
+# Track if any files need updates
+files_needing_update = license_files.select do |file|
+  content = ::File.read(file)
+
+  # Replace year range in copyright line
+  updated_content = content.sub(
+    /Copyright .* Block, Inc\./,
+    "Copyright (c) 2024 - #{current_year} Block, Inc."
+  )
+
+  (content != updated_content).tap do |needs_update|
+    if needs_update && !verify
+      ::File.write(file, updated_content)
+      puts "Updated #{file}"
+    end
+  end
+end
+
+if verify && !files_needing_update.empty?
+  puts <<~EOS
+    #{files_needing_update.size} license files need to be updated. Run script/update_licenses to fix.
+
+    #{files_needing_update.map { |f| " - #{f} " }.join("\n")}
+  EOS
+
+  exit 1
+end
