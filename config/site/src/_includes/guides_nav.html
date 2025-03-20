@@ -1,0 +1,24 @@
+<!-- Guides dropdown -->
+<div class="relative group">
+  <button
+    class="text-base text-blue-600 dark:text-blue-400 flex items-center space-x-1">
+    <span>Guides</span>
+    {% include icons/chevron-down.svg %}
+  </button>
+  <div class="absolute left-0 pt-2 w-48 hidden group-hover:block z-50">
+    <div class="{{site.style.navbar_dropdown}}">
+      <!-- Dropdown pip -->
+      <div class="{{site.style.dropdown_pip}}"></div>
+      <div class="relative py-1">
+        {% for page in site.pages %}
+          {% if page.url contains '/guides/' and page.url != '/guides/' %}
+            <a href="{{ page.url | relative_url }}"
+              class="{{site.style.dropdown_item}}">
+              {{ page.title | default: page.name | remove: '.md' | titleize }}
+            </a>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>

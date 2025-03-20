@@ -22,19 +22,19 @@
           {% assign subpages = site.pages | where_exp: "page", "page.url contains section.url" | where_exp: "page", "page.url != section.url" | sort: "menu_order" %}
           {% assign section_name = section.url | split: '/' | last %}
           {% if subpages.size == 0 %}
-            <a href="{{ section.url | relative_url }}" class="block px-4 py-2 text-base text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600">
+            <a href="{{ section.url | relative_url }}" class="{{site.style.dropdown_item}}">
               {{ section.nav_title }}
             </a>
           {% elsif section_name == "filtering" %}
             <div class="group/filtering">
-              <a href="{{ '/query-api/filtering/' | relative_url }}" class="block px-4 py-2 text-base text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center justify-between">
+              <a href="{{ '/query-api/filtering/' | relative_url }}" class="{{site.style.dropdown_item}} flex items-center justify-between">
                 <span>{{ section.nav_title }}</span>
                 {% include icons/chevron-right.svg %}
               </a>
               <div class="hidden group-hover/filtering:block absolute left-full top-0 ml-0.5 w-48">
                 <div class="{{site.style.navbar_dropdown}} py-1">
                   {% for page in subpages %}
-                    <a href="{{ page.url | relative_url }}" class="block px-4 py-2 text-base text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600">
+                    <a href="{{ page.url | relative_url }}" class="{{site.style.dropdown_item}}">
                       {{ page.nav_title }}
                     </a>
                   {% endfor %}
@@ -43,14 +43,14 @@
             </div>
           {% elsif section_name == "aggregations" %}
             <div class="group/aggregations">
-              <a href="{{ '/query-api/aggregations/' | relative_url }}" class="block px-4 py-2 text-base text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center justify-between">
+              <a href="{{ '/query-api/aggregations/' | relative_url }}" class="{{site.style.dropdown_item}} flex items-center justify-between">
                 <span>{{ section.nav_title }}</span>
                 {% include icons/chevron-right.svg %}
               </a>
               <div class="hidden group-hover/aggregations:block absolute left-full top-0 ml-0.5 w-48">
                 <div class="{{site.style.navbar_dropdown}} py-1">
                   {% for page in subpages %}
-                    <a href="{{ page.url | relative_url }}" class="block px-4 py-2 text-base text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600">
+                    <a href="{{ page.url | relative_url }}" class="{{site.style.dropdown_item}}">
                       {{ page.nav_title }}
                     </a>
                   {% endfor %}
