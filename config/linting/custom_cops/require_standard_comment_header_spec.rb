@@ -8,12 +8,16 @@
 
 require_relative "require_standard_comment_header"
 require "rubocop/rspec/support"
+require "date"
 
 module ElasticGraph
   RSpec.describe RequireStandardCommentHeader do
     include ::RuboCop::RSpec::ExpectOffense
+
     let(:cop) { RequireStandardCommentHeader.new(config) }
     let(:config) { ::RuboCop::Config.new("ElasticGraph/RequireStandardCommentHeader" => {"Enabled" => true}) }
+    let(:current_year) { Date.today.year }
+    let(:year_range) { "2024 - #{current_year}" }
 
     it "autocorrects a file that does not have the standard header" do
       expect_offense(<<~RUBY)
@@ -23,7 +27,7 @@ module ElasticGraph
       RUBY
 
       expect_correction(<<~RUBY)
-        # Copyright 2024 Block, Inc.
+        # Copyright #{year_range} Block, Inc.
         #
         # Use of this source code is governed by an MIT-style
         # license that can be found in the LICENSE file or at
@@ -38,7 +42,7 @@ module ElasticGraph
 
     it "does not register an offense when a file has the standard header (and no other leading comments)" do
       expect_no_offenses(<<~RUBY)
-        # Copyright 2024 Block, Inc.
+        # Copyright #{year_range} Block, Inc.
         #
         # Use of this source code is governed by an MIT-style
         # license that can be found in the LICENSE file or at
@@ -53,7 +57,7 @@ module ElasticGraph
 
     it "autocorrects a file when the class documentation has no blank line between it and the standard header" do
       expect_offense(<<~RUBY)
-        # Copyright 2024 Block, Inc.
+        # Copyright #{year_range} Block, Inc.
         #
         # Use of this source code is governed by an MIT-style
         # license that can be found in the LICENSE file or at
@@ -67,7 +71,7 @@ module ElasticGraph
       RUBY
 
       expect_correction(<<~RUBY)
-        # Copyright 2024 Block, Inc.
+        # Copyright #{year_range} Block, Inc.
         #
         # Use of this source code is governed by an MIT-style
         # license that can be found in the LICENSE file or at
@@ -83,7 +87,7 @@ module ElasticGraph
 
     it "does not register an offense when a file has the standard header and other leading comments with a blank line in between" do
       expect_no_offenses(<<~RUBY)
-        # Copyright 2024 Block, Inc.
+        # Copyright #{year_range} Block, Inc.
         #
         # Use of this source code is governed by an MIT-style
         # license that can be found in the LICENSE file or at
@@ -105,7 +109,7 @@ module ElasticGraph
       RUBY
 
       expect_correction(<<~RUBY)
-        # Copyright 2024 Block, Inc.
+        # Copyright #{year_range} Block, Inc.
         #
         # Use of this source code is governed by an MIT-style
         # license that can be found in the LICENSE file or at
@@ -120,7 +124,7 @@ module ElasticGraph
 
     it "does not register an offense when a file is only comments and has the standard header" do
       expect_no_offenses(<<~RUBY)
-        # Copyright 2024 Block, Inc.
+        # Copyright #{year_range} Block, Inc.
         #
         # Use of this source code is governed by an MIT-style
         # license that can be found in the LICENSE file or at
@@ -135,7 +139,7 @@ module ElasticGraph
 
     it "autocorrects a comments-only file when the non-standard comments have no blank comment line between them and the standard header" do
       expect_offense(<<~RUBY)
-        # Copyright 2024 Block, Inc.
+        # Copyright #{year_range} Block, Inc.
         #
         # Use of this source code is governed by an MIT-style
         # license that can be found in the LICENSE file or at
@@ -148,7 +152,7 @@ module ElasticGraph
       RUBY
 
       expect_correction(<<~RUBY)
-        # Copyright 2024 Block, Inc.
+        # Copyright #{year_range} Block, Inc.
         #
         # Use of this source code is governed by an MIT-style
         # license that can be found in the LICENSE file or at
@@ -163,7 +167,7 @@ module ElasticGraph
 
     it "autocorrects an out-of-date standard header" do
       expect_offense(<<~RUBY)
-        # Copyright 2023 Block, Inc.
+        # Copyright 2024 Block, Inc.
         #
         # Use of this source code is governed by an MIT-style
         # license that can be found in the LICENSE file or at
@@ -177,7 +181,7 @@ module ElasticGraph
       RUBY
 
       expect_correction(<<~RUBY)
-        # Copyright 2024 Block, Inc.
+        # Copyright #{year_range} Block, Inc.
         #
         # Use of this source code is governed by an MIT-style
         # license that can be found in the LICENSE file or at
@@ -196,6 +200,17 @@ module ElasticGraph
 
         puts "hello world"
       RUBY
+    end
+
+    describe "LICENSE.txt" do
+      let(:expected_copyright) { "Copyright (c) 2024 - #{current_year} Block, Inc." }
+
+      it "has an up-to-date copyright notice" do
+        license_content = File.read(File.expand_path("../../../LICENSE.txt", __dir__))
+        copyright_line = license_content.lines.find { |line| line.include?("Copyright") }.to_s.strip
+
+        expect(copyright_line).to eq(expected_copyright)
+      end
     end
   end
 end

@@ -8,7 +8,7 @@ updated_code_filename = "#{__dir__}/../../tmp/updated_valid_time_zones.rb"
 java_time_zones = `java --source 11 #{__dir__}/dump_time_zones.java`.split("\n")
 
 ::File.write(updated_code_filename, <<~EOS)
-  # Copyright 2024 Block, Inc.
+  # Copyright 2024 - 2025 Block, Inc.
   #
   # Use of this source code is governed by an MIT-style
   # license that can be found in the LICENSE file or at
