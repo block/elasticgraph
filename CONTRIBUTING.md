@@ -134,9 +134,38 @@ bundle exec rspec --only-failures
 bundle exec rspec --next-failure
 ```
 
+In addition, you can run tests in parallel by prefixing the `rspec` command with `flatware`:
+
+```bash
+bundle exec flatware rspec path/to/dir
+```
+
+`script/quick_build`, `script/run_specs`, and `script/run_gem_specs` use flatware when appropriate. (It's not always faster!)
+
+The integration and acceptance tests require Elasticsearch or OpenSearch to be running locally on a specific
+port; to boot it for those tests, run one of the following in a separate terminal and leave it running:
+
+```bash
+bundle exec rake elasticsearch:test:boot
+# or
+bundle exec rake opensearch:test:boot
+```
+
+Note: our integration and acceptance tests hammer Elasticsearch/OpenSearh pretty hard, particularly when running
+tests in parallel. Sometimes that puts the datastore into a bad state. When this happens, simply kill the `rake *:test:boot`
+process, and run it again; then re-run the tests.
+
 ## Project Website
 
-The source code for https://block.github.io/elasticgraph/ lives in [config/site](config/site). To serve it locally, run:
+The source code for https://block.github.io/elasticgraph/ lives in [config/site](config/site).
+
+To build it locally, run:
+
+```bash
+bundle exec rake site:build
+```
+
+To serve it locally, run:
 
 ```bash
 bundle exec rake site:serve

@@ -1,0 +1,15 @@
+# This file is used by Goose: https://block.github.io/goose/docs/guides/using-goosehints/
+
+This is an open source Ruby project. Review CONTRIBUTING.md for information on working in this codebase.
+
+Be sure all Ruby code matches the standardrb linting rules. Use `bundle exec rake standardrb --fix` on the file if needed.
+
+Prefer functional programming patterns where applicable. Avoid monkey patching. Avoid removing the trailing newline at the end of source code files.
+
+When writing scripts, prefer writing them in Ruby. Alternately, they can be written in bash if the the script is primarily interacting with the file system and running shell commands.
+
+When iterating on Ruby code changes, use `bundle exec rspec path/to/file` to run a focused subset of tests related to your changes. Then, before committing, run `script/quick_build` to confirm the entire build passes.
+
+Our CI build enforces 100% test coverage, so when writing tests, be sure that the tests cover all lines and branches of implementation code. `# :nocov:` can be used to mark code as uncovered in rare situations if needed.
+
+When iterating on website changes, use `bundle exec rake site:build`, and look at the resulting output in `config/site/_site`.
