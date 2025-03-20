@@ -23,5 +23,5 @@ style:
   navbar_dropdown: relative rounded-lg bg-white dark:bg-gray-700 shadow-lg border border-gray-200/80 dark:border-gray-600/50
   dropdown_pip: absolute -top-1.5 left-4 h-3 w-3 bg-white dark:bg-gray-700 transform rotate-45 border-t border-l border-gray-200/80 dark:border-gray-600/50
 
-demo_oneliner: "curl -s https://raw.githubusercontent.com/block/elasticgraph/refs/heads/main/config/docker_demo/docker-compose.yaml | docker compose -f - up"
+demo_oneliner: "curl -s https://block.github.io/elasticgraph/docker-compose.yaml | docker compose -f - up"
 localhost_eg_url: "http://localhost:9000/"
