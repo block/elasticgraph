@@ -25,9 +25,9 @@
         <h4 class="text-lg font-semibold mb-4">Documentation</h4>
         <ul class="space-y-3" role="list">
           <li><a href="{{ '/getting-started' | relative_url }}" class="{{ site.style.link }}">Getting Started</a></li>
-          <li><a href="{{ '/query-api/overview' | relative_url }}" class="{{ site.style.link }}">Query API</a></li>
+          <li><a href="{{ '/query-api' | relative_url }}" class="{{ site.style.link }}">Query API</a></li>
           <li><a href="{{ '/guides/' | relative_url }}" class="{{ site.style.link }}">Guides</a></li>
-          <li><a href="{{ '/docs/' | append: site.data.doc_versions.latest_version | relative_url }}" class="{{ site.style.link }}">{{ site.data.doc_versions.latest_version }} Docs</a></li>
+          <li><a href="{{ '/api-docs/' | relative_url }}" class="{{ site.style.link }}">API Docs</a></li>
         </ul>
       </nav>
 
@@ -68,8 +68,8 @@
         <!-- Edit links -->
         <div class="flex items-center gap-4">
           {% if page.path %}
-          <a href="{{ site.github_url }}/edit/main/config/site/src/{{ page.path }}" 
-             class="{{ site.style.link }} inline-flex items-center gap-1.25" 
+          <a href="{{ site.github_url }}/edit/main/config/site/src/{{ page.path }}"
+             class="{{ site.style.link }} inline-flex items-center gap-1.25"
              rel="noopener">
             {% include icons/github.svg %}
             <span class="hidden sm:inline">Edit on GitHub</span>
