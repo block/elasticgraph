@@ -6,7 +6,6 @@ permalink: /guides/
 
 Learn how to build and scale your ElasticGraph applications with our comprehensive guides.
 
-
 ## Available Guides
 
 {% assign guides = site.pages | where_exp: "item", "item.path contains 'guides/'" | sort: "title" %}
@@ -16,7 +15,6 @@ Learn how to build and scale your ElasticGraph applications with our comprehensi
   - {{ guide.description }}
 {%- endif -%}
 {% endfor %}
-
 
 ## Getting Started
 
