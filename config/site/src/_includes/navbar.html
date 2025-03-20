@@ -15,8 +15,8 @@
         </button>
         <div class="absolute left-0 pt-2 w-48 hidden group-hover:block z-50">
           <div class="{{site.style.navbar_dropdown}}">
-            <!-- Triangle pointer -->
-            <div class="{{site.style.chevron_right}}"></div>
+            <!-- Dropdown pip -->
+            <div class="{{site.style.dropdown_pip}}"></div>
             <div class="relative py-1">
               {% for version in site.data.doc_versions.versions %}
                 <a href="{{ '/docs/' | append: version | relative_url }}"
