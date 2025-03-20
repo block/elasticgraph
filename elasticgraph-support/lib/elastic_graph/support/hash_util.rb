@@ -50,9 +50,7 @@ module ElasticGraph
       # Recursively transforms any hash keys in the given object to string keys, without
       # mutating the provided argument.
       def self.stringify_keys(object)
-        recursively_transform(object) do |key, value, hash|
-          hash[key.to_s] = value
-        end
+        transform_keys(object, :to_s)
       end
 
       # Recursively transforms any hash keys in the given object to symbol keys, without
@@ -61,9 +59,7 @@ module ElasticGraph
       # Important note: this should never be used on untrusted input. Symbols are not GCd in
       # Ruby in the same way as strings.
       def self.symbolize_keys(object)
-        recursively_transform(object) do |key, value, hash|
-          hash[key.to_sym] = value
-        end
+        transform_keys(object, :to_sym)
       end
 
       # Recursively prunes nil values from the hash, at any level of its structure, without
@@ -145,6 +141,23 @@ module ElasticGraph
             raise KeyError, "Value at key #{path_parts.first(num_parts - 1).join(".").inspect} is not a `Hash` as expected; " \
               "instead, was a `#{(_ = inner_hash).class}`"
           end
+        end
+      end
+
+      # Note: this implementation was chosen based off of a benchmark in
+      # `benchmarks/hash_util/key_transformations.rb`.
+      private_class_method def self.transform_keys(object, method)
+        case object
+        when ::Hash
+          result = {} # : ::Hash[untyped, untyped]
+          object.each do |key, value|
+            result[key.send(method)] = transform_keys(value, method)
+          end
+          result
+        when ::Array
+          object.map { |item| transform_keys(item, method) }
+        else
+          object
         end
       end
 

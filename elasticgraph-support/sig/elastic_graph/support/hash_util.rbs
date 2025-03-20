@@ -38,6 +38,7 @@ module ElasticGraph
       private
 
       # Fully expressing the types here without using `untyped` is quite hard! So for now we use `untyped`.
+      def self.transform_keys: (untyped, ::Symbol) -> untyped
       def self.recursively_prune_if: (::Hash[untyped, untyped], (^(::String) -> void)?) { (untyped) -> bool } -> ::Hash[untyped, untyped]
       def self.recursively_transform: (untyped, ?::String?) { (key, value, ::Hash[key, value], ::String) -> void } -> untyped
       def self.populate_flat_hash: [K] (::Hash[K, untyped], ::String, ::Hash[::String, untyped]) -> void

@@ -11,11 +11,13 @@ source "https://rubygems.org"
 # Gems needed by the test suite and other CI checks.
 group :development do
   gem "aws_lambda_ric", "~> 3.0"
+  gem "benchmark-ips", "~> 2.13"
   gem "coderay", "~> 1.1", ">= 1.1.3"
   gem "factory_bot", "~> 6.5", ">= 6.5.1"
   gem "faker", "~> 3.5", ">= 3.5.1"
   gem "flatware-rspec", "~> 2.3", ">= 2.3.4"
   gem "httpx", "~> 1.4", ">= 1.4.1"
+  gem "memory_profiler", "~> 1.0"
   gem "method_source", "~> 1.1"
   gem "rubocop-factory_bot", "~> 2.26", ">= 2.26.1"
   gem "rubocop-rake", "~> 0.6"

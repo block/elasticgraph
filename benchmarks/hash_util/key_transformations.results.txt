@@ -1,0 +1,460 @@
+
+Verifying implementations return the same results...
+✅ All implementations return the same results
+
+Running performance benchmarks...
+ruby 3.3.4 (2024-07-09 revision be1089c8ec) [arm64-darwin23]
+Warming up --------------------------------------
+original stringify - simple
+                        66.428k i/100ms
+optimized1 stringify - simple
+                       100.601k i/100ms
+optimized2 stringify - simple
+                       140.623k i/100ms
+optimized3 stringify - simple
+                       123.382k i/100ms
+original stringify - nested
+                        20.715k i/100ms
+optimized1 stringify - nested
+                        37.655k i/100ms
+optimized2 stringify - nested
+                        45.391k i/100ms
+optimized3 stringify - nested
+                        43.760k i/100ms
+original stringify - array heavy
+                         6.969k i/100ms
+optimized1 stringify - array heavy
+                        14.129k i/100ms
+optimized2 stringify - array heavy
+                        17.917k i/100ms
+optimized3 stringify - array heavy
+                        15.471k i/100ms
+original symbolize - simple
+                        91.227k i/100ms
+optimized1 symbolize - simple
+                       140.953k i/100ms
+optimized2 symbolize - simple
+                       176.658k i/100ms
+optimized3 symbolize - simple
+                       164.771k i/100ms
+original symbolize - nested
+                        23.930k i/100ms
+optimized1 symbolize - nested
+                        43.693k i/100ms
+optimized2 symbolize - nested
+                        50.873k i/100ms
+optimized3 symbolize - nested
+                        51.675k i/100ms
+original symbolize - array heavy
+                         6.265k i/100ms
+optimized1 symbolize - array heavy
+                        16.875k i/100ms
+optimized2 symbolize - array heavy
+                        21.711k i/100ms
+optimized3 symbolize - array heavy
+                        21.102k i/100ms
+Calculating -------------------------------------
+original stringify - simple
+                        667.653k (± 4.2%) i/s    (1.50 μs/i) -      3.388M in   5.083331s
+optimized1 stringify - simple
+                          1.095M (± 4.8%) i/s  (912.91 ns/i) -      5.533M in   5.063502s
+optimized2 stringify - simple
+                          1.428M (± 3.1%) i/s  (700.23 ns/i) -      7.172M in   5.026813s
+optimized3 stringify - simple
+                          1.207M (± 4.4%) i/s  (828.67 ns/i) -      6.046M in   5.019820s
+original stringify - nested
+                        211.499k (± 3.0%) i/s    (4.73 μs/i) -      1.077M in   5.097670s
+optimized1 stringify - nested
+                        361.424k (± 4.0%) i/s    (2.77 μs/i) -      1.807M in   5.009137s
+optimized2 stringify - nested
+                        478.446k (± 3.2%) i/s    (2.09 μs/i) -      2.406M in   5.033569s
+optimized3 stringify - nested
+                        418.432k (± 4.2%) i/s    (2.39 μs/i) -      2.100M in   5.028964s
+original stringify - array heavy
+                         70.673k (± 3.3%) i/s   (14.15 μs/i) -    355.419k in   5.034823s
+optimized1 stringify - array heavy
+                        141.049k (± 3.8%) i/s    (7.09 μs/i) -    706.450k in   5.015690s
+optimized2 stringify - array heavy
+                        180.010k (± 4.1%) i/s    (5.56 μs/i) -    913.767k in   5.084585s
+optimized3 stringify - array heavy
+                        162.088k (± 3.3%) i/s    (6.17 μs/i) -    819.963k in   5.064465s
+original symbolize - simple
+                        904.029k (± 3.6%) i/s    (1.11 μs/i) -      4.561M in   5.052323s
+optimized1 symbolize - simple
+                          1.391M (± 3.9%) i/s  (718.68 ns/i) -      7.048M in   5.073045s
+optimized2 symbolize - simple
+                          1.748M (± 3.4%) i/s  (572.08 ns/i) -      8.833M in   5.059144s
+optimized3 symbolize - simple
+                          1.550M (± 4.1%) i/s  (645.37 ns/i) -      7.744M in   5.006064s
+original symbolize - nested
+                        235.749k (± 3.9%) i/s    (4.24 μs/i) -      1.196M in   5.083034s
+optimized1 symbolize - nested
+                        446.801k (± 3.6%) i/s    (2.24 μs/i) -      2.272M in   5.091889s
+optimized2 symbolize - nested
+                        543.596k (± 3.4%) i/s    (1.84 μs/i) -      2.747M in   5.059996s
+optimized3 symbolize - nested
+                        524.622k (± 2.5%) i/s    (1.91 μs/i) -      2.635M in   5.026671s
+original symbolize - array heavy
+                         75.045k (± 3.5%) i/s   (13.33 μs/i) -    375.900k in   5.015469s
+optimized1 symbolize - array heavy
+                        170.776k (± 2.8%) i/s    (5.86 μs/i) -    860.625k in   5.043500s
+optimized2 symbolize - array heavy
+                        217.729k (± 2.7%) i/s    (4.59 μs/i) -      1.107M in   5.089358s
+optimized3 symbolize - array heavy
+                        213.374k (± 3.0%) i/s    (4.69 μs/i) -      1.076M in   5.048526s
+
+Comparison:
+optimized2 symbolize - simple:  1748016.8 i/s
+optimized3 symbolize - simple:  1549504.5 i/s - 1.13x  slower
+optimized2 stringify - simple:  1428108.4 i/s - 1.22x  slower
+optimized1 symbolize - simple:  1391433.5 i/s - 1.26x  slower
+optimized3 stringify - simple:  1206752.7 i/s - 1.45x  slower
+optimized1 stringify - simple:  1095396.6 i/s - 1.60x  slower
+original symbolize - simple:   904028.6 i/s - 1.93x  slower
+original stringify - simple:   667653.2 i/s - 2.62x  slower
+optimized2 symbolize - nested:   543595.6 i/s - 3.22x  slower
+optimized3 symbolize - nested:   524622.1 i/s - 3.33x  slower
+optimized2 stringify - nested:   478446.3 i/s - 3.65x  slower
+optimized1 symbolize - nested:   446800.8 i/s - 3.91x  slower
+optimized3 stringify - nested:   418431.6 i/s - 4.18x  slower
+optimized1 stringify - nested:   361424.2 i/s - 4.84x  slower
+original symbolize - nested:   235749.4 i/s - 7.41x  slower
+optimized2 symbolize - array heavy:   217729.5 i/s - 8.03x  slower
+optimized3 symbolize - array heavy:   213373.9 i/s - 8.19x  slower
+original stringify - nested:   211499.3 i/s - 8.26x  slower
+optimized2 stringify - array heavy:   180010.4 i/s - 9.71x  slower
+optimized1 symbolize - array heavy:   170775.7 i/s - 10.24x  slower
+optimized3 stringify - array heavy:   162088.5 i/s - 10.78x  slower
+optimized1 stringify - array heavy:   141048.9 i/s - 12.39x  slower
+original symbolize - array heavy:    75045.4 i/s - 23.29x  slower
+original stringify - array heavy:    70673.0 i/s - 24.73x  slower
+
+
+Running memory allocation analysis...
+
+Original implementation memory profile:
+Total allocated: 644.00 kB (8700 objects)
+Total retained:  0 B (0 objects)
+
+allocated memory by gem
+-----------------------------------
+ 644.00 kB  other
+
+allocated memory by file
+-----------------------------------
+ 644.00 kB  benchmarks/hash_util/key_transformations.rb
+
+allocated memory by location
+-----------------------------------
+ 152.00 kB  benchmarks/hash_util/key_transformations.rb:38
+ 144.00 kB  benchmarks/hash_util/key_transformations.rb:37
+ 128.00 kB  benchmarks/hash_util/key_transformations.rb:30
+  84.00 kB  benchmarks/hash_util/key_transformations.rb:32
+  64.00 kB  benchmarks/hash_util/key_transformations.rb:31
+  40.00 kB  benchmarks/hash_util/key_transformations.rb:34
+  32.00 kB  benchmarks/hash_util/key_transformations.rb:16
+
+allocated memory by class
+-----------------------------------
+ 268.00 kB  String
+ 128.00 kB  Hash
+ 112.00 kB  Enumerator
+  96.00 kB  Array
+  40.00 kB  Proc
+
+allocated objects by gem
+-----------------------------------
+      8700  other
+
+allocated objects by file
+-----------------------------------
+      8700  benchmarks/hash_util/key_transformations.rb
+
+allocated objects by location
+-----------------------------------
+      2100  benchmarks/hash_util/key_transformations.rb:38
+      1600  benchmarks/hash_util/key_transformations.rb:31
+      1500  benchmarks/hash_util/key_transformations.rb:32
+      1400  benchmarks/hash_util/key_transformations.rb:37
+       800  benchmarks/hash_util/key_transformations.rb:16
+       800  benchmarks/hash_util/key_transformations.rb:30
+       500  benchmarks/hash_util/key_transformations.rb:34
+
+allocated objects by class
+-----------------------------------
+      4400  String
+      2300  Array
+       800  Hash
+       700  Enumerator
+       500  Proc
+
+retained memory by gem
+-----------------------------------
+NO DATA
+
+retained memory by file
+-----------------------------------
+NO DATA
+
+retained memory by location
+-----------------------------------
+NO DATA
+
+retained memory by class
+-----------------------------------
+NO DATA
+
+retained objects by gem
+-----------------------------------
+NO DATA
+
+retained objects by file
+-----------------------------------
+NO DATA
+
+retained objects by location
+-----------------------------------
+NO DATA
+
+retained objects by class
+-----------------------------------
+NO DATA
+
+
+Allocated String Report
+-----------------------------------
+       200  "id"
+       200  benchmarks/hash_util/key_transformations.rb:16
+
+       200  "tags"
+       200  benchmarks/hash_util/key_transformations.rb:16
+
+       100  "items"
+        50  benchmarks/hash_util/key_transformations.rb:16
+        50  benchmarks/hash_util/key_transformations.rb:32
+
+       100  "items[0]"
+       100  benchmarks/hash_util/key_transformations.rb:38
+
+       100  "items[0].id"
+       100  benchmarks/hash_util/key_transformations.rb:32
+
+       100  "items[0].tags"
+       100  benchmarks/hash_util/key_transformations.rb:32
+
+       100  "items[0].tags[0]"
+       100  benchmarks/hash_util/key_transformations.rb:38
+
+       100  "items[0].tags[1]"
+       100  benchmarks/hash_util/key_transformations.rb:38
+
+       100  "items[0].tags[2]"
+       100  benchmarks/hash_util/key_transformations.rb:38
+
+       100  "items[1]"
+       100  benchmarks/hash_util/key_transformations.rb:38
+
+       100  "items[1].id"
+       100  benchmarks/hash_util/key_transformations.rb:32
+
+       100  "items[1].tags"
+       100  benchmarks/hash_util/key_transformations.rb:32
+
+       100  "items[1].tags[0]"
+       100  benchmarks/hash_util/key_transformations.rb:38
+
+       100  "items[1].tags[1]"
+       100  benchmarks/hash_util/key_transformations.rb:38
+
+       100  "items[1].tags[2]"
+       100  benchmarks/hash_util/key_transformations.rb:38
+
+       100  "items[2]"
+       100  benchmarks/hash_util/key_transformations.rb:38
+
+       100  "items[2].id"
+       100  benchmarks/hash_util/key_transformations.rb:32
+
+       100  "items[2].tags"
+       100  benchmarks/hash_util/key_transformations.rb:32
+
+       100  "items[2].tags[0]"
+       100  benchmarks/hash_util/key_transformations.rb:38
+
+       100  "items[2].tags[1]"
+       100  benchmarks/hash_util/key_transformations.rb:38
+
+       100  "items[2].tags[2]"
+       100  benchmarks/hash_util/key_transformations.rb:38
+
+       100  "items[3]"
+       100  benchmarks/hash_util/key_transformations.rb:38
+
+       100  "items[3].id"
+       100  benchmarks/hash_util/key_transformations.rb:32
+
+       100  "items[3].tags"
+       100  benchmarks/hash_util/key_transformations.rb:32
+
+       100  "items[3].tags[0]"
+       100  benchmarks/hash_util/key_transformations.rb:38
+
+       100  "items[3].tags[1]"
+       100  benchmarks/hash_util/key_transformations.rb:38
+
+       100  "items[3].tags[2]"
+       100  benchmarks/hash_util/key_transformations.rb:38
+
+       100  "metadata"
+        50  benchmarks/hash_util/key_transformations.rb:16
+        50  benchmarks/hash_util/key_transformations.rb:32
+
+       100  "metadata.counts"
+       100  benchmarks/hash_util/key_transformations.rb:32
+
+       100  "metadata.counts[0]"
+       100  benchmarks/hash_util/key_transformations.rb:38
+
+       100  "metadata.counts[1]"
+       100  benchmarks/hash_util/key_transformations.rb:38
+
+       100  "metadata.counts[2]"
+       100  benchmarks/hash_util/key_transformations.rb:38
+
+       100  "metadata.nested"
+       100  benchmarks/hash_util/key_transformations.rb:32
+
+       100  "metadata.nested[0]"
+       100  benchmarks/hash_util/key_transformations.rb:38
+
+       100  "metadata.nested[0].x"
+       100  benchmarks/hash_util/key_transformations.rb:32
+
+       100  "metadata.nested[0].y"
+       100  benchmarks/hash_util/key_transformations.rb:32
+
+       100  "metadata.nested[1]"
+       100  benchmarks/hash_util/key_transformations.rb:38
+
+       100  "metadata.nested[1].x"
+       100  benchmarks/hash_util/key_transformations.rb:32
+
+       100  "metadata.nested[1].y"
+       100  benchmarks/hash_util/key_transformations.rb:32
+
+       100  "x"
+       100  benchmarks/hash_util/key_transformations.rb:16
+
+       100  "y"
+       100  benchmarks/hash_util/key_transformations.rb:16
+
+        50  "counts"
+        50  benchmarks/hash_util/key_transformations.rb:16
+
+        50  "nested"
+        50  benchmarks/hash_util/key_transformations.rb:16
+
+
+Optimized implementation memory profile:
+Total allocated: 192.00 kB (2300 objects)
+Total retained:  0 B (0 objects)
+
+allocated memory by gem
+-----------------------------------
+ 192.00 kB  other
+
+allocated memory by file
+-----------------------------------
+ 192.00 kB  benchmarks/hash_util/key_transformations.rb
+
+allocated memory by location
+-----------------------------------
+ 128.00 kB  benchmarks/hash_util/key_transformations.rb:86
+  32.00 kB  benchmarks/hash_util/key_transformations.rb:88
+  32.00 kB  benchmarks/hash_util/key_transformations.rb:92
+
+allocated memory by class
+-----------------------------------
+ 128.00 kB  Hash
+  32.00 kB  Array
+  32.00 kB  String
+
+allocated objects by gem
+-----------------------------------
+      2300  other
+
+allocated objects by file
+-----------------------------------
+      2300  benchmarks/hash_util/key_transformations.rb
+
+allocated objects by location
+-----------------------------------
+       800  benchmarks/hash_util/key_transformations.rb:86
+       800  benchmarks/hash_util/key_transformations.rb:88
+       700  benchmarks/hash_util/key_transformations.rb:92
+
+allocated objects by class
+-----------------------------------
+       800  Hash
+       800  String
+       700  Array
+
+retained memory by gem
+-----------------------------------
+NO DATA
+
+retained memory by file
+-----------------------------------
+NO DATA
+
+retained memory by location
+-----------------------------------
+NO DATA
+
+retained memory by class
+-----------------------------------
+NO DATA
+
+retained objects by gem
+-----------------------------------
+NO DATA
+
+retained objects by file
+-----------------------------------
+NO DATA
+
+retained objects by location
+-----------------------------------
+NO DATA
+
+retained objects by class
+-----------------------------------
+NO DATA
+
+
+Allocated String Report
+-----------------------------------
+       200  "id"
+       200  benchmarks/hash_util/key_transformations.rb:88
+
+       200  "tags"
+       200  benchmarks/hash_util/key_transformations.rb:88
+
+       100  "x"
+       100  benchmarks/hash_util/key_transformations.rb:88
+
+       100  "y"
+       100  benchmarks/hash_util/key_transformations.rb:88
+
+        50  "counts"
+        50  benchmarks/hash_util/key_transformations.rb:88
+
+        50  "items"
+        50  benchmarks/hash_util/key_transformations.rb:88
+
+        50  "metadata"
+        50  benchmarks/hash_util/key_transformations.rb:88
+
+        50  "nested"
+        50  benchmarks/hash_util/key_transformations.rb:88
+
