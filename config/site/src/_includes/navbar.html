@@ -1,16 +1,16 @@
 <!-- Navbar -->
 <nav class="w-full py-4 bg-gray-200 dark:bg-gray-800 shadow-sm">
   <div class="container mx-auto flex justify-between items-center px-4">
-    <div class="text-xl flex items-center space-x-4">
-      <a href="{{ '/' | relative_url }}" class="font-bold hover:underline">ElasticGraph</a>
-      <a href="{{ '/getting-started' | relative_url }}" class="{{ site.style.link }}">Get Started</a>
+    <div class="flex items-center space-x-6">
+      <a href="{{ '/' | relative_url }}" class="text-lg font-bold hover:underline">ElasticGraph</a>
+      <a href="{{ '/getting-started' | relative_url }}" class="text-base {{ site.style.link }}">Get Started</a>
 
       {% include query_api_nav.html %}
 
       <!-- Docs dropdown -->
       <div class="relative group">
-        <button class="text-blue-600 dark:text-blue-400 flex items-center">
-          Docs
+        <button class="text-base text-blue-600 dark:text-blue-400 flex items-center space-x-1">
+          <span>Docs</span>
           {% include icons/chevron-down.svg %}
         </button>
         <div class="absolute left-0 pt-2 w-48 hidden group-hover:block z-50">
@@ -20,7 +20,7 @@
             <div class="relative py-1">
               {% for version in site.data.doc_versions.versions %}
                 <a href="{{ '/docs/' | append: version | relative_url }}"
-                   class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600">
+                   class="block px-4 py-2 text-base text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600">
                   {% if version == 'main' %}
                     Development (main)
                   {% else %}
@@ -32,20 +32,20 @@
           </div>
         </div>
       </div>
-
     </div>
-    <div class="flex items-center space-x-4">
+
+    <div class="flex items-center space-x-6">
       <form action="{{ '/search/' | relative_url }}" method="get" class="relative">
         <input type="text" name="query" placeholder="Search..."
-               class="px-3 py-1 rounded-md text-sm border border-gray-300 dark:border-gray-600
+               class="px-4 py-2 rounded-md text-base border border-gray-300 dark:border-gray-600
                       bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200
                       focus:outline-none focus:ring-2 focus:ring-blue-500">
       </form>
-      <a href="{{ site.github_url }}" target="_blank" class="{{ site.style.link }} inline-flex items-center gap-1.25" rel="noopener">
+      <a href="{{ site.github_url }}" target="_blank" class="text-base {{ site.style.link }} inline-flex items-center space-x-2" rel="noopener">
         {% include icons/github.svg %}
-        GitHub
+        <span>GitHub</span>
       </a>
-      <a href="{{ '/about' | relative_url }}" class="{{ site.style.link }}">About</a>
+      <a href="{{ '/about' | relative_url }}" class="text-base {{ site.style.link }}">About</a>
     </div>
   </div>
 
