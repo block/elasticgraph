@@ -181,10 +181,10 @@ can be used in your publishing system to validate the indexing payloads or for c
 
 ## Resources
 
-- **[ElasticGraph Query API Documentation]({% link query-api.md %})**
-- **[ElasticGraph Ruby API Documentation]({% link api-docs.md %})**
-- **[ElasticGraph Guides]({% link guides.md %})**
 - **[GraphQL Introduction](https://graphql.org/learn/)**
+- **[ElasticGraph Query API Documentation]({% link query-api.md %})**
+- **[ElasticGraph Guides]({% link guides.md %})**
+- **[ElasticGraph Ruby API Documentation]({% link api-docs.md %})**
 
 ## Feedback
 

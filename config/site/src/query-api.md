@@ -19,21 +19,16 @@ Learn how to effectively use ElasticGraph's powerful Query API to search, filter
 {% assign sections = sections | sort: "menu_order" %}
 
 {% for section in sections %}
-### {{ section.nav_title | default: section.title }}
+### [{{ section.nav_title | default: section.title }}]({{ section.url | relative_url }})
 {% if section.description %}
 {{ section.description }}
 {% endif %}
 
 {% assign subpages = site.pages | where_exp: "page", "page.url contains section.url" | where_exp: "page", "page.url != section.url" | sort: "menu_order" %}
-{% assign section_name = section.url | split: '/' | last %}
-
 {% if subpages.size > 0 %}
-- [{{ section.nav_title | default: section.title }}]({{ section.url | relative_url }}) (Overview)
 {% for subpage in subpages %}
-  - [{{ subpage.nav_title | default: subpage.title }}]({{ subpage.url | relative_url }})
+- [{{ subpage.nav_title | default: subpage.title }}]({{ subpage.url | relative_url }})
 {% endfor %}
-{% else %}
-- [{{ section.nav_title | default: section.title }}]({{ section.url | relative_url }})
 {% endif %}
 
 {% endfor %}
