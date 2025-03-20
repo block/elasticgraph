@@ -44,7 +44,11 @@ module ElasticGraph
     require_relative "../../script/list_eg_gems"
     DOCUMENTED_GEMS = ::ElasticGraphGems.list - undocumented_gems
 
+    attr_accessor :disable_updates_on_file_recreates
+
     def initialize
+      self.disable_updates_on_file_recreates = false
+
       namespace :site do
         task build_docs: [:unpack_doc_archives] do
           # Clean the docs output directory
@@ -200,37 +204,64 @@ module ElasticGraph
         task serve: [:build_docs, :build_css, "examples:compile_queries", :extract_content] do
           require "filewatcher"
 
-          # Regenerate the YARD docs anytime we change anything.
-          ::Thread.new do
-            ::Filewatcher.new(DOCUMENTED_GEMS.map { |g| "#{g}/" }).watch do |changes|
-              changed_files = changes.keys.map { |f| ::Pathname.new(f).relative_path_from(REPO_ROOT) }.sort
-              puts "#{changed_files.size} files changed (#{changed_files.join(", ")}). Regenerating YARD docs..."
-              run_yard_doc_ignoring_expected_warnings
+          # Regenerate the YARD docs anytime we change anything in the source code of the gems that are documented.
+          watch_files(
+            "Regenerating YARD docs",
+            DOCUMENTED_GEMS.map { |g| "#{g}/" }
+          ) do
+            run_yard_doc_ignoring_expected_warnings
+          end
+
+          # Recompile queries when any of the examples change.
+          watch_files(
+            "Recompiling GraphQL queries into data files",
+            EXAMPLE_SCHEMA_FILES_BY_NAME.values.map { |f| "#{f.parent}/" },
+            exclude: "**/*.variables.yaml"
+          ) do |changed_files|
+            changed_files.each do |file|
+              t1 = ::Time.now
+              example_schema = file.to_s.split("/")[3]
+              task = ::Rake::Task["site:examples:#{example_schema}:compile_queries"]
+              task.all_prerequisite_tasks.each(&:reenable)
+              task.tap(&:reenable).invoke
+              t2 = ::Time.now
+
+              puts "Done in #{(t2 - t1).round(3)} seconds."
+            rescue => e
+              # Print validation errors and allow the filewatcher to continue.
+              puts <<~EOS
+                #{e.class}: #{e.message}
+
+                #{e.backtrace.join("\n")}
+              EOS
             end
           end
 
-          # Re-compile queries when any of the examples change.
-          ::Thread.new do
-            ::Filewatcher.new(EXAMPLE_SCHEMA_FILES_BY_NAME.values.map { |f| "#{f.parent}/" }, exclude: "**/*.variables.yaml").watch do |changes|
-              changed_files = changes.keys.map { |f| ::Pathname.new(f).relative_path_from(REPO_ROOT) }.sort
+          # Recompile CSS when any of the inputs change.
+          css_input_files = [
+            SITE_CONFIG_DIR / "tailwind.config.js",
+            SITE_CONFIG_DIR / "package.json",
+            SITE_SOURCE_DIR / "assets" / "css" / "tailwind.css"
+          ].map(&:to_s)
 
-              puts "#{changed_files.size} files changed (#{changed_files.join(", ")}). Recompiling GraphQL queries into data files..."
-              changed_files.each do |file|
-                t1 = ::Time.now
-                example_schema = file.to_s.split("/")[3]
-                task = ::Rake::Task["site:examples:#{example_schema}:compile_queries"]
-                task.all_prerequisite_tasks.each(&:reenable)
-                task.tap(&:reenable).invoke
-                t2 = ::Time.now
+          page_input_globs = [SITE_SOURCE_DIR / "**/*.{html,md}"].map(&:to_s)
+          css_output_file = (SITE_SOURCE_DIR / "assets" / "css" / "main.css").to_s
+          watch_files(
+            "Rebuilding css",
+            page_input_globs + css_input_files,
+            exclude: css_output_file
+          ) do
+            # For reasons I don't understand, `::Filewatcher` reports that hundreds of files are deleted and recreated
+            # every time we run `build_css`. To avoid getting in an infinite loop, we disable updates on file recreates
+            # while `build_css` runs and for 10 seconds afterwards.
+            self.disable_updates_on_file_recreates = true
 
-                puts "Done in #{(t2 - t1).round(3)} seconds."
-              rescue => e
-                # Print validation errors and allow the filewatcher to continue.
-                puts <<~EOS
-                  #{e.class}: #{e.message}
-
-                  #{e.backtrace.join("\n")}
-                EOS
+            begin
+              build_css
+            ensure
+              ::Thread.new do
+                sleep 10
+                self.disable_updates_on_file_recreates = false
               end
             end
           end
@@ -302,12 +333,7 @@ module ElasticGraph
 
         task build_css: :npm_install do
           require "rouge"
-
-          ::Dir.chdir(SITE_SOURCE_DIR) do
-            sh "npm run build:css"
-            # tulip appears to provide the best looking syntax highlighting theme of all the built-in rouge themes.
-            ::File.write("assets/css/highlight.css", ::Rouge::Theme.find("tulip").render(scope: ".highlight"))
-          end
+          build_css
         end
 
         # When we are releasing gems, these dependencies aren't available.
@@ -348,6 +374,48 @@ module ElasticGraph
             end
           end
         end
+      end
+    end
+
+    def watch_files(description, *args, **kwargs)
+      ::Thread.new do
+        ::Filewatcher.new(*args, **kwargs).watch do |changes|
+          effective_changes =
+            if disable_updates_on_file_recreates
+              changes.reject { |file, event| event == :deleted || event == :created }
+            else
+              changes
+            end
+
+          changed_files = effective_changes.map do |file, _|
+            ::Pathname.new(file).relative_path_from(REPO_ROOT)
+          end.sort
+
+          changed_file_descriptions = effective_changes.map do |file, event|
+            relative_path = ::Pathname.new(file).relative_path_from(REPO_ROOT)
+            "#{relative_path} (#{event})"
+          end.sort
+
+          unless changed_files.empty?
+            details =
+              if changed_file_descriptions.size < 8
+                changed_file_descriptions.join(", ")
+              else
+                "#{changed_file_descriptions.first(8).join(", ")}..."
+              end
+
+            puts "#{changed_file_descriptions.size} files changed (#{details}). #{description}..."
+            yield changed_files
+          end
+        end
+      end
+    end
+
+    def build_css
+      ::Dir.chdir(SITE_SOURCE_DIR) do
+        sh "npm run build:css"
+        # tulip appears to provide the best looking syntax highlighting theme of all the built-in rouge themes.
+        ::File.write("assets/css/highlight.css", ::Rouge::Theme.find("tulip").render(scope: ".highlight"))
       end
     end
 
