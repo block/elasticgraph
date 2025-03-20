@@ -1,8 +1,10 @@
 <!-- Footer -->
 <footer class="w-full py-8 bg-gray-200 dark:bg-gray-800 shadow-sm mt-auto" role="contentinfo">
   <div class="container mx-auto px-4">
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-      <div class="col-span-2">
+    <!-- Main footer content -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+      <!-- About section - full width on mobile -->
+      <div class="col-span-1 sm:col-span-2">
         <h3 class="text-xl font-bold mb-4">
           <a href="{{ '/' | relative_url }}" class="hover:underline" aria-label="ElasticGraph Home">ElasticGraph</a>
         </h3>
@@ -18,9 +20,10 @@
         </p>
       </div>
 
-      <nav aria-label="Documentation links">
+      <!-- Documentation links -->
+      <nav aria-label="Documentation links" class="col-span-1">
         <h4 class="text-lg font-semibold mb-4">Documentation</h4>
-        <ul class="space-y-2" role="list">
+        <ul class="space-y-3" role="list">
           <li><a href="{{ '/getting-started' | relative_url }}" class="{{ site.style.link }}">Getting Started</a></li>
           <li><a href="{{ '/query-api/overview' | relative_url }}" class="{{ site.style.link }}">Query API</a></li>
           <li><a href="{{ '/guides/' | relative_url }}" class="{{ site.style.link }}">Guides</a></li>
@@ -28,25 +31,26 @@
         </ul>
       </nav>
 
-      <nav aria-label="Community links">
+      <!-- Community links -->
+      <nav aria-label="Community links" class="col-span-1">
         <h4 class="text-lg font-semibold mb-4">Community</h4>
-        <ul class="space-y-2" role="list">
+        <ul class="space-y-3" role="list">
           <li>
             <a href="{{ site.github_url }}" class="{{ site.style.link }} inline-flex items-center gap-1.25" rel="noopener">
               {% include icons/github.svg %}
-              GitHub
+              <span>GitHub</span>
             </a>
           </li>
           <li>
             <a href="{{ site.discord_url }}" class="{{ site.style.link }} inline-flex items-center gap-1.25" rel="noopener">
               {% include icons/discord.svg %}
-              Discord
+              <span>Discord</span>
             </a>
           </li>
           <li>
             <a href="{{ site.github_url }}/discussions" class="{{ site.style.link }} inline-flex items-center gap-1.25" rel="noopener">
               {% include icons/discussions.svg %}
-              Discussions
+              <span>Discussions</span>
             </a>
           </li>
           <li><a href="{{ '/about' | relative_url }}" class="{{ site.style.link }}">About</a></li>
@@ -54,18 +58,26 @@
       </nav>
     </div>
 
-    <div class="mt-8 pt-8 border-t border-gray-300 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-400 flex justify-between items-center">
-      <div>
-        &copy; 2024 - {{ 'now' | date: "%Y" }} Block, Inc. Released under the MIT License.
-      </div>
-      <div class="flex items-center gap-4">
-        {% if page.path %}
-        <a href="{{ site.github_url }}/edit/main/config/site/src/{{ page.path }}" class="{{ site.style.link }} inline-flex items-center gap-1.25" rel="noopener">
-          {% include icons/github.svg %}
-          Edit on GitHub
-        </a>
-        {% endif %}
-        <a href="{{ site.github_url }}/blob/main/LICENSE.txt" class="{{ site.style.link }}">License</a>
+    <!-- Footer bottom - copyright and edit links -->
+    <div class="mt-8 pt-8 border-t border-gray-300 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-400">
+      <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+        <!-- Copyright -->
+        <div class="text-center sm:text-left">
+          &copy; 2024 - {{ 'now' | date: "%Y" }} Block, Inc. Released under the MIT License.
+        </div>
+        <!-- Edit links -->
+        <div class="flex items-center gap-4">
+          {% if page.path %}
+          <a href="{{ site.github_url }}/edit/main/config/site/src/{{ page.path }}" 
+             class="{{ site.style.link }} inline-flex items-center gap-1.25" 
+             rel="noopener">
+            {% include icons/github.svg %}
+            <span class="hidden sm:inline">Edit on GitHub</span>
+            <span class="sm:hidden">Edit</span>
+          </a>
+          {% endif %}
+          <a href="{{ site.github_url }}/blob/main/LICENSE.txt" class="{{ site.style.link }}">License</a>
+        </div>
       </div>
     </div>
   </div>
