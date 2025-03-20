@@ -8,9 +8,7 @@
 
       <!-- Mobile Menu Button -->
       <button id="mobile-menu-button" class="lg:hidden p-2" aria-label="Toggle menu">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-        </svg>
+        {% include icons/menu.svg %}
       </button>
 
       <!-- Desktop Navigation -->
@@ -26,7 +24,7 @@
           <!-- Docs dropdown -->
           <div class="relative group">
             <button class="{{site.style.dropdown_button}}">
-              <span>Docs</span>
+              <span>API Docs</span>
               {% include icons/chevron-down.svg %}
             </button>
             <div class="{{site.style.dropdown_toggle}}">
@@ -80,7 +78,7 @@
 
         <!-- Mobile Docs Menu -->
         <div class="space-y-2">
-          <div class="font-medium">Documentation</div>
+          <div class="font-medium">API Docs</div>
           <div class="pl-4 space-y-2">
             {% for version in site.data.doc_versions.versions %}
               <a href="{{ '/docs/' | append: version | relative_url }}"

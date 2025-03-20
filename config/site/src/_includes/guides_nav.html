@@ -1,7 +1,6 @@
 <!-- Guides dropdown -->
 <div class="relative group">
-  <button
-    class="{{site.style.dropdown_button}}">
+  <button class="{{site.style.dropdown_button}}">
     <span>Guides</span>
     {% include icons/chevron-down.svg %}
   </button>
@@ -10,13 +9,11 @@
       <!-- Dropdown pip -->
       <div class="{{site.style.dropdown_pip}}"></div>
       <div class="relative py-1">
-        {% for page in site.pages %}
-          {% if page.url contains '/guides/' and page.url != '/guides/' %}
-            <a href="{{ page.url | relative_url }}"
-              class="{{site.style.dropdown_item}}">
-              {{ page.title | default: page.name | remove: '.md' | titleize }}
-            </a>
-          {% endif %}
+        {% assign guides = site.pages | where_exp: "item", "item.path contains 'guides/'" | where_exp: "item", "item.url != '/guides/'" | sort: "title" %}
+        {% for guide in guides %}
+          <a href="{{ guide.url | relative_url }}" class="{{site.style.dropdown_item}}">
+            {{ guide.title | default: guide.name | remove: '.md' | titleize }}
+          </a>
         {% endfor %}
       </div>
     </div>
