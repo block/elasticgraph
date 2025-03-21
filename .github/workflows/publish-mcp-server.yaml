@@ -1,12 +1,11 @@
 name: ElasticGraph MCP Server Python Package
 
 on:
-  workflow_dispatch:  # Allows manual triggering while testing
+  # Manually trigger the piepline to publish to PyPI
+  workflow_dispatch:
   pull_request:
     paths:
       - 'ai_tools/elasticgraph-mcp-server/**'
-  release:
-    types: [created]
 
 jobs:
   test:
@@ -76,7 +75,7 @@ jobs:
   publish:
     name: Publish to PyPI
     needs: build
-    if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     environment:
       name: pypi

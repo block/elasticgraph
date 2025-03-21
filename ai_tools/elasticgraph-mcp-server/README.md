@@ -106,3 +106,9 @@ goose session
 
 Try this prompt:
 > First, learn about MCP servers from `tmp/mcp_for_llm_instructions.md`. Then, see the current MCP server I'm building in `src/elasticgraph_mcp/server.py`. Now <specify your changes>
+
+## Releases
+
+The [elasticgraph-mcp-server](https://pypi.org/project/elasticgraph-mcp-server/) package is published to PyPI via a GitHub workflow manual action. See `.github/workflows/publish-mcp-server.yaml`.
+
+To publish a new version bump the `.ai_tools/elasticgraph-mcp-server/pyproject.toml` version and then manually trigger the workflow via the GitHub Action UI: https://github.com/block/elasticgraph/actions.
