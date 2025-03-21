@@ -163,8 +163,7 @@ module ElasticGraph
               be provided on a single `#{t.name}` input because of collisions between key names. For example, if you want to provide
               multiple `#{any_satisfy}: ...` filters, you could do `#{all_of}: [{#{any_satisfy}: ...}, {#{any_satisfy}: ...}]`.
 
-              Will be ignored when `null` is passed. 
-              When an empty list is passed, this part of the filter matches no documents.
+              When `null` or an empty list is passed, matches all documents.
             EOS
           end
 
