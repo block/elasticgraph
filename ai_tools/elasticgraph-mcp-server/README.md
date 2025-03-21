@@ -44,23 +44,17 @@ Add a development build to Goose:
 
 1. In Goose, navigate to **Settings > Extensions > Add**.
 2. Set **Type** to **StandardIO**.
-3. Obtain the absolute path to the project’s CLI:
+3. Paste the run command for your local development version, it will start with `uv run </path/to/elasticgraph_mcp/.venv/bin/elasticgraph-mcp-server>`
 
 ```bash
-# Get the path and copy it to your clipboard
-realpath .venv/bin/elasticgraph-mcp-server | pbcopy
+# Copy the run command to your clipboard
+echo "uv run $(realpath .venv/bin/elasticgraph-mcp-server)" | pbcopy
 ```
 
-4. Type `uv run` then paste that path
 
-```bash
-uv run </path/to/elasticgraph_mcp/.venv/bin/elasticgraph-mcp-server>
-```
-
-5. Enable the extension and verify that Goose recognizes your tools.
+4. Enable the extension and verify that Goose recognizes your tools.
 
 Ask goose: What tools and resources for ElasticGraph do you have?
-
 
 ## Development commands
 
