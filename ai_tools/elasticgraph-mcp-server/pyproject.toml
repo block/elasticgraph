@@ -1,6 +1,6 @@
 [project]
 name = "elasticgraph-mcp-server"
-version = "0.0.1"
+version = "0.0.2"
 description = "MCP Server for ElasticGraph to allow goose, Cursor, etc to create and manage your ElasticGraph project."
 readme = "README.md"
 requires-python = ">=3.12"
@@ -28,6 +28,10 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build]
+packages = ["."]
+package-dir = "src"
+
+[tool.hatch.build.targets.wheel]
 packages = ["src/elasticgraph_mcp"]
 
 [dependency-groups]
