@@ -1,9 +1,12 @@
+# ElasticGraph MCP Server
+# Provides MCP (Model Context Protocol) support for ElasticGraph projects
+
 [project]
 name = "elasticgraph-mcp-server"
-version = "0.1.1"
-description = "MCP Server for ElasticGraph to allow goose, Cursor, etc to create and manage your ElasticGraph project."
+version = "0.1.2"
+description = "MCP Server for ElasticGraph to allow Goose, Cursor, etc to create and manage your ElasticGraph project."
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = "~=3.13"
 license = "MIT"
 authors = [
     { name = "Brian Sigafoos", email = "briansigafoos@block.xyz" },
@@ -15,9 +18,9 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
-    "httpx>=0.28.1",
-    "mcp[cli]>=1.3.0",
-    "packaging>=23.0",
+    "httpx~=0.28.1",
+    "mcp[cli]~=1.5.0",
+    "packaging~=24.2",
 ]
 
 [project.scripts]
@@ -36,17 +39,18 @@ packages = ["src/elasticgraph_mcp"]
 
 [dependency-groups]
 dev = [
-    "ruff>=0.9.9",
-    "pytest>=8.0.0",
-    "pytest-cov>=4.1.0",
-    "pre-commit>=3.6.0",
-    "pytest-asyncio>=0.25.3",
+    "ruff~=0.11.2",
+    "pytest~=8.3.5",
+    "pytest-cov~=6.0.0",
+    "pre-commit~=4.2.0",
+    "pytest-asyncio~=0.25.3",
 ]
 
 [tool.ruff]
-target-version = "py312"
+target-version = "py313"
 line-length = 120
 
+# Lint rules legend: https://docs.astral.sh/ruff/rules/
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "W", "UP", "B"]
 fixable = ["ALL"]
