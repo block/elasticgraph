@@ -76,8 +76,7 @@ jobs:
   publish:
     name: Publish to PyPI
     needs: build
-    # TODO: put this back!
-    # if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     environment:
       name: pypi
