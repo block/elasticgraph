@@ -22,7 +22,6 @@ I'm building with ElasticGraph. Here's the documentation:
 
 <button id="copy-button" class="btn-primary">Copy this prompt</button>
 
-
 ### Start building
 
 Ask your favorite LLM about:
@@ -31,6 +30,33 @@ Ask your favorite LLM about:
 - Configuring Elasticsearch/OpenSearch
 - Writing ElasticGraph GraphQL queries
 - Searching and aggregating your data
+
+## ElasticGraph MCP Server
+
+The [elasticgraph-mcp-server](https://pypi.org/project/elasticgraph-mcp-server/) enables AI agents to interact with your ElasticGraph projects through the [Model Context Protocol](https://modelcontextprotocol.io/). This allows AI tools to:
+
+- Access ElasticGraph documentation
+- Write schema definitions or GraphQL queries grounded in the full ElasticGraph docs
+- Run common ElasticGraph commands
+
+### Installation
+
+Install and run the MCP server, for example as a [Goose extension](https://block.github.io/goose/docs/getting-started/using-extensions), using:
+
+{% highlight bash %}
+uvx elasticgraph-mcp-server
+{% endhighlight %}
+
+Full documentation for [elasticgraph-mcp-server](https://pypi.org/project/elasticgraph-mcp-server/).
+
+### Compatible AI Tools
+
+You can use the ElasticGraph MCP server with:
+
+- [Goose](https://block.github.io/goose/) - as an extension
+- [Claude](https://www.anthropic.com/news/model-context-protocol) - in the desktop app as an MCP server
+- [Cursor](https://docs.cursor.com/context/model-context-protocol) - as an MCP tool
+
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
