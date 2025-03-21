@@ -1,6 +1,6 @@
 # ElasticGraph MCP Server
 
-This provides a Model Context Protocol server for ElasticGraph using the [python-sdk](https://github.com/modelcontextprotocol/python-sdk).
+This provides a Model Context Protocol (MCP) server for [ElasticGraph](https://block.github.io/elasticgraph/) using the [MCP python-sdk](https://github.com/modelcontextprotocol/python-sdk).
 
 ## Setup
 

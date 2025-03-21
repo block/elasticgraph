@@ -1,6 +1,6 @@
 [project]
 name = "elasticgraph-mcp-server"
-version = "0.0.2"
+version = "0.1.1"
 description = "MCP Server for ElasticGraph to allow goose, Cursor, etc to create and manage your ElasticGraph project."
 readme = "README.md"
 requires-python = ">=3.12"
@@ -55,3 +55,7 @@ fixable = ["ALL"]
 testpaths = ["tests"]
 python_files = "test_*.py"
 addopts = "-v --tb=short"
+
+[project.urls]
+Homepage = "https://block.github.io/elasticgraph/"
+Repository = "https://github.com/block/elasticgraph"
