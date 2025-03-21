@@ -6,7 +6,7 @@ import pytest
 from mcp.shared.exceptions import McpError
 from mcp.types import INTERNAL_ERROR
 
-from mcp_elasticgraph.errors import create_command_error
+from elasticgraph_mcp.errors import create_command_error
 
 
 class TestCommandError:

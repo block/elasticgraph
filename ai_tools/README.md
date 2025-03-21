@@ -1,6 +1,6 @@
-# Agent Toolkit
+# AI Tools
 
-This toolkit provides components for using AI agents with function calling capabilities to help you build with ElasticGraph.
+These tools are meant to be used AI agents with function calling capabilities to help you build with ElasticGraph.
 
 ## Components
 
@@ -14,7 +14,7 @@ Located in [`modelcontextprotocol/`](./modelcontextprotocol/), this provides a s
 
 You can use the MCP server with a variety of tools and platforms, including:
 
-- in [goose](https://block.github.io/goose/) as an "extension"
+- in [Goose](https://block.github.io/goose/) as an "extension"
 - in [Claude](https://www.anthropic.com/news/model-context-protocol) Desktop app as an "MCP server"
 - in [Cursor](https://docs.cursor.com/context/model-context-protocol) as an "MCP tool"
 

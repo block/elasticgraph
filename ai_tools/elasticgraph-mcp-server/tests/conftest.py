@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from mcp_elasticgraph.helpers import GRAPHQL_SCHEMA_FILENAME
+from elasticgraph_mcp.helpers import GRAPHQL_SCHEMA_FILENAME
 
 
 @pytest.fixture

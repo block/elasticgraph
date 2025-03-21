@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 from mcp.shared.exceptions import McpError
 
-from mcp_elasticgraph.helpers import (
+from elasticgraph_mcp.helpers import (
     COMMON_SCHEMA_PATHS,
     GRAPHQL_SCHEMA_FILENAME,
     find_graphql_schema,

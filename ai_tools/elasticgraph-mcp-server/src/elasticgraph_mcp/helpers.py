@@ -11,11 +11,10 @@ This module provides utility functions for:
 
 import os
 import subprocess
-from functools import lru_cache
 
 import httpx
 
-from mcp_elasticgraph.errors import create_command_error, create_not_in_project_error
+from elasticgraph_mcp.errors import create_command_error, create_not_in_project_error
 
 # Constants
 MIN_RUBY_VERSION = "3.2.0"
@@ -28,17 +27,26 @@ COMMON_SCHEMA_PATHS = [
 ]
 
 
-@lru_cache(maxsize=1)
+# Cache for API docs content
+_api_docs_cache = None
+
+
 async def fetch_api_docs() -> str | None:
     """
     Fetch the ElasticGraph API docs with caching.
     Returns None if fetch fails.
     """
+    global _api_docs_cache
+
+    if _api_docs_cache is not None:
+        return _api_docs_cache
+
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(API_DOCS_URL, timeout=10.0)
-            await response.raise_for_status()
-            return response.text
+            response.raise_for_status()
+            _api_docs_cache = response.text
+            return _api_docs_cache
     except (httpx.HTTPError, httpx.ReadTimeout):
         return None
 

@@ -5,9 +5,9 @@ from pathlib import Path
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
+from mcp.shared.exceptions import McpError
 
-from mcp_elasticgraph.helpers import GRAPHQL_SCHEMA_FILENAME
-from mcp_elasticgraph.server import (
+from elasticgraph_mcp.server import (
     get_api_docs,
     get_graphql_schema,
     is_elasticgraph_project,
@@ -17,7 +17,7 @@ from mcp_elasticgraph.server import (
 @pytest.fixture
 def mock_project_checks():
     """Mock the project directory checks."""
-    with patch("mcp_elasticgraph.helpers.run_command") as mock_run:
+    with patch("elasticgraph_mcp.helpers.run_command") as mock_run:
         # Mock successful Gemfile and elasticgraph checks
         mock_run.side_effect = [
             Mock(returncode=0),  # test -f Gemfile
@@ -67,25 +67,16 @@ class TestGraphQLSchema:
     def test_get_schema_not_in_project(self, temp_dir: Path) -> None:
         """Test getting schema when not in an ElasticGraph project."""
         os.chdir(temp_dir)
-        result = get_graphql_schema()
-
-        assert "contents" in result
-        assert len(result["contents"]) == 1
-        assert result["contents"][0]["uri"] == "schema://graphql"
-        assert result["contents"][0]["mimeType"] == "text/plain"
-        assert "No Gemfile found" in result["contents"][0]["text"]
+        with pytest.raises(McpError) as exc_info:
+            get_graphql_schema()
+        assert "No Gemfile found" in str(exc_info.value)
 
     def test_get_schema_file_not_found(self, mock_elasticgraph_project: Path) -> None:
         """Test getting schema when schema file doesn't exist."""
         os.chdir(mock_elasticgraph_project)
-        result = get_graphql_schema()
-
-        assert "contents" in result
-        assert len(result["contents"]) == 1
-        assert result["contents"][0]["uri"] == "schema://graphql"
-        assert result["contents"][0]["mimeType"] == "text/plain"
-        assert GRAPHQL_SCHEMA_FILENAME in result["contents"][0]["text"]
-        assert "not found" in result["contents"][0]["text"]
+        with pytest.raises(McpError) as exc_info:
+            get_graphql_schema()
+        assert "schema.graphql not found" in str(exc_info.value)
 
     def test_get_schema_permission_error(self, mock_elasticgraph_project: Path, mock_schema_file: Path) -> None:
         """Test getting schema when permission denied."""
@@ -93,14 +84,9 @@ class TestGraphQLSchema:
         # Make schema file unreadable
         mock_schema_file.chmod(0o000)
 
-        result = get_graphql_schema()
-
-        assert "contents" in result
-        assert len(result["contents"]) == 1
-        assert result["contents"][0]["uri"] == "schema://graphql"
-        assert result["contents"][0]["mimeType"] == "text/plain"
-        assert "Failed to read" in result["contents"][0]["text"]
-        assert "Check file permissions" in result["contents"][0]["text"]
+        with pytest.raises(McpError) as exc_info:
+            get_graphql_schema()
+        assert "Failed to read schema.graphql" in str(exc_info.value)
 
         # Restore permissions for cleanup
         mock_schema_file.chmod(0o644)
@@ -113,16 +99,24 @@ class TestApiDocs:
     async def test_get_api_docs_success(self) -> None:
         """Test successfully retrieving API docs."""
         mock_docs = "# ElasticGraph API Documentation\n\n## Overview"
-        with patch("httpx.AsyncClient.get") as mock_get:
-            # Create mock response
-            mock_response = AsyncMock()
-            mock_response.text = mock_docs
-            mock_get.return_value = mock_response
 
+        # Create an async mock response
+        mock_response = AsyncMock()
+        mock_response.text = mock_docs
+        mock_response.raise_for_status = Mock()
+
+        # Create an async mock client
+        mock_client = AsyncMock()
+        mock_client.get.return_value = mock_response
+        mock_client.__aenter__.return_value = mock_client
+
+        # Patch the AsyncClient class
+        with patch("httpx.AsyncClient", return_value=mock_client):
             result = await get_api_docs()
 
-            # Verify the response was properly awaited
-            mock_response.raise_for_status.assert_awaited_once()
+            # Verify operations were called
+            mock_client.get.assert_awaited_once()
+            mock_response.raise_for_status.assert_called_once()
 
             assert "contents" in result
             assert len(result["contents"]) == 1
@@ -137,12 +131,9 @@ class TestApiDocs:
         async def mock_fetch():
             return None
 
-        with patch("mcp_elasticgraph.server.fetch_api_docs", side_effect=mock_fetch):
-            result = await get_api_docs()
+        with patch("elasticgraph_mcp.server.fetch_api_docs", side_effect=mock_fetch):
+            with pytest.raises(McpError) as exc_info:
+                await get_api_docs()
 
-            assert "contents" in result
-            assert len(result["contents"]) == 1
-            assert result["contents"][0]["uri"] == "docs://api"
-            assert result["contents"][0]["mimeType"] == "text/plain"
-            assert "Error: Failed to fetch API documentation" in result["contents"][0]["text"]
-            assert "check your internet connection" in result["contents"][0]["text"].lower()
+            error_str = str(exc_info.value)
+            assert "Failed to fetch API documentation" in error_str

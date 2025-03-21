@@ -42,8 +42,9 @@ lint: ## Run ruff linting with auto-correct
 # Development server commands
 server: ## Run the MCP server
 	@echo "$(BLUE)Starting MCP server...$(RESET)"
-	mcp_elasticgraph
+	uv pip install .
+	elasticgraph-mcp-server
 
 inspector: ## Run the MCP Inspector with browser UI
 	@echo "$(BLUE)Starting MCP Inspector...$(RESET)"
-	mcp dev src/mcp_elasticgraph/server.py
+	mcp dev src/elasticgraph_mcp/server.py
