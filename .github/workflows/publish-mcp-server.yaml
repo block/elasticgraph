@@ -1,16 +1,17 @@
-name: Publish Python Package to PyPI
+name: MCP Server Package
 
 on:
   workflow_dispatch:  # Allows manual triggering while testing
+  pull_request:
+    paths:
+      - 'ai_tools/elasticgraph-mcp-server/**'
   release:
     types: [created]
 
 jobs:
-  deploy:
+  build:
+    name: Build Package
     runs-on: ubuntu-latest
-    environment:
-      name: pypi
-      url: https://pypi.org/p/elasticgraph-mcp-server
     defaults:
       run:
         working-directory: ai_tools/elasticgraph-mcp-server
@@ -31,8 +32,29 @@ jobs:
     - name: Build package
       run: python -m build
 
+    - name: Upload dist as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: python-package-distributions
+        path: ai_tools/elasticgraph-mcp-server/dist/
+
+  publish:
+    name: Publish to PyPI
+    needs: build
+    if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/elasticgraph-mcp-server
+
+    steps:
+    - name: Download dist artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: python-package-distributions
+        path: dist
+
     - name: Publish to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
         password: ${{ secrets.PYPI_API_TOKEN }}
-        packages-dir: ai_tools/elasticgraph-mcp-server/dist/
