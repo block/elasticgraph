@@ -282,11 +282,11 @@ module ElasticGraph
               f.default false
             end
 
-            # any_of/not don't really make sense on this filter because it doesn't make sense to
-            # apply an OR operator or negation to the fields of this type since they are all an
+            # any_of/all_of/not don't really make sense on this filter because it doesn't make sense
+            # to apply an OR operator or negation to the fields of this type since they are all an
             # indivisible part of a single filter operation on a specific field. So we remove them
             # here.
-            remove_any_of_and_not_filter_operators_on(t)
+            remove_any_of_and_all_of_and_not_filter_operators_on(t)
           end
 
           register_filter "MatchesPhrase" do |t|
@@ -300,11 +300,11 @@ module ElasticGraph
               f.documentation "The input phrase to search for."
             end
 
-            # any_of/not don't really make sense on this filter because it doesn't make sense to
-            # apply an OR operator or negation to the fields of this type since they are all an
+            # any_of/all_of/not don't really make sense on this filter because it doesn't make
+            # to apply an OR operator or negation to the fields of this type since they are all an
             # indivisible part of a single filter operation on a specific field. So we remove them
             # here.
-            remove_any_of_and_not_filter_operators_on(t)
+            remove_any_of_and_all_of_and_not_filter_operators_on(t)
           end
 
           # This is defined as a built-in ElasticGraph type so that we can leverage Elasticsearch/OpenSearch GeoLocation features
@@ -372,11 +372,11 @@ module ElasticGraph
               f.documentation "Determines the unit of the specified `#{names.max_distance}`."
             end
 
-            # any_of/not don't really make sense on this filter because it doesn't make sense to
-            # apply an OR operator or negation to the fields of this type since they are all an
+            # any_of/all_of/not don't really make sense on this filter because it doesn't make sense
+            # to apply an OR operator or negation to the fields of this type since they are all an
             # indivisible part of a single filter operation on a specific field. So we remove them
             # here.
-            remove_any_of_and_not_filter_operators_on(t)
+            remove_any_of_and_all_of_and_not_filter_operators_on(t)
           end
 
           # Note: `has_next_page`/`has_previous_page` are required to be non-null by the relay
@@ -732,11 +732,11 @@ module ElasticGraph
                 f.default "UTC"
               end
 
-              # With our initial implementation of `time_of_day` filtering, it's tricky to support `any_of`/`not` within
+              # With our initial implementation of `time_of_day` filtering, it's tricky to support `any_of`/`all_of`/`not` within
               # the `time_of_day: {...}` input object. They are still supported outside of `time_of_day` (on the parent
               # input object) so no functionality is losts by omitting these. Also, this aligns with our `GeoLocationDistanceFilterInput`
               # which is a similarly complex filter where we didn't include them.
-              remove_any_of_and_not_filter_operators_on(t)
+              remove_any_of_and_all_of_and_not_filter_operators_on(t)
             end
           end
 
@@ -1543,8 +1543,9 @@ module ElasticGraph
           schema_def_state.register_input_type(input_type)
         end
 
-        def remove_any_of_and_not_filter_operators_on(type)
+        def remove_any_of_and_all_of_and_not_filter_operators_on(type)
           type.graphql_fields_by_name.delete(names.any_of)
+          type.graphql_fields_by_name.delete(names.all_of)
           type.graphql_fields_by_name.delete(names.not)
         end
       end

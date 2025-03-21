@@ -154,6 +154,20 @@ module ElasticGraph
             EOS
           end
 
+          t.field @state.schema_elements.all_of, "[#{t.name}!]" do |f|
+            f.documentation <<~EOS
+              Matches records where all of the provided sub-filters evaluate to true.
+              This works just like an AND operator in SQL.
+
+              Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+              be provided on a single `#{t.name}` input because of collisions between key names. For example, if you want to provide
+              multiple `#{any_satisfy}: ...` filters, you could do `#{all_of}: [{#{any_satisfy}: ...}, {#{any_satisfy}: ...}]`.
+
+              Will be ignored when `null` is passed. 
+              When an empty list is passed, this part of the filter matches no documents.
+            EOS
+          end
+
           t.field @state.schema_elements.not, t.name do |f|
             f.documentation <<~EOS
               Matches records where the provided sub-filter evaluates to false.
@@ -305,18 +319,6 @@ module ElasticGraph
               Matches records where any of the list elements match the provided sub-filter.
 
               When `null` or an empty object is passed, matches all documents.
-            EOS
-          end
-
-          t.field all_of, "[#{t.name}!]" do |f|
-            f.documentation <<~EOS
-              Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
-
-              Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
-              be provided on a single `#{t.name}` input because of collisions between key names. For example, if you want to provide
-              multiple `#{any_satisfy}: ...` filters, you could do `#{all_of}: [{#{any_satisfy}: ...}, {#{any_satisfy}: ...}]`.
-
-              When `null` or an empty list is passed, matches all documents.
             EOS
           end
 
