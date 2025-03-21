@@ -62,7 +62,7 @@ jobs:
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
           cache-version: 2
 
-      - uses: KengoTODA/actions-setup-docker-compose@0169fb81f56cb44a908f67a3ec212f3579e2e4fe # main
+      - uses: KengoTODA/actions-setup-docker-compose@c87e531c5cb07c74d23a929bd8cdf54c2f4b583f # main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
