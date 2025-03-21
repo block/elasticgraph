@@ -242,7 +242,7 @@ module ElasticGraph
 
           if errors.empty?
             # We assume the size of the ops and the other array is the same and it cannot have `nil`.
-            zip = ops.zip(msearch_response.fetch("responses")) #: Array[[_Operation, Hash[String, Hash[String, untyped]]]]
+            zip = ops.zip(msearch_response.fetch("responses")) # : ::Array[[_Operation, ::Hash[::String, ::Hash[::String, untyped]]]]
 
             versions_by_op = zip.to_h do |(op, response)|
               hits = response.fetch("hits").fetch("hits")
