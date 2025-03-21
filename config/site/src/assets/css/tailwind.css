@@ -61,6 +61,21 @@
     content: 'ⓘ';
   }
 
+  /* Tip alert */
+  .alert-tip {
+    @apply my-4 rounded-lg border-l-4 p-4 border-green-400 bg-green-50/30 dark:border-green-500 dark:bg-green-950/20;
+  }
+
+  .alert-tip > p:first-of-type,
+  .alert-tip > .alert-title {
+    @apply mb-2 flex items-center gap-2 text-lg font-semibold text-green-700 dark:text-green-400;
+  }
+
+  .alert-tip > p:first-of-type::before,
+  .alert-tip > .alert-title::before {
+    content: '💡';
+  }
+
   /* Warning alert */
   .alert-warning {
     @apply my-4 rounded-lg border-l-4 p-4 border-amber-400 bg-amber-50/30 dark:border-amber-500 dark:bg-amber-950/20;
@@ -78,24 +93,28 @@
 
   /* Alert content */
   .alert-note > p:not(:first-of-type),
-  .alert-warning > p:not(:first-of-type) {
+  .alert-warning > p:not(:first-of-type),
+  .alert-tip > p:not(:first-of-type) {
     @apply text-gray-700 dark:text-gray-300;
   }
 
   /* Remove margin from last element in alerts to maintain consistent padding */
   .alert-note > :last-child,
-  .alert-warning > :last-child {
+  .alert-warning > :last-child,
+  .alert-tip > :last-child {
     @apply mb-0;
   }
 
   /* Code blocks within alerts */
   .alert-note .highlight,
-  .alert-warning .highlight {
+  .alert-warning .highlight,
+  .alert-tip .highlight {
     @apply my-4 mx-0;
   }
 
   .alert-note pre,
-  .alert-warning pre {
+  .alert-warning pre,
+  .alert-tip pre {
     @apply bg-white/50 dark:bg-gray-900/50;
   }
 

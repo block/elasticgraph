@@ -1,9 +1,9 @@
-query EqualityFilterNull {
+query FindUnnamedArtists {
   artists(filter: {
     name: {equalToAnyOf: [null]}
   }) {
     nodes {
-      name
+      name # will be null on all returned nodes
       bio {
         yearFormed
       }

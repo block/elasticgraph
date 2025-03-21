@@ -1,4 +1,4 @@
-[`allOf`]({% link query-api/filtering/conjunctions.md %})
+[`allOf`]({% link query-api/filtering/conjunctions.md %}#anding-subfilters-with-allof)
 : Matches records where all of the provided sub-filters evaluate to true.
   This works just like an `AND` operator in SQL.
 
@@ -8,7 +8,7 @@
 
   When `null` or an empty list is passed, matches all documents.
 
-[`anyOf`]({% link query-api/filtering/conjunctions.md %})
+[`anyOf`]({% link query-api/filtering/conjunctions.md %}#oring-subfilters-with-anyof)
 : Matches records where any of the provided sub-filters evaluate to true.
   This works just like an `OR` operator in SQL.
 

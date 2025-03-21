@@ -9,6 +9,8 @@ The `GeoLocation` type supports a special predicate:
 
 {% include filtering_predicate_definitions/near.md %}
 
+Here's an example of this predicate:
+
 {% highlight graphql %}
 {{ site.data.music_queries.filtering.FindSeattleVenues }}
 {% endhighlight %}

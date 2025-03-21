@@ -3,7 +3,7 @@ layout: query-api
 title: 'ElasticGraph Query API: Sorting'
 permalink: "/query-api/sorting/"
 nav_title: Sorting
-menu_order: 5
+menu_order: 4
 ---
 Use `orderBy:` on a root query field to control how the results are sorted:
 
@@ -12,3 +12,5 @@ Use `orderBy:` on a root query field to control how the results are sorted:
 {% endhighlight %}
 
 This query, for example, would sort by `name` (ascending), with `bio.yearFormed` (descending) as a tie breaker.
+When no `orderBy:` argument is provided, ElasticGraph will sort according to the
+[default sort configured on the index]({{ '/docs/' | append: site.data.doc_versions.latest_version | append: '/ElasticGraph/SchemaDefinition/Indexing/Index.html#default_sort-instance_method' | relative_url }}).

@@ -19,7 +19,7 @@ formed after the year 2000 with "accordion" in their bio:
 ### ORing subfilters with `anyOf`
 
 To instead find artists formed after the year 2000 OR with "accordion" in their bio, you
-can wrap the sub-filters in an `anyOf`:
+can pass the sub-filters as a list to `anyOf`:
 
 {% highlight graphql %}
 {{ site.data.music_queries.filtering.FindRecentOrAccordionArtists }}

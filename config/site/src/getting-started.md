@@ -28,7 +28,9 @@ $ git -v
 git version 2.46.0
 {% endhighlight %}
 
-Note: you don't need these exact versions (these are just examples). Your Ruby version does need to be 3.3.x or greater, though.
+{: .alert-note}
+**Note**{: .alert-title}
+You don't need these exact versions (these are just examples). Your Ruby version does need to be 3.3.x or greater, though.
 
 ## Step 1: Bootstrap a new ElasticGraph Project
 

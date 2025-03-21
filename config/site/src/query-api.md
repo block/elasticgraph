@@ -1,7 +1,8 @@
 ---
-layout: markdown
+layout: query-api
 title: Query API
 permalink: /query-api/
+hide_try_queries_tip: true
 ---
 
 Learn how to effectively use ElasticGraph's powerful Query API to search, filter, sort, and aggregate your data.

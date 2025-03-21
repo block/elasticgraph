@@ -1,4 +1,4 @@
-query EqualityFilter {
+query FindU2OrRadiohead {
   artists(filter: {
     name: {equalToAnyOf: ["U2", "Radiohead"]}
   }) {

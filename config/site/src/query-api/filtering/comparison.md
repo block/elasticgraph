@@ -9,6 +9,8 @@ ElasticGraph offers a standard set of comparison filter predicates:
 
 {% include filtering_predicate_definitions/comparison.md %}
 
+Here's an example:
+
 {% highlight graphql %}
 {{ site.data.music_queries.filtering.FindArtistsFormedIn90s }}
 {% endhighlight %}

@@ -12,11 +12,11 @@ The most commonly used predicate supports equality filtering:
 Here's a basic example:
 
 {% highlight graphql %}
-{{ site.data.music_queries.filtering.EqualityFilter }}
+{{ site.data.music_queries.filtering.FindU2OrRadiohead }}
 {% endhighlight %}
 
 Unlike the SQL `IN` operator, you can find records with `null` values if you put `null` in the list:
 
 {% highlight graphql %}
-{{ site.data.music_queries.filtering.EqualityFilterNull }}
+{{ site.data.music_queries.filtering.FindUnnamedArtists }}
 {% endhighlight %}

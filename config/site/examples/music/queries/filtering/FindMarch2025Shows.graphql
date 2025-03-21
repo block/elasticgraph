@@ -1,0 +1,31 @@
+query FindMarch2025Shows {
+  artists(filter: {
+    tours: {anySatisfy: {shows: {anySatisfy: {
+      startedAt: {
+        gte: "2025-03-01T00:00:00Z"
+        lt: "2025-04-01T00:00:00Z"
+
+        # Using gte/lt to fully cover the range is simpler than gte/lte:
+        # gte: "2025-03-01T00:00:00Z"
+        # lte: "2025-03-31T23:59:99.999Z"
+
+        # ...and simpler than gt/lt:
+        # gt: "2025-02-28T23:59:99.999Z"
+        # lt: "2025-04-01T00:00:00Z"
+      }
+    }}}}
+  }) {
+    nodes {
+      name
+
+      tours {
+        shows {
+          venue {
+            id
+          }
+          startedAt
+        }
+      }
+    }
+  }
+}

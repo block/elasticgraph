@@ -4,6 +4,7 @@ title: 'ElasticGraph Query API: Available Filter Predicates'
 permalink: "/query-api/filtering/available-predicates/"
 nav_title: Available Predicates
 menu_order: 1
+hide_try_queries_tip: true
 ---
 ElasticGraph offers a variety of filtering predicates:
 

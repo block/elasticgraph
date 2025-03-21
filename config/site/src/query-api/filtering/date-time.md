@@ -20,8 +20,14 @@ ElasticGraph supports three different date/time types:
   formatted based on the [partial-time portion of RFC3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6).
 
 All three support the standard set of [equality]({% link query-api/filtering/equality.md %}) and
-[comparison]({% link query-api/filtering/comparison.md %}) predicates. In addition, `DateTime` fields
-support one more filtering operator:
+[comparison]({% link query-api/filtering/comparison.md %}) predicates. When using comparison
+predicates to cover a range, it's usually simplest to pair `gte` with `lt`:
+
+{% highlight graphql %}
+{{ site.data.music_queries.filtering.FindMarch2025Shows }}
+{% endhighlight %}
+
+In addition, `DateTime` fields support one more filtering operator:
 
 {% include filtering_predicate_definitions/time_of_day.md %}
 
