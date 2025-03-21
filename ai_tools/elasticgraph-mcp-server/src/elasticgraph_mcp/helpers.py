@@ -17,7 +17,7 @@ import httpx
 from elasticgraph_mcp.errors import create_command_error, create_not_in_project_error
 
 # Constants
-MIN_RUBY_VERSION = "3.2.0"
+MIN_RUBY_VERSION = "3.3.0"
 GRAPHQL_SCHEMA_FILENAME = "schema.graphql"
 API_DOCS_URL = "https://block.github.io/elasticgraph/llms-full.txt"
 

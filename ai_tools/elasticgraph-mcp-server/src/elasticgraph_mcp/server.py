@@ -93,6 +93,11 @@ def get_common_commands() -> ResponseDict:
                 "example": "cd my_project && bundle exec rake boot_locally",
             },
             {
+                "command": "bundle exec rake build",
+                "description": "Main command for new projects that will re-generate the schema artifacts and run tests",
+                "example": "cd my_project && bundle exec rake build",
+            },
+            {
                 "command": "bundle exec rake schema_artifacts:dump",
                 "description": "Validate and dump the Ruby schema definition into schema.graphql",
                 "example": "cd my_project && bundle exec rake schema_artifacts:dump",

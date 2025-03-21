@@ -11,7 +11,7 @@ from elasticgraph_mcp.helpers import GRAPHQL_SCHEMA_FILENAME
 
 
 @pytest.fixture
-def temp_dir() -> Generator[Path, None, None]:
+def temp_dir() -> Generator[Path]:
     """Create a temporary directory for testing.
 
     Yields:

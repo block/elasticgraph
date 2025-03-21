@@ -1,6 +1,6 @@
 # Development tasks for ElasticGraph MCP
 
-.PHONY: help install dev test format lint server inspector
+.PHONY: help install build test format lint server inspector
 
 # Default target when just running 'make'
 .DEFAULT_GOAL := help
@@ -21,7 +21,7 @@ install: ## Install dependencies using uv
 	@echo "$(BLUE)Installing dependencies...$(RESET)"
 	uv sync
 
-dev: format lint test ## Run format, lint, and test (main development command)
+build: format lint test ## Run format, lint, and test (main development command)
 	@echo "$(GREEN)All development checks completed!$(RESET)"
 
 test: ## Run tests
