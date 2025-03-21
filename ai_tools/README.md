@@ -1,12 +1,12 @@
 # AI Tools
 
-These tools are meant to be used AI agents with function calling capabilities to help you build with ElasticGraph.
+To help you build an ElasticGraph project, you can use these tools with AI agents.
 
 ## Components
 
-### Model Context Protocol (MCP)
+### ElasticGraph MCP Servier
 
-Located in [`modelcontextprotocol/`](./modelcontextprotocol/), this provides a server implementation for the [Model Context Protocol](https://modelcontextprotocol.io/). MCP enables AI agents to:
+Located in [`elasticgraph-mcp-server/`](./elasticgraph-mcp-server/), this provides a server implementation for the [Model Context Protocol](https://modelcontextprotocol.io/). MCP enables AI agents to:
 
 - Dynamically discover and use tools through function calling
 - Access contextual information through a standardized protocol
@@ -18,12 +18,6 @@ You can use the MCP server with a variety of tools and platforms, including:
 - in [Claude](https://www.anthropic.com/news/model-context-protocol) Desktop app as an "MCP server"
 - in [Cursor](https://docs.cursor.com/context/model-context-protocol) as an "MCP tool"
 
-## Getting Started
-
-See the individual component directories for detailed documentation and setup instructions:
-- [Model Context Protocol Server](./modelcontextprotocol/README.md)
-
 ## Additional Resources
 
-- ElasticGraph follows [llmstxt.org](https://llmstxt.org/) and publishes an `llms-full.txt` file: https://block.github.io/elasticgraph/llms-full.txt
-  - Coming soon `llms.txt` root file
+- ElasticGraph follows [llmstxt.org](https://llmstxt.org/) and publishes all documenation concatenated into one `llms-full.txt` file: https://block.github.io/elasticgraph/llms-full.txt

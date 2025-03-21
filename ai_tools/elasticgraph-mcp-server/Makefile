@@ -1,6 +1,6 @@
 # Development tasks for ElasticGraph MCP
 
-.PHONY: help install dev test format lint clean coverage build docs
+.PHONY: help install dev test format lint server inspector
 
 # Default target when just running 'make'
 .DEFAULT_GOAL := help
@@ -13,7 +13,7 @@ RED := \033[31m
 RESET := \033[0m
 
 help: ## Show this help message
-	@echo "$(BLUE)ElasticGraph MCP Development Commands$(RESET)"
+	@echo "$(BLUE)ElasticGraph MCP Server Development Commands$(RESET)"
 	@echo
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "$(YELLOW)%-20s$(RESET) %s\n", $$1, $$2}'
 
