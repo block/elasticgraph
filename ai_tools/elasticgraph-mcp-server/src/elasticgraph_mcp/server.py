@@ -136,13 +136,21 @@ def get_documentation_links() -> ResponseDict:
                 "url": "https://block.github.io/elasticgraph/",
                 "description": "ElasticGraph official website",
             },
+            "quickstart": {
+                "url": "https://block.github.io/elasticgraph/getting-started/",
+                "description": "Get Started with ElasticGraph",
+            },
             "query_api": {
                 "url": "https://block.github.io/elasticgraph/query-api/",
                 "description": "ElasticGraph Query API",
             },
-            "guide": {
-                "url": "https://block.github.io/elasticgraph/getting-started/",
-                "description": "Getting Started with ElasticGraph guide",
+            "guides": {
+                "url": "https://block.github.io/elasticgraph/guides/",
+                "description": "ElasticGraph Guides",
+            },
+            "api_docs": {
+                "url": "https://block.github.io/elasticgraph/api-docs/",
+                "description": "ElasticGraph API Docs",
             },
         }
 
