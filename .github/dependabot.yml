@@ -149,3 +149,8 @@ updates:
     directory: /elasticgraph
     schedule:
       interval: weekly
+
+  - package-ecosystem: pip
+    directory: /ai_tools/elasticgraph-mcp-server
+    schedule:
+      interval: weekly
