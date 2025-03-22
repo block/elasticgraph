@@ -30,7 +30,7 @@ module ElasticGraph
       :total_document_count_needed, :aggregations, :logger, :filter_interpreter, :routing_picker,
       :index_expression_builder, :default_page_size, :search_index_definitions, :max_page_size,
       :filters, :sort, :document_pagination, :requested_fields, :individual_docs_needed,
-      :monotonic_clock_deadline, :schema_element_names
+      :size_multiplier, :monotonic_clock_deadline, :schema_element_names
     )
       # Load these files after the `Query` class has been defined, to avoid
       # `TypeError: superclass mismatch for class Query`
@@ -100,6 +100,7 @@ module ElasticGraph
         sort: [],
         requested_fields: [],
         document_pagination: {},
+        size_multiplier: 1,
         monotonic_clock_deadline: nil,
         aggregations: {}
       )
@@ -110,6 +111,7 @@ module ElasticGraph
           sort: merge_attribute(:sort, sort),
           requested_fields: self.requested_fields + requested_fields,
           document_pagination: merge_attribute(:document_pagination, document_pagination),
+          size_multiplier: self.size_multiplier * size_multiplier,
           monotonic_clock_deadline: [self.monotonic_clock_deadline, monotonic_clock_deadline].compact.min,
           aggregations: self.aggregations.merge(aggregations)
         )
@@ -214,6 +216,7 @@ module ElasticGraph
           total_document_count_needed: total_document_count_needed,
           decoded_cursor_factory: decoded_cursor_factory,
           schema_element_names: schema_element_names,
+          size_multiplier: size_multiplier,
           paginator: Paginator.new(
             default_page_size: default_page_size,
             max_page_size: max_page_size,
@@ -321,6 +324,7 @@ module ElasticGraph
           filters: [],
           sort: [],
           document_pagination: {},
+          size_multiplier: 1,
           aggregations: {},
           requested_fields: [],
           individual_docs_needed: false,
@@ -340,6 +344,7 @@ module ElasticGraph
             filters: filters.to_set,
             sort: sort,
             document_pagination: document_pagination,
+            size_multiplier: size_multiplier,
             aggregations: aggregations,
             requested_fields: requested_fields.to_set,
             individual_docs_needed: individual_docs_needed || !requested_fields.empty?,

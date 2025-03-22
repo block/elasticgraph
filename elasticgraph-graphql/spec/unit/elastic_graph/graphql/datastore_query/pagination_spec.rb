@@ -46,6 +46,14 @@ module ElasticGraph
 
         expect(datastore_body_of(query)).to include(size: 0)
       end
+
+      it "applies the `size_multiplier` to the size we request from the datastore" do
+        query = new_query(individual_docs_needed: true, document_pagination: {first: 7})
+        multiplied_query = query.merge_with(size_multiplier: 3)
+
+        # 24 because we add 1 to the "base" size and (7 + 1) * 3 = 24
+        expect(datastore_body_of(multiplied_query)).to include(size: 24)
+      end
     end
   end
 end

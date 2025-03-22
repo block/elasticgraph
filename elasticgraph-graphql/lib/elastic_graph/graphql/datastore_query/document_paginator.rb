@@ -22,7 +22,8 @@ module ElasticGraph
         :individual_docs_needed,
         # `total_document_count_needed`: when false, `track_total_hits` will be 0 in our datastore query.
         # This will prevent the datastore from doing extra work to get an accurate count
-        :total_document_count_needed
+        :total_document_count_needed,
+        :size_multiplier
       )
         # Builds a hash containing the portions of a datastore search body related to pagination.
         def to_datastore_body
@@ -60,7 +61,7 @@ module ElasticGraph
         private
 
         def effective_size
-          individual_docs_needed ? paginator.requested_page_size : 0
+          (individual_docs_needed ? paginator.requested_page_size : 0) * size_multiplier
         end
 
         def effective_sort

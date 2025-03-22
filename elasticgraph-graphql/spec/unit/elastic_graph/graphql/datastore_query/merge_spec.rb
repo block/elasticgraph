@@ -170,6 +170,17 @@ module ElasticGraph
         }.to avoid_logging_warnings
       end
 
+      it "multiplies the `size_multiplier` when merging", covers: :size_multiplier do
+        merged = merge({size_multiplier: 1}, {size_multiplier: 1})
+        expect(merged.size_multiplier).to eq(1)
+
+        merged = merge({size_multiplier: 5}, {size_multiplier: 1})
+        expect(merged.size_multiplier).to eq(5)
+
+        merged = merge({size_multiplier: 2}, {size_multiplier: 7})
+        expect(merged.size_multiplier).to eq(14)
+      end
+
       it "merges `aggregations` by merging the hashes", covers: :aggregations do
         agg1 = aggregation_query_of(name: "a1", groupings: [
           field_term_grouping_of("foo1", "bar1"),
