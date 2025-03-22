@@ -103,7 +103,6 @@ module ElasticGraph
         def initialize(
           name:, type:, parent_type:, schema_def_state:,
           accuracy_confidence: :high, name_in_index: name,
-          runtime_metadata_graphql_field: SchemaArtifacts::RuntimeMetadata::GraphQLField::EMPTY,
           type_for_derived_types: nil, graphql_only: nil, singular: nil,
           sortable: nil, filterable: nil, aggregatable: nil, groupable: nil,
           backing_indexing_field: nil, as_input: false, legacy_grouping_schema: false, resolver: nil
