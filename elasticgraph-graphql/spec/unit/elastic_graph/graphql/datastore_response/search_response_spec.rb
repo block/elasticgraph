@@ -278,7 +278,7 @@ module ElasticGraph
               eileen = {"_id" => "E", "_source" => {"id" => "E", "name" => "Eileen", "age" => 12}}
             )
 
-            filtered = response.filter_results("name", ["Bob", "Eileen"].to_set)
+            filtered = response.filter_results("name", ["Bob", "Eileen"].to_set, 10)
 
             expect(filtered.documents.map(&:payload)).to eq [bob.fetch("_source"), eileen.fetch("_source")]
           end
@@ -290,7 +290,7 @@ module ElasticGraph
               {"_id" => "E", "_source" => {"id" => "E", "name" => "Eileen", "age" => 12}}
             )
 
-            filtered = response.filter_results("name", ["Bob", "Hellen"].to_set)
+            filtered = response.filter_results("name", ["Bob", "Hellen"].to_set, 10)
 
             expect(filtered.documents.map(&:payload)).to eq [bob.fetch("_source")]
           end
@@ -303,7 +303,7 @@ module ElasticGraph
             )
 
             expect {
-              response.filter_results("address", ["Bob", "Hellen"].to_set)
+              response.filter_results("address", ["Bob", "Hellen"].to_set, 10)
             }.to raise_error a_string_including("address")
           end
 
@@ -314,7 +314,21 @@ module ElasticGraph
               {"_id" => "E"}
             )
 
-            filtered = response.filter_results("id", ["B", "E", "F"].to_set)
+            filtered = response.filter_results("id", ["B", "E", "F"].to_set, 10)
+
+            expect(filtered.documents.map(&:id)).to eq ["B", "E"]
+          end
+
+          it "limits the returned results to the given size" do
+            response = response_of(
+              {"_id" => "B"},
+              {"_id" => "J"},
+              {"_id" => "E"},
+              {"_id" => "G"},
+              {"_id" => "F"}
+            )
+
+            filtered = response.filter_results("id", ["B", "E", "F"].to_set, 2)
 
             expect(filtered.documents.map(&:id)).to eq ["B", "E"]
           end
@@ -326,7 +340,7 @@ module ElasticGraph
               {"_id" => "E", "_source" => {}}
             )
 
-            filtered = response.filter_results("id", [].to_set)
+            filtered = response.filter_results("id", [].to_set, 10)
 
             expect(filtered).to be_empty
           end
@@ -338,7 +352,7 @@ module ElasticGraph
               match2 = {"_id" => "E", "_source" => {"id" => "E", "foo_ids" => [3, 19, 47], "age" => 12}}
             )
 
-            filtered = response.filter_results("foo_ids", [1, 17, 19].to_set)
+            filtered = response.filter_results("foo_ids", [1, 17, 19].to_set, 10)
 
             expect(filtered.documents.map(&:payload)).to eq [match1.fetch("_source"), match2.fetch("_source")]
           end
@@ -350,7 +364,7 @@ module ElasticGraph
               eileen = {"_id" => "E", "_source" => {"id" => "E", "info" => {"name" => "Eileen"}, "age" => 12}}
             )
 
-            filtered = response.filter_results("info.name", ["Bob", "Eileen"].to_set)
+            filtered = response.filter_results("info.name", ["Bob", "Eileen"].to_set, 10)
 
             expect(filtered.documents.map(&:payload)).to eq [bob.fetch("_source"), eileen.fetch("_source")]
           end
@@ -363,7 +377,7 @@ module ElasticGraph
             )
             expect(response.map(&:decoded_cursor_factory)).to eq([decoded_cursor_factory] * 3)
 
-            filtered = response.filter_results("name", ["Bob", "Eileen"].to_set)
+            filtered = response.filter_results("name", ["Bob", "Eileen"].to_set, 10)
 
             expect(filtered.map(&:decoded_cursor_factory)).to eq([decoded_cursor_factory] * 2)
           end
@@ -384,7 +398,7 @@ module ElasticGraph
               }
             }))
 
-            filtered = response.filter_results("id", ["b"].to_set)
+            filtered = response.filter_results("id", ["b"].to_set, 10)
 
             expect(filtered.metadata).to eq metadata
           end
@@ -404,7 +418,7 @@ module ElasticGraph
             })
             expect(response.total_document_count).to eq 17
 
-            filtered = response.filter_results("id", ["b"].to_set)
+            filtered = response.filter_results("id", ["b"].to_set, 10)
 
             expect { filtered.total_document_count }.to raise_error Errors::CountUnavailableError
           end
@@ -425,7 +439,7 @@ module ElasticGraph
             })
             expect(response.aggregations).to eq({})
 
-            filtered = response.filter_results("id", ["b"].to_set)
+            filtered = response.filter_results("id", ["b"].to_set, 10)
 
             expect { filtered.aggregations }.to raise_error Errors::AggregationsUnavailableError
           end

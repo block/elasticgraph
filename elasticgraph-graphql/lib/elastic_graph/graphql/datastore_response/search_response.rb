@@ -100,13 +100,14 @@ module ElasticGraph
         RAW_EMPTY = {"hits" => {"hits" => [], "total" => {"value" => 0}}}.freeze
         EMPTY = build(RAW_EMPTY)
 
-        # Returns a response filtered to results that have matching `values` at the given `field_path`.
+        # Returns a response filtered to results that have matching `values` at the given `field_path`, limiting
+        # the results to the first `size` results.
         #
         # This is designed for use in situations where we have N different datastore queries which are identical
         # except for differing filter values. For efficiency, we combine those queries into a single query that
         # filters on the set union of values. We can then use this method to "split" the single response into what
         # the separate responses would have been if we hadn't combined into a single query.
-        def filter_results(field_path, values)
+        def filter_results(field_path, values, size)
           filter =
             if field_path == "id"
               # `id` filtering is a very common case, and we want to avoid having to request
@@ -116,7 +117,7 @@ module ElasticGraph
               ->(hit) { values.intersect?(Support::HashUtil.fetch_leaf_values_at_path(hit.fetch("_source"), field_path).to_set) }
             end
 
-          hits = raw_data.fetch("hits").fetch("hits").select(&filter)
+          hits = raw_data.fetch("hits").fetch("hits").select(&filter).first(size)
           updated_raw_data = Support::HashUtil.deep_merge(raw_data, {"hits" => {"hits" => hits, "total" => nil}})
 
           SearchResponse.build(
