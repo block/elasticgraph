@@ -163,6 +163,18 @@ Will match all documents if passed as an empty object (or as `null`).
 """
 input AddressFilterInput {
   """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `AddressFilterInput` input because of collisions
+  between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [AddressFilterInput!]
+
+  """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
@@ -262,6 +274,18 @@ Will match all documents if passed as an empty object (or as `null`).
 """
 input AddressTimestampsFilterInput {
   """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `AddressTimestampsFilterInput` input because of
+  collisions between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [AddressTimestampsFilterInput!]
+
+  """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
@@ -320,6 +344,18 @@ Will match all documents if passed as an empty object (or as `null`).
 """
 input AffiliationsFieldsListFilterInput {
   """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `AffiliationsFieldsListFilterInput` input because of
+  collisions between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [AffiliationsFieldsListFilterInput!]
+
+  """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
@@ -364,6 +400,18 @@ Input type used to specify filters on `Affiliations` fields.
 Will match all documents if passed as an empty object (or as `null`).
 """
 input AffiliationsFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `AffiliationsFilterInput` input because of collisions
+  between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [AffiliationsFilterInput!]
+
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
@@ -458,6 +506,18 @@ Will match all documents if passed as an empty object (or as `null`).
 """
 input BooleanFilterInput {
   """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `BooleanFilterInput` input because of collisions
+  between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [BooleanFilterInput!]
+
+  """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
@@ -491,6 +551,18 @@ Input type used to specify filters on elements of a `[Boolean]` field.
 Will match all documents if passed as an empty object (or as `null`).
 """
 input BooleanListElementFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `BooleanListElementFilterInput` input because of
+  collisions between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [BooleanListElementFilterInput!]
+
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
@@ -574,6 +646,18 @@ Will match all documents if passed as an empty object (or as `null`).
 """
 input ColorFilterInput {
   """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `ColorFilterInput` input because of collisions between
+  key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [ColorFilterInput!]
+
+  """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
@@ -613,6 +697,18 @@ Input type used to specify filters on elements of a `[Color]` field.
 Will match all documents if passed as an empty object (or as `null`).
 """
 input ColorListElementFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `ColorListElementFilterInput` input because of
+  collisions between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [ColorListElementFilterInput!]
+
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
@@ -1070,6 +1166,18 @@ Will match all documents if passed as an empty object (or as `null`).
 """
 input ComponentFilterInput {
   """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `ComponentFilterInput` input because of collisions
+  between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [ComponentFilterInput!]
+
+  """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
@@ -1329,6 +1437,18 @@ Will match all documents if passed as an empty object (or as `null`).
 """
 input CurrencyDetailsFilterInput {
   """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `CurrencyDetailsFilterInput` input because of
+  collisions between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [CurrencyDetailsFilterInput!]
+
+  """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
@@ -1430,6 +1550,18 @@ Input type used to specify filters on `Date` fields.
 Will match all documents if passed as an empty object (or as `null`).
 """
 input DateFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `DateFilterInput` input because of collisions between
+  key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [DateFilterInput!]
+
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
@@ -1608,6 +1740,18 @@ Will match all documents if passed as an empty object (or as `null`).
 """
 input DateListElementFilterInput {
   """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `DateListElementFilterInput` input because of
+  collisions between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [DateListElementFilterInput!]
+
+  """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
@@ -1753,6 +1897,18 @@ Input type used to specify filters on `DateTime` fields.
 Will match all documents if passed as an empty object (or as `null`).
 """
 input DateTimeFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `DateTimeFilterInput` input because of collisions
+  between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [DateTimeFilterInput!]
+
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
@@ -2023,6 +2179,18 @@ Input type used to specify filters on elements of a `[DateTime]` field.
 Will match all documents if passed as an empty object (or as `null`).
 """
 input DateTimeListElementFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `DateTimeListElementFilterInput` input because of
+  collisions between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [DateTimeListElementFilterInput!]
+
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
@@ -2574,6 +2742,18 @@ Will match all documents if passed as an empty object (or as `null`).
 """
 input ElectricalPartFilterInput {
   """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `ElectricalPartFilterInput` input because of
+  collisions between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [ElectricalPartFilterInput!]
+
+  """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
@@ -2743,6 +2923,18 @@ Will match all documents if passed as an empty object (or as `null`).
 """
 input FloatFilterInput {
   """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `FloatFilterInput` input because of collisions between
+  key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [FloatFilterInput!]
+
+  """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
@@ -2846,6 +3038,18 @@ Will match all documents if passed as an empty object (or as `null`).
 """
 input GeoLocationFilterInput {
   """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `GeoLocationFilterInput` input because of collisions
+  between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [GeoLocationFilterInput!]
+
+  """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
@@ -2883,6 +3087,17 @@ Will match all documents if passed as an empty object (or as `null`).
 """
 input IDFilterInput {
   """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `IDFilterInput` input because of collisions between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [IDFilterInput!]
+
+  """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
@@ -2916,6 +3131,18 @@ Input type used to specify filters on elements of a `[ID]` field.
 Will match all documents if passed as an empty object (or as `null`).
 """
 input IDListElementFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `IDListElementFilterInput` input because of collisions
+  between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [IDListElementFilterInput!]
+
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
@@ -3051,6 +3278,18 @@ Will match all documents if passed as an empty object (or as `null`).
 """
 input IntFilterInput {
   """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `IntFilterInput` input because of collisions between
+  key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [IntFilterInput!]
+
+  """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
@@ -3112,6 +3351,18 @@ Input type used to specify filters on elements of a `[Int]` field.
 Will match all documents if passed as an empty object (or as `null`).
 """
 input IntListElementFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `IntListElementFilterInput` input because of
+  collisions between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [IntListElementFilterInput!]
+
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
@@ -3238,6 +3489,18 @@ Input type used to specify filters on `Inventor` fields.
 Will match all documents if passed as an empty object (or as `null`).
 """
 input InventorFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `InventorFilterInput` input because of collisions
+  between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [InventorFilterInput!]
+
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
@@ -3389,6 +3652,18 @@ Will match all documents if passed as an empty object (or as `null`).
 """
 input JsonSafeLongFilterInput {
   """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `JsonSafeLongFilterInput` input because of collisions
+  between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [JsonSafeLongFilterInput!]
+
+  """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
@@ -3450,6 +3725,18 @@ Input type used to specify filters on elements of a `[JsonSafeLong]` field.
 Will match all documents if passed as an empty object (or as `null`).
 """
 input JsonSafeLongListElementFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `JsonSafeLongListElementFilterInput` input because of
+  collisions between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [JsonSafeLongListElementFilterInput!]
+
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
@@ -3597,6 +3884,18 @@ Input type used to specify filters on `LocalTime` fields.
 Will match all documents if passed as an empty object (or as `null`).
 """
 input LocalTimeFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `LocalTimeFilterInput` input because of collisions
+  between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [LocalTimeFilterInput!]
+
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
@@ -3821,6 +4120,18 @@ Input type used to specify filters on `LongString` fields.
 Will match all documents if passed as an empty object (or as `null`).
 """
 input LongStringFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `LongStringFilterInput` input because of collisions
+  between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [LongStringFilterInput!]
+
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
@@ -4119,6 +4430,18 @@ Will match all documents if passed as an empty object (or as `null`).
 """
 input ManufacturerFilterInput {
   """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `ManufacturerFilterInput` input because of collisions
+  between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [ManufacturerFilterInput!]
+
+  """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
@@ -4279,6 +4602,18 @@ Input type used to specify filters on `Material` fields.
 Will match all documents if passed as an empty object (or as `null`).
 """
 input MaterialFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `MaterialFilterInput` input because of collisions
+  between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [MaterialFilterInput!]
+
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
@@ -4559,6 +4894,18 @@ Will match all documents if passed as an empty object (or as `null`).
 """
 input MechanicalPartFilterInput {
   """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `MechanicalPartFilterInput` input because of
+  collisions between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [MechanicalPartFilterInput!]
+
+  """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
@@ -4698,6 +5045,18 @@ Will match all documents if passed as an empty object (or as `null`).
 """
 input MoneyFieldsListFilterInput {
   """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `MoneyFieldsListFilterInput` input because of
+  collisions between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [MoneyFieldsListFilterInput!]
+
+  """
   Used to filter on the `amount_cents` field.
 
   When `null` or an empty object is passed, matches all documents.
@@ -4742,6 +5101,18 @@ Input type used to specify filters on `Money` fields.
 Will match all documents if passed as an empty object (or as `null`).
 """
 input MoneyFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `MoneyFilterInput` input because of collisions between
+  key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [MoneyFilterInput!]
+
   """
   Used to filter on the `amount_cents` field.
 
@@ -5166,6 +5537,18 @@ Input type used to specify filters on `NamedEntity` fields.
 Will match all documents if passed as an empty object (or as `null`).
 """
 input NamedEntityFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `NamedEntityFilterInput` input because of collisions
+  between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [NamedEntityFilterInput!]
+
   """
   Used to filter on the `amount_cents` field.
 
@@ -6222,6 +6605,18 @@ Will match all documents if passed as an empty object (or as `null`).
 """
 input NamedInventorFilterInput {
   """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `NamedInventorFilterInput` input because of collisions
+  between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [NamedInventorFilterInput!]
+
+  """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
@@ -6474,6 +6869,18 @@ Will match all documents if passed as an empty object (or as `null`).
 """
 input PartFilterInput {
   """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `PartFilterInput` input because of collisions between
+  key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [PartFilterInput!]
+
+  """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
@@ -6660,6 +7067,18 @@ input PlayerFieldsListFilterInput {
   affiliations: AffiliationsFieldsListFilterInput
 
   """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `PlayerFieldsListFilterInput` input because of
+  collisions between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [PlayerFieldsListFilterInput!]
+
+  """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
@@ -6724,6 +7143,18 @@ input PlayerFilterInput {
   When `null` or an empty object is passed, matches all documents.
   """
   affiliations: AffiliationsFilterInput
+
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `PlayerFilterInput` input because of collisions
+  between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [PlayerFilterInput!]
 
   """
   Matches records where any of the provided sub-filters evaluate to true.
@@ -6921,6 +7352,18 @@ Will match all documents if passed as an empty object (or as `null`).
 """
 input PlayerSeasonFieldsListFilterInput {
   """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `PlayerSeasonFieldsListFilterInput` input because of
+  collisions between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [PlayerSeasonFieldsListFilterInput!]
+
+  """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
@@ -6972,6 +7415,18 @@ Input type used to specify filters on `PlayerSeason` fields.
 Will match all documents if passed as an empty object (or as `null`).
 """
 input PlayerSeasonFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `PlayerSeasonFilterInput` input because of collisions
+  between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [PlayerSeasonFilterInput!]
+
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
@@ -7102,6 +7557,18 @@ Input type used to specify filters on `Position` fields.
 Will match all documents if passed as an empty object (or as `null`).
 """
 input PositionFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `PositionFilterInput` input because of collisions
+  between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [PositionFilterInput!]
+
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
@@ -8511,6 +8978,18 @@ Will match all documents if passed as an empty object (or as `null`).
 """
 input SizeFilterInput {
   """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `SizeFilterInput` input because of collisions between
+  key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [SizeFilterInput!]
+
+  """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
@@ -8550,6 +9029,18 @@ Input type used to specify filters on elements of a `[Size]` field.
 Will match all documents if passed as an empty object (or as `null`).
 """
 input SizeListElementFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `SizeListElementFilterInput` input because of
+  collisions between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [SizeListElementFilterInput!]
+
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
@@ -8957,6 +9448,18 @@ Will match all documents if passed as an empty object (or as `null`).
 """
 input SponsorFilterInput {
   """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `SponsorFilterInput` input because of collisions
+  between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [SponsorFilterInput!]
+
+  """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
@@ -9052,6 +9555,18 @@ Will match all documents if passed as an empty object (or as `null`).
 """
 input SponsorshipFieldsListFilterInput {
   """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `SponsorshipFieldsListFilterInput` input because of
+  collisions between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [SponsorshipFieldsListFilterInput!]
+
+  """
   Used to filter on the `annual_total` field.
 
   When `null` or an empty object is passed, matches all documents.
@@ -9096,6 +9611,18 @@ Input type used to specify filters on `Sponsorship` fields.
 Will match all documents if passed as an empty object (or as `null`).
 """
 input SponsorshipFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `SponsorshipFilterInput` input because of collisions
+  between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [SponsorshipFilterInput!]
+
   """
   Used to filter on the `annual_total` field.
 
@@ -9248,6 +9775,18 @@ Will match all documents if passed as an empty object (or as `null`).
 """
 input StringFilterInput {
   """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `StringFilterInput` input because of collisions
+  between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [StringFilterInput!]
+
+  """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
@@ -9281,6 +9820,18 @@ Input type used to specify filters on elements of a `[String]` field.
 Will match all documents if passed as an empty object (or as `null`).
 """
 input StringListElementFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `StringListElementFilterInput` input because of
+  collisions between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [StringListElementFilterInput!]
+
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
@@ -9853,6 +10404,18 @@ Will match all documents if passed as an empty object (or as `null`).
 """
 input TeamDetailsFilterInput {
   """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `TeamDetailsFilterInput` input because of collisions
+  between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [TeamDetailsFilterInput!]
+
+  """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
@@ -9920,6 +10483,18 @@ Input type used to specify filters on `Team` fields.
 Will match all documents if passed as an empty object (or as `null`).
 """
 input TeamFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `TeamFilterInput` input because of collisions between
+  key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [TeamFilterInput!]
+
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
@@ -10176,6 +10751,18 @@ Input type used to specify filters on `TeamNestedFields` fields.
 Will match all documents if passed as an empty object (or as `null`).
 """
 input TeamNestedFieldsFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `TeamNestedFieldsFilterInput` input because of
+  collisions between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [TeamNestedFieldsFilterInput!]
+
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
@@ -10438,6 +11025,18 @@ Will match all documents if passed as an empty object (or as `null`).
 """
 input TeamRecordFieldsListFilterInput {
   """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `TeamRecordFieldsListFilterInput` input because of
+  collisions between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [TeamRecordFieldsListFilterInput!]
+
+  """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
@@ -10510,6 +11109,18 @@ Input type used to specify filters on `TeamRecord` fields.
 Will match all documents if passed as an empty object (or as `null`).
 """
 input TeamRecordFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `TeamRecordFilterInput` input because of collisions
+  between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [TeamRecordFilterInput!]
+
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
@@ -10709,6 +11320,18 @@ Will match all documents if passed as an empty object (or as `null`).
 """
 input TeamSeasonFieldsListFilterInput {
   """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `TeamSeasonFieldsListFilterInput` input because of
+  collisions between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [TeamSeasonFieldsListFilterInput!]
+
+  """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
@@ -10809,6 +11432,18 @@ Input type used to specify filters on `TeamSeason` fields.
 Will match all documents if passed as an empty object (or as `null`).
 """
 input TeamSeasonFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `TeamSeasonFilterInput` input because of collisions
+  between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [TeamSeasonFilterInput!]
+
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
@@ -11481,6 +12116,18 @@ Will match all documents if passed as an empty object (or as `null`).
 """
 input TextFilterInput {
   """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `TextFilterInput` input because of collisions between
+  key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [TextFilterInput!]
+
+  """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
@@ -11560,6 +12207,18 @@ Input type used to specify filters on `Untyped` fields.
 Will match all documents if passed as an empty object (or as `null`).
 """
 input UntypedFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `UntypedFilterInput` input because of collisions
+  between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [UntypedFilterInput!]
+
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
@@ -12214,6 +12873,18 @@ Will match all documents if passed as an empty object (or as `null`).
 """
 input WidgetCurrencyFilterInput {
   """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `WidgetCurrencyFilterInput` input because of
+  collisions between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [WidgetCurrencyFilterInput!]
+
+  """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
@@ -12375,6 +13046,18 @@ Will match all documents if passed as an empty object (or as `null`).
 """
 input WidgetCurrencyNestedFieldsFilterInput {
   """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `WidgetCurrencyNestedFieldsFilterInput` input because
+  of collisions between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [WidgetCurrencyNestedFieldsFilterInput!]
+
+  """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
@@ -12520,6 +13203,18 @@ Input type used to specify filters on `Widget` fields.
 Will match all documents if passed as an empty object (or as `null`).
 """
 input WidgetFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `WidgetFilterInput` input because of collisions
+  between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [WidgetFilterInput!]
+
   """
   Used to filter on the `amount_cents` field.
 
@@ -13026,6 +13721,18 @@ Will match all documents if passed as an empty object (or as `null`).
 """
 input WidgetOptionSetsFilterInput {
   """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `WidgetOptionSetsFilterInput` input because of
+  collisions between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [WidgetOptionSetsFilterInput!]
+
+  """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
@@ -13095,6 +13802,18 @@ Input type used to specify filters on `WidgetOptions` fields.
 Will match all documents if passed as an empty object (or as `null`).
 """
 input WidgetOptionsFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `WidgetOptionsFilterInput` input because of collisions
+  between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [WidgetOptionsFilterInput!]
+
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
@@ -13470,6 +14189,18 @@ Input type used to specify filters on `WidgetOrAddress` fields.
 Will match all documents if passed as an empty object (or as `null`).
 """
 input WidgetOrAddressFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `WidgetOrAddressFilterInput` input because of
+  collisions between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [WidgetOrAddressFilterInput!]
+
   """
   Used to filter on the `amount_cents` field.
 
@@ -14874,6 +15605,18 @@ Will match all documents if passed as an empty object (or as `null`).
 """
 input WidgetWorkspaceFilterInput {
   """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `WidgetWorkspaceFilterInput` input because of
+  collisions between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [WidgetWorkspaceFilterInput!]
+
+  """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.
 
@@ -14998,6 +15741,18 @@ Input type used to specify filters on `WorkspaceWidget` fields.
 Will match all documents if passed as an empty object (or as `null`).
 """
 input WorkspaceWidgetFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `WorkspaceWidgetFilterInput` input because of
+  collisions between key names. For example, if you want to provide
+  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [WorkspaceWidgetFilterInput!]
+
   """
   Matches records where any of the provided sub-filters evaluate to true.
   This works just like an OR operator in SQL.

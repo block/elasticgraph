@@ -214,6 +214,7 @@ module ElasticGraph
           expect(type_def_from(schema_string, "UrlFilterInput")).to eq(<<~EOS.strip)
             input UrlFilterInput @inaccessible {
               #{schema_elements.any_of}: [UrlFilterInput!]
+              #{schema_elements.all_of}: [UrlFilterInput!]
               #{schema_elements.not}: UrlFilterInput
               #{schema_elements.equal_to_any_of}: [Url]
               host: String @inaccessible
@@ -542,6 +543,7 @@ module ElasticGraph
           expect(type_def_from(schema_string, "UrlFilterInput")).to eq(<<~EOS.strip)
             input UrlFilterInput @tag(name: "test") {
               #{schema_elements.any_of}: [UrlFilterInput!]
+              #{schema_elements.all_of}: [UrlFilterInput!]
               #{schema_elements.not}: UrlFilterInput
               #{schema_elements.equal_to_any_of}: [Url]
               host: String @tag(name: "test")

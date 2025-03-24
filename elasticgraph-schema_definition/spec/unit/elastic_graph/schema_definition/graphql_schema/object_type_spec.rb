@@ -337,6 +337,7 @@ module ElasticGraph
             expect(filter_type_from(result, "Widget")).to eq(<<~EOS.strip)
               input WidgetFilterInput {
                 #{schema_elements.any_of}: [WidgetFilterInput!]
+                #{schema_elements.all_of}: [WidgetFilterInput!]
                 not: WidgetFilterInput
                 id: IDFilterInput
                 cost: IntFilterInput @deprecated @external
