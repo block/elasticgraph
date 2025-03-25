@@ -4,7 +4,7 @@
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple
   filters that can't be provided on a single filter input because of collisions between key names.
-  For example, if you want to provide multiple `anySatisfy: ...` filters, you could do `allOf: [{anySatisfy: ...}, {anySatisfy: ...}]`.
+  For example, if you want to AND multiple OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do `allOf: [{anyOf: [...]}, {anyOf: [...]}]`.
 
   When `null` or an empty list is passed, matches all documents.
 

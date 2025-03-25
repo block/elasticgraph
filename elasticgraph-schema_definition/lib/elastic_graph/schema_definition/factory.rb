@@ -138,7 +138,7 @@ module ElasticGraph
 
       def new_filter_input_type(source_type, name_prefix: source_type, category: :filter_input)
         all_of = @state.schema_elements.all_of
-        any_satisfy = @state.schema_elements.any_satisfy
+        any_of = @state.schema_elements.any_of
         new_input_type(@state.type_ref(name_prefix).as_static_derived_type(category).name) do |t|
           t.documentation <<~EOS
             Input type used to specify filters on `#{source_type}` fields.
@@ -161,8 +161,8 @@ module ElasticGraph
               Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
 
               Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
-              be provided on a single `#{t.name}` input because of collisions between key names. For example, if you want to provide
-              multiple `#{any_satisfy}: ...` filters, you could do `#{all_of}: [{#{any_satisfy}: ...}, {#{any_satisfy}: ...}]`.
+              be provided on a single `#{t.name}` input because of collisions between key names. For example, if you want to AND multiple
+              OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do #{all_of}: [{#{any_of}: [...]}, {#{any_of}: [...]}].
 
               When `null` or an empty list is passed, matches all documents.
             EOS

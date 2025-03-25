@@ -111,8 +111,8 @@ module ElasticGraph
               Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
 
               Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
-              be provided on a single `GeoLocationFilterInput` input because of collisions between key names. For example, if you want to provide
-              multiple `#{schema_elements.any_satisfy}: ...` filters, you could do `#{schema_elements.all_of}: [{#{schema_elements.any_satisfy}: ...}, {#{schema_elements.any_satisfy}: ...}]`.
+              be provided on a single `GeoLocationFilterInput` input because of collisions between key names. For example, if you want to AND multiple
+              OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do #{schema_elements.all_of}: [{#{schema_elements.any_of}: [...]}, {#{schema_elements.any_of}: [...]}].
 
               When `null` or an empty list is passed, matches all documents.
               """
@@ -153,8 +153,8 @@ module ElasticGraph
               Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
 
               Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
-              be provided on a single `GeoLocationListElementFilterInput` input because of collisions between key names. For example, if you want to provide
-              multiple `#{schema_elements.any_satisfy}: ...` filters, you could do `#{schema_elements.all_of}: [{#{schema_elements.any_satisfy}: ...}, {#{schema_elements.any_satisfy}: ...}]`.
+              be provided on a single `GeoLocationListElementFilterInput` input because of collisions between key names. For example, if you want to AND multiple
+              OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do #{schema_elements.all_of}: [{#{schema_elements.any_of}: [...]}, {#{schema_elements.any_of}: [...]}].
 
               When `null` or an empty list is passed, matches all documents.
               """
@@ -681,8 +681,8 @@ module ElasticGraph
               Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
 
               Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
-              be provided on a single `TextFilterInput` input because of collisions between key names. For example, if you want to provide
-              multiple `#{schema_elements.any_satisfy}: ...` filters, you could do `#{schema_elements.all_of}: [{#{schema_elements.any_satisfy}: ...}, {#{schema_elements.any_satisfy}: ...}]`.
+              be provided on a single `TextFilterInput` input because of collisions between key names. For example, if you want to AND multiple
+              OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do #{schema_elements.all_of}: [{#{schema_elements.any_of}: [...]}, {#{schema_elements.any_of}: [...]}].
 
               When `null` or an empty list is passed, matches all documents.
               """
@@ -747,8 +747,8 @@ module ElasticGraph
               Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
 
               Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
-              be provided on a single `TextListElementFilterInput` input because of collisions between key names. For example, if you want to provide
-              multiple `#{schema_elements.any_satisfy}: ...` filters, you could do `#{schema_elements.all_of}: [{#{schema_elements.any_satisfy}: ...}, {#{schema_elements.any_satisfy}: ...}]`.
+              be provided on a single `TextListElementFilterInput` input because of collisions between key names. For example, if you want to AND multiple
+              OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do #{schema_elements.all_of}: [{#{schema_elements.any_of}: [...]}, {#{schema_elements.any_of}: [...]}].
 
               When `null` or an empty list is passed, matches all documents.
               """
@@ -839,8 +839,8 @@ module ElasticGraph
                 Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
 
                 Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
-                be provided on a single `#{scalar}ListFilterInput` input because of collisions between key names. For example, if you want to provide
-                multiple `#{schema_elements.any_satisfy}: ...` filters, you could do `#{schema_elements.all_of}: [{#{schema_elements.any_satisfy}: ...}, {#{schema_elements.any_satisfy}: ...}]`.
+                be provided on a single `#{scalar}ListFilterInput` input because of collisions between key names. For example, if you want to AND multiple
+                OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do #{schema_elements.all_of}: [{#{schema_elements.any_of}: [...]}, {#{schema_elements.any_of}: [...]}].
 
                 When `null` or an empty list is passed, matches all documents.
                 """

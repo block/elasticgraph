@@ -167,8 +167,8 @@ input AddressFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `AddressFilterInput` input because of collisions
-  between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -278,8 +278,8 @@ input AddressTimestampsFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `AddressTimestampsFilterInput` input because of
-  collisions between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  collisions between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -348,8 +348,8 @@ input AffiliationsFieldsListFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `AffiliationsFieldsListFilterInput` input because of
-  collisions between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  collisions between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -405,8 +405,8 @@ input AffiliationsFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `AffiliationsFilterInput` input because of collisions
-  between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -510,8 +510,8 @@ input BooleanFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `BooleanFilterInput` input because of collisions
-  between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -556,8 +556,8 @@ input BooleanListElementFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `BooleanListElementFilterInput` input because of
-  collisions between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  collisions between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -594,8 +594,8 @@ input BooleanListFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `BooleanListFilterInput` input because of collisions
-  between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -650,8 +650,8 @@ input ColorFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `ColorFilterInput` input because of collisions between
-  key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -702,8 +702,8 @@ input ColorListElementFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `ColorListElementFilterInput` input because of
-  collisions between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  collisions between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -740,8 +740,8 @@ input ColorListFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `ColorListFilterInput` input because of collisions
-  between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -1170,8 +1170,8 @@ input ComponentFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `ComponentFilterInput` input because of collisions
-  between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -1441,8 +1441,8 @@ input CurrencyDetailsFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `CurrencyDetailsFilterInput` input because of
-  collisions between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  collisions between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -1555,8 +1555,8 @@ input DateFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `DateFilterInput` input because of collisions between
-  key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -1744,8 +1744,8 @@ input DateListElementFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `DateListElementFilterInput` input because of
-  collisions between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  collisions between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -1810,8 +1810,8 @@ input DateListFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `DateListFilterInput` input because of collisions
-  between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -1902,8 +1902,8 @@ input DateTimeFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `DateTimeFilterInput` input because of collisions
-  between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -2184,8 +2184,8 @@ input DateTimeListElementFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `DateTimeListElementFilterInput` input because of
-  collisions between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  collisions between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -2257,8 +2257,8 @@ input DateTimeListFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `DateTimeListFilterInput` input because of collisions
-  between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -2746,8 +2746,8 @@ input ElectricalPartFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `ElectricalPartFilterInput` input because of
-  collisions between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  collisions between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -2927,8 +2927,8 @@ input FloatFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `FloatFilterInput` input because of collisions between
-  key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -3042,8 +3042,8 @@ input GeoLocationFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `GeoLocationFilterInput` input because of collisions
-  between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -3090,8 +3090,9 @@ input IDFilterInput {
   Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
-  be provided on a single `IDFilterInput` input because of collisions between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  be provided on a single `IDFilterInput` input because of collisions between
+  key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -3136,8 +3137,8 @@ input IDListElementFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `IDListElementFilterInput` input because of collisions
-  between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -3174,8 +3175,8 @@ input IDListFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `IDListFilterInput` input because of collisions
-  between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -3282,8 +3283,8 @@ input IntFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `IntFilterInput` input because of collisions between
-  key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -3356,8 +3357,8 @@ input IntListElementFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `IntListElementFilterInput` input because of
-  collisions between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  collisions between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -3422,8 +3423,8 @@ input IntListFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `IntListFilterInput` input because of collisions
-  between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -3494,8 +3495,8 @@ input InventorFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `InventorFilterInput` input because of collisions
-  between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -3656,8 +3657,8 @@ input JsonSafeLongFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `JsonSafeLongFilterInput` input because of collisions
-  between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -3730,8 +3731,8 @@ input JsonSafeLongListElementFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `JsonSafeLongListElementFilterInput` input because of
-  collisions between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  collisions between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -3796,8 +3797,8 @@ input JsonSafeLongListFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `JsonSafeLongListFilterInput` input because of
-  collisions between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  collisions between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -3889,8 +3890,8 @@ input LocalTimeFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `LocalTimeFilterInput` input because of collisions
-  between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -4125,8 +4126,8 @@ input LongStringFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `LongStringFilterInput` input because of collisions
-  between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -4434,8 +4435,8 @@ input ManufacturerFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `ManufacturerFilterInput` input because of collisions
-  between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -4607,8 +4608,8 @@ input MaterialFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `MaterialFilterInput` input because of collisions
-  between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -4898,8 +4899,8 @@ input MechanicalPartFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `MechanicalPartFilterInput` input because of
-  collisions between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  collisions between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -5049,8 +5050,8 @@ input MoneyFieldsListFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `MoneyFieldsListFilterInput` input because of
-  collisions between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  collisions between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -5106,8 +5107,8 @@ input MoneyFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `MoneyFilterInput` input because of collisions between
-  key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -5171,8 +5172,8 @@ input MoneyListFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `MoneyListFilterInput` input because of collisions
-  between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -5542,8 +5543,8 @@ input NamedEntityFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `NamedEntityFilterInput` input because of collisions
-  between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -6609,8 +6610,8 @@ input NamedInventorFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `NamedInventorFilterInput` input because of collisions
-  between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -6873,8 +6874,8 @@ input PartFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `PartFilterInput` input because of collisions between
-  key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -7071,8 +7072,8 @@ input PlayerFieldsListFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `PlayerFieldsListFilterInput` input because of
-  collisions between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  collisions between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -7149,8 +7150,8 @@ input PlayerFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `PlayerFilterInput` input because of collisions
-  between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -7240,8 +7241,8 @@ input PlayerListFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `PlayerListFilterInput` input because of collisions
-  between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -7356,8 +7357,8 @@ input PlayerSeasonFieldsListFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `PlayerSeasonFieldsListFilterInput` input because of
-  collisions between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  collisions between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -7420,8 +7421,8 @@ input PlayerSeasonFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `PlayerSeasonFilterInput` input because of collisions
-  between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -7492,8 +7493,8 @@ input PlayerSeasonListFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `PlayerSeasonListFilterInput` input because of
-  collisions between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  collisions between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -7562,8 +7563,8 @@ input PositionFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `PositionFilterInput` input because of collisions
-  between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -8982,8 +8983,8 @@ input SizeFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `SizeFilterInput` input because of collisions between
-  key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -9034,8 +9035,8 @@ input SizeListElementFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `SizeListElementFilterInput` input because of
-  collisions between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  collisions between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -9072,8 +9073,8 @@ input SizeListFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `SizeListFilterInput` input because of collisions
-  between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -9452,8 +9453,8 @@ input SponsorFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `SponsorFilterInput` input because of collisions
-  between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -9559,8 +9560,8 @@ input SponsorshipFieldsListFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `SponsorshipFieldsListFilterInput` input because of
-  collisions between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  collisions between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -9616,8 +9617,8 @@ input SponsorshipFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `SponsorshipFilterInput` input because of collisions
-  between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -9681,8 +9682,8 @@ input SponsorshipListFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `SponsorshipListFilterInput` input because of
-  collisions between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  collisions between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -9779,8 +9780,8 @@ input StringFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `StringFilterInput` input because of collisions
-  between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -9825,8 +9826,8 @@ input StringListElementFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `StringListElementFilterInput` input because of
-  collisions between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  collisions between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -9863,8 +9864,8 @@ input StringListFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `StringListFilterInput` input because of collisions
-  between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -10408,8 +10409,8 @@ input TeamDetailsFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `TeamDetailsFilterInput` input because of collisions
-  between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -10488,8 +10489,8 @@ input TeamFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `TeamFilterInput` input because of collisions between
-  key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -10756,8 +10757,8 @@ input TeamNestedFieldsFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `TeamNestedFieldsFilterInput` input because of
-  collisions between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  collisions between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -11029,8 +11030,8 @@ input TeamRecordFieldsListFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `TeamRecordFieldsListFilterInput` input because of
-  collisions between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  collisions between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -11114,8 +11115,8 @@ input TeamRecordFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `TeamRecordFilterInput` input because of collisions
-  between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -11324,8 +11325,8 @@ input TeamSeasonFieldsListFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `TeamSeasonFieldsListFilterInput` input because of
-  collisions between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  collisions between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -11437,8 +11438,8 @@ input TeamSeasonFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `TeamSeasonFilterInput` input because of collisions
-  between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -11667,8 +11668,8 @@ input TeamSeasonListFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `TeamSeasonListFilterInput` input because of
-  collisions between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  collisions between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -12120,8 +12121,8 @@ input TextFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `TextFilterInput` input because of collisions between
-  key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -12212,8 +12213,8 @@ input UntypedFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `UntypedFilterInput` input because of collisions
-  between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -12877,8 +12878,8 @@ input WidgetCurrencyFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `WidgetCurrencyFilterInput` input because of
-  collisions between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  collisions between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -13050,8 +13051,8 @@ input WidgetCurrencyNestedFieldsFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `WidgetCurrencyNestedFieldsFilterInput` input because
-  of collisions between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  of collisions between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -13208,8 +13209,8 @@ input WidgetFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `WidgetFilterInput` input because of collisions
-  between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -13725,8 +13726,8 @@ input WidgetOptionSetsFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `WidgetOptionSetsFilterInput` input because of
-  collisions between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  collisions between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -13807,8 +13808,8 @@ input WidgetOptionsFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `WidgetOptionsFilterInput` input because of collisions
-  between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -14194,8 +14195,8 @@ input WidgetOrAddressFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `WidgetOrAddressFilterInput` input because of
-  collisions between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  collisions between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -15609,8 +15610,8 @@ input WidgetWorkspaceFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `WidgetWorkspaceFilterInput` input because of
-  collisions between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  collisions between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
@@ -15746,8 +15747,8 @@ input WorkspaceWidgetFilterInput {
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
   be provided on a single `WorkspaceWidgetFilterInput` input because of
-  collisions between key names. For example, if you want to provide
-  multiple `any_satisfy: ...` filters, you could do `all_of: [{any_satisfy: ...}, {any_satisfy: ...}]`.
+  collisions between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
