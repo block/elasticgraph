@@ -412,6 +412,10 @@ module ElasticGraph
           }
 
           expect {
+            HashUtil.fetch_value_at_path(hash, ["bar"])
+          }.to raise_error KeyError, a_string_including('["bar"]')
+
+          expect {
             HashUtil.fetch_value_at_path(hash, ["bar", "bazz"])
           }.to raise_error KeyError, a_string_including('["bar"]')
 

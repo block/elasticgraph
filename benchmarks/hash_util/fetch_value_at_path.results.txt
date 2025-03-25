@@ -1,0 +1,73 @@
+Benchmarking deep path (5 levels)...
+
+ruby 3.3.4 (2024-07-09 revision be1089c8ec) [arm64-darwin23]
+Warming up --------------------------------------
+       reduce - deep   115.955k i/100ms
+         each - deep   235.763k i/100ms
+          dig - deep   222.627k i/100ms
+        while - deep   329.013k i/100ms
+    recursion - deep   271.910k i/100ms
+Calculating -------------------------------------
+       reduce - deep      1.150M (± 1.2%) i/s  (869.40 ns/i) -      5.798M in   5.041337s
+         each - deep      2.335M (± 1.9%) i/s  (428.19 ns/i) -     11.788M in   5.049381s
+          dig - deep      2.236M (± 1.0%) i/s  (447.22 ns/i) -     11.354M in   5.078223s
+        while - deep      3.366M (± 1.1%) i/s  (297.05 ns/i) -     17.109M in   5.082672s
+    recursion - deep      2.729M (± 1.1%) i/s  (366.43 ns/i) -     13.867M in   5.082002s
+
+Comparison:
+        while - deep:  3366486.2 i/s
+    recursion - deep:  2729055.1 i/s - 1.23x  slower
+         each - deep:  2335412.9 i/s - 1.44x  slower
+          dig - deep:  2236037.9 i/s - 1.51x  slower
+       reduce - deep:  1150217.9 i/s - 2.93x  slower
+
+
+Benchmarking shallow path (single key - most common case)...
+
+ruby 3.3.4 (2024-07-09 revision be1089c8ec) [arm64-darwin23]
+Warming up --------------------------------------
+    reduce - shallow   216.048k i/100ms
+      each - shallow   520.593k i/100ms
+       dig - shallow   518.908k i/100ms
+     while - shallow   917.523k i/100ms
+ recursion - shallow   856.315k i/100ms
+          single key     1.601M i/100ms
+Calculating -------------------------------------
+    reduce - shallow      2.167M (± 1.2%) i/s  (461.45 ns/i) -     11.018M in   5.085212s
+      each - shallow      5.193M (± 1.6%) i/s  (192.57 ns/i) -     26.030M in   5.013940s
+       dig - shallow      5.027M (± 3.6%) i/s  (198.91 ns/i) -     25.426M in   5.064801s
+     while - shallow      9.116M (± 1.2%) i/s  (109.70 ns/i) -     45.876M in   5.033168s
+ recursion - shallow      8.610M (± 0.4%) i/s  (116.15 ns/i) -     43.672M in   5.072514s
+          single key     15.882M (± 0.8%) i/s   (62.96 ns/i) -     80.062M in   5.041315s
+
+Comparison:
+          single key: 15882209.3 i/s
+     while - shallow:  9116143.1 i/s - 1.74x  slower
+ recursion - shallow:  8609693.5 i/s - 1.84x  slower
+      each - shallow:  5192896.8 i/s - 3.06x  slower
+       dig - shallow:  5027432.5 i/s - 3.16x  slower
+    reduce - shallow:  2167072.5 i/s - 7.33x  slower
+
+
+Benchmarking error cases...
+
+ruby 3.3.4 (2024-07-09 revision be1089c8ec) [arm64-darwin23]
+Warming up --------------------------------------
+      reduce - error    68.804k i/100ms
+        each - error    98.257k i/100ms
+         dig - error   121.912k i/100ms
+       while - error   120.585k i/100ms
+   recursion - error   120.585k i/100ms
+Calculating -------------------------------------
+      reduce - error    695.902k (± 2.2%) i/s    (1.44 μs/i) -      3.509M in   5.045049s
+        each - error    989.822k (± 2.0%) i/s    (1.01 μs/i) -      5.011M in   5.064797s
+         dig - error      1.221M (± 1.0%) i/s  (818.97 ns/i) -      6.218M in   5.092500s
+       while - error      1.229M (± 1.6%) i/s  (813.85 ns/i) -      6.150M in   5.006312s
+   recursion - error      1.191M (± 2.6%) i/s  (839.80 ns/i) -      6.029M in   5.066987s
+
+Comparison:
+       while - error:  1228721.1 i/s
+         dig - error:  1221047.0 i/s - same-ish: difference falls within error
+   recursion - error:  1190760.9 i/s - same-ish: difference falls within error
+        each - error:   989822.5 i/s - 1.24x  slower
+      reduce - error:   695902.1 i/s - 1.77x  slower

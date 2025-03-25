@@ -125,19 +125,41 @@ module ElasticGraph
       # If any parent value is not a hash as expected, raises an error.
       # If the key at any level is not found, yields to the provided block (which can provide a default value)
       # or raises an error if no block is provided.
+      #
+      # Note: this is a somewhat lengthy implementation, but it was chosen based on benchmarking. This method
+      # needs to be fast because it gets used repeatedly when resolving GraphQL queries at all levels of the
+      # response structure.
       def self.fetch_value_at_path(hash, path_parts)
-        path_parts.each.with_index(1).reduce(hash) do |inner_hash, (key, num_parts)|
-          if inner_hash.is_a?(::Hash)
-            inner_hash.fetch(key) do
-              missing_path = path_parts.first(num_parts)
-              return yield missing_path if block_given?
-              raise KeyError, "Key not found: #{missing_path.inspect}"
-            end
-          else
-            raise KeyError, "Value at key #{path_parts.first(num_parts - 1).inspect} is not a `Hash` as expected; " \
-              "instead, was a `#{(_ = inner_hash).class}`"
+        # We expect the most common case to be a single path part. Benchmarks have shown that special casing it
+        # is quite worthwhile, as it is much faster than the general purpose implementation further below.
+        if path_parts.size == 1
+          return hash.fetch(path_parts.first) do
+            return yield path_parts if block_given?
+            raise KeyError, "Key not found: #{path_parts.inspect}"
           end
         end
+
+        current = hash
+        i = 0
+
+        while i < path_parts.length
+          key = path_parts[i]
+
+          unless current.is_a?(Hash)
+            raise KeyError, "Value at key #{path_parts.first(i).inspect} is not a `Hash` as expected; " \
+              "instead, was a `#{current.class}`"
+          end
+
+          current = current.fetch(key) do
+            missing_path = path_parts.first(i + 1)
+            return yield missing_path if block_given?
+            raise KeyError, "Key not found: #{missing_path.inspect}"
+          end
+
+          i += 1
+        end
+
+        current
       end
 
       # Note: this implementation was chosen based off of a benchmark in
