@@ -60,6 +60,10 @@ module ElasticGraph
           @name ||= @graphql_field.name
         end
 
+        def path_in_index
+          @path_in_index ||= name_in_index.split(".")
+        end
+
         # Returns an object that knows how this field joins to its relation.
         # Used by ElasticGraph::Resolvers::NestedRelationships.
         def relation_join

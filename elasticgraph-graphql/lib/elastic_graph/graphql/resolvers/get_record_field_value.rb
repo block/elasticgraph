@@ -20,7 +20,6 @@ module ElasticGraph
         end
 
         def resolve(field:, object:, args:, context:, lookahead:)
-          field_name = field.name_in_index
           data =
             case object
             when DatastoreResponse::Document
@@ -29,7 +28,7 @@ module ElasticGraph
               object
             end
 
-          value = Support::HashUtil.fetch_value_at_path(data, field_name.split(".")) { nil }
+          value = Support::HashUtil.fetch_value_at_path(data, field.path_in_index) { nil }
           value = [] if value.nil? && field.type.list?
 
           if field.type.relay_connection?
