@@ -29,7 +29,8 @@ module ElasticGraph
         def resolve(field:, object:, args:, context:, lookahead:)
           log_warning = ->(**options) { log_field_problem_warning(field: field, **options) }
           join = field.relation_join
-          id_or_ids = join.extract_id_or_ids_from(object, log_warning)
+          payload = object.is_a?(DatastoreResponse::Document) ? object.payload : object
+          id_or_ids = join.extract_id_or_ids_from(payload, log_warning)
           query = yield
 
           response =

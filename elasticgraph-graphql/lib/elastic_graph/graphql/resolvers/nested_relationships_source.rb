@@ -63,6 +63,7 @@ module ElasticGraph
         def initialize(query:, join:, context:, monotonic_clock:, mode:)
           @query = query
           @join = join
+          @filter_id_field_path_string = join.filter_id_field_path.join(".")
           @context = context
           @schema_element_names = @context.fetch(:schema_element_names)
           @logger = context.fetch(:logger)
@@ -120,7 +121,7 @@ module ElasticGraph
             # the original implementation (so `fetch_original` doesn't also request that field...) but for
             # the purposes of comparison we need to request it so that the document payloads will have the
             # same fields.
-            fetch_original(id_sets, requested_fields: [@join.filter_id_field_name])
+            fetch_original(id_sets, requested_fields: [@filter_id_field_path_string])
           end
 
           optimized_duration_ms, optimized_results = time_duration do
@@ -215,7 +216,7 @@ module ElasticGraph
           # First, we build a combined query with filters that account for all ids we are filtering on from all `id_sets`.
           filtered_query = @query.merge_with(
             filters: filters_for(id_sets.reduce(:union)),
-            requested_fields: [@join.filter_id_field_name],
+            requested_fields: [@filter_id_field_path_string],
             # We need to request a larger size than `@query` originally had. If the original size was `10` and we have
             # 5 sets of ids, then, at a minimum, we need to request 50 results (10 results for each id set).
             #
@@ -229,7 +230,7 @@ module ElasticGraph
 
           # Next, we produce a separate response for each id set by filtering the results to the ones that match the ids in the set.
           filtered_responses_by_id_set = id_sets.to_h do |id_set|
-            filtered_response = response.filter_results(@join.filter_id_field_name.split("."), id_set, @query.effective_size)
+            filtered_response = response.filter_results(@join.filter_id_field_path, id_set, @query.effective_size)
             [id_set, filtered_response]
           end
 
@@ -266,7 +267,7 @@ module ElasticGraph
         end
 
         def filters_for(ids)
-          join_filter = build_filter(@join.filter_id_field_name, nil, @join.foreign_key_nested_paths, ids.to_a)
+          join_filter = build_filter(@join.filter_id_field_path, [], @join.foreign_key_nested_paths, ids.to_a)
 
           if @join.additional_filter.empty?
             [join_filter]
@@ -279,12 +280,12 @@ module ElasticGraph
           next_nested_path, *rest_nested_paths = nested_paths
 
           if next_nested_path.nil?
-            path = path.delete_prefix("#{previous_nested_path}.") if previous_nested_path
-            {path => {@schema_element_names.equal_to_any_of => ids}}
+            path = path.drop(previous_nested_path.size) unless previous_nested_path.empty?
+            {path.join(".") => {@schema_element_names.equal_to_any_of => ids}}
           else
             sub_filter = build_filter(path, next_nested_path, rest_nested_paths, ids)
-            next_nested_path = next_nested_path.delete_prefix("#{previous_nested_path}.") if previous_nested_path
-            {next_nested_path => {@schema_element_names.any_satisfy => sub_filter}}
+            next_nested_path = next_nested_path.drop(previous_nested_path.size) unless previous_nested_path.empty?
+            {next_nested_path.join(".") => {@schema_element_names.any_satisfy => sub_filter}}
           end
         end
 

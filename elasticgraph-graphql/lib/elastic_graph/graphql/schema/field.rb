@@ -134,13 +134,14 @@ module ElasticGraph
         end
 
         def index_id_field_names_for_relation
-          if type.unwrap_fully == parent_type # means its a self-referential relation (e.g. child to parent of same type)
-            # Since it's self-referential, the `filter_id_field` (which lives on the "remote" type) also must
-            # exist as a field in our DatastoreCore::IndexDefinition.
-            [relation_join.document_id_field_name, relation_join.filter_id_field_name]
-          else
-            [relation_join.document_id_field_name]
-          end
+          @index_id_field_names_for_relation ||=
+            if type.unwrap_fully == parent_type # means its a self-referential relation (e.g. child to parent of same type)
+              # Since it's self-referential, the `filter_id_field` (which lives on the "remote" type) also must
+              # exist as a field in our DatastoreCore::IndexDefinition.
+              [relation_join.document_id_field_path.join("."), relation_join.filter_id_field_path.join(".")]
+            else
+              [relation_join.document_id_field_path.join(".")]
+            end
         end
       end
     end

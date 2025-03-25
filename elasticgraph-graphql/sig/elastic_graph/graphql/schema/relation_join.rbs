@@ -12,39 +12,39 @@ module ElasticGraph
       class RelationJoinSupertype < Data
         def initialize: (
           field: Field,
-          document_id_field_name: ::String,
-          filter_id_field_name: ::String,
+          document_id_field_path: ::Array[::String],
+          filter_id_field_path: ::Array[::String],
           id_cardinality: RelationJoin::cardinality,
           doc_cardinality: RelationJoin::cardinality,
           additional_filter: ::Hash[::String, untyped],
-          foreign_key_nested_paths: ::Array[::String]
+          foreign_key_nested_paths: ::Array[::Array[::String]]
         ) -> void
 
         def self.new: (
           field: Field,
-          document_id_field_name: ::String,
-          filter_id_field_name: ::String,
+          document_id_field_path: ::Array[::String],
+          filter_id_field_path: ::Array[::String],
           id_cardinality: RelationJoin::cardinality,
           doc_cardinality: RelationJoin::cardinality,
           additional_filter: ::Hash[::String, untyped],
-          foreign_key_nested_paths: ::Array[::String]
+          foreign_key_nested_paths: ::Array[::Array[::String]]
         ) -> RelationJoin | (
           Field,
-          ::String,
-          ::String,
+          ::Array[::String],
+          ::Array[::String],
           RelationJoin::cardinality,
           RelationJoin::cardinality,
           ::Hash[::String, untyped],
-          ::Array[::String]
+          ::Array[::Array[::String]]
         ) -> RelationJoin
 
         attr_reader field: Field
-        attr_reader document_id_field_name: ::String
-        attr_reader filter_id_field_name: ::String
+        attr_reader document_id_field_path: ::Array[::String]
+        attr_reader filter_id_field_path: ::Array[::String]
         attr_reader id_cardinality: RelationJoin::cardinality
         attr_reader doc_cardinality: RelationJoin::cardinality
         attr_reader additional_filter: ::Hash[::String, untyped]
-        attr_reader foreign_key_nested_paths: ::Array[::String]
+        attr_reader foreign_key_nested_paths: ::Array[::Array[::String]]
       end
 
       class RelationJoin < RelationJoinSupertype

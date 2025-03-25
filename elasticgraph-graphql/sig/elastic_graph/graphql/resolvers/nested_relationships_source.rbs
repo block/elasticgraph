@@ -15,6 +15,7 @@ module ElasticGraph
 
         @query: DatastoreQuery
         @join: Schema::RelationJoin
+        @filter_id_field_path_string: ::String
         @context: ::GraphQL::Query::Context
         @schema_element_names: SchemaArtifacts::RuntimeMetadata::SchemaElementNames
         @logger: ::Logger
@@ -53,9 +54,9 @@ module ElasticGraph
         def filters_for: (::Set[untyped]) -> ::Array[::Hash[::String, untyped]]
 
         def build_filter: (
-          ::String,
-          ::String?,
           ::Array[::String],
+          ::Array[::String],
+          ::Array[::Array[::String]],
           ::Array[untyped]
         ) -> ::Hash[::String, untyped]
 

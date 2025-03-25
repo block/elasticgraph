@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/graphql/datastore_response/search_response"
+require "elastic_graph/support/hash_util"
 
 module ElasticGraph
   class GraphQL
@@ -25,11 +26,13 @@ module ElasticGraph
       # of ElasticGraph::Resolvers::NestedRelationships, and is driven by that class's tests.
       # It lives here because it's useful to expose it off of a `Field` since it's a property
       # of the field and that lets us memoize it on the field itself.
-      class RelationJoin < ::Data.define(:field, :document_id_field_name, :filter_id_field_name, :id_cardinality, :doc_cardinality, :additional_filter, :foreign_key_nested_paths)
+      class RelationJoin < ::Data.define(:field, :document_id_field_path, :filter_id_field_path, :id_cardinality, :doc_cardinality, :additional_filter, :foreign_key_nested_paths)
         def self.from(field)
           return nil if (relation = field.relation).nil?
 
           doc_cardinality = field.type.collection? ? Cardinality::Many : Cardinality::One
+          foreign_key_nested_paths = relation.foreign_key_nested_paths.map { |p| p.split(".") }
+          foreign_key_path = relation.foreign_key.split(".")
 
           if relation.direction == :in
             # An inbound foreign key has some field (such as `foo_id`) on another document that points
@@ -37,11 +40,11 @@ module ElasticGraph
             #
             # The cardinality of the document id field on an inbound relation is always 1 since
             # it is always the primary key `id` field.
-            new(field, "id", relation.foreign_key, Cardinality::One, doc_cardinality, relation.additional_filter, relation.foreign_key_nested_paths)
+            new(field, ["id"], foreign_key_path, Cardinality::One, doc_cardinality, relation.additional_filter, foreign_key_nested_paths)
           else
             # An outbound foreign key has some field (such as `foo_id`) on the document with the relation
             # that point out to the `id` field of another document.
-            new(field, relation.foreign_key, "id", doc_cardinality, doc_cardinality, relation.additional_filter, relation.foreign_key_nested_paths)
+            new(field, foreign_key_path, ["id"], doc_cardinality, doc_cardinality, relation.additional_filter, foreign_key_nested_paths)
           end
         end
 
@@ -51,13 +54,13 @@ module ElasticGraph
 
         # Extracts a single id or a list of ids from the given document, as required by the relation.
         def extract_id_or_ids_from(document, log_warning)
-          id_or_ids = document.fetch(document_id_field_name) do
-            log_warning.call(document: document, problem: "#{document_id_field_name} is missing from the document")
+          id_or_ids = Support::HashUtil.fetch_value_at_path(document, document_id_field_path) do
+            log_warning.call(document: document, problem: "#{document_id_field_path.join(".")} is missing from the document")
             blank_value
           end
 
           normalize_ids(id_or_ids) do |problem|
-            log_warning.call(document: document, problem: "#{document_id_field_name}: #{problem}")
+            log_warning.call(document: document, problem: "#{document_id_field_path.join(".")}: #{problem}")
           end
         end
 
