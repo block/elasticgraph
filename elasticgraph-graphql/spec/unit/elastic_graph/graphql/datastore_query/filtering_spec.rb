@@ -364,6 +364,103 @@ module ElasticGraph
       end
 
       describe "`all_of` operator" do
+        context "top-level usage on distinct fields" do
+          it "behaves the same as specifying multiple fields in the same object" do
+            query1 = new_query(filter: {
+              "color" => {"equal_to_any_of" => ["RED"]},
+              "size"  => {"gt" => 10}
+            })
+            query2 = new_query(filter: {"all_of" => [
+              {"color" => {"equal_to_any_of" => ["RED"]}},
+              {"size"  => {"gt" => 10}}
+            ]})
+
+            expect(datastore_body_of(query1)).to eq(datastore_body_of(query2))
+          end
+        end
+
+        context "top-level usage on the same key" do
+          it "allows ANDing two subfilters on the same field (otherwise impossible in a single object)" do
+            query = new_query(filter: {
+              "all_of" => [
+                {"color" => {"equal_to_any_of" => ["RED"]}},
+                {"color" => {"not" => {"equal_to_any_of" => ["GREEN"]}}}
+              ]
+            })
+
+            expect(datastore_body_of(query)).to query_datastore_with(
+              bool: {
+                filter: [
+                  {
+                    bool: {
+                      filter: [
+                        { terms: { "color" => ["RED"] } }
+                      ]
+                    }
+                  },
+                  {
+                    bool: {
+                      must_not: [
+                        {
+                          bool: {
+                            filter: [
+                              { terms: { "color" => ["GREEN"] } }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            )
+          end
+        end
+
+        context "combining multiple any_of subfilters" do
+          it "allows an AND of multiple OR blocks (i.e. allOf of anyOfs)" do
+            query = new_query(filter: {
+              "all_of" => [
+                {
+                  "any_of" => [
+                    {"color" => {"equal_to_any_of" => ["RED"]}},
+                    {"size"  => {"gt" => 10}}
+                  ]
+                },
+                {
+                  "any_of" => [
+                    {"color" => {"equal_to_any_of" => ["BLUE"]}},
+                    {"size"  => {"lt" => 5}}
+                  ]
+                }
+              ]
+            })
+
+            expect(datastore_body_of(query)).to query_datastore_with(bool: {
+              filter: [
+                {
+                  bool: {
+                    minimum_should_match: 1,
+                    should: [
+                      {bool: {filter: [{terms: {"color" => ["RED"]}}]}},
+                      {bool: {filter: [{range: {"size" => {gt: 10}}}]}}
+                    ]
+                  }
+                },
+                {
+                  bool: {
+                    minimum_should_match: 1,
+                    should: [
+                      {bool: {filter: [{terms: {"color" => ["BLUE"]}}]}},
+                      {bool: {filter: [{range: {"size" => {lt: 5}}}]}}
+                    ]
+                  }
+                }
+              ]
+            })
+          end
+        end
+
         it "can be used to wrap multiple `any_satisfy` expressions to require multiple sub-filters to be satisfied by a list element" do
           query = new_query(filter: {
             "tags" => {"all_of" => [
@@ -372,10 +469,12 @@ module ElasticGraph
             ]}
           })
 
-          expect(datastore_body_of(query)).to query_datastore_with({bool: {filter: [
-            {terms: {"tags" => ["a", "b"]}},
-            {terms: {"tags" => ["c", "d"]}}
-          ]}})
+          expect(datastore_body_of(query)).to query_datastore_with({ bool: {
+            filter: [
+              {bool: {filter: [{terms: {"tags" => ["a", "b"]}}]}},
+              {bool: { filter: [{terms: {"tags" => ["c", "d"]}}]}}
+            ]
+          }})
         end
 
         it "is treated as `true` when `null` is passed" do
@@ -426,10 +525,12 @@ module ElasticGraph
               ]}
             })
 
-            expect(datastore_body_of(query)).to query_datastore_with({bool: {filter: [
-              {terms: {"tags" => ["a", "b"]}},
-              {terms: {"tags" => ["c", "d"]}}
-            ]}})
+            expect(datastore_body_of(query)).to query_datastore_with({ bool: {
+              filter: [
+                {bool: {filter: [{terms: {"tags" => ["a", "b"]}}]}},
+                {bool: { filter: [{terms: {"tags" => ["c", "d"]}}]}}
+              ]
+            }})
           end
 
           context "when using `snake_case` schema names" do
