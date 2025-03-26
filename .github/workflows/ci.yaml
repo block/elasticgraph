@@ -54,15 +54,17 @@ jobs:
         with:
           egress-policy: audit
 
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
-      - uses: ruby/setup-ruby@1a615958ad9d422dd932dc1d5823942ee002799f # v1.227.0
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@1a615958ad9d422dd932dc1d5823942ee002799f # v1.227.0
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
-          cache-version: 2
 
-      - uses: KengoTODA/actions-setup-docker-compose@0169fb81f56cb44a908f67a3ec212f3579e2e4fe # main
+      - name: Setup Docker Compose
+        uses: KengoTODA/actions-setup-docker-compose@0169fb81f56cb44a908f67a3ec212f3579e2e4fe # main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -72,10 +74,11 @@ jobs:
           git config --global user.email "action@github.com"
           git config --global init.defaultBranch main
 
+      - name: Run Build Part
       # Note: the `10` argument on the end is a number of seconds to sleep after booting the datastore.
       # We've found that there is a minor race condition where the shards aren't fully ready for the tests
       # to hit them if we don't wait a bit after booting.
-      - run: script/ci_parts/${{ matrix.build_part }} ${{ matrix.datastore }} 10
+        run: script/ci_parts/${{ matrix.build_part }} ${{ matrix.datastore }} 10
 
   docker-demo:
     runs-on: ubuntu-latest
@@ -93,6 +96,12 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@1a615958ad9d422dd932dc1d5823942ee002799f # v1.227.0
+        with:
+          ruby-version: "3.4"
+          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@b5ca514318bd6ebac0fb2aedd5d36ec1b5c232a2 # v3.10.0

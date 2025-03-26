@@ -1,11 +1,27 @@
 #!/usr/bin/env bash
 
 set -e
+set -x
 
 # Set default environment variables
 export OPENSEARCH_VERSION=${OPENSEARCH_VERSION:-2.19.1}
 export OPENSEARCH_IMAGE="elasticgraph-opensearch-demo:latest"
 export ELASTICGRAPH_IMAGE="elasticgraph-demo:latest"
+
+cleanup() {
+  local exit_code=$?
+  echo "Cleaning up..."
+  # Kill the logs process if it's running
+  if [ ! -z "${LOGS_PID+x}" ]; then
+    kill $LOGS_PID 2>/dev/null || true
+  fi
+  # Bring down containers
+  docker compose -f config/docker_demo/docker-compose.yaml down -v
+  exit $exit_code
+}
+
+# Set up cleanup trap for all exit scenarios
+trap cleanup EXIT
 
 if [ -z "${NO_BUILD+x}" ]; then
   echo "Building OpenSearch image..."
@@ -41,31 +57,18 @@ for i in {1..30}; do
   fi
   if [ $i -eq 30 ]; then
     echo "Timed out waiting for ElasticGraph"
-    kill $LOGS_PID
-    docker compose -f config/docker_demo/docker-compose.yaml down -v
     exit 1
   fi
   echo "Waiting... ($i/30)"
   sleep 2
 done
 
-# Run a test query
-echo "Running test query..."
-QUERY='{"query": "{ artists { totalEdgeCount } }"}'
-RESPONSE=$(curl -s -X POST -H "Content-Type: application/json" -d "$QUERY" http://localhost:9000/graphql)
-
-# Check if we got a positive number back
-if echo "$RESPONSE" | grep -q '"totalEdgeCount":[1-9][0-9]*'; then
-  COUNT=$(echo "$RESPONSE" | grep -o '"totalEdgeCount":[0-9]*' | cut -d':' -f2)
-  echo "Successfully got $COUNT artists"
-else
-  echo "Failed to get positive artist count. Response:"
-  echo "$RESPONSE"
+# Run the example query validation
+echo "Running example query validation..."
+if ! bundle exec rake -f config/site/examples/music/Rakefile example_queries:validate_results; then
+  echo "Example query validation failed"
   docker compose -f config/docker_demo/docker-compose.yaml logs
-  docker compose -f config/docker_demo/docker-compose.yaml down -v
   exit 1
 fi
 
-# Clean up
-echo "Cleaning up..."
-docker compose -f config/docker_demo/docker-compose.yaml down -v
+echo "All tests passed successfully!"

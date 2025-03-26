@@ -1,0 +1,229 @@
+# Copyright 2024 - 2025 Block, Inc.
+#
+# Use of this source code is governed by an MIT-style
+# license that can be found in the LICENSE file or at
+# https://opensource.org/licenses/MIT.
+#
+# frozen_string_literal: true
+
+require "graphql"
+require "json"
+require "net/http"
+require "pathname"
+require "yaml"
+
+module ExampleQueries
+  # Simple terminal output helpers
+  module Output
+    TICK = "✓"
+    CROSS = "✗"
+    SKIP = "-"
+    RESET = "\e[0m"
+    RED = "\e[31m"
+    GREEN = "\e[32m"
+    YELLOW = "\e[33m"
+    BOLD = "\e[1m"
+
+    def self.success(message)
+      puts "#{GREEN}#{TICK} #{message}#{RESET}"
+    end
+
+    def self.failure(message)
+      puts "#{RED}#{CROSS} #{message}#{RESET}"
+    end
+
+    def self.skip(message)
+      puts "#{YELLOW}#{SKIP} #{message}#{RESET}"
+    end
+
+    def self.header(message)
+      puts "\n#{BOLD}#{message}#{RESET}"
+    end
+
+    def self.format_error(error)
+      case error
+      when Hash
+        if error["message"]
+          "#{error["message"]}#{error["locations"] ? " at #{error["locations"].inspect}" : ""}"
+        else
+          error.inspect
+        end
+      else
+        error.to_s
+      end
+    end
+
+    def self.format_graphql_errors(errors)
+      errors.map { |e| "  - #{format_error(e)}" }.join("\n")
+    end
+
+    def self.format_data(data)
+      JSON.pretty_generate(data)
+        .lines
+        .map { |line| "    #{line}" }
+        .join
+    end
+  end
+
+  # Handles the validation of a single query
+  class QueryValidator
+    def initialize(query_file)
+      query_file = Pathname.new(query_file)
+      @query_name = query_file.basename(".graphql").to_s
+      @query = File.read(query_file)
+    end
+
+    def validate
+      Output.header("Testing #{@query_name}...")
+
+      # Parse the query to check for variable definitions
+      if query_requires_variables?
+        Output.skip("Skipping query that requires variables")
+        return [:skip, "Requires variables"]
+      end
+
+      uri = URI("http://localhost:9000/graphql")
+      http = Net::HTTP.new(uri.host, uri.port)
+      request = Net::HTTP::Post.new(uri.path, "Content-Type" => "application/json")
+      request.body = {
+        query: @query,
+        variables: {}  # Empty variables since we're skipping queries that need them
+      }.to_json
+
+      response = http.request(request)
+      result = JSON.parse(response.body)
+
+      if result["errors"]
+        Output.failure("Query returned errors:")
+        puts Output.format_graphql_errors(result["errors"])
+        return [:error, "GraphQL errors encountered"]
+      end
+
+      data = result["data"]
+      empty = data.empty? || data.values.any? do |value|
+        case value
+        when Hash
+          value["nodes"]&.empty? || value["edges"]&.empty?
+        when Array
+          value.empty?
+        else
+          value.nil?
+        end
+      end
+
+      if empty
+        Output.failure("Query returned empty results:")
+        puts Output.format_data(data)
+        return [:empty, "Empty results returned"]
+      end
+
+      Output.success("Query returned valid results")
+      [:success, nil]
+    rescue => e
+      Output.failure("Query execution failed:")
+      puts "  - #{e.message}"
+      [:error, e.message]
+    end
+
+    private
+
+    def query_requires_variables?
+      # Parse the query using the GraphQL gem
+      document = GraphQL.parse(@query)
+
+      # Look through all operation definitions in the document
+      document.definitions.any? do |definition|
+        next unless definition.is_a?(GraphQL::Language::Nodes::OperationDefinition)
+
+        # Check if any of the variables are required (non-null)
+        definition.variables.any? do |variable|
+          # A type is non-null if its last type component is non-null
+          last_type = variable.type
+          while last_type.respond_to?(:of_type)
+            last_type = last_type.of_type
+          end
+          last_type.is_a?(GraphQL::Language::Nodes::NonNullType)
+        end
+      end
+    rescue GraphQL::ParseError => e
+      Output.failure("Failed to parse query:")
+      puts "  - #{e.message}"
+      false
+    end
+  end
+end
+
+namespace :example_queries do
+  # Queries that are known to fail and will be fixed in a follow-up PR
+  allowed_failures = [
+    # TODO: Remove these once fixed
+    "AccordionAndViolinStrictSearch",
+    "AccordionOrViolinSearch",
+    "AnyOfGotcha",
+    "BluegrassArtistAggregations",
+    "BluegrassArtistLifetimeSales",
+    "FindArtist",
+    "FindMarch2025Shows",
+    "FindProlificArtists",
+    "FindRecentAccordionArtists",
+    "FindSeattleVenues",
+    "FindUnnamedArtists",
+    "PhraseSearch",
+    "SkaArtistHomeCountries"
+  ].to_set
+
+  desc "Validate that all example queries return non-empty results"
+  task :validate_results do
+    queries_dir = Pathname.new(__dir__) / "queries"
+    failed_queries = []
+    skipped_queries = []
+    query_count = 0
+    success_count = 0
+    skip_count = 0
+    allowed_failure_count = 0
+
+    Dir.glob(queries_dir / "**" / "*.graphql").sort.each do |query_file|
+      query_count += 1
+      validator = ExampleQueries::QueryValidator.new(query_file)
+      status, message = validator.validate
+      query_name = File.basename(query_file, ".graphql")
+
+      case status
+      when :success
+        success_count += 1
+      when :skip
+        skip_count += 1
+        skipped_queries << [query_name, message]
+      else
+        if allowed_failures.include?(query_name)
+          allowed_failure_count += 1
+          ExampleQueries::Output.skip("Known failing query - will be fixed in follow-up PR")
+        else
+          failed_queries << [query_name, message]
+        end
+      end
+    end
+
+    puts "\n#{ExampleQueries::Output::BOLD}Results Summary:#{ExampleQueries::Output::RESET}"
+    puts "Total Queries: #{query_count}"
+    puts "#{ExampleQueries::Output::GREEN}Successful: #{success_count}#{ExampleQueries::Output::RESET}"
+    puts "#{ExampleQueries::Output::YELLOW}Skipped: #{skip_count}#{ExampleQueries::Output::RESET}"
+    puts "#{ExampleQueries::Output::YELLOW}Allowed Failures: #{allowed_failure_count}#{ExampleQueries::Output::RESET}"
+    puts "#{ExampleQueries::Output::RED}Failed: #{failed_queries.size}#{ExampleQueries::Output::RESET}"
+
+    if skipped_queries.any?
+      puts "\n#{ExampleQueries::Output::YELLOW}#{ExampleQueries::Output::BOLD}Skipped Queries:#{ExampleQueries::Output::RESET}"
+      skipped_queries.each do |name, reason|
+        puts "- #{name}: #{reason}"
+      end
+    end
+
+    unless failed_queries.empty?
+      puts "\n#{ExampleQueries::Output::RED}#{ExampleQueries::Output::BOLD}Failed Queries:#{ExampleQueries::Output::RESET}"
+      failed_queries.each do |name, error|
+        puts "- #{name}: #{error}"
+      end
+      exit 1
+    end
+  end
+end
