@@ -1,6 +1,6 @@
 query FindProlificArtists {
   artists(filter: {
-    albums: {count: {gte: 20}}
+    albums: {count: {gte: 5}}
   }) {
     nodes {
       name

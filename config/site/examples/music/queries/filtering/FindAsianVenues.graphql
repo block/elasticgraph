@@ -1,9 +1,9 @@
-query FindSeattleVenues {
+query FindAsianVenues {
   venues(filter: {
     location: {near: {
-      latitude: 47.621
-      longitude: -122.349
-      maxDistance: 10
+      latitude: 49.102271
+      longitude: 87.143660
+      maxDistance: 2000
       unit: MILE
     }}
   }) {

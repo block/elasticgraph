@@ -15,4 +15,4 @@ Here's a basic example:
 
 Unlike the SQL `IN` operator, you can find records with `null` values if you put `null` in the list:
 
-{% include copyable_code_snippet.html language="graphql" music_query="filtering.FindUnnamedArtists" %}
+{% include copyable_code_snippet.html language="graphql" music_query="filtering.FindUnnamedVenues" %}

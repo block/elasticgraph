@@ -154,15 +154,6 @@ module ExampleQueries
 end
 
 namespace :example_queries do
-  # Queries that are known to fail and will be fixed in a follow-up PR
-  allowed_failures = [
-    # TODO: Remove these once fixed
-    "FindMarch2025Shows",
-    "FindProlificArtists",
-    "FindSeattleVenues",
-    "FindUnnamedArtists"
-  ].to_set
-
   desc "Validate that all example queries return non-empty results"
   task :validate_results do
     queries_dir = Pathname.new(__dir__) / "queries"
@@ -171,7 +162,6 @@ namespace :example_queries do
     query_count = 0
     success_count = 0
     skip_count = 0
-    allowed_failure_count = 0
 
     Dir.glob(queries_dir / "**" / "*.graphql").sort.each do |query_file|
       query_count += 1
@@ -186,12 +176,7 @@ namespace :example_queries do
         skip_count += 1
         skipped_queries << [query_name, message]
       else
-        if allowed_failures.include?(query_name)
-          allowed_failure_count += 1
-          ExampleQueries::Output.skip("Known failing query - will be fixed in follow-up PR")
-        else
-          failed_queries << [query_name, message]
-        end
+        failed_queries << [query_name, message]
       end
     end
 
@@ -199,7 +184,6 @@ namespace :example_queries do
     puts "Total Queries: #{query_count}"
     puts "#{ExampleQueries::Output::GREEN}Successful: #{success_count}#{ExampleQueries::Output::RESET}"
     puts "#{ExampleQueries::Output::YELLOW}Skipped: #{skip_count}#{ExampleQueries::Output::RESET}"
-    puts "#{ExampleQueries::Output::YELLOW}Allowed Failures: #{allowed_failure_count}#{ExampleQueries::Output::RESET}"
     puts "#{ExampleQueries::Output::RED}Failed: #{failed_queries.size}#{ExampleQueries::Output::RESET}"
 
     if skipped_queries.any?

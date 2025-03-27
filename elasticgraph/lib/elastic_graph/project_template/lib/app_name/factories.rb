@@ -163,9 +163,6 @@ FactoryBot.define do
   factory :venue, parent: :indexed_type_base do
     __typename { "Venue" }
 
-    # Prevent multiple venues with the same name by hashing the name to produce the id.
-    id { Digest::MD5.hexdigest(name) }
-
     name do
       # Some common music venue types
       venue_types = ["Theater", "Arena", "Music Hall", "Stadium", "Opera House", "Amphitheater"]

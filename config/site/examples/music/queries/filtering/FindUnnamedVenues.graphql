@@ -1,12 +1,10 @@
-query FindUnnamedArtists {
-  artists(filter: {
+query FindUnnamedVenues {
+  venues(filter: {
     name: {equalToAnyOf: [null]}
   }) {
     nodes {
       name # will be null on all returned nodes
-      bio {
-        yearFormed
-      }
+      capacity
     }
   }
 }
