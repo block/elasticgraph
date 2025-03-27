@@ -1,6 +1,6 @@
-require "date"
 require "factory_bot"
 require "faker"
+require "yaml"
 
 FactoryBot.define do
   factory :hash_base, class: Hash do
@@ -12,7 +12,8 @@ FactoryBot.define do
   end
 
   trait :versioned do
-    __version { Faker::Number.between(from: 1, to: 10) }
+    # Use the current time as the version so that newly generated records always "win" over previously indexed records.
+    __version { Time.now.to_i }
   end
 
   current_json_schema_version = nil
