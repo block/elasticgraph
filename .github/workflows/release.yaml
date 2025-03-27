@@ -71,7 +71,7 @@ jobs:
             git commit -m "Archive docs for v${{ inputs.version }}"
           fi
 
-      - name: Bump the ElasticGraph version
+      - name: Bump the ElasticGraph version to release version
         run: |
           bundle exec rake bump_version[${{ inputs.version }}]
           if [[ ! "${{ inputs.version }}" =~ [a-zA-Z] ]]; then
@@ -92,6 +92,11 @@ jobs:
         with:
           await-release: ${{ ! inputs.dry-run }}
 
+      - name: Bump the ElasticGraph version to next pre-release version
+        run: |
+          unset GEM_RELEASE_PRETEND
+          bundle exec rake bump_version_to_next_prerelease
+
       # Note: this must come after we release the gem because it resets git back to the same SHA we started on
       # (before bumping the version), but the RubyGems release depends on the version having been bumped.
       - name: Create pull request for the version bump
@@ -101,6 +106,11 @@ jobs:
           branch: release-v${{ inputs.version }}
           title: "Release v${{ inputs.version }}"
           body: |
+            > [!NOTE]
+            > This PR bumps the ElasticGraph version twice in two separate commits. The released version does not show
+            > in the overall PR diff but is in the first commit. These two commits should not be squashed or rebased so
+            > that the tagged commit lands as-is in the base branch.
+
             - [ ] Confirm the [release action](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) succeeded before merging
             - [ ] Confirm this version bump should be merged into [${{ github.ref_name }}](https://github.com/${{ github.repository }}/tree/${{ github.ref_name }}) or change the base branch
             - [ ] Review and edit the [GitHub Draft Release](https://github.com/${{ github.repository }}/releases) (can be done after this PR is merged)
