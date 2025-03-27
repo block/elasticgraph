@@ -93,7 +93,12 @@ jobs:
           await-release: ${{ ! inputs.dry-run }}
 
       - name: Bump the ElasticGraph version to next pre-release version
-        run: bundle exec rake bump_version_to_next_prerelease
+        run: |
+          git status
+          git show
+          bundle exec rake bump_version_to_next_prerelease
+          git status
+          git show
 
       # Note: this must come after we release the gem because it resets git back to the same SHA we started on
       # (before bumping the version), but the RubyGems release depends on the version having been bumped.
