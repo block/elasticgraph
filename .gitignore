@@ -11,6 +11,10 @@
 /*/Gemfile.lock
 /*/rbs_collection.lock.yaml
 
+config/release/bin
+config/release/bundle
+config/release/.bundle
+
 # Allows customization of the bundle for things like pry, debugger, etc.
 Gemfile-custom
 
