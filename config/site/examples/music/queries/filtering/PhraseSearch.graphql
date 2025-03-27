@@ -3,7 +3,7 @@ query PhraseSearch {
     bio: {
       description:{
         matchesPhrase: {
-          phrase: "pioneers in jazz"
+          phrase: "unique musical identity"
         }
       }
     }
