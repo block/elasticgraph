@@ -30,6 +30,15 @@
                           bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200
                           focus:outline-none focus:ring-2 focus:ring-blue-500">
           </form>
+          <!-- Theme Toggle Button -->
+          <button onclick="toggleTheme()" class="p-2 rounded-md hover:bg-gray-300 dark:hover:bg-gray-700" aria-label="Toggle theme">
+            <span class="hidden dark:block {{ site.style.link }}">
+              {% include icons/sun.svg %}
+            </span>
+            <span class="block dark:hidden {{ site.style.link }}">
+              {% include icons/moon.svg %}
+            </span>
+          </button>
           <a href="{{ site.github_url }}" target="_blank" class="text-base {{ site.style.link }} inline-flex items-center space-x-2" rel="noopener">
             {% include icons/github.svg %}
             <span>GitHub</span>
@@ -46,6 +55,16 @@
         <a href="{% link query-api.md %}" class="text-base {{ site.style.link }}">Query API</a>
         <a href="{% link guides.md %}" class="text-base {{ site.style.link }}">Guides</a>
         <a href="{% link api-docs.md %}" class="text-base {{ site.style.link }}">API Docs</a>
+        <!-- Mobile Theme Toggle -->
+        <button onclick="toggleTheme()" class="flex items-center space-x-2 text-base {{ site.style.link }}">
+          <span class="hidden dark:block">
+            {% include icons/sun.svg %}
+          </span>
+          <span class="block dark:hidden">
+            {% include icons/moon.svg %}
+          </span>
+          <span>Toggle Theme</span>
+        </button>
         <a href="{{ site.github_url }}" target="_blank" class="text-base {{ site.style.link }} inline-flex items-center space-x-2" rel="noopener">
           {% include icons/github.svg %}
           <span>GitHub</span>
