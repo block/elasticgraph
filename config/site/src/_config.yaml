@@ -26,5 +26,5 @@ style:
   dropdown_item: block px-4 py-2 text-base text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600
   dropdown_pip: absolute -top-1.5 left-4 h-3 w-3 bg-white dark:bg-gray-700 transform rotate-45 border-t border-l border-gray-200/80 dark:border-gray-600/50
 
-demo_oneliner: "curl -s https://block.github.io/elasticgraph/docker-compose.yaml | docker compose -f - up"
+demo_oneliner: "curl -s https://block.github.io/elasticgraph/dc.yml | docker compose -f - up --pull always"
 localhost_eg_url: "http://localhost:9000/"

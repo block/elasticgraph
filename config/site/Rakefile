@@ -305,7 +305,7 @@ module ElasticGraph
           pages = Dir.glob("#{src_dir}/**/*").reject do |file|
             # Skip directories, files in directories that don't contain pages, a couple specific files, and js/css assets.
             File.directory?(file) ||
-              %w[/_data/ /docs/ /_includes/ /_layouts/ /_plugins/ /_config.yaml docker-compose.yaml].any? { |dir| file.include?(dir) } ||
+              %w[/_data/ /docs/ /_includes/ /_layouts/ /_plugins/ /_config.yaml dc.yml].any? { |dir| file.include?(dir) } ||
               %w[.js .css].include?(File.extname(file))
           end
 
