@@ -114,6 +114,7 @@ module ElasticGraph
           expect(filter_type_from(result, "FullText")).to eq(<<~EOS.strip)
             input FullTextFilterInput {
               #{schema_elements.any_of}: [FullTextFilterInput!]
+              #{schema_elements.all_of}: [FullTextFilterInput!]
               #{schema_elements.not}: FullTextFilterInput
               #{schema_elements.equal_to_any_of}: [FullText]
             }
@@ -129,6 +130,7 @@ module ElasticGraph
           expect(filter_type_from(result, "Short")).to eq(<<~EOS.strip)
             input ShortFilterInput {
               #{schema_elements.any_of}: [ShortFilterInput!]
+              #{schema_elements.all_of}: [ShortFilterInput!]
               #{schema_elements.not}: ShortFilterInput
               #{schema_elements.equal_to_any_of}: [Short]
               #{schema_elements.gt}: Short
@@ -148,6 +150,7 @@ module ElasticGraph
           expect(filter_type_from(result, "CalendarDate")).to eq(<<~EOS.strip)
             input CalendarDateFilterInput {
               #{schema_elements.any_of}: [CalendarDateFilterInput!]
+              #{schema_elements.all_of}: [CalendarDateFilterInput!]
               #{schema_elements.not}: CalendarDateFilterInput
               #{schema_elements.equal_to_any_of}: [CalendarDate]
               #{schema_elements.gt}: CalendarDate
@@ -180,6 +183,16 @@ module ElasticGraph
               """
               #{schema_elements.any_of}: [ShortListFilterInput!]
               """
+              Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+              Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+              be provided on a single `ShortListFilterInput` input because of collisions between key names. For example, if you want to AND multiple
+              OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do #{schema_elements.all_of}: [{#{schema_elements.any_of}: [...]}, {#{schema_elements.any_of}: [...]}].
+
+              When `null` or an empty list is passed, matches all documents.
+              """
+              #{schema_elements.all_of}: [ShortListFilterInput!]
+              """
               Matches records where the provided sub-filter evaluates to false.
               This works just like a NOT operator in SQL.
 
@@ -192,16 +205,6 @@ module ElasticGraph
               When `null` or an empty object is passed, matches all documents.
               """
               #{schema_elements.any_satisfy}: ShortListElementFilterInput
-              """
-              Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
-
-              Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
-              be provided on a single `ShortListFilterInput` input because of collisions between key names. For example, if you want to provide
-              multiple `#{schema_elements.any_satisfy}: ...` filters, you could do `#{schema_elements.all_of}: [{#{schema_elements.any_satisfy}: ...}, {#{schema_elements.any_satisfy}: ...}]`.
-
-              When `null` or an empty list is passed, matches all documents.
-              """
-              #{schema_elements.all_of}: [ShortListFilterInput!]
               """
               Used to filter on the number of non-null elements in this list field.
 
@@ -233,6 +236,16 @@ module ElasticGraph
               When an empty list is passed, this part of the filter matches no documents.
               """
               #{schema_elements.any_of}: [ByteFilterInput!]
+              """
+              Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+              Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+              be provided on a single `ByteFilterInput` input because of collisions between key names. For example, if you want to AND multiple
+              OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do #{schema_elements.all_of}: [{#{schema_elements.any_of}: [...]}, {#{schema_elements.any_of}: [...]}].
+
+              When `null` or an empty list is passed, matches all documents.
+              """
+              #{schema_elements.all_of}: [ByteFilterInput!]
               """
               Matches records where the provided sub-filter evaluates to false.
               This works just like a NOT operator in SQL.

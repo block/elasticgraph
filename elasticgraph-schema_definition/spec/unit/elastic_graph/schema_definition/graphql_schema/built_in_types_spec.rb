@@ -108,6 +108,16 @@ module ElasticGraph
               """
               #{schema_elements.any_of}: [GeoLocationFilterInput!]
               """
+              Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+              Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+              be provided on a single `GeoLocationFilterInput` input because of collisions between key names. For example, if you want to AND multiple
+              OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do #{schema_elements.all_of}: [{#{schema_elements.any_of}: [...]}, {#{schema_elements.any_of}: [...]}].
+
+              When `null` or an empty list is passed, matches all documents.
+              """
+              #{schema_elements.all_of}: [GeoLocationFilterInput!]
+              """
               Matches records where the provided sub-filter evaluates to false.
               This works just like a NOT operator in SQL.
 
@@ -139,6 +149,16 @@ module ElasticGraph
               When an empty list is passed, this part of the filter matches no documents.
               """
               #{schema_elements.any_of}: [GeoLocationListElementFilterInput!]
+              """
+              Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+              Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+              be provided on a single `GeoLocationListElementFilterInput` input because of collisions between key names. For example, if you want to AND multiple
+              OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do #{schema_elements.all_of}: [{#{schema_elements.any_of}: [...]}, {#{schema_elements.any_of}: [...]}].
+
+              When `null` or an empty list is passed, matches all documents.
+              """
+              #{schema_elements.all_of}: [GeoLocationListElementFilterInput!]
               """
               Matches records where the field's geographic location is within a specified distance from the
               location identified by `latitude` and `longitude`.
@@ -186,6 +206,7 @@ module ElasticGraph
           expect(type_named("DateFilterInput")).to eq(<<~EOS.strip)
             input DateFilterInput {
               #{schema_elements.any_of}: [DateFilterInput!]
+              #{schema_elements.all_of}: [DateFilterInput!]
               #{schema_elements.not}: DateFilterInput
               #{schema_elements.equal_to_any_of}: [Date]
               #{schema_elements.gt}: Date
@@ -198,6 +219,7 @@ module ElasticGraph
           expect(type_named("DateListElementFilterInput")).to eq(<<~EOS.strip)
             input DateListElementFilterInput {
               #{schema_elements.any_of}: [DateListElementFilterInput!]
+              #{schema_elements.all_of}: [DateListElementFilterInput!]
               #{schema_elements.equal_to_any_of}: [Date!]
               #{schema_elements.gt}: Date
               #{schema_elements.gte}: Date
@@ -218,6 +240,7 @@ module ElasticGraph
           expect(type_named("DateTimeFilterInput")).to eq(<<~EOS.strip)
             input DateTimeFilterInput {
               #{schema_elements.any_of}: [DateTimeFilterInput!]
+              #{schema_elements.all_of}: [DateTimeFilterInput!]
               #{schema_elements.not}: DateTimeFilterInput
               #{schema_elements.equal_to_any_of}: [DateTime]
               #{schema_elements.gt}: DateTime
@@ -231,6 +254,7 @@ module ElasticGraph
           expect(type_named("DateTimeListElementFilterInput")).to eq(<<~EOS.strip)
             input DateTimeListElementFilterInput {
               #{schema_elements.any_of}: [DateTimeListElementFilterInput!]
+              #{schema_elements.all_of}: [DateTimeListElementFilterInput!]
               #{schema_elements.equal_to_any_of}: [DateTime!]
               #{schema_elements.gt}: DateTime
               #{schema_elements.gte}: DateTime
@@ -296,6 +320,7 @@ module ElasticGraph
           expect(type_def_from(result, "TimestampFilterInput")).to eq(<<~EOS.strip)
             input TimestampFilterInput {
               #{schema_elements.any_of}: [TimestampFilterInput!]
+              #{schema_elements.all_of}: [TimestampFilterInput!]
               #{schema_elements.not}: TimestampFilterInput
               #{schema_elements.equal_to_any_of}: [Timestamp]
               #{schema_elements.gt}: Timestamp
@@ -309,6 +334,7 @@ module ElasticGraph
           expect(type_def_from(result, "TimestampListElementFilterInput")).to eq(<<~EOS.strip)
             input TimestampListElementFilterInput {
               #{schema_elements.any_of}: [TimestampListElementFilterInput!]
+              #{schema_elements.all_of}: [TimestampListElementFilterInput!]
               #{schema_elements.equal_to_any_of}: [Timestamp!]
               #{schema_elements.gt}: Timestamp
               #{schema_elements.gte}: Timestamp
@@ -339,6 +365,7 @@ module ElasticGraph
           expect(type_def_from(result, "TimestampFilterInput")).to eq(<<~EOS.strip)
             input TimestampFilterInput {
               #{schema_elements.any_of}: [TimestampFilterInput!]
+              #{schema_elements.all_of}: [TimestampFilterInput!]
               #{schema_elements.not}: TimestampFilterInput
               #{schema_elements.equal_to_any_of}: [DateTime]
               #{schema_elements.gt}: DateTime
@@ -352,6 +379,7 @@ module ElasticGraph
           expect(type_def_from(result, "TimestampListElementFilterInput")).to eq(<<~EOS.strip)
             input TimestampListElementFilterInput {
               #{schema_elements.any_of}: [TimestampListElementFilterInput!]
+              #{schema_elements.all_of}: [TimestampListElementFilterInput!]
               #{schema_elements.equal_to_any_of}: [DateTime!]
               #{schema_elements.gt}: DateTime
               #{schema_elements.gte}: DateTime
@@ -374,6 +402,7 @@ module ElasticGraph
           expect(type_named("LocalTimeFilterInput")).to eq(<<~EOS.strip)
             input LocalTimeFilterInput {
               #{schema_elements.any_of}: [LocalTimeFilterInput!]
+              #{schema_elements.all_of}: [LocalTimeFilterInput!]
               #{schema_elements.not}: LocalTimeFilterInput
               #{schema_elements.equal_to_any_of}: [LocalTime]
               #{schema_elements.gt}: LocalTime
@@ -386,6 +415,7 @@ module ElasticGraph
           expect(type_named("LocalTimeListElementFilterInput")).to eq(<<~EOS.strip)
             input LocalTimeListElementFilterInput {
               #{schema_elements.any_of}: [LocalTimeListElementFilterInput!]
+              #{schema_elements.all_of}: [LocalTimeListElementFilterInput!]
               #{schema_elements.equal_to_any_of}: [LocalTime!]
               #{schema_elements.gt}: LocalTime
               #{schema_elements.gte}: LocalTime
@@ -408,6 +438,7 @@ module ElasticGraph
           expect(type_named("TimeZoneFilterInput")).to eq(<<~EOS.strip)
             input TimeZoneFilterInput {
               #{schema_elements.any_of}: [TimeZoneFilterInput!]
+              #{schema_elements.all_of}: [TimeZoneFilterInput!]
               #{schema_elements.not}: TimeZoneFilterInput
               #{schema_elements.equal_to_any_of}: [TimeZone]
             }
@@ -416,6 +447,7 @@ module ElasticGraph
           expect(type_named("TimeZoneListElementFilterInput")).to eq(<<~EOS.strip)
             input TimeZoneListElementFilterInput {
               #{schema_elements.any_of}: [TimeZoneListElementFilterInput!]
+              #{schema_elements.all_of}: [TimeZoneListElementFilterInput!]
               #{schema_elements.equal_to_any_of}: [TimeZone!]
             }
           EOS
@@ -453,6 +485,7 @@ module ElasticGraph
           expect(type_named("DateTimeUnitFilterInput")).to eq(<<~EOS.strip)
             input DateTimeUnitFilterInput {
               #{schema_elements.any_of}: [DateTimeUnitFilterInput!]
+              #{schema_elements.all_of}: [DateTimeUnitFilterInput!]
               #{schema_elements.not}: DateTimeUnitFilterInput
               #{schema_elements.equal_to_any_of}: [DateTimeUnitInput]
             }
@@ -461,6 +494,7 @@ module ElasticGraph
           expect(type_named("DateTimeUnitListElementFilterInput")).to eq(<<~EOS.strip)
             input DateTimeUnitListElementFilterInput {
               #{schema_elements.any_of}: [DateTimeUnitListElementFilterInput!]
+              #{schema_elements.all_of}: [DateTimeUnitListElementFilterInput!]
               #{schema_elements.equal_to_any_of}: [DateTimeUnitInput!]
             }
           EOS
@@ -521,6 +555,7 @@ module ElasticGraph
           expect(type_named("JsonSafeLongFilterInput")).to eq(<<~EOS.strip)
             input JsonSafeLongFilterInput {
               #{schema_elements.any_of}: [JsonSafeLongFilterInput!]
+              #{schema_elements.all_of}: [JsonSafeLongFilterInput!]
               #{schema_elements.not}: JsonSafeLongFilterInput
               #{schema_elements.equal_to_any_of}: [JsonSafeLong]
               #{schema_elements.gt}: JsonSafeLong
@@ -533,6 +568,7 @@ module ElasticGraph
           expect(type_named("JsonSafeLongListElementFilterInput")).to eq(<<~EOS.strip)
             input JsonSafeLongListElementFilterInput {
               #{schema_elements.any_of}: [JsonSafeLongListElementFilterInput!]
+              #{schema_elements.all_of}: [JsonSafeLongListElementFilterInput!]
               #{schema_elements.equal_to_any_of}: [JsonSafeLong!]
               #{schema_elements.gt}: JsonSafeLong
               #{schema_elements.gte}: JsonSafeLong
@@ -558,6 +594,7 @@ module ElasticGraph
           expect(type_named("LongStringListElementFilterInput")).to eq(<<~EOS.strip)
             input LongStringListElementFilterInput {
               #{schema_elements.any_of}: [LongStringListElementFilterInput!]
+              #{schema_elements.all_of}: [LongStringListElementFilterInput!]
               #{schema_elements.equal_to_any_of}: [LongString!]
               #{schema_elements.gt}: LongString
               #{schema_elements.gte}: LongString
@@ -574,6 +611,7 @@ module ElasticGraph
             expect(type_named("#{type}FilterInput")).to eq(<<~EOS.strip)
               input #{type}FilterInput {
                 #{schema_elements.any_of}: [#{type}FilterInput!]
+                #{schema_elements.all_of}: [#{type}FilterInput!]
                 #{schema_elements.not}: #{type}FilterInput
                 #{schema_elements.equal_to_any_of}: [#{type}]
                 #{schema_elements.gt}: #{type}
@@ -586,6 +624,7 @@ module ElasticGraph
             expect(type_named("#{type}ListElementFilterInput")).to eq(<<~EOS.strip)
               input #{type}ListElementFilterInput {
                 #{schema_elements.any_of}: [#{type}ListElementFilterInput!]
+                #{schema_elements.all_of}: [#{type}ListElementFilterInput!]
                 #{schema_elements.equal_to_any_of}: [#{type}!]
                 #{schema_elements.gt}: #{type}
                 #{schema_elements.gte}: #{type}
@@ -603,6 +642,7 @@ module ElasticGraph
             expect(type_named("#{type}FilterInput")).to eq(<<~EOS.strip)
               input #{type}FilterInput {
                 #{schema_elements.any_of}: [#{type}FilterInput!]
+                #{schema_elements.all_of}: [#{type}FilterInput!]
                 #{schema_elements.not}: #{type}FilterInput
                 #{schema_elements.equal_to_any_of}: [#{type}]
               }
@@ -611,6 +651,7 @@ module ElasticGraph
             expect(type_named("#{type}ListElementFilterInput")).to eq(<<~EOS.strip)
               input #{type}ListElementFilterInput {
                 #{schema_elements.any_of}: [#{type}ListElementFilterInput!]
+                #{schema_elements.all_of}: [#{type}ListElementFilterInput!]
                 #{schema_elements.equal_to_any_of}: [#{type}!]
               }
             EOS
@@ -636,6 +677,16 @@ module ElasticGraph
               When an empty list is passed, this part of the filter matches no documents.
               """
               #{schema_elements.any_of}: [TextFilterInput!]
+              """
+              Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+              Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+              be provided on a single `TextFilterInput` input because of collisions between key names. For example, if you want to AND multiple
+              OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do #{schema_elements.all_of}: [{#{schema_elements.any_of}: [...]}, {#{schema_elements.any_of}: [...]}].
+
+              When `null` or an empty list is passed, matches all documents.
+              """
+              #{schema_elements.all_of}: [TextFilterInput!]
               """
               Matches records where the provided sub-filter evaluates to false.
               This works just like a NOT operator in SQL.
@@ -692,6 +743,16 @@ module ElasticGraph
               When an empty list is passed, this part of the filter matches no documents.
               """
               #{schema_elements.any_of}: [TextListElementFilterInput!]
+              """
+              Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+              Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+              be provided on a single `TextListElementFilterInput` input because of collisions between key names. For example, if you want to AND multiple
+              OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do #{schema_elements.all_of}: [{#{schema_elements.any_of}: [...]}, {#{schema_elements.any_of}: [...]}].
+
+              When `null` or an empty list is passed, matches all documents.
+              """
+              #{schema_elements.all_of}: [TextListElementFilterInput!]
               """
               Matches records where the field value is equal to any of the provided values.
               This works just like an IN operator in SQL.
@@ -775,6 +836,16 @@ module ElasticGraph
                 """
                 #{schema_elements.any_of}: [#{scalar}ListFilterInput!]
                 """
+                Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+                Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+                be provided on a single `#{scalar}ListFilterInput` input because of collisions between key names. For example, if you want to AND multiple
+                OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do #{schema_elements.all_of}: [{#{schema_elements.any_of}: [...]}, {#{schema_elements.any_of}: [...]}].
+
+                When `null` or an empty list is passed, matches all documents.
+                """
+                #{schema_elements.all_of}: [#{scalar}ListFilterInput!]
+                """
                 Matches records where the provided sub-filter evaluates to false.
                 This works just like a NOT operator in SQL.
 
@@ -787,16 +858,6 @@ module ElasticGraph
                 When `null` or an empty object is passed, matches all documents.
                 """
                 #{schema_elements.any_satisfy}: #{scalar}ListElementFilterInput
-                """
-                Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
-
-                Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
-                be provided on a single `#{scalar}ListFilterInput` input because of collisions between key names. For example, if you want to provide
-                multiple `#{schema_elements.any_satisfy}: ...` filters, you could do `#{schema_elements.all_of}: [{#{schema_elements.any_satisfy}: ...}, {#{schema_elements.any_satisfy}: ...}]`.
-
-                When `null` or an empty list is passed, matches all documents.
-                """
-                #{schema_elements.all_of}: [#{scalar}ListFilterInput!]
                 """
                 Used to filter on the number of non-null elements in this list field.
 

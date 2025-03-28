@@ -95,6 +95,7 @@ module ElasticGraph
           expect(type_def_from(result, "InputWithDefaultsFilterInput")).to eq(<<~EOS.strip)
             input InputWithDefaultsFilterInput {
               #{schema_elements.any_of}: [InputWithDefaultsFilterInput!]
+              #{schema_elements.all_of}: [InputWithDefaultsFilterInput!]
               not: InputWithDefaultsFilterInput
               no_default: Int!
               default_of_null: Int = null

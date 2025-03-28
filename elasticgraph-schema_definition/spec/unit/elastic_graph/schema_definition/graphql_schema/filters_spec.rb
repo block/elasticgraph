@@ -52,6 +52,16 @@ module ElasticGraph
               """
               #{schema_elements.any_of}: [WidgetFilterInput!]
               """
+              Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+              Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+              be provided on a single `WidgetFilterInput` input because of collisions between key names. For example, if you want to AND multiple
+              OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do #{schema_elements.all_of}: [{#{schema_elements.any_of}: [...]}, {#{schema_elements.any_of}: [...]}].
+
+              When `null` or an empty list is passed, matches all documents.
+              """
+              #{schema_elements.all_of}: [WidgetFilterInput!]
+              """
               Matches records where the provided sub-filter evaluates to false.
               This works just like a NOT operator in SQL.
 
@@ -111,6 +121,16 @@ module ElasticGraph
               """
               #{schema_elements.any_of}: [WidgetOptionsFilterInput!]
               """
+              Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+              Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+              be provided on a single `WidgetOptionsFilterInput` input because of collisions between key names. For example, if you want to AND multiple
+              OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do #{schema_elements.all_of}: [{#{schema_elements.any_of}: [...]}, {#{schema_elements.any_of}: [...]}].
+
+              When `null` or an empty list is passed, matches all documents.
+              """
+              #{schema_elements.all_of}: [WidgetOptionsFilterInput!]
+              """
               Matches records where the provided sub-filter evaluates to false.
               This works just like a NOT operator in SQL.
 
@@ -150,6 +170,16 @@ module ElasticGraph
               """
               #{schema_elements.any_of}: [WidgetOptionsListFilterInput!]
               """
+              Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+              Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+              be provided on a single `WidgetOptionsListFilterInput` input because of collisions between key names. For example, if you want to AND multiple
+              OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do #{schema_elements.all_of}: [{#{schema_elements.any_of}: [...]}, {#{schema_elements.any_of}: [...]}].
+
+              When `null` or an empty list is passed, matches all documents.
+              """
+              #{schema_elements.all_of}: [WidgetOptionsListFilterInput!]
+              """
               Matches records where the provided sub-filter evaluates to false.
               This works just like a NOT operator in SQL.
 
@@ -162,16 +192,6 @@ module ElasticGraph
               When `null` or an empty object is passed, matches all documents.
               """
               #{schema_elements.any_satisfy}: WidgetOptionsFilterInput
-              """
-              Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
-
-              Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
-              be provided on a single `WidgetOptionsListFilterInput` input because of collisions between key names. For example, if you want to provide
-              multiple `#{schema_elements.any_satisfy}: ...` filters, you could do `#{schema_elements.all_of}: [{#{schema_elements.any_satisfy}: ...}, {#{schema_elements.any_satisfy}: ...}]`.
-
-              When `null` or an empty list is passed, matches all documents.
-              """
-              #{schema_elements.all_of}: [WidgetOptionsListFilterInput!]
               """
               Used to filter on the number of non-null elements in this list field.
 
@@ -200,6 +220,7 @@ module ElasticGraph
           expect(filter_type_from(result, "Widget")).to eq(<<~EOS.strip)
             input WidgetFilterInput {
               #{schema_elements.any_of}: [WidgetFilterInput!]
+              #{schema_elements.all_of}: [WidgetFilterInput!]
               #{schema_elements.not}: WidgetFilterInput
               id: IDFilterInput
             }
@@ -238,6 +259,7 @@ module ElasticGraph
           expect(filter_type_from(result, "Widget")).to eq(<<~EOS.strip)
             input WidgetFilterInput {
               #{schema_elements.any_of}: [WidgetFilterInput!]
+              #{schema_elements.all_of}: [WidgetFilterInput!]
               #{schema_elements.not}: WidgetFilterInput
               id: IDFilterInput
               nullable_point: PointFilterInput
@@ -268,6 +290,7 @@ module ElasticGraph
           expect(filter_type_from(result, "Widget")).to eq(<<~EOS.strip)
             input WidgetFilterInput {
               #{schema_elements.any_of}: [WidgetFilterInput!]
+              #{schema_elements.all_of}: [WidgetFilterInput!]
               #{schema_elements.not}: WidgetFilterInput
               id: IDFilterInput
               nullable_point: PointFilterInput
@@ -298,6 +321,7 @@ module ElasticGraph
           expect(filter_type_from(result, "Widget")).to eq(<<~EOS.strip)
             input WidgetFilterInput {
               #{schema_elements.any_of}: [WidgetFilterInput!]
+              #{schema_elements.all_of}: [WidgetFilterInput!]
               #{schema_elements.not}: WidgetFilterInput
               id: IDFilterInput
               nullable_point: PointFilterInput
@@ -324,6 +348,7 @@ module ElasticGraph
           expect(filter_type_from(result, "Widget")).to eq(<<~EOS.strip)
             input WidgetFilterInput {
               #{schema_elements.any_of}: [WidgetFilterInput!]
+              #{schema_elements.all_of}: [WidgetFilterInput!]
               #{schema_elements.not}: WidgetFilterInput
               id: IDFilterInput
             }
@@ -371,6 +396,7 @@ module ElasticGraph
           expect(filter_type_from(result, "WidgetOptions")).to eq(<<~EOS.strip)
             input WidgetOptionsFilterInput {
               #{schema_elements.any_of}: [WidgetOptionsFilterInput!]
+              #{schema_elements.all_of}: [WidgetOptionsFilterInput!]
               #{schema_elements.not}: WidgetOptionsFilterInput
               size: IntFilterInput
               main_color: StringFilterInput
@@ -400,6 +426,16 @@ module ElasticGraph
               When an empty list is passed, this part of the filter matches no documents.
               """
               #{schema_elements.any_of}: [ColorFilterInput!]
+              """
+              Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+              Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+              be provided on a single `ColorFilterInput` input because of collisions between key names. For example, if you want to AND multiple
+              OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do #{schema_elements.all_of}: [{#{schema_elements.any_of}: [...]}, {#{schema_elements.any_of}: [...]}].
+
+              When `null` or an empty list is passed, matches all documents.
+              """
+              #{schema_elements.all_of}: [ColorFilterInput!]
               """
               Matches records where the provided sub-filter evaluates to false.
               This works just like a NOT operator in SQL.
@@ -435,6 +471,16 @@ module ElasticGraph
               """
               #{schema_elements.any_of}: [ColorListElementFilterInput!]
               """
+              Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+              Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+              be provided on a single `ColorListElementFilterInput` input because of collisions between key names. For example, if you want to AND multiple
+              OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do #{schema_elements.all_of}: [{#{schema_elements.any_of}: [...]}, {#{schema_elements.any_of}: [...]}].
+
+              When `null` or an empty list is passed, matches all documents.
+              """
+              #{schema_elements.all_of}: [ColorListElementFilterInput!]
+              """
               Matches records where the field value is equal to any of the provided values.
               This works just like an IN operator in SQL.
 
@@ -462,6 +508,16 @@ module ElasticGraph
               """
               #{schema_elements.any_of}: [ColorListFilterInput!]
               """
+              Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+              Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+              be provided on a single `ColorListFilterInput` input because of collisions between key names. For example, if you want to AND multiple
+              OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do #{schema_elements.all_of}: [{#{schema_elements.any_of}: [...]}, {#{schema_elements.any_of}: [...]}].
+
+              When `null` or an empty list is passed, matches all documents.
+              """
+              #{schema_elements.all_of}: [ColorListFilterInput!]
+              """
               Matches records where the provided sub-filter evaluates to false.
               This works just like a NOT operator in SQL.
 
@@ -474,16 +530,6 @@ module ElasticGraph
               When `null` or an empty object is passed, matches all documents.
               """
               #{schema_elements.any_satisfy}: ColorListElementFilterInput
-              """
-              Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
-
-              Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
-              be provided on a single `ColorListFilterInput` input because of collisions between key names. For example, if you want to provide
-              multiple `#{schema_elements.any_satisfy}: ...` filters, you could do `#{schema_elements.all_of}: [{#{schema_elements.any_satisfy}: ...}, {#{schema_elements.any_satisfy}: ...}]`.
-
-              When `null` or an empty list is passed, matches all documents.
-              """
-              #{schema_elements.all_of}: [ColorListFilterInput!]
               """
               Used to filter on the number of non-null elements in this list field.
 
@@ -512,6 +558,7 @@ module ElasticGraph
           expect(filter_type_from(result, "Widget")).to eq(<<~EOS.strip)
             input WidgetFilterInput {
               #{schema_elements.any_of}: [WidgetFilterInput!]
+              #{schema_elements.all_of}: [WidgetFilterInput!]
               #{schema_elements.not}: WidgetFilterInput
               id: IDFilterInput
               cost: IntFilterInput
@@ -530,6 +577,7 @@ module ElasticGraph
           expect(filter_type_from(result, "WidgetOptions")).to eq(<<~EOS.strip)
             input WidgetOptionsFilterInput {
               #{schema_elements.any_of}: [WidgetOptionsFilterInput!]
+              #{schema_elements.all_of}: [WidgetOptionsFilterInput!]
               #{schema_elements.not}: WidgetOptionsFilterInput
               size: IntFilterInput
             }
@@ -548,6 +596,7 @@ module ElasticGraph
           expect(filter_type_from(result, "Widget")).to eq(<<~EOS.strip)
             input WidgetFilterInput {
               #{schema_elements.any_of}: [WidgetFilterInput!]
+              #{schema_elements.all_of}: [WidgetFilterInput!]
               not: WidgetFilterInput
               id: IDFilterInput
               location: GeoLocationFilterInput
@@ -568,6 +617,7 @@ module ElasticGraph
           expect(filter_type_from(result, "Widget")).to eq(<<~EOS.strip)
             input WidgetFilterInput {
               #{schema_elements.any_of}: [WidgetFilterInput!]
+              #{schema_elements.all_of}: [WidgetFilterInput!]
               #{schema_elements.not}: WidgetFilterInput
               name: StringFilterInput
               description: TextFilterInput
@@ -681,6 +731,7 @@ module ElasticGraph
           expect(filter_type_from(result, "Widget")).to eq(<<~EOS.chomp)
             input WidgetFilterInput {
               #{schema_elements.any_of}: [WidgetFilterInput!]
+              #{schema_elements.all_of}: [WidgetFilterInput!]
               #{schema_elements.not}: WidgetFilterInput
               tags1: StringListFilterInput
               tags2: StringListFilterInput
@@ -700,6 +751,7 @@ module ElasticGraph
           expect(filter_type_from(result, "Widget")).to eq(<<~EOS.chomp)
             input WidgetFilterInput {
               #{schema_elements.any_of}: [WidgetFilterInput!]
+              #{schema_elements.all_of}: [WidgetFilterInput!]
               #{schema_elements.not}: WidgetFilterInput
               tags: StringListFilterInput
             }
@@ -716,6 +768,7 @@ module ElasticGraph
           expect(filter_type_from(result, "Widget")).to eq(<<~EOS.chomp)
             input WidgetFilterInput {
               #{schema_elements.any_of}: [WidgetFilterInput!]
+              #{schema_elements.all_of}: [WidgetFilterInput!]
               #{schema_elements.not}: WidgetFilterInput
               times: TimeOfDayListFilterInput
             }
@@ -736,6 +789,7 @@ module ElasticGraph
           expect(filter_type_from(result, "Widget")).to eq(<<~EOS.chomp)
             input WidgetFilterInput {
               #{schema_elements.any_of}: [WidgetFilterInput!]
+              #{schema_elements.all_of}: [WidgetFilterInput!]
               #{schema_elements.not}: WidgetFilterInput
               colors: ColorListFilterInput
             }
@@ -754,6 +808,7 @@ module ElasticGraph
           expect(filter_type_from(result, "Widget")).to eq(<<~EOS.chomp)
             input WidgetFilterInput {
               #{schema_elements.any_of}: [WidgetFilterInput!]
+              #{schema_elements.all_of}: [WidgetFilterInput!]
               #{schema_elements.not}: WidgetFilterInput
               tags: TextListFilterInput
             }
@@ -770,6 +825,7 @@ module ElasticGraph
           expect(filter_type_from(result, "Widget")).to eq(<<~EOS.chomp)
             input WidgetFilterInput {
               #{schema_elements.any_of}: [WidgetFilterInput!]
+              #{schema_elements.all_of}: [WidgetFilterInput!]
               #{schema_elements.not}: WidgetFilterInput
               locations: GeoLocationListFilterInput
             }
@@ -793,6 +849,7 @@ module ElasticGraph
           expect(filter_type_from(result, "Widget")).to eq(<<~EOS.chomp)
             input WidgetFilterInput {
               #{schema_elements.any_of}: [WidgetFilterInput!]
+              #{schema_elements.all_of}: [WidgetFilterInput!]
               #{schema_elements.not}: WidgetFilterInput
               id: IDFilterInput
             }
@@ -817,6 +874,7 @@ module ElasticGraph
           expect(filter_type_from(result, "Widget")).to eq(<<~EOS.chomp)
             input WidgetFilterInput {
               #{schema_elements.any_of}: [WidgetFilterInput!]
+              #{schema_elements.all_of}: [WidgetFilterInput!]
               #{schema_elements.not}: WidgetFilterInput
               id: IDFilterInput
               shapes: ShapeListFilterInput
@@ -842,6 +900,7 @@ module ElasticGraph
           expect(filter_type_from(result, "Widget")).to eq(<<~EOS.chomp)
             input WidgetFilterInput {
               #{schema_elements.any_of}: [WidgetFilterInput!]
+              #{schema_elements.all_of}: [WidgetFilterInput!]
               #{schema_elements.not}: WidgetFilterInput
               id: IDFilterInput
               shapes: ShapeFieldsListFilterInput
@@ -872,6 +931,7 @@ module ElasticGraph
           expect(fields_list_filter_type_from(result, "Player")).to eq(<<~EOS.strip)
             input PlayerFieldsListFilterInput {
               #{schema_elements.any_of}: [PlayerFieldsListFilterInput!]
+              #{schema_elements.all_of}: [PlayerFieldsListFilterInput!]
               #{schema_elements.not}: PlayerFieldsListFilterInput
               seasons: PlayerSeasonListFilterInput
               #{schema_elements.count}: IntFilterInput
@@ -902,6 +962,7 @@ module ElasticGraph
           expect(fields_list_filter_type_from(result, "Player")).to eq(<<~EOS.strip)
             input PlayerFieldsListFilterInput {
               #{schema_elements.any_of}: [PlayerFieldsListFilterInput!]
+              #{schema_elements.all_of}: [PlayerFieldsListFilterInput!]
               #{schema_elements.not}: PlayerFieldsListFilterInput
               seasons: SeasonForAPlayerListFilterInput
               #{schema_elements.count}: IntFilterInput
@@ -954,6 +1015,7 @@ module ElasticGraph
             expect(fields_list_filter_type_from(result, "WidgetOptions")).to eq(<<~EOS.strip)
               input WidgetOptionsFieldsListFilterInput {
                 #{schema_elements.any_of}: [WidgetOptionsFieldsListFilterInput!]
+                #{schema_elements.all_of}: [WidgetOptionsFieldsListFilterInput!]
                 #{schema_elements.not}: WidgetOptionsFieldsListFilterInput
                 single_color1: ColorListFilterInput
                 single_color2: ColorListFilterInput
@@ -992,6 +1054,7 @@ module ElasticGraph
             expect(fields_list_filter_type_from(result, "Widget")).to eq(<<~EOS.strip)
               input WidgetFieldsListFilterInput {
                 #{schema_elements.any_of}: [WidgetFieldsListFilterInput!]
+                #{schema_elements.all_of}: [WidgetFieldsListFilterInput!]
                 #{schema_elements.not}: WidgetFieldsListFilterInput
                 options: WidgetOptionsFieldsListFilterInput
                 embedded_options_list: WidgetOptionsFieldsListFilterInput
@@ -1012,6 +1075,7 @@ module ElasticGraph
             expect(fields_list_filter_type_from(result, "WidgetOptions")).to eq(<<~EOS.strip)
               input WidgetOptionsFieldsListFilterInput {
                 #{schema_elements.any_of}: [WidgetOptionsFieldsListFilterInput!]
+                #{schema_elements.all_of}: [WidgetOptionsFieldsListFilterInput!]
                 #{schema_elements.not}: WidgetOptionsFieldsListFilterInput
                 geo_location: GeoLocationListFilterInput
                 geo_locations: GeoLocationListFilterInput
@@ -1031,6 +1095,7 @@ module ElasticGraph
             expect(fields_list_filter_type_from(result, "WidgetOptions")).to eq(<<~EOS.strip)
               input WidgetOptionsFieldsListFilterInput {
                 #{schema_elements.any_of}: [WidgetOptionsFieldsListFilterInput!]
+                #{schema_elements.all_of}: [WidgetOptionsFieldsListFilterInput!]
                 #{schema_elements.not}: WidgetOptionsFieldsListFilterInput
                 int2: IntListFilterInput
                 #{schema_elements.count}: IntFilterInput
@@ -1084,6 +1149,7 @@ module ElasticGraph
             expect(filter_type_from(result, "Inventor")).to eq(<<~EOS.strip)
               input InventorFilterInput {
                 #{schema_elements.any_of}: [InventorFilterInput!]
+                #{schema_elements.all_of}: [InventorFilterInput!]
                 #{schema_elements.not}: InventorFilterInput
                 name: StringFilterInput
                 nationality: StringFilterInput
@@ -1148,6 +1214,7 @@ module ElasticGraph
             expect(filter_type_from(result, "ClothingItem")).to eq(<<~EOS.strip)
               input ClothingItemFilterInput {
                 #{schema_elements.any_of}: [ClothingItemFilterInput!]
+                #{schema_elements.all_of}: [ClothingItemFilterInput!]
                 #{schema_elements.not}: ClothingItemFilterInput
                 size: SizeFilterInput
                 shirt_color: StringFilterInput
@@ -1204,6 +1271,7 @@ module ElasticGraph
             expect(filter_type_from(result, "Inventor")).to eq(<<~EOS.strip)
               input InventorFilterInput {
                 #{schema_elements.any_of}: [InventorFilterInput!]
+                #{schema_elements.all_of}: [InventorFilterInput!]
                 #{schema_elements.not}: InventorFilterInput
                 name: StringFilterInput
                 stock_ticker: StringFilterInput
@@ -1264,6 +1332,7 @@ module ElasticGraph
             expect(filter_type_from(result, "Inventor")).to eq(<<~EOS.strip)
               input InventorFilterInput {
                 #{schema_elements.any_of}: [InventorFilterInput!]
+                #{schema_elements.all_of}: [InventorFilterInput!]
                 #{schema_elements.not}: InventorFilterInput
                 name: StringFilterInput
                 nationality: StringFilterInput

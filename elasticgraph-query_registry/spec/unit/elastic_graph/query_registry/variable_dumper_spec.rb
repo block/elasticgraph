@@ -111,7 +111,7 @@ module ElasticGraph
             "CountWithIdFilterInput" => {
               "idFilter" => {
                 "type" => "IDFilterInput!",
-                "fields" => {"any_of" => "[IDFilterInput!]", "not" => "IDFilterInput", "equal_to_any_of" => "[ID]"}
+                "fields" => {"all_of" => "[IDFilterInput!]", "any_of" => "[IDFilterInput!]", "not" => "IDFilterInput", "equal_to_any_of" => "[ID]"}
               }
             }
           })
@@ -145,24 +145,29 @@ module ElasticGraph
 
           expect(dumper.dump_variables_for_query(query_string)).to eq({"CountWithOptions" => {
             "optionsFilterInput" => {"type" => "WidgetOptionsFilterInput!", "fields" => {
+              "all_of" => "[WidgetOptionsFilterInput!]",
               "any_of" => "[WidgetOptionsFilterInput!]",
               "not" => "WidgetOptionsFilterInput",
               "color" => {"type" => "ColorFilterInput", "fields" => {
+                "all_of" => "[ColorFilterInput!]",
                 "any_of" => "[ColorFilterInput!]",
                 "not" => "ColorFilterInput",
                 "equal_to_any_of" => {"type" => "[ColorInput]", "values" => ["BLUE", "GREEN", "RED"]}
               }},
               "is_draft" => {"type" => "BooleanFilterInput", "fields" => {
+                "all_of" => "[BooleanFilterInput!]",
                 "any_of" => "[BooleanFilterInput!]",
                 "not" => "BooleanFilterInput",
                 "equal_to_any_of" => "[Boolean]"
               }},
               "size" => {"type" => "SizeFilterInput", "fields" => {
+                "all_of" => "[SizeFilterInput!]",
                 "any_of" => "[SizeFilterInput!]",
                 "not" => "SizeFilterInput",
                 "equal_to_any_of" => {"type" => "[SizeInput]", "values" => ["LARGE", "MEDIUM", "SMALL"]}
               }},
               "the_size" => {"type" => "SizeFilterInput", "fields" => {
+                "all_of" => "[SizeFilterInput!]",
                 "any_of" => "[SizeFilterInput!]",
                 "not" => "SizeFilterInput",
                 "equal_to_any_of" => {"type" => "[SizeInput]", "values" => ["LARGE", "MEDIUM", "SMALL"]}

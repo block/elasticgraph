@@ -697,6 +697,7 @@ module ElasticGraph
 
           expect(type_def_for.call("WidgetFilterInput")).to eq(<<~EOS.strip)
             input WidgetFilterInput {
+              #{schema_elements.all_of}: [WidgetFilterInput!]
               #{schema_elements.any_of}: [WidgetFilterInput!]
               id: IDFilterInput
               name: StringFilterInput @tag(name: "public")
@@ -735,6 +736,7 @@ module ElasticGraph
 
           expect(type_def_for.call("WidgetOptionsFilterInput")).to eq(<<~EOS.strip)
             input WidgetOptionsFilterInput {
+              #{schema_elements.all_of}: [WidgetOptionsFilterInput!]
               #{schema_elements.any_of}: [WidgetOptionsFilterInput!]
               color: StringFilterInput @tag(name: "public")
               not: WidgetOptionsFilterInput
@@ -788,6 +790,7 @@ module ElasticGraph
           # the tagging of those source fields. That's why `name`, `options1`, etc are tagged with `public` below.
           expect(type_def_for.call("IdentifiableFilterInput")).to eq(<<~EOS.strip)
             input IdentifiableFilterInput {
+              #{schema_elements.all_of}: [IdentifiableFilterInput!]
               #{schema_elements.any_of}: [IdentifiableFilterInput!]
               id: IDFilterInput
               name: StringFilterInput @tag(name: "public")

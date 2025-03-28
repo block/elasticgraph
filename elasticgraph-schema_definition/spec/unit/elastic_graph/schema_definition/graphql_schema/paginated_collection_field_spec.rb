@@ -119,6 +119,7 @@ module ElasticGraph
           expect(filter_type_from(result, "Widget")).to eq(<<~EOS.chomp)
             input WidgetFilterInput {
               #{schema_elements.any_of}: [WidgetFilterInput!]
+              #{schema_elements.all_of}: [WidgetFilterInput!]
               #{schema_elements.not}: WidgetFilterInput
               names: StringListFilterInput
             }
@@ -161,6 +162,7 @@ module ElasticGraph
           expect(filter_type_from(result, "Widget")).to eq(<<~EOS.chomp)
             input WidgetFilterInput {
               #{schema_elements.any_of}: [WidgetFilterInput!]
+              #{schema_elements.all_of}: [WidgetFilterInput!]
               #{schema_elements.not}: WidgetFilterInput
               times: TimeOfDayListFilterInput
             }
