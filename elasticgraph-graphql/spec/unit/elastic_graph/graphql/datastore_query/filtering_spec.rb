@@ -366,16 +366,29 @@ module ElasticGraph
       describe "`all_of` operator" do
         context "top-level usage on distinct fields" do
           it "behaves the same as specifying multiple fields in the same object" do
-            query1 = new_query(filter: {
-              "color" => {"equal_to_any_of" => ["RED"]},
-              "size"  => {"gt" => 10}
-            })
-            query2 = new_query(filter: {"all_of" => [
+            query = new_query(filter: {"all_of" => [
               {"color" => {"equal_to_any_of" => ["RED"]}},
               {"size"  => {"gt" => 10}}
             ]})
 
-            expect(datastore_body_of(query1)).to eq(datastore_body_of(query2))
+            expect(datastore_body_of(query)).to query_datastore_with(bool: {
+              filter: [
+                {
+                  bool: {
+                    filter: [
+                      { terms: { "color" => ["RED"] } }
+                    ]
+                  }
+                },
+                {
+                  bool: {
+                    filter: [
+                      { range: { "size" => { gt: 10 } } }
+                    ]
+                  }
+                }
+              ]
+            })
           end
         end
 

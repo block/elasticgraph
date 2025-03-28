@@ -296,6 +296,98 @@ module ElasticGraph
           end
         end
 
+        context "top-level usage on distinct fields" do
+          it "behaves the same as specifying multiple fields in an object (both are AND)" do
+            index_into(
+              graphql,
+              t1 = build(:team, id: "t1", past_names: ["foo"], forbes_valuations: [500_000]),
+              t2 = build(:team, id: "t2", past_names: ["foo"], forbes_valuations: [50_000]),
+              t3 = build(:team, id: "t3", past_names: ["bar"], forbes_valuations: [500_000])
+            )
+
+            filter_fields = {
+              "past_names" => {"any_satisfy" => {"equal_to_any_of" => ["foo"]}},
+              "forbes_valuations" => {"any_satisfy" => {"gt" => 100_000}}
+            }
+
+            results_side_by_side = search_with_freeform_filter(filter_fields)
+            expect(results_side_by_side).to match_array(ids_of(t1))
+
+            filter_all_of = {
+              "all_of" => [
+                {
+                  "past_names" => {
+                    "any_satisfy" => {"equal_to_any_of" => ["foo"]}
+                  }
+                },
+                {
+                  "forbes_valuations" => {
+                    "any_satisfy" => {"gt" => 100_000}
+                  }
+                }
+              ]
+            }
+
+            results_all_of = search_with_freeform_filter(filter_all_of)
+            expect(results_all_of).to match_array(ids_of(t1))
+          end
+        end
+
+        context "top-level usage on the same key" do
+          it "allows ANDing two subfilters on the same field" do
+            index_into(
+              graphql,
+              t1 = build(:team, id: "t1", forbes_valuations: [1_000_000, 100_000_000]),
+              t2 = build(:team, id: "t2", forbes_valuations: []),
+              t3 = build(:team, id: "t3", forbes_valuations: [3_000_000])
+            )
+
+            all_of_filter = {
+              "forbes_valuations" => {
+                "all_of" => [
+                  {"any_satisfy" => {"gt" => 2_000_000}},
+                  {"any_satisfy" => {"lt" => 5_000_000}}
+                ]
+              }
+            }
+
+            results = search_with_freeform_filter(all_of_filter)
+            expect(results).to match_array(ids_of(t1, t3))
+          end
+        end
+
+        context "combining multiple `any_of` subfilters" do
+          it "handles AND of OR blocks (allOf of anyOf)" do
+            index_into(
+              graphql,
+              t1 = build(:team, id: "t1", past_names: ["foo"], forbes_valuations: [500_000]),
+              t2 = build(:team, id: "t2", past_names: ["foo"], forbes_valuations: [50_000]),
+              t3 = build(:team, id: "t3", past_names: ["bar"], forbes_valuations: [500_000]),
+              t4 = build(:team, id: "t4", past_names: ["bar"], forbes_valuations: [50_000])
+            )
+
+            filter = {
+              "all_of" => [
+                {
+                  "any_of" => [
+                    {"past_names" => {"any_satisfy" => {"equal_to_any_of" => ["foo"]}}},
+                    {"forbes_valuations" => {"any_satisfy" => {"gt" => 100_000}}}
+                  ]
+                },
+                {
+                  "any_of" => [
+                    {"past_names" => {"any_satisfy" => {"equal_to_any_of" => ["bar"]}}},
+                    {"forbes_valuations" => {"any_satisfy" => {"lt" => 60_000}}}
+                  ]
+                }
+              ]
+            }
+
+            results = search_with_freeform_filter(filter)
+            expect(results).to match_array(ids_of(t2,t3))
+          end
+        end
+
         def search_datastore(**options, &before_msearch)
           super(index_def_name: "teams", **options, &before_msearch)
         end
