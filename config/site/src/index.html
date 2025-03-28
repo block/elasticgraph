@@ -5,15 +5,22 @@ permalink: /
 ---
 
 <!-- Main Content -->
-<div class="grow flex items-center justify-center py-12">
-  <div class="text-center max-w-2xl">
-    <p class="text-4xl font-extrabold mb-8">
-      Schema-driven, scalable, cloud-native, batteries-included
-      <span class="text-blue-400">GraphQL</span>
-      with superpowers
+<div class="grow flex items-center justify-center py-20">
+  <div class="text-center max-w-3xl px-4">
+    <div class="flex justify-center">
+      <div class="w-20 h-20 mb-4">
+        {% include icons/logo.svg %}
+      </div>
+    </div>
+    <p
+      class="text-6xl font-extrabold mb-8 bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-500 dark:to-blue-300 bg-clip-text text-transparent">
+      ElasticGraph
     </p>
-    <h1 class="text-xl opacity-90 mb-4">
-      {{ site.description }}
+    <h1 class="text-2xl opacity-90 mb-8 leading-relaxed">
+      Schema-driven, scalable, cloud-native, batteries-included
+      <span class="text-3xl font-bold bg-gradient-to-br from-purple-600 to-blue-500 dark:from-purple-400 dark:to-blue-300 bg-clip-text text-transparent">GraphQL</span>
+      with superpowers, backed by 
+      <span class="text-3xl font-bold bg-gradient-to-br from-blue-600 to-green-500 dark:from-blue-400 dark:to-green-300 bg-clip-text text-transparent">Elasticsearch / OpenSearch</span>
     </h1>
   </div>
 </div>
@@ -33,6 +40,6 @@ permalink: /
     "{{ site.github_url }}",
     "{{ site.discord_url }}"
   ],
-  "description": "{{ site.tagline }}"
+  "description": "{{ site.description }}"
 }
 </script>

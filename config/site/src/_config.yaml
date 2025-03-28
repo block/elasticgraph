@@ -8,8 +8,8 @@ discord_url: https://discord.gg/8m9FqJ7a7F
 x_url: https://x.com/elasticgraph
 x_username: "@ElasticGraph"
 support_email: elasticgraph@squareup.com
-tagline: Schema-driven, scalable, cloud-native, batteries-included GraphQL with superpowers.
-description: ElasticGraph is an open-source framework for indexing, searching, and aggregating data powered by GraphQL and Elasticsearch / OpenSearch.
+description: Open source framework for indexing, searching, and aggregating data powered by GraphQL and Elasticsearch / OpenSearch
+tagline: Schema-driven, scalable, cloud-native, batteries-included GraphQL with superpowers, backed by Elasticsearch / OpenSearch
 
 # Include `_index.html` file from docs directories
 # https://github.com/lsegal/yard/issues/1027
@@ -20,8 +20,9 @@ include:
 style:
   body: bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 flex flex-col h-screen
   link: text-blue-600 dark:text-blue-400 hover:underline
+  navbar_link: text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white transition-colors duration-200
+  color_background: bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-400 dark:to-blue-500
   navbar_dropdown: relative rounded-lg bg-white dark:bg-gray-700 shadow-lg border border-gray-200/80 dark:border-gray-600/50
-  dropdown_button: text-base text-blue-600 dark:text-blue-400 flex items-center space-x-1
   dropdown_toggle: absolute left-0 pt-2 w-48 hidden group-hover:block z-50
   dropdown_item: block px-4 py-2 text-base text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600
   dropdown_pip: absolute -top-1.5 left-4 h-3 w-3 bg-white dark:bg-gray-700 transform rotate-45 border-t border-l border-gray-200/80 dark:border-gray-600/50

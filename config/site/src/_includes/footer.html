@@ -5,11 +5,17 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
       <!-- About section - full width on mobile -->
       <div class="col-span-1 sm:col-span-2">
+        <!-- Logo and Title -->
         <h3 class="text-xl font-bold mb-4">
-          <a href="{{ '/' | relative_url }}" class="hover:underline" aria-label="ElasticGraph Home">ElasticGraph</a>
+          <a href="{{ '/' | relative_url }}" class="flex items-center space-x-2 group w-fit" aria-label="ElasticGraph Home">
+            <div class="w-8 h-8 text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform duration-200">
+              {% include icons/logo.svg %}
+            </div>
+            <span class="group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200">ElasticGraph</span>
+          </a>
         </h3>
         <p class="text-gray-700 dark:text-gray-300 mb-4">
-          {{ site.tagline }}
+          {{ site.description }}
         </p>
         <p class="text-gray-700 dark:text-gray-300">
           Join our community and contribute on

@@ -9,7 +9,7 @@
 {% assign sections = sections | sort: "menu_order" %}
 
 <div class="relative group">
-  <a href="{% link query-api.md %}" class="{{site.style.dropdown_button}}">
+  <a href="{% link query-api.md %}" class="{{site.style.navbar_link}} flex items-center space-x-1">
     <span>Query API</span>
     {% include icons/chevron-down.svg %}
   </a>

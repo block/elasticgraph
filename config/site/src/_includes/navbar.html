@@ -3,11 +3,16 @@
   <div class="container mx-auto px-4">
     <!-- Desktop and Mobile Nav Container -->
     <div class="flex justify-between items-center">
-      <!-- Logo -->
-      <a href="{{ '/' | relative_url }}" class="text-lg font-bold hover:underline">ElasticGraph</a>
+      <!-- Logo and Title -->
+      <a href="{{ '/' | relative_url }}" class="flex items-center space-x-2 group">
+        <div class="w-8 h-8 group-hover:scale-110 transition-transform duration-200">
+          {% include icons/logo.svg %}
+        </div>
+        <span class="text-lg font-bold text-gray-900 dark:text-white">ElasticGraph</span>
+      </a>
 
       <!-- Mobile Menu Button -->
-      <button id="mobile-menu-button" class="lg:hidden p-2" aria-label="Toggle menu">
+      <button id="mobile-menu-button" class="lg:hidden p-2 {{ site.style.navbar_link }}" aria-label="Toggle menu">
         {% include icons/menu.svg %}
       </button>
 
@@ -15,7 +20,7 @@
       <div class="hidden lg:flex lg:items-center lg:space-x-6 w-full justify-between ml-6">
         <!-- Left Side Nav Items -->
         <div class="flex items-center space-x-6">
-          <a href="{% link getting-started.md %}" class="text-base {{ site.style.link }}">Get Started</a>
+          <a href="{% link getting-started.md %}" class="text-base {{ site.style.navbar_link }}">Get Started</a>
 
           {% include query_api_nav.html %}
           {% include guides_nav.html %}
@@ -31,19 +36,18 @@
                           focus:outline-none focus:ring-2 focus:ring-blue-500">
           </form>
           <!-- Theme Toggle Button -->
-          <button onclick="toggleTheme()" class="p-2 rounded-md hover:bg-gray-300 dark:hover:bg-gray-700" aria-label="Toggle theme">
-            <span class="hidden dark:block {{ site.style.link }}">
+          <button onclick="toggleTheme()" class="p-2 rounded-md {{ site.style.navbar_link }} cursor-pointer hover:bg-gray-300/50 dark:hover:bg-gray-700/50" aria-label="Toggle theme">
+            <span class="hidden dark:block">
               {% include icons/sun.svg %}
             </span>
-            <span class="block dark:hidden {{ site.style.link }}">
+            <span class="block dark:hidden">
               {% include icons/moon.svg %}
             </span>
           </button>
-          <a href="{{ site.github_url }}" target="_blank" class="text-base {{ site.style.link }} inline-flex items-center space-x-2" rel="noopener">
+          <a href="{{ site.github_url }}" target="_blank" class="text-base {{ site.style.navbar_link }} inline-flex items-center space-x-2" rel="noopener">
             {% include icons/github.svg %}
-            <span>GitHub</span>
           </a>
-          <a href="{% link about.md %}" class="text-base {{ site.style.link }}">About</a>
+          <a href="{% link about.md %}" class="text-base {{ site.style.navbar_link }}">About</a>
         </div>
       </div>
     </div>
@@ -51,12 +55,12 @@
     <!-- Mobile Navigation Menu -->
     <div id="mobile-menu" class="hidden lg:hidden mt-4">
       <div class="flex flex-col space-y-4">
-        <a href="{% link getting-started.md %}" class="text-base {{ site.style.link }}">Get Started</a>
-        <a href="{% link query-api.md %}" class="text-base {{ site.style.link }}">Query API</a>
-        <a href="{% link guides.md %}" class="text-base {{ site.style.link }}">Guides</a>
-        <a href="{% link api-docs.md %}" class="text-base {{ site.style.link }}">API Docs</a>
+        <a href="{% link getting-started.md %}" class="text-base {{ site.style.navbar_link }}">Get Started</a>
+        <a href="{% link query-api.md %}" class="text-base {{ site.style.navbar_link }}">Query API</a>
+        <a href="{% link guides.md %}" class="text-base {{ site.style.navbar_link }}">Guides</a>
+        <a href="{% link api-docs.md %}" class="text-base {{ site.style.navbar_link }}">API Docs</a>
         <!-- Mobile Theme Toggle -->
-        <button onclick="toggleTheme()" class="flex items-center space-x-2 text-base {{ site.style.link }}">
+        <button onclick="toggleTheme()" class="flex items-center space-x-2 text-base {{ site.style.navbar_link }} cursor-pointer" aria-label="Toggle theme">
           <span class="hidden dark:block">
             {% include icons/sun.svg %}
           </span>
@@ -65,11 +69,11 @@
           </span>
           <span>Toggle Theme</span>
         </button>
-        <a href="{{ site.github_url }}" target="_blank" class="text-base {{ site.style.link }} inline-flex items-center space-x-2" rel="noopener">
+        <a href="{{ site.github_url }}" target="_blank" class="text-base {{ site.style.navbar_link }} inline-flex items-center space-x-2" rel="noopener">
           {% include icons/github.svg %}
           <span>GitHub</span>
         </a>
-        <a href="{% link about.md %}" class="text-base {{ site.style.link }}">About</a>
+        <a href="{% link about.md %}" class="text-base {{ site.style.navbar_link }}">About</a>
 
         <!-- Mobile Search -->
         <form action="{{ '/search/' | relative_url }}" method="get" class="relative">
@@ -88,7 +92,7 @@
       <ol class="list-reset flex flex-wrap">
         {% if page.url != "/" %}
         <li>
-          <a href="{{ '/' | relative_url }}" class="hover:underline">Home</a>
+          <a href="{{ '/' | relative_url }}" class="{{ site.style.navbar_link }}">Home</a>
         </li>
         {% endif %}
 
@@ -108,7 +112,7 @@
             {% if page.url == link %}
               {{ page_title }}
             {% else %}
-              <a href="{{ link | relative_url }}" class="hover:underline capitalize">
+              <a href="{{ link | relative_url }}" class="{{ site.style.navbar_link }} capitalize">
                 {{ page_title }}
               </a>
             {% endif %}
