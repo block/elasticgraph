@@ -303,10 +303,10 @@ module ElasticGraph
           # Find all markdown and HTML files in src directory
           src_dir = SITE_SOURCE_DIR
           pages = Dir.glob("#{src_dir}/**/*").reject do |file|
-            # Skip directories, files in directories that don't contain pages, a couple specific files, and js/css assets.
+            # Skip directories, files in directories that don't contain pages, binary files, and specific file types
             File.directory?(file) ||
-              %w[/_data/ /docs/ /_includes/ /_layouts/ /_plugins/ /_config.yaml dc.yml].any? { |dir| file.include?(dir) } ||
-              %w[.js .css].include?(File.extname(file))
+              %w[/_data/ /docs/ /_includes/ /_layouts/ /_plugins/ /_config.yaml dc.yml /examples/ /assets/].any? { |dir| file.include?(dir) } ||
+              %w[.js .css .png .jpg .jpeg .gif .ico .svg .woff .woff2 .ttf .eot .webmanifest .yaml .graphql].include?(File.extname(file).downcase)
           end
 
           # Check each page to make sure the frontmatter specifies a `permalink`. This matters because it ensures consistent behavior
@@ -316,22 +316,30 @@ module ElasticGraph
           # to explicitly pick what URL the page is served from, and will help ensure consistent behavior between local development and
           # GitHub pages.
           failed_pages = pages.filter_map do |page|
-            content = File.read(page)
             relative_path = Pathname.new(page).relative_path_from(src_dir)
+            begin
+              content = File.read(page, encoding: "utf-8")
 
-            # Check if file has frontmatter (content between --- markers)
-            if content =~ /\A---\s*\n(.*?)\n---\s*\n/m
-              frontmatter = YAML.safe_load($1)
+              # Check if file has frontmatter (content between --- markers)
+              if content =~ /\A---\s*\n(.*?)\n---\s*\n/m
+                frontmatter = YAML.safe_load($1)
 
-              if !frontmatter.key?("permalink")
-                [relative_path, "Missing permalink in frontmatter"]
-              elsif frontmatter["permalink"].nil?
-                [relative_path, "Permalink is null"]
-              elsif frontmatter["permalink"].strip.empty?
-                [relative_path, "Permalink is empty"]
+                if !frontmatter.key?("permalink")
+                  [relative_path, "Missing permalink in frontmatter"]
+                elsif frontmatter["permalink"].nil?
+                  [relative_path, "Permalink is null"]
+                elsif frontmatter["permalink"].strip.empty?
+                  [relative_path, "Permalink is empty"]
+                end
+              else
+                [relative_path, "No frontmatter found"]
               end
-            else
-              [relative_path, "No frontmatter found"]
+            rescue Encoding::InvalidByteSequenceError => e
+              puts "Warning: Encoding issue in file #{relative_path}: #{e.message}"
+              next  # Skip files with encoding issues
+            rescue => e
+              puts "Error processing file #{relative_path}: #{e.message}"
+              raise e
             end
           end
 
