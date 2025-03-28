@@ -973,6 +973,123 @@ module ElasticGraph
         end
       end
 
+      describe "`all_of` operator acceptance" do
+        it "top-level usage on distinct fields behaves the same as specifying multiple fields in a single object" do
+          w1 = build(:widget,
+                     id: "widg1",
+                     name: "Thing1",
+                     tags: ["alpha", "beta"],
+                     options: build(:widget_options, color: "BLUE", size: "SMALL"),
+                     )
+          w2 = build(:widget,
+                     id: "widg2",
+                     name: "Thing2",
+                     tags: ["gamma"],
+                     options: build(:widget_options, color: "BLUE", size: "MEDIUM"),
+                     )
+          w3 = build(:widget,
+                     id: "widg3",
+                     name: "Thing3",
+                     tags: ["alpha", "beta"],
+                     options: build(:widget_options, color: "GREEN", size: "SMALL"),
+                     )
+
+          index_records(w1, w2, w3)
+
+          filter_side_by_side = {
+            "tags" => {
+              "any_satisfy" => {
+                "equal_to_any_of" => ["alpha"]
+              }
+            },
+            "options" => {
+              "color" => {
+                "equal_to_any_of" => [enum_value(:BLUE)]
+              }
+            }
+          }
+
+          side_by_side_results = list_widgets_with(:name, filter: filter_side_by_side, order_by: [:name_ASC])
+          expect(side_by_side_results).to match([
+                                     string_hash_of(w1, :id, :name),
+                                   ])
+
+          filter_all_of = {
+            "all_of" => [
+              {
+                "tags" => {
+                  "any_satisfy" => { "equal_to_any_of" => ["alpha"] }
+                }
+              },
+              {
+                "options" => {
+                  "color" => {
+                    "equal_to_any_of" => [enum_value(:BLUE)]
+                  }
+                }
+              }
+            ]
+          }
+
+          all_of_results = list_widgets_with(:name, filter: filter_all_of, order_by: [:name_ASC])
+          expect(all_of_results).to match([
+                                            string_hash_of(w1, :id, :name),
+                                          ])
+        end
+
+        it "top-level usage on the same field allows ANDing two subfilters on that field" do
+          w1 = build(:widget, id: "widg1", tags: ["alpha", "beta"])
+          w2 = build(:widget, id: "widg2", tags: ["alpha"])
+          w3 = build(:widget, id: "widg3", tags: ["gamma", "beta"])
+          index_records(w1, w2, w3)
+
+          filter_all_of_tags = {
+            "tags" => {
+              "all_of" => [
+                { "any_satisfy" => { "equal_to_any_of" => ["alpha"] } },
+                { "not" => { "any_satisfy" => { "equal_to_any_of" => ["beta"] } } }
+              ]
+            }
+          }
+
+          results = list_widgets_with(:tags, filter: filter_all_of_tags, order_by: [:id_ASC])
+          expect(results).to match([
+                                     string_hash_of(w2, :id, :tags),
+                                   ])
+        end
+
+        it "allows AND of multiple OR blocks (allOf of anyOf)" do
+          w1 = build(:widget, id: "widg1", tags: ["foo"],  amount_cents: 50)
+          w2 = build(:widget, id: "widg2", tags: ["foo"],  amount_cents: 500)
+          w3 = build(:widget, id: "widg3", tags: ["bar"],  amount_cents: 50)
+          w4 = build(:widget, id: "widg4", tags: ["bar"],  amount_cents: 500)
+          index_records(w1, w2, w3, w4)
+
+          filter = {
+            "all_of" => [
+              {
+                "any_of" => [
+                  { "tags" => { "any_satisfy" => { "equal_to_any_of" => ["foo"] } } },
+                  { "amount_cents" => { "gt" => 100 } }
+                ]
+              },
+              {
+                "any_of" => [
+                  { "tags" => { "any_satisfy" => { "equal_to_any_of" => ["bar"] } } },
+                  { "amount_cents" => { "lt" => 100 } }
+                ]
+              }
+            ]
+          }
+
+          results = list_widgets_with(:amount_cents, filter: filter, order_by: [:id_ASC])
+          expect(results).to match([
+                                     string_hash_of(w1, :id, :amount_cents),
+                                     string_hash_of(w4, :id, :amount_cents)
+                             ])
+        end
+      end
+
       def list_widgets_with(fieldname, **query_args)
         query_widgets_with(fieldname, **query_args).dig("data", "widgets", "edges").map { |we| we.fetch("node") }
       end

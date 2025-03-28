@@ -219,10 +219,14 @@ module ElasticGraph
         end
 
         def process_all_of_expression(bool_node, expressions, field_path)
-          # `all_of` represents an AND. AND is the default way that `process_filter_hash` combines
-          # filters so we just have to call it for each sub-expression.
+          # `all_of` represents an AND of multiple subexpressions.
+          # To achieve this, we build a new bool sub-filter for each subexpression and push it onto
+          # the parent’s `:filter` array. Each item in `:filter` is independently required (AND).
           expressions.each do |sub_expression|
-            process_filter_hash(bool_node, sub_expression, field_path)
+            sub_filter = build_bool_hash do |sub_bool_node|
+              process_filter_hash(sub_bool_node, sub_expression, field_path)
+            end
+            bool_node[:filter] << sub_filter if sub_filter
           end
         end
 
