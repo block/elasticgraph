@@ -66,7 +66,7 @@
 
   /* Note alert */
   .alert-note {
-    @apply my-4 rounded-lg border-l-4 p-4 border-blue-400 bg-blue-50/30 dark:border-blue-500 dark:bg-blue-950/20;
+    @apply my-4 rounded-lg border-l-4 p-4 border-blue-500 bg-blue-900/10 dark:border-blue-500 dark:bg-blue-950/20;
   }
 
   .alert-note > p:first-of-type,
@@ -81,7 +81,7 @@
 
   /* Tip alert */
   .alert-tip {
-    @apply my-4 rounded-lg border-l-4 p-4 border-green-400 bg-green-50/30 dark:border-green-500 dark:bg-green-950/20;
+    @apply my-4 rounded-lg border-l-4 p-4 border-green-500 bg-green-900/10 dark:border-green-500 dark:bg-green-950/20;
   }
 
   .alert-tip > p:first-of-type,
@@ -96,7 +96,7 @@
 
   /* Warning alert */
   .alert-warning {
-    @apply my-4 rounded-lg border-l-4 p-4 border-amber-400 bg-amber-50/30 dark:border-amber-500 dark:bg-amber-950/20;
+    @apply my-4 rounded-lg border-l-4 p-4 border-amber-500 bg-amber-900/10 dark:border-amber-500 dark:bg-amber-950/20;
   }
 
   .alert-warning > p:first-of-type,
@@ -113,7 +113,7 @@
   .alert-note > p:not(:first-of-type),
   .alert-warning > p:not(:first-of-type),
   .alert-tip > p:not(:first-of-type) {
-    @apply text-gray-700 dark:text-gray-300;
+    @apply text-gray-900 dark:text-gray-300;
   }
 
   /* Remove margin from last element in alerts to maintain consistent padding */
@@ -133,7 +133,7 @@
   .alert-note pre,
   .alert-warning pre,
   .alert-tip pre {
-    @apply bg-white/50 dark:bg-gray-900/50;
+    @apply bg-gray-900/95;
   }
 
   /* Heading anchors */
@@ -146,7 +146,7 @@
   }
 
   .heading-anchor svg {
-    @apply inline-block align-middle fill-gray-500 dark:fill-gray-400;
+    @apply inline-block align-middle fill-gray-600 hover:fill-blue-500 dark:fill-gray-400 dark:hover:fill-gray-300;
   }
 
   .has-anchor:hover .heading-anchor,
