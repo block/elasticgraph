@@ -5,12 +5,12 @@ module ElasticGraph
 
       class GraphQLAdapterBuilder
         @runtime_metadata: SchemaArtifacts::RuntimeMetadata::Schema
-        @named_resolvers: ::Hash[::Symbol, _Resolver]
+        @named_resolvers: ::Hash[::Symbol, _GraphQLResolver]
         @query_adapter: QueryAdapter
 
         def initialize: (
           runtime_metadata: SchemaArtifacts::RuntimeMetadata::Schema,
-          named_resolvers: ::Hash[::Symbol, _Resolver],
+          named_resolvers: ::Hash[::Symbol, _GraphQLResolver],
           query_adapter: QueryAdapter
         ) -> void
 

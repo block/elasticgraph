@@ -1503,23 +1503,35 @@ graphql_extension_modules:
   require_path: elastic_graph/apollo/graphql/engine_extension
 graphql_resolvers_by_name:
   apollo_entities:
-    extension_name: ElasticGraph::Apollo::GraphQL::EntitiesFieldResolver
-    require_path: elastic_graph/apollo/graphql/entities_field_resolver
+    needs_lookahead: true
+    resolver_ref:
+      extension_name: ElasticGraph::Apollo::GraphQL::EntitiesFieldResolver
+      require_path: elastic_graph/apollo/graphql/entities_field_resolver
   apollo_service:
-    extension_name: ElasticGraph::Apollo::GraphQL::ServiceFieldResolver
-    require_path: elastic_graph/apollo/graphql/service_field_resolver
+    needs_lookahead: true
+    resolver_ref:
+      extension_name: ElasticGraph::Apollo::GraphQL::ServiceFieldResolver
+      require_path: elastic_graph/apollo/graphql/service_field_resolver
   get_record_field_value:
-    extension_name: ElasticGraph::GraphQL::Resolvers::GetRecordFieldValue
-    require_path: elastic_graph/graphql/resolvers/get_record_field_value
+    needs_lookahead: true
+    resolver_ref:
+      extension_name: ElasticGraph::GraphQL::Resolvers::GetRecordFieldValue
+      require_path: elastic_graph/graphql/resolvers/get_record_field_value
   list_records:
-    extension_name: ElasticGraph::GraphQL::Resolvers::ListRecords
-    require_path: elastic_graph/graphql/resolvers/list_records
+    needs_lookahead: true
+    resolver_ref:
+      extension_name: ElasticGraph::GraphQL::Resolvers::ListRecords
+      require_path: elastic_graph/graphql/resolvers/list_records
   nested_relationships:
-    extension_name: ElasticGraph::GraphQL::Resolvers::NestedRelationships
-    require_path: elastic_graph/graphql/resolvers/nested_relationships
+    needs_lookahead: true
+    resolver_ref:
+      extension_name: ElasticGraph::GraphQL::Resolvers::NestedRelationships
+      require_path: elastic_graph/graphql/resolvers/nested_relationships
   object:
-    extension_name: ElasticGraph::GraphQL::Resolvers::Object
-    require_path: elastic_graph/graphql/resolvers/object
+    needs_lookahead: true
+    resolver_ref:
+      extension_name: ElasticGraph::GraphQL::Resolvers::Object
+      require_path: elastic_graph/graphql/resolvers/object
 index_definitions_by_name:
   addresses:
     current_sources:

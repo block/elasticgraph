@@ -9,6 +9,7 @@
 require "elastic_graph/schema_artifacts/runtime_metadata/enum"
 require "elastic_graph/schema_artifacts/runtime_metadata/extension"
 require "elastic_graph/schema_artifacts/runtime_metadata/extension_loader"
+require "elastic_graph/schema_artifacts/runtime_metadata/graphql_resolver"
 require "elastic_graph/schema_artifacts/runtime_metadata/hash_dumper"
 require "elastic_graph/schema_artifacts/runtime_metadata/index_definition"
 require "elastic_graph/schema_artifacts/runtime_metadata/object_type"
@@ -70,18 +71,9 @@ module ElasticGraph
               [] # : ::Array[Extension]
             end
 
-          graphql_resolvers_by_name =
-            if for_context == :graphql
-              require "elastic_graph/graphql/resolvers/interface"
-              resolver_loader = ExtensionLoader.new(GraphQL::Resolvers::Interface)
-              hash[GRAPHQL_RESOLVERS_BY_NAME]&.to_h do |name, resolver_hash|
-                [name.to_sym, Extension.load_from_hash(resolver_hash, via: resolver_loader)]
-              end || {}
-            else
-              # Avoid loading GraphQL resolvers if we're not in a GraphQL context. We can't count
-              # on the resolvers even being available to load in other contexts.
-              {} # : ::Hash[::Symbol, Extension]
-            end
+          graphql_resolvers_by_name = hash[GRAPHQL_RESOLVERS_BY_NAME]&.to_h do |name, resolver_hash|
+            [name.to_sym, GraphQLResolver.from_hash(resolver_hash)]
+          end || {}
 
           static_script_ids_by_scoped_name = hash[STATIC_SCRIPT_IDS_BY_NAME] || {}
 

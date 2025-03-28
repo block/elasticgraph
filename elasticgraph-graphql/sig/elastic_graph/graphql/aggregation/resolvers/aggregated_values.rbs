@@ -31,7 +31,7 @@ module ElasticGraph
         end
 
         class AggregatedValues < AggregatedValuesSupertype
-          include GraphQL::Resolvers::_Resolvable
+          include _GraphQLResolvable
         end
       end
     end

@@ -7,8 +7,8 @@
 # frozen_string_literal: true
 
 require "elastic_graph/errors"
-require "elastic_graph/graphql/resolvers/interface"
 require "elastic_graph/schema_artifacts/runtime_metadata/extension"
+require "elastic_graph/schema_artifacts/runtime_metadata/graphql_resolver"
 require "elastic_graph/schema_definition/mixins/has_readable_to_s_and_inspect"
 require "elastic_graph/schema_definition/results"
 require "elastic_graph/schema_definition/state"
@@ -325,8 +325,14 @@ module ElasticGraph
       #     end
       #   end
       def register_graphql_resolver(name, klass, defined_at:, **resolver_config)
-        resolver = SchemaArtifacts::RuntimeMetadata::Extension.new(klass, defined_at, resolver_config)
-        resolver.verify_against!(GraphQL::Resolvers::Interface)
+        extension = SchemaArtifacts::RuntimeMetadata::Extension.new(klass, defined_at, resolver_config)
+        extension.verify_against!(SchemaArtifacts::RuntimeMetadata::GraphQLResolver::Interface)
+
+        resolver = SchemaArtifacts::RuntimeMetadata::GraphQLResolver.new(
+          needs_lookahead: true,
+          resolver_ref: extension.to_dumpable_hash
+        )
+
         @state.graphql_resolvers_by_name[name] = resolver
         nil
       end

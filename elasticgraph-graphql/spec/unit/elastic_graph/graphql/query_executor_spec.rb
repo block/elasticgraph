@@ -382,11 +382,9 @@ module ElasticGraph
                   context[:additional_operand]
                 ].compact.reduce(:*)
               end
-
-              def self.name
-                "MultiplyResolver"
-              end
             end
+
+            ::Object.const_set(:MultiplyResolver, multiply_resolver)
 
             self.schema_artifacts = generate_schema_artifacts do |schema|
               schema.register_graphql_resolver :multiply, multiply_resolver, defined_at: __FILE__
@@ -410,7 +408,16 @@ module ElasticGraph
             end
           end
 
+          after(:context) do
+            ::Object.send(:remove_const, :MultiplyResolver) # standard:disable RSpec/RemoveConst
+          end
+
           let(:graphql) { build_graphql(schema_artifacts: schema_artifacts) }
+
+          before do
+            # stub the `require` call that happens. If we allow it to load this file it'll mess with our reported code coverage
+            allow(SchemaArtifacts::RuntimeMetadata::GraphQLResolver.extension_loader).to receive(:require)
+          end
 
           it "allows an injected resolver to resolve the custom field" do
             query = <<~EOS

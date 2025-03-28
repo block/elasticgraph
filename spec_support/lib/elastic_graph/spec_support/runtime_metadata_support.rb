@@ -148,6 +148,18 @@ module ElasticGraph
           )
         end
 
+        DEFAULT_RESOLVER_REF = {
+          "extension_name" => "ElasticGraph::GraphQL::Resolvers::GetRecordFieldValue",
+          "require_path" => "elastic_graph/graphql/resolvers/get_record_field_value"
+        }
+
+        def graphql_resolver_with(needs_lookahead: false, resolver_ref: DEFAULT_RESOLVER_REF)
+          GraphQLResolver.new(
+            needs_lookahead: needs_lookahead,
+            resolver_ref: resolver_ref
+          )
+        end
+
         def scalar_type_with(
           coercion_adapter_ref: ScalarType::DEFAULT_COERCION_ADAPTER_REF,
           indexing_preparer_ref: ScalarType::DEFAULT_INDEXING_PREPARER_REF

@@ -19,7 +19,7 @@ module ElasticGraph
       attr_accessor json_schema_version: ::Integer?
       attr_accessor json_schema_version_setter_location: ::Thread::Backtrace::Location?
       attr_reader graphql_extension_modules: ::Array[SchemaArtifacts::RuntimeMetadata::Extension]
-      attr_reader graphql_resolvers_by_name: ::Hash[::Symbol, SchemaArtifacts::RuntimeMetadata::Extension]
+      attr_reader graphql_resolvers_by_name: ::Hash[::Symbol, SchemaArtifacts::RuntimeMetadata::GraphQLResolver]
       attr_accessor initially_registered_built_in_types: ::Set[::String]
       attr_accessor built_in_types_customization_blocks: ::Array[^(SchemaElements::graphQLType) -> void]
       attr_accessor user_definition_complete: bool

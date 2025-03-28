@@ -143,7 +143,12 @@ module ElasticGraph
               overrides: {"any_of" => "or"}
             ),
             graphql_extension_modules: [graphql_extension_module1],
-            graphql_resolvers_by_name: {resolver1: graphql_resolver1(limit: 10)},
+            graphql_resolvers_by_name: {
+              resolver1: graphql_resolver_with(
+                needs_lookahead: true,
+                resolver_ref: graphql_resolver1(limit: 10).to_dumpable_hash
+              )
+            },
             static_script_ids_by_scoped_name: {
               "filter/time_of_day" => "time_of_day_4474b200b6a00f385ed49f7c9669cbf3"
             }
@@ -278,9 +283,12 @@ module ElasticGraph
             }],
             "graphql_resolvers_by_name" => {
               "resolver1" => {
-                "extension_name" => "ElasticGraph::GraphQLResolver1",
-                "require_path" => "elastic_graph/spec_support/example_extensions/graphql_resolvers",
-                "extension_config" => {"limit" => 10}
+                "needs_lookahead" => true,
+                "resolver_ref" => {
+                  "extension_name" => "ElasticGraph::GraphQLResolver1",
+                  "require_path" => "elastic_graph/spec_support/example_extensions/graphql_resolvers",
+                  "extension_config" => {"limit" => 10}
+                }
               }
             },
             "static_script_ids_by_scoped_name" => {

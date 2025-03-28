@@ -10,7 +10,7 @@ module ElasticGraph
         attr_reader index_definitions_by_name: ::Hash[::String, IndexDefinition]
         attr_reader schema_element_names: SchemaElementNames
         attr_reader graphql_extension_modules: ::Array[Extension]
-        attr_reader graphql_resolvers_by_name: ::Hash[::Symbol, Extension]
+        attr_reader graphql_resolvers_by_name: ::Hash[::Symbol, GraphQLResolver]
         attr_reader static_script_ids_by_scoped_name: ::Hash[::String, ::String]
 
         def initialize: (
@@ -20,7 +20,7 @@ module ElasticGraph
           index_definitions_by_name: ::Hash[::String, IndexDefinition],
           schema_element_names: SchemaElementNames,
           graphql_extension_modules: ::Array[Extension],
-          graphql_resolvers_by_name: ::Hash[::Symbol, Extension],
+          graphql_resolvers_by_name: ::Hash[::Symbol, GraphQLResolver],
           static_script_ids_by_scoped_name: ::Hash[::String, ::String]) -> void
 
         def with: (
@@ -30,7 +30,7 @@ module ElasticGraph
           ?index_definitions_by_name: ::Hash[::String, IndexDefinition],
           ?schema_element_names: SchemaElementNames,
           ?graphql_extension_modules: ::Array[Extension],
-          ?graphql_resolvers_by_name: ::Hash[::Symbol, Extension],
+          ?graphql_resolvers_by_name: ::Hash[::Symbol, GraphQLResolver],
           ?static_script_ids_by_scoped_name: ::Hash[::String, ::String]) -> Schema
       end
 

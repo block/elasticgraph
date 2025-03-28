@@ -40,7 +40,12 @@ module ElasticGraph
           end
         end
 
-        expect(result.fetch(:resolver1)).to eq(graphql_resolver1(param: 15))
+        expect(result.fetch(:resolver1)).to eq(
+          graphql_resolver_with(
+            needs_lookahead: true,
+            resolver_ref: graphql_resolver1(param: 15).to_dumpable_hash
+          )
+        )
       end
 
       it "verifies the registered resolver to confirm it confirms to the resolver interface" do

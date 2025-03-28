@@ -1,0 +1,59 @@
+module ElasticGraph
+  module SchemaArtifacts
+    module RuntimeMetadata
+      class GraphQLResolverSupertype
+        attr_reader needs_lookahead: bool
+        attr_reader resolver_ref: ::Hash[::String, ::String]
+
+        def initialize: (
+          needs_lookahead: bool,
+          resolver_ref: ::Hash[::String, ::String]
+        ) -> void
+
+        def with: (
+          ?needs_lookahead: bool,
+          ?resolver_ref: ::Hash[::String, ::String]
+        ) -> instance
+
+        def self.new:
+          (needs_lookahead: bool, resolver_ref: ::Hash[::String, ::String]) -> instance
+          | (bool, ::Hash[::String, ::String]) -> instance
+      end
+
+      class GraphQLResolver < GraphQLResolverSupertype
+        self.@extension_loader: ExtensionLoader?
+        def self.extension_loader: () -> ExtensionLoader
+
+        NEEDS_LOOKAHEAD: "needs_lookahead"
+        RESOLVER_REF: "resolver_ref"
+
+        def load_resolver: () -> Extension
+        def self.from_hash: (::Hash[::String, untyped]) -> GraphQLResolver
+        def to_dumpable_hash: () -> ::Hash[::String, untyped]
+
+        class Interface
+          include _GraphQLResolver
+        end
+      end
+    end
+  end
+
+  interface _GraphQLResolvable
+    def resolve: (
+      field: ElasticGraph::GraphQL::Schema::Field,
+      object: untyped,
+      context: ::GraphQL::Query::Context,
+      args: ::Hash[::String, untyped],
+      lookahead: ::GraphQL::Execution::Lookahead
+    ) -> untyped
+  end
+
+  interface _GraphQLResolver
+    def initialize: (
+      elasticgraph_graphql: GraphQL,
+      config: ::Hash[::String, untyped]
+    ) -> void
+
+    include _GraphQLResolvable
+  end
+end

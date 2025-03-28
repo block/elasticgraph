@@ -2,7 +2,7 @@ module ElasticGraph
   class GraphQL
     module Resolvers
       class Object
-        include _Resolver
+        include _GraphQLResolver
       end
     end
   end
