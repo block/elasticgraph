@@ -30,6 +30,10 @@ pushd $gem
   cp ../Gemfile.lock Gemfile.lock
   BUNDLE_GEMFILE=Gemfile bundle check || (rm -rf Gemfile.lock && bundle install)
   if [[ "$gem" == "elasticgraph-graphql" || "$gem" == "elasticgraph-indexer" || "$gem" == "elasticgraph-schema_definition" ]]; then
+    # Avoid a connection issue if a prior run was interrupted. More info:
+    # https://github.com/briandunn/flatware/issues/68
+    rm -f flatware-sink
+
     # These gems have larger test suites that take longer, and therefore benefit from being run in parallel with flatware.
     BUNDLE_GEMFILE=Gemfile bundle exec flatware rspec --backtrace --format progress
   else
