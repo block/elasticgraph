@@ -44,7 +44,7 @@
               {% include icons/moon.svg %}
             </span>
           </button>
-          <a href="{{ site.github_url }}" target="_blank" class="text-base {{ site.style.navbar_link }} inline-flex items-center space-x-2" rel="noopener">
+          <a href="{{ site.github_url }}" target="_blank" class="p-2 w-9 h-9 {{ site.style.navbar_link }} inline-flex items-center justify-center hover:bg-gray-300/50 dark:hover:bg-gray-700/50 rounded-md" rel="noopener">
             {% include icons/github.svg %}
           </a>
           <a href="{% link about.md %}" class="text-base {{ site.style.navbar_link }}">About</a>
@@ -70,7 +70,9 @@
           <span>Toggle Theme</span>
         </button>
         <a href="{{ site.github_url }}" target="_blank" class="text-base {{ site.style.navbar_link }} inline-flex items-center space-x-2" rel="noopener">
-          {% include icons/github.svg %}
+          <div class="w-5 h-5">
+            {% include icons/github.svg %}
+          </div>
           <span>GitHub</span>
         </a>
         <a href="{% link about.md %}" class="text-base {{ site.style.navbar_link }}">About</a>
