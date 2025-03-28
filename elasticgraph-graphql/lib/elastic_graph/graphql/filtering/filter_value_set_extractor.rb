@@ -99,6 +99,8 @@ module ElasticGraph
             filter_value_set_for_filter_hash(filter_value, target_field_path_parts, traversed_field_path_parts + [field_or_op], negate: negate)
           when :any_of
             filter_value_set_for_any_of(filter_value, target_field_path_parts, traversed_field_path_parts, negate: negate)
+          when :all_of
+            filter_value_set_for_all_of(filter_value, target_field_path_parts, traversed_field_path_parts, negate: negate)
           when :operator
             # Check to make sure the operator applies to the target field. If not, we have no information
             # in this clause. The set is unbounded, and may have exclusions.
@@ -130,6 +132,19 @@ module ElasticGraph
           # is an `any_of` clause that does not match on the `target_field_path_parts` then the filter
           # excludes no documents on the basis of the target filter.
           map_reduce_sets(filter_hashes, :union, negate: negate) do |filter_hash|
+            filter_value_set_for_filter_hash(filter_hash, target_field_path_parts, traversed_field_path_parts, negate: negate)
+          end
+        end
+
+        # Determines the set of filter values for an `all_of` clause, which is used for ANDing multiple filters together.
+        def filter_value_set_for_all_of(filter_hashes, target_field_path_parts, traversed_field_path_parts, negate:)
+          # all_of: [] => match all values
+          if filter_hashes.empty?
+            return negate ? @empty_set : @all_values_set
+          end
+
+          # With all_of (AND), we do an intersection of subfilters
+          map_reduce_sets(filter_hashes, :intersection, negate: negate) do |filter_hash|
             filter_value_set_for_filter_hash(filter_hash, target_field_path_parts, traversed_field_path_parts, negate: negate)
           end
         end
