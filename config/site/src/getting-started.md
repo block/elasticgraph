@@ -7,7 +7,7 @@ permalink: /getting-started/
 Welcome to ElasticGraph! This guide will help you set up ElasticGraph locally, run queries using GraphiQL, and evolve an example schema.
 By the end of this tutorial, you'll have a working ElasticGraph instance running on your machine.
 
-**Estimated Time to Complete**: Approximately 10 minutes
+**Estimated Time to Complete**: 10 minutes
 
 ## Prerequisites
 
@@ -131,7 +131,8 @@ Delete the `artist` schema definition:
 
 Then define your own schema in a Ruby file under `config/schema`.
 
-* Use the [schema definition API docs](/elasticgraph/docs/main/ElasticGraph/SchemaDefinition/API.html) as a reference.
+* Use the [schema definition API docs](/elasticgraph/docs/{{ site.data.doc_versions.latest_version }}/ElasticGraph/SchemaDefinition/API.html) as a reference.
+* Use our [AI Tools]({% link guides/ai-tools.md %}) together with an LLM such as [Goose](https://block.github.io/goose/) to translate a schema from an existing format such as protocol buffers, JSON schema, or SQL.
 * Run `bundle exec rake build` and deal with any errors that are reported.
 * Hint: search the project codebase for `TODO` comments to find things that need updating.
 
@@ -142,8 +143,8 @@ Your ElasticGraph project includes a command that's designed to be run on CI:
 {% include copyable_code_snippet.html language="shell" code="bundle exec rake check" %}
 
 This should be run on every commit (ideally before merging a pull request) using a CI system
-such as [GitHub Actions](https://github.com/features/actions), [Buildkite](https://buildkite.com/),
-or [Circle CI](https://circleci.com/).
+such as [Buildkite](https://buildkite.com/), [Circle CI](https://circleci.com/),
+[GitHub Actions](https://github.com/features/actions), or [Jenkins](https://www.jenkins.io/).
 
 ### Deploy
 
