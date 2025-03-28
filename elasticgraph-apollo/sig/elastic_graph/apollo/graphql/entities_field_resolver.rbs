@@ -2,7 +2,7 @@ module ElasticGraph
   module Apollo
     module GraphQL
       class EntitiesFieldResolver
-        include ::ElasticGraph::_GraphQLResolver
+        include ::ElasticGraph::_GraphQLResolverWithLookahead
 
         private
 

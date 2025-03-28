@@ -33,7 +33,7 @@ module ElasticGraph
         end
 
         class SubAggregations < SubAggregationsSupertype
-          include _GraphQLResolvable
+          include _GraphQLResolvableWithLookahead
 
           private
 

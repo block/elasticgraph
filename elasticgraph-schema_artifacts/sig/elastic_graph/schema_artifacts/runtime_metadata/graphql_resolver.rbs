@@ -21,8 +21,11 @@ module ElasticGraph
       end
 
       class GraphQLResolver < GraphQLResolverSupertype
-        self.@extension_loader: ExtensionLoader?
-        def self.extension_loader: () -> ExtensionLoader
+        self.@with_lookahead_loader: ExtensionLoader?
+        def self.with_lookahead_loader: () -> ExtensionLoader
+
+        self.@without_lookahead_loader: ExtensionLoader?
+        def self.without_lookahead_loader: () -> ExtensionLoader
 
         NEEDS_LOOKAHEAD: "needs_lookahead"
         RESOLVER_REF: "resolver_ref"
@@ -31,14 +34,18 @@ module ElasticGraph
         def self.from_hash: (::Hash[::String, untyped]) -> GraphQLResolver
         def to_dumpable_hash: () -> ::Hash[::String, untyped]
 
-        class Interface
-          include _GraphQLResolver
+        class InterfaceWithLookahead
+          include _GraphQLResolverWithLookahead
+        end
+
+        class InterfaceWithoutLookahead
+          include _GraphQLResolverWithoutLookahead
         end
       end
     end
   end
 
-  interface _GraphQLResolvable
+  interface _GraphQLResolvableWithLookahead
     def resolve: (
       field: ElasticGraph::GraphQL::Schema::Field,
       object: untyped,
@@ -48,12 +55,30 @@ module ElasticGraph
     ) -> untyped
   end
 
-  interface _GraphQLResolver
+  interface _GraphQLResolvableWithoutLookahead
+    def resolve: (
+      field: ElasticGraph::GraphQL::Schema::Field,
+      object: untyped,
+      context: ::GraphQL::Query::Context,
+      args: ::Hash[::String, untyped]
+    ) -> untyped
+  end
+
+  interface _GraphQLResolverWithLookahead
     def initialize: (
       elasticgraph_graphql: GraphQL,
       config: ::Hash[::String, untyped]
     ) -> void
 
-    include _GraphQLResolvable
+    include _GraphQLResolvableWithLookahead
+  end
+
+  interface _GraphQLResolverWithoutLookahead
+    def initialize: (
+      elasticgraph_graphql: GraphQL,
+      config: ::Hash[::String, untyped]
+    ) -> void
+
+    include _GraphQLResolvableWithoutLookahead
   end
 end

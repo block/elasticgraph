@@ -326,10 +326,17 @@ module ElasticGraph
       #   end
       def register_graphql_resolver(name, klass, defined_at:, **resolver_config)
         extension = SchemaArtifacts::RuntimeMetadata::Extension.new(klass, defined_at, resolver_config)
-        extension.verify_against!(SchemaArtifacts::RuntimeMetadata::GraphQLResolver::Interface)
+
+        needs_lookahead =
+          if extension.verify_against(SchemaArtifacts::RuntimeMetadata::GraphQLResolver::InterfaceWithLookahead).empty?
+            true
+          else
+            extension.verify_against!(SchemaArtifacts::RuntimeMetadata::GraphQLResolver::InterfaceWithoutLookahead)
+            false
+          end
 
         resolver = SchemaArtifacts::RuntimeMetadata::GraphQLResolver.new(
-          needs_lookahead: true,
+          needs_lookahead: needs_lookahead,
           resolver_ref: extension.to_dumpable_hash
         )
 

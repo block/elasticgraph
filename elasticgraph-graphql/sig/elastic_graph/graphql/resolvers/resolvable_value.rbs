@@ -4,7 +4,7 @@ module ElasticGraph
       module ResolvableValue
         def self.new: (*Symbol) ?{ () [self: self] -> void } -> ResolvableValueClass
 
-        include _GraphQLResolvable
+        include _GraphQLResolvableWithLookahead
         attr_reader schema_element_names: SchemaArtifacts::RuntimeMetadata::SchemaElementNames
 
         private

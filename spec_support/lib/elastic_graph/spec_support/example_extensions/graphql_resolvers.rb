@@ -7,7 +7,7 @@
 # frozen_string_literal: true
 
 module ElasticGraph
-  class GraphQLResolver1
+  class GraphQLResolverWithLookahead
     def initialize(elasticgraph_graphql:, config:)
     end
 
@@ -15,11 +15,11 @@ module ElasticGraph
     end
   end
 
-  class GraphQLResolver2
+  class GraphQLResolverWithoutLookahead
     def initialize(elasticgraph_graphql:, config:)
     end
 
-    def resolve(field:, object:, args:, context:, lookahead:)
+    def resolve(field:, object:, args:, context:)
     end
   end
 
@@ -27,7 +27,7 @@ module ElasticGraph
     def initialize(elasticgraph_graphql:, config:)
     end
 
-    def resolve(field:, object:, args:, context:)
+    def resolve(field:, object:, args:)
     end
   end
 end

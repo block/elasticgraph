@@ -2,7 +2,7 @@ module ElasticGraph
   class GraphQL
     module Resolvers
       class ListRecords
-        include _GraphQLResolver
+        include _GraphQLResolverWithLookahead
       end
     end
   end

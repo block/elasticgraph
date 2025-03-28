@@ -190,8 +190,12 @@ module ElasticGraph
           Extension.new(GraphQLExtensionModule1, "support/example_extensions/graphql_extension_modules", {})
         end
 
-        def graphql_resolver1(**config)
-          Extension.new(GraphQLResolver1, "elastic_graph/spec_support/example_extensions/graphql_resolvers", config)
+        def graphql_resolver_with_lookahead(**config)
+          Extension.new(GraphQLResolverWithLookahead, "elastic_graph/spec_support/example_extensions/graphql_resolvers", config)
+        end
+
+        def graphql_resolver_without_lookahead(**config)
+          Extension.new(GraphQLResolverWithoutLookahead, "elastic_graph/spec_support/example_extensions/graphql_resolvers", config)
         end
       end
     end

@@ -416,7 +416,7 @@ module ElasticGraph
 
           before do
             # stub the `require` call that happens. If we allow it to load this file it'll mess with our reported code coverage
-            allow(SchemaArtifacts::RuntimeMetadata::GraphQLResolver.extension_loader).to receive(:require)
+            allow(SchemaArtifacts::RuntimeMetadata::GraphQLResolver.with_lookahead_loader).to receive(:require)
           end
 
           it "allows an injected resolver to resolve the custom field" do

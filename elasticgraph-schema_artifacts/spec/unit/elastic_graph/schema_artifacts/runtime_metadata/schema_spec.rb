@@ -146,7 +146,7 @@ module ElasticGraph
             graphql_resolvers_by_name: {
               resolver1: graphql_resolver_with(
                 needs_lookahead: true,
-                resolver_ref: graphql_resolver1(limit: 10).to_dumpable_hash
+                resolver_ref: graphql_resolver_with_lookahead(limit: 10).to_dumpable_hash
               )
             },
             static_script_ids_by_scoped_name: {
@@ -285,7 +285,7 @@ module ElasticGraph
               "resolver1" => {
                 "needs_lookahead" => true,
                 "resolver_ref" => {
-                  "extension_name" => "ElasticGraph::GraphQLResolver1",
+                  "extension_name" => "ElasticGraph::GraphQLResolverWithLookahead",
                   "require_path" => "elastic_graph/spec_support/example_extensions/graphql_resolvers",
                   "extension_config" => {"limit" => 10}
                 }

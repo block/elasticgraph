@@ -26,10 +26,10 @@ module ElasticGraph
         )
       end
 
-      it "includes registered custom resolvers when a field is defined that uses the resolver" do
+      it "includes a registered `needs_lookahead: true` custom resolver when a field is defined that uses the resolver" do
         result = graphql_resolvers_by_name do |schema|
           schema.register_graphql_resolver :resolver1,
-            GraphQLResolver1,
+            GraphQLResolverWithLookahead,
             defined_at: "elastic_graph/spec_support/example_extensions/graphql_resolvers",
             param: 15
 
@@ -43,7 +43,29 @@ module ElasticGraph
         expect(result.fetch(:resolver1)).to eq(
           graphql_resolver_with(
             needs_lookahead: true,
-            resolver_ref: graphql_resolver1(param: 15).to_dumpable_hash
+            resolver_ref: graphql_resolver_with_lookahead(param: 15).to_dumpable_hash
+          )
+        )
+      end
+
+      it "includes a registered `needs_lookahead: false` custom resolver when a field is defined that uses the resolver" do
+        result = graphql_resolvers_by_name do |schema|
+          schema.register_graphql_resolver :resolver1,
+            GraphQLResolverWithoutLookahead,
+            defined_at: "elastic_graph/spec_support/example_extensions/graphql_resolvers",
+            param: 15
+
+          schema.on_root_query_type do |t|
+            t.field "foo", "Int" do |f|
+              f.resolver = :resolver1
+            end
+          end
+        end
+
+        expect(result.fetch(:resolver1)).to eq(
+          graphql_resolver_with(
+            needs_lookahead: false,
+            resolver_ref: graphql_resolver_without_lookahead(param: 15).to_dumpable_hash
           )
         )
       end
@@ -108,11 +130,11 @@ module ElasticGraph
 
         graphql_resolvers_by_name(output: output) do |schema|
           schema.register_graphql_resolver :resolver1,
-            GraphQLResolver1,
+            GraphQLResolverWithLookahead,
             defined_at: "elastic_graph/spec_support/example_extensions/graphql_resolvers"
 
           schema.register_graphql_resolver :resolver2,
-            GraphQLResolver2,
+            GraphQLResolverWithoutLookahead,
             defined_at: "elastic_graph/spec_support/example_extensions/graphql_resolvers"
         end
 

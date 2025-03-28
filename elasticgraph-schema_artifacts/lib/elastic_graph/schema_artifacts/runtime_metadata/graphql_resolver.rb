@@ -12,15 +12,20 @@ module ElasticGraph
   module SchemaArtifacts
     module RuntimeMetadata
       class GraphQLResolver < ::Data.define(:needs_lookahead, :resolver_ref)
-        def self.extension_loader
-          @extension_loader ||= ExtensionLoader.new(Interface)
+        def self.with_lookahead_loader
+          @with_lookahead_loader ||= ExtensionLoader.new(InterfaceWithLookahead)
+        end
+
+        def self.without_lookahead_loader
+          @without_lookahead_loader ||= ExtensionLoader.new(InterfaceWithoutLookahead)
         end
 
         NEEDS_LOOKAHEAD = "needs_lookahead"
         RESOLVER_REF = "resolver_ref"
 
         def load_resolver
-          Extension.load_from_hash(resolver_ref, via: GraphQLResolver.extension_loader)
+          loader = needs_lookahead ? GraphQLResolver.with_lookahead_loader : GraphQLResolver.without_lookahead_loader
+          Extension.load_from_hash(resolver_ref, via: loader)
         end
 
         def self.from_hash(hash)
@@ -38,12 +43,21 @@ module ElasticGraph
           }
         end
 
-        class Interface
+        class InterfaceWithLookahead
           def initialize(elasticgraph_graphql:, config:)
             # must be defined, but nothing to do
           end
 
           def resolve(field:, object:, args:, context:, lookahead:)
+          end
+        end
+
+        class InterfaceWithoutLookahead
+          def initialize(elasticgraph_graphql:, config:)
+            # must be defined, but nothing to do
+          end
+
+          def resolve(field:, object:, args:, context:)
           end
         end
       end
