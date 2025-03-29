@@ -47,31 +47,52 @@ module ElasticGraph
                   raise Errors::SchemaError, "Resolver `#{resolver_name}` (for `#{type_name}.#{field_name}`) cannot be found."
                 end
 
-                resolver_lambda = lambda do |object, args, context|
-                  schema_field = context.fetch(:elastic_graph_schema).field_named(type_name, field_name)
+                resolver_lambda =
+                  if resolver.method(:resolve).parameters.include?([:keyreq, :lookahead])
+                    lambda do |object, args, context|
+                      schema_field = context.fetch(:elastic_graph_schema).field_named(type_name, field_name)
 
-                  # Extract the `:lookahead` extra that we have configured all fields to provide.
-                  # See https://graphql-ruby.org/api-doc/1.10.8/GraphQL/Execution/Lookahead.html for more info.
-                  # It is not a "real" arg in the schema and breaks `args_to_schema_form` when we call that
-                  # so we need to peel it off here.
-                  lookahead = args[:lookahead]
+                      # Extract the `:lookahead` extra that we have configured all fields to provide.
+                      # See https://graphql-ruby.org/api-doc/1.10.8/GraphQL/Execution/Lookahead.html for more info.
+                      # It is not a "real" arg in the schema and breaks `args_to_schema_form` when we call that
+                      # so we need to peel it off here.
+                      lookahead = args[:lookahead]
 
-                  # Convert args to the form they were defined in the schema, undoing the normalization
-                  # the GraphQL gem does to convert them to Ruby keyword args form.
-                  args = schema_field.args_to_schema_form(args.except(:lookahead))
+                      # Convert args to the form they were defined in the schema, undoing the normalization
+                      # the GraphQL gem does to convert them to Ruby keyword args form.
+                      args = schema_field.args_to_schema_form(args.except(:lookahead))
 
-                  result = resolver.resolve(field: schema_field, object: object, args: args, context: context, lookahead: lookahead) do
-                    @query_adapter.build_query_from(field: schema_field, args: args, lookahead: lookahead, context: context)
+                      result = resolver.resolve(field: schema_field, object: object, args: args, context: context, lookahead: lookahead) do
+                        @query_adapter.build_query_from(field: schema_field, args: args, lookahead: lookahead, context: context)
+                      end
+
+                      # Give the field a chance to coerce the result before returning it. Initially, this is only used to deal with
+                      # enum value overrides (e.g. so that if `DayOfWeek.MONDAY` has been overridden to `DayOfWeek.MON`, we can coerce
+                      # a `MONDAY` value being returned by a painless script to `MON`), but this is designed to be general purpose
+                      # and we may use it for other coercions in the future.
+                      #
+                      # Note that coercion of scalar values is handled by the `coerce_result` callback below.
+                      schema_field.coerce_result(result)
+                    end
+                  else
+                    lambda do |object, args, context|
+                      schema_field = context.fetch(:elastic_graph_schema).field_named(type_name, field_name)
+                      # Convert args to the form they were defined in the schema, undoing the normalization
+                      # the GraphQL gem does to convert them to Ruby keyword args form.
+                      # TODO: remove lookahead once we're no longer settings `extras([:lookahead])` on these fields.
+                      args = schema_field.args_to_schema_form(args.except(:lookahead))
+
+                      result = resolver.resolve(field: schema_field, object: object, args: args, context: context)
+
+                      # Give the field a chance to coerce the result before returning it. Initially, this is only used to deal with
+                      # enum value overrides (e.g. so that if `DayOfWeek.MONDAY` has been overridden to `DayOfWeek.MON`, we can coerce
+                      # a `MONDAY` value being returned by a painless script to `MON`), but this is designed to be general purpose
+                      # and we may use it for other coercions in the future.
+                      #
+                      # Note that coercion of scalar values is handled by the `coerce_result` callback below.
+                      schema_field.coerce_result(result)
+                    end
                   end
-
-                  # Give the field a chance to coerce the result before returning it. Initially, this is only used to deal with
-                  # enum value overrides (e.g. so that if `DayOfWeek.MONDAY` has been overridden to `DayOfWeek.MON`, we can coerce
-                  # a `MONDAY` value being returned by a painless script to `MON`), but this is designed to be general purpose
-                  # and we may use it for other coercions in the future.
-                  #
-                  # Note that coercion of scalar values is handled by the `coerce_result` callback below.
-                  schema_field.coerce_result(result)
-                end
 
                 [field_name, resolver_lambda]
               end

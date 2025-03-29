@@ -22,7 +22,8 @@ module ElasticGraph
           :get_record_field_value,
           :list_records,
           :nested_relationships,
-          :object
+          :object_with_lookahead,
+          :object_without_lookahead
         )
       end
 
@@ -120,7 +121,8 @@ module ElasticGraph
               - :get_record_field_value
               - :list_records
               - :nested_relationships
-              - :object
+              - :object_with_lookahead
+              - :object_without_lookahead
           EOS
         end
       end

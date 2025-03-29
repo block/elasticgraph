@@ -2,7 +2,7 @@ module ElasticGraph
   module Apollo
     module GraphQL
       class ServiceFieldResolver
-        include ::ElasticGraph::_GraphQLResolverWithLookahead
+        include ::ElasticGraph::_GraphQLResolverWithoutLookahead
 
         private
 

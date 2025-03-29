@@ -375,7 +375,7 @@ module ElasticGraph
               def initialize(elasticgraph_graphql:, config:)
               end
 
-              def resolve(field:, object:, args:, context:, lookahead:)
+              def resolve(field:, object:, args:, context:)
                 [
                   args.dig("operands", "x"),
                   args.dig("operands", "y"),
@@ -416,7 +416,7 @@ module ElasticGraph
 
           before do
             # stub the `require` call that happens. If we allow it to load this file it'll mess with our reported code coverage
-            allow(SchemaArtifacts::RuntimeMetadata::GraphQLResolver.with_lookahead_loader).to receive(:require)
+            allow(SchemaArtifacts::RuntimeMetadata::GraphQLResolver.without_lookahead_loader).to receive(:require)
           end
 
           it "allows an injected resolver to resolve the custom field" do

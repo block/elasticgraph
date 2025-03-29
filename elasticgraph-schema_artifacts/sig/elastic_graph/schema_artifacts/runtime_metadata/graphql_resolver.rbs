@@ -52,7 +52,7 @@ module ElasticGraph
       context: ::GraphQL::Query::Context,
       args: ::Hash[::String, untyped],
       lookahead: ::GraphQL::Execution::Lookahead
-    ) -> untyped
+    ) { () -> ElasticGraph::GraphQL::DatastoreQuery } -> untyped
   end
 
   interface _GraphQLResolvableWithoutLookahead

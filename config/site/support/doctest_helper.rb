@@ -10,6 +10,7 @@ require "elastic_graph/apollo/schema_definition/api_extension"
 require "elastic_graph/schema_artifacts/runtime_metadata/schema_element_names"
 require "elastic_graph/schema_definition/api"
 require "elastic_graph/schema_definition/schema_artifact_manager"
+require "rspec/mocks"
 require "tmpdir"
 
 module ElasticGraph
@@ -20,6 +21,7 @@ module ElasticGraph
     # to implicitly rely on the surrounding file system state, and allows doc test to interactive
     # with the file system as needed without worrying about it corrupting our local file system.
     doctest.before do
+      ::RSpec::Mocks.setup
       @original_pwd = ::Dir.pwd
       @tmp_dir = ::Dir.mktmpdir
       @original_load_path = $LOAD_PATH.dup
@@ -27,6 +29,7 @@ module ElasticGraph
     end
 
     doctest.after do
+      ::RSpec::Mocks.teardown
       $LOAD_PATH.replace(@original_load_path)
       ::Dir.chdir(@original_pwd)
       ::FileUtils.rm_rf(@tmp_dir)
@@ -111,9 +114,25 @@ module ElasticGraph
       EOS
     end
 
-    doctest.before "ElasticGraph::SchemaDefinition::API#register_graphql_resolver" do
+    doctest.before "ElasticGraph::SchemaDefinition::API#register_graphql_resolver@Register a custom resolver for use by a custom `Query` field" do
+      # The validation performed on the resolver attempts to read the `source_location` of methods of the resolver, but
+      # in this context, `eval` is being used and the file doesn't exist! So we have to stub it out here.
+      extend ::RSpec::Mocks::ExampleMethods
+      allow(::File).to receive(:read).and_wrap_original do |original, file_name|
+        if file_name.include?("(eval at")
+          ([file_name] * 10).join("\n")
+        else
+          original.call(file_name)
+        end
+      end
+
       $LOAD_PATH << ::Dir.pwd
       ::File.write("add_resolver.rb", "")
+    end
+
+    doctest.before "ElasticGraph::SchemaDefinition::API#register_graphql_resolver@Register a custom resolver that uses lookahead" do
+      $LOAD_PATH << ::Dir.pwd
+      ::File.write("artist_resolver.rb", "")
     end
 
     [

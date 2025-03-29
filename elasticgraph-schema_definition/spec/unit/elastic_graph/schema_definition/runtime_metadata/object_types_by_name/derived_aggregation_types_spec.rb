@@ -61,7 +61,7 @@ module ElasticGraph
           "description" => graphql_field_with(
             name_in_index: "description_index",
             relation: nil,
-            resolver: :object
+            resolver: :object_with_lookahead
           )
         })
       end
@@ -79,12 +79,12 @@ module ElasticGraph
           "cost" => graphql_field_with(
             name_in_index: "cost_index",
             relation: nil,
-            resolver: :object
+            resolver: :object_with_lookahead
           ),
           "id" => graphql_field_with(
             name_in_index: "id",
             relation: nil,
-            resolver: :object
+            resolver: :object_with_lookahead
           )
         })
       end
@@ -113,11 +113,11 @@ module ElasticGraph
         end
 
         expect(team_sub_aggs.graphql_fields_by_name).to eq({
-          "collections" => graphql_field_with(name_in_index: "collections_in_index", resolver: :object)
+          "collections" => graphql_field_with(name_in_index: "collections_in_index", resolver: :object_with_lookahead)
         })
 
         expect(team_collections_sub_aggs.graphql_fields_by_name).to eq({
-          "players" => graphql_field_with(name_in_index: "the_players", resolver: :object)
+          "players" => graphql_field_with(name_in_index: "the_players", resolver: :object_with_lookahead)
         })
       end
     end

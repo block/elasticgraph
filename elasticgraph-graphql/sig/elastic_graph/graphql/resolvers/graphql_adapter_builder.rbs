@@ -1,16 +1,18 @@
 module ElasticGraph
   class GraphQL
+    type resolver = _GraphQLResolverWithLookahead | _GraphQLResolverWithoutLookahead
+
     module Resolvers
       type graphQLAdapter = ::Hash[::String, untyped]
 
       class GraphQLAdapterBuilder
         @runtime_metadata: SchemaArtifacts::RuntimeMetadata::Schema
-        @named_resolvers: ::Hash[::Symbol, _GraphQLResolverWithLookahead]
+        @named_resolvers: ::Hash[::Symbol, resolver]
         @query_adapter: QueryAdapter
 
         def initialize: (
           runtime_metadata: SchemaArtifacts::RuntimeMetadata::Schema,
-          named_resolvers: ::Hash[::Symbol, _GraphQLResolverWithLookahead],
+          named_resolvers: ::Hash[::Symbol, resolver],
           query_adapter: QueryAdapter
         ) -> void
 

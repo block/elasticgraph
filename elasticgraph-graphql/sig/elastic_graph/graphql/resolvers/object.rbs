@@ -1,8 +1,14 @@
 module ElasticGraph
   class GraphQL
     module Resolvers
-      class Object
-        include _GraphQLResolverWithLookahead
+      module Object
+        class WithLookahead
+          include _GraphQLResolverWithLookahead
+        end
+
+        class WithoutLookahead
+          include _GraphQLResolverWithoutLookahead
+        end
       end
     end
   end

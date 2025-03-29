@@ -306,7 +306,7 @@ module ElasticGraph
       #     def initialize(elasticgraph_graphql:, config:)
       #     end
       #
-      #     def resolve(field:, object:, args:, context:, lookahead:)
+      #     def resolve(field:, object:, args:, context:)
       #       args.fetch("x") + args.fetch("y")
       #     end
       #   end
@@ -321,6 +321,39 @@ module ElasticGraph
       #         f.argument "x", "Int!"
       #         f.argument "y", "Int!"
       #         f.resolver = :add
+      #       end
+      #     end
+      #   end
+      #
+      # @example Register a custom resolver that uses lookahead
+      #
+      #   # In `artist_resolver.rb`:
+      #   class ArtistResolver
+      #     def initialize(elasticgraph_graphql:, config:)
+      #     end
+      #
+      #     def resolve(field:, object:, args:, context:, lookahead:)
+      #       # The extra `lookahead` argument can be used to see what child fields are selected.
+      #       # See https://graphql-ruby.org/queries/lookahead.html for details.
+      #       #
+      #       # Note: there is overhead involved in providing the `lookahead`, so it's best to not
+      #       # request it (by defining it as one of the `resolve` arguments) unless it's really needed.
+      #     end
+      #   end
+      #
+      #   # In `config/schema.rb`:
+      #   ElasticGraph.define_schema do |schema|
+      #     require(resolver_path = "artist_resolver")
+      #     schema.register_graphql_resolver :artist, ArtistResolver, defined_at: resolver_path
+      #
+      #     schema.object_type "Artist" do |t|
+      #       t.field "name", "String"
+      #       # ...
+      #     end
+      #
+      #     schema.on_root_query_type do |t|
+      #       t.field "artist", "Artist" do |f|
+      #         f.resolver = :artist
       #       end
       #     end
       #   end

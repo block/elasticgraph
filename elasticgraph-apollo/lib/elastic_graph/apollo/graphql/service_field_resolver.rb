@@ -17,7 +17,7 @@ module ElasticGraph
           # Nothing to initialize, but needs to be defined to satisfy the resolver interface.
         end
 
-        def resolve(field:, object:, args:, context:, lookahead:)
+        def resolve(field:, object:, args:, context:)
           {"sdl" => service_sdl(context.fetch(:elastic_graph_schema).graphql_schema)}
         end
 

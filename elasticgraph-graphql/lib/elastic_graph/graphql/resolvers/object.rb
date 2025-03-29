@@ -9,14 +9,26 @@
 module ElasticGraph
   class GraphQL
     module Resolvers
-      # Resolver which just delegates to `object` for resolving.
-      class Object
-        def initialize(elasticgraph_graphql:, config:)
-          # Nothing to initialize, but needs to be defined to satisfy the resolver interface.
+      # Resolvers which just delegates to `object` for resolving.
+      module Object
+        class WithLookahead
+          def initialize(elasticgraph_graphql:, config:)
+            # Nothing to initialize, but needs to be defined to satisfy the resolver interface.
+          end
+
+          def resolve(field:, object:, args:, context:, lookahead:)
+            object.resolve(field: field, object: object, args: args, context: context, lookahead: lookahead)
+          end
         end
 
-        def resolve(field:, object:, args:, context:, lookahead:)
-          object.resolve(field: field, object: object, args: args, context: context, lookahead: lookahead)
+        class WithoutLookahead
+          def initialize(elasticgraph_graphql:, config:)
+            # Nothing to initialize, but needs to be defined to satisfy the resolver interface.
+          end
+
+          def resolve(field:, object:, args:, context:)
+            object.resolve(field: field, object: object, args: args, context: context)
+          end
         end
       end
     end

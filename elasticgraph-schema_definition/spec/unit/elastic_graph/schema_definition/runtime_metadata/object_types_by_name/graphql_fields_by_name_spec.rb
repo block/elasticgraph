@@ -26,7 +26,7 @@ module ElasticGraph
             end
 
             t.field "title", "String" do |f|
-              f.resolver = :object
+              f.resolver = :object_without_lookahead
             end
           end
         end
@@ -35,7 +35,7 @@ module ElasticGraph
           "id" => graphql_field_with(name_in_index: "id", resolver: :list_records),
           "description" => graphql_field_with(name_in_index: "description", resolver: :list_records),
           "name" => graphql_field_with(name_in_index: "name", resolver: :get_record_field_value),
-          "title" => graphql_field_with(name_in_index: "title", resolver: :object)
+          "title" => graphql_field_with(name_in_index: "title", resolver: :object_without_lookahead)
         })
       end
 

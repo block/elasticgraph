@@ -19,7 +19,7 @@ module ElasticGraph
           @schema_element_names = elasticgraph_graphql.runtime_metadata.schema_element_names
         end
 
-        def resolve(field:, object:, args:, context:, lookahead:)
+        def resolve(field:, object:, args:, context:)
           data =
             case object
             when DatastoreResponse::Document
