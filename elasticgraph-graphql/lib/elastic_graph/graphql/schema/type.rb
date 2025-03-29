@@ -24,7 +24,8 @@ module ElasticGraph
           graphql_type,
           index_definitions,
           object_runtime_metadata,
-          enum_runtime_metadata
+          enum_runtime_metadata,
+          resolvers_needing_lookahead
         )
           @schema = schema
           @graphql_type = graphql_type
@@ -37,6 +38,7 @@ module ElasticGraph
           @elasticgraph_category = object_runtime_metadata&.elasticgraph_category
           @graphql_only_return_type = object_runtime_metadata&.graphql_only_return_type
           @enum_runtime_metadata = enum_runtime_metadata
+          @resolvers_needing_lookahead = resolvers_needing_lookahead
           @enum_value_names_by_original_name = (enum_runtime_metadata&.values_by_name || {}).to_h do |name, value|
             [value.alternate_original_name || name, name]
           end
@@ -250,7 +252,13 @@ module ElasticGraph
           # Eagerly fan out and instantiate all `Field` objects so that the :extras
           # get added to each field as require before we execute the first query
           fields_hash.each_with_object({}) do |(name, field), hash|
-            hash[name] = Field.new(schema, self, field, @object_runtime_metadata&.graphql_fields_by_name&.dig(name))
+            hash[name] = Field.new(
+              schema,
+              self,
+              field,
+              @object_runtime_metadata&.graphql_fields_by_name&.dig(name),
+              @resolvers_needing_lookahead
+            )
           end
         end
 

@@ -20,7 +20,7 @@ module ElasticGraph
 
         attr_reader :schema, :schema_element_names, :graphql_field, :name_in_index, :relation, :computation_detail, :resolver
 
-        def initialize(schema, parent_type, graphql_field, runtime_metadata)
+        def initialize(schema, parent_type, graphql_field, runtime_metadata, resolvers_needing_lookahead)
           @schema = schema
           @schema_element_names = schema.element_names
           @parent_type = parent_type
@@ -29,27 +29,7 @@ module ElasticGraph
           @computation_detail = runtime_metadata&.computation_detail
           @resolver = runtime_metadata&.resolver
           @name_in_index = runtime_metadata&.name_in_index || name
-
-          # Adds the :extras required by ElasticGraph. For now, this blindly adds `:lookahead`
-          # to each field so that we have access to what the child selections are, as described here:
-          #
-          # https://graphql-ruby.org/queries/lookahead
-          #
-          # Currently we only need this when building an `DatastoreQuery` (which is not done for all
-          # fields) so a future optimization may only add this to fields where we actually need it.
-          # For now we add it to all fields because it's simplest and it's not clear if there is
-          # any performance benefit to not adding it when we do not use it.
-          #
-          # Note: input fields do not respond to `extras`, which is why we do it conditionally here.
-          #
-          # Note: on GraphQL gem introspection types (e.g. `__Field`), the fields respond to `:extras`,
-          # but that later causes a weird error (`ArgumentError: unknown keyword: :lookahead`)
-          # when those types are accessed in a Query. We don't really want to mutate the fields on the
-          # built-in types by adding `:lookahead` so it's best to avoid setting that extra on the built
-          # in types.
-          if @graphql_field.respond_to?(:extras) && !BUILT_IN_TYPE_NAMES.include?(parent_type.name)
-            @graphql_field.extras([:lookahead])
-          end
+          @graphql_field.extras([:lookahead]) if resolvers_needing_lookahead.include?(@resolver)
         end
 
         def type
