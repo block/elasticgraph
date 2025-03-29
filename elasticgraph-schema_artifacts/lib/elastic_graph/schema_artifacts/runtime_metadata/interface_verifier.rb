@@ -22,9 +22,18 @@ module ElasticGraph
       # called. But this verifies the interface to the extent that we can.
       module InterfaceVerifier
         class << self
+          def verify!(extension, against:, constant_name:)
+            problems = verify(extension, against:, constant_name:)
+
+            if problems.any?
+              raise Errors::InvalidExtensionError,
+                "Extension `#{constant_name}` does not implement the expected interface correctly. Problems:\n\n" \
+                "#{problems.join("\n")}"
+            end
+          end
+
           def verify(extension, against:, constant_name:)
-            # @type var problems: ::Array[::String]
-            problems = []
+            problems = [] # : ::Array[::String]
             problems.concat(verify_methods("class", extension.singleton_class, against.singleton_class))
 
             if extension.is_a?(::Module)
@@ -39,11 +48,7 @@ module ElasticGraph
               problems << "- Is not a class or module as expected"
             end
 
-            if problems.any?
-              raise Errors::InvalidExtensionError,
-                "Extension `#{constant_name}` does not implement the expected interface correctly. Problems:\n\n" \
-                "#{problems.join("\n")}"
-            end
+            problems
           end
 
           private

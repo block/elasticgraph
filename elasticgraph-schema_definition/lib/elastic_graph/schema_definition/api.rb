@@ -326,7 +326,7 @@ module ElasticGraph
       #   end
       def register_graphql_resolver(name, klass, defined_at:, **resolver_config)
         resolver = SchemaArtifacts::RuntimeMetadata::Extension.new(klass, defined_at, resolver_config)
-        resolver.verify_against(GraphQL::Resolvers::Interface)
+        resolver.verify_against!(GraphQL::Resolvers::Interface)
         @state.graphql_resolvers_by_name[name] = resolver
         nil
       end

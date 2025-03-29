@@ -45,6 +45,10 @@ module ElasticGraph
           }.reject { |_, v| v.empty? }
         end
 
+        def verify_against!(interface_def)
+          InterfaceVerifier.verify!(extension_class, against: interface_def, constant_name: extension_name)
+        end
+
         def verify_against(interface_def)
           InterfaceVerifier.verify(extension_class, against: interface_def, constant_name: extension_name)
         end

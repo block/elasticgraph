@@ -45,7 +45,7 @@ module ElasticGraph
           require require_path
           extension_class = ::Object.const_get(constant_name)
           Extension.new(extension_class, require_path, {}, constant_name.delete_prefix("::")).tap do |ext|
-            ext.verify_against(@interface_def)
+            ext.verify_against!(@interface_def)
           end
         end
       end

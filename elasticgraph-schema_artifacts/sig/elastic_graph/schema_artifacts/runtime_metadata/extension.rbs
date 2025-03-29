@@ -39,7 +39,8 @@ module ElasticGraph
         def self.load_from_hash: (::Hash[::String, untyped], via: ExtensionLoader) -> Extension
         def to_dumpable_hash: () -> ::Hash[::String, untyped]
 
-        def verify_against: (extensionClass) -> void
+        def verify_against!: (extensionClass) -> void
+        def verify_against: (extensionClass) -> ::Array[::String]
       end
     end
   end

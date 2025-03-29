@@ -17,13 +17,13 @@ module ElasticGraph
 
         it "allows a valid implementation" do
           expect {
-            verify("ElasticGraph::Extensions::Valid", from: "support/example_extensions/valid")
+            verify!("ElasticGraph::Extensions::Valid", from: "support/example_extensions/valid")
           }.not_to raise_error
         end
 
         it "verifies the extension matches the interface definition, notifying of missing instance methods" do
           expect {
-            verify("ElasticGraph::Extensions::MissingInstanceMethod", from: "support/example_extensions/missing_instance_method")
+            verify!("ElasticGraph::Extensions::MissingInstanceMethod", from: "support/example_extensions/missing_instance_method")
           }.to raise_error Errors::InvalidExtensionError, a_string_including(
             "ElasticGraph::Extensions::MissingInstanceMethod",
             "Missing instance methods", "instance_method1"
@@ -32,7 +32,7 @@ module ElasticGraph
 
         it "verifies the extension matches the interface definition, notifying of missing class methods" do
           expect {
-            verify("ElasticGraph::Extensions::MissingClassMethod", from: "support/example_extensions/missing_class_method")
+            verify!("ElasticGraph::Extensions::MissingClassMethod", from: "support/example_extensions/missing_class_method")
           }.to raise_error Errors::InvalidExtensionError, a_string_including(
             "ElasticGraph::Extensions::MissingClassMethod",
             "Missing class methods", "class_method"
@@ -41,7 +41,7 @@ module ElasticGraph
 
         it "verifies the extension matches the interface definition, notifying of argument mis-matches" do
           expect {
-            verify("ElasticGraph::Extensions::ArgsMismatch", from: "support/example_extensions/args_mismatch")
+            verify!("ElasticGraph::Extensions::ArgsMismatch", from: "support/example_extensions/args_mismatch")
           }.to raise_error Errors::InvalidExtensionError, a_string_including(
             "ElasticGraph::Extensions::ArgsMismatch",
             "Method signature", "def self.class_method", "def instance_method1", "def instance_method2"
@@ -50,7 +50,7 @@ module ElasticGraph
 
         it "verifies that the extension is a class or module" do
           expect {
-            verify("ElasticGraph::Extensions::NotAClassOrModule", from: "support/example_extensions/not_a_class_or_module")
+            verify!("ElasticGraph::Extensions::NotAClassOrModule", from: "support/example_extensions/not_a_class_or_module")
           }.to raise_error Errors::InvalidExtensionError, a_string_including(
             "ElasticGraph::Extensions::NotAClassOrModule", "not a class or module"
           ).and(excluding("class_method", "instance_method1", "instance_method2"))
@@ -58,7 +58,7 @@ module ElasticGraph
 
         it "verifies that the extension name matches the provided name" do
           expect {
-            verify("ElasticGraph::Extensions::NameMismatch", from: "support/example_extensions/name_mismatch")
+            verify!("ElasticGraph::Extensions::NameMismatch", from: "support/example_extensions/name_mismatch")
           }.to raise_error Errors::InvalidExtensionError, a_string_including(
             "ElasticGraph::Extensions::NameMismatch",
             "differs from the provided extension name",
@@ -68,8 +68,24 @@ module ElasticGraph
 
         it "ignores extra methods defined on the extension beyond what the interface requires" do
           expect {
-            verify("ElasticGraph::Extensions::AdditionalMethods", from: "support/example_extensions/additional_methods")
+            verify!("ElasticGraph::Extensions::AdditionalMethods", from: "support/example_extensions/additional_methods")
           }.not_to raise_error
+        end
+
+        it "offers `verify` as an alternative to `verify!` which returns problems instead of raising an error" do
+          expect {
+            verify!("ElasticGraph::Extensions::Valid", from: "support/example_extensions/valid")
+          }.not_to raise_error
+          expect(
+            verify("ElasticGraph::Extensions::Valid", from: "support/example_extensions/valid")
+          ).to be_empty
+
+          expect {
+            verify!("ElasticGraph::Extensions::ArgsMismatch", from: "support/example_extensions/args_mismatch")
+          }.to raise_error Errors::InvalidExtensionError
+          expect(
+            verify("ElasticGraph::Extensions::ArgsMismatch", from: "support/example_extensions/args_mismatch")
+          ).not_to be_empty
         end
 
         context "with an instantiable extension interface" do
@@ -77,7 +93,7 @@ module ElasticGraph
 
           it "raises an exception if the extension is missing the required `initialize` method" do
             expect {
-              verify("ElasticGraph::Extensions::InitializeMissing", from: "support/example_extensions/initialize_missing")
+              verify!("ElasticGraph::Extensions::InitializeMissing", from: "support/example_extensions/initialize_missing")
             }.to raise_error Errors::InvalidExtensionError, a_string_including(
               "ElasticGraph::Extensions::InitializeMissing",
               "Missing instance methods: `initialize`"
@@ -86,7 +102,7 @@ module ElasticGraph
 
           it "raises an exception if the extension's `initialize` accepts different arguments" do
             expect {
-              verify("ElasticGraph::Extensions::InitializeDoesntMatch", from: "support/example_extensions/initialize_doesnt_match")
+              verify!("ElasticGraph::Extensions::InitializeDoesntMatch", from: "support/example_extensions/initialize_doesnt_match")
             }.to raise_error Errors::InvalidExtensionError, a_string_including(
               "ElasticGraph::Extensions::InitializeDoesntMatch",
               "Method signature for instance method `initialize` (`def initialize(some_arg:, another_arg:)`) does not match interface (`def initialize(some_arg:)`)"
@@ -95,9 +111,15 @@ module ElasticGraph
 
           it "allows a valid implementation" do
             expect {
-              verify("ElasticGraph::Extensions::ValidInstantiable", from: "support/example_extensions/valid_instantiable")
+              verify!("ElasticGraph::Extensions::ValidInstantiable", from: "support/example_extensions/valid_instantiable")
             }.not_to raise_error
           end
+        end
+
+        def verify!(constant_name, from:)
+          require from
+          extension = ::Object.const_get(constant_name)
+          InterfaceVerifier.verify!(extension, against: interface_def, constant_name: constant_name)
         end
 
         def verify(constant_name, from:)

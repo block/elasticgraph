@@ -2,7 +2,8 @@ module ElasticGraph
   module SchemaArtifacts
     module RuntimeMetadata
       module InterfaceVerifier
-        def self.verify: (extensionClass, against: extensionClass, constant_name: ::String) -> void
+        def self.verify!: (extensionClass, against: extensionClass, constant_name: ::String) -> void
+        def self.verify: (extensionClass, against: extensionClass, constant_name: ::String) -> ::Array[::String]
 
         private
 

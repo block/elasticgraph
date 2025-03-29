@@ -40,8 +40,11 @@ module ElasticGraph
           )
 
           expect {
-            valid_extension.verify_against(ExampleInterfaceDef)
+            valid_extension.verify_against!(ExampleInterfaceDef)
           }.not_to raise_error
+          expect(
+            valid_extension.verify_against(ExampleInterfaceDef)
+          ).to be_empty
 
           invalid_extension = Extension.new(
             extension_class: Extensions::MissingInstanceMethod,
@@ -50,8 +53,11 @@ module ElasticGraph
           )
 
           expect {
-            invalid_extension.verify_against(ExampleInterfaceDef)
+            invalid_extension.verify_against!(ExampleInterfaceDef)
           }.to raise_error Errors::InvalidExtensionError, a_string_including("instance_method1")
+          expect(
+            invalid_extension.verify_against(ExampleInterfaceDef)
+          ).to include(a_string_including("instance_method1"))
         end
       end
 
