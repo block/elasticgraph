@@ -79,8 +79,7 @@ module ElasticGraph
                       schema_field = context.fetch(:elastic_graph_schema).field_named(type_name, field_name)
                       # Convert args to the form they were defined in the schema, undoing the normalization
                       # the GraphQL gem does to convert them to Ruby keyword args form.
-                      # TODO: remove lookahead once we're no longer settings `extras([:lookahead])` on these fields.
-                      args = schema_field.args_to_schema_form(args.except(:lookahead))
+                      args = schema_field.args_to_schema_form(args)
 
                       result = resolver.resolve(field: schema_field, object: object, args: args, context: context)
 

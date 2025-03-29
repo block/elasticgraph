@@ -39,6 +39,9 @@ module ElasticGraph
         @element_names = runtime_metadata.schema_element_names
         @config = config
         @runtime_metadata = runtime_metadata
+        resolvers_needing_lookahead = runtime_metadata.graphql_resolvers_by_name.filter_map do |name, resolver|
+          name if resolver.needs_lookahead
+        end.to_set
 
         @types_by_graphql_type = Hash.new do |hash, key|
           hash[key] = Type.new(
@@ -46,7 +49,8 @@ module ElasticGraph
             key,
             index_definitions_by_graphql_type[key.graphql_name] || [],
             runtime_metadata.object_types_by_name[key.graphql_name],
-            runtime_metadata.enum_types_by_name[key.graphql_name]
+            runtime_metadata.enum_types_by_name[key.graphql_name],
+            resolvers_needing_lookahead
           )
         end
 
