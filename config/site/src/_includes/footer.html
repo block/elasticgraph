@@ -19,7 +19,7 @@
         </p>
         <p class="text-gray-700 dark:text-gray-300">
           Join our community and contribute on
-          <a href="{{ site.github_url }}" class="{{ site.style.link }} inline-flex items-center gap-1.25" rel="noopener">
+          <a href="{{ site.github_url }}" class="{{ site.style.link }} inline-flex items-center gap-1.25">
             GitHub
             <span class="w-4 h-4">
               {% include icons/github.svg %}
@@ -44,7 +44,7 @@
         <h4 class="text-lg font-semibold mb-4">Community</h4>
         <ul class="space-y-3" role="list">
           <li>
-            <a href="{{ site.github_url }}" class="{{ site.style.link }} inline-flex items-center gap-1.25" rel="noopener">
+            <a href="{{ site.github_url }}" class="{{ site.style.link }} inline-flex items-center gap-1.25">
               <span class="w-4 h-4">
                 {% include icons/github.svg %}
               </span>
@@ -52,13 +52,13 @@
             </a>
           </li>
           <li>
-            <a href="{{ site.discord_url }}" class="{{ site.style.link }} inline-flex items-center gap-1.25" rel="noopener">
+            <a href="{{ site.discord_url }}" class="{{ site.style.link }} inline-flex items-center gap-1.25">
               {% include icons/discord.svg %}
               <span>Discord</span>
             </a>
           </li>
           <li>
-            <a href="{{ site.github_url }}/discussions" class="{{ site.style.link }} inline-flex items-center gap-1.25" rel="noopener">
+            <a href="{{ site.github_url }}/discussions" class="{{ site.style.link }} inline-flex items-center gap-1.25">
               {% include icons/discussions.svg %}
               <span>Discussions</span>
             </a>
@@ -79,8 +79,7 @@
         <div class="flex items-center gap-4">
           {% if page.path %}
           <a href="{{ site.github_url }}/edit/main/config/site/src/{{ page.path }}"
-             class="{{ site.style.link }} inline-flex items-center gap-1.25"
-             rel="noopener">
+             class="{{ site.style.link }} inline-flex items-center gap-1.25">
             <span class="w-4 h-4">
               {% include icons/github.svg %}
             </span> 

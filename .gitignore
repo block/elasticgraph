@@ -65,6 +65,7 @@ config/site/doc/
 # Ignore Jekyll generated site artifacts
 config/site/_site
 config/site/src/api-docs
+config/site/src/config/site
 config/site/src/_data/*_queries.yaml
 config/site/src/_data/content.yaml
 config/site/.jekyll-metadata
