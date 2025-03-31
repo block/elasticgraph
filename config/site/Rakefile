@@ -17,11 +17,11 @@ module ElasticGraph
     SITE_CONFIG_DIR = ::Pathname.new(__dir__)
     REPO_ROOT = SITE_CONFIG_DIR.parent.parent
     SITE_SOURCE_DIR = SITE_CONFIG_DIR / "src"
-    DOCS_DIR = SITE_SOURCE_DIR / "docs"
-    ARCHIVED_DOCS_DIR = SITE_CONFIG_DIR / "archived_docs"
-    YARD_OUTPUT_DIR = DOCS_DIR / "main"
+    API_DOCS_DIR = SITE_SOURCE_DIR / "api-docs"
+    ARCHIVED_API_DOCS_DIR = SITE_CONFIG_DIR / "archived_docs"
+    YARD_OUTPUT_DIR = API_DOCS_DIR / "main"
     JEKYLL_SITE_DIR = SITE_CONFIG_DIR / "_site"
-    JEKYLL_DOCS_DIR = JEKYLL_SITE_DIR / "docs"
+    JEKYLL_API_DOCS_DIR = JEKYLL_SITE_DIR / "api-docs"
     JEKYLL_DATA_DIR = SITE_SOURCE_DIR / "_data"
     EXAMPLE_SCHEMA_FILES_BY_NAME = SITE_CONFIG_DIR.glob("examples/*/schema.rb").to_h do |file|
       [file.parent.basename.to_s, file]
@@ -140,7 +140,7 @@ module ElasticGraph
 
           extractor = ContentExtractor.new(
             jekyll_site_dir: JEKYLL_SITE_DIR,
-            docs_dir: DOCS_DIR
+            api_docs_dir: API_DOCS_DIR
           )
 
           content = extractor.extract_content
@@ -160,9 +160,9 @@ module ElasticGraph
           abort "Version argument is required (e.g., rake site:archive_docs[1.0.0])" unless args[:version]
 
           archive_name = "v#{args[:version]}.tar.gz"
-          archive_path = ARCHIVED_DOCS_DIR / archive_name
+          archive_path = ARCHIVED_API_DOCS_DIR / archive_name
 
-          FileUtils.mkdir_p(ARCHIVED_DOCS_DIR)
+          FileUtils.mkdir_p(ARCHIVED_API_DOCS_DIR)
 
           Dir.chdir(YARD_OUTPUT_DIR) do
             # --no-xattrs is necessary to ensure that apple-specific attributes are excluded from the archive.
@@ -174,14 +174,14 @@ module ElasticGraph
           puts "Documentation archive created at: #{archive_path}"
         end
 
-        desc "Unpack all documentation archives into src/docs"
+        desc "Unpack all documentation archives into src/api-docs"
         task :unpack_doc_archives do
           # Clean the docs directory
-          FileUtils.rm_rf(DOCS_DIR)
+          FileUtils.rm_rf(API_DOCS_DIR)
 
-          Dir.glob(ARCHIVED_DOCS_DIR / "*.tar.gz").sort.each do |archive|
+          Dir.glob(ARCHIVED_API_DOCS_DIR / "*.tar.gz").sort.each do |archive|
             version_name = File.basename(archive, ".tar.gz")
-            target_dir = DOCS_DIR / version_name
+            target_dir = API_DOCS_DIR / version_name
 
             # Remove existing directory if it exists
             FileUtils.rm_rf(target_dir)
@@ -268,7 +268,7 @@ module ElasticGraph
           run_html_proofer.call(
             JEKYLL_SITE_DIR,
             # We are not in control of the generated YARD docs, and need to check them with more relaxed settings.
-            ignore_files: [/#{JEKYLL_DOCS_DIR}/o],
+            ignore_files: [%r{#{JEKYLL_API_DOCS_DIR}/.+/}o],
             # Needed so our internal URLs are resolved correctly.
             swap_urls: {%r{^/elasticgraph/} => "/"},
             # Our "Getting Started" page links to the locally booted ElasticGraph, which HTMLProofer can't resolve.
@@ -279,8 +279,8 @@ module ElasticGraph
           # We treat the YARD docs for previously released versions as being immutable, and have no plans to fix issues
           # like broken external links, etc.
           run_html_proofer.call(
-            JEKYLL_DOCS_DIR,
-            ignore_files: [/#{JEKYLL_DOCS_DIR / "main"}/o],
+            JEKYLL_API_DOCS_DIR,
+            ignore_files: [/#{JEKYLL_API_DOCS_DIR / "main"}/o, "#{JEKYLL_API_DOCS_DIR}/index.html"],
             ignore_urls: ["elasticgraph-rack/lib/elastic_graph/rack/graphiql/index.html"],
             check_external_hash: false,
             ignore_missing_alt: true,
@@ -290,7 +290,7 @@ module ElasticGraph
 
           # We use stricter settings for the newly generated YARD docs, since we can actually fix these.
           run_html_proofer.call(
-            JEKYLL_DOCS_DIR / "main",
+            JEKYLL_API_DOCS_DIR / "main",
             # YARD generates a bunch of anchor tags with no hrefs, which we can't do anything about.
             allow_missing_href: true
           )
@@ -311,7 +311,7 @@ module ElasticGraph
           pages = Dir.glob("#{src_dir}/**/*").reject do |file|
             # Skip directories, files in directories that don't contain pages, binary files, and specific file types
             File.directory?(file) ||
-              %w[/_data/ /docs/ /_includes/ /_layouts/ /_plugins/ /_config.yaml dc.yml /examples/ /assets/].any? { |dir| file.include?(dir) } ||
+              %w[/_data/ /api-docs/ /_includes/ /_layouts/ /_plugins/ /_config.yaml dc.yml /examples/ /assets/].any? { |dir| file.include?(dir) } ||
               %w[.js .css .png .jpg .jpeg .gif .ico .svg .woff .woff2 .ttf .eot .webmanifest .yaml .graphql].include?(File.extname(file).downcase)
           end
 

@@ -176,7 +176,7 @@ Then visit http://localhost:4000/elasticgraph/ in your browser. Local edits to t
 ### API Documentation
 
 ElasticGraph's Ruby code is documented using [YARD](https://yardoc.org/). You can view the rendered API docs in the context of the
-project website using the same `site:serve` rake task (just visit http://localhost:4000/elasticgraph/docs/main/). However, that task
+project website using the same `site:serve` rake task (just visit http://localhost:4000/elasticgraph/api-docs/main/). However, that task
 fully regenerates the documentation from scratch and it's not very quick. If you're working on multiple changes to the API documentation,
 you'll get a faster feedback loop using the `site:preview_docs:[gem name]` tasks. For example, to preview the docs of
 [elasticgraph-schema_definition](elasticgraph-schema_definition), run:

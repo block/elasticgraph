@@ -10,7 +10,7 @@
       <div class="{{site.style.dropdown_pip}}"></div>
       <div class="relative py-1">
         {% for version in site.data.doc_versions.versions %}
-          <a href="{{ '/docs/' | append: version | relative_url }}"
+          <a href="{{ '/api-docs/' | append: version | relative_url }}"
               class="{{site.style.dropdown_item}}">
             {% if version == 'main' %}
               Development (main)

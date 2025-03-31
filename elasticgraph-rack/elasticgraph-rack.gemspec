@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
   spec.metadata = {
     "bug_tracker_uri" => "https://github.com/block/elasticgraph/issues",
     "changelog_uri" => "https://github.com/block/elasticgraph/releases/tag/v#{ElasticGraph::VERSION}",
-    "documentation_uri" => "https://block.github.io/elasticgraph/docs/v#{ElasticGraph::VERSION}/",
+    "documentation_uri" => "https://block.github.io/elasticgraph/api-docs/v#{ElasticGraph::VERSION}/",
     "homepage_uri" => "https://block.github.io/elasticgraph/",
     "source_code_uri" => "https://github.com/block/elasticgraph/tree/v#{ElasticGraph::VERSION}/#{spec.name}",
     "gem_category" => "local" # used by script/update_codebase_overview

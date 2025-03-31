@@ -9,11 +9,11 @@
 module Jekyll
   class DocVersions < Generator
     def generate(site)
-      # Get all subdirectories in src/docs
-      docs_dir = File.join(site.source, "docs")
-      versions = if Dir.exist?(docs_dir)
-        Dir.entries(docs_dir)
-          .select { |f| File.directory?(File.join(docs_dir, f)) && f !~ /^\./ }
+      # Get all subdirectories in src/api-docs
+      api_docs_dir = File.join(site.source, "api-docs")
+      versions = if Dir.exist?(api_docs_dir)
+        Dir.entries(api_docs_dir)
+          .select { |f| File.directory?(File.join(api_docs_dir, f)) && f !~ /^\./ }
           .sort_by { |v| (v == "main") ? "0" : Gem::Version.new(v.delete_prefix("v")) }
           .reverse
       else

@@ -10,20 +10,20 @@ require "nokogiri"
 
 module ElasticGraph
   class ContentExtractor
-    def initialize(jekyll_site_dir:, docs_dir:)
+    def initialize(jekyll_site_dir:, api_docs_dir:)
       @jekyll_site_dir = jekyll_site_dir
-      @docs_dir = docs_dir
+      @api_docs_dir = api_docs_dir
     end
 
     def extract_content
       # Get the latest docs version
-      latest_docs_version = Dir.entries(@docs_dir).grep(/^v/)
+      latest_docs_version = Dir.entries(@api_docs_dir).grep(/^v/)
         .max_by { |v| Gem::Version.new(v.delete_prefix("v")) }
 
       puts "Indexing API docs from latest version: #{latest_docs_version}"
 
       # Extract docs content - without code blocks for search
-      api_docs_content = process_docs_directory(@docs_dir / latest_docs_version, latest_docs_version)
+      api_docs_content = process_docs_directory(@api_docs_dir / latest_docs_version, latest_docs_version)
       markdown_content = process_markdown_pages
 
       # Build the searchable content
@@ -127,9 +127,9 @@ module ElasticGraph
         title, content = extract_file_content(file)
         next if content.empty?
 
-        # Generate URL with /docs/version/ prefix
+        # Generate URL with /api-docs/version/ prefix
         relative_path = file.sub(dir.to_s, "")
-        url = "/docs/#{version}#{relative_path}"
+        url = "/api-docs/#{version}#{relative_path}"
 
         {
           "title" => "API Documentation - #{title}",
@@ -146,7 +146,7 @@ module ElasticGraph
         # Skip files we don't want to index
         next if file.include?("/css/") || file.include?("/js/")
         next if %w[frames.html file_list.html class_list.html method_list.html].include?(File.basename(file))
-        next if file.include?("/docs/") # Skip API docs, we handle those separately
+        next if file.include?("/api-docs/") # Skip API docs, we handle those separately
 
         # Get the rendered content
         content = File.read(file)
