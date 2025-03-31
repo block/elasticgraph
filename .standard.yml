@@ -16,6 +16,9 @@ ignore:
     # This file is a symlink of the `artists.rb` file from the project template, and we can't include the
     # standard header in it without adding it to the project template, which we don't want to do.
     - ElasticGraph/RequireStandardCommentHeader
+  - "config/site/examples/music_simplified/schema.rb":
+    # This file is rendered at the website, and we don't want to require the standard header on it.
+    - ElasticGraph/RequireStandardCommentHeader
   - "**/*.rb":
     # This cop forces syntax that steep does not yet support. (e.g. `def foo(**); bar(**); end`)
     # Once steep supports that, we can stop ignoring this one.

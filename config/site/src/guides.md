@@ -10,7 +10,7 @@ Learn how to build and scale your ElasticGraph applications with our comprehensi
 
 {% assign guides = site.pages | where_exp: "item", "item.path contains 'guides/'" | sort: "title" %}
 {% for guide in guides %}
-- [{{ guide.title | default: guide.name | remove: '.md' }}]({{ guide.url | relative_url }})
+- [{{ guide.nav_title }}]({{ guide.url | relative_url }})
 {% endfor %}
 
 ## Getting Started

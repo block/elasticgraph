@@ -67,6 +67,8 @@ config/site/_site
 config/site/src/api-docs
 config/site/src/config/site
 config/site/src/_data/*_queries.yaml
+config/site/src/_data/music.yaml
+config/site/src/_data/music_simplified.yaml
 config/site/src/_data/content.yaml
 config/site/.jekyll-metadata
 config/site/package-lock.json

@@ -127,7 +127,7 @@ module ElasticGraph
         end
 
         desc "Build Jekyll site with freshly generated YARD documentation"
-        task build: [:build_docs, :build_css, "examples:compile_queries", :extract_content] do
+        task build: [:build_docs, :build_css, "examples:extract_snippets", :extract_content] do
           run_jekyll :build
         end
 
@@ -197,7 +197,7 @@ module ElasticGraph
         end
 
         desc "Serve Jekyll site locally"
-        task serve: [:build_docs, :build_css, "examples:compile_queries", :extract_content] do
+        task serve: [:build_docs, :build_css, "examples:extract_snippets", :extract_content] do
           require "filewatcher"
 
           # Regenerate the YARD docs anytime we change anything in the source code of the gems that are documented.
@@ -217,7 +217,7 @@ module ElasticGraph
             changed_files.each do |file|
               t1 = ::Time.now
               example_schema = file.to_s.split("/")[3]
-              task = ::Rake::Task["site:examples:#{example_schema}:compile_queries"]
+              task = ::Rake::Task["site:examples:#{example_schema}:extract_snippets"]
               task.all_prerequisite_tasks.each(&:reenable)
               task.tap(&:reenable).invoke
               t2 = ::Time.now
@@ -312,7 +312,8 @@ module ElasticGraph
             # Skip directories, files in directories that don't contain pages, binary files, and specific file types
             File.directory?(file) ||
               %w[/_data/ /api-docs/ /_includes/ /_layouts/ /_plugins/ /_config.yaml dc.yml /examples/ /assets/].any? { |dir| file.include?(dir) } ||
-              %w[.js .css .png .jpg .jpeg .gif .ico .svg .woff .woff2 .ttf .eot .webmanifest .yaml .graphql].include?(File.extname(file).downcase)
+              %w[.js .css .png .jpg .jpeg .gif .ico .svg .woff .woff2 .ttf .eot .webmanifest .yaml .graphql].include?(File.extname(file).downcase) ||
+              file.end_with?(".graphql.txt")
           end
 
           # Check each page to make sure the frontmatter specifies a `permalink`. This matters because it ensures consistent behavior
@@ -386,7 +387,8 @@ module ElasticGraph
           require "elastic_graph/query_registry/rake_tasks"
 
           namespace :examples do
-            task compile_queries: EXAMPLE_SCHEMA_FILES_BY_NAME.keys.map { |schema| "#{schema}:compile_queries" }
+            desc "Generate and extract code snippets from example schemas"
+            task extract_snippets: EXAMPLE_SCHEMA_FILES_BY_NAME.keys.map { |schema| "#{schema}:extract_snippets" }
 
             EXAMPLE_SCHEMA_FILES_BY_NAME.each do |schema_name, schema_file|
               example_dir = schema_file.parent
@@ -398,21 +400,33 @@ module ElasticGraph
                   tasks.opensearch_versions = []
                   tasks.enforce_json_schema_version = false
                 end
-                ::ElasticGraph::QueryRegistry::RakeTasks.from_yaml_file(settings_file, queries_dir)
 
-                task "query_registry:validate_queries" => ["schema_artifacts:dump", "query_registry:dump_variables:all"]
-
-                task compile_queries: "query_registry:validate_queries" do
-                  queries_by_name_by_category = queries_dir.children.to_h do |category_path|
-                    queries_by_name = category_path.glob("*.graphql").to_h do |query_path|
-                      [query_path.basename.sub_ext("").to_s, query_path.read.strip]
-                    end
-
-                    [category_path.basename.to_s, queries_by_name]
+                task extract_snippets: ["schema_artifacts:dump"] do
+                  files = ::Dir.glob(::File.join(example_dir, "*.rb")).to_h do |file|
+                    [::File.basename(file).delete_suffix(".rb"), ::File.read(file).strip]
                   end
+                  data = {"files" => files}
 
                   ::FileUtils.mkdir_p JEKYLL_DATA_DIR
-                  ::File.write(::File.join(JEKYLL_DATA_DIR, "#{schema_name}_queries.yaml"), ::YAML.dump(queries_by_name_by_category))
+                  ::File.write(::File.join(JEKYLL_DATA_DIR, "#{schema_name}.yaml"), ::YAML.dump(data))
+                end
+
+                if queries_dir.exist?
+                  ::ElasticGraph::QueryRegistry::RakeTasks.from_yaml_file(settings_file, queries_dir)
+                  task "query_registry:validate_queries" => ["schema_artifacts:dump", "query_registry:dump_variables:all"]
+
+                  task extract_snippets: "query_registry:validate_queries" do
+                    queries_by_name_by_category = queries_dir.children.to_h do |category_path|
+                      queries_by_name = category_path.glob("*.graphql").to_h do |query_path|
+                        [query_path.basename.sub_ext("").to_s, query_path.read.strip]
+                      end
+
+                      [category_path.basename.to_s, queries_by_name]
+                    end
+
+                    ::FileUtils.mkdir_p JEKYLL_DATA_DIR
+                    ::File.write(::File.join(JEKYLL_DATA_DIR, "#{schema_name}_queries.yaml"), ::YAML.dump(queries_by_name_by_category))
+                  end
                 end
               end
             end

@@ -164,6 +164,7 @@ can be used in your publishing system to validate the indexing payloads or for c
 
 ## Resources
 
+- **[How ElasticGraph Works]({% link guides/how-it-works.md %})**
 - **[GraphQL Introduction](https://graphql.org/learn/)**
 - **[ElasticGraph Query API Documentation]({% link query-api.md %})**
 - **[ElasticGraph Guides]({% link guides.md %})**
