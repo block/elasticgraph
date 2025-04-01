@@ -3,7 +3,7 @@
 # as recommended by https://github.com/dependabot/dependabot-core/issues/3253#issuecomment-852541544
 name: Dependabot Gem PR Check
 on:
-  pull_request
+  pull_request:
     paths:
       - "Gemfile.lock"
 
