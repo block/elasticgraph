@@ -79,7 +79,7 @@ PATH
   remote: elasticgraph-indexer_lambda
   specs:
     elasticgraph-indexer_lambda (0.19.1.2.pre)
-      aws-sdk-s3 (~> 1.182)
+      aws-sdk-s3 (~> 1.183)
       elasticgraph-indexer (= 0.19.1.2.pre)
       elasticgraph-lambda_support (= 0.19.1.2.pre)
       ox (~> 2.14, >= 2.14.22)
