@@ -4,11 +4,10 @@ ElasticGraph is designed to be modular, with a small core, and many built-in ext
 for specific use cases. This minimizes exposure to vulnerabilities, reduces bloat, and makes ongoing upgrades
 easier. The libraries that ship with ElasticGraph can be broken down into several categories.
 
-### Core Libraries (8 gems)
+### Core Libraries (7 gems)
 
 These libraries form the core backbone of ElasticGraph that is designed to run in a production deployment. Every ElasticGraph deployment will need to use all of these.
 
-* [elasticgraph](elasticgraph/README.md): Bootstraps ElasticGraph projects.
 * [elasticgraph-admin](elasticgraph-admin/README.md): ElasticGraph gem that provides datastore administrative tasks, to keep a datastore up-to-date with an ElasticGraph schema.
 * [elasticgraph-datastore_core](elasticgraph-datastore_core/README.md): ElasticGraph gem containing the core datastore support types and logic.
 * [elasticgraph-graphql](elasticgraph-graphql/README.md): The ElasticGraph GraphQL query engine.
@@ -21,7 +20,6 @@ These libraries form the core backbone of ElasticGraph that is designed to run i
 
 ```mermaid
 graph LR;
-    elasticgraph --> elasticgraph-support & thor
     elasticgraph-admin --> elasticgraph-datastore_core & elasticgraph-indexer & elasticgraph-schema_artifacts & elasticgraph-support & rake
     elasticgraph-datastore_core --> elasticgraph-schema_artifacts & elasticgraph-support
     elasticgraph-graphql --> elasticgraph-datastore_core & elasticgraph-schema_artifacts & graphql
@@ -29,7 +27,6 @@ graph LR;
     elasticgraph-json_schema --> elasticgraph-support & json_schemer
     elasticgraph-schema_artifacts --> elasticgraph-support
     elasticgraph-support --> logger
-    style elasticgraph color: DodgerBlue;
     style elasticgraph-admin color: DodgerBlue;
     style elasticgraph-datastore_core color: DodgerBlue;
     style elasticgraph-graphql color: DodgerBlue;
@@ -37,7 +34,6 @@ graph LR;
     style elasticgraph-json_schema color: DodgerBlue;
     style elasticgraph-schema_artifacts color: DodgerBlue;
     style elasticgraph-support color: DodgerBlue;
-    style thor color: Red;
     style rake color: Red;
     style graphql color: Red;
     style hashdiff color: Red;
@@ -48,7 +44,6 @@ click hashdiff href "https://rubygems.org/gems/hashdiff"
 click json_schemer href "https://rubygems.org/gems/json_schemer"
 click logger href "https://rubygems.org/gems/logger"
 click rake href "https://rubygems.org/gems/rake"
-click thor href "https://rubygems.org/gems/thor"
 ```
 
 ### AWS Lambda Integration Libraries (5 gems)
@@ -155,11 +150,12 @@ click faraday-retry href "https://rubygems.org/gems/faraday-retry"
 click opensearch-ruby href "https://rubygems.org/gems/opensearch-ruby"
 ```
 
-### Local Development Libraries (3 gems)
+### Local Development Libraries (4 gems)
 
 These libraries are used for local development of ElasticGraph applications, but are not intended to be deployed to production (except for `elasticgraph-rack`).
 `elasticgraph-rack` is used to boot ElasticGraph locally but can also be used to run ElasticGraph in any rack-compatible server (including a Rails application).
 
+* [elasticgraph](elasticgraph/README.md): Bootstraps ElasticGraph projects.
 * [elasticgraph-local](elasticgraph-local/README.md): Provides support for developing and running ElasticGraph applications locally.
 * [elasticgraph-rack](elasticgraph-rack/README.md): ElasticGraph gem for serving an ElasticGraph GraphQL endpoint using rack.
 * [elasticgraph-schema_definition](elasticgraph-schema_definition/README.md): ElasticGraph gem that provides the schema definition API and generates schema artifacts.
@@ -168,12 +164,16 @@ These libraries are used for local development of ElasticGraph applications, but
 
 ```mermaid
 graph LR;
+    elasticgraph --> elasticgraph-support & thor
     elasticgraph-local --> elasticgraph-admin & elasticgraph-graphql & elasticgraph-indexer & elasticgraph-rack & elasticgraph-schema_definition & rackup & rake & webrick
     elasticgraph-rack --> elasticgraph-graphql & rack
     elasticgraph-schema_definition --> elasticgraph-graphql & elasticgraph-indexer & elasticgraph-json_schema & elasticgraph-schema_artifacts & elasticgraph-support & graphql & rake
+    style elasticgraph color: DodgerBlue;
     style elasticgraph-local color: DodgerBlue;
     style elasticgraph-rack color: DodgerBlue;
     style elasticgraph-schema_definition color: DodgerBlue;
+    style elasticgraph-support color: Green;
+    style thor color: Red;
     style elasticgraph-admin color: Green;
     style elasticgraph-graphql color: Green;
     style elasticgraph-indexer color: Green;
@@ -183,12 +183,12 @@ graph LR;
     style rack color: Red;
     style elasticgraph-json_schema color: Green;
     style elasticgraph-schema_artifacts color: Green;
-    style elasticgraph-support color: Green;
     style graphql color: Red;
 click graphql href "https://rubygems.org/gems/graphql"
 click rack href "https://rubygems.org/gems/rack"
 click rackup href "https://rubygems.org/gems/rackup"
 click rake href "https://rubygems.org/gems/rake"
+click thor href "https://rubygems.org/gems/thor"
 click webrick href "https://rubygems.org/gems/webrick"
 ```
 

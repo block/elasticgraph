@@ -22,15 +22,19 @@ module ElasticGraph
     end
 
     def gem_categories
-      @gem_categories ||= gem_specs.group_by do |spec|
-        spec.metadata.fetch("gem_category") do
-          raise "No category set for #{spec.name}."
+      @gem_categories ||= begin
+        specs_by_category = gem_specs.group_by do |spec|
+          spec.metadata.fetch("gem_category") { raise "No category set for #{spec.name}." }.tap do |category|
+            unless CategoryInfo::BY_NAME.key?(category)
+              raise "Unrecognized gem category `#{category}` found on gem: #{spec.name}."
+            end
+          end
         end
-      end.map do |category, specs|
-        category_info = CategoryInfo::BY_NAME.fetch(category) do
-          raise "Unrecognized category: `#{category}` found on gems: #{specs.map(&:name)}."
+
+        CategoryInfo::BY_NAME.map do |category, category_info|
+          specs = specs_by_category.fetch(category)
+          GemCategory.new(category, category_info, specs, gem_specs)
         end
-        GemCategory.new(category, category_info, specs, gem_specs)
       end
     end
   end
@@ -91,16 +95,16 @@ module ElasticGraph
         These libraries form the core backbone of ElasticGraph that is designed to run in a production deployment. Every ElasticGraph deployment will need to use all of these.
       EOS
 
-      "datastore_adapter" => new("Datastore Adapters", <<~EOS),
-        These libraries adapt ElasticGraph to your choice of datastore (Elasticsearch or OpenSearch).
+      "lambda" => new("AWS Lambda Integration Libraries", <<~EOS),
+        These libraries wrap the the core ElasticGraph libraries so that they can be deployed using AWS Lambda.
       EOS
 
       "extension" => new("Extensions", <<~EOS),
         These libraries extend ElasticGraph to provide optional but commonly needed functionality.
       EOS
 
-      "lambda" => new("AWS Lambda Integration Libraries", <<~EOS),
-        These libraries wrap the the core ElasticGraph libraries so that they can be deployed using AWS Lambda.
+      "datastore_adapter" => new("Datastore Adapters", <<~EOS),
+        These libraries adapt ElasticGraph to your choice of datastore (Elasticsearch or OpenSearch).
       EOS
 
       "local" => new("Local Development Libraries", <<~EOS)
