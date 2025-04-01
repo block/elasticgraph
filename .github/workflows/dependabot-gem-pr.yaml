@@ -1,9 +1,11 @@
 # This workflow doesn't have access to secrets and has a read-only token
 # It exists to trigger `update-gem-version-artifacts.yaml` in a two-step process,
 # as recommended by https://github.com/dependabot/dependabot-core/issues/3253#issuecomment-852541544
-name: Dependabot PR Check
+name: Dependabot Gem PR Check
 on:
   pull_request
+    paths:
+      - "Gemfile.lock"
 
 jobs:
   check-dependabot:
