@@ -49,26 +49,7 @@ module ElasticGraph
             })]
           end
 
-          it "runs multiple filter value sets as separate queries if `total_document_count` is requested" do
-            index_into(
-              graphql,
-              build(:widget, id: "w1", component_ids: ["c1", "c7"]),
-              build(:widget, id: "w2", component_ids: ["c2"]),
-              build(:widget, id: "w3", component_ids: ["c1"]),
-              build(:widget, id: "w4", component_ids: ["c1", "c9"])
-            )
-
-            expect {
-              response1, response2 = resolve_field("Component.widget", ["c1"], ["c2", "c5"], total_document_count_needed: true)
-
-              expect(response1.total_document_count).to eq 3
-              expect(response2.total_document_count).to eq 1
-            }.to perform_datastore_search("main", 2).times
-
-            expect(logged_jsons_of_type(merged_queries_message_type)).to eq([])
-          end
-
-          it "runs multiple filter value sets as separate queries if the query has aggregations`" do
+          it "runs multiple filter value sets as separate queries if the query has aggregations or needs the total doc count" do
             index_into(
               graphql,
               build(:widget, id: "w1", component_ids: ["c1", "c7"], amount_cents: 100),
@@ -88,6 +69,15 @@ module ElasticGraph
 
               expect(response1.aggregations).to eq({"agg:amount_cents:sum" => {"value" => 800.0}}) # 100 + 300 + 400
               expect(response2.aggregations).to eq({"agg:amount_cents:sum" => {"value" => 200.0}}) # just 200
+            }.to perform_datastore_search("main", 2).times
+
+            expect(logged_jsons_of_type(merged_queries_message_type)).to eq([])
+
+            expect {
+              response1, response2 = resolve_field("Component.widget", ["c1"], ["c2", "c5"], total_document_count_needed: true)
+
+              expect(response1.total_document_count).to eq 3
+              expect(response2.total_document_count).to eq 1
             }.to perform_datastore_search("main", 2).times
 
             expect(logged_jsons_of_type(merged_queries_message_type)).to eq([])
@@ -341,6 +331,39 @@ module ElasticGraph
               [a_string_including("w4 (hash: ")],
               [a_string_including("w2 (hash:"), a_string_including("w3 (hash: "), a_string_including("w4 (hash: ")]
             ]
+          end
+
+          it "uses the original logic for aggregations and `total_document_count_needed` queries, since they can't use the optimized logic" do
+            index_into(
+              graphql,
+              build(:widget, id: "w1", component_ids: ["c1", "c7"], amount_cents: 100),
+              build(:widget, id: "w2", component_ids: ["c2"], amount_cents: 200),
+              build(:widget, id: "w3", component_ids: ["c1"], amount_cents: 300),
+              build(:widget, id: "w4", component_ids: ["c1", "c9"], amount_cents: 400)
+            )
+
+            agg_query = aggregation_query_of(name: "agg", computations: [computation_of("amount_cents", :sum)])
+
+            expect {
+              response1, response2 = resolve_field(
+                "Component.widget_aggregations",
+                ["c1"], ["c2", "c5"],
+                aggregations: {"agg" => agg_query}
+              )
+
+              expect(response1.aggregations).to eq({"agg:amount_cents:sum" => {"value" => 800.0}}) # 100 + 300 + 400
+              expect(response2.aggregations).to eq({"agg:amount_cents:sum" => {"value" => 200.0}}) # just 200
+            }.to perform_datastore_search("main", 2).times
+
+            expect {
+              response1, response2 = resolve_field("Component.widget", ["c1"], ["c2", "c5"], total_document_count_needed: true)
+
+              expect(response1.total_document_count).to eq 3
+              expect(response2.total_document_count).to eq 1
+            }.to perform_datastore_search("main", 2).times
+
+            expect(logged_jsons_of_type(merged_queries_message_type)).to eq([])
+            expect(logged_jsons_of_type(comparison_results_message_type)).to eq([])
           end
         end
 

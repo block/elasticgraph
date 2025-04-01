@@ -72,6 +72,8 @@ module ElasticGraph
         end
 
         def fetch(id_sets)
+          return fetch_original(id_sets) unless can_merge_filters?
+
           case @mode
           when :original
             fetch_original(id_sets)
@@ -89,8 +91,6 @@ module ElasticGraph
         private
 
         def fetch_optimized(id_sets)
-          return fetch_via_separate_queries(id_sets) unless can_merge_filters?
-
           attempt_count = 0
           duration_ms, responses_by_id_set = time_duration do
             fetch_via_single_query_with_merged_filters(id_sets) { attempt_count += 1 }
