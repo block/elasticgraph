@@ -96,15 +96,17 @@ module ElasticGraph
             fetch_via_single_query_with_merged_filters(id_sets) { attempt_count += 1 }
           end
 
-          @logger.info({
-            "message_type" => "NestedRelationshipsMergedQueries",
-            "field" => @join.field.description,
-            "optimized_attempt_count" => [attempt_count, MAX_OPTIMIZED_ATTEMPTS].min,
-            "degraded_to_separate_queries" => (attempt_count > MAX_OPTIMIZED_ATTEMPTS),
-            "id_set_count" => id_sets.size,
-            "total_id_count" => id_sets.reduce(:union).size,
-            "duration_ms" => duration_ms
-          })
+          if id_sets.size > 1
+            @logger.info({
+              "message_type" => "NestedRelationshipsMergedQueries",
+              "field" => @join.field.description,
+              "optimized_attempt_count" => [attempt_count, MAX_OPTIMIZED_ATTEMPTS].min,
+              "degraded_to_separate_queries" => (attempt_count > MAX_OPTIMIZED_ATTEMPTS),
+              "id_set_count" => id_sets.size,
+              "total_id_count" => id_sets.reduce(:union).size,
+              "duration_ms" => duration_ms
+            })
+          end
 
           id_sets.map { |id_set| responses_by_id_set.fetch(id_set) }
         end
