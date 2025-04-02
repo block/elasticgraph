@@ -64,7 +64,7 @@ bundle exec rake boot_locally
 open http://localhost:9000/
 
 # You can also visit <%= ElasticGraph.setup_env.datastore_ui_name %> via:
-open http://localhost:19293/
+open http://localhost:19200/
 ```
 
 ### Run Build Tasks
@@ -119,7 +119,7 @@ You can pass an arg (note quotes) to seed more batches of data:
 ### Using <%= ElasticGraph.setup_env.datastore_ui_name %>
 
 After running `bundle exec rake boot_locally` and opening <%= ElasticGraph.setup_env.datastore_ui_name %>
-`open http://localhost:19293/` click "Dev Tools" to open the <%= ElasticGraph.setup_env.datastore_name %> console.
+`open http://localhost:19200/` click "Dev Tools" to open the <%= ElasticGraph.setup_env.datastore_name %> console.
 
 Here are some queries to get you started:
 

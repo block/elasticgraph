@@ -5,7 +5,7 @@ datastore:
   clusters:
     main:
       backend: <%= ElasticGraph.setup_env.datastore %>
-      url: http://localhost:9293
+      url: http://localhost:9200
       settings: {}
   index_definitions:
     # TODO: replace the `artists:` and `venues:` keys with the indices from your dataset

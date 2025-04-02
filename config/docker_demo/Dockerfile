@@ -59,7 +59,7 @@ RUN <<EOS
   ELASTICGRAPH_GEMS_PATH=/app bundle exec elasticgraph new demo --datastore opensearch
 
   # Configure OpenSearch connection
-  sed -i 's/localhost:9293/opensearch:9200/g' demo/config/settings/local.yaml
+  sed -i 's/localhost/opensearch/g' demo/config/settings/local.yaml
 
   # Clean up unnecessary files
   rm -rf .git
