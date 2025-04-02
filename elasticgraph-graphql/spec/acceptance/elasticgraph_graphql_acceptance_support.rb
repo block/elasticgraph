@@ -6,6 +6,7 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/graphql/datastore_search_router"
 require "elastic_graph/schema_definition/schema_elements/type_namer"
 require "elastic_graph/spec_support/builds_admin"
 require "graphql"
@@ -43,6 +44,13 @@ module ElasticGraph
       # matcher in some tests which tries to assert which specific requests get made, since index definitions
       # have caching behavior that can make the presence or absence of that request slightly non-deterministic.
       pre_cache_index_state(graphql)
+    end
+
+    def expect_indices_not_configured_error
+      expect {
+        response = yield
+        expect(response.dig("errors").first).to include({"message" => GraphQL::DatastoreSearchRouter::INDICES_NOT_CONFIGURED_MESSAGE})
+      }.to log_warning(a_string_including(GraphQL::DatastoreSearchRouter::INDICES_NOT_CONFIGURED_MESSAGE))
     end
 
     def self.with_both_casing_forms(&block)

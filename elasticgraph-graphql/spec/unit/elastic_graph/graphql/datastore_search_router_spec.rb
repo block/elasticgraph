@@ -185,6 +185,21 @@ module ElasticGraph
           )
         end
 
+        it "raises `::GraphQL::ExecutionError` if a search queries no shards as that indicates the indices have not been configured" do
+          allow(main_datastore_client).to receive(:msearch).and_return("took" => 10, "responses" => [
+            empty_response,
+            DatastoreResponse::SearchResponse::RAW_EMPTY.merge(
+              "took" => 5, "_shards" => {"total" => 0, "successful" => 0, "skipped" => 0, "failed" => 0}, "status" => 200
+            )
+          ])
+
+          expect {
+            router.msearch([query1, query2])
+          }.to raise_error ::GraphQL::ExecutionError, a_string_including(
+            "The datastore indices have not been configured. They must be configured before ElasticGraph can serve queries."
+          )
+        end
+
         it "logs warning if a query has failed shards" do
           shard_failure_bits = {
             "_shards" => {

@@ -28,6 +28,8 @@ module ElasticGraph
         @config = config
       end
 
+      INDICES_NOT_CONFIGURED_MESSAGE = "The datastore indices have not been configured. They must be configured before ElasticGraph can serve queries."
+
       # Sends the datastore a multi-search request based on the given queries.
       # Returns a hash of responses keyed by the query.
       def msearch(queries, query_tracker: QueryDetailsTracker.empty)
@@ -80,7 +82,13 @@ module ElasticGraph
 
           queried_shard_count = server_took_and_results.reduce(0) do |outer_accum, (_, queries_and_responses)|
             outer_accum + queries_and_responses.reduce(0) do |inner_accum, (_, response)|
-              inner_accum + (response.dig("_shards", "total") || 0)
+              shards_total = response.dig("_shards", "total")
+
+              if shards_total == 0
+                raise ::GraphQL::ExecutionError, INDICES_NOT_CONFIGURED_MESSAGE
+              end
+
+              inner_accum + (shards_total || 0)
             end
           end
 

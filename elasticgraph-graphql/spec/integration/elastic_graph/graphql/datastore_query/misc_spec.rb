@@ -8,6 +8,7 @@
 
 require_relative "datastore_query_integration_support"
 require "elastic_graph/errors"
+require "elastic_graph/graphql/datastore_search_router"
 
 module ElasticGraph
   class GraphQL
@@ -117,7 +118,7 @@ module ElasticGraph
         end
       end
 
-      context "on a rollover index when no concrete indices yet exist (e.g. before indexing the first document)" do
+      context "when indices have not yet been configured", :builds_admin do
         let(:graphql) do
           build_graphql(schema_definition: lambda do |schema|
             schema.object_type "Widget" do |t|
@@ -130,7 +131,7 @@ module ElasticGraph
           end)
         end
 
-        it "returns an empty result" do
+        it "raises a `GraphQL::ExecutionError` indicating they need to be configured" do
           widgets_def = graphql.datastore_core.index_definitions_by_name.fetch(unique_index_name)
 
           query = graphql.datastore_query_builder.new_query(
@@ -141,8 +142,13 @@ module ElasticGraph
           index_names = main_datastore_client.list_indices_matching("*")
           expect(index_names).not_to include(a_string_including(unique_index_name))
 
-          results = perform_query(graphql, query)
+          expect { perform_query(graphql, query) }.to raise_error ::GraphQL::ExecutionError, DatastoreSearchRouter::INDICES_NOT_CONFIGURED_MESSAGE
 
+          admin = build_admin(datastore_core: graphql.datastore_core)
+          admin.cluster_configurator.configure_cluster(StringIO.new)
+
+          # ...but after configuring them, the error goes away (even though no documents have been indexed!)
+          results = perform_query(graphql, query)
           expect(results.to_a).to eq []
         end
       end
