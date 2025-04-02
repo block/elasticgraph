@@ -270,7 +270,35 @@ module ElasticGraph
               "message_type" => comparison_results_message_type,
               "field" => "Component.widget",
               "optimized_faster" => (a_value == true).or(a_value == false),
-              "got_same_results" => true
+              "got_same_results" => true,
+              "id_set_count" => 2,
+              "total_id_count" => 4
+            })]
+
+            flush_logs
+
+            expect {
+              response1 = resolve_field("Component.widget", ["c5"]).first
+
+              expect(response1.map(&:id)).to contain_exactly("w3")
+            }.to perform_datastore_search("main", 2).times.and perform_datastore_msearch("main", 2).time
+
+            expect(logged_jsons_of_type(merged_queries_message_type)).to match [a_hash_including({
+              "message_type" => merged_queries_message_type,
+              "field" => "Component.widget",
+              "optimized_attempt_count" => 1,
+              "degraded_to_separate_queries" => false,
+              "id_set_count" => 1,
+              "total_id_count" => 1
+            })]
+
+            expect(logged_jsons_of_type(comparison_results_message_type)).to match [a_hash_including({
+              "message_type" => comparison_results_message_type,
+              "field" => "Component.widget",
+              "optimized_faster" => (a_value == true).or(a_value == false),
+              "got_same_results" => true,
+              "id_set_count" => 1,
+              "total_id_count" => 1
             })]
           end
 
@@ -317,7 +345,9 @@ module ElasticGraph
               "message_type" => comparison_results_message_type,
               "field" => "Component.widget",
               "optimized_faster" => (a_value == true).or(a_value == false),
-              "got_same_results" => false
+              "got_same_results" => false,
+              "id_set_count" => 2,
+              "total_id_count" => 4
             })]
 
             expect(comparison_messages.size).to eq 1

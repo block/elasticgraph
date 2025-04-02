@@ -121,7 +121,12 @@ module ElasticGraph
             # the original implementation (so `fetch_original` doesn't also request that field...) but for
             # the purposes of comparison we need to request it so that the document payloads will have the
             # same fields.
-            fetch_original(id_sets, requested_fields: [@join.filter_id_field_name])
+            #
+            # Note: we don't add the requested field if we have only a single id set, in order to align with
+            # the short-circuiting logic in `fetch_via_single_query_with_merged_filters`. Otherwise, any time
+            # we have a single id set we always get reported differences which are not actually real!
+            requested_fields = (id_sets.size > 1) ? [@join.filter_id_field_name] : [] # : ::Array[::String]
+            fetch_original(id_sets, requested_fields: requested_fields)
           end
 
           optimized_duration_ms, optimized_results = time_duration do
@@ -137,6 +142,8 @@ module ElasticGraph
             "original_duration_ms" => original_duration_ms,
             "optimized_duration_ms" => optimized_duration_ms,
             "optimized_faster" => (optimized_duration_ms < original_duration_ms),
+            "id_set_count" => id_sets.size,
+            "total_id_count" => id_sets.reduce(:union).size,
             "got_same_results" => got_same_results
           }
 
