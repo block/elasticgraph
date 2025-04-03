@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+# This script runs all specs from all the elasticgraph gems. Any arguments passed to this script
+# will be appended to the `rspec` command.
+
+# Print a trace of simple commands.
+# Verbose form of `set -x`.
+set -o xtrace
+
+# Avoid a connection issue if a prior run was interrupted. More info:
+# https://github.com/briandunn/flatware/issues/68
+rm -f flatware-sink
+
+# Limit the number of workers to 8. On some really beefy CI worker hosts, we've seen
+# flatware default to 96 workers (due to the host having 96 vCPUs!), but that's overkill,
+# and using too many workers can perform worse.
+#
+# In addition, using too many parallel processes can overwhelm the locally booted datastore,
+# because we have to create a separate set of indices for each process. The datastore tends
+# to run into limits when we use 16 processes. 8 processes seems to work better
+#
+# Note: `Etc.nprocessors` is what flatware uses internally for the default number of workers.
+worker_count=$(ruby -retc -e "puts [8, Etc.nprocessors].min")
+
+bundle exec flatware rspec -w $worker_count "$@"

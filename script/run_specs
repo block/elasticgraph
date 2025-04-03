@@ -17,15 +17,4 @@ set -o xtrace
 # - The specific gems we want to exclude are ones we are OK excluding all of.
 spec_dirs=$(script/list_eg_gems.rb | grep -v elasticgraph-local)
 
-# Avoid a connection issue if a prior run was interrupted. More info:
-# https://github.com/briandunn/flatware/issues/68
-rm -f flatware-sink
-
-# Limit the number of workers to 16. On some really beefy CI worker hosts, we've seen
-# flatware default to 96 workers (due to the host having 96 vCPUs!), but that's overkill,
-# and using too many workers can perform worse.
-#
-# Note: `Etc.nprocessors` is what flatware uses internally for the default number of workers.
-worker_count=$(ruby -retc -e "puts [16, Etc.nprocessors].min")
-
-bundle exec flatware rspec $spec_dirs -w $worker_count "$@"
+script/flatware_rspec $spec_dirs "$@"
