@@ -20,10 +20,10 @@ PATH
   remote: elasticgraph-apollo
   specs:
     elasticgraph-apollo (0.19.1.2.pre)
-      apollo-federation (~> 3.10)
+      apollo-federation (~> 3.10, >= 3.10.1)
       elasticgraph-graphql (= 0.19.1.2.pre)
       elasticgraph-support (= 0.19.1.2.pre)
-      graphql (~> 2.4.15)
+      graphql (~> 2.4.16)
 
 PATH
   remote: elasticgraph-datastore_core
@@ -54,7 +54,7 @@ PATH
     elasticgraph-graphql (0.19.1.2.pre)
       elasticgraph-datastore_core (= 0.19.1.2.pre)
       elasticgraph-schema_artifacts (= 0.19.1.2.pre)
-      graphql (~> 2.4.15)
+      graphql (~> 2.4.16)
 
 PATH
   remote: elasticgraph-health_check
@@ -143,7 +143,7 @@ PATH
     elasticgraph-query_registry (0.19.1.2.pre)
       elasticgraph-graphql (= 0.19.1.2.pre)
       elasticgraph-support (= 0.19.1.2.pre)
-      graphql (~> 2.4.15)
+      graphql (~> 2.4.16)
       rake (~> 13.2, >= 13.2.1)
 
 PATH
@@ -168,7 +168,7 @@ PATH
       elasticgraph-json_schema (= 0.19.1.2.pre)
       elasticgraph-schema_artifacts (= 0.19.1.2.pre)
       elasticgraph-support (= 0.19.1.2.pre)
-      graphql (~> 2.4.15)
+      graphql (~> 2.4.16)
       rake (~> 13.2, >= 13.2.1)
 
 PATH
