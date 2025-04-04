@@ -205,7 +205,7 @@ GEM
       public_suffix (>= 2.0.2, < 7.0)
     afm (0.2.2)
     ansi (1.5.0)
-    apollo-federation (3.10.0)
+    apollo-federation (3.10.1)
       google-protobuf (< 5)
       graphql
     ast (2.4.2)
@@ -307,13 +307,13 @@ GEM
       flatware (= 2.3.4)
       rspec (>= 3.6)
     forwardable-extended (2.6.0)
-    google-protobuf (4.29.3)
+    google-protobuf (4.30.2)
       bigdecimal
       rake (>= 13)
-    google-protobuf (4.29.3-arm64-darwin)
+    google-protobuf (4.30.2-arm64-darwin)
       bigdecimal
       rake (>= 13)
-    graphql (2.4.15)
+    graphql (2.4.16)
       base64
       fiber-storage
       logger
