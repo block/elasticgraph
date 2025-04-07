@@ -136,6 +136,10 @@ module ElasticGraph
         ).to_s
       end
 
+      def excluding_indices?
+        search_index_expression.split(",").any? { |expr| expr.start_with?("-") }
+      end
+
       # Returns the name of the datastore cluster as a String where this query should be setn.
       # Unless exactly 1 cluster name is found, this method raises a Errors::ConfigError.
       def cluster_name

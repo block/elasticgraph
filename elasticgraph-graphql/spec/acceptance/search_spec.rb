@@ -640,7 +640,7 @@ module ElasticGraph
       end
 
       describe "`list` filtering behavior" do
-        it "supports filtering on scalar lists, nested object lists, and embedded object lists" do
+        it "supports filtering on scalar lists, nested object lists, and embedded object lists", :expect_index_exclusions do
           index_records(
             build(
               :team,
@@ -704,6 +704,11 @@ module ElasticGraph
               current_players: []
             )
           )
+
+          # Verify that if we filter on a rollover field with a range that excludes all indices, we get back no results rather than an
+          # "indices are not configured" error.
+          teams = query_teams_with(filter: {formed_on: {gt: "9999-01-01"}})
+          expect(teams).to eq []
 
           # Verify `any_satisfy: {...}` with all null predicates on a list-of-scalars field.
           results = query_teams_with(filter: {past_names: {any_satisfy: {equal_to_any_of: nil}}})

@@ -80,11 +80,11 @@ module ElasticGraph
             [response["took"], queries_for_cluster.zip(ordered_responses)]
           end
 
-          queried_shard_count = server_took_and_results.reduce(0) do |outer_accum, (_, queries_and_responses)|
-            outer_accum + queries_and_responses.reduce(0) do |inner_accum, (_, response)|
+          queried_shard_count = server_took_and_results.reduce(0) do |outer_accum, (query, queries_and_responses)|
+            outer_accum + queries_and_responses.reduce(0) do |inner_accum, (query, response)|
               shards_total = response.dig("_shards", "total")
 
-              if shards_total == 0
+              if shards_total == 0 && !query.excluding_indices?
                 raise ::GraphQL::ExecutionError, INDICES_NOT_CONFIGURED_MESSAGE
               end
 

@@ -25,10 +25,13 @@ module ElasticGraph
         self.schema_artifacts = generate_schema_artifacts do |schema|
           schema.object_type "Widget" do |t|
             t.field "id", "ID!"
+            t.field "created_at", "DateTime"
             t.field "currency", "String"
             t.field "name", "String"
             t.field "some_field", "String!"
-            t.index "widgets"
+            t.index "widgets" do |i|
+              i.rollover :yearly, "created_at"
+            end
           end
         end
       end
@@ -39,7 +42,13 @@ module ElasticGraph
         )
       end
 
-      let(:main_datastore_client) { instance_spy(Elasticsearch::Client, cluster_name: "main") }
+      let(:no_shards_searched_response) do
+        DatastoreResponse::SearchResponse::RAW_EMPTY.merge(
+          "took" => 5, "_shards" => {"total" => 0, "successful" => 0, "skipped" => 0, "failed" => 0}, "status" => 200
+        )
+      end
+
+      let(:main_datastore_client) { instance_spy(Elasticsearch::Client, cluster_name: "main", list_indices_matching: ["widgets_rollover__2024", "widgets_rollover__2025"]) }
       let(:other_datastore_client) { instance_spy(Elasticsearch::Client, cluster_name: "other") }
       let(:graphql) { build_graphql }
       let(:router) { graphql.datastore_search_router }
@@ -64,9 +73,9 @@ module ElasticGraph
           router.msearch([query1, query2])
 
           expect(main_datastore_client).to have_received(:msearch).with(a_hash_including(body: [
-            {index: "widgets"},
+            {index: "widgets_rollover__*"},
             a_hash_including(sort: sort_list_with_missing_option_for(sort_list), size: a_value_within(1).of(10)),
-            {index: "widgets"},
+            {index: "widgets_rollover__*"},
             a_hash_including(sort: sort_list_with_missing_option_for(sort_list), size: a_value_within(1).of(3))
           ]))
         end
@@ -152,7 +161,7 @@ module ElasticGraph
           expect {
             router.msearch([query1, query2])
           }.to raise_error(Errors::SearchFailedError, a_string_including(
-            "2) ", '{"index":"widgets"}', inspect_output_of('{"bad stuff" => "happened"}')
+            "2) ", '{"index":"widgets_rollover__*"}', inspect_output_of('{"bad stuff" => "happened"}')
           ).and(excluding(
             # These are parts of the body of the request, which we don't want included because it could contain PII!.
             "track_total_hits", "size"
@@ -185,12 +194,10 @@ module ElasticGraph
           )
         end
 
-        it "raises `::GraphQL::ExecutionError` if a search queries no shards as that indicates the indices have not been configured" do
+        it "raises `::GraphQL::ExecutionError` if a search queries no shards without excluding any indices as that indicates the indices have not been configured" do
           allow(main_datastore_client).to receive(:msearch).and_return("took" => 10, "responses" => [
             empty_response,
-            DatastoreResponse::SearchResponse::RAW_EMPTY.merge(
-              "took" => 5, "_shards" => {"total" => 0, "successful" => 0, "skipped" => 0, "failed" => 0}, "status" => 200
-            )
+            no_shards_searched_response
           ])
 
           expect {
@@ -198,6 +205,19 @@ module ElasticGraph
           }.to raise_error ::GraphQL::ExecutionError, a_string_including(
             "The datastore indices have not been configured. They must be configured before ElasticGraph can serve queries."
           )
+        end
+
+        it "returns no results if a search queries no shards while excluding indices as that indicates the indices have been configured" do
+          allow(main_datastore_client).to receive(:msearch).and_return("took" => 10, "responses" => [
+            empty_response,
+            no_shards_searched_response
+          ])
+
+          query_excluding_indices = query2.merge_with(filters: [{"created_at" => {"gte" => "2025-01-01T00:00:00Z"}}])
+          expect(query_excluding_indices.search_index_expression).to eq("widgets_rollover__*,-widgets_rollover__2024")
+
+          responses_by_query = router.msearch([query1, query_excluding_indices])
+          expect(responses_by_query.values.map(&:documents)).to eq [[], []]
         end
 
         it "logs warning if a query has failed shards" do
@@ -231,7 +251,7 @@ module ElasticGraph
           }.to log(a_string_including(
             "The following queries have failed shards",
             "Query 2",
-            "against index `widgets`",
+            "against index `widgets_rollover__*`",
             "illegal_argument_exception",
             "numHits must be > 0; TotalHitCountCollector can be used for the total hit count"
           ))
@@ -311,7 +331,7 @@ module ElasticGraph
         end
 
         it "prints via `puts` the datastore query and response only when `DEBUG_QUERY` is set" do
-          formatted_messages_pattern = /QUERY:\n.*"index": "widgets".*\nRESPONSE:\n.*"responses"/m
+          formatted_messages_pattern = /QUERY:\n.*"index": "widgets_rollover__\*".*\nRESPONSE:\n.*"responses"/m
           with_env("DEBUG_QUERY" => "1") do
             expect {
               router.msearch([query1, query2])
