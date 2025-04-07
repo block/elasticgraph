@@ -33,10 +33,7 @@ module ElasticGraph
     def build_indexer(use_old_update_script: false, **options, &block)
       return super(**options, &block) unless use_old_update_script
 
-      schema_artifacts = SchemaArtifacts::FromDisk.new(
-        ::File.join(CommonSpecHelpers::REPO_ROOT, "config", "schema", "artifacts"),
-        :indexer
-      )
+      schema_artifacts = SchemaArtifacts::FromDisk.new(::File.join(CommonSpecHelpers::REPO_ROOT, "config", "schema", "artifacts"))
 
       schema_artifacts.runtime_metadata.object_types_by_name.each do |name, object_type|
         object_type.update_targets.map! do |update_target|

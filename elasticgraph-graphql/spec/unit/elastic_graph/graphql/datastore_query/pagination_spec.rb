@@ -14,7 +14,7 @@ module ElasticGraph
       include_context "DatastoreQueryUnitSupport"
 
       before(:context) do
-        artifacts = CommonSpecHelpers.stock_schema_artifacts(for_context: :graphql)
+        artifacts = CommonSpecHelpers.stock_schema_artifacts
         @index_def_names = artifacts.indices.keys + artifacts.index_templates.keys
       end
 

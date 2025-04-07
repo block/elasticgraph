@@ -17,11 +17,11 @@ module ElasticGraph
     # @dynamic config, schema_artifacts, logger, client_customization_block
     attr_reader :config, :schema_artifacts, :logger, :client_customization_block
 
-    def self.from_parsed_yaml(parsed_yaml, for_context:, &client_customization_block)
+    def self.from_parsed_yaml(parsed_yaml, &client_customization_block)
       new(
         config: DatastoreCore::Config.from_parsed_yaml(parsed_yaml),
         logger: Support::Logger.from_parsed_yaml(parsed_yaml),
-        schema_artifacts: SchemaArtifacts.from_parsed_yaml(parsed_yaml, for_context: for_context),
+        schema_artifacts: SchemaArtifacts.from_parsed_yaml(parsed_yaml),
         client_customization_block: client_customization_block
       )
     end

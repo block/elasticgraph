@@ -16,15 +16,11 @@ module ElasticGraph
   end
 
   module SchemaArtifacts
-    def self.from_parsed_yaml: (
-      parsedYamlSettings,
-      for_context: context
-    ) ?{ (untyped) -> void } -> FromDisk
+    def self.from_parsed_yaml: (parsedYamlSettings) ?{ (untyped) -> void } -> FromDisk
 
     class FromDiskSupertype
       attr_reader artifacts_dir: ::String
-      attr_reader context: context
-      def initialize: (artifacs_dir: ::String, context: context) -> void
+      def initialize: (artifacs_dir: ::String) -> void
     end
 
     class FromDisk < FromDiskSupertype
@@ -32,8 +28,8 @@ module ElasticGraph
       include ArtifactsHelperMethods
 
       def self.new:
-        (artifacs_dir: ::String, context: context) -> instance
-      | (::String, context) -> instance
+        (artifacs_dir: ::String) -> instance
+      | (::String) -> instance
 
       private
 

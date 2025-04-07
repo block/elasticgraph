@@ -15,7 +15,7 @@ module ElasticGraph
     module GraphQLExtension
       def datastore_query_adapters
         @datastore_query_adapters ||= begin
-          runtime_metadata_configs = runtime_metadata.graphql_extension_modules.filter_map do |ext_mod|
+          runtime_metadata_configs = runtime_metadata.graphql_extension_modules.map(&:load_extension).filter_map do |ext_mod|
             Support::HashUtil.stringify_keys(ext_mod.config) if ext_mod.extension_class == GraphQLExtension
           end
 

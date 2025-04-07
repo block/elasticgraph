@@ -1499,8 +1499,9 @@ enum_types_by_name:
           direction: desc
           field_path: widget.id
 graphql_extension_modules:
-- name: ElasticGraph::Apollo::GraphQL::EngineExtension
-  require_path: elastic_graph/apollo/graphql/engine_extension
+- extension_ref:
+    name: ElasticGraph::Apollo::GraphQL::EngineExtension
+    require_path: elastic_graph/apollo/graphql/engine_extension
 graphql_resolvers_by_name:
   apollo_entities:
     needs_lookahead: true

@@ -33,7 +33,7 @@ module ElasticGraph
       &customize_datastore_config
     )
       GraphQL.new(
-        datastore_core: datastore_core || build_datastore_core(for_context: :graphql, **datastore_core_options, &customize_datastore_config),
+        datastore_core: datastore_core || build_datastore_core(**datastore_core_options, &customize_datastore_config),
         config: GraphQL::Config.new(
           max_page_size: max_page_size,
           default_page_size: default_page_size,

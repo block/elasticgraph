@@ -27,7 +27,7 @@ module ElasticGraph
     def self.from_parsed_yaml(parsed_yaml, &datastore_client_customization_block)
       new(
         config: GraphQL::Config.from_parsed_yaml(parsed_yaml),
-        datastore_core: DatastoreCore.from_parsed_yaml(parsed_yaml, for_context: :graphql, &datastore_client_customization_block)
+        datastore_core: DatastoreCore.from_parsed_yaml(parsed_yaml, &datastore_client_customization_block)
       )
     end
 
@@ -56,7 +56,7 @@ module ElasticGraph
 
       # Apply any extension modules that have been configured.
       @config.extension_modules.each { |mod| extend mod }
-      @runtime_metadata.graphql_extension_modules.each { |ext_mod| extend ext_mod.extension_class }
+      @runtime_metadata.graphql_extension_modules.each { |ext_mod| extend ext_mod.load_extension.extension_class }
     end
 
     # @private

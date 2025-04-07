@@ -115,10 +115,15 @@ module ElasticGraph
       end
 
       it "does not add interceptors if GraphQLExtension is not used" do
+        extension_mod = Module.new
+        stub_const("MyExtension", extension_mod)
+
         schema_artifacts = generate_schema_artifacts do |schema|
           schema.register_graphql_extension(
-            Module.new,
-            defined_at: __FILE__,
+            extension_mod,
+            # `defined_at` just needs a valid require path, but needs to be outside ElasticGraph
+            # to not mess with our code coverage measurement.
+            defined_at: "time",
             interceptors: interceptors
           )
         end

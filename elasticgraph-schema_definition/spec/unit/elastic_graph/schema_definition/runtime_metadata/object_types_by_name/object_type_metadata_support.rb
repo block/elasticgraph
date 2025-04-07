@@ -15,7 +15,7 @@ module ElasticGraph
 
       def object_types_by_name(**options, &block)
         runtime_metadata = define_schema(**options, &block).runtime_metadata
-        runtime_metadata = SchemaArtifacts::RuntimeMetadata::Schema.from_hash(runtime_metadata.to_dumpable_hash, for_context: :admin)
+        runtime_metadata = SchemaArtifacts::RuntimeMetadata::Schema.from_hash(runtime_metadata.to_dumpable_hash)
         runtime_metadata.object_types_by_name
       end
 

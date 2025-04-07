@@ -69,7 +69,7 @@ module ElasticGraph
 
         before(:context) do
           enum_types = ::GraphQL::Schema.from_definition(
-            stock_schema_artifacts(for_context: :graphql).graphql_schema_string
+            stock_schema_artifacts.graphql_schema_string
           ).types.values.select { |t| t.kind.enum? }
 
           # For each enum type, we want to override the values to be different, as a forcing function to make
@@ -270,7 +270,7 @@ module ElasticGraph
     def build(*args, **opts)
       raw_data = super
 
-      schema_artifacts = stock_schema_artifacts(for_context: :graphql)
+      schema_artifacts = stock_schema_artifacts
       json_schema_defs = schema_artifacts.json_schemas_for(schema_artifacts.latest_json_schema_version).fetch("$defs")
 
       if (typename = raw_data[:__typename])

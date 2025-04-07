@@ -16,7 +16,7 @@ module ElasticGraph
     extend CommonSpecHelpers
 
     def build_admin(datastore_core: nil, **options, &customize_datastore_config)
-      Admin.new(datastore_core: datastore_core || build_datastore_core(for_context: :admin, **options, &customize_datastore_config))
+      Admin.new(datastore_core: datastore_core || build_datastore_core(**options, &customize_datastore_config))
     end
   end
 

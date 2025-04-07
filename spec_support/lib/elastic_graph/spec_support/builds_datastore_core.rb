@@ -16,7 +16,6 @@ require "stringio"
 module ElasticGraph
   module BuildsDatastoreCore
     def build_datastore_core(
-      for_context:,
       client_customization_block: nil,
       clients_by_name: nil,
       config: nil,
@@ -66,9 +65,9 @@ module ElasticGraph
         elsif schema_artifacts_directory
           # Deal with the relative nature of paths in config, ensuring we can run the specs while being
           # in the repo root and also while being in a gem directory.
-          SchemaArtifacts::FromDisk.new(schema_artifacts_directory.sub("config", "#{CommonSpecHelpers::REPO_ROOT}/config"), for_context)
+          SchemaArtifacts::FromDisk.new(schema_artifacts_directory.sub("config", "#{CommonSpecHelpers::REPO_ROOT}/config"))
         else
-          stock_schema_artifacts(for_context: for_context)
+          stock_schema_artifacts
         end
 
       if clients_by_name.nil? && respond_to?(:stubbed_datastore_client)

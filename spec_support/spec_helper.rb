@@ -279,11 +279,10 @@ module ElasticGraph
       @test_settings_file
     end
 
-    def self.stock_schema_artifacts(for_context:)
-      @stock_schema_artifacts ||= {}
-      @stock_schema_artifacts[for_context] ||= begin
+    def self.stock_schema_artifacts
+      @stock_schema_artifacts ||= begin
         require "elastic_graph/schema_artifacts/from_disk"
-        SchemaArtifacts.from_parsed_yaml(parsed_test_settings_yaml, for_context: for_context)
+        SchemaArtifacts.from_parsed_yaml(parsed_test_settings_yaml)
       end
     end
 
@@ -317,8 +316,8 @@ module ElasticGraph
       raise_error(::SystemExit, *args, &block).and output(/./).to_stderr
     end
 
-    def stock_schema_artifacts(for_context:)
-      CommonSpecHelpers.stock_schema_artifacts(for_context: for_context)
+    def stock_schema_artifacts
+      CommonSpecHelpers.stock_schema_artifacts
     end
 
     def parsed_test_settings_yaml

@@ -19,7 +19,7 @@ module ElasticGraph
           begin
             http_path_segment = config.extension_settings.dig("health_check", "http_path_segment")
             http_path_segment ||= runtime_metadata
-              .graphql_extension_modules
+              .graphql_extension_modules.map(&:load_extension)
               .find { |ext_mod| ext_mod.extension_class == EnvoyExtension }
               &.config
               &.dig(:http_path_segment)

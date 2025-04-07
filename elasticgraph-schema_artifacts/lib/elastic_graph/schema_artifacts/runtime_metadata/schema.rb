@@ -9,6 +9,7 @@
 require "elastic_graph/schema_artifacts/runtime_metadata/enum"
 require "elastic_graph/schema_artifacts/runtime_metadata/extension"
 require "elastic_graph/schema_artifacts/runtime_metadata/extension_loader"
+require "elastic_graph/schema_artifacts/runtime_metadata/graphql_extension"
 require "elastic_graph/schema_artifacts/runtime_metadata/graphql_resolver"
 require "elastic_graph/schema_artifacts/runtime_metadata/hash_dumper"
 require "elastic_graph/schema_artifacts/runtime_metadata/index_definition"
@@ -40,7 +41,7 @@ module ElasticGraph
         GRAPHQL_RESOLVERS_BY_NAME = "graphql_resolvers_by_name"
         STATIC_SCRIPT_IDS_BY_NAME = "static_script_ids_by_scoped_name"
 
-        def self.from_hash(hash, for_context:)
+        def self.from_hash(hash)
           object_types_by_name = hash[OBJECT_TYPES_BY_NAME]&.transform_values do |type_hash|
             ObjectType.from_hash(type_hash)
           end || {}
@@ -59,17 +60,10 @@ module ElasticGraph
 
           schema_element_names = SchemaElementNames.from_hash(hash.fetch(SCHEMA_ELEMENT_NAMES))
 
-          extension_loader = ExtensionLoader.new(Module.new)
           graphql_extension_modules =
-            if for_context == :graphql
-              hash[GRAPHQL_EXTENSION_MODULES]&.map do |ext_mod_hash|
-                Extension.load_from_hash(ext_mod_hash, via: extension_loader)
-              end || []
-            else
-              # Avoid loading GraphQL extension modules if we're not in a GraphQL context. We can't count
-              # on the extension modules even being available to load in other contexts.
-              [] # : ::Array[Extension]
-            end
+            hash[GRAPHQL_EXTENSION_MODULES]&.map do |ext_mod_hash|
+              GraphQLExtension.from_hash(ext_mod_hash)
+            end || []
 
           graphql_resolvers_by_name = hash[GRAPHQL_RESOLVERS_BY_NAME]&.to_h do |name, resolver_hash|
             [name.to_sym, GraphQLResolver.from_hash(resolver_hash)]

@@ -278,8 +278,10 @@ module ElasticGraph
               "overrides" => {"any_of" => "or"}
             },
             "graphql_extension_modules" => [{
-              "name" => "ElasticGraph::SchemaArtifacts::GraphQLExtensionModule1",
-              "require_path" => "support/example_extensions/graphql_extension_modules"
+              "extension_ref" => {
+                "name" => "ElasticGraph::SchemaArtifacts::GraphQLExtensionModule1",
+                "require_path" => "support/example_extensions/graphql_extension_modules"
+              }
             }],
             "graphql_resolvers_by_name" => {
               "resolver1" => {
@@ -296,7 +298,7 @@ module ElasticGraph
             }
           )
 
-          expect(Schema.from_hash(hash, for_context: :graphql)).to eq schema
+          expect(Schema.from_hash(hash)).to eq schema
         end
 
         it "ignores object types that have no meaningful runtime metadata" do
@@ -323,7 +325,7 @@ module ElasticGraph
             "NoMetadata" => object_type_with
           })
 
-          schema = Schema.from_hash(schema.to_dumpable_hash, for_context: :graphql)
+          schema = Schema.from_hash(schema.to_dumpable_hash)
 
           expect(schema.object_types_by_name.keys).to contain_exactly(
             "UpdateTargetsOnly",
@@ -341,15 +343,13 @@ module ElasticGraph
             "NoValues" => enum_type_with(values_by_name: {})
           })
 
-          schema = Schema.from_hash(schema.to_dumpable_hash, for_context: :graphql)
+          schema = Schema.from_hash(schema.to_dumpable_hash)
 
           expect(schema.enum_types_by_name.keys).to contain_exactly("HasValues")
         end
 
         it "builds from a minimal hash" do
-          schema = Schema.from_hash({
-            "schema_element_names" => {"form" => "camelCase"}
-          }, for_context: :graphql)
+          schema = Schema.from_hash({"schema_element_names" => {"form" => "camelCase"}})
 
           expect(schema).to eq Schema.new(
             object_types_by_name: {},
@@ -361,14 +361,6 @@ module ElasticGraph
             graphql_resolvers_by_name: {},
             static_script_ids_by_scoped_name: {}
           )
-        end
-
-        it "only loads `graphql_extension_modules` for the `:graphql` context since the extension module gems may not be available in other contexts" do
-          schema = schema_with(graphql_extension_modules: [graphql_extension_module1])
-
-          expect(Schema.from_hash(schema.to_dumpable_hash, for_context: :admin).graphql_extension_modules).to eq []
-          expect(Schema.from_hash(schema.to_dumpable_hash, for_context: :indexer).graphql_extension_modules).to eq []
-          expect(Schema.from_hash(schema.to_dumpable_hash, for_context: :graphql).graphql_extension_modules).to eq [graphql_extension_module1]
         end
 
         it "dumps all hashes in alphabetical order for consistency" do

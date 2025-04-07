@@ -23,7 +23,7 @@ module ElasticGraph
     # A factory method that builds a IndexerAutoscalerLambda instance from the given parsed YAML config.
     # `from_yaml_file(file_name, &block)` is also available (via `Support::FromYamlFile`).
     def self.from_parsed_yaml(parsed_yaml, &datastore_client_customization_block)
-      new(datastore_core: DatastoreCore.from_parsed_yaml(parsed_yaml, for_context: :indexer_autoscaler_lambda, &datastore_client_customization_block))
+      new(datastore_core: DatastoreCore.from_parsed_yaml(parsed_yaml, &datastore_client_customization_block))
     end
 
     # @dynamic datastore_core

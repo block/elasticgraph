@@ -81,6 +81,7 @@ module ElasticGraph
             super() + "\n# #{extension_data.inspect}"
           end
         end
+        stub_const("ConfigExtensionModule", config_extension_module)
 
         runtime_metadata_extension_module = Module.new do
           define_method :runtime_metadata do
@@ -90,11 +91,14 @@ module ElasticGraph
             )
           end
         end
+        stub_const("RuntimeMetadataExtensionModule", runtime_metadata_extension_module)
 
         extended_graphql = build_graphql(
           extension_modules: [config_extension_module],
           schema_definition: lambda do |schema|
-            schema.register_graphql_extension runtime_metadata_extension_module, defined_at: __FILE__
+            # `defined_at` just needs a valid require path, but needs to be outside ElasticGraph
+            # to not mess with our code coverage measurement.
+            schema.register_graphql_extension runtime_metadata_extension_module, defined_at: "time"
             define_schema_elements(schema)
           end
         )

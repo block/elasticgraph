@@ -290,7 +290,7 @@ module ElasticGraph
         does_not_match_warning_snippet = "does not match any type in your GraphQL schema"
 
         it "respects type name overrides for all types (both core and derived), except standard GraphQL ones like `Int`" do
-          original_types = graphql_types_defined_in(CommonSpecHelpers.stock_schema_artifacts(for_context: :graphql).graphql_schema_string)
+          original_types = graphql_types_defined_in(CommonSpecHelpers.stock_schema_artifacts.graphql_schema_string)
 
           # In this test, we evaluate our main test schema because it exercises such a wide variety of cases.
           ::File.write("schema.rb", <<~EOS)
@@ -341,7 +341,7 @@ module ElasticGraph
           derived_type_regex = /#{derived_type_suffixes.join("|")}\z/
 
           exclusions = SchemaElements::TypeNamer::TYPES_THAT_CANNOT_BE_OVERRIDDEN
-          schema_string = CommonSpecHelpers.stock_schema_artifacts(for_context: :graphql).graphql_schema_string
+          schema_string = CommonSpecHelpers.stock_schema_artifacts.graphql_schema_string
           original_core_types = graphql_types_defined_in(schema_string).reject do |t|
             t.start_with?("__") || derived_type_regex.match?(t) || exclusions.include?(t)
           end

@@ -21,7 +21,6 @@ module ElasticGraph
       &customize_datastore_config
     )
       datastore_core = build_datastore_core(
-        for_context: :autoscaling,
         **datastore_core_options,
         &customize_datastore_config
       )

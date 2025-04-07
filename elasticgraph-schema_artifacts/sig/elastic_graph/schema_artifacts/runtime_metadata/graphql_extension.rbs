@@ -1,0 +1,32 @@
+module ElasticGraph
+  module SchemaArtifacts
+    module RuntimeMetadata
+      class GraphQLExtensionSupertype
+        attr_reader extension_ref: ::Hash[::String, ::String]
+
+        def initialize: (
+          extension_ref: ::Hash[::String, ::String]
+        ) -> void
+
+        def with: (
+          ?extension_ref: ::Hash[::String, ::String]
+        ) -> instance
+
+        def self.new:
+          (extension_ref: ::Hash[::String, ::String]) -> instance
+          | (::Hash[::String, ::String]) -> instance
+      end
+
+      class GraphQLExtension < GraphQLExtensionSupertype
+        self.@loader: ExtensionLoader?
+        def self.loader: () -> ExtensionLoader
+
+        EXTENSION_REF: "extension_ref"
+
+        def load_extension: () -> Extension
+        def self.from_hash: (::Hash[::String, untyped]) -> GraphQLExtension
+        def to_dumpable_hash: () -> ::Hash[::String, untyped]
+      end
+    end
+  end
+end

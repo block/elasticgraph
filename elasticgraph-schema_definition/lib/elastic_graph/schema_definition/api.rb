@@ -287,7 +287,8 @@ module ElasticGraph
       #       defined_at: query_registry_require_path
       #   end
       def register_graphql_extension(extension_module, defined_at:, **config)
-        @state.graphql_extension_modules << SchemaArtifacts::RuntimeMetadata::Extension.new(extension_module, defined_at, config)
+        extension = SchemaArtifacts::RuntimeMetadata::Extension.new(extension_module, defined_at, config)
+        @state.graphql_extension_modules << SchemaArtifacts::RuntimeMetadata::GraphQLExtension.new(extension.to_dumpable_hash)
         nil
       end
 

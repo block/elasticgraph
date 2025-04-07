@@ -24,14 +24,14 @@ module ElasticGraph
 
     describe ".from_parsed_yaml" do
       it "can build an instance from a parsed settings YAML file" do
-        datastore_core = DatastoreCore.from_parsed_yaml(parsed_test_settings_yaml, for_context: :admin)
+        datastore_core = DatastoreCore.from_parsed_yaml(parsed_test_settings_yaml)
 
         expect(datastore_core).to be_an(DatastoreCore)
       end
 
       it "allows the datastore clients to be customized via the passed block" do
         customization_block = lambda { |conn| }
-        datastore_core = DatastoreCore.from_parsed_yaml(parsed_test_settings_yaml, for_context: :admin, &customization_block)
+        datastore_core = DatastoreCore.from_parsed_yaml(parsed_test_settings_yaml, &customization_block)
 
         expect(datastore_core.client_customization_block).to be(customization_block)
       end

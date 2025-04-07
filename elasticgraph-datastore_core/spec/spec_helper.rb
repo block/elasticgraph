@@ -13,18 +13,8 @@
 require "elastic_graph/spec_support/builds_datastore_core"
 
 module ElasticGraph
-  module DatastoreCoreSpecHelpers
-    include BuildsDatastoreCore
-
-    def build_datastore_core(**options, &block)
-      # Default `for_context` to :admin since it is a more limited context.
-      options = {for_context: :admin}.merge(options)
-      super(**options, &block)
-    end
-  end
-
   RSpec.configure do |config|
-    config.include DatastoreCoreSpecHelpers, absolute_file_path: %r{/elasticgraph-datastore_core/}
+    config.include BuildsDatastoreCore, absolute_file_path: %r{/elasticgraph-datastore_core/}
   end
 end
 

@@ -36,21 +36,21 @@ module ElasticGraph
         }.to raise_error Errors::ConfigError, a_string_including("foo")
       end
 
-      def from_parsed_yaml(parsed_yaml, for_context: :graphql)
-        SchemaArtifacts.from_parsed_yaml(parsed_yaml, for_context: for_context)
+      def from_parsed_yaml(parsed_yaml)
+        SchemaArtifacts.from_parsed_yaml(parsed_yaml)
       end
     end
 
     RSpec.describe FromDisk do
       it "loads each schema artifact from disk" do
-        artifacts = FromDisk.new(::File.join(CommonSpecHelpers::REPO_ROOT, "config", "schema", "artifacts"), :graphql)
+        artifacts = FromDisk.new(::File.join(CommonSpecHelpers::REPO_ROOT, "config", "schema", "artifacts"))
 
         expect_artifacts_to_load_and_be_valid(artifacts)
         expect(artifacts.datastore_scripts.values.first).to include("context", "script")
       end
 
       context "with multiple json schemas", :in_temp_dir do
-        let(:artifacts) { FromDisk.new(Dir.pwd, :indexer) }
+        let(:artifacts) { FromDisk.new(Dir.pwd) }
 
         before do
           ::FileUtils.mkdir_p(JSON_SCHEMAS_BY_VERSION_DIRECTORY)
@@ -81,7 +81,7 @@ module ElasticGraph
       end
 
       context "before any artifacts have been dumped", :in_temp_dir do
-        let(:artifacts) { FromDisk.new(Dir.pwd, :graphql) }
+        let(:artifacts) { FromDisk.new(Dir.pwd) }
 
         it "raises an error when accessing missing artifacts is attempted" do
           expect { artifacts.graphql_schema_string }.to raise_missing_artifacts_error
@@ -104,7 +104,7 @@ module ElasticGraph
       end
 
       describe "#index_mappings_by_index_def_name" do
-        let(:artifacts) { FromDisk.new(::File.join(CommonSpecHelpers::REPO_ROOT, "config", "schema", "artifacts"), :indexer) }
+        let(:artifacts) { FromDisk.new(::File.join(CommonSpecHelpers::REPO_ROOT, "config", "schema", "artifacts")) }
 
         it "returns the index mappings" do
           mappings = artifacts.index_mappings_by_index_def_name

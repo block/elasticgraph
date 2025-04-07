@@ -131,7 +131,7 @@ module ElasticGraph
 
           context "with `sub_aggregations`" do
             before(:context) do
-              self.schema_artifacts = CommonSpecHelpers.stock_schema_artifacts(for_context: :graphql)
+              self.schema_artifacts = CommonSpecHelpers.stock_schema_artifacts
             end
 
             it "can build sub-aggregations" do

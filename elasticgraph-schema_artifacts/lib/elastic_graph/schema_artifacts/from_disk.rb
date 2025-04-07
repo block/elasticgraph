@@ -17,7 +17,7 @@ require "yaml"
 module ElasticGraph
   module SchemaArtifacts
     # Builds a `SchemaArtifacts::FromDisk` instance using the provided YAML settings.
-    def self.from_parsed_yaml(parsed_yaml, for_context:)
+    def self.from_parsed_yaml(parsed_yaml)
       schema_artifacts = parsed_yaml.fetch("schema_artifacts") do
         raise Errors::ConfigError, "Config is missing required key `schema_artifacts`."
       end
@@ -30,11 +30,11 @@ module ElasticGraph
         raise Errors::ConfigError, "Config is missing required key `schema_artifacts.directory`."
       end
 
-      FromDisk.new(directory, for_context)
+      FromDisk.new(directory)
     end
 
     # Responsible for loading schema artifacts from disk.
-    class FromDisk < Support::MemoizableData.define(:artifacts_dir, :context)
+    class FromDisk < Support::MemoizableData.define(:artifacts_dir)
       include ArtifactsHelperMethods
 
       def graphql_schema_string
@@ -74,10 +74,7 @@ module ElasticGraph
       end
 
       def runtime_metadata
-        @runtime_metadata ||= RuntimeMetadata::Schema.from_hash(
-          parsed_yaml_from(RUNTIME_METADATA_FILE),
-          for_context: context
-        )
+        @runtime_metadata ||= RuntimeMetadata::Schema.from_hash(parsed_yaml_from(RUNTIME_METADATA_FILE))
       end
 
       private

@@ -94,7 +94,7 @@ module ElasticGraph
 
         artifacts_manager.dump_artifacts
 
-        SchemaArtifacts::FromDisk.new(tmp_dir, :graphql)
+        SchemaArtifacts::FromDisk.new(tmp_dir)
         # :nocov:
       end
 

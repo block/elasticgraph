@@ -14,13 +14,6 @@ module ElasticGraph
   class GraphQL
     SPEC_ROOT = __dir__
   end
-
-  module GraphQLSpecHelpers
-    def build_datastore_core(**options, &block)
-      options = {for_context: :graphql}.merge(options)
-      super(**options, &block)
-    end
-  end
 end
 
 RSpec.configure do |config|
@@ -31,7 +24,6 @@ RSpec.configure do |config|
   config.when_first_matching_example_defined(:ensure_no_orphaned_types) { require_relative "support/ensure_no_orphaned_types" }
   config.when_first_matching_example_defined(:query_adapter) { require_relative "support/query_adapter" }
   config.when_first_matching_example_defined(:resolver) { require_relative "support/resolver" }
-  config.prepend ElasticGraph::GraphQLSpecHelpers, absolute_file_path: %r{/elasticgraph-graphql/}
 end
 
 RSpec::Matchers.define :take_less_than do |max_expected_duration|

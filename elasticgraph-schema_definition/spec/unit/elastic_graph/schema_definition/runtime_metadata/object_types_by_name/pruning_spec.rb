@@ -31,7 +31,7 @@ module ElasticGraph
           end
         end
 
-        runtime_metadata = SchemaArtifacts::RuntimeMetadata::Schema.from_hash(results.runtime_metadata.to_dumpable_hash, for_context: :admin)
+        runtime_metadata = SchemaArtifacts::RuntimeMetadata::Schema.from_hash(results.runtime_metadata.to_dumpable_hash)
 
         # Note: this list has greatly grown over time. When you make a change causing a new type to be dumped, this'll fail
         # and force you to consider if that new type should be dumped or not. Add types to this as needed for ones that we

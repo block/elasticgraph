@@ -1,7 +1,5 @@
 module ElasticGraph
   module SchemaArtifacts
-    type context = :admin | :graphql | :indexer | :indexer_autoscaler_lambda
-
     module RuntimeMetadata
       class SchemaSupertype
         attr_reader object_types_by_name: ::Hash[::String, ObjectType]
@@ -9,7 +7,7 @@ module ElasticGraph
         attr_reader enum_types_by_name: ::Hash[::String, Enum::Type]
         attr_reader index_definitions_by_name: ::Hash[::String, IndexDefinition]
         attr_reader schema_element_names: SchemaElementNames
-        attr_reader graphql_extension_modules: ::Array[Extension]
+        attr_reader graphql_extension_modules: ::Array[GraphQLExtension]
         attr_reader graphql_resolvers_by_name: ::Hash[::Symbol, GraphQLResolver]
         attr_reader static_script_ids_by_scoped_name: ::Hash[::String, ::String]
 
@@ -19,7 +17,7 @@ module ElasticGraph
           enum_types_by_name: ::Hash[::String, Enum::Type],
           index_definitions_by_name: ::Hash[::String, IndexDefinition],
           schema_element_names: SchemaElementNames,
-          graphql_extension_modules: ::Array[Extension],
+          graphql_extension_modules: ::Array[GraphQLExtension],
           graphql_resolvers_by_name: ::Hash[::Symbol, GraphQLResolver],
           static_script_ids_by_scoped_name: ::Hash[::String, ::String]) -> void
 
@@ -29,7 +27,7 @@ module ElasticGraph
           ?enum_types_by_name: ::Hash[::String, Enum::Type],
           ?index_definitions_by_name: ::Hash[::String, IndexDefinition],
           ?schema_element_names: SchemaElementNames,
-          ?graphql_extension_modules: ::Array[Extension],
+          ?graphql_extension_modules: ::Array[GraphQLExtension],
           ?graphql_resolvers_by_name: ::Hash[::Symbol, GraphQLResolver],
           ?static_script_ids_by_scoped_name: ::Hash[::String, ::String]) -> Schema
       end
@@ -44,7 +42,7 @@ module ElasticGraph
         GRAPHQL_RESOLVERS_BY_NAME: "graphql_resolvers_by_name"
         STATIC_SCRIPT_IDS_BY_NAME: "static_script_ids_by_scoped_name"
 
-        def self.from_hash: (::Hash[::String, untyped], for_context: context) -> Schema
+        def self.from_hash: (::Hash[::String, untyped]) -> Schema
         def to_dumpable_hash: () -> ::Hash[::String, untyped]
       end
     end

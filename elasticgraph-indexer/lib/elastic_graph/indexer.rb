@@ -22,7 +22,7 @@ module ElasticGraph
     def self.from_parsed_yaml(parsed_yaml, &datastore_client_customization_block)
       new(
         config: Indexer::Config.from_parsed_yaml(parsed_yaml),
-        datastore_core: DatastoreCore.from_parsed_yaml(parsed_yaml, for_context: :indexer, &datastore_client_customization_block)
+        datastore_core: DatastoreCore.from_parsed_yaml(parsed_yaml, &datastore_client_customization_block)
       )
     end
 

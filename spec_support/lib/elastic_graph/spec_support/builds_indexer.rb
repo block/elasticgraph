@@ -25,7 +25,7 @@ module ElasticGraph
       &customize_datastore_config
     )
       Indexer.new(
-        datastore_core: datastore_core || build_datastore_core(for_context: :indexer, **datastore_core_options, &customize_datastore_config),
+        datastore_core: datastore_core || build_datastore_core(**datastore_core_options, &customize_datastore_config),
         config: Indexer::Config.new(
           latency_slo_thresholds_by_timestamp_in_ms: latency_slo_thresholds_by_timestamp_in_ms,
           skip_derived_indexing_type_updates: skip_derived_indexing_type_updates.transform_values(&:to_set)

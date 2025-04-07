@@ -277,7 +277,7 @@ module ElasticGraph
           describe "properties of an overall schema (using the full test schema for completeness)" do
             attr_reader :schema
             before(:context) do
-              @schema = ::GraphQL::Schema.from_definition(CommonSpecHelpers.stock_schema_artifacts(for_context: :graphql).graphql_schema_string)
+              @schema = ::GraphQL::Schema.from_definition(CommonSpecHelpers.stock_schema_artifacts.graphql_schema_string)
             end
 
             let(:input_types) { schema.types.values.select { |type| type.kind.input_object? } }

@@ -421,8 +421,8 @@ module ElasticGraph
           expect(with_apollo_results.indices).to eq(without_apollo_results.indices)
           expect(with_apollo_results.index_templates).to eq(without_apollo_results.index_templates)
 
-          with_apollo_runtime_metadata = SchemaArtifacts::RuntimeMetadata::Schema.from_hash(with_apollo_results.runtime_metadata.to_dumpable_hash, for_context: :graphql)
-          without_apollo_runtime_metadata = SchemaArtifacts::RuntimeMetadata::Schema.from_hash(without_apollo_results.runtime_metadata.to_dumpable_hash, for_context: :graphql)
+          with_apollo_runtime_metadata = SchemaArtifacts::RuntimeMetadata::Schema.from_hash(with_apollo_results.runtime_metadata.to_dumpable_hash)
+          without_apollo_runtime_metadata = SchemaArtifacts::RuntimeMetadata::Schema.from_hash(without_apollo_results.runtime_metadata.to_dumpable_hash)
           expect(with_apollo_runtime_metadata.enum_types_by_name).to eq(without_apollo_runtime_metadata.enum_types_by_name)
           expect(with_apollo_runtime_metadata.object_types_by_name.except("_Entity", "_Service", "Query")).to eq(without_apollo_runtime_metadata.object_types_by_name.except("Query"))
         end
@@ -481,8 +481,8 @@ module ElasticGraph
         it "registers the GraphQL extension since the GraphQL endpoint will be buggy/broken if the extension is not loaded given the custom schema elements that have been added" do
           runtime_metadata = define_schema(with_apollo: true) { |s| define_some_types_on(s) }.runtime_metadata
 
-          expect(runtime_metadata.graphql_extension_modules).to include(
-            SchemaArtifacts::RuntimeMetadata::Extension.new(GraphQL::EngineExtension, "elastic_graph/apollo/graphql/engine_extension", {})
+          expect(runtime_metadata.graphql_extension_modules.map(&:extension_ref)).to include(
+            SchemaArtifacts::RuntimeMetadata::Extension.new(GraphQL::EngineExtension, "elastic_graph/apollo/graphql/engine_extension", {}).to_dumpable_hash
           )
         end
 

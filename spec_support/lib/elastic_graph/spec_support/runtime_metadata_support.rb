@@ -187,7 +187,8 @@ module ElasticGraph
         end
 
         def graphql_extension_module1
-          Extension.new(GraphQLExtensionModule1, "support/example_extensions/graphql_extension_modules", {})
+          extension = Extension.new(GraphQLExtensionModule1, "support/example_extensions/graphql_extension_modules", {})
+          GraphQLExtension.new(extension_ref: extension.to_dumpable_hash)
         end
 
         def graphql_resolver_with_lookahead(**config)

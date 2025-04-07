@@ -155,7 +155,7 @@ module ElasticGraph
           end
         end
 
-        runtime_metadata = SchemaArtifacts::RuntimeMetadata::Schema.from_hash(results.runtime_metadata.to_dumpable_hash, for_context: :admin)
+        runtime_metadata = SchemaArtifacts::RuntimeMetadata::Schema.from_hash(results.runtime_metadata.to_dumpable_hash)
         expect(runtime_metadata.enum_types_by_name.keys).to contain_exactly(
           "DateGroupingGranularity", "DateGroupingGranularityInput",
           "DateGroupingTruncationUnit", "DateGroupingTruncationUnitInput",
