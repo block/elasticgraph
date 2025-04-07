@@ -20,7 +20,7 @@ module ElasticGraph
       let(:grouped_by) { case_correctly("grouped_by") }
       let(:approximate_distinct_value_count) { case_correctly("approximate_distinct_value_count") }
 
-      it "returns empty aggregation results when the indices have not been configured or no documents have been indexed" do
+      it "returns empty aggregation results when querying a rollover index that does not yet have any concrete index (e.g. before the first document is indexed)" do
         allow(GraphQL::DatastoreQuery).to receive(:perform).and_wrap_original do |original, queries, &block|
           queries.each do |query|
             original_to_datastore_msearch_header = query.to_datastore_msearch_header
@@ -38,9 +38,25 @@ module ElasticGraph
         end
 
         # Test grouped_by
-        expect_indices_not_configured_error { group_widgets_by_tag(allow_errors: true) }
+        aggregations = group_widgets_by_tag
+        expect(aggregations).to eq [{
+          grouped_by => {"tag" => nil},
+          "count" => 0,
+          aggregated_values => {
+            "#{amount_cents}1" => {"sum" => 0},
+            "#{amount_cents}2" => {"sum" => 0}
+          }
+        }]
+
         # Test aggregated_values
-        expect_indices_not_configured_error { list_widgets_with_aggregations(all_amount_aggregations, allow_errors: true) }
+        aggregations = list_widgets_with_aggregations(all_amount_aggregations)
+        expect(aggregations).to contain_exactly({
+          aggregated_values => {
+            amount_cents => expected_aggregated_amounts_of([]),
+            "cost" => {amount_cents => expected_aggregated_amounts_of([])}
+          },
+          "count" => 0
+        })
       end
 
       it "returns aggregates (terms, date histogram) and nested aggregates" do
@@ -2353,8 +2369,8 @@ module ElasticGraph
       OPTS
     end
 
-    def group_widgets_by_tag(allow_errors: false)
-      response = call_graphql_query(<<~QUERY, allow_errors: allow_errors)
+    def group_widgets_by_tag
+      call_graphql_query(<<~QUERY).dig("data", case_correctly("widget_aggregations"), "nodes")
         query {
           widget_aggregations {
             nodes {
@@ -2368,10 +2384,6 @@ module ElasticGraph
           }
         }
       QUERY
-
-      return response if allow_errors
-
-      response.dig("data", case_correctly("widget_aggregations"), "nodes")
     end
 
     def widget_ungrouped_aggregated_values_for(field_selections)
@@ -2425,8 +2437,8 @@ module ElasticGraph
       QUERY
     end
 
-    def list_widgets_with_aggregations(widget_aggregation, allow_errors: false, **query_args)
-      response = call_graphql_query(<<~QUERY, allow_errors: allow_errors)
+    def list_widgets_with_aggregations(widget_aggregation, **query_args)
+      call_graphql_query(<<~QUERY).dig("data", case_correctly("widget_aggregations"), "edges").map { |edge| edge["node"] }
         query {
           widgets#{graphql_args(query_args)} {
             edges {
@@ -2473,10 +2485,6 @@ module ElasticGraph
           }
         }
       QUERY
-
-      return response if allow_errors
-
-      response.dig("data", case_correctly("widget_aggregations"), "edges").map { |edge| edge["node"] }
     end
 
     def group_components_by_position_x_and_y
