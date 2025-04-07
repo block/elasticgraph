@@ -30,7 +30,7 @@ graphql:
   default_page_size: 50
   max_page_size: 500
 logger:
-  device: log/development.log
+  device: stdout
 indexer:
   latency_slo_thresholds_by_timestamp_in_ms: {}
 schema_artifacts:
