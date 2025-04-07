@@ -37,7 +37,7 @@ PATH
   specs:
     elasticgraph-elasticsearch (0.19.1.2.pre)
       elasticgraph-support (= 0.19.1.2.pre)
-      elasticsearch (~> 8.17, >= 8.17.1)
+      elasticsearch (~> 8.17, >= 8.17.2)
       faraday (~> 2.12, >= 2.12.2)
       faraday-retry (~> 2.3, >= 2.3.1)
 
