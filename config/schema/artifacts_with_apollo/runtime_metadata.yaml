@@ -1499,43 +1499,43 @@ enum_types_by_name:
           direction: desc
           field_path: widget.id
 graphql_extension_modules:
-- extension_name: ElasticGraph::Apollo::GraphQL::EngineExtension
+- name: ElasticGraph::Apollo::GraphQL::EngineExtension
   require_path: elastic_graph/apollo/graphql/engine_extension
 graphql_resolvers_by_name:
   apollo_entities:
     needs_lookahead: true
     resolver_ref:
-      extension_name: ElasticGraph::Apollo::GraphQL::EntitiesFieldResolver
+      name: ElasticGraph::Apollo::GraphQL::EntitiesFieldResolver
       require_path: elastic_graph/apollo/graphql/entities_field_resolver
   apollo_service:
     needs_lookahead: false
     resolver_ref:
-      extension_name: ElasticGraph::Apollo::GraphQL::ServiceFieldResolver
+      name: ElasticGraph::Apollo::GraphQL::ServiceFieldResolver
       require_path: elastic_graph/apollo/graphql/service_field_resolver
   get_record_field_value:
     needs_lookahead: false
     resolver_ref:
-      extension_name: ElasticGraph::GraphQL::Resolvers::GetRecordFieldValue
+      name: ElasticGraph::GraphQL::Resolvers::GetRecordFieldValue
       require_path: elastic_graph/graphql/resolvers/get_record_field_value
   list_records:
     needs_lookahead: true
     resolver_ref:
-      extension_name: ElasticGraph::GraphQL::Resolvers::ListRecords
+      name: ElasticGraph::GraphQL::Resolvers::ListRecords
       require_path: elastic_graph/graphql/resolvers/list_records
   nested_relationships:
     needs_lookahead: true
     resolver_ref:
-      extension_name: ElasticGraph::GraphQL::Resolvers::NestedRelationships
+      name: ElasticGraph::GraphQL::Resolvers::NestedRelationships
       require_path: elastic_graph/graphql/resolvers/nested_relationships
   object_with_lookahead:
     needs_lookahead: true
     resolver_ref:
-      extension_name: ElasticGraph::GraphQL::Resolvers::Object::WithLookahead
+      name: ElasticGraph::GraphQL::Resolvers::Object::WithLookahead
       require_path: elastic_graph/graphql/resolvers/object
   object_without_lookahead:
     needs_lookahead: false
     resolver_ref:
-      extension_name: ElasticGraph::GraphQL::Resolvers::Object::WithoutLookahead
+      name: ElasticGraph::GraphQL::Resolvers::Object::WithoutLookahead
       require_path: elastic_graph/graphql/resolvers/object
 index_definitions_by_name:
   addresses:
@@ -6367,129 +6367,129 @@ object_types_by_name:
 scalar_types_by_name:
   Boolean:
     coercion_adapter:
-      extension_name: ElasticGraph::GraphQL::ScalarCoercionAdapters::NoOp
+      name: ElasticGraph::GraphQL::ScalarCoercionAdapters::NoOp
       require_path: elastic_graph/graphql/scalar_coercion_adapters/no_op
     indexing_preparer:
-      extension_name: ElasticGraph::Indexer::IndexingPreparers::NoOp
+      name: ElasticGraph::Indexer::IndexingPreparers::NoOp
       require_path: elastic_graph/indexer/indexing_preparers/no_op
   Cursor:
     coercion_adapter:
-      extension_name: ElasticGraph::GraphQL::ScalarCoercionAdapters::Cursor
+      name: ElasticGraph::GraphQL::ScalarCoercionAdapters::Cursor
       require_path: elastic_graph/graphql/scalar_coercion_adapters/cursor
     indexing_preparer:
-      extension_name: ElasticGraph::Indexer::IndexingPreparers::NoOp
+      name: ElasticGraph::Indexer::IndexingPreparers::NoOp
       require_path: elastic_graph/indexer/indexing_preparers/no_op
   Date:
     coercion_adapter:
-      extension_name: ElasticGraph::GraphQL::ScalarCoercionAdapters::Date
+      name: ElasticGraph::GraphQL::ScalarCoercionAdapters::Date
       require_path: elastic_graph/graphql/scalar_coercion_adapters/date
     indexing_preparer:
-      extension_name: ElasticGraph::Indexer::IndexingPreparers::NoOp
+      name: ElasticGraph::Indexer::IndexingPreparers::NoOp
       require_path: elastic_graph/indexer/indexing_preparers/no_op
   DateTime:
     coercion_adapter:
-      extension_name: ElasticGraph::GraphQL::ScalarCoercionAdapters::DateTime
+      name: ElasticGraph::GraphQL::ScalarCoercionAdapters::DateTime
       require_path: elastic_graph/graphql/scalar_coercion_adapters/date_time
     indexing_preparer:
-      extension_name: ElasticGraph::Indexer::IndexingPreparers::NoOp
+      name: ElasticGraph::Indexer::IndexingPreparers::NoOp
       require_path: elastic_graph/indexer/indexing_preparers/no_op
   FieldSet:
     coercion_adapter:
-      extension_name: ElasticGraph::GraphQL::ScalarCoercionAdapters::NoOp
+      name: ElasticGraph::GraphQL::ScalarCoercionAdapters::NoOp
       require_path: elastic_graph/graphql/scalar_coercion_adapters/no_op
     indexing_preparer:
-      extension_name: ElasticGraph::Indexer::IndexingPreparers::NoOp
+      name: ElasticGraph::Indexer::IndexingPreparers::NoOp
       require_path: elastic_graph/indexer/indexing_preparers/no_op
   Float:
     coercion_adapter:
-      extension_name: ElasticGraph::GraphQL::ScalarCoercionAdapters::NoOp
+      name: ElasticGraph::GraphQL::ScalarCoercionAdapters::NoOp
       require_path: elastic_graph/graphql/scalar_coercion_adapters/no_op
     indexing_preparer:
-      extension_name: ElasticGraph::Indexer::IndexingPreparers::NoOp
+      name: ElasticGraph::Indexer::IndexingPreparers::NoOp
       require_path: elastic_graph/indexer/indexing_preparers/no_op
   ID:
     coercion_adapter:
-      extension_name: ElasticGraph::GraphQL::ScalarCoercionAdapters::NoOp
+      name: ElasticGraph::GraphQL::ScalarCoercionAdapters::NoOp
       require_path: elastic_graph/graphql/scalar_coercion_adapters/no_op
     indexing_preparer:
-      extension_name: ElasticGraph::Indexer::IndexingPreparers::NoOp
+      name: ElasticGraph::Indexer::IndexingPreparers::NoOp
       require_path: elastic_graph/indexer/indexing_preparers/no_op
   Int:
     coercion_adapter:
-      extension_name: ElasticGraph::GraphQL::ScalarCoercionAdapters::NoOp
+      name: ElasticGraph::GraphQL::ScalarCoercionAdapters::NoOp
       require_path: elastic_graph/graphql/scalar_coercion_adapters/no_op
     indexing_preparer:
-      extension_name: ElasticGraph::Indexer::IndexingPreparers::Integer
+      name: ElasticGraph::Indexer::IndexingPreparers::Integer
       require_path: elastic_graph/indexer/indexing_preparers/integer
   JsonSafeLong:
     coercion_adapter:
-      extension_name: ElasticGraph::GraphQL::ScalarCoercionAdapters::JsonSafeLong
+      name: ElasticGraph::GraphQL::ScalarCoercionAdapters::JsonSafeLong
       require_path: elastic_graph/graphql/scalar_coercion_adapters/longs
     indexing_preparer:
-      extension_name: ElasticGraph::Indexer::IndexingPreparers::Integer
+      name: ElasticGraph::Indexer::IndexingPreparers::Integer
       require_path: elastic_graph/indexer/indexing_preparers/integer
   LocalTime:
     coercion_adapter:
-      extension_name: ElasticGraph::GraphQL::ScalarCoercionAdapters::LocalTime
+      name: ElasticGraph::GraphQL::ScalarCoercionAdapters::LocalTime
       require_path: elastic_graph/graphql/scalar_coercion_adapters/local_time
     indexing_preparer:
-      extension_name: ElasticGraph::Indexer::IndexingPreparers::NoOp
+      name: ElasticGraph::Indexer::IndexingPreparers::NoOp
       require_path: elastic_graph/indexer/indexing_preparers/no_op
   LongString:
     coercion_adapter:
-      extension_name: ElasticGraph::GraphQL::ScalarCoercionAdapters::LongString
+      name: ElasticGraph::GraphQL::ScalarCoercionAdapters::LongString
       require_path: elastic_graph/graphql/scalar_coercion_adapters/longs
     indexing_preparer:
-      extension_name: ElasticGraph::Indexer::IndexingPreparers::Integer
+      name: ElasticGraph::Indexer::IndexingPreparers::Integer
       require_path: elastic_graph/indexer/indexing_preparers/integer
   String:
     coercion_adapter:
-      extension_name: ElasticGraph::GraphQL::ScalarCoercionAdapters::NoOp
+      name: ElasticGraph::GraphQL::ScalarCoercionAdapters::NoOp
       require_path: elastic_graph/graphql/scalar_coercion_adapters/no_op
     indexing_preparer:
-      extension_name: ElasticGraph::Indexer::IndexingPreparers::NoOp
+      name: ElasticGraph::Indexer::IndexingPreparers::NoOp
       require_path: elastic_graph/indexer/indexing_preparers/no_op
   TimeZone:
     coercion_adapter:
-      extension_name: ElasticGraph::GraphQL::ScalarCoercionAdapters::TimeZone
+      name: ElasticGraph::GraphQL::ScalarCoercionAdapters::TimeZone
       require_path: elastic_graph/graphql/scalar_coercion_adapters/time_zone
     indexing_preparer:
-      extension_name: ElasticGraph::Indexer::IndexingPreparers::NoOp
+      name: ElasticGraph::Indexer::IndexingPreparers::NoOp
       require_path: elastic_graph/indexer/indexing_preparers/no_op
   Untyped:
     coercion_adapter:
-      extension_name: ElasticGraph::GraphQL::ScalarCoercionAdapters::Untyped
+      name: ElasticGraph::GraphQL::ScalarCoercionAdapters::Untyped
       require_path: elastic_graph/graphql/scalar_coercion_adapters/untyped
     indexing_preparer:
-      extension_name: ElasticGraph::Indexer::IndexingPreparers::Untyped
+      name: ElasticGraph::Indexer::IndexingPreparers::Untyped
       require_path: elastic_graph/indexer/indexing_preparers/untyped
   _Any:
     coercion_adapter:
-      extension_name: ElasticGraph::GraphQL::ScalarCoercionAdapters::NoOp
+      name: ElasticGraph::GraphQL::ScalarCoercionAdapters::NoOp
       require_path: elastic_graph/graphql/scalar_coercion_adapters/no_op
     indexing_preparer:
-      extension_name: ElasticGraph::Indexer::IndexingPreparers::NoOp
+      name: ElasticGraph::Indexer::IndexingPreparers::NoOp
       require_path: elastic_graph/indexer/indexing_preparers/no_op
   federation__Policy:
     coercion_adapter:
-      extension_name: ElasticGraph::GraphQL::ScalarCoercionAdapters::NoOp
+      name: ElasticGraph::GraphQL::ScalarCoercionAdapters::NoOp
       require_path: elastic_graph/graphql/scalar_coercion_adapters/no_op
     indexing_preparer:
-      extension_name: ElasticGraph::Indexer::IndexingPreparers::NoOp
+      name: ElasticGraph::Indexer::IndexingPreparers::NoOp
       require_path: elastic_graph/indexer/indexing_preparers/no_op
   federation__Scope:
     coercion_adapter:
-      extension_name: ElasticGraph::GraphQL::ScalarCoercionAdapters::NoOp
+      name: ElasticGraph::GraphQL::ScalarCoercionAdapters::NoOp
       require_path: elastic_graph/graphql/scalar_coercion_adapters/no_op
     indexing_preparer:
-      extension_name: ElasticGraph::Indexer::IndexingPreparers::NoOp
+      name: ElasticGraph::Indexer::IndexingPreparers::NoOp
       require_path: elastic_graph/indexer/indexing_preparers/no_op
   link__Import:
     coercion_adapter:
-      extension_name: ElasticGraph::GraphQL::ScalarCoercionAdapters::NoOp
+      name: ElasticGraph::GraphQL::ScalarCoercionAdapters::NoOp
       require_path: elastic_graph/graphql/scalar_coercion_adapters/no_op
     indexing_preparer:
-      extension_name: ElasticGraph::Indexer::IndexingPreparers::NoOp
+      name: ElasticGraph::Indexer::IndexingPreparers::NoOp
       require_path: elastic_graph/indexer/indexing_preparers/no_op
 schema_element_names:
   form: snake_case

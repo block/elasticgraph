@@ -87,7 +87,7 @@ Next, configure this library in your ElasticGraph config YAML files:
 graphql:
   extension_modules:
   - require_path: elastic_graph/query_registry/graphql_extension
-    extension_name: ElasticGraph::QueryRegistry::GraphQLExtension
+    name: ElasticGraph::QueryRegistry::GraphQLExtension
 query_registry:
   allow_unregistered_clients: false
   allow_any_query_for_clients:

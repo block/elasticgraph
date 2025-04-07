@@ -22,8 +22,8 @@ module ElasticGraph
           hash = extension.to_dumpable_hash
 
           expect(hash).to eq({
-            "extension_config" => {"foo" => "bar"},
-            "extension_name" => "ElasticGraph::Extensions::Valid",
+            "config" => {"foo" => "bar"},
+            "name" => "ElasticGraph::Extensions::Valid",
             "require_path" => "support/example_extensions/valid"
           })
 
@@ -36,7 +36,7 @@ module ElasticGraph
           valid_extension = Extension.new(
             extension_class: Extensions::Valid,
             require_path: "support/example_extensions/valid",
-            extension_config: {}
+            config: {}
           )
 
           expect {
@@ -49,7 +49,7 @@ module ElasticGraph
           invalid_extension = Extension.new(
             extension_class: Extensions::MissingInstanceMethod,
             require_path: "support/example_extensions/missing_instance_method",
-            extension_config: {}
+            config: {}
           )
 
           expect {

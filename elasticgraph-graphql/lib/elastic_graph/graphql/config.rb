@@ -44,9 +44,9 @@ module ElasticGraph
 
         extension_loader = SchemaArtifacts::RuntimeMetadata::ExtensionLoader.new(::Module.new)
         extension_mods = parsed_yaml.fetch("extension_modules", []).map do |mod_hash|
-          extension_loader.load(mod_hash.fetch("extension_name"), from: mod_hash.fetch("require_path"), config: {}).extension_class.tap do |mod|
+          extension_loader.load(mod_hash.fetch("name"), from: mod_hash.fetch("require_path"), config: {}).extension_class.tap do |mod|
             unless mod.instance_of?(::Module)
-              raise Errors::ConfigError, "`#{mod_hash.fetch("extension_name")}` is not a module, but all application extension modules must be modules."
+              raise Errors::ConfigError, "`#{mod_hash.fetch("name")}` is not a module, but all application extension modules must be modules."
             end
           end
         end
@@ -83,13 +83,13 @@ module ElasticGraph
 
         client_resolver_loader = SchemaArtifacts::RuntimeMetadata::ExtensionLoader.new(Client::DefaultResolver)
         extension = client_resolver_loader.load(
-          config.fetch("extension_name"),
+          config.fetch("name"),
           from: config.fetch("require_path"),
-          config: config.except("extension_name", "require_path")
+          config: config.except("name", "require_path")
         )
         extension_class = extension.extension_class # : ::Class
 
-        __skip__ = extension_class.new(extension.extension_config)
+        __skip__ = extension_class.new(extension.config)
       end
     end
   end

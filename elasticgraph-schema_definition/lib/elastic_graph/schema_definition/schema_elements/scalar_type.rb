@@ -112,7 +112,7 @@ module ElasticGraph
         #   end
         def coerce_with(adapter_name, defined_at:)
           self.runtime_metadata = runtime_metadata.with(coercion_adapter_ref: {
-            "extension_name" => adapter_name,
+            "name" => adapter_name,
             "require_path" => defined_at
           }).tap(&:load_coercion_adapter) # verify the adapter is valid.
         end
@@ -140,7 +140,7 @@ module ElasticGraph
         #   end
         def prepare_for_indexing_with(preparer_name, defined_at:)
           self.runtime_metadata = runtime_metadata.with(indexing_preparer_ref: {
-            "extension_name" => preparer_name,
+            "name" => preparer_name,
             "require_path" => defined_at
           }).tap(&:load_indexing_preparer) # verify the preparer is valid.
         end

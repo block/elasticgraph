@@ -6,21 +6,21 @@ module ElasticGraph
       class ExtensionSupertype
         attr_reader extension_class: extensionClass
         attr_reader require_path: ::String
-        attr_reader extension_config: ::Hash[::Symbol, untyped]
-        attr_reader extension_name: ::String
+        attr_reader config: ::Hash[::Symbol, untyped]
+        attr_reader name: ::String
 
         def initialize: (
           extension_class: extensionClass,
           require_path: ::String,
-          extension_config: ::Hash[::Symbol, untyped],
-          extension_name: ::String
+          config: ::Hash[::Symbol, untyped],
+          name: ::String
         ) -> void
 
         def with: (
           ?extension_class: extensionClass,
           ?require_path: ::String,
-          ?extension_config: ::Hash[::Symbol, untyped],
-          ?extension_name: ::String
+          ?config: ::Hash[::Symbol, untyped],
+          ?name: ::String
         ) -> Extension
       end
 
@@ -28,12 +28,12 @@ module ElasticGraph
         def initialize: (
           extension_class: extensionClass,
           require_path: ::String,
-          extension_config: ::Hash[::Symbol, untyped],
-          ?extension_name: ::String
+          config: ::Hash[::Symbol, untyped],
+          ?name: ::String
         ) -> void
 
         def self.new:
-          (extension_class: extensionClass, require_path: ::String, extension_config: ::Hash[::Symbol, untyped], ?extension_name: ::String) -> Extension
+          (extension_class: extensionClass, require_path: ::String, config: ::Hash[::Symbol, untyped], ?name: ::String) -> Extension
           | (extensionClass, ::String, ::Hash[::Symbol, untyped], ?::String) -> Extension
 
         def self.load_from_hash: (::Hash[::String, untyped], via: ExtensionLoader) -> Extension

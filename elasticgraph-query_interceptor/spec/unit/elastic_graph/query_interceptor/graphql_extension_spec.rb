@@ -17,11 +17,11 @@ module ElasticGraph
       let(:interceptors) do
         [
           {
-            "extension_name" => "MyApp::HideNonPublicThings",
+            "name" => "MyApp::HideNonPublicThings",
             "require_path" => "./hide_non_public_things"
           },
           {
-            "extension_name" => "MyApp::FilterOnUser",
+            "name" => "MyApp::FilterOnUser",
             "require_path" => "./filter_on_user",
             "config" => {"header" => "USER-NAME", "key" => "user"}
           }

@@ -167,7 +167,7 @@ module ElasticGraph
     def named_graphql_resolvers
       @named_graphql_resolvers ||= runtime_metadata.graphql_resolvers_by_name.transform_values do |resolver|
         ext = resolver.load_resolver
-        (_ = ext.extension_class).new(elasticgraph_graphql: self, config: ext.extension_config)
+        (_ = ext.extension_class).new(elasticgraph_graphql: self, config: ext.config)
       end
     end
 

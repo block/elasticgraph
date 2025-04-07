@@ -23,7 +23,7 @@ module ElasticGraph
         end
 
         expect(metadata).to eq scalar_type_with(coercion_adapter_ref: {
-          "extension_name" => "ExampleScalarCoercionAdapter",
+          "name" => "ExampleScalarCoercionAdapter",
           "require_path" => "support/example_extensions/scalar_coercion_adapter"
         })
       end
@@ -38,7 +38,7 @@ module ElasticGraph
         end
 
         expect(metadata).to eq scalar_type_with(indexing_preparer_ref: {
-          "extension_name" => "ExampleIndexingPreparer",
+          "name" => "ExampleIndexingPreparer",
           "require_path" => "support/example_extensions/indexing_preparer"
         })
       end
@@ -85,7 +85,7 @@ module ElasticGraph
         end
 
         expect(metadata.coercion_adapter_ref).to eq({
-          "extension_name" => "ExampleScalarCoercionAdapter",
+          "name" => "ExampleScalarCoercionAdapter",
           "require_path" => "support/example_extensions/scalar_coercion_adapter"
         })
       end

@@ -45,9 +45,9 @@ module ElasticGraph
         end
 
         config = Config.from_parsed_yaml({"query_interceptor" => {"interceptors" => [
-          {"extension_name" => "Interceptor1", "require_path" => "./interceptor1"},
-          {"extension_name" => "Interceptor2", "require_path" => "./interceptor2", "config" => {"foo" => "bar"}},
-          {"extension_name" => "Interceptor3", "require_path" => "./interceptor3"}
+          {"name" => "Interceptor1", "require_path" => "./interceptor1"},
+          {"name" => "Interceptor2", "require_path" => "./interceptor2", "config" => {"foo" => "bar"}},
+          {"name" => "Interceptor3", "require_path" => "./interceptor3"}
         ]}})
 
         expect(config.interceptors).to eq [
@@ -65,7 +65,7 @@ module ElasticGraph
 
         expect {
           Config.from_parsed_yaml({"query_interceptor" => {"interceptors" => [
-            {"extension_name" => "InvalidInterceptor", "require_path" => "./invalid_interceptor"}
+            {"name" => "InvalidInterceptor", "require_path" => "./invalid_interceptor"}
           ]}})
         }.to raise_error Errors::InvalidExtensionError, a_string_including("Missing instance methods:", "intercept")
       end

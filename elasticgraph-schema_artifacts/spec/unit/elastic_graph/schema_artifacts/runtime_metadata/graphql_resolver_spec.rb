@@ -16,7 +16,7 @@ module ElasticGraph
           resolver = GraphQLResolver.new(
             needs_lookahead: true,
             resolver_ref: {
-              "extension_name" => "ElasticGraph::GraphQLResolverWithLookahead",
+              "name" => "ElasticGraph::GraphQLResolverWithLookahead",
               "require_path" => "elastic_graph/spec_support/example_extensions/graphql_resolvers"
             }
           )
@@ -28,7 +28,7 @@ module ElasticGraph
           resolver = GraphQLResolver.new(
             needs_lookahead: false,
             resolver_ref: {
-              "extension_name" => "ElasticGraph::GraphQLResolverWithoutLookahead",
+              "name" => "ElasticGraph::GraphQLResolverWithoutLookahead",
               "require_path" => "elastic_graph/spec_support/example_extensions/graphql_resolvers"
             }
           )
@@ -40,7 +40,7 @@ module ElasticGraph
           resolver = GraphQLResolver.new(
             needs_lookahead: true,
             resolver_ref: {
-              "extension_name" => "ElasticGraph::GraphQLResolverWithoutLookahead",
+              "name" => "ElasticGraph::GraphQLResolverWithoutLookahead",
               "require_path" => "elastic_graph/spec_support/example_extensions/graphql_resolvers"
             }
           )
@@ -54,7 +54,7 @@ module ElasticGraph
           resolver = GraphQLResolver.new(
             needs_lookahead: false,
             resolver_ref: {
-              "extension_name" => "ElasticGraph::GraphQLResolverWithLookahead",
+              "name" => "ElasticGraph::GraphQLResolverWithLookahead",
               "require_path" => "elastic_graph/spec_support/example_extensions/graphql_resolvers"
             }
           )

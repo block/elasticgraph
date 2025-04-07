@@ -21,7 +21,7 @@ module ElasticGraph
             http_path_segment ||= runtime_metadata
               .graphql_extension_modules
               .find { |ext_mod| ext_mod.extension_class == EnvoyExtension }
-              &.extension_config
+              &.config
               &.dig(:http_path_segment)
 
             if http_path_segment.nil?

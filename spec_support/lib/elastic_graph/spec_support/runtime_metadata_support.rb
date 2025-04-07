@@ -149,7 +149,7 @@ module ElasticGraph
         end
 
         DEFAULT_RESOLVER_REF = {
-          "extension_name" => "ElasticGraph::GraphQL::Resolvers::GetRecordFieldValue",
+          "name" => "ElasticGraph::GraphQL::Resolvers::GetRecordFieldValue",
           "require_path" => "elastic_graph/graphql/resolvers/get_record_field_value"
         }
 

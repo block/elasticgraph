@@ -19,11 +19,11 @@ your interceptor when it is initialized.
 ``` yaml
 extension_modules:
 - require_path: elastic_graph/query_interceptor/graphql_extension
-  extension_name: ElasticGraph::QueryInterceptor::GraphQLExtension
+  name: ElasticGraph::QueryInterceptor::GraphQLExtension
 query_interceptor:
   interceptors:
   - require_path: ./my_app/example_interceptor
-    extension_name: MyApp::ExampleInterceptor
+    name: MyApp::ExampleInterceptor
     config: # Optional
       foo: bar
 ```

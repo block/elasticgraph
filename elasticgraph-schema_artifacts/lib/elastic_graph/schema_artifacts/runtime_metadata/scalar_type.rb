@@ -22,12 +22,12 @@ module ElasticGraph
         end
 
         DEFAULT_COERCION_ADAPTER_REF = {
-          "extension_name" => "ElasticGraph::GraphQL::ScalarCoercionAdapters::NoOp",
+          "name" => "ElasticGraph::GraphQL::ScalarCoercionAdapters::NoOp",
           "require_path" => "elastic_graph/graphql/scalar_coercion_adapters/no_op"
         }
 
         DEFAULT_INDEXING_PREPARER_REF = {
-          "extension_name" => "ElasticGraph::Indexer::IndexingPreparers::NoOp",
+          "name" => "ElasticGraph::Indexer::IndexingPreparers::NoOp",
           "require_path" => "elastic_graph/indexer/indexing_preparers/no_op"
         }
 

@@ -16,21 +16,21 @@ module ElasticGraph
       def self.from_parsed_yaml(parsed_config_hash, parsed_runtime_metadata_hashes: [])
         interceptor_hashes = parsed_runtime_metadata_hashes.flat_map { |h| h["interceptors"] || [] }
 
-        if (extension_config = parsed_config_hash["query_interceptor"])
-          extra_keys = extension_config.keys - EXPECTED_KEYS
+        if (config = parsed_config_hash["query_interceptor"])
+          extra_keys = config.keys - EXPECTED_KEYS
 
           unless extra_keys.empty?
             raise Errors::ConfigError, "Unknown `query_interceptor` config settings: #{extra_keys.join(", ")}"
           end
 
-          interceptor_hashes += extension_config.fetch("interceptors")
+          interceptor_hashes += config.fetch("interceptors")
         end
 
         loader = SchemaArtifacts::RuntimeMetadata::ExtensionLoader.new(InterceptorInterface)
 
         interceptors = interceptor_hashes.map do |hash|
           empty_config = {}  # : ::Hash[::Symbol, untyped]
-          ext = loader.load(hash.fetch("extension_name"), from: hash.fetch("require_path"), config: empty_config)
+          ext = loader.load(hash.fetch("name"), from: hash.fetch("require_path"), config: empty_config)
           config = hash["config"] || {} # : ::Hash[::String, untyped]
           InterceptorData.new(klass: ext.extension_class, config: config)
         end

@@ -19,7 +19,7 @@ module ElasticGraph
           "slow_query_latency_warning_threshold_in_ms" => 3200,
           "extension_modules" => [],
           "client_resolver" => {
-            "extension_name" => "ElasticGraph::GraphQL::ClientResolvers::ViaHTTPHeader",
+            "name" => "ElasticGraph::GraphQL::ClientResolvers::ViaHTTPHeader",
             "require_path" => "support/client_resolvers",
             "header_name" => "X-Client-Name"
           }
@@ -101,7 +101,7 @@ module ElasticGraph
               "default_page_size" => 27,
               "max_page_size" => 270,
               "client_resolver" => {
-                "extension_name" => "ElasticGraph::GraphQL::ClientResolvers::ViaHTTPHeader",
+                "name" => "ElasticGraph::GraphQL::ClientResolvers::ViaHTTPHeader",
                 "require_path" => "support/client_resolvers_typo",
                 "header_name" => "X-CLIENT-NAME"
               }
@@ -115,7 +115,7 @@ module ElasticGraph
               "default_page_size" => 27,
               "max_page_size" => 270,
               "client_resolver" => {
-                "extension_name" => "ElasticGraph::GraphQL::ClientResolvers::ViaHTTPHeaderTypo",
+                "name" => "ElasticGraph::GraphQL::ClientResolvers::ViaHTTPHeaderTypo",
                 "require_path" => "support/client_resolvers",
                 "header_name" => "X-CLIENT-NAME"
               }
@@ -129,7 +129,7 @@ module ElasticGraph
               "default_page_size" => 27,
               "max_page_size" => 270,
               "client_resolver" => {
-                "extension_name" => "ElasticGraph::GraphQL::ClientResolvers::Invalid",
+                "name" => "ElasticGraph::GraphQL::ClientResolvers::Invalid",
                 "require_path" => "support/client_resolvers",
                 "header_name" => "X-CLIENT-NAME"
               }
@@ -175,9 +175,9 @@ module ElasticGraph
           extension_modules = extension_modules_from(<<~YAML)
             extension_modules:
               - require_path: ./eg_extension_module1
-                extension_name: EgExtensionModule1
+                name: EgExtensionModule1
               - require_path: ./eg_extension_module2
-                extension_name: EgExtensionModule2
+                name: EgExtensionModule2
           YAML
 
           expect(extension_modules).to eq([::EgExtensionModule1, ::EgExtensionModule2])
@@ -188,7 +188,7 @@ module ElasticGraph
             extension_modules_from(<<~YAML)
               extension_modules:
                 - require_path: ./not_real
-                  extension_name: NotReal
+                  name: NotReal
             YAML
           }.to raise_error LoadError, a_string_including("not_real")
         end
@@ -198,7 +198,7 @@ module ElasticGraph
             extension_modules_from(<<~YAML)
               extension_modules:
                 - require: ./not_real
-                  extension_name: NotReal
+                  name: NotReal
             YAML
           }.to raise_error a_string_including("require_path")
 
@@ -213,7 +213,7 @@ module ElasticGraph
                 - require_path: ./eg_extension_module1
                   extension: EgExtensionModule1
             YAML
-          }.to raise_error a_string_including("extension_name")
+          }.to raise_error a_string_including("name")
         end
 
         it "raises a clear error if the named extension is not a module" do
@@ -226,7 +226,7 @@ module ElasticGraph
             extension_modules_from(<<~YAML)
               extension_modules:
                 - require_path: ./eg_extension_class1
-                  extension_name: EgExtensionClass1
+                  name: EgExtensionClass1
             YAML
           }.to raise_error a_string_including("not a module")
 
@@ -238,7 +238,7 @@ module ElasticGraph
             extension_modules_from(<<~YAML)
               extension_modules:
                 - require_path: ./eg_extension_object1
-                  extension_name: EgExtensionObject1
+                  name: EgExtensionObject1
             YAML
           }.to raise_error a_string_including("not a class or module")
         end

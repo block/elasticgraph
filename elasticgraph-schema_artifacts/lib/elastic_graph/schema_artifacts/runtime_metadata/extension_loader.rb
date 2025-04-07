@@ -36,7 +36,7 @@ module ElasticGraph
               raise Errors::InvalidExtensionError, "Extension `#{constant_name}` cannot be loaded from `#{from}`, " \
                 "since it has already been loaded from `#{extension.require_path}`."
             end
-          end.with(extension_config: config)
+          end.with(config: config)
         end
 
         private

@@ -205,21 +205,21 @@ module ElasticGraph
             "scalar_types_by_name" => {
               "ScalarType1" => {
                 "coercion_adapter" => {
-                  "extension_name" => "ElasticGraph::SchemaArtifacts::ScalarCoercionAdapter1",
+                  "name" => "ElasticGraph::SchemaArtifacts::ScalarCoercionAdapter1",
                   "require_path" => "support/example_extensions/scalar_coercion_adapters"
                 },
                 "indexing_preparer" => {
-                  "extension_name" => "ElasticGraph::SchemaArtifacts::IndexingPreparer1",
+                  "name" => "ElasticGraph::SchemaArtifacts::IndexingPreparer1",
                   "require_path" => "support/example_extensions/indexing_preparers"
                 }
               },
               "ScalarType2" => {
                 "coercion_adapter" => {
-                  "extension_name" => "ElasticGraph::SchemaArtifacts::ScalarCoercionAdapter2",
+                  "name" => "ElasticGraph::SchemaArtifacts::ScalarCoercionAdapter2",
                   "require_path" => "support/example_extensions/scalar_coercion_adapters"
                 },
                 "indexing_preparer" => {
-                  "extension_name" => "ElasticGraph::SchemaArtifacts::IndexingPreparer2",
+                  "name" => "ElasticGraph::SchemaArtifacts::IndexingPreparer2",
                   "require_path" => "support/example_extensions/indexing_preparers"
                 }
               }
@@ -278,16 +278,16 @@ module ElasticGraph
               "overrides" => {"any_of" => "or"}
             },
             "graphql_extension_modules" => [{
-              "extension_name" => "ElasticGraph::SchemaArtifacts::GraphQLExtensionModule1",
+              "name" => "ElasticGraph::SchemaArtifacts::GraphQLExtensionModule1",
               "require_path" => "support/example_extensions/graphql_extension_modules"
             }],
             "graphql_resolvers_by_name" => {
               "resolver1" => {
                 "needs_lookahead" => true,
                 "resolver_ref" => {
-                  "extension_name" => "ElasticGraph::GraphQLResolverWithLookahead",
+                  "name" => "ElasticGraph::GraphQLResolverWithLookahead",
                   "require_path" => "elastic_graph/spec_support/example_extensions/graphql_resolvers",
-                  "extension_config" => {"limit" => 10}
+                  "config" => {"limit" => 10}
                 }
               }
             },

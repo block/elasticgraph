@@ -276,7 +276,7 @@ module ElasticGraph
       #
       # @param extension_module [Module] GraphQL extension module
       # @param defined_at [String] the `require` path of the extension module
-      # @param extension_config [Hash<Symbol, Object>] configuration options for the extension module
+      # @param config [Hash<Symbol, Object>] configuration options for the extension module
       # @return [void]
       #
       # @example Register `elasticgraph-query_registry` extension module
@@ -286,8 +286,8 @@ module ElasticGraph
       #     schema.register_graphql_extension ElasticGraph::QueryRegistry::GraphQLExtension,
       #       defined_at: query_registry_require_path
       #   end
-      def register_graphql_extension(extension_module, defined_at:, **extension_config)
-        @state.graphql_extension_modules << SchemaArtifacts::RuntimeMetadata::Extension.new(extension_module, defined_at, extension_config)
+      def register_graphql_extension(extension_module, defined_at:, **config)
+        @state.graphql_extension_modules << SchemaArtifacts::RuntimeMetadata::Extension.new(extension_module, defined_at, config)
         nil
       end
 
