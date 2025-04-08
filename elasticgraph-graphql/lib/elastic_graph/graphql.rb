@@ -135,9 +135,12 @@ module ElasticGraph
         {
           # We depend on this to avoid N+1 calls to the datastore.
           ::GraphQL::Dataloader => {},
-          # This is new in the graphql-ruby 2.4 release, and will be required in the future.
-          # We pass `preload: true` because the way we handle the schema depends on it being preloaded.
-          ::GraphQL::Schema::Visibility => {preload: true}
+          # Here we opt-in to the old `GraphQL::Schema::Warden` visibility plugin.
+          # The new plugin, `GraphQL::Schema::Visibility`, causes a performance regression
+          # in ElasticGraph projects, and until that's fixed we want to stick with the old plugin.
+          #
+          # TODO: switch back to `::GraphQL::Schema::Visibility => {preload: true}` once the perf issue has been fixed.
+          ::GraphQL::Schema::Warden => {}
         }
       end
     end
