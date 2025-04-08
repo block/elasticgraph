@@ -13,6 +13,8 @@ module ElasticGraph
   ::RSpec.describe CLI, "new command", :in_temp_dir do
     it "initializes a new ElasticGraph project" do
       override_gemfile_to_use_local_elasticgraph_gems do
+        # Note: this is intentionally a relative path, in contrast to the absolute path
+        # used by the `supports absolute paths` example.
         output = run_new("musical_artists1")
 
         expect(output.lines.first(18).join).to eq <<~EOS
@@ -120,6 +122,26 @@ module ElasticGraph
       }.to fail_with(
         a_string_including("App name must start with a letter and be in `snake_case` form but was not: `1musical_artists`.")
       )
+    end
+
+    it "supports absolute paths" do
+      # Make our bundler commands (which get run inside `Bundler.with_unbundled_env { ... }`) a no-op to make this test faster.
+      allow(::Bundler).to receive(:with_unbundled_env)
+
+      eg_project_dir = ::File.join(::Dir.pwd, "tmp", "eg_project")
+      run_new(eg_project_dir)
+
+      expect(::Dir.children(eg_project_dir)).to include(
+        "Gemfile",
+        "config",
+        "lib",
+        "spec"
+      )
+
+      # Verify that the method we stub above is in fact called. If the implementation changes to no longer use
+      # `Bundler.with_unbundled_env` we want to know about it because it means this test will likely get about 5x
+      # slower until we adjust our stubbing above to match the implementation change.
+      expect(::Bundler).to have_received(:with_unbundled_env)
     end
 
     def fail_with(message)

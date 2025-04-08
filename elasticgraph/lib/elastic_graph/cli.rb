@@ -28,7 +28,7 @@ module ElasticGraph
     option :datastore, desc: "elasticsearch or opensearch", type: :string, default: "opensearch"
     desc "new APP_NAME", "Generate a new ElasticGraph project in APP_NAME."
     def new(app_path)
-      new_app_path = ::File.join(::Dir.pwd, app_path)
+      new_app_path = ::File.absolute_path?(app_path) ? app_path : ::File.join(::Dir.pwd, app_path)
       app_name = ::File.basename(new_app_path)
 
       unless app_name.match?(/\A[a-z][a-z0-9_]+\z/)
