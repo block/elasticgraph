@@ -62,3 +62,6 @@ task build: ["schema_artifacts:dump", *standard_checks]
 
 desc "Check everything. Intended to be run on CI to check your project."
 task check: ["schema_artifacts:check", *standard_checks]
+
+# Make `rake` run `rake build` for convenience.
+task default: :build
