@@ -3,7 +3,7 @@ layout: markdown
 title: Versioning Policy
 permalink: /guides/versioning-policy/
 nav_title: Versioning Policy
-menu_order: 40
+menu_order: 50
 ---
 
 ElasticGraph does _not_ strictly follow the [SemVer](https://semver.org/) spec. We followed that early in the project's life
