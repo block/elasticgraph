@@ -11,8 +11,9 @@ These are the "north stars" that guide ElasticGraph development. They guide the 
 ### General Principles
 
 **ElasticGraph is designed to be modular with minimal dependencies.**
-: We're cautious about taking on new dependencies. Combined with the modular nature of ElasticGraph,
-  this supports slim deployment artifacts that enable AWS lambda deployments to maintain minimal boot
+: We're cautious about taking on new dependencies: we'll only add a new one when the functionality it offers
+  goes far beyond what we can quickly and easily write ourselves. Combined with the modular nature of ElasticGraph,
+  this supports slim deployment artifacts that enable AWS Lambda deployments to maintain minimal boot
   times. For example, an `elasticgraph-indexer` deployment has no dependency on the `graphql` gem.
 
 **ElasticGraph is designed to be highly extensible.**
@@ -23,6 +24,8 @@ These are the "north stars" that guide ElasticGraph development. They guide the 
   [elasticgraph-query_interceptor](https://github.com/block/elasticgraph/tree/main/elasticgraph-query_interceptor),
   [elasticgraph-query_registry](https://github.com/block/elasticgraph/tree/main/elasticgraph-query_registry),
   and the various [AWS lambda components](https://github.com/block/elasticgraph/blob/main/CODEBASE_OVERVIEW.md#aws-lambda-integration-libraries-5-gems).
+  In addition, extensions are designed to apply hermetically: when applied to one instance of `ElasticGraph::GraphQL`, `ElasticGraph::Indexer`,
+  or `ElasticGraph::SchemaDefinition::API`, they don't apply to any other instances of those classes.
 
 ### Query API Principles
 
@@ -73,7 +76,35 @@ These are the "north stars" that guide ElasticGraph development. They guide the 
   JSON schema artifacts are versioned which allows an `elasticgraph-indexer` and a data publisher
   to be deployed independently with no interruption to the indexing pipeline.
 
-### Codebase Princples
+**Schema definition features which apply to multiple types of schema elements must use the same API everywhere.**
+: For example, documentation can be added to any type of schema element (a type, field, argument, enum value, etc)
+  using the same API (`element.documentation "Description"`). This is achieved through a set of
+  [mixins](https://github.com/block/elasticgraph/tree/main/elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins).
+
+### Codebase Principles
+
+**We aim for consistency.**
+: We try to use terminology in a consistent manner throughout the codebase. Our APIs are designed to
+  use a consistent style and "voice" so that they are predictable to use.
+
+**The codebase has no global state.**
+: Global state is quite common in a lot of Ruby codebases (it's very convenient to expose something
+  like database connection as a via a class attribute) but we avoid that throughout the codebase. Instead,
+  our entry points like `ElasticGraph::GraphQL` and `ElasticGraph::Indexer` inject dependencies into each
+  component. This makes ElasticGraph easier to reason about, aids in making ElasticGraph threadsafe,
+  and supports the ability to have multiple application instances in the same Ruby process.
+
+**We favor an immutable functional style.**
+: Where feasible, we create immutable objects and write functional code that transforms those objects.
+  This makes the codebase easier to reason about and maintain.
+
+**When facing two ways to implement a given piece of functionality, we prefer the simpler approach.**
+: Simpler code and architectures makes for easier debugging later, and allows new contributors to more quickly
+  onboard and contribute to the project.
+
+**We avoid monkey patching.**
+: While monkey-patching is a common technique in the Ruby community, it often leads to future problems and
+  we avoid it.
 
 **Every line and branch of code must be covered by tests except where we intentionally opt-out.**
 : Our CI build enforces 100% test coverage except where we opt-out using [`:nocov:` comments](https://github.com/search?q=repo%3Ablock%2Felasticgraph%20nocov&type=code).
