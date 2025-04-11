@@ -4,6 +4,7 @@ module ElasticGraph
       module SupportsDefaultValue
         NO_DEFAULT_PROVIDED: Module
         @default_value: untyped
+        def initialize: (*untyped, **untyped) ?{ (*untyped, **untyped) -> untyped } -> void
         def default: (untyped) -> void
         def default_value_sdl: () -> ::String?
       end

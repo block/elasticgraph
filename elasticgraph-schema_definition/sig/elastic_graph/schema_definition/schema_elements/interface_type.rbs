@@ -14,6 +14,10 @@ module ElasticGraph
 
         def initialize: (State, ::String) { (InterfaceType) -> void } -> void
         def interface_fields_by_name: () -> ::Hash[::String, Field]
+
+        private
+
+        def resolve_subtypes: () -> ::Set[SchemaElements::TypeWithSubfields]
       end
     end
   end

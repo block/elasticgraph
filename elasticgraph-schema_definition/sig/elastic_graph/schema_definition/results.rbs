@@ -7,6 +7,7 @@ module ElasticGraph
 
     class Results < ResultsSupertype
       include _SchemaArtifacts
+      include Support::_MemoizableDataClass
 
       def json_schema_version_setter_location: () -> ::Thread::Backtrace::Location?
       def json_schema_field_metadata_by_type_and_field_name: () -> ::Hash[::String, ::Hash[::String, Indexing::JSONSchemaFieldMetadata]]

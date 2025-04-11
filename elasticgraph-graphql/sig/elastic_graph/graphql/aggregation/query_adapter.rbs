@@ -27,6 +27,7 @@ module ElasticGraph
 
       class QueryAdapter < QueryAdapterSupertype
         include _QueryAdapter
+        include Support::_MemoizableDataClass
 
         class WithoutSchema
           include _QueryAdapter

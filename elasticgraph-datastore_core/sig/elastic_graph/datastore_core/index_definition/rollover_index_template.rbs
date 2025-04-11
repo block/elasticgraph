@@ -4,6 +4,7 @@ module ElasticGraph
       class RolloverIndexTemplate
         include IndexDefinition::Base
         include _IndexDefinition
+        include Support::_MemoizableDataClass
 
         def initialize: (**untyped) -> void
 

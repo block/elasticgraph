@@ -12,6 +12,8 @@ module ElasticGraph
         @list_counts_field_paths_for_source: ::Hash[::String, ::Set[::String]]
         @max_result_window: ::Integer?
 
+        def to_s: () -> ::String
+
         private
 
         def identify_list_counts_field_paths_for_source: (::String) -> ::Set[::String]

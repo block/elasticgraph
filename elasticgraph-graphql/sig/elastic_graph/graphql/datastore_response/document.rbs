@@ -25,6 +25,8 @@ module ElasticGraph
           ?decoded_cursor_factory: DecodedCursor::_Factory
         ) -> Document
 
+        def self.with_payload: (::Hash[::String, untyped]) -> Document
+
         def []: (::String) -> untyped
         def fetch: (::String) -> untyped
         def index_name: () -> ::String

@@ -11,6 +11,7 @@ module ElasticGraph
     end
 
     interface _MemoizableDataClass
+      def after_initialize: () -> void
     end
   end
 end

@@ -11,6 +11,7 @@ module ElasticGraph
       end
 
       class TypeReference < TypeReferenceSupertype
+        include Support::_MemoizableDataClass
         extend ::Forwardable
         def type_namer: () -> TypeNamer
         def fully_unwrapped: () -> TypeReference
