@@ -24,12 +24,12 @@ module ElasticGraph
         @root_schema = ::JSONSchemer.schema(
           schema,
           meta_schema: schema.fetch("$schema"),
-          # Here we opt to have regular expressions resolved using an ecmo-compatible resolver, instead of Ruby's.
+          # Here we opt to have regular expressions resolved using an ecma-compatible resolver, instead of Ruby's.
           #
           # We do this because regexp patterns in our JSON schema are intended to be used by JSON schema libraries
           # in many languages, not just in Ruby, and we want to support the widest compatibility. For example,
           # Ruby requires that we use `\A` and `\z` to anchor the start and end of the string (`^` and `$` anchor the
-          # start and end of a line instead), where as ecmo regexes treat `^` and `$` as the start and end of the string.
+          # start and end of a line instead), where as ecma regexes treat `^` and `$` as the start and end of the string.
           # For a pattern to be usable by non-Ruby publishers, we need to use `^/`$` for our start/end anchors, and we
           # want our validator to treat it the same way here.
           #
