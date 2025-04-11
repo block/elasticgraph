@@ -24,7 +24,7 @@ changes explained in steps 1 and 2.
 {% include copyable_code_snippet.html language="ruby" data="custom_resolver.snippets.lib.roll_dice_resolver_rb.RollDiceResolver" %}
 
 Conventionally, resolvers are defined in `lib` (and you'd put `lib` on the Ruby `$LOAD_PATH`).
-As shown here, your resolver needs to define two methods:
+As shown here, the resolver needs to define two methods:
 
 {% comment %}
 TODO: link to the API docs for the different `ElasticGraph::GraphQL` types once the site includes those API docs.
@@ -35,7 +35,7 @@ TODO: link to the API docs for the different `ElasticGraph::GraphQL` types once 
   * `elasticgraph_graphql`: the `ElasticGraph::GraphQL` instance, providing access to dependencies.
   * `config`: parameterized configuration values for your resolver.
 
-`resolver`
+`resolve`
 : Defines the resolver logic. Accepts four arguments:
   * `field`: the `ElasticGraph::GraphQL::Schema::Field` object representing the field being resolved.
   * `object`: the value returned by the resolver of the parent field.
