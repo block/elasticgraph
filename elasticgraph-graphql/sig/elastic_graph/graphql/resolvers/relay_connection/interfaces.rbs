@@ -4,6 +4,7 @@ module ElasticGraph
       module RelayConnection
         interface _RelayConnection[N]
           def page_info: () -> _RelayPageInfo
+          def total_edge_count: () -> ::Integer?
           def edges: () -> ::Array[_RelayEdge[N]]
           def nodes: () -> ::Array[N]
         end

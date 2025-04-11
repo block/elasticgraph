@@ -25,6 +25,7 @@ module ElasticGraph
 
         class Object < ObjectSuperType
           include _FieldType
+          include Support::_MemoizableDataClass
 
           @to_mapping: ::Hash[::String, untyped]?
           @to_json_schema: ::Hash[::String, untyped]?

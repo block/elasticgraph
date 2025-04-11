@@ -2,6 +2,7 @@ module ElasticGraph
   module SchemaDefinition
     module Mixins
       module VerifiesGraphQLName: _NamedElement
+        def initialize: (*untyped, **untyped) ?{ (*untyped, **untyped) -> untyped } -> void
         def self.verify_name!: (::String) -> void
       end
     end

@@ -35,6 +35,7 @@ module ElasticGraph
       def index_name_for_writes: (::Hash[::String, untyped], ?timestamp_field_path: ::String?) -> ::String
       def mappings_in_datastore: (DatastoreCore::_Client) -> ::Hash[::String, untyped]
       def related_rollover_indices: (DatastoreCore::_Client, ?only_if_exists: bool) -> ::Array[IndexDefinition::RolloverIndex]
+      def delete_from_datastore: (DatastoreCore::_Client) -> void
     end
 
     # Defines the full `_IndexDefinition` interface.

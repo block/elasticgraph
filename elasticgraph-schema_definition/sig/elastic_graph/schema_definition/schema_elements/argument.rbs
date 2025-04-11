@@ -16,6 +16,7 @@ module ElasticGraph
         include Mixins::HasDocumentation
         include Mixins::HasDirectives
 
+        def to_sdl: () -> ::String
         def value_type: () -> TypeReference
       end
     end

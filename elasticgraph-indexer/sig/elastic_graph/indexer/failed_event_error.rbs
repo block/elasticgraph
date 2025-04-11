@@ -8,6 +8,7 @@ module ElasticGraph
       attr_reader id: ::String
       attr_reader full_id: ::String
       attr_reader op: ::String
+      attr_reader type: ::String
       attr_reader version: ::Integer
       attr_reader record: ::Hash[::String, untyped]?
 

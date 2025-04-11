@@ -12,7 +12,6 @@ module ElasticGraph
           def initialize: (SchemaArtifacts::RuntimeMetadata::SchemaElementNames, ::GraphQL::Pagination::ArrayConnection[N]) -> void
 
           def self.build: [N] (::Array[N], ::Hash[::String, untyped], SchemaArtifacts::RuntimeMetadata::SchemaElementNames, ::GraphQL::Query::Context) -> ArrayAdapter[N]
-          def total_edge_count: () -> ::Integer
 
           @edges: ::Array[_RelayEdge[N]]?
           @nodes: ::Array[N]?

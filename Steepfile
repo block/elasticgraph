@@ -91,6 +91,5 @@ target :elasticgraph_gems do
     # For more detail: https://github.com/soutaro/steep/wiki/Release-Note-1.5#better-flow-sensitive-typing-analysis
     config[::Steep::Diagnostic::Ruby::UnreachableBranch] = :hint
     config[::Steep::Diagnostic::Ruby::UnreachableValueBranch] = :hint
-    config[::Steep::Diagnostic::Ruby::UndeclaredMethodDefinition] = :information
   end
 end
