@@ -42,7 +42,7 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = [">= 3.2", "< 3.5"]
 
   spec.add_dependency "elasticgraph-support", ElasticGraph::VERSION
-  spec.add_dependency "faraday", "~> 2.12", ">= 2.12.2"
+  spec.add_dependency "faraday", "~> 2.13"
   spec.add_dependency "faraday-retry", "~> 2.3", ">= 2.3.1"
   spec.add_dependency "opensearch-ruby", "~> 3.4"
 end

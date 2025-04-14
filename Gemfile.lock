@@ -38,7 +38,7 @@ PATH
     elasticgraph-elasticsearch (0.19.2.1.pre)
       elasticgraph-support (= 0.19.2.1.pre)
       elasticsearch (~> 8.17, >= 8.17.2)
-      faraday (~> 2.12, >= 2.12.2)
+      faraday (~> 2.13)
       faraday-retry (~> 2.3, >= 2.3.1)
 
 PATH
@@ -126,7 +126,7 @@ PATH
   specs:
     elasticgraph-opensearch (0.19.2.1.pre)
       elasticgraph-support (= 0.19.2.1.pre)
-      faraday (~> 2.12, >= 2.12.2)
+      faraday (~> 2.13)
       faraday-retry (~> 2.3, >= 2.3.1)
       opensearch-ruby (~> 3.4)
 
@@ -619,7 +619,7 @@ DEPENDENCIES
   elasticgraph-support (= 0.19.2.1.pre)!
   factory_bot (~> 6.5, >= 6.5.1)
   faker (~> 3.5, >= 3.5.1)
-  faraday (~> 2.12, >= 2.12.2)
+  faraday (~> 2.13)
   filewatcher (~> 2.1)
   flatware-rspec (~> 2.3, >= 2.3.4)
   html-proofer (~> 5.0, >= 5.0.10)
