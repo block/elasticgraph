@@ -42,7 +42,7 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = [">= 3.2", "< 3.5"]
 
   spec.add_dependency "elasticgraph-graphql", ElasticGraph::VERSION
-  spec.add_dependency "rack", "~> 3.1", ">= 3.1.12"
+  spec.add_dependency "rack", "~> 3.1", ">= 3.1.13"
 
   spec.add_development_dependency "elasticgraph-admin", ElasticGraph::VERSION
   spec.add_development_dependency "elasticgraph-elasticsearch", ElasticGraph::VERSION
