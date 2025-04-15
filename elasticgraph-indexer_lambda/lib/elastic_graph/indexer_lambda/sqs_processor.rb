@@ -21,6 +21,16 @@ module ElasticGraph
         @report_batch_item_failures = report_batch_item_failures
         @logger = logger
         @s3_client = s3_client
+
+        @logger.warn({
+          "message" => "SqsProcessorEncodingInfo",
+          "ENV" => ENV.slice("LANG", "LC_ALL", "LC_CTYPE", "LANGUAGE"),
+          "default_external_encoding" => Encoding.default_external,
+          "default_internal_encoding" => Encoding.default_internal,
+          "default_locale_encoding" => Encoding.find("locale"),
+          "default_filesystem_encoding" => Encoding.find("filesystem"),
+          "script_encoding" => __ENCODING__
+        })
       end
 
       # Processes the ElasticGraph events in the given `lambda_event`, indexing the data in the datastore.
@@ -89,7 +99,25 @@ module ElasticGraph
         if jsonl_string.start_with?(S3_OFFLOADING_INDICATOR)
           jsonl_string = get_payload_from_s3(jsonl_string)
         end
-        jsonl_string.split("\n").map { |event| JSON.parse(event) }
+
+        jsonl_lines =
+          begin
+            jsonl_string.split("\n")
+          rescue ::ArgumentError => ex
+            forced_utf8_works =
+              begin
+                ::String.new(jsonl_string, encoding: "UTF-8").split("\n")
+                true
+              rescue ::ArgumentError
+                # :nocov:
+                false
+                # :nocov:
+              end
+
+            raise ::ArgumentError, "#{ex.message}. jsonl_string encoding: #{jsonl_string.encoding}. forced_utf8_works: #{forced_utf8_works}"
+          end
+
+        jsonl_lines.map { |event| JSON.parse(event) }
       end
 
       def extract_sqs_metadata(record)

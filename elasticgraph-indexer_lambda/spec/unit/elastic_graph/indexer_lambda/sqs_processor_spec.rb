@@ -258,6 +258,21 @@ module ElasticGraph
           end
         end
 
+        it "provides useful logs when running into an encoding issue" do
+          body = ::String.new(jsonl({"field1" => "not ascii: Σ¥"}), encoding: "US-ASCII")
+          expect { body.split("\n") }.to raise_error(ArgumentError, "invalid byte sequence in US-ASCII")
+
+          lambda_event = {
+            "Records" => [
+              {"messageId" => "a", "body" => body}
+            ]
+          }
+
+          expect {
+            sqs_processor.process(lambda_event)
+          }.to raise_error ArgumentError, "invalid byte sequence in US-ASCII. jsonl_string encoding: US-ASCII. forced_utf8_works: true"
+        end
+
         context "when one or more events fail to process" do
           context "when `report_batch_item_failures` is false" do
             let(:sqs_processor) { build_sqs_processor(report_batch_item_failures: false) }
@@ -367,7 +382,13 @@ module ElasticGraph
       end
 
       def build_sqs_processor(report_batch_item_failures:, **options)
-        SqsProcessor.new(indexer_processor, report_batch_item_failures: report_batch_item_failures, logger: logger, **options)
+        processor = nil
+
+        expect {
+          processor = SqsProcessor.new(indexer_processor, report_batch_item_failures: report_batch_item_failures, logger: logger, **options)
+        }.to log_warning(a_string_including("SqsProcessorEncodingInfo"))
+
+        processor
       end
     end
   end
