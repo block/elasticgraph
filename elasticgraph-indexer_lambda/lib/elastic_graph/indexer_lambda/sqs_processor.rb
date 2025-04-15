@@ -23,7 +23,7 @@ module ElasticGraph
         @s3_client = s3_client
 
         @logger.warn({
-          "message" => "SqsProcessorEncodingInfo",
+          "message_type" => "SqsProcessorEncodingInfo",
           "ENV" => ENV.slice("LANG", "LC_ALL", "LC_CTYPE", "LANGUAGE"),
           "default_external_encoding" => Encoding.default_external,
           "default_internal_encoding" => Encoding.default_internal,
