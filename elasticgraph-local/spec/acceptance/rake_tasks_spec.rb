@@ -166,10 +166,12 @@ module ElasticGraph
           ensure
             # :nocov: -- under normal conditions some branches here aren't used
             pid = begin
-              Integer(::File.read(pid_file))
+              pid_contents = ::File.read(pid_file)
+              Integer(pid_contents)
             rescue
               nil
             end
+
             ::Process.kill(9, pid) if pid
             # :nocov:
           end
