@@ -336,7 +336,7 @@ module ElasticGraph
             query, errors = registry.build_and_validate_query("not_a_query", client: client_named("my_client"))
 
             expect(errors).to be_empty
-            expect(query.result["errors"].to_s).to include("Expected one of", 'actual: IDENTIFIER (\"not_a_query\")')
+            expect(query.result["errors"].to_s).to include('IDENTIFIER (\"not_a_query\")')
           end
 
           it "does not consider a query registered by a different client" do
@@ -411,7 +411,7 @@ module ElasticGraph
               query, errors = registry.build_and_validate_query("not_a_query", client: client)
 
               expect(errors).to be_empty
-              expect(query.result["errors"].to_s).to include("Expected one of", 'actual: IDENTIFIER (\"not_a_query\")')
+              expect(query.result["errors"].to_s).to include('IDENTIFIER (\"not_a_query\")')
             end
 
             def prepare_registry_with(query_string)

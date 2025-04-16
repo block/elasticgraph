@@ -88,13 +88,13 @@ module ElasticGraph
 
           expect(validate(query_string)).to have_errors_for_operations(nil => [{
             "locations" => [{"line" => 1, "column" => 15}],
-            "message" => a_string_including("Expected LCURLY, actual: IDENTIFIER (\"bad\")")
+            "message" => a_string_including("LCURLY", "IDENTIFIER (\"bad\")")
           }])
         end
 
         it "returns errors when the query string is empty" do
           expect(validate("")).to have_errors_for_operations(nil => [{
-            "message" => a_string_including("Unexpected end of document")
+            "message" => a_string_matching(/unexpected end of (document|file)/i)
           }])
         end
 
@@ -309,7 +309,7 @@ module ElasticGraph
 
             expect(validate(query_string)).to have_errors_for_operations(nil => [{
               "locations" => [{"line" => 1, "column" => 18}],
-              "message" => a_string_including("Expected VAR_SIGN, actual: IDENTIFIER (\"id\")")
+              "message" => a_string_including("VAR_SIGN", "IDENTIFIER (\"id\")")
             }])
           end
 

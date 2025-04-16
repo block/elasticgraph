@@ -132,6 +132,13 @@ module ElasticGraph
     def graphql_gem_plugins
       @graphql_gem_plugins ||= begin
         require "graphql"
+        # As per https://graphql-ruby.org/language_tools/c_parser.html, loading the
+        # C parser causes the faster parser to be assigned as the `::GraphQL.default_parser`,
+        # providing greater efficiency.
+        #
+        # We load it here since this is where we load the GraphQL gem.
+        require "graphql/c_parser"
+
         {
           # We depend on this to avoid N+1 calls to the datastore.
           ::GraphQL::Dataloader => {},
@@ -247,6 +254,8 @@ module ElasticGraph
     # it's nice to load dependencies when needed.
     def load_dependencies_eagerly
       require "graphql"
+      require "graphql/c_parser"
+
       ::GraphQL.eager_load!
 
       # run a simple GraphQL query to force load any dependencies needed to handle GraphQL queries

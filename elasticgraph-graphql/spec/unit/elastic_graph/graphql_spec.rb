@@ -48,6 +48,12 @@ module ElasticGraph
           "Resolver `get_record_field_value`", "cannot be found."
         )
       end
+
+      it "loads the GraphQL C parser for faster GraphQL parsing" do
+        build_graphql.schema
+
+        expect(::GraphQL.default_parser.name).to eq "GraphQL::CParser"
+      end
     end
 
     describe "#load_dependencies_eagerly" do

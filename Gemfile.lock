@@ -56,6 +56,7 @@ PATH
       elasticgraph-datastore_core (= 0.19.2.1.pre)
       elasticgraph-schema_artifacts (= 0.19.2.1.pre)
       graphql (~> 2.5.3)
+      graphql-c_parser (~> 1.1, >= 1.1.2)
 
 PATH
   remote: elasticgraph-health_check
@@ -145,6 +146,7 @@ PATH
       elasticgraph-graphql (= 0.19.2.1.pre)
       elasticgraph-support (= 0.19.2.1.pre)
       graphql (~> 2.5.3)
+      graphql-c_parser (~> 1.1, >= 1.1.2)
       rake (~> 13.2, >= 13.2.1)
 
 PATH
@@ -170,6 +172,7 @@ PATH
       elasticgraph-schema_artifacts (= 0.19.2.1.pre)
       elasticgraph-support (= 0.19.2.1.pre)
       graphql (~> 2.5.3)
+      graphql-c_parser (~> 1.1, >= 1.1.2)
       rake (~> 13.2, >= 13.2.1)
 
 PATH
@@ -318,6 +321,8 @@ GEM
       base64
       fiber-storage
       logger
+    graphql-c_parser (1.1.2)
+      graphql (>= 2.2.10)
     hana (1.3.7)
     hashdiff (1.1.2)
     hashery (2.1.2)

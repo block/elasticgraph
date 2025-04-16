@@ -145,7 +145,7 @@ module ElasticGraph
             For client `client_jane`:
               - CountParts.graphql (1 operation):
                 - (no operation name): 🛑. Got 1 validation error:
-                  1) Expected LCURLY, actual: IDENTIFIER ("parts") at [2, 3]
+                  1) syntax error, unexpected IDENTIFIER ("parts"), expecting LCURLY at [2, 3]
                      source: query_registry/client_jane/CountParts.graphql:2:3
           EOS
         end

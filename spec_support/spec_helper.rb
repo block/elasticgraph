@@ -451,13 +451,6 @@ end
 # If we're using the parallel test runner, we have to load our adapters which patch various bits of behavior
 # to make it safe to run tests in parallel.
 require "elastic_graph/spec_support/parallel_spec_runner" if defined?(::Flatware)
-
-# optimize_graphql.rb makes our tests faster but also makes them slightly less "realistic"
-# since the optimization that implements won't be in place in production. Locally, we care
-# a lot about test speed and are willing to make that tradeoff, but on CI we optimize for
-# greater "test accuracy" even if it makes the tests a bit slower, so we don't want this
-# loaded there.
-require "elastic_graph/spec_support/optimize_graphql" unless ENV["CI"]
 require "elastic_graph/spec_support/validate_graphql_schemas"
 require "pathname"
 
