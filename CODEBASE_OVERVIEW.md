@@ -22,7 +22,7 @@ These libraries form the core backbone of ElasticGraph that is designed to run i
 graph LR;
     elasticgraph-admin --> elasticgraph-datastore_core & elasticgraph-indexer & elasticgraph-schema_artifacts & elasticgraph-support & rake
     elasticgraph-datastore_core --> elasticgraph-schema_artifacts & elasticgraph-support
-    elasticgraph-graphql --> elasticgraph-datastore_core & elasticgraph-schema_artifacts & graphql
+    elasticgraph-graphql --> base64 & elasticgraph-datastore_core & elasticgraph-schema_artifacts & graphql
     elasticgraph-indexer --> elasticgraph-datastore_core & elasticgraph-json_schema & elasticgraph-schema_artifacts & elasticgraph-support & hashdiff
     elasticgraph-json_schema --> elasticgraph-support & json_schemer
     elasticgraph-schema_artifacts --> elasticgraph-support
@@ -35,10 +35,12 @@ graph LR;
     style elasticgraph-schema_artifacts color: DodgerBlue;
     style elasticgraph-support color: DodgerBlue;
     style rake color: Red;
+    style base64 color: Red;
     style graphql color: Red;
     style hashdiff color: Red;
     style json_schemer color: Red;
     style logger color: Red;
+click base64 href "https://rubygems.org/gems/base64"
 click graphql href "https://rubygems.org/gems/graphql"
 click hashdiff href "https://rubygems.org/gems/hashdiff"
 click json_schemer href "https://rubygems.org/gems/json_schemer"
