@@ -26,20 +26,6 @@ module ElasticGraph
           end
         end
 
-        it "exposes `use_updates_for_indexing?` based on index config" do
-          index = define_index("my_type", config_overrides: {
-            index_definitions: {"my_type" => config_index_def_of(use_updates_for_indexing: true)}
-          })
-
-          expect(index.use_updates_for_indexing?).to be true
-
-          index = define_index("my_type", config_overrides: {
-            index_definitions: {"my_type" => config_index_def_of(use_updates_for_indexing: false)}
-          })
-
-          expect(index.use_updates_for_indexing?).to be false
-        end
-
         describe "#index_expression_for_search" do
           it "returns the index expression to search" do
             index_def = define_index("items")

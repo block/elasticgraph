@@ -8,7 +8,6 @@ module ElasticGraph
         attr_reader setting_overrides: ::Hash[::String, untyped]
         attr_reader setting_overrides_by_timestamp: ::Hash[::String, ::Hash[::String, untyped]]
         attr_reader custom_timestamp_ranges: ::Array[IndexDefinition::CustomTimestampRange]
-        attr_reader use_updates_for_indexing: bool
 
         def initialize: (
           ignore_routing_values: ::Set[::String],
@@ -16,8 +15,8 @@ module ElasticGraph
           index_into_clusters: ::Array[::String],
           setting_overrides: ::Hash[::String, untyped],
           setting_overrides_by_timestamp: ::Hash[::String, ::Hash[::String, untyped]],
-          custom_timestamp_ranges: ::Array[IndexDefinition::CustomTimestampRange],
-          use_updates_for_indexing: bool) -> void
+          custom_timestamp_ranges: ::Array[IndexDefinition::CustomTimestampRange]
+        ) -> void
 
         def with: (
           ?ignore_routing_values: ::Set[::String],
@@ -25,8 +24,8 @@ module ElasticGraph
           ?index_into_clusters: ::Array[::String],
           ?setting_overrides: ::Hash[::String, untyped],
           ?setting_overrides_by_timestamp: ::Hash[::String, ::Hash[::String, untyped]],
-          ?custom_timestamp_ranges: ::Array[IndexDefinition::CustomTimestampRange],
-          ?use_updates_for_indexing: bool) -> IndexDefinition
+          ?custom_timestamp_ranges: ::Array[IndexDefinition::CustomTimestampRange]
+        ) -> IndexDefinition
       end
 
       class IndexDefinition < IndexDefinitionSupertype
@@ -37,8 +36,8 @@ module ElasticGraph
 
         def self.from: (
           custom_timestamp_ranges: ::Array[::Hash[::String, untyped]],
-          ?use_updates_for_indexing: bool,
-          **untyped) -> IndexDefinition
+          **untyped
+        ) -> IndexDefinition
 
         class CustomTimestampRangeSupertype
           attr_reader index_name_suffix: ::String
@@ -48,12 +47,14 @@ module ElasticGraph
           def initialize: (
             index_name_suffix: ::String,
             setting_overrides: ::Hash[::String, untyped],
-            time_set: Support::TimeSet) -> void
+            time_set: Support::TimeSet
+          ) -> void
 
           def with: (
             ?index_name_suffix: ::String,
             ?setting_overrides: ::Hash[::String, untyped],
-            ?time_set: Support::TimeSet) -> CustomTimestampRange
+            ?time_set: Support::TimeSet
+          ) -> CustomTimestampRange
         end
 
         class CustomTimestampRange < CustomTimestampRangeSupertype

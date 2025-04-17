@@ -26,7 +26,6 @@ module ElasticGraph
                 foo: 23
           index_definitions:
             widgets:
-              use_updates_for_indexing: true
               query_cluster: "main"
               index_into_clusters: ["main"]
               ignore_routing_values: []
@@ -52,8 +51,7 @@ module ElasticGraph
           index_into_clusters: ["main"],
           setting_overrides: {},
           setting_overrides_by_timestamp: {},
-          custom_timestamp_ranges: [],
-          use_updates_for_indexing: true
+          custom_timestamp_ranges: []
         ))
         expect(config.log_traffic).to eq true
         expect(config.max_client_retries).to eq 3
@@ -93,8 +91,7 @@ module ElasticGraph
           index_into_clusters: ["main"],
           setting_overrides: {},
           setting_overrides_by_timestamp: {},
-          custom_timestamp_ranges: [],
-          use_updates_for_indexing: true
+          custom_timestamp_ranges: []
         ))
         expect(config.log_traffic).to eq false
         expect(config.max_client_retries).to eq 3

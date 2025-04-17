@@ -25,16 +25,13 @@ module ElasticGraph
       #   allowing us to have different settings than the template for some timestamp.
       # - custom_timestamp_ranges: defines indices for a custom timestamp range (rather than relying
       #   on the configured rollover frequency).
-      # - use_updates_for_indexing: when `true`, opts the index into using the `update` API instead of the `index` API for indexing.
-      #   (Defaults to `true`).
       class IndexDefinition < ::Data.define(
         :ignore_routing_values,
         :query_cluster,
         :index_into_clusters,
         :setting_overrides,
         :setting_overrides_by_timestamp,
-        :custom_timestamp_ranges,
-        :use_updates_for_indexing
+        :custom_timestamp_ranges
       )
         def initialize(ignore_routing_values:, **rest)
           __skip__ = super(ignore_routing_values: ignore_routing_values.to_set, **rest)
@@ -69,10 +66,9 @@ module ElasticGraph
           end
         end
 
-        def self.from(custom_timestamp_ranges:, use_updates_for_indexing: true, **rest)
+        def self.from(custom_timestamp_ranges:, **rest)
           __skip__ = new(
             custom_timestamp_ranges: CustomTimestampRange.ranges_from(custom_timestamp_ranges),
-            use_updates_for_indexing: use_updates_for_indexing,
             **rest
           )
         end
