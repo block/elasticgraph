@@ -177,16 +177,8 @@ module ElasticGraph
           end
         end
 
-        context "when `use_updates_for_indexing?` is set to true (using the version of the `update_data` script from EG v0.8+)", use_updates_for_indexing: true do
+        context "when `use_updates_for_indexing?` is set to true", use_updates_for_indexing: true do
           include_examples "source_event_versions_in_index when `use_updates_for_indexing?` is set to true"
-        end
-
-        context "when `use_updates_for_indexing?` is set to true (using the version of the `update_data` script from EG < v0.8)", use_updates_for_indexing: true do
-          include_examples "source_event_versions_in_index when `use_updates_for_indexing?` is set to true"
-
-          def build_indexer(**options)
-            super(use_old_update_script: true, **options)
-          end
         end
 
         def test_documents_of_type(type, &block)
