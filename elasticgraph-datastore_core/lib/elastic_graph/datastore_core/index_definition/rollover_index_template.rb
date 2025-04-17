@@ -31,7 +31,7 @@ module ElasticGraph
 
         # `include IndexDefinition::Base` provides all these methods. Steep should be able to detect it
         # but can't for some reason so we have to declare them with `@dynamic`.
-        # @dynamic flattened_env_setting_overrides, routing_value_for_prepared_record, has_custom_routing?, cluster_to_query, use_updates_for_indexing?
+        # @dynamic flattened_env_setting_overrides, routing_value_for_prepared_record, has_custom_routing?, cluster_to_query
         # @dynamic clusters_to_index_into, all_accessible_cluster_names, ignored_values_for_routing, searches_could_hit_incomplete_docs?, max_result_window
         # @dynamic accessible_cluster_names_to_index_into, accessible_from_queries?, known_related_query_rollover_indices, list_counts_field_paths_for_source
         include IndexDefinition::Base

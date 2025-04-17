@@ -91,10 +91,6 @@ module ElasticGraph
           end
         end
 
-        def use_updates_for_indexing?
-          env_index_config.use_updates_for_indexing
-        end
-
         def ignored_values_for_routing
           env_index_config.ignore_routing_values
         end

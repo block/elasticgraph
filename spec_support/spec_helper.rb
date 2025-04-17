@@ -404,8 +404,7 @@ module ElasticGraph
       ignore_routing_values: [],
       setting_overrides: {},
       setting_overrides_by_timestamp: {},
-      custom_timestamp_ranges: [],
-      use_updates_for_indexing: true
+      custom_timestamp_ranges: []
     )
       require "elastic_graph/datastore_core/configuration/index_definition"
       DatastoreCore::Configuration::IndexDefinition.from(
@@ -414,8 +413,7 @@ module ElasticGraph
         ignore_routing_values: ignore_routing_values,
         setting_overrides: setting_overrides,
         setting_overrides_by_timestamp: setting_overrides_by_timestamp,
-        custom_timestamp_ranges: custom_timestamp_ranges,
-        use_updates_for_indexing: use_updates_for_indexing
+        custom_timestamp_ranges: custom_timestamp_ranges
       )
     end
 

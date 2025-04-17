@@ -4,7 +4,6 @@ module ElasticGraph
     # provided by the `IndexDefinition::Base` module.
     interface _IndexDefinitionCommonMethods
       def flattened_env_setting_overrides: () -> ::Hash[::String, untyped]
-      def use_updates_for_indexing?: () -> bool
       def routing_value_for_prepared_record: (::Hash[::String, untyped], ?route_with_path: ::String?, ?id_path: ::String) -> ::String?
       def has_custom_routing?: () -> bool
       def max_result_window: () -> ::Integer
