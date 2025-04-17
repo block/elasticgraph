@@ -64,17 +64,7 @@ module ElasticGraph
             expect(get_component_names_from_response(response)).to contain_exactly("version_as_float")
           end
 
-          # Here we disable VCR because we are dealing with `version` numbers.
-          # To guarantee that our `router.bulk` calls index the operations, we
-          # use monotonically increasing `version` values based on the current
-          # system time clock, and have configured VCR to match requests that only
-          # differ on the `version` values. However, when VCR is playing back the
-          # response will contain the `version` from when the cassette was recorded,
-          # which will differ from the version we are dealing with on this run of the
-          # test.
-          #
-          # To avoid odd, confusing failures, we just disable VCR here.
-          context "when an event is malformed", :no_vcr do
+          context "when an event is malformed" do
             let(:valid_event_1) { build_upsert_event(:component, id: "c678", name: "valid1") }
             let(:malformed_event) { build_upsert_event(:component, id: "c789", name: 17) } # name is an integer instead of a string as expected
             let(:valid_event_2) { build_upsert_event(:component, id: "c890", name: "valid2") }

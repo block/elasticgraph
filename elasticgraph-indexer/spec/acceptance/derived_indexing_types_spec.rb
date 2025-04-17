@@ -147,17 +147,7 @@ module ElasticGraph
         })
       end
 
-      # Here we disable VCR because we are dealing with `version` numbers.
-      # To guarantee that our `router.bulk` calls index the operations, we
-      # use monotonically increasing `version` values based on the current
-      # system time clock, and have configured VCR to match requests that only
-      # differ on the `version` values. However, when VCR is playing back the
-      # response will contain the `version` from when the cassette was recorded,
-      # which will differ from the version we are dealing with on this run of the
-      # test.
-      #
-      # To avoid odd, confusing failures, we just disable VCR here.
-      it "ignores an event that tries to change the value if that event has already been superseded by a corrected event with a greater version", :no_vcr do
+      it "ignores an event that tries to change the value if that event has already been superseded by a corrected event with a greater version" do
         # Original widget.
         widget_v1 = widget("LARGE", "RED", "USD", cost_currency_symbol: "$", id: "w1", workspace_id: "wid23")
 

@@ -7,7 +7,6 @@
 # frozen_string_literal: true
 
 require "date"
-require "elastic_graph/spec_support/factories/shared"
 
 # Note: it is *essential* that all factories defined here generate records
 # deterministically, in order for the request bodies to (and responses from)
