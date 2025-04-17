@@ -33,15 +33,6 @@ module ElasticGraph
       @version = version
       @admin = admin || build_admin(datastore_backend: datastore_backend)
       self.state_file_name = state_file_name
-
-      # Also make our old datastore scripts available to call from our tests for backwards-compatibility testing.
-      #
-      # TODO: Drop this when we no longer need to maintain backwards-compatibility.
-      # standard:disable Lint/NestedMethodDefinition
-      def (@admin.schema_artifacts).datastore_scripts
-        super.merge(::YAML.safe_load_file(::File.join(__dir__, "old_datastore_scripts.yaml")))
-      end
-      # standard:enable Lint/NestedMethodDefinition
     end
 
     def manage_cluster

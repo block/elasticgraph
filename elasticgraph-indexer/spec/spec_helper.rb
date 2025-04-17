@@ -10,45 +10,12 @@
 # Note that it gets loaded by `spec_support/spec_helper.rb` which contains common spec support
 # code for all ElasticGraph test suites.
 
-require "delegate"
-
 module ElasticGraph
   module IndexerSpecHelpers
-    class UseOldUpdateScripts < ::SimpleDelegator
-      def script_id
-        OLD_INDEX_DATA_UPDATE_SCRIPT_ID
-      end
-
-      def for_normal_indexing?
-        true
-      end
-    end
-
     def with_use_updates_for_indexing(config, use_updates_for_indexing)
       config.with(index_definitions: config.index_definitions.transform_values do |index_def|
         index_def.with(use_updates_for_indexing: use_updates_for_indexing)
       end)
-    end
-
-    def build_indexer(use_old_update_script: false, **options, &block)
-      return super(**options, &block) unless use_old_update_script
-
-      schema_artifacts = SchemaArtifacts::FromDisk.new(
-        ::File.join(CommonSpecHelpers::REPO_ROOT, "config", "schema", "artifacts"),
-        :indexer
-      )
-
-      schema_artifacts.runtime_metadata.object_types_by_name.each do |name, object_type|
-        object_type.update_targets.map! do |update_target|
-          if update_target.for_normal_indexing?
-            UseOldUpdateScripts.new(update_target)
-          else
-            update_target
-          end
-        end
-      end
-
-      super(schema_artifacts: schema_artifacts, **options, &block)
     end
   end
 
