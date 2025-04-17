@@ -47,8 +47,6 @@ module ElasticGraph
         def validate_record_returning_failure: (event, ::Integer) -> BuildResult?
         def build_failed_result: (event, ::String, ::String) -> BuildResult
         def build_all_operations_for: (event, _RecordPreparer) -> ::Array[_Operation]
-        def upsert_operations: (event, _RecordPreparer) -> ::Array[_Operation]
-        def update_operations: (event, _RecordPreparer) -> ::Array[_Operation]
         def index_definitions_for: (::String) -> ::Array[DatastoreCore::_IndexDefinition]
         def raise: (*untyped) -> void
 

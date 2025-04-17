@@ -22,250 +22,186 @@ module ElasticGraph
       let(:noop_version_conflict_reason) { "[123]: version conflict, current version [534319179481001] is higher or equal to the one provided [534319179481000]" }
 
       describe "#source_event_versions_in_index" do
-        shared_examples_for "source_event_versions_in_index" do
-          before do
-            stub_msearch_on(main_datastore_client, "main")
-            stub_msearch_on(other_datastore_client, "other")
+        before do
+          stub_msearch_on(main_datastore_client, "main")
+          stub_msearch_on(other_datastore_client, "other")
+        end
+
+        let(:requested_docs_by_client) { ::Hash.new { |h, k| h[k] = [] } }
+        let(:stubbed_versions_by_index_and_id) { {} }
+        let(:widget_primary_indexing_op) { new_primary_indexing_op({"type" => "Widget", "id" => "1", "version" => 1, "record" => {"id" => "1", "some_field" => "value", "created_at" => "2021-08-24T23:30:00Z", "workspace_id" => "ws123"}}) }
+        let(:component_primary_indexing_op) { new_primary_indexing_op({"type" => "Component", "id" => "7", "version" => 1, "record" => {"id" => "1", "some_field" => "value"}}) }
+        let(:widget_derived_update_op) do
+          new_operation(
+            {"type" => "Widget", "id" => "4", "version" => 1, "record" => {"id" => "1", "currency" => "USD", "name" => "thing1"}},
+            destination_index_def: indexer.datastore_core.index_definitions_by_name.fetch("widget_currencies"),
+            update_target: indexer.schema_artifacts.runtime_metadata.object_types_by_name.fetch("Widget").update_targets.first,
+            doc_id: "USD"
+          )
+        end
+
+        it "does not make a request to the datastore if the operations list is empty" do
+          expect(router.source_event_versions_in_index([])).to eq({})
+
+          expect(main_datastore_client).not_to have_received(:msearch)
+          expect(other_datastore_client).not_to have_received(:msearch)
+        end
+
+        it "raises an error when the datastore returns unexpected errors" do
+          allow(main_datastore_client).to receive(:msearch) do |request|
+            # 4 elements = searches for 2 documents since its a search header + search body for each.
+            expect(request.fetch(:body).size).to eq(4)
+
+            {
+              "responses" => [
+                # These are example failures that we got while implementing the `source_event_versions_in_index` logic before we had it entirely correct.
+                # These specific errors should no longer happen but we are using them here as examples of what failures look like.
+                {"status" => 400, "error" => {"root_cause" => [{"type" => "null_pointer_exception", "reason" => "type must not be null"}], "type" => "null_pointer_exception", "reason" => "type must not be null"}},
+                {"status" => 400, "error" => {"root_cause" => [{"type" => "index_not_found_exception", "reason" => "no such index [widgets]", "resource.type" => "index_expression", "resource.id" => "widgets", "index_uuid" => "_na_", "index" => "widgets"}], "type" => "index_not_found_exception", "reason" => "no such index [widgets]", "resource.type" => "index_expression", "resource.id" => "widgets", "index_uuid" => "_na_", "index" => "widgets"}}
+              ]
+            }
           end
 
-          let(:requested_docs_by_client) { ::Hash.new { |h, k| h[k] = [] } }
-          let(:stubbed_versions_by_index_and_id) { {} }
-          let(:widget_primary_indexing_op) { new_primary_indexing_op({"type" => "Widget", "id" => "1", "version" => 1, "record" => {"id" => "1", "some_field" => "value", "created_at" => "2021-08-24T23:30:00Z", "workspace_id" => "ws123"}}) }
-          let(:component_primary_indexing_op) { new_primary_indexing_op({"type" => "Component", "id" => "7", "version" => 1, "record" => {"id" => "1", "some_field" => "value"}}) }
-          let(:widget_derived_update_op) do
-            new_operation(
-              {"type" => "Widget", "id" => "4", "version" => 1, "record" => {"id" => "1", "currency" => "USD", "name" => "thing1"}},
-              destination_index_def: indexer.datastore_core.index_definitions_by_name.fetch("widget_currencies"),
-              update_target: indexer.schema_artifacts.runtime_metadata.object_types_by_name.fetch("Widget").update_targets.first,
-              doc_id: "USD"
+          expect {
+            router.source_event_versions_in_index([widget_primary_indexing_op, component_primary_indexing_op])
+          }.to raise_error Errors::IdentifyDocumentVersionsFailedError, a_string_including(
+            "null_pointer_exception", "index_not_found_exception"
+          )
+        end
+
+        context "when configured to index types into separate clusters" do
+          let(:indexer) { build_indexer(index_to_clusters: {"components" => {"index_into_clusters" => ["main", "other"]}}) }
+
+          it "queries the version on the appropriate clusters for each operation" do
+            stubbed_versions_by_index_and_id[["widgets", widget_primary_indexing_op.doc_id]] = 17
+            stubbed_versions_by_index_and_id[["components", component_primary_indexing_op.doc_id]] = 27
+
+            results = router.source_event_versions_in_index([widget_primary_indexing_op, component_primary_indexing_op])
+
+            expect(results).to eq(
+              widget_primary_indexing_op => {"main" => [17]},
+              component_primary_indexing_op => {"main" => [27], "other" => [27]}
+            )
+
+            expect(requested_docs_by_client.keys).to contain_exactly("main", "other")
+            expect(requested_docs_by_client["main"]).to contain_exactly(
+              doc_version_request_for(widget_primary_indexing_op),
+              doc_version_request_for(component_primary_indexing_op)
+            )
+            expect(requested_docs_by_client["other"]).to contain_exactly(
+              doc_version_request_for(component_primary_indexing_op)
             )
           end
+        end
 
-          it "does not make a request to the datastore if the operations list is empty" do
-            expect(router.source_event_versions_in_index([])).to eq({})
-
-            expect(main_datastore_client).not_to have_received(:msearch)
-            expect(other_datastore_client).not_to have_received(:msearch)
+        context "when a type is configured with a cluster name that is not itself configured" do
+          let(:indexer) do
+            build_indexer(index_to_clusters: {
+              "components" => {"index_into_clusters" => ["undefined"]},
+              "widgets" => {"index_into_clusters" => ["main"]}
+            })
           end
 
-          it "raises an error when the datastore returns unexpected errors" do
-            allow(main_datastore_client).to receive(:msearch) do |request|
-              # 4 elements = searches for 2 documents since its a search header + search body for each.
-              expect(request.fetch(:body).size).to eq(4)
+          it "avoids querying the unconfigured cluster, and returns `nil` for the version" do
+            stubbed_versions_by_index_and_id[["widgets", widget_primary_indexing_op.doc_id]] = 17
+            stubbed_versions_by_index_and_id[["components", component_primary_indexing_op.doc_id]] = 27
 
-              {
-                "responses" => [
-                  # These are example failures that we got while implementing the `source_event_versions_in_index` logic before we had it entirely correct.
-                  # These specific errors should no longer happen but we are using them here as examples of what failures look like.
-                  {"status" => 400, "error" => {"root_cause" => [{"type" => "null_pointer_exception", "reason" => "type must not be null"}], "type" => "null_pointer_exception", "reason" => "type must not be null"}},
-                  {"status" => 400, "error" => {"root_cause" => [{"type" => "index_not_found_exception", "reason" => "no such index [widgets]", "resource.type" => "index_expression", "resource.id" => "widgets", "index_uuid" => "_na_", "index" => "widgets"}], "type" => "index_not_found_exception", "reason" => "no such index [widgets]", "resource.type" => "index_expression", "resource.id" => "widgets", "index_uuid" => "_na_", "index" => "widgets"}}
-                ]
+            results = router.source_event_versions_in_index([widget_primary_indexing_op, component_primary_indexing_op])
+
+            expect(results).to eq(
+              widget_primary_indexing_op => {"main" => [17]},
+              component_primary_indexing_op => {"undefined" => []}
+            )
+          end
+        end
+
+        it "supports normal updates and derived indexing type update operations" do
+          stubbed_versions_by_index_and_id[["widgets", widget_primary_indexing_op.doc_id]] = 17
+          stubbed_versions_by_index_and_id[["widget_currencies", widget_derived_update_op.doc_id]] = 33
+          stubbed_versions_by_index_and_id[["components", component_primary_indexing_op.doc_id]] = 27
+
+          # Note: we intentionally mix the operations which are ignored and the non-ignored operations to force
+          # the implementation to handle them correctly.
+          results = router.source_event_versions_in_index([widget_primary_indexing_op, widget_derived_update_op, component_primary_indexing_op])
+
+          expect(requested_docs_by_client.keys).to contain_exactly("main")
+          expect(requested_docs_by_client["main"]).to contain_exactly(
+            doc_version_request_for(widget_primary_indexing_op),
+            doc_version_request_for(component_primary_indexing_op)
+          )
+
+          expect(results.keys).to contain_exactly(widget_primary_indexing_op, component_primary_indexing_op, widget_derived_update_op)
+          expect(results[widget_primary_indexing_op]).to eq("main" => [17])
+          expect(results[component_primary_indexing_op]).to eq("main" => [27])
+
+          # The derived document doesn't keep track of `__versions` so it doesn't have a version it can return.
+          expect(results[widget_derived_update_op]).to eq("main" => [])
+        end
+
+        def new_primary_indexing_op(event)
+          update_targets = indexer
+            .schema_artifacts
+            .runtime_metadata
+            .object_types_by_name
+            .fetch(event.fetch("type"))
+            .update_targets
+            .select { |ut| ut.type == event.fetch("type") }
+
+          expect(update_targets.size).to eq(1)
+          index_def = indexer.datastore_core.index_definitions_by_graphql_type.fetch(event.fetch("type")).first
+
+          Operation::Update.new(
+            event: event,
+            prepared_record: indexer.record_preparer_factory.for_latest_json_schema_version.prepare_for_index(
+              event.fetch("type"),
+              event.fetch("record")
+            ),
+            destination_index_def: index_def,
+            update_target: update_targets.first,
+            doc_id: event.fetch("id"),
+            destination_index_mapping: indexer.schema_artifacts.index_mappings_by_index_def_name.fetch(index_def.name)
+          )
+        end
+
+        def stub_msearch_on(client, client_name)
+          allow(client).to receive(:msearch) do |request|
+            requested_docs = request.dig(:body).each_slice(2).map do |(search_header, search_body)|
+              # verify we avoid requesting fields we don't need to identify the version
+              expect(search_body.dig(:_source, :includes)).to include(a_string_starting_with("__versions."))
+
+              [search_header.fetch(:index), search_body.fetch(:query).fetch(:ids).fetch(:values).first]
+            end
+
+            requested_docs_by_client[client_name].concat(requested_docs)
+
+            responses = requested_docs.map do |(index, id)|
+              version = stubbed_versions_by_index_and_id[[index, id]]
+
+              relationship = {
+                "widgets" => SELF_RELATIONSHIP_NAME,
+                "components" => SELF_RELATIONSHIP_NAME,
+                "widget_currencies" => "currency"
+              }.fetch(index)
+
+              hit = {
+                "_index" => index, "_type" => "_doc", "_id" => id, "_source" => {
+                  "__versions" => {relationship => {id => version}}
+                }
               }
+
+              {"hits" => {"hits" => [hit]}}
             end
 
-            expect {
-              router.source_event_versions_in_index([widget_primary_indexing_op, component_primary_indexing_op])
-            }.to raise_error Errors::IdentifyDocumentVersionsFailedError, a_string_including(
-              "null_pointer_exception", "index_not_found_exception"
-            )
-          end
-
-          context "when configured to index types into separate clusters" do
-            let(:indexer) { build_indexer(index_to_clusters: {"components" => {"index_into_clusters" => ["main", "other"]}}) }
-
-            it "queries the version on the appropriate clusters for each operation" do
-              stubbed_versions_by_index_and_id[["widgets", widget_primary_indexing_op.doc_id]] = 17
-              stubbed_versions_by_index_and_id[["components", component_primary_indexing_op.doc_id]] = 27
-
-              results = router.source_event_versions_in_index([widget_primary_indexing_op, component_primary_indexing_op])
-
-              expect(results).to eq(
-                widget_primary_indexing_op => {"main" => [17]},
-                component_primary_indexing_op => {"main" => [27], "other" => [27]}
-              )
-
-              expect(requested_docs_by_client.keys).to contain_exactly("main", "other")
-              expect(requested_docs_by_client["main"]).to contain_exactly(
-                doc_version_request_for(widget_primary_indexing_op),
-                doc_version_request_for(component_primary_indexing_op)
-              )
-              expect(requested_docs_by_client["other"]).to contain_exactly(
-                doc_version_request_for(component_primary_indexing_op)
-              )
-            end
-          end
-
-          context "when a type is configured with a cluster name that is not itself configured" do
-            let(:indexer) do
-              build_indexer(index_to_clusters: {
-                "components" => {"index_into_clusters" => ["undefined"]},
-                "widgets" => {"index_into_clusters" => ["main"]}
-              })
-            end
-
-            it "avoids querying the unconfigured cluster, and returns `nil` for the version" do
-              stubbed_versions_by_index_and_id[["widgets", widget_primary_indexing_op.doc_id]] = 17
-              stubbed_versions_by_index_and_id[["components", component_primary_indexing_op.doc_id]] = 27
-
-              results = router.source_event_versions_in_index([widget_primary_indexing_op, component_primary_indexing_op])
-
-              expect(results).to eq(
-                widget_primary_indexing_op => {"main" => [17]},
-                component_primary_indexing_op => {"undefined" => []}
-              )
-            end
+            {"responses" => responses}
           end
         end
+      end
 
-        context "when `use_updates_for_indexing?` is set to false" do
-          def build_indexer(**options, &block)
-            super(use_updates_for_indexing: false, **options, &block)
-          end
-
-          include_context "source_event_versions_in_index" do
-            it "supports all types of operations" do
-              stubbed_versions_by_index_and_id[["widgets", widget_primary_indexing_op.doc_id]] = 17
-              stubbed_versions_by_index_and_id[["widget_currencies", widget_derived_update_op.doc_id]] = 33
-              stubbed_versions_by_index_and_id[["components", component_primary_indexing_op.doc_id]] = 27
-
-              # Note: we intentionally mix the operations which are ignored and the non-ignored operations to force
-              # the implementation to handle them correctly.
-              results = router.source_event_versions_in_index([widget_primary_indexing_op, widget_derived_update_op, component_primary_indexing_op])
-
-              expect(requested_docs_by_client.keys).to contain_exactly("main")
-              expect(requested_docs_by_client["main"]).to contain_exactly(
-                doc_version_request_for(widget_primary_indexing_op),
-                doc_version_request_for(component_primary_indexing_op)
-              )
-
-              expect(results.keys).to contain_exactly(widget_primary_indexing_op, component_primary_indexing_op, widget_derived_update_op)
-              expect(results[widget_primary_indexing_op]).to eq("main" => [17])
-              expect(results[component_primary_indexing_op]).to eq("main" => [27])
-              expect(results[widget_derived_update_op]).to eq("main" => []) # as an unversioned op we return an empty list
-            end
-
-            def new_primary_indexing_op(event)
-              new_operation(event)
-            end
-
-            def stub_msearch_on(client, client_name)
-              allow(client).to receive(:msearch) do |request|
-                requested_docs = request.dig(:body).each_slice(2).map do |(search_header, search_body)|
-                  # verify we avoid requesting fields we don't need to identify the version
-                  expect(search_body).to include(_source: false, version: true)
-
-                  [search_header.fetch(:index), search_body.fetch(:query).fetch(:ids).fetch(:values).first]
-                end
-
-                requested_docs_by_client[client_name].concat(requested_docs)
-
-                responses = requested_docs.map do |(index, id)|
-                  version = stubbed_versions_by_index_and_id[[index, id]]
-                  hit = {"_index" => index, "_type" => "_doc", "_id" => id, "_version" => version}
-                  {"hits" => {"hits" => [hit].compact}}
-                end
-
-                {"responses" => responses}
-              end
-            end
-          end
-        end
-
-        context "when `use_updates_for_indexing?` is set to true" do
-          def build_indexer(**options, &block)
-            super(use_updates_for_indexing: true, **options, &block)
-          end
-
-          include_context "source_event_versions_in_index" do
-            it "supports normal updates and derived indexing type update operations" do
-              stubbed_versions_by_index_and_id[["widgets", widget_primary_indexing_op.doc_id]] = 17
-              stubbed_versions_by_index_and_id[["widget_currencies", widget_derived_update_op.doc_id]] = 33
-              stubbed_versions_by_index_and_id[["components", component_primary_indexing_op.doc_id]] = 27
-
-              # Note: we intentionally mix the operations which are ignored and the non-ignored operations to force
-              # the implementation to handle them correctly.
-              results = router.source_event_versions_in_index([widget_primary_indexing_op, widget_derived_update_op, component_primary_indexing_op])
-
-              expect(requested_docs_by_client.keys).to contain_exactly("main")
-              expect(requested_docs_by_client["main"]).to contain_exactly(
-                doc_version_request_for(widget_primary_indexing_op),
-                doc_version_request_for(component_primary_indexing_op)
-              )
-
-              expect(results.keys).to contain_exactly(widget_primary_indexing_op, component_primary_indexing_op, widget_derived_update_op)
-              expect(results[widget_primary_indexing_op]).to eq("main" => [17])
-              expect(results[component_primary_indexing_op]).to eq("main" => [27])
-
-              # The derived document doesn't keep track of `__versions` so it doesn't have a version it can return.
-              expect(results[widget_derived_update_op]).to eq("main" => [])
-            end
-
-            def new_primary_indexing_op(event)
-              update_targets = indexer
-                .schema_artifacts
-                .runtime_metadata
-                .object_types_by_name
-                .fetch(event.fetch("type"))
-                .update_targets
-                .select { |ut| ut.type == event.fetch("type") }
-
-              expect(update_targets.size).to eq(1)
-              index_def = indexer.datastore_core.index_definitions_by_graphql_type.fetch(event.fetch("type")).first
-
-              Operation::Update.new(
-                event: event,
-                prepared_record: indexer.record_preparer_factory.for_latest_json_schema_version.prepare_for_index(
-                  event.fetch("type"),
-                  event.fetch("record")
-                ),
-                destination_index_def: index_def,
-                update_target: update_targets.first,
-                doc_id: event.fetch("id"),
-                destination_index_mapping: indexer.schema_artifacts.index_mappings_by_index_def_name.fetch(index_def.name)
-              )
-            end
-
-            def stub_msearch_on(client, client_name)
-              allow(client).to receive(:msearch) do |request|
-                requested_docs = request.dig(:body).each_slice(2).map do |(search_header, search_body)|
-                  # verify we avoid requesting fields we don't need to identify the version
-                  expect(search_body.dig(:_source, :includes)).to include(a_string_starting_with("__versions."))
-
-                  [search_header.fetch(:index), search_body.fetch(:query).fetch(:ids).fetch(:values).first]
-                end
-
-                requested_docs_by_client[client_name].concat(requested_docs)
-
-                responses = requested_docs.map do |(index, id)|
-                  version = stubbed_versions_by_index_and_id[[index, id]]
-
-                  relationship = {
-                    "widgets" => SELF_RELATIONSHIP_NAME,
-                    "components" => SELF_RELATIONSHIP_NAME,
-                    "widget_currencies" => "currency"
-                  }.fetch(index)
-
-                  hit = {
-                    "_index" => index, "_type" => "_doc", "_id" => id, "_source" => {
-                      "__versions" => {relationship => {id => version}}
-                    }
-                  }
-
-                  {"hits" => {"hits" => [hit]}}
-                end
-
-                {"responses" => responses}
-              end
-            end
-          end
-        end
-
-        def doc_version_request_for(op)
-          [
-            op.destination_index_def.index_expression_for_search,
-            op.doc_id
-          ]
-        end
+      def doc_version_request_for(op)
+        [
+          op.destination_index_def.index_expression_for_search,
+          op.doc_id
+        ]
       end
 
       describe "#bulk" do
@@ -740,7 +676,7 @@ module ElasticGraph
         {"items" => items}
       end
 
-      def build_indexer(index_to_clusters: {}, use_updates_for_indexing: true)
+      def build_indexer(index_to_clusters: {})
         super(clients_by_name: {"main" => main_datastore_client, "other" => other_datastore_client}, schema_definition: lambda do |schema|
           schema.object_type "Component" do |t|
             t.field "id", "ID!"
@@ -769,7 +705,7 @@ module ElasticGraph
             index_to_clusters.to_h do |index, clusters|
               [index, config_index_def_of(index_into_clusters: clusters["index_into_clusters"])]
             end
-          )).then { |c| with_use_updates_for_indexing(c, use_updates_for_indexing) }
+          ))
         end
       end
     end

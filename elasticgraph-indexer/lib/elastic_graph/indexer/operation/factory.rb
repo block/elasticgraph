@@ -10,7 +10,6 @@ require "elastic_graph/constants"
 require "elastic_graph/indexer/event_id"
 require "elastic_graph/indexer/failed_event_error"
 require "elastic_graph/indexer/operation/update"
-require "elastic_graph/indexer/operation/upsert"
 require "elastic_graph/indexer/record_preparer"
 require "elastic_graph/json_schema/validator_factory"
 require "elastic_graph/support/memoizable_data"
@@ -140,23 +139,6 @@ module ElasticGraph
         end
 
         def build_all_operations_for(event, record_preparer)
-          upsert_operations(event, record_preparer) + update_operations(event, record_preparer)
-        end
-
-        def upsert_operations(event, record_preparer)
-          type = event.fetch("type") do
-            # This key should only be missing on invalid events. We still want to build operations
-            # for the event (to put it in the `FailedEventError`) but in this case we can't build
-            # any because we don't know what indices to target.
-            return []
-          end
-
-          index_definitions_for(type).reject(&:use_updates_for_indexing?).map do |index_definition|
-            Upsert.new(event, index_definition, record_preparer)
-          end
-        end
-
-        def update_operations(event, record_preparer)
           # If `type` is missing or is not a known type (as indicated by `runtime_metadata` being nil)
           # then we can't build a derived indexing type update operation. That case will only happen when we build
           # operations for an `FailedEventError` rather than to execute.

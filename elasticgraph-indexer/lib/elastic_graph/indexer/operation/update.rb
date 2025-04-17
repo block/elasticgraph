@@ -27,8 +27,6 @@ module ElasticGraph
           update_target:,
           destination_index_mapping:
         )
-          return [] if update_target.for_normal_indexing? && !destination_index_def.use_updates_for_indexing?
-
           prepared_record = record_preparer.prepare_for_index(event["type"], event["record"] || {"id" => event["id"]})
 
           Support::HashUtil
