@@ -173,9 +173,6 @@ module GraphQL
       def self.print_schema: (Schema, **untyped) -> ::String
     end
 
-    class Warden
-    end
-
     class Visibility
     end
   end
