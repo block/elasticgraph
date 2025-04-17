@@ -548,7 +548,7 @@ RSpec.configure do |config|
   config.define_derived_metadata(:uses_datastore) do |meta|
     # Note: we MUST consider the `body` when matching requests, because the body is
     # part of the core identity of requests to the datastore.
-    meta[:vcr] = {match_requests_on: [:method, :uri, :body_ignoring_bulk_version]} unless meta.key?(:vcr)
+    meta[:vcr] = {match_requests_on: [:method, :uri, :body]} unless meta.key?(:vcr)
     meta[:builds_indexer] = true
   end
 end

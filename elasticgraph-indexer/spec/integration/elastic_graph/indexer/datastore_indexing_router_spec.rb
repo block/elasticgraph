@@ -12,17 +12,7 @@ require "elastic_graph/support/monotonic_clock"
 module ElasticGraph
   class Indexer
     RSpec.describe DatastoreIndexingRouter, :uses_datastore, :capture_logs do
-      # Here we disable VCR because we are dealing with `version` numbers.
-      # To guarantee that our `router.bulk` calls index the operations, we
-      # use monotonically increasing `version` values based on the current
-      # system time clock, and have configured VCR to match requests that only
-      # differ on the `version` values. However, when VCR is playing back the
-      # response will contain the `version` from when the cassette was recorded,
-      # which will differ from the version we are dealing with on this run of the
-      # test.
-      #
-      # To avoid odd, confusing failures, we just disable VCR here.
-      describe "#source_event_versions_in_index", :factories, :no_vcr do
+      describe "#source_event_versions_in_index", :factories do
         let(:indexer) { build_indexer }
         let(:router) { indexer.datastore_router }
         let(:operation_factory) { indexer.operation_factory }

@@ -34,12 +34,6 @@ module VCRSupport
     [name_for(example_group), description].join("/")
   end
 
-  def ignoring_bulk_body_version(request)
-    return request.body unless /_bulk/.match?(request.uri)
-    # https://rubular.com/r/wwUZ44xMJpz2m0
-    request.body.gsub(/,"version":\d+/, "")
-  end
-
   # Used to match against `VCR::Errors::UnhandledHTTPRequestError` exceptions
   # and any exceptions that are caused by that type of exception (as indicated
   # by its presence as the `cause` or it being mentioned in the `message).
@@ -82,10 +76,6 @@ VCR.configure do |config|
   # print the failures, etc), which means that a failure in an example isn't propagated
   # to VCR unless we manually call `cassette.run_failed!`.
   config.default_cassette_options[:record_on_error] = false
-
-  config.register_request_matcher :body_ignoring_bulk_version do |request_1, request_2|
-    VCRSupport.ignoring_bulk_body_version(request_1) == VCRSupport.ignoring_bulk_body_version(request_2)
-  end
 end
 
 RSpec.configure do |config|
