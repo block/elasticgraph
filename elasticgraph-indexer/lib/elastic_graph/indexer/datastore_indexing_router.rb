@@ -207,14 +207,7 @@ module ElasticGraph
                 include_version =
                   if op.destination_index_def.use_updates_for_indexing?
                     # @type var op: Operation::Update
-                    {_source: {includes: [
-                      "__versions.#{op.update_target.relationship}",
-                      # The update_data script before ElasticGraph v0.8 used __sourceVersions[type] instead of __versions[relationship].
-                      # To be backwards-compatible we need to fetch the data at both paths.
-                      #
-                      # TODO: Drop this when we no longer need to maintain backwards-compatibility.
-                      "__sourceVersions.#{op.event.fetch("type")}"
-                    ]}}
+                    {_source: {includes: ["__versions.#{op.update_target.relationship}"]}}
                   else
                     {version: true, _source: false}
                   end
@@ -263,12 +256,7 @@ module ElasticGraph
               if op.destination_index_def.use_updates_for_indexing?
                 # @type var op: Operation::Update
                 versions = hits.filter_map do |hit|
-                  hit.dig("_source", "__versions", op.update_target.relationship, hit.fetch("_id")) ||
-                    # The update_data script before ElasticGraph v0.8 used __sourceVersions[type] instead of __versions[relationship].
-                    # To be backwards-compatible we need to fetch the data at both paths.
-                    #
-                    # TODO: Drop this when we no longer need to maintain backwards-compatibility.
-                    hit.dig("_source", "__sourceVersions", op.event.fetch("type"), hit.fetch("_id"))
+                  hit.dig("_source", "__versions", op.update_target.relationship, hit.fetch("_id"))
                 end
 
                 [op, versions.uniq]

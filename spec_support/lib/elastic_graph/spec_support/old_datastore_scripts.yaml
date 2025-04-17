@@ -1,7 +1,7 @@
 ---
-# Copied from config/schema/artifacts/datastore_scripts.yaml#L196-L264 in ElasticGraph v0.8.0.0.
+# Copied from config/schema/artifacts/datastore_scripts.yaml#L196-L264 in ElasticGraph v0.9.0.0.
 # TODO: Drop this when we no longer need to maintain backwards-compatibility.
-update_index_data_9b97090d5c97c4adc82dc7f4c2b89bc5:
+update_index_data_7b4f66599e5dd7658f5c15c44b2d998b:
   context: update
   script:
     lang: painless
@@ -19,14 +19,6 @@ update_index_data_9b97090d5c97c4adc82dc7f4c2b89bc5:
         source.__versions[params.relationship] = [:];
       }
 
-      if (source.__sourceVersions == null) {
-        source.__sourceVersions = [:];
-      }
-
-      if (source.__sourceVersions[params.sourceType] == null) {
-        source.__sourceVersions[params.sourceType] = [:];
-      }
-
       // While the version in `__versions` is going to be used for the doc version in the future, for now
       // we need to continue getting it from `__sourceVersions`. Both our old version and this versions of this
       // script keep the value in `__sourceVersions` up-to-date, whereas the old script only writes it to
@@ -35,7 +27,7 @@ update_index_data_9b97090d5c97c4adc82dc7f4c2b89bc5:
       //
       // Later, after the old script is no longer used by any clusters, we'll stop using `__sourceVersions`.
       // TODO: switch to `__versions` when we no longer need to maintain compatibility with the old version of the script.
-      Number _versionForSourceType = source.__sourceVersions.get(params.sourceType)?.get(params.sourceId);
+      Number _versionForSourceType = source.get("__sourceVersions")?.get(params.sourceType)?.get(params.sourceId);
       Number _versionForRelationship = source.__versions.get(params.relationship)?.get(params.sourceId);
 
       // Our JSON schema requires event versions to be non-negative, so we can safely use Long.MIN_VALUE as a stand-in when the value is null.
@@ -62,11 +54,4 @@ update_index_data_9b97090d5c97c4adc82dc7f4c2b89bc5:
         source.putAll(params.data);
         source.id = params.id;
         source.__versions[params.relationship][params.sourceId] = eventVersion;
-
-        // To continue to be backwards compatible with the old version of this script, we need to write the version to
-        // `__sourceVersions` since that's where it looks. In addition, we need to use `params.version` (which can be
-        // double) rather than `eventVersion` (a long) to mirror how the old version of this script behaved (which didn't
-        // do any casting).
-        // TODO: drop this when we no longer need to maintain compatibility with the old version of the script.
-        source.__sourceVersions[params.sourceType][params.sourceId] = params.version;
       }

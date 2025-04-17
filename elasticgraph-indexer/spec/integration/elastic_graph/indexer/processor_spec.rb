@@ -200,7 +200,7 @@ module ElasticGraph
       end
 
       # TODO: drop these backwards compatibility when we no longer need to maintain compatibility with the old version of the script.
-      context "on a system that's been using `use_updates_for_indexing: true` with the initial v0.8 update data script", use_updates_for_indexing: true do
+      context "on a system that's been using `use_updates_for_indexing: true` with the initial v0.9 update data script", use_updates_for_indexing: true do
         let(:component_id) { "c12" }
         let(:new_script_indexer) { build_indexer(use_old_update_script: false) }
         let(:old_script_indexer) { build_indexer(use_old_update_script: true) }
@@ -217,12 +217,10 @@ module ElasticGraph
             }.to change_name_and_version_metadata(
               from: {
                 "name" => "old",
-                "__sourceVersions" => {"Component" => {component_id => 1}},
                 "__versions" => {SELF_RELATIONSHIP_NAME => {component_id => 1}}
               },
               to: {
                 "name" => "new",
-                "__sourceVersions" => {"Component" => {component_id => 1}},
                 "__versions" => {SELF_RELATIONSHIP_NAME => {component_id => 2}}
               }
             )
@@ -240,7 +238,6 @@ module ElasticGraph
               },
               to: {
                 "name" => "new",
-                "__sourceVersions" => {"Component" => {component_id => 2}},
                 "__versions" => {SELF_RELATIONSHIP_NAME => {component_id => 2}}
               }
             )
@@ -258,7 +255,6 @@ module ElasticGraph
               process_batches([new_event], via: new_script_indexer)
             }.to leave_name_and_version_metadata_unchanged_from(
               "name" => "old",
-              "__sourceVersions" => {"Component" => {component_id => 1}},
               "__versions" => {SELF_RELATIONSHIP_NAME => {component_id => 1}}
             )
           end
@@ -286,7 +282,6 @@ module ElasticGraph
               process_batches([new_event], via: new_script_indexer)
             }.to leave_name_and_version_metadata_unchanged_from(
               "name" => "old",
-              "__sourceVersions" => {"Component" => {component_id => 2}},
               "__versions" => {SELF_RELATIONSHIP_NAME => {component_id => 2}}
             )
           end
@@ -302,7 +297,7 @@ module ElasticGraph
             )
           end
 
-          it "considers the max version from `__sourceVersions` and `__versions` to be the document's version when deciding whether to process an update" do
+          it "can go back and forth between old and new versions when processing updates" do
             expected_state1 = {
               "name" => "name1",
               "__versions" => {SELF_RELATIONSHIP_NAME => {component_id => 1}}
@@ -310,28 +305,24 @@ module ElasticGraph
 
             expected_state2 = {
               "name" => "name2",
-              "__versions" => {SELF_RELATIONSHIP_NAME => {component_id => 2}},
-              "__sourceVersions" => {"Component" => {component_id => 2}}
+              "__versions" => {SELF_RELATIONSHIP_NAME => {component_id => 2}}
             }
 
             expected_state3 = {
               "name" => "name3",
-              "__versions" => {SELF_RELATIONSHIP_NAME => {component_id => 3}},
-              "__sourceVersions" => {"Component" => {component_id => 2}}
+              "__versions" => {SELF_RELATIONSHIP_NAME => {component_id => 3}}
             }
 
             # 1) Successfully index using the new script...
             process_batches([build_component_event(name: "name1", version: 1)], via: new_script_indexer)
 
-            # 2) Then successfully index using the old script. Notably, the old script sets the version on `__sourceVersions`
-            #    but not on `__versions`, leaving `__versions` with an out-of-date value.
+            # 2) Then successfully index using the old script.
             expect {
               process_batches([build_component_event(name: "name2", version: 2)], via: old_script_indexer)
             }.to change_name_and_version_metadata(from: expected_state1, to: expected_state2)
 
             # 3) Then try to index using the new script with an event that doesn't have a greater version. It should
-            #    leave things unchanged. (Which requires it to use the version found in `__sourceVersions`, not the
-            #    version found in` __versions`).
+            #    leave things unchanged.
             expect {
               process_batches([build_component_event(name: "name3", version: 2)], via: new_script_indexer)
             }.to leave_name_and_version_metadata_unchanged_from(expected_state2)
@@ -359,7 +350,7 @@ module ElasticGraph
         def indexed_name_and_version_metadata
           results = search.dig("hits", "hits")
             .select { |h| h["_index"] == "components" }
-            .map { |h| h.dig("_source").slice("name", "__versions", "__sourceVersions") }
+            .map { |h| h.dig("_source").slice("name", "__versions") }
 
           expect(results.size).to eq(1)
           results.first
