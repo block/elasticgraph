@@ -198,20 +198,11 @@ module ElasticGraph
         client_names_and_results = Support::Threading.parallel_map(ops_by_client_name) do |(client_name, all_ops)|
           # @type block: [::String, ::Symbol, ::Array[untyped] | ::Hash[_Operation, ::Array[::Integer]]]
 
-          ops, unversioned_ops = all_ops.partition(&:versioned?)
+          ops, unversioned_ops = all_ops.partition(&:versioned?) # : [::Array[Operation::Update], ::Array[Operation::Update]]
 
           msearch_response =
             if (client = @datastore_clients_by_name[client_name]) && ops.any?
               body = ops.flat_map do |op|
-                # We only care about the source versions, but the way we get it varies.
-                include_version =
-                  if op.destination_index_def.use_updates_for_indexing?
-                    # @type var op: Operation::Update
-                    {_source: {includes: ["__versions.#{op.update_target.relationship}"]}}
-                  else
-                    {version: true, _source: false}
-                  end
-
                 [
                   # Note: we intentionally search the entire index expression, not just an individual index based on a rollover timestamp.
                   # And we intentionally do NOT provide a routing value--we want to find the version, no matter what shard the document
@@ -222,8 +213,12 @@ module ElasticGraph
                   # a different shard and index than what the operation is targeted at. We want to search across all of them
                   # so that we will find it, regardless of where it lives.
                   {index: op.destination_index_def.index_expression_for_search},
-                  # Filter to the documents matching the id.
-                  {query: {ids: {values: [op.doc_id]}}}.merge(include_version)
+                  {
+                    # Filter to the documents matching the id.
+                    query: {ids: {values: [op.doc_id]}},
+                    # We only care about the version.
+                    _source: {includes: ["__versions.#{op.update_target.relationship}"]}
+                  }
                 ]
               end
 
@@ -237,7 +232,7 @@ module ElasticGraph
 
           if errors.empty?
             # We assume the size of the ops and the other array is the same and it cannot have `nil`.
-            zip = ops.zip(msearch_response.fetch("responses")) # : ::Array[[_Operation, ::Hash[::String, ::Hash[::String, untyped]]]]
+            zip = ops.zip(msearch_response.fetch("responses")) # : ::Array[[Operation::Update, ::Hash[::String, ::Hash[::String, untyped]]]]
 
             versions_by_op = zip.to_h do |(op, response)|
               hits = response.fetch("hits").fetch("hits")
@@ -253,20 +248,15 @@ module ElasticGraph
                 })
               end
 
-              if op.destination_index_def.use_updates_for_indexing?
-                # @type var op: Operation::Update
-                versions = hits.filter_map do |hit|
-                  hit.dig("_source", "__versions", op.update_target.relationship, hit.fetch("_id"))
-                end
-
-                [op, versions.uniq]
-              else
-                [op, hits.map { |h| h.fetch("_version") }.uniq]
+              versions = hits.filter_map do |hit|
+                hit.dig("_source", "__versions", op.update_target.relationship, hit.fetch("_id"))
               end
+
+              [op, versions.uniq]
             end
 
             unversioned_ops_hash = unversioned_ops.to_h do |op|
-              [op, []] # : [_Operation, ::Array[::Integer]]
+              [op, []] # : [Operation::Update, ::Array[::Integer]]
             end
 
             [client_name, :success, versions_by_op.merge(unversioned_ops_hash)]

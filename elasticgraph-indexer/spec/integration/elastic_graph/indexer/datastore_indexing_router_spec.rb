@@ -23,162 +23,121 @@ module ElasticGraph
       #
       # To avoid odd, confusing failures, we just disable VCR here.
       describe "#source_event_versions_in_index", :factories, :no_vcr do
-        shared_examples_for "source_event_versions_in_index" do
-          let(:indexer) { build_indexer }
-          let(:router) { indexer.datastore_router }
-          let(:operation_factory) { indexer.operation_factory }
+        let(:indexer) { build_indexer }
+        let(:router) { indexer.datastore_router }
+        let(:operation_factory) { indexer.operation_factory }
 
-          it "looks up the document version for each of the specified operations, returning a map of versions by operation" do
-            test_documents_of_type(:address) do |op|
-              expect(uses_custom_routing?(op)).to eq false
-            end
+        it "looks up the document version for each of the specified operations, returning a map of versions by operation" do
+          test_documents_of_type(:address) do |op|
+            expect(uses_custom_routing?(op)).to eq false
           end
+        end
 
-          it "queries the version from the correct shard when the index uses custom shard routing" do
-            test_documents_of_type(:widget) do |op|
-              expect(uses_custom_routing?(op)).to eq true
-            end
+        it "queries the version from the correct shard when the index uses custom shard routing" do
+          test_documents_of_type(:widget) do |op|
+            expect(uses_custom_routing?(op)).to eq true
           end
+        end
 
-          it "returns an empty list of versions when only given an unversioned operation" do
-            unversioned_op = build_expecting_success(build_upsert_event(:widget)).find { |op| !op.versioned? }
-            expect(unversioned_op).to be_a(Operation::Update)
+        it "returns an empty list of versions when only given an unversioned operation" do
+          unversioned_op = build_expecting_success(build_upsert_event(:widget)).find { |op| !op.versioned? }
+          expect(unversioned_op).to be_a(Operation::Update)
 
-            expect {
-              versions_by_cluster_by_op = router.source_event_versions_in_index([unversioned_op])
+          expect {
+            versions_by_cluster_by_op = router.source_event_versions_in_index([unversioned_op])
 
-              expect(versions_by_cluster_by_op).to eq({unversioned_op => {"main" => []}})
-            }.not_to change { datastore_requests("main") }
-          end
+            expect(versions_by_cluster_by_op).to eq({unversioned_op => {"main" => []}})
+          }.not_to change { datastore_requests("main") }
+        end
 
-          it "finds the document on any shard, even if it differs from what the operation's routing key would route to" do
-            op1 = build_primary_indexing_op(:widget, id: "mutated_routing_key", workspace_id: "wid1")
+        it "finds the document on any shard, even if it differs from what the operation's routing key would route to" do
+          op1 = build_primary_indexing_op(:widget, id: "mutated_routing_key", workspace_id: "wid1")
 
-            results = router.bulk([op1], refresh: true)
-            expect(results.successful_operations_by_cluster_name).to match("main" => a_collection_containing_exactly(op1))
+          results = router.bulk([op1], refresh: true)
+          expect(results.successful_operations_by_cluster_name).to match("main" => a_collection_containing_exactly(op1))
 
-            op2 = build_primary_indexing_op(:widget, id: "mutated_routing_key", workspace_id: "wid2")
+          op2 = build_primary_indexing_op(:widget, id: "mutated_routing_key", workspace_id: "wid2")
+          versions_by_cluster_by_op = router.source_event_versions_in_index([op2])
+
+          expect(versions_by_cluster_by_op.keys).to contain_exactly(op2)
+          expect(versions_by_cluster_by_op[op2]).to eq("main" => [op1.event.fetch("version")])
+        end
+
+        it "finds the document on any index, even if it differs from the operation's target index" do
+          op1 = build_primary_indexing_op(:widget, id: "mutated_rollover_timestamp", created_at: "2019-12-03T00:00:00Z")
+
+          results = router.bulk([op1], refresh: true)
+          expect(results.successful_operations_by_cluster_name).to match("main" => a_collection_containing_exactly(op1))
+
+          op2 = build_primary_indexing_op(:widget, id: "mutated_rollover_timestamp", created_at: "2023-12-03T00:00:00Z")
+          versions_by_cluster_by_op = router.source_event_versions_in_index([op2])
+
+          expect(versions_by_cluster_by_op.keys).to contain_exactly(op2)
+          expect(versions_by_cluster_by_op[op2]).to eq("main" => [op1.event.fetch("version")])
+        end
+
+        it "logs a warning and returns all versions if multiple copies of the document are found" do
+          op1 = build_primary_indexing_op(:widget, id: "mutated_routing_and_timestamp", workspace_id: "wid1", created_at: "2019-12-03T00:00:00Z")
+          op2 = build_primary_indexing_op(:widget, id: "mutated_routing_and_timestamp", workspace_id: "wid2", created_at: "2023-12-03T00:00:00Z", __version: op1.event.fetch("version") + 1)
+
+          results = router.bulk([op1, op2], refresh: true)
+          expect(results.successful_operations_by_cluster_name).to match("main" => a_collection_containing_exactly(op1, op2))
+
+          expect {
+            versions_by_cluster_by_op = router.source_event_versions_in_index([op1])
+            expect(versions_by_cluster_by_op.keys).to contain_exactly(op1)
+            expect(versions_by_cluster_by_op[op1]).to match("main" => a_collection_containing_exactly(
+              op1.event.fetch("version"),
+              op2.event.fetch("version")
+            ))
+
             versions_by_cluster_by_op = router.source_event_versions_in_index([op2])
-
             expect(versions_by_cluster_by_op.keys).to contain_exactly(op2)
-            expect(versions_by_cluster_by_op[op2]).to eq("main" => [op1.event.fetch("version")])
-          end
+            expect(versions_by_cluster_by_op[op2]).to match("main" => a_collection_containing_exactly(
+              op1.event.fetch("version"),
+              op2.event.fetch("version")
+            ))
+          }.to log_warning a_string_including("IdentifyDocumentVersionsGotMultipleResults")
 
-          it "finds the document on any index, even if it differs from the operation's target index" do
-            op1 = build_primary_indexing_op(:widget, id: "mutated_rollover_timestamp", created_at: "2019-12-03T00:00:00Z")
-
-            results = router.bulk([op1], refresh: true)
-            expect(results.successful_operations_by_cluster_name).to match("main" => a_collection_containing_exactly(op1))
-
-            op2 = build_primary_indexing_op(:widget, id: "mutated_rollover_timestamp", created_at: "2023-12-03T00:00:00Z")
-            versions_by_cluster_by_op = router.source_event_versions_in_index([op2])
-
-            expect(versions_by_cluster_by_op.keys).to contain_exactly(op2)
-            expect(versions_by_cluster_by_op[op2]).to eq("main" => [op1.event.fetch("version")])
-          end
-
-          it "logs a warning and returns all versions if multiple copies of the document are found" do
-            op1 = build_primary_indexing_op(:widget, id: "mutated_routing_and_timestamp", workspace_id: "wid1", created_at: "2019-12-03T00:00:00Z")
-            op2 = build_primary_indexing_op(:widget, id: "mutated_routing_and_timestamp", workspace_id: "wid2", created_at: "2023-12-03T00:00:00Z", __version: op1.event.fetch("version") + 1)
-
-            results = router.bulk([op1, op2], refresh: true)
-            expect(results.successful_operations_by_cluster_name).to match("main" => a_collection_containing_exactly(op1, op2))
-
-            expect {
-              versions_by_cluster_by_op = router.source_event_versions_in_index([op1])
-              expect(versions_by_cluster_by_op.keys).to contain_exactly(op1)
-              expect(versions_by_cluster_by_op[op1]).to match("main" => a_collection_containing_exactly(
-                op1.event.fetch("version"),
-                op2.event.fetch("version")
-              ))
-
-              versions_by_cluster_by_op = router.source_event_versions_in_index([op2])
-              expect(versions_by_cluster_by_op.keys).to contain_exactly(op2)
-              expect(versions_by_cluster_by_op[op2]).to match("main" => a_collection_containing_exactly(
-                op1.event.fetch("version"),
-                op2.event.fetch("version")
-              ))
-            }.to log_warning a_string_including("IdentifyDocumentVersionsGotMultipleResults")
-
-            expect(logged_jsons_of_type("IdentifyDocumentVersionsGotMultipleResults")).to contain_exactly(
-              a_hash_including(
-                "id" => ["mutated_routing_and_timestamp", "mutated_routing_and_timestamp"],
-                "routing" => a_collection_containing_exactly("wid1", "wid2"),
-                "index" => a_collection_containing_exactly("widgets_rollover__after_2021", "widgets_rollover__2019")
-              ),
-              a_hash_including(
-                "id" => ["mutated_routing_and_timestamp", "mutated_routing_and_timestamp"],
-                "routing" => a_collection_containing_exactly("wid1", "wid2"),
-                "index" => a_collection_containing_exactly("widgets_rollover__after_2021", "widgets_rollover__2019")
-              )
+          expect(logged_jsons_of_type("IdentifyDocumentVersionsGotMultipleResults")).to contain_exactly(
+            a_hash_including(
+              "id" => ["mutated_routing_and_timestamp", "mutated_routing_and_timestamp"],
+              "routing" => a_collection_containing_exactly("wid1", "wid2"),
+              "index" => a_collection_containing_exactly("widgets_rollover__after_2021", "widgets_rollover__2019")
+            ),
+            a_hash_including(
+              "id" => ["mutated_routing_and_timestamp", "mutated_routing_and_timestamp"],
+              "routing" => a_collection_containing_exactly("wid1", "wid2"),
+              "index" => a_collection_containing_exactly("widgets_rollover__after_2021", "widgets_rollover__2019")
             )
-          end
+          )
         end
 
-        context "when `use_updates_for_indexing?` is set to false", use_updates_for_indexing: false do
-          include_examples "source_event_versions_in_index" do
-            it "supports all types of operations" do
-              op1 = build_primary_indexing_op(:widget)
-              expect(op1).to be_a Operation::Upsert
+        it "supports both primary indexing operations and derived indexing operations" do
+          derived_update, self_update = build_expecting_success(build_upsert_event(:widget))
+          expect(derived_update.update_target.type).to eq("WidgetCurrency")
+          expect(self_update.update_target.type).to eq("Widget")
 
-              op2 = build_expecting_success(build_upsert_event(:widget)).last
-              expect(op2).to be_a Operation::Update
+          results = router.bulk([derived_update, self_update], refresh: true)
+          expect(results.successful_operations_by_cluster_name).to match("main" => a_collection_containing_exactly(derived_update, self_update))
 
-              results = router.bulk([op1, op2], refresh: true)
-              expect(results.successful_operations_by_cluster_name).to match("main" => a_collection_containing_exactly(op1, op2))
+          versions_by_cluster_by_op = router.source_event_versions_in_index([derived_update, self_update])
+          expect(versions_by_cluster_by_op.keys).to contain_exactly(derived_update, self_update)
+          expect(versions_by_cluster_by_op[self_update]).to eq("main" => [derived_update.event.fetch("version")])
 
-              versions_by_cluster_by_op = router.source_event_versions_in_index([op1, op2])
-              expect(versions_by_cluster_by_op.keys).to contain_exactly(op1, op2)
-              expect(versions_by_cluster_by_op[op1]).to eq("main" => [op1.event.fetch("version")])
-              expect(versions_by_cluster_by_op[op2]).to match("main" => []) # the derived document doesn't keep track of source event versions
-            end
-
-            def build_primary_indexing_op(type, **overrides)
-              event = build_upsert_event(type, **overrides)
-              ops = build_expecting_success(event).grep(Operation::Upsert)
-              expect(ops.size).to eq(1)
-              ops.first
-            end
-
-            def uses_custom_routing?(op)
-              op.to_datastore_bulk.first.fetch(:index).key?(:routing)
-            end
-          end
+          # The derived document doesn't keep track of `__versions` so it doesn't have a version it can return.
+          expect(versions_by_cluster_by_op[derived_update]).to eq("main" => [])
         end
 
-        shared_examples_for "source_event_versions_in_index when `use_updates_for_indexing?` is set to true" do
-          include_examples "source_event_versions_in_index" do
-            it "supports both primary indexing operations and derived indexing operations" do
-              derived_update, self_update = build_expecting_success(build_upsert_event(:widget))
-              expect(derived_update.update_target.type).to eq("WidgetCurrency")
-              expect(self_update.update_target.type).to eq("Widget")
-
-              results = router.bulk([derived_update, self_update], refresh: true)
-              expect(results.successful_operations_by_cluster_name).to match("main" => a_collection_containing_exactly(derived_update, self_update))
-
-              versions_by_cluster_by_op = router.source_event_versions_in_index([derived_update, self_update])
-              expect(versions_by_cluster_by_op.keys).to contain_exactly(derived_update, self_update)
-              expect(versions_by_cluster_by_op[self_update]).to eq("main" => [derived_update.event.fetch("version")])
-
-              # The derived document doesn't keep track of `__versions` so it doesn't have a version it can return.
-              expect(versions_by_cluster_by_op[derived_update]).to eq("main" => [])
-            end
-
-            def uses_custom_routing?(op)
-              op.to_datastore_bulk.first.fetch(:update).key?(:routing)
-            end
-
-            def build_primary_indexing_op(type, **overrides)
-              event = build_upsert_event(type, **overrides)
-              ops = build_expecting_success(event).select { |op| op.update_target.for_normal_indexing? }
-              expect(ops.size).to eq(1)
-              ops.first
-            end
-          end
+        def uses_custom_routing?(op)
+          op.to_datastore_bulk.first.fetch(:update).key?(:routing)
         end
 
-        context "when `use_updates_for_indexing?` is set to true", use_updates_for_indexing: true do
-          include_examples "source_event_versions_in_index when `use_updates_for_indexing?` is set to true"
+        def build_primary_indexing_op(type, **overrides)
+          event = build_upsert_event(type, **overrides)
+          ops = build_expecting_success(event).select { |op| op.update_target.for_normal_indexing? }
+          expect(ops.size).to eq(1)
+          ops.first
         end
 
         def test_documents_of_type(type, &block)
