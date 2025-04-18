@@ -125,7 +125,7 @@ module ElasticGraph
   #
   # Note: this constant is automatically kept up-to-date by our `schema_artifacts:dump` rake task.
   # @private
-  INDEX_DATA_UPDATE_SCRIPT_ID = "update_index_data_38ea36e5b48fc1566d4142e9fc44b12e"
+  INDEX_DATA_UPDATE_SCRIPT_ID = "update_index_data_1fdfaf1c9261c96019decc89b515bd9a"
 
   # The id of the old version of the update data script before ElasticGraph v0.9. For now, we are maintaining
   # backwards compatibility with how it recorded event versions, and we have test coverage for that which relies
@@ -133,7 +133,7 @@ module ElasticGraph
   #
   # TODO: Drop this when we no longer need to maintain backwards-compatibility.
   # @private
-  OLD_INDEX_DATA_UPDATE_SCRIPT_ID = "update_index_data_9b97090d5c97c4adc82dc7f4c2b89bc5"
+  OLD_INDEX_DATA_UPDATE_SCRIPT_ID = "update_index_data_7b4f66599e5dd7658f5c15c44b2d998b"
 
   # When an update script has a no-op result we often want to communicate more information about
   # why it was a no-op back to ElatsicGraph from the script. The only way to do that is to throw
