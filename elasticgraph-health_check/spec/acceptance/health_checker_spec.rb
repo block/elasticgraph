@@ -6,15 +6,16 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/graphql/datastore_search_router"
 require "elastic_graph/health_check/health_checker"
 require "elastic_graph/support/hash_util"
 require "yaml"
 
 module ElasticGraph
   module HealthCheck
-    RSpec.describe "HealthChecker", :uses_datastore, :factories, :builds_graphql do
+    RSpec.describe "HealthChecker", :uses_datastore, :factories, :builds_graphql, :capture_logs do
       let(:now) { ::Time.iso8601("2022-02-14T12:30:00Z") }
-      let(:graphql) { build_graphql(extension_settings: Support::HashUtil.stringify_keys(extension_settings), clock: class_double(::Time, now: now)) }
+      let(:graphql) { build_graphql }
       let(:health_checker) { HealthChecker.build_from(graphql) }
       let(:extension_settings) do
         {
@@ -70,6 +71,35 @@ module ElasticGraph
           "widgets_rollover__2020",
           "widgets_rollover__2021"
         )
+      end
+
+      context "when querying a cluster in which the indices have not been configured" do
+        let(:graphql) do
+          build_graphql.tap do |graphql|
+            graphql.datastore_core.index_definitions_by_graphql_type.values.each do |index_defs|
+              index_defs.each do |index_def|
+                allow(index_def).to receive(:name).and_return("not_found_index")
+              end
+            end
+          end
+        end
+
+        it "indicates the cluster is degraded rather than allowing `GraphQL::ExecutionError` to bubble up" do
+          expect {
+            status = health_checker.check_health
+
+            expect(status).to be_a HealthStatus
+            expect(status.category).to eq(:degraded)
+          }.to log_warning a_string_including(
+            "HealthChecker getting GraphQL errors when querying the datastore",
+            "GraphQL::ExecutionError",
+            GraphQL::DatastoreSearchRouter::INDICES_NOT_CONFIGURED_MESSAGE
+          )
+        end
+      end
+
+      def build_graphql(**options)
+        super(extension_settings: Support::HashUtil.stringify_keys(extension_settings), clock: class_double(::Time, now: now), **options)
       end
     end
   end

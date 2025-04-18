@@ -26,6 +26,7 @@ module ElasticGraph
       @indexed_document_types_by_name: ::Hash[::String, GraphQL::Schema::Type]
       @config: Config
 
+      def datastore_msearch: (::Array[GraphQL::DatastoreQuery]) -> ::Hash[GraphQL::DatastoreQuery, GraphQL::DatastoreResponse::SearchResponse]
       def build_recency_query_for: (::String, Config::DataRecencyCheck) -> GraphQL::DatastoreQuery
       def build_index_optimization_filter_for: (Config::DataRecencyCheck) -> ::Hash[::String, untyped]?
       def execute_in_parallel: (*::Proc) -> ::Array[untyped]
