@@ -12,6 +12,7 @@ require "elastic_graph/schema_definition/json_schema_pruner"
 require "elastic_graph/support/memoizable_data"
 require "fileutils"
 require "graphql"
+require "graphql/c_parser"
 require "tempfile"
 require "yaml"
 

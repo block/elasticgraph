@@ -22,7 +22,7 @@ These libraries form the core backbone of ElasticGraph that is designed to run i
 graph LR;
     elasticgraph-admin --> elasticgraph-datastore_core & elasticgraph-indexer & elasticgraph-schema_artifacts & elasticgraph-support & rake
     elasticgraph-datastore_core --> elasticgraph-schema_artifacts & elasticgraph-support
-    elasticgraph-graphql --> base64 & elasticgraph-datastore_core & elasticgraph-schema_artifacts & graphql
+    elasticgraph-graphql --> base64 & elasticgraph-datastore_core & elasticgraph-schema_artifacts & graphql & graphql-c_parser
     elasticgraph-indexer --> elasticgraph-datastore_core & elasticgraph-json_schema & elasticgraph-schema_artifacts & elasticgraph-support & hashdiff
     elasticgraph-json_schema --> elasticgraph-support & json_schemer
     elasticgraph-schema_artifacts --> elasticgraph-support
@@ -37,11 +37,13 @@ graph LR;
     style rake color: Red;
     style base64 color: Red;
     style graphql color: Red;
+    style graphql-c_parser color: Red;
     style hashdiff color: Red;
     style json_schemer color: Red;
     style logger color: Red;
 click base64 href "https://rubygems.org/gems/base64"
 click graphql href "https://rubygems.org/gems/graphql"
+click graphql-c_parser href "https://rubygems.org/gems/graphql-c_parser"
 click hashdiff href "https://rubygems.org/gems/hashdiff"
 click json_schemer href "https://rubygems.org/gems/json_schemer"
 click logger href "https://rubygems.org/gems/logger"
@@ -109,7 +111,7 @@ graph LR;
     elasticgraph-apollo --> elasticgraph-graphql & elasticgraph-support & graphql & apollo-federation
     elasticgraph-health_check --> elasticgraph-datastore_core & elasticgraph-graphql & elasticgraph-support
     elasticgraph-query_interceptor --> elasticgraph-graphql & elasticgraph-schema_artifacts
-    elasticgraph-query_registry --> elasticgraph-graphql & elasticgraph-support & graphql & rake
+    elasticgraph-query_registry --> elasticgraph-graphql & elasticgraph-support & graphql & graphql-c_parser & rake
     style elasticgraph-apollo color: DodgerBlue;
     style elasticgraph-health_check color: DodgerBlue;
     style elasticgraph-query_interceptor color: DodgerBlue;
@@ -120,9 +122,11 @@ graph LR;
     style apollo-federation color: Red;
     style elasticgraph-datastore_core color: Green;
     style elasticgraph-schema_artifacts color: Green;
+    style graphql-c_parser color: Red;
     style rake color: Red;
 click apollo-federation href "https://rubygems.org/gems/apollo-federation"
 click graphql href "https://rubygems.org/gems/graphql"
+click graphql-c_parser href "https://rubygems.org/gems/graphql-c_parser"
 click rake href "https://rubygems.org/gems/rake"
 ```
 
@@ -169,7 +173,7 @@ graph LR;
     elasticgraph --> elasticgraph-support & thor
     elasticgraph-local --> elasticgraph-admin & elasticgraph-graphql & elasticgraph-indexer & elasticgraph-rack & elasticgraph-schema_definition & rackup & rake & webrick
     elasticgraph-rack --> elasticgraph-graphql & rack
-    elasticgraph-schema_definition --> elasticgraph-graphql & elasticgraph-indexer & elasticgraph-json_schema & elasticgraph-schema_artifacts & elasticgraph-support & graphql & rake
+    elasticgraph-schema_definition --> elasticgraph-graphql & elasticgraph-indexer & elasticgraph-json_schema & elasticgraph-schema_artifacts & elasticgraph-support & graphql & graphql-c_parser & rake
     style elasticgraph color: DodgerBlue;
     style elasticgraph-local color: DodgerBlue;
     style elasticgraph-rack color: DodgerBlue;
@@ -186,7 +190,9 @@ graph LR;
     style elasticgraph-json_schema color: Green;
     style elasticgraph-schema_artifacts color: Green;
     style graphql color: Red;
+    style graphql-c_parser color: Red;
 click graphql href "https://rubygems.org/gems/graphql"
+click graphql-c_parser href "https://rubygems.org/gems/graphql-c_parser"
 click rack href "https://rubygems.org/gems/rack"
 click rackup href "https://rubygems.org/gems/rackup"
 click rake href "https://rubygems.org/gems/rake"

@@ -9,6 +9,7 @@
 require "elastic_graph/query_registry/variable_backward_incompatibility_detector"
 require "elastic_graph/query_registry/variable_dumper"
 require "graphql"
+require "graphql/c_parser"
 
 module ElasticGraph
   module QueryRegistry
