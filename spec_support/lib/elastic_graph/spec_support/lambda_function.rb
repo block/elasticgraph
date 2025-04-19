@@ -107,7 +107,9 @@ RSpec.shared_context "lambda function" do |config_overrides_in_yaml: {}|
     # https://github.com/aws/aws-lambda-ruby-runtime-interface-client/blob/3.0.0/lib/aws_lambda_ric.rb#L150-L152
     expect(::Logger.ancestors).to include(::LoggerPatch)
 
-    # Log a message--this is what triggers a `NoMethodError` when logger 1.6.0 is used.
-    ::Logger.new($stdout).error("test log message")
+    expect {
+      # Log a message to stdout--this is what triggered a `NoMethodError` when logger 1.6.0 is used.
+      ::Logger.new($stdout).error("test log message")
+    }.to output(a_string_including("test log message")).to_stdout_from_any_process
   end
 end

@@ -16,8 +16,10 @@ RSpec.describe "Admin lambda function" do
       lambda: "elastic_graph/admin_lambda/lambda_function.rb",
       const: :HandleAdminRequest
     ) do |lambda_function|
-      response = lambda_function.handle_request(event: {"argv" => ["-T"]}, context: {})
-      expect(response["rake_output"]).to include("rake clusters:configure:dry_run")
+      expect {
+        response = lambda_function.handle_request(event: {"argv" => ["-T"]}, context: {})
+        expect(response["rake_output"]).to include("rake clusters:configure:dry_run")
+      }.to output(a_string_including("rake clusters:configure:dry_run")).to_stdout_from_any_process
     end
   end
 end
