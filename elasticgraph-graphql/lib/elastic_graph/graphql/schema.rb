@@ -25,7 +25,7 @@ module ElasticGraph
         scalar_types.to_set.union(introspection_types)
       )
 
-      attr_reader :element_names, :config, :graphql_schema, :runtime_metadata
+      attr_reader :element_names, :config, :logger, :graphql_schema, :runtime_metadata
 
       def initialize(
         graphql_schema_string:,
@@ -38,6 +38,7 @@ module ElasticGraph
       )
         @element_names = runtime_metadata.schema_element_names
         @config = config
+        @logger = logger
         @runtime_metadata = runtime_metadata
         resolvers_needing_lookahead = runtime_metadata.graphql_resolvers_by_name.filter_map do |name, resolver|
           name if resolver.needs_lookahead
@@ -69,7 +70,7 @@ module ElasticGraph
         # of loading the schema, before we execute the first query.
         @types_by_name = build_types_by_name
 
-        log_hidden_types(logger)
+        log_hidden_types
       end
 
       def type_from(graphql_type)
@@ -140,7 +141,7 @@ module ElasticGraph
         end.freeze
       end
 
-      def log_hidden_types(logger)
+      def log_hidden_types
         hidden_types = @types_by_name.values.select(&:hidden_from_queries?)
         return if hidden_types.empty?
 

@@ -407,9 +407,8 @@ module ElasticGraph
               query: instance_double(::GraphQL::Query),
               schema: graphql.schema.graphql_schema,
               values: {
-                logger: graphql.logger,
+                elastic_graph_schema: graphql.schema,
                 dataloader: dataloader,
-                schema_element_names: graphql.runtime_metadata.schema_element_names,
                 datastore_search_router: graphql.datastore_search_router,
                 elastic_graph_query_tracker: QueryDetailsTracker.empty
               }

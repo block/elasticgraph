@@ -61,13 +61,10 @@ module ElasticGraph
           operation_name: operation_name,
           client: client,
           context: context.merge({
-            logger: @logger,
             monotonic_clock_deadline: timeout_in_ms&.+(start_time_in_ms),
             elastic_graph_schema: @schema,
-            schema_element_names: @schema.element_names,
             elastic_graph_query_tracker: query_tracker,
-            datastore_search_router: @datastore_search_router,
-            nested_relationship_resolver_mode: @config.nested_relationship_resolver_mode
+            datastore_search_router: @datastore_search_router
           }.compact)
         )
 

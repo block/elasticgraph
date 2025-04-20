@@ -65,8 +65,9 @@ module ElasticGraph
           @join = join
           @filter_id_field_name_path = @join.filter_id_field_name.split(".")
           @context = context
-          @schema_element_names = @context.fetch(:schema_element_names)
-          @logger = context.fetch(:logger)
+          elastic_graph_schema = context.fetch(:elastic_graph_schema)
+          @schema_element_names = elastic_graph_schema.element_names
+          @logger = elastic_graph_schema.logger
           @monotonic_clock = monotonic_clock
           @mode = mode
         end

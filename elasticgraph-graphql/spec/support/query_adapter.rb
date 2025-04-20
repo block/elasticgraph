@@ -64,7 +64,6 @@ module QueryAdapterSpecSupport
     end
 
     def call(parent_type, field, object, args, context)
-      context[:schema_element_names] = @graphql.schema.element_names
       schema_field = @graphql.schema.field_named(parent_type.graphql_name, field.name)
 
       lookahead = args[:lookahead]

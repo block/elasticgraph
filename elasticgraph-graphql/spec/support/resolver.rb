@@ -24,13 +24,10 @@ module ResolverHelperMethods
         query: nil,
         schema: graphql.schema.graphql_schema,
         values: {
-          logger: graphql.logger,
           elastic_graph_schema: graphql.schema,
-          schema_element_names: graphql.runtime_metadata.schema_element_names,
           dataloader: dataloader,
           elastic_graph_query_tracker: query_details_tracker,
-          datastore_search_router: graphql.datastore_search_router,
-          nested_relationship_resolver_mode: graphql.config.nested_relationship_resolver_mode
+          datastore_search_router: graphql.datastore_search_router
         }
       )
 

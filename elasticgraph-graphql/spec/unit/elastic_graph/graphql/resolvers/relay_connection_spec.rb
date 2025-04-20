@@ -62,7 +62,7 @@ module ElasticGraph
 
             graphql = build_graphql(schema_artifacts: schema_artifacts)
             field = graphql.schema.field_named("Query", field_name)
-            context = {schema_element_names: graphql.runtime_metadata.schema_element_names}
+            context = {elastic_graph_schema: graphql.schema}
 
             lookahead = ::GraphQL::Execution::Lookahead.new(
               query: nil,
