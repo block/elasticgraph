@@ -68,8 +68,7 @@ module ElasticGraph
           end
 
         validator.build_and_validate_query(query_string, client: client, variables: variables, operation_name: operation_name, context: context) do
-          ::GraphQL::Query.new(
-            @graphql_schema,
+          @schema.new_graphql_query(
             query_string,
             variables: variables,
             operation_name: operation_name,
@@ -81,7 +80,7 @@ module ElasticGraph
       private
 
       def initialize(schema, client_names:, allow_unregistered_clients:, allow_any_query_for_clients:, &provide_query_strings_for_client)
-        @graphql_schema = schema.graphql_schema
+        @schema = schema
         allow_any_query_for_clients_set = allow_any_query_for_clients.to_set
 
         @registered_client_validator = QueryValidators::ForRegisteredClient.new(

@@ -14,7 +14,7 @@ module ElasticGraph
   module QueryRegistry
     RSpec.describe QueryValidator do
       let(:schema) { build_graphql.schema }
-      let(:variable_dumper) { VariableDumper.new(schema.graphql_schema) }
+      let(:variable_dumper) { VariableDumper.new(schema) }
 
       describe "#validate" do
         it "returns no errors when given a valid named query with no arguments" do

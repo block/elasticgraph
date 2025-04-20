@@ -15,16 +15,16 @@ module ElasticGraph
   module QueryRegistry
     class QueryValidator
       def initialize(schema, require_eg_latency_slo_directive:)
-        @graphql_schema = schema.graphql_schema
+        @schema = schema
         @schema_element_names = schema.element_names
-        @var_dumper = VariableDumper.new(@graphql_schema)
+        @var_dumper = VariableDumper.new(schema)
         @var_incompat_detector = VariableBackwardIncompatibilityDetector.new
         @require_eg_latency_slo_directive = require_eg_latency_slo_directive
       end
 
       def validate(query_string, previously_dumped_variables:, client_name:, query_name:)
         # We pass `validate: false` since we do query validation on the operation level down below.
-        query = ::GraphQL::Query.new(@graphql_schema, query_string, validate: false)
+        query = @schema.new_graphql_query(query_string, validate: false)
 
         if query.document.nil?
           {nil => query.static_errors.map(&:to_h)}
@@ -91,8 +91,8 @@ module ElasticGraph
       def static_validation_errors_for(query, operation, fragments)
         # Build a document with just this operation so that we can validate it in isolation, apart from the other operations.
         document = query.document.merge(definitions: [operation] + fragments)
-        query = ::GraphQL::Query.new(@graphql_schema, nil, document: document, validate: false)
-        @graphql_schema.static_validator.validate(query).fetch(:errors).map(&:to_h)
+        query = @schema.new_graphql_query(nil, document: document, validate: false)
+        @schema.graphql_schema.static_validator.validate(query).fetch(:errors).map(&:to_h)
       end
     end
   end

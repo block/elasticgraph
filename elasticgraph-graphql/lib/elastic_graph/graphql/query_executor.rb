@@ -9,7 +9,6 @@
 require "elastic_graph/graphql/client"
 require "elastic_graph/graphql/query_details_tracker"
 require "elastic_graph/support/hash_util"
-require "graphql"
 
 module ElasticGraph
   class GraphQL
@@ -18,13 +17,11 @@ module ElasticGraph
       # @dynamic schema
       attr_reader :schema
 
-      def initialize(schema:, monotonic_clock:, logger:, slow_query_threshold_ms:, datastore_search_router:, config:)
+      def initialize(schema:, monotonic_clock:, logger:, slow_query_threshold_ms:)
         @schema = schema
         @monotonic_clock = monotonic_clock
         @logger = logger
         @slow_query_threshold_ms = slow_query_threshold_ms
-        @datastore_search_router = datastore_search_router
-        @config = config
       end
 
       # Executes the given `query_string` using the provided `variables`.
@@ -62,9 +59,7 @@ module ElasticGraph
           client: client,
           context: context.merge({
             monotonic_clock_deadline: timeout_in_ms&.+(start_time_in_ms),
-            elastic_graph_schema: @schema,
-            elastic_graph_query_tracker: query_tracker,
-            datastore_search_router: @datastore_search_router
+            elastic_graph_query_tracker: query_tracker
           }.compact)
         )
 
@@ -133,8 +128,7 @@ module ElasticGraph
       # Note: this is designed so that `elasticgraph-query_registry` can hook into this method. It needs to be able
       # to override how the query is built and executed.
       def build_and_execute_query(query_string:, variables:, operation_name:, context:, client:)
-        query = ::GraphQL::Query.new(
-          @schema.graphql_schema,
+        query = @schema.new_graphql_query(
           query_string,
           variables: variables,
           operation_name: operation_name,

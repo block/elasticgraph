@@ -16,7 +16,6 @@ module ElasticGraph
       # Query validator implementation used for registered clients.
       class ForRegisteredClient < ::Data.define(
         :schema,
-        :graphql_schema,
         :allow_any_query_for_clients,
         :client_data_by_client_name,
         :client_cache_mutex,
@@ -25,7 +24,6 @@ module ElasticGraph
         def initialize(schema:, client_names:, allow_any_query_for_clients:, provide_query_strings_for_client:)
           super(
             schema: schema,
-            graphql_schema: schema.graphql_schema,
             allow_any_query_for_clients: allow_any_query_for_clients,
             client_cache_mutex: ::Mutex.new,
             provide_query_strings_for_client: provide_query_strings_for_client,
@@ -107,8 +105,7 @@ module ElasticGraph
         end
 
         def prepare_query_for_execution(query, variables:, operation_name:, context:)
-          ::GraphQL::Query.new(
-            graphql_schema,
+          schema.new_graphql_query(
             # Here we pass `document` instead of query string, so that we don't have to re-parse the query.
             # However, when the document is nil, we still need to pass the query string.
             query.document ? nil : query.query_string,

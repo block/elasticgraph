@@ -26,7 +26,7 @@ module ElasticGraph
 
       private
 
-      @graphql_schema: ::GraphQL::Schema
+      @schema: GraphQL::Schema
       @registered_client_validator: QueryValidators::ForRegisteredClient
       @unregistered_client_validator: QueryValidators::ForUnregisteredClient
     end

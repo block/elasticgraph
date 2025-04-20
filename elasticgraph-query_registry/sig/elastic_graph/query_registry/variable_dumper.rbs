@@ -5,7 +5,7 @@ module ElasticGraph
       type enumTypeInfo = {"type" => ::String, "values" => ::Array[::String]}
       type typeInfo = ::String | objectTypeInfo | enumTypeInfo
 
-      def initialize: (::GraphQL::Schema) -> void
+      def initialize: (GraphQL::Schema) -> void
       def dump_variables_for_query: (::String) -> ::Hash[::String, ::Hash[::String, typeInfo]]
       def dump_variables_for_operations: (
         ::Array[::GraphQL::Language::Nodes::OperationDefinition]
@@ -13,6 +13,7 @@ module ElasticGraph
 
       private
 
+      @schema: GraphQL::Schema
       @graphql_schema: ::GraphQL::Schema
       def variables_for_op: (::GraphQL::Language::Nodes::OperationDefinition) -> ::Hash[::String, typeInfo]
       def type_info: (::GraphQL::Schema::_Type) -> typeInfo

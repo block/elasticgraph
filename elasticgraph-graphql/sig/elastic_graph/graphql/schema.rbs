@@ -10,10 +10,20 @@ module ElasticGraph
         config: Config,
         logger: Logger,
         runtime_metadata: SchemaArtifacts::RuntimeMetadata::Schema,
+        datastore_search_router: DatastoreSearchRouter,
         index_definitions_by_graphql_type: ::Hash[::String, ::Array[DatastoreCore::_IndexDefinition]],
         graphql_gem_plugins: ::Hash[::Class, ::Hash[::Symbol, untyped]],
         graphql_adapter: Resolvers::graphQLAdapter
       ) -> void
+
+      def new_graphql_query: (
+        ::String?,
+        ?operation_name: ::String?,
+        ?variables: ::Hash[::String, untyped],
+        ?context: ::Hash[::Symbol, untyped],
+        ?document: ::GraphQL::Language::Nodes::Document?,
+        ?validate: bool
+      ) -> ::GraphQL::Query
 
       def type_from: (::GraphQL::Schema::_Type) -> Type
       def type_named: (::String) -> Type

@@ -12,9 +12,7 @@ module ElasticGraph
         schema: GraphQL::Schema,
         monotonic_clock: Support::MonotonicClock,
         logger: ::Logger,
-        slow_query_threshold_ms: ::Integer,
-        datastore_search_router: GraphQL::DatastoreSearchRouter,
-        config: GraphQL::Config
+        slow_query_threshold_ms: ::Integer
       ) -> void
 
       private

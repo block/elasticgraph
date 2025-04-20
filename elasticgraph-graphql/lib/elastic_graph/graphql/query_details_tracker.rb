@@ -6,10 +6,6 @@
 #
 # frozen_string_literal: true
 
-require "elastic_graph/graphql/client"
-require "elastic_graph/support/hash_util"
-require "graphql"
-
 module ElasticGraph
   class GraphQL
     # Class used to track details of what happens during a single GraphQL query for the purposes of logging.

@@ -3,7 +3,6 @@ module ElasticGraph
     module QueryValidators
       class ForRegisteredClientSupertype
         attr_reader schema: GraphQL::Schema
-        attr_reader graphql_schema: ::GraphQL::Schema
         attr_reader allow_any_query_for_clients: ::Set[::String]
         attr_reader client_cache_mutex: ::Thread::Mutex
         attr_reader provide_query_strings_for_client: ^(::String) -> ::Array[::String]
@@ -11,7 +10,6 @@ module ElasticGraph
 
         def initialize: (
           schema: GraphQL::Schema,
-          graphql_schema: ::GraphQL::Schema,
           allow_any_query_for_clients: ::Set[::String],
           client_cache_mutex: ::Thread::Mutex,
           provide_query_strings_for_client: ^(::String) -> ::Array[::String],

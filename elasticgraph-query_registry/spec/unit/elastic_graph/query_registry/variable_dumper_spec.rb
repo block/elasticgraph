@@ -12,7 +12,7 @@ require "elastic_graph/query_registry/variable_dumper"
 module ElasticGraph
   module QueryRegistry
     RSpec.describe VariableDumper do
-      let(:dumper) { VariableDumper.new(build_graphql.schema.graphql_schema) }
+      let(:dumper) { VariableDumper.new(build_graphql.schema) }
 
       describe "#dump_variables_for_query" do
         it "returns an empty hash for a valid query that has no variables" do

@@ -23,8 +23,6 @@ module ElasticGraph
             monotonic_clock: monotonic_clock,
             logger: logger,
             slow_query_threshold_ms: config.slow_query_latency_warning_threshold_in_ms,
-            datastore_search_router: datastore_search_router,
-            config: config,
             registry_directory: registry_config.path_to_registry,
             allow_unregistered_clients: registry_config.allow_unregistered_clients,
             allow_any_query_for_clients: registry_config.allow_any_query_for_clients
@@ -41,17 +39,13 @@ module ElasticGraph
         schema:,
         monotonic_clock:,
         logger:,
-        slow_query_threshold_ms:,
-        datastore_search_router:,
-        config:
+        slow_query_threshold_ms:
       )
         super(
           schema: schema,
           monotonic_clock: monotonic_clock,
           logger: logger,
-          slow_query_threshold_ms: slow_query_threshold_ms,
-          datastore_search_router: datastore_search_router,
-          config: config
+          slow_query_threshold_ms: slow_query_threshold_ms
         )
 
         @registry = Registry.build_from_directory(

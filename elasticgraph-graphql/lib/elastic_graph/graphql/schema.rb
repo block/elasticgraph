@@ -32,6 +32,7 @@ module ElasticGraph
         config:,
         logger:,
         runtime_metadata:,
+        datastore_search_router:,
         index_definitions_by_graphql_type:,
         graphql_gem_plugins:,
         graphql_adapter:
@@ -40,6 +41,8 @@ module ElasticGraph
         @config = config
         @logger = logger
         @runtime_metadata = runtime_metadata
+        @datastore_search_router = datastore_search_router
+
         resolvers_needing_lookahead = runtime_metadata.graphql_resolvers_by_name.filter_map do |name, resolver|
           name if resolver.needs_lookahead
         end.to_set
@@ -71,6 +74,28 @@ module ElasticGraph
         @types_by_name = build_types_by_name
 
         log_hidden_types
+      end
+
+      def new_graphql_query(
+        query_string,
+        operation_name: nil,
+        variables: {},
+        context: {},
+        document: nil,
+        validate: true
+      )
+        ::GraphQL::Query.new(
+          graphql_schema,
+          query_string,
+          variables: variables,
+          operation_name: operation_name,
+          document: document,
+          validate: validate,
+          context: context.merge({
+            elastic_graph_schema: self,
+            datastore_search_router: @datastore_search_router
+          })
+        )
       end
 
       def type_from(graphql_type)

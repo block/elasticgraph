@@ -24,14 +24,15 @@ module ElasticGraph
     # When the structure of variables changes, we can then tell the engineer that they need to verify
     # that it won't break the client.
     class VariableDumper
-      def initialize(graphql_schema)
-        @graphql_schema = graphql_schema
+      def initialize(schema)
+        @schema = schema
+        @graphql_schema = schema.graphql_schema
       end
 
       # Returns a hash of operations from the given query string. For each operation, the value
       # is a hash of variables.
       def dump_variables_for_query(query_string)
-        query = ::GraphQL::Query.new(@graphql_schema, query_string, validate: false)
+        query = @schema.new_graphql_query(query_string, validate: false)
 
         if query.document.nil?
           # If the query was unparsable, we don't know anything about the variables and must just return an empty hash.

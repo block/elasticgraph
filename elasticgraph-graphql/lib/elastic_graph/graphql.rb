@@ -78,9 +78,7 @@ module ElasticGraph
           schema: schema,
           monotonic_clock: monotonic_clock,
           logger: logger,
-          slow_query_threshold_ms: @config.slow_query_latency_warning_threshold_in_ms,
-          datastore_search_router: datastore_search_router,
-          config: config
+          slow_query_threshold_ms: @config.slow_query_latency_warning_threshold_in_ms
         )
       end
     end
@@ -94,6 +92,7 @@ module ElasticGraph
           config: config,
           logger: logger,
           runtime_metadata: runtime_metadata,
+          datastore_search_router: datastore_search_router,
           index_definitions_by_graphql_type: @datastore_core.index_definitions_by_graphql_type,
           graphql_gem_plugins: graphql_gem_plugins,
           graphql_adapter: graphql_adapter

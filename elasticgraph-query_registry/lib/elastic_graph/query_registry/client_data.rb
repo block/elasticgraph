@@ -12,7 +12,7 @@ module ElasticGraph
       # @implements ClientData
       def self.from(schema, registered_query_strings)
         queries_by_original_string = registered_query_strings.to_h do |query_string|
-          [query_string, ::GraphQL::Query.new(schema.graphql_schema, query_string, validate: false)]
+          [query_string, schema.new_graphql_query(query_string, validate: false)]
         end
 
         canonical_query_strings = queries_by_original_string.values.map do |q|

@@ -57,7 +57,7 @@ module ElasticGraph
         require "elastic_graph/query_registry/variable_dumper"
         require "yaml"
 
-        variable_dumper = VariableDumper.new(graphql.schema.graphql_schema)
+        variable_dumper = VariableDumper.new(graphql.schema)
 
         @registered_queries_by_client_dir.glob(query_glob) do |file|
           dumped_variables = variable_dumper.dump_variables_for_query(file.read)

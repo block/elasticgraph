@@ -15,7 +15,7 @@ module ElasticGraph
 
       private
 
-      @graphql_schema: ::GraphQL::Schema
+      @schema: GraphQL::Schema
       @schema_element_names: SchemaArtifacts::RuntimeMetadata::SchemaElementNames
       @var_dumper: VariableDumper
       @var_incompat_detector: VariableBackwardIncompatibilityDetector
