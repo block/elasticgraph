@@ -57,7 +57,7 @@ module ElasticGraph
       def variables_for_op(operation)
         operation.variables.sort_by(&:name).to_h do |variable|
           type_info =
-            if (type = @graphql_schema.type_from_ast(variable.type))
+            if (type = @graphql_schema.type_from_ast(variable.type, context: @schema.graphql_query_context))
               type_info(type)
             else
               # We should only get here if a variable references a type that is undefined. Since we

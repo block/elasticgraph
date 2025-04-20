@@ -109,7 +109,10 @@ module ElasticGraph
           # If `__typename` is available, use that to resolve. It should be available on any embedded abstract types...
           # (See `Inventor` in `config/schema.graphql` for an example of this kind of type union.)
           if (typename = object["__typename"])
-            schema.graphql_schema.possible_types(supertype).find { |t| t.graphql_name == typename }
+            schema
+              .graphql_schema
+              .possible_types(supertype, visibility_profile: VISIBILITY_PROFILE)
+              .find { |t| t.graphql_name == typename }
           else
             # ...otherwise infer the type based on what index the object came from. This is the case
             # with unions/interfaces of individually indexed types.

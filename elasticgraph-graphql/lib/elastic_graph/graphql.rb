@@ -8,6 +8,7 @@
 
 require "elastic_graph/datastore_core"
 require "elastic_graph/graphql/config"
+require "elastic_graph/constants"
 require "elastic_graph/support/from_yaml_file"
 
 module ElasticGraph
@@ -142,9 +143,17 @@ module ElasticGraph
         {
           # We depend on this to avoid N+1 calls to the datastore.
           ::GraphQL::Dataloader => {},
-          # This is new in the graphql-ruby 2.4 release, and will be required in the future.
-          # We pass `preload: true` because the way we handle the schema depends on it being preloaded.
-          ::GraphQL::Schema::Visibility => {preload: true}
+          # https://graphql-ruby.org/authorization/visibility.html
+          ::GraphQL::Schema::Visibility => {
+            # The GraphQL gem internally cache the visibility per profile. Ideally, we'd have only a single profile,
+            # but that makes for a chicken-and-egg problem: our visibility logic depends on the schema being fully
+            # loaded, but the `visibility?` methods are called while loading the schema. To deal with that, we're
+            # using tw profiles:
+            #
+            # - `boot` is used while loading, and skips our normal visibility logic.
+            # - `main` is used after that and uses our normal visibility logic.
+            profiles: {:boot => {}, VISIBILITY_PROFILE => {}} # : ::Hash[::Symbol, ::Hash[::Symbol, untyped]]
+          }
         }
       end
     end

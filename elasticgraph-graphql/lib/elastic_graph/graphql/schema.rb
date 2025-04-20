@@ -9,7 +9,6 @@
 require "graphql"
 require "elastic_graph/constants"
 require "elastic_graph/errors"
-require "elastic_graph/graphql/schema/base_classes"
 require "elastic_graph/graphql/schema/field"
 require "elastic_graph/graphql/schema/type"
 
@@ -64,7 +63,7 @@ module ElasticGraph
         # variables above we'll get `NoMethodError` on `nil`.
         @graphql_schema = ::GraphQL::Schema.from_definition(
           graphql_schema_string,
-          base_types: {object: BaseObject},
+          base_types: {object: build_base_object_class},
           default_resolve: graphql_adapter,
           using: graphql_gem_plugins
         )
@@ -72,6 +71,7 @@ module ElasticGraph
         # Pre-load all defined types so that all field extras can get configured as part
         # of loading the schema, before we execute the first query.
         @types_by_name = build_types_by_name
+        @graphql_schema.visibility.preload
 
         log_hidden_types
       end
@@ -92,10 +92,15 @@ module ElasticGraph
           document: document,
           validate: validate,
           context: context.merge({
+            datastore_search_router: @datastore_search_router,
             elastic_graph_schema: self,
-            datastore_search_router: @datastore_search_router
+            visibility_profile: VISIBILITY_PROFILE
           })
         )
+      end
+
+      def graphql_query_context
+        @graphql_query_context ||= new_graphql_query(nil).context
       end
 
       def type_from(graphql_type)
@@ -148,8 +153,38 @@ module ElasticGraph
 
       private
 
+      def build_base_object_class
+        schema = self
+
+        base_field_class = ::Class.new(::GraphQL::Schema::Field) do
+          define_method :visible? do |context|
+            return super(context) if context[:visibility_profile] == :boot
+
+            if schema.field_named(owner.graphql_name, graphql_name).hidden_from_queries?
+              return false
+            end
+
+            super(context)
+          end
+        end
+
+        ::Class.new(::GraphQL::Schema::Object) do
+          field_class base_field_class
+
+          define_singleton_method :visible? do |context|
+            return super(context) if context[:visibility_profile] == :boot
+
+            if schema.type_named(graphql_name).hidden_from_queries?
+              return false
+            end
+
+            super(context)
+          end
+        end
+      end
+
       def build_types_by_name
-        graphql_schema.types.transform_values do |graphql_type|
+        graphql_schema.types(visibility_profile: :boot).transform_values do |graphql_type|
           @types_by_graphql_type[graphql_type]
         end
       end

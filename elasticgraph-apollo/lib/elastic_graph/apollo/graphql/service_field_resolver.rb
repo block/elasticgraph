@@ -18,13 +18,13 @@ module ElasticGraph
         end
 
         def resolve(field:, object:, args:, context:)
-          {"sdl" => service_sdl(context.fetch(:elastic_graph_schema).graphql_schema)}
+          {"sdl" => service_sdl(context.fetch(:elastic_graph_schema))}
         end
 
         private
 
-        def service_sdl(graphql_schema)
-          ::GraphQL::Schema::Printer.print_schema(graphql_schema)
+        def service_sdl(schema)
+          ::GraphQL::Schema::Printer.print_schema(schema.graphql_schema, context: schema.graphql_query_context)
         end
       end
     end

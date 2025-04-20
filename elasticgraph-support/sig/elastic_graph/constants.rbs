@@ -36,4 +36,5 @@ module ElasticGraph
   JSON_META_SCHEMA: ::String
   DATASTORE_BULK_FILTER_PATH: ::String
   GRAPHQL_LAMBDA_AWS_ARN_HEADER: ::String
+  VISIBILITY_PROFILE: ::Symbol
 end

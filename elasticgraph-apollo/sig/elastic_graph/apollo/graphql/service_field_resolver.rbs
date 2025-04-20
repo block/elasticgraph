@@ -6,7 +6,7 @@ module ElasticGraph
 
         private
 
-        def service_sdl: (::GraphQL::Schema) -> ::String
+        def service_sdl: (ElasticGraph::GraphQL::Schema) -> ::String
       end
     end
   end

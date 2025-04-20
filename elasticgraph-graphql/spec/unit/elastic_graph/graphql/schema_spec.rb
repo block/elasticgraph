@@ -31,6 +31,20 @@ module ElasticGraph
         end
       end
 
+      describe "#graphql_query_context" do
+        it "returns a `GraphQL::Query::Context` object used for GraphQL queries" do
+          schema = define_schema do |s|
+            s.object_type "Widget" do |t|
+              t.field "id", "ID!"
+              t.index "widgets"
+            end
+          end
+
+          expect(schema.graphql_query_context).to be_a(::GraphQL::Query::Context)
+          expect(schema.graphql_query_context.to_h).to eq(schema.new_graphql_query(nil).context.to_h)
+        end
+      end
+
       describe "#type_named" do
         let(:schema) do
           define_schema do |s|

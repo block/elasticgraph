@@ -253,6 +253,10 @@ module ElasticGraph
   # @private
   GRAPHQL_LAMBDA_AWS_ARN_HEADER = "X-AWS-LAMBDA-CALLER-ARN"
 
+  # The name of the visibility profile we use with the GraphQL gem.
+  # @private
+  VISIBILITY_PROFILE = :main
+
   # TODO(steep): it complains about `define_schema` not being defined but it is defined
   # in another file; I shouldn't have to say it's dynamic here. For now this works though.
   # @dynamic self.define_schema

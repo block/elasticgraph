@@ -25,6 +25,7 @@ module ElasticGraph
         ?validate: bool
       ) -> ::GraphQL::Query
 
+      def graphql_query_context: () -> ::GraphQL::Query::Context
       def type_from: (::GraphQL::Schema::_Type) -> Type
       def type_named: (::String) -> Type
       def field_named: (::String, ::String) -> Field

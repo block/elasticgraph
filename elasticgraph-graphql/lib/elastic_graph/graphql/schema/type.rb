@@ -112,7 +112,10 @@ module ElasticGraph
         # Returns the subtypes of this type, if it has any. This is like `#possible_types` provided by the
         # GraphQL gem, but that includes a type itself when you ask for the possible types of a non-abstract type.
         def subtypes
-          @subtypes ||= @schema.graphql_schema.possible_types(graphql_type).map { |t| @schema.type_from(t) } - [self]
+          @subtypes ||= @schema
+            .graphql_schema
+            .possible_types(graphql_type, visibility_profile: :boot)
+            .map { |t| @schema.type_from(t) } - [self]
         end
 
         def field_named(field_name)

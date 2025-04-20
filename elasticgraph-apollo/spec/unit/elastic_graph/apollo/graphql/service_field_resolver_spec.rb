@@ -32,11 +32,11 @@ module ElasticGraph
           data = execute_expecting_no_errors("query { _service { sdl } }")
           expect(data).to match("_service" => {"sdl" => an_instance_of(::String)})
 
-          returned_schema = ::GraphQL::Schema.from_definition(data.fetch("_service").fetch("sdl"))
-          full_schema = graphql.schema.graphql_schema
+          returned_schema_types = ::GraphQL::Schema.from_definition(data.fetch("_service").fetch("sdl")).types(visibility_profile: VISIBILITY_PROFILE)
+          full_schema_types = graphql.schema.graphql_schema.types(visibility_profile: VISIBILITY_PROFILE)
 
-          expect(full_schema.types.keys).to match_array(returned_schema.types.keys)
-          expect(full_schema.types.fetch("Query").fields.keys).to match_array(returned_schema.types.fetch("Query").fields.keys)
+          expect(full_schema_types.keys).to match_array(returned_schema_types.keys)
+          expect(full_schema_types.fetch("Query").fields.keys).to match_array(returned_schema_types.fetch("Query").fields.keys)
         end
 
         it "does not interfere with other fields on the `Query` type" do

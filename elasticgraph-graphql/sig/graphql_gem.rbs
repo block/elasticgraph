@@ -137,7 +137,10 @@ module GraphQL
     def execute: (::String, **untyped) -> ::Hash[::String, untyped]
     def self.from_definition: (::String) -> Schema
     def to_definition: () -> ::String
-    def type_from_ast: (Language::Nodes::AbstractNode) -> _Type?
+    def type_from_ast: (
+      Language::Nodes::AbstractNode,
+      ?context: Query::Context
+    ) -> _Type?
 
     interface _Type
       def kind: () -> TypeKinds::TypeKind
