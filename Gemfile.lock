@@ -637,7 +637,7 @@ DEPENDENCIES
   jekyll (~> 4.4, >= 4.4.1)
   memory_profiler (~> 1.1)
   method_source (~> 1.1)
-  nokogiri (~> 1.18)
+  nokogiri (~> 1.18, >= 1.18.8)
   rack-test (~> 2.2)
   rake (~> 13.2, >= 13.2.1)
   rspec (~> 3.13)
