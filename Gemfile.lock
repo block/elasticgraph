@@ -212,7 +212,7 @@ GEM
     apollo-federation (3.10.1)
       google-protobuf (< 5)
       graphql
-    ast (2.4.2)
+    ast (2.4.3)
     async (2.23.1)
       console (~> 1.29)
       fiber-annotation
@@ -409,7 +409,7 @@ GEM
     optimist (3.2.0)
     ox (2.14.22)
       bigdecimal (>= 3.0)
-    parallel (1.26.3)
+    parallel (1.27.0)
     parser (3.3.8.0)
       ast (~> 2.4.1)
       racc
@@ -478,8 +478,9 @@ GEM
       rubocop-ast (>= 1.38.0, < 2.0)
     rubocop-rake (0.6.0)
       rubocop (~> 1.0)
-    rubocop-rspec (3.4.0)
-      rubocop (~> 1.61)
+    rubocop-rspec (3.6.0)
+      lint_roller (~> 1.1)
+      rubocop (~> 1.72, >= 1.72.1)
     ruby-progressbar (1.13.0)
     ruby-rc4 (0.1.5)
     safe_yaml (1.0.5)
@@ -644,7 +645,7 @@ DEPENDENCIES
   rspec-retry (~> 0.6, >= 0.6.2)
   rubocop-factory_bot (~> 2.26, >= 2.26.1)
   rubocop-rake (~> 0.6)
-  rubocop-rspec (~> 3.4)
+  rubocop-rspec (~> 3.6)
   simplecov (~> 0.22)
   simplecov-console (~> 0.9, >= 0.9.3)
   standard (~> 1.49.0)
