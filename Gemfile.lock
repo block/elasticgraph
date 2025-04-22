@@ -37,7 +37,7 @@ PATH
   specs:
     elasticgraph-elasticsearch (0.19.2.1.pre)
       elasticgraph-support (= 0.19.2.1.pre)
-      elasticsearch (~> 8.17, >= 8.17.2)
+      elasticsearch (>= 8.17.2, < 10.0)
       faraday (~> 2.13)
       faraday-retry (~> 2.3, >= 2.3.1)
 
@@ -267,10 +267,10 @@ GEM
     elastic-transport (8.4.0)
       faraday (< 3)
       multi_json
-    elasticsearch (8.17.2)
+    elasticsearch (9.0.0)
       elastic-transport (~> 8.3)
-      elasticsearch-api (= 8.17.2)
-    elasticsearch-api (8.17.2)
+      elasticsearch-api (= 9.0.0)
+    elasticsearch-api (9.0.0)
       multi_json
     em-websocket (0.5.3)
       eventmachine (>= 0.12.9)
