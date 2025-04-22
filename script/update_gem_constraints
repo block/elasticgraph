@@ -21,6 +21,8 @@ class DependencyUpdater
     @changes = Hash.new do |hash, key|
       hash[key] = []
     end
+    @previous_constraints = {}
+    load_previous_constraints
   end
 
   def run
@@ -32,12 +34,27 @@ class DependencyUpdater
 
   private
 
+  def load_previous_constraints
+    # Get the content of files before the HEAD commit
+    ["Gemfile", *`git ls-files "*.gemspec"`.split("\n")].each do |file|
+      previous_content = `git show HEAD^:#{file} 2>/dev/null`
+      next if previous_content.empty?
+
+      # Extract gem constraints from the previous version
+      previous_content.scan(/(?:gem|add(?:_development)?_dependency)\s+['"]([^'"]+)['"](?:\s*,\s*((?:['"][~><=\s\d.]+['"](?:\s*,\s*['"][~><=\s\d.]+['"])*)))/) do |gem_name, constraints|
+        if constraints
+          @previous_constraints[gem_name] = constraints.strip
+        end
+      end
+    end
+  end
+
   def update_gemfile
     content = versions.reduce(File.read("Gemfile")) do |gemfile, (gem_name, version)|
       # Look for gem lines with version constraints
       gemfile.gsub(/^(\s*gem\s+['"]#{gem_name}['"])\s*,\s*((?:['"][~><=\s\d.]+['"](?:\s*,\s*['"][~><=\s\d.]+['"])*))/) do |match|
         old_constraint = $2.strip
-        new_constraint = format_version_constraint(version, old_constraint)
+        new_constraint = format_version_constraint(gem_name, version, old_constraint)
         record_change("Gemfile", gem_name, old_constraint, new_constraint) if old_constraint != new_constraint
         "#{$1}, #{new_constraint}"
       end
@@ -52,7 +69,7 @@ class DependencyUpdater
         # Look for add_dependency lines with version constraints
         gemspec.gsub(/^(\s*spec\.add(?:_development)?_dependency\s+['"]#{gem_name}['"])\s*,\s*((?:['"][~><=\s\d.]+['"](?:\s*,\s*['"][~><=\s\d.]+['"])*))/) do |match|
           old_constraint = $2.strip
-          new_constraint = format_version_constraint(version, old_constraint)
+          new_constraint = format_version_constraint(gem_name, version, old_constraint)
           record_change(gemspec_path, gem_name, old_constraint, new_constraint) if old_constraint != new_constraint
           "#{$1}, #{new_constraint}"
         end
@@ -93,7 +110,40 @@ class DependencyUpdater
     end
   end
 
-  def format_version_constraint(version, original_constraint)
+  def format_version_constraint(gem_name, version, original_constraint)
+    # Use previous constraint's format if available
+    if (prev_constraint = @previous_constraints[gem_name])
+      # Extract the format: look for ~> X.Y or ~> X.Y.Z pattern
+      if (match = prev_constraint.match(/["']~>\s*(\d+\.\d+(?:\.\d+)?)["'](?:\s*,\s*["']>=\s*[\d.]+["'])?/))
+        prev_version = match[1]
+        parts = version.split(".")
+        new_version = parts[0..prev_version.count(".")].join(".")
+
+        # If the version ends in .0 and we're using major.minor format,
+        # we don't need the >= constraint
+        if prev_version.count(".") == 1 && version.end_with?(".0")
+          "\"~> #{new_version}\""
+        else
+          # Otherwise preserve the exact format, just update the version numbers
+          prev_constraint.gsub(/\d+\.\d+(?:\.\d+)?/) do |old_ver|
+            if old_ver == prev_version
+              new_version
+            else
+              version
+            end
+          end
+        end
+      else
+        # Fall back to default behavior if format doesn't match expected pattern
+        format_constraint_with_default_rules(version, original_constraint)
+      end
+    else
+      # No previous constraint found, use default behavior
+      format_constraint_with_default_rules(version, original_constraint)
+    end
+  end
+
+  def format_constraint_with_default_rules(version, original_constraint)
     # Extract the original ~> version and any >= version if present
     tilde_match = original_constraint.match(/["']~>\s*(\d+\.\d+(?:\.\d+)?)["']/)
     return "\"~> #{version}\"" unless tilde_match # fallback if no ~> found
