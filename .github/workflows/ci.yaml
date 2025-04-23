@@ -30,7 +30,7 @@ jobs:
           - "3.3"
           - "3.4"
         datastore:
-          - "elasticsearch:8.17.3"
+          - "elasticsearch:8.18.0"
           - "opensearch:2.19.1"
           - "opensearch:2.7.0"
         include:
@@ -40,13 +40,13 @@ jobs:
           # configuration here.
           - build_part: "run_misc_checks"
             ruby: "3.4"
-            datastore: "elasticsearch:8.17.3"
+            datastore: "elasticsearch:8.18.0"
           - build_part: "run_specs_with_vcr"
             ruby: "3.4"
-            datastore: "elasticsearch:8.17.3"
+            datastore: "elasticsearch:8.18.0"
           - build_part: "run_specs_file_by_file"
             ruby: "3.4"
-            datastore: "elasticsearch:8.17.3"
+            datastore: "elasticsearch:8.18.0"
 
     steps:
       - name: Harden Runner
