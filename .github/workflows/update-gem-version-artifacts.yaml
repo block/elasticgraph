@@ -47,6 +47,8 @@ jobs:
           script/update_gem_constraints
 
       - name: Commit and push if changed
+        env:
+          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
         run: |
           if [[ -n "$(git status --porcelain)" ]]; then
             git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -56,5 +58,5 @@ jobs:
 
             # Push using the PAT
             git remote set-url origin "https://x-access-token:${{ secrets.PAT_FOR_PUSHING_AND_TRIGGERING_CI }}@github.com/${{ github.repository }}.git"
-            git push origin HEAD:${{ github.event.workflow_run.head_branch }}
+            git push origin "HEAD:$HEAD_BRANCH"
           fi
