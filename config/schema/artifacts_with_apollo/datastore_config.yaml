@@ -1970,7 +1970,7 @@ scripts:
 
         // No timestamp values matched the params, so return `false`.
         return false;
-  update_index_data_1fdfaf1c9261c96019decc89b515bd9a:
+  update_index_data_38ea36e5b48fc1566d4142e9fc44b12e:
     context: update
     script:
       lang: painless
@@ -2008,10 +2008,30 @@ scripts:
          );
         }
 
-        Number maybeDocVersion = source.__versions.get(params.relationship)?.get(params.sourceId);
+        // While the version in `__versions` is going to be used for the doc version in the future, for now
+        // we need to continue getting it from `__sourceVersions`. Both our old version and this versions of this
+        // script keep the value in `__sourceVersions` up-to-date, whereas the old script only writes it to
+        // `__sourceVersions`. Until we have completely migrated off of the old script for all ElasticGraph
+        // clusters, we need to keep using it.
+        //
+        // Later, after the old script is no longer used by any clusters, we'll stop using `__sourceVersions`.
+        Number _versionForSourceType = source.get("__sourceVersions")?.get(params.sourceType)?.get(sourceId);
+        Number _versionForRelationship = relationshipVersionsMap.get(sourceId);
 
         // Our JSON schema requires event versions to be non-negative, so we can safely use Long.MIN_VALUE as a stand-in when the value is null.
-        long docVersion = maybeDocVersion == null ? Long.MIN_VALUE : maybeDocVersion.longValue();
+        long versionForSourceType = _versionForSourceType == null ? Long.MIN_VALUE : _versionForSourceType.longValue();
+        long versionForRelationship = _versionForRelationship == null ? Long.MIN_VALUE : _versionForRelationship.longValue();
+
+        // Pick the larger of the two versions as our doc version. Note that `Math.max` didn't work for me here for
+        // reasons I don't understand, but a simple ternary works fine.
+        //
+        // In theory, we could just use `versionForSourceType` as the `docVersion` (and not even check `__versions` at all)
+        // since both the old version and this version maintain the doc version in `__sourceVersions`. However, that would
+        // prevent this version of the script from being forward-compatible with the planned next version of this script.
+        // In the next version, we plan to stop writing to `__sourceVersions`, and as we can't deploy that change atomically,
+        // this version of the script will continue to run after that has begun to be used. So this version of the script
+        // must consider which version is greater here, and not simply trust either version value.
+        long docVersion = versionForSourceType > versionForRelationship ? versionForSourceType : versionForRelationship;
 
         if (docVersion >= eventVersion) {
           throw new IllegalArgumentException("ElasticGraph update was a no-op: [" +

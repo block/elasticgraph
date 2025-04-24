@@ -8,6 +8,7 @@
 
 require "elastic_graph/admin"
 require "elastic_graph/spec_support/builds_admin"
+require "elastic_graph/support/hash_util"
 require "yaml"
 
 module ElasticGraph
@@ -35,11 +36,53 @@ module ElasticGraph
       self.state_file_name = state_file_name
 
       # Also make our old datastore scripts available to call from our tests for backwards-compatibility testing.
+      # We also need to add the `__sourceVersions` field back that some tests rely on but which we don't want
+      # generated in our `datastore_config.yaml` anymore.
       #
       # TODO: Drop this when we no longer need to maintain backwards-compatibility.
       # standard:disable Lint/NestedMethodDefinition
       def (@admin.schema_artifacts).datastore_scripts
         super.merge(::YAML.safe_load_file(::File.join(__dir__, "old_datastore_scripts.yaml")))
+      end
+
+      def (@admin.schema_artifacts).indices
+        datastore_config = super
+
+        overrides = datastore_config.transform_values do |index_config|
+          {
+            "mappings" => {
+              "properties" => {
+                "__sourceVersions" => {
+                  "type" => "object",
+                  "dynamic" => "false"
+                }
+              }
+            }
+          }
+        end
+
+        Support::HashUtil.deep_merge(datastore_config, overrides)
+      end
+
+      def (@admin.schema_artifacts).index_templates
+        datastore_config = super
+
+        overrides = datastore_config.transform_values do |index_config|
+          {
+            "template" => {
+              "mappings" => {
+                "properties" => {
+                  "__sourceVersions" => {
+                    "type" => "object",
+                    "dynamic" => "false"
+                  }
+                }
+              }
+            }
+          }
+        end
+
+        Support::HashUtil.deep_merge(datastore_config, overrides)
       end
       # standard:enable Lint/NestedMethodDefinition
     end

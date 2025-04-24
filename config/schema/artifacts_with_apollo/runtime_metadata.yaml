@@ -2760,7 +2760,7 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
+      script_id: update_index_data_38ea36e5b48fc1566d4142e9fc44b12e
       type: Address
   AddressAggregatedValues:
     graphql_fields_by_name:
@@ -2961,7 +2961,7 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
+      script_id: update_index_data_38ea36e5b48fc1566d4142e9fc44b12e
       type: Component
   ComponentAggregatedValues:
     graphql_fields_by_name:
@@ -3208,7 +3208,7 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
+      script_id: update_index_data_38ea36e5b48fc1566d4142e9fc44b12e
       type: ElectricalPart
   ElectricalPartAggregatedValues:
     graphql_fields_by_name:
@@ -3515,7 +3515,7 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
+      script_id: update_index_data_38ea36e5b48fc1566d4142e9fc44b12e
       type: Manufacturer
   ManufacturerAggregatedValues:
     graphql_fields_by_name:
@@ -3626,7 +3626,7 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
+      script_id: update_index_data_38ea36e5b48fc1566d4142e9fc44b12e
       type: MechanicalPart
   MechanicalPartAggregatedValues:
     graphql_fields_by_name:
@@ -4465,7 +4465,7 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
+      script_id: update_index_data_38ea36e5b48fc1566d4142e9fc44b12e
       type: Sponsor
   SponsorAggregatedValues:
     graphql_fields_by_name:
@@ -4661,7 +4661,7 @@ object_types_by_name:
       relationship: __self
       rollover_timestamp_value_source: formed_on
       routing_value_source: league
-      script_id: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
+      script_id: update_index_data_38ea36e5b48fc1566d4142e9fc44b12e
       type: Team
   TeamAggregatedValues:
     graphql_fields_by_name:
@@ -5445,7 +5445,7 @@ object_types_by_name:
       relationship: __self
       rollover_timestamp_value_source: created_at
       routing_value_source: workspace_id2
-      script_id: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
+      script_id: update_index_data_38ea36e5b48fc1566d4142e9fc44b12e
       type: Widget
     - data_params:
         widget_cost:
@@ -5476,7 +5476,7 @@ object_types_by_name:
         version:
           cardinality: one
       relationship: widget
-      script_id: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
+      script_id: update_index_data_38ea36e5b48fc1566d4142e9fc44b12e
       type: Component
   WidgetAggregatedValues:
     graphql_fields_by_name:
@@ -5653,7 +5653,7 @@ object_types_by_name:
       relationship: __self
       rollover_timestamp_value_source: introduced_on
       routing_value_source: primary_continent
-      script_id: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
+      script_id: update_index_data_38ea36e5b48fc1566d4142e9fc44b12e
       type: WidgetCurrency
   WidgetCurrencyAggregatedValues:
     graphql_fields_by_name:
@@ -6259,7 +6259,7 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
+      script_id: update_index_data_38ea36e5b48fc1566d4142e9fc44b12e
       type: WidgetWorkspace
     - data_params:
         workspace_name:
@@ -6280,7 +6280,7 @@ object_types_by_name:
       relationship: workspace
       rollover_timestamp_value_source: widget.created_at
       routing_value_source: id
-      script_id: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
+      script_id: update_index_data_38ea36e5b48fc1566d4142e9fc44b12e
       type: Widget
   WidgetWorkspaceAggregatedValues:
     graphql_fields_by_name:
@@ -6498,4 +6498,4 @@ static_script_ids_by_scoped_name:
   field/as_day_of_week: field_as_day_of_week_f2b5c7d9e8f75bf2457b52412bfb6537
   field/as_time_of_day: field_as_time_of_day_ed82aba44fc66bff5635bec4305c1c66
   filter/by_time_of_day: filter_by_time_of_day_ea12d0561b24961789ab68ed38435612
-  update/index_data: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
+  update/index_data: update_index_data_38ea36e5b48fc1566d4142e9fc44b12e
