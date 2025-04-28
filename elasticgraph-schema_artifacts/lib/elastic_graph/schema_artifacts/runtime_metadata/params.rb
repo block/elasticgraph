@@ -12,6 +12,7 @@ require "elastic_graph/support/hash_util"
 module ElasticGraph
   module SchemaArtifacts
     module RuntimeMetadata
+      # @private
       module Param
         def self.dump_params_hash(hash_of_params)
           hash_of_params.sort_by(&:first).to_h { |name, param| [name, param.to_dumpable_hash(name)] }
@@ -31,6 +32,8 @@ module ElasticGraph
       end
 
       # Represents metadata about dynamic params we pass to our update scripts.
+      #
+      # @private
       class DynamicParam < ::Data.define(:source_path, :cardinality)
         SOURCE_PATH = "source_path"
         CARDINALITY = "cardinality"
@@ -58,6 +61,7 @@ module ElasticGraph
         end
       end
 
+      # @private
       class StaticParam < ::Data.define(:value)
         VALUE = "value"
 

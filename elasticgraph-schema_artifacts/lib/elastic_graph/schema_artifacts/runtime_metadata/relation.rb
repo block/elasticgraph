@@ -9,6 +9,7 @@
 module ElasticGraph
   module SchemaArtifacts
     module RuntimeMetadata
+      # @private
       class Relation < ::Data.define(:foreign_key, :direction, :additional_filter, :foreign_key_nested_paths)
         FOREIGN_KEY = "foreign_key"
         DIRECTION = "direction"

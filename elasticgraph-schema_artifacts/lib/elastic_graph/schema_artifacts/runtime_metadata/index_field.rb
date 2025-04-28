@@ -12,6 +12,8 @@ module ElasticGraph
   module SchemaArtifacts
     module RuntimeMetadata
       # Runtime metadata related to a field on a datastore index definition.
+      #
+      # @private
       class IndexField < ::Data.define(:source)
         SOURCE = "source"
 

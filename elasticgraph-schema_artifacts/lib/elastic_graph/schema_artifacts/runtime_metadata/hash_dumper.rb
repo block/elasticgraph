@@ -9,6 +9,7 @@
 module ElasticGraph
   module SchemaArtifacts
     module RuntimeMetadata
+      # @private
       module HashDumper
         def self.dump_hash(hash)
           hash.sort_by(&:first).to_h do |key, value|

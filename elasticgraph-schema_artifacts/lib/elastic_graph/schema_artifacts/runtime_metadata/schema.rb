@@ -20,6 +20,7 @@ require "elastic_graph/support/hash_util"
 
 module ElasticGraph
   module SchemaArtifacts
+    # Namespace containing class definitions for runtime metadata.
     module RuntimeMetadata
       # Entry point for runtime metadata for an entire schema.
       class Schema < ::Data.define(
@@ -32,15 +33,27 @@ module ElasticGraph
         :graphql_resolvers_by_name,
         :static_script_ids_by_scoped_name
       )
+        # @private
         OBJECT_TYPES_BY_NAME = "object_types_by_name"
+        # @private
         SCALAR_TYPES_BY_NAME = "scalar_types_by_name"
+        # @private
         ENUM_TYPES_BY_NAME = "enum_types_by_name"
+        # @private
         INDEX_DEFINITIONS_BY_NAME = "index_definitions_by_name"
+        # @private
         SCHEMA_ELEMENT_NAMES = "schema_element_names"
+        # @private
         GRAPHQL_EXTENSION_MODULES = "graphql_extension_modules"
+        # @private
         GRAPHQL_RESOLVERS_BY_NAME = "graphql_resolvers_by_name"
+        # @private
         STATIC_SCRIPT_IDS_BY_NAME = "static_script_ids_by_scoped_name"
 
+        # Loads a {RuntimeMetadata::Schema} from the given hash.
+        #
+        # @param hash [Hash<String, Hash<String, Object>>] runtime metadata hash loaded from YAML
+        # @return [Schema] the runtime metadata schema instance
         def self.from_hash(hash)
           object_types_by_name = hash[OBJECT_TYPES_BY_NAME]&.transform_values do |type_hash|
             ObjectType.from_hash(type_hash)
@@ -83,6 +96,9 @@ module ElasticGraph
           )
         end
 
+        # Converts to a hash that is suitable for dumping to disk as YAML.
+        #
+        # @return [Hash<String, Hash<String, Object>>] runtime metadata hash ready to dump to YAML
         def to_dumpable_hash
           Support::HashUtil.recursively_prune_nils_and_empties_from({
             # Keys here are ordered alphabetically; please keep them that way.

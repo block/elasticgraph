@@ -20,6 +20,8 @@ module ElasticGraph
       # Note, however, that this does not guarantee no runtime exceptions from the use of the
       # extension: the extension may return invalid return values, or throw exceptions when
       # called. But this verifies the interface to the extent that we can.
+      #
+      # @private
       module InterfaceVerifier
         class << self
           def verify!(extension, against:, constant_name:)

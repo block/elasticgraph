@@ -12,6 +12,7 @@ require "elastic_graph/schema_artifacts/runtime_metadata/relation"
 module ElasticGraph
   module SchemaArtifacts
     module RuntimeMetadata
+      # @private
       class GraphQLField < ::Data.define(:name_in_index, :relation, :computation_detail, :resolver)
         EMPTY = new(nil, nil, nil, nil)
         NAME_IN_INDEX = "name_in_index"

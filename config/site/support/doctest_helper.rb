@@ -11,6 +11,7 @@ require "elastic_graph/schema_artifacts/runtime_metadata/schema_element_names"
 require "elastic_graph/schema_definition/api"
 require "elastic_graph/schema_definition/schema_artifact_manager"
 require "rspec/mocks"
+require "stringio"
 require "tmpdir"
 
 module ElasticGraph
@@ -20,12 +21,19 @@ module ElasticGraph
     # Run each doctest in an empty temp dir. This ensures that the doc tests are not able
     # to implicitly rely on the surrounding file system state, and allows doc test to interactive
     # with the file system as needed without worrying about it corrupting our local file system.
+    #
+    # In addition, capture output so our examples can print without it actually showing up in
+    # the doctest output.
     doctest.before do
       ::RSpec::Mocks.setup
       @original_pwd = ::Dir.pwd
       @tmp_dir = ::Dir.mktmpdir
       @original_load_path = $LOAD_PATH.dup
       ::Dir.chdir(@tmp_dir)
+      @original_stdout = $stdout
+      @original_stderr = $stderr
+      $stdout = ::StringIO.new
+      $stderr = ::StringIO.new
     end
 
     doctest.after do
@@ -33,6 +41,8 @@ module ElasticGraph
       $LOAD_PATH.replace(@original_load_path)
       ::Dir.chdir(@original_pwd)
       ::FileUtils.rm_rf(@tmp_dir)
+      $stdout = @original_stdout
+      $stderr = @original_stderr
     end
 
     # Many doc tests are for the schema definition API, and need to be run with a schema definition
@@ -160,6 +170,10 @@ module ElasticGraph
         end
       end
     end
+
+    doctest.before "ElasticGraph::SchemaArtifacts" do
+      extend SchemaArtifactsDoctestSupport
+    end
   end
 
   # Here we work around a bug in yard-doctest. Usually it evaluates examples in the context of the `YARD::Doctest::Example` instance.
@@ -183,5 +197,11 @@ module ElasticGraph
     end
 
     ::YARD::Doctest::Example.prepend self
+  end
+
+  module SchemaArtifactsDoctestSupport
+    def schema_artifacts_dir
+      ::File.expand_path("../../schema/artifacts", __dir__)
+    end
   end
 end

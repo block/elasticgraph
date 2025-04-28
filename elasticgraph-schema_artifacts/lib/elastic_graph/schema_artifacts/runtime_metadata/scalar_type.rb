@@ -12,6 +12,8 @@ module ElasticGraph
   module SchemaArtifacts
     module RuntimeMetadata
       # Provides runtime metadata related to scalar types.
+      #
+      # @private
       class ScalarType < ::Data.define(:coercion_adapter_ref, :indexing_preparer_ref)
         def self.coercion_adapter_extension_loader
           @coercion_adapter_extension_loader ||= ExtensionLoader.new(ScalarCoercionAdapterInterface)
@@ -77,6 +79,7 @@ module ElasticGraph
         private :to_h
       end
 
+      # @private
       class ScalarCoercionAdapterInterface
         def self.coerce_input(value, ctx)
         end
@@ -85,6 +88,7 @@ module ElasticGraph
         end
       end
 
+      # @private
       class ScalarIndexingPreparerInterface
         def self.prepare_for_indexing(value)
         end

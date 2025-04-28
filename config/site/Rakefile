@@ -38,7 +38,6 @@ module ElasticGraph
       elasticgraph-lambda_support
       elasticgraph-query_interceptor
       elasticgraph-query_registry
-      elasticgraph-schema_artifacts
     ]
 
     require_relative "../../script/list_eg_gems"
@@ -369,7 +368,7 @@ module ElasticGraph
         end
 
         desc "Perform validations of the website, including doc tests and doc coverage"
-        task validate: [:build, :validate_no_empty_code_snippets, :validate_html_output, :docs_coverage, :doctest, :validate_page_frontmatter]
+        task validate: [:build, :validate_no_empty_code_snippets, :docs_coverage, :doctest, :validate_page_frontmatter, :validate_html_output]
 
         task build_css: :npm_install do
           require "rouge"

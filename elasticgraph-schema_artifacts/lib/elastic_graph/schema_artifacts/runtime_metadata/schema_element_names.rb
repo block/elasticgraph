@@ -13,6 +13,8 @@ module ElasticGraph
   module SchemaArtifacts
     module RuntimeMetadata
       # Defines a generic schema element names API. Defined as a separate class to facilitate easy testing.
+      #
+      # @private
       class SchemaElementNamesDefinition
         def self.new(*element_names)
           ::Data.define(:form, :overrides, :exposed_name_by_canonical_name, :canonical_name_by_exposed_name) do
@@ -107,6 +109,7 @@ module ElasticGraph
         FORM = "form"
         OVERRIDES = "overrides"
 
+        # @private
         module SnakeCaseConverter
           extend self
 
@@ -115,6 +118,7 @@ module ElasticGraph
           end
         end
 
+        # @private
         module CamelCaseConverter
           extend self
 
@@ -129,6 +133,7 @@ module ElasticGraph
         }
       end
 
+      # @private
       SchemaElementNames = SchemaElementNamesDefinition.new(
         # Filter arg and operation names:
         :filter,

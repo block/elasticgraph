@@ -12,8 +12,11 @@ require "elastic_graph/schema_artifacts/runtime_metadata/sort_field"
 module ElasticGraph
   module SchemaArtifacts
     module RuntimeMetadata
+      # @private
       module Enum
         # Runtime metadata related to an ElasticGraph enum type.
+        #
+        # @private
         class Type < ::Data.define(:values_by_name)
           VALUES_BY_NAME = "values_by_name"
 
@@ -34,6 +37,8 @@ module ElasticGraph
         end
 
         # Runtime metadata related to an ElasticGraph enum value.
+        #
+        # @private
         class Value < ::Data.define(:sort_field, :datastore_value, :datastore_abbreviation, :alternate_original_name)
           DATASTORE_VALUE = "datastore_value"
           DATASTORE_ABBREVIATION = "datastore_abbreviation"

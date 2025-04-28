@@ -11,6 +11,7 @@ require "elastic_graph/errors"
 module ElasticGraph
   module SchemaArtifacts
     module RuntimeMetadata
+      # @private
       class SortField < ::Data.define(:field_path, :direction)
         def initialize(field_path:, direction:)
           unless direction == :asc || direction == :desc

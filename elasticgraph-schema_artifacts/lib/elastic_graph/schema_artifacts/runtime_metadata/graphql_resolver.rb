@@ -11,6 +11,7 @@ require "elastic_graph/schema_artifacts/runtime_metadata/extension_loader"
 module ElasticGraph
   module SchemaArtifacts
     module RuntimeMetadata
+      # @private
       class GraphQLResolver < ::Data.define(:needs_lookahead, :resolver_ref)
         def self.with_lookahead_loader
           @with_lookahead_loader ||= ExtensionLoader.new(InterfaceWithLookahead)
@@ -43,6 +44,7 @@ module ElasticGraph
           }
         end
 
+        # @private
         class InterfaceWithLookahead
           def initialize(elasticgraph_graphql:, config:)
             # must be defined, but nothing to do
@@ -52,6 +54,7 @@ module ElasticGraph
           end
         end
 
+        # @private
         class InterfaceWithoutLookahead
           def initialize(elasticgraph_graphql:, config:)
             # must be defined, but nothing to do

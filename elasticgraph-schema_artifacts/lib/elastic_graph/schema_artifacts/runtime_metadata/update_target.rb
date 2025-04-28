@@ -13,6 +13,8 @@ module ElasticGraph
   module SchemaArtifacts
     module RuntimeMetadata
       # Provides runtime metadata related to the targets of datastore `update` calls.
+      #
+      # @private
       class UpdateTarget < ::Data.define(
         :type,
         :relationship,

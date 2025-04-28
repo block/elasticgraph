@@ -14,6 +14,8 @@ module ElasticGraph
   module SchemaArtifacts
     module RuntimeMetadata
       # Provides runtime metadata related to object types.
+      #
+      # @private
       class ObjectType < ::Data.define(
         :update_targets,
         :index_definition_names,

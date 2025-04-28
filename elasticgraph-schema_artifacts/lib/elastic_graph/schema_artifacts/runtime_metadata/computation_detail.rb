@@ -10,6 +10,8 @@ module ElasticGraph
   module SchemaArtifacts
     module RuntimeMetadata
       # Details about our aggregation functions.
+      #
+      # @private
       class ComputationDetail < ::Data.define(:empty_bucket_value, :function)
         FUNCTION = "function"
         EMPTY_BUCKET_VALUE = "empty_bucket_value"

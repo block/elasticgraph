@@ -11,6 +11,7 @@ require "elastic_graph/schema_artifacts/runtime_metadata/extension_loader"
 module ElasticGraph
   module SchemaArtifacts
     module RuntimeMetadata
+      # @private
       class GraphQLExtension < ::Data.define(:extension_ref)
         def self.loader
           @loader ||= ExtensionLoader.new(Module.new)

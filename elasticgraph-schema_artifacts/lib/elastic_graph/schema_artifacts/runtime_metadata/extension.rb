@@ -23,6 +23,8 @@ module ElasticGraph
       # We eagerly load extensions (and validate them in the `ExtensionLoader`) in
       # order to surface any issues with the extension as soon as possible. We don't
       # want to defer errors if we can detect any issues with the extension at boot time.
+      #
+      # @private
       Extension = ::Data.define(:extension_class, :require_path, :config, :name) do
         # @implements Extension
         def initialize(extension_class:, require_path:, config:, name: extension_class.name.to_s)

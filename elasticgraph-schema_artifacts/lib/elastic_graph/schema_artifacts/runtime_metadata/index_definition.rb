@@ -14,6 +14,8 @@ module ElasticGraph
   module SchemaArtifacts
     module RuntimeMetadata
       # Runtime metadata related to a datastore index definition.
+      #
+      # @private
       class IndexDefinition < ::Data.define(:route_with, :rollover, :default_sort_fields, :current_sources, :fields_by_path)
         ROUTE_WITH = "route_with"
         ROLLOVER = "rollover"
@@ -52,6 +54,7 @@ module ElasticGraph
           }
         end
 
+        # @private
         class Rollover < ::Data.define(:frequency, :timestamp_field_path)
           FREQUENCY = "frequency"
           TIMESTAMP_FIELD_PATH = "timestamp_field_path"

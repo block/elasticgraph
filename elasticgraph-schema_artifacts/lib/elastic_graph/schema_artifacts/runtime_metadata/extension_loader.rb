@@ -22,6 +22,8 @@ module ElasticGraph
       # Note, however, that this does not guarantee no runtime exceptions from the use of the
       # extension: the extension may return invalid return values, or throw exceptions when
       # called. But this verifies the interface to the extent that we can.
+      #
+      # @private
       class ExtensionLoader
         def initialize(interface_def)
           @interface_def = interface_def

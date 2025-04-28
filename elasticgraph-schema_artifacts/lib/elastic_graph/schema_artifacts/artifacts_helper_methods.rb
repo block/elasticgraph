@@ -9,21 +9,36 @@
 module ElasticGraph
   module SchemaArtifacts
     # Mixin that offers convenient helper methods on top of the basic schema artifacts.
-    # Intended to be mixed into every implementation of the `_SchemaArtifacts` interface.
+    # Intended to be mixed into {FromDisk} and other implementations of the same interface
+    # (such as {SchemaDefinition::Results}.
     module ArtifactsHelperMethods
+      # Provides accesses to the datastore scripts, typically written using the [painless scripting
+      # language](https://www.elastic.co/docs/explore-analyze/scripting/modules-scripting-painless).
+      #
+      # @return [Hash<String, Hash<String, Object>>]
       def datastore_scripts
         datastore_config.fetch("scripts")
       end
 
+      # Provides accesses to the datastore index templates, which are used for a rollover index defined using
+      # {SchemaDefinition::Indexing::Index#rollover}.
+      #
+      # @return [Hash<String, Hash<String, Object>>]
       def index_templates
         datastore_config.fetch("index_templates")
       end
 
+      # Provides accesses to the datastore indices, used for an index that does not rollover.
+      #
+      # @return [Hash<String, Hash<String, Object>>]
       def indices
         datastore_config.fetch("indices")
       end
 
-      # Builds a map of index mappings, keyed by index definition name.
+      # Provides access to the [mappings](https://www.elastic.co/docs/manage-data/data-store/mapping) of both the
+      # {#index_templates} and {#indices}.
+      #
+      # @return [Hash<String, Hash<String, Object>>]
       def index_mappings_by_index_def_name
         @index_mappings_by_index_def_name ||= index_templates
           .transform_values { |config| config.fetch("template").fetch("mappings") }
