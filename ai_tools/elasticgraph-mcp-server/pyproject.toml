@@ -19,7 +19,7 @@ classifiers = [
 ]
 dependencies = [
     "httpx~=0.28.1",
-    "mcp[cli]~=1.6.0",
+    "mcp[cli]~=1.7.1",
     "packaging~=25.0",
 ]
 
