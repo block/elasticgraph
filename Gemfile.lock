@@ -23,7 +23,7 @@ PATH
       apollo-federation (~> 3.10, >= 3.10.1)
       elasticgraph-graphql (= 1.0.0.pre)
       elasticgraph-support (= 1.0.0.pre)
-      graphql (~> 2.5.4)
+      graphql (~> 2.5.6)
 
 PATH
   remote: elasticgraph-datastore_core
@@ -55,7 +55,7 @@ PATH
       base64 (~> 0.2)
       elasticgraph-datastore_core (= 1.0.0.pre)
       elasticgraph-schema_artifacts (= 1.0.0.pre)
-      graphql (~> 2.5.4)
+      graphql (~> 2.5.6)
       graphql-c_parser (~> 1.1, >= 1.1.2)
 
 PATH
@@ -145,7 +145,7 @@ PATH
     elasticgraph-query_registry (1.0.0.pre)
       elasticgraph-graphql (= 1.0.0.pre)
       elasticgraph-support (= 1.0.0.pre)
-      graphql (~> 2.5.4)
+      graphql (~> 2.5.6)
       graphql-c_parser (~> 1.1, >= 1.1.2)
       rake (~> 13.2, >= 13.2.1)
 
@@ -171,7 +171,7 @@ PATH
       elasticgraph-json_schema (= 1.0.0.pre)
       elasticgraph-schema_artifacts (= 1.0.0.pre)
       elasticgraph-support (= 1.0.0.pre)
-      graphql (~> 2.5.4)
+      graphql (~> 2.5.6)
       graphql-c_parser (~> 1.1, >= 1.1.2)
       rake (~> 13.2, >= 13.2.1)
 
