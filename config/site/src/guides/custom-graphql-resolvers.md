@@ -57,7 +57,7 @@ provided as a query argument.
 {% include copyable_code_snippet.html language="ruby" data="custom_resolver.snippets.schema_rb.register_graphql_resolver" %}
 
 Custom resolvers must be registered with ElasticGraph in the schema definition, using the [`register_graphql_resolver`
-API](https://block.github.io/elasticgraph/api-docs/{{ site.data.doc_versions.latest_version }}/ElasticGraph/SchemaDefinition/API.html#register_graphql_resolver-instance_method).
+API](/elasticgraph/api-docs/{{ site.data.doc_versions.latest_version }}/ElasticGraph/SchemaDefinition/API.html#register_graphql_resolver-instance_method).
 Any arguments provided after `defined_at:` get recorded as resolver config, which will later be passed to the resolver's `initialize` method.
 In this case, we've registered the resolver to roll two dice.
 
@@ -65,7 +65,7 @@ In this case, we've registered the resolver to roll two dice.
 
 {% include copyable_code_snippet.html language="ruby" data="custom_resolver.snippets.schema_rb.on_root_query_type" %}
 
-Here we've defined a field on `Query` using [`on_root_query_type`](https://block.github.io/elasticgraph/api-docs/{{ site.data.doc_versions.latest_version }}/ElasticGraph/SchemaDefinition/API.html#on_root_query_type-instance_method).
+Here we've defined a field on `Query` using [`on_root_query_type`](/elasticgraph/api-docs/{{ site.data.doc_versions.latest_version }}/ElasticGraph/SchemaDefinition/API.html#on_root_query_type-instance_method).
 We've assigned the `:roll_dice` resolver to our custom field.
 
 ### Step 4: Query the Custom Field
