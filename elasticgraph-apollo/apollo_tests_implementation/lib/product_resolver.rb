@@ -26,13 +26,7 @@ class ProductResolver
       monotonic_clock_deadline: context[:monotonic_clock_deadline],
       filters: [{"id" => {"equalToAnyOf" => [args.fetch("id")]}}],
       individual_docs_needed: true,
-      requested_fields: %w[
-        id sku package notes
-        variation.id
-        dimensions.size dimensions.weight dimensions.unit
-        createdBy.averageProductsCreatedPerYear createdBy.email createdBy.name createdBy.totalProductsCreated createdBy.yearsOfEmployment
-        research.study.caseNumber research.study.description research.outcome
-      ]
+      request_all_fields: true
     )
 
     @datastore_router.msearch([query]).fetch(query).documents.first

@@ -218,6 +218,30 @@ module ElasticGraph
         }.to avoid_logging_warnings
       end
 
+      it "sets `request_all_fields` to `true` if it is set on either query", covers: :request_all_fields do
+        merged = merge(
+          {request_all_fields: true},
+          {request_all_fields: false}
+        )
+        expect(merged.request_all_fields).to be true
+      end
+
+      it "sets `request_all_fields` to `true` if it is set on both queries", covers: :request_all_fields do
+        merged = merge(
+          {request_all_fields: true},
+          {request_all_fields: true}
+        )
+        expect(merged.request_all_fields).to be true
+      end
+
+      it "sets `request_all_fields` to `false` if it is set to false on both queries", covers: :request_all_fields do
+        merged = merge(
+          {request_all_fields: false},
+          {request_all_fields: false}
+        )
+        expect(merged.request_all_fields).to be false
+      end
+
       it "sets `individual_docs_needed` to `true` if it is set on either query", covers: :individual_docs_needed do
         merged = merge(
           {individual_docs_needed: true},
@@ -232,6 +256,22 @@ module ElasticGraph
           {individual_docs_needed: false}
         )
         expect(merged.individual_docs_needed).to be false
+      end
+
+      it "sets `individual_docs_needed` to `true` if specific fields are requested", covers: :individual_docs_needed do
+        merged = merge(
+          {individual_docs_needed: false},
+          {requested_fields: ["name"]}
+        )
+        expect(merged.individual_docs_needed).to be true
+      end
+
+      it "sets `individual_docs_needed` to `true` if all fields are requested", covers: :individual_docs_needed do
+        merged = merge(
+          {individual_docs_needed: false},
+          {request_all_fields: true}
+        )
+        expect(merged.individual_docs_needed).to be true
       end
 
       it "sets `total_document_count_needed` to `true` if it is set on either query", covers: :total_document_count_needed do

@@ -41,6 +41,15 @@ module ElasticGraph
 
         expect(results.size).to eq 0
       end
+
+      specify "returns all fields if passed `request_all_fields: true`" do
+        index_into(graphql, build(:widget))
+
+        results = search_datastore(request_all_fields: true)
+
+        expect(results.first.payload.keys).to include("name", "id", "options", "the_opts", "tags")
+        expect(results.first["options"].keys).to include("size", "the_sighs")
+      end
     end
   end
 end
