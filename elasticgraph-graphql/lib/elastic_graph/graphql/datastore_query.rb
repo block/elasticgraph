@@ -29,8 +29,8 @@ module ElasticGraph
     class DatastoreQuery < Support::MemoizableData.define(
       :total_document_count_needed, :aggregations, :logger, :filter_interpreter, :routing_picker,
       :index_expression_builder, :default_page_size, :search_index_definitions, :max_page_size,
-      :filters, :sort, :document_pagination, :requested_fields, :individual_docs_needed,
-      :size_multiplier, :monotonic_clock_deadline, :schema_element_names
+      :filters, :sort, :document_pagination, :requested_fields, :request_all_fields,
+      :individual_docs_needed, :size_multiplier, :monotonic_clock_deadline, :schema_element_names
     )
       # Load these files after the `Query` class has been defined, to avoid
       # `TypeError: superclass mismatch for class Query`
@@ -99,17 +99,19 @@ module ElasticGraph
         filters: [],
         sort: [],
         requested_fields: [],
+        request_all_fields: false,
         document_pagination: {},
         size_multiplier: 1,
         monotonic_clock_deadline: nil,
         aggregations: {}
       )
         with(
-          individual_docs_needed: self.individual_docs_needed || individual_docs_needed || !requested_fields.empty?,
+          individual_docs_needed: self.individual_docs_needed || individual_docs_needed || !requested_fields.empty? || request_all_fields,
           total_document_count_needed: self.total_document_count_needed || total_document_count_needed || aggregations.values.any?(&:needs_total_doc_count?),
           filters: self.filters + filters,
           sort: merge_attribute(:sort, sort),
           requested_fields: self.requested_fields + requested_fields,
+          request_all_fields: self.request_all_fields || request_all_fields,
           document_pagination: merge_attribute(:document_pagination, document_pagination),
           size_multiplier: self.size_multiplier * size_multiplier,
           monotonic_clock_deadline: [self.monotonic_clock_deadline, monotonic_clock_deadline].compact.min,
@@ -304,6 +306,7 @@ module ElasticGraph
       # at all--which means the datastore can avoid decompressing the _source field. Otherwise,
       # we only ask for the fields we need to return.
       def source
+        return true if request_all_fields
         requested_source_fields = requested_fields - ["id"]
         return false if requested_source_fields.empty?
         # Merging in requested_fields as _source:{includes:} based on Elasticsearch documentation:
@@ -336,6 +339,7 @@ module ElasticGraph
           size_multiplier: 1,
           aggregations: {},
           requested_fields: [],
+          request_all_fields: false,
           individual_docs_needed: false,
           total_document_count_needed: false,
           monotonic_clock_deadline: nil
@@ -356,7 +360,8 @@ module ElasticGraph
             size_multiplier: size_multiplier,
             aggregations: aggregations,
             requested_fields: requested_fields.to_set,
-            individual_docs_needed: individual_docs_needed || !requested_fields.empty?,
+            request_all_fields: request_all_fields,
+            individual_docs_needed: individual_docs_needed || !requested_fields.empty? || request_all_fields,
             total_document_count_needed: total_document_count_needed || aggregations.values.any?(&:needs_total_doc_count?),
             monotonic_clock_deadline: monotonic_clock_deadline,
             filter_interpreter: filter_interpreter,

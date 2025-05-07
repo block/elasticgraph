@@ -36,6 +36,12 @@ module ElasticGraph
 
         expect(datastore_body_of(query)[:_source]).to eq(false)
       end
+
+      it "passes `_source: true` when requesting all fields" do
+        query = new_query(requested_fields: [], request_all_fields: true)
+
+        expect(datastore_body_of(query)[:_source]).to eq(true)
+      end
     end
   end
 end
