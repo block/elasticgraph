@@ -31,7 +31,7 @@ jobs:
           - "3.4"
         datastore:
           - "elasticsearch:9.0.0"
-          - "opensearch:2.19.1"
+          - "opensearch:3.0.0"
           - "opensearch:2.7.0"
         include:
           # We have 4 build parts. The "primary" one is `run_each_gem_spec`, and we need that to be run on
@@ -86,7 +86,7 @@ jobs:
       contents: read
       packages: write
     env:
-      OPENSEARCH_VERSION: "2.19.1"
+      OPENSEARCH_VERSION: "3.0.0"
 
     steps:
       - name: Harden Runner

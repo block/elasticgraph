@@ -4,5 +4,5 @@
 elasticsearch:
 - 9.0.0 # latest version as of 2025-04-23.
 opensearch:
-- 2.19.1 # latest version as of 2025-03-10.
+- 3.0.0 # latest version as of 2025-05-07.
 - 2.7.0 # lowest version ElasticGraph currently supports
