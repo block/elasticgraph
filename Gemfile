@@ -19,9 +19,13 @@ group :development do
   gem "httpx", "~> 1.4", ">= 1.4.1"
   gem "memory_profiler", "~> 1.1"
   gem "method_source", "~> 1.1"
-  gem "rubocop-factory_bot", "~> 2.27", ">= 2.27.1"
+  # We are waiting to upgrade to >= 2.27 until standardrb compatibility with rubocop plugins is fixed:
+  # https://github.com/standardrb/standard/issues/701
+  gem "rubocop-factory_bot", "~> 2.26.1"
   gem "rubocop-rake", "~> 0.6"
-  gem "rubocop-rspec", "~> 3.6"
+  # We are waiting to upgrade to >= 3.5 until standardrb compatibility with rubocop plugins is fixed:
+  # https://github.com/standardrb/standard/issues/701
+  gem "rubocop-rspec", "~> 3.4.0"
   gem "rspec", "~> 3.13"
   gem "rspec-retry", "~> 0.6", ">= 0.6.2"
   gem "simplecov", "~> 0.22"
