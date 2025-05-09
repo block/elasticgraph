@@ -55,45 +55,6 @@ module ElasticGraph
         }.to raise_error Errors::ConfigError, a_string_including("fake_setting")
       end
 
-      describe "#nested_relationship_resolver_mode" do
-        it "default to `:optimized`" do
-          config = Config.from_parsed_yaml("graphql" => {
-            "default_page_size" => 27,
-            "max_page_size" => 270
-          })
-
-          expect(config.nested_relationship_resolver_mode).to eq :optimized
-        end
-
-        it "can be set to `:optimized`, `:original` or `:comparison`" do
-          results = %w[optimized original comparison].to_h do |yaml_value|
-            config = Config.from_parsed_yaml("graphql" => {
-              "default_page_size" => 27,
-              "max_page_size" => 270,
-              "nested_relationship_resolver_mode" => yaml_value
-            })
-
-            [yaml_value, config.nested_relationship_resolver_mode]
-          end
-
-          expect(results).to eq({
-            "optimized" => :optimized,
-            "original" => :original,
-            "comparison" => :comparison
-          })
-        end
-
-        it "raises an error if it is set to any other value" do
-          expect {
-            Config.from_parsed_yaml("graphql" => {
-              "default_page_size" => 27,
-              "max_page_size" => 270,
-              "nested_relationship_resolver_mode" => "unknown_value"
-            })
-          }.to raise_error Errors::ConfigError, a_string_including("unknown_value")
-        end
-      end
-
       describe "#client_resolver" do
         it "raises an error when given an invalid require path" do
           expect {

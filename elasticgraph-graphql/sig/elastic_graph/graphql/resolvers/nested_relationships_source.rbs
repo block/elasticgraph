@@ -9,8 +9,7 @@ module ElasticGraph
           query: DatastoreQuery,
           join: Schema::RelationJoin,
           context: ::GraphQL::Query::Context,
-          monotonic_clock: Support::MonotonicClock,
-          mode: nestedRelationshipResolverMode
+          monotonic_clock: Support::MonotonicClock
         ) -> void
 
         @query: DatastoreQuery
@@ -20,7 +19,6 @@ module ElasticGraph
         @schema_element_names: SchemaArtifacts::RuntimeMetadata::SchemaElementNames
         @logger: ::Logger
         @monotonic_clock: Support::MonotonicClock
-        @mode: nestedRelationshipResolverMode
 
         def fetch: (::Array[::Set[untyped]]) -> ::Array[DatastoreResponse::SearchResponse]
 
@@ -29,15 +27,13 @@ module ElasticGraph
           query: DatastoreQuery,
           join: Schema::RelationJoin,
           context: ::GraphQL::Query::Context,
-          monotonic_clock: Support::MonotonicClock,
-          mode: nestedRelationshipResolverMode
+          monotonic_clock: Support::MonotonicClock
         ) -> DatastoreResponse::SearchResponse
 
         private
 
         def fetch_optimized: (::Array[::Set[untyped]]) -> ::Array[DatastoreResponse::SearchResponse]
         def fetch_original: (::Array[::Set[untyped]], ?requested_fields: ::Array[::String]) -> ::Array[DatastoreResponse::SearchResponse]
-        def fetch_comparison: (::Array[::Set[untyped]]) -> ::Array[DatastoreResponse::SearchResponse]
 
         def can_merge_filters?: () -> bool
 
@@ -61,7 +57,6 @@ module ElasticGraph
         ) -> ::Hash[::String, untyped]
 
         def time_duration: [T] () { () -> T } -> [::Integer, T]
-        def loggable_results: (::Array[DatastoreResponse::SearchResponse]) -> ::Array[::Array[::String]]
       end
     end
   end

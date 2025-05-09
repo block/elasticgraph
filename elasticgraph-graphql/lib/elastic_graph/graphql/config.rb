@@ -20,12 +20,6 @@ module ElasticGraph
       :max_page_size,
       # Queries that take longer than this configured threshold will have a sanitized version logged.
       :slow_query_latency_warning_threshold_in_ms,
-      # How to resolve nested relationships:
-      #
-      # - `optimized` (default): uses the new (in ElasticGraph 0.19.2.0) optimized resolver logic.
-      # - `original`: uses the resolver logic from ElasticGraph v0.19.1.1 and before.
-      # - `comparison`: runs both versions of the logic in serial, to compare them for correctness and performance. Results are logged.
-      :nested_relationship_resolver_mode,
       # Object used to identify the client of a GraphQL query based on the HTTP request.
       :client_resolver,
       # Array of modules that will be extended onto the `GraphQL` instance to support extension libraries.
@@ -51,17 +45,10 @@ module ElasticGraph
           end
         end
 
-        nested_relationship_resolver_mode = parsed_yaml["nested_relationship_resolver_mode"]&.to_sym || :optimized
-        unless VALID_NESTED_RELATIONSHIP_RESOLVER_MODES.include?(nested_relationship_resolver_mode)
-          raise Errors::ConfigError, "Invalid value for `nested_relationship_resolver_mode`: #{nested_relationship_resolver_mode}. " \
-            "Valid values: #{VALID_NESTED_RELATIONSHIP_RESOLVER_MODES.join(", ")}."
-        end
-
         new(
           default_page_size: parsed_yaml.fetch("default_page_size"),
           max_page_size: parsed_yaml.fetch("max_page_size"),
           slow_query_latency_warning_threshold_in_ms: parsed_yaml["slow_query_latency_warning_threshold_in_ms"] || 5000,
-          nested_relationship_resolver_mode: nested_relationship_resolver_mode,
           client_resolver: load_client_resolver(parsed_yaml),
           extension_modules: extension_mods,
           extension_settings: entire_parsed_yaml.except(*ELASTICGRAPH_CONFIG_KEYS)
@@ -73,8 +60,6 @@ module ElasticGraph
 
       # The standard ElasticGraph root config setting keys; anything else is assumed to be extension settings.
       ELASTICGRAPH_CONFIG_KEYS = %w[graphql indexer logger datastore schema_artifacts]
-
-      VALID_NESTED_RELATIONSHIP_RESOLVER_MODES = [:optimized, :original, :comparison]
 
       private_class_method def self.load_client_resolver(parsed_yaml)
         config = parsed_yaml.fetch("client_resolver") do

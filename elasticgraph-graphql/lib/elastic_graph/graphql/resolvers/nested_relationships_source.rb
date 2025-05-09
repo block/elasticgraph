@@ -60,7 +60,7 @@ module ElasticGraph
         # isn't particularly expensive, compared to needing to re-run an extra query.
         EXTRA_SIZE_MULTIPLIER = 4
 
-        def initialize(query:, join:, context:, monotonic_clock:, mode:)
+        def initialize(query:, join:, context:, monotonic_clock:)
           @query = query
           @join = join
           @filter_id_field_name_path = @join.filter_id_field_name.split(".")
@@ -69,24 +69,15 @@ module ElasticGraph
           @schema_element_names = elastic_graph_schema.element_names
           @logger = elastic_graph_schema.logger
           @monotonic_clock = monotonic_clock
-          @mode = mode
         end
 
         def fetch(id_sets)
           return fetch_original(id_sets) unless can_merge_filters?
-
-          case @mode
-          when :original
-            fetch_original(id_sets)
-          when :comparison
-            fetch_comparison(id_sets)
-          else
-            fetch_optimized(id_sets)
-          end
+          fetch_optimized(id_sets)
         end
 
-        def self.execute_one(ids, query:, join:, context:, monotonic_clock:, mode:)
-          context.dataloader.with(self, query:, join:, context:, monotonic_clock:, mode:).load(ids)
+        def self.execute_one(ids, query:, join:, context:, monotonic_clock:)
+          context.dataloader.with(self, query:, join:, context:, monotonic_clock:).load(ids)
         end
 
         private
@@ -114,52 +105,6 @@ module ElasticGraph
 
         def fetch_original(id_sets, requested_fields: [])
           fetch_via_separate_queries(id_sets, requested_fields: requested_fields)
-        end
-
-        def fetch_comparison(id_sets)
-          # Note: we'd ideally run both versions of the logic in parallel, but our attempts to do that resulted in errors
-          # because of the fiber context in which dataloaders run.
-          original_duration_ms, original_results = time_duration do
-            # In the `fetch_optimized` implementation, we request this extra field. We don't need it for
-            # the original implementation (so `fetch_original` doesn't also request that field...) but for
-            # the purposes of comparison we need to request it so that the document payloads will have the
-            # same fields.
-            #
-            # Note: we don't add the requested field if we have only a single id set, in order to align with
-            # the short-circuiting logic in `fetch_via_single_query_with_merged_filters`. Otherwise, any time
-            # we have a single id set we always get reported differences which are not actually real!
-            requested_fields = (id_sets.size > 1) ? [@join.filter_id_field_name] : [] # : ::Array[::String]
-            fetch_original(id_sets, requested_fields: requested_fields)
-          end
-
-          optimized_duration_ms, optimized_results = time_duration do
-            fetch_optimized(id_sets)
-          end
-
-          # To see if we got the same results we only look at the documents, because we expect differences outside
-          # of the documents--for example, the `SearchResponse#metadata` will report different `took` values.
-          got_same_results = original_results.map(&:documents) == optimized_results.map(&:documents)
-          message = {
-            "message_type" => "NestedRelationshipsComparisonResults",
-            "field" => @join.field.description,
-            "original_duration_ms" => original_duration_ms,
-            "optimized_duration_ms" => optimized_duration_ms,
-            "optimized_faster" => (optimized_duration_ms < original_duration_ms),
-            "id_set_count" => id_sets.size,
-            "total_id_count" => id_sets.reduce(:union).size,
-            "got_same_results" => got_same_results
-          }
-
-          if got_same_results
-            @logger.info(message)
-          else
-            @logger.error(message.merge({
-              "original_documents" => loggable_results(original_results),
-              "optimized_documents" => loggable_results(optimized_results)
-            }))
-          end
-
-          original_results
         end
 
         # For "simple", document-based queries, we can safely merge filters. However, this cannot be done safely when the response
@@ -306,18 +251,6 @@ module ElasticGraph
           result = yield
           stop_time = @monotonic_clock.now_in_ms
           [stop_time - start_time, result]
-        end
-
-        # Converts the given list of responses into a format we can safely log when we are logging
-        # response differences. We include the `id` (to identify the document) and the `hash` (so
-        # we can tell if the payload of a document differed, without logging the contents of that
-        # payload).
-        def loggable_results(responses)
-          responses.map do |response|
-            response.documents.map do |doc|
-              "#{doc.id} (hash: #{doc.hash})"
-            end
-          end
         end
       end
     end

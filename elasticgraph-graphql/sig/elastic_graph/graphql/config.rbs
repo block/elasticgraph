@@ -1,12 +1,9 @@
 module ElasticGraph
   class GraphQL
-    type nestedRelationshipResolverMode = :optimized | :original | :comparison
-
     class ConfigSupertype
       attr_reader default_page_size: ::Integer
       attr_reader max_page_size: ::Integer
       attr_reader slow_query_latency_warning_threshold_in_ms: ::Integer
-      attr_reader nested_relationship_resolver_mode: nestedRelationshipResolverMode
       attr_reader client_resolver: Client::_Resolver
       attr_reader extension_modules: ::Array[::Module]
       attr_reader extension_settings: parsedYamlSettings
@@ -15,7 +12,6 @@ module ElasticGraph
         default_page_size: ::Integer,
         max_page_size: ::Integer,
         slow_query_latency_warning_threshold_in_ms: ::Integer,
-        nested_relationship_resolver_mode: nestedRelationshipResolverMode,
         client_resolver: Client::_Resolver,
         extension_modules: ::Array[::Module],
         extension_settings: parsedYamlSettings
@@ -25,7 +21,6 @@ module ElasticGraph
         ?default_page_size: ::Integer,
         ?max_page_size: ::Integer,
         ?slow_query_latency_warning_threshold_in_ms: ::Integer,
-        ?nested_relationship_resolver_mode: nestedRelationshipResolverMode,
         ?client_resolver: Client::_Resolver,
         ?extension_modules: ::Array[::Module],
         ?extension_settings: parsedYamlSettings
@@ -42,7 +37,6 @@ module ElasticGraph
       extend _BuildableFromParsedYaml[Config]
       EXPECTED_KEYS: ::Array[::String]
       ELASTICGRAPH_CONFIG_KEYS: ::Array[::String]
-      VALID_NESTED_RELATIONSHIP_RESOLVER_MODES: ::Array[nestedRelationshipResolverMode]
     end
   end
 end

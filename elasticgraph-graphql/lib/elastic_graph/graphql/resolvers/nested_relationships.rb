@@ -23,7 +23,6 @@ module ElasticGraph
           @schema_element_names = elasticgraph_graphql.runtime_metadata.schema_element_names
           @logger = elasticgraph_graphql.logger
           @monotonic_clock = elasticgraph_graphql.monotonic_clock
-          @resolver_mode = elasticgraph_graphql.config.nested_relationship_resolver_mode
         end
 
         def resolve(field:, object:, args:, context:, lookahead:)
@@ -41,8 +40,7 @@ module ElasticGraph
                 NestedRelationshipsSource.execute_one(
                   Array(id_or_ids).to_set,
                   query:, join:, context:,
-                  monotonic_clock: @monotonic_clock,
-                  mode: @resolver_mode
+                  monotonic_clock: @monotonic_clock
                 )
 
               join.normalize_documents(initial_response) do |problem|
