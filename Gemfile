@@ -21,7 +21,7 @@ group :development do
   gem "method_source", "~> 1.1"
   # We are waiting to upgrade to >= 2.27 until standardrb compatibility with rubocop plugins is fixed:
   # https://github.com/standardrb/standard/issues/701
-  gem "rubocop-factory_bot", "~> 2.26.1"
+  gem "rubocop-factory_bot", "~> 2.27.1"
   # We are waiting to upgrade to >= 0.7 until standardrb compatibility with rubocop plugins is fixed:
   # https://github.com/standardrb/standard/issues/701
   gem "rubocop-rake", "~> 0.6.0"
