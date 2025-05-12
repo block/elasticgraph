@@ -22,7 +22,9 @@ group :development do
   # We are waiting to upgrade to >= 2.27 until standardrb compatibility with rubocop plugins is fixed:
   # https://github.com/standardrb/standard/issues/701
   gem "rubocop-factory_bot", "~> 2.26.1"
-  gem "rubocop-rake", "~> 0.7", ">= 0.7.1"
+  # We are waiting to upgrade to >= 0.7 until standardrb compatibility with rubocop plugins is fixed:
+  # https://github.com/standardrb/standard/issues/701
+  gem "rubocop-rake", "~> 0.6.0"
   # We are waiting to upgrade to >= 3.5 until standardrb compatibility with rubocop plugins is fixed:
   # https://github.com/standardrb/standard/issues/701
   gem "rubocop-rspec", "~> 3.4.0"
