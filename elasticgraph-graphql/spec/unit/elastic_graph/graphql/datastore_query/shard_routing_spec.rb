@@ -69,7 +69,6 @@ module ElasticGraph
         expect(shard_routing_for(["name"], {"name" => {"gte" => "abc"}})).to search_all_shards
         expect(shard_routing_for(["name"], {"name" => {"lt" => "abc"}})).to search_all_shards
         expect(shard_routing_for(["name"], {"name" => {"lte" => "abc"}})).to search_all_shards
-        expect(shard_routing_for(["name"], {"name" => {"matches" => "abc"}})).to search_all_shards
         expect(shard_routing_for(["name"], {"name" => {"matches_query" => {"query" => "abc"}}})).to search_all_shards
         expect(shard_routing_for(["name"], {"name" => {"matches_phrase" => {"phrase" => "abc"}}})).to search_all_shards
       end
@@ -445,7 +444,6 @@ module ElasticGraph
           expect(shard_routing_for(["name"], {"name" => {"not" => {"gte" => "abc"}}})).to search_all_shards
           expect(shard_routing_for(["name"], {"name" => {"not" => {"lt" => "abc"}}})).to search_all_shards
           expect(shard_routing_for(["name"], {"name" => {"not" => {"lte" => "abc"}}})).to search_all_shards
-          expect(shard_routing_for(["name"], {"name" => {"not" => {"matches" => "abc"}}})).to search_all_shards
           expect(shard_routing_for(["name"], {"name" => {"not" => {"matches_query" => {"query" => "abc"}}}})).to search_all_shards
           expect(shard_routing_for(["name"], {"name" => {"not" => {"matches_phrase" => {"phrase" => "abc"}}}})).to search_all_shards
         end

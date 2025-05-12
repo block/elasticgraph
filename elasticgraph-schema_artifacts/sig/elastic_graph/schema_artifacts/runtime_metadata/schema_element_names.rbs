@@ -22,7 +22,6 @@ module ElasticGraph
         attr_reader gte: ::String
         attr_reader lt: ::String
         attr_reader lte: ::String
-        attr_reader matches: ::String
         attr_reader matches_query: ::String
         attr_reader matches_phrase: ::String
         attr_reader all_of: ::String

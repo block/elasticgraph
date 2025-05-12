@@ -12054,13 +12054,6 @@ input TextFilterInput {
   any_of: [TextFilterInput!]
 
   """
-  Matches records where the field value matches the provided value using full text search.
-
-  When `null` is passed, matches all documents.
-  """
-  matches: String @deprecated(reason: "Use `matches_query` instead.")
-
-  """
   Matches records where the field value has a phrase matching the provided phrase using
   full text search. This is stricter than `matches_query`: all terms must match
   and be in the same order as the provided phrase.

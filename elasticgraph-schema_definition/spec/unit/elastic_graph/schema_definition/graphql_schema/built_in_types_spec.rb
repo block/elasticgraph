@@ -695,12 +695,6 @@ module ElasticGraph
               """
               #{schema_elements.not}: TextFilterInput
               """
-              Matches records where the field value matches the provided value using full text search.
-
-              When `null` is passed, matches all documents.
-              """
-              #{schema_elements.matches}: String @deprecated(reason: "Use `#{schema_elements.matches_query}` instead.")
-              """
               Matches records where the field value matches the provided query using full text search.
               This is more lenient than `#{schema_elements.matches_phrase}`: the order of terms is ignored, and,
               by default, only one search term is required to be in the field value.
@@ -744,12 +738,6 @@ module ElasticGraph
               When `null` or an empty list is passed, matches all documents.
               """
               #{schema_elements.all_of}: [TextListElementFilterInput!]
-              """
-              Matches records where the field value matches the provided value using full text search.
-
-              When `null` is passed, matches all documents.
-              """
-              #{schema_elements.matches}: String @deprecated(reason: "Use `#{schema_elements.matches_query}` instead.")
               """
               Matches records where the field value matches the provided query using full text search.
               This is more lenient than `#{schema_elements.matches_phrase}`: the order of terms is ignored, and,

@@ -200,16 +200,6 @@ module ElasticGraph
         def register_standard_elastic_graph_types
           # This is a special filter on a `String` type, so we don't have a `Text` scalar to generate it from.
           schema_def_state.factory.build_standard_filter_input_types_for_index_leaf_type("String", name_prefix: "Text") do |t|
-            t.field names.matches, "String" do |f|
-              f.documentation <<~EOS
-                Matches records where the field value matches the provided value using full text search.
-
-                When `null` is passed, matches all documents.
-              EOS
-
-              f.directive "deprecated", reason: "Use `#{names.matches_query}` instead."
-            end
-
             t.field names.matches_query, schema_def_state.type_ref("MatchesQuery").as_filter_input.name do |f|
               f.documentation <<~EOS
                 Matches records where the field value matches the provided query using full text search.

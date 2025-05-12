@@ -800,7 +800,7 @@ module ElasticGraph
         end
       end
 
-      specify "`matches` filters using full text search" do
+      specify "`matches_query` filters using full text search" do
         index_into(
           graphql,
           widget1 = build(:widget, name_text: "a blue thing"),
@@ -810,12 +810,12 @@ module ElasticGraph
           widget5 = build(:widget, name_text: "a blue device")
         )
 
-        results = search_with_filter("name_text", "matches", "blue thing")
+        results = search_with_filter("name_text", "matches_query", {"query" => "blue thing", "allowed_edits_per_term" => allowed_edits_per_term_of("NONE")})
 
         expect(results).to match_array(ids_of(widget1, widget2, widget4, widget5))
       end
 
-      specify "`matches` filters using full text search with flexible options" do
+      specify "`matches_query` filters using full text search with flexible options" do
         index_into(
           graphql,
           widget1 = build(:widget, name_text: "a blue thing"),
@@ -949,8 +949,8 @@ module ElasticGraph
           },
           "name_text" => {
             "any_of" => [
-              {"matches" => "red"},
-              {"matches" => "blue"}
+              {"matches_query" => {"query" => "red", "allowed_edits_per_term" => allowed_edits_per_term_of("NONE")}},
+              {"matches_query" => {"query" => "blue", "allowed_edits_per_term" => allowed_edits_per_term_of("NONE")}}
             ]
           }
         })
@@ -973,8 +973,8 @@ module ElasticGraph
             {
               "name_text" => {
                 "any_of" => [
-                  {"matches" => "blue"},
-                  {"matches" => "green"}
+                  {"matches_query" => {"query" => "blue", "allowed_edits_per_term" => allowed_edits_per_term_of("NONE")}},
+                  {"matches_query" => {"query" => "green", "allowed_edits_per_term" => allowed_edits_per_term_of("NONE")}}
                 ]
               }
             },
@@ -1037,7 +1037,6 @@ module ElasticGraph
         expect(search_with_filter("amount_cents", "gt", nil)).to eq ids_of(widget1, widget2)
         expect(search_with_filter("amount_cents", "gte", nil)).to eq ids_of(widget1, widget2)
         expect(search_with_filter("amount_cents", "any_of", nil)).to eq ids_of(widget1, widget2)
-        expect(search_with_filter("name_text", "matches", nil)).to eq ids_of(widget1, widget2)
         expect(search_with_filter("name_text", "matches_query", nil)).to eq ids_of(widget1, widget2)
         expect(search_with_filter("name_text", "matches_phrase", nil)).to eq ids_of(widget1, widget2)
         expect(search_with_freeform_filter({"id" => {}})).to eq ids_of(widget1, widget2)
@@ -1432,6 +1431,10 @@ module ElasticGraph
 
       def color_of(value_name)
         enum_value("ColorInput", value_name)
+      end
+
+      def allowed_edits_per_term_of(value_name)
+        enum_value("MatchesQueryAllowedEditsPerTermInput", value_name)
       end
     end
   end

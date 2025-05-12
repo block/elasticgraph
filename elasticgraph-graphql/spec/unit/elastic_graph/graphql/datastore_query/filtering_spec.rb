@@ -111,12 +111,6 @@ module ElasticGraph
         )
       end
 
-      it "builds a `match` must condition when given a `matches`: 'string' filter" do
-        query = new_query(filter: {"name_text" => {"matches" => "foo"}})
-
-        expect(datastore_body_of(query)).to query_datastore_with(bool: {must: [{match: {"name_text" => "foo"}}]})
-      end
-
       it "builds a `match` must condition when given a `matches_query`: 'MatchesQueryFilterInput' filter" do
         query = new_query(
           filter: {
@@ -348,15 +342,17 @@ module ElasticGraph
 
         it "builds an `exists` when the `equal_to_any_of: [nil]` part is among other filters" do
           query = new_query(filter: {
-            "name_text" => {"matches" => "foo"},
+            "name" => {"equal_to_any_of" => ["foo"]},
             "age" => {"equal_to_any_of" => [nil]},
             "currency" => {"equal_to_any_of" => ["USD"]}
           })
 
           expect(datastore_body_of(query)).to query_datastore_with({
             bool: {
-              filter: [{terms: {"currency" => ["USD"]}}],
-              must: [{match: {"name_text" => "foo"}}],
+              filter: [
+                {terms: {"name" => ["foo"]}},
+                {terms: {"currency" => ["USD"]}}
+              ],
               must_not: [{bool: {filter: [{exists: {"field" => "age"}}]}}]
             }
           })

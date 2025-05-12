@@ -90,7 +90,6 @@ module ElasticGraph
             schema_names.gte => ->(field_name, value) { RangeQuery.new(field_name, :gte, value) },
             schema_names.lt => ->(field_name, value) { RangeQuery.new(field_name, :lt, value) },
             schema_names.lte => ->(field_name, value) { RangeQuery.new(field_name, :lte, value) },
-            schema_names.matches => ->(field_name, value) { BooleanQuery.must({match: {field_name => value}}) },
             schema_names.matches_query => ->(field_name, value) do
               allowed_edits_per_term = value.fetch(schema_names.allowed_edits_per_term).runtime_metadata.datastore_abbreviation
 

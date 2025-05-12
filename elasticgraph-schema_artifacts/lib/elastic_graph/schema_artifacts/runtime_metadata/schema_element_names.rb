@@ -137,7 +137,7 @@ module ElasticGraph
       SchemaElementNames = SchemaElementNamesDefinition.new(
         # Filter arg and operation names:
         :filter,
-        :equal_to_any_of, :gt, :gte, :lt, :lte, :matches, :matches_phrase, :matches_query, :any_of, :all_of, :not,
+        :equal_to_any_of, :gt, :gte, :lt, :lte, :matches_phrase, :matches_query, :any_of, :all_of, :not,
         :time_of_day, :any_satisfy,
         # Directives
         :eg_latency_slo, :ms,

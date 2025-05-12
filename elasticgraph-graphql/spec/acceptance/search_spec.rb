@@ -463,11 +463,6 @@ module ElasticGraph
           case_correctly("widget_fee_currencies") => ["CAD", "USD"]
         }])
 
-        full_text_search_results = list_widgets_with(:name, filter: {"name_text" => {matches: "thing1"}}, order_by: [:name_ASC])
-        expect(full_text_search_results).to match([
-          string_hash_of(widget1, :id, :name)
-        ])
-
         full_text_query_search_results = list_widgets_with(:name, filter: {"name_text" => {matches_query: {query: "thing1"}}}, order_by: [:name_ASC])
         expect(full_text_query_search_results).to match([
           string_hash_of(widget1, :id, :name),
