@@ -200,13 +200,6 @@ module ElasticGraph
         def register_standard_elastic_graph_types
           # This is a special filter on a `String` type, so we don't have a `Text` scalar to generate it from.
           schema_def_state.factory.build_standard_filter_input_types_for_index_leaf_type("String", name_prefix: "Text") do |t|
-            # We can't support filtering on `null` within a list, so make the field non-nullable when it's the
-            # `ListElementFilterInput` type. See scalar_type.rb for a larger comment explaining the rationale behind this.
-            equal_to_any_of_type = t.type_ref.list_element_filter_input? ? "[String!]" : "[String]"
-            t.field names.equal_to_any_of, equal_to_any_of_type do |f|
-              f.documentation ScalarType::EQUAL_TO_ANY_OF_DOC
-            end
-
             t.field names.matches, "String" do |f|
               f.documentation <<~EOS
                 Matches records where the field value matches the provided value using full text search.

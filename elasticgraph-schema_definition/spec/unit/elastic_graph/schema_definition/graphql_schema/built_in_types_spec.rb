@@ -695,15 +695,6 @@ module ElasticGraph
               """
               #{schema_elements.not}: TextFilterInput
               """
-              Matches records where the field value is equal to any of the provided values.
-              This works just like an IN operator in SQL.
-
-              When `null` is passed, matches all documents. When an empty list is passed,
-              this part of the filter matches no documents. When `null` is passed in the
-              list, this part of the filter matches records where the field value is `null`.
-              """
-              #{schema_elements.equal_to_any_of}: [String]
-              """
               Matches records where the field value matches the provided value using full text search.
 
               When `null` is passed, matches all documents.
@@ -753,15 +744,6 @@ module ElasticGraph
               When `null` or an empty list is passed, matches all documents.
               """
               #{schema_elements.all_of}: [TextListElementFilterInput!]
-              """
-              Matches records where the field value is equal to any of the provided values.
-              This works just like an IN operator in SQL.
-
-              When `null` is passed, matches all documents. When an empty list is passed,
-              this part of the filter matches no documents. When `null` is passed in the
-              list, this part of the filter matches records where the field value is `null`.
-              """
-              #{schema_elements.equal_to_any_of}: [String!]
               """
               Matches records where the field value matches the provided value using full text search.
 

@@ -1,0 +1,10 @@
+query FindNamedVenues {
+  venues(filter: {
+    name: {not: {equalToAnyOf: [null]}}
+  }) {
+    nodes {
+      name # will be non-null on all returned nodes
+      capacity
+    }
+  }
+}
