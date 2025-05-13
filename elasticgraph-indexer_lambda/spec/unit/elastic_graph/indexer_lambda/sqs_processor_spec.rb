@@ -21,7 +21,7 @@ module ElasticGraph
 
       describe "#process" do
         let(:s3_client) { Aws::S3::Client.new(stub_responses: true) }
-        let(:sqs_processor) { build_sqs_processor(report_batch_item_failures: false) }
+        let(:sqs_processor) { build_sqs_processor }
 
         it "processes a lambda event containing a single SQS message with a single ElasticGraph event" do
           lambda_event = {
@@ -259,98 +259,71 @@ module ElasticGraph
         end
 
         context "when one or more events fail to process" do
-          context "when `report_batch_item_failures` is false" do
-            let(:sqs_processor) { build_sqs_processor(report_batch_item_failures: false) }
+          let(:sqs_processor) { build_sqs_processor }
 
-            it "raises an `IndexingFailuresError` to notify about the failure and force all SQS messages to be retried" do
-              allow(indexer_processor).to receive(:process_returning_failures).and_return([
-                failure_of("id1", message: "boom1", event: {"id" => "id1", "message_id" => "12"}),
-                failure_of("id7", message: "boom7", event: {"id" => "id7", "message_id" => "67"})
-              ])
+          it "indicates which SQS messages had failures in the lambda response so that only those messages are retried (while still logging the errors)" do
+            allow(indexer_processor).to receive(:process_returning_failures).and_return([
+              failure_of("id1", message: "boom1", event: {"id" => "id1", "message_id" => "12"}),
+              failure_of("id7", message: "boom7", event: {"id" => "id7", "message_id" => "67"})
+            ])
 
-              lambda_event = {
-                "Records" => [
-                  {"messageId" => "12", "body" => jsonl({"id" => "id1"}, {"id" => "id2"})},
-                  {"messageId" => "67", "body" => jsonl({"id" => "id6"}, {"id" => "id7"})}
-                ]
-              }
+            lambda_event = {
+              "Records" => [
+                {"messageId" => "12", "body" => jsonl({"id" => "id1"}, {"id" => "id2"})},
+                {"messageId" => "34", "body" => jsonl({"id" => "id3"}, {"id" => "id4"})},
+                {"messageId" => "5", "body" => jsonl({"id" => "id5"})},
+                {"messageId" => "67", "body" => jsonl({"id" => "id6"}, {"id" => "id7"})}
+              ]
+            }
 
-              expect {
-                sqs_processor.process(lambda_event)
-              }.to raise_error Indexer::IndexingFailuresError, a_string_including(
-                "Got 2 failure(s) from 4 event(s)", "boom1", "boom7",
-                "These failures came from 2 message(s): 12, 67."
-              )
-            end
+            response = nil
+
+            expect {
+              response = sqs_processor.process(lambda_event)
+            }.to log a_string_including(
+              "Got 2 failure(s) from 7 event(s):", "boom1", "boom7",
+              "These failures came from 2 message(s): 12, 67."
+            )
+
+            expect(response).to eq({"batchItemFailures" => [
+              {"itemIdentifier" => "12"},
+              {"itemIdentifier" => "67"}
+            ]})
           end
 
-          context "when `report_batch_item_failures` is true" do
-            let(:sqs_processor) { build_sqs_processor(report_batch_item_failures: true) }
+          it "falls back to raising an `IndexingFailuresError` if the SQS id of an event cannot be determined" do
+            allow(indexer_processor).to receive(:process_returning_failures).and_return([
+              failure_of("id1", message: "boom1", event: {"id" => "id1"}),
+              failure_of("id7", message: "boom7", event: {"id" => "id7", "message_id" => "67"})
+            ])
 
-            it "indicates which SQS messages had failures in the lambda response so that only those messages are retried (while still logging the errors)" do
-              allow(indexer_processor).to receive(:process_returning_failures).and_return([
-                failure_of("id1", message: "boom1", event: {"id" => "id1", "message_id" => "12"}),
-                failure_of("id7", message: "boom7", event: {"id" => "id7", "message_id" => "67"})
-              ])
+            lambda_event = {
+              "Records" => [
+                {"body" => jsonl({"id" => "id1"}, {"id" => "id2"})},
+                {"messageId" => "34", "body" => jsonl({"id" => "id3"}, {"id" => "id4"})},
+                {"messageId" => "5", "body" => jsonl({"id" => "id5"})},
+                {"messageId" => "67", "body" => jsonl({"id" => "id6"}, {"id" => "id7"})}
+              ]
+            }
 
-              lambda_event = {
-                "Records" => [
-                  {"messageId" => "12", "body" => jsonl({"id" => "id1"}, {"id" => "id2"})},
-                  {"messageId" => "34", "body" => jsonl({"id" => "id3"}, {"id" => "id4"})},
-                  {"messageId" => "5", "body" => jsonl({"id" => "id5"})},
-                  {"messageId" => "67", "body" => jsonl({"id" => "id6"}, {"id" => "id7"})}
-                ]
-              }
-
-              response = nil
-
-              expect {
-                response = sqs_processor.process(lambda_event)
-              }.to log a_string_including(
-                "Got 2 failure(s) from 7 event(s):", "boom1", "boom7",
-                "These failures came from 2 message(s): 12, 67."
-              )
-
-              expect(response).to eq({"batchItemFailures" => [
-                {"itemIdentifier" => "12"},
-                {"itemIdentifier" => "67"}
-              ]})
-            end
-
-            it "falls back to raising an `IndexingFailuresError` if the SQS id of an event cannot be determined" do
-              allow(indexer_processor).to receive(:process_returning_failures).and_return([
-                failure_of("id1", message: "boom1", event: {"id" => "id1"}),
-                failure_of("id7", message: "boom7", event: {"id" => "id7", "message_id" => "67"})
-              ])
-
-              lambda_event = {
-                "Records" => [
-                  {"body" => jsonl({"id" => "id1"}, {"id" => "id2"})},
-                  {"messageId" => "34", "body" => jsonl({"id" => "id3"}, {"id" => "id4"})},
-                  {"messageId" => "5", "body" => jsonl({"id" => "id5"})},
-                  {"messageId" => "67", "body" => jsonl({"id" => "id6"}, {"id" => "id7"})}
-                ]
-              }
-
-              expect {
-                sqs_processor.process(lambda_event)
-              }.to log(a_string_including(
-                "Got 2 failure(s) from 7 event(s)", "boom1", "boom7",
-                "These failures came from 1 message(s): 67."
-              )).and raise_error(
-                Errors::MessageIdsMissingError,
-                a_string_including("Unexpected: some failures did not have a `message_id`")
-              )
-            end
-          end
-
-          def failure_of(id, message: "boom", event: {})
-            instance_double(Indexer::FailedEventError, id: id, message: message, event: event)
+            expect {
+              sqs_processor.process(lambda_event)
+            }.to log(a_string_including(
+              "Got 2 failure(s) from 7 event(s)", "boom1", "boom7",
+              "These failures came from 1 message(s): 67."
+            )).and raise_error(
+              Errors::MessageIdsMissingError,
+              a_string_including("Unexpected: some failures did not have a `message_id`")
+            )
           end
         end
 
-        def build_sqs_processor(report_batch_item_failures:)
-          super(report_batch_item_failures: report_batch_item_failures, s3_client: s3_client)
+        def failure_of(id, message: "boom", event: {})
+          instance_double(Indexer::FailedEventError, id: id, message: message, event: event)
+        end
+
+        def build_sqs_processor
+          super(s3_client: s3_client)
         end
       end
 
@@ -358,7 +331,7 @@ module ElasticGraph
         include_context "lambda function"
 
         it "lazily creates the S3 client when needed" do
-          expect(build_sqs_processor(report_batch_item_failures: false).send(:s3_client)).to be_a Aws::S3::Client
+          expect(build_sqs_processor.send(:s3_client)).to be_a Aws::S3::Client
         end
       end
 
@@ -366,8 +339,8 @@ module ElasticGraph
         items.map { |i| ::JSON.generate(i) }.join("\n")
       end
 
-      def build_sqs_processor(report_batch_item_failures:, **options)
-        SqsProcessor.new(indexer_processor, report_batch_item_failures: report_batch_item_failures, logger: logger, **options)
+      def build_sqs_processor(**options)
+        SqsProcessor.new(indexer_processor, logger: logger, **options)
       end
     end
   end

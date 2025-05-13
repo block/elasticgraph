@@ -19,11 +19,7 @@ module ElasticGraph
         require "elastic_graph/indexer_lambda/sqs_processor"
 
         indexer = ElasticGraph::IndexerLambda.indexer_from_env
-        @sqs_processor = ElasticGraph::IndexerLambda::SqsProcessor.new(
-          indexer.processor,
-          logger: indexer.logger,
-          report_batch_item_failures: ENV["REPORT_BATCH_ITEM_FAILURES"] == "true"
-        )
+        @sqs_processor = ElasticGraph::IndexerLambda::SqsProcessor.new(indexer.processor, logger: indexer.logger)
       end
 
       def handle_request(event:, context:)

@@ -16,9 +16,8 @@ module ElasticGraph
     #
     # @private
     class SqsProcessor
-      def initialize(indexer_processor, report_batch_item_failures:, logger:, s3_client: nil)
+      def initialize(indexer_processor, logger:, s3_client: nil)
         @indexer_processor = indexer_processor
-        @report_batch_item_failures = report_batch_item_failures
         @logger = logger
         @s3_client = s3_client
       end
@@ -30,7 +29,6 @@ module ElasticGraph
 
         if failures.any?
           failures_error = Indexer::IndexingFailuresError.for(failures: failures, events: events)
-          raise failures_error unless @report_batch_item_failures
           @logger.error(failures_error.message)
         end
 

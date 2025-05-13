@@ -3,7 +3,6 @@ module ElasticGraph
     class SqsProcessor
       def initialize: (
         Indexer::Processor,
-        report_batch_item_failures: bool,
         logger: ::Logger,
         ?s3_client: Aws::S3::Client?
       ) -> void
@@ -13,7 +12,6 @@ module ElasticGraph
       private
 
       @indexer_processor: Indexer::Processor
-      @report_batch_item_failures: bool
       @logger: ::Logger
       @s3_client: Aws::S3::Client?
 
