@@ -126,6 +126,10 @@ module ElasticGraph
           raise Errors::NotFoundError, msg
         end
 
+        def fields_by_name_in_index
+          @fields_by_name_in_index ||= @fields_by_name.values.group_by(&:name_in_index)
+        end
+
         def enum_value_named(enum_value_name)
           @enum_values_by_name[enum_value_name]
         end

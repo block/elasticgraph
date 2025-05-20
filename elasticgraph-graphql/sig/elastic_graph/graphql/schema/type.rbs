@@ -10,6 +10,7 @@ module ElasticGraph
         def search_index_definitions: () -> ::Array[DatastoreCore::_IndexDefinition]
         def unwrap_fully: () -> Type
         def field_named: (::String) -> Field
+        def fields_by_name_in_index: () -> ::Hash[::String, ::Array[Field]]
         def object?: () -> bool
         def collection?: () -> bool
         def relay_connection?: () -> bool

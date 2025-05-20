@@ -621,6 +621,8 @@ module ElasticGraph
           order_by: [:amount_cents_ASC])
 
         expect(widgets).to eq([])
+
+        test_search_highlighting(widget1, widget2, widget3)
       end
 
       it "supports fetching interface fields" do
@@ -1126,6 +1128,61 @@ module ElasticGraph
         end
       end
 
+      def test_search_highlighting(widget1, widget2, widget3)
+        # Demonstrate we get empty lists of highlights when there are no filters.
+        highlights_by_id = query_widget_highlights
+        expect(highlights_by_id).to eq({
+          widget1.fetch(:id) => [],
+          widget2.fetch(:id) => [],
+          widget3.fetch(:id) => []
+        })
+
+        # Demonstrate that we get search highlights based on the filters.
+        highlights_by_id = query_widget_highlights(filter: {
+          "any_of" => [
+            {"tags" => {"any_satisfy" => {"equal_to_any_of" => ["ghi", "jkl"]}}},
+            {"name" => {"contains" => {"any_substring_of" => ["ing"]}}}
+          ]
+        })
+        expect(highlights_by_id).to eq({
+          widget1.fetch(:id) => [
+            {"path" => ["name"], "snippets" => ["<em>thing123</em>"]}
+          ],
+          widget2.fetch(:id) => [
+            {"path" => ["name"], "snippets" => ["<em>thing234</em>"]},
+            {"path" => ["tags"], "snippets" => ["<em>ghi</em>", "<em>jkl</em>"]}
+          ]
+        })
+
+        # Demonstrate that nested search highlight paths work, including with alternate `name_in_index`
+        highlights_by_id = query_widget_highlights(filter: {
+          "the_options" => {"the_size" => {"equal_to_any_of" => [enum_value(:SMALL), enum_value(:MEDIUM)]}}
+        })
+        expect(highlights_by_id).to eq({
+          widget1.fetch(:id) => [{
+            "path" => [case_correctly("the_options"), case_correctly("the_size")],
+            "snippets" => ["<em>#{enum_value(:SMALL)}</em>"]
+          }],
+          widget2.fetch(:id) => [{
+            "path" => [case_correctly("the_options"), case_correctly("the_size")],
+            "snippets" => ["<em>#{enum_value(:SMALL)}</em>"]
+          }],
+          widget3.fetch(:id) => [{
+            "path" => [case_correctly("the_options"), case_correctly("the_size")],
+            "snippets" => ["<em>#{enum_value(:MEDIUM)}</em>"]
+          }]
+        })
+
+        # Demonstrate we can get *just* the highlights and no other fields off of the `edges`.
+        # (Initially this did not work.)
+        highlights = query_just_widget_highlights(filter: {
+          "tags" => {"any_satisfy" => {"equal_to_any_of" => ["ghi", "jkl"]}}
+        })
+        expect(highlights).to eq([
+          [{"path" => ["tags"], "snippets" => ["<em>ghi</em>", "<em>jkl</em>"]}]
+        ])
+      end
+
       def list_widgets_with(fieldname, **query_args)
         query_widgets_with(fieldname, **query_args).dig("data", "widgets", "edges").map { |we| we.fetch("node") }
       end
@@ -1184,6 +1241,40 @@ module ElasticGraph
                 node {
                   id
                   #{fieldname}
+                }
+              }
+            }
+          }
+        QUERY
+      end
+
+      def query_widget_highlights(**query_args)
+        call_graphql_query(<<~QUERY).dig("data", "widgets", "edges").to_h { |e| [e.dig("node", "id"), e.dig(case_correctly("all_highlights"))] }
+          query {
+            widgets#{graphql_args(query_args)} {
+              edges {
+                node {
+                  id
+                }
+
+                all_highlights {
+                  path
+                  snippets
+                }
+              }
+            }
+          }
+        QUERY
+      end
+
+      def query_just_widget_highlights(**query_args)
+        call_graphql_query(<<~QUERY).dig("data", "widgets", "edges").map { |e| e.dig(case_correctly("all_highlights")) }
+          query {
+            widgets#{graphql_args(query_args)} {
+              edges {
+                all_highlights {
+                  path
+                  snippets
                 }
               }
             }

@@ -9,6 +9,26 @@ module ElasticGraph
             schema: Schema
           ) -> GraphQL::Resolvers::RelayConnection::GenericAdapter[DatastoreResponse::Document]
         end
+
+        class DocumentEdge < GenericAdapter::Edge[DatastoreResponse::Document]
+          @all_highlights: ::Array[SearchHighlight]?
+          def all_highlights: () -> ::Array[SearchHighlight]
+
+          private
+
+          def path_from: (::String, Schema::Type) -> ::Array[::String]?
+        end
+
+        class SearchHighlight < ResolvableValueClass
+          attr_reader path: ::Array[::String]
+          attr_reader snippets: ::Array[::String]
+
+          def initialize: (
+            Schema,
+            ::Array[::String],
+            ::Array[::String]
+          ) -> void
+        end
       end
     end
   end

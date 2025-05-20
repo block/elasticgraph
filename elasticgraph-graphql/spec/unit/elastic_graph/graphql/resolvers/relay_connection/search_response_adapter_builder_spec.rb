@@ -13,7 +13,7 @@ module ElasticGraph
   class GraphQL
     module Resolvers
       module RelayConnection
-        RSpec.describe SearchResponseAdapterBuilder do
+        RSpec.describe SearchResponseAdapterBuilder, :capture_logs do
           include SortSupport
 
           let(:decoded_cursor_factory) { decoded_cursor_factory_for("amount_cents") }
@@ -22,9 +22,20 @@ module ElasticGraph
 
           before(:context) do
             self.schema_artifacts = generate_schema_artifacts do |schema|
+              schema.object_type "WidgetOptions" do |t|
+                t.field "size", "String"
+                t.field "alt_size", "String", name_in_index: "alt_size_in_index"
+              end
+
               schema.object_type "Widget" do |t|
                 t.field "id", "ID!"
                 t.field "amount_cents", "Int!"
+                t.field "name", "String"
+                t.field "tag", "String"
+                t.field "options", "WidgetOptions"
+                t.field "alt_options", "WidgetOptions", name_in_index: "alt_options_in_index"
+                t.field "opts1", "WidgetOptions", name_in_index: "opts"
+                t.field "opts2", "WidgetOptions", name_in_index: "opts", graphql_only: true
                 t.index "widgets" do |i|
                   i.default_sort "amount_cents", :asc
                 end
@@ -186,6 +197,187 @@ module ElasticGraph
             )
           end
 
+          it "also exposes `all_highlights` off of the edges to support search highlighting" do
+            hit1 = hit_for(1, "w1", highlights: {"name" => ["snippet1", "snippet2"]})
+            hit2 = hit_for(2, "w2", highlights: {"name" => ["snippet3", "snippet4"], "tag" => ["snippet5"]})
+
+            results = execute_query(query: <<~QUERY, hits: [hit1, hit2])
+              query {
+                widgets(filter: {
+                  any_of: [
+                    {name: {contains: {any_substring_of: ["snippet"]}}}
+                    {tag: {contains: {any_substring_of: ["snippet"]}}}
+                  ]
+                }) {
+                  edges {
+                    all_highlights {
+                      path
+                      snippets
+                    }
+                  }
+                }
+              }
+            QUERY
+
+            expect(results).to match(
+              "data" => {
+                "widgets" => {
+                  "edges" => [
+                    {
+                      "all_highlights" => [
+                        {"path" => ["name"], "snippets" => ["snippet1", "snippet2"]}
+                      ]
+                    },
+                    {
+                      "all_highlights" => [
+                        {"path" => ["name"], "snippets" => ["snippet3", "snippet4"]},
+                        {"path" => ["tag"], "snippets" => ["snippet5"]}
+                      ]
+                    }
+                  ]
+                }
+              }
+            )
+          end
+
+          it "splits returned highlights fields into path segments" do
+            hit1 = hit_for(1, "w1", highlights: {"options.size" => ["snippet1", "snippet2"]})
+
+            results = execute_query(query: <<~QUERY, hits: [hit1])
+              query {
+                widgets(filter: {options: {size: {equal_to_any_of: ["LARGE"]}}}) {
+                  edges {
+                    all_highlights {
+                      path
+                      snippets
+                    }
+                  }
+                }
+              }
+            QUERY
+
+            expect(results).to match(
+              "data" => {
+                "widgets" => {
+                  "edges" => [
+                    {
+                      "all_highlights" => [
+                        {"path" => ["options", "size"], "snippets" => ["snippet1", "snippet2"]}
+                      ]
+                    }
+                  ]
+                }
+              }
+            )
+          end
+
+          it "translates highlight paths from the `name_in_index` names to the GraphQL field names" do
+            hit1 = hit_for(1, "w1", highlights: {"alt_options_in_index.alt_size_in_index" => ["snippet1", "snippet2"]})
+
+            results = execute_query(query: <<~QUERY, hits: [hit1])
+              query {
+                widgets(filter: {alt_options: {alt_size: {equal_to_any_of: ["LARGE"]}}}) {
+                  edges {
+                    all_highlights {
+                      path
+                      snippets
+                    }
+                  }
+                }
+              }
+            QUERY
+
+            expect(results).to match(
+              "data" => {
+                "widgets" => {
+                  "edges" => [
+                    {
+                      "all_highlights" => [
+                        {"path" => ["alt_options", "alt_size"], "snippets" => ["snippet1", "snippet2"]}
+                      ]
+                    }
+                  ]
+                }
+              }
+            )
+          end
+
+          it "tolerates a `name_in_index` mapping to multiple GraphQL fields" do
+            hit1 = hit_for(1, "w1", highlights: {"opts.size" => ["snippet1", "snippet2"]})
+
+            results = execute_query(query: <<~QUERY, hits: [hit1])
+              query {
+                widgets(filter: {opts1: {size: {equal_to_any_of: ["LARGE"]}}}) {
+                  edges {
+                    all_highlights {
+                      path
+                      snippets
+                    }
+                  }
+                }
+              }
+            QUERY
+
+            expect(results).to eq({
+              "data" => {
+                "widgets" => {
+                  "edges" => [
+                    {
+                      "all_highlights" => [
+                        {"path" => ["opts1", "size"], "snippets" => ["snippet1", "snippet2"]}
+                      ]
+                    }
+                  ]
+                }
+              }
+            }).or eq({
+              "data" => {
+                "widgets" => {
+                  "edges" => [
+                    {
+                      "all_highlights" => [
+                        {"path" => ["opts2", "size"], "snippets" => ["snippet1", "snippet2"]}
+                      ]
+                    }
+                  ]
+                }
+              }
+            })
+          end
+
+          it "ignores highlights that cannot be mapped to GraphQL fields" do
+            hit1 = hit_for(1, "w1", highlights: {"foo.bar" => ["snippet1", "snippet2"]})
+
+            results = nil
+
+            expect {
+              results = execute_query(query: <<~QUERY, hits: [hit1])
+                query {
+                  widgets(filter: {opts1: {size: {equal_to_any_of: ["LARGE"]}}}) {
+                    edges {
+                      all_highlights {
+                        path
+                        snippets
+                      }
+                    }
+                  }
+                }
+              QUERY
+            }.to log_warning(a_string_including(
+              "Skipping SearchHighlight for Widget w1 which contains a path (foo.bar) that does not map to any GraphQL field path."
+            ))
+
+            expect(results).to match(
+              "data" => {
+                "widgets" => {
+                  "edges" => [
+                    {"all_highlights" => []}
+                  ]
+                }
+              }
+            )
+          end
+
           def build_response_hash(hits)
             {
               "took" => 50,
@@ -222,7 +414,7 @@ module ElasticGraph
             }
           end
 
-          def hit_for(amount_cents, id)
+          def hit_for(amount_cents, id, highlights: {})
             {
               "_index" => "widgets",
               "_type" => "_doc",
@@ -233,7 +425,8 @@ module ElasticGraph
                 "version" => 10,
                 "amount_cents" => amount_cents
               },
-              "sort" => [amount_cents, id]
+              "sort" => [amount_cents, id],
+              "highlight" => highlights
             }
           end
         end

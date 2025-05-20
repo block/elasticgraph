@@ -21,9 +21,11 @@ module ElasticGraph
           # Lambda that is used to convert a node to a sort value during truncation.
           :to_sort_value,
           # Gets an optional count of total edges.
-          :get_total_edge_count
+          :get_total_edge_count,
+          # The class used for edges
+          :edge_class
         )
-          # @dynamic initialize, with, schema, raw_nodes, paginator, to_sort_value, get_total_edge_count
+          # @dynamic initialize, with, schema, raw_nodes, paginator, to_sort_value, get_total_edge_count, edge_class
 
           def page_info
             @page_info ||= PageInfo.new(
@@ -39,7 +41,7 @@ module ElasticGraph
           end
 
           def edges
-            @edges ||= nodes.map { |node| Edge.new(schema, node) }
+            @edges ||= nodes.map { |node| edge_class.new(schema, node) }
           end
 
           def nodes

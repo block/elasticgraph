@@ -8,6 +8,12 @@ module ElasticGraph
           def !=: (untyped) -> bool
         end
 
+        interface _EdgeType[N < _NodeWithCursor]
+          def new: (Schema, N) -> GenericAdapter::Edge[N]
+        end
+
+        type edgeType[N < _NodeWithCursor] = ::Class & _EdgeType[N]
+
         class GenericAdapter[N < _NodeWithCursor] < ResolvableValueClass
           include _RelayConnection[N]
 
@@ -16,13 +22,15 @@ module ElasticGraph
           attr_reader paginator: DatastoreQuery::Paginator[N]
           attr_reader to_sort_value: ^(N, DecodedCursor) -> ::Array[DatastoreQuery::Paginator::SortValue]
           attr_reader get_total_edge_count: ^() -> ::Integer?
+          attr_reader edge_class: edgeType[N]
 
           def initialize: (
             schema: Schema,
             raw_nodes: ::Array[N],
             paginator: DatastoreQuery::Paginator[N],
             to_sort_value: ^(N, DecodedCursor) -> ::Array[DatastoreQuery::Paginator::SortValue],
-            get_total_edge_count: ^() -> ::Integer?
+            get_total_edge_count: ^() -> ::Integer?,
+            edge_class: edgeType[N]
           ) -> void
 
           def with: (
@@ -30,7 +38,8 @@ module ElasticGraph
             ?raw_nodes: ::Array[N],
             ?paginator: DatastoreQuery::Paginator[N],
             ?to_sort_value: ^(N, DecodedCursor) -> ::Array[DatastoreQuery::Paginator::SortValue],
-            ?get_total_edge_count: ^() -> ::Integer?
+            ?get_total_edge_count: ^() -> ::Integer?,
+            ?edge_class: edgeType[N]
           ) -> GenericAdapter[N]
 
           private

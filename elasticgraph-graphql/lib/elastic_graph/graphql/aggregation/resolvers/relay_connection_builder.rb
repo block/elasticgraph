@@ -27,6 +27,7 @@ module ElasticGraph
               raw_nodes: raw_nodes_for(query, parent_queries, schema, field_path, &build_buckets),
               paginator: query.paginator,
               get_total_edge_count: -> {},
+              edge_class: (_ = GraphQL::Resolvers::RelayConnection::GenericAdapter::Edge),
               to_sort_value: ->(node, decoded_cursor) do
                 query.groupings.map do |grouping|
                   DatastoreQuery::Paginator::SortValue.new(

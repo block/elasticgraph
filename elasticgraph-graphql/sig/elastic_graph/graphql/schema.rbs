@@ -4,6 +4,7 @@ module ElasticGraph
     class Schema
       attr_reader graphql_schema: ::GraphQL::Schema
       attr_reader element_names: SchemaArtifacts::RuntimeMetadata::SchemaElementNames
+      attr_reader logger: Logger
 
       def initialize: (
         graphql_schema_string: ::String,
@@ -28,6 +29,7 @@ module ElasticGraph
       def graphql_query_context: () -> ::GraphQL::Query::Context
       def type_from: (::GraphQL::Schema::_Type) -> Type
       def type_named: (::String) -> Type
+      def document_type_stored_in: (::String) -> Type
       def field_named: (::String, ::String) -> Field
       def indexed_document_types: () -> ::Array[Type]
       def log_hidden_types: (Logger) -> void
