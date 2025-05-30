@@ -37,6 +37,14 @@ module ElasticGraph
         end
 
         class DocumentEdge < GenericAdapter::Edge
+          def highlights
+            @highlights ||= node.highlights.each_with_object({}) do |(path_string, snippets), highlights| # $::Hash[::String, untyped]
+              *object_fields, leaf_field = path_string.split(".")
+              leaf_hash = object_fields.reduce(highlights) { |accum, field| accum[field] ||= {} }
+              leaf_hash[leaf_field.to_s] = snippets
+            end
+          end
+
           def all_highlights
             @all_highlights ||= begin
               document_type = schema.document_type_stored_in(node.index_definition_name)

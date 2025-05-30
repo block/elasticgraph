@@ -24,6 +24,7 @@ module ElasticGraph
             self.schema_artifacts = generate_schema_artifacts do |schema|
               schema.object_type "WidgetOptions" do |t|
                 t.field "size", "String"
+                t.field "color", "String"
                 t.field "alt_size", "String", name_in_index: "alt_size_in_index"
               end
 
@@ -199,7 +200,7 @@ module ElasticGraph
           end
 
           describe "all_highlights" do
-            it "also exposes `all_highlights` off of the edges to support search highlighting" do
+            it "exposes `all_highlights` off of the edges to support search highlighting" do
               hit1 = hit_for(1, "w1", highlights: {"name" => ["snippet1", "snippet2"]})
               hit2 = hit_for(2, "w2", highlights: {"name" => ["snippet3", "snippet4"], "tag" => ["snippet5"]})
 
@@ -415,6 +416,213 @@ module ElasticGraph
                   "widgets" => {
                     "edges" => [
                       {"all_highlights" => []}
+                    ]
+                  }
+                }
+              )
+            end
+          end
+
+          describe "highlights" do
+            it "returns the requested highlights" do
+              hit1 = hit_for(1, "w1", highlights: {"name" => ["snippet1", "snippet2"]})
+              hit2 = hit_for(2, "w2", highlights: {"name" => ["snippet3", "snippet4"], "tag" => ["snippet5"]})
+
+              results = execute_query(query: <<~QUERY, hits: [hit1, hit2])
+                query {
+                  widgets(filter: {
+                    any_of: [
+                      {name: {contains: {any_substring_of: ["snippet"]}}}
+                      {tag: {contains: {any_substring_of: ["snippet"]}}}
+                    ]
+                  }) {
+                    edges {
+                      highlights {
+                        name
+                        tag
+                      }
+                    }
+                  }
+                }
+              QUERY
+
+              expect(results).to match(
+                "data" => {
+                  "widgets" => {
+                    "edges" => [
+                      {
+                        "highlights" => {
+                          "name" => ["snippet1", "snippet2"],
+                          "tag" => []
+                        }
+                      },
+                      {
+                        "highlights" => {
+                          "name" => ["snippet3", "snippet4"],
+                          "tag" => ["snippet5"]
+                        }
+                      }
+                    ]
+                  }
+                }
+              )
+            end
+
+            it "supports nested fields" do
+              hit1 = hit_for(1, "w1", highlights: {"options.size" => ["snippet1", "snippet2"]})
+
+              results = execute_query(query: <<~QUERY, hits: [hit1])
+                query {
+                  widgets(filter: {options: {size: {equal_to_any_of: ["LARGE"]}}}) {
+                    edges {
+                      highlights {
+                        options {
+                          size
+                          color
+                        }
+                      }
+                    }
+                  }
+                }
+              QUERY
+
+              expect(results).to match(
+                "data" => {
+                  "widgets" => {
+                    "edges" => [
+                      {
+                        "highlights" => {
+                          "options" => {
+                            "size" => ["snippet1", "snippet2"],
+                            "color" => []
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              )
+            end
+
+            it "supports fields that have an alternate `name_in_index`" do
+              hit1 = hit_for(1, "w1", highlights: {"opts.alt_size_in_index" => ["snippet1", "snippet2"]})
+
+              results = execute_query(query: <<~QUERY, hits: [hit1])
+                query {
+                  widgets(filter: {alt_options: {alt_size: {equal_to_any_of: ["LARGE"]}}}) {
+                    edges {
+                      highlights {
+                        opts1 { alt_size }
+                        opts2 { alt_size }
+                      }
+                    }
+                  }
+                }
+              QUERY
+
+              expect(results).to match(
+                "data" => {
+                  "widgets" => {
+                    "edges" => [
+                      {
+                        "highlights" => {
+                          "opts1" => {"alt_size" => ["snippet1", "snippet2"]},
+                          "opts2" => {"alt_size" => ["snippet1", "snippet2"]}
+                        }
+                      }
+                    ]
+                  }
+                }
+              )
+            end
+
+            it "supports matching highlights from multiple nested subfields" do
+              hit1 = hit_for(1, "w1", highlights: {"options.size" => ["snippet1", "snippet2"], "options.color" => ["snippet3"]})
+
+              results = execute_query(query: <<~QUERY, hits: [hit1])
+                query {
+                  widgets(filter: {options: {
+                    size: {equal_to_any_of: ["LARGE"]}
+                    color: {equal_to_any_of: ["RED"]}
+                  }}) {
+                    edges {
+                      highlights {
+                        options {
+                          size
+                          color
+                        }
+                      }
+                    }
+                  }
+                }
+              QUERY
+
+              expect(results).to match(
+                "data" => {
+                  "widgets" => {
+                    "edges" => [
+                      {
+                        "highlights" => {
+                          "options" => {
+                            "size" => ["snippet1", "snippet2"],
+                            "color" => ["snippet3"]
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              )
+            end
+
+            it "supports `highlights` alongside `all_highlights` in the same request" do
+              hit1 = hit_for(1, "w1", highlights: {"options.size" => ["snippet1", "snippet2"], "options.color" => ["snippet3"]})
+
+              results = execute_query(query: <<~QUERY, hits: [hit1])
+                query {
+                  widgets(filter: {options: {
+                    size: {equal_to_any_of: ["LARGE"]}
+                    color: {equal_to_any_of: ["RED"]}
+                  }}) {
+                    edges {
+                      highlights {
+                        options {
+                          size
+                          color
+                        }
+                      }
+
+                      all_highlights {
+                        path
+                        snippets
+                      }
+                    }
+                  }
+                }
+              QUERY
+
+              expect(results).to match(
+                "data" => {
+                  "widgets" => {
+                    "edges" => [
+                      {
+                        "highlights" => {
+                          "options" => {
+                            "size" => ["snippet1", "snippet2"],
+                            "color" => ["snippet3"]
+                          }
+                        },
+                        "all_highlights" => [
+                          {
+                            "path" => ["options", "color"],
+                            "snippets" => ["snippet3"]
+                          },
+                          {
+                            "path" => ["options", "size"],
+                            "snippets" => ["snippet1", "snippet2"]
+                          }
+                        ]
+                      }
                     ]
                   }
                 }
