@@ -252,6 +252,7 @@ module ElasticGraph
               t.field "options", "[WidgetOptions!]!" do |f|
                 f.mapping type: "nested"
               end
+              t.field "options_alt", "[WidgetOptions!]!", name_in_index: "options", graphql_only: true
               t.index "widgets"
             end
           end
@@ -366,6 +367,7 @@ module ElasticGraph
               t.field "description", "String" do |f|
                 f.mapping type: "text"
               end
+              t.field "description_alt", "String", name_in_index: "description", graphql_only: true
 
               t.index "widgets"
             end

@@ -40,6 +40,7 @@ module ElasticGraph
               t.field "some_text", "String" do |f|
                 f.mapping type: "text"
               end
+              t.field "some_text_alt", "String", name_in_index: "some_text", graphql_only: true
               t.relates_to_one "parent", "Widget", via: "parent_id", dir: :out
               t.relates_to_many "children", "Widget", via: "children_ids", dir: :in, singular: "child"
               t.index "widgets"

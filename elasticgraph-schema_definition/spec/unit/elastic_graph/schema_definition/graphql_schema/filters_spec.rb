@@ -611,6 +611,8 @@ module ElasticGraph
               t.field "description", "String" do |f|
                 f.mapping type: "text"
               end
+
+              t.field "description_alt", "String", name_in_index: "description", graphql_only: true
             end
           end
 
@@ -621,6 +623,7 @@ module ElasticGraph
               #{schema_elements.not}: WidgetFilterInput
               name: StringFilterInput
               description: TextFilterInput
+              description_alt: TextFilterInput
             }
           EOS
         end
@@ -802,6 +805,8 @@ module ElasticGraph
               t.field "tags", "[String!]!" do |f|
                 f.mapping type: "text"
               end
+
+              t.field "tags_alt", "[String!]!", name_in_index: "tags", graphql_only: true
             end
           end
 
@@ -811,6 +816,7 @@ module ElasticGraph
               #{schema_elements.all_of}: [WidgetFilterInput!]
               #{schema_elements.not}: WidgetFilterInput
               tags: TextListFilterInput
+              tags_alt: TextListFilterInput
             }
           EOS
         end

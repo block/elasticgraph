@@ -301,7 +301,7 @@ module ElasticGraph
 
           schema_def_state.paginated_collection_element_types << element_type
 
-          backing_indexing_field = field(name, "[#{element_type}!]!", indexing_only: true, name_in_index: name_in_index, &block)
+          field(name, "[#{element_type}!]!", indexing_only: true, name_in_index: name_in_index, &block)
 
           field(
             name,
@@ -311,8 +311,7 @@ module ElasticGraph
             groupable: !!singular,
             sortable: false,
             graphql_only: true,
-            singular: singular,
-            backing_indexing_field: backing_indexing_field
+            singular: singular
           ) do |f|
             f.define_relay_pagination_arguments!
             block&.call(f)
