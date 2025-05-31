@@ -19,6 +19,7 @@ module ElasticGraph
             schema.object_type "WidgetOptions" do |t|
               t.field "size", "String"
               t.field "color", "String"
+              t.field "color_alt", "String", name_in_index: "color", graphql_only: true
             end
 
             schema.object_type "Person" do |t|
@@ -55,8 +56,10 @@ module ElasticGraph
               t.field "name", "String"
               t.field "created_at", "DateTime"
               t.field "last_name", "String"
+              t.field "last_name_alt", "String", name_in_index: "last_name", graphql_only: true
               t.field "amount_cents", "Int"
               t.field "options", "WidgetOptions"
+              t.field "options_alt", "WidgetOptions", name_in_index: "options", graphql_only: true
               t.field "inventor", "Inventor"
               t.field "named_inventor", "NamedInventor"
               t.relates_to_many "components", "Component", via: "component_ids", dir: :out, singular: "component"
@@ -115,6 +118,7 @@ module ElasticGraph
           expect(query.requested_fields).to contain_exactly("id", "name")
           expect(query.individual_docs_needed).to be true
           expect(query.total_document_count_needed).to be false
+          expect(query.requested_highlights).to be_empty
           expect(query.request_all_highlights).to be false
         end
 
@@ -133,6 +137,7 @@ module ElasticGraph
           expect(query.requested_fields).to contain_exactly("id", "name")
           expect(query.individual_docs_needed).to be true
           expect(query.total_document_count_needed).to be false
+          expect(query.requested_highlights).to be_empty
           expect(query.request_all_highlights).to be false
         end
 
@@ -160,6 +165,7 @@ module ElasticGraph
           expect(query.requested_fields).to be_empty
           expect(query.individual_docs_needed).to be false
           expect(query.total_document_count_needed).to be false
+          expect(query.requested_highlights).to be_empty
           expect(query.request_all_highlights).to be false
         end
 
@@ -183,6 +189,7 @@ module ElasticGraph
           expect(query.requested_fields).to contain_exactly("id", "name", "options.size")
           expect(query.individual_docs_needed).to be true
           expect(query.total_document_count_needed).to be false
+          expect(query.requested_highlights).to be_empty
           expect(query.request_all_highlights).to be false
         end
 
@@ -214,6 +221,7 @@ module ElasticGraph
           expect(query.requested_fields).to contain_exactly("id", "inventor.__typename", "named_inventor.__typename")
           expect(query.individual_docs_needed).to be true
           expect(query.total_document_count_needed).to be false
+          expect(query.requested_highlights).to be_empty
           expect(query.request_all_highlights).to be false
         end
 
@@ -245,6 +253,7 @@ module ElasticGraph
           expect(query.requested_fields).to contain_exactly("inventor.__typename", "inventor.name", "inventor.nationality", "inventor.stock_ticker")
           expect(query.individual_docs_needed).to be true
           expect(query.total_document_count_needed).to be false
+          expect(query.requested_highlights).to be_empty
           expect(query.request_all_highlights).to be false
         end
 
@@ -275,6 +284,7 @@ module ElasticGraph
           expect(query.requested_fields).to contain_exactly("named_inventor.__typename", "named_inventor.name", "named_inventor.nationality", "named_inventor.stock_ticker")
           expect(query.individual_docs_needed).to be true
           expect(query.total_document_count_needed).to be false
+          expect(query.requested_highlights).to be_empty
           expect(query.request_all_highlights).to be false
         end
 
@@ -302,6 +312,7 @@ module ElasticGraph
           expect(query.requested_fields).to contain_exactly("inventor.__typename", "inventor.nationality", "inventor.stock_ticker")
           expect(query.individual_docs_needed).to be true
           expect(query.total_document_count_needed).to be false
+          expect(query.requested_highlights).to be_empty
           expect(query.request_all_highlights).to be false
         end
 
@@ -329,6 +340,7 @@ module ElasticGraph
           expect(query.requested_fields).to contain_exactly("named_inventor.__typename", "named_inventor.nationality", "named_inventor.stock_ticker")
           expect(query.individual_docs_needed).to be true
           expect(query.total_document_count_needed).to be false
+          expect(query.requested_highlights).to be_empty
           expect(query.request_all_highlights).to be false
         end
 
@@ -374,6 +386,105 @@ module ElasticGraph
           expect(query.total_document_count_needed).to be false
         end
 
+        describe "requested_highlights" do
+          it "sets them based on the requested `edges.highlights` sub-fields" do
+            query = datastore_query_for(:Query, :widgets, <<~QUERY)
+              query {
+                widgets {
+                  edges {
+                    highlights {
+                      name
+                      last_name
+                      options {
+                        size
+                        color
+                      }
+                    }
+                  }
+                }
+              }
+            QUERY
+
+            expect(query.requested_highlights).to contain_exactly("name", "last_name", "options.size", "options.color")
+            expect(query.request_all_highlights).to be false
+            expect(query.individual_docs_needed).to be true
+          end
+
+          it "uses the `name_in_index` of a field when it differs from the GraphQL field name" do
+            query = datastore_query_for(:Query, :widgets, <<~QUERY)
+              query {
+                widgets {
+                  edges {
+                    highlights {
+                      last_name_alt
+                      options_alt {
+                        color_alt
+                      }
+                    }
+                  }
+                }
+              }
+            QUERY
+
+            expect(query.requested_highlights).to contain_exactly("last_name", "options.color")
+            expect(query.request_all_highlights).to be false
+            expect(query.individual_docs_needed).to be true
+          end
+
+          it "ignores GraphQL aliases when determining the highlighted field names" do
+            query = datastore_query_for(:Query, :ws, <<~QUERY)
+              query {
+                ws: widgets {
+                  es: edges {
+                    hs: highlights {
+                      n: name
+                      ln: last_name
+                      o: options {
+                        s: size
+                        c: color
+                      }
+                    }
+                  }
+                }
+              }
+            QUERY
+
+            expect(query.requested_highlights).to contain_exactly("name", "last_name", "options.size", "options.color")
+            expect(query.request_all_highlights).to be false
+            expect(query.individual_docs_needed).to be true
+          end
+
+          it "leaves it empty when the only leaf fields requested under `edges.highlights` is `__typename`" do
+            query = datastore_query_for(:Query, :widgets, <<~QUERY)
+              query {
+                widgets {
+                  edges {
+                    highlights {
+                      __typename
+
+                      options {
+                        __typename
+                      }
+
+                      inventor {
+                        __typename
+                      }
+
+                      named_inventor {
+                        __typename
+                      }
+                    }
+                  }
+                }
+              }
+            QUERY
+
+            expect(query.requested_highlights).to be_empty
+            expect(query.request_all_highlights).to be false
+            expect(query.individual_docs_needed).to be false
+          end
+        end
+
         describe "request_all_highlights" do
           it "sets `request_all_highlights = true` when `all_highlights.path` is requested" do
             query = datastore_query_for(:Query, :widgets, <<~QUERY)
@@ -390,6 +501,7 @@ module ElasticGraph
 
             expect(query.request_all_highlights).to be true
             expect(query.individual_docs_needed).to be true
+            expect(query.requested_highlights).to be_empty
           end
 
           it "sets `request_all_highlights = true` when `all_highlights.snippets` is requested" do
@@ -407,6 +519,7 @@ module ElasticGraph
 
             expect(query.request_all_highlights).to be true
             expect(query.individual_docs_needed).to be true
+            expect(query.requested_highlights).to be_empty
           end
 
           it "sets `request_all_highlights = true` when `all_highlights.snippets` and `all_highlights.path` are requested" do
@@ -425,6 +538,7 @@ module ElasticGraph
 
             expect(query.request_all_highlights).to be true
             expect(query.individual_docs_needed).to be true
+            expect(query.requested_highlights).to be_empty
           end
 
           it "sets `request_all_highlights = false` when the only requested `all_highlights` field is `__typename`" do
@@ -442,6 +556,7 @@ module ElasticGraph
 
             expect(query.request_all_highlights).to be false
             expect(query.individual_docs_needed).to be false
+            expect(query.requested_highlights).to be_empty
           end
 
           it "sets `request_all_highlights = false` when `all_highlights` is not requested" do
@@ -457,6 +572,7 @@ module ElasticGraph
 
             expect(query.request_all_highlights).to be false
             expect(query.individual_docs_needed).to be true # needed because of the cursor
+            expect(query.requested_highlights).to be_empty
           end
         end
 
@@ -623,6 +739,7 @@ module ElasticGraph
             expect(query.requested_fields).to contain_exactly("name", "id", "parent_id")
             expect(query.individual_docs_needed).to be true
             expect(query.total_document_count_needed).to be false
+            expect(query.requested_highlights).to be_empty
             expect(query.request_all_highlights).to be false
           end
         end
@@ -648,6 +765,7 @@ module ElasticGraph
             expect(query.requested_fields).to contain_exactly("last_name", "id")
             expect(query.individual_docs_needed).to be true
             expect(query.total_document_count_needed).to be false
+            expect(query.requested_highlights).to be_empty
             expect(query.request_all_highlights).to be false
           end
 
@@ -675,6 +793,7 @@ module ElasticGraph
             expect(query.requested_fields).to contain_exactly("name", "id", "parent_id")
             expect(query.individual_docs_needed).to be true
             expect(query.total_document_count_needed).to be false
+            expect(query.requested_highlights).to be_empty
             expect(query.request_all_highlights).to be false
           end
         end
@@ -708,6 +827,7 @@ module ElasticGraph
             expect(query.requested_fields).to contain_exactly("last_name", "id")
             expect(query.individual_docs_needed).to be true
             expect(query.total_document_count_needed).to be false
+            expect(query.requested_highlights).to be_empty
             expect(query.request_all_highlights).to be false
           end
         end
@@ -750,6 +870,7 @@ module ElasticGraph
             expect(query.requested_fields).to contain_exactly("last_name", "part_ids")
             expect(query.individual_docs_needed).to be true
             expect(query.total_document_count_needed).to be false
+            expect(query.requested_highlights).to be_empty
             expect(query.request_all_highlights).to be false
           end
         end
@@ -792,6 +913,7 @@ module ElasticGraph
             expect(query.requested_fields).to contain_exactly("name", "voltage", "__typename")
             expect(query.individual_docs_needed).to be true
             expect(query.total_document_count_needed).to be false
+            expect(query.requested_highlights).to be_empty
             expect(query.request_all_highlights).to be false
           end
         end

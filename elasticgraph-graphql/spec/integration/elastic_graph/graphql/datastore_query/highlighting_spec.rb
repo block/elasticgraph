@@ -13,7 +13,7 @@ module ElasticGraph
     RSpec.describe DatastoreQuery, "highlighting" do
       include_context "DatastoreQueryIntegrationSupport"
 
-      it "returns `client_filters` highlights on the returned search hits when `request_all_highlights` is `true`" do
+      it "returns `client_filters` highlights on the returned search hits when highlights are requested" do
         index_into(
           graphql,
           build(:widget, id: "w1", name: "Widget 1", tags: ["blue"]),
@@ -24,6 +24,41 @@ module ElasticGraph
 
         results = search_datastore(
           request_all_highlights: true,
+          client_filters: [{
+            "any_of" => [
+              {"name" => {"starts_with" => {"any_prefix_of" => ["Widget"]}}},
+              {"tags" => {"any_satisfy" => {"contains" => {"any_substring_of" => ["red"]}}}}
+            ]
+          }]
+        )
+
+        expect(results.documents.to_h { |d| [d.id, d.highlights] }).to eq({
+          "w1" => {"name" => ["<em>Widget 1</em>"]},
+          "w2" => {"name" => ["<em>Widget 2</em>"]},
+          "w3" => {"tags" => ["<em>red tag</em>", "<em>orange-red</em>"]},
+          "w4" => {"name" => ["<em>Widget 4</em>"], "tags" => ["<em>red tag</em>", "<em>orange-red</em>"]}
+        })
+
+        results = search_datastore(
+          requested_highlights: ["name"],
+          client_filters: [{
+            "any_of" => [
+              {"name" => {"starts_with" => {"any_prefix_of" => ["Widget"]}}},
+              {"tags" => {"any_satisfy" => {"contains" => {"any_substring_of" => ["red"]}}}}
+            ]
+          }]
+        )
+
+        expect(results.documents.to_h { |d| [d.id, d.highlights] }).to eq({
+          "w1" => {"name" => ["<em>Widget 1</em>"]},
+          "w2" => {"name" => ["<em>Widget 2</em>"]},
+          "w3" => {},
+          "w4" => {"name" => ["<em>Widget 4</em>"]}
+        })
+
+        results = search_datastore(
+          request_all_highlights: true,
+          requested_highlights: ["name"],
           client_filters: [{
             "any_of" => [
               {"name" => {"starts_with" => {"any_prefix_of" => ["Widget"]}}},

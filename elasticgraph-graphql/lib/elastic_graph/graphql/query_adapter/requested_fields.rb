@@ -43,10 +43,15 @@ module ElasticGraph
         def query_attributes_for(field:, lookahead:)
           attributes =
             if field.type.relay_connection?
+              highlights = lookahead
+                .selection(@schema.element_names.edges)
+                .selection(@schema.element_names.highlights)
+
               {
                 individual_docs_needed: pagination_fields_need_individual_docs?(lookahead),
                 requested_fields: requested_fields_under(relay_connection_node_from(lookahead)),
-                request_all_highlights: requesting_all_highlights?(lookahead)
+                request_all_highlights: requesting_all_highlights?(lookahead),
+                requested_highlights: requested_fields_under(highlights)
               }
             else
               {

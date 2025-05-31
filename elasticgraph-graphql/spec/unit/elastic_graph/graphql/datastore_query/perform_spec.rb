@@ -76,12 +76,20 @@ module ElasticGraph
         with_fields = new_minimal_query(client_filters: filters, requested_fields: ["name"])
         with_total_hits = new_minimal_query(client_filters: filters, total_document_count_needed: true)
         with_aggs = new_minimal_query(client_filters: filters, aggregations: [agg = aggregation_query_of(computations: [computation_of("amountMoney", "amount", :sum)])])
-        with_highlights = new_minimal_query(client_filters: filters, request_all_highlights: true)
+        with_all_highlights = new_minimal_query(client_filters: filters, request_all_highlights: true)
+        with_requested_highlights = new_minimal_query(client_filters: filters, requested_highlights: ["name"])
 
         yielded_header_body_tuples_by_query = nil
         query_response = raw_response_with_docs(raw_doc)
 
-        responses = DatastoreQuery.perform([empty_query, with_fields, with_total_hits, with_aggs, with_highlights]) do |header_body_tuples_by_query|
+        responses = DatastoreQuery.perform([
+          empty_query,
+          with_fields,
+          with_total_hits,
+          with_aggs,
+          with_all_highlights,
+          with_requested_highlights
+        ]) do |header_body_tuples_by_query|
           yielded_header_body_tuples_by_query = header_body_tuples_by_query
           header_body_tuples_by_query.transform_values { query_response }
         end
@@ -90,7 +98,7 @@ module ElasticGraph
         expect(yielded_header_body_tuples_by_query.keys).to contain_exactly(
           with_fields, with_total_hits,
           with_aggs.with(aggregations: {agg.name => agg}),
-          with_highlights
+          with_all_highlights, with_requested_highlights
         )
 
         # ...but we should still get a response for it.
@@ -99,7 +107,8 @@ module ElasticGraph
           with_fields => 1,
           with_total_hits => 1,
           with_aggs => 1,
-          with_highlights => 1
+          with_all_highlights => 1,
+          with_requested_highlights => 1
         )
       end
 

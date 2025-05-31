@@ -29,7 +29,8 @@ module ElasticGraph
     class DatastoreQuery < Support::MemoizableData.define(
       :total_document_count_needed, :aggregations, :logger, :filter_interpreter, :routing_picker,
       :index_expression_builder, :default_page_size, :search_index_definitions, :max_page_size,
-      :client_filters, :internal_filters, :sort, :document_pagination, :requested_fields, :request_all_fields, :request_all_highlights,
+      :client_filters, :internal_filters, :sort, :document_pagination,
+      :requested_fields, :request_all_fields, :requested_highlights, :request_all_highlights,
       :individual_docs_needed, :size_multiplier, :monotonic_clock_deadline, :schema_element_names
     )
       # Load these files after the `Query` class has been defined, to avoid
@@ -101,20 +102,28 @@ module ElasticGraph
         sort: [],
         requested_fields: [],
         request_all_fields: false,
+        requested_highlights: [],
         request_all_highlights: false,
         document_pagination: {},
         size_multiplier: 1,
         monotonic_clock_deadline: nil,
         aggregations: {}
       )
+        individual_docs_needed ||= self.individual_docs_needed ||
+          !requested_fields.empty? || request_all_fields ||
+          !requested_highlights.empty? || request_all_highlights
+
+        total_document_count_needed ||= self.total_document_count_needed || aggregations.values.any?(&:needs_total_doc_count?)
+
         with(
-          individual_docs_needed: self.individual_docs_needed || individual_docs_needed || !requested_fields.empty? || request_all_fields || request_all_highlights,
-          total_document_count_needed: self.total_document_count_needed || total_document_count_needed || aggregations.values.any?(&:needs_total_doc_count?),
+          individual_docs_needed: individual_docs_needed,
+          total_document_count_needed: total_document_count_needed,
           client_filters: self.client_filters + client_filters,
           internal_filters: self.internal_filters + internal_filters,
           sort: merge_attribute(:sort, sort),
           requested_fields: self.requested_fields + requested_fields,
           request_all_fields: self.request_all_fields || request_all_fields,
+          requested_highlights: self.requested_highlights + requested_highlights,
           request_all_highlights: self.request_all_highlights || request_all_highlights,
           document_pagination: merge_attribute(:document_pagination, document_pagination),
           size_multiplier: self.size_multiplier * size_multiplier,
@@ -322,12 +331,16 @@ module ElasticGraph
       end
 
       def highlight
-        return nil unless request_all_highlights && !client_filters.empty?
+        return nil if !request_all_highlights && requested_highlights.empty?
 
-        {
-          fields: {"*" => {}},
-          highlight_query: (filter_interpreter.build_query(client_filters) unless internal_filters.empty?)
-        }.compact
+        # If there are no filters, there's nothing to highlight.
+        return nil if client_filters.empty?
+
+        field_paths = request_all_highlights ? ["*"] : requested_highlights
+        fields = field_paths.to_h { |field| [field, {}] }
+        highlight_query = filter_interpreter.build_query(client_filters) unless internal_filters.empty?
+
+        {fields:, highlight_query:}.compact
       end
 
       # Encapsulates dependencies of `Query`, giving us something we can expose off of `application`
@@ -357,6 +370,7 @@ module ElasticGraph
           aggregations: {},
           requested_fields: [],
           request_all_fields: false,
+          requested_highlights: [],
           request_all_highlights: false,
           individual_docs_needed: false,
           total_document_count_needed: false,
@@ -365,6 +379,11 @@ module ElasticGraph
           if search_index_definitions.empty?
             raise Errors::SearchFailedError, "Query is invalid, since it contains no `search_index_definitions`."
           end
+
+          individual_docs_needed ||= !requested_fields.empty? || request_all_fields ||
+            !requested_highlights.empty? || request_all_highlights
+
+          total_document_count_needed ||= aggregations.values.any?(&:needs_total_doc_count?)
 
           DatastoreQuery.new(
             routing_picker: routing_picker,
@@ -379,10 +398,11 @@ module ElasticGraph
             size_multiplier: size_multiplier,
             aggregations: aggregations,
             requested_fields: requested_fields.to_set,
+            requested_highlights: requested_highlights.to_set,
             request_all_fields: request_all_fields,
             request_all_highlights: request_all_highlights,
-            individual_docs_needed: individual_docs_needed || !requested_fields.empty? || request_all_fields || request_all_highlights,
-            total_document_count_needed: total_document_count_needed || aggregations.values.any?(&:needs_total_doc_count?),
+            individual_docs_needed: individual_docs_needed,
+            total_document_count_needed: total_document_count_needed,
             monotonic_clock_deadline: monotonic_clock_deadline,
             filter_interpreter: filter_interpreter,
             default_page_size: default_page_size,

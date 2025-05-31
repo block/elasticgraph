@@ -12,7 +12,7 @@ require "support/aggregations_helpers"
 
 module ElasticGraph
   class GraphQL
-    RSpec.describe DatastoreQuery, "#merge" do
+    RSpec.describe DatastoreQuery, "#merge", :capture_logs do
       include SortSupport, AggregationsHelpers
       include_context "DatastoreQueryUnitSupport"
 
@@ -134,13 +134,11 @@ module ElasticGraph
       end
 
       it "uses one of the `sort` values when `sort` values are the same and does not log a warning", covers: :sort do
-        expect {
-          merged = merge(
-            {sort: [{created_at: {"order" => "asc"}}], individual_docs_needed: true},
-            {sort: [{created_at: {"order" => "asc"}}], individual_docs_needed: true}
-          )
-          expect(datastore_body_of(merged)).to include_sort_with_tiebreaker(created_at: {"order" => "asc"})
-        }.to avoid_logging_warnings
+        merged = merge(
+          {sort: [{created_at: {"order" => "asc"}}], individual_docs_needed: true},
+          {sort: [{created_at: {"order" => "asc"}}], individual_docs_needed: true}
+        )
+        expect(datastore_body_of(merged)).to include_sort_with_tiebreaker(created_at: {"order" => "asc"})
       end
 
       it "maintains a `document_pagination` value of `{}` when merging two queries that have `{}` for `document_pagination`", covers: :document_pagination do
@@ -171,13 +169,11 @@ module ElasticGraph
       end
 
       it "uses one of the `document_pagination` values when `document_pagination` values are the same and does not log a warning", covers: :document_pagination do
-        expect {
-          merged = merge(
-            {document_pagination: {first: 10}},
-            {document_pagination: {first: 10}}
-          )
-          expect(merged.document_pagination).to eq({first: 10})
-        }.to avoid_logging_warnings
+        merged = merge(
+          {document_pagination: {first: 10}},
+          {document_pagination: {first: 10}}
+        )
+        expect(merged.document_pagination).to eq({first: 10})
       end
 
       it "multiplies the `size_multiplier` when merging", covers: :size_multiplier do
@@ -252,6 +248,14 @@ module ElasticGraph
         expect(merged.request_all_fields).to be false
       end
 
+      it "correctly merges requested highlights from multiple queries by concatenating and de-duplicating them", covers: :requested_highlights do
+        merged = merge(
+          {requested_highlights: ["a", "b"]},
+          {requested_highlights: ["b", "c"]}
+        )
+        expect(merged.requested_highlights).to contain_exactly("a", "b", "c")
+      end
+
       it "sets `request_all_highlights` to `true` if it is set on either query", covers: :request_all_highlights do
         merged = merge(
           {request_all_highlights: true},
@@ -304,6 +308,14 @@ module ElasticGraph
         merged = merge(
           {individual_docs_needed: false},
           {request_all_fields: true}
+        )
+        expect(merged.individual_docs_needed).to be true
+      end
+
+      it "sets `individual_docs_needed` to `true` if specific highlights are requested", covers: :individual_docs_needed do
+        merged = merge(
+          {individual_docs_needed: false},
+          {requested_highlights: ["name"]}
         )
         expect(merged.individual_docs_needed).to be true
       end
