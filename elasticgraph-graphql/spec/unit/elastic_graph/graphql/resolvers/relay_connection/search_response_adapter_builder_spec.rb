@@ -34,6 +34,7 @@ module ElasticGraph
                 t.field "tag", "String"
                 t.field "options", "WidgetOptions"
                 t.field "alt_options", "WidgetOptions", name_in_index: "alt_options_in_index"
+                t.field "options3", "WidgetOptions", name_in_index: "alt_options"
                 t.field "opts1", "WidgetOptions", name_in_index: "opts"
                 t.field "opts2", "WidgetOptions", name_in_index: "opts", graphql_only: true
                 t.index "widgets" do |i|
@@ -197,160 +198,156 @@ module ElasticGraph
             )
           end
 
-          it "also exposes `all_highlights` off of the edges to support search highlighting" do
-            hit1 = hit_for(1, "w1", highlights: {"name" => ["snippet1", "snippet2"]})
-            hit2 = hit_for(2, "w2", highlights: {"name" => ["snippet3", "snippet4"], "tag" => ["snippet5"]})
+          describe "all_highlights" do
+            it "also exposes `all_highlights` off of the edges to support search highlighting" do
+              hit1 = hit_for(1, "w1", highlights: {"name" => ["snippet1", "snippet2"]})
+              hit2 = hit_for(2, "w2", highlights: {"name" => ["snippet3", "snippet4"], "tag" => ["snippet5"]})
 
-            results = execute_query(query: <<~QUERY, hits: [hit1, hit2])
-              query {
-                widgets(filter: {
-                  any_of: [
-                    {name: {contains: {any_substring_of: ["snippet"]}}}
-                    {tag: {contains: {any_substring_of: ["snippet"]}}}
-                  ]
-                }) {
-                  edges {
-                    all_highlights {
-                      path
-                      snippets
+              results = execute_query(query: <<~QUERY, hits: [hit1, hit2])
+                query {
+                  widgets(filter: {
+                    any_of: [
+                      {name: {contains: {any_substring_of: ["snippet"]}}}
+                      {tag: {contains: {any_substring_of: ["snippet"]}}}
+                    ]
+                  }) {
+                    edges {
+                      all_highlights {
+                        path
+                        snippets
+                      }
                     }
                   }
                 }
-              }
-            QUERY
+              QUERY
 
-            expect(results).to match(
-              "data" => {
-                "widgets" => {
-                  "edges" => [
-                    {
-                      "all_highlights" => [
-                        {"path" => ["name"], "snippets" => ["snippet1", "snippet2"]}
-                      ]
-                    },
-                    {
-                      "all_highlights" => [
-                        {"path" => ["name"], "snippets" => ["snippet3", "snippet4"]},
-                        {"path" => ["tag"], "snippets" => ["snippet5"]}
-                      ]
-                    }
-                  ]
+              expect(results).to match(
+                "data" => {
+                  "widgets" => {
+                    "edges" => [
+                      {
+                        "all_highlights" => [
+                          {"path" => ["name"], "snippets" => ["snippet1", "snippet2"]}
+                        ]
+                      },
+                      {
+                        "all_highlights" => [
+                          {"path" => ["name"], "snippets" => ["snippet3", "snippet4"]},
+                          {"path" => ["tag"], "snippets" => ["snippet5"]}
+                        ]
+                      }
+                    ]
+                  }
                 }
-              }
-            )
-          end
+              )
+            end
 
-          it "splits returned highlights fields into path segments" do
-            hit1 = hit_for(1, "w1", highlights: {"options.size" => ["snippet1", "snippet2"]})
+            it "splits returned highlights fields into path segments" do
+              hit1 = hit_for(1, "w1", highlights: {"options.size" => ["snippet1", "snippet2"]})
 
-            results = execute_query(query: <<~QUERY, hits: [hit1])
-              query {
-                widgets(filter: {options: {size: {equal_to_any_of: ["LARGE"]}}}) {
-                  edges {
-                    all_highlights {
-                      path
-                      snippets
+              results = execute_query(query: <<~QUERY, hits: [hit1])
+                query {
+                  widgets(filter: {options: {size: {equal_to_any_of: ["LARGE"]}}}) {
+                    edges {
+                      all_highlights {
+                        path
+                        snippets
+                      }
                     }
                   }
                 }
-              }
-            QUERY
+              QUERY
 
-            expect(results).to match(
-              "data" => {
-                "widgets" => {
-                  "edges" => [
-                    {
-                      "all_highlights" => [
-                        {"path" => ["options", "size"], "snippets" => ["snippet1", "snippet2"]}
-                      ]
-                    }
-                  ]
+              expect(results).to match(
+                "data" => {
+                  "widgets" => {
+                    "edges" => [
+                      {
+                        "all_highlights" => [
+                          {"path" => ["options", "size"], "snippets" => ["snippet1", "snippet2"]}
+                        ]
+                      }
+                    ]
+                  }
                 }
-              }
-            )
-          end
+              )
+            end
 
-          it "translates highlight paths from the `name_in_index` names to the GraphQL field names" do
-            hit1 = hit_for(1, "w1", highlights: {"alt_options_in_index.alt_size_in_index" => ["snippet1", "snippet2"]})
+            it "returns highlights in alphabetical order of the GraphQL paths" do
+              hit1 = hit_for(1, "w1", highlights: {
+                "alt_options.size" => ["snippet1", "snippet2"],
+                "name" => ["snippet3"],
+                "tag" => ["snippet4"]
+              })
 
-            results = execute_query(query: <<~QUERY, hits: [hit1])
-              query {
-                widgets(filter: {alt_options: {alt_size: {equal_to_any_of: ["LARGE"]}}}) {
-                  edges {
-                    all_highlights {
-                      path
-                      snippets
+              results = execute_query(query: <<~QUERY, hits: [hit1])
+                query {
+                  widgets(filter: {
+                    name: {equal_to_any_of: ["X83"]}
+                    options3: {size: {equal_to_any_of: ["LARGE"]}}
+                    tag: {equal_to_any_of: ["best"]}
+                  }) {
+                    edges {
+                      all_highlights {
+                        path
+                        snippets
+                      }
                     }
                   }
                 }
-              }
-            QUERY
+              QUERY
 
-            expect(results).to match(
-              "data" => {
-                "widgets" => {
-                  "edges" => [
-                    {
-                      "all_highlights" => [
-                        {"path" => ["alt_options", "alt_size"], "snippets" => ["snippet1", "snippet2"]}
-                      ]
-                    }
-                  ]
+              expect(results).to match(
+                "data" => {
+                  "widgets" => {
+                    "edges" => [
+                      {
+                        "all_highlights" => [
+                          {"path" => ["name"], "snippets" => ["snippet3"]},
+                          {"path" => ["options3", "size"], "snippets" => ["snippet1", "snippet2"]},
+                          {"path" => ["tag"], "snippets" => ["snippet4"]}
+                        ]
+                      }
+                    ]
+                  }
                 }
-              }
-            )
-          end
+              )
+            end
 
-          it "tolerates a `name_in_index` mapping to multiple GraphQL fields" do
-            hit1 = hit_for(1, "w1", highlights: {"opts.size" => ["snippet1", "snippet2"]})
+            it "translates highlight paths from the `name_in_index` names to the GraphQL field names" do
+              hit1 = hit_for(1, "w1", highlights: {"alt_options_in_index.alt_size_in_index" => ["snippet1", "snippet2"]})
 
-            results = execute_query(query: <<~QUERY, hits: [hit1])
-              query {
-                widgets(filter: {opts1: {size: {equal_to_any_of: ["LARGE"]}}}) {
-                  edges {
-                    all_highlights {
-                      path
-                      snippets
+              results = execute_query(query: <<~QUERY, hits: [hit1])
+                query {
+                  widgets(filter: {alt_options: {alt_size: {equal_to_any_of: ["LARGE"]}}}) {
+                    edges {
+                      all_highlights {
+                        path
+                        snippets
+                      }
                     }
                   }
                 }
-              }
-            QUERY
+              QUERY
 
-            expect(results).to eq({
-              "data" => {
-                "widgets" => {
-                  "edges" => [
-                    {
-                      "all_highlights" => [
-                        {"path" => ["opts1", "size"], "snippets" => ["snippet1", "snippet2"]}
-                      ]
-                    }
-                  ]
+              expect(results).to match(
+                "data" => {
+                  "widgets" => {
+                    "edges" => [
+                      {
+                        "all_highlights" => [
+                          {"path" => ["alt_options", "alt_size"], "snippets" => ["snippet1", "snippet2"]}
+                        ]
+                      }
+                    ]
+                  }
                 }
-              }
-            }).or eq({
-              "data" => {
-                "widgets" => {
-                  "edges" => [
-                    {
-                      "all_highlights" => [
-                        {"path" => ["opts2", "size"], "snippets" => ["snippet1", "snippet2"]}
-                      ]
-                    }
-                  ]
-                }
-              }
-            })
-          end
+              )
+            end
 
-          it "ignores highlights that cannot be mapped to GraphQL fields" do
-            hit1 = hit_for(1, "w1", highlights: {"foo.bar" => ["snippet1", "snippet2"]})
+            it "tolerates a `name_in_index` mapping to multiple GraphQL fields" do
+              hit1 = hit_for(1, "w1", highlights: {"opts.size" => ["snippet1", "snippet2"]})
 
-            results = nil
-
-            expect {
               results = execute_query(query: <<~QUERY, hits: [hit1])
                 query {
                   widgets(filter: {opts1: {size: {equal_to_any_of: ["LARGE"]}}}) {
@@ -363,19 +360,66 @@ module ElasticGraph
                   }
                 }
               QUERY
-            }.to log_warning(a_string_including(
-              "Skipping SearchHighlight for Widget w1 which contains a path (foo.bar) that does not map to any GraphQL field path."
-            ))
 
-            expect(results).to match(
-              "data" => {
-                "widgets" => {
-                  "edges" => [
-                    {"all_highlights" => []}
-                  ]
+              expect(results).to eq({
+                "data" => {
+                  "widgets" => {
+                    "edges" => [
+                      {
+                        "all_highlights" => [
+                          {"path" => ["opts1", "size"], "snippets" => ["snippet1", "snippet2"]}
+                        ]
+                      }
+                    ]
+                  }
                 }
-              }
-            )
+              }).or eq({
+                "data" => {
+                  "widgets" => {
+                    "edges" => [
+                      {
+                        "all_highlights" => [
+                          {"path" => ["opts2", "size"], "snippets" => ["snippet1", "snippet2"]}
+                        ]
+                      }
+                    ]
+                  }
+                }
+              })
+            end
+
+            it "ignores highlights that cannot be mapped to GraphQL fields" do
+              hit1 = hit_for(1, "w1", highlights: {"foo.bar" => ["snippet1", "snippet2"]})
+
+              results = nil
+
+              expect {
+                results = execute_query(query: <<~QUERY, hits: [hit1])
+                  query {
+                    widgets(filter: {opts1: {size: {equal_to_any_of: ["LARGE"]}}}) {
+                      edges {
+                        all_highlights {
+                          path
+                          snippets
+                        }
+                      }
+                    }
+                  }
+                QUERY
+              }.to log_warning(a_string_including(
+                "Skipping SearchHighlight for Widget w1 which contains a path (foo.bar) that does not map to any GraphQL field path."
+              ))
+
+              expect(results).to match(
+                "data" => {
+                  "widgets" => {
+                    "edges" => [
+                      {"all_highlights" => []}
+                    ]
+                  }
+                }
+              )
+            end
           end
 
           def build_response_hash(hits)

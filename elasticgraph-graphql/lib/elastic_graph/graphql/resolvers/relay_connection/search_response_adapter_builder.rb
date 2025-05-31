@@ -45,7 +45,7 @@ module ElasticGraph
                 if (path = path_from(path_string, document_type))
                   SearchHighlight.new(schema, path, snippets)
                 end
-              end
+              end.sort_by(&:path)
             end
           end
 
