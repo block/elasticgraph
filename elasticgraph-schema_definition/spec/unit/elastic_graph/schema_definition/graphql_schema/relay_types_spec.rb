@@ -42,9 +42,13 @@ module ElasticGraph
               """
               #{schema_elements.cursor}: Cursor
               """
-              Search highlights for this `Widget`, indicating where in the indexed document the query matched.
+              All search highlights for this `Widget`, indicating where in the indexed document the query matched.
               """
               #{schema_elements.all_highlights}: [SearchHighlight!]!
+              """
+              Specific search highlights for this `Widget`, providing matching snippets for the requested fields.
+              """
+              #{schema_elements.highlights}: WidgetHighlights
             }
           EOS
         end
@@ -77,6 +81,7 @@ module ElasticGraph
               #{schema_elements.node}: Inventor
               #{schema_elements.cursor}: Cursor
               #{schema_elements.all_highlights}: [SearchHighlight!]!
+              #{schema_elements.highlights}: InventorHighlights
             }
           EOS
         end
@@ -376,7 +381,7 @@ module ElasticGraph
           EOS
         end
 
-        it "only defines `all_highlights` on `*Edge` types derived from indexed object types" do
+        it "only defines `highlights` and `all_highlights` on `*Edge` types derived from indexed object types" do
           result = define_schema do |api|
             api.object_type "WidgetIndexed" do |t|
               t.field "id", "ID!"
@@ -398,6 +403,7 @@ module ElasticGraph
               #{schema_elements.node}: WidgetIndexed
               #{schema_elements.cursor}: Cursor
               #{schema_elements.all_highlights}: [SearchHighlight!]!
+              #{schema_elements.highlights}: WidgetIndexedHighlights
             }
           EOS
 
@@ -405,6 +411,37 @@ module ElasticGraph
             type WidgetUnIndexedEdge {
               #{schema_elements.node}: WidgetUnIndexed
               #{schema_elements.cursor}: Cursor
+            }
+          EOS
+        end
+
+        it "only defines `highlights` on an `*Edge` type if the source type has highlightable fields" do
+          result = define_schema do |api|
+            api.object_type "HighlightableWidget" do |t|
+              t.field "id", "ID!", highlightable: true
+              t.index "widgets"
+            end
+
+            api.object_type "UnhighlightableWidget" do |t|
+              t.field "id", "ID!", highlightable: false
+              t.index "widgets"
+            end
+          end
+
+          expect(edge_type_from(result, "HighlightableWidget")).to eq(<<~EOS.strip)
+            type HighlightableWidgetEdge {
+              #{schema_elements.node}: HighlightableWidget
+              #{schema_elements.cursor}: Cursor
+              #{schema_elements.all_highlights}: [SearchHighlight!]!
+              #{schema_elements.highlights}: HighlightableWidgetHighlights
+            }
+          EOS
+
+          expect(edge_type_from(result, "UnhighlightableWidget")).to eq(<<~EOS.strip)
+            type UnhighlightableWidgetEdge {
+              #{schema_elements.node}: UnhighlightableWidget
+              #{schema_elements.cursor}: Cursor
+              #{schema_elements.all_highlights}: [SearchHighlight!]!
             }
           EOS
         end

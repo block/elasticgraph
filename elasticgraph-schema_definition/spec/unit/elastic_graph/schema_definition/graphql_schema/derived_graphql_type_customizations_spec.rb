@@ -40,7 +40,7 @@ module ElasticGraph
                 dt.directive "deprecated"
               end
 
-              t.customize_derived_types "WidgetAggregation", "WidgetEdge", "WidgetFilterInput", "WidgetListFilterInput", "WidgetFieldsListFilterInput", "WidgetSortOrderInput" do |dt|
+              t.customize_derived_types "WidgetAggregation", "WidgetEdge", "WidgetFilterInput", "WidgetListFilterInput", "WidgetFieldsListFilterInput", "WidgetHighlights", "WidgetSortOrderInput" do |dt|
                 dt.directive "external"
               end
 
@@ -70,6 +70,7 @@ module ElasticGraph
           expect(grouped_by_type_from(result, "Widget")).to include("WidgetGroupedBy @deprecated @derived {")
           expect(edge_type_from(result, "Widget")).to include("WidgetEdge @external @derived {")
           expect(filter_type_from(result, "Widget")).to include("WidgetFilterInput @external @derived {")
+          expect(highlights_type_from(result, "Widget")).to include("WidgetHighlights @external @derived {")
           expect(list_filter_type_from(result, "Widget")).to include("WidgetListFilterInput @external @derived {")
           expect(fields_list_filter_type_from(result, "Widget")).to include("WidgetFieldsListFilterInput @external @derived {")
           expect(sort_order_type_from(result, "Widget")).to include("WidgetSortOrderInput @external @derived {")
@@ -93,6 +94,7 @@ module ElasticGraph
             WidgetConnection
             WidgetEdge
             WidgetFilterInput
+            WidgetHighlights
             WidgetListFilterInput
             WidgetFieldsListFilterInput
             WidgetSortOrderInput
@@ -146,6 +148,7 @@ module ElasticGraph
           expect(aggregated_values_type_from(result, "Widget")).to include("WidgetAggregatedValues @deprecated")
           expect(grouped_by_type_from(result, "Widget")).to include("WidgetGroupedBy @deprecated")
           expect(filter_type_from(result, "Widget")).to include("WidgetFilterInput @deprecated")
+          expect(highlights_type_from(result, "Widget")).to include("WidgetHighlights @deprecated")
           expect(list_filter_type_from(result, "Widget")).to include("WidgetListFilterInput @deprecated")
           expect(fields_list_filter_type_from(result, "Widget")).to include("WidgetFieldsListFilterInput @deprecated")
           expect(edge_type_from(result, "Widget")).to include("WidgetEdge @deprecated")
@@ -243,6 +246,7 @@ module ElasticGraph
 
           expect(type_def_from(result, "Widget")).not_to include("@internal")
           expect(filter_type_from(result, "Widget")).not_to include("@internal")
+          expect(highlights_type_from(result, "Widget")).not_to include("@internal")
           expect(list_filter_type_from(result, "Widget")).not_to include("@internal")
           expect(fields_list_filter_type_from(result, "Widget")).not_to include("@internal")
           expect(edge_type_from(result, "Widget")).not_to include("@internal")

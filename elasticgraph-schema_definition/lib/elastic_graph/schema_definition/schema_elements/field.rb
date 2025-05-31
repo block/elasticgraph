@@ -52,6 +52,8 @@ module ElasticGraph
       #   @private
       # @!attribute [rw] grouped_by_customizations
       #   @private
+      # @!attribute [rw] highlights_customizations
+      #   @private
       # @!attribute [rw] sub_aggregations_customizations
       #   @private
       # @!attribute [rw] aggregated_values_customizations
@@ -67,6 +69,8 @@ module ElasticGraph
       # @!attribute [rw] aggregatable
       #   @private
       # @!attribute [rw] groupable
+      #   @private
+      # @!attribute [rw] highlightable
       #   @private
       # @!attribute [rw] source
       #   @private
@@ -84,9 +88,10 @@ module ElasticGraph
       #   @private
       class Field < Struct.new(
         :name, :original_type, :parent_type, :original_type_for_derived_types, :schema_def_state, :accuracy_confidence,
-        :filter_customizations, :grouped_by_customizations, :sub_aggregations_customizations,
-        :aggregated_values_customizations, :sort_order_enum_value_customizations,
-        :args, :sortable, :filterable, :aggregatable, :groupable, :graphql_only, :source, :runtime_field_script, :relationship, :singular_name,
+        :filter_customizations, :grouped_by_customizations, :highlights_customizations, :sub_aggregations_customizations,
+        :aggregated_values_customizations, :sort_order_enum_value_customizations, :args,
+        :sortable, :filterable, :aggregatable, :groupable, :highlightable,
+        :graphql_only, :source, :runtime_field_script, :relationship, :singular_name,
         :computation_detail, :non_nullable_in_json_schema, :as_input,
         :name_in_index, :resolver
       )
@@ -100,7 +105,7 @@ module ElasticGraph
           name:, type:, parent_type:, schema_def_state:,
           accuracy_confidence: :high, name_in_index: name,
           type_for_derived_types: nil, graphql_only: nil, singular: nil,
-          sortable: nil, filterable: nil, aggregatable: nil, groupable: nil,
+          sortable: nil, filterable: nil, aggregatable: nil, groupable: nil, highlightable: nil,
           as_input: false, resolver: nil
         )
           type_ref = schema_def_state.type_ref(type)
@@ -113,6 +118,7 @@ module ElasticGraph
             accuracy_confidence: accuracy_confidence,
             filter_customizations: [],
             grouped_by_customizations: [],
+            highlights_customizations: [],
             sub_aggregations_customizations: [],
             aggregated_values_customizations: [],
             sort_order_enum_value_customizations: [],
@@ -121,6 +127,7 @@ module ElasticGraph
             filterable: filterable,
             aggregatable: aggregatable,
             groupable: groupable,
+            highlightable: highlightable,
             graphql_only: graphql_only,
             source: nil,
             runtime_field_script: nil,
@@ -173,6 +180,7 @@ module ElasticGraph
         # @return [void]
         # @see #customize_aggregated_values_field
         # @see #customize_grouped_by_field
+        # @see #customize_highlights_field
         # @see #customize_sort_order_enum_values
         # @see #customize_sub_aggregations_field
         # @see #on_each_generated_schema_element
@@ -205,6 +213,7 @@ module ElasticGraph
         # @return [void]
         # @see #customize_filter_field
         # @see #customize_grouped_by_field
+        # @see #customize_highlights_field
         # @see #customize_sort_order_enum_values
         # @see #customize_sub_aggregations_field
         # @see #on_each_generated_schema_element
@@ -237,6 +246,7 @@ module ElasticGraph
         # @return [void]
         # @see #customize_aggregated_values_field
         # @see #customize_filter_field
+        # @see #customize_highlights_field
         # @see #customize_sort_order_enum_values
         # @see #customize_sub_aggregations_field
         # @see #on_each_generated_schema_element
@@ -259,6 +269,39 @@ module ElasticGraph
           grouped_by_customizations << customization_block
         end
 
+        # @note For each field defined in your schema that is highlightable, a corresponding highlights field will be created on the
+        #   `*Highlights` type derived from the parent object type.
+        #
+        # Registers a customization callback that will be applied to the corresponding highlights field that will be generated for this
+        # field.
+        #
+        # @yield [Field] derived highlights field
+        # @return [void]
+        # @see #customize_aggregated_values_field
+        # @see #customize_filter_field
+        # @see #customize_grouped_by_field
+        # @see #customize_sort_order_enum_values
+        # @see #customize_sub_aggregations_field
+        # @see #on_each_generated_schema_element
+        #
+        # @example Mark `CampaignHighlights.organizationId` with `@deprecated`
+        #   ElasticGraph.define_schema do |schema|
+        #     schema.object_type "Campaign" do |t|
+        #       t.field "id", "ID"
+        #
+        #       t.field "organizationId", "ID" do |f|
+        #         f.customize_highlights_field do |gbf|
+        #           gbf.directive "deprecated"
+        #         end
+        #       end
+        #
+        #       t.index "campaigns"
+        #     end
+        #   end
+        def customize_highlights_field(&customization_block)
+          highlights_customizations << customization_block
+        end
+
         # @note For each field defined in your schema that is sub-aggregatable (e.g. list fields indexed using the `nested` mapping type),
         # a corresponding field will be created on the `*AggregationSubAggregations` type derived from the parent object type.
         #
@@ -270,6 +313,7 @@ module ElasticGraph
         # @see #customize_aggregated_values_field
         # @see #customize_filter_field
         # @see #customize_grouped_by_field
+        # @see #customize_highlights_field
         # @see #customize_sort_order_enum_values
         # @see #on_each_generated_schema_element
         #
@@ -311,6 +355,7 @@ module ElasticGraph
         # @see #customize_aggregated_values_field
         # @see #customize_filter_field
         # @see #customize_grouped_by_field
+        # @see #customize_highlights_field
         # @see #customize_sub_aggregations_field
         # @see #on_each_generated_schema_element
         #
@@ -339,6 +384,8 @@ module ElasticGraph
         #   ask for values for the field in a response.
         # * A {Field} may be generated on the `*FilterInput` {InputType} derived from the parent {ObjectType} or {InterfaceType}. This is
         #   used by clients to specify how the query should filter.
+        # * A {Field} may be generated on the `*Highlights` {ObjectType} derived from the parent {ObjectType} or {InterfaceType}. This is
+        #   used by clients to request search highlights for a field.
         # * A {Field} may be generated on the `*AggregationGroupedBy` {ObjectType} derived from the parent {ObjectType} or {InterfaceType}.
         #   This is used by clients to specify how aggregations should be grouped.
         # * A {Field} may be generated on the `*AggregatedValues` {ObjectType} derived from the parent {ObjectType} or {InterfaceType}.
@@ -355,6 +402,7 @@ module ElasticGraph
         # @see #customize_aggregated_values_field
         # @see #customize_filter_field
         # @see #customize_grouped_by_field
+        # @see #customize_highlights_field
         # @see #customize_sort_order_enum_values
         # @see #customize_sub_aggregations_field
         #
@@ -363,15 +411,16 @@ module ElasticGraph
         #     schema.object_type "Transaction" do |t|
         #       t.field "id", "ID"
         #
-        #       t.field "amount", "Int" do |f|
+        #       t.field "currency", "String" do |f|
         #         f.on_each_generated_schema_element do |element|
-        #           # Adds a `@deprecated` directive to every GraphQL schema element generated for `amount`:
+        #           # Adds a `@deprecated` directive to every GraphQL schema element generated for `currency`:
         #           #
-        #           # - The `Transaction.amount` field.
-        #           # - The `TransactionFilterInput.amount` field.
-        #           # - The `TransactionAggregationGroupedBy.amount` field.
-        #           # - The `TransactionAggregatedValues.amount` field.
-        #           # - The `TransactionSortOrder.amount_ASC` and`TransactionSortOrder.amount_DESC` enum values.
+        #           # - The `Transaction.currency` field.
+        #           # - The `TransactionFilterInput.currency` field.
+        #           # - The `TransactionHighlights.currency` field.
+        #           # - The `TransactionAggregationGroupedBy.currency` field.
+        #           # - The `TransactionAggregatedValues.currency` field.
+        #           # - The `TransactionSortOrder.currency_ASC` and`TransactionSortOrder.currency_DESC` enum values.
         #           element.directive "deprecated"
         #         end
         #       end
@@ -384,6 +433,7 @@ module ElasticGraph
           customize_filter_field(&customization_block)
           customize_aggregated_values_field(&customization_block)
           customize_grouped_by_field(&customization_block)
+          customize_highlights_field(&customization_block)
           customize_sub_aggregations_field(&customization_block)
           customize_sort_order_enum_values(&customization_block)
         end
@@ -601,6 +651,17 @@ module ElasticGraph
           nested? || type_for_derived_types.fully_unwrapped.as_object_type&.supports?(&:sub_aggregatable?)
         end
 
+        # @private
+        HIGHLIGHTABLE_MAPPING_TYPES = %w[keyword text match_only_text]
+
+        def highlightable?
+          return highlightable unless highlightable.nil?
+          return false if relationship
+          return true if HIGHLIGHTABLE_MAPPING_TYPES.include?(mapping_type)
+
+          type_for_derived_types.fully_unwrapped.as_object_type&.supports?(&:highlightable?)
+        end
+
         # Defines an argument on the field.
         #
         # @note ElasticGraph takes care of defining arguments for all the query features it supports, so there is generally no need to use
@@ -667,6 +728,24 @@ module ElasticGraph
             add_grouped_by_field_documentation(f)
 
             grouped_by_customizations.each { |block| block.call(f) }
+          end
+        end
+
+        # @private
+        def define_highlights_field(parent_type)
+          return unless highlightable?
+
+          unwrapped_type = type_for_derived_types.fully_unwrapped
+          type_name =
+            if unwrapped_type.leaf?
+              "[String!]!"
+            else
+              unwrapped_type.as_highlights.name
+            end
+
+          parent_type.field name, type_name, name_in_index: name_in_index, graphql_only: true do |f|
+            f.documentation derived_documentation("Search highlights for the `#{name}`, providing snippets of the matching text")
+            highlights_customizations.each { |block| block.call(f) }
           end
         end
 

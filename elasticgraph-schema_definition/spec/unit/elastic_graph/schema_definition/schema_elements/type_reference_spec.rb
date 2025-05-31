@@ -133,8 +133,8 @@ module ElasticGraph
 
           %w[
             AggregatedValues GroupedBy Aggregation AggregationConnection AggregationEdge
-            Connection Edge FilterInput ListFilterInput FieldsListFilterInput ListElementFilterInput
-            SubAggregation AggregationSubAggregations
+            Connection Edge FilterInput Highlights ListFilterInput FieldsListFilterInput
+            ListElementFilterInput SubAggregation AggregationSubAggregations
           ].each do |suffix|
             it "considers a `*#{suffix}` type to be an object instead of a leaf" do
               expect_to_be_object suffix

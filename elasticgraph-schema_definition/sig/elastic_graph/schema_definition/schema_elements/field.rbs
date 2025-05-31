@@ -40,6 +40,7 @@ module ElasticGraph
           ?filterable: bool?,
           ?aggregatable: bool?,
           ?groupable: bool?,
+          ?highlightable: bool?,
           ?graphql_only: bool?,
           ?singular: ::String?,
           ?as_input: bool
@@ -51,6 +52,7 @@ module ElasticGraph
         def customize_filter_field: () { (Field) -> void } -> void
         def customize_sort_order_enum_values: () { (SortOrderEnumValue) -> void } -> void
         def customize_grouped_by_field: () { (Field) -> void } -> void
+        def customize_highlighs_field: () { (Field) -> void } -> void
         def customize_sub_aggregations_field: () { (Field) -> void } -> void
         def customize_aggregated_values_field: () { (Field) -> void } -> void
         def on_each_generated_schema_element: () { (Field | SortOrderEnumValue) -> void } -> void
@@ -59,11 +61,13 @@ module ElasticGraph
         def define_relay_pagination_arguments!: () -> void
         def filterable?: () -> bool
         def groupable?: () -> bool
+        def highlightable?: () -> bool
         def list_field_groupable_by_single_values?: () -> bool
         def aggregatable?: () -> bool
         def sub_aggregatable?: () -> bool
         def define_aggregated_values_field: (ObjectType) -> void
         def define_grouped_by_field: (ObjectType) -> void
+        def define_highlights_field: (ObjectType) -> void
         def define_sub_aggregations_field: (parent_type: ObjectType, type: ::String) ?{ (Field) -> void } -> void
         def define_old_aggregation_fields: (ObjectType) -> void
         def to_indexing_field_reference: () -> Indexing::FieldReference?

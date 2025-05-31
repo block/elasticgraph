@@ -287,6 +287,7 @@ module ElasticGraph
         # @dynamic as_edge
         # @dynamic as_fields_list_filter_input
         # @dynamic as_filter_input
+        # @dynamic as_highlights
         # @dynamic as_input_enum
         # @dynamic as_list_element_filter_input, list_element_filter_input?
         # @dynamic as_list_filter_input, list_filter_input?

@@ -41,6 +41,7 @@ module ElasticGraph
 
         attr_reader order_by: ::String
 
+        attr_reader highlights: ::String
         attr_reader all_highlights: ::String
         attr_reader path: ::String
         attr_reader snippets: ::String

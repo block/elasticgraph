@@ -144,7 +144,7 @@ module ElasticGraph
         # For sorting.
         :order_by,
         # For search highlighting,
-        :all_highlights, :path, :snippets,
+        :highlights, :all_highlights, :path, :snippets,
         # For aggregation
         :grouped_by, :count, :count_detail, :aggregated_values, :sub_aggregations,
         # Date/time grouping aggregation fields

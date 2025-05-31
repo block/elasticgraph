@@ -147,6 +147,7 @@ module ElasticGraph
           FieldsListFilterInput: "%{base}FieldsListFilterInput",
           FilterInput: "%{base}FilterInput",
           GroupedBy: "%{base}GroupedBy",
+          Highlights: "%{base}Highlights",
           InputEnum: "%{base}Input",
           ListElementFilterInput: "%{base}ListElementFilterInput",
           ListFilterInput: "%{base}ListFilterInput",

@@ -304,8 +304,8 @@ module ElasticGraph
               end
 
               api.object_type "Widget" do |t|
-                t.field "id", "ID", groupable: false, aggregatable: false
-                t.field "cost", "Int" do |f|
+                t.field "id", "ID", groupable: false, aggregatable: false, highlightable: false
+                t.field "cost", "Int", highlightable: true do |f|
                   f.on_each_generated_schema_element do |gse|
                     gse.directive "deprecated"
                   end
@@ -354,6 +354,13 @@ module ElasticGraph
             expect(grouped_by_type_from(result, "Widget")).to eq(<<~EOS.strip)
               type WidgetGroupedBy {
                 cost: Int @deprecated @external
+              }
+            EOS
+
+            expect(highlights_type_from(result, "Widget")).to eq(<<~EOS.strip)
+              type WidgetHighlights {
+                cost: [String!]! @deprecated @external
+                costs: MoneyHighlights @deprecated
               }
             EOS
 

@@ -221,6 +221,7 @@ module ElasticGraph
             :Connection,
             :Edge,
             :FilterInput,
+            :Highlights,
             :ListFilterInput,
             :FieldsListFilterInput,
             :ListElementFilterInput,

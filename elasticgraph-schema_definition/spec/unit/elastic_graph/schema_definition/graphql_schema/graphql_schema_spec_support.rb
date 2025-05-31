@@ -78,6 +78,10 @@ module ElasticGraph
         derived_graphql_type_def_from(sdl, source_type, "FilterInput", include_docs: include_docs)
       end
 
+      def highlights_type_from(sdl, source_type, include_docs: false)
+        derived_graphql_type_def_from(sdl, source_type, "Highlights", include_docs: include_docs)
+      end
+
       def aggregation_type_from(sdl, source_type, include_docs: false)
         derived_graphql_type_def_from(sdl, source_type, "Aggregation", include_docs: include_docs)
       end

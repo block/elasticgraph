@@ -70,7 +70,8 @@ module ElasticGraph
             build_aggregation_sub_aggregations_types + [
               indexed_agg_type,
               to_grouped_by_type,
-              to_aggregated_values_type
+              to_aggregated_values_type,
+              to_highlights_type
             ].compact
         end
 
@@ -259,6 +260,20 @@ module ElasticGraph
 
             graphql_fields_by_name.values.each do |field|
               field.define_aggregated_values_field(t)
+            end
+          end
+        end
+
+        def to_highlights_type
+          # If the type uses a custom mapping type we don't know how it can be highlighted, so we assume it needs no highlights type.
+          return nil if does_not_support?(&:highlightable?)
+
+          new_non_empty_object_type type_ref.as_highlights.name do |t|
+            t.documentation "Type used to request desired `#{name}` search highlight fields."
+            t.default_graphql_resolver = :get_record_field_value
+
+            graphql_fields_by_name.values.each do |field|
+              field.define_highlights_field(t)
             end
           end
         end

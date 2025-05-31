@@ -45,6 +45,7 @@ module ElasticGraph
         def as_edge: () -> TypeReference
         def as_fields_list_filter_input: () -> TypeReference
         def as_filter_input: () -> TypeReference
+        def as_highlights: () -> TypeReference
         def as_input_enum: () -> TypeReference
         def as_list_element_filter_input: () -> TypeReference
         def as_list_filter_input: () -> TypeReference

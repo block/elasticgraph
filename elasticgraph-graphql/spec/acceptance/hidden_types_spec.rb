@@ -89,24 +89,24 @@ module ElasticGraph
             type_and_filters_for("LongString") +
             type_and_filters_for("Material", as_input_enum: true) +
             type_and_filters_for("Size", include_list: true, as_input_enum: true) +
-            type_and_filters_for("TeamNestedFields") +
+            type_and_filters_for("TeamNestedFields") + ["TeamNestedFieldsHighlights"] +
             type_and_filters_for("Affiliations") +
             type_and_filters_for("ID", include_list: true) +
             type_filter_and_non_indexed_aggregation_types_for("TeamDetails") +
-            type_filter_and_non_indexed_aggregation_types_for("AddressTimestamps") - ["AddressTimestamps"] +
+            type_filter_and_non_indexed_aggregation_types_for("AddressTimestamps", include_highlights: false) - ["AddressTimestamps"] +
             type_filter_and_non_indexed_aggregation_types_for("Affiliations", include_fields_list_filter: true) +
             type_filter_and_non_indexed_aggregation_types_for("CurrencyDetails") +
             type_filter_and_non_indexed_aggregation_types_for("Inventor") +
             type_filter_and_non_indexed_aggregation_types_for("NamedInventor") +
             type_filter_and_non_indexed_aggregation_types_for("Money", include_list_filter: true, include_fields_list_filter: true) - ["MoneyListElementFilterInput"] +
-            type_filter_and_non_indexed_aggregation_types_for("Position") +
+            type_filter_and_non_indexed_aggregation_types_for("Position", include_highlights: false) +
             type_filter_and_non_indexed_aggregation_types_for("Player", include_list_filter: true, include_fields_list_filter: true) - ["PlayerListElementFilterInput"] +
             type_filter_and_non_indexed_aggregation_types_for("PlayerSeason", include_list_filter: true, include_fields_list_filter: true) - ["PlayerSeasonListElementFilterInput"] +
-            type_filter_and_non_indexed_aggregation_types_for("TeamRecord", include_fields_list_filter: true) +
+            type_filter_and_non_indexed_aggregation_types_for("TeamRecord", include_fields_list_filter: true, include_highlights: false) +
             type_filter_and_non_indexed_aggregation_types_for("TeamSeason", include_list_filter: true, include_fields_list_filter: true) - ["TeamSeasonListElementFilterInput"] +
             type_filter_and_non_indexed_aggregation_types_for("WidgetOptions") +
             type_filter_and_non_indexed_aggregation_types_for("WidgetOptionSets") - ["WidgetOptionSetsGroupedBy"] +
-            type_filter_and_non_indexed_aggregation_types_for("WidgetCurrencyNestedFields") +
+            type_filter_and_non_indexed_aggregation_types_for("WidgetCurrencyNestedFields", include_highlights: false) +
             type_filter_and_non_indexed_aggregation_types_for("WorkspaceWidget") +
             type_filter_and_non_indexed_aggregation_types_for("Sponsorship", include_list_filter: true, include_fields_list_filter: true) - ["SponsorshipListElementFilterInput"] +
             ::GraphQL::Schema::BUILT_IN_TYPES.keys.flat_map { |k| type_and_filters_for(k) } +
@@ -196,7 +196,8 @@ module ElasticGraph
 
         def all_types_related_to(type_name, include_list_filter: false)
           relay_types_related_to(type_name, include_list_filter: include_list_filter) +
-            aggregation_types_related_to(type_name)
+            aggregation_types_related_to(type_name) +
+            ["#{type_name}Highlights"]
         end
 
         def relay_types_related_to(type_name, include_list_filter: false)
@@ -212,10 +213,11 @@ module ElasticGraph
           suffixes.map { |suffix| type_name + suffix }
         end
 
-        def type_filter_and_non_indexed_aggregation_types_for(type_name, include_list_filter: false, include_fields_list_filter: false)
+        def type_filter_and_non_indexed_aggregation_types_for(type_name, include_list_filter: false, include_fields_list_filter: false, include_highlights: true)
           suffixes = ["", "FilterInput", "GroupedBy", "AggregatedValues"]
           suffixes += ["ListFilterInput", "ListElementFilterInput"] if include_list_filter
           suffixes += ["FieldsListFilterInput"] if include_fields_list_filter
+          suffixes += ["Highlights"] if include_highlights
           suffixes.map { |suffix| type_name + suffix }
         end
 

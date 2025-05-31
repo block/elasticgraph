@@ -91,6 +91,7 @@ module ElasticGraph
           WidgetFieldsListFilterInput
           WidgetFilterInput
           WidgetGroupedBy
+          WidgetHighlights
           WidgetListFilterInput
           WidgetOptions
           WidgetOptionsAggregatedValues

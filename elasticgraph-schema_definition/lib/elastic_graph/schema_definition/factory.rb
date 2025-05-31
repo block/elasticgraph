@@ -433,6 +433,8 @@ module ElasticGraph
 
       def edge_type_for(type_name)
         type_ref = @state.type_ref(type_name)
+        object_type = type_ref.as_object_type # : SchemaElements::ObjectType
+
         new_object_type type_ref.as_edge.name do |t|
           t.relay_pagination_type = true
           t.default_graphql_resolver = :object_without_lookahead
@@ -457,9 +459,15 @@ module ElasticGraph
             EOS
           end
 
-          if type_ref.as_object_type&.indexed?
+          if object_type&.indexed?
             t.field @state.schema_elements.all_highlights, "[SearchHighlight!]!" do |f|
-              f.documentation "Search highlights for this `#{type_name}`, indicating where in the indexed document the query matched."
+              f.documentation "All search highlights for this `#{type_name}`, indicating where in the indexed document the query matched."
+            end
+
+            if object_type.supports?(&:highlightable?)
+              t.field @state.schema_elements.highlights, type_ref.as_highlights.name do |f|
+                f.documentation "Specific search highlights for this `#{type_name}`, providing matching snippets for the requested fields."
+              end
             end
           end
         end

@@ -529,6 +529,22 @@ module ElasticGraph
           EOS
         end
 
+        it "does not automatically copy directives to the derived field" do
+          result = define_schema do |api|
+            api.object_type "Widget" do |t|
+              t.field "name", "String" do |f|
+                f.directive "deprecated", reason: "Use `new_name` instead."
+              end
+            end
+          end
+
+          expect(grouped_by_type_from(result, "Widget")).to eq(<<~EOS.strip)
+            type WidgetGroupedBy {
+              name: String
+            }
+          EOS
+        end
+
         shared_examples_for "a type with subtypes" do |type_def_method|
           it "defines a field for an abstract type if that abstract type has aggregatable fields" do
             results = define_schema do |api|

@@ -145,7 +145,7 @@ Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for mor
 """
 type AddressEdge {
   """
-  Search highlights for this `Address`, indicating where in the indexed document the query matched.
+  All search highlights for this `Address`, indicating where in the indexed document the query matched.
   """
   all_highlights: [SearchHighlight!]!
 
@@ -154,6 +154,11 @@ type AddressEdge {
   a `before` or `after` argument to continue paginating from this `Address`.
   """
   cursor: Cursor
+
+  """
+  Specific search highlights for this `Address`, providing matching snippets for the requested fields.
+  """
+  highlights: AddressHighlights
 
   """
   The `Address` of this edge.
@@ -231,6 +236,16 @@ type AddressGroupedBy {
   The `timestamps` field value for this group.
   """
   timestamps: AddressTimestampsGroupedBy
+}
+
+"""
+Type used to request desired `Address` search highlight fields.
+"""
+type AddressHighlights {
+  """
+  Search highlights for the `full_address`, providing snippets of the matching text.
+  """
+  full_address: [String!]!
 }
 
 """
@@ -465,6 +480,21 @@ type AffiliationsGroupedBy {
   once.
   """
   sponsorships_object: SponsorshipGroupedBy
+}
+
+"""
+Type used to request desired `Affiliations` search highlight fields.
+"""
+type AffiliationsHighlights {
+  """
+  Search highlights for the `sponsorships_nested`, providing snippets of the matching text.
+  """
+  sponsorships_nested: SponsorshipHighlights
+
+  """
+  Search highlights for the `sponsorships_object`, providing snippets of the matching text.
+  """
+  sponsorships_object: SponsorshipHighlights
 }
 
 """
@@ -1153,7 +1183,7 @@ Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for mor
 """
 type ComponentEdge {
   """
-  Search highlights for this `Component`, indicating where in the indexed document the query matched.
+  All search highlights for this `Component`, indicating where in the indexed document the query matched.
   """
   all_highlights: [SearchHighlight!]!
 
@@ -1162,6 +1192,11 @@ type ComponentEdge {
   a `before` or `after` argument to continue paginating from this `Component`.
   """
   cursor: Cursor
+
+  """
+  Specific search highlights for this `Component`, providing matching snippets for the requested fields.
+  """
+  highlights: ComponentHighlights
 
   """
   The `Component` of this edge.
@@ -1313,6 +1348,51 @@ type ComponentGroupedBy {
   The `widget_workspace_id` field value for this group.
   """
   widget_workspace_id: ID
+}
+
+"""
+Type used to request desired `Component` search highlight fields.
+"""
+type ComponentHighlights {
+  """
+  Search highlights for the `id`, providing snippets of the matching text.
+  """
+  id: [String!]!
+
+  """
+  Search highlights for the `name`, providing snippets of the matching text.
+  """
+  name: [String!]!
+
+  """
+  Search highlights for the `tags`, providing snippets of the matching text.
+  """
+  tags: [String!]!
+
+  """
+  Search highlights for the `widget_cost`, providing snippets of the matching text.
+  """
+  widget_cost: MoneyHighlights
+
+  """
+  Search highlights for the `widget_name`, providing snippets of the matching text.
+  """
+  widget_name: [String!]!
+
+  """
+  Search highlights for the `widget_size`, providing snippets of the matching text.
+  """
+  widget_size: [String!]!
+
+  """
+  Search highlights for the `widget_tags`, providing snippets of the matching text.
+  """
+  widget_tags: [String!]!
+
+  """
+  Search highlights for the `widget_workspace_id`, providing snippets of the matching text.
+  """
+  widget_workspace_id: [String!]!
 }
 
 """
@@ -1503,6 +1583,21 @@ type CurrencyDetailsGroupedBy {
   The `unit` field value for this group.
   """
   unit: String
+}
+
+"""
+Type used to request desired `CurrencyDetails` search highlight fields.
+"""
+type CurrencyDetailsHighlights {
+  """
+  Search highlights for the `symbol`, providing snippets of the matching text.
+  """
+  symbol: [String!]!
+
+  """
+  Search highlights for the `unit`, providing snippets of the matching text.
+  """
+  unit: [String!]!
 }
 
 """
@@ -2659,7 +2754,7 @@ Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for mor
 """
 type ElectricalPartEdge {
   """
-  Search highlights for this `ElectricalPart`, indicating where in the indexed document the query matched.
+  All search highlights for this `ElectricalPart`, indicating where in the indexed document the query matched.
   """
   all_highlights: [SearchHighlight!]!
 
@@ -2668,6 +2763,11 @@ type ElectricalPartEdge {
   a `before` or `after` argument to continue paginating from this `ElectricalPart`.
   """
   cursor: Cursor
+
+  """
+  Specific search highlights for this `ElectricalPart`, providing matching snippets for the requested fields.
+  """
+  highlights: ElectricalPartHighlights
 
   """
   The `ElectricalPart` of this edge.
@@ -2757,6 +2857,21 @@ type ElectricalPartGroupedBy {
   The `voltage` field value for this group.
   """
   voltage: Int
+}
+
+"""
+Type used to request desired `ElectricalPart` search highlight fields.
+"""
+type ElectricalPartHighlights {
+  """
+  Search highlights for the `id`, providing snippets of the matching text.
+  """
+  id: [String!]!
+
+  """
+  Search highlights for the `name`, providing snippets of the matching text.
+  """
+  name: [String!]!
 }
 
 """
@@ -3499,6 +3614,26 @@ type InventorGroupedBy {
   The `stock_ticker` field value for this group.
   """
   stock_ticker: String
+}
+
+"""
+Type used to request desired `Inventor` search highlight fields.
+"""
+type InventorHighlights {
+  """
+  Search highlights for the `name`, providing snippets of the matching text.
+  """
+  name: [String!]!
+
+  """
+  Search highlights for the `nationality`, providing snippets of the matching text.
+  """
+  nationality: [String!]!
+
+  """
+  Search highlights for the `stock_ticker`, providing snippets of the matching text.
+  """
+  stock_ticker: [String!]!
 }
 
 """
@@ -4353,7 +4488,7 @@ Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for mor
 """
 type ManufacturerEdge {
   """
-  Search highlights for this `Manufacturer`, indicating where in the indexed document the query matched.
+  All search highlights for this `Manufacturer`, indicating where in the indexed document the query matched.
   """
   all_highlights: [SearchHighlight!]!
 
@@ -4362,6 +4497,11 @@ type ManufacturerEdge {
   a `before` or `after` argument to continue paginating from this `Manufacturer`.
   """
   cursor: Cursor
+
+  """
+  Specific search highlights for this `Manufacturer`, providing matching snippets for the requested fields.
+  """
+  highlights: ManufacturerHighlights
 
   """
   The `Manufacturer` of this edge.
@@ -4439,6 +4579,21 @@ type ManufacturerGroupedBy {
   The `name` field value for this group.
   """
   name: String
+}
+
+"""
+Type used to request desired `Manufacturer` search highlight fields.
+"""
+type ManufacturerHighlights {
+  """
+  Search highlights for the `id`, providing snippets of the matching text.
+  """
+  id: [String!]!
+
+  """
+  Search highlights for the `name`, providing snippets of the matching text.
+  """
+  name: [String!]!
 }
 
 """
@@ -4822,7 +4977,7 @@ Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for mor
 """
 type MechanicalPartEdge {
   """
-  Search highlights for this `MechanicalPart`, indicating where in the indexed document the query matched.
+  All search highlights for this `MechanicalPart`, indicating where in the indexed document the query matched.
   """
   all_highlights: [SearchHighlight!]!
 
@@ -4831,6 +4986,11 @@ type MechanicalPartEdge {
   a `before` or `after` argument to continue paginating from this `MechanicalPart`.
   """
   cursor: Cursor
+
+  """
+  Specific search highlights for this `MechanicalPart`, providing matching snippets for the requested fields.
+  """
+  highlights: MechanicalPartHighlights
 
   """
   The `MechanicalPart` of this edge.
@@ -4920,6 +5080,26 @@ type MechanicalPartGroupedBy {
   The `name` field value for this group.
   """
   name: String
+}
+
+"""
+Type used to request desired `MechanicalPart` search highlight fields.
+"""
+type MechanicalPartHighlights {
+  """
+  Search highlights for the `id`, providing snippets of the matching text.
+  """
+  id: [String!]!
+
+  """
+  Search highlights for the `material`, providing snippets of the matching text.
+  """
+  material: [String!]!
+
+  """
+  Search highlights for the `name`, providing snippets of the matching text.
+  """
+  name: [String!]!
 }
 
 """
@@ -5109,6 +5289,16 @@ type MoneyGroupedBy {
   The `currency` field value for this group.
   """
   currency: String
+}
+
+"""
+Type used to request desired `Money` search highlight fields.
+"""
+type MoneyHighlights {
+  """
+  Search highlights for the `currency`, providing snippets of the matching text.
+  """
+  currency: [String!]!
 }
 
 """
@@ -5456,7 +5646,7 @@ Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for mor
 """
 type NamedEntityEdge {
   """
-  Search highlights for this `NamedEntity`, indicating where in the indexed document the query matched.
+  All search highlights for this `NamedEntity`, indicating where in the indexed document the query matched.
   """
   all_highlights: [SearchHighlight!]!
 
@@ -5465,6 +5655,11 @@ type NamedEntityEdge {
   a `before` or `after` argument to continue paginating from this `NamedEntity`.
   """
   cursor: Cursor
+
+  """
+  Specific search highlights for this `NamedEntity`, providing matching snippets for the requested fields.
+  """
+  highlights: NamedEntityHighlights
 
   """
   The `NamedEntity` of this edge.
@@ -5973,6 +6168,126 @@ type NamedEntityGroupedBy {
   The `workspace_name` field value for this group.
   """
   workspace_name: String
+}
+
+"""
+Type used to request desired `NamedEntity` search highlight fields.
+"""
+type NamedEntityHighlights {
+  """
+  Search highlights for the `cost`, providing snippets of the matching text.
+  """
+  cost: MoneyHighlights
+
+  """
+  Search highlights for the `cost_currency_name`, providing snippets of the matching text.
+  """
+  cost_currency_name: [String!]!
+
+  """
+  Search highlights for the `cost_currency_primary_continent`, providing snippets of the matching text.
+  """
+  cost_currency_primary_continent: [String!]!
+
+  """
+  Search highlights for the `cost_currency_symbol`, providing snippets of the matching text.
+  """
+  cost_currency_symbol: [String!]!
+
+  """
+  Search highlights for the `cost_currency_unit`, providing snippets of the matching text.
+  """
+  cost_currency_unit: [String!]!
+
+  """
+  Search highlights for the `fees`, providing snippets of the matching text.
+  """
+  fees: MoneyHighlights
+
+  """
+  Search highlights for the `id`, providing snippets of the matching text.
+  """
+  id: [String!]!
+
+  """
+  Search highlights for the `inventor`, providing snippets of the matching text.
+  """
+  inventor: InventorHighlights
+
+  """
+  Search highlights for the `material`, providing snippets of the matching text.
+  """
+  material: [String!]!
+
+  """
+  Search highlights for the `metadata`, providing snippets of the matching text.
+  """
+  metadata: [String!]!
+
+  """
+  Search highlights for the `name`, providing snippets of the matching text.
+  """
+  name: [String!]!
+
+  """
+  Search highlights for the `name_text`, providing snippets of the matching text.
+  """
+  name_text: [String!]!
+
+  """
+  Search highlights for the `named_inventor`, providing snippets of the matching text.
+  """
+  named_inventor: NamedInventorHighlights
+
+  """
+  Search highlights for the `options`, providing snippets of the matching text.
+  """
+  options: WidgetOptionsHighlights
+
+  """
+  Search highlights for the `tags`, providing snippets of the matching text.
+  """
+  tags: [String!]!
+
+  """
+  Search highlights for the `the_options`, providing snippets of the matching text.
+  """
+  the_options: WidgetOptionsHighlights
+
+  """
+  Search highlights for the `widget_cost`, providing snippets of the matching text.
+  """
+  widget_cost: MoneyHighlights
+
+  """
+  Search highlights for the `widget_name`, providing snippets of the matching text.
+  """
+  widget_name: [String!]!
+
+  """
+  Search highlights for the `widget_size`, providing snippets of the matching text.
+  """
+  widget_size: [String!]!
+
+  """
+  Search highlights for the `widget_tags`, providing snippets of the matching text.
+  """
+  widget_tags: [String!]!
+
+  """
+  Search highlights for the `widget_workspace_id`, providing snippets of the matching text.
+  """
+  widget_workspace_id: [String!]!
+
+  """
+  Search highlights for the `workspace_id`, providing snippets of the matching text.
+  """
+  workspace_id: [String!]!
+
+  """
+  Search highlights for the `workspace_name`, providing snippets of the matching text.
+  """
+  workspace_name: [String!]!
 }
 
 """
@@ -6502,6 +6817,26 @@ type NamedInventorGroupedBy {
 }
 
 """
+Type used to request desired `NamedInventor` search highlight fields.
+"""
+type NamedInventorHighlights {
+  """
+  Search highlights for the `name`, providing snippets of the matching text.
+  """
+  name: [String!]!
+
+  """
+  Search highlights for the `nationality`, providing snippets of the matching text.
+  """
+  nationality: [String!]!
+
+  """
+  Search highlights for the `stock_ticker`, providing snippets of the matching text.
+  """
+  stock_ticker: [String!]!
+}
+
+"""
 A return type used from aggregations to provided aggregated values over non-numeric fields.
 """
 type NonNumericAggregatedValues {
@@ -6677,7 +7012,7 @@ Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for mor
 """
 type PartEdge {
   """
-  Search highlights for this `Part`, indicating where in the indexed document the query matched.
+  All search highlights for this `Part`, indicating where in the indexed document the query matched.
   """
   all_highlights: [SearchHighlight!]!
 
@@ -6686,6 +7021,11 @@ type PartEdge {
   a `before` or `after` argument to continue paginating from this `Part`.
   """
   cursor: Cursor
+
+  """
+  Specific search highlights for this `Part`, providing matching snippets for the requested fields.
+  """
+  highlights: PartHighlights
 
   """
   The `Part` of this edge.
@@ -6787,6 +7127,26 @@ type PartGroupedBy {
   The `voltage` field value for this group.
   """
   voltage: Int
+}
+
+"""
+Type used to request desired `Part` search highlight fields.
+"""
+type PartHighlights {
+  """
+  Search highlights for the `id`, providing snippets of the matching text.
+  """
+  id: [String!]!
+
+  """
+  Search highlights for the `material`, providing snippets of the matching text.
+  """
+  material: [String!]!
+
+  """
+  Search highlights for the `name`, providing snippets of the matching text.
+  """
+  name: [String!]!
 }
 
 """
@@ -7061,6 +7421,36 @@ type PlayerGroupedBy {
 }
 
 """
+Type used to request desired `Player` search highlight fields.
+"""
+type PlayerHighlights {
+  """
+  Search highlights for the `affiliations`, providing snippets of the matching text.
+  """
+  affiliations: AffiliationsHighlights
+
+  """
+  Search highlights for the `name`, providing snippets of the matching text.
+  """
+  name: [String!]!
+
+  """
+  Search highlights for the `nicknames`, providing snippets of the matching text.
+  """
+  nicknames: [String!]!
+
+  """
+  Search highlights for the `seasons_nested`, providing snippets of the matching text.
+  """
+  seasons_nested: PlayerSeasonHighlights
+
+  """
+  Search highlights for the `seasons_object`, providing snippets of the matching text.
+  """
+  seasons_object: PlayerSeasonHighlights
+}
+
+"""
 Input type used to specify filters on `[Player]` fields.
 
 Will match all documents if passed as an empty object (or as `null`).
@@ -7310,6 +7700,16 @@ type PlayerSeasonGroupedBy {
   The `year` field value for this group.
   """
   year: Int
+}
+
+"""
+Type used to request desired `PlayerSeason` search highlight fields.
+"""
+type PlayerSeasonHighlights {
+  """
+  Search highlights for the `awards`, providing snippets of the matching text.
+  """
+  awards: [String!]!
 }
 
 """
@@ -9277,7 +9677,7 @@ Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for mor
 """
 type SponsorEdge {
   """
-  Search highlights for this `Sponsor`, indicating where in the indexed document the query matched.
+  All search highlights for this `Sponsor`, indicating where in the indexed document the query matched.
   """
   all_highlights: [SearchHighlight!]!
 
@@ -9286,6 +9686,11 @@ type SponsorEdge {
   a `before` or `after` argument to continue paginating from this `Sponsor`.
   """
   cursor: Cursor
+
+  """
+  Specific search highlights for this `Sponsor`, providing matching snippets for the requested fields.
+  """
+  highlights: SponsorHighlights
 
   """
   The `Sponsor` of this edge.
@@ -9351,6 +9756,21 @@ type SponsorGroupedBy {
   The `name` field value for this group.
   """
   name: String
+}
+
+"""
+Type used to request desired `Sponsor` search highlight fields.
+"""
+type SponsorHighlights {
+  """
+  Search highlights for the `id`, providing snippets of the matching text.
+  """
+  id: [String!]!
+
+  """
+  Search highlights for the `name`, providing snippets of the matching text.
+  """
+  name: [String!]!
 }
 
 """
@@ -9520,6 +9940,21 @@ type SponsorshipGroupedBy {
   The `sponsor_id` field value for this group.
   """
   sponsor_id: ID
+}
+
+"""
+Type used to request desired `Sponsorship` search highlight fields.
+"""
+type SponsorshipHighlights {
+  """
+  Search highlights for the `annual_total`, providing snippets of the matching text.
+  """
+  annual_total: MoneyHighlights
+
+  """
+  Search highlights for the `sponsor_id`, providing snippets of the matching text.
+  """
+  sponsor_id: [String!]!
 }
 
 """
@@ -10385,6 +10820,16 @@ type TeamDetailsGroupedBy {
 }
 
 """
+Type used to request desired `TeamDetails` search highlight fields.
+"""
+type TeamDetailsHighlights {
+  """
+  Search highlights for the `uniform_colors`, providing snippets of the matching text.
+  """
+  uniform_colors: [String!]!
+}
+
+"""
 Represents a specific `Team` in the context of a `TeamConnection`,
 providing access to both the `Team` and query-specific information such as the pagination `Cursor`.
 
@@ -10393,7 +10838,7 @@ Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for mor
 """
 type TeamEdge {
   """
-  Search highlights for this `Team`, indicating where in the indexed document the query matched.
+  All search highlights for this `Team`, indicating where in the indexed document the query matched.
   """
   all_highlights: [SearchHighlight!]!
 
@@ -10402,6 +10847,11 @@ type TeamEdge {
   a `before` or `after` argument to continue paginating from this `Team`.
   """
   cursor: Cursor
+
+  """
+  Specific search highlights for this `Team`, providing matching snippets for the requested fields.
+  """
+  highlights: TeamHighlights
 
   """
   The `Team` of this edge.
@@ -10642,6 +11092,81 @@ type TeamGroupedBy {
 }
 
 """
+Type used to request desired `Team` search highlight fields.
+"""
+type TeamHighlights {
+  """
+  Search highlights for the `country_code`, providing snippets of the matching text.
+  """
+  country_code: [String!]!
+
+  """
+  Search highlights for the `current_name`, providing snippets of the matching text.
+  """
+  current_name: [String!]!
+
+  """
+  Search highlights for the `current_players_nested`, providing snippets of the matching text.
+  """
+  current_players_nested: PlayerHighlights
+
+  """
+  Search highlights for the `current_players_object`, providing snippets of the matching text.
+  """
+  current_players_object: PlayerHighlights
+
+  """
+  Search highlights for the `details`, providing snippets of the matching text.
+  """
+  details: TeamDetailsHighlights
+
+  """
+  Search highlights for the `forbes_valuation_moneys_nested`, providing snippets of the matching text.
+  """
+  forbes_valuation_moneys_nested: MoneyHighlights
+
+  """
+  Search highlights for the `forbes_valuation_moneys_object`, providing snippets of the matching text.
+  """
+  forbes_valuation_moneys_object: MoneyHighlights
+
+  """
+  Search highlights for the `id`, providing snippets of the matching text.
+  """
+  id: [String!]!
+
+  """
+  Search highlights for the `league`, providing snippets of the matching text.
+  """
+  league: [String!]!
+
+  """
+  Search highlights for the `nested_fields`, providing snippets of the matching text.
+  """
+  nested_fields: TeamNestedFieldsHighlights
+
+  """
+  Search highlights for the `nested_fields2`, providing snippets of the matching text.
+  """
+  nested_fields2: TeamNestedFieldsHighlights
+
+  """
+  Search highlights for the `past_names`, providing snippets of the matching text.
+  """
+  past_names: [String!]!
+
+  """
+  Search highlights for the `seasons_nested`, providing snippets of the matching text.
+  """
+  seasons_nested: TeamSeasonHighlights
+
+  """
+  Search highlights for the `seasons_object`, providing snippets of the matching text.
+  """
+  seasons_object: TeamSeasonHighlights
+}
+
+"""
 Return type representing a bucket of `Money` objects for a sub-aggregation within each `TeamAggregation`.
 """
 type TeamMoneySubAggregation {
@@ -10737,6 +11262,26 @@ input TeamNestedFieldsFilterInput {
   When `null` or an empty object is passed, matches all documents.
   """
   seasons: TeamSeasonListFilterInput
+}
+
+"""
+Type used to request desired `TeamNestedFields` search highlight fields.
+"""
+type TeamNestedFieldsHighlights {
+  """
+  Search highlights for the `current_players`, providing snippets of the matching text.
+  """
+  current_players: PlayerHighlights
+
+  """
+  Search highlights for the `forbes_valuation_moneys`, providing snippets of the matching text.
+  """
+  forbes_valuation_moneys: MoneyHighlights
+
+  """
+  Search highlights for the `seasons`, providing snippets of the matching text.
+  """
+  seasons: TeamSeasonHighlights
 }
 
 """
@@ -11442,6 +11987,26 @@ type TeamSeasonGroupedBy {
   The `year` field value for this group.
   """
   year: Int
+}
+
+"""
+Type used to request desired `TeamSeason` search highlight fields.
+"""
+type TeamSeasonHighlights {
+  """
+  Search highlights for the `notes`, providing snippets of the matching text.
+  """
+  notes: [String!]!
+
+  """
+  Search highlights for the `players_nested`, providing snippets of the matching text.
+  """
+  players_nested: PlayerHighlights
+
+  """
+  Search highlights for the `players_object`, providing snippets of the matching text.
+  """
+  players_object: PlayerHighlights
 }
 
 """
@@ -12643,7 +13208,7 @@ Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for mor
 """
 type WidgetCurrencyEdge {
   """
-  Search highlights for this `WidgetCurrency`, indicating where in the indexed document the query matched.
+  All search highlights for this `WidgetCurrency`, indicating where in the indexed document the query matched.
   """
   all_highlights: [SearchHighlight!]!
 
@@ -12652,6 +13217,11 @@ type WidgetCurrencyEdge {
   a `before` or `after` argument to continue paginating from this `WidgetCurrency`.
   """
   cursor: Cursor
+
+  """
+  Specific search highlights for this `WidgetCurrency`, providing matching snippets for the requested fields.
+  """
+  highlights: WidgetCurrencyHighlights
 
   """
   The `WidgetCurrency` of this edge.
@@ -12818,6 +13388,51 @@ type WidgetCurrencyGroupedBy {
   widget_name: String
 }
 
+"""
+Type used to request desired `WidgetCurrency` search highlight fields.
+"""
+type WidgetCurrencyHighlights {
+  """
+  Search highlights for the `details`, providing snippets of the matching text.
+  """
+  details: CurrencyDetailsHighlights
+
+  """
+  Search highlights for the `id`, providing snippets of the matching text.
+  """
+  id: [String!]!
+
+  """
+  Search highlights for the `name`, providing snippets of the matching text.
+  """
+  name: [String!]!
+
+  """
+  Search highlights for the `primary_continent`, providing snippets of the matching text.
+  """
+  primary_continent: [String!]!
+
+  """
+  Search highlights for the `widget_fee_currencies`, providing snippets of the matching text.
+  """
+  widget_fee_currencies: [String!]!
+
+  """
+  Search highlights for the `widget_names`, providing snippets of the matching text.
+  """
+  widget_names: [String!]!
+
+  """
+  Search highlights for the `widget_options`, providing snippets of the matching text.
+  """
+  widget_options: WidgetOptionSetsHighlights
+
+  """
+  Search highlights for the `widget_tags`, providing snippets of the matching text.
+  """
+  widget_tags: [String!]!
+}
+
 type WidgetCurrencyNestedFields {
   max_widget_cost: Int
 }
@@ -12979,7 +13594,7 @@ Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for mor
 """
 type WidgetEdge {
   """
-  Search highlights for this `Widget`, indicating where in the indexed document the query matched.
+  All search highlights for this `Widget`, indicating where in the indexed document the query matched.
   """
   all_highlights: [SearchHighlight!]!
 
@@ -12988,6 +13603,11 @@ type WidgetEdge {
   a `before` or `after` argument to continue paginating from this `Widget`.
   """
   cursor: Cursor
+
+  """
+  Specific search highlights for this `Widget`, providing matching snippets for the requested fields.
+  """
+  highlights: WidgetHighlights
 
   """
   The `Widget` of this edge.
@@ -13407,6 +14027,96 @@ type WidgetGroupedBy {
   workspace_name: String
 }
 
+"""
+Type used to request desired `Widget` search highlight fields.
+"""
+type WidgetHighlights {
+  """
+  Search highlights for the `cost`, providing snippets of the matching text.
+  """
+  cost: MoneyHighlights
+
+  """
+  Search highlights for the `cost_currency_name`, providing snippets of the matching text.
+  """
+  cost_currency_name: [String!]!
+
+  """
+  Search highlights for the `cost_currency_primary_continent`, providing snippets of the matching text.
+  """
+  cost_currency_primary_continent: [String!]!
+
+  """
+  Search highlights for the `cost_currency_symbol`, providing snippets of the matching text.
+  """
+  cost_currency_symbol: [String!]!
+
+  """
+  Search highlights for the `cost_currency_unit`, providing snippets of the matching text.
+  """
+  cost_currency_unit: [String!]!
+
+  """
+  Search highlights for the `fees`, providing snippets of the matching text.
+  """
+  fees: MoneyHighlights
+
+  """
+  Search highlights for the `id`, providing snippets of the matching text.
+  """
+  id: [String!]!
+
+  """
+  Search highlights for the `inventor`, providing snippets of the matching text.
+  """
+  inventor: InventorHighlights
+
+  """
+  Search highlights for the `metadata`, providing snippets of the matching text.
+  """
+  metadata: [String!]!
+
+  """
+  Search highlights for the `name`, providing snippets of the matching text.
+  """
+  name: [String!]!
+
+  """
+  Search highlights for the `name_text`, providing snippets of the matching text.
+  """
+  name_text: [String!]!
+
+  """
+  Search highlights for the `named_inventor`, providing snippets of the matching text.
+  """
+  named_inventor: NamedInventorHighlights
+
+  """
+  Search highlights for the `options`, providing snippets of the matching text.
+  """
+  options: WidgetOptionsHighlights
+
+  """
+  Search highlights for the `tags`, providing snippets of the matching text.
+  """
+  tags: [String!]!
+
+  """
+  Search highlights for the `the_options`, providing snippets of the matching text.
+  """
+  the_options: WidgetOptionsHighlights
+
+  """
+  Search highlights for the `workspace_id`, providing snippets of the matching text.
+  """
+  workspace_id: [String!]!
+
+  """
+  Search highlights for the `workspace_name`, providing snippets of the matching text.
+  """
+  workspace_name: [String!]!
+}
+
 type WidgetOptionSets {
   colors: [Color!]!
   sizes: [Size!]!
@@ -13475,6 +14185,21 @@ input WidgetOptionSetsFilterInput {
   When `null` or an empty object is passed, matches all documents.
   """
   sizes: SizeListFilterInput
+}
+
+"""
+Type used to request desired `WidgetOptionSets` search highlight fields.
+"""
+type WidgetOptionSetsHighlights {
+  """
+  Search highlights for the `colors`, providing snippets of the matching text.
+  """
+  colors: [String!]!
+
+  """
+  Search highlights for the `sizes`, providing snippets of the matching text.
+  """
+  sizes: [String!]!
 }
 
 type WidgetOptions {
@@ -13596,6 +14321,26 @@ type WidgetOptionsGroupedBy {
   The `the_size` field value for this group.
   """
   the_size: Size
+}
+
+"""
+Type used to request desired `WidgetOptions` search highlight fields.
+"""
+type WidgetOptionsHighlights {
+  """
+  Search highlights for the `color`, providing snippets of the matching text.
+  """
+  color: [String!]!
+
+  """
+  Search highlights for the `size`, providing snippets of the matching text.
+  """
+  size: [String!]!
+
+  """
+  Search highlights for the `the_size`, providing snippets of the matching text.
+  """
+  the_size: [String!]!
 }
 
 union WidgetOrAddress = Address | Widget
@@ -13870,7 +14615,7 @@ Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for mor
 """
 type WidgetOrAddressEdge {
   """
-  Search highlights for this `WidgetOrAddress`, indicating where in the indexed document the query matched.
+  All search highlights for this `WidgetOrAddress`, indicating where in the indexed document the query matched.
   """
   all_highlights: [SearchHighlight!]!
 
@@ -13879,6 +14624,11 @@ type WidgetOrAddressEdge {
   a `before` or `after` argument to continue paginating from this `WidgetOrAddress`.
   """
   cursor: Cursor
+
+  """
+  Specific search highlights for this `WidgetOrAddress`, providing matching snippets for the requested fields.
+  """
+  highlights: WidgetOrAddressHighlights
 
   """
   The `WidgetOrAddress` of this edge.
@@ -14327,6 +15077,101 @@ type WidgetOrAddressGroupedBy {
   The `workspace_name` field value for this group.
   """
   workspace_name: String
+}
+
+"""
+Type used to request desired `WidgetOrAddress` search highlight fields.
+"""
+type WidgetOrAddressHighlights {
+  """
+  Search highlights for the `cost`, providing snippets of the matching text.
+  """
+  cost: MoneyHighlights
+
+  """
+  Search highlights for the `cost_currency_name`, providing snippets of the matching text.
+  """
+  cost_currency_name: [String!]!
+
+  """
+  Search highlights for the `cost_currency_primary_continent`, providing snippets of the matching text.
+  """
+  cost_currency_primary_continent: [String!]!
+
+  """
+  Search highlights for the `cost_currency_symbol`, providing snippets of the matching text.
+  """
+  cost_currency_symbol: [String!]!
+
+  """
+  Search highlights for the `cost_currency_unit`, providing snippets of the matching text.
+  """
+  cost_currency_unit: [String!]!
+
+  """
+  Search highlights for the `fees`, providing snippets of the matching text.
+  """
+  fees: MoneyHighlights
+
+  """
+  Search highlights for the `full_address`, providing snippets of the matching text.
+  """
+  full_address: [String!]!
+
+  """
+  Search highlights for the `id`, providing snippets of the matching text.
+  """
+  id: [String!]!
+
+  """
+  Search highlights for the `inventor`, providing snippets of the matching text.
+  """
+  inventor: InventorHighlights
+
+  """
+  Search highlights for the `metadata`, providing snippets of the matching text.
+  """
+  metadata: [String!]!
+
+  """
+  Search highlights for the `name`, providing snippets of the matching text.
+  """
+  name: [String!]!
+
+  """
+  Search highlights for the `name_text`, providing snippets of the matching text.
+  """
+  name_text: [String!]!
+
+  """
+  Search highlights for the `named_inventor`, providing snippets of the matching text.
+  """
+  named_inventor: NamedInventorHighlights
+
+  """
+  Search highlights for the `options`, providing snippets of the matching text.
+  """
+  options: WidgetOptionsHighlights
+
+  """
+  Search highlights for the `tags`, providing snippets of the matching text.
+  """
+  tags: [String!]!
+
+  """
+  Search highlights for the `the_options`, providing snippets of the matching text.
+  """
+  the_options: WidgetOptionsHighlights
+
+  """
+  Search highlights for the `workspace_id`, providing snippets of the matching text.
+  """
+  workspace_id: [String!]!
+
+  """
+  Search highlights for the `workspace_name`, providing snippets of the matching text.
+  """
+  workspace_name: [String!]!
 }
 
 """
@@ -15145,7 +15990,7 @@ Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for mor
 """
 type WidgetWorkspaceEdge {
   """
-  Search highlights for this `WidgetWorkspace`, indicating where in the indexed document the query matched.
+  All search highlights for this `WidgetWorkspace`, indicating where in the indexed document the query matched.
   """
   all_highlights: [SearchHighlight!]!
 
@@ -15154,6 +15999,11 @@ type WidgetWorkspaceEdge {
   a `before` or `after` argument to continue paginating from this `WidgetWorkspace`.
   """
   cursor: Cursor
+
+  """
+  Specific search highlights for this `WidgetWorkspace`, providing matching snippets for the requested fields.
+  """
+  highlights: WidgetWorkspaceHighlights
 
   """
   The `WidgetWorkspace` of this edge.
@@ -15231,6 +16081,26 @@ type WidgetWorkspaceGroupedBy {
   The `widget` field value for this group.
   """
   widget: WorkspaceWidgetGroupedBy
+}
+
+"""
+Type used to request desired `WidgetWorkspace` search highlight fields.
+"""
+type WidgetWorkspaceHighlights {
+  """
+  Search highlights for the `id`, providing snippets of the matching text.
+  """
+  id: [String!]!
+
+  """
+  Search highlights for the `name`, providing snippets of the matching text.
+  """
+  name: [String!]!
+
+  """
+  Search highlights for the `widget`, providing snippets of the matching text.
+  """
+  widget: WorkspaceWidgetHighlights
 }
 
 """
@@ -15361,4 +16231,14 @@ type WorkspaceWidgetGroupedBy {
   The `id` field value for this group.
   """
   id: ID
+}
+
+"""
+Type used to request desired `WorkspaceWidget` search highlight fields.
+"""
+type WorkspaceWidgetHighlights {
+  """
+  Search highlights for the `id`, providing snippets of the matching text.
+  """
+  id: [String!]!
 }

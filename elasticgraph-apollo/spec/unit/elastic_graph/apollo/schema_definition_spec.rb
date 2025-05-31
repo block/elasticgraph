@@ -717,6 +717,16 @@ module ElasticGraph
             }
           EOS
 
+          expect(type_def_for.call("WidgetHighlights")).to eq(<<~EOS.strip)
+            type WidgetHighlights {
+              id: [String!]!
+              name: [String!]! @tag(name: "public")
+              options1: WidgetOptionsHighlights @tag(name: "public")
+              options2: WidgetOptionsHighlights @tag(name: "internal")
+              token: [String!]!
+            }
+          EOS
+
           expect(type_def_for.call("WidgetAggregatedValues")).to eq(<<~EOS.strip)
             type WidgetAggregatedValues {
               id: NonNumericAggregatedValues
@@ -748,6 +758,12 @@ module ElasticGraph
             type WidgetOptionsGroupedBy {
               color: String @tag(name: "public")
               size: Int
+            }
+          EOS
+
+          expect(type_def_for.call("WidgetOptionsHighlights")).to eq(<<~EOS.strip)
+            type WidgetOptionsHighlights {
+              color: [String!]! @tag(name: "public")
             }
           EOS
 
@@ -807,6 +823,16 @@ module ElasticGraph
               options1: WidgetOptionsGroupedBy @tag(name: "public")
               options2: WidgetOptionsGroupedBy @tag(name: "internal")
               token: String @tag(name: "public-interface")
+            }
+          EOS
+
+          expect(type_def_for.call("IdentifiableHighlights")).to eq(<<~EOS.strip)
+            type IdentifiableHighlights {
+              id: [String!]!
+              name: [String!]! @tag(name: "public")
+              options1: WidgetOptionsHighlights @tag(name: "public")
+              options2: WidgetOptionsHighlights @tag(name: "internal")
+              token: [String!]! @tag(name: "public-interface")
             }
           EOS
 

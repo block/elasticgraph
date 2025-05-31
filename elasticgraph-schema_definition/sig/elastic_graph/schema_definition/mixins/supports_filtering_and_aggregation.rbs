@@ -27,6 +27,7 @@ module ElasticGraph
         def to_indexed_aggregation_type: () -> SchemaElements::ObjectType?
         def to_grouped_by_type: () -> SchemaElements::ObjectType?
         def to_aggregated_values_type: () -> SchemaElements::ObjectType?
+        def to_highlights_type: () -> SchemaElements::ObjectType?
         def new_non_empty_object_type: (::String) { (SchemaElements::ObjectType) -> void } -> SchemaElements::ObjectType?
       end
     end

@@ -126,6 +126,7 @@ module ElasticGraph
 
           expect(metadata.fetch("Widget").graphql_fields_by_name.fetch("names").name_in_index).to eq("names2")
           expect(metadata.fetch("WidgetFilterInput").graphql_fields_by_name.fetch("names").name_in_index).to eq("names2")
+          expect(metadata.fetch("WidgetHighlights").graphql_fields_by_name.fetch("names").name_in_index).to eq("names2")
         end
       end
 
