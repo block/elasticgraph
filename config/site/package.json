@@ -1,7 +1,7 @@
 {
   "devDependencies": {
     "@tailwindcss/typography": "0.5.16",
-    "tailwindcss": "4.1.7"
+    "tailwindcss": "4.1.8"
   },
   "scripts": {
     "build:css": "npx @tailwindcss/cli -i ./src/assets/css/tailwind.css -o ./src/assets/css/main.css --minify",
