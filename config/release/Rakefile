@@ -45,12 +45,19 @@ end
 
 desc "Bumps the ElasticGraph version to the next pre-release version"
 task :bump_version_to_next_prerelease do
+  prerelease_regex = /[A-Za-z]/
   *main_parts, last_part = ElasticGraph::VERSION.split(".").filter_map do |part|
     # ignore any pre-release parts.
-    Integer(part) unless part.match?(/[A-Za-z]/)
+    Integer(part) unless part.match?(prerelease_regex)
   end
 
-  new_version = [*main_parts, last_part + 1, "pre"].join(".")
+  # There are two cases here:
+  #
+  # * If we just released a pre-release (e.g. `1.1.0.rc1`), we want to bump the version to `1.1.0.pre`, without incrementing the last part.
+  # * If we just released a normal version (e.g. `1.1.0`), we want to bump the version to `1.1.1.pre`, and increment the last part.
+  last_part += 1 unless ElasticGraph::VERSION.match?(prerelease_regex)
+  new_version = [*main_parts, last_part, "pre"].join(".")
+
   bump_version.call(version: new_version, message: "Bump version to v#{new_version}.")
 end
 
