@@ -622,7 +622,7 @@ module ElasticGraph
 
         expect(widgets).to eq([])
 
-        test_search_highlighting(widget1, widget2, widget3)
+        test_widget_search_highlighting(widget1, widget2, widget3)
       end
 
       it "supports fetching interface fields" do
@@ -975,6 +975,8 @@ module ElasticGraph
           results = query_teams_with(filter: {seasons_nested: {all_of: [{}]}})
           # All teams should be returned since the `nil` part of the filter expression is treated as `true`.
           expect(results).to eq [{"id" => "t1"}, {"id" => "t2"}, {"id" => "t3"}, {"id" => "t4"}]
+
+          test_team_search_highlighting
         end
 
         it "statically (through the schema) disallows some filter features that do not work well with `any_satisfy`" do
@@ -1128,15 +1130,15 @@ module ElasticGraph
         end
       end
 
-      def test_search_highlighting(widget1, widget2, widget3)
+      def test_widget_search_highlighting(widget1, widget2, widget3)
         # Demonstrate we get empty lists of highlights when there are no filters.
-        highlights_by_id = query_widget_all_highlights
+        highlights_by_id = query_all_highlights("widgets")
         expect(highlights_by_id).to eq({
           widget1.fetch(:id) => [],
           widget2.fetch(:id) => [],
           widget3.fetch(:id) => []
         })
-        highlights_by_id = query_widget_highlights("name, tags")
+        highlights_by_id = query_highlights("widgets", "name, tags")
         expect(highlights_by_id).to eq({
           widget1.fetch(:id) => {"name" => [], "tags" => []},
           widget2.fetch(:id) => {"name" => [], "tags" => []},
@@ -1144,7 +1146,7 @@ module ElasticGraph
         })
 
         # Demonstrate that we get search highlights based on the filters.
-        highlights_by_id = query_widget_all_highlights(filter: {
+        highlights_by_id = query_all_highlights("widgets", filter: {
           "any_of" => [
             {"tags" => {"any_satisfy" => {"equal_to_any_of" => ["ghi", "jkl"]}}},
             {"name" => {"contains" => {"any_substring_of" => ["ing"]}}}
@@ -1159,7 +1161,7 @@ module ElasticGraph
             {"path" => ["tags"], "snippets" => ["<em>ghi</em>", "<em>jkl</em>"]}
           ]
         })
-        highlights_by_id = query_widget_highlights("name, tags", filter: {
+        highlights_by_id = query_highlights("widgets", "name, tags", filter: {
           "any_of" => [
             {"tags" => {"any_satisfy" => {"equal_to_any_of" => ["ghi", "jkl"]}}},
             {"name" => {"contains" => {"any_substring_of" => ["ing"]}}}
@@ -1177,7 +1179,7 @@ module ElasticGraph
         })
 
         # Demonstrate that nested search highlight paths work, including with alternate `name_in_index`
-        highlights_by_id = query_widget_all_highlights(filter: {
+        highlights_by_id = query_all_highlights("widgets", filter: {
           "the_options" => {
             "any_of" => [
               {"the_size" => {"equal_to_any_of" => [enum_value(:SMALL), enum_value(:MEDIUM)]}},
@@ -1213,7 +1215,7 @@ module ElasticGraph
             }
           ]
         })
-        highlights_by_id = query_widget_highlights("the_options { the_size, color }", filter: {
+        highlights_by_id = query_highlights("widgets", "the_options { the_size, color }", filter: {
           "the_options" => {
             "any_of" => [
               {"the_size" => {"equal_to_any_of" => [enum_value(:SMALL), enum_value(:MEDIUM)]}},
@@ -1244,13 +1246,13 @@ module ElasticGraph
 
         # Demonstrate we can get *just* the highlights and no other fields off of the `edges`.
         # (Initially this did not work.)
-        highlights = query_just_widget_all_highlights(filter: {
+        highlights = query_just_all_highlights("widgets", filter: {
           "tags" => {"any_satisfy" => {"equal_to_any_of" => ["ghi", "jkl"]}}
         })
         expect(highlights).to eq([
           [{"path" => ["tags"], "snippets" => ["<em>ghi</em>", "<em>jkl</em>"]}]
         ])
-        highlights = query_just_widget_highlights("tags", filter: {
+        highlights = query_just_highlights("widgets", "tags", filter: {
           "tags" => {"any_satisfy" => {"equal_to_any_of" => ["ghi", "jkl"]}}
         })
         expect(highlights).to eq([
@@ -1258,7 +1260,7 @@ module ElasticGraph
         ])
 
         # Demonstrate that we can request both `highlights` and `all_highlights` on the same query.
-        highlights_by_id = query_widget_highlights_and_all_highlights("name, tags", filter: {
+        highlights_by_id = query_highlights_and_all_highlights("widgets", "name, tags", filter: {
           "any_of" => [
             {"tags" => {"any_satisfy" => {"equal_to_any_of" => ["ghi", "jkl"]}}},
             {"name" => {"contains" => {"any_substring_of" => ["ing"]}}}
@@ -1284,6 +1286,56 @@ module ElasticGraph
               {"path" => ["tags"], "snippets" => ["<em>ghi</em>", "<em>jkl</em>"]}
             ]
           }
+        })
+      end
+
+      def test_team_search_highlighting
+        # Test highlighting when searching on a list-of-strings field
+        highlights_by_id = query_all_highlights("teams", filter: {
+          "past_names" => {"any_satisfy" => {"contains" => {"any_substring_of" => ["Pil"]}}}
+        })
+        expect(highlights_by_id).to eq({
+          "t1" => [{"path" => [case_correctly("past_names")], "snippets" => ["<em>Pilots</em>"]}],
+          "t2" => [{"path" => [case_correctly("past_names")], "snippets" => ["<em>Ace Piloteers</em>"]}],
+          "t3" => [{"path" => [case_correctly("past_names")], "snippets" => ["<em>Pilots</em>"]}],
+          "t4" => [{"path" => [case_correctly("past_names")], "snippets" => ["<em>Pill Bugs</em>"]}]
+        })
+        highlights_by_id = query_highlights("teams", "past_names", filter: {
+          "past_names" => {"any_satisfy" => {"contains" => {"any_substring_of" => ["Pil"]}}}
+        })
+        expect(highlights_by_id).to eq({
+          "t1" => {case_correctly("past_names") => ["<em>Pilots</em>"]},
+          "t2" => {case_correctly("past_names") => ["<em>Ace Piloteers</em>"]},
+          "t3" => {case_correctly("past_names") => ["<em>Pilots</em>"]},
+          "t4" => {case_correctly("past_names") => ["<em>Pill Bugs</em>"]}
+        })
+
+        # Test highlighting when searching on a string under a list-of-objects field
+        highlights_by_id = query_all_highlights("teams", filter: {
+          "current_players_object" => {"name" => {"any_satisfy" => {"contains" => {"any_substring_of" => ["Ichiro"]}}}}
+        })
+        expect(highlights_by_id).to eq({
+          "t3" => [{"path" => [case_correctly("current_players_object"), "name"], "snippets" => ["<em>Ichiro</em>"]}]
+        })
+        highlights_by_id = query_highlights("teams", "current_players_object { name }", filter: {
+          "current_players_object" => {"name" => {"any_satisfy" => {"contains" => {"any_substring_of" => ["Ichiro"]}}}}
+        })
+        expect(highlights_by_id).to eq({
+          "t3" => {case_correctly("current_players_object") => {"name" => ["<em>Ichiro</em>"]}}
+        })
+
+        # Test highlighting when searching on a string under a list-of-nested-objects field
+        highlights_by_id = query_all_highlights("teams", filter: {
+          "current_players_nested" => {"any_satisfy" => {"name" => {"contains" => {"any_substring_of" => ["Ichiro"]}}}}
+        })
+        expect(highlights_by_id).to eq({
+          "t3" => [{"path" => [case_correctly("current_players_nested"), "name"], "snippets" => ["<em>Ichiro</em>"]}]
+        })
+        highlights_by_id = query_highlights("teams", "current_players_nested { name }", filter: {
+          "current_players_nested" => {"any_satisfy" => {"name" => {"contains" => {"any_substring_of" => ["Ichiro"]}}}}
+        })
+        expect(highlights_by_id).to eq({
+          "t3" => {case_correctly("current_players_nested") => {"name" => ["<em>Ichiro</em>"]}}
         })
       end
 
@@ -1352,10 +1404,10 @@ module ElasticGraph
         QUERY
       end
 
-      def query_widget_highlights(highlights_subfields, **query_args)
-        call_graphql_query(<<~QUERY).dig("data", "widgets", "edges").to_h { |e| [e.dig("node", "id"), e.dig(case_correctly("highlights"))] }
+      def query_highlights(root_field, highlights_subfields, **query_args)
+        call_graphql_query(<<~QUERY).dig("data", case_correctly(root_field), "edges").to_h { |e| [e.dig("node", "id"), e.dig(case_correctly("highlights"))] }
           query {
-            widgets#{graphql_args(query_args)} {
+            #{root_field}#{graphql_args(query_args)} {
               edges {
                 node {
                   id
@@ -1370,10 +1422,10 @@ module ElasticGraph
         QUERY
       end
 
-      def query_widget_all_highlights(**query_args)
-        call_graphql_query(<<~QUERY).dig("data", "widgets", "edges").to_h { |e| [e.dig("node", "id"), e.dig(case_correctly("all_highlights"))] }
+      def query_all_highlights(root_field, **query_args)
+        call_graphql_query(<<~QUERY).dig("data", case_correctly(root_field), "edges").to_h { |e| [e.dig("node", "id"), e.dig(case_correctly("all_highlights"))] }
           query {
-            widgets#{graphql_args(query_args)} {
+            #{root_field}#{graphql_args(query_args)} {
               edges {
                 node {
                   id
@@ -1389,10 +1441,10 @@ module ElasticGraph
         QUERY
       end
 
-      def query_widget_highlights_and_all_highlights(highlights_subfields, **query_args)
-        call_graphql_query(<<~QUERY).dig("data", "widgets", "edges").to_h { |e| [e.dig("node", "id"), e.except("node")] }
+      def query_highlights_and_all_highlights(root_field, highlights_subfields, **query_args)
+        call_graphql_query(<<~QUERY).dig("data", case_correctly(root_field), "edges").to_h { |e| [e.dig("node", "id"), e.except("node")] }
           query {
-            widgets#{graphql_args(query_args)} {
+            #{root_field}#{graphql_args(query_args)} {
               edges {
                 node {
                   id
@@ -1412,10 +1464,10 @@ module ElasticGraph
         QUERY
       end
 
-      def query_just_widget_highlights(highlights_subfields, **query_args)
-        call_graphql_query(<<~QUERY).dig("data", "widgets", "edges").map { |e| e.dig(case_correctly("highlights")) }
+      def query_just_highlights(root_field, highlights_subfields, **query_args)
+        call_graphql_query(<<~QUERY).dig("data", case_correctly(root_field), "edges").map { |e| e.dig(case_correctly("highlights")) }
           query {
-            widgets#{graphql_args(query_args)} {
+            #{root_field}#{graphql_args(query_args)} {
               edges {
                 highlights {
                   #{highlights_subfields}
@@ -1426,10 +1478,10 @@ module ElasticGraph
         QUERY
       end
 
-      def query_just_widget_all_highlights(**query_args)
-        call_graphql_query(<<~QUERY).dig("data", "widgets", "edges").map { |e| e.dig(case_correctly("all_highlights")) }
+      def query_just_all_highlights(root_field, **query_args)
+        call_graphql_query(<<~QUERY).dig("data", case_correctly(root_field), "edges").map { |e| e.dig(case_correctly("all_highlights")) }
           query {
-            widgets#{graphql_args(query_args)} {
+            #{root_field}#{graphql_args(query_args)} {
               edges {
                 all_highlights {
                   path

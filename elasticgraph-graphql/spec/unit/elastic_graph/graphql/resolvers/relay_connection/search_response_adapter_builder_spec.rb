@@ -38,6 +38,15 @@ module ElasticGraph
                 t.field "options3", "WidgetOptions", name_in_index: "alt_options"
                 t.field "opts1", "WidgetOptions", name_in_index: "opts"
                 t.field "opts2", "WidgetOptions", name_in_index: "opts", graphql_only: true
+
+                t.field "options_list_object", "[WidgetOptions!]!" do |f|
+                  f.mapping type: "object"
+                end
+
+                t.field "options_list_nested", "[WidgetOptions!]!" do |f|
+                  f.mapping type: "nested"
+                end
+
                 t.index "widgets" do |i|
                   i.default_sort "amount_cents", :asc
                 end
@@ -416,6 +425,68 @@ module ElasticGraph
                   "widgets" => {
                     "edges" => [
                       {"all_highlights" => []}
+                    ]
+                  }
+                }
+              )
+            end
+
+            it "handles the `path` under an object list field" do
+              hit1 = hit_for(1, "t1", highlights: {"options_list_object.size" => ["snippet1"]})
+
+              results = execute_query(query: <<~QUERY, hits: [hit1])
+                query {
+                  widgets(filter: {options_list_object: {size: {any_satisfy: {equal_to_any_of: ["LARGE"]}}}}) {
+                    edges {
+                      all_highlights {
+                        path
+                        snippets
+                      }
+                    }
+                  }
+                }
+              QUERY
+
+              expect(results).to match(
+                "data" => {
+                  "widgets" => {
+                    "edges" => [
+                      {
+                        "all_highlights" => [
+                          {"path" => ["options_list_object", "size"], "snippets" => ["snippet1"]}
+                        ]
+                      }
+                    ]
+                  }
+                }
+              )
+            end
+
+            it "handles the `path` under a nested list field" do
+              hit1 = hit_for(1, "t1", highlights: {"options_list_nested.size" => ["snippet1"]})
+
+              results = execute_query(query: <<~QUERY, hits: [hit1])
+                query {
+                  widgets(filter: {options_list_nested: {any_satisfy: {size: {equal_to_any_of: ["LARGE"]}}}}) {
+                    edges {
+                      all_highlights {
+                        path
+                        snippets
+                      }
+                    }
+                  }
+                }
+              QUERY
+
+              expect(results).to match(
+                "data" => {
+                  "widgets" => {
+                    "edges" => [
+                      {
+                        "all_highlights" => [
+                          {"path" => ["options_list_nested", "size"], "snippets" => ["snippet1"]}
+                        ]
+                      }
                     ]
                   }
                 }

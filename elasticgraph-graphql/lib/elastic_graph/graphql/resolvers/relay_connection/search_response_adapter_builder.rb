@@ -65,7 +65,7 @@ module ElasticGraph
             # The GraphQL field name and `name_in_index` can be different. The datastore returns path segments using
             # the `name_in_index` but we want to return the GraphQL field name, so here we translate.
             path_string.split(".").map do |name_in_index|
-              fields = type.fields_by_name_in_index[name_in_index] || []
+              fields = type.unwrap_fully.fields_by_name_in_index[name_in_index] || []
 
               # It's possible (but pretty rare) for a single `name_in_index` to map to multiple GraphQL fields.
               # We don't really have a basis for preferring one over another so we just use the first one here.
