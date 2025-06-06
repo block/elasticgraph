@@ -1024,6 +1024,32 @@ module ElasticGraph
         end
       end
 
+      it "avoids sending the datastore duplicate queries" do
+        results = call_graphql_query(<<~QUERY)
+          query {
+            total_count1: widgets {
+              total_edge_count
+            }
+
+            total_count2: widgets {
+              total_edge_count
+            }
+          }
+        QUERY
+
+        expect(results.dig("data", case_correctly("total_count1"), case_correctly("total_edge_count"))).to eq 0
+        expect(results.dig("data", case_correctly("total_count2"), case_correctly("total_edge_count"))).to eq 0
+
+        executed_queries_logs = logged_jsons_of_type("ElasticGraphQueryExecutorQueryDuration")
+        expect(executed_queries_logs.size).to eq(1)
+        expect(executed_queries_logs.first).to include({
+          "datastore_request_count" => 1,
+          "datastore_query_count" => 1
+        })
+
+        expect(performed_search_metadata("main").size).to eq 1
+      end
+
       context "when multiple sources flow into the same index" do
         it "automatically excludes documents that have not received data from their primary `__self` source" do
           index_records(

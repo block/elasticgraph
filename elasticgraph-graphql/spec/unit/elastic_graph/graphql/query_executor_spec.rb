@@ -447,16 +447,19 @@ module ElasticGraph
         def define_graphql
           router = instance_double("ElasticGraph::GraphQL::DatastoreSearchRouter")
           allow(router).to receive(:msearch) do |queries, query_tracker:|
+            queries.each do |query|
+              allow(query).to receive(:shard_routing_values).and_return(["routing_value_1", "routing_value_2"])
+            end
+
+            query_tracker.record_datastore_queries_for_single_request(queries)
+
             query_tracker.record_datastore_query_metrics(
               client_duration_ms: datastore_query_client_duration_ms,
               server_duration_ms: datastore_query_server_duration_ms,
               queried_shard_count: queried_shard_count
             )
 
-            queries.each_with_object({}) do |query, hash|
-              allow(query).to receive(:shard_routing_values).and_return(["routing_value_1", "routing_value_2"])
-              hash[query] = {}
-            end
+            queries.to_h { |query| [query, {}] }
           end
 
           build_graphql(

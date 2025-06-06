@@ -119,6 +119,32 @@ module ElasticGraph
           }))
         end
 
+        it "avoids sending an identical query multiple times in the same HTTP request" do
+          allow(main_datastore_client).to receive(:msearch) do |queries|
+            # We use `each_slice(2)` because each query has two parts (a `header` and a `body`).
+            expect(queries.fetch(:body).each_slice(2).size).to eq 2
+            {
+              "took" => 10,
+              "responses" => [
+                empty_response.merge("r" => 1),
+                empty_response.merge("r" => 2)
+              ]
+            }
+          end
+
+          query_tracker = QueryDetailsTracker.empty
+
+          # Here we are creating a different `DatastoreQuery` object (by assigning a different deadline) but the query payload is identical.
+          query3 = query1.merge_with(monotonic_clock_deadline: now_when_msearch_is_called + 10000)
+          responses = router.msearch([query1, query2, query3], query_tracker: query_tracker)
+
+          expect(responses.size).to eq(3)
+          expect(responses.fetch(query3)).to eq(responses.fetch(query1))
+          expect(responses.fetch(query2)).not_to eq(responses.fetch(query1))
+
+          expect(query_tracker.query_counts_per_datastore_request).to eq [2]
+        end
+
         it "raises `Errors::RequestExceededDeadlineError` if a query has a deadline in the past" do
           queries = [
             query1.merge_with(monotonic_clock_deadline: now_when_msearch_is_called + -3),

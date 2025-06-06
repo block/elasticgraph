@@ -72,12 +72,22 @@ module ElasticGraph
           datastore_query_started_at = @monotonic_clock.now_in_ms
 
           server_took_and_results = Support::Threading.parallel_map(queries_and_header_body_tuples_by_datastore_client) do |datastore_client, query_and_header_body_tuples_for_cluster|
-            queries_for_cluster, header_body_tuples = query_and_header_body_tuples_for_cluster.transpose
-            msearch_body = header_body_tuples.flatten(1)
+            queries_by_header_body_tuples = query_and_header_body_tuples_for_cluster
+              .group_by { |(query, header_body_tuple)| header_body_tuple }
+              .transform_values { |values| values.map(&:first) }
+
+            msearch_body = queries_by_header_body_tuples.keys.flatten(1)
             response = datastore_client.msearch(body: msearch_body, headers: headers)
             debug_query(query: msearch_body, response: response)
-            ordered_responses = response.fetch("responses")
-            [response["took"], queries_for_cluster.zip(ordered_responses)]
+
+            query_tracker.record_datastore_queries_for_single_request(queries_by_header_body_tuples.values.map(&:first))
+
+            responses_by_header_body_tuple = queries_by_header_body_tuples.keys.zip(response.fetch("responses")).to_h
+            ordered_queries_and_responses = query_and_header_body_tuples_for_cluster.map do |(query, header_body_tuple)|
+              [query, responses_by_header_body_tuple.fetch(header_body_tuple)]
+            end
+
+            [response["took"], ordered_queries_and_responses]
           end
 
           queried_shard_count = server_took_and_results.reduce(0) do |outer_accum, (query, queries_and_responses)|
