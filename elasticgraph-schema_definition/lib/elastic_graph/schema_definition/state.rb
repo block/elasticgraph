@@ -173,8 +173,7 @@ module ElasticGraph
             raise Errors::SchemaError, "Cannot access `user_defined_field_references_by_type_name` until the schema definition is complete."
           end
 
-          @user_defined_field_references_by_type_name ||= user_defined_fields
-            .group_by { |f| f.type.fully_unwrapped.name }
+          user_defined_fields.group_by { |f| f.type.fully_unwrapped.name }
         end
       end
 
