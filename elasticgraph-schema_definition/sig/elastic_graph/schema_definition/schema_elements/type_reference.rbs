@@ -20,7 +20,7 @@ module ElasticGraph
         def unwrap_list: () -> TypeReference
         def as_object_type: () -> anyObjectType?
         def object?: () -> bool
-        def enum?: () -> bool
+        def enum?: () ?{ () -> bool } -> bool
         def leaf?: () -> bool
         def list?: () -> bool
         def non_null?: () -> bool

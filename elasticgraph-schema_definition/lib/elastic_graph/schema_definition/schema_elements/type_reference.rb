@@ -108,8 +108,12 @@ module ElasticGraph
           when :enum
             true
           else
-            # If we can't determine the type from the name, just raise an error.
-            raise Errors::SchemaError, "Type `#{name}` cannot be resolved. Is it misspelled?"
+            if block_given?
+              yield
+            else
+              # If we can't determine the type from the name, just raise an error.
+              raise Errors::SchemaError, "Type `#{name}` cannot be resolved. Is it misspelled?"
+            end
           end
         end
 
@@ -339,7 +343,7 @@ module ElasticGraph
           return :object if OBJECT_FORMATS.any? { |f| type_namer.matches_format?(name, f) }
 
           if (as_output_enum_name = type_namer.extract_base_from(name, format: :InputEnum))
-            :enum if ENUM_FORMATS.any? { |f| type_namer.matches_format?(as_output_enum_name, f) }
+            :enum if schema_def_state.type_ref(as_output_enum_name).enum? { false }
           end
         end
 

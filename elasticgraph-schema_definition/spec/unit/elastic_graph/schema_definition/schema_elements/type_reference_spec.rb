@@ -161,6 +161,14 @@ module ElasticGraph
             expect(type.enum?).to be false
           end
 
+          it "considers both input and output forms of an enum to be an enum" do
+            type = type_ref("DateTimeUnit")
+            expect(type.enum?).to be true
+
+            type = type_ref("DateTimeUnitInput")
+            expect(type.enum?).to be true
+          end
+
           context "when dealing with a type that has been renamed" do
             it "correctly detects a renamed object type" do
               type = type_ref("RingValuesAggregated")
@@ -564,6 +572,13 @@ module ElasticGraph
                   f.mapping type: "object"
                 end
                 t.index "has_nested"
+              end
+
+              api.on_root_query_type do |t|
+                t.field "time", "DateTime" do |f|
+                  date_time_unit_input_type_name = api.state.type_ref("DateTimeUnit").as_input_enum
+                  f.argument "offsetUnit", "#{date_time_unit_input_type_name}!"
+                end
               end
             end
           end
