@@ -1,0 +1,25 @@
+query GlobalSearchV2(
+  $query: String = "Rock" # an example search term; replace with whatever you want
+) {
+  artists(filter: {
+    anyOf: [
+      {albums: {anySatisfy: {name: {contains: {anySubstringOf: [$query]}}}}}
+      {albums: {anySatisfy: {tracks: {anySatisfy: {name: {contains: {anySubstringOf: [$query]}}}}}}}
+      {bio: {homeCountry: {equalToAnyOf: [$query]}}}
+      {bio: {description: {matchesQuery: {query: $query}}}}
+      {name: {contains: {anySubstringOf: [$query]}}}
+      {tours: {anySatisfy: {name: {contains: {anySubstringOf: [$query]}}}}}
+    ]
+  }) {
+    edges {
+      node {
+        name
+      }
+
+      allHighlights {
+        path
+        snippets
+      }
+    }
+  }
+}

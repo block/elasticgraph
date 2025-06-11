@@ -41,3 +41,7 @@ entire schema.
   extends it with support for `totalEdgeCount` and `nodes`.
   Pagination is available under both a "raw data" field (e.g `artists`) and under
   an aggregations field (e.g. `artistAggregations`).
+
+[Highlighting]({% link query-api/highlighting.md %})
+: ElasticGraph offers search highlighting, providing snippets which indicate where
+  search terms matched within the returned documents.

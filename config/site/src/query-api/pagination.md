@@ -32,7 +32,15 @@ It can be used to get a total count of matching records:
 ### Nodes
 
 As an alternative to `edges.node`, ElasticGraph offers `nodes`. This is recommended over `edges` except when you need
-a per-node `cursor` (which is available under `edges`) since it removes an extra layer of nesting, providing a simpler
-response structure:
+access to an edge-specific feature since it removes an extra layer of nesting, providing a simpler response structure:
 
 {% include copyable_code_snippet.html language="graphql" data="music_queries.pagination.PaginationNodes" %}
+
+<div class="alert-note" markdown="1">
+**Note**{: .alert-title}
+
+There are a couple of features that are available under `edges` but not `nodes`:
+
+* **Per-node cursors**: Edges provide a `cursor` alongside each `node`.
+* [**Search highlighting**]({% link query-api/highlighting.md %}): Each edge provides `highlights` and `allHighlights`.
+</div>
