@@ -457,6 +457,16 @@ module ElasticGraph
               expect(ref.to_final_form(as_input: true).name).to eq "NewName"
             end
 
+            it "allows a sort order enum to be overridden to omit the `Input` suffix" do
+              ref = type_ref(
+                "[WidgetSortOrder!]",
+                type_name_overrides: {WidgetSortOrderInput: "WidgetSortOrder"}
+              )
+
+              expect(ref.to_final_form(as_input: true).name).to eq "[WidgetSortOrder!]"
+              expect(ref.to_final_form(as_input: false).name).to eq "[WidgetSortOrder!]"
+            end
+
             def api(type_name_overrides: {}, derived_type_name_formats: {})
               API.new(
                 SchemaArtifacts::RuntimeMetadata::SchemaElementNames.new(form: "snake_case"),

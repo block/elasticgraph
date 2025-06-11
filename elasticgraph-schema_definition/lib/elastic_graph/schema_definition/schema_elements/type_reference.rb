@@ -343,7 +343,8 @@ module ElasticGraph
           return :object if OBJECT_FORMATS.any? { |f| type_namer.matches_format?(name, f) }
 
           if (as_output_enum_name = type_namer.extract_base_from(name, format: :InputEnum))
-            :enum if schema_def_state.type_ref(as_output_enum_name).enum? { false }
+            return :enum if ENUM_FORMATS.any? { |f| type_namer.matches_format?(as_output_enum_name, f) }
+            :enum if as_output_enum_name != self.name && schema_def_state.type_ref(as_output_enum_name).enum? { false }
           end
         end
 
