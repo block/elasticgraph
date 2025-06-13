@@ -330,8 +330,7 @@ module ElasticGraph
       # registered callback.
       #
       # @param type [Symbol] type of data batch. Can be the name of a GraphQL type or any other name you want to give a batch of fake data
-      # @yield [Array<Hash<String, Object>>, Array<Hash<Symbol, Object>>] list the block should append to when generating data
-      # @yieldreturn [void]
+      # @yieldreturn [Array<Hash<String, Object>>] generated data
       #
       # @example Register a callback to generate fake `campaigns` data
       #   ElasticGraph::Local::RakeTasks.new(
