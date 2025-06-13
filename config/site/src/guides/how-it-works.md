@@ -130,7 +130,7 @@ input ElasticGraph generates to support filtering on `Album` objects:
 This artifact is used by [elasticgraph-graphql](https://github.com/block/elasticgraph/tree/main/elasticgraph-graphql)
 to provide the GraphQL endpoint. In addition, it's a public artifact which can be provided to GraphQL clients.
 
-### Artifact 4: `runtime_metadata.yaml`.
+### Artifact 4: `runtime_metadata.yaml`
 
 The [`runtime_metadata.yaml` artifact]({% link guides/how-it-works/schema-artifacts/runtime_metadata.yaml %}) is the
 final schema artifact. It provides metaadata used by the various parts of ElasticGraph at runtime. For example,
