@@ -238,6 +238,81 @@ module ElasticGraph
             }
           EOS
         end
+
+        it "allows a graphql-only paginated collection field with abilities disabled" do
+          result = define_schema do |api|
+            api.object_type "Component" do |t|
+              t.field "id", "ID"
+            end
+
+            api.object_type "Widget" do |t|
+              t.field "id", "ID"
+              t.paginated_collection_field "component_ids", "ID", singular: "component_id"
+              t.paginated_collection_field "components", "Component",
+                name_in_index: "component_ids",
+                graphql_only: true,
+                filterable: false,
+                groupable: false,
+                aggregatable: false,
+                highlightable: false
+
+              t.index "widgets"
+            end
+          end
+
+          expect(type_def_from(result, "Widget")).to eq(<<~EOS.chomp)
+            type Widget {
+              id: ID
+              component_ids(
+                #{schema_elements.first}: Int
+                #{schema_elements.after}: Cursor
+                #{schema_elements.last}: Int
+                #{schema_elements.before}: Cursor): IDConnection
+              components(
+                #{schema_elements.first}: Int
+                #{schema_elements.after}: Cursor
+                #{schema_elements.last}: Int
+                #{schema_elements.before}: Cursor): ComponentConnection
+            }
+          EOS
+
+          expect(filter_type_from(result, "Widget")).to eq(<<~EOS.chomp)
+            input WidgetFilterInput {
+              #{schema_elements.any_of}: [WidgetFilterInput!]
+              #{schema_elements.all_of}: [WidgetFilterInput!]
+              #{schema_elements.not}: WidgetFilterInput
+              id: IDFilterInput
+              component_ids: IDListFilterInput
+            }
+          EOS
+
+          expect(grouped_by_type_from(result, "Widget")).to eq(<<~EOS.chomp)
+            type WidgetGroupedBy {
+              component_id: ID
+            }
+          EOS
+
+          expect(aggregated_values_type_from(result, "Widget")).to eq(<<~EOS.chomp)
+            type WidgetAggregatedValues {
+              id: NonNumericAggregatedValues
+              component_ids: NonNumericAggregatedValues
+            }
+          EOS
+
+          expect(highlights_type_from(result, "Widget")).to eq(<<~EOS.chomp)
+            type WidgetHighlights {
+              id: [String!]!
+              component_ids: [String!]!
+            }
+          EOS
+
+          expect(sort_order_type_from(result, "Widget")).to eq(<<~EOS.chomp)
+            enum WidgetSortOrderInput {
+              id_ASC
+              id_DESC
+            }
+          EOS
+        end
       end
     end
   end

@@ -68,7 +68,12 @@ module ElasticGraph
           ::String,
           ::String,
           ?name_in_index: ::String,
-          ?singular: ::String?
+          ?graphql_only: bool,
+          ?singular: ::String?,
+          ?groupable: bool?,
+          ?filterable: bool?,
+          ?aggregatable: bool?,
+          ?highlightable: bool?
         ) ?{ (Field) -> void } -> Field
 
         def relates_to_one: (::String, ::String, via: ::String, dir: foreignKeyDirection) ?{ (Relationship) -> void } -> void

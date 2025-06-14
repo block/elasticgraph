@@ -279,6 +279,14 @@ module ElasticGraph
         #   differently named field in the index.
         # @param singular [String] indicates what the singular form of a field's name is. When provided, ElasticGraph will define a
         #   `groupedBy` field (using the singular form) allowing clients to group by individual values from the field.
+        # @param aggregatable [Boolean] force-enables or disables the ability for aggregation queries to aggregate over this field.
+        #   When not provided, ElasticGraph will infer field aggregatability based on the field's GraphQL type and mapping type.
+        # @param filterable [Boolean] force-enables or disables the ability for queries to filter by this field. When not provided,
+        #   ElasticGraph will infer field filterability based on the field's GraphQL type and mapping type.
+        # @param groupable [Boolean] force-enables or disables the ability for aggregation queries to group by this field. When
+        #   not provided, ElasticGraph will infer field groupability based on the field's GraphQL type and mapping type.
+        # @param highlightable [Boolean] force-enables or disables the ability to request search highlights for this field. When
+        #   not provided, ElasticGraph will infer field highlightable based on the field's mapping type.
         # @yield [Field] the field for further customization
         # @return [void]
         #
@@ -295,23 +303,39 @@ module ElasticGraph
         #       t.index "authors"
         #     end
         #   end
-        def paginated_collection_field(name, element_type, name_in_index: name, singular: nil, &block)
+        def paginated_collection_field(
+          name,
+          element_type,
+          name_in_index: name,
+          graphql_only: false,
+          singular: nil,
+          groupable: !!singular,
+          filterable: nil,
+          aggregatable: nil,
+          highlightable: nil,
+          &block
+        )
           element_type_ref = schema_def_state.type_ref(element_type).to_final_form
           element_type = element_type_ref.name
 
           schema_def_state.paginated_collection_element_types << element_type
 
-          field(name, "[#{element_type}!]!", indexing_only: true, name_in_index: name_in_index, &block)
+          unless graphql_only
+            field(name, "[#{element_type}!]!", indexing_only: true, name_in_index: name_in_index, &block)
+          end
 
           field(
             name,
             element_type_ref.as_connection.name,
             name_in_index: name_in_index,
             type_for_derived_types: "[#{element_type}]",
-            groupable: !!singular,
-            sortable: false,
             graphql_only: true,
-            singular: singular
+            singular: singular,
+            groupable: groupable,
+            filterable: filterable,
+            aggregatable: aggregatable,
+            highlightable: highlightable,
+            sortable: false
           ) do |f|
             f.define_relay_pagination_arguments!
             block&.call(f)
