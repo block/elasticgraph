@@ -5,25 +5,25 @@ module ElasticGraph
         attr_reader name_in_index: ::String?
         attr_reader relation: Relation?
         attr_reader computation_detail: ComputationDetail?
-        attr_reader resolver: ::Symbol?
+        attr_reader resolver: ConfiguredGraphQLResolver?
 
         def initialize: (
           name_in_index: ::String?,
           relation: Relation?,
           computation_detail: ComputationDetail?,
-          resolver: ::Symbol?
+          resolver: ConfiguredGraphQLResolver?
         ) -> void
 
         def with: (
           ?name_in_index: ::String?,
           ?relation: Relation?,
           ?computation_detail: ComputationDetail?,
-          ?resolver: ::Symbol?
+          ?resolver: ConfiguredGraphQLResolver?
         ) -> instance
 
         def self.new:
-          (name_in_index: ::String?, relation: Relation?, computation_detail: ComputationDetail?, resolver: ::Symbol?) -> instance
-          | (::String?, Relation?, ComputationDetail?, ::Symbol?) -> instance
+          (name_in_index: ::String?, relation: Relation?, computation_detail: ComputationDetail?, resolver: ConfiguredGraphQLResolver?) -> instance
+          | (::String?, Relation?, ComputationDetail?, ConfiguredGraphQLResolver?) -> instance
       end
 
       class GraphQLField < GraphQLFieldSupertype

@@ -83,7 +83,7 @@ module QueryAdapterSpecSupport
     end
 
     def resolved_with_resolver_that_builds_datastore_query?(schema_field, object)
-      resolver = @graphql.named_graphql_resolvers.fetch(schema_field.resolver)
+      resolver = @graphql.named_graphql_resolvers.fetch(schema_field.resolver.name)
       @resolvers_that_build_datastore_query.include?(resolver)
     end
 

@@ -1,0 +1,32 @@
+module ElasticGraph
+  module SchemaArtifacts
+    module RuntimeMetadata
+      class ConfiguredGraphQLResolverSupertype
+        attr_reader name: ::Symbol
+        attr_reader config: ::Hash[::Symbol, untyped]
+
+        def initialize: (
+          name: ::Symbol,
+          config: ::Hash[::Symbol, untyped]
+        ) -> void
+
+        def with: (
+          ?name: ::Symbol,
+          ?config: ::Hash[::Symbol, untyped]
+        ) -> instance
+
+        def self.new:
+          (name: ::Symbol, config: ::Hash[::Symbol, untyped]) -> instance
+          | (::Symbol, ::Hash[::Symbol, untyped]) -> instance
+      end
+
+      class ConfiguredGraphQLResolver < ConfiguredGraphQLResolverSupertype
+        NAME: "name"
+        CONFIG: "config"
+
+        def self.from_hash: (::Hash[::String, untyped]) -> ConfiguredGraphQLResolver
+        def to_dumpable_hash: () -> ::Hash[::String, untyped]
+      end
+    end
+  end
+end

@@ -42,9 +42,9 @@ module ElasticGraph
         def object_type_hash
           @runtime_metadata.object_types_by_name.filter_map do |type_name, type|
             fields_hash = type.graphql_fields_by_name.filter_map do |field_name, field|
-              if (resolver_name = field.resolver)
-                resolver = @named_resolvers.fetch(resolver_name) do
-                  raise Errors::SchemaError, "Resolver `#{resolver_name}` (for `#{type_name}.#{field_name}`) cannot be found."
+              if (configured_resolver = field.resolver)
+                resolver = @named_resolvers.fetch(configured_resolver.name) do
+                  raise Errors::SchemaError, "Resolver `#{configured_resolver.name}` (for `#{type_name}.#{field_name}`) cannot be found."
                 end
 
                 resolver_lambda =

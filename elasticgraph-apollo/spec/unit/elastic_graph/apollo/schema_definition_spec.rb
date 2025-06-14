@@ -7,12 +7,14 @@
 # frozen_string_literal: true
 
 require "elastic_graph/apollo/schema_definition/api_extension"
+require "elastic_graph/spec_support/runtime_metadata_support"
 require "elastic_graph/spec_support/schema_definition_helpers"
 require "graphql"
 
 module ElasticGraph
   module Apollo
     RSpec.describe SchemaDefinition do
+      include SchemaArtifacts::RuntimeMetadata::RuntimeMetadataSupport
       include_context "SchemaDefinitionHelpers"
 
       def self.with_both_casing_forms(&block)
@@ -431,8 +433,8 @@ module ElasticGraph
           results = define_schema(with_apollo: true) { |s| define_some_types_on(s) }
           query_type = results.runtime_metadata.object_types_by_name.fetch("Query")
 
-          expect(query_type.graphql_fields_by_name.fetch("_entities").resolver).to eq :apollo_entities
-          expect(query_type.graphql_fields_by_name.fetch("_service").resolver).to eq :apollo_service
+          expect(query_type.graphql_fields_by_name.fetch("_entities").resolver).to eq configured_graphql_resolver(:apollo_entities)
+          expect(query_type.graphql_fields_by_name.fetch("_service").resolver).to eq configured_graphql_resolver(:apollo_service)
         end
 
         # We use `dont_validate_graphql_schema` here because the validation triggers the example exceptions we assert on from

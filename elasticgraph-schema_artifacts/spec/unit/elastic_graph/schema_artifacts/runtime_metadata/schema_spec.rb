@@ -58,7 +58,7 @@ module ElasticGraph
                     computation_detail: nil,
                     name_in_index: "name_index",
                     relation: nil,
-                    resolver: :self
+                    resolver: ConfiguredGraphQLResolver.new(:self, {arg1: 17})
                   ),
                   "parent" => GraphQLField.new(
                     computation_detail: nil,
@@ -69,7 +69,7 @@ module ElasticGraph
                       additional_filter: {"flag_field" => {"equalToAnyOf" => [true]}},
                       foreign_key_nested_paths: ["grandparents", "grandparents.parents"]
                     ),
-                    resolver: :self
+                    resolver: ConfiguredGraphQLResolver.new(:self, {})
                   ),
                   "sum" => GraphQLField.new(
                     computation_detail: ComputationDetail.new(
@@ -78,7 +78,7 @@ module ElasticGraph
                     ),
                     name_in_index: "sum",
                     relation: nil,
-                    resolver: :self
+                    resolver: ConfiguredGraphQLResolver.new(:self, {})
                   )
                 },
                 elasticgraph_category: :some_category,
@@ -174,7 +174,7 @@ module ElasticGraph
                 "graphql_fields_by_name" => {
                   "name_graphql" => {
                     "name_in_index" => "name_index",
-                    "resolver" => "self"
+                    "resolver" => {"name" => "self", "config" => {"arg1" => 17}}
                   },
                   "parent" => {
                     "relation" => {
@@ -183,14 +183,14 @@ module ElasticGraph
                       "additional_filter" => {"flag_field" => {"equalToAnyOf" => [true]}},
                       "foreign_key_nested_paths" => ["grandparents", "grandparents.parents"]
                     },
-                    "resolver" => "self"
+                    "resolver" => {"name" => "self"}
                   },
                   "sum" => {
                     "computation_detail" => {
                       "empty_bucket_value" => 0,
                       "function" => "sum"
                     },
-                    "resolver" => "self"
+                    "resolver" => {"name" => "self"}
                   }
                 },
                 "elasticgraph_category" => "some_category",
@@ -309,7 +309,7 @@ module ElasticGraph
                 name_in_index: "name_index",
                 computation_detail: nil,
                 relation: nil,
-                resolver: :self
+                resolver: ConfiguredGraphQLResolver.new(:self, {})
               )
             }),
             "NoMetadata" => object_type_with

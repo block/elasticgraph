@@ -78,7 +78,9 @@ module ElasticGraph
         # @param default_resolver_name [Symbol] name of the GraphQL resolver to use as the default for fields of this type
         # @return [void]
         def resolve_fields_with(default_resolver_name)
-          @default_graphql_resolver = default_resolver_name
+          @default_graphql_resolver = default_resolver_name&.then do
+            SchemaArtifacts::RuntimeMetadata::ConfiguredGraphQLResolver.new(it, {})
+          end
         end
 
         # List of indices. (Currently we only store one but we may support multiple in the future).

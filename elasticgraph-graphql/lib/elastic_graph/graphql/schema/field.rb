@@ -29,7 +29,7 @@ module ElasticGraph
           @computation_detail = runtime_metadata&.computation_detail
           @resolver = runtime_metadata&.resolver
           @name_in_index = runtime_metadata&.name_in_index || name
-          @graphql_field.extras([:lookahead]) if resolvers_needing_lookahead.include?(@resolver)
+          @graphql_field.extras([:lookahead]) if resolvers_needing_lookahead.include?(@resolver&.name)
         end
 
         def type
