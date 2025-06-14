@@ -148,6 +148,10 @@ module ElasticGraph
           )
         end
 
+        def configured_graphql_resolver(name, **config)
+          ConfiguredGraphQLResolver.new(name, config)
+        end
+
         DEFAULT_RESOLVER_REF = {
           "name" => "ElasticGraph::GraphQL::Resolvers::GetRecordFieldValue",
           "require_path" => "elastic_graph/graphql/resolvers/get_record_field_value"

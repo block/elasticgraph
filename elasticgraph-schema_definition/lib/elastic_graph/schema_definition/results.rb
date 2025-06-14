@@ -364,8 +364,8 @@ module ElasticGraph
           .object_types_by_name
           .each do |type_name, type|
             type.graphql_fields_by_name.each do |field_name, field|
-              if (resolver = field.resolver)
-                fields_by_resolvers[resolver] << "#{type_name}.#{field_name}"
+              if (resolver_name = field.resolver&.name)
+                fields_by_resolvers[resolver_name] << "#{type_name}.#{field_name}"
               end
             end
           end

@@ -2618,18 +2618,23 @@ object_types_by_name:
   Address:
     graphql_fields_by_name:
       full_address:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       geo_location:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       manufacturer:
         relation:
           direction: out
           foreign_key: manufacturer_id
-        resolver: nested_relationships
+        resolver:
+          name: nested_relationships
       shapes:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       timestamps:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
     index_definition_names:
     - addresses
     update_targets:
@@ -2663,93 +2668,122 @@ object_types_by_name:
   AddressAggregatedValues:
     graphql_fields_by_name:
       full_address:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       geo_location:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       shapes:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       timestamps:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   AddressAggregation:
     elasticgraph_category: indexed_aggregation
     graphql_fields_by_name:
       aggregated_values:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       count:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       grouped_by:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
     source_type: Address
   AddressAggregationConnection:
     elasticgraph_category: relay_connection
     graphql_fields_by_name:
       edges:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       nodes:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       page_info:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   AddressAggregationEdge:
     elasticgraph_category: relay_edge
     graphql_fields_by_name:
       cursor:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       node:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   AddressConnection:
     elasticgraph_category: relay_connection
     graphql_fields_by_name:
       edges:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       nodes:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       page_info:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       total_edge_count:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   AddressEdge:
     elasticgraph_category: relay_edge
     graphql_fields_by_name:
       all_highlights:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       cursor:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       highlights:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       node:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   AddressGroupedBy:
     graphql_fields_by_name:
       full_address:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       timestamps:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   AddressHighlights:
     graphql_fields_by_name:
       full_address:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   AddressTimestamps:
     graphql_fields_by_name:
       created_at:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   AddressTimestampsAggregatedValues:
     graphql_fields_by_name:
       created_at:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   AddressTimestampsGroupedBy:
     graphql_fields_by_name:
       created_at:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   Affiliations:
     graphql_fields_by_name:
       sponsorships_nested:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       sponsorships_object:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   AffiliationsAggregatedValues:
     graphql_fields_by_name:
       sponsorships_object:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   AffiliationsFieldsListFilterInput:
     graphql_fields_by_name:
       count:
@@ -2757,21 +2791,27 @@ object_types_by_name:
   AffiliationsGroupedBy:
     graphql_fields_by_name:
       sponsorships_object:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   AffiliationsHighlights:
     graphql_fields_by_name:
       sponsorships_nested:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       sponsorships_object:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   AggregationCountDetail:
     graphql_fields_by_name:
       approximate_value:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       exact_value:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       upper_bound:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
     graphql_only_return_type: true
   BooleanListFilterInput:
     graphql_fields_by_name:
@@ -2784,13 +2824,16 @@ object_types_by_name:
   Company:
     graphql_fields_by_name:
       name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       stock_ticker:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   Component:
     graphql_fields_by_name:
       created_at:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       dollar_widget:
         relation:
           additional_filter:
@@ -2800,51 +2843,66 @@ object_types_by_name:
                 - 100
           direction: in
           foreign_key: component_ids
-        resolver: nested_relationships
+        resolver:
+          name: nested_relationships
       id:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       part_aggregations:
         relation:
           direction: out
           foreign_key: part_ids
-        resolver: nested_relationships
+        resolver:
+          name: nested_relationships
       parts:
         relation:
           direction: out
           foreign_key: part_ids
-        resolver: nested_relationships
+        resolver:
+          name: nested_relationships
       position:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       tags:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       widget:
         relation:
           direction: in
           foreign_key: component_ids
-        resolver: nested_relationships
+        resolver:
+          name: nested_relationships
       widget_aggregations:
         relation:
           direction: in
           foreign_key: component_ids
-        resolver: nested_relationships
+        resolver:
+          name: nested_relationships
       widget_cost:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       widget_name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       widget_size:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       widget_tags:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       widget_workspace_id:
         name_in_index: widget_workspace_id3
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       widgets:
         relation:
           direction: in
           foreign_key: component_ids
-        resolver: nested_relationships
+        resolver:
+          name: nested_relationships
     index_definition_names:
     - components
     update_targets:
@@ -2878,74 +2936,100 @@ object_types_by_name:
   ComponentAggregatedValues:
     graphql_fields_by_name:
       created_at:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       id:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       position:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       tags:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       widget_cost:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       widget_name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       widget_size:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       widget_tags:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       widget_workspace_id:
         name_in_index: widget_workspace_id3
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   ComponentAggregation:
     elasticgraph_category: indexed_aggregation
     graphql_fields_by_name:
       aggregated_values:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       count:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       grouped_by:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
     source_type: Component
   ComponentAggregationConnection:
     elasticgraph_category: relay_connection
     graphql_fields_by_name:
       edges:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       nodes:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       page_info:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   ComponentAggregationEdge:
     elasticgraph_category: relay_edge
     graphql_fields_by_name:
       cursor:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       node:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   ComponentConnection:
     elasticgraph_category: relay_connection
     graphql_fields_by_name:
       edges:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       nodes:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       page_info:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       total_edge_count:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   ComponentEdge:
     elasticgraph_category: relay_edge
     graphql_fields_by_name:
       all_highlights:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       cursor:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       highlights:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       node:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   ComponentFilterInput:
     graphql_fields_by_name:
       widget_workspace_id:
@@ -2953,109 +3037,143 @@ object_types_by_name:
   ComponentGroupedBy:
     graphql_fields_by_name:
       created_at:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       position:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       widget_cost:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       widget_name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       widget_size:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       widget_workspace_id:
         name_in_index: widget_workspace_id3
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   ComponentHighlights:
     graphql_fields_by_name:
       id:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       tags:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       widget_cost:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       widget_name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       widget_size:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       widget_tags:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       widget_workspace_id:
         name_in_index: widget_workspace_id3
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   Country:
     graphql_fields_by_name:
       currency:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       id:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       names:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       team_aggregations:
         relation:
           direction: in
           foreign_key: country_code
-        resolver: nested_relationships
+        resolver:
+          name: nested_relationships
       teams:
         relation:
           direction: in
           foreign_key: country_code
-        resolver: nested_relationships
+        resolver:
+          name: nested_relationships
   CurrencyDetails:
     graphql_fields_by_name:
       symbol:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       unit:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   CurrencyDetailsAggregatedValues:
     graphql_fields_by_name:
       symbol:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       unit:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   CurrencyDetailsGroupedBy:
     graphql_fields_by_name:
       symbol:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       unit:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   CurrencyDetailsHighlights:
     graphql_fields_by_name:
       symbol:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       unit:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   DateAggregatedValues:
     elasticgraph_category: scalar_aggregated_values
     graphql_fields_by_name:
       approximate_avg:
         computation_detail:
           function: avg
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       approximate_distinct_value_count:
         computation_detail:
           empty_bucket_value: 0
           function: cardinality
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       exact_max:
         computation_detail:
           function: max
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       exact_min:
         computation_detail:
           function: min
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
     graphql_only_return_type: true
   DateGroupedBy:
     elasticgraph_category: date_grouped_by_object
     graphql_fields_by_name:
       as_date:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       as_day_of_week:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
     graphql_only_return_type: true
   DateListFilterInput:
     graphql_fields_by_name:
@@ -3067,32 +3185,40 @@ object_types_by_name:
       approximate_avg:
         computation_detail:
           function: avg
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       approximate_distinct_value_count:
         computation_detail:
           empty_bucket_value: 0
           function: cardinality
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       exact_max:
         computation_detail:
           function: max
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       exact_min:
         computation_detail:
           function: min
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
     graphql_only_return_type: true
   DateTimeGroupedBy:
     elasticgraph_category: date_grouped_by_object
     graphql_fields_by_name:
       as_date:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       as_date_time:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       as_day_of_week:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       as_time_of_day:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
     graphql_only_return_type: true
   DateTimeListFilterInput:
     graphql_fields_by_name:
@@ -3104,25 +3230,32 @@ object_types_by_name:
         relation:
           direction: in
           foreign_key: part_ids
-        resolver: nested_relationships
+        resolver:
+          name: nested_relationships
       components:
         relation:
           direction: in
           foreign_key: part_ids
-        resolver: nested_relationships
+        resolver:
+          name: nested_relationships
       created_at:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       id:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       manufacturer:
         relation:
           direction: out
           foreign_key: manufacturer_id
-        resolver: nested_relationships
+        resolver:
+          name: nested_relationships
       name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       voltage:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
     index_definition_names:
     - electrical_parts
     update_targets:
@@ -3154,115 +3287,149 @@ object_types_by_name:
   ElectricalPartAggregatedValues:
     graphql_fields_by_name:
       created_at:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       id:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       voltage:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   ElectricalPartAggregation:
     elasticgraph_category: indexed_aggregation
     graphql_fields_by_name:
       aggregated_values:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       count:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       grouped_by:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
     source_type: ElectricalPart
   ElectricalPartAggregationConnection:
     elasticgraph_category: relay_connection
     graphql_fields_by_name:
       edges:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       nodes:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       page_info:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   ElectricalPartAggregationEdge:
     elasticgraph_category: relay_edge
     graphql_fields_by_name:
       cursor:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       node:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   ElectricalPartConnection:
     elasticgraph_category: relay_connection
     graphql_fields_by_name:
       edges:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       nodes:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       page_info:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       total_edge_count:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   ElectricalPartEdge:
     elasticgraph_category: relay_edge
     graphql_fields_by_name:
       all_highlights:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       cursor:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       highlights:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       node:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   ElectricalPartGroupedBy:
     graphql_fields_by_name:
       created_at:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       voltage:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   ElectricalPartHighlights:
     graphql_fields_by_name:
       id:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   FloatAggregatedValues:
     elasticgraph_category: scalar_aggregated_values
     graphql_fields_by_name:
       approximate_avg:
         computation_detail:
           function: avg
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       approximate_distinct_value_count:
         computation_detail:
           empty_bucket_value: 0
           function: cardinality
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       approximate_sum:
         computation_detail:
           empty_bucket_value: 0
           function: sum
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       exact_max:
         computation_detail:
           function: max
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       exact_min:
         computation_detail:
           function: min
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
     graphql_only_return_type: true
   GeoLocation:
     graphql_fields_by_name:
       latitude:
         name_in_index: lat
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       longitude:
         name_in_index: lon
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   GeoShape:
     graphql_fields_by_name:
       coordinates:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       type:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   IDListFilterInput:
     graphql_fields_by_name:
       count:
@@ -3273,30 +3440,36 @@ object_types_by_name:
       approximate_avg:
         computation_detail:
           function: avg
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       approximate_distinct_value_count:
         computation_detail:
           empty_bucket_value: 0
           function: cardinality
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       approximate_sum:
         computation_detail:
           empty_bucket_value: 0
           function: sum
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       exact_max:
         computation_detail:
           function: max
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       exact_min:
         computation_detail:
           function: min
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       exact_sum:
         computation_detail:
           empty_bucket_value: 0
           function: sum
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
     graphql_only_return_type: true
   IntListFilterInput:
     graphql_fields_by_name:
@@ -3305,65 +3478,83 @@ object_types_by_name:
   Inventor:
     graphql_fields_by_name:
       name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       nationality:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       stock_ticker:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   InventorAggregatedValues:
     graphql_fields_by_name:
       name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       nationality:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       stock_ticker:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   InventorGroupedBy:
     graphql_fields_by_name:
       name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       nationality:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       stock_ticker:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   InventorHighlights:
     graphql_fields_by_name:
       name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       nationality:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       stock_ticker:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   JsonSafeLongAggregatedValues:
     elasticgraph_category: scalar_aggregated_values
     graphql_fields_by_name:
       approximate_avg:
         computation_detail:
           function: avg
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       approximate_distinct_value_count:
         computation_detail:
           empty_bucket_value: 0
           function: cardinality
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       approximate_sum:
         computation_detail:
           empty_bucket_value: 0
           function: sum
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       exact_max:
         computation_detail:
           function: max
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       exact_min:
         computation_detail:
           function: min
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       exact_sum:
         computation_detail:
           empty_bucket_value: 0
           function: sum
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
     graphql_only_return_type: true
   JsonSafeLongListFilterInput:
     graphql_fields_by_name:
@@ -3375,20 +3566,24 @@ object_types_by_name:
       approximate_avg:
         computation_detail:
           function: avg
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       approximate_distinct_value_count:
         computation_detail:
           empty_bucket_value: 0
           function: cardinality
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       exact_max:
         computation_detail:
           function: max
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       exact_min:
         computation_detail:
           function: min
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
     graphql_only_return_type: true
   LongStringAggregatedValues:
     elasticgraph_category: scalar_aggregated_values
@@ -3396,38 +3591,46 @@ object_types_by_name:
       approximate_avg:
         computation_detail:
           function: avg
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       approximate_distinct_value_count:
         computation_detail:
           empty_bucket_value: 0
           function: cardinality
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       approximate_max:
         computation_detail:
           function: max
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       approximate_min:
         computation_detail:
           function: min
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       approximate_sum:
         computation_detail:
           empty_bucket_value: 0
           function: sum
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       exact_max:
         computation_detail:
           function: max
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       exact_min:
         computation_detail:
           function: min
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       exact_sum:
         computation_detail:
           empty_bucket_value: 0
           function: sum
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
     graphql_only_return_type: true
   Manufacturer:
     graphql_fields_by_name:
@@ -3435,23 +3638,29 @@ object_types_by_name:
         relation:
           direction: in
           foreign_key: manufacturer_id
-        resolver: nested_relationships
+        resolver:
+          name: nested_relationships
       created_at:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       id:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       manufactured_part_aggregations:
         relation:
           direction: in
           foreign_key: manufacturer_id
-        resolver: nested_relationships
+        resolver:
+          name: nested_relationships
       manufactured_parts:
         relation:
           direction: in
           foreign_key: manufacturer_id
-        resolver: nested_relationships
+        resolver:
+          name: nested_relationships
       name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
     index_definition_names:
     - manufacturers
     update_targets:
@@ -3479,96 +3688,126 @@ object_types_by_name:
   ManufacturerAggregatedValues:
     graphql_fields_by_name:
       created_at:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       id:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   ManufacturerAggregation:
     elasticgraph_category: indexed_aggregation
     graphql_fields_by_name:
       aggregated_values:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       count:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       grouped_by:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
     source_type: Manufacturer
   ManufacturerAggregationConnection:
     elasticgraph_category: relay_connection
     graphql_fields_by_name:
       edges:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       nodes:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       page_info:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   ManufacturerAggregationEdge:
     elasticgraph_category: relay_edge
     graphql_fields_by_name:
       cursor:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       node:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   ManufacturerConnection:
     elasticgraph_category: relay_connection
     graphql_fields_by_name:
       edges:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       nodes:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       page_info:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       total_edge_count:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   ManufacturerEdge:
     elasticgraph_category: relay_edge
     graphql_fields_by_name:
       all_highlights:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       cursor:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       highlights:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       node:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   ManufacturerGroupedBy:
     graphql_fields_by_name:
       created_at:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   ManufacturerHighlights:
     graphql_fields_by_name:
       id:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   MechanicalPart:
     graphql_fields_by_name:
       component_aggregations:
         relation:
           direction: in
           foreign_key: part_ids
-        resolver: nested_relationships
+        resolver:
+          name: nested_relationships
       components:
         relation:
           direction: in
           foreign_key: part_ids
-        resolver: nested_relationships
+        resolver:
+          name: nested_relationships
       created_at:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       id:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       manufacturer:
         relation:
           direction: out
           foreign_key: manufacturer_id
-        resolver: nested_relationships
+        resolver:
+          name: nested_relationships
       material:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
     index_definition_names:
     - mechanical_parts
     update_targets:
@@ -3600,89 +3839,119 @@ object_types_by_name:
   MechanicalPartAggregatedValues:
     graphql_fields_by_name:
       created_at:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       id:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       material:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   MechanicalPartAggregation:
     elasticgraph_category: indexed_aggregation
     graphql_fields_by_name:
       aggregated_values:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       count:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       grouped_by:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
     source_type: MechanicalPart
   MechanicalPartAggregationConnection:
     elasticgraph_category: relay_connection
     graphql_fields_by_name:
       edges:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       nodes:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       page_info:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   MechanicalPartAggregationEdge:
     elasticgraph_category: relay_edge
     graphql_fields_by_name:
       cursor:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       node:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   MechanicalPartConnection:
     elasticgraph_category: relay_connection
     graphql_fields_by_name:
       edges:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       nodes:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       page_info:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       total_edge_count:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   MechanicalPartEdge:
     elasticgraph_category: relay_edge
     graphql_fields_by_name:
       all_highlights:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       cursor:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       highlights:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       node:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   MechanicalPartGroupedBy:
     graphql_fields_by_name:
       created_at:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       material:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   MechanicalPartHighlights:
     graphql_fields_by_name:
       id:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       material:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   Money:
     graphql_fields_by_name:
       amount_cents:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       currency:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   MoneyAggregatedValues:
     graphql_fields_by_name:
       amount_cents:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       currency:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   MoneyFieldsListFilterInput:
     graphql_fields_by_name:
       count:
@@ -3690,13 +3959,16 @@ object_types_by_name:
   MoneyGroupedBy:
     graphql_fields_by_name:
       amount_cents:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       currency:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   MoneyHighlights:
     graphql_fields_by_name:
       currency:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   MoneyListFilterInput:
     graphql_fields_by_name:
       count:
@@ -3707,45 +3979,61 @@ object_types_by_name:
         relation:
           direction: in
           foreign_key: manufacturer_id
-        resolver: nested_relationships
+        resolver:
+          name: nested_relationships
       amount_cents:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       amount_cents2:
         name_in_index: amount_cents
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       amounts:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       component_aggregations:
         relation:
           direction: out
           foreign_key: component_ids
-        resolver: nested_relationships
+        resolver:
+          name: nested_relationships
       components:
         relation:
           direction: out
           foreign_key: component_ids
-        resolver: nested_relationships
+        resolver:
+          name: nested_relationships
       cost:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       cost_currency_introduced_on:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       cost_currency_name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       cost_currency_primary_continent:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       cost_currency_symbol:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       cost_currency_unit:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       created_at:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       created_at2:
         name_in_index: created_at
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       created_at_time_of_day:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       created_on:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       dollar_widget:
         relation:
           additional_filter:
@@ -3755,236 +4043,324 @@ object_types_by_name:
                 - 100
           direction: in
           foreign_key: component_ids
-        resolver: nested_relationships
+        resolver:
+          name: nested_relationships
       fees:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       id:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       inventor:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       manufactured_part_aggregations:
         relation:
           direction: in
           foreign_key: manufacturer_id
-        resolver: nested_relationships
+        resolver:
+          name: nested_relationships
       manufactured_parts:
         relation:
           direction: in
           foreign_key: manufacturer_id
-        resolver: nested_relationships
+        resolver:
+          name: nested_relationships
       manufacturer:
         relation:
           direction: out
           foreign_key: manufacturer_id
-        resolver: nested_relationships
+        resolver:
+          name: nested_relationships
       material:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       metadata:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       name_text:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       named_inventor:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       options:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       part_aggregations:
         relation:
           direction: out
           foreign_key: part_ids
-        resolver: nested_relationships
+        resolver:
+          name: nested_relationships
       parts:
         relation:
           direction: out
           foreign_key: part_ids
-        resolver: nested_relationships
+        resolver:
+          name: nested_relationships
       position:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       release_dates:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       release_timestamps:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       size:
         name_in_index: options.size
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       tags:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       the_options:
         name_in_index: the_opts
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       voltage:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       weight_in_ng:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       weight_in_ng_str:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       widget:
         relation:
           direction: in
           foreign_key: component_ids
-        resolver: nested_relationships
+        resolver:
+          name: nested_relationships
       widget_aggregations:
         relation:
           direction: in
           foreign_key: component_ids
-        resolver: nested_relationships
+        resolver:
+          name: nested_relationships
       widget_cost:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       widget_name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       widget_size:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       widget_tags:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       widget_workspace_id:
         name_in_index: widget_workspace_id3
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       widgets:
         relation:
           direction: in
           foreign_key: component_ids
-        resolver: nested_relationships
+        resolver:
+          name: nested_relationships
       workspace:
         relation:
           direction: in
           foreign_key: widget.id
-        resolver: nested_relationships
+        resolver:
+          name: nested_relationships
       workspace_id:
         name_in_index: workspace_id2
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       workspace_name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   NamedEntityAggregatedValues:
     graphql_fields_by_name:
       amount_cents:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       amount_cents2:
         name_in_index: amount_cents
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       amounts:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       cost:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       cost_currency_introduced_on:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       cost_currency_name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       cost_currency_primary_continent:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       cost_currency_symbol:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       cost_currency_unit:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       created_at:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       created_at2:
         name_in_index: created_at
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       created_at_time_of_day:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       created_on:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       fees:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       id:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       inventor:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       material:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       metadata:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       named_inventor:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       options:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       position:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       release_dates:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       release_timestamps:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       size:
         name_in_index: options.size
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       tags:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       the_options:
         name_in_index: the_opts
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       voltage:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       weight_in_ng:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       weight_in_ng_str:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       widget_cost:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       widget_name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       widget_size:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       widget_tags:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       widget_workspace_id:
         name_in_index: widget_workspace_id3
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       workspace_id:
         name_in_index: workspace_id2
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       workspace_name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   NamedEntityAggregation:
     elasticgraph_category: indexed_aggregation
     graphql_fields_by_name:
       aggregated_values:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       count:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       grouped_by:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
     source_type: NamedEntity
   NamedEntityAggregationConnection:
     elasticgraph_category: relay_connection
     graphql_fields_by_name:
       edges:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       nodes:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       page_info:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   NamedEntityAggregationEdge:
     elasticgraph_category: relay_edge
     graphql_fields_by_name:
       cursor:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       node:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   NamedEntityConnection:
     elasticgraph_category: relay_connection
     graphql_fields_by_name:
       edges:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       nodes:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       page_info:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       total_edge_count:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   NamedEntityEdge:
     elasticgraph_category: relay_edge
     graphql_fields_by_name:
       all_highlights:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       cursor:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       highlights:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       node:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   NamedEntityFilterInput:
     graphql_fields_by_name:
       amount_cents2:
@@ -4002,165 +4378,234 @@ object_types_by_name:
   NamedEntityGroupedBy:
     graphql_fields_by_name:
       amount_cents:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       amount_cents2:
         name_in_index: amount_cents
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       cost:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       cost_currency_introduced_on:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       cost_currency_name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       cost_currency_primary_continent:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       cost_currency_symbol:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       cost_currency_unit:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       created_at:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       created_at2:
         name_in_index: created_at
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       created_at_time_of_day:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       created_on:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       fees:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       inventor:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       material:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       metadata:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       named_inventor:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       options:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       position:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       release_date:
         name_in_index: release_dates
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       release_timestamp:
         name_in_index: release_timestamps
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       size:
         name_in_index: options.size
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       tag:
         name_in_index: tags
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       the_options:
         name_in_index: the_opts
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       voltage:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       weight_in_ng:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       weight_in_ng_str:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       widget_cost:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       widget_name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       widget_size:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       widget_workspace_id:
         name_in_index: widget_workspace_id3
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       workspace_id:
         name_in_index: workspace_id2
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       workspace_name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   NamedEntityHighlights:
     graphql_fields_by_name:
       cost:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       cost_currency_name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       cost_currency_primary_continent:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       cost_currency_symbol:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       cost_currency_unit:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       fees:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       id:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       inventor:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       material:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       metadata:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       name_text:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       named_inventor:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       options:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       tags:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       the_options:
         name_in_index: the_opts
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       widget_cost:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       widget_name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       widget_size:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       widget_tags:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       widget_workspace_id:
         name_in_index: widget_workspace_id3
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       workspace_id:
         name_in_index: workspace_id2
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       workspace_name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   NamedInventor:
     graphql_fields_by_name:
       name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       nationality:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       stock_ticker:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   NamedInventorAggregatedValues:
     graphql_fields_by_name:
       name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       nationality:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       stock_ticker:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   NamedInventorGroupedBy:
     graphql_fields_by_name:
       name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       nationality:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       stock_ticker:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   NamedInventorHighlights:
     graphql_fields_by_name:
       name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       nationality:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       stock_ticker:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   NonNumericAggregatedValues:
     elasticgraph_category: scalar_aggregated_values
     graphql_fields_by_name:
@@ -4168,18 +4613,23 @@ object_types_by_name:
         computation_detail:
           empty_bucket_value: 0
           function: cardinality
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
     graphql_only_return_type: true
   PageInfo:
     graphql_fields_by_name:
       end_cursor:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       has_next_page:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       has_previous_page:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       start_cursor:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
     graphql_only_return_type: true
   Part:
     graphql_fields_by_name:
@@ -4187,133 +4637,180 @@ object_types_by_name:
         relation:
           direction: in
           foreign_key: part_ids
-        resolver: nested_relationships
+        resolver:
+          name: nested_relationships
       components:
         relation:
           direction: in
           foreign_key: part_ids
-        resolver: nested_relationships
+        resolver:
+          name: nested_relationships
       created_at:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       id:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       manufacturer:
         relation:
           direction: out
           foreign_key: manufacturer_id
-        resolver: nested_relationships
+        resolver:
+          name: nested_relationships
       material:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       voltage:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   PartAggregatedValues:
     graphql_fields_by_name:
       created_at:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       id:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       material:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       voltage:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   PartAggregation:
     elasticgraph_category: indexed_aggregation
     graphql_fields_by_name:
       aggregated_values:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       count:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       grouped_by:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
     source_type: Part
   PartAggregationConnection:
     elasticgraph_category: relay_connection
     graphql_fields_by_name:
       edges:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       nodes:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       page_info:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   PartAggregationEdge:
     elasticgraph_category: relay_edge
     graphql_fields_by_name:
       cursor:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       node:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   PartConnection:
     elasticgraph_category: relay_connection
     graphql_fields_by_name:
       edges:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       nodes:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       page_info:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       total_edge_count:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   PartEdge:
     elasticgraph_category: relay_edge
     graphql_fields_by_name:
       all_highlights:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       cursor:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       highlights:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       node:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   PartGroupedBy:
     graphql_fields_by_name:
       created_at:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       material:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       voltage:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   PartHighlights:
     graphql_fields_by_name:
       id:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       material:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   Person:
     graphql_fields_by_name:
       name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       nationality:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   Player:
     graphql_fields_by_name:
       affiliations:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       nicknames:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       seasons_nested:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       seasons_object:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   PlayerAggregatedValues:
     graphql_fields_by_name:
       affiliations:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       nicknames:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       seasons_object:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   PlayerFieldsListFilterInput:
     graphql_fields_by_name:
       count:
@@ -4321,23 +4818,31 @@ object_types_by_name:
   PlayerGroupedBy:
     graphql_fields_by_name:
       affiliations:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       seasons_object:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   PlayerHighlights:
     graphql_fields_by_name:
       affiliations:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       nicknames:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       seasons_nested:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       seasons_object:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   PlayerListFilterInput:
     graphql_fields_by_name:
       count:
@@ -4345,19 +4850,25 @@ object_types_by_name:
   PlayerSeason:
     graphql_fields_by_name:
       awards:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       games_played:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       year:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   PlayerSeasonAggregatedValues:
     graphql_fields_by_name:
       awards:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       games_played:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       year:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   PlayerSeasonFieldsListFilterInput:
     graphql_fields_by_name:
       count:
@@ -4365,13 +4876,16 @@ object_types_by_name:
   PlayerSeasonGroupedBy:
     graphql_fields_by_name:
       games_played:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       year:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   PlayerSeasonHighlights:
     graphql_fields_by_name:
       awards:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   PlayerSeasonListFilterInput:
     graphql_fields_by_name:
       count:
@@ -4379,85 +4893,121 @@ object_types_by_name:
   Position:
     graphql_fields_by_name:
       x:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       "y":
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   PositionAggregatedValues:
     graphql_fields_by_name:
       x:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       "y":
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   PositionGroupedBy:
     graphql_fields_by_name:
       x:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       "y":
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   Query:
     graphql_fields_by_name:
       _entities:
-        resolver: apollo_entities
+        resolver:
+          name: apollo_entities
       _service:
-        resolver: apollo_service
+        resolver:
+          name: apollo_service
       address_aggregations:
-        resolver: list_records
+        resolver:
+          name: list_records
       addresses:
-        resolver: list_records
+        resolver:
+          name: list_records
       component_aggregations:
-        resolver: list_records
+        resolver:
+          name: list_records
       components:
-        resolver: list_records
+        resolver:
+          name: list_records
       electrical_part_aggregations:
-        resolver: list_records
+        resolver:
+          name: list_records
       electrical_parts:
-        resolver: list_records
+        resolver:
+          name: list_records
       manufacturer_aggregations:
-        resolver: list_records
+        resolver:
+          name: list_records
       manufacturers:
-        resolver: list_records
+        resolver:
+          name: list_records
       mechanical_part_aggregations:
-        resolver: list_records
+        resolver:
+          name: list_records
       mechanical_parts:
-        resolver: list_records
+        resolver:
+          name: list_records
       named_entities:
-        resolver: list_records
+        resolver:
+          name: list_records
       named_entity_aggregations:
-        resolver: list_records
+        resolver:
+          name: list_records
       part_aggregations:
-        resolver: list_records
+        resolver:
+          name: list_records
       parts:
-        resolver: list_records
+        resolver:
+          name: list_records
       sponsor_aggregations:
-        resolver: list_records
+        resolver:
+          name: list_records
       sponsors:
-        resolver: list_records
+        resolver:
+          name: list_records
       team_aggregations:
-        resolver: list_records
+        resolver:
+          name: list_records
       teams:
-        resolver: list_records
+        resolver:
+          name: list_records
       widget_aggregations:
-        resolver: list_records
+        resolver:
+          name: list_records
       widget_currencies:
-        resolver: list_records
+        resolver:
+          name: list_records
       widget_currency_aggregations:
-        resolver: list_records
+        resolver:
+          name: list_records
       widget_or_address_aggregations:
-        resolver: list_records
+        resolver:
+          name: list_records
       widget_workspace_aggregations:
-        resolver: list_records
+        resolver:
+          name: list_records
       widget_workspaces:
-        resolver: list_records
+        resolver:
+          name: list_records
       widgets:
-        resolver: list_records
+        resolver:
+          name: list_records
       widgets_or_addresses:
-        resolver: list_records
+        resolver:
+          name: list_records
   SearchHighlight:
     graphql_fields_by_name:
       path:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       snippets:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
     graphql_only_return_type: true
   SizeListFilterInput:
     graphql_fields_by_name:
@@ -4472,12 +5022,14 @@ object_types_by_name:
           foreign_key_nested_paths:
           - current_players_nested
           - current_players_nested.affiliations.sponsorships_nested
-        resolver: nested_relationships
+        resolver:
+          name: nested_relationships
       affiliated_team_from_object_aggregations:
         relation:
           direction: in
           foreign_key: current_players_object.affiliations.sponsorships_object.sponsor_id
-        resolver: nested_relationships
+        resolver:
+          name: nested_relationships
       affiliated_teams_from_nested:
         relation:
           direction: in
@@ -4485,16 +5037,20 @@ object_types_by_name:
           foreign_key_nested_paths:
           - current_players_nested
           - current_players_nested.affiliations.sponsorships_nested
-        resolver: nested_relationships
+        resolver:
+          name: nested_relationships
       affiliated_teams_from_object:
         relation:
           direction: in
           foreign_key: current_players_object.affiliations.sponsorships_object.sponsor_id
-        resolver: nested_relationships
+        resolver:
+          name: nested_relationships
       id:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
     index_definition_names:
     - sponsors
     update_targets:
@@ -4520,79 +5076,104 @@ object_types_by_name:
   SponsorAggregatedValues:
     graphql_fields_by_name:
       id:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   SponsorAggregation:
     elasticgraph_category: indexed_aggregation
     graphql_fields_by_name:
       aggregated_values:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       count:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       grouped_by:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
     source_type: Sponsor
   SponsorAggregationConnection:
     elasticgraph_category: relay_connection
     graphql_fields_by_name:
       edges:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       nodes:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       page_info:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   SponsorAggregationEdge:
     elasticgraph_category: relay_edge
     graphql_fields_by_name:
       cursor:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       node:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   SponsorConnection:
     elasticgraph_category: relay_connection
     graphql_fields_by_name:
       edges:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       nodes:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       page_info:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       total_edge_count:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   SponsorEdge:
     elasticgraph_category: relay_edge
     graphql_fields_by_name:
       all_highlights:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       cursor:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       highlights:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       node:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   SponsorGroupedBy:
     graphql_fields_by_name:
       name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   SponsorHighlights:
     graphql_fields_by_name:
       id:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   Sponsorship:
     graphql_fields_by_name:
       annual_total:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       sponsor_id:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   SponsorshipAggregatedValues:
     graphql_fields_by_name:
       annual_total:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       sponsor_id:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   SponsorshipFieldsListFilterInput:
     graphql_fields_by_name:
       count:
@@ -4600,15 +5181,19 @@ object_types_by_name:
   SponsorshipGroupedBy:
     graphql_fields_by_name:
       annual_total:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       sponsor_id:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   SponsorshipHighlights:
     graphql_fields_by_name:
       annual_total:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       sponsor_id:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   SponsorshipListFilterInput:
     graphql_fields_by_name:
       count:
@@ -4617,20 +5202,26 @@ object_types_by_name:
     elasticgraph_category: relay_connection
     graphql_fields_by_name:
       edges:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       nodes:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       page_info:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       total_edge_count:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   StringEdge:
     elasticgraph_category: relay_edge
     graphql_fields_by_name:
       cursor:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       node:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   StringListFilterInput:
     graphql_fields_by_name:
       count:
@@ -4638,42 +5229,60 @@ object_types_by_name:
   Team:
     graphql_fields_by_name:
       country_code:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       current_name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       current_players_nested:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       current_players_object:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       details:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       forbes_valuation_moneys_nested:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       forbes_valuation_moneys_object:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       forbes_valuations:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       formed_on:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       id:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       league:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       nested_fields:
         name_in_index: the_nested_fields
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       nested_fields2:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       past_names:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       seasons_nested:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       seasons_object:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       stadium_location:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       won_championships_at:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
     index_definition_names:
     - teams
     update_targets:
@@ -4732,162 +5341,219 @@ object_types_by_name:
   TeamAggregatedValues:
     graphql_fields_by_name:
       country_code:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       current_name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       current_players_object:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       details:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       forbes_valuation_moneys_object:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       forbes_valuations:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       formed_on:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       id:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       league:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       past_names:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       seasons_object:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       stadium_location:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       won_championships_at:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   TeamAggregation:
     elasticgraph_category: indexed_aggregation
     graphql_fields_by_name:
       aggregated_values:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       count:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       grouped_by:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       sub_aggregations:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
     source_type: Team
   TeamAggregationConnection:
     elasticgraph_category: relay_connection
     graphql_fields_by_name:
       edges:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       nodes:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       page_info:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   TeamAggregationCurrentPlayersObjectAffiliationsSubAggregations:
     graphql_fields_by_name:
       sponsorships_nested:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   TeamAggregationCurrentPlayersObjectSubAggregations:
     graphql_fields_by_name:
       affiliations:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       seasons_nested:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   TeamAggregationEdge:
     elasticgraph_category: relay_edge
     graphql_fields_by_name:
       cursor:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       node:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   TeamAggregationNestedFields2SubAggregations:
     graphql_fields_by_name:
       current_players:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       forbes_valuation_moneys:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       seasons:
         name_in_index: the_seasons
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   TeamAggregationNestedFieldsSubAggregations:
     graphql_fields_by_name:
       current_players:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       forbes_valuation_moneys:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       seasons:
         name_in_index: the_seasons
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   TeamAggregationSeasonsObjectPlayersObjectAffiliationsSubAggregations:
     graphql_fields_by_name:
       sponsorships_nested:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   TeamAggregationSeasonsObjectPlayersObjectSubAggregations:
     graphql_fields_by_name:
       affiliations:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       seasons_nested:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   TeamAggregationSeasonsObjectSubAggregations:
     graphql_fields_by_name:
       players_nested:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       players_object:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   TeamAggregationSubAggregations:
     graphql_fields_by_name:
       current_players_nested:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       current_players_object:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       forbes_valuation_moneys_nested:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       nested_fields:
         name_in_index: the_nested_fields
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       nested_fields2:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       seasons_nested:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       seasons_object:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   TeamConnection:
     elasticgraph_category: relay_connection
     graphql_fields_by_name:
       edges:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       nodes:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       page_info:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       total_edge_count:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   TeamDetails:
     graphql_fields_by_name:
       count:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       uniform_colors:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   TeamDetailsAggregatedValues:
     graphql_fields_by_name:
       count:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       uniform_colors:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   TeamDetailsGroupedBy:
     graphql_fields_by_name:
       count:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   TeamDetailsHighlights:
     graphql_fields_by_name:
       uniform_colors:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   TeamEdge:
     elasticgraph_category: relay_edge
     graphql_fields_by_name:
       all_highlights:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       cursor:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       highlights:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       node:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   TeamFilterInput:
     graphql_fields_by_name:
       nested_fields:
@@ -4895,76 +5561,106 @@ object_types_by_name:
   TeamGroupedBy:
     graphql_fields_by_name:
       country_code:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       current_name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       current_players_object:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       details:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       forbes_valuation_moneys_object:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       formed_on:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       league:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       seasons_object:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   TeamHighlights:
     graphql_fields_by_name:
       country_code:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       current_name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       current_players_nested:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       current_players_object:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       details:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       forbes_valuation_moneys_nested:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       forbes_valuation_moneys_object:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       id:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       league:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       nested_fields:
         name_in_index: the_nested_fields
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       nested_fields2:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       past_names:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       seasons_nested:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       seasons_object:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   TeamMoneySubAggregation:
     graphql_fields_by_name:
       aggregated_values:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       count_detail:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       grouped_by:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   TeamMoneySubAggregationConnection:
     elasticgraph_category: nested_sub_aggregation_connection
     graphql_fields_by_name:
       nodes:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       page_info:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   TeamNestedFields:
     graphql_fields_by_name:
       current_players:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       forbes_valuation_moneys:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       seasons:
         name_in_index: the_seasons
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   TeamNestedFieldsFilterInput:
     graphql_fields_by_name:
       seasons:
@@ -4972,110 +5668,145 @@ object_types_by_name:
   TeamNestedFieldsHighlights:
     graphql_fields_by_name:
       current_players:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       forbes_valuation_moneys:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       seasons:
         name_in_index: the_seasons
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   TeamPlayerPlayerSeasonSubAggregation:
     graphql_fields_by_name:
       aggregated_values:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       count_detail:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       grouped_by:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   TeamPlayerPlayerSeasonSubAggregationConnection:
     elasticgraph_category: nested_sub_aggregation_connection
     graphql_fields_by_name:
       nodes:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       page_info:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   TeamPlayerSeasonSubAggregation:
     graphql_fields_by_name:
       aggregated_values:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       count_detail:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       grouped_by:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   TeamPlayerSeasonSubAggregationConnection:
     elasticgraph_category: nested_sub_aggregation_connection
     graphql_fields_by_name:
       nodes:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       page_info:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   TeamPlayerSponsorshipSubAggregation:
     graphql_fields_by_name:
       aggregated_values:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       count_detail:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       grouped_by:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   TeamPlayerSponsorshipSubAggregationConnection:
     elasticgraph_category: nested_sub_aggregation_connection
     graphql_fields_by_name:
       nodes:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       page_info:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   TeamPlayerSubAggregation:
     graphql_fields_by_name:
       aggregated_values:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       count_detail:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       grouped_by:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       sub_aggregations:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   TeamPlayerSubAggregationAffiliationsSubAggregations:
     graphql_fields_by_name:
       sponsorships_nested:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   TeamPlayerSubAggregationConnection:
     elasticgraph_category: nested_sub_aggregation_connection
     graphql_fields_by_name:
       nodes:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       page_info:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   TeamPlayerSubAggregationSubAggregations:
     graphql_fields_by_name:
       affiliations:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       seasons_nested:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   TeamRecord:
     graphql_fields_by_name:
       first_win_on:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       last_win_on:
         name_in_index: last_win_date
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       losses:
         name_in_index: loss_count
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       wins:
         name_in_index: win_count
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   TeamRecordAggregatedValues:
     graphql_fields_by_name:
       first_win_on:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       last_win_on:
         name_in_index: last_win_date
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       losses:
         name_in_index: loss_count
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       wins:
         name_in_index: win_count
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   TeamRecordFieldsListFilterInput:
     graphql_fields_by_name:
       count:
@@ -5097,56 +5828,77 @@ object_types_by_name:
   TeamRecordGroupedBy:
     graphql_fields_by_name:
       first_win_on:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       last_win_on:
         name_in_index: last_win_date
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       losses:
         name_in_index: loss_count
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       wins:
         name_in_index: win_count
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   TeamSeason:
     graphql_fields_by_name:
       count:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       notes:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       players_nested:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       players_object:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       record:
         name_in_index: the_record
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       started_at:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       was_shortened:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       won_games_at:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       year:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   TeamSeasonAggregatedValues:
     graphql_fields_by_name:
       count:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       notes:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       players_object:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       record:
         name_in_index: the_record
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       started_at:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       was_shortened:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       won_games_at:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       year:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   TeamSeasonFieldsListFilterInput:
     graphql_fields_by_name:
       record:
@@ -5158,32 +5910,43 @@ object_types_by_name:
   TeamSeasonGroupedBy:
     graphql_fields_by_name:
       count:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       note:
         name_in_index: notes
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       players_object:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       record:
         name_in_index: the_record
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       started_at:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       was_shortened:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       won_game_at:
         name_in_index: won_games_at
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       year:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   TeamSeasonHighlights:
     graphql_fields_by_name:
       notes:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       players_nested:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       players_object:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   TeamSeasonListFilterInput:
     graphql_fields_by_name:
       count:
@@ -5191,220 +5954,298 @@ object_types_by_name:
   TeamSponsorshipSubAggregation:
     graphql_fields_by_name:
       aggregated_values:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       count_detail:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       grouped_by:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   TeamSponsorshipSubAggregationConnection:
     elasticgraph_category: nested_sub_aggregation_connection
     graphql_fields_by_name:
       nodes:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       page_info:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   TeamTeamSeasonPlayerPlayerSeasonSubAggregation:
     graphql_fields_by_name:
       aggregated_values:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       count_detail:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       grouped_by:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   TeamTeamSeasonPlayerPlayerSeasonSubAggregationConnection:
     elasticgraph_category: nested_sub_aggregation_connection
     graphql_fields_by_name:
       nodes:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       page_info:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   TeamTeamSeasonPlayerSeasonSubAggregation:
     graphql_fields_by_name:
       aggregated_values:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       count_detail:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       grouped_by:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   TeamTeamSeasonPlayerSeasonSubAggregationConnection:
     elasticgraph_category: nested_sub_aggregation_connection
     graphql_fields_by_name:
       nodes:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       page_info:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   TeamTeamSeasonPlayerSponsorshipSubAggregation:
     graphql_fields_by_name:
       aggregated_values:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       count_detail:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       grouped_by:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   TeamTeamSeasonPlayerSponsorshipSubAggregationConnection:
     elasticgraph_category: nested_sub_aggregation_connection
     graphql_fields_by_name:
       nodes:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       page_info:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   TeamTeamSeasonPlayerSubAggregation:
     graphql_fields_by_name:
       aggregated_values:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       count_detail:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       grouped_by:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       sub_aggregations:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   TeamTeamSeasonPlayerSubAggregationAffiliationsSubAggregations:
     graphql_fields_by_name:
       sponsorships_nested:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   TeamTeamSeasonPlayerSubAggregationConnection:
     elasticgraph_category: nested_sub_aggregation_connection
     graphql_fields_by_name:
       nodes:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       page_info:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   TeamTeamSeasonPlayerSubAggregationSubAggregations:
     graphql_fields_by_name:
       affiliations:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       seasons_nested:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   TeamTeamSeasonSponsorshipSubAggregation:
     graphql_fields_by_name:
       aggregated_values:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       count_detail:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       grouped_by:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   TeamTeamSeasonSponsorshipSubAggregationConnection:
     elasticgraph_category: nested_sub_aggregation_connection
     graphql_fields_by_name:
       nodes:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       page_info:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   TeamTeamSeasonSubAggregation:
     graphql_fields_by_name:
       aggregated_values:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       count_detail:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       grouped_by:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       sub_aggregations:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   TeamTeamSeasonSubAggregationConnection:
     elasticgraph_category: nested_sub_aggregation_connection
     graphql_fields_by_name:
       nodes:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       page_info:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   TeamTeamSeasonSubAggregationPlayersObjectAffiliationsSubAggregations:
     graphql_fields_by_name:
       sponsorships_nested:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   TeamTeamSeasonSubAggregationPlayersObjectSubAggregations:
     graphql_fields_by_name:
       affiliations:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       seasons_nested:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   TeamTeamSeasonSubAggregationSubAggregations:
     graphql_fields_by_name:
       players_nested:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       players_object:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   Widget:
     graphql_fields_by_name:
       amount_cents:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       amount_cents2:
         name_in_index: amount_cents
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       amounts:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       component_aggregations:
         relation:
           direction: out
           foreign_key: component_ids
-        resolver: nested_relationships
+        resolver:
+          name: nested_relationships
       components:
         relation:
           direction: out
           foreign_key: component_ids
-        resolver: nested_relationships
+        resolver:
+          name: nested_relationships
       cost:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       cost_currency_introduced_on:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       cost_currency_name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       cost_currency_primary_continent:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       cost_currency_symbol:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       cost_currency_unit:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       created_at:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       created_at2:
         name_in_index: created_at
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       created_at_time_of_day:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       created_on:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       fees:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       id:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       inventor:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       metadata:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       name_text:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       named_inventor:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       options:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       release_dates:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       release_timestamps:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       size:
         name_in_index: options.size
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       tags:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       the_options:
         name_in_index: the_opts
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       weight_in_ng:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       weight_in_ng_str:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       workspace:
         relation:
           direction: in
           foreign_key: widget.id
-        resolver: nested_relationships
+        resolver:
+          name: nested_relationships
       workspace_id:
         name_in_index: workspace_id2
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       workspace_name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
     index_definition_names:
     - widgets
     update_targets:
@@ -5542,130 +6383,182 @@ object_types_by_name:
   WidgetAggregatedValues:
     graphql_fields_by_name:
       amount_cents:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       amount_cents2:
         name_in_index: amount_cents
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       amounts:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       cost:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       cost_currency_introduced_on:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       cost_currency_name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       cost_currency_primary_continent:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       cost_currency_symbol:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       cost_currency_unit:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       created_at:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       created_at2:
         name_in_index: created_at
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       created_at_time_of_day:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       created_on:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       fees:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       id:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       inventor:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       metadata:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       named_inventor:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       options:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       release_dates:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       release_timestamps:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       size:
         name_in_index: options.size
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       tags:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       the_options:
         name_in_index: the_opts
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       weight_in_ng:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       weight_in_ng_str:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       workspace_id:
         name_in_index: workspace_id2
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       workspace_name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   WidgetAggregation:
     elasticgraph_category: indexed_aggregation
     graphql_fields_by_name:
       aggregated_values:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       count:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       grouped_by:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
     source_type: Widget
   WidgetAggregationConnection:
     elasticgraph_category: relay_connection
     graphql_fields_by_name:
       edges:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       nodes:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       page_info:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   WidgetAggregationEdge:
     elasticgraph_category: relay_edge
     graphql_fields_by_name:
       cursor:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       node:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   WidgetConnection:
     elasticgraph_category: relay_connection
     graphql_fields_by_name:
       edges:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       nodes:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       page_info:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       total_edge_count:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   WidgetCurrency:
     graphql_fields_by_name:
       details:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       id:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       introduced_on:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       nested_fields:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       oldest_widget_created_at:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       primary_continent:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       widget_fee_currencies:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       widget_names:
         name_in_index: widget_names2
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       widget_options:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       widget_tags:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
     index_definition_names:
     - widget_currencies
     update_targets:
@@ -5710,76 +6603,103 @@ object_types_by_name:
   WidgetCurrencyAggregatedValues:
     graphql_fields_by_name:
       details:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       id:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       introduced_on:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       nested_fields:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       oldest_widget_created_at:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       primary_continent:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       widget_fee_currencies:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       widget_names:
         name_in_index: widget_names2
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       widget_options:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       widget_tags:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   WidgetCurrencyAggregation:
     elasticgraph_category: indexed_aggregation
     graphql_fields_by_name:
       aggregated_values:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       count:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       grouped_by:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
     source_type: WidgetCurrency
   WidgetCurrencyAggregationConnection:
     elasticgraph_category: relay_connection
     graphql_fields_by_name:
       edges:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       nodes:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       page_info:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   WidgetCurrencyAggregationEdge:
     elasticgraph_category: relay_edge
     graphql_fields_by_name:
       cursor:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       node:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   WidgetCurrencyConnection:
     elasticgraph_category: relay_connection
     graphql_fields_by_name:
       edges:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       nodes:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       page_info:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       total_edge_count:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   WidgetCurrencyEdge:
     elasticgraph_category: relay_edge
     graphql_fields_by_name:
       all_highlights:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       cursor:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       highlights:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       node:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   WidgetCurrencyFilterInput:
     graphql_fields_by_name:
       widget_names:
@@ -5787,62 +6707,84 @@ object_types_by_name:
   WidgetCurrencyGroupedBy:
     graphql_fields_by_name:
       details:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       introduced_on:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       nested_fields:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       oldest_widget_created_at:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       primary_continent:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       widget_name:
         name_in_index: widget_names2
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   WidgetCurrencyHighlights:
     graphql_fields_by_name:
       details:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       id:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       primary_continent:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       widget_fee_currencies:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       widget_names:
         name_in_index: widget_names2
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       widget_options:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       widget_tags:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   WidgetCurrencyNestedFields:
     graphql_fields_by_name:
       max_widget_cost:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   WidgetCurrencyNestedFieldsAggregatedValues:
     graphql_fields_by_name:
       max_widget_cost:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   WidgetCurrencyNestedFieldsGroupedBy:
     graphql_fields_by_name:
       max_widget_cost:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   WidgetEdge:
     elasticgraph_category: relay_edge
     graphql_fields_by_name:
       all_highlights:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       cursor:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       highlights:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       node:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   WidgetFilterInput:
     graphql_fields_by_name:
       amount_cents2:
@@ -5858,145 +6800,203 @@ object_types_by_name:
   WidgetGroupedBy:
     graphql_fields_by_name:
       amount_cents:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       amount_cents2:
         name_in_index: amount_cents
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       cost:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       cost_currency_introduced_on:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       cost_currency_name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       cost_currency_primary_continent:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       cost_currency_symbol:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       cost_currency_unit:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       created_at:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       created_at2:
         name_in_index: created_at
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       created_at_time_of_day:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       created_on:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       fees:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       inventor:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       metadata:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       named_inventor:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       options:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       release_date:
         name_in_index: release_dates
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       release_timestamp:
         name_in_index: release_timestamps
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       size:
         name_in_index: options.size
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       tag:
         name_in_index: tags
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       the_options:
         name_in_index: the_opts
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       weight_in_ng:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       weight_in_ng_str:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       workspace_id:
         name_in_index: workspace_id2
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       workspace_name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   WidgetHighlights:
     graphql_fields_by_name:
       cost:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       cost_currency_name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       cost_currency_primary_continent:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       cost_currency_symbol:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       cost_currency_unit:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       fees:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       id:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       inventor:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       metadata:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       name_text:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       named_inventor:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       options:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       tags:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       the_options:
         name_in_index: the_opts
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       workspace_id:
         name_in_index: workspace_id2
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       workspace_name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   WidgetOptionSets:
     graphql_fields_by_name:
       colors:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       sizes:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   WidgetOptionSetsAggregatedValues:
     graphql_fields_by_name:
       colors:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       sizes:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   WidgetOptionSetsHighlights:
     graphql_fields_by_name:
       colors:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       sizes:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   WidgetOptions:
     graphql_fields_by_name:
       color:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       is_draft:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       size:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       the_size:
         name_in_index: the_sighs
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   WidgetOptionsAggregatedValues:
     graphql_fields_by_name:
       color:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       is_draft:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       size:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       the_size:
         name_in_index: the_sighs
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   WidgetOptionsFilterInput:
     graphql_fields_by_name:
       the_size:
@@ -6004,239 +7004,333 @@ object_types_by_name:
   WidgetOptionsGroupedBy:
     graphql_fields_by_name:
       color:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       is_draft:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       size:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       the_size:
         name_in_index: the_sighs
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   WidgetOptionsHighlights:
     graphql_fields_by_name:
       color:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       size:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       the_size:
         name_in_index: the_sighs
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   WidgetOrAddress:
     graphql_fields_by_name:
       amount_cents:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       amount_cents2:
         name_in_index: amount_cents
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       amounts:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       component_aggregations:
         relation:
           direction: out
           foreign_key: component_ids
-        resolver: nested_relationships
+        resolver:
+          name: nested_relationships
       components:
         relation:
           direction: out
           foreign_key: component_ids
-        resolver: nested_relationships
+        resolver:
+          name: nested_relationships
       cost:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       cost_currency_introduced_on:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       cost_currency_name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       cost_currency_primary_continent:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       cost_currency_symbol:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       cost_currency_unit:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       created_at:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       created_at2:
         name_in_index: created_at
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       created_at_time_of_day:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       created_on:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       fees:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       full_address:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       geo_location:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       id:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       inventor:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       manufacturer:
         relation:
           direction: out
           foreign_key: manufacturer_id
-        resolver: nested_relationships
+        resolver:
+          name: nested_relationships
       metadata:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       name_text:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       named_inventor:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       options:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       release_dates:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       release_timestamps:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       shapes:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       size:
         name_in_index: options.size
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       tags:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       the_options:
         name_in_index: the_opts
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       timestamps:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       weight_in_ng:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       weight_in_ng_str:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       workspace:
         relation:
           direction: in
           foreign_key: widget.id
-        resolver: nested_relationships
+        resolver:
+          name: nested_relationships
       workspace_id:
         name_in_index: workspace_id2
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       workspace_name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   WidgetOrAddressAggregatedValues:
     graphql_fields_by_name:
       amount_cents:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       amount_cents2:
         name_in_index: amount_cents
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       amounts:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       cost:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       cost_currency_introduced_on:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       cost_currency_name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       cost_currency_primary_continent:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       cost_currency_symbol:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       cost_currency_unit:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       created_at:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       created_at2:
         name_in_index: created_at
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       created_at_time_of_day:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       created_on:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       fees:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       full_address:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       geo_location:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       id:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       inventor:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       metadata:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       named_inventor:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       options:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       release_dates:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       release_timestamps:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       shapes:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       size:
         name_in_index: options.size
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       tags:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       the_options:
         name_in_index: the_opts
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       timestamps:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       weight_in_ng:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       weight_in_ng_str:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       workspace_id:
         name_in_index: workspace_id2
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       workspace_name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   WidgetOrAddressAggregation:
     elasticgraph_category: indexed_aggregation
     graphql_fields_by_name:
       aggregated_values:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       count:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       grouped_by:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
     source_type: WidgetOrAddress
   WidgetOrAddressAggregationConnection:
     elasticgraph_category: relay_connection
     graphql_fields_by_name:
       edges:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       nodes:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       page_info:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   WidgetOrAddressAggregationEdge:
     elasticgraph_category: relay_edge
     graphql_fields_by_name:
       cursor:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       node:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   WidgetOrAddressConnection:
     elasticgraph_category: relay_connection
     graphql_fields_by_name:
       edges:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       nodes:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       page_info:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       total_edge_count:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   WidgetOrAddressEdge:
     elasticgraph_category: relay_edge
     graphql_fields_by_name:
       all_highlights:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       cursor:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       highlights:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       node:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   WidgetOrAddressFilterInput:
     graphql_fields_by_name:
       amount_cents2:
@@ -6252,119 +7346,169 @@ object_types_by_name:
   WidgetOrAddressGroupedBy:
     graphql_fields_by_name:
       amount_cents:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       amount_cents2:
         name_in_index: amount_cents
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       cost:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       cost_currency_introduced_on:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       cost_currency_name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       cost_currency_primary_continent:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       cost_currency_symbol:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       cost_currency_unit:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       created_at:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       created_at2:
         name_in_index: created_at
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       created_at_time_of_day:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       created_on:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       fees:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       full_address:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       inventor:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       metadata:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       named_inventor:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       options:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       release_date:
         name_in_index: release_dates
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       release_timestamp:
         name_in_index: release_timestamps
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       size:
         name_in_index: options.size
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       tag:
         name_in_index: tags
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       the_options:
         name_in_index: the_opts
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       timestamps:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       weight_in_ng:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       weight_in_ng_str:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       workspace_id:
         name_in_index: workspace_id2
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       workspace_name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   WidgetOrAddressHighlights:
     graphql_fields_by_name:
       cost:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       cost_currency_name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       cost_currency_primary_continent:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       cost_currency_symbol:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       cost_currency_unit:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       fees:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       full_address:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       id:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       inventor:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       metadata:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       name_text:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       named_inventor:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       options:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       tags:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       the_options:
         name_in_index: the_opts
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       workspace_id:
         name_in_index: workspace_id2
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       workspace_name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   WidgetWorkspace:
     graphql_fields_by_name:
       id:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       widget:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
     index_definition_names:
     - widget_workspaces
     update_targets:
@@ -6413,101 +7557,133 @@ object_types_by_name:
   WidgetWorkspaceAggregatedValues:
     graphql_fields_by_name:
       id:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       widget:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   WidgetWorkspaceAggregation:
     elasticgraph_category: indexed_aggregation
     graphql_fields_by_name:
       aggregated_values:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       count:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       grouped_by:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
     source_type: WidgetWorkspace
   WidgetWorkspaceAggregationConnection:
     elasticgraph_category: relay_connection
     graphql_fields_by_name:
       edges:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       nodes:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       page_info:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   WidgetWorkspaceAggregationEdge:
     elasticgraph_category: relay_edge
     graphql_fields_by_name:
       cursor:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       node:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   WidgetWorkspaceConnection:
     elasticgraph_category: relay_connection
     graphql_fields_by_name:
       edges:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       nodes:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       page_info:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       total_edge_count:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   WidgetWorkspaceEdge:
     elasticgraph_category: relay_edge
     graphql_fields_by_name:
       all_highlights:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       cursor:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       highlights:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
       node:
-        resolver: object_without_lookahead
+        resolver:
+          name: object_without_lookahead
   WidgetWorkspaceGroupedBy:
     graphql_fields_by_name:
       name:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       widget:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   WidgetWorkspaceHighlights:
     graphql_fields_by_name:
       id:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       name:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       widget:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   WorkspaceWidget:
     graphql_fields_by_name:
       created_at:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       id:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   WorkspaceWidgetAggregatedValues:
     graphql_fields_by_name:
       created_at:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       id:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   WorkspaceWidgetGroupedBy:
     graphql_fields_by_name:
       created_at:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
       id:
-        resolver: object_with_lookahead
+        resolver:
+          name: object_with_lookahead
   WorkspaceWidgetHighlights:
     graphql_fields_by_name:
       id:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
   _Entity:
     graphql_only_return_type: true
   _Service:
     graphql_fields_by_name:
       sdl:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
     graphql_only_return_type: true
 scalar_types_by_name:
   Boolean:

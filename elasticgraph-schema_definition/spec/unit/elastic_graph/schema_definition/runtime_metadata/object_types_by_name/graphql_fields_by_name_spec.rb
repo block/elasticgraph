@@ -32,10 +32,10 @@ module ElasticGraph
         end
 
         expect(metadata.graphql_fields_by_name).to eq({
-          "id" => graphql_field_with(name_in_index: "id", resolver: :list_records),
-          "description" => graphql_field_with(name_in_index: "description", resolver: :list_records),
-          "name" => graphql_field_with(name_in_index: "name", resolver: :get_record_field_value),
-          "title" => graphql_field_with(name_in_index: "title", resolver: :object_without_lookahead)
+          "id" => graphql_field_with(name_in_index: "id", resolver: configured_graphql_resolver(:list_records)),
+          "description" => graphql_field_with(name_in_index: "description", resolver: configured_graphql_resolver(:list_records)),
+          "name" => graphql_field_with(name_in_index: "name", resolver: configured_graphql_resolver(:get_record_field_value)),
+          "title" => graphql_field_with(name_in_index: "title", resolver: configured_graphql_resolver(:object_without_lookahead))
         })
       end
 
@@ -141,7 +141,7 @@ module ElasticGraph
           expect(metadata.graphql_fields_by_name).to eq({
             "description" => graphql_field_with(
               name_in_index: "description_index",
-              resolver: :get_record_field_value,
+              resolver: configured_graphql_resolver(:get_record_field_value),
               relation: nil
             )
           })

@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/schema_artifacts/runtime_metadata/computation_detail"
+require "elastic_graph/schema_artifacts/runtime_metadata/configured_graphql_resolver"
 require "elastic_graph/schema_artifacts/runtime_metadata/relation"
 
 module ElasticGraph
@@ -25,7 +26,7 @@ module ElasticGraph
             name_in_index: hash[NAME_IN_INDEX],
             relation: hash[RELATION]&.then { |rel_hash| Relation.from_hash(rel_hash) },
             computation_detail: hash[AGGREGATION_DETAIL]&.then { |agg_hash| ComputationDetail.from_hash(agg_hash) },
-            resolver: hash[RESOLVER]&.to_sym
+            resolver: hash[RESOLVER]&.then { |res_hash| ConfiguredGraphQLResolver.from_hash(res_hash) }
           )
         end
 
@@ -35,7 +36,7 @@ module ElasticGraph
             AGGREGATION_DETAIL => computation_detail&.to_dumpable_hash,
             NAME_IN_INDEX => name_in_index,
             RELATION => relation&.to_dumpable_hash,
-            RESOLVER => resolver&.to_s
+            RESOLVER => resolver&.to_dumpable_hash
           }
         end
 

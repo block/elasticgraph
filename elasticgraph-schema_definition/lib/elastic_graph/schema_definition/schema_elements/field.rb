@@ -8,6 +8,7 @@
 
 require "delegate"
 require "elastic_graph/constants"
+require "elastic_graph/schema_artifacts/runtime_metadata/configured_graphql_resolver"
 require "elastic_graph/schema_definition/indexing/field"
 require "elastic_graph/schema_definition/indexing/field_reference"
 require "elastic_graph/schema_definition/mixins/has_directives"
@@ -525,7 +526,7 @@ module ElasticGraph
         #     end
         #   end
         def resolve_with(resolver_name)
-          self.resolver = resolver_name
+          self.resolver = resolver_name&.then { SchemaArtifacts::RuntimeMetadata::ConfiguredGraphQLResolver.new(it, {}) }
         end
 
         # @private
