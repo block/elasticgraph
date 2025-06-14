@@ -135,6 +135,8 @@ module ElasticGraph
         #   not provided, ElasticGraph will infer field groupability based on the field's GraphQL type and mapping type.
         # @option options [Boolean] sortable force-enables or disables the ability for queries to sort by this field. When not provided,
         #   ElasticGraph will infer field sortability based on the field's GraphQL type and mapping type.
+        # @option options [Boolean] highlightable force-enables or disables the ability to request search highlights for this field. When
+        #   not provided, ElasticGraph will infer field highlightable based on the field's mapping type.
         # @yield [Field] the field for further customization
         # @return [void]
         #
