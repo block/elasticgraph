@@ -76,10 +76,12 @@ module ElasticGraph
         # can override this using {SchemaElements::Field#resolve_with}.
         #
         # @param default_resolver_name [Symbol] name of the GraphQL resolver to use as the default for fields of this type
+        # @param config [Hash<Symbol, Object>] configuration parameters for the resolver
         # @return [void]
-        def resolve_fields_with(default_resolver_name)
+        # @see API#register_graphql_resolver
+        def resolve_fields_with(default_resolver_name, **config)
           @default_graphql_resolver = default_resolver_name&.then do
-            SchemaArtifacts::RuntimeMetadata::ConfiguredGraphQLResolver.new(it, {})
+            SchemaArtifacts::RuntimeMetadata::ConfiguredGraphQLResolver.new(it, config)
           end
         end
 

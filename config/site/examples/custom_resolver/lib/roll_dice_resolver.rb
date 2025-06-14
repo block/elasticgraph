@@ -11,13 +11,14 @@
 class RollDiceResolver
   def initialize(elasticgraph_graphql:, config:)
     @number_of_dice = config.fetch(:number_of_dice)
+    @multiplier = config.fetch(:multiplier)
   end
 
   def resolve(field:, object:, args:, context:)
     @number_of_dice
       .times
       .map { rand(args.fetch("sides")) + 1 }
-      .sum
+      .sum * @multiplier
   end
 end
 # :snippet-end:

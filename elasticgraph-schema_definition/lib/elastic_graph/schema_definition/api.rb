@@ -300,22 +300,29 @@ module ElasticGraph
       # @param defined_at [String] the `require` path of the resolver
       # @param resolver_config [Hash<Symbol, Object>] configuration options for the resolver, to support parameterized resolvers
       # @return [void]
+      # @see Mixins::HasIndices#resolve_fields_with
+      # @see SchemaElements::Field#resolve_with
       #
       # @example Register a custom resolver for use by a custom `Query` field
       #   # In `add_resolver.rb`:
       #   class AddResolver
       #     def initialize(elasticgraph_graphql:, config:)
+      #       @multiplier = config.fetch(:multiplier, 1)
       #     end
       #
       #     def resolve(field:, object:, args:, context:)
-      #       args.fetch("x") + args.fetch("y")
+      #       sum = args.fetch("x") + args.fetch("y")
+      #       sum * @multiplier
       #     end
       #   end
       #
       #   # In `config/schema.rb`:
       #   ElasticGraph.define_schema do |schema|
       #     require(resolver_path = "add_resolver")
-      #     schema.register_graphql_resolver :add, AddResolver, defined_at: resolver_path
+      #     schema.register_graphql_resolver :add,
+      #       AddResolver,
+      #       defined_at: resolver_path,
+      #       multiplier: 2 # extra args are passed to the resolver within `config`.
       #
       #     schema.on_root_query_type do |t|
       #       t.field "add", "Int" do |f|

@@ -1,5 +1,7 @@
 module ElasticGraph
   class GraphQL
+    type namedGraphQLResolversHash = ::Hash[::Symbol, ^(::Hash[::Symbol, untyped]) -> resolver]
+
     attr_reader config: Config
     attr_reader logger: ::Logger
     attr_reader runtime_metadata: SchemaArtifacts::RuntimeMetadata::Schema
@@ -45,8 +47,8 @@ module ElasticGraph
     @resolver_query_adapter: Resolvers::QueryAdapter?
     def resolver_query_adapter: () -> Resolvers::QueryAdapter
 
-    @named_graphql_resolvers: ::Hash[::Symbol, resolver]?
-    def named_graphql_resolvers: () -> ::Hash[::Symbol, resolver]
+    @named_graphql_resolvers: namedGraphQLResolversHash?
+    def named_graphql_resolvers: () -> namedGraphQLResolversHash
 
     @datastore_query_adapters: ::Array[_QueryAdapter]?
     def datastore_query_adapters: () -> ::Array[_QueryAdapter]
