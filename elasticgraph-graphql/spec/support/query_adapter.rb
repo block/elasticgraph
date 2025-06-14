@@ -27,20 +27,6 @@ module QueryAdapterSpecSupport
     def initialize(list_item_count: 1)
       @list_item_count = list_item_count
       @graphql = yield(graphql_adapter: self)
-
-      # Only 2 resolvers yield to `Resolvers::GraphQLAdapter` to get a query built. Here we
-      # put those into an array so that we can mimic the behavior in this `QueryProbe` and only
-      # build an `DatastoreQuery` for the same fields.
-      resolvers_module = ::ElasticGraph::GraphQL::Resolvers
-
-      @resolvers_that_build_datastore_query = @graphql.named_graphql_resolvers.values.select do |resolver|
-        case resolver
-        when resolvers_module::ListRecords, resolvers_module::NestedRelationships
-          true
-        else
-          false
-        end
-      end
     end
 
     def datastore_queries_by_field_for(query)
@@ -83,8 +69,8 @@ module QueryAdapterSpecSupport
     end
 
     def resolved_with_resolver_that_builds_datastore_query?(schema_field, object)
-      resolver = @graphql.named_graphql_resolvers.fetch(schema_field.resolver.name)
-      @resolvers_that_build_datastore_query.include?(resolver)
+      # Only 2 resolvers yield to `Resolvers::GraphQLAdapter` to get a query built.
+      [:list_records, :nested_relationships].include?(schema_field.resolver.name)
     end
 
     def coerce_input(type, value, ctx)

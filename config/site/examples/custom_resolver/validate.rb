@@ -16,7 +16,7 @@ query = ::File.read(::File.join(__dir__, "query.graphql"))
 response = graphql.graphql_query_executor.execute(query)
 data = response.fetch("data")
 
-unless (1..12).cover?(data.fetch("roll6SidedDice")) && (1..20).cover?(data.fetch("roll10SidedDice"))
+unless (3..36).cover?(data.fetch("roll6SidedDice")) && (3..60).cover?(data.fetch("roll10SidedDice"))
   raise <<~EOS
     Got an unexpected response:
 

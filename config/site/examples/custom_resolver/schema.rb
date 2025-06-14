@@ -25,7 +25,7 @@ ElasticGraph.define_schema do |schema|
       f.argument "sides", "Int" do |a|
         a.default 6
       end
-      f.resolve_with :roll_dice
+      f.resolve_with :roll_dice, multiplier: 3
     end
   end
   # :snippet-end:

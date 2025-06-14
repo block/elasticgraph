@@ -499,16 +499,20 @@ module ElasticGraph
         # via {Mixins::HasIndices#resolve_fields_with} will be used.
         #
         # @param resolver_name [Symbol] name of the GraphQL resolver
+        # @param config [Hash<Symbol, Object>] configuration parameters for the resolver
         # @return [void]
+        # @see API#register_graphql_resolver
         #
         # @example Use a custom resolver for a custom `Query` field
         #   # In `add_resolver.rb`:
         #   class AddResolver
         #     def initialize(elasticgraph_graphql:, config:)
+        #       @multiplier = config.fetch(:multiplier, 1)
         #     end
         #
         #     def resolve(field:, object:, args:, context:)
-        #       args.fetch("x") + args.fetch("y")
+        #       sum = args.fetch("x") + args.fetch("y")
+        #       sum * @multiplier
         #     end
         #   end
         #
@@ -521,12 +525,14 @@ module ElasticGraph
         #       t.field "add", "Int" do |f|
         #         f.argument "x", "Int!"
         #         f.argument "y", "Int!"
-        #         f.resolve_with :add
+        #
+        #         # Extra args (`multiplier: 2`, in this example) are passed to the resolver within `config`.
+        #         f.resolve_with :add, multiplier: 2
         #       end
         #     end
         #   end
-        def resolve_with(resolver_name)
-          self.resolver = resolver_name&.then { SchemaArtifacts::RuntimeMetadata::ConfiguredGraphQLResolver.new(it, {}) }
+        def resolve_with(resolver_name, **config)
+          self.resolver = resolver_name&.then { SchemaArtifacts::RuntimeMetadata::ConfiguredGraphQLResolver.new(it, config) }
         end
 
         # @private

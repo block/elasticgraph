@@ -50,7 +50,7 @@ which allows you to inspect the child field selections. However, providing it im
 more performant if you omit it from your `resolve` definition.
 
 In this case, our `RollDiceResolver` simulates the rolling of the configured `number_of_dice`, each of which has a number of `sides`
-provided as a query argument.
+provided as a query argument. Finally, it multiplies the dice roll by a configured `multiplier`.
 
 ### Step 2: Register the Resolver
 
@@ -66,7 +66,13 @@ In this case, we've registered the resolver to roll two dice.
 {% include copyable_code_snippet.html language="ruby" data="custom_resolver.snippets.schema_rb.on_root_query_type" %}
 
 Here we've defined a field on `Query` using [`on_root_query_type`](/elasticgraph/api-docs/{{ site.data.doc_versions.latest_version }}/ElasticGraph/SchemaDefinition/API.html#on_root_query_type-instance_method),
-and configured it to use the `:roll_dice` resolver.
+and configured it to use the `:roll_dice` resolver. Extra arguments (`multiplier: 3`, in this case) will be passed to the resolver in `config`.
+
+{: .alert-note}
+**Note**{: .alert-title}
+Resolver config values can be provided both when registering the resolver (via `schema.register_graphql_resolver`)
+and when configuring a field to use the resolver (via `field.resolve_with`). These configuration options will be
+merged together to provide `config` when instantiating the resolver.
 
 ### Step 4: Query the Custom Field
 

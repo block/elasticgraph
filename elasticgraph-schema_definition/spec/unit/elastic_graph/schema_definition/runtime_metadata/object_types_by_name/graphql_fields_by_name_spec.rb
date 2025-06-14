@@ -39,6 +39,35 @@ module ElasticGraph
         })
       end
 
+      it "records resolver arguments as `config`" do
+        metadata = object_type_metadata_for "Widget" do |s|
+          s.object_type "Widget" do |t|
+            t.resolve_fields_with :list_records, limit: 17
+
+            t.field "id", "ID"
+
+            t.field "description", "String" do |f|
+              f.resolve_with :list_records, limit: 4
+            end
+
+            t.field "name", "String" do |f|
+              f.resolve_with :get_record_field_value, max: 12
+            end
+
+            t.field "title", "String" do |f|
+              f.resolve_with :object_without_lookahead, size: 3
+            end
+          end
+        end
+
+        expect(metadata.graphql_fields_by_name).to eq({
+          "id" => graphql_field_with(name_in_index: "id", resolver: configured_graphql_resolver(:list_records, limit: 17)),
+          "description" => graphql_field_with(name_in_index: "description", resolver: configured_graphql_resolver(:list_records, limit: 4)),
+          "name" => graphql_field_with(name_in_index: "name", resolver: configured_graphql_resolver(:get_record_field_value, max: 12)),
+          "title" => graphql_field_with(name_in_index: "title", resolver: configured_graphql_resolver(:object_without_lookahead, size: 3))
+        })
+      end
+
       it "omits `resolver` from input fields" do
         metadata = object_type_metadata_for "WidgetFilterInput" do |s|
           s.object_type "Widget" do |t|
