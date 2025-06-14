@@ -438,7 +438,7 @@ module ElasticGraph
           # to go from non-null to null, but is not a breaking change to make it non-null
           # in the future.
           register_framework_object_type "PageInfo" do |t|
-            t.default_graphql_resolver = :object_without_lookahead
+            t.resolve_fields_with :object_without_lookahead
 
             t.documentation <<~EOS
               Provides information about the specific fetched page. This implements the `PageInfo`
@@ -470,7 +470,7 @@ module ElasticGraph
           end
 
           register_framework_object_type "SearchHighlight" do |t|
-            t.default_graphql_resolver = :object_without_lookahead
+            t.resolve_fields_with :object_without_lookahead
 
             t.documentation "Provides information about why a document matched a search via highlighted snippets."
 
@@ -573,7 +573,7 @@ module ElasticGraph
 
           register_framework_object_type "AggregationCountDetail" do |t|
             t.documentation "Provides detail about an aggregation `#{names.count}`."
-            t.default_graphql_resolver = :object_without_lookahead
+            t.resolve_fields_with :object_without_lookahead
 
             t.field names.approximate_value, "JsonSafeLong!", graphql_only: true do |f|
               f.documentation <<~EOS
@@ -1294,7 +1294,7 @@ module ElasticGraph
           date = schema_def_state.type_ref("Date")
           register_framework_object_type date.as_grouped_by.name do |t|
             t.documentation "Allows for grouping `Date` values based on the desired return type."
-            t.default_graphql_resolver = :object_with_lookahead
+            t.resolve_fields_with :object_with_lookahead
             t.override_runtime_metadata(elasticgraph_category: :date_grouped_by_object)
 
             t.field names.as_date, "Date", graphql_only: true do |f|
@@ -1312,7 +1312,7 @@ module ElasticGraph
           date_time = schema_def_state.type_ref("DateTime")
           register_framework_object_type date_time.as_grouped_by.name do |t|
             t.documentation "Allows for grouping `DateTime` values based on the desired return type."
-            t.default_graphql_resolver = :object_with_lookahead
+            t.resolve_fields_with :object_with_lookahead
             t.override_runtime_metadata(elasticgraph_category: :date_grouped_by_object)
 
             t.field names.as_date_time, "DateTime", graphql_only: true do |f|

@@ -35,7 +35,7 @@ module ElasticGraph
           schema_definition: ->(schema) {
             schema.object_type "Widget" do |t|
               t.field "id", "ID" do |f|
-                f.resolver = :get_record_field_value
+                f.resolve_with :get_record_field_value
               end
               t.index "widgets"
             end

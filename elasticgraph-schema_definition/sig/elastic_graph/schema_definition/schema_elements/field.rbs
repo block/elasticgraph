@@ -25,7 +25,7 @@ module ElasticGraph
         attr_reader non_nullable_in_json_schema: bool
         attr_reader source: FieldSource?
         attr_accessor relationship: Relationship?
-        attr_accessor resolver: ::Symbol?
+        attr_reader resolver: ::Symbol?
         attr_reader singular_name: ::String?
         attr_reader as_input: bool
 
@@ -78,6 +78,7 @@ module ElasticGraph
         def to_filter_field: (parent_type: anyObjectType, ?for_single_value: bool) -> Field
         def to_sdl: (?type_structure_only: bool, ?default_value_sdl: ::String?) ?{ (argument) -> boolish } -> ::String
         def sourced_from: (::String, ::String) -> void
+        def resolve_with: (::Symbol?) -> void
         def paths_to_lists_for_count_indexing: (?has_list_ancestor: bool) -> ::Array[::String]
         def index_leaf?: () -> bool
 

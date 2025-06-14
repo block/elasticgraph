@@ -321,7 +321,7 @@ module ElasticGraph
       #       t.field "add", "Int" do |f|
       #         f.argument "x", "Int!"
       #         f.argument "y", "Int!"
-      #         f.resolver = :add
+      #         f.resolve_with :add
       #       end
       #     end
       #   end
@@ -354,7 +354,7 @@ module ElasticGraph
       #
       #     schema.on_root_query_type do |t|
       #       t.field "artist", "Artist" do |f|
-      #         f.resolver = :artist
+      #         f.resolve_with :artist
       #       end
       #     end
       #   end

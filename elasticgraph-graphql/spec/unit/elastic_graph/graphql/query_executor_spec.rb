@@ -45,11 +45,11 @@ module ElasticGraph
               if type.name == "Query"
                 type.field "colors", "[Color!]!" do |f|
                   f.argument "args", "ColorArgs"
-                  f.resolver = :list_records
+                  f.resolve_with :list_records
                 end
                 type.field "colors2", "[Color2!]!" do |f|
                   f.argument "args", "ColorArgs"
-                  f.resolver = :list_records
+                  f.resolve_with :list_records
                 end
               end
             end
@@ -184,9 +184,9 @@ module ElasticGraph
         it "logs the full sanitized query with exception details if executing the query triggers an exception" do
           self.schema_artifacts = generate_schema_artifacts do |schema|
             schema.on_root_query_type do |t|
-              t.default_graphql_resolver = nil
+              t.resolve_fields_with nil
               t.field "foo", "Int" do |f|
-                f.resolver = :list_records
+                f.resolve_with :list_records
               end
             end
           end
@@ -392,7 +392,7 @@ module ElasticGraph
               schema.on_root_query_type do |type|
                 type.field "multiply", "Int" do |f|
                   f.argument("operands", "Operands!")
-                  f.resolver = :multiply
+                  f.resolve_with :multiply
                 end
               end
 

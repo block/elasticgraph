@@ -116,7 +116,7 @@ module ElasticGraph
       def define_root_graphql_type
         state.api.object_type "Query" do |query_type|
           query_type.documentation "The query entry point for the entire schema."
-          query_type.default_graphql_resolver = nil
+          query_type.resolve_fields_with nil
 
           state.types_by_name.values.select(&:indexed?).sort_by(&:name).each do |type|
             # @type var indexed_type: Mixins::HasIndices & _Type
@@ -130,7 +130,7 @@ module ElasticGraph
               singular: indexed_type.singular_root_query_field_name
             ) do |f|
               f.documentation "Fetches `#{indexed_type.name}`s based on the provided arguments."
-              f.resolver = :list_records
+              f.resolve_with :list_records
               f.hide_relationship_runtime_metadata = true
               indexed_type.root_query_fields_customizations&.call(f)
             end

@@ -535,7 +535,7 @@ module ElasticGraph
             )
 
             field.relationship = relationship
-            field.resolver = :nested_relationships
+            field.resolve_with :nested_relationships
 
             yield relationship if block_given?
 

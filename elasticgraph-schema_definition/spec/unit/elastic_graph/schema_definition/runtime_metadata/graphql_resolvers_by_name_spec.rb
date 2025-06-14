@@ -36,7 +36,7 @@ module ElasticGraph
 
           schema.on_root_query_type do |t|
             t.field "foo", "Int" do |f|
-              f.resolver = :resolver1
+              f.resolve_with :resolver1
             end
           end
         end
@@ -58,7 +58,7 @@ module ElasticGraph
 
           schema.on_root_query_type do |t|
             t.field "foo", "Int" do |f|
-              f.resolver = :resolver1
+              f.resolve_with :resolver1
             end
           end
         end
@@ -86,21 +86,21 @@ module ElasticGraph
           graphql_resolvers_by_name do |schema|
             schema.on_root_query_type do |t|
               t.field "foo1", "Int" do |f|
-                f.resolver = :resolver1
+                f.resolve_with :resolver1
               end
 
               t.field "foo2", "Int" do |f|
-                f.resolver = :get_record_field_value
+                f.resolve_with :get_record_field_value
               end
 
               t.field "foo3", "Int" do |f|
-                f.resolver = :resolver1
+                f.resolve_with :resolver1
               end
             end
 
             schema.object_type "MyType" do |t|
               t.field "bar", "Int" do |f|
-                f.resolver = :resolver2
+                f.resolve_with :resolver2
               end
             end
           end

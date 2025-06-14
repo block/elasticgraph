@@ -38,7 +38,7 @@ RSpec.shared_context "scalar coercion adapter support" do |scalar_type_name, sch
 
           # `resolver` is overridden via our `test_adapter` above, but we still need to assign it to something here to
           # avoid errors from `elasticgraph-schema_definition`.
-          f.resolver = :get_record_field_value
+          f.resolve_with :get_record_field_value
         end
       end
     end)
