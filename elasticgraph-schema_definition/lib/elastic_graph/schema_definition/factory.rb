@@ -286,7 +286,7 @@ module ElasticGraph
         new_object_type @state.type_ref(index_leaf_type).as_aggregated_values.name do |type|
           type.graphql_only true
           type.documentation "A return type used from aggregations to provided aggregated values over `#{index_leaf_type}` fields."
-          type.default_graphql_resolver = :object_with_lookahead
+          type.resolve_fields_with :object_with_lookahead
           type.override_runtime_metadata(elasticgraph_category: :scalar_aggregated_values)
 
           type.field @state.schema_elements.approximate_distinct_value_count, "JsonSafeLong", graphql_only: true do |f|
@@ -437,7 +437,7 @@ module ElasticGraph
 
         new_object_type type_ref.as_edge.name do |t|
           t.relay_pagination_type = true
-          t.default_graphql_resolver = :object_without_lookahead
+          t.resolve_fields_with :object_without_lookahead
           t.override_runtime_metadata(elasticgraph_category: :relay_edge)
 
           t.documentation <<~EOS
@@ -477,7 +477,7 @@ module ElasticGraph
         type_ref = @state.type_ref(type_name)
         new_object_type type_ref.as_connection.name do |t|
           t.relay_pagination_type = true
-          t.default_graphql_resolver = :object_without_lookahead
+          t.resolve_fields_with :object_without_lookahead
           t.override_runtime_metadata(elasticgraph_category: :relay_connection)
 
           if support_pagination

@@ -48,14 +48,14 @@ module ApolloTestImpl
     schema.on_root_query_type do |type|
       type.field "product", "Product" do |f|
         f.argument "id", "ID!"
-        f.resolver = :product
+        f.resolve_with :product
       end
 
       type.field "deprecatedProduct", "DeprecatedProduct" do |f|
         f.argument "sku", "String!"
         f.argument "package", "String!"
         f.directive "deprecated", reason: "Use product query instead"
-        f.resolver = :product
+        f.resolve_with :product
       end
     end
 

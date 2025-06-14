@@ -20,14 +20,14 @@ module ElasticGraph
         attr_reader :runtime_metadata_overrides
 
         # @return [::Symbol, nil] the default GraphQL resolver to use for fields on this type
-        attr_accessor :default_graphql_resolver
-        # @dynamic default_graphql_resolver, default_graphql_resolver=
+        attr_reader :default_graphql_resolver
+        # @dynamic default_graphql_resolver
 
         # @private
         def initialize(*args, **options)
           super(*args, **options)
           @runtime_metadata_overrides = {}
-          self.default_graphql_resolver = :get_record_field_value
+          resolve_fields_with :get_record_field_value
           yield self
 
           # Freeze `indices` so that the indexable status of a type does not change after instantiation.
@@ -70,6 +70,15 @@ module ElasticGraph
         #   end
         def index(name, **settings, &block)
           indices.replace([Indexing::Index.new(name, settings, schema_def_state, self, &block)])
+        end
+
+        # Configures the default GraphQL resolver that will be used to resolve the fields of this type. Individual fields
+        # can override this using {SchemaElements::Field#resolve_with}.
+        #
+        # @param default_resolver_name [Symbol] name of the GraphQL resolver to use as the default for fields of this type
+        # @return [void]
+        def resolve_fields_with(default_resolver_name)
+          @default_graphql_resolver = default_resolver_name
         end
 
         # List of indices. (Currently we only store one but we may support multiple in the future).

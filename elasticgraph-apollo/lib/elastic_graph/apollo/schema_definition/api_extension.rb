@@ -487,7 +487,7 @@ module ElasticGraph
                 EOS
               end
 
-              f.resolver = :apollo_entities
+              f.resolve_with :apollo_entities
             end
           end
 
@@ -503,7 +503,7 @@ module ElasticGraph
               Not intended for use by clients other than Apollo.
             EOS
 
-            f.resolver = :apollo_service
+            f.resolve_with :apollo_service
           end
         end
       end

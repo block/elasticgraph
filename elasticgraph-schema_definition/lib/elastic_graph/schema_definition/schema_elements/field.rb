@@ -149,6 +149,8 @@ module ElasticGraph
           yield self if block_given?
         end
 
+        private :resolver=
+
         # @private
         @@initialize_param_names = instance_method(:initialize).parameters.map(&:last).to_set
 
@@ -490,6 +492,40 @@ module ElasticGraph
             relationship_name: relationship,
             field_path: field_path
           )
+        end
+
+        # Configures the GraphQL resolver used to resolve this field. If not set, the resolver configured on the parent type
+        # via {Mixins::HasIndices#resolve_fields_with} will be used.
+        #
+        # @param resolver_name [Symbol] name of the GraphQL resolver
+        # @return [void]
+        #
+        # @example Use a custom resolver for a custom `Query` field
+        #   # In `add_resolver.rb`:
+        #   class AddResolver
+        #     def initialize(elasticgraph_graphql:, config:)
+        #     end
+        #
+        #     def resolve(field:, object:, args:, context:)
+        #       args.fetch("x") + args.fetch("y")
+        #     end
+        #   end
+        #
+        #   # In `config/schema.rb`:
+        #   ElasticGraph.define_schema do |schema|
+        #     require(resolver_path = "add_resolver")
+        #     schema.register_graphql_resolver :add, AddResolver, defined_at: resolver_path
+        #
+        #     schema.on_root_query_type do |t|
+        #       t.field "add", "Int" do |f|
+        #         f.argument "x", "Int!"
+        #         f.argument "y", "Int!"
+        #         f.resolve_with :add
+        #       end
+        #     end
+        #   end
+        def resolve_with(resolver_name)
+          self.resolver = resolver_name
         end
 
         # @private

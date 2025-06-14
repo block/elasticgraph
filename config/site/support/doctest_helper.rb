@@ -124,20 +124,25 @@ module ElasticGraph
       EOS
     end
 
-    doctest.before "ElasticGraph::SchemaDefinition::API#register_graphql_resolver@Register a custom resolver for use by a custom `Query` field" do
-      # The validation performed on the resolver attempts to read the `source_location` of methods of the resolver, but
-      # in this context, `eval` is being used and the file doesn't exist! So we have to stub it out here.
-      extend ::RSpec::Mocks::ExampleMethods
-      allow(::File).to receive(:read).and_wrap_original do |original, file_name|
-        if file_name.include?("(eval")
-          ([file_name] * 10).join("\n")
-        else
-          original.call(file_name)
+    [
+      "ElasticGraph::SchemaDefinition::API#register_graphql_resolver@Register a custom resolver for use by a custom `Query` field",
+      "ElasticGraph::SchemaDefinition::SchemaElements::Field#resolve_with@Use a custom resolver for a custom `Query` field"
+    ].each do |description|
+      doctest.before description do
+        # The validation performed on the resolver attempts to read the `source_location` of methods of the resolver, but
+        # in this context, `eval` is being used and the file doesn't exist! So we have to stub it out here.
+        extend ::RSpec::Mocks::ExampleMethods
+        allow(::File).to receive(:read).and_wrap_original do |original, file_name|
+          if file_name.include?("(eval")
+            ([file_name] * 10).join("\n")
+          else
+            original.call(file_name)
+          end
         end
-      end
 
-      $LOAD_PATH << ::Dir.pwd
-      ::File.write("add_resolver.rb", "")
+        $LOAD_PATH << ::Dir.pwd
+        ::File.write("add_resolver.rb", "")
+      end
     end
 
     doctest.before "ElasticGraph::SchemaDefinition::API#register_graphql_resolver@Register a custom resolver that uses lookahead" do

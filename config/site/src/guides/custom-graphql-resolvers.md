@@ -16,7 +16,7 @@ the API provided by ElasticGraph with your own custom implementation. Here's how
 {: .alert-tip}
 **Tip**{: .alert-title}
 ElasticGraph provides friendly error messages. Instead of reading this guide, you can jump straight to
-[step 3](#step-3-assign-the-resolver-to-a-field) and let the error messages guide you through the
+[step 3](#step-3-configure-a-field-to-use-the-resolver) and let the error messages guide you through the
 changes explained in steps 1 and 2.
 
 ### Step 1: Define a Resolver Class
@@ -61,12 +61,12 @@ API](/elasticgraph/api-docs/{{ site.data.doc_versions.latest_version }}/ElasticG
 Any arguments provided after `defined_at:` get recorded as resolver config, which will later be passed to the resolver's `initialize` method.
 In this case, we've registered the resolver to roll two dice.
 
-### Step 3: Assign the Resolver to a Field
+### Step 3: Configure a Field to use the Resolver
 
 {% include copyable_code_snippet.html language="ruby" data="custom_resolver.snippets.schema_rb.on_root_query_type" %}
 
-Here we've defined a field on `Query` using [`on_root_query_type`](/elasticgraph/api-docs/{{ site.data.doc_versions.latest_version }}/ElasticGraph/SchemaDefinition/API.html#on_root_query_type-instance_method).
-We've assigned the `:roll_dice` resolver to our custom field.
+Here we've defined a field on `Query` using [`on_root_query_type`](/elasticgraph/api-docs/{{ site.data.doc_versions.latest_version }}/ElasticGraph/SchemaDefinition/API.html#on_root_query_type-instance_method),
+and configured it to use the `:roll_dice` resolver.
 
 ### Step 4: Query the Custom Field
 

@@ -16,17 +16,17 @@ module ElasticGraph
       it "defaults the `resolver` of each individual field to the parent type's `default_graphql_resolver`" do
         metadata = object_type_metadata_for "Widget" do |s|
           s.object_type "Widget" do |t|
-            t.default_graphql_resolver = :list_records
+            t.resolve_fields_with :list_records
 
             t.field "id", "ID"
             t.field "description", "String"
 
             t.field "name", "String" do |f|
-              f.resolver = :get_record_field_value
+              f.resolve_with :get_record_field_value
             end
 
             t.field "title", "String" do |f|
-              f.resolver = :object_without_lookahead
+              f.resolve_with :object_without_lookahead
             end
           end
         end
@@ -46,7 +46,7 @@ module ElasticGraph
 
             t.field "title", "String", name_in_index: "title2" do |f|
               f.customize_filter_field do |ff|
-                ff.resolver = :other2
+                ff.resolve_with :other2
               end
             end
           end
@@ -74,9 +74,9 @@ module ElasticGraph
         expect {
           object_type_metadata_for "Widget" do |s|
             s.object_type "Widget" do |t|
-              t.default_graphql_resolver = nil
+              t.resolve_fields_with nil
               t.field "id", "ID" do |f|
-                f.resolver = nil
+                f.resolve_with nil
               end
             end
           end

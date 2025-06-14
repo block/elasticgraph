@@ -46,7 +46,7 @@ module ElasticGraph
               # Record metadata that is necessary for elasticgraph-graphql to correctly recognize and handle
               # this sub-aggregation correctly.
               t.override_runtime_metadata(elasticgraph_category: :nested_sub_aggregation_connection)
-              t.default_graphql_resolver = :object_without_lookahead
+              t.resolve_fields_with :object_without_lookahead
             end
           end
 
@@ -118,7 +118,7 @@ module ElasticGraph
             schema_def_state.sub_aggregation_paths_for(nested_field_ref.parent_type).map do |path|
               schema_def_state.factory.new_object_type type_ref.as_sub_aggregation(parent_doc_types: path.parent_doc_types).name do |t|
                 t.documentation "Return type representing a bucket of `#{name}` objects for a sub-aggregation within each `#{type_ref.as_parent_aggregation(parent_doc_types: path.parent_doc_types).name}`."
-                t.default_graphql_resolver = :object_without_lookahead
+                t.resolve_fields_with :object_without_lookahead
 
                 t.field schema_def_state.schema_elements.count_detail, "AggregationCountDetail", graphql_only: true do |f|
                   f.documentation "Details of the count of `#{name}` documents in a sub-aggregation bucket."
@@ -166,7 +166,7 @@ module ElasticGraph
             schema_def_state.factory.new_object_type agg_sub_aggs_type_ref.name do |t|
               under_field_description = "under `#{path.field_path_string}` " unless path.field_path.empty?
               t.documentation "Provides access to the `#{schema_def_state.schema_elements.sub_aggregations}` #{under_field_description}within each `#{type_ref.as_parent_aggregation(parent_doc_types: path.parent_doc_types).name}`."
-              t.default_graphql_resolver = :object_with_lookahead
+              t.resolve_fields_with :object_with_lookahead
 
               sub_aggregatable_fields.each do |field|
                 if field.nested?
@@ -229,7 +229,7 @@ module ElasticGraph
 
             # Record metadata that is necessary for elasticgraph-graphql to correctly recognize and handle
             # this indexed aggregation type correctly.
-            t.default_graphql_resolver = :object_without_lookahead
+            t.resolve_fields_with :object_without_lookahead
             t.override_runtime_metadata(source_type: name, elasticgraph_category: :indexed_aggregation)
           end
         end
@@ -241,7 +241,7 @@ module ElasticGraph
 
           new_non_empty_object_type type_ref.as_grouped_by.name do |t|
             t.documentation "Type used to specify the `#{name}` fields to group by for aggregations."
-            t.default_graphql_resolver = :object_with_lookahead
+            t.resolve_fields_with :object_with_lookahead
 
             graphql_fields_by_name.values.each do |field|
               field.define_grouped_by_field(t)
@@ -256,7 +256,7 @@ module ElasticGraph
 
           new_non_empty_object_type type_ref.as_aggregated_values.name do |t|
             t.documentation "Type used to perform aggregation computations on `#{name}` fields."
-            t.default_graphql_resolver = :object_with_lookahead
+            t.resolve_fields_with :object_with_lookahead
 
             graphql_fields_by_name.values.each do |field|
               field.define_aggregated_values_field(t)
@@ -270,7 +270,7 @@ module ElasticGraph
 
           new_non_empty_object_type type_ref.as_highlights.name do |t|
             t.documentation "Type used to request desired `#{name}` search highlight fields."
-            t.default_graphql_resolver = :get_record_field_value
+            t.resolve_fields_with :get_record_field_value
 
             graphql_fields_by_name.values.each do |field|
               field.define_highlights_field(t)
