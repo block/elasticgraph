@@ -17,6 +17,7 @@ require "aws-sdk-s3"
 module ElasticGraph
   module IndexerLambda
     RSpec.describe SqsProcessor, :capture_logs do
+      let(:ignore_sqs_latency_timestamps_from_arns) { [] }
       let(:indexer_processor) { instance_double(Indexer::Processor, process_returning_failures: []) }
 
       describe "#process" do
@@ -26,7 +27,7 @@ module ElasticGraph
         it "processes a lambda event containing a single SQS message with a single ElasticGraph event" do
           lambda_event = {
             "Records" => [
-              {"messageId" => "a", "body" => jsonl({"field1" => {}})}
+              sqs_message("a", {"field1" => {}})
             ]
           }
 
@@ -40,9 +41,9 @@ module ElasticGraph
         it "processes a lambda event containing multiple SQS messages" do
           lambda_event = {
             "Records" => [
-              {"messageId" => "a", "body" => jsonl({"field1" => {}})},
-              {"messageId" => "b", "body" => jsonl({"field2" => {}})},
-              {"messageId" => "c", "body" => jsonl({"field3" => {}})}
+              sqs_message("a", {"field1" => {}}),
+              sqs_message("b", {"field2" => {}}),
+              sqs_message("c", {"field3" => {}})
             ]
           }
 
@@ -58,8 +59,8 @@ module ElasticGraph
         it "processes a lambda event containing multiple ElasticGraph events in the SQS messages" do
           lambda_event = {
             "Records" => [
-              {"messageId" => "a", "body" => jsonl({"field1" => {}}, {"field2" => {}})},
-              {"messageId" => "b", "body" => jsonl({"field3" => {}}, {"field4" => {}}, {"field5" => {}})}
+              sqs_message("a", {"field1" => {}}, {"field2" => {}}),
+              sqs_message("b", {"field3" => {}}, {"field4" => {}}, {"field5" => {}})
             ]
           }
 
@@ -80,24 +81,8 @@ module ElasticGraph
 
           lambda_event = {
             "Records" => [
-              {
-                "messageId" => "a",
-                "body" => jsonl(
-                  {"field1" => {}},
-                  {"field2" => {}}
-                ),
-                "attributes" => {
-                  "SentTimestamp" => sent_timestamp_millis
-                }
-              },
-              {
-                "messageId" => "b",
-                "body" => jsonl(
-                  {"field3" => {}},
-                  {"field4" => {}},
-                  {"field5" => {}}
-                )
-              }
+              sqs_message("a", {"field1" => {}}, {"field2" => {}}, attributes: {"SentTimestamp" => sent_timestamp_millis}),
+              sqs_message("b", {"field3" => {}}, {"field4" => {}}, {"field5" => {}})
             ]
           }
 
@@ -111,9 +96,9 @@ module ElasticGraph
         it "raises a clear error if the lambda event does not contain SQS messages under `Records` as expected" do
           lambda_event = {
             "Rows" => [
-              {"messageId" => "a", "body" => jsonl({"field1" => {}})},
-              {"messageId" => "b", "body" => jsonl({"field2" => {}})},
-              {"messageId" => "c", "body" => jsonl({"field1" => {}})}
+              sqs_message("a", {"field1" => {}}),
+              sqs_message("b", {"field2" => {}}),
+              sqs_message("c", {"field1" => {}})
             ]
           }
 
@@ -127,9 +112,9 @@ module ElasticGraph
         it "raises a clear error if the SQS messages lack a `body` as expected" do
           lambda_event = {
             "Records" => [
-              {"messageId" => "a", "data" => jsonl({"field1" => {}})},
-              {"messageId" => "b", "data" => jsonl({"field2" => {}})},
-              {"messageId" => "c", "data" => jsonl({"field1" => {}})}
+              sqs_message("a"),
+              sqs_message("b"),
+              sqs_message("c")
             ]
           }
 
@@ -147,10 +132,10 @@ module ElasticGraph
 
           lambda_event = {
             "Records" => [
-              {"messageId" => "a", "body" => JSON.generate([
+              sqs_message("a", JSON.generate([
                 "software.amazon.payloadoffloading.PayloadS3Pointer",
                 {"s3BucketName" => bucket_name, "s3Key" => s3_key}
-              ])}
+              ]))
             ]
           }
 
@@ -173,10 +158,10 @@ module ElasticGraph
 
           lambda_event = {
             "Records" => [
-              {"messageId" => "a", "body" => JSON.generate([
+              sqs_message("a", JSON.generate([
                 "software.amazon.payloadoffloading.PayloadS3Pointer",
                 {"s3BucketName" => bucket_name, "s3Key" => s3_key}
-              ])}
+              ]))
             ]
           }
 
@@ -198,14 +183,10 @@ module ElasticGraph
 
           lambda_event = {
             "Records" => [
-              {
-                "messageId" => "a",
-                "body" => jsonl({"field1" => {}}),
-                "attributes" => {
-                  "ApproximateFirstReceiveTimestamp" => approximate_first_receive_timestamp_millis,
-                  "SentTimestamp" => sent_timestamp_millis
-                }
-              }
+              sqs_message("a", {"field1" => {}}, attributes: {
+                "ApproximateFirstReceiveTimestamp" => approximate_first_receive_timestamp_millis,
+                "SentTimestamp" => sent_timestamp_millis
+              })
             ]
           }
 
@@ -231,14 +212,10 @@ module ElasticGraph
 
           lambda_event = {
             "Records" => [
-              {
-                "messageId" => "a",
-                "body" => jsonl({"latency_timestamps" => {"field1" => "value1"}}),
-                "attributes" => {
-                  "ApproximateFirstReceiveTimestamp" => approximate_first_receive_timestamp_millis,
-                  "SentTimestamp" => sent_timestamp_millis
-                }
-              }
+              sqs_message("a", {"latency_timestamps" => {"field1" => "value1"}}, attributes: {
+                "ApproximateFirstReceiveTimestamp" => approximate_first_receive_timestamp_millis,
+                "SentTimestamp" => sent_timestamp_millis
+              })
             ]
           }
 
@@ -258,6 +235,47 @@ module ElasticGraph
           end
         end
 
+        context "when `ignore_sqs_latency_timestamps_from_arns` is configured" do
+          let(:ignore_sqs_latency_timestamps_from_arns) { ["ignored-arn1", "ignored-arn2"] }
+
+          it "ignores SQS latency timestamps on events which have an `eventSourceARN` in the configured list" do
+            approximate_first_receive_timestamp_millis = "1696334412345"
+            sent_timestamp_millis = "796010423456"
+
+            lambda_event = {
+              "Records" => [
+                sqs_message("a", {"latency_timestamps" => {"field1" => "value1"}}, event_source_arn: "ignored-arn1", attributes: {
+                  "ApproximateFirstReceiveTimestamp" => approximate_first_receive_timestamp_millis,
+                  "SentTimestamp" => sent_timestamp_millis
+                }),
+                sqs_message("b", {"field2" => {}}, event_source_arn: "other-arn1", attributes: {
+                  "ApproximateFirstReceiveTimestamp" => approximate_first_receive_timestamp_millis,
+                  "SentTimestamp" => sent_timestamp_millis
+                }),
+                sqs_message("c", {"field3" => {}}, event_source_arn: "ignored-arn2", attributes: {
+                  "ApproximateFirstReceiveTimestamp" => approximate_first_receive_timestamp_millis,
+                  "SentTimestamp" => sent_timestamp_millis
+                }),
+                sqs_message("a", {"latency_timestamps" => {"field2" => "value2"}}, event_source_arn: "other-arn2", attributes: {
+                  "ApproximateFirstReceiveTimestamp" => approximate_first_receive_timestamp_millis,
+                  "SentTimestamp" => sent_timestamp_millis
+                })
+              ]
+            }
+
+            sqs_processor.process(lambda_event)
+
+            expect(indexer_processor).to have_received(:process_returning_failures) do |events|
+              expect(events.map { |e| e.fetch("latency_timestamps", {}).keys }).to eq [
+                ["field1"],
+                ["processing_first_attempted_at", "sqs_received_at"],
+                [],
+                ["field2", "processing_first_attempted_at", "sqs_received_at"]
+              ]
+            end
+          end
+        end
+
         context "when one or more events fail to process" do
           let(:sqs_processor) { build_sqs_processor }
 
@@ -269,10 +287,10 @@ module ElasticGraph
 
             lambda_event = {
               "Records" => [
-                {"messageId" => "12", "body" => jsonl({"id" => "id1"}, {"id" => "id2"})},
-                {"messageId" => "34", "body" => jsonl({"id" => "id3"}, {"id" => "id4"})},
-                {"messageId" => "5", "body" => jsonl({"id" => "id5"})},
-                {"messageId" => "67", "body" => jsonl({"id" => "id6"}, {"id" => "id7"})}
+                sqs_message("12", {"id" => "id1"}, {"id" => "id2"}),
+                sqs_message("34", {"id" => "id3"}, {"id" => "id4"}),
+                sqs_message("5", {"id" => "id5"}),
+                sqs_message("67", {"id" => "id6"}, {"id" => "id7"})
               ]
             }
 
@@ -299,10 +317,10 @@ module ElasticGraph
 
             lambda_event = {
               "Records" => [
-                {"body" => jsonl({"id" => "id1"}, {"id" => "id2"})},
-                {"messageId" => "34", "body" => jsonl({"id" => "id3"}, {"id" => "id4"})},
-                {"messageId" => "5", "body" => jsonl({"id" => "id5"})},
-                {"messageId" => "67", "body" => jsonl({"id" => "id6"}, {"id" => "id7"})}
+                sqs_message(nil, {"id" => "id1"}, {"id" => "id2"}),
+                sqs_message("34", {"id" => "id3"}, {"id" => "id4"}),
+                sqs_message("5", {"id" => "id5"}),
+                sqs_message("67", {"id" => "id6"}, {"id" => "id7"})
               ]
             }
 
@@ -322,8 +340,8 @@ module ElasticGraph
           instance_double(Indexer::FailedEventError, id: id, message: message, event: event)
         end
 
-        def build_sqs_processor
-          super(s3_client: s3_client)
+        def build_sqs_processor(**options)
+          super(s3_client: s3_client, **options)
         end
       end
 
@@ -335,12 +353,36 @@ module ElasticGraph
         end
       end
 
+      def sqs_message(message_id, *body, event_source_arn: "arn:aws:sqs:us-east-2:123456789012:my-queue", attributes: nil)
+        body =
+          case body
+          in []
+            nil
+          in [::String]
+            body.first
+          else
+            jsonl(*body)
+          end
+
+        {
+          "messageId" => message_id,
+          "body" => body,
+          "eventSourceARN" => event_source_arn,
+          "attributes" => attributes
+        }.compact
+      end
+
       def jsonl(*items)
         items.map { |i| ::JSON.generate(i) }.join("\n")
       end
 
       def build_sqs_processor(**options)
-        SqsProcessor.new(indexer_processor, logger: logger, **options)
+        SqsProcessor.new(
+          indexer_processor,
+          logger: logger,
+          ignore_sqs_latency_timestamps_from_arns: ignore_sqs_latency_timestamps_from_arns,
+          **options
+        )
       end
     end
   end

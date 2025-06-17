@@ -16,10 +16,14 @@ module ElasticGraph
     #
     # @private
     class SqsProcessor
-      def initialize(indexer_processor, logger:, s3_client: nil)
+      # @dynamic ignore_sqs_latency_timestamps_from_arns
+      attr_reader :ignore_sqs_latency_timestamps_from_arns
+
+      def initialize(indexer_processor, logger:, ignore_sqs_latency_timestamps_from_arns:, s3_client: nil)
         @indexer_processor = indexer_processor
         @logger = logger
         @s3_client = s3_client
+        @ignore_sqs_latency_timestamps_from_arns = ignore_sqs_latency_timestamps_from_arns
       end
 
       # Processes the ElasticGraph events in the given `lambda_event`, indexing the data in the datastore.
@@ -67,9 +71,15 @@ module ElasticGraph
         sqs_received_at_by_message_id = {} # : Hash[String, String]
         lambda_event.fetch("Records").flat_map do |record|
           sqs_metadata = extract_sqs_metadata(record)
+
           if (message_id = sqs_metadata.fetch("message_id", nil))
             sqs_received_at_by_message_id[message_id] = sqs_metadata.dig("latency_timestamps", "sqs_received_at")
           end
+
+          if @ignore_sqs_latency_timestamps_from_arns.include?(record.fetch("eventSourceARN"))
+            sqs_metadata = sqs_metadata.except("latency_timestamps")
+          end
+
           parse_jsonl(record.fetch("body")).map do |event|
             ElasticGraph::Support::HashUtil.deep_merge(event, sqs_metadata)
           end

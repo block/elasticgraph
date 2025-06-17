@@ -4,7 +4,8 @@ module ElasticGraph
       def initialize: (
         Indexer::Processor,
         logger: ::Logger,
-        ?s3_client: Aws::S3::Client?
+        ignore_sqs_latency_timestamps_from_arns: ::Set[::String],
+        ?s3_client: Aws::S3::Client?,
       ) -> void
 
       def process: (::Hash[::String, untyped], ?refresh_indices: bool) -> void
@@ -14,6 +15,8 @@ module ElasticGraph
       @indexer_processor: Indexer::Processor
       @logger: ::Logger
       @s3_client: Aws::S3::Client?
+
+      attr_reader ignore_sqs_latency_timestamps_from_arns: ::Set[::String]
 
       def events_from: (::Hash[::String, untyped]) -> ::Array[::Hash[::String, untyped]]
       S3_OFFLOADING_INDICATOR: String

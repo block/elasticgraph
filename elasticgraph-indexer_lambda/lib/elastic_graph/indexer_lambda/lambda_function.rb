@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/lambda_support/lambda_function"
+require "json"
 
 module ElasticGraph
   module IndexerLambda
@@ -14,12 +15,21 @@ module ElasticGraph
     class LambdaFunction
       prepend LambdaSupport::LambdaFunction
 
+      # @dynamic sqs_processor
+      attr_reader :sqs_processor
+
       def initialize
         require "elastic_graph/indexer_lambda"
         require "elastic_graph/indexer_lambda/sqs_processor"
 
         indexer = ElasticGraph::IndexerLambda.indexer_from_env
-        @sqs_processor = ElasticGraph::IndexerLambda::SqsProcessor.new(indexer.processor, logger: indexer.logger)
+        ignore_sqs_latency_timestamps_from_arns = ::JSON.parse(ENV.fetch("IGNORE_SQS_LATENCY_TIMESTAMPS_FROM_ARNS", "[]")).to_set
+
+        @sqs_processor = ElasticGraph::IndexerLambda::SqsProcessor.new(
+          indexer.processor,
+          ignore_sqs_latency_timestamps_from_arns: ignore_sqs_latency_timestamps_from_arns,
+          logger: indexer.logger
+        )
       end
 
       def handle_request(event:, context:)
