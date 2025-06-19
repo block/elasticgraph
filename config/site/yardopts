@@ -7,3 +7,5 @@
 --exclude bundle
 --exclude spec
 --exclude sig
+--plugin markdown
+--markup-provider redcarpet

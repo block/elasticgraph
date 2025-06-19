@@ -291,7 +291,9 @@ module ElasticGraph
           run_html_proofer.call(
             JEKYLL_API_DOCS_DIR / "main",
             # YARD generates a bunch of anchor tags with no hrefs, which we can't do anything about.
-            allow_missing_href: true
+            allow_missing_href: true,
+            # We have links to locally booted ElasticGraph, which HTMLProofer can't resolve.
+            ignore_urls: ["http://localhost:9000/"]
           )
         end
 

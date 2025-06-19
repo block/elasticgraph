@@ -438,6 +438,7 @@ GEM
       ffi (~> 1.0)
     rbs (3.9.0)
       logger
+    redcarpet (3.6.1)
     regexp_parser (2.10.0)
     rexml (3.4.0)
     rouge (4.5.1)
@@ -579,6 +580,9 @@ GEM
     yard-doctest (0.1.17)
       minitest
       yard
+    yard-markdown (0.5.0)
+      csv
+      yard
     yell (2.2.2)
     zeitwerk (2.7.2)
 
@@ -640,6 +644,7 @@ DEPENDENCIES
   nokogiri (~> 1.18, >= 1.18.8)
   rack-test (~> 2.2)
   rake (~> 13.2, >= 13.2.1)
+  redcarpet (~> 3.6, >= 3.6.1)
   rspec (~> 3.13)
   rspec-retry (~> 0.6, >= 0.6.2)
   rubocop-factory_bot (~> 2.26.1)
@@ -653,6 +658,7 @@ DEPENDENCIES
   vcr (~> 6.3, >= 6.3.1)
   yard (~> 0.9, >= 0.9.37)
   yard-doctest (~> 0.1, >= 0.1.17)
+  yard-markdown (~> 0.5)
 
 BUNDLED WITH
    2.6.2
