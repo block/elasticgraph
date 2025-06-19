@@ -1,7 +1,7 @@
 query RollDice {
-  # Returns a random number between 1 and 12
+  # Returns a random number between 6 and 36 (2 dice of 6 sides x 3)
   roll6SidedDice: rollDice
 
-  # Returns a random number between 1 and 20
+  # Returns a random number between 6 and 60 (2 dice of 10 sides x 3)
   roll10SidedDice: rollDice(sides: 10)
 }

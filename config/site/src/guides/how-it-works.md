@@ -141,13 +141,15 @@ object_types_by_name:
   Artist:
     graphql_fields_by_name:
       albums:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       id:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       lifetimeSales:
-        resolver: get_record_field_value
+        resolver:
+          name: get_record_field_value
       name:
-        resolver: get_record_field_value
     index_definition_names:
     - artists" %}
 
