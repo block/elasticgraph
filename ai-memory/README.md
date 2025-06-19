@@ -273,7 +273,7 @@ This section highlights other important aspects of the ElasticGraph project:
 
 -   **Monorepo Management and Tooling**:
     -   The project employs several custom scripts in the `script/` directory to automate monorepo maintenance tasks.
-    -   `script/update_codebase_overview`: Dynamically generates the `CODEBASE_OVERVIEW.md` file by inspecting gem metadata and dependencies. This is crucial for keeping the high-level project documentation accurate.
+    -   `script/update_dependency_diagrams`: Dynamically generates the `CODEBASE_OVERVIEW.md` file by inspecting gem metadata and dependencies. This is crucial for keeping the high-level project documentation accurate.
     -   `script/update_ci_yaml`: Manages the GitHub Actions CI workflow configuration (specifically `ci.yaml`), synchronizing it with tested datastore versions defined in `config/tested_datastore_versions.yaml`.
     -   Other scripts handle tasks like license updates, type checking, and running various test suites.
 
@@ -304,7 +304,7 @@ This separation allows for a developer-friendly Ruby DSL for defining the schema
 The `script/` directory contains various scripts for development, maintenance, and CI tasks:
 
 -   `update_gem_constraints`: Manages gem version constraints, likely within `.gemspec` files or the main `Gemfile`.
--   `update_codebase_overview`: Dynamically generates the `CODEBASE_OVERVIEW.md` file by inspecting gem metadata and dependencies. This is crucial for keeping the high-level project documentation accurate.
+-   `update_dependency_diagrams`: Dynamically generates the `CODEBASE_OVERVIEW.md` file by inspecting gem metadata and dependencies. This is crucial for keeping the high-level project documentation accurate.
 -   `update_licenses`: Scans and updates license information for project dependencies.
 -   `quick_build`: Provides a potentially faster, possibly less comprehensive, build option for local development.
 -   `spellcheck`: Runs spell-checking across the codebase.

@@ -4,6 +4,44 @@ Provides support for developing and running ElasticGraph applications locally.
 These locally running ElasticGraph applications use 100% fake generated data
 so as not to require a publisher of real data to be implemented.
 
+## Dependency Diagram
+
+```mermaid
+graph LR;
+    classDef targetGemStyle fill:#FADBD8,stroke:#EC7063,color:#000,stroke-width:2px;
+    classDef otherEgGemStyle fill:#A9DFBF,stroke:#2ECC71,color:#000;
+    classDef externalGemStyle fill:#E0EFFF,stroke:#70A1D7,color:#2980B9;
+    elasticgraph-local["elasticgraph-local"];
+    class elasticgraph-local targetGemStyle;
+    elasticgraph-admin["elasticgraph-admin"];
+    elasticgraph-local --> elasticgraph-admin;
+    class elasticgraph-admin otherEgGemStyle;
+    elasticgraph-graphql["elasticgraph-graphql"];
+    elasticgraph-local --> elasticgraph-graphql;
+    class elasticgraph-graphql otherEgGemStyle;
+    elasticgraph-indexer["elasticgraph-indexer"];
+    elasticgraph-local --> elasticgraph-indexer;
+    class elasticgraph-indexer otherEgGemStyle;
+    elasticgraph-rack["elasticgraph-rack"];
+    elasticgraph-local --> elasticgraph-rack;
+    class elasticgraph-rack otherEgGemStyle;
+    elasticgraph-schema_definition["elasticgraph-schema_definition"];
+    elasticgraph-local --> elasticgraph-schema_definition;
+    class elasticgraph-schema_definition otherEgGemStyle;
+    rackup["rackup"];
+    elasticgraph-local --> rackup;
+    class rackup externalGemStyle;
+    rake["rake"];
+    elasticgraph-local --> rake;
+    class rake externalGemStyle;
+    webrick["webrick"];
+    elasticgraph-local --> webrick;
+    class webrick externalGemStyle;
+    click rackup href "https://rubygems.org/gems/rackup" "Open on RubyGems.org" _blank;
+    click rake href "https://rubygems.org/gems/rake" "Open on RubyGems.org" _blank;
+    click webrick href "https://rubygems.org/gems/webrick" "Open on RubyGems.org" _blank;
+```
+
 ## Installation
 
 Add `elasticgraph-local` to a new project `Gemfile`:

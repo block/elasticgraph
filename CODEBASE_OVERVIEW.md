@@ -20,34 +20,65 @@ These libraries form the core backbone of ElasticGraph that is designed to run i
 
 ```mermaid
 graph LR;
-    elasticgraph-admin --> elasticgraph-datastore_core & elasticgraph-indexer & elasticgraph-schema_artifacts & elasticgraph-support & rake
-    elasticgraph-datastore_core --> elasticgraph-schema_artifacts & elasticgraph-support
-    elasticgraph-graphql --> base64 & elasticgraph-datastore_core & elasticgraph-schema_artifacts & graphql & graphql-c_parser
-    elasticgraph-indexer --> elasticgraph-datastore_core & elasticgraph-json_schema & elasticgraph-schema_artifacts & elasticgraph-support & hashdiff
-    elasticgraph-json_schema --> elasticgraph-support & json_schemer
-    elasticgraph-schema_artifacts --> elasticgraph-support
-    elasticgraph-support --> logger
-    style elasticgraph-admin color: DodgerBlue;
-    style elasticgraph-datastore_core color: DodgerBlue;
-    style elasticgraph-graphql color: DodgerBlue;
-    style elasticgraph-indexer color: DodgerBlue;
-    style elasticgraph-json_schema color: DodgerBlue;
-    style elasticgraph-schema_artifacts color: DodgerBlue;
-    style elasticgraph-support color: DodgerBlue;
-    style rake color: Red;
-    style base64 color: Red;
-    style graphql color: Red;
-    style graphql-c_parser color: Red;
-    style hashdiff color: Red;
-    style json_schemer color: Red;
-    style logger color: Red;
-click base64 href "https://rubygems.org/gems/base64"
-click graphql href "https://rubygems.org/gems/graphql"
-click graphql-c_parser href "https://rubygems.org/gems/graphql-c_parser"
-click hashdiff href "https://rubygems.org/gems/hashdiff"
-click json_schemer href "https://rubygems.org/gems/json_schemer"
-click logger href "https://rubygems.org/gems/logger"
-click rake href "https://rubygems.org/gems/rake"
+    classDef targetGemStyle fill:#FADBD8,stroke:#EC7063,color:#000,stroke-width:2px;
+    classDef otherEgGemStyle fill:#A9DFBF,stroke:#2ECC71,color:#000;
+    classDef externalGemCatStyle fill:#E0EFFF,stroke:#70A1D7,color:#2980B9;
+    elasticgraph-admin["elasticgraph-admin"];
+    elasticgraph-datastore_core["elasticgraph-datastore_core"];
+    elasticgraph-indexer["elasticgraph-indexer"];
+    elasticgraph-schema_artifacts["elasticgraph-schema_artifacts"];
+    elasticgraph-support["elasticgraph-support"];
+    rake["rake"];
+    elasticgraph-graphql["elasticgraph-graphql"];
+    base64["base64"];
+    graphql["graphql"];
+    graphql-c_parser["graphql-c_parser"];
+    elasticgraph-json_schema["elasticgraph-json_schema"];
+    hashdiff["hashdiff"];
+    json_schemer["json_schemer"];
+    logger["logger"];
+    elasticgraph-admin --> elasticgraph-datastore_core;
+    elasticgraph-admin --> elasticgraph-indexer;
+    elasticgraph-admin --> elasticgraph-schema_artifacts;
+    elasticgraph-admin --> elasticgraph-support;
+    elasticgraph-admin --> rake;
+    elasticgraph-datastore_core --> elasticgraph-schema_artifacts;
+    elasticgraph-datastore_core --> elasticgraph-support;
+    elasticgraph-graphql --> base64;
+    elasticgraph-graphql --> elasticgraph-datastore_core;
+    elasticgraph-graphql --> elasticgraph-schema_artifacts;
+    elasticgraph-graphql --> graphql;
+    elasticgraph-graphql --> graphql-c_parser;
+    elasticgraph-indexer --> elasticgraph-datastore_core;
+    elasticgraph-indexer --> elasticgraph-json_schema;
+    elasticgraph-indexer --> elasticgraph-schema_artifacts;
+    elasticgraph-indexer --> elasticgraph-support;
+    elasticgraph-indexer --> hashdiff;
+    elasticgraph-json_schema --> elasticgraph-support;
+    elasticgraph-json_schema --> json_schemer;
+    elasticgraph-schema_artifacts --> elasticgraph-support;
+    elasticgraph-support --> logger;
+    class elasticgraph-admin targetGemStyle;
+    class elasticgraph-datastore_core targetGemStyle;
+    class elasticgraph-indexer targetGemStyle;
+    class elasticgraph-schema_artifacts targetGemStyle;
+    class elasticgraph-support targetGemStyle;
+    class rake externalGemCatStyle;
+    class elasticgraph-graphql targetGemStyle;
+    class base64 externalGemCatStyle;
+    class graphql externalGemCatStyle;
+    class graphql-c_parser externalGemCatStyle;
+    class elasticgraph-json_schema targetGemStyle;
+    class hashdiff externalGemCatStyle;
+    class json_schemer externalGemCatStyle;
+    class logger externalGemCatStyle;
+    click rake href "https://rubygems.org/gems/rake" "Open on RubyGems.org" _blank;
+    click base64 href "https://rubygems.org/gems/base64" "Open on RubyGems.org" _blank;
+    click graphql href "https://rubygems.org/gems/graphql" "Open on RubyGems.org" _blank;
+    click graphql-c_parser href "https://rubygems.org/gems/graphql-c_parser" "Open on RubyGems.org" _blank;
+    click hashdiff href "https://rubygems.org/gems/hashdiff" "Open on RubyGems.org" _blank;
+    click json_schemer href "https://rubygems.org/gems/json_schemer" "Open on RubyGems.org" _blank;
+    click logger href "https://rubygems.org/gems/logger" "Open on RubyGems.org" _blank;
 ```
 
 ### AWS Lambda Integration Libraries (5 gems)
@@ -64,35 +95,67 @@ These libraries wrap the the core ElasticGraph libraries so that they can be dep
 
 ```mermaid
 graph LR;
-    elasticgraph-admin_lambda --> rake & elasticgraph-admin & elasticgraph-lambda_support
-    elasticgraph-graphql_lambda --> elasticgraph-graphql & elasticgraph-lambda_support
-    elasticgraph-indexer_autoscaler_lambda --> elasticgraph-datastore_core & elasticgraph-lambda_support & aws-sdk-lambda & aws-sdk-sqs & aws-sdk-cloudwatch & ox
-    elasticgraph-indexer_lambda --> elasticgraph-indexer & elasticgraph-lambda_support & aws-sdk-s3 & ox
-    elasticgraph-lambda_support --> elasticgraph-opensearch & faraday_middleware-aws-sigv4
-    style elasticgraph-admin_lambda color: DodgerBlue;
-    style elasticgraph-graphql_lambda color: DodgerBlue;
-    style elasticgraph-indexer_autoscaler_lambda color: DodgerBlue;
-    style elasticgraph-indexer_lambda color: DodgerBlue;
-    style elasticgraph-lambda_support color: DodgerBlue;
-    style rake color: Red;
-    style elasticgraph-admin color: Green;
-    style elasticgraph-graphql color: Green;
-    style elasticgraph-datastore_core color: Green;
-    style aws-sdk-lambda color: Red;
-    style aws-sdk-sqs color: Red;
-    style aws-sdk-cloudwatch color: Red;
-    style ox color: Red;
-    style elasticgraph-indexer color: Green;
-    style aws-sdk-s3 color: Red;
-    style elasticgraph-opensearch color: Green;
-    style faraday_middleware-aws-sigv4 color: Red;
-click aws-sdk-cloudwatch href "https://rubygems.org/gems/aws-sdk-cloudwatch"
-click aws-sdk-lambda href "https://rubygems.org/gems/aws-sdk-lambda"
-click aws-sdk-s3 href "https://rubygems.org/gems/aws-sdk-s3"
-click aws-sdk-sqs href "https://rubygems.org/gems/aws-sdk-sqs"
-click faraday_middleware-aws-sigv4 href "https://rubygems.org/gems/faraday_middleware-aws-sigv4"
-click ox href "https://rubygems.org/gems/ox"
-click rake href "https://rubygems.org/gems/rake"
+    classDef targetGemStyle fill:#FADBD8,stroke:#EC7063,color:#000,stroke-width:2px;
+    classDef otherEgGemStyle fill:#A9DFBF,stroke:#2ECC71,color:#000;
+    classDef externalGemCatStyle fill:#E0EFFF,stroke:#70A1D7,color:#2980B9;
+    elasticgraph-admin_lambda["elasticgraph-admin_lambda"];
+    rake["rake"];
+    elasticgraph-admin["elasticgraph-admin"];
+    elasticgraph-lambda_support["elasticgraph-lambda_support"];
+    elasticgraph-graphql_lambda["elasticgraph-graphql_lambda"];
+    elasticgraph-graphql["elasticgraph-graphql"];
+    elasticgraph-indexer_autoscaler_lambda["elasticgraph-indexer_autoscaler_lambda"];
+    elasticgraph-datastore_core["elasticgraph-datastore_core"];
+    aws-sdk-lambda["aws-sdk-lambda"];
+    aws-sdk-sqs["aws-sdk-sqs"];
+    aws-sdk-cloudwatch["aws-sdk-cloudwatch"];
+    ox["ox"];
+    elasticgraph-indexer_lambda["elasticgraph-indexer_lambda"];
+    elasticgraph-indexer["elasticgraph-indexer"];
+    aws-sdk-s3["aws-sdk-s3"];
+    elasticgraph-opensearch["elasticgraph-opensearch"];
+    faraday_middleware-aws-sigv4["faraday_middleware-aws-sigv4"];
+    elasticgraph-admin_lambda --> rake;
+    elasticgraph-admin_lambda --> elasticgraph-admin;
+    elasticgraph-admin_lambda --> elasticgraph-lambda_support;
+    elasticgraph-graphql_lambda --> elasticgraph-graphql;
+    elasticgraph-graphql_lambda --> elasticgraph-lambda_support;
+    elasticgraph-indexer_autoscaler_lambda --> elasticgraph-datastore_core;
+    elasticgraph-indexer_autoscaler_lambda --> elasticgraph-lambda_support;
+    elasticgraph-indexer_autoscaler_lambda --> aws-sdk-lambda;
+    elasticgraph-indexer_autoscaler_lambda --> aws-sdk-sqs;
+    elasticgraph-indexer_autoscaler_lambda --> aws-sdk-cloudwatch;
+    elasticgraph-indexer_autoscaler_lambda --> ox;
+    elasticgraph-indexer_lambda --> elasticgraph-indexer;
+    elasticgraph-indexer_lambda --> elasticgraph-lambda_support;
+    elasticgraph-indexer_lambda --> aws-sdk-s3;
+    elasticgraph-indexer_lambda --> ox;
+    elasticgraph-lambda_support --> elasticgraph-opensearch;
+    elasticgraph-lambda_support --> faraday_middleware-aws-sigv4;
+    class elasticgraph-admin_lambda targetGemStyle;
+    class rake externalGemCatStyle;
+    class elasticgraph-admin otherEgGemStyle;
+    class elasticgraph-lambda_support targetGemStyle;
+    class elasticgraph-graphql_lambda targetGemStyle;
+    class elasticgraph-graphql otherEgGemStyle;
+    class elasticgraph-indexer_autoscaler_lambda targetGemStyle;
+    class elasticgraph-datastore_core otherEgGemStyle;
+    class aws-sdk-lambda externalGemCatStyle;
+    class aws-sdk-sqs externalGemCatStyle;
+    class aws-sdk-cloudwatch externalGemCatStyle;
+    class ox externalGemCatStyle;
+    class elasticgraph-indexer_lambda targetGemStyle;
+    class elasticgraph-indexer otherEgGemStyle;
+    class aws-sdk-s3 externalGemCatStyle;
+    class elasticgraph-opensearch otherEgGemStyle;
+    class faraday_middleware-aws-sigv4 externalGemCatStyle;
+    click rake href "https://rubygems.org/gems/rake" "Open on RubyGems.org" _blank;
+    click aws-sdk-lambda href "https://rubygems.org/gems/aws-sdk-lambda" "Open on RubyGems.org" _blank;
+    click aws-sdk-sqs href "https://rubygems.org/gems/aws-sdk-sqs" "Open on RubyGems.org" _blank;
+    click aws-sdk-cloudwatch href "https://rubygems.org/gems/aws-sdk-cloudwatch" "Open on RubyGems.org" _blank;
+    click ox href "https://rubygems.org/gems/ox" "Open on RubyGems.org" _blank;
+    click aws-sdk-s3 href "https://rubygems.org/gems/aws-sdk-s3" "Open on RubyGems.org" _blank;
+    click faraday_middleware-aws-sigv4 href "https://rubygems.org/gems/faraday_middleware-aws-sigv4" "Open on RubyGems.org" _blank;
 ```
 
 ### Extensions (4 gems)
@@ -108,26 +171,51 @@ These libraries extend ElasticGraph to provide optional but commonly needed func
 
 ```mermaid
 graph LR;
-    elasticgraph-apollo --> elasticgraph-graphql & elasticgraph-support & graphql & apollo-federation
-    elasticgraph-health_check --> elasticgraph-datastore_core & elasticgraph-graphql & elasticgraph-support
-    elasticgraph-query_interceptor --> elasticgraph-graphql & elasticgraph-schema_artifacts
-    elasticgraph-query_registry --> elasticgraph-graphql & elasticgraph-support & graphql & graphql-c_parser & rake
-    style elasticgraph-apollo color: DodgerBlue;
-    style elasticgraph-health_check color: DodgerBlue;
-    style elasticgraph-query_interceptor color: DodgerBlue;
-    style elasticgraph-query_registry color: DodgerBlue;
-    style elasticgraph-graphql color: Green;
-    style elasticgraph-support color: Green;
-    style graphql color: Red;
-    style apollo-federation color: Red;
-    style elasticgraph-datastore_core color: Green;
-    style elasticgraph-schema_artifacts color: Green;
-    style graphql-c_parser color: Red;
-    style rake color: Red;
-click apollo-federation href "https://rubygems.org/gems/apollo-federation"
-click graphql href "https://rubygems.org/gems/graphql"
-click graphql-c_parser href "https://rubygems.org/gems/graphql-c_parser"
-click rake href "https://rubygems.org/gems/rake"
+    classDef targetGemStyle fill:#FADBD8,stroke:#EC7063,color:#000,stroke-width:2px;
+    classDef otherEgGemStyle fill:#A9DFBF,stroke:#2ECC71,color:#000;
+    classDef externalGemCatStyle fill:#E0EFFF,stroke:#70A1D7,color:#2980B9;
+    elasticgraph-apollo["elasticgraph-apollo"];
+    elasticgraph-graphql["elasticgraph-graphql"];
+    elasticgraph-support["elasticgraph-support"];
+    graphql["graphql"];
+    apollo-federation["apollo-federation"];
+    elasticgraph-health_check["elasticgraph-health_check"];
+    elasticgraph-datastore_core["elasticgraph-datastore_core"];
+    elasticgraph-query_interceptor["elasticgraph-query_interceptor"];
+    elasticgraph-schema_artifacts["elasticgraph-schema_artifacts"];
+    elasticgraph-query_registry["elasticgraph-query_registry"];
+    graphql-c_parser["graphql-c_parser"];
+    rake["rake"];
+    elasticgraph-apollo --> elasticgraph-graphql;
+    elasticgraph-apollo --> elasticgraph-support;
+    elasticgraph-apollo --> graphql;
+    elasticgraph-apollo --> apollo-federation;
+    elasticgraph-health_check --> elasticgraph-datastore_core;
+    elasticgraph-health_check --> elasticgraph-graphql;
+    elasticgraph-health_check --> elasticgraph-support;
+    elasticgraph-query_interceptor --> elasticgraph-graphql;
+    elasticgraph-query_interceptor --> elasticgraph-schema_artifacts;
+    elasticgraph-query_registry --> elasticgraph-graphql;
+    elasticgraph-query_registry --> elasticgraph-support;
+    elasticgraph-query_registry --> graphql;
+    elasticgraph-query_registry --> graphql-c_parser;
+    elasticgraph-query_registry --> rake;
+    class elasticgraph-apollo targetGemStyle;
+    class elasticgraph-graphql otherEgGemStyle;
+    class elasticgraph-support otherEgGemStyle;
+    class graphql externalGemCatStyle;
+    class apollo-federation externalGemCatStyle;
+    class elasticgraph-health_check targetGemStyle;
+    class elasticgraph-datastore_core otherEgGemStyle;
+    class elasticgraph-query_interceptor targetGemStyle;
+    class elasticgraph-schema_artifacts otherEgGemStyle;
+    class elasticgraph-query_registry targetGemStyle;
+    class graphql-c_parser externalGemCatStyle;
+    class rake externalGemCatStyle;
+    click graphql href "https://rubygems.org/gems/graphql" "Open on RubyGems.org" _blank;
+    click apollo-federation href "https://rubygems.org/gems/apollo-federation" "Open on RubyGems.org" _blank;
+    click graphql-c_parser href "https://rubygems.org/gems/graphql-c_parser" "Open on RubyGems.org" _blank;
+    click rake href "https://rubygems.org/gems/rake" "Open on RubyGems.org" _blank;
 ```
 
 ### Datastore Adapters (2 gems)
@@ -141,19 +229,35 @@ These libraries adapt ElasticGraph to your choice of datastore (Elasticsearch or
 
 ```mermaid
 graph LR;
-    elasticgraph-elasticsearch --> elasticgraph-support & elasticsearch & faraday & faraday-retry
-    elasticgraph-opensearch --> elasticgraph-support & faraday & faraday-retry & opensearch-ruby
-    style elasticgraph-elasticsearch color: DodgerBlue;
-    style elasticgraph-opensearch color: DodgerBlue;
-    style elasticgraph-support color: Green;
-    style elasticsearch color: Red;
-    style faraday color: Red;
-    style faraday-retry color: Red;
-    style opensearch-ruby color: Red;
-click elasticsearch href "https://rubygems.org/gems/elasticsearch"
-click faraday href "https://rubygems.org/gems/faraday"
-click faraday-retry href "https://rubygems.org/gems/faraday-retry"
-click opensearch-ruby href "https://rubygems.org/gems/opensearch-ruby"
+    classDef targetGemStyle fill:#FADBD8,stroke:#EC7063,color:#000,stroke-width:2px;
+    classDef otherEgGemStyle fill:#A9DFBF,stroke:#2ECC71,color:#000;
+    classDef externalGemCatStyle fill:#E0EFFF,stroke:#70A1D7,color:#2980B9;
+    elasticgraph-elasticsearch["elasticgraph-elasticsearch"];
+    elasticgraph-support["elasticgraph-support"];
+    elasticsearch["elasticsearch"];
+    faraday["faraday"];
+    faraday-retry["faraday-retry"];
+    elasticgraph-opensearch["elasticgraph-opensearch"];
+    opensearch-ruby["opensearch-ruby"];
+    elasticgraph-elasticsearch --> elasticgraph-support;
+    elasticgraph-elasticsearch --> elasticsearch;
+    elasticgraph-elasticsearch --> faraday;
+    elasticgraph-elasticsearch --> faraday-retry;
+    elasticgraph-opensearch --> elasticgraph-support;
+    elasticgraph-opensearch --> faraday;
+    elasticgraph-opensearch --> faraday-retry;
+    elasticgraph-opensearch --> opensearch-ruby;
+    class elasticgraph-elasticsearch targetGemStyle;
+    class elasticgraph-support otherEgGemStyle;
+    class elasticsearch externalGemCatStyle;
+    class faraday externalGemCatStyle;
+    class faraday-retry externalGemCatStyle;
+    class elasticgraph-opensearch targetGemStyle;
+    class opensearch-ruby externalGemCatStyle;
+    click elasticsearch href "https://rubygems.org/gems/elasticsearch" "Open on RubyGems.org" _blank;
+    click faraday href "https://rubygems.org/gems/faraday" "Open on RubyGems.org" _blank;
+    click faraday-retry href "https://rubygems.org/gems/faraday-retry" "Open on RubyGems.org" _blank;
+    click opensearch-ruby href "https://rubygems.org/gems/opensearch-ruby" "Open on RubyGems.org" _blank;
 ```
 
 ### Local Development Libraries (4 gems)
@@ -170,33 +274,69 @@ These libraries are used for local development of ElasticGraph applications, but
 
 ```mermaid
 graph LR;
-    elasticgraph --> elasticgraph-support & thor
-    elasticgraph-local --> elasticgraph-admin & elasticgraph-graphql & elasticgraph-indexer & elasticgraph-rack & elasticgraph-schema_definition & rackup & rake & webrick
-    elasticgraph-rack --> elasticgraph-graphql & rack
-    elasticgraph-schema_definition --> elasticgraph-graphql & elasticgraph-indexer & elasticgraph-json_schema & elasticgraph-schema_artifacts & elasticgraph-support & graphql & graphql-c_parser & rake
-    style elasticgraph color: DodgerBlue;
-    style elasticgraph-local color: DodgerBlue;
-    style elasticgraph-rack color: DodgerBlue;
-    style elasticgraph-schema_definition color: DodgerBlue;
-    style elasticgraph-support color: Green;
-    style thor color: Red;
-    style elasticgraph-admin color: Green;
-    style elasticgraph-graphql color: Green;
-    style elasticgraph-indexer color: Green;
-    style rackup color: Red;
-    style rake color: Red;
-    style webrick color: Red;
-    style rack color: Red;
-    style elasticgraph-json_schema color: Green;
-    style elasticgraph-schema_artifacts color: Green;
-    style graphql color: Red;
-    style graphql-c_parser color: Red;
-click graphql href "https://rubygems.org/gems/graphql"
-click graphql-c_parser href "https://rubygems.org/gems/graphql-c_parser"
-click rack href "https://rubygems.org/gems/rack"
-click rackup href "https://rubygems.org/gems/rackup"
-click rake href "https://rubygems.org/gems/rake"
-click thor href "https://rubygems.org/gems/thor"
-click webrick href "https://rubygems.org/gems/webrick"
+    classDef targetGemStyle fill:#FADBD8,stroke:#EC7063,color:#000,stroke-width:2px;
+    classDef otherEgGemStyle fill:#A9DFBF,stroke:#2ECC71,color:#000;
+    classDef externalGemCatStyle fill:#E0EFFF,stroke:#70A1D7,color:#2980B9;
+    elasticgraph["elasticgraph"];
+    elasticgraph-support["elasticgraph-support"];
+    thor["thor"];
+    elasticgraph-local["elasticgraph-local"];
+    elasticgraph-admin["elasticgraph-admin"];
+    elasticgraph-graphql["elasticgraph-graphql"];
+    elasticgraph-indexer["elasticgraph-indexer"];
+    elasticgraph-rack["elasticgraph-rack"];
+    elasticgraph-schema_definition["elasticgraph-schema_definition"];
+    rackup["rackup"];
+    rake["rake"];
+    webrick["webrick"];
+    rack["rack"];
+    elasticgraph-json_schema["elasticgraph-json_schema"];
+    elasticgraph-schema_artifacts["elasticgraph-schema_artifacts"];
+    graphql["graphql"];
+    graphql-c_parser["graphql-c_parser"];
+    elasticgraph --> elasticgraph-support;
+    elasticgraph --> thor;
+    elasticgraph-local --> elasticgraph-admin;
+    elasticgraph-local --> elasticgraph-graphql;
+    elasticgraph-local --> elasticgraph-indexer;
+    elasticgraph-local --> elasticgraph-rack;
+    elasticgraph-local --> elasticgraph-schema_definition;
+    elasticgraph-local --> rackup;
+    elasticgraph-local --> rake;
+    elasticgraph-local --> webrick;
+    elasticgraph-rack --> elasticgraph-graphql;
+    elasticgraph-rack --> rack;
+    elasticgraph-schema_definition --> elasticgraph-graphql;
+    elasticgraph-schema_definition --> elasticgraph-indexer;
+    elasticgraph-schema_definition --> elasticgraph-json_schema;
+    elasticgraph-schema_definition --> elasticgraph-schema_artifacts;
+    elasticgraph-schema_definition --> elasticgraph-support;
+    elasticgraph-schema_definition --> graphql;
+    elasticgraph-schema_definition --> graphql-c_parser;
+    elasticgraph-schema_definition --> rake;
+    class elasticgraph targetGemStyle;
+    class elasticgraph-support otherEgGemStyle;
+    class thor externalGemCatStyle;
+    class elasticgraph-local targetGemStyle;
+    class elasticgraph-admin otherEgGemStyle;
+    class elasticgraph-graphql otherEgGemStyle;
+    class elasticgraph-indexer otherEgGemStyle;
+    class elasticgraph-rack targetGemStyle;
+    class elasticgraph-schema_definition targetGemStyle;
+    class rackup externalGemCatStyle;
+    class rake externalGemCatStyle;
+    class webrick externalGemCatStyle;
+    class rack externalGemCatStyle;
+    class elasticgraph-json_schema otherEgGemStyle;
+    class elasticgraph-schema_artifacts otherEgGemStyle;
+    class graphql externalGemCatStyle;
+    class graphql-c_parser externalGemCatStyle;
+    click thor href "https://rubygems.org/gems/thor" "Open on RubyGems.org" _blank;
+    click rackup href "https://rubygems.org/gems/rackup" "Open on RubyGems.org" _blank;
+    click rake href "https://rubygems.org/gems/rake" "Open on RubyGems.org" _blank;
+    click webrick href "https://rubygems.org/gems/webrick" "Open on RubyGems.org" _blank;
+    click rack href "https://rubygems.org/gems/rack" "Open on RubyGems.org" _blank;
+    click graphql href "https://rubygems.org/gems/graphql" "Open on RubyGems.org" _blank;
+    click graphql-c_parser href "https://rubygems.org/gems/graphql-c_parser" "Open on RubyGems.org" _blank;
 ```
 
