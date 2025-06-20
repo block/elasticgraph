@@ -8,7 +8,7 @@ This gem wraps `elasticgraph-admin` in order to run it from an AWS Lambda.
 graph LR;
     classDef currentGemStyle fill:#AED6F1,stroke:#3498DB,color:#000,stroke-width:2px;
     classDef internalEgGemStyle fill:#A9DFBF,stroke:#2ECC71,color:#000;
-    classDef externalGemStyle fill:#F4F6F7,stroke:#B3B6B7,color:#2980B9;
+    classDef externalGemStyle fill:#FADBD8,stroke:#EC7063,color:#2980B9;
     elasticgraph-admin_lambda["elasticgraph-admin_lambda"];
     class elasticgraph-admin_lambda currentGemStyle;
     rake["rake"];
