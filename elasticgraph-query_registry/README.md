@@ -29,6 +29,29 @@ Importantly, once installed, registered clients who send unregistered
 queries will get errors. Unregistered clients can similarly be blocked
 if desired based on a configuration setting.
 
+## Dependency Diagram
+
+```mermaid
+graph LR;
+    elasticgraph-query_registry --> elasticgraph-graphql;
+    elasticgraph-query_registry --> elasticgraph-support;
+    elasticgraph-query_registry --> graphql;
+    elasticgraph-query_registry --> graphql-c_parser;
+    elasticgraph-query_registry --> rake;
+    no_eg_dependents[(No direct EG dependents)] --> elasticgraph-query_registry;
+    classDef currentGemStyle fill:#lightblue,stroke:#333,stroke-width:2px;
+    classDef internalEgGemStyle fill:#lightgreen,stroke:#333,stroke-width:1px;
+    classDef externalGemStyle fill:#lightcoral,stroke:#333,stroke-width:1px;
+    classDef placeholderNodeStyle fill:#eee,stroke:#333,stroke-width:1px;
+    class elasticgraph-query_registry currentGemStyle;
+    class elasticgraph-graphql internalEgGemStyle;
+    class elasticgraph-support internalEgGemStyle;
+    class graphql externalGemStyle;
+    class graphql-c_parser externalGemStyle;
+    class rake externalGemStyle;
+    class no_eg_dependents placeholderNodeStyle;
+```
+
 ## Query Verification Guarantees
 
 The query verification provided by this library is limited in scope. It

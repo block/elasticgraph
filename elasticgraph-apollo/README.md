@@ -5,6 +5,27 @@ allowing an ElasticGraph application to be plugged into an Apollo-powered GraphQ
 
 Note: this library only supports the v2 Federation specification.
 
+## Dependency Diagram
+
+```mermaid
+graph LR;
+    elasticgraph-apollo --> elasticgraph-graphql;
+    elasticgraph-apollo --> elasticgraph-support;
+    elasticgraph-apollo --> graphql;
+    elasticgraph-apollo --> apollo-federation;
+    no_eg_dependents[(No direct EG dependents)] --> elasticgraph-apollo;
+    classDef currentGemStyle fill:#lightblue,stroke:#333,stroke-width:2px;
+    classDef internalEgGemStyle fill:#lightgreen,stroke:#333,stroke-width:1px;
+    classDef externalGemStyle fill:#lightcoral,stroke:#333,stroke-width:1px;
+    classDef placeholderNodeStyle fill:#eee,stroke:#333,stroke-width:1px;
+    class elasticgraph-apollo currentGemStyle;
+    class elasticgraph-graphql internalEgGemStyle;
+    class elasticgraph-support internalEgGemStyle;
+    class graphql externalGemStyle;
+    class apollo-federation externalGemStyle;
+    class no_eg_dependents placeholderNodeStyle;
+```
+
 ## Usage
 
 First, add `elasticgraph-apollo` to your `Gemfile`:

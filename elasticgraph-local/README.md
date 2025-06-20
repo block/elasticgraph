@@ -4,6 +4,35 @@ Provides support for developing and running ElasticGraph applications locally.
 These locally running ElasticGraph applications use 100% fake generated data
 so as not to require a publisher of real data to be implemented.
 
+## Dependency Diagram
+
+```mermaid
+graph LR;
+    elasticgraph-local --> elasticgraph-admin;
+    elasticgraph-local --> elasticgraph-graphql;
+    elasticgraph-local --> elasticgraph-indexer;
+    elasticgraph-local --> elasticgraph-rack;
+    elasticgraph-local --> elasticgraph-schema_definition;
+    elasticgraph-local --> rackup;
+    elasticgraph-local --> rake;
+    elasticgraph-local --> webrick;
+    no_eg_dependents[(No direct EG dependents)] --> elasticgraph-local;
+    classDef currentGemStyle fill:#lightblue,stroke:#333,stroke-width:2px;
+    classDef internalEgGemStyle fill:#lightgreen,stroke:#333,stroke-width:1px;
+    classDef externalGemStyle fill:#lightcoral,stroke:#333,stroke-width:1px;
+    classDef placeholderNodeStyle fill:#eee,stroke:#333,stroke-width:1px;
+    class elasticgraph-local currentGemStyle;
+    class elasticgraph-admin internalEgGemStyle;
+    class elasticgraph-graphql internalEgGemStyle;
+    class elasticgraph-indexer internalEgGemStyle;
+    class elasticgraph-rack internalEgGemStyle;
+    class elasticgraph-schema_definition internalEgGemStyle;
+    class rackup externalGemStyle;
+    class rake externalGemStyle;
+    class webrick externalGemStyle;
+    class no_eg_dependents placeholderNodeStyle;
+```
+
 ## Installation
 
 Add `elasticgraph-local` to a new project `Gemfile`:
