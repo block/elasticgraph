@@ -82,48 +82,43 @@ module ElasticGraph
       current_gem_name = @gem_spec.name
 
       mermaid_lines = ["graph LR;"]
+      # Explicitly define the current gem node with its name as the label.
+      # This ensures it appears even if it has no connections.
+      mermaid_lines << "    #{current_gem_name}[\"#{current_gem_name}\"];" 
       all_node_names_in_diagram = Set.new([current_gem_name])
 
-      if deps.empty?
-        mermaid_lines << "    #{current_gem_name} --> no_deps[(No direct dependencies)];"
-        all_node_names_in_diagram.add("no_deps")
-      else
+      unless deps.empty?
         deps.each do |dep_name|
+          # Define dependency node with its name as label before creating link
+          mermaid_lines << "    #{dep_name}[\"#{dep_name}\"];"
           mermaid_lines << "    #{current_gem_name} --> #{dep_name};"
           all_node_names_in_diagram.add(dep_name)
         end
       end
 
-      if dependents.empty?
-        mermaid_lines << "    no_eg_dependents[(No direct EG dependents)] --> #{current_gem_name};"
-        all_node_names_in_diagram.add("no_eg_dependents")
-      else
+      unless dependents.empty?
         dependents.each do |dep_name|
+          # Define dependent node with its name as label before creating link
+          mermaid_lines << "    #{dep_name}[\"#{dep_name}\"];"
           mermaid_lines << "    #{dep_name} --> #{current_gem_name};"
           all_node_names_in_diagram.add(dep_name)
         end
       end
-
-      mermaid_lines << "    classDef currentGemStyle fill:#lightblue,stroke:#333,stroke-width:2px;"
-      mermaid_lines << "    classDef internalEgGemStyle fill:#lightgreen,stroke:#333,stroke-width:1px;"
-      mermaid_lines << "    classDef externalGemStyle fill:#lightcoral,stroke:#333,stroke-width:1px;"
-      mermaid_lines << "    classDef placeholderNodeStyle fill:#eee,stroke:#333,stroke-width:1px;"
-
+      
+      # Apply direct styles using the `style` keyword
       all_node_names_in_diagram.each do |node_name|
-        style_class = case node_name
-        when current_gem_name
-          "currentGemStyle"
-        when "no_deps", "no_eg_dependents"
-          "placeholderNodeStyle"
+        style_string = ""
+        if node_name == current_gem_name
+          # Style for the current gem being processed
+          style_string = "fill:#lightblue,stroke:#2980b9,stroke-width:2px,color:#000"
+        elsif @all_specs.any? { |s| s.name == node_name }
+          # Style for other internal ElasticGraph gems
+          style_string = "fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000"
         else
-          # Check if it's an ElasticGraph gem (present in all_specs)
-          if @all_specs.any? { |s| s.name == node_name }
-            "internalEgGemStyle"
-          else
-            "externalGemStyle"
-          end
+          # Style for external gems
+          style_string = "fill:#lightcoral,stroke:#c0392b,stroke-width:1px,color:#000"
         end
-        mermaid_lines << "    class #{node_name} #{style_class};"
+        mermaid_lines << "    style #{node_name} #{style_string};"
       end
 
       "```mermaid\n#{mermaid_lines.join("\n")}\n```"
