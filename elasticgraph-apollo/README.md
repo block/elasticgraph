@@ -9,20 +9,23 @@ Note: this library only supports the v2 Federation specification.
 
 ```mermaid
 graph LR;
+    classDef currentGemStyle fill:#E0EFFF,stroke:#70A1D7,color:#000,stroke-width:2px;
+    classDef internalEgGemStyle fill:#D4EFDF,stroke:#58D68D,color:#000;
+    classDef externalGemStyle fill:#FADBD8,stroke:#EC7063,color:#000;
     elasticgraph-apollo["elasticgraph-apollo"];
+    class elasticgraph-apollo currentGemStyle;
     elasticgraph-graphql["elasticgraph-graphql"];
     elasticgraph-apollo --> elasticgraph-graphql;
+    class elasticgraph-graphql internalEgGemStyle;
     elasticgraph-support["elasticgraph-support"];
     elasticgraph-apollo --> elasticgraph-support;
+    class elasticgraph-support internalEgGemStyle;
     graphql["graphql"];
     elasticgraph-apollo --> graphql;
+    class graphql externalGemStyle;
     apollo-federation["apollo-federation"];
     elasticgraph-apollo --> apollo-federation;
-    style elasticgraph-apollo color:DodgerBlue,stroke-width:2px,stroke:DodgerBlue;
-    style elasticgraph-graphql color:Green,stroke:Green;
-    style elasticgraph-support color:Green,stroke:Green;
-    style graphql color:Red,stroke:Red;
-    style apollo-federation color:Red,stroke:Red;
+    class apollo-federation externalGemStyle;
     click graphql href "https://rubygems.org/gems/graphql" "Open on RubyGems.org" _blank;
     click apollo-federation href "https://rubygems.org/gems/apollo-federation" "Open on RubyGems.org" _blank;
 ```
