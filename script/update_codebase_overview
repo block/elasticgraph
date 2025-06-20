@@ -17,8 +17,21 @@ module ElasticGraph
 
     def gem_specs
       @gem_specs ||= ::ElasticGraphGems.list.map do |gem_name|
-        ::Gem::Specification.load("#{PROJECT_ROOT}/#{gem_name}/#{gem_name}.gemspec")
-      end
+        # Ensure gemspec path is absolute and correct
+        gemspec_path = File.join(PROJECT_ROOT, gem_name, "#{gem_name}.gemspec")
+        unless File.exist?(gemspec_path)
+          # This should ideally not happen if ElasticGraphGems.list is accurate
+          # but good for robustness if script is run in unusual states.
+          STDERR.puts "Warning: Gemspec not found for #{gem_name} at #{gemspec_path}. Skipping."
+          next nil
+        end
+        begin
+          ::Gem::Specification.load(gemspec_path)
+        rescue StandardError => e
+          STDERR.puts "Warning: Failed to load gemspec for #{gem_name} at #{gemspec_path}. Error: #{e.message}. Skipping."
+          next nil
+        end
+      end.compact # compact to remove any nils from failed loads
     end
 
     def gem_categories
@@ -32,7 +45,7 @@ module ElasticGraph
         end
 
         CategoryInfo::BY_NAME.map do |category, category_info|
-          specs = specs_by_category.fetch(category)
+          specs = specs_by_category.fetch(category, []) # Use fetch with default to avoid error if category has no gems
           GemCategory.new(category, category_info, specs, gem_specs)
         end
       end
@@ -103,6 +116,7 @@ module ElasticGraph
         when "no_deps", "no_eg_dependents"
           "placeholderNodeStyle"
         else
+          # Check if it's an ElasticGraph gem (present in all_specs)
           if @all_specs.any? { |s| s.name == node_name }
             "internalEgGemStyle"
           else
@@ -135,78 +149,128 @@ module ElasticGraph
 
     private def _isolate_intro_and_tail(readme_lines_after_h1)
       intro_lines = []
-      tail_lines = []
+      tail_content_lines = [] # Renamed for clarity
 
-      end_of_intro_index = readme_lines_after_h1.find_index { |line| line.strip.start_with?("## ") }
+      # Find the index of the first H2 heading (e.g., "## Some Other Section")
+      # or the specific "## Dependency Diagram" heading.
+      first_h2_or_diagram_heading_index = readme_lines_after_h1.find_index do |line|
+        line.strip.start_with?("## ")
+      end
 
-      if end_of_intro_index.nil?
+      if first_h2_or_diagram_heading_index.nil?
+        # No H2 headings found after H1, so all remaining lines are considered intro.
         intro_lines = readme_lines_after_h1
       else
-        intro_lines = readme_lines_after_h1[0...end_of_intro_index]
-        h2_onwards_lines = readme_lines_after_h1[end_of_intro_index..]
-        diagram_heading_index_in_h2_onwards = h2_onwards_lines.find_index { |line| line.strip == "## Dependency Diagram" }
+        # H2 heading(s) exist. Intro is everything before the first one.
+        intro_lines = readme_lines_after_h1[0...first_h2_or_diagram_heading_index]
 
-        if diagram_heading_index_in_h2_onwards
-          tail_lines.concat(h2_onwards_lines[0...diagram_heading_index_in_h2_onwards])
-          current_search_index = diagram_heading_index_in_h2_onwards + 1
+        # Now, from the first H2 onwards, find where the "## Dependency Diagram" section is (if it exists)
+        # and what comes after it.
+        content_from_first_h2 = readme_lines_after_h1[first_h2_or_diagram_heading_index..]
+
+        diagram_heading_index_in_remaining = content_from_first_h2.find_index do |line|
+          line.strip == "## Dependency Diagram"
+        end
+
+        if diagram_heading_index_in_remaining.nil?
+          # "## Dependency Diagram" not found, so all content_from_first_h2 is considered tail.
+          tail_content_lines = content_from_first_h2
+        else
+          # "## Dependency Diagram" found.
+          # Tail starts with content before the diagram heading (if any H2s were before it).
+          tail_content_lines.concat(content_from_first_h2[0...diagram_heading_index_in_remaining])
+
+          # Now, skip the diagram heading and its Mermaid block.
+          current_search_index_in_remaining = diagram_heading_index_in_remaining + 1 # Start after "## Dependency Diagram" line
           mermaid_block_started = false
           mermaid_block_ended = false
 
-          while current_search_index < h2_onwards_lines.length
-            line_strip = h2_onwards_lines[current_search_index].strip
+          while current_search_index_in_remaining < content_from_first_h2.length
+            line_strip = content_from_first_h2[current_search_index_in_remaining].strip
             if !mermaid_block_started && line_strip == "```mermaid"
               mermaid_block_started = true
-            elsif mermaid_block_started && line_strip == "```"
-              current_search_index += 1
+            elsif mermaid_block_started && !mermaid_block_ended && line_strip == "```"
               mermaid_block_ended = true
-              break
+              # Move past the closing ```
+              current_search_index_in_remaining += 1
+              break # Found end of mermaid block
             end
-            current_search_index += 1
+            current_search_index_in_remaining += 1
           end
-
-          if mermaid_block_started && mermaid_block_ended
-            tail_lines.concat(h2_onwards_lines[current_search_index..] || [])
+          
+          # If a mermaid block was started (and potentially ended), append the rest of the content.
+          if mermaid_block_started # Check if we even entered a mermaid block
+             # If mermaid_block_ended is true, current_search_index_in_remaining is already past it.
+             # If mermaid_block_ended is false, it means we hit EOF inside mermaid block (malformed)
+             # or the block was empty. In any case, take from current_search_index_in_remaining.
+            if current_search_index_in_remaining < content_from_first_h2.length
+              tail_content_lines.concat(content_from_first_h2[current_search_index_in_remaining..])
+            end
+          else 
+            # No mermaid block found after "## Dependency Diagram" heading,
+            # so the rest of the content_from_first_h2 (after the heading line) is tail.
+             if diagram_heading_index_in_remaining + 1 < content_from_first_h2.length
+                tail_content_lines.concat(content_from_first_h2[(diagram_heading_index_in_remaining + 1)..])
+             end
           end
-        else
-          tail_lines = h2_onwards_lines
         end
       end
+      
+      # Join lines and strip only at the very end to preserve internal structure.
+      # Ensure there are no excessive newlines between intro and the start of tail_content_lines.
+      intro_str = intro_lines.join
+      tail_str = tail_content_lines.join
 
       {
-        intro_content: intro_lines.join.strip,
-        tail_content: tail_lines.join.strip
+        intro_content: intro_str.chomp, # Chomp trailing newlines from intro part
+        tail_content: tail_str.chomp    # Chomp trailing newlines from tail part
       }
     end
 
+
     public def construct_expected_readme(actual_readme_content, new_mermaid_diagram_block)
       lines = actual_readme_content.lines
-      h1_line = lines.first.strip
+      h1_line = lines.first # Keep its original newline
 
       readme_lines_after_h1 = lines[1..] || []
       parsed_parts = _isolate_intro_and_tail(readme_lines_after_h1)
 
-      components = [h1_line]
+      components = [h1_line] # h1_line includes its newline
 
       intro_text = parsed_parts[:intro_content]
-      unless intro_text.empty?
-        components << ""
+      # Add intro if it's not just whitespace.
+      # Ensure there's a blank line after intro if it's not empty,
+      # or after H1 if intro is empty, before "## Dependency Diagram".
+      if !intro_text.strip.empty?
         components << intro_text
+        components << "\n" # Ensure separation if intro_text didn't end with \n\n
       end
+      
+      # Always ensure a blank line before the "## Dependency Diagram" heading,
+      # unless the intro itself was empty and H1 already provided one.
+      components << "\n" unless components.last.end_with?("\n\n") || components.last.end_with?("\n") && components.length == 1
 
-      components << ""
-      components << "## Dependency Diagram"
-      components << ""
-      components << new_mermaid_diagram_block.strip
+
+      components << "## Dependency Diagram\n"
+      components << "\n" # Blank line after heading
+      components << new_mermaid_diagram_block.strip # Mermaid block itself
+      components << "\n" # Blank line after mermaid block
 
       tail_text = parsed_parts[:tail_content]
-      unless tail_text.empty?
-        components << ""
+      if !tail_text.strip.empty?
+        components << "\n" # Ensure separation before tail_text
         components << tail_text
       end
-
-      final_content = components.join("\n") + "\n"
+      
+      # Join all components. If any component already ends with sufficient newlines,
+      # `join` handles it. Add a final newline if not present.
+      final_content = components.join
+      final_content += "\n" unless final_content.end_with?("\n")
+      
+      # Normalize multiple blank lines down to a single blank line (two newlines)
       final_content.gsub(/\n{3,}/, "\n\n")
     end
+
 
     public def process
       pre_flight_result = perform_readme_pre_flight_check
@@ -230,6 +294,7 @@ module ElasticGraph
 
   class GemCategory < ::Data.define(:category_name, :info, :gem_specs, :all_eg_gem_specs)
     def mermaid_definition
+      return "" if gem_specs.empty? # Handle empty categories gracefully
       <<~MERMAID
         ```mermaid
         graph LR;
@@ -244,7 +309,10 @@ module ElasticGraph
 
     def mermaid_deps
       gem_specs.filter_map do |spec|
-        unless spec.runtime_dependencies.empty?
+        # Ensure spec.runtime_dependencies is not nil and not empty
+        unless spec.runtime_dependencies.nil? || spec.runtime_dependencies.empty?
+          # Ensure dependency names are valid for Mermaid node IDs (e.g., no special chars not handled by Mermaid)
+          # For simple names, this is fine. Complex names might need sanitization.
           deps = spec.runtime_dependencies.map(&:name).join(" & ")
           "    #{spec.name} --> #{deps}"
         end
@@ -253,7 +321,7 @@ module ElasticGraph
 
     def mermaid_styles
       all_nodes = gem_specs.map(&:name) | gem_specs.flat_map { |spec| spec.runtime_dependencies.map(&:name) }
-      all_nodes.map do |node|
+      all_nodes.compact.uniq.map do |node| # Add compact and uniq for robustness
         "    style #{node} #{style_for(node)};"
       end
     end
@@ -270,7 +338,7 @@ module ElasticGraph
     end
 
     def mermaid_clicks
-      gem_specs.flat_map { |spec| spec.runtime_dependencies.map(&:name) }.uniq.sort.filter_map do |gem_name|
+      gem_specs.flat_map { |spec| spec.runtime_dependencies.map(&:name) }.compact.uniq.sort.filter_map do |gem_name|
         unless all_eg_gem_specs.any? { |spec| spec.name == gem_name }
           "click #{gem_name} href \"https://rubygems.org/gems/#{gem_name}\""
         end
@@ -304,36 +372,101 @@ module ElasticGraph
   end
 end
 
-# Placeholder for all_specs loading, will be done once in the main script body
-# all_specs_for_readme_processing = ::ElasticGraphGems.list.map do |gem_name|
-#   ::Gem::Specification.load(File.join(ElasticGraph::CodebaseOverviewRenderer::PROJECT_ROOT, gem_name, "#{gem_name}.gemspec"))
-# end
 
+# --- Main script execution ---
 renderer = ElasticGraph::CodebaseOverviewRenderer.new(DATA.read)
-contents = renderer.render
-readme_path = ::File.join(__dir__, "..", "CODEBASE_OVERVIEW.md")
+all_gem_specs = renderer.gem_specs # Load all gem specs once
+
+readme_path_overview = ::File.join(ElasticGraph::CodebaseOverviewRenderer::PROJECT_ROOT, "CODEBASE_OVERVIEW.md")
+readme_errors = [] # To collect errors for --verify mode
 
 case ARGV.first
 when "--verify"
-  if ::File.read(readme_path) == contents
-    puts "✅ CODEBASE_OVERVIEW is up-to-date."
+  puts "Verifying CODEBASE_OVERVIEW.md..."
+  generated_overview_contents = renderer.render
+  if ::File.exist?(readme_path_overview) && ::File.read(readme_path_overview) == generated_overview_contents
+    puts "✅ CODEBASE_OVERVIEW.md is up-to-date."
   else
-    tmp_path = ::File.join(__dir__, "..", "tmp", "CODEBASE_OVERVIEW.md")
-    ::File.write(tmp_path, contents)
+    tmp_path = ::File.join(ElasticGraph::CodebaseOverviewRenderer::PROJECT_ROOT, "tmp", "CODEBASE_OVERVIEW.md")
+    ::FileUtils.mkdir_p(File.dirname(tmp_path)) # Ensure tmp directory exists
+    ::File.write(tmp_path, generated_overview_contents)
 
-    diff = `git diff --no-index #{readme_path} #{tmp_path} #{" --color" unless ENV["CI"]}`
-
-    puts "❌ CODEBASE_OVERVIEW is out-of-date. Run `#{__FILE__}` to update it. Diff:"
-    puts
-    puts diff
-    exit(1) # For now, only CODEBASE_OVERVIEW failure causes exit in verify
+    diff_command = "git diff --no-index --exit-code #{readme_path_overview} #{tmp_path}"
+    diff_command += " --color" unless ENV["CI"]
+    
+    diff_output = `#{diff_command}`
+    
+    if $?.success? # No diff means files are the same, but File.read check failed. Should not happen.
+        readme_errors << "❌ CODEBASE_OVERVIEW.md content mismatch but git diff shows no changes. Please investigate."
+    else
+        readme_errors << "❌ CODEBASE_OVERVIEW.md is out-of-date. Diff:\n#{diff_output}"
+    end
   end
-when nil
-  ::File.write(readme_path, contents)
-  puts "CODEBASE_OVERVIEW.md updated."
+
+  puts "\nVerifying individual gem README dependency diagrams..."
+  all_gem_specs.each do |spec|
+    processor = ElasticGraph::IndividualGemReadmeProcessor.new(spec, all_gem_specs, ElasticGraph::CodebaseOverviewRenderer::PROJECT_ROOT)
+    result = processor.process
+
+    if result[:status] == :error
+      readme_errors << "❌ Error processing #{spec.name}: #{result[:message]}"
+    else
+      # In verify mode, we check if actual content matches expected content
+      if result[:actual_content] == result[:expected_content]
+        puts "✅ #{spec.name} README diagram is up-to-date."
+      else
+        readme_errors << "❌ #{spec.name} README diagram at #{result[:readme_path]} is out-of-date or improperly formatted."
+        # Optionally, provide a diff for individual READMEs if desired (more complex)
+        # For now, just a message.
+      end
+    end
+  end
+
+  if readme_errors.empty?
+    puts "\n🎉 All dependency diagrams (CODEBASE_OVERVIEW.md and individual gems) are up-to-date."
+    exit 0
+  else
+    puts "\n--- Verification Summary ---"
+    readme_errors.each { |err| puts err }
+    puts "\nScript verification failed. Please review the errors above."
+    exit 1
+  end
+
+when nil # Default mode: update files
+  puts "Updating CODEBASE_OVERVIEW.md..."
+  generated_overview_contents = renderer.render
+  ::File.write(readme_path_overview, generated_overview_contents)
+  puts "✅ CODEBASE_OVERVIEW.md updated."
+
+  puts "\nUpdating individual gem README dependency diagrams..."
+  all_gem_specs.each do |spec|
+    puts "Processing gem #{spec.name}..."
+    processor = ElasticGraph::IndividualGemReadmeProcessor.new(spec, all_gem_specs, ElasticGraph::CodebaseOverviewRenderer::PROJECT_ROOT)
+    result = processor.process
+
+    if result[:status] == :error
+      puts "  ❌ Error: #{result[:message]}"
+    else
+      if result[:actual_content] == result[:expected_content]
+        puts "  ✅ #{result[:readme_path]} dependency diagram is already up-to-date."
+      else
+        begin
+          ::File.write(result[:readme_path], result[:expected_content])
+          puts "  ✅ #{result[:readme_path]} dependency diagram updated."
+        rescue StandardError => e
+          puts "  ❌ Failed to write #{result[:readme_path]}: #{e.message}"
+        end
+      end
+    end
+  end
+  puts "\nDependency diagram processing complete."
+  exit 0
+
 else
-  raise "Unknown argument: #{ARGV.first}. Expected `--verify` or nothing."
+  STDERR.puts "Unknown argument: #{ARGV.first}. Expected `--verify` or nothing."
+  exit 1
 end
+
 
 __END__
 # ElasticGraph Codebase Overview
