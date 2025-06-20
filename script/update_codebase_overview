@@ -51,10 +51,9 @@ module ElasticGraph
   end
 
   class IndividualGemReadmeProcessor
-    # Consistent styling constants
-    STYLE_CURRENT_GEM = "fill:#E0EFFF,stroke:#70A1D7,color:#000,stroke-width:2px"
-    STYLE_INTERNAL_EG_GEM = "fill:#D4EFDF,stroke:#58D68D,color:#000"
-    STYLE_EXTERNAL_GEM = "fill:#FADBD8,stroke:#EC7063,color:#000"
+    STYLE_CURRENT_GEM = "fill:#AED6F1,stroke:#3498DB,color:#000,stroke-width:2px"      # Clearer Blue
+    STYLE_INTERNAL_EG_GEM = "fill:#A9DFBF,stroke:#2ECC71,color:#000"                  # Clearer Green
+    STYLE_EXTERNAL_GEM = "fill:#F4F6F7,stroke:#B3B6B7,color:#2980B9"                  # Light Grey, Blue text (link-like)
 
     def initialize(gem_spec, all_specs, project_root)
       @gem_spec = gem_spec
@@ -85,12 +84,10 @@ module ElasticGraph
       current_gem_name = @gem_spec.name
 
       mermaid_lines = ["graph LR;"]
-      # Define classes first
       mermaid_lines << "    classDef currentGemStyle #{STYLE_CURRENT_GEM};"
       mermaid_lines << "    classDef internalEgGemStyle #{STYLE_INTERNAL_EG_GEM};"
       mermaid_lines << "    classDef externalGemStyle #{STYLE_EXTERNAL_GEM};"
 
-      # Define current gem node and apply its class
       mermaid_lines << "    #{current_gem_name}[\"#{current_gem_name}\"];"
       mermaid_lines << "    class #{current_gem_name} currentGemStyle;"
 
@@ -113,7 +110,7 @@ module ElasticGraph
           mermaid_lines << "    #{dep_name}[\"#{dep_name}\"];"
           mermaid_lines << "    #{dep_name} --> #{current_gem_name};"
           all_node_names_in_diagram.add(dep_name)
-          mermaid_lines << "    class #{dep_name} internalEgGemStyle;" # Dependents are always internal EG gems
+          mermaid_lines << "    class #{dep_name} internalEgGemStyle;"
         end
       end
 
@@ -227,10 +224,9 @@ module ElasticGraph
   end
 
   class GemCategory < ::Data.define(:category_name, :info, :gem_specs, :all_eg_gem_specs)
-    # Consistent styling constants, matching IndividualGemReadmeProcessor where applicable
-    STYLE_CURRENT_CATEGORY_GEM = "fill:#E0EFFF,stroke:#70A1D7,color:#000,stroke-width:1.5px" # Slightly less thick than current gem in its own README
-    STYLE_OTHER_EG_GEM = "fill:#D4EFDF,stroke:#58D68D,color:#000"
-    STYLE_EXTERNAL_CATEGORY_GEM = "fill:#FADBD8,stroke:#EC7063,color:#000"
+    STYLE_CURRENT_CATEGORY_GEM = "fill:#AED6F1,stroke:#3498DB,color:#000,stroke-width:1.5px"  # Clearer Blue
+    STYLE_OTHER_EG_GEM = "fill:#A9DFBF,stroke:#2ECC71,color:#000"                          # Clearer Green
+    STYLE_EXTERNAL_CATEGORY_GEM = "fill:#F4F6F7,stroke:#B3B6B7,color:#2980B9"              # Light Grey, Blue text
 
     def mermaid_definition
       return "" if gem_specs.empty?
@@ -239,7 +235,6 @@ module ElasticGraph
         "    classDef otherEgGemStyle #{STYLE_OTHER_EG_GEM};",
         "    classDef externalGemCatStyle #{STYLE_EXTERNAL_CATEGORY_GEM};"
       ]
-      # Ensure all nodes are defined with labels so classes can be applied
       node_definitions = all_nodes_in_category_diagrams.map { |name| "    #{name}[\"#{name}\"];" }
 
       <<~MERMAID
@@ -257,7 +252,6 @@ module ElasticGraph
     private
 
     def mermaid_deps
-      # Create individual links for each dependency for proper styling and linking
       gem_specs.flat_map do |spec|
         next if spec.runtime_dependencies.nil? || spec.runtime_dependencies.empty?
         spec.runtime_dependencies.map do |dep|
@@ -267,7 +261,6 @@ module ElasticGraph
     end
 
     def all_nodes_in_category_diagrams
-      # Collect all unique node names appearing in this category's diagrams
       nodes = Set.new
       gem_specs.each do |spec|
         nodes.add(spec.name)
@@ -279,11 +272,11 @@ module ElasticGraph
     def mermaid_node_classes
       all_nodes_in_category_diagrams.map do |node_name|
         class_name = if gem_specs.any? { |spec| spec.name == node_name }
-                       "currentCategoryGemStyle" # Gem is in the current category being displayed
+                       "currentCategoryGemStyle"
                      elsif all_eg_gem_specs.any? { |spec| spec.name == node_name }
-                       "otherEgGemStyle"       # Gem is another ElasticGraph gem (not in this category)
+                       "otherEgGemStyle"
                      else
-                       "externalGemCatStyle"   # Gem is external
+                       "externalGemCatStyle"
                      end
         "    class #{node_name} #{class_name};"
       end
@@ -291,7 +284,6 @@ module ElasticGraph
 
     def mermaid_clicks
       all_nodes_in_category_diagrams.filter_map do |gem_name|
-        # Add click only for external gems
         is_internal_in_category = gem_specs.any? { |spec| spec.name == gem_name }
         is_other_eg_gem = all_eg_gem_specs.any? { |spec| spec.name == gem_name }
         unless is_internal_in_category || is_other_eg_gem
@@ -350,7 +342,7 @@ when "--verify"
 
     diff_output = `#{diff_command}`
 
-    readme_errors << if $?.success? # No diff means files are the same, but File.read check failed. Should not happen.
+    readme_errors << if $?.success?
       "❌ CODEBASE_OVERVIEW.md content mismatch but git diff shows no changes. Please investigate."
     else
       "❌ CODEBASE_OVERVIEW.md is out-of-date. Diff:\n#{diff_output}"
@@ -365,7 +357,6 @@ when "--verify"
     if result[:status] == :error
       readme_errors << "❌ Error processing #{spec.name}: #{result[:message]}"
     elsif result[:actual_content] == result[:expected_content]
-      # In verify mode, we check if actual content matches expected content
       puts "✅ #{spec.name} README diagram is up-to-date."
     else
       readme_errors << "❌ #{spec.name} README diagram at #{result[:readme_path]} is out-of-date or improperly formatted."
