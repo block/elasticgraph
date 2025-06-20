@@ -6,23 +6,27 @@ Contains code related to ElasticGraph's generated schema artifacts.
 
 ```mermaid
 graph LR;
+    elasticgraph-schema_artifacts["elasticgraph-schema_artifacts"];
+    elasticgraph-support["elasticgraph-support"];
     elasticgraph-schema_artifacts --> elasticgraph-support;
+    elasticgraph-admin["elasticgraph-admin"];
     elasticgraph-admin --> elasticgraph-schema_artifacts;
+    elasticgraph-datastore_core["elasticgraph-datastore_core"];
     elasticgraph-datastore_core --> elasticgraph-schema_artifacts;
+    elasticgraph-graphql["elasticgraph-graphql"];
     elasticgraph-graphql --> elasticgraph-schema_artifacts;
+    elasticgraph-indexer["elasticgraph-indexer"];
     elasticgraph-indexer --> elasticgraph-schema_artifacts;
+    elasticgraph-query_interceptor["elasticgraph-query_interceptor"];
     elasticgraph-query_interceptor --> elasticgraph-schema_artifacts;
+    elasticgraph-schema_definition["elasticgraph-schema_definition"];
     elasticgraph-schema_definition --> elasticgraph-schema_artifacts;
-    classDef currentGemStyle fill:#lightblue,stroke:#333,stroke-width:2px;
-    classDef internalEgGemStyle fill:#lightgreen,stroke:#333,stroke-width:1px;
-    classDef externalGemStyle fill:#lightcoral,stroke:#333,stroke-width:1px;
-    classDef placeholderNodeStyle fill:#eee,stroke:#333,stroke-width:1px;
-    class elasticgraph-schema_artifacts currentGemStyle;
-    class elasticgraph-support internalEgGemStyle;
-    class elasticgraph-admin internalEgGemStyle;
-    class elasticgraph-datastore_core internalEgGemStyle;
-    class elasticgraph-graphql internalEgGemStyle;
-    class elasticgraph-indexer internalEgGemStyle;
-    class elasticgraph-query_interceptor internalEgGemStyle;
-    class elasticgraph-schema_definition internalEgGemStyle;
+    style elasticgraph-schema_artifacts fill:#lightblue,stroke:#2980b9,stroke-width:2px,color:#000;
+    style elasticgraph-support fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
+    style elasticgraph-admin fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
+    style elasticgraph-datastore_core fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
+    style elasticgraph-graphql fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
+    style elasticgraph-indexer fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
+    style elasticgraph-query_interceptor fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
+    style elasticgraph-schema_definition fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
 ```

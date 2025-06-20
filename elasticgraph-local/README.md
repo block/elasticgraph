@@ -8,29 +8,32 @@ so as not to require a publisher of real data to be implemented.
 
 ```mermaid
 graph LR;
+    elasticgraph-local["elasticgraph-local"];
+    elasticgraph-admin["elasticgraph-admin"];
     elasticgraph-local --> elasticgraph-admin;
+    elasticgraph-graphql["elasticgraph-graphql"];
     elasticgraph-local --> elasticgraph-graphql;
+    elasticgraph-indexer["elasticgraph-indexer"];
     elasticgraph-local --> elasticgraph-indexer;
+    elasticgraph-rack["elasticgraph-rack"];
     elasticgraph-local --> elasticgraph-rack;
+    elasticgraph-schema_definition["elasticgraph-schema_definition"];
     elasticgraph-local --> elasticgraph-schema_definition;
+    rackup["rackup"];
     elasticgraph-local --> rackup;
+    rake["rake"];
     elasticgraph-local --> rake;
+    webrick["webrick"];
     elasticgraph-local --> webrick;
-    no_eg_dependents[(No direct EG dependents)] --> elasticgraph-local;
-    classDef currentGemStyle fill:#lightblue,stroke:#333,stroke-width:2px;
-    classDef internalEgGemStyle fill:#lightgreen,stroke:#333,stroke-width:1px;
-    classDef externalGemStyle fill:#lightcoral,stroke:#333,stroke-width:1px;
-    classDef placeholderNodeStyle fill:#eee,stroke:#333,stroke-width:1px;
-    class elasticgraph-local currentGemStyle;
-    class elasticgraph-admin internalEgGemStyle;
-    class elasticgraph-graphql internalEgGemStyle;
-    class elasticgraph-indexer internalEgGemStyle;
-    class elasticgraph-rack internalEgGemStyle;
-    class elasticgraph-schema_definition internalEgGemStyle;
-    class rackup externalGemStyle;
-    class rake externalGemStyle;
-    class webrick externalGemStyle;
-    class no_eg_dependents placeholderNodeStyle;
+    style elasticgraph-local fill:#lightblue,stroke:#2980b9,stroke-width:2px,color:#000;
+    style elasticgraph-admin fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
+    style elasticgraph-graphql fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
+    style elasticgraph-indexer fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
+    style elasticgraph-rack fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
+    style elasticgraph-schema_definition fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
+    style rackup fill:#lightcoral,stroke:#c0392b,stroke-width:1px,color:#000;
+    style rake fill:#lightcoral,stroke:#c0392b,stroke-width:1px,color:#000;
+    style webrick fill:#lightcoral,stroke:#c0392b,stroke-width:1px,color:#000;
 ```
 
 ## Installation

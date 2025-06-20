@@ -9,21 +9,20 @@ Note: this library only supports the v2 Federation specification.
 
 ```mermaid
 graph LR;
+    elasticgraph-apollo["elasticgraph-apollo"];
+    elasticgraph-graphql["elasticgraph-graphql"];
     elasticgraph-apollo --> elasticgraph-graphql;
+    elasticgraph-support["elasticgraph-support"];
     elasticgraph-apollo --> elasticgraph-support;
+    graphql["graphql"];
     elasticgraph-apollo --> graphql;
+    apollo-federation["apollo-federation"];
     elasticgraph-apollo --> apollo-federation;
-    no_eg_dependents[(No direct EG dependents)] --> elasticgraph-apollo;
-    classDef currentGemStyle fill:#lightblue,stroke:#333,stroke-width:2px;
-    classDef internalEgGemStyle fill:#lightgreen,stroke:#333,stroke-width:1px;
-    classDef externalGemStyle fill:#lightcoral,stroke:#333,stroke-width:1px;
-    classDef placeholderNodeStyle fill:#eee,stroke:#333,stroke-width:1px;
-    class elasticgraph-apollo currentGemStyle;
-    class elasticgraph-graphql internalEgGemStyle;
-    class elasticgraph-support internalEgGemStyle;
-    class graphql externalGemStyle;
-    class apollo-federation externalGemStyle;
-    class no_eg_dependents placeholderNodeStyle;
+    style elasticgraph-apollo fill:#lightblue,stroke:#2980b9,stroke-width:2px,color:#000;
+    style elasticgraph-graphql fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
+    style elasticgraph-support fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
+    style graphql fill:#lightcoral,stroke:#c0392b,stroke-width:1px,color:#000;
+    style apollo-federation fill:#lightcoral,stroke:#c0392b,stroke-width:1px,color:#000;
 ```
 
 ## Usage

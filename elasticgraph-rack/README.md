@@ -9,17 +9,17 @@ compatible web server.
 
 ```mermaid
 graph LR;
+    elasticgraph-rack["elasticgraph-rack"];
+    elasticgraph-graphql["elasticgraph-graphql"];
     elasticgraph-rack --> elasticgraph-graphql;
+    rack["rack"];
     elasticgraph-rack --> rack;
+    elasticgraph-local["elasticgraph-local"];
     elasticgraph-local --> elasticgraph-rack;
-    classDef currentGemStyle fill:#lightblue,stroke:#333,stroke-width:2px;
-    classDef internalEgGemStyle fill:#lightgreen,stroke:#333,stroke-width:1px;
-    classDef externalGemStyle fill:#lightcoral,stroke:#333,stroke-width:1px;
-    classDef placeholderNodeStyle fill:#eee,stroke:#333,stroke-width:1px;
-    class elasticgraph-rack currentGemStyle;
-    class elasticgraph-graphql internalEgGemStyle;
-    class rack externalGemStyle;
-    class elasticgraph-local internalEgGemStyle;
+    style elasticgraph-rack fill:#lightblue,stroke:#2980b9,stroke-width:2px,color:#000;
+    style elasticgraph-graphql fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
+    style rack fill:#lightcoral,stroke:#c0392b,stroke-width:1px,color:#000;
+    style elasticgraph-local fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
 ```
 
 ## Serving an ElasticGraph GraphQL Endpoint

@@ -33,23 +33,23 @@ if desired based on a configuration setting.
 
 ```mermaid
 graph LR;
+    elasticgraph-query_registry["elasticgraph-query_registry"];
+    elasticgraph-graphql["elasticgraph-graphql"];
     elasticgraph-query_registry --> elasticgraph-graphql;
+    elasticgraph-support["elasticgraph-support"];
     elasticgraph-query_registry --> elasticgraph-support;
+    graphql["graphql"];
     elasticgraph-query_registry --> graphql;
+    graphql-c_parser["graphql-c_parser"];
     elasticgraph-query_registry --> graphql-c_parser;
+    rake["rake"];
     elasticgraph-query_registry --> rake;
-    no_eg_dependents[(No direct EG dependents)] --> elasticgraph-query_registry;
-    classDef currentGemStyle fill:#lightblue,stroke:#333,stroke-width:2px;
-    classDef internalEgGemStyle fill:#lightgreen,stroke:#333,stroke-width:1px;
-    classDef externalGemStyle fill:#lightcoral,stroke:#333,stroke-width:1px;
-    classDef placeholderNodeStyle fill:#eee,stroke:#333,stroke-width:1px;
-    class elasticgraph-query_registry currentGemStyle;
-    class elasticgraph-graphql internalEgGemStyle;
-    class elasticgraph-support internalEgGemStyle;
-    class graphql externalGemStyle;
-    class graphql-c_parser externalGemStyle;
-    class rake externalGemStyle;
-    class no_eg_dependents placeholderNodeStyle;
+    style elasticgraph-query_registry fill:#lightblue,stroke:#2980b9,stroke-width:2px,color:#000;
+    style elasticgraph-graphql fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
+    style elasticgraph-support fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
+    style graphql fill:#lightcoral,stroke:#c0392b,stroke-width:1px,color:#000;
+    style graphql-c_parser fill:#lightcoral,stroke:#c0392b,stroke-width:1px,color:#000;
+    style rake fill:#lightcoral,stroke:#c0392b,stroke-width:1px,color:#000;
 ```
 
 ## Query Verification Guarantees
