@@ -6,19 +6,21 @@ Wraps the official OpenSearch client for use by ElasticGraph.
 
 ```mermaid
 graph LR;
+    elasticgraph-opensearch["elasticgraph-opensearch"];
+    elasticgraph-support["elasticgraph-support"];
     elasticgraph-opensearch --> elasticgraph-support;
+    faraday["faraday"];
     elasticgraph-opensearch --> faraday;
+    faraday-retry["faraday-retry"];
     elasticgraph-opensearch --> faraday-retry;
+    opensearch-ruby["opensearch-ruby"];
     elasticgraph-opensearch --> opensearch-ruby;
+    elasticgraph-lambda_support["elasticgraph-lambda_support"];
     elasticgraph-lambda_support --> elasticgraph-opensearch;
-    classDef currentGemStyle fill:#lightblue,stroke:#333,stroke-width:2px;
-    classDef internalEgGemStyle fill:#lightgreen,stroke:#333,stroke-width:1px;
-    classDef externalGemStyle fill:#lightcoral,stroke:#333,stroke-width:1px;
-    classDef placeholderNodeStyle fill:#eee,stroke:#333,stroke-width:1px;
-    class elasticgraph-opensearch currentGemStyle;
-    class elasticgraph-support internalEgGemStyle;
-    class faraday externalGemStyle;
-    class faraday-retry externalGemStyle;
-    class opensearch-ruby externalGemStyle;
-    class elasticgraph-lambda_support internalEgGemStyle;
+    style elasticgraph-opensearch fill:#lightblue,stroke:#2980b9,stroke-width:2px,color:#000;
+    style elasticgraph-support fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
+    style faraday fill:#lightcoral,stroke:#c0392b,stroke-width:1px,color:#000;
+    style faraday-retry fill:#lightcoral,stroke:#c0392b,stroke-width:1px,color:#000;
+    style opensearch-ruby fill:#lightcoral,stroke:#c0392b,stroke-width:1px,color:#000;
+    style elasticgraph-lambda_support fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
 ```

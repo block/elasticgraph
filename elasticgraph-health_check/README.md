@@ -26,19 +26,17 @@ overall status will be `degraded`. If the recency checks pass, but at least one 
 
 ```mermaid
 graph LR;
+    elasticgraph-health_check["elasticgraph-health_check"];
+    elasticgraph-datastore_core["elasticgraph-datastore_core"];
     elasticgraph-health_check --> elasticgraph-datastore_core;
+    elasticgraph-graphql["elasticgraph-graphql"];
     elasticgraph-health_check --> elasticgraph-graphql;
+    elasticgraph-support["elasticgraph-support"];
     elasticgraph-health_check --> elasticgraph-support;
-    no_eg_dependents[(No direct EG dependents)] --> elasticgraph-health_check;
-    classDef currentGemStyle fill:#lightblue,stroke:#333,stroke-width:2px;
-    classDef internalEgGemStyle fill:#lightgreen,stroke:#333,stroke-width:1px;
-    classDef externalGemStyle fill:#lightcoral,stroke:#333,stroke-width:1px;
-    classDef placeholderNodeStyle fill:#eee,stroke:#333,stroke-width:1px;
-    class elasticgraph-health_check currentGemStyle;
-    class elasticgraph-datastore_core internalEgGemStyle;
-    class elasticgraph-graphql internalEgGemStyle;
-    class elasticgraph-support internalEgGemStyle;
-    class no_eg_dependents placeholderNodeStyle;
+    style elasticgraph-health_check fill:#lightblue,stroke:#2980b9,stroke-width:2px,color:#000;
+    style elasticgraph-datastore_core fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
+    style elasticgraph-graphql fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
+    style elasticgraph-support fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
 ```
 
 ## Integration

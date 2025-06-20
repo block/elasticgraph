@@ -6,21 +6,20 @@ Adapts elasticgraph-indexer to run in an AWS Lambda.
 
 ```mermaid
 graph LR;
+    elasticgraph-indexer_lambda["elasticgraph-indexer_lambda"];
+    elasticgraph-indexer["elasticgraph-indexer"];
     elasticgraph-indexer_lambda --> elasticgraph-indexer;
+    elasticgraph-lambda_support["elasticgraph-lambda_support"];
     elasticgraph-indexer_lambda --> elasticgraph-lambda_support;
+    aws-sdk-s3["aws-sdk-s3"];
     elasticgraph-indexer_lambda --> aws-sdk-s3;
+    ox["ox"];
     elasticgraph-indexer_lambda --> ox;
-    no_eg_dependents[(No direct EG dependents)] --> elasticgraph-indexer_lambda;
-    classDef currentGemStyle fill:#lightblue,stroke:#333,stroke-width:2px;
-    classDef internalEgGemStyle fill:#lightgreen,stroke:#333,stroke-width:1px;
-    classDef externalGemStyle fill:#lightcoral,stroke:#333,stroke-width:1px;
-    classDef placeholderNodeStyle fill:#eee,stroke:#333,stroke-width:1px;
-    class elasticgraph-indexer_lambda currentGemStyle;
-    class elasticgraph-indexer internalEgGemStyle;
-    class elasticgraph-lambda_support internalEgGemStyle;
-    class aws-sdk-s3 externalGemStyle;
-    class ox externalGemStyle;
-    class no_eg_dependents placeholderNodeStyle;
+    style elasticgraph-indexer_lambda fill:#lightblue,stroke:#2980b9,stroke-width:2px,color:#000;
+    style elasticgraph-indexer fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
+    style elasticgraph-lambda_support fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
+    style aws-sdk-s3 fill:#lightcoral,stroke:#c0392b,stroke-width:1px,color:#000;
+    style ox fill:#lightcoral,stroke:#c0392b,stroke-width:1px,color:#000;
 ```
 
 ## SQS Message Payload Format

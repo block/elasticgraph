@@ -3,23 +3,24 @@
 
 ```mermaid
 graph LR;
+    elasticgraph-indexer_autoscaler_lambda["elasticgraph-indexer_autoscaler_lambda"];
+    elasticgraph-datastore_core["elasticgraph-datastore_core"];
     elasticgraph-indexer_autoscaler_lambda --> elasticgraph-datastore_core;
+    elasticgraph-lambda_support["elasticgraph-lambda_support"];
     elasticgraph-indexer_autoscaler_lambda --> elasticgraph-lambda_support;
+    aws-sdk-lambda["aws-sdk-lambda"];
     elasticgraph-indexer_autoscaler_lambda --> aws-sdk-lambda;
+    aws-sdk-sqs["aws-sdk-sqs"];
     elasticgraph-indexer_autoscaler_lambda --> aws-sdk-sqs;
+    aws-sdk-cloudwatch["aws-sdk-cloudwatch"];
     elasticgraph-indexer_autoscaler_lambda --> aws-sdk-cloudwatch;
+    ox["ox"];
     elasticgraph-indexer_autoscaler_lambda --> ox;
-    no_eg_dependents[(No direct EG dependents)] --> elasticgraph-indexer_autoscaler_lambda;
-    classDef currentGemStyle fill:#lightblue,stroke:#333,stroke-width:2px;
-    classDef internalEgGemStyle fill:#lightgreen,stroke:#333,stroke-width:1px;
-    classDef externalGemStyle fill:#lightcoral,stroke:#333,stroke-width:1px;
-    classDef placeholderNodeStyle fill:#eee,stroke:#333,stroke-width:1px;
-    class elasticgraph-indexer_autoscaler_lambda currentGemStyle;
-    class elasticgraph-datastore_core internalEgGemStyle;
-    class elasticgraph-lambda_support internalEgGemStyle;
-    class aws-sdk-lambda externalGemStyle;
-    class aws-sdk-sqs externalGemStyle;
-    class aws-sdk-cloudwatch externalGemStyle;
-    class ox externalGemStyle;
-    class no_eg_dependents placeholderNodeStyle;
+    style elasticgraph-indexer_autoscaler_lambda fill:#lightblue,stroke:#2980b9,stroke-width:2px,color:#000;
+    style elasticgraph-datastore_core fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
+    style elasticgraph-lambda_support fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
+    style aws-sdk-lambda fill:#lightcoral,stroke:#c0392b,stroke-width:1px,color:#000;
+    style aws-sdk-sqs fill:#lightcoral,stroke:#c0392b,stroke-width:1px,color:#000;
+    style aws-sdk-cloudwatch fill:#lightcoral,stroke:#c0392b,stroke-width:1px,color:#000;
+    style ox fill:#lightcoral,stroke:#c0392b,stroke-width:1px,color:#000;
 ```

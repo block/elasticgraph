@@ -6,19 +6,18 @@ Wraps the official Elasticsearch client for use by ElasticGraph.
 
 ```mermaid
 graph LR;
+    elasticgraph-elasticsearch["elasticgraph-elasticsearch"];
+    elasticgraph-support["elasticgraph-support"];
     elasticgraph-elasticsearch --> elasticgraph-support;
+    elasticsearch["elasticsearch"];
     elasticgraph-elasticsearch --> elasticsearch;
+    faraday["faraday"];
     elasticgraph-elasticsearch --> faraday;
+    faraday-retry["faraday-retry"];
     elasticgraph-elasticsearch --> faraday-retry;
-    no_eg_dependents[(No direct EG dependents)] --> elasticgraph-elasticsearch;
-    classDef currentGemStyle fill:#lightblue,stroke:#333,stroke-width:2px;
-    classDef internalEgGemStyle fill:#lightgreen,stroke:#333,stroke-width:1px;
-    classDef externalGemStyle fill:#lightcoral,stroke:#333,stroke-width:1px;
-    classDef placeholderNodeStyle fill:#eee,stroke:#333,stroke-width:1px;
-    class elasticgraph-elasticsearch currentGemStyle;
-    class elasticgraph-support internalEgGemStyle;
-    class elasticsearch externalGemStyle;
-    class faraday externalGemStyle;
-    class faraday-retry externalGemStyle;
-    class no_eg_dependents placeholderNodeStyle;
+    style elasticgraph-elasticsearch fill:#lightblue,stroke:#2980b9,stroke-width:2px,color:#000;
+    style elasticgraph-support fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
+    style elasticsearch fill:#lightcoral,stroke:#c0392b,stroke-width:1px,color:#000;
+    style faraday fill:#lightcoral,stroke:#c0392b,stroke-width:1px,color:#000;
+    style faraday-retry fill:#lightcoral,stroke:#c0392b,stroke-width:1px,color:#000;
 ```
