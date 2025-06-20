@@ -18,11 +18,13 @@ graph LR;
     elasticgraph-apollo --> graphql;
     apollo-federation["apollo-federation"];
     elasticgraph-apollo --> apollo-federation;
-    style elasticgraph-apollo fill:#lightblue,stroke:#2980b9,stroke-width:2px,color:#000;
-    style elasticgraph-graphql fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
-    style elasticgraph-support fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
-    style graphql fill:#lightcoral,stroke:#c0392b,stroke-width:1px,color:#000;
-    style apollo-federation fill:#lightcoral,stroke:#c0392b,stroke-width:1px,color:#000;
+    style elasticgraph-apollo color:DodgerBlue,stroke-width:2px,stroke:DodgerBlue;
+    style elasticgraph-graphql color:Green,stroke:Green;
+    style elasticgraph-support color:Green,stroke:Green;
+    style graphql color:Red,stroke:Red;
+    style apollo-federation color:Red,stroke:Red;
+    click graphql href "https://rubygems.org/gems/graphql" "Open on RubyGems.org" _blank;
+    click apollo-federation href "https://rubygems.org/gems/apollo-federation" "Open on RubyGems.org" _blank;
 ```
 
 ## Usage

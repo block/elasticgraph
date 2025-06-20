@@ -13,8 +13,9 @@ graph LR;
     elasticgraph-admin_lambda --> elasticgraph-admin;
     elasticgraph-lambda_support["elasticgraph-lambda_support"];
     elasticgraph-admin_lambda --> elasticgraph-lambda_support;
-    style elasticgraph-admin_lambda fill:#lightblue,stroke:#2980b9,stroke-width:2px,color:#000;
-    style rake fill:#lightcoral,stroke:#c0392b,stroke-width:1px,color:#000;
-    style elasticgraph-admin fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
-    style elasticgraph-lambda_support fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
+    style elasticgraph-admin_lambda color:DodgerBlue,stroke-width:2px,stroke:DodgerBlue;
+    style rake color:Red,stroke:Red;
+    style elasticgraph-admin color:Green,stroke:Green;
+    style elasticgraph-lambda_support color:Green,stroke:Green;
+    click rake href "https://rubygems.org/gems/rake" "Open on RubyGems.org" _blank;
 ```

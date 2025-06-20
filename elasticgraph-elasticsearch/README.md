@@ -15,9 +15,12 @@ graph LR;
     elasticgraph-elasticsearch --> faraday;
     faraday-retry["faraday-retry"];
     elasticgraph-elasticsearch --> faraday-retry;
-    style elasticgraph-elasticsearch fill:#lightblue,stroke:#2980b9,stroke-width:2px,color:#000;
-    style elasticgraph-support fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
-    style elasticsearch fill:#lightcoral,stroke:#c0392b,stroke-width:1px,color:#000;
-    style faraday fill:#lightcoral,stroke:#c0392b,stroke-width:1px,color:#000;
-    style faraday-retry fill:#lightcoral,stroke:#c0392b,stroke-width:1px,color:#000;
+    style elasticgraph-elasticsearch color:DodgerBlue,stroke-width:2px,stroke:DodgerBlue;
+    style elasticgraph-support color:Green,stroke:Green;
+    style elasticsearch color:Red,stroke:Red;
+    style faraday color:Red,stroke:Red;
+    style faraday-retry color:Red,stroke:Red;
+    click elasticsearch href "https://rubygems.org/gems/elasticsearch" "Open on RubyGems.org" _blank;
+    click faraday href "https://rubygems.org/gems/faraday" "Open on RubyGems.org" _blank;
+    click faraday-retry href "https://rubygems.org/gems/faraday-retry" "Open on RubyGems.org" _blank;
 ```

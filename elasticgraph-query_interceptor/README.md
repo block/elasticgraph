@@ -13,9 +13,9 @@ graph LR;
     elasticgraph-query_interceptor --> elasticgraph-graphql;
     elasticgraph-schema_artifacts["elasticgraph-schema_artifacts"];
     elasticgraph-query_interceptor --> elasticgraph-schema_artifacts;
-    style elasticgraph-query_interceptor fill:#lightblue,stroke:#2980b9,stroke-width:2px,color:#000;
-    style elasticgraph-graphql fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
-    style elasticgraph-schema_artifacts fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
+    style elasticgraph-query_interceptor color:DodgerBlue,stroke-width:2px,stroke:DodgerBlue;
+    style elasticgraph-graphql color:Green,stroke:Green;
+    style elasticgraph-schema_artifacts color:Green,stroke:Green;
 ```
 
 ## Setup

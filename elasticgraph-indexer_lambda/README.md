@@ -15,11 +15,13 @@ graph LR;
     elasticgraph-indexer_lambda --> aws-sdk-s3;
     ox["ox"];
     elasticgraph-indexer_lambda --> ox;
-    style elasticgraph-indexer_lambda fill:#lightblue,stroke:#2980b9,stroke-width:2px,color:#000;
-    style elasticgraph-indexer fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
-    style elasticgraph-lambda_support fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
-    style aws-sdk-s3 fill:#lightcoral,stroke:#c0392b,stroke-width:1px,color:#000;
-    style ox fill:#lightcoral,stroke:#c0392b,stroke-width:1px,color:#000;
+    style elasticgraph-indexer_lambda color:DodgerBlue,stroke-width:2px,stroke:DodgerBlue;
+    style elasticgraph-indexer color:Green,stroke:Green;
+    style elasticgraph-lambda_support color:Green,stroke:Green;
+    style aws-sdk-s3 color:Red,stroke:Red;
+    style ox color:Red,stroke:Red;
+    click aws-sdk-s3 href "https://rubygems.org/gems/aws-sdk-s3" "Open on RubyGems.org" _blank;
+    click ox href "https://rubygems.org/gems/ox" "Open on RubyGems.org" _blank;
 ```
 
 ## SQS Message Payload Format

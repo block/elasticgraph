@@ -25,15 +25,18 @@ graph LR;
     elasticgraph-local --> rake;
     webrick["webrick"];
     elasticgraph-local --> webrick;
-    style elasticgraph-local fill:#lightblue,stroke:#2980b9,stroke-width:2px,color:#000;
-    style elasticgraph-admin fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
-    style elasticgraph-graphql fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
-    style elasticgraph-indexer fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
-    style elasticgraph-rack fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
-    style elasticgraph-schema_definition fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
-    style rackup fill:#lightcoral,stroke:#c0392b,stroke-width:1px,color:#000;
-    style rake fill:#lightcoral,stroke:#c0392b,stroke-width:1px,color:#000;
-    style webrick fill:#lightcoral,stroke:#c0392b,stroke-width:1px,color:#000;
+    style elasticgraph-local color:DodgerBlue,stroke-width:2px,stroke:DodgerBlue;
+    style elasticgraph-admin color:Green,stroke:Green;
+    style elasticgraph-graphql color:Green,stroke:Green;
+    style elasticgraph-indexer color:Green,stroke:Green;
+    style elasticgraph-rack color:Green,stroke:Green;
+    style elasticgraph-schema_definition color:Green,stroke:Green;
+    style rackup color:Red,stroke:Red;
+    style rake color:Red,stroke:Red;
+    style webrick color:Red,stroke:Red;
+    click rackup href "https://rubygems.org/gems/rackup" "Open on RubyGems.org" _blank;
+    click rake href "https://rubygems.org/gems/rake" "Open on RubyGems.org" _blank;
+    click webrick href "https://rubygems.org/gems/webrick" "Open on RubyGems.org" _blank;
 ```
 
 ## Installation

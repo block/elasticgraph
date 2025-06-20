@@ -15,9 +15,10 @@ graph LR;
     elasticgraph-indexer --> elasticgraph-json_schema;
     elasticgraph-schema_definition["elasticgraph-schema_definition"];
     elasticgraph-schema_definition --> elasticgraph-json_schema;
-    style elasticgraph-json_schema fill:#lightblue,stroke:#2980b9,stroke-width:2px,color:#000;
-    style elasticgraph-support fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
-    style json_schemer fill:#lightcoral,stroke:#c0392b,stroke-width:1px,color:#000;
-    style elasticgraph-indexer fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
-    style elasticgraph-schema_definition fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
+    style elasticgraph-json_schema color:DodgerBlue,stroke-width:2px,stroke:DodgerBlue;
+    style elasticgraph-support color:Green,stroke:Green;
+    style json_schemer color:Red,stroke:Red;
+    style elasticgraph-indexer color:Green,stroke:Green;
+    style elasticgraph-schema_definition color:Green,stroke:Green;
+    click json_schemer href "https://rubygems.org/gems/json_schemer" "Open on RubyGems.org" _blank;
 ```

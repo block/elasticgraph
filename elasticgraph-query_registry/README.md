@@ -44,12 +44,15 @@ graph LR;
     elasticgraph-query_registry --> graphql-c_parser;
     rake["rake"];
     elasticgraph-query_registry --> rake;
-    style elasticgraph-query_registry fill:#lightblue,stroke:#2980b9,stroke-width:2px,color:#000;
-    style elasticgraph-graphql fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
-    style elasticgraph-support fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
-    style graphql fill:#lightcoral,stroke:#c0392b,stroke-width:1px,color:#000;
-    style graphql-c_parser fill:#lightcoral,stroke:#c0392b,stroke-width:1px,color:#000;
-    style rake fill:#lightcoral,stroke:#c0392b,stroke-width:1px,color:#000;
+    style elasticgraph-query_registry color:DodgerBlue,stroke-width:2px,stroke:DodgerBlue;
+    style elasticgraph-graphql color:Green,stroke:Green;
+    style elasticgraph-support color:Green,stroke:Green;
+    style graphql color:Red,stroke:Red;
+    style graphql-c_parser color:Red,stroke:Red;
+    style rake color:Red,stroke:Red;
+    click graphql href "https://rubygems.org/gems/graphql" "Open on RubyGems.org" _blank;
+    click graphql-c_parser href "https://rubygems.org/gems/graphql-c_parser" "Open on RubyGems.org" _blank;
+    click rake href "https://rubygems.org/gems/rake" "Open on RubyGems.org" _blank;
 ```
 
 ## Query Verification Guarantees
