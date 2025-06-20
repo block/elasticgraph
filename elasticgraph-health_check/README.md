@@ -26,17 +26,20 @@ overall status will be `degraded`. If the recency checks pass, but at least one 
 
 ```mermaid
 graph LR;
+    classDef currentGemStyle fill:#E0EFFF,stroke:#70A1D7,color:#000,stroke-width:2px;
+    classDef internalEgGemStyle fill:#D4EFDF,stroke:#58D68D,color:#000;
+    classDef externalGemStyle fill:#FADBD8,stroke:#EC7063,color:#000;
     elasticgraph-health_check["elasticgraph-health_check"];
+    class elasticgraph-health_check currentGemStyle;
     elasticgraph-datastore_core["elasticgraph-datastore_core"];
     elasticgraph-health_check --> elasticgraph-datastore_core;
+    class elasticgraph-datastore_core internalEgGemStyle;
     elasticgraph-graphql["elasticgraph-graphql"];
     elasticgraph-health_check --> elasticgraph-graphql;
+    class elasticgraph-graphql internalEgGemStyle;
     elasticgraph-support["elasticgraph-support"];
     elasticgraph-health_check --> elasticgraph-support;
-    style elasticgraph-health_check color:DodgerBlue,stroke-width:2px,stroke:DodgerBlue;
-    style elasticgraph-datastore_core color:Green,stroke:Green;
-    style elasticgraph-graphql color:Green,stroke:Green;
-    style elasticgraph-support color:Green,stroke:Green;
+    class elasticgraph-support internalEgGemStyle;
 ```
 
 ## Integration

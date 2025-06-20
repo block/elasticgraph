@@ -8,14 +8,17 @@ how.
 
 ```mermaid
 graph LR;
+    classDef currentGemStyle fill:#E0EFFF,stroke:#70A1D7,color:#000,stroke-width:2px;
+    classDef internalEgGemStyle fill:#D4EFDF,stroke:#58D68D,color:#000;
+    classDef externalGemStyle fill:#FADBD8,stroke:#EC7063,color:#000;
     elasticgraph-query_interceptor["elasticgraph-query_interceptor"];
+    class elasticgraph-query_interceptor currentGemStyle;
     elasticgraph-graphql["elasticgraph-graphql"];
     elasticgraph-query_interceptor --> elasticgraph-graphql;
+    class elasticgraph-graphql internalEgGemStyle;
     elasticgraph-schema_artifacts["elasticgraph-schema_artifacts"];
     elasticgraph-query_interceptor --> elasticgraph-schema_artifacts;
-    style elasticgraph-query_interceptor color:DodgerBlue,stroke-width:2px,stroke:DodgerBlue;
-    style elasticgraph-graphql color:Green,stroke:Green;
-    style elasticgraph-schema_artifacts color:Green,stroke:Green;
+    class elasticgraph-schema_artifacts internalEgGemStyle;
 ```
 
 ## Setup

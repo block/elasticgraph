@@ -9,25 +9,28 @@ It is not meant to be used directly by end users of ElasticGraph.
 
 ```mermaid
 graph LR;
+    classDef currentGemStyle fill:#E0EFFF,stroke:#70A1D7,color:#000,stroke-width:2px;
+    classDef internalEgGemStyle fill:#D4EFDF,stroke:#58D68D,color:#000;
+    classDef externalGemStyle fill:#FADBD8,stroke:#EC7063,color:#000;
     elasticgraph-lambda_support["elasticgraph-lambda_support"];
+    class elasticgraph-lambda_support currentGemStyle;
     elasticgraph-opensearch["elasticgraph-opensearch"];
     elasticgraph-lambda_support --> elasticgraph-opensearch;
+    class elasticgraph-opensearch internalEgGemStyle;
     faraday_middleware-aws-sigv4["faraday_middleware-aws-sigv4"];
     elasticgraph-lambda_support --> faraday_middleware-aws-sigv4;
+    class faraday_middleware-aws-sigv4 externalGemStyle;
     elasticgraph-admin_lambda["elasticgraph-admin_lambda"];
     elasticgraph-admin_lambda --> elasticgraph-lambda_support;
+    class elasticgraph-admin_lambda internalEgGemStyle;
     elasticgraph-graphql_lambda["elasticgraph-graphql_lambda"];
     elasticgraph-graphql_lambda --> elasticgraph-lambda_support;
+    class elasticgraph-graphql_lambda internalEgGemStyle;
     elasticgraph-indexer_autoscaler_lambda["elasticgraph-indexer_autoscaler_lambda"];
     elasticgraph-indexer_autoscaler_lambda --> elasticgraph-lambda_support;
+    class elasticgraph-indexer_autoscaler_lambda internalEgGemStyle;
     elasticgraph-indexer_lambda["elasticgraph-indexer_lambda"];
     elasticgraph-indexer_lambda --> elasticgraph-lambda_support;
-    style elasticgraph-lambda_support color:DodgerBlue,stroke-width:2px,stroke:DodgerBlue;
-    style elasticgraph-opensearch color:Green,stroke:Green;
-    style faraday_middleware-aws-sigv4 color:Red,stroke:Red;
-    style elasticgraph-admin_lambda color:Green,stroke:Green;
-    style elasticgraph-graphql_lambda color:Green,stroke:Green;
-    style elasticgraph-indexer_autoscaler_lambda color:Green,stroke:Green;
-    style elasticgraph-indexer_lambda color:Green,stroke:Green;
+    class elasticgraph-indexer_lambda internalEgGemStyle;
     click faraday_middleware-aws-sigv4 href "https://rubygems.org/gems/faraday_middleware-aws-sigv4" "Open on RubyGems.org" _blank;
 ```

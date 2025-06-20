@@ -33,23 +33,26 @@ if desired based on a configuration setting.
 
 ```mermaid
 graph LR;
+    classDef currentGemStyle fill:#E0EFFF,stroke:#70A1D7,color:#000,stroke-width:2px;
+    classDef internalEgGemStyle fill:#D4EFDF,stroke:#58D68D,color:#000;
+    classDef externalGemStyle fill:#FADBD8,stroke:#EC7063,color:#000;
     elasticgraph-query_registry["elasticgraph-query_registry"];
+    class elasticgraph-query_registry currentGemStyle;
     elasticgraph-graphql["elasticgraph-graphql"];
     elasticgraph-query_registry --> elasticgraph-graphql;
+    class elasticgraph-graphql internalEgGemStyle;
     elasticgraph-support["elasticgraph-support"];
     elasticgraph-query_registry --> elasticgraph-support;
+    class elasticgraph-support internalEgGemStyle;
     graphql["graphql"];
     elasticgraph-query_registry --> graphql;
+    class graphql externalGemStyle;
     graphql-c_parser["graphql-c_parser"];
     elasticgraph-query_registry --> graphql-c_parser;
+    class graphql-c_parser externalGemStyle;
     rake["rake"];
     elasticgraph-query_registry --> rake;
-    style elasticgraph-query_registry color:DodgerBlue,stroke-width:2px,stroke:DodgerBlue;
-    style elasticgraph-graphql color:Green,stroke:Green;
-    style elasticgraph-support color:Green,stroke:Green;
-    style graphql color:Red,stroke:Red;
-    style graphql-c_parser color:Red,stroke:Red;
-    style rake color:Red,stroke:Red;
+    class rake externalGemStyle;
     click graphql href "https://rubygems.org/gems/graphql" "Open on RubyGems.org" _blank;
     click graphql-c_parser href "https://rubygems.org/gems/graphql-c_parser" "Open on RubyGems.org" _blank;
     click rake href "https://rubygems.org/gems/rake" "Open on RubyGems.org" _blank;

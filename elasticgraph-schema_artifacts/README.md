@@ -6,27 +6,30 @@ Contains code related to ElasticGraph's generated schema artifacts.
 
 ```mermaid
 graph LR;
+    classDef currentGemStyle fill:#E0EFFF,stroke:#70A1D7,color:#000,stroke-width:2px;
+    classDef internalEgGemStyle fill:#D4EFDF,stroke:#58D68D,color:#000;
+    classDef externalGemStyle fill:#FADBD8,stroke:#EC7063,color:#000;
     elasticgraph-schema_artifacts["elasticgraph-schema_artifacts"];
+    class elasticgraph-schema_artifacts currentGemStyle;
     elasticgraph-support["elasticgraph-support"];
     elasticgraph-schema_artifacts --> elasticgraph-support;
+    class elasticgraph-support internalEgGemStyle;
     elasticgraph-admin["elasticgraph-admin"];
     elasticgraph-admin --> elasticgraph-schema_artifacts;
+    class elasticgraph-admin internalEgGemStyle;
     elasticgraph-datastore_core["elasticgraph-datastore_core"];
     elasticgraph-datastore_core --> elasticgraph-schema_artifacts;
+    class elasticgraph-datastore_core internalEgGemStyle;
     elasticgraph-graphql["elasticgraph-graphql"];
     elasticgraph-graphql --> elasticgraph-schema_artifacts;
+    class elasticgraph-graphql internalEgGemStyle;
     elasticgraph-indexer["elasticgraph-indexer"];
     elasticgraph-indexer --> elasticgraph-schema_artifacts;
+    class elasticgraph-indexer internalEgGemStyle;
     elasticgraph-query_interceptor["elasticgraph-query_interceptor"];
     elasticgraph-query_interceptor --> elasticgraph-schema_artifacts;
+    class elasticgraph-query_interceptor internalEgGemStyle;
     elasticgraph-schema_definition["elasticgraph-schema_definition"];
     elasticgraph-schema_definition --> elasticgraph-schema_artifacts;
-    style elasticgraph-schema_artifacts color:DodgerBlue,stroke-width:2px,stroke:DodgerBlue;
-    style elasticgraph-support color:Green,stroke:Green;
-    style elasticgraph-admin color:Green,stroke:Green;
-    style elasticgraph-datastore_core color:Green,stroke:Green;
-    style elasticgraph-graphql color:Green,stroke:Green;
-    style elasticgraph-indexer color:Green,stroke:Green;
-    style elasticgraph-query_interceptor color:Green,stroke:Green;
-    style elasticgraph-schema_definition color:Green,stroke:Green;
+    class elasticgraph-schema_definition internalEgGemStyle;
 ```

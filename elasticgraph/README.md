@@ -7,14 +7,17 @@ parts of ElasticGraph are used from the same deployed app.
 
 ```mermaid
 graph LR;
+    classDef currentGemStyle fill:#E0EFFF,stroke:#70A1D7,color:#000,stroke-width:2px;
+    classDef internalEgGemStyle fill:#D4EFDF,stroke:#58D68D,color:#000;
+    classDef externalGemStyle fill:#FADBD8,stroke:#EC7063,color:#000;
     elasticgraph["elasticgraph"];
+    class elasticgraph currentGemStyle;
     elasticgraph-support["elasticgraph-support"];
     elasticgraph --> elasticgraph-support;
+    class elasticgraph-support internalEgGemStyle;
     thor["thor"];
     elasticgraph --> thor;
-    style elasticgraph color:DodgerBlue,stroke-width:2px,stroke:DodgerBlue;
-    style elasticgraph-support color:Green,stroke:Green;
-    style thor color:Red,stroke:Red;
+    class thor externalGemStyle;
     click thor href "https://rubygems.org/gems/thor" "Open on RubyGems.org" _blank;
 ```
 

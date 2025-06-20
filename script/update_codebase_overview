@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 require "erb"
+require "fileutils"
 require_relative "list_eg_gems"
 
 module ElasticGraph
@@ -17,11 +18,8 @@ module ElasticGraph
 
     def gem_specs
       @gem_specs ||= ::ElasticGraphGems.list.map do |gem_name|
-        # Ensure gemspec path is absolute and correct
         gemspec_path = File.join(PROJECT_ROOT, gem_name, "#{gem_name}.gemspec")
         unless File.exist?(gemspec_path)
-          # This should ideally not happen if ElasticGraphGems.list is accurate
-          # but good for robustness if script is run in unusual states.
           warn "Warning: Gemspec not found for #{gem_name} at #{gemspec_path}. Skipping."
           next nil
         end
@@ -31,7 +29,7 @@ module ElasticGraph
           warn "Warning: Failed to load gemspec for #{gem_name} at #{gemspec_path}. Error: #{e.message}. Skipping."
           next nil
         end
-      end.compact # compact to remove any nils from failed loads
+      end.compact
     end
 
     def gem_categories
@@ -45,7 +43,7 @@ module ElasticGraph
         end
 
         CategoryInfo::BY_NAME.map do |category, category_info|
-          specs = specs_by_category.fetch(category, []) # Use fetch with default to avoid error if category has no gems
+          specs = specs_by_category.fetch(category, [])
           GemCategory.new(category, category_info, specs, gem_specs)
         end
       end
@@ -53,9 +51,14 @@ module ElasticGraph
   end
 
   class IndividualGemReadmeProcessor
+    # Consistent styling constants
+    STYLE_CURRENT_GEM = "fill:#E0EFFF,stroke:#70A1D7,color:#000,stroke-width:2px"
+    STYLE_INTERNAL_EG_GEM = "fill:#D4EFDF,stroke:#58D68D,color:#000"
+    STYLE_EXTERNAL_GEM = "fill:#FADBD8,stroke:#EC7063,color:#000"
+
     def initialize(gem_spec, all_specs, project_root)
       @gem_spec = gem_spec
-      @all_specs = all_specs # This should be an array of Gem::Specification objects
+      @all_specs = all_specs
       @project_root = project_root
       @readme_path = File.join(@project_root, @gem_spec.name, "README.md")
     end
@@ -82,50 +85,38 @@ module ElasticGraph
       current_gem_name = @gem_spec.name
 
       mermaid_lines = ["graph LR;"]
-      # Explicitly define the current gem node with its name as the label.
-      mermaid_lines << "    #{current_gem_name}[\"#{current_gem_name}\"];" 
+      # Define classes first
+      mermaid_lines << "    classDef currentGemStyle #{STYLE_CURRENT_GEM};"
+      mermaid_lines << "    classDef internalEgGemStyle #{STYLE_INTERNAL_EG_GEM};"
+      mermaid_lines << "    classDef externalGemStyle #{STYLE_EXTERNAL_GEM};"
+
+      # Define current gem node and apply its class
+      mermaid_lines << "    #{current_gem_name}[\"#{current_gem_name}\"];"
+      mermaid_lines << "    class #{current_gem_name} currentGemStyle;"
+
       all_node_names_in_diagram = Set.new([current_gem_name])
-      external_deps_for_links = Set.new # To collect external deps for click links
+      external_deps_for_links = Set.new
 
       unless deps.empty?
         deps.each do |dep_name|
-          # Define dependency node with its name as label before creating link
           mermaid_lines << "    #{dep_name}[\"#{dep_name}\"];"
           mermaid_lines << "    #{current_gem_name} --> #{dep_name};"
           all_node_names_in_diagram.add(dep_name)
-          # Check if this dependency is external
-          unless @all_specs.any? { |s| s.name == dep_name }
-            external_deps_for_links.add(dep_name)
-          end
+          is_internal = @all_specs.any? { |s| s.name == dep_name }
+          mermaid_lines << "    class #{dep_name} #{is_internal ? 'internalEgGemStyle' : 'externalGemStyle'};"
+          external_deps_for_links.add(dep_name) unless is_internal
         end
       end
 
       unless dependents.empty?
         dependents.each do |dep_name|
-          # Define dependent node with its name as label before creating link
           mermaid_lines << "    #{dep_name}[\"#{dep_name}\"];"
           mermaid_lines << "    #{dep_name} --> #{current_gem_name};"
           all_node_names_in_diagram.add(dep_name)
+          mermaid_lines << "    class #{dep_name} internalEgGemStyle;" # Dependents are always internal EG gems
         end
-      end
-      
-      # Apply direct styles using the `style` keyword, focusing on text/border color
-      all_node_names_in_diagram.each do |node_name|
-        style_string = ""
-        if node_name == current_gem_name
-          # Current gem: DodgerBlue text/border, thicker border
-          style_string = "color:DodgerBlue,stroke-width:2px,stroke:DodgerBlue" 
-        elsif @all_specs.any? { |s| s.name == node_name }
-          # Internal EG gem: Green text/border
-          style_string = "color:Green,stroke:Green" 
-        else
-          # External gem: Red text/border
-          style_string = "color:Red,stroke:Red" 
-        end
-        mermaid_lines << "    style #{node_name} #{style_string};"
       end
 
-      # Add click links for external dependencies
       external_deps_for_links.each do |ext_dep_name|
         mermaid_lines << "    click #{ext_dep_name} href \"https://rubygems.org/gems/#{ext_dep_name}\" \"Open on RubyGems.org\" _blank;"
       end
@@ -137,150 +128,94 @@ module ElasticGraph
       unless File.exist?(@readme_path)
         return {status: :error, message: "README for #{@gem_spec.name} at #{@readme_path} is missing."}
       end
-
       content = File.read(@readme_path)
       if content.strip.empty?
         return {status: :error, message: "README for #{@gem_spec.name} at #{@readme_path} is empty."}
       end
-
       first_line = content.lines.first
       unless first_line && first_line.start_with?("# ")
         return {status: :error, message: "README for #{@gem_spec.name} at #{@readme_path} does not start with an H1 title."}
       end
-
       {status: :ok, content: content}
     end
 
     private def _isolate_intro_and_tail(readme_lines_after_h1)
       intro_lines = []
-      tail_content_lines = [] # Renamed for clarity
-
-      # Find the index of the first H2 heading (e.g., "## Some Other Section")
-      # or the specific "## Dependency Diagram" heading.
-      first_h2_or_diagram_heading_index = readme_lines_after_h1.find_index do |line|
-        line.strip.start_with?("## ")
-      end
+      tail_content_lines = []
+      first_h2_or_diagram_heading_index = readme_lines_after_h1.find_index { |line| line.strip.start_with?("## ") }
 
       if first_h2_or_diagram_heading_index.nil?
-        # No H2 headings found after H1, so all remaining lines are considered intro.
         intro_lines = readme_lines_after_h1
       else
-        # H2 heading(s) exist. Intro is everything before the first one.
         intro_lines = readme_lines_after_h1[0...first_h2_or_diagram_heading_index]
-
-        # Now, from the first H2 onwards, find where the "## Dependency Diagram" section is (if it exists)
-        # and what comes after it.
         content_from_first_h2 = readme_lines_after_h1[first_h2_or_diagram_heading_index..]
-
-        diagram_heading_index_in_remaining = content_from_first_h2.find_index do |line|
-          line.strip == "## Dependency Diagram"
-        end
+        diagram_heading_index_in_remaining = content_from_first_h2.find_index { |line| line.strip == "## Dependency Diagram" }
 
         if diagram_heading_index_in_remaining.nil?
-          # "## Dependency Diagram" not found, so all content_from_first_h2 is considered tail.
           tail_content_lines = content_from_first_h2
         else
-          # "## Dependency Diagram" found.
-          # Tail starts with content before the diagram heading (if any H2s were before it).
           tail_content_lines.concat(content_from_first_h2[0...diagram_heading_index_in_remaining])
-
-          # Now, skip the diagram heading and its Mermaid block.
-          current_search_index_in_remaining = diagram_heading_index_in_remaining + 1 # Start after "## Dependency Diagram" line
+          current_search_index_in_remaining = diagram_heading_index_in_remaining + 1
           mermaid_block_started = false
           mermaid_block_ended = false
-
           while current_search_index_in_remaining < content_from_first_h2.length
             line_strip = content_from_first_h2[current_search_index_in_remaining].strip
             if !mermaid_block_started && line_strip == "```mermaid"
               mermaid_block_started = true
             elsif mermaid_block_started && !mermaid_block_ended && line_strip == "```"
               mermaid_block_ended = true
-              # Move past the closing ```
               current_search_index_in_remaining += 1
-              break # Found end of mermaid block
+              break
             end
             current_search_index_in_remaining += 1
           end
-
-          # If a mermaid block was started (and potentially ended), append the rest of the content.
-          if mermaid_block_started # Check if we even entered a mermaid block
-            # If mermaid_block_ended is true, current_search_index_in_remaining is already past it.
-            # If mermaid_block_ended is false, it means we hit EOF inside mermaid block (malformed)
-            # or the block was empty. In any case, take from current_search_index_in_remaining.
+          if mermaid_block_started
             if current_search_index_in_remaining < content_from_first_h2.length
               tail_content_lines.concat(content_from_first_h2[current_search_index_in_remaining..])
             end
           elsif diagram_heading_index_in_remaining + 1 < content_from_first_h2.length
-            # No mermaid block found after "## Dependency Diagram" heading,
-            # so the rest of the content_from_first_h2 (after the heading line) is tail.
             tail_content_lines.concat(content_from_first_h2[(diagram_heading_index_in_remaining + 1)..])
           end
         end
       end
-
-      # Join lines and strip only at the very end to preserve internal structure.
-      # Ensure there are no excessive newlines between intro and the start of tail_content_lines.
-      intro_str = intro_lines.join
-      tail_str = tail_content_lines.join
-
       {
-        intro_content: intro_str.chomp, # Chomp trailing newlines from intro part
-        tail_content: tail_str.chomp    # Chomp trailing newlines from tail part
+        intro_content: intro_lines.join.chomp,
+        tail_content: tail_content_lines.join.chomp
       }
     end
 
     public def construct_expected_readme(actual_readme_content, new_mermaid_diagram_block)
       lines = actual_readme_content.lines
-      h1_line = lines.first # Keep its original newline
-
+      h1_line = lines.first
       readme_lines_after_h1 = lines[1..] || []
       parsed_parts = _isolate_intro_and_tail(readme_lines_after_h1)
-
-      components = [h1_line] # h1_line includes its newline
-
+      components = [h1_line]
       intro_text = parsed_parts[:intro_content]
-      # Add intro if it's not just whitespace.
-      # Ensure there's a blank line after intro if it's not empty,
-      # or after H1 if intro is empty, before "## Dependency Diagram".
       if !intro_text.strip.empty?
         components << intro_text
-        components << "\n" # Ensure separation if intro_text didn't end with \n\n
+        components << "\n"
       end
-
-      # Always ensure a blank line before the "## Dependency Diagram" heading,
-      # unless the intro itself was empty and H1 already provided one.
       components << "\n" unless components.last.end_with?("\n\n") || components.last.end_with?("\n") && components.length == 1
-
       components << "## Dependency Diagram\n"
-      components << "\n" # Blank line after heading
-      components << new_mermaid_diagram_block.strip # Mermaid block itself
-      components << "\n" # Blank line after mermaid block
-
+      components << "\n"
+      components << new_mermaid_diagram_block.strip
+      components << "\n"
       tail_text = parsed_parts[:tail_content]
       if !tail_text.strip.empty?
-        components << "\n" # Ensure separation before tail_text
+        components << "\n"
         components << tail_text
       end
-
-      # Join all components. If any component already ends with sufficient newlines,
-      # `join` handles it. Add a final newline if not present.
       final_content = components.join
       final_content += "\n" unless final_content.end_with?("\n")
-
-      # Normalize multiple blank lines down to a single blank line (two newlines)
       final_content.gsub(/\n{3,}/, "\n\n")
     end
 
     public def process
       pre_flight_result = perform_readme_pre_flight_check
-
       return pre_flight_result if pre_flight_result[:status] == :error
-
       actual_content = pre_flight_result[:content]
-
       new_mermaid_diagram = generate_mermaid_diagram
       expected_content = construct_expected_readme(actual_content, new_mermaid_diagram)
-
       {
         status: :ok,
         actual_content: actual_content,
@@ -292,13 +227,28 @@ module ElasticGraph
   end
 
   class GemCategory < ::Data.define(:category_name, :info, :gem_specs, :all_eg_gem_specs)
+    # Consistent styling constants, matching IndividualGemReadmeProcessor where applicable
+    STYLE_CURRENT_CATEGORY_GEM = "fill:#E0EFFF,stroke:#70A1D7,color:#000,stroke-width:1.5px" # Slightly less thick than current gem in its own README
+    STYLE_OTHER_EG_GEM = "fill:#D4EFDF,stroke:#58D68D,color:#000"
+    STYLE_EXTERNAL_CATEGORY_GEM = "fill:#FADBD8,stroke:#EC7063,color:#000"
+
     def mermaid_definition
-      return "" if gem_specs.empty? # Handle empty categories gracefully
+      return "" if gem_specs.empty?
+      class_defs = [
+        "    classDef currentCategoryGemStyle #{STYLE_CURRENT_CATEGORY_GEM};",
+        "    classDef otherEgGemStyle #{STYLE_OTHER_EG_GEM};",
+        "    classDef externalGemCatStyle #{STYLE_EXTERNAL_CATEGORY_GEM};"
+      ]
+      # Ensure all nodes are defined with labels so classes can be applied
+      node_definitions = all_nodes_in_category_diagrams.map { |name| "    #{name}[\"#{name}\"];" }
+
       <<~MERMAID
         ```mermaid
         graph LR;
+        #{class_defs.join("\n")}
+        #{node_definitions.uniq.join("\n")}
         #{mermaid_deps.join("\n")}
-        #{mermaid_styles.join("\n")}
+        #{mermaid_node_classes.join("\n")}
         #{mermaid_clicks.join("\n")}
         ```
       MERMAID
@@ -307,39 +257,45 @@ module ElasticGraph
     private
 
     def mermaid_deps
-      gem_specs.filter_map do |spec|
-        # Ensure spec.runtime_dependencies is not nil and not empty
-        unless spec.runtime_dependencies.nil? || spec.runtime_dependencies.empty?
-          # Ensure dependency names are valid for Mermaid node IDs (e.g., no special chars not handled by Mermaid)
-          # For simple names, this is fine. Complex names might need sanitization.
-          deps = spec.runtime_dependencies.map(&:name).join(" & ")
-          "    #{spec.name} --> #{deps}"
+      # Create individual links for each dependency for proper styling and linking
+      gem_specs.flat_map do |spec|
+        next if spec.runtime_dependencies.nil? || spec.runtime_dependencies.empty?
+        spec.runtime_dependencies.map do |dep|
+          "    #{spec.name} --> #{dep.name};"
         end
-      end
+      end.compact
     end
 
-    def mermaid_styles
-      all_nodes = gem_specs.map(&:name) | gem_specs.flat_map { |spec| spec.runtime_dependencies.map(&:name) }
-      all_nodes.compact.uniq.map do |node| # Add compact and uniq for robustness
-        "    style #{node} #{style_for(node)};"
+    def all_nodes_in_category_diagrams
+      # Collect all unique node names appearing in this category's diagrams
+      nodes = Set.new
+      gem_specs.each do |spec|
+        nodes.add(spec.name)
+        spec.runtime_dependencies.each { |dep| nodes.add(dep.name) }
       end
+      nodes.to_a.compact.uniq
     end
 
-    def style_for(gem_name)
-      # These colors were chosen to look good on GitHub in both light mode and dark mode.
-      if gem_specs.any? { |spec| spec.name == gem_name }
-        "color:DodgerBlue" # Basic "Blue" doesn't look good in dark mode.
-      elsif all_eg_gem_specs.any? { |spec| spec.name == gem_name }
-        "color:Green"
-      else
-        "color:Red"
+    def mermaid_node_classes
+      all_nodes_in_category_diagrams.map do |node_name|
+        class_name = if gem_specs.any? { |spec| spec.name == node_name }
+                       "currentCategoryGemStyle" # Gem is in the current category being displayed
+                     elsif all_eg_gem_specs.any? { |spec| spec.name == node_name }
+                       "otherEgGemStyle"       # Gem is another ElasticGraph gem (not in this category)
+                     else
+                       "externalGemCatStyle"   # Gem is external
+                     end
+        "    class #{node_name} #{class_name};"
       end
     end
 
     def mermaid_clicks
-      gem_specs.flat_map { |spec| spec.runtime_dependencies.map(&:name) }.compact.uniq.sort.filter_map do |gem_name|
-        unless all_eg_gem_specs.any? { |spec| spec.name == gem_name }
-          "click #{gem_name} href \"https://rubygems.org/gems/#{gem_name}\" \"Open on RubyGems.org\" _blank;"
+      all_nodes_in_category_diagrams.filter_map do |gem_name|
+        # Add click only for external gems
+        is_internal_in_category = gem_specs.any? { |spec| spec.name == gem_name }
+        is_other_eg_gem = all_eg_gem_specs.any? { |spec| spec.name == gem_name }
+        unless is_internal_in_category || is_other_eg_gem
+          "    click #{gem_name} href \"https://rubygems.org/gems/#{gem_name}\" \"Open on RubyGems.org\" _blank;"
         end
       end
     end
@@ -413,8 +369,6 @@ when "--verify"
       puts "✅ #{spec.name} README diagram is up-to-date."
     else
       readme_errors << "❌ #{spec.name} README diagram at #{result[:readme_path]} is out-of-date or improperly formatted."
-      # Optionally, provide a diff for individual READMEs if desired (more complex)
-      # For now, just a message.
     end
   end
 
