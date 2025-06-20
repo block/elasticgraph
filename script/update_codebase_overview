@@ -2,7 +2,6 @@
 
 require "erb"
 require_relative "list_eg_gems"
-require "set" # Added for Set
 
 module ElasticGraph
   class CodebaseOverviewRenderer
@@ -41,12 +40,11 @@ module ElasticGraph
   end
 
   class IndividualGemReadmeProcessor
-
     def initialize(gem_spec, all_specs, project_root)
       @gem_spec = gem_spec
       @all_specs = all_specs # This should be an array of Gem::Specification objects
       @project_root = project_root
-      @readme_path = File.join(@project_root, @gem_spec.name, "README.md") 
+      @readme_path = File.join(@project_root, @gem_spec.name, "README.md")
     end
 
     def direct_dependencies
@@ -92,7 +90,7 @@ module ElasticGraph
           all_node_names_in_diagram.add(dep_name)
         end
       end
-      
+
       mermaid_lines << "    classDef currentGemStyle fill:#lightblue,stroke:#333,stroke-width:2px;"
       mermaid_lines << "    classDef internalEgGemStyle fill:#lightgreen,stroke:#333,stroke-width:1px;"
       mermaid_lines << "    classDef externalGemStyle fill:#lightcoral,stroke:#333,stroke-width:1px;"
@@ -100,17 +98,17 @@ module ElasticGraph
 
       all_node_names_in_diagram.each do |node_name|
         style_class = case node_name
-                      when current_gem_name
-                        "currentGemStyle"
-                      when "no_deps", "no_eg_dependents"
-                        "placeholderNodeStyle"
-                      else
-                        if @all_specs.any? { |s| s.name == node_name }
-                          "internalEgGemStyle"
-                        else
-                          "externalGemStyle"
-                        end
-                      end
+        when current_gem_name
+          "currentGemStyle"
+        when "no_deps", "no_eg_dependents"
+          "placeholderNodeStyle"
+        else
+          if @all_specs.any? { |s| s.name == node_name }
+            "internalEgGemStyle"
+          else
+            "externalGemStyle"
+          end
+        end
         mermaid_lines << "    class #{node_name} #{style_class};"
       end
 
@@ -119,61 +117,61 @@ module ElasticGraph
 
     public def perform_readme_pre_flight_check
       unless File.exist?(@readme_path)
-        return { status: :error, message: "README for #{@gem_spec.name} at #{@readme_path} is missing." }
+        return {status: :error, message: "README for #{@gem_spec.name} at #{@readme_path} is missing."}
       end
 
       content = File.read(@readme_path)
       if content.strip.empty?
-        return { status: :error, message: "README for #{@gem_spec.name} at #{@readme_path} is empty." }
+        return {status: :error, message: "README for #{@gem_spec.name} at #{@readme_path} is empty."}
       end
 
       first_line = content.lines.first
       unless first_line && first_line.start_with?("# ")
-        return { status: :error, message: "README for #{@gem_spec.name} at #{@readme_path} does not start with an H1 title." }
+        return {status: :error, message: "README for #{@gem_spec.name} at #{@readme_path} does not start with an H1 title."}
       end
 
-      { status: :ok, content: content }
+      {status: :ok, content: content}
     end
-    
+
     private def _isolate_intro_and_tail(readme_lines_after_h1)
       intro_lines = []
       tail_lines = []
-      
+
       end_of_intro_index = readme_lines_after_h1.find_index { |line| line.strip.start_with?("## ") }
-      
+
       if end_of_intro_index.nil?
         intro_lines = readme_lines_after_h1
       else
         intro_lines = readme_lines_after_h1[0...end_of_intro_index]
-        h2_onwards_lines = readme_lines_after_h1[end_of_intro_index..-1]
+        h2_onwards_lines = readme_lines_after_h1[end_of_intro_index..]
         diagram_heading_index_in_h2_onwards = h2_onwards_lines.find_index { |line| line.strip == "## Dependency Diagram" }
-        
+
         if diagram_heading_index_in_h2_onwards
           tail_lines.concat(h2_onwards_lines[0...diagram_heading_index_in_h2_onwards])
           current_search_index = diagram_heading_index_in_h2_onwards + 1
           mermaid_block_started = false
           mermaid_block_ended = false
-          
+
           while current_search_index < h2_onwards_lines.length
             line_strip = h2_onwards_lines[current_search_index].strip
             if !mermaid_block_started && line_strip == "```mermaid"
               mermaid_block_started = true
             elsif mermaid_block_started && line_strip == "```"
-              current_search_index += 1 
+              current_search_index += 1
               mermaid_block_ended = true
-              break 
+              break
             end
             current_search_index += 1
           end
-          
+
           if mermaid_block_started && mermaid_block_ended
-            tail_lines.concat(h2_onwards_lines[current_search_index..-1] || [])
+            tail_lines.concat(h2_onwards_lines[current_search_index..] || [])
           end
         else
           tail_lines = h2_onwards_lines
         end
       end
-      
+
       {
         intro_content: intro_lines.join.strip,
         tail_content: tail_lines.join.strip
@@ -182,53 +180,52 @@ module ElasticGraph
 
     public def construct_expected_readme(actual_readme_content, new_mermaid_diagram_block)
       lines = actual_readme_content.lines
-      h1_line = lines.first.strip 
-      
-      readme_lines_after_h1 = lines[1..-1] || []
+      h1_line = lines.first.strip
+
+      readme_lines_after_h1 = lines[1..] || []
       parsed_parts = _isolate_intro_and_tail(readme_lines_after_h1)
 
-      components = [h1_line] 
-      
+      components = [h1_line]
+
       intro_text = parsed_parts[:intro_content]
       unless intro_text.empty?
-        components << "" 
+        components << ""
         components << intro_text
       end
-      
-      components << "" 
+
+      components << ""
       components << "## Dependency Diagram"
-      components << "" 
-      components << new_mermaid_diagram_block.strip 
-      
+      components << ""
+      components << new_mermaid_diagram_block.strip
+
       tail_text = parsed_parts[:tail_content]
       unless tail_text.empty?
-        components << "" 
+        components << ""
         components << tail_text
       end
-      
+
       final_content = components.join("\n") + "\n"
-      final_content.gsub(/\n{3,}/, "\n\n") 
+      final_content.gsub(/\n{3,}/, "\n\n")
     end
 
     public def process
       pre_flight_result = perform_readme_pre_flight_check
-      
+
       return pre_flight_result if pre_flight_result[:status] == :error
-      
+
       actual_content = pre_flight_result[:content]
-      
+
       new_mermaid_diagram = generate_mermaid_diagram
       expected_content = construct_expected_readme(actual_content, new_mermaid_diagram)
-      
-      { 
-        status: :ok, 
-        actual_content: actual_content, 
-        expected_content: expected_content, 
-        gem_name: @gem_spec.name, 
-        readme_path: @readme_path 
+
+      {
+        status: :ok,
+        actual_content: actual_content,
+        expected_content: expected_content,
+        gem_name: @gem_spec.name,
+        readme_path: @readme_path
       }
     end
-
   end
 
   class GemCategory < ::Data.define(:category_name, :info, :gem_specs, :all_eg_gem_specs)
