@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 require "erb"
-require "fileutils"
+require "fileutils" # Ensure FileUtils is available
 require_relative "list_eg_gems"
 
 module ElasticGraph
@@ -19,16 +19,7 @@ module ElasticGraph
     def gem_specs
       @gem_specs ||= ::ElasticGraphGems.list.map do |gem_name|
         gemspec_path = File.join(PROJECT_ROOT, gem_name, "#{gem_name}.gemspec")
-        unless File.exist?(gemspec_path)
-          warn "Warning: Gemspec not found for #{gem_name} at #{gemspec_path}. Skipping."
-          next nil
-        end
-        begin
-          ::Gem::Specification.load(gemspec_path)
-        rescue => e
-          warn "Warning: Failed to load gemspec for #{gem_name} at #{gemspec_path}. Error: #{e.message}. Skipping."
-          next nil
-        end
+        ::Gem::Specification.load(gemspec_path)
       end.compact
     end
 
@@ -51,7 +42,6 @@ module ElasticGraph
   end
 
   class IndividualGemReadmeProcessor
-    # Swapped Red and Blue: Red for current, Blue for external links
     STYLE_CURRENT_GEM = "fill:#FADBD8,stroke:#EC7063,color:#000,stroke-width:2px"      # Light Red/Pink fill, Moderate Red stroke, Black text
     STYLE_INTERNAL_EG_GEM = "fill:#A9DFBF,stroke:#2ECC71,color:#000"                  # Clearer Green fill, Vibrant Green stroke, Black text
     STYLE_EXTERNAL_GEM = "fill:#E0EFFF,stroke:#70A1D7,color:#2980B9"                  # Light Blue fill, Moderate Blue stroke, Blue link text
@@ -193,7 +183,7 @@ module ElasticGraph
         components << intro_text
         components << "\n"
       end
-      components << "\n" unless components.last.end_with?("\n\n") || components.last.end_with?("\n") && components.length == 1
+      components << "\n" if !components.last.end_with?("\n\n") && !(components.last.end_with?("\n") && components.length == 1)
       components << "## Dependency Diagram\n"
       components << "\n"
       components << new_mermaid_diagram_block.strip
@@ -225,7 +215,6 @@ module ElasticGraph
   end
 
   class GemCategory < ::Data.define(:category_name, :info, :gem_specs, :all_eg_gem_specs)
-    # Swapped Red and Blue: Red for current category gems, Blue for external links
     STYLE_CURRENT_CATEGORY_GEM = "fill:#FADBD8,stroke:#EC7063,color:#000,stroke-width:1.5px"  # Light Red/Pink fill, Moderate Red stroke
     STYLE_OTHER_EG_GEM = "fill:#A9DFBF,stroke:#2ECC71,color:#000"                          # Clearer Green fill, Vibrant Green stroke
     STYLE_EXTERNAL_CATEGORY_GEM = "fill:#E0EFFF,stroke:#70A1D7,color:#2980B9"              # Light Blue fill, Moderate Blue stroke, Blue link text
@@ -319,95 +308,109 @@ module ElasticGraph
       EOS
     }
   end
-end
 
-# --- Main script execution ---
-renderer = ElasticGraph::CodebaseOverviewRenderer.new(DATA.read)
-all_gem_specs = renderer.gem_specs # Load all gem specs once
-
-readme_path_overview = ::File.join(ElasticGraph::CodebaseOverviewRenderer::PROJECT_ROOT, "CODEBASE_OVERVIEW.md")
-readme_errors = [] # To collect errors for --verify mode
-
-case ARGV.first
-when "--verify"
-  puts "Verifying CODEBASE_OVERVIEW.md..."
-  generated_overview_contents = renderer.render
-  if ::File.exist?(readme_path_overview) && ::File.read(readme_path_overview) == generated_overview_contents
-    puts "✅ CODEBASE_OVERVIEW.md is up-to-date."
-  else
-    tmp_path = ::File.join(ElasticGraph::CodebaseOverviewRenderer::PROJECT_ROOT, "tmp", "CODEBASE_OVERVIEW.md")
-    ::FileUtils.mkdir_p(File.dirname(tmp_path)) # Ensure tmp directory exists
-    ::File.write(tmp_path, generated_overview_contents)
-
-    diff_command = "git diff --no-index --exit-code #{readme_path_overview} #{tmp_path}"
-    diff_command += " --color" unless ENV["CI"]
-
-    diff_output = `#{diff_command}`
-
-    readme_errors << if $?.success?
-      "❌ CODEBASE_OVERVIEW.md content mismatch but git diff shows no changes. Please investigate."
-    else
-      "❌ CODEBASE_OVERVIEW.md is out-of-date. Diff:\n#{diff_output}"
+  # New class to encapsulate script running logic
+  class DependencyDiagramUpdater
+    def initialize(mode_arg)
+      @mode = mode_arg
+      @project_root = CodebaseOverviewRenderer::PROJECT_ROOT
+      @renderer = CodebaseOverviewRenderer.new(DATA.read) # DATA is from the __END__ block
+      @all_gem_specs = @renderer.gem_specs
+      @overview_readme_path = File.join(@project_root, "CODEBASE_OVERVIEW.md")
+      @readme_errors = []
     end
-  end
 
-  puts "\nVerifying individual gem README dependency diagrams..."
-  all_gem_specs.each do |spec|
-    processor = ElasticGraph::IndividualGemReadmeProcessor.new(spec, all_gem_specs, ElasticGraph::CodebaseOverviewRenderer::PROJECT_ROOT)
-    result = processor.process
-
-    if result[:status] == :error
-      readme_errors << "❌ Error processing #{spec.name}: #{result[:message]}"
-    elsif result[:actual_content] == result[:expected_content]
-      puts "✅ #{spec.name} README diagram is up-to-date."
-    else
-      readme_errors << "❌ #{spec.name} README diagram at #{result[:readme_path]} is out-of-date or improperly formatted."
+    def run
+      case @mode
+      when "--verify"
+        verify_overview_readme
+        process_all_gem_readmes(verify_mode: true)
+        report_verification_results
+      when nil
+        update_overview_readme
+        process_all_gem_readmes(verify_mode: false)
+        puts "\nDependency diagram processing complete."
+        exit 0
+      else
+        warn "Unknown argument: #{@mode}. Expected `--verify` or nothing."
+        exit 1
+      end
     end
-  end
 
-  if readme_errors.empty?
-    puts "\n🎉 All dependency diagrams (CODEBASE_OVERVIEW.md and individual gems) are up-to-date."
-    exit 0
-  else
-    puts "\n--- Verification Summary ---"
-    readme_errors.each { |err| puts err }
-    puts "\nScript verification failed. Please review the errors above."
-    exit 1
-  end
+    private
 
-when nil # Default mode: update files
-  puts "Updating CODEBASE_OVERVIEW.md..."
-  generated_overview_contents = renderer.render
-  ::File.write(readme_path_overview, generated_overview_contents)
-  puts "✅ CODEBASE_OVERVIEW.md updated."
+    def verify_overview_readme
+      puts "Verifying CODEBASE_OVERVIEW.md..."
+      generated_contents = @renderer.render
+      if File.exist?(@overview_readme_path) && File.read(@overview_readme_path) == generated_contents
+        puts "✅ CODEBASE_OVERVIEW.md is up-to-date."
+      else
+        tmp_path = File.join(@project_root, "tmp", "CODEBASE_OVERVIEW.md")
+        FileUtils.mkdir_p(File.dirname(tmp_path))
+        File.write(tmp_path, generated_contents)
+        diff_command = "git diff --no-index --exit-code #{@overview_readme_path} #{tmp_path}"
+        diff_command += " --color" unless ENV["CI"]
+        diff_output = `#{diff_command}`
+        @readme_errors << ($?.success? ?
+          "❌ CODEBASE_OVERVIEW.md content mismatch but git diff shows no changes. Please investigate." :
+          "❌ CODEBASE_OVERVIEW.md is out-of-date. Diff:\n#{diff_output}"
+                          )
+      end
+    end
 
-  puts "\nUpdating individual gem README dependency diagrams..."
-  all_gem_specs.each do |spec|
-    puts "Processing gem #{spec.name}..."
-    processor = ElasticGraph::IndividualGemReadmeProcessor.new(spec, all_gem_specs, ElasticGraph::CodebaseOverviewRenderer::PROJECT_ROOT)
-    result = processor.process
+    def update_overview_readme
+      puts "Updating CODEBASE_OVERVIEW.md..."
+      generated_contents = @renderer.render
+      File.write(@overview_readme_path, generated_contents)
+      puts "✅ CODEBASE_OVERVIEW.md updated."
+    end
 
-    if result[:status] == :error
-      puts "  ❌ Error: #{result[:message]}"
-    elsif result[:actual_content] == result[:expected_content]
-      puts "  ✅ #{result[:readme_path]} dependency diagram is already up-to-date."
-    else
-      begin
-        ::File.write(result[:readme_path], result[:expected_content])
-        puts "  ✅ #{result[:readme_path]} dependency diagram updated."
-      rescue => e
-        puts "  ❌ Failed to write #{result[:readme_path]}: #{e.message}"
+    def process_all_gem_readmes(verify_mode:)
+      action_desc = verify_mode ? "Verifying" : "Updating"
+      puts "\n#{action_desc} individual gem README dependency diagrams..."
+
+      @all_gem_specs.each do |spec|
+        puts "Processing gem #{spec.name}..." unless verify_mode # Only log individual gems when updating
+        processor = IndividualGemReadmeProcessor.new(spec, @all_gem_specs, @project_root)
+        result = processor.process
+
+        if result[:status] == :error
+          message = "❌ Error processing #{spec.name}: #{result[:message]}"
+          verify_mode ? (@readme_errors << message) : (puts "  #{message}")
+        elsif result[:actual_content] == result[:expected_content]
+          puts "#{verify_mode ? "✅" : "  ✅"} #{spec.name} README diagram is up-to-date."
+        elsif verify_mode
+          @readme_errors << "❌ #{spec.name} README diagram at #{result[:readme_path]} is out-of-date or improperly formatted."
+        else
+          begin
+            File.write(result[:readme_path], result[:expected_content])
+            puts "  ✅ #{result[:readme_path]} dependency diagram updated."
+          rescue => e
+            puts "  ❌ Failed to write #{result[:readme_path]}: #{e.message}"
+          end
+        end
+      end
+    end
+
+    def report_verification_results
+      if @readme_errors.empty?
+        puts "\n🎉 All dependency diagrams (CODEBASE_OVERVIEW.md and individual gems) are up-to-date."
+        exit 0
+      else
+        puts "\n--- Verification Summary ---"
+        @readme_errors.each { |err| puts err }
+        puts "\nScript verification failed. Please review the errors above."
+        exit 1
       end
     end
   end
-  puts "\nDependency diagram processing complete."
-  exit 0
-
-else
-  warn "Unknown argument: #{ARGV.first}. Expected `--verify` or nothing."
-  exit 1
 end
 
+# --- Main script execution ---
+if __FILE__ == $PROGRAM_NAME
+  updater = ElasticGraph::DependencyDiagramUpdater.new(ARGV.first)
+  updater.run
+end
 
 __END__
 # ElasticGraph Codebase Overview
