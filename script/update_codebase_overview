@@ -51,9 +51,9 @@ module ElasticGraph
   end
 
   class IndividualGemReadmeProcessor
-    STYLE_CURRENT_GEM = "fill:#AED6F1,stroke:#3498DB,color:#000,stroke-width:2px"      # Clearer Blue
-    STYLE_INTERNAL_EG_GEM = "fill:#A9DFBF,stroke:#2ECC71,color:#000"                  # Clearer Green
-    STYLE_EXTERNAL_GEM = "fill:#F4F6F7,stroke:#B3B6B7,color:#2980B9"                  # Light Grey, Blue text (link-like)
+    STYLE_CURRENT_GEM = "fill:#AED6F1,stroke:#3498DB,color:#000,stroke-width:2px"      # Clearer Blue fill, Stronger Blue stroke
+    STYLE_INTERNAL_EG_GEM = "fill:#A9DFBF,stroke:#2ECC71,color:#000"                  # Clearer Green fill, Vibrant Green stroke
+    STYLE_EXTERNAL_GEM = "fill:#FADBD8,stroke:#EC7063,color:#2980B9"                  # Light Red/Pink fill, Moderate Red stroke, Blue link text
 
     def initialize(gem_spec, all_specs, project_root)
       @gem_spec = gem_spec
@@ -226,7 +226,7 @@ module ElasticGraph
   class GemCategory < ::Data.define(:category_name, :info, :gem_specs, :all_eg_gem_specs)
     STYLE_CURRENT_CATEGORY_GEM = "fill:#AED6F1,stroke:#3498DB,color:#000,stroke-width:1.5px"  # Clearer Blue
     STYLE_OTHER_EG_GEM = "fill:#A9DFBF,stroke:#2ECC71,color:#000"                          # Clearer Green
-    STYLE_EXTERNAL_CATEGORY_GEM = "fill:#F4F6F7,stroke:#B3B6B7,color:#2980B9"              # Light Grey, Blue text
+    STYLE_EXTERNAL_CATEGORY_GEM = "fill:#FADBD8,stroke:#EC7063,color:#2980B9"              # Light Red/Pink fill, Moderate Red stroke, Blue link text
 
     def mermaid_definition
       return "" if gem_specs.empty?

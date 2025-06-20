@@ -22,7 +22,7 @@ These libraries form the core backbone of ElasticGraph that is designed to run i
 graph LR;
     classDef currentCategoryGemStyle fill:#AED6F1,stroke:#3498DB,color:#000,stroke-width:1.5px;
     classDef otherEgGemStyle fill:#A9DFBF,stroke:#2ECC71,color:#000;
-    classDef externalGemCatStyle fill:#F4F6F7,stroke:#B3B6B7,color:#2980B9;
+    classDef externalGemCatStyle fill:#FADBD8,stroke:#EC7063,color:#2980B9;
     elasticgraph-admin["elasticgraph-admin"];
     elasticgraph-datastore_core["elasticgraph-datastore_core"];
     elasticgraph-indexer["elasticgraph-indexer"];
@@ -97,7 +97,7 @@ These libraries wrap the the core ElasticGraph libraries so that they can be dep
 graph LR;
     classDef currentCategoryGemStyle fill:#AED6F1,stroke:#3498DB,color:#000,stroke-width:1.5px;
     classDef otherEgGemStyle fill:#A9DFBF,stroke:#2ECC71,color:#000;
-    classDef externalGemCatStyle fill:#F4F6F7,stroke:#B3B6B7,color:#2980B9;
+    classDef externalGemCatStyle fill:#FADBD8,stroke:#EC7063,color:#2980B9;
     elasticgraph-admin_lambda["elasticgraph-admin_lambda"];
     rake["rake"];
     elasticgraph-admin["elasticgraph-admin"];
@@ -173,7 +173,7 @@ These libraries extend ElasticGraph to provide optional but commonly needed func
 graph LR;
     classDef currentCategoryGemStyle fill:#AED6F1,stroke:#3498DB,color:#000,stroke-width:1.5px;
     classDef otherEgGemStyle fill:#A9DFBF,stroke:#2ECC71,color:#000;
-    classDef externalGemCatStyle fill:#F4F6F7,stroke:#B3B6B7,color:#2980B9;
+    classDef externalGemCatStyle fill:#FADBD8,stroke:#EC7063,color:#2980B9;
     elasticgraph-apollo["elasticgraph-apollo"];
     elasticgraph-graphql["elasticgraph-graphql"];
     elasticgraph-support["elasticgraph-support"];
@@ -231,7 +231,7 @@ These libraries adapt ElasticGraph to your choice of datastore (Elasticsearch or
 graph LR;
     classDef currentCategoryGemStyle fill:#AED6F1,stroke:#3498DB,color:#000,stroke-width:1.5px;
     classDef otherEgGemStyle fill:#A9DFBF,stroke:#2ECC71,color:#000;
-    classDef externalGemCatStyle fill:#F4F6F7,stroke:#B3B6B7,color:#2980B9;
+    classDef externalGemCatStyle fill:#FADBD8,stroke:#EC7063,color:#2980B9;
     elasticgraph-elasticsearch["elasticgraph-elasticsearch"];
     elasticgraph-support["elasticgraph-support"];
     elasticsearch["elasticsearch"];
@@ -276,7 +276,7 @@ These libraries are used for local development of ElasticGraph applications, but
 graph LR;
     classDef currentCategoryGemStyle fill:#AED6F1,stroke:#3498DB,color:#000,stroke-width:1.5px;
     classDef otherEgGemStyle fill:#A9DFBF,stroke:#2ECC71,color:#000;
-    classDef externalGemCatStyle fill:#F4F6F7,stroke:#B3B6B7,color:#2980B9;
+    classDef externalGemCatStyle fill:#FADBD8,stroke:#EC7063,color:#2980B9;
     elasticgraph["elasticgraph"];
     elasticgraph-support["elasticgraph-support"];
     thor["thor"];
