@@ -10,9 +10,9 @@ only depends on `logger` (which originated in the Ruby standard library).
 
 ```mermaid
 graph LR;
-    classDef currentGemStyle fill:#E0EFFF,stroke:#70A1D7,color:#000,stroke-width:2px;
-    classDef internalEgGemStyle fill:#D4EFDF,stroke:#58D68D,color:#000;
-    classDef externalGemStyle fill:#FADBD8,stroke:#EC7063,color:#000;
+    classDef currentGemStyle fill:#AED6F1,stroke:#3498DB,color:#000,stroke-width:2px;
+    classDef internalEgGemStyle fill:#A9DFBF,stroke:#2ECC71,color:#000;
+    classDef externalGemStyle fill:#F4F6F7,stroke:#B3B6B7,color:#2980B9;
     elasticgraph-support["elasticgraph-support"];
     class elasticgraph-support currentGemStyle;
     logger["logger"];
