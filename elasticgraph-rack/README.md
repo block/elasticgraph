@@ -16,10 +16,11 @@ graph LR;
     elasticgraph-rack --> rack;
     elasticgraph-local["elasticgraph-local"];
     elasticgraph-local --> elasticgraph-rack;
-    style elasticgraph-rack fill:#lightblue,stroke:#2980b9,stroke-width:2px,color:#000;
-    style elasticgraph-graphql fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
-    style rack fill:#lightcoral,stroke:#c0392b,stroke-width:1px,color:#000;
-    style elasticgraph-local fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
+    style elasticgraph-rack color:DodgerBlue,stroke-width:2px,stroke:DodgerBlue;
+    style elasticgraph-graphql color:Green,stroke:Green;
+    style rack color:Red,stroke:Red;
+    style elasticgraph-local color:Green,stroke:Green;
+    click rack href "https://rubygems.org/gems/rack" "Open on RubyGems.org" _blank;
 ```
 
 ## Serving an ElasticGraph GraphQL Endpoint

@@ -12,9 +12,10 @@ graph LR;
     elasticgraph --> elasticgraph-support;
     thor["thor"];
     elasticgraph --> thor;
-    style elasticgraph fill:#lightblue,stroke:#2980b9,stroke-width:2px,color:#000;
-    style elasticgraph-support fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
-    style thor fill:#lightcoral,stroke:#c0392b,stroke-width:1px,color:#000;
+    style elasticgraph color:DodgerBlue,stroke-width:2px,stroke:DodgerBlue;
+    style elasticgraph-support color:Green,stroke:Green;
+    style thor color:Red,stroke:Red;
+    click thor href "https://rubygems.org/gems/thor" "Open on RubyGems.org" _blank;
 ```
 
 ## Getting Started

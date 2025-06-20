@@ -83,9 +83,9 @@ module ElasticGraph
 
       mermaid_lines = ["graph LR;"]
       # Explicitly define the current gem node with its name as the label.
-      # This ensures it appears even if it has no connections.
       mermaid_lines << "    #{current_gem_name}[\"#{current_gem_name}\"];" 
       all_node_names_in_diagram = Set.new([current_gem_name])
+      external_deps_for_links = Set.new # To collect external deps for click links
 
       unless deps.empty?
         deps.each do |dep_name|
@@ -93,6 +93,10 @@ module ElasticGraph
           mermaid_lines << "    #{dep_name}[\"#{dep_name}\"];"
           mermaid_lines << "    #{current_gem_name} --> #{dep_name};"
           all_node_names_in_diagram.add(dep_name)
+          # Check if this dependency is external
+          unless @all_specs.any? { |s| s.name == dep_name }
+            external_deps_for_links.add(dep_name)
+          end
         end
       end
 
@@ -105,20 +109,25 @@ module ElasticGraph
         end
       end
       
-      # Apply direct styles using the `style` keyword
+      # Apply direct styles using the `style` keyword, focusing on text/border color
       all_node_names_in_diagram.each do |node_name|
         style_string = ""
         if node_name == current_gem_name
-          # Style for the current gem being processed
-          style_string = "fill:#lightblue,stroke:#2980b9,stroke-width:2px,color:#000"
+          # Current gem: DodgerBlue text/border, thicker border
+          style_string = "color:DodgerBlue,stroke-width:2px,stroke:DodgerBlue" 
         elsif @all_specs.any? { |s| s.name == node_name }
-          # Style for other internal ElasticGraph gems
-          style_string = "fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000"
+          # Internal EG gem: Green text/border
+          style_string = "color:Green,stroke:Green" 
         else
-          # Style for external gems
-          style_string = "fill:#lightcoral,stroke:#c0392b,stroke-width:1px,color:#000"
+          # External gem: Red text/border
+          style_string = "color:Red,stroke:Red" 
         end
         mermaid_lines << "    style #{node_name} #{style_string};"
+      end
+
+      # Add click links for external dependencies
+      external_deps_for_links.each do |ext_dep_name|
+        mermaid_lines << "    click #{ext_dep_name} href \"https://rubygems.org/gems/#{ext_dep_name}\" \"Open on RubyGems.org\" _blank;"
       end
 
       "```mermaid\n#{mermaid_lines.join("\n")}\n```"
@@ -319,18 +328,18 @@ module ElasticGraph
     def style_for(gem_name)
       # These colors were chosen to look good on GitHub in both light mode and dark mode.
       if gem_specs.any? { |spec| spec.name == gem_name }
-        "color: DodgerBlue" # Basic "Blue" doesn't look good in dark mode.
+        "color:DodgerBlue" # Basic "Blue" doesn't look good in dark mode.
       elsif all_eg_gem_specs.any? { |spec| spec.name == gem_name }
-        "color: Green"
+        "color:Green"
       else
-        "color: Red"
+        "color:Red"
       end
     end
 
     def mermaid_clicks
       gem_specs.flat_map { |spec| spec.runtime_dependencies.map(&:name) }.compact.uniq.sort.filter_map do |gem_name|
         unless all_eg_gem_specs.any? { |spec| spec.name == gem_name }
-          "click #{gem_name} href \"https://rubygems.org/gems/#{gem_name}\""
+          "click #{gem_name} href \"https://rubygems.org/gems/#{gem_name}\" \"Open on RubyGems.org\" _blank;"
         end
       end
     end

@@ -11,7 +11,7 @@ graph LR;
     elasticgraph-graphql_lambda --> elasticgraph-graphql;
     elasticgraph-lambda_support["elasticgraph-lambda_support"];
     elasticgraph-graphql_lambda --> elasticgraph-lambda_support;
-    style elasticgraph-graphql_lambda fill:#lightblue,stroke:#2980b9,stroke-width:2px,color:#000;
-    style elasticgraph-graphql fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
-    style elasticgraph-lambda_support fill:#lightgreen,stroke:#27ae60,stroke-width:1px,color:#000;
+    style elasticgraph-graphql_lambda color:DodgerBlue,stroke-width:2px,stroke:DodgerBlue;
+    style elasticgraph-graphql color:Green,stroke:Green;
+    style elasticgraph-lambda_support color:Green,stroke:Green;
 ```
