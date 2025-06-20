@@ -5,6 +5,23 @@ Intended primarily to make it easy to boot ElasticGraph applications locally,
 but could also be used to serve an ElasticGraph application from any Rack
 compatible web server.
 
+## Dependency Diagram
+
+```mermaid
+graph LR;
+    elasticgraph-rack --> elasticgraph-graphql;
+    elasticgraph-rack --> rack;
+    elasticgraph-local --> elasticgraph-rack;
+    classDef currentGemStyle fill:#lightblue,stroke:#333,stroke-width:2px;
+    classDef internalEgGemStyle fill:#lightgreen,stroke:#333,stroke-width:1px;
+    classDef externalGemStyle fill:#lightcoral,stroke:#333,stroke-width:1px;
+    classDef placeholderNodeStyle fill:#eee,stroke:#333,stroke-width:1px;
+    class elasticgraph-rack currentGemStyle;
+    class elasticgraph-graphql internalEgGemStyle;
+    class rack externalGemStyle;
+    class elasticgraph-local internalEgGemStyle;
+```
+
 ## Serving an ElasticGraph GraphQL Endpoint
 
 `ElasticGraph::Rack::GraphQLEndpoint` is a Rack application. Here's an

@@ -22,6 +22,25 @@ The returned status is the worst of the status values from the individual sub-ch
 As mentioned above, the returned status is the worst status of these two checks. E.g. if the datastore cluster(s) are all `green`, but a recency check fails, the
 overall status will be `degraded`. If the recency checks pass, but at least one datastore cluster is `red`, an `unhealthy` status will be returned.
 
+## Dependency Diagram
+
+```mermaid
+graph LR;
+    elasticgraph-health_check --> elasticgraph-datastore_core;
+    elasticgraph-health_check --> elasticgraph-graphql;
+    elasticgraph-health_check --> elasticgraph-support;
+    no_eg_dependents[(No direct EG dependents)] --> elasticgraph-health_check;
+    classDef currentGemStyle fill:#lightblue,stroke:#333,stroke-width:2px;
+    classDef internalEgGemStyle fill:#lightgreen,stroke:#333,stroke-width:1px;
+    classDef externalGemStyle fill:#lightcoral,stroke:#333,stroke-width:1px;
+    classDef placeholderNodeStyle fill:#eee,stroke:#333,stroke-width:1px;
+    class elasticgraph-health_check currentGemStyle;
+    class elasticgraph-datastore_core internalEgGemStyle;
+    class elasticgraph-graphql internalEgGemStyle;
+    class elasticgraph-support internalEgGemStyle;
+    class no_eg_dependents placeholderNodeStyle;
+```
+
 ## Integration
 
 To use, simply register the `EnvoyExtension` when defining your schema:

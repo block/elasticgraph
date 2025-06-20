@@ -2,6 +2,27 @@
 
 Adapts elasticgraph-indexer to run in an AWS Lambda.
 
+## Dependency Diagram
+
+```mermaid
+graph LR;
+    elasticgraph-indexer_lambda --> elasticgraph-indexer;
+    elasticgraph-indexer_lambda --> elasticgraph-lambda_support;
+    elasticgraph-indexer_lambda --> aws-sdk-s3;
+    elasticgraph-indexer_lambda --> ox;
+    no_eg_dependents[(No direct EG dependents)] --> elasticgraph-indexer_lambda;
+    classDef currentGemStyle fill:#lightblue,stroke:#333,stroke-width:2px;
+    classDef internalEgGemStyle fill:#lightgreen,stroke:#333,stroke-width:1px;
+    classDef externalGemStyle fill:#lightcoral,stroke:#333,stroke-width:1px;
+    classDef placeholderNodeStyle fill:#eee,stroke:#333,stroke-width:1px;
+    class elasticgraph-indexer_lambda currentGemStyle;
+    class elasticgraph-indexer internalEgGemStyle;
+    class elasticgraph-lambda_support internalEgGemStyle;
+    class aws-sdk-s3 externalGemStyle;
+    class ox externalGemStyle;
+    class no_eg_dependents placeholderNodeStyle;
+```
+
 ## SQS Message Payload Format
 
 We use [JSON Lines](http://jsonlines.org/) to encode our indexing events. It is just individual JSON objects
