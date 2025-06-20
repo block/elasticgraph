@@ -26,9 +26,9 @@ overall status will be `degraded`. If the recency checks pass, but at least one 
 
 ```mermaid
 graph LR;
-    classDef currentGemStyle fill:#AED6F1,stroke:#3498DB,color:#000,stroke-width:2px;
+    classDef currentGemStyle fill:#FADBD8,stroke:#EC7063,color:#000,stroke-width:2px;
     classDef internalEgGemStyle fill:#A9DFBF,stroke:#2ECC71,color:#000;
-    classDef externalGemStyle fill:#FADBD8,stroke:#EC7063,color:#2980B9;
+    classDef externalGemStyle fill:#E0EFFF,stroke:#70A1D7,color:#2980B9;
     elasticgraph-health_check["elasticgraph-health_check"];
     class elasticgraph-health_check currentGemStyle;
     elasticgraph-datastore_core["elasticgraph-datastore_core"];
