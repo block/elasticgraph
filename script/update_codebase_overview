@@ -5,27 +5,21 @@ require "fileutils" # Ensure FileUtils is available
 require_relative "list_eg_gems"
 
 module ElasticGraph
-  class CodebaseOverviewRenderer
-    PROJECT_ROOT = File.expand_path("..", __dir__)
+  PROJECT_ROOT = File.expand_path("..", __dir__)
 
-    def initialize(template)
+  class CodebaseOverviewRenderer
+    def initialize(template, gem_specs)
       @erb = ::ERB.new(template, trim_mode: "-")
+      @gem_specs = gem_specs
     end
 
     def render
       @erb.result(binding)
     end
 
-    def gem_specs
-      @gem_specs ||= ::ElasticGraphGems.list.map do |gem_name|
-        gemspec_path = File.join(PROJECT_ROOT, gem_name, "#{gem_name}.gemspec")
-        ::Gem::Specification.load(gemspec_path)
-      end.compact
-    end
-
     def gem_categories
       @gem_categories ||= begin
-        specs_by_category = gem_specs.group_by do |spec|
+        specs_by_category = @gem_specs.group_by do |spec|
           spec.metadata.fetch("gem_category") { raise "No category set for #{spec.name}." }.tap do |category|
             unless CategoryInfo::BY_NAME.key?(category)
               raise "Unrecognized gem category `#{category}` found on gem: #{spec.name}."
@@ -35,7 +29,7 @@ module ElasticGraph
 
         CategoryInfo::BY_NAME.map do |category, category_info|
           specs = specs_by_category.fetch(category, [])
-          GemCategory.new(category, category_info, specs, gem_specs)
+          GemCategory.new(category, category_info, specs, @gem_specs)
         end
       end
     end
@@ -46,11 +40,10 @@ module ElasticGraph
     STYLE_INTERNAL_EG_GEM = "fill:#A9DFBF,stroke:#2ECC71,color:#000"                  # Clearer Green fill, Vibrant Green stroke, Black text
     STYLE_EXTERNAL_GEM = "fill:#E0EFFF,stroke:#70A1D7,color:#2980B9"                  # Light Blue fill, Moderate Blue stroke, Blue link text
 
-    def initialize(gem_spec, all_specs, project_root)
+    def initialize(gem_spec, all_specs)
       @gem_spec = gem_spec
       @all_specs = all_specs
-      @project_root = project_root
-      @readme_path = File.join(@project_root, @gem_spec.name, "README.md")
+      @readme_path = File.join(PROJECT_ROOT, @gem_spec.name, "README.md")
     end
 
     def direct_dependencies
@@ -313,10 +306,8 @@ module ElasticGraph
   class DependencyDiagramUpdater
     def initialize(mode_arg)
       @mode = mode_arg
-      @project_root = CodebaseOverviewRenderer::PROJECT_ROOT
-      @renderer = CodebaseOverviewRenderer.new(DATA.read) # DATA is from the __END__ block
-      @all_gem_specs = @renderer.gem_specs
-      @overview_readme_path = File.join(@project_root, "CODEBASE_OVERVIEW.md")
+      @renderer = CodebaseOverviewRenderer.new(DATA.read, gem_specs) # DATA is from the __END__ block
+      @overview_readme_path = File.join(PROJECT_ROOT, "CODEBASE_OVERVIEW.md")
       @readme_errors = []
     end
 
@@ -339,13 +330,20 @@ module ElasticGraph
 
     private
 
+    def gem_specs
+      @gem_specs ||= ::ElasticGraphGems.list.map do |gem_name|
+        gemspec_path = File.join(PROJECT_ROOT, gem_name, "#{gem_name}.gemspec")
+        ::Gem::Specification.load(gemspec_path)
+      end.compact
+    end
+
     def verify_overview_readme
       puts "Verifying CODEBASE_OVERVIEW.md..."
       generated_contents = @renderer.render
       if File.exist?(@overview_readme_path) && File.read(@overview_readme_path) == generated_contents
         puts "✅ CODEBASE_OVERVIEW.md is up-to-date."
       else
-        tmp_path = File.join(@project_root, "tmp", "CODEBASE_OVERVIEW.md")
+        tmp_path = File.join(PROJECT_ROOT, "tmp", "CODEBASE_OVERVIEW.md")
         FileUtils.mkdir_p(File.dirname(tmp_path))
         File.write(tmp_path, generated_contents)
         diff_command = "git diff --no-index --exit-code #{@overview_readme_path} #{tmp_path}"
@@ -369,9 +367,9 @@ module ElasticGraph
       action_desc = verify_mode ? "Verifying" : "Updating"
       puts "\n#{action_desc} individual gem README dependency diagrams..."
 
-      @all_gem_specs.each do |spec|
+      gem_specs.each do |spec|
         puts "Processing gem #{spec.name}..." unless verify_mode # Only log individual gems when updating
-        processor = IndividualGemReadmeProcessor.new(spec, @all_gem_specs, @project_root)
+        processor = IndividualGemReadmeProcessor.new(spec, gem_specs)
         result = processor.process
 
         if result[:status] == :error
