@@ -1,29 +1,28 @@
 #!/usr/bin/env ruby
 
 require "erb"
+require "fileutils" # Ensure FileUtils is available
 require_relative "list_eg_gems"
 
 module ElasticGraph
-  class CodebaseOverviewRenderer
-    PROJECT_ROOT = File.expand_path("..", __dir__)
+  PROJECT_ROOT = File.expand_path("..", __dir__)
+  STYLE_TARGET_GEM = "fill:#FADBD8,stroke:#EC7063,color:#000,stroke-width:2px" # Light Red/Pink fill, Moderate Red stroke, Black text
+  STYLE_OTHER_EG_GEM = "fill:#A9DFBF,stroke:#2ECC71,color:#000"                # Clearer Green fill, Vibrant Green stroke, Black text
+  STYLE_EXTERNAL_GEM = "fill:#E0EFFF,stroke:#70A1D7,color:#2980B9"             # Light Blue fill, Moderate Blue stroke, Blue link text
 
-    def initialize(template)
+  class CodebaseOverviewRenderer
+    def initialize(template, gem_specs)
       @erb = ::ERB.new(template, trim_mode: "-")
+      @gem_specs = gem_specs
     end
 
     def render
       @erb.result(binding)
     end
 
-    def gem_specs
-      @gem_specs ||= ::ElasticGraphGems.list.map do |gem_name|
-        ::Gem::Specification.load("#{PROJECT_ROOT}/#{gem_name}/#{gem_name}.gemspec")
-      end
-    end
-
     def gem_categories
       @gem_categories ||= begin
-        specs_by_category = gem_specs.group_by do |spec|
+        specs_by_category = @gem_specs.group_by do |spec|
           spec.metadata.fetch("gem_category") { raise "No category set for #{spec.name}." }.tap do |category|
             unless CategoryInfo::BY_NAME.key?(category)
               raise "Unrecognized gem category `#{category}` found on gem: #{spec.name}."
@@ -32,20 +31,198 @@ module ElasticGraph
         end
 
         CategoryInfo::BY_NAME.map do |category, category_info|
-          specs = specs_by_category.fetch(category)
-          GemCategory.new(category, category_info, specs, gem_specs)
+          specs = specs_by_category.fetch(category, [])
+          GemCategory.new(category, category_info, specs, @gem_specs)
         end
       end
     end
   end
 
+  class IndividualGemReadmeProcessor
+    def initialize(gem_spec, all_specs)
+      @gem_spec = gem_spec
+      @all_specs = all_specs
+      @readme_path = File.join(PROJECT_ROOT, @gem_spec.name, "README.md")
+    end
+
+    def direct_dependencies
+      @gem_spec.runtime_dependencies.map(&:name)
+    end
+
+    def direct_internal_dependents
+      dependents = []
+      current_gem_name = @gem_spec.name
+      @all_specs.each do |other_spec|
+        next if other_spec.name == current_gem_name
+        if other_spec.runtime_dependencies.any? { |dep| dep.name == current_gem_name }
+          dependents << other_spec.name
+        end
+      end
+      dependents.uniq.sort
+    end
+
+    public def generate_mermaid_diagram
+      deps = direct_dependencies
+      dependents = direct_internal_dependents
+      current_gem_name = @gem_spec.name
+
+      mermaid_lines = ["graph LR;"]
+      mermaid_lines << "    classDef targetGemStyle #{STYLE_TARGET_GEM};"
+      mermaid_lines << "    classDef otherEgGemStyle #{STYLE_OTHER_EG_GEM};"
+      mermaid_lines << "    classDef externalGemStyle #{STYLE_EXTERNAL_GEM};"
+
+      mermaid_lines << "    #{current_gem_name}[\"#{current_gem_name}\"];"
+      mermaid_lines << "    class #{current_gem_name} targetGemStyle;"
+
+      all_node_names_in_diagram = Set.new([current_gem_name])
+      external_deps_for_links = Set.new
+
+      unless deps.empty?
+        deps.each do |dep_name|
+          mermaid_lines << "    #{dep_name}[\"#{dep_name}\"];"
+          mermaid_lines << "    #{current_gem_name} --> #{dep_name};"
+          all_node_names_in_diagram.add(dep_name)
+          is_internal = @all_specs.any? { |s| s.name == dep_name }
+          mermaid_lines << "    class #{dep_name} #{is_internal ? "otherEgGemStyle" : "externalGemStyle"};"
+          external_deps_for_links.add(dep_name) unless is_internal
+        end
+      end
+
+      unless dependents.empty?
+        dependents.each do |dep_name|
+          mermaid_lines << "    #{dep_name}[\"#{dep_name}\"];"
+          mermaid_lines << "    #{dep_name} --> #{current_gem_name};"
+          all_node_names_in_diagram.add(dep_name)
+          mermaid_lines << "    class #{dep_name} otherEgGemStyle;"
+        end
+      end
+
+      external_deps_for_links.each do |ext_dep_name|
+        mermaid_lines << "    click #{ext_dep_name} href \"https://rubygems.org/gems/#{ext_dep_name}\" \"Open on RubyGems.org\" _blank;"
+      end
+
+      "```mermaid\n#{mermaid_lines.join("\n")}\n```"
+    end
+
+    public def perform_readme_pre_flight_check
+      unless File.exist?(@readme_path)
+        return {status: :error, message: "README for #{@gem_spec.name} at #{@readme_path} is missing."}
+      end
+      content = File.read(@readme_path)
+      if content.strip.empty?
+        return {status: :error, message: "README for #{@gem_spec.name} at #{@readme_path} is empty."}
+      end
+      first_line = content.lines.first
+      unless first_line && first_line.start_with?("# ")
+        return {status: :error, message: "README for #{@gem_spec.name} at #{@readme_path} does not start with an H1 title."}
+      end
+      {status: :ok, content: content}
+    end
+
+    private def _isolate_intro_and_tail(readme_lines_after_h1)
+      intro_lines = []
+      tail_content_lines = []
+      first_h2_or_diagram_heading_index = readme_lines_after_h1.find_index { |line| line.strip.start_with?("## ") }
+
+      if first_h2_or_diagram_heading_index.nil?
+        intro_lines = readme_lines_after_h1
+      else
+        intro_lines = readme_lines_after_h1[0...first_h2_or_diagram_heading_index]
+        content_from_first_h2 = readme_lines_after_h1[first_h2_or_diagram_heading_index..]
+        diagram_heading_index_in_remaining = content_from_first_h2.find_index { |line| line.strip == "## Dependency Diagram" }
+
+        if diagram_heading_index_in_remaining.nil?
+          tail_content_lines = content_from_first_h2
+        else
+          tail_content_lines.concat(content_from_first_h2[0...diagram_heading_index_in_remaining])
+          current_search_index_in_remaining = diagram_heading_index_in_remaining + 1
+          mermaid_block_started = false
+          mermaid_block_ended = false
+          while current_search_index_in_remaining < content_from_first_h2.length
+            line_strip = content_from_first_h2[current_search_index_in_remaining].strip
+            if !mermaid_block_started && line_strip == "```mermaid"
+              mermaid_block_started = true
+            elsif mermaid_block_started && !mermaid_block_ended && line_strip == "```"
+              mermaid_block_ended = true
+              current_search_index_in_remaining += 1
+              break
+            end
+            current_search_index_in_remaining += 1
+          end
+          if mermaid_block_started
+            if current_search_index_in_remaining < content_from_first_h2.length
+              tail_content_lines.concat(content_from_first_h2[current_search_index_in_remaining..])
+            end
+          elsif diagram_heading_index_in_remaining + 1 < content_from_first_h2.length
+            tail_content_lines.concat(content_from_first_h2[(diagram_heading_index_in_remaining + 1)..])
+          end
+        end
+      end
+      {
+        intro_content: intro_lines.join.chomp,
+        tail_content: tail_content_lines.join.chomp
+      }
+    end
+
+    public def construct_expected_readme(actual_readme_content, new_mermaid_diagram_block)
+      lines = actual_readme_content.lines
+      h1_line = lines.first
+      readme_lines_after_h1 = lines[1..] || []
+      parsed_parts = _isolate_intro_and_tail(readme_lines_after_h1)
+      components = [h1_line]
+      intro_text = parsed_parts[:intro_content]
+      if !intro_text.strip.empty?
+        components << intro_text
+        components << "\n"
+      end
+      components << "\n" if !components.last.end_with?("\n\n") && !(components.last.end_with?("\n") && components.length == 1)
+      components << "## Dependency Diagram\n"
+      components << "\n"
+      components << new_mermaid_diagram_block.strip
+      components << "\n"
+      tail_text = parsed_parts[:tail_content]
+      if !tail_text.strip.empty?
+        components << "\n"
+        components << tail_text
+      end
+      final_content = components.join
+      final_content += "\n" unless final_content.end_with?("\n")
+      final_content.gsub(/\n{3,}/, "\n\n")
+    end
+
+    public def process
+      pre_flight_result = perform_readme_pre_flight_check
+      return pre_flight_result if pre_flight_result[:status] == :error
+      actual_content = pre_flight_result[:content]
+      new_mermaid_diagram = generate_mermaid_diagram
+      expected_content = construct_expected_readme(actual_content, new_mermaid_diagram)
+      {
+        status: :ok,
+        actual_content: actual_content,
+        expected_content: expected_content,
+        gem_name: @gem_spec.name,
+        readme_path: @readme_path
+      }
+    end
+  end
+
   class GemCategory < ::Data.define(:category_name, :info, :gem_specs, :all_eg_gem_specs)
     def mermaid_definition
+      return "" if gem_specs.empty?
+      class_defs = [
+        "    classDef targetGemStyle #{STYLE_TARGET_GEM};",
+        "    classDef otherEgGemStyle #{STYLE_OTHER_EG_GEM};",
+        "    classDef externalGemCatStyle #{STYLE_EXTERNAL_GEM};"
+      ]
+      node_definitions = all_nodes_in_category_diagrams.map { |name| "    #{name}[\"#{name}\"];" }
+
       <<~MERMAID
         ```mermaid
         graph LR;
+        #{class_defs.join("\n")}
+        #{node_definitions.uniq.join("\n")}
         #{mermaid_deps.join("\n")}
-        #{mermaid_styles.join("\n")}
+        #{mermaid_node_classes.join("\n")}
         #{mermaid_clicks.join("\n")}
         ```
       MERMAID
@@ -54,36 +231,42 @@ module ElasticGraph
     private
 
     def mermaid_deps
-      gem_specs.filter_map do |spec|
-        unless spec.runtime_dependencies.empty?
-          deps = spec.runtime_dependencies.map(&:name).join(" & ")
-          "    #{spec.name} --> #{deps}"
+      gem_specs.flat_map do |spec|
+        next if spec.runtime_dependencies.nil? || spec.runtime_dependencies.empty?
+        spec.runtime_dependencies.map do |dep|
+          "    #{spec.name} --> #{dep.name};"
         end
-      end
+      end.compact
     end
 
-    def mermaid_styles
-      all_nodes = gem_specs.map(&:name) | gem_specs.flat_map { |spec| spec.runtime_dependencies.map(&:name) }
-      all_nodes.map do |node|
-        "    style #{node} #{style_for(node)};"
+    def all_nodes_in_category_diagrams
+      nodes = Set.new
+      gem_specs.each do |spec|
+        nodes.add(spec.name)
+        spec.runtime_dependencies.each { |dep| nodes.add(dep.name) }
       end
+      nodes.to_a.compact.uniq
     end
 
-    def style_for(gem_name)
-      # These colors were chosen to look good on GitHub in both light mode and dark mode.
-      if gem_specs.any? { |spec| spec.name == gem_name }
-        "color: DodgerBlue" # Basic "Blue" doesn't look good in dark mode.
-      elsif all_eg_gem_specs.any? { |spec| spec.name == gem_name }
-        "color: Green"
-      else
-        "color: Red"
+    def mermaid_node_classes
+      all_nodes_in_category_diagrams.map do |node_name|
+        class_name = if gem_specs.any? { |spec| spec.name == node_name }
+          "targetGemStyle"
+        elsif all_eg_gem_specs.any? { |spec| spec.name == node_name }
+          "otherEgGemStyle"
+        else
+          "externalGemCatStyle"
+        end
+        "    class #{node_name} #{class_name};"
       end
     end
 
     def mermaid_clicks
-      gem_specs.flat_map { |spec| spec.runtime_dependencies.map(&:name) }.uniq.sort.filter_map do |gem_name|
-        unless all_eg_gem_specs.any? { |spec| spec.name == gem_name }
-          "click #{gem_name} href \"https://rubygems.org/gems/#{gem_name}\""
+      all_nodes_in_category_diagrams.filter_map do |gem_name|
+        is_internal_in_category = gem_specs.any? { |spec| spec.name == gem_name }
+        is_other_eg_gem = all_eg_gem_specs.any? { |spec| spec.name == gem_name }
+        unless is_internal_in_category || is_other_eg_gem
+          "    click #{gem_name} href \"https://rubygems.org/gems/#{gem_name}\" \"Open on RubyGems.org\" _blank;"
         end
       end
     end
@@ -113,32 +296,113 @@ module ElasticGraph
       EOS
     }
   end
+
+  # New class to encapsulate script running logic
+  class DependencyDiagramUpdater
+    def initialize(mode_arg)
+      @mode = mode_arg
+      @renderer = CodebaseOverviewRenderer.new(DATA.read, gem_specs) # DATA is from the __END__ block
+      @overview_readme_path = File.join(PROJECT_ROOT, "CODEBASE_OVERVIEW.md")
+      @readme_errors = []
+    end
+
+    def run
+      case @mode
+      when "--verify"
+        verify_overview_readme
+        process_all_gem_readmes(verify_mode: true)
+        report_verification_results
+      when nil
+        update_overview_readme
+        process_all_gem_readmes(verify_mode: false)
+        puts "\nDependency diagram processing complete."
+        exit 0
+      else
+        warn "Unknown argument: #{@mode}. Expected `--verify` or nothing."
+        exit 1
+      end
+    end
+
+    private
+
+    def gem_specs
+      @gem_specs ||= ::ElasticGraphGems.list.map do |gem_name|
+        gemspec_path = File.join(PROJECT_ROOT, gem_name, "#{gem_name}.gemspec")
+        ::Gem::Specification.load(gemspec_path)
+      end.compact
+    end
+
+    def verify_overview_readme
+      puts "Verifying CODEBASE_OVERVIEW.md..."
+      generated_contents = @renderer.render
+      if File.exist?(@overview_readme_path) && File.read(@overview_readme_path) == generated_contents
+        puts "✅ CODEBASE_OVERVIEW.md is up-to-date."
+      else
+        tmp_path = File.join(PROJECT_ROOT, "tmp", "CODEBASE_OVERVIEW.md")
+        FileUtils.mkdir_p(File.dirname(tmp_path))
+        File.write(tmp_path, generated_contents)
+        diff_command = "git diff --no-index --exit-code #{@overview_readme_path} #{tmp_path}"
+        diff_command += " --color" unless ENV["CI"]
+        diff_output = `#{diff_command}`
+        @readme_errors << ($?.success? ?
+          "❌ CODEBASE_OVERVIEW.md content mismatch but git diff shows no changes. Please investigate." :
+          "❌ CODEBASE_OVERVIEW.md is out-of-date. Diff:\n#{diff_output}"
+                          )
+      end
+    end
+
+    def update_overview_readme
+      puts "Updating CODEBASE_OVERVIEW.md..."
+      generated_contents = @renderer.render
+      File.write(@overview_readme_path, generated_contents)
+      puts "✅ CODEBASE_OVERVIEW.md updated."
+    end
+
+    def process_all_gem_readmes(verify_mode:)
+      action_desc = verify_mode ? "Verifying" : "Updating"
+      puts "\n#{action_desc} individual gem README dependency diagrams..."
+
+      gem_specs.each do |spec|
+        puts "Processing gem #{spec.name}..." unless verify_mode # Only log individual gems when updating
+        processor = IndividualGemReadmeProcessor.new(spec, gem_specs)
+        result = processor.process
+
+        if result[:status] == :error
+          message = "❌ Error processing #{spec.name}: #{result[:message]}"
+          verify_mode ? (@readme_errors << message) : (puts "  #{message}")
+        elsif result[:actual_content] == result[:expected_content]
+          puts "#{verify_mode ? "✅" : "  ✅"} #{spec.name} README diagram is up-to-date."
+        elsif verify_mode
+          @readme_errors << "❌ #{spec.name} README diagram at #{result[:readme_path]} is out-of-date or improperly formatted."
+        else
+          begin
+            File.write(result[:readme_path], result[:expected_content])
+            puts "  ✅ #{result[:readme_path]} dependency diagram updated."
+          rescue => e
+            puts "  ❌ Failed to write #{result[:readme_path]}: #{e.message}"
+          end
+        end
+      end
+    end
+
+    def report_verification_results
+      if @readme_errors.empty?
+        puts "\n🎉 All dependency diagrams (CODEBASE_OVERVIEW.md and individual gems) are up-to-date."
+        exit 0
+      else
+        puts "\n--- Verification Summary ---"
+        @readme_errors.each { |err| puts err }
+        puts "\nScript verification failed. Please review the errors above."
+        exit 1
+      end
+    end
+  end
 end
 
-renderer = ElasticGraph::CodebaseOverviewRenderer.new(DATA.read)
-contents = renderer.render
-readme_path = ::File.join(__dir__, "..", "CODEBASE_OVERVIEW.md")
-
-case ARGV.first
-when "--verify"
-  if ::File.read(readme_path) == contents
-    puts "✅ CODEBASE_OVERVIEW is up-to-date."
-  else
-    tmp_path = ::File.join(__dir__, "..", "tmp", "CODEBASE_OVERVIEW.md")
-    ::File.write(tmp_path, contents)
-
-    diff = `git diff --no-index #{readme_path} #{tmp_path} #{" --color" unless ENV["CI"]}`
-
-    puts "❌ CODEBASE_OVERVIEW is out-of-date. Run `#{__FILE__}` to update it. Diff:"
-    puts
-    puts diff
-    exit(1)
-  end
-when nil
-  ::File.write(readme_path, contents)
-  puts "CODEBASE_OVERVIEW.md updated."
-else
-  raise "Unknown argument: #{ARGV.first}. Expected `--verify` or nothing."
+# --- Main script execution ---
+if __FILE__ == $PROGRAM_NAME
+  updater = ElasticGraph::DependencyDiagramUpdater.new(ARGV.first)
+  updater.run
 end
 
 __END__

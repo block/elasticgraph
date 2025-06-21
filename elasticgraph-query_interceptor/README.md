@@ -4,6 +4,23 @@ An ElasticGraph extension library that lets you intercept datastore
 queries before they are submitted in order to customize/modify them some
 how.
 
+## Dependency Diagram
+
+```mermaid
+graph LR;
+    classDef targetGemStyle fill:#FADBD8,stroke:#EC7063,color:#000,stroke-width:2px;
+    classDef otherEgGemStyle fill:#A9DFBF,stroke:#2ECC71,color:#000;
+    classDef externalGemStyle fill:#E0EFFF,stroke:#70A1D7,color:#2980B9;
+    elasticgraph-query_interceptor["elasticgraph-query_interceptor"];
+    class elasticgraph-query_interceptor targetGemStyle;
+    elasticgraph-graphql["elasticgraph-graphql"];
+    elasticgraph-query_interceptor --> elasticgraph-graphql;
+    class elasticgraph-graphql otherEgGemStyle;
+    elasticgraph-schema_artifacts["elasticgraph-schema_artifacts"];
+    elasticgraph-query_interceptor --> elasticgraph-schema_artifacts;
+    class elasticgraph-schema_artifacts otherEgGemStyle;
+```
+
 ## Setup
 
 First, add `elasticgraph-query_interceptor` to your `Gemfile`:

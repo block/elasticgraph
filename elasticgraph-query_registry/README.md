@@ -29,6 +29,35 @@ Importantly, once installed, registered clients who send unregistered
 queries will get errors. Unregistered clients can similarly be blocked
 if desired based on a configuration setting.
 
+## Dependency Diagram
+
+```mermaid
+graph LR;
+    classDef targetGemStyle fill:#FADBD8,stroke:#EC7063,color:#000,stroke-width:2px;
+    classDef otherEgGemStyle fill:#A9DFBF,stroke:#2ECC71,color:#000;
+    classDef externalGemStyle fill:#E0EFFF,stroke:#70A1D7,color:#2980B9;
+    elasticgraph-query_registry["elasticgraph-query_registry"];
+    class elasticgraph-query_registry targetGemStyle;
+    elasticgraph-graphql["elasticgraph-graphql"];
+    elasticgraph-query_registry --> elasticgraph-graphql;
+    class elasticgraph-graphql otherEgGemStyle;
+    elasticgraph-support["elasticgraph-support"];
+    elasticgraph-query_registry --> elasticgraph-support;
+    class elasticgraph-support otherEgGemStyle;
+    graphql["graphql"];
+    elasticgraph-query_registry --> graphql;
+    class graphql externalGemStyle;
+    graphql-c_parser["graphql-c_parser"];
+    elasticgraph-query_registry --> graphql-c_parser;
+    class graphql-c_parser externalGemStyle;
+    rake["rake"];
+    elasticgraph-query_registry --> rake;
+    class rake externalGemStyle;
+    click graphql href "https://rubygems.org/gems/graphql" "Open on RubyGems.org" _blank;
+    click graphql-c_parser href "https://rubygems.org/gems/graphql-c_parser" "Open on RubyGems.org" _blank;
+    click rake href "https://rubygems.org/gems/rake" "Open on RubyGems.org" _blank;
+```
+
 ## Query Verification Guarantees
 
 The query verification provided by this library is limited in scope. It
