@@ -6,17 +6,17 @@ Adapts elasticgraph-indexer to run in an AWS Lambda.
 
 ```mermaid
 graph LR;
-    classDef currentGemStyle fill:#FADBD8,stroke:#EC7063,color:#000,stroke-width:2px;
-    classDef internalEgGemStyle fill:#A9DFBF,stroke:#2ECC71,color:#000;
+    classDef targetGemStyle fill:#FADBD8,stroke:#EC7063,color:#000,stroke-width:2px;
+    classDef otherEgGemStyle fill:#A9DFBF,stroke:#2ECC71,color:#000;
     classDef externalGemStyle fill:#E0EFFF,stroke:#70A1D7,color:#2980B9;
     elasticgraph-indexer_lambda["elasticgraph-indexer_lambda"];
-    class elasticgraph-indexer_lambda currentGemStyle;
+    class elasticgraph-indexer_lambda targetGemStyle;
     elasticgraph-indexer["elasticgraph-indexer"];
     elasticgraph-indexer_lambda --> elasticgraph-indexer;
-    class elasticgraph-indexer internalEgGemStyle;
+    class elasticgraph-indexer otherEgGemStyle;
     elasticgraph-lambda_support["elasticgraph-lambda_support"];
     elasticgraph-indexer_lambda --> elasticgraph-lambda_support;
-    class elasticgraph-lambda_support internalEgGemStyle;
+    class elasticgraph-lambda_support otherEgGemStyle;
     aws-sdk-s3["aws-sdk-s3"];
     elasticgraph-indexer_lambda --> aws-sdk-s3;
     class aws-sdk-s3 externalGemStyle;

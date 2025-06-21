@@ -33,17 +33,17 @@ if desired based on a configuration setting.
 
 ```mermaid
 graph LR;
-    classDef currentGemStyle fill:#FADBD8,stroke:#EC7063,color:#000,stroke-width:2px;
-    classDef internalEgGemStyle fill:#A9DFBF,stroke:#2ECC71,color:#000;
+    classDef targetGemStyle fill:#FADBD8,stroke:#EC7063,color:#000,stroke-width:2px;
+    classDef otherEgGemStyle fill:#A9DFBF,stroke:#2ECC71,color:#000;
     classDef externalGemStyle fill:#E0EFFF,stroke:#70A1D7,color:#2980B9;
     elasticgraph-query_registry["elasticgraph-query_registry"];
-    class elasticgraph-query_registry currentGemStyle;
+    class elasticgraph-query_registry targetGemStyle;
     elasticgraph-graphql["elasticgraph-graphql"];
     elasticgraph-query_registry --> elasticgraph-graphql;
-    class elasticgraph-graphql internalEgGemStyle;
+    class elasticgraph-graphql otherEgGemStyle;
     elasticgraph-support["elasticgraph-support"];
     elasticgraph-query_registry --> elasticgraph-support;
-    class elasticgraph-support internalEgGemStyle;
+    class elasticgraph-support otherEgGemStyle;
     graphql["graphql"];
     elasticgraph-query_registry --> graphql;
     class graphql externalGemStyle;

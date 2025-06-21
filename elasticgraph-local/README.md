@@ -8,26 +8,26 @@ so as not to require a publisher of real data to be implemented.
 
 ```mermaid
 graph LR;
-    classDef currentGemStyle fill:#FADBD8,stroke:#EC7063,color:#000,stroke-width:2px;
-    classDef internalEgGemStyle fill:#A9DFBF,stroke:#2ECC71,color:#000;
+    classDef targetGemStyle fill:#FADBD8,stroke:#EC7063,color:#000,stroke-width:2px;
+    classDef otherEgGemStyle fill:#A9DFBF,stroke:#2ECC71,color:#000;
     classDef externalGemStyle fill:#E0EFFF,stroke:#70A1D7,color:#2980B9;
     elasticgraph-local["elasticgraph-local"];
-    class elasticgraph-local currentGemStyle;
+    class elasticgraph-local targetGemStyle;
     elasticgraph-admin["elasticgraph-admin"];
     elasticgraph-local --> elasticgraph-admin;
-    class elasticgraph-admin internalEgGemStyle;
+    class elasticgraph-admin otherEgGemStyle;
     elasticgraph-graphql["elasticgraph-graphql"];
     elasticgraph-local --> elasticgraph-graphql;
-    class elasticgraph-graphql internalEgGemStyle;
+    class elasticgraph-graphql otherEgGemStyle;
     elasticgraph-indexer["elasticgraph-indexer"];
     elasticgraph-local --> elasticgraph-indexer;
-    class elasticgraph-indexer internalEgGemStyle;
+    class elasticgraph-indexer otherEgGemStyle;
     elasticgraph-rack["elasticgraph-rack"];
     elasticgraph-local --> elasticgraph-rack;
-    class elasticgraph-rack internalEgGemStyle;
+    class elasticgraph-rack otherEgGemStyle;
     elasticgraph-schema_definition["elasticgraph-schema_definition"];
     elasticgraph-local --> elasticgraph-schema_definition;
-    class elasticgraph-schema_definition internalEgGemStyle;
+    class elasticgraph-schema_definition otherEgGemStyle;
     rackup["rackup"];
     elasticgraph-local --> rackup;
     class rackup externalGemStyle;

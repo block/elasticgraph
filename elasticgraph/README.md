@@ -7,14 +7,14 @@ parts of ElasticGraph are used from the same deployed app.
 
 ```mermaid
 graph LR;
-    classDef currentGemStyle fill:#FADBD8,stroke:#EC7063,color:#000,stroke-width:2px;
-    classDef internalEgGemStyle fill:#A9DFBF,stroke:#2ECC71,color:#000;
+    classDef targetGemStyle fill:#FADBD8,stroke:#EC7063,color:#000,stroke-width:2px;
+    classDef otherEgGemStyle fill:#A9DFBF,stroke:#2ECC71,color:#000;
     classDef externalGemStyle fill:#E0EFFF,stroke:#70A1D7,color:#2980B9;
     elasticgraph["elasticgraph"];
-    class elasticgraph currentGemStyle;
+    class elasticgraph targetGemStyle;
     elasticgraph-support["elasticgraph-support"];
     elasticgraph --> elasticgraph-support;
-    class elasticgraph-support internalEgGemStyle;
+    class elasticgraph-support otherEgGemStyle;
     thor["thor"];
     elasticgraph --> thor;
     class thor externalGemStyle;

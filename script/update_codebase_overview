@@ -6,6 +6,9 @@ require_relative "list_eg_gems"
 
 module ElasticGraph
   PROJECT_ROOT = File.expand_path("..", __dir__)
+  STYLE_TARGET_GEM = "fill:#FADBD8,stroke:#EC7063,color:#000,stroke-width:2px" # Light Red/Pink fill, Moderate Red stroke, Black text
+  STYLE_OTHER_EG_GEM = "fill:#A9DFBF,stroke:#2ECC71,color:#000"                # Clearer Green fill, Vibrant Green stroke, Black text
+  STYLE_EXTERNAL_GEM = "fill:#E0EFFF,stroke:#70A1D7,color:#2980B9"             # Light Blue fill, Moderate Blue stroke, Blue link text
 
   class CodebaseOverviewRenderer
     def initialize(template, gem_specs)
@@ -36,10 +39,6 @@ module ElasticGraph
   end
 
   class IndividualGemReadmeProcessor
-    STYLE_CURRENT_GEM = "fill:#FADBD8,stroke:#EC7063,color:#000,stroke-width:2px"      # Light Red/Pink fill, Moderate Red stroke, Black text
-    STYLE_INTERNAL_EG_GEM = "fill:#A9DFBF,stroke:#2ECC71,color:#000"                  # Clearer Green fill, Vibrant Green stroke, Black text
-    STYLE_EXTERNAL_GEM = "fill:#E0EFFF,stroke:#70A1D7,color:#2980B9"                  # Light Blue fill, Moderate Blue stroke, Blue link text
-
     def initialize(gem_spec, all_specs)
       @gem_spec = gem_spec
       @all_specs = all_specs
@@ -68,12 +67,12 @@ module ElasticGraph
       current_gem_name = @gem_spec.name
 
       mermaid_lines = ["graph LR;"]
-      mermaid_lines << "    classDef currentGemStyle #{STYLE_CURRENT_GEM};"
-      mermaid_lines << "    classDef internalEgGemStyle #{STYLE_INTERNAL_EG_GEM};"
+      mermaid_lines << "    classDef targetGemStyle #{STYLE_TARGET_GEM};"
+      mermaid_lines << "    classDef otherEgGemStyle #{STYLE_OTHER_EG_GEM};"
       mermaid_lines << "    classDef externalGemStyle #{STYLE_EXTERNAL_GEM};"
 
       mermaid_lines << "    #{current_gem_name}[\"#{current_gem_name}\"];"
-      mermaid_lines << "    class #{current_gem_name} currentGemStyle;"
+      mermaid_lines << "    class #{current_gem_name} targetGemStyle;"
 
       all_node_names_in_diagram = Set.new([current_gem_name])
       external_deps_for_links = Set.new
@@ -84,7 +83,7 @@ module ElasticGraph
           mermaid_lines << "    #{current_gem_name} --> #{dep_name};"
           all_node_names_in_diagram.add(dep_name)
           is_internal = @all_specs.any? { |s| s.name == dep_name }
-          mermaid_lines << "    class #{dep_name} #{is_internal ? "internalEgGemStyle" : "externalGemStyle"};"
+          mermaid_lines << "    class #{dep_name} #{is_internal ? "otherEgGemStyle" : "externalGemStyle"};"
           external_deps_for_links.add(dep_name) unless is_internal
         end
       end
@@ -94,7 +93,7 @@ module ElasticGraph
           mermaid_lines << "    #{dep_name}[\"#{dep_name}\"];"
           mermaid_lines << "    #{dep_name} --> #{current_gem_name};"
           all_node_names_in_diagram.add(dep_name)
-          mermaid_lines << "    class #{dep_name} internalEgGemStyle;"
+          mermaid_lines << "    class #{dep_name} otherEgGemStyle;"
         end
       end
 
@@ -208,16 +207,12 @@ module ElasticGraph
   end
 
   class GemCategory < ::Data.define(:category_name, :info, :gem_specs, :all_eg_gem_specs)
-    STYLE_CURRENT_CATEGORY_GEM = "fill:#FADBD8,stroke:#EC7063,color:#000,stroke-width:1.5px"  # Light Red/Pink fill, Moderate Red stroke
-    STYLE_OTHER_EG_GEM = "fill:#A9DFBF,stroke:#2ECC71,color:#000"                          # Clearer Green fill, Vibrant Green stroke
-    STYLE_EXTERNAL_CATEGORY_GEM = "fill:#E0EFFF,stroke:#70A1D7,color:#2980B9"              # Light Blue fill, Moderate Blue stroke, Blue link text
-
     def mermaid_definition
       return "" if gem_specs.empty?
       class_defs = [
-        "    classDef currentCategoryGemStyle #{STYLE_CURRENT_CATEGORY_GEM};",
+        "    classDef targetGemStyle #{STYLE_TARGET_GEM};",
         "    classDef otherEgGemStyle #{STYLE_OTHER_EG_GEM};",
-        "    classDef externalGemCatStyle #{STYLE_EXTERNAL_CATEGORY_GEM};"
+        "    classDef externalGemCatStyle #{STYLE_EXTERNAL_GEM};"
       ]
       node_definitions = all_nodes_in_category_diagrams.map { |name| "    #{name}[\"#{name}\"];" }
 
@@ -256,7 +251,7 @@ module ElasticGraph
     def mermaid_node_classes
       all_nodes_in_category_diagrams.map do |node_name|
         class_name = if gem_specs.any? { |spec| spec.name == node_name }
-          "currentCategoryGemStyle"
+          "targetGemStyle"
         elsif all_eg_gem_specs.any? { |spec| spec.name == node_name }
           "otherEgGemStyle"
         else

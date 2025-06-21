@@ -9,20 +9,20 @@ compatible web server.
 
 ```mermaid
 graph LR;
-    classDef currentGemStyle fill:#FADBD8,stroke:#EC7063,color:#000,stroke-width:2px;
-    classDef internalEgGemStyle fill:#A9DFBF,stroke:#2ECC71,color:#000;
+    classDef targetGemStyle fill:#FADBD8,stroke:#EC7063,color:#000,stroke-width:2px;
+    classDef otherEgGemStyle fill:#A9DFBF,stroke:#2ECC71,color:#000;
     classDef externalGemStyle fill:#E0EFFF,stroke:#70A1D7,color:#2980B9;
     elasticgraph-rack["elasticgraph-rack"];
-    class elasticgraph-rack currentGemStyle;
+    class elasticgraph-rack targetGemStyle;
     elasticgraph-graphql["elasticgraph-graphql"];
     elasticgraph-rack --> elasticgraph-graphql;
-    class elasticgraph-graphql internalEgGemStyle;
+    class elasticgraph-graphql otherEgGemStyle;
     rack["rack"];
     elasticgraph-rack --> rack;
     class rack externalGemStyle;
     elasticgraph-local["elasticgraph-local"];
     elasticgraph-local --> elasticgraph-rack;
-    class elasticgraph-local internalEgGemStyle;
+    class elasticgraph-local otherEgGemStyle;
     click rack href "https://rubygems.org/gems/rack" "Open on RubyGems.org" _blank;
 ```
 

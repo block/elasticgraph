@@ -20,7 +20,7 @@ These libraries form the core backbone of ElasticGraph that is designed to run i
 
 ```mermaid
 graph LR;
-    classDef currentCategoryGemStyle fill:#FADBD8,stroke:#EC7063,color:#000,stroke-width:1.5px;
+    classDef targetGemStyle fill:#FADBD8,stroke:#EC7063,color:#000,stroke-width:2px;
     classDef otherEgGemStyle fill:#A9DFBF,stroke:#2ECC71,color:#000;
     classDef externalGemCatStyle fill:#E0EFFF,stroke:#70A1D7,color:#2980B9;
     elasticgraph-admin["elasticgraph-admin"];
@@ -58,17 +58,17 @@ graph LR;
     elasticgraph-json_schema --> json_schemer;
     elasticgraph-schema_artifacts --> elasticgraph-support;
     elasticgraph-support --> logger;
-    class elasticgraph-admin currentCategoryGemStyle;
-    class elasticgraph-datastore_core currentCategoryGemStyle;
-    class elasticgraph-indexer currentCategoryGemStyle;
-    class elasticgraph-schema_artifacts currentCategoryGemStyle;
-    class elasticgraph-support currentCategoryGemStyle;
+    class elasticgraph-admin targetGemStyle;
+    class elasticgraph-datastore_core targetGemStyle;
+    class elasticgraph-indexer targetGemStyle;
+    class elasticgraph-schema_artifacts targetGemStyle;
+    class elasticgraph-support targetGemStyle;
     class rake externalGemCatStyle;
-    class elasticgraph-graphql currentCategoryGemStyle;
+    class elasticgraph-graphql targetGemStyle;
     class base64 externalGemCatStyle;
     class graphql externalGemCatStyle;
     class graphql-c_parser externalGemCatStyle;
-    class elasticgraph-json_schema currentCategoryGemStyle;
+    class elasticgraph-json_schema targetGemStyle;
     class hashdiff externalGemCatStyle;
     class json_schemer externalGemCatStyle;
     class logger externalGemCatStyle;
@@ -95,7 +95,7 @@ These libraries wrap the the core ElasticGraph libraries so that they can be dep
 
 ```mermaid
 graph LR;
-    classDef currentCategoryGemStyle fill:#FADBD8,stroke:#EC7063,color:#000,stroke-width:1.5px;
+    classDef targetGemStyle fill:#FADBD8,stroke:#EC7063,color:#000,stroke-width:2px;
     classDef otherEgGemStyle fill:#A9DFBF,stroke:#2ECC71,color:#000;
     classDef externalGemCatStyle fill:#E0EFFF,stroke:#70A1D7,color:#2980B9;
     elasticgraph-admin_lambda["elasticgraph-admin_lambda"];
@@ -132,19 +132,19 @@ graph LR;
     elasticgraph-indexer_lambda --> ox;
     elasticgraph-lambda_support --> elasticgraph-opensearch;
     elasticgraph-lambda_support --> faraday_middleware-aws-sigv4;
-    class elasticgraph-admin_lambda currentCategoryGemStyle;
+    class elasticgraph-admin_lambda targetGemStyle;
     class rake externalGemCatStyle;
     class elasticgraph-admin otherEgGemStyle;
-    class elasticgraph-lambda_support currentCategoryGemStyle;
-    class elasticgraph-graphql_lambda currentCategoryGemStyle;
+    class elasticgraph-lambda_support targetGemStyle;
+    class elasticgraph-graphql_lambda targetGemStyle;
     class elasticgraph-graphql otherEgGemStyle;
-    class elasticgraph-indexer_autoscaler_lambda currentCategoryGemStyle;
+    class elasticgraph-indexer_autoscaler_lambda targetGemStyle;
     class elasticgraph-datastore_core otherEgGemStyle;
     class aws-sdk-lambda externalGemCatStyle;
     class aws-sdk-sqs externalGemCatStyle;
     class aws-sdk-cloudwatch externalGemCatStyle;
     class ox externalGemCatStyle;
-    class elasticgraph-indexer_lambda currentCategoryGemStyle;
+    class elasticgraph-indexer_lambda targetGemStyle;
     class elasticgraph-indexer otherEgGemStyle;
     class aws-sdk-s3 externalGemCatStyle;
     class elasticgraph-opensearch otherEgGemStyle;
@@ -171,7 +171,7 @@ These libraries extend ElasticGraph to provide optional but commonly needed func
 
 ```mermaid
 graph LR;
-    classDef currentCategoryGemStyle fill:#FADBD8,stroke:#EC7063,color:#000,stroke-width:1.5px;
+    classDef targetGemStyle fill:#FADBD8,stroke:#EC7063,color:#000,stroke-width:2px;
     classDef otherEgGemStyle fill:#A9DFBF,stroke:#2ECC71,color:#000;
     classDef externalGemCatStyle fill:#E0EFFF,stroke:#70A1D7,color:#2980B9;
     elasticgraph-apollo["elasticgraph-apollo"];
@@ -200,16 +200,16 @@ graph LR;
     elasticgraph-query_registry --> graphql;
     elasticgraph-query_registry --> graphql-c_parser;
     elasticgraph-query_registry --> rake;
-    class elasticgraph-apollo currentCategoryGemStyle;
+    class elasticgraph-apollo targetGemStyle;
     class elasticgraph-graphql otherEgGemStyle;
     class elasticgraph-support otherEgGemStyle;
     class graphql externalGemCatStyle;
     class apollo-federation externalGemCatStyle;
-    class elasticgraph-health_check currentCategoryGemStyle;
+    class elasticgraph-health_check targetGemStyle;
     class elasticgraph-datastore_core otherEgGemStyle;
-    class elasticgraph-query_interceptor currentCategoryGemStyle;
+    class elasticgraph-query_interceptor targetGemStyle;
     class elasticgraph-schema_artifacts otherEgGemStyle;
-    class elasticgraph-query_registry currentCategoryGemStyle;
+    class elasticgraph-query_registry targetGemStyle;
     class graphql-c_parser externalGemCatStyle;
     class rake externalGemCatStyle;
     click graphql href "https://rubygems.org/gems/graphql" "Open on RubyGems.org" _blank;
@@ -229,7 +229,7 @@ These libraries adapt ElasticGraph to your choice of datastore (Elasticsearch or
 
 ```mermaid
 graph LR;
-    classDef currentCategoryGemStyle fill:#FADBD8,stroke:#EC7063,color:#000,stroke-width:1.5px;
+    classDef targetGemStyle fill:#FADBD8,stroke:#EC7063,color:#000,stroke-width:2px;
     classDef otherEgGemStyle fill:#A9DFBF,stroke:#2ECC71,color:#000;
     classDef externalGemCatStyle fill:#E0EFFF,stroke:#70A1D7,color:#2980B9;
     elasticgraph-elasticsearch["elasticgraph-elasticsearch"];
@@ -247,12 +247,12 @@ graph LR;
     elasticgraph-opensearch --> faraday;
     elasticgraph-opensearch --> faraday-retry;
     elasticgraph-opensearch --> opensearch-ruby;
-    class elasticgraph-elasticsearch currentCategoryGemStyle;
+    class elasticgraph-elasticsearch targetGemStyle;
     class elasticgraph-support otherEgGemStyle;
     class elasticsearch externalGemCatStyle;
     class faraday externalGemCatStyle;
     class faraday-retry externalGemCatStyle;
-    class elasticgraph-opensearch currentCategoryGemStyle;
+    class elasticgraph-opensearch targetGemStyle;
     class opensearch-ruby externalGemCatStyle;
     click elasticsearch href "https://rubygems.org/gems/elasticsearch" "Open on RubyGems.org" _blank;
     click faraday href "https://rubygems.org/gems/faraday" "Open on RubyGems.org" _blank;
@@ -274,7 +274,7 @@ These libraries are used for local development of ElasticGraph applications, but
 
 ```mermaid
 graph LR;
-    classDef currentCategoryGemStyle fill:#FADBD8,stroke:#EC7063,color:#000,stroke-width:1.5px;
+    classDef targetGemStyle fill:#FADBD8,stroke:#EC7063,color:#000,stroke-width:2px;
     classDef otherEgGemStyle fill:#A9DFBF,stroke:#2ECC71,color:#000;
     classDef externalGemCatStyle fill:#E0EFFF,stroke:#70A1D7,color:#2980B9;
     elasticgraph["elasticgraph"];
@@ -314,15 +314,15 @@ graph LR;
     elasticgraph-schema_definition --> graphql;
     elasticgraph-schema_definition --> graphql-c_parser;
     elasticgraph-schema_definition --> rake;
-    class elasticgraph currentCategoryGemStyle;
+    class elasticgraph targetGemStyle;
     class elasticgraph-support otherEgGemStyle;
     class thor externalGemCatStyle;
-    class elasticgraph-local currentCategoryGemStyle;
+    class elasticgraph-local targetGemStyle;
     class elasticgraph-admin otherEgGemStyle;
     class elasticgraph-graphql otherEgGemStyle;
     class elasticgraph-indexer otherEgGemStyle;
-    class elasticgraph-rack currentCategoryGemStyle;
-    class elasticgraph-schema_definition currentCategoryGemStyle;
+    class elasticgraph-rack targetGemStyle;
+    class elasticgraph-schema_definition targetGemStyle;
     class rackup externalGemCatStyle;
     class rake externalGemCatStyle;
     class webrick externalGemCatStyle;

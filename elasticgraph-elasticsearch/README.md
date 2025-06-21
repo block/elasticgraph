@@ -6,14 +6,14 @@ Wraps the official Elasticsearch client for use by ElasticGraph.
 
 ```mermaid
 graph LR;
-    classDef currentGemStyle fill:#FADBD8,stroke:#EC7063,color:#000,stroke-width:2px;
-    classDef internalEgGemStyle fill:#A9DFBF,stroke:#2ECC71,color:#000;
+    classDef targetGemStyle fill:#FADBD8,stroke:#EC7063,color:#000,stroke-width:2px;
+    classDef otherEgGemStyle fill:#A9DFBF,stroke:#2ECC71,color:#000;
     classDef externalGemStyle fill:#E0EFFF,stroke:#70A1D7,color:#2980B9;
     elasticgraph-elasticsearch["elasticgraph-elasticsearch"];
-    class elasticgraph-elasticsearch currentGemStyle;
+    class elasticgraph-elasticsearch targetGemStyle;
     elasticgraph-support["elasticgraph-support"];
     elasticgraph-elasticsearch --> elasticgraph-support;
-    class elasticgraph-support internalEgGemStyle;
+    class elasticgraph-support otherEgGemStyle;
     elasticsearch["elasticsearch"];
     elasticgraph-elasticsearch --> elasticsearch;
     class elasticsearch externalGemStyle;

@@ -9,17 +9,17 @@ Note: this library only supports the v2 Federation specification.
 
 ```mermaid
 graph LR;
-    classDef currentGemStyle fill:#FADBD8,stroke:#EC7063,color:#000,stroke-width:2px;
-    classDef internalEgGemStyle fill:#A9DFBF,stroke:#2ECC71,color:#000;
+    classDef targetGemStyle fill:#FADBD8,stroke:#EC7063,color:#000,stroke-width:2px;
+    classDef otherEgGemStyle fill:#A9DFBF,stroke:#2ECC71,color:#000;
     classDef externalGemStyle fill:#E0EFFF,stroke:#70A1D7,color:#2980B9;
     elasticgraph-apollo["elasticgraph-apollo"];
-    class elasticgraph-apollo currentGemStyle;
+    class elasticgraph-apollo targetGemStyle;
     elasticgraph-graphql["elasticgraph-graphql"];
     elasticgraph-apollo --> elasticgraph-graphql;
-    class elasticgraph-graphql internalEgGemStyle;
+    class elasticgraph-graphql otherEgGemStyle;
     elasticgraph-support["elasticgraph-support"];
     elasticgraph-apollo --> elasticgraph-support;
-    class elasticgraph-support internalEgGemStyle;
+    class elasticgraph-support otherEgGemStyle;
     graphql["graphql"];
     elasticgraph-apollo --> graphql;
     class graphql externalGemStyle;

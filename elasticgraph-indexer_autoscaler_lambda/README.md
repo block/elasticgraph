@@ -3,17 +3,17 @@
 
 ```mermaid
 graph LR;
-    classDef currentGemStyle fill:#FADBD8,stroke:#EC7063,color:#000,stroke-width:2px;
-    classDef internalEgGemStyle fill:#A9DFBF,stroke:#2ECC71,color:#000;
+    classDef targetGemStyle fill:#FADBD8,stroke:#EC7063,color:#000,stroke-width:2px;
+    classDef otherEgGemStyle fill:#A9DFBF,stroke:#2ECC71,color:#000;
     classDef externalGemStyle fill:#E0EFFF,stroke:#70A1D7,color:#2980B9;
     elasticgraph-indexer_autoscaler_lambda["elasticgraph-indexer_autoscaler_lambda"];
-    class elasticgraph-indexer_autoscaler_lambda currentGemStyle;
+    class elasticgraph-indexer_autoscaler_lambda targetGemStyle;
     elasticgraph-datastore_core["elasticgraph-datastore_core"];
     elasticgraph-indexer_autoscaler_lambda --> elasticgraph-datastore_core;
-    class elasticgraph-datastore_core internalEgGemStyle;
+    class elasticgraph-datastore_core otherEgGemStyle;
     elasticgraph-lambda_support["elasticgraph-lambda_support"];
     elasticgraph-indexer_autoscaler_lambda --> elasticgraph-lambda_support;
-    class elasticgraph-lambda_support internalEgGemStyle;
+    class elasticgraph-lambda_support otherEgGemStyle;
     aws-sdk-lambda["aws-sdk-lambda"];
     elasticgraph-indexer_autoscaler_lambda --> aws-sdk-lambda;
     class aws-sdk-lambda externalGemStyle;
