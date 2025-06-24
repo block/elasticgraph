@@ -107,7 +107,7 @@ jobs:
           driver: docker-container
 
       - name: Build OpenSearch image
-        uses: docker/build-push-action@14487ce63c7a62a4a324b0bfb37086795e31c6c1 # v6.16.0
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
         with:
           context: elasticgraph-local/lib/elastic_graph/local/opensearch
           file: elasticgraph-local/lib/elastic_graph/local/opensearch/Dockerfile
@@ -119,7 +119,7 @@ jobs:
             elasticgraph-opensearch-demo:latest
 
       - name: Build ElasticGraph image
-        uses: docker/build-push-action@14487ce63c7a62a4a324b0bfb37086795e31c6c1 # v6.16.0
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
         with:
           context: .
           file: config/docker_demo/Dockerfile
@@ -143,7 +143,7 @@ jobs:
 
       - name: Push OpenSearch image
         if: success() && github.ref == 'refs/heads/main'
-        uses: docker/build-push-action@14487ce63c7a62a4a324b0bfb37086795e31c6c1 # v6.16.0
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
         with:
           context: elasticgraph-local/lib/elastic_graph/local/opensearch
           file: elasticgraph-local/lib/elastic_graph/local/opensearch/Dockerfile
@@ -157,7 +157,7 @@ jobs:
 
       - name: Push ElasticGraph image
         if: success() && github.ref == 'refs/heads/main'
-        uses: docker/build-push-action@14487ce63c7a62a4a324b0bfb37086795e31c6c1 # v6.16.0
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
         with:
           context: .
           file: config/docker_demo/Dockerfile
