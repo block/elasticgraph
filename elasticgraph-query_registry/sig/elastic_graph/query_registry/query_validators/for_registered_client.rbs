@@ -27,13 +27,13 @@ module ElasticGraph
 
         def applies_to?: (GraphQL::Client) -> bool
 
-        def build_and_validate_query: (
+        def build_and_validate_query_with_registration_status: (
           ::String?,
           client: GraphQL::Client,
           ?variables: ::Hash[::String, untyped],
           ?operation_name: ::String?,
           ?context: ::Hash[::Symbol, untyped]
-        ) { () -> ::GraphQL::Query } -> [::GraphQL::Query, ::Array[::String]]
+        ) { () -> ::GraphQL::Query } -> [::GraphQL::Query, ::Array[::String], bool]
 
         private
 

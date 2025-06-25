@@ -12,18 +12,18 @@ module ElasticGraph
       # Query validator implementation used for unregistered or anonymous clients.
       ForUnregisteredClient = ::Data.define(:allow_unregistered_clients, :allow_any_query_for_clients) do
         # @implements ForUnregisteredClient
-        def build_and_validate_query(query_string, client:, variables: {}, operation_name: nil, context: {})
+        def build_and_validate_query_with_registration_status(query_string, client:, variables: {}, operation_name: nil, context: {})
           query = yield
 
-          return [query, []] if allow_unregistered_clients
+          return [query, [], false] if allow_unregistered_clients
 
           client_name = client&.name
-          return [query, []] if client_name && allow_any_query_for_clients.include?(client_name)
+          return [query, [], false] if client_name && allow_any_query_for_clients.include?(client_name)
 
           [query, [
             "Client #{client&.description || "(unknown)"} is not a registered client, it is not in " \
             "`allow_any_query_for_clients` and `allow_unregistered_clients` is false."
-          ]]
+          ], false]
         end
       end
     end

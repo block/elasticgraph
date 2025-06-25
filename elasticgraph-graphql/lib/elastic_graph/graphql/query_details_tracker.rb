@@ -17,6 +17,7 @@ module ElasticGraph
       :datastore_query_server_duration_ms,
       :datastore_query_client_duration_ms,
       :queried_shard_count,
+      :extension_data,
       :mutex
     )
       def self.empty
@@ -27,6 +28,7 @@ module ElasticGraph
           datastore_query_server_duration_ms: 0,
           datastore_query_client_duration_ms: 0,
           queried_shard_count: 0,
+          extension_data: {},
           mutex: ::Thread::Mutex.new
         )
       end
@@ -51,6 +53,13 @@ module ElasticGraph
       # network time, JSON serialization time, etc.
       def datastore_request_transport_duration_ms
         datastore_query_client_duration_ms - datastore_query_server_duration_ms
+      end
+
+      # Allows extensions to add custom data that will be included in the query duration log
+      def set_extension_data(key, value)
+        mutex.synchronize do
+          extension_data[key] = value
+        end
       end
     end
   end
