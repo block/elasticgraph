@@ -2,7 +2,7 @@
 
 This document serves as the primary, single source of truth for understanding the ElasticGraph project.
 
-## Product Context
+## Project Context
 
 -   **Why this project exists**: ElasticGraph is a general purpose, near real-time data query and search platform.
 -   **Problems it solves**: It addresses the need for a scalable and performant platform for rich interactive queries and simplified creation of complex reports.

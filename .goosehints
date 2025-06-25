@@ -21,7 +21,7 @@ The Memory Bank consists of core files and optional context files, all in Markdo
 1. **ai-memory/README.md**
 
    - This is the main memory bank file, acting as the project's single source of truth for the AI.
-   - **Product Context:**
+   - **Project Context:**
      - Why this project exists
      - Problems it solves
      - How it should work
@@ -72,20 +72,15 @@ The Memory Bank consists of core files and optional context files, all in Markdo
      - **User-Centricity:** Keep the end-user and their needs at the forefront of the specification.
    - A comprehensive feature specification that answers questions across the following categories. Include references to any relevant existing files or documentation:
      - **1. Feature Overview**: Problem, value, success metrics (KPIs).
-     - **2. Users and Personas**: Target users, goals, pain points.
-     - **3. User Stories & Scenarios**: High-level user stories, edge cases.
-     - **4. Scope Definition**: In scope (must-haves), out of scope.
-     - **5. Acceptance Criteria**: For each user story, verification methods.
-     - **6. Functional Requirements**: Inputs, outputs, business rules, validations.
-     - **7. Non-Functional Requirements**: Performance, scalability, reliability, security, privacy, accessibility.
-     - **8. Data & Integration**: APIs to use/extend, data models, external dependencies.
-     - **9. UI/UX Considerations**: Design patterns, affected screens/components, responsiveness.
-     - **10. Technical Architecture**: Affected layers/components, fit into existing architecture.
-     - **11. File & Code Organization**: Location for new files, naming conventions, refactoring opportunities.
-     - **12. Testing Strategy**: Unit, integration, E2E tests, mocking.
-     - **13. Deployment & Rollout**: Feature flags, deployment steps, rollback.
-     - **14. Monitoring & Observability**: Logs, metrics, alerts.
-     - **15. Documentation Needs**: User-facing docs, internal docs updates.
+     - **2. User Stories & Scenarios**: High-level user stories, edge cases.
+     - **3. Scope Definition**: In scope (must-haves), out of scope.
+     - **4. Acceptance Criteria**: For each user story, verification methods.
+     - **5. Functional Requirements**: Inputs, outputs, business rules, validations.
+     - **6. Non-Functional Requirements**: Performance, scalability, reliability, security, privacy, accessibility.
+     - **7. Technical Architecture**: Affected layers/components, fit into existing architecture.
+     - **8. File & Code Organization**: Location for new files, naming conventions, refactoring opportunities.
+     - **9. Testing Strategy**: Unit, integration, E2E tests, mocking.
+     - **10. Documentation Needs**: User-facing docs, internal docs updates.
 
 3. **ai-memory/TASKS.md**
    - Purpose: A living Product Requirements Document (PRD) and execution plan, detailing the specific, actionable tasks required to implement the feature defined in `ai-memory/PROMPT.md`. This document is continuously updated by the AI as work progresses.
