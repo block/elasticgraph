@@ -1,5 +1,7 @@
 # ElasticGraph::IndexerAutoscalerLambda
 
+ElasticGraph gem that monitors OpenSearch CPU utilization to autoscale indexer lambda concurrency.
+
 ## Dependency Diagram
 
 ```mermaid

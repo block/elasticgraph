@@ -1,7 +1,6 @@
 # ElasticGraph
 
-ElasticGraph meta-gem that pulls in all the core ElasticGraph gems. Intended for use when all
-parts of ElasticGraph are used from the same deployed app.
+Bootstraps ElasticGraph projects.
 
 ## Dependency Diagram
 
@@ -21,10 +20,14 @@ graph LR;
     click thor href "https://rubygems.org/gems/thor" "Open on RubyGems.org" _blank;
 ```
 
-## Getting Started
+## Usage
 
-Run this command to bootstrap a new local project:
+Run one of these commands to bootstrap a new ElasticGraph project:
 
+```bash
+gem exec elasticgraph new path/to/project --datastore elasticsearch
+# or
+gem exec elasticgraph new path/to/project --datastore opensearch
 ```
-elasticgraph new my_app
-```
+
+See our [getting started guide](https://block.github.io/elasticgraph/getting-started/) for a full tutorial.

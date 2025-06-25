@@ -2,18 +2,6 @@
 
 Provides a GraphiQL IDE for ElasticGraph projects.
 
-Here's an example `config.ru`:
-
-```ruby
-require 'elastic_graph/graphql'
-require 'elastic_graph/graphiql'
-
-graphql = ElasticGraph::GraphQL.from_yaml_file("config/settings/local.yaml")
-run ElasticGraph::GraphiQL.new(graphql)
-```
-
-Run this with `rackup` (after installing the `rackup` gem) or any other rack-compatible server.
-
 ## Dependency Diagram
 
 ```mermaid
@@ -30,6 +18,20 @@ graph LR;
     elasticgraph-local --> elasticgraph-graphiql;
     class elasticgraph-local otherEgGemStyle;
 ```
+
+## Usage
+
+Use this gem with any rack-compatible server. Here's an example `config.ru`:
+
+```ruby
+require 'elastic_graph/graphql'
+require 'elastic_graph/graphiql'
+
+graphql = ElasticGraph::GraphQL.from_yaml_file("config/settings/local.yaml")
+run ElasticGraph::GraphiQL.new(graphql)
+```
+
+Run this with `rackup` (after installing the `rackup` gem) or any other rack-compatible server.
 
 ## License
 

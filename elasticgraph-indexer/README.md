@@ -1,5 +1,7 @@
 # ElasticGraph::Indexer
 
+ElasticGraph gem that provides APIs to robustly index data into a datastore.
+
 ## Dependency Diagram
 
 ```mermaid
@@ -37,4 +39,15 @@ graph LR;
     elasticgraph-schema_definition --> elasticgraph-indexer;
     class elasticgraph-schema_definition otherEgGemStyle;
     click hashdiff href "https://rubygems.org/gems/hashdiff" "Open on RubyGems.org" _blank;
+```
+
+## Usage
+
+```ruby
+require "elastic_graph/indexer"
+
+indexer = ElasticGraph::Indexer.from_yaml_file("config/settings/local.yaml")
+
+events = [] # JSON events read from an async datastream
+indexer.processor.process(events)
 ```

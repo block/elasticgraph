@@ -1,6 +1,6 @@
 # ElasticGraph::GraphQLLambda
 
-This gem wraps `elasticgraph-graphql` in order to run it from an AWS Lambda.
+Adapts `elasticgraph-graphql` to run as an AWS Lambda.
 
 ## Dependency Diagram
 

@@ -44,22 +44,49 @@ graph LR;
 
 ## Integration
 
-To use, simply register the `EnvoyExtension` when defining your schema:
+To use, add the gem to your bundle:
+
+```diff
+diff --git a/Gemfile b/Gemfile
+index 4a5ef1e..5e9251d 100644
+--- a/Gemfile
++++ b/Gemfile
+@@ -8,6 +8,7 @@ gem "elasticgraph-query_registry", *elasticgraph_details
+
+ # Can be elasticgraph-elasticsearch or elasticgraph-opensearch based on the datastore you want to use.
+ gem "elasticgraph-opensearch", *elasticgraph_details
++gem "elasticgraph-health_check", *elasticgraph_details
+
+ gem "httpx", "~> 1.3"
 
 ```
-require(envoy_extension_path = "elastic_graph/health_check/envoy_extension")
-schema.register_graphql_extension ElasticGraph::HealthCheck::EnvoyExtension,
-  defined_at: envoy_extension_path,
-  http_path_segment: "/_status"
+
+Then register the `EnvoyExtension` when defining your schema:
+
+```diff
+diff --git a/config/schema.rb b/config/schema.rb
+index 015c5fa..e3e60c6 100644
+--- a/config/schema.rb
++++ b/config/schema.rb
+@@ -12,6 +12,11 @@ ElasticGraph.define_schema do |schema|
+   # If you don't want to use this extension, you can remove these lines.
+   require(query_registry_path = "elastic_graph/query_registry/graphql_extension")
+   schema.register_graphql_extension ElasticGraph::QueryRegistry::GraphQLExtension, defined_at: query_registry_path
++
++  require(envoy_extension_path = "elastic_graph/health_check/envoy_extension")
++  schema.register_graphql_extension ElasticGraph::HealthCheck::EnvoyExtension,
++    defined_at: envoy_extension_path,
++    http_path_segment: "/_status"
+ end
+
+ # Load the rest of the schema from files at config/schema/**/*.rb.
 ```
 
-## Configuration
+Finally, configure it:
 
-These checks are configurable. The following configuration will be used as an example:
-
-```
+```yaml
 health_check:
-  clusters_to_consider: ["widgets-cluster"]
+  clusters_to_consider: ["main"]
   data_recency_checks:
     Widget:
       timestamp_field: createdAt

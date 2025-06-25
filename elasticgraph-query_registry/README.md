@@ -1,9 +1,9 @@
 # ElasticGraph::QueryRegistry
 
-`ElasticGraph::QueryRegistry` provides a simple source-controlled query
-registry for ElasticGraph applications. This is designed for cases where
-the clients of your application are other internal teams in your organization,
-who are willing to register their queries before using them.
+Provides a source-controlled query registry for ElasticGraph applications.
+This is designed for cases where the clients of your application are other
+internal teams in your organization, who are willing to register their
+queries before using them.
 
 Query registration provides a few key benefits:
 
@@ -104,40 +104,17 @@ execute any query.
 
 ## Setup
 
-First, add `elasticgraph-query_registry` to your `Gemfile`:
+`elasticgraph-query_registry` comes installed in new projects bootstrapped using `elasticgraph new`.
 
-``` ruby
-gem "elasticgraph-query_registry"
-```
+Configure it in your ElasticGraph config YAML files:
 
-Next, configure this library in your ElasticGraph config YAML files:
-
-``` yaml
-graphql:
-  extension_modules:
-  - require_path: elastic_graph/query_registry/graphql_extension
-    name: ElasticGraph::QueryRegistry::GraphQLExtension
+```yaml
 query_registry:
   allow_unregistered_clients: false
   allow_any_query_for_clients:
   - adhoc_client
   path_to_registry: config/queries
 ```
-
-Next, load the `ElasticGraph::QueryRegistry` rake tasks in your `Rakefile`:
-
-``` ruby
-require "elastic_graph/query_registry/rake_tasks"
-
-ElasticGraph::QueryRegistry::RakeTasks.from_yaml_file(
-  "path/to/settings.yaml",
-  "config/queries",
-  require_eg_latency_slo_directive: true
-)
-```
-
-You'll want to add `rake query_registry:validate_queries` to your CI build so
-that every registered query is validated as part of every build.
 
 Finally, your application needs to include a `client:` when submitting
 each GraphQL query for execution. The client `name` should match the
@@ -159,10 +136,12 @@ This library also uses some generated artifacts (`*.variables.yaml` files)
 so it can detect when a change to the structure or type of a variable is
 backward-incompatible. For this to work, it requires that the generated
 variables files are kept up-to-date. Any time a change impacts the structure
-of any variables used by any queries, you'll need to run a task like
-`query_registry:dump_variables[client_name, query_name]` (or
-`query_registry:dump_variables:all`) to update the artifacts.
+of any variables used by any queries, you'll need to run a task to update the
+artifacts:
 
-Don't worry about if you forget this, though--the
-`query_registry:validate_queries` task will also fail and give you
-instructions anytime a variables file is not up-to-date.
+```bash
+bundle exec rake "query_registry:dump_variables[client_name, query_name]"
+```
+
+Don't worry about if you forget this, though--the `query_registry:validate_queries`
+task will also fail and give you instructions anytime a variables file is not up-to-date.

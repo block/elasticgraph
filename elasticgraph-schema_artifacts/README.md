@@ -33,3 +33,19 @@ graph LR;
     elasticgraph-schema_definition --> elasticgraph-schema_artifacts;
     class elasticgraph-schema_definition otherEgGemStyle;
 ```
+
+## Usage
+
+`elasticgraph-schema_artifacts` is used internally by the other parts of ElasticGraph, but it can also be used directly:
+
+```ruby
+require "elastic_graph/schema_artifacts"
+
+artifacts = ElasticGraph::SchemaArtifacts.from_yaml_file("config/settings/local.yaml")
+
+# The `artifacts` object provides access to the various schema artifacts:
+artifacts.graphql_schema_string
+artifacts.datastore_config
+artifacts.runtime_metadata
+artifacts.json_schemas_for(artifacts.latest_json_schema_version)
+```

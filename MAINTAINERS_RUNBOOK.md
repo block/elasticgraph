@@ -293,3 +293,17 @@ When updating a README file, you may want to run the validator locally:
 ```bash
 script/validate_readme_snippets --file elasticgraph-somegem/README.md
 ```
+
+## Apollo
+
+`elasticgraph-apollo` uses https://github.com/apollographql/apollo-federation-subgraph-compatibility
+to verify compatibility with Apollo. Things to note:
+
+- Run `elasticgraph-apollo/script/test_compatibility` to run the compatibility tests (the CI build runs this).
+- Run `elasticgraph-apollo/script/boot_eg_apollo_implementation` to boot the ElasticGraph compatibility test implementation (can be useful for debugging `test_compatibility` failures).
+- These scripts require some additional dependencies to be installed (such as `docker`, `node`, and `npm`).
+- To get that to pass locally on a Mac, I had to enable the `Use Docker Compose V2` flag in Docker Desktop (under "Preferences -> General").  Without that checked, I got errors like this:
+
+```
+ERROR: for apollo-federation-subgraph-compatibility_router_1  Cannot start service router: OCI runtime create failed: container_linux.go:380: starting container process caused: process_linux.go:545: container init caused: rootfs_linux.go:76: mounting "/host_mnt/Users/myron/Development/sq-elasticgraph-ruby/elasticgraph-apollo/vendor/apollo-federation-subgraph-compatibility/supergraph.graphql" to rootfs at "/etc/config/supergraph.graphql" caused: mount through procfd: not a directory: unknown: Are you trying to mount a directory onto a file (or vice-versa)? Check if the specified host path exists and is the expected type
+```

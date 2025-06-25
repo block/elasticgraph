@@ -54,3 +54,15 @@ graph LR;
     click graphql href "https://rubygems.org/gems/graphql" "Open on RubyGems.org" _blank;
     click graphql-c_parser href "https://rubygems.org/gems/graphql-c_parser" "Open on RubyGems.org" _blank;
 ```
+
+## Usage
+
+Most of the time, an `elasticgraph-graphql` endpoint is served via HTTP using `elasticgraph-rack` or `elasticgraph-graphql_lambda`.
+However, you can interact with it directly in Ruby:
+
+```ruby
+require "elastic_graph/graphql"
+
+graphql = ElasticGraph::GraphQL.from_yaml_file("config/settings/local.yaml")
+graphql.graphql_query_executor.execute("query { __typename }") # Returns a GraphQL response.
+```
