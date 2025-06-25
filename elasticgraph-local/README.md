@@ -44,40 +44,10 @@ graph LR;
 
 ## Installation
 
-Add `elasticgraph-local` to a new project `Gemfile`:
+`elasticgraph-local` is added to a project automatically when you bootstrap a project using:
 
-```
-source "https://rubygems.org"
-
-group :development do
-  gem "factory_bot"
-  gem "faker"
-  gem "elasticgraph-local"
-end
-```
-
-As shown above, you can also pull in any gems that will help you
-generate fake data. We tend to use [factory_bot](https://github.com/thoughtbot/factory_bot)
-and [faker](https://github.com/faker-ruby/faker). `elasticgraph-local` should be defined
-in the `development` group (you don't want to include it in any staging or production
-deployment).
-
-Next, install the `elasticgraph-local` rake tasks in your `Rakefile`, with code like:
-
-```
-require 'elastic_graph/local/rake_tasks'
-
-ElasticGraph::Local::RakeTasks.new(
-  local_config_yaml: "config/settings/development.yaml",
-  path_to_schema: "config/schema.rb"
-) do |tasks|
-  tasks.define_fake_data_batch_for :widgets do |batch|
-    # Use faker/factory_bot etc here to generate fake data
-    # and add it to the `batch` array.
-    # You'll probably want to put that logic in another file
-    # and load it from here.
-  end
-end
+```bash
+gem exec elasticgraph new path/to/project
 ```
 
 ## Usage
@@ -98,8 +68,8 @@ At a high level, this provides tasks that help you to:
 
 If you just want to boot ElasticGraph locally without worrying about any of the details, run:
 
-```
-$ bundle exec rake boot_locally
+```bash
+bundle exec rake boot_locally
 ```
 
 That sequences each of the other tasks so that, with a single command, you can go from nothing to a

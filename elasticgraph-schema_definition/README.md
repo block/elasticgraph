@@ -46,3 +46,44 @@ graph LR;
     click graphql-c_parser href "https://rubygems.org/gems/graphql-c_parser" "Open on RubyGems.org" _blank;
     click rake href "https://rubygems.org/gems/rake" "Open on RubyGems.org" _blank;
 ```
+
+## Usage
+
+Define the shape of your data using the schema definition API:
+
+```ruby
+# in config/schema/team.rb
+
+ElasticGraph.define_schema do |schema|
+  schema.enum_type "SportsLeague" do |t|
+    t.value "MLB"
+    t.value "NBA"
+    t.value "NFL"
+    t.value "NHL"
+  end
+
+  schema.object_type "Team" do |t|
+    t.field "id", "ID!"
+    t.field "league", "SportsLeague"
+    t.field "formedOn", "Date"
+    t.field "currentName", "String"
+    t.field "pastNames", "[String!]!"
+    t.field "stadium_location", "GeoLocation"
+
+    t.index "teams"
+  end
+end
+```
+
+The default rake task (`bundle exec rake`) performs a full build, including generating schema artifacts.
+You can directly generate schema artifacts with:
+
+```bash
+bundle exec rake schema_artifacts:dump
+```
+
+To see if the artifacts are up-to-date, run:
+
+```bash
+bundle exec rake schema_artifacts:check
+```

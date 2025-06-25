@@ -25,3 +25,7 @@ graph LR;
     class elasticgraph-schema_definition otherEgGemStyle;
     click json_schemer href "https://rubygems.org/gems/json_schemer" "Open on RubyGems.org" _blank;
 ```
+
+## Usage
+
+This gem is used automatically by `elasticgraph-indexer` to validate events as they are indexed.

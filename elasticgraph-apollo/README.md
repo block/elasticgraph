@@ -32,27 +32,47 @@ graph LR;
 
 ## Usage
 
-First, add `elasticgraph-apollo` to your `Gemfile`:
+First, add `elasticgraph-apollo` to your `Gemfile`, alongside the other ElasticGraph gems:
+
+```diff
+diff --git a/Gemfile b/Gemfile
+index 4a5ef1e..5c16c2b 100644
+--- a/Gemfile
++++ b/Gemfile
+@@ -8,6 +8,7 @@ gem "elasticgraph-query_registry", *elasticgraph_details
+
+ # Can be elasticgraph-elasticsearch or elasticgraph-opensearch based on the datastore you want to use.
+ gem "elasticgraph-opensearch", *elasticgraph_details
++gem "elasticgraph-apollo", *elasticgraph_details
+
+ gem "httpx", "~> 1.3"
 
 ```
-gem "elasticgraph-apollo"
-```
 
-Finally, update your ElasticGraph schema artifact rake tasks in your `Rakefile`
-so that `ElasticGraph::GraphQL::Apollo::SchemaDefinition::APIExtension` is
-passed as one of the `extension_modules`:
+Finally, update `Rakefile` so that `ElasticGraph::GraphQL::Apollo::SchemaDefinition::APIExtension` is
+used as one of the `extension_modules`:
 
-```
-require "elastic_graph/schema_definition/rake_tasks"
-require "elastic_graph/apollo/schema_definition/api_extension"
+```diff
+diff --git a/Rakefile b/Rakefile
+index 2943335..26633c3 100644
+--- a/Rakefile
++++ b/Rakefile
+@@ -1,5 +1,6 @@
+ project_root = File.expand_path(__dir__)
 
-ElasticGraph::SchemaDefinition::RakeTasks.new(
-  schema_element_name_form: :snake_case,
-  index_document_sizes: true,
-  path_to_schema: "config/schema.rb",
-  schema_artifacts_directory: artifacts_dir,
-  extension_modules: [ElasticGraph::Apollo::SchemaDefinition::APIExtension]
-)
++require "elastic_graph/apollo/schema_definition/api_extension"
+ require "elastic_graph/local/rake_tasks"
+ require "elastic_graph/query_registry/rake_tasks"
+ require "rspec/core/rake_task"
+@@ -12,6 +13,8 @@ ElasticGraph::Local::RakeTasks.new(
+   local_config_yaml: settings_file,
+   path_to_schema: "#{project_root}/config/schema.rb"
+ ) do |tasks|
++  tasks.schema_definition_extension_modules = [ElasticGraph::Apollo::SchemaDefinition::APIExtension]
++
+   # Set this to true once you're beyond the prototyping stage.
+   tasks.enforce_json_schema_version = false
+
 ```
 
 That's it!
@@ -66,23 +86,21 @@ This library supports multiple versions of Apollo federation. As of Jan. 2024, i
 * v2.5
 * v2.6
 
-By default, the newest version is targeted. If you need an older version (e.g. because your organization is
-running an older Apollo version), you can configure it in your schema definition with:
+By default, the newest version is targeted. If you need an older version (e.g. because your organization is running
+an older Apollo version), you can configure it in your schema definition with `schema.target_apollo_federation_version`:
 
-```
-schema.target_apollo_federation_version "2.3"
-```
+```diff
+diff --git a/config/schema.rb b/config/schema.rb
+index 015c5fa..362cdcb 100644
+--- a/config/schema.rb
++++ b/config/schema.rb
+@@ -4,6 +4,8 @@ ElasticGraph.define_schema do |schema|
+   # ElasticGraph will tell you when you need to bump this.
+   schema.json_schema_version 1
 
-## Testing Notes
-
-This project uses https://github.com/apollographql/apollo-federation-subgraph-compatibility
-to verify compatibility with Apollo. Things to note:
-
-- Run `elasticgraph-apollo/script/test_compatibility` to run the compatibility tests (the CI build runs this).
-- Run `elasticgraph-apollo/script/boot_eg_apollo_implementation` to boot the ElasticGraph compatibility test implementation (can be useful for debugging `test_compatibility` failures).
-- These scripts require some additional dependencies to be installed (such as `docker`, `node`, and `npm`).
-- To get that to pass locally on my Mac, I had to enable the `Use Docker Compose V2` flag in Docker Desktop (under "Preferences -> General").  Without that checked, I got errors like this:
-
-```
-ERROR: for apollo-federation-subgraph-compatibility_router_1  Cannot start service router: OCI runtime create failed: container_linux.go:380: starting container process caused: process_linux.go:545: container init caused: rootfs_linux.go:76: mounting "/host_mnt/Users/myron/Development/sq-elasticgraph-ruby/elasticgraph-apollo/vendor/apollo-federation-subgraph-compatibility/supergraph.graphql" to rootfs at "/etc/config/supergraph.graphql" caused: mount through procfd: not a directory: unknown: Are you trying to mount a directory onto a file (or vice-versa)? Check if the specified host path exists and is the expected type
++  schema.target_apollo_federation_version "2.3"
++
+   # This registers the elasticgraph-query_registry extension, which can be used to reject queries that
+   # clients have not registered (and to reject queries that differ from what a client has registered).
+   # In addition, every registered query is validated against the schema in the CI build, giving you
 ```

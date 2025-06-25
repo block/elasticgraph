@@ -33,3 +33,17 @@ graph LR;
     elasticgraph-indexer_autoscaler_lambda --> elasticgraph-datastore_core;
     class elasticgraph-indexer_autoscaler_lambda otherEgGemStyle;
 ```
+
+## Usage
+
+This gem is an internal "support" gem that other parts of ElasticGraph rely on but which ElasticGraph users are not expected to interact with.
+However, here's a usage example if you want to poke around:
+
+```ruby
+require "elastic_graph/datastore_core"
+
+datastore_core = ElasticGraph::DatastoreCore.from_yaml_file("config/settings/local.yaml")
+datastore_core.index_definitions_by_name # Hash of index definitition objects, keyed by index name
+datastore_core.index_definitions_by_graphql_type # Hash of index definitition objects, keyed by GraphQL type name
+datastore_core.clients_by_name # Hash of datastore clients, keyed by name
+```
