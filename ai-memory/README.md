@@ -221,6 +221,7 @@ The project is a monorepo composed of many gems. Each gem typically resides in i
     -   **Key Files**: `lib/elastic_graph/query_registry/registry.rb` (manages query files), `lib/elastic_graph/query_registry/query_validator.rb` (validates queries), `lib/elastic_graph/query_registry/graphql_extension.rb` (GraphQL integration), `lib/elastic_graph/query_registry/rake_tasks.rb` (for CI validation and managing variable artifacts).
     -   **Dependencies**: `elasticgraph-graphql`, `elasticgraph-support`, `graphql`, `graphql-c_parser`, `rake`.
     -   **Provides**: A robust system for managing and validating GraphQL queries, especially useful for internal clients and ensuring schema evolution safety. Uses a directory structure (e.g., `config/queries/[client_name]/query.graphql`) and `*.variables.yaml` files for variable structure validation.
+    -   **Warning Mode Feature**: Added support for `warn_on_unregistered_query_for_clients` configuration option that allows unregistered queries to execute while logging warnings. This provides a gradual migration path for teams adopting the query registry. Warnings are logged even for clients in `allow_any_query_for_clients` to enable monitoring of query usage patterns.
 
 **Datastore Adapters:**
 -   `elasticgraph-elasticsearch/`: Wraps the official Elasticsearch client (`elasticsearch` gem) for use by ElasticGraph.

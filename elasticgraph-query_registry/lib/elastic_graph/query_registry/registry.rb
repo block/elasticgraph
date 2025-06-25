@@ -36,14 +36,16 @@ module ElasticGraph
       # Public factory method, which builds a `Registry` instance from the given directory.
       # Subdirectories are treated as client names, and the files in them are treated as
       # individually registered queries.
-      def self.build_from_directory(schema, directory, allow_unregistered_clients:, allow_any_query_for_clients:)
+      def self.build_from_directory(schema, directory, allow_unregistered_clients:, allow_any_query_for_clients:, warn_on_unregistered_query_for_clients:, logger:)
         directory = Pathname.new(directory)
 
         new(
           schema,
           client_names: directory.children.map { |client_dir| client_dir.basename.to_s },
           allow_unregistered_clients: allow_unregistered_clients,
-          allow_any_query_for_clients: allow_any_query_for_clients
+          allow_any_query_for_clients: allow_any_query_for_clients,
+          warn_on_unregistered_query_for_clients: warn_on_unregistered_query_for_clients,
+          logger: logger
         ) do |client_name|
           # Lazily read queries off of disk when we need to for a given client.
           (directory / client_name).glob("*.graphql").map { |file| ::File.read(file.to_s) }
@@ -79,14 +81,17 @@ module ElasticGraph
 
       private
 
-      def initialize(schema, client_names:, allow_unregistered_clients:, allow_any_query_for_clients:, &provide_query_strings_for_client)
+      def initialize(schema, client_names:, allow_unregistered_clients:, allow_any_query_for_clients:, warn_on_unregistered_query_for_clients:, logger:, &provide_query_strings_for_client)
         @schema = schema
         allow_any_query_for_clients_set = allow_any_query_for_clients.to_set
+        warn_on_unregistered_query_for_clients_set = warn_on_unregistered_query_for_clients.to_set
 
         @registered_client_validator = QueryValidators::ForRegisteredClient.new(
           schema: schema,
           client_names: client_names,
           allow_any_query_for_clients: allow_any_query_for_clients_set,
+          warn_on_unregistered_query_for_clients: warn_on_unregistered_query_for_clients_set,
+          logger: logger,
           provide_query_strings_for_client: provide_query_strings_for_client
         )
 
