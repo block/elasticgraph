@@ -162,3 +162,110 @@ with it), you can do so from the [Dependency Graph--Dependabot page](https://git
 
 * Click "Recent update jobs" next to a dependabot job
 * Click the "Check for updates" button
+
+## Updating GraphiQL
+
+The GraphiQL UI served by `elasticgraph-graphiql` uses locally vendored assets, packaged into `elasticgraph-graphiql/lib/elastic_graph/graphiql/assets.tar.gz`.
+These assets are built from a specified version of the official `graphql/graphiql` Vite example (`examples/graphiql-vite`).
+This ensures the UI can run offline, is not dependent on external CDNs, and uses ElasticGraph project favicons.
+
+The `elasticgraph-graphiql/lib/elastic_graph/graphiql.rb` application extracts this tarball into a temporary directory at runtime to serve the UI.
+
+To update the `graphiql.tar.gz` archive (e.g., to a newer version of GraphiQL or to reflect changes in project favicons):
+
+1.  **Prerequisites:** Ensure you have the following command-line tools installed and available in your system's PATH:
+    *   `git`
+    *   `node` (Node.js, a recent LTS version is recommended)
+    *   `yarn` (Yarn package manager)
+    *   `tar`
+    *   `gzip` (usually included with `tar`)
+
+2.  **Run the Update Script:** Execute the following script from the root of the `elasticgraph-fully-local-graphiql` project. You can
+    optionally specify a git ref (tag, branch, or commit SHA) from the `graphql/graphiql` repository using the `--ref` option.
+
+    ```bash
+    # To use a specific version, e.g., a tag graphiql@5.0.3
+    elasticgraph-graphiql/script/update_graphiql --ref graphiql@5.0.3
+    ```
+
+3.  **What the Script Does:**
+    *   Clones the specified version of the `graphql/graphiql` repository into a temporary directory.
+    *   Modifies the source of the `examples/graphiql-vite` (`App.jsx`) to use `/graphql` as its API endpoint.
+    *   Installs all necessary Node.js dependencies for the monorepo using `yarn install`.
+    *   Builds all packages within the `graphql/graphiql` monorepo using `yarn build`.
+    *   Builds the specific `example-graphiql-vite` workspace using `yarn workspace example-graphiql-vite build`.
+    *   Modifies the resulting `dist/index.html` to set the title to "ElasticGraph GraphiQL".
+    *   Copies favicons from this project's `config/site/src/assets/favicons/` into the `dist/` directory.
+    *   Creates a `graphiql.tar.gz` archive from the contents of the modified `dist/` directory.
+    *   Saves this archive to `elasticgraph-graphiql/lib/elastic_graph/graphiql/assets.tar.gz`.
+    *   Cleans up the temporary build directory.
+
+4.  **Test the updated GraphiQL:**
+    * Boot locally with `bundle exec rake boot_local`.
+    * Try out the GraphiQL UI in the browser to confirm it works.
+    * Confirm in the network tab that all assets load correctly.
+
+5.  **Commit Changes:** After the script successfully completes, the `elasticgraph-graphiql/lib/elastic_graph/graphiql/assets.tar.gz`
+    file will be updated. Review this change and commit it to your version control system.
+
+This process ensures that `elasticgraph-graphiql` serves a self-contained and consistently branded version of the GraphiQL UI.
+
+## Creating a new ElasticGraph Gem
+
+Occasionally, it's useful to create a new gem that's part of the set of ElasticGraph gems provided by this repo. Here's how to do that.
+
+1. Copy a skeleton from another gem. (`elasticgraph-opensearch` is a pretty small one, so it's what we'll use here). Be sure to use
+   `cp -R` so that symlinked files copy properly:
+
+```bash
+cp -R elasticgraph-opensearch elasticgraph-newgem
+```
+
+2. Cleanup the `lib`/`spec`/`sig` files that were originally in `elasticgraph-opensearch` (these will be entirely different for your new gem):
+
+```bash
+rm -rf elasticgraph-newgem/lib/elastic_graph/opensearch
+rm -rf elasticgraph-newgem/spec/unit/elastic_graph/opensearch
+rm -rf elasticgraph-newgem/sig/elastic_graph/opensearch
+rm -rf elasticgraph-newgem/sig/opensearch.rbs
+```
+
+3. Use your IDE or similar tool to find and replace `elasticgraph-opensearch` with `elasticgraph-newgem` in your gem directory.
+
+4. Edit the gemspec. Be sure to update the following as needed:
+    * `name`
+    * `summary`
+    * `metadata.gem_category`
+    * `add_dependency`
+    * `add_development_dependency`
+
+5. Add the gem to git, and then update our dependency diagrams:
+
+```bash
+git add elasticgraph-newgem
+script/update_dependency_diagrams
+```
+
+6. Write the code and specs for the gem. To run the gem's test suite in the way it's run on CI, run:
+
+```bash
+script/run_gem_specs elasticgraph-newgem
+```
+
+7. Open a PR with the new gem once it's ready for review.
+
+8. Once that has merged, register the new gem with rubygems.org. We use RubyGems [trusted publishing](https://guides.rubygems.org/trusted-publishing/)
+   to publish our gems to rubygems.org from a GitHub action. Follow the [guide](https://guides.rubygems.org/trusted-publishing/pushing-a-new-gem/) for
+   pushing a new gem. Enter the following details into the "New Pending Trusted Publisher" form:
+
+   * **RubyGem name**: Whatever the new gem is called (elasticgraph-newgem in the examples above)
+   * **Trusted publisher type**: GitHub Actions
+   * **Repository owner**: block
+   * **Repository name**: elasticgraph
+   * **Workflow filename**: release.yaml
+   * **Environment**: rubygems.org
+
+9. Publish an ElasticGraph release to verify the new gem can be released successfully. This needs to happen within 12 hours of creating the
+   pending trusted publisher on rubygems.org (as that's how long a new pending trusted publisher is valid for). Use the release process
+   explained at the top of this document, but be sure to use a release candidate version (e.g. `1.2.3.rc1`). We don't want to be trying out
+   the publishing of a new gem for the first time when cutting a final release.

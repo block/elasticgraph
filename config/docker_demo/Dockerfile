@@ -13,6 +13,7 @@ COPY elasticgraph elasticgraph/
 COPY elasticgraph-support elasticgraph-support/
 COPY elasticgraph-admin elasticgraph-admin/
 COPY elasticgraph-datastore_core elasticgraph-datastore_core/
+COPY elasticgraph-graphiql elasticgraph-graphiql/
 COPY elasticgraph-graphql elasticgraph-graphql/
 COPY elasticgraph-indexer elasticgraph-indexer/
 COPY elasticgraph-json_schema elasticgraph-json_schema/

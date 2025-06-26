@@ -1,0 +1,8 @@
+module ElasticGraph
+  module GraphiQL
+    def self.new: (
+      GraphQL,
+      ?output: io
+    ) -> ::Rack::_Application
+  end
+end

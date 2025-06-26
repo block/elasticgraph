@@ -240,16 +240,24 @@ The project is a monorepo composed of many gems. Each gem typically resides in i
     -   **Key Files**: `exe/elasticgraph` (executable script), `lib/elastic_graph/cli.rb` (Thor-based CLI logic), `lib/elastic_graph/project_template/` (directory containing project templates).
     -   **Dependencies**: `elasticgraph-support`, `thor`.
     -   **Provides**: Project scaffolding and bootstrapping.
+-   `elasticgraph-graphiql/`: Provides a GraphiQL IDE for ElasticGraph projects.
+    -   **Purpose**: Serves both an ElasticGraph GraphQL endpoint and a GraphiQL IDE in a single Rack application. Designed for local development, can be mounted in Rails applications, or run in any Rack-compatible context.
+    -   **Key Files**: `lib/elastic_graph/graphiql.rb` (main Rack application builder), `lib/elastic_graph/graphiql/assets.tar.gz` (bundled GraphiQL assets), `lib/elastic_graph/graphiql/assets_info.md` (asset version tracking), `script/update_graphiql` (asset update script).
+    -   **Dependencies**: `elasticgraph-rack`.
+    -   **Architecture**: Uses Rack::Builder to serve static GraphiQL assets (extracted from tarball at runtime) and routes "/graphql" to the GraphQL endpoint. Assets are sourced from the official GraphiQL repository's Vite example, modified to use local endpoints and ElasticGraph branding.
+    -   **Provides**: A fully functional GraphiQL IDE with ElasticGraph integration for local development and testing.
 -   `elasticgraph-local/`: Provides Rake tasks and Docker configurations to support developing and running ElasticGraph applications locally.
     -   **Purpose**: Facilitates a local development workflow by managing local datastore instances (Elasticsearch/OpenSearch via Docker), handling schema artifact generation, indexing fake data (defined by the developer using tools like `factory_bot`), and booting a local GraphiQL UI and GraphQL endpoint.
-    -   **Key Files**: `lib/elastic_graph/local/rake_tasks.rb` (core Rake task definitions), `lib/elastic_graph/local/docker_runner.rb`, Docker-related files in `lib/elastic_graph/local/elasticsearch/` and `lib/elastic_graph/local/opensearch/`, `lib/elastic_graph/local/config.ru` (for Rack application).
-    -   **Dependencies**: `elasticgraph-admin`, `elasticgraph-graphql`, `elasticgraph-indexer`, `elasticgraph-rack`, `elasticgraph-schema_definition`, `rackup`, `rake`, `webrick`.
-    -   **Provides**: A comprehensive local development environment setup and management through Rake tasks (e.g., `rake boot_locally`).
--   `elasticgraph-rack/`: Uses Rack to serve an ElasticGraph GraphQL endpoint and a GraphiQL UI, primarily for local development.
-    -   **Purpose**: Enables easy local serving of the GraphQL API and the GraphiQL in-browser IDE for query testing and exploration. Can be used with any Rack-compatible server.
-    -   **Key Files**: `lib/elastic_graph/rack/graphql_endpoint.rb` (Rack app for API), `lib/elastic_graph/rack/graphiql.rb` and `lib/elastic_graph/rack/graphiql/index.html` (for GraphiQL UI).
+    -   **Key Files**: `lib/elastic_graph/local/rake_tasks.rb` (core Rake task definitions), `lib/elastic_graph/local/docker_runner.rb`, Docker-related files in `lib/elastic_graph/local/elasticsearch/` and `lib/elastic_graph/local/opensearch/`, `lib/elastic_graph/local/config.ru` (for GraphiQL Rack application).
+    -   **Dependencies**: `elasticgraph-admin`, `elasticgraph-graphql`, `elasticgraph-graphiql`, `elasticgraph-indexer`, `elasticgraph-rack`, `elasticgraph-schema_definition`, `rackup`, `rake`, `webrick`.
+    -   **Integration**: The `rake boot_graphiql` task uses `elasticgraph-graphiql` via the `config.ru` file to serve the GraphiQL IDE, automatically opening it in a browser for local development.
+    -   **Provides**: A comprehensive local development environment setup and management through Rake tasks (e.g., `rake boot_locally`, `rake boot_graphiql`).
+-   `elasticgraph-rack/`: Uses Rack to serve an ElasticGraph GraphQL endpoint, primarily for local development.
+    -   **Purpose**: Enables easy local serving of the GraphQL API
+    -   **Key Files**:
+        - `lib/elastic_graph/rack/graphql_endpoint.rb`: Rack app for the GraphQL API.
     -   **Dependencies**: `elasticgraph-graphql`, `rack`.
-    -   **Provides**: Local serving capabilities for the GraphQL API and GraphiQL.
+    -   **Provides**: Local serving capabilities for the GraphQL API.
 -   `elasticgraph-schema_definition/`: Provides the Ruby DSL and tools for defining an ElasticGraph schema and generating all necessary runtime artifacts.
     -   **Purpose**: Allows developers to define their GraphQL schema, types, fields, relationships, indexing strategies (including Painless scripts for updates and derived fields), and datastore script configurations using a Ruby-based DSL. This gem then processes these definitions to generate artifacts (GraphQL schema, JSON schemas, datastore mappings, runtime metadata) used by other ElasticGraph components. It is not intended for production deployment itself.
     -   **Key Files**: `lib/elastic_graph/schema_definition/api.rb` (core DSL), `lib/elastic_graph/schema_definition/schema_elements/` (classes for schema parts), `lib/elastic_graph/schema_definition/indexing/` (indexing definitions), `lib/elastic_graph/schema_definition/scripting/` (datastore script definitions), `lib/elastic_graph/schema_definition/schema_artifact_manager.rb`, `lib/elastic_graph/schema_definition/rake_tasks.rb`.

@@ -65,6 +65,5 @@ We welcome contributions to ElasticGraph!
 
 ElasticGraph is released under the [MIT License](https://github.com/block/elasticgraph/blob/main/LICENSE.txt).
 
-The [GraphiQL interface](https://github.com/block/elasticgraph/blob/main/elasticgraph-rack/lib/elastic_graph/rack/graphiql/index.html)
-bundled with `elasticgraph-rack` is derived from the [GraphiQL project](https://github.com/graphql/graphiql), which is also licensed
-under the MIT License, Copyright (c) GraphQL Contributors.
+The GraphiQL interface bundled with `elasticgraph-graphiql` is derived from the [GraphiQL project](https://github.com/graphql/graphiql),
+which is also licensed under the MIT License, Copyright (c) GraphQL Contributors.

@@ -6,6 +6,7 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/rack"
 require "elastic_graph/rack/graphql_endpoint"
 require "elastic_graph/constants"
 
@@ -86,9 +87,11 @@ module ElasticGraph::Rack
       end
 
       it "allows exceptions to be raised in the test environment" do
-        expect {
-          call_graphql_query(introspection_query)
-        }.to raise_error("boom")
+        with_env "RACK_ENV" => "test" do
+          expect {
+            call_graphql_query(introspection_query)
+          }.to raise_error("boom")
+        end
       end
 
       it "renders exceptions (instead of propagating them) in non-test environments" do

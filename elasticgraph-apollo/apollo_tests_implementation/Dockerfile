@@ -11,6 +11,7 @@ COPY elasticgraph-admin /web/elasticgraph-admin
 COPY elasticgraph-apollo /web/elasticgraph-apollo
 COPY elasticgraph-datastore_core /web/elasticgraph-datastore_core
 COPY elasticgraph-elasticsearch /web/elasticgraph-elasticsearch
+COPY elasticgraph-graphiql /web/elasticgraph-graphiql
 COPY elasticgraph-graphql /web/elasticgraph-graphql
 COPY elasticgraph-indexer /web/elasticgraph-indexer
 COPY elasticgraph-json_schema /web/elasticgraph-json_schema

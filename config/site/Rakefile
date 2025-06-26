@@ -280,11 +280,13 @@ module ElasticGraph
           run_html_proofer.call(
             JEKYLL_API_DOCS_DIR,
             ignore_files: [/#{JEKYLL_API_DOCS_DIR / "main"}/o, "#{JEKYLL_API_DOCS_DIR}/index.html"],
-            ignore_urls: ["elasticgraph-rack/lib/elastic_graph/rack/graphiql/index.html"],
             check_external_hash: false,
             ignore_missing_alt: true,
             allow_missing_href: true,
-            disable_external: true
+            disable_external: true,
+            # An invalid URL that made its way into old versions of the docs. We don't want to update old versions of the
+            # API docs to fix broken links.
+            ignore_urls: ["elasticgraph-rack/lib/elastic_graph/rack/graphiql/index.html"]
           )
 
           # We use stricter settings for the newly generated YARD docs, since we can actually fix these.

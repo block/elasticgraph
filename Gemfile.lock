@@ -42,6 +42,12 @@ PATH
       faraday-retry (~> 2.3, >= 2.3.2)
 
 PATH
+  remote: elasticgraph-graphiql
+  specs:
+    elasticgraph-graphiql (1.0.0.pre)
+      elasticgraph-rack (= 1.0.0.pre)
+
+PATH
   remote: elasticgraph-graphql_lambda
   specs:
     elasticgraph-graphql_lambda (1.0.0.pre)
@@ -115,9 +121,9 @@ PATH
   specs:
     elasticgraph-local (1.0.0.pre)
       elasticgraph-admin (= 1.0.0.pre)
+      elasticgraph-graphiql (= 1.0.0.pre)
       elasticgraph-graphql (= 1.0.0.pre)
       elasticgraph-indexer (= 1.0.0.pre)
-      elasticgraph-rack (= 1.0.0.pre)
       elasticgraph-schema_definition (= 1.0.0.pre)
       rackup (~> 2.2, >= 2.2.1)
       rake (~> 13.3)
@@ -607,6 +613,7 @@ DEPENDENCIES
   elasticgraph-apollo (= 1.0.0.pre)!
   elasticgraph-datastore_core (= 1.0.0.pre)!
   elasticgraph-elasticsearch (= 1.0.0.pre)!
+  elasticgraph-graphiql (= 1.0.0.pre)!
   elasticgraph-graphql (= 1.0.0.pre)!
   elasticgraph-graphql_lambda (= 1.0.0.pre)!
   elasticgraph-health_check (= 1.0.0.pre)!

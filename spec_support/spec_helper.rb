@@ -211,6 +211,7 @@ RSpec.configure do |config|
   config.when_first_matching_example_defined(:builds_graphql) { require "elastic_graph/spec_support/builds_graphql" }
   config.when_first_matching_example_defined(:capture_logs) { require "elastic_graph/spec_support/logging" }
   config.when_first_matching_example_defined(:factories) { require "elastic_graph/spec_support/factories" }
+  config.when_first_matching_example_defined(:rack_app) { require "elastic_graph/spec_support/rack_app" }
   config.when_first_matching_example_defined(:rake_task) { require "elastic_graph/spec_support/rake_task" }
   config.when_first_matching_example_defined(:stub_datastore_client) { require "elastic_graph/spec_support/stub_datastore_client" }
   config.when_first_matching_example_defined(:vcr) { require "elastic_graph/spec_support/vcr" }

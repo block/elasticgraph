@@ -9,7 +9,7 @@
 # This `config.ru` file is used by the `rake boot_graphiql` task.
 
 require "elastic_graph/graphql"
-require "elastic_graph/rack/graphiql"
+require "elastic_graph/graphiql"
 
 graphql = ElasticGraph::GraphQL.from_yaml_file(ENV.fetch("ELASTICGRAPH_YAML_FILE"))
-run ElasticGraph::Rack::GraphiQL.new(graphql)
+run ElasticGraph::GraphiQL.new(graphql)

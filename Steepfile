@@ -10,7 +10,6 @@ require_relative "script/list_eg_gems"
 
 target :elasticgraph_gems do
   exclude_dirs = %w[
-    elasticgraph-rack
     spec_support
   ].to_set
 
@@ -76,6 +75,7 @@ target :elasticgraph_gems do
     "fileutils",
     "forwardable",
     "json",
+    "open3",
     "pathname",
     "shellwords",
     "tmpdir",

@@ -9,13 +9,13 @@
 require_relative "../elasticgraph-support/lib/elastic_graph/version"
 
 Gem::Specification.new do |spec|
-  spec.name = "elasticgraph-local"
+  spec.name = "elasticgraph-graphiql"
   spec.version = ElasticGraph::VERSION
   spec.authors = ["Myron Marston", "Ben VandenBos", "Block Engineering"]
   spec.email = ["myron@squareup.com"]
   spec.homepage = "https://block.github.io/elasticgraph/"
   spec.license = "MIT"
-  spec.summary = "Provides support for developing and running ElasticGraph applications locally."
+  spec.summary = "Provides a GraphiQL IDE for ElasticGraph projects."
 
   # See https://guides.rubygems.org/specification-reference/#metadata
   # for metadata entries understood by rubygems.org.
@@ -41,16 +41,8 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = [">= 3.4", "< 3.5"]
 
-  spec.add_dependency "elasticgraph-admin", ElasticGraph::VERSION
-  spec.add_dependency "elasticgraph-graphql", ElasticGraph::VERSION
-  spec.add_dependency "elasticgraph-graphiql", ElasticGraph::VERSION
-  spec.add_dependency "elasticgraph-indexer", ElasticGraph::VERSION
-  spec.add_dependency "elasticgraph-schema_definition", ElasticGraph::VERSION
-  spec.add_dependency "rackup", "~> 2.2", ">= 2.2.1"
-  spec.add_dependency "rake", "~> 13.3"
-  spec.add_dependency "webrick", "~> 1.9", ">= 1.9.1"
+  spec.add_dependency "elasticgraph-rack", ElasticGraph::VERSION
 
-  spec.add_development_dependency "elasticgraph-apollo", ElasticGraph::VERSION
   spec.add_development_dependency "elasticgraph-elasticsearch", ElasticGraph::VERSION
   spec.add_development_dependency "elasticgraph-opensearch", ElasticGraph::VERSION
 end

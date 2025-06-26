@@ -1,0 +1,187 @@
+#!/usr/bin/env ruby
+
+# Copyright 2024 - 2025 Block, Inc.
+#
+# Use of this source code is governed by an MIT-style
+# license that can be found in the LICENSE file or at
+# https://opensource.org/licenses/MIT.
+#
+# frozen_string_literal: true
+
+require "fileutils"
+require "open3"
+require "optparse"
+require "shellwords"
+require "tmpdir"
+
+# --- Configuration Constants ---
+GRAPHIQL_REPO_URL = "https://github.com/graphql/graphiql"
+VITE_EXAMPLE_SUBPATH = File.join("examples", "graphiql-vite")
+VITE_EXAMPLE_PACKAGE_NAME = "example-graphiql-vite"
+TARGET_ASSETS_TARBALL_PATH = File.expand_path("../lib/elastic_graph/graphiql/assets.tar.gz", __dir__)
+ELASTICGRAPH_FAVICONS_SOURCE_DIR = File.expand_path("../../config/site/src/assets/favicons", __dir__)
+
+# --- Options Parsing ---
+git_ref = nil
+
+OptionParser.new do |opts|
+  opts.banner = "Usage: #{$PROGRAM_NAME} [options]"
+  opts.separator ""
+  opts.separator "Specific options:"
+
+  opts.on("-r REF", "--ref REF", String, "Git ref (tag, branch, commit SHA) of the graphql/graphiql repository to use") do |ref|
+    git_ref = ref
+  end
+
+  opts.on_tail("-h", "--help", "Show this message") do
+    puts opts
+    exit
+  end
+end.parse!
+
+unless git_ref
+  raise "Must provide a `--ref`."
+end
+
+def run_command(command, in_dir: nil, env_vars: {})
+  puts "Executing: #{command} #{"(in dir: #{in_dir})" if in_dir}"
+
+  full_command_env = ENV.to_h.merge(env_vars)
+  stdout_str, stderr_str, status = Open3.capture3(full_command_env, command, chdir: in_dir || Dir.pwd)
+
+  unless status.success?
+    puts "Error executing command: #{command}"
+    puts "STDOUT:\n#{stdout_str}" unless stdout_str.empty?
+    puts "STDERR:\n#{stderr_str}" unless stderr_str.empty?
+    puts "Exit status: #{status.exitstatus}"
+
+    raise "Command failed: #{command}"
+  end
+
+  stdout_str
+end
+
+# --- Main Script Logic ---
+puts "Script update_graphiql started."
+puts "Configuration:"
+puts "  GraphiQL Repo URL: #{GRAPHIQL_REPO_URL}"
+puts "  GraphiQL Git Ref: #{git_ref}"
+puts "  Target Example Subpath: #{VITE_EXAMPLE_SUBPATH}"
+puts "  Target Example Package Name: #{VITE_EXAMPLE_PACKAGE_NAME}"
+puts "  Target Archive Path: #{TARGET_ASSETS_TARBALL_PATH}"
+puts "  ElasticGraph Favicons Source: #{ELASTICGRAPH_FAVICONS_SOURCE_DIR}"
+
+puts "\nStarting main operations..."
+Dir.mktmpdir("graphiql_build") do |temp_dir|
+  puts "Created temporary directory for build: #{temp_dir}"
+
+  repo_clone_subdir = "graphiql_repo"
+  repo_clone_path = File.join(temp_dir, repo_clone_subdir)
+  FileUtils.mkdir_p(repo_clone_path)
+
+  puts "\nCloning graphql/graphiql repository (ref: #{git_ref}) into #{repo_clone_path}..."
+  run_command("git clone #{GRAPHIQL_REPO_URL}.git .", in_dir: repo_clone_path)
+  puts "Checking out git ref: #{git_ref}..."
+  run_command("git checkout #{Shellwords.escape(git_ref)}", in_dir: repo_clone_path)
+  puts "Successfully cloned and checked out ref: #{git_ref}."
+
+  example_dir = File.join(repo_clone_path, VITE_EXAMPLE_SUBPATH)
+  unless Dir.exist?(example_dir)
+    raise "Example path #{VITE_EXAMPLE_SUBPATH} not found after clone and checkout in #{repo_clone_path}."
+  end
+  puts "Found example path: #{example_dir}"
+
+  app_jsx_path = File.join(example_dir, "src", "App.jsx")
+  unless File.exist?(app_jsx_path)
+    raise "#{app_jsx_path} not found. Skipping fetcher URL modification."
+  end
+
+  puts "\nModifying #{app_jsx_path} to use local /graphql endpoint..."
+  app_content = File.read(app_jsx_path)
+  original_fetch_url = "https://graphql.earthdata.nasa.gov/api"
+  target_fetch_url = "/graphql"
+  if app_content.gsub!(original_fetch_url, target_fetch_url)
+    File.write(app_jsx_path, app_content)
+    puts "Successfully updated fetch URL in #{app_jsx_path} to '#{target_fetch_url}'."
+  else
+    raise "Could not find expected remote fetch URL ('#{original_fetch_url}') in #{app_jsx_path}."
+  end
+
+  puts "\nInstalling dependencies from root (#{repo_clone_path}) using Yarn..."
+  run_command("yarn install --frozen-lockfile", in_dir: repo_clone_path, env_vars: {"NODE_OPTIONS" => "--max-old-space-size=4096"})
+
+  puts "\nBuilding packages using Yarn..."
+  run_command("yarn build", in_dir: repo_clone_path, env_vars: {"NODE_OPTIONS" => "--max-old-space-size=4096"})
+
+  puts "\nBuilding GraphiQL example (#{VITE_EXAMPLE_PACKAGE_NAME}) using Yarn workspace..."
+  run_command("yarn workspace #{VITE_EXAMPLE_PACKAGE_NAME} build", in_dir: repo_clone_path, env_vars: {"NODE_OPTIONS" => "--max-old-space-size=4096"})
+
+  dist_path = File.join(example_dir, "dist")
+  index_html_in_dist_path = File.join(dist_path, "index.html")
+  unless Dir.exist?(dist_path) && File.exist?(index_html_in_dist_path)
+    raise "Build output directory '#{dist_path}' or 'index.html' not found after build."
+  end
+  puts "Build successful. Assets found in: #{dist_path}"
+
+  # Modify dist/index.html (title) BEFORE archiving
+  puts "\nModifying #{index_html_in_dist_path} for title..."
+  index_html_content = File.read(index_html_in_dist_path)
+
+  # Update Title
+  original_title_pattern = /<title>GraphiQL Vite Example<\/title>/i
+  target_title = "<title>ElasticGraph GraphiQL</title>"
+  if index_html_content.gsub!(original_title_pattern, target_title)
+    puts "Successfully updated title in HTML content buffer."
+  else
+    raise "Could not find original title ('GraphiQL Vite Example') in HTML content buffer."
+  end
+
+  # Favicon Replacement: Replace the example's favicon.svg with ElasticGraph's version.
+  # The graphiql-vite example's index.html already links to /favicon.svg.
+  puts "\nProcessing favicon replacement..."
+  elasticgraph_favicon_svg_source = File.join(ELASTICGRAPH_FAVICONS_SOURCE_DIR, "favicon.svg")
+  target_favicon_in_dist = File.join(dist_path, "favicon.svg")
+
+  puts "  Source ElasticGraph favicon path: #{elasticgraph_favicon_svg_source}"
+  puts "  Target favicon path in dist: #{target_favicon_in_dist}"
+
+  unless File.exist?(elasticgraph_favicon_svg_source)
+    raise "ElasticGraph favicon.svg NOT FOUND at source (#{elasticgraph_favicon_svg_source})."
+  end
+
+  FileUtils.cp(elasticgraph_favicon_svg_source, target_favicon_in_dist)
+  puts "  SUCCESS: Copied ElasticGraph favicon.svg to #{target_favicon_in_dist}."
+
+  # Write all accumulated HTML changes (title)
+  File.write(index_html_in_dist_path, index_html_content)
+  puts "Finished HTML modifications and favicon replacement."
+
+  # Create tar.gz archive
+  archive_parent_dir = File.dirname(TARGET_ASSETS_TARBALL_PATH)
+  FileUtils.mkdir_p(archive_parent_dir)
+  archive_filename = File.basename(TARGET_ASSETS_TARBALL_PATH)
+  temp_archive_file_path = File.join(temp_dir, archive_filename)
+
+  puts "\nCreating tarball: #{temp_archive_file_path} from contents of #{dist_path}..."
+  tar_command = "tar -czvf #{Shellwords.escape(temp_archive_file_path)} -C #{Shellwords.escape(dist_path)} ."
+  run_command(tar_command)
+
+  puts "Moving tarball from #{temp_archive_file_path} to #{TARGET_ASSETS_TARBALL_PATH}..."
+  FileUtils.mv(temp_archive_file_path, TARGET_ASSETS_TARBALL_PATH)
+  puts "Tarball successfully created at #{TARGET_ASSETS_TARBALL_PATH}"
+
+  # Record the GraphiQL git ref we used so there's a record of it.
+  ::File.write(::File.expand_path("../assets_info.md", TARGET_ASSETS_TARBALL_PATH), <<~EOS)
+    The `assets.tar.gz` tarball was built using the `elasticgraph-graphiql/scripts/update_graphiql` script, which
+    also updates this file.
+
+    It was last run using git ref `#{git_ref}` and it sourced GraphiQL from:
+
+    #{GRAPHIQL_REPO_URL}/tree/#{git_ref}/#{VITE_EXAMPLE_SUBPATH}
+  EOS
+
+  puts "\nOperations in temporary directory completed."
+end
+
+puts "Temporary directory cleaned up."
+puts "\nScript completed successfully."

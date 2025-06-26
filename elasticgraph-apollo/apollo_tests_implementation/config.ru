@@ -9,7 +9,7 @@
 require "elastic_graph/admin"
 require "elastic_graph/graphql"
 require "elastic_graph/indexer"
-require "elastic_graph/rack/graphiql"
+require "elastic_graph/graphiql"
 require "elastic_graph/indexer/test_support/converters"
 
 admin = ElasticGraph::Admin.from_yaml_file("config/settings.yaml")
@@ -119,4 +119,4 @@ indexer.processor.process(events, refresh_indices: true)
 puts "Elasticsearch bootstrapping done. Booting the GraphQL server."
 
 use Rack::ShowExceptions
-run ElasticGraph::Rack::GraphiQL.new(graphql)
+run ElasticGraph::GraphiQL.new(graphql)

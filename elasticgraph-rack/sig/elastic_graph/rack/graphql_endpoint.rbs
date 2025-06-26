@@ -1,0 +1,10 @@
+module ElasticGraph
+  module Rack
+    class GraphQLEndpoint
+      include ::Rack::_Application
+      def initialize: (GraphQL) -> void
+      @logger: ::Logger
+      @graphql_http_endpoint: GraphQL::HTTPEndpoint
+    end
+  end
+end

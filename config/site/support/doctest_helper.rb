@@ -162,7 +162,7 @@ module ElasticGraph
     end
 
     [
-      "ElasticGraph::Rack::GraphiQL",
+      "ElasticGraph::GraphiQL",
       "ElasticGraph::Rack::GraphQLEndpoint"
     ].each do |description|
       doctest.before description do
@@ -186,10 +186,10 @@ module ElasticGraph
   #
   # This creates ordering dependency bugs for us--specifically:
   #
-  # * The example for `ElasticGraph::Rack::GraphiQL` and `ElasticGraph::Rack::GraphQLEndpoint` both depend on `run` being
+  # * The example for `ElasticGraph::GraphiQL` and `ElasticGraph::Rack::GraphQLEndpoint` both depend on `run` being
   #   defined since they are `config.ru` examples.
   # * We have a `before` hook above which defines the `run` method they need.
-  # * When `ElasticGraph::Rack::GraphiQL` is loaded it turns around and loads `ElasticGraph::Rack:::GraphQLEndpoint` since
+  # * When `ElasticGraph::GraphiQL` is loaded it turns around and loads `ElasticGraph::Rack:::GraphQLEndpoint` since
   #   it depends on it.
   # * That means that if the `GraphQLEndpoint` runs first everything works fine; but if the `GraphiQL` examples runs first, then
   #   when the `GraphQLEndpoint` example runs, its class is defined and it changes how yard-doctest evaluates the example.

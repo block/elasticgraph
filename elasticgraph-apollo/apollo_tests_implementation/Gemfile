@@ -13,6 +13,7 @@ source "https://rubygems.org"
   apollo
   datastore_core
   elasticsearch
+  graphiql
   graphql
   indexer
   json_schema

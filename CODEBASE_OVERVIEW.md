@@ -260,12 +260,13 @@ graph LR;
     click opensearch-ruby href "https://rubygems.org/gems/opensearch-ruby" "Open on RubyGems.org" _blank;
 ```
 
-### Local Development Libraries (4 gems)
+### Local Development Libraries (5 gems)
 
 These libraries are used for local development of ElasticGraph applications, but are not intended to be deployed to production (except for `elasticgraph-rack`).
 `elasticgraph-rack` is used to boot ElasticGraph locally but can also be used to run ElasticGraph in any rack-compatible server (including a Rails application).
 
 * [elasticgraph](elasticgraph/README.md): Bootstraps ElasticGraph projects.
+* [elasticgraph-graphiql](elasticgraph-graphiql/README.md): Provides a GraphiQL IDE for ElasticGraph projects.
 * [elasticgraph-local](elasticgraph-local/README.md): Provides support for developing and running ElasticGraph applications locally.
 * [elasticgraph-rack](elasticgraph-rack/README.md): ElasticGraph gem for serving an ElasticGraph GraphQL endpoint using rack.
 * [elasticgraph-schema_definition](elasticgraph-schema_definition/README.md): ElasticGraph gem that provides the schema definition API and generates schema artifacts.
@@ -280,11 +281,12 @@ graph LR;
     elasticgraph["elasticgraph"];
     elasticgraph-support["elasticgraph-support"];
     thor["thor"];
+    elasticgraph-graphiql["elasticgraph-graphiql"];
+    elasticgraph-rack["elasticgraph-rack"];
     elasticgraph-local["elasticgraph-local"];
     elasticgraph-admin["elasticgraph-admin"];
     elasticgraph-graphql["elasticgraph-graphql"];
     elasticgraph-indexer["elasticgraph-indexer"];
-    elasticgraph-rack["elasticgraph-rack"];
     elasticgraph-schema_definition["elasticgraph-schema_definition"];
     rackup["rackup"];
     rake["rake"];
@@ -296,10 +298,11 @@ graph LR;
     graphql-c_parser["graphql-c_parser"];
     elasticgraph --> elasticgraph-support;
     elasticgraph --> thor;
+    elasticgraph-graphiql --> elasticgraph-rack;
     elasticgraph-local --> elasticgraph-admin;
     elasticgraph-local --> elasticgraph-graphql;
+    elasticgraph-local --> elasticgraph-graphiql;
     elasticgraph-local --> elasticgraph-indexer;
-    elasticgraph-local --> elasticgraph-rack;
     elasticgraph-local --> elasticgraph-schema_definition;
     elasticgraph-local --> rackup;
     elasticgraph-local --> rake;
@@ -317,11 +320,12 @@ graph LR;
     class elasticgraph targetGemStyle;
     class elasticgraph-support otherEgGemStyle;
     class thor externalGemCatStyle;
+    class elasticgraph-graphiql targetGemStyle;
+    class elasticgraph-rack targetGemStyle;
     class elasticgraph-local targetGemStyle;
     class elasticgraph-admin otherEgGemStyle;
     class elasticgraph-graphql otherEgGemStyle;
     class elasticgraph-indexer otherEgGemStyle;
-    class elasticgraph-rack targetGemStyle;
     class elasticgraph-schema_definition targetGemStyle;
     class rackup externalGemCatStyle;
     class rake externalGemCatStyle;
