@@ -127,3 +127,50 @@ script/update_ci_yaml
 ```
 
 See https://github.com/block/elasticgraph/pull/545 for an example PR.
+
+## Updating GraphiQL
+
+The GraphiQL UI served by `elasticgraph-rack` uses locally vendored assets, packaged into `elasticgraph-rack/lib/elastic_graph/rack/graphiql.tar.gz`.
+These assets are built from a specified version of the official `graphql/graphiql` Vite example (`examples/graphiql-vite`).
+This ensures the UI can run offline, is not dependent on external CDNs, and uses ElasticGraph project favicons.
+
+The `elasticgraph-rack/lib/elastic_graph/rack/graphiql.rb` application extracts this tarball into a temporary directory at runtime to serve the UI.
+
+To update the `graphiql.tar.gz` archive (e.g., to a newer version of GraphiQL or to reflect changes in project favicons):
+
+1.  **Prerequisites:** Ensure you have the following command-line tools installed and available in your system's PATH:
+    *   `git`
+    *   `node` (Node.js, a recent LTS version is recommended)
+    *   `yarn` (Yarn package manager)
+    *   `tar`
+    *   `gzip` (usually included with `tar`)
+
+2.  **Run the Update Script:** Execute the following script from the root of the `elasticgraph-fully-local-graphiql` project. You can
+    optionally specify a git ref (tag, branch, or commit SHA) from the `graphql/graphiql` repository using the `--ref` option.
+
+    ```bash
+    # To use a specific version, e.g., a tag graphiql@5.0.0
+    elasticgraph-rack/script/update_graphiql --ref graphiql@5.0.0
+    ```
+
+3.  **What the Script Does:**
+    *   Clones the specified version of the `graphql/graphiql` repository into a temporary directory.
+    *   Modifies the source of the `examples/graphiql-vite` (`App.jsx`) to use `/graphql` as its API endpoint.
+    *   Installs all necessary Node.js dependencies for the monorepo using `yarn install`.
+    *   Builds all packages within the `graphql/graphiql` monorepo using `yarn build`.
+    *   Builds the specific `example-graphiql-vite` workspace using `yarn workspace example-graphiql-vite build`.
+    *   Modifies the resulting `dist/index.html` to set the title to "ElasticGraph GraphiQL".
+    *   Copies favicons from this project's `config/site/src/assets/favicons/` into the `dist/` directory.
+    *   Creates a `graphiql.tar.gz` archive from the contents of the modified `dist/` directory.
+    *   Saves this archive to `elasticgraph-rack/lib/elastic_graph/rack/graphiql.tar.gz`.
+    *   Cleans up the temporary build directory.
+
+4.  **Test the updated GraphiQL:**
+    * Boot locally with `bundle exec rake boot_local`.
+    * Try out the GraphiQL UI in the browser to confirm it works.
+    * Confirm in the network tab that all assets load correctly.
+
+5.  **Commit Changes:** After the script successfully completes, the `elasticgraph-rack/lib/elastic_graph/rack/graphiql.tar.gz`
+    file will be updated. Review this change and commit it to your version control system.
+
+This process ensures that `elasticgraph-rack` serves a self-contained and consistently branded version of the GraphiQL UI.

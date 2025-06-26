@@ -19,6 +19,16 @@ module ElasticGraph::Rack
       expect(last_response).to be_ok_with_title "ElasticGraph GraphiQL"
     end
 
+    it "fails with a clear error if the GraphiQL assets cannot be extracted" do
+      allow(::Open3).to receive(:capture3).with(a_string_starting_with("tar ")).and_return(
+        ["boom stdout", "boom stderr", instance_double(::Process::Status, success?: false, exitstatus: 17)]
+      )
+
+      expect {
+        get "/"
+      }.to raise_error a_string_including("boom stdout", "boom stderr")
+    end
+
     def be_ok_with_title(title)
       have_attributes(status: 200, body: a_string_including("<title>#{title}</title>"))
     end
