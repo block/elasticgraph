@@ -187,20 +187,6 @@ bundle exec rake site:preview_docs:elasticgraph-schema_definition
 
 Then visit http://localhost:8808/. The preview task will rebuild the parts of the generated docs impacted by your edits, and is quite fast.
 
-## Releasing New Versions
-
-Project maintainers can release a new version using the [Release workflow](https://github.com/block/elasticgraph/actions/workflows/release.yaml).
-
-* Click "Run workflow"
-* Select a branch to release from
-* Specify a version number (based on our versioning policy)
-* Click "Run workflow"
-
-A "Dry Run" option is also available. It's primarily intended for use when testing changes to the Release workflow. It does the
-release actions which are reversible (e.g. bumping the version, pushing a branch, opening a PR, generating draft release notes)
-while skipping the one action that's not reversible (actually releasing to rubygems.org). When used, please remember to cleanup
-afterwards: close the PR and delete the draft release notes.
-
 ---
 
 ## Communications
