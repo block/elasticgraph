@@ -246,10 +246,14 @@ The project is a monorepo composed of many gems. Each gem typically resides in i
     -   **Dependencies**: `elasticgraph-admin`, `elasticgraph-graphql`, `elasticgraph-indexer`, `elasticgraph-rack`, `elasticgraph-schema_definition`, `rackup`, `rake`, `webrick`.
     -   **Provides**: A comprehensive local development environment setup and management through Rake tasks (e.g., `rake boot_locally`).
 -   `elasticgraph-rack/`: Uses Rack to serve an ElasticGraph GraphQL endpoint and a GraphiQL UI, primarily for local development.
-    -   **Purpose**: Enables easy local serving of the GraphQL API and the GraphiQL in-browser IDE for query testing and exploration. Can be used with any Rack-compatible server.
-    -   **Key Files**: `lib/elastic_graph/rack/graphql_endpoint.rb` (Rack app for API), `lib/elastic_graph/rack/graphiql.rb` and `lib/elastic_graph/rack/graphiql/index.html` (for GraphiQL UI).
+    -   **Purpose**: Enables easy local serving of the GraphQL API and a fully self-contained, customizable GraphiQL UI. The GraphiQL assets are vendored as a `graphiql.tar.gz` archive, built from a specified version (via git ref) of the official `graphql/graphiql` Vite example using the `elasticgraph-rack/script/update_graphiql` script. This script also integrates custom ElasticGraph favicons. The Rack application extracts the archive at runtime into a temporary directory to serve the UI, ensuring offline availability and consistent branding.
+    -   **Key Files**:
+        - `lib/elastic_graph/rack/graphql_endpoint.rb`: Rack app for the GraphQL API.
+        - `lib/elastic_graph/rack/graphiql.rb`: Serves the GraphiQL UI by extracting assets at runtime.
+        - `lib/elastic_graph/rack/graphiql.tar.gz`: The vendored archive of GraphiQL static assets.
+        - `script/update_graphiql`: Script to build and update `graphiql.tar.gz`, allowing version specification and custom favicons.
     -   **Dependencies**: `elasticgraph-graphql`, `rack`.
-    -   **Provides**: Local serving capabilities for the GraphQL API and GraphiQL.
+    -   **Provides**: Local serving capabilities for the GraphQL API and a customizable, offline-ready GraphiQL UI.
 -   `elasticgraph-schema_definition/`: Provides the Ruby DSL and tools for defining an ElasticGraph schema and generating all necessary runtime artifacts.
     -   **Purpose**: Allows developers to define their GraphQL schema, types, fields, relationships, indexing strategies (including Painless scripts for updates and derived fields), and datastore script configurations using a Ruby-based DSL. This gem then processes these definitions to generate artifacts (GraphQL schema, JSON schemas, datastore mappings, runtime metadata) used by other ElasticGraph components. It is not intended for production deployment itself.
     -   **Key Files**: `lib/elastic_graph/schema_definition/api.rb` (core DSL), `lib/elastic_graph/schema_definition/schema_elements/` (classes for schema parts), `lib/elastic_graph/schema_definition/indexing/` (indexing definitions), `lib/elastic_graph/schema_definition/scripting/` (datastore script definitions), `lib/elastic_graph/schema_definition/schema_artifact_manager.rb`, `lib/elastic_graph/schema_definition/rake_tasks.rb`.

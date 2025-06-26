@@ -43,7 +43,7 @@ Run this with `rackup` (after installing the `rackup` gem) or any other rack-com
 
 ## Serving a GraphiQL UI
 
-This gem also provides a simple GraphiQL UI using the CDN-hosted GraphiQL assets.
+This gem also provides a simple GraphiQL UI using locally vendored static assets.
 Here's an example `config.ru` to boot that:
 
 ``` ruby
@@ -60,6 +60,5 @@ Run this with `rackup` (after installing the `rackup` gem) or any other rack-com
 
 elasticgraph-rack is released under the [MIT License](https://opensource.org/licenses/MIT).
 
-[Part of the distributed code](lib/elastic_graph/rack/graphiql/index.html)
-comes from the [GraphiQL project](https://github.com/graphql/graphiql), also licensed under the
-MIT License, Copyright (c) GraphQL Contributors.
+Part of the distributed code comes from the [GraphiQL project](https://github.com/graphql/graphiql),
+also licensed under the MIT License, Copyright (c) GraphQL Contributors.
