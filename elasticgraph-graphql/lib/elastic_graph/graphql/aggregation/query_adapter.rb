@@ -251,10 +251,11 @@ module ElasticGraph
               )
             else
               DateHistogramGrouping.new(
-                field_path: child_field_path,
-                interval: interval_from(child_node, schema_args),
-                offset: datetime_offset_from(child_node, schema_args),
-                time_zone: time_zone
+                child_field_path,
+                interval_from(child_node, schema_args),
+                time_zone,
+                datetime_offset_from(child_node, schema_args),
+                schema_args[:min_doc_count] || 1
               )
             end
           end
