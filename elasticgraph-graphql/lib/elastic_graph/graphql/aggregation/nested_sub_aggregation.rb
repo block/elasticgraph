@@ -26,7 +26,7 @@ module ElasticGraph
         end
 
         def build_agg_hash(filter_interpreter, parent_queries:)
-          detail = query.build_agg_detail(filter_interpreter, field_path: nested_path, parent_queries: parent_queries)
+          detail = query.build_agg_detail(filter_interpreter, field_path: nested_path, parent_queries: parent_queries, nested_context: true)
           return {} if detail.nil?
 
           parent_query_names = parent_queries.map(&:name)
