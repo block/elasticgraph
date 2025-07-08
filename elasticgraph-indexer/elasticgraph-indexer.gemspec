@@ -45,7 +45,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "elasticgraph-json_schema", ElasticGraph::VERSION
   spec.add_dependency "elasticgraph-schema_artifacts", ElasticGraph::VERSION
   spec.add_dependency "elasticgraph-support", ElasticGraph::VERSION
-  spec.add_dependency "hashdiff", "~> 1.1", ">= 1.1.2"
+  spec.add_dependency "hashdiff", "~> 1.2"
 
   spec.add_development_dependency "elasticgraph-admin", ElasticGraph::VERSION
   spec.add_development_dependency "elasticgraph-elasticsearch", ElasticGraph::VERSION

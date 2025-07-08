@@ -94,7 +94,7 @@ PATH
       elasticgraph-json_schema (= 1.0.0.pre)
       elasticgraph-schema_artifacts (= 1.0.0.pre)
       elasticgraph-support (= 1.0.0.pre)
-      hashdiff (~> 1.1, >= 1.1.2)
+      hashdiff (~> 1.2)
 
 PATH
   remote: elasticgraph-json_schema
