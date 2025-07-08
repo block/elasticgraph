@@ -248,7 +248,7 @@ GEM
     aws-sigv4 (1.11.0)
       aws-eventstream (~> 1, >= 1.0.2)
     aws_lambda_ric (3.0.0)
-    base64 (0.2.0)
+    base64 (0.3.0)
     benchmark (0.4.0)
     benchmark-ips (2.14.0)
     bigdecimal (3.1.9)
