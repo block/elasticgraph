@@ -45,5 +45,5 @@ Gem::Specification.new do |spec|
   # it'll no longer be available without declaring a dependency.
   spec.add_dependency "logger", "~> 1.7"
 
-  spec.add_development_dependency "faraday", "~> 2.13", ">= 2.13.1"
+  spec.add_development_dependency "faraday", "~> 2.13", ">= 2.13.2"
 end

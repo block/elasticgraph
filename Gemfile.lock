@@ -37,8 +37,8 @@ PATH
   specs:
     elasticgraph-elasticsearch (1.0.0.pre)
       elasticgraph-support (= 1.0.0.pre)
-      elasticsearch (~> 9.0, >= 9.0.2)
-      faraday (~> 2.13, >= 2.13.1)
+      elasticsearch (~> 9.0, >= 9.0.3)
+      faraday (~> 2.13, >= 2.13.2)
       faraday-retry (~> 2.3, >= 2.3.1)
 
 PATH
@@ -128,7 +128,7 @@ PATH
   specs:
     elasticgraph-opensearch (1.0.0.pre)
       elasticgraph-support (= 1.0.0.pre)
-      faraday (~> 2.13, >= 2.13.1)
+      faraday (~> 2.13, >= 2.13.2)
       faraday-retry (~> 2.3, >= 2.3.1)
       opensearch-ruby (~> 3.4)
 
