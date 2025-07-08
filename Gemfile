@@ -65,7 +65,7 @@ gems_in_this_repo = ::Dir.glob("#{repo_root}/*/*.gemspec").map do |gemspec|
   ::File.basename(::File.dirname(gemspec))
 end.to_set
 
-# Here we override the `gem` method to automatically add the ElasticGraph version
+# Here we override the `add_dependency` method to automatically add the ElasticGraph version
 # to all ElasticGraph gems. If we don't do this, we can get confusing bundler warnings
 # like:
 #
@@ -75,12 +75,9 @@ end.to_set
 # This is necessary because our `gemspec` call below registers a `gem` for the gem defined by the gemspec, but it does not include
 # a version requirement, and bundler gets confused when other gems have dependencies on the same gem with a version requirement.
 # This ensures that we always have the same version requirements for all ElasticGraph gems.
-define_singleton_method :gem do |name, *args|
-  if gems_in_this_repo.include?(name)
-    args.unshift ::ElasticGraph::VERSION unless args.first.include?(::ElasticGraph::VERSION)
-  end
-
-  super(name, *args)
+define_singleton_method :add_dependency do |name, version = nil, *args, **options, &block|
+  version = ::ElasticGraph::VERSION if gems_in_this_repo.include?(name)
+  super(name, version, *args, **options, &block)
 end
 
 # This file is symlinked from the repo root into each gem directory. To detect which case we're in,
