@@ -1,0 +1,72 @@
+# Copyright 2024 - 2025 Block, Inc.
+#
+# Use of this source code is governed by an MIT-style
+# license that can be found in the LICENSE file or at
+# https://opensource.org/licenses/MIT.
+#
+# frozen_string_literal: true
+
+# Note: this file is symlinked as the `Gemfile` for each gem in this repo.
+# It dynamically provides a local bundle for a single ElasticGraph gem. The
+# local bundle includes the overall development dependencies provided by
+# `Gemfile-shared` as well as the ElasticGraph gems that are declared as
+# dependencies from the gemspec.
+#
+# We use this from `script/run_gem_specs` to run a gem's specs in the context of its
+# local bundle. This helps us ensure that our gemspecs have the correct dependencies
+# listed. If a gem's test suite requires another ElasticGraph gem to be available,
+# `script/run_gem_specs` will only pass if we're that gem is in the bundle by being
+# declared as a dependency in the gemspec.
+
+source "https://rubygems.org"
+
+repo_root = ::File.expand_path("..", __dir__)
+eval_gemfile "#{repo_root}/Gemfile-shared"
+
+gemspec
+
+# Identify the gems that live in the ElasticGraph repository.
+gems_in_this_repo = ::Dir.glob("#{repo_root}/*/*.gemspec").map do |gemspec|
+  ::File.basename(::File.dirname(gemspec))
+end.to_set
+
+# After loading the gemspec, we want to explicitly tell bundler where to find each of the ElasticGraph
+# gems that live in this repository. Otherwise, it will try to look in system gems or on a remote
+# gemserver for them.
+#
+# Bundler stores all loaded gemspecs in `@gemspecs` so here we get the gemspec that was just loaded
+if (loaded_gemspec = @gemspecs.last)
+
+  # This set will keep track of which gems have been registered so far, so we never register an
+  # ElasticGraph gem more than once.
+  registered_gems = ::Set.new
+
+  register_gemspec_gems_with_path = lambda do |deps|
+    deps.each do |dep|
+      next unless gems_in_this_repo.include?(dep.name) && !registered_gems.include?(dep.name)
+
+      dep_path = "#{repo_root}/#{dep.name}"
+      gem dep.name, ::ElasticGraph::VERSION, path: dep_path
+
+      # record the fact that this gem has been registered so that we don't try calling `gem` for it again.
+      registered_gems << dep.name
+
+      # Finally, load the gemspec and recursively apply this process to its runtime dependencies.
+      # Notably, we avoid using `.dependencies` because we do not want development dependencies to
+      # be registered as part of this.
+      runtime_dependencies = ::Bundler.load_gemspec("#{dep_path}/#{dep.name}.gemspec").runtime_dependencies
+      register_gemspec_gems_with_path.call(runtime_dependencies)
+    end
+  end
+
+  # Ensure that the recursive lambda above doesn't try to re-register the loaded gemspec's gem.
+  registered_gems << loaded_gemspec.name
+
+  # Here we begin the process of registering the ElasticGraph gems we need to include in the current
+  # bundle. We use `loaded_gemspec.dependencies` to include development and runtime dependencies.
+  # For the "outer" gem identified by our loaded gemspec, we need the bundle to include both its
+  # runtime and development dependencies. In contrast, when we recurse, we only look at runtime
+  # dependencies. We are ok with transitive runtime dependencies being pulled in but we don't want
+  # transitive development dependencies.
+  register_gemspec_gems_with_path.call(loaded_gemspec.dependencies)
+end

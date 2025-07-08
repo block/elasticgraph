@@ -48,5 +48,4 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "elasticgraph-elasticsearch", ElasticGraph::VERSION
   spec.add_development_dependency "elasticgraph-opensearch", ElasticGraph::VERSION
   spec.add_development_dependency "elasticgraph-indexer", ElasticGraph::VERSION
-  spec.add_development_dependency "rack-test", "~> 2.2"
 end
