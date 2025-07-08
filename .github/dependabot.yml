@@ -1,16 +1,19 @@
 version: 2
 updates:
   - package-ecosystem: github-actions
+    open-pull-requests-limit: 10
     directory: /
     schedule:
       interval: monthly
 
   - package-ecosystem: bundler
+    open-pull-requests-limit: 20
     directory: /
     schedule:
       interval: weekly
 
   - package-ecosystem: bundler
+    open-pull-requests-limit: 10
     directory: /config/release
     schedule:
       interval: weekly
