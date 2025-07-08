@@ -111,6 +111,14 @@ module ElasticGraph
           expect(seasons).to eq(count_detail_of(0))
           expect(seasons_player_seasons).to eq(count_detail_of(0))
 
+          # Demonstrate filtering sub-aggregations on `count`.
+          seasons, seasons_player_seasons = count_seasons_and_season_player_seasons(seasons: {filter: {players_nested: {count: {gt: 1}}}})
+          expect(seasons).to eq(count_detail_of(1))
+          expect(seasons_player_seasons).to eq(count_detail_of(3))
+          seasons, seasons_player_seasons = count_seasons_and_season_player_seasons(seasons: {filter: {players_object: {count: {lt: 2}}}})
+          expect(seasons).to eq(count_detail_of(5))
+          expect(seasons_player_seasons).to eq(count_detail_of(0))
+
           player_count, season_count, season_player_count, season_player_season_count = aggregate_sibling_and_deeply_nested_counts
           expect(player_count).to eq(count_detail_of(5))
           expect(season_count).to eq(count_detail_of(6))

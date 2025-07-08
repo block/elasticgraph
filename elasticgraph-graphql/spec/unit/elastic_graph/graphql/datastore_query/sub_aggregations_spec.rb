@@ -178,6 +178,28 @@ module ElasticGraph
         })
       end
 
+      it "allows sub-aggregations to filter on the count of list fields" do
+        query = new_query(aggregations: [aggregation_query_of(name: "teams", sub_aggregations: [
+          nested_sub_aggregation_of(path_in_index: ["current_players_nested"], query: sub_aggregation_query_of(name: "current_players_nested", filter: {
+            "seasons_nested" => {LIST_COUNTS_FIELD => {"gt" => 1}}
+          }))
+        ])])
+
+        expect(datastore_body_of(query)).to include_aggs({
+          "teams:current_players_nested" => {
+            "meta" => outer_meta({"bucket_path" => ["current_players_nested:filtered"]}),
+            "nested" => {"path" => "current_players_nested"},
+            "aggs" => {
+              "current_players_nested:filtered" => {
+                "filter" => {
+                  bool: {filter: [{range: {"current_players_nested.#{LIST_COUNTS_FIELD}.seasons_nested" => {gt: 1}}}]}
+                }
+              }
+            }
+          }
+        })
+      end
+
       it "treats empty filters treating as `true`" do
         query = new_query(aggregations: [aggregation_query_of(name: "teams", sub_aggregations: [
           nested_sub_aggregation_of(path_in_index: ["current_players_nested"], query: sub_aggregation_query_of(name: "current_players_nested", filter: {

@@ -46,14 +46,16 @@ module ElasticGraph
         def build_agg_detail: (
           Filtering::FilterInterpreter,
           field_path: ::Array[PathSegment],
-          parent_queries: ::Array[Query]
+          parent_queries: ::Array[Query],
+          ?nested: bool
         ) -> AggregationDetail?
 
         private
 
         def filter_detail: (
           Filtering::FilterInterpreter,
-          ::Array[PathSegment]
+          ::Array[PathSegment],
+          ?nested: bool
         ) { () -> AggregationDetail } -> AggregationDetail
 
         def computations_detail: () -> ::Hash[::String, untyped]

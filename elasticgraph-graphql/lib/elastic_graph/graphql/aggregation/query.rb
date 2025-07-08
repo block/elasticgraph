@@ -57,11 +57,11 @@ module ElasticGraph
           build_agg_detail(filter_interpreter, field_path: [], parent_queries: [])&.clauses || {}
         end
 
-        def build_agg_detail(filter_interpreter, field_path:, parent_queries:)
+        def build_agg_detail(filter_interpreter, field_path:, parent_queries:, nested: false)
           return nil if paginator.desired_page_size.zero? || paginator.paginated_from_singleton_cursor?
           queries = parent_queries + [self] # : ::Array[Query]
 
-          filter_detail(filter_interpreter, field_path) do
+          filter_detail(filter_interpreter, field_path, nested: nested) do
             grouping_adapter.grouping_detail_for(self) do
               Support::HashUtil.disjoint_merge(computations_detail, sub_aggregation_detail(filter_interpreter, queries))
             end
@@ -70,8 +70,14 @@ module ElasticGraph
 
         private
 
-        def filter_detail(filter_interpreter, field_path)
+        def filter_detail(filter_interpreter, field_path, nested: false)
           filtering_field_path = Filtering::FieldPath.of(field_path.filter_map(&:name_in_index))
+
+          # When we're dealing with a nested sub-aggregation, we need to apply the nested transformation
+          # to the filtering field path to ensure count filters work correctly.
+          # This is necessary because nested fields create separate document contexts in Elasticsearch/OpenSearch.
+          filtering_field_path = filtering_field_path.nested if nested
+
           filter_clause = filter_interpreter.build_query([filter].compact, from_field_path: filtering_field_path)
 
           inner_detail = yield
