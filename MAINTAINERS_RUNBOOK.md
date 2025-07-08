@@ -127,3 +127,38 @@ script/update_ci_yaml
 ```
 
 See https://github.com/block/elasticgraph/pull/545 for an example PR.
+
+## Dependabot
+
+We use [Dependabot](https://docs.github.com/en/code-security/getting-started/dependabot-quickstart-guide) to automatically keep dependencies
+up-to-date. Our [dependabot config](https://github.com/block/elasticgraph/blob/main/.github/dependabot.yml) configures the cadence of
+dependabot updates (among other things)--feel free to tweak it as needed.
+
+### Dependabot PRs
+
+We have some custom tooling that hooks into Dependabot PRs and updates some other artifacts:
+
+* [script/update_gem_constraints](https://github.com/block/elasticgraph/blob/main/script/update_gem_constraints) updates constraints in our
+  gemspecs. Dependabot only updates the version in `Gemfile`/`Gemfile.lock`, leaving our gemspec constraints untouched. However, it helps
+  avoid surprises for ElasticGraph users if they get the same gem versions our CI runs against, so we want the constraints in our gemspecs
+  to be updated to match.
+* [workflows/update-gem-version-artifacts.yaml](https://github.com/block/elasticgraph/blob/main/.github/workflows/update-gem-version-artifacts.yaml)
+  runs on Dependabot PRs. It runs `script/update_gem_constraints`, updates [rbs_collection.lock.yaml](https://github.com/block/elasticgraph/blob/main/rbs_collection.lock.yaml),
+  and pushes a commit to the PR.
+
+Dependabot PRs can be reviewed and merged without the approval of another maintainer. Before merging, please:
+
+* Review the release notes provided by Dependabot in the PR description. If there are any new features of a dependency that we should
+  take advantage of, please [open an issue](https://github.com/block/elasticgraph/issues/new/choose) so we can track that work.
+* Confirm the CI build fully passes.
+* Review the diff to make sure it looks reasonable.
+
+When merging, please use the "Squash and merge" option as we don't need to keep the two commits in the PR separate.
+
+### Triggering Dependabot
+
+Dependabot is configured to run on a regular cadence, but if you ever need to trigger it by hand (e.g. to troubleshoot a problem
+with it), you can do so from the [Dependency Graph--Dependabot page](https://github.com/block/elasticgraph/network/updates):
+
+* Click "Recent update jobs" next to a dependabot job
+* Click the "Check for updates" button
