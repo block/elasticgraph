@@ -52,7 +52,7 @@ PATH
   remote: elasticgraph-graphql
   specs:
     elasticgraph-graphql (1.0.0.pre)
-      base64 (~> 0.2)
+      base64 (~> 0.3)
       elasticgraph-datastore_core (= 1.0.0.pre)
       elasticgraph-schema_artifacts (= 1.0.0.pre)
       graphql (~> 2.5.6)
