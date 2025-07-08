@@ -42,7 +42,7 @@ gems:
   source:
     type: rubygems
 - name: aws-sdk-kms
-  version: 1.99.0
+  version: 1.106.0
   source:
     type: rubygems
 - name: aws-sdk-lambda
@@ -50,7 +50,7 @@ gems:
   source:
     type: rubygems
 - name: aws-sdk-s3
-  version: 1.184.0
+  version: 1.192.0
   source:
     type: rubygems
 - name: aws-sdk-sqs
