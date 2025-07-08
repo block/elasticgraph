@@ -75,7 +75,7 @@ PATH
       aws-sdk-sqs (~> 1.93)
       elasticgraph-datastore_core (= 1.0.0.pre)
       elasticgraph-lambda_support (= 1.0.0.pre)
-      ox (~> 2.14, >= 2.14.22)
+      ox (~> 2.14, >= 2.14.23)
 
 PATH
   remote: elasticgraph-indexer_lambda
@@ -84,7 +84,7 @@ PATH
       aws-sdk-s3 (~> 1.184)
       elasticgraph-indexer (= 1.0.0.pre)
       elasticgraph-lambda_support (= 1.0.0.pre)
-      ox (~> 2.14, >= 2.14.22)
+      ox (~> 2.14, >= 2.14.23)
 
 PATH
   remote: elasticgraph-indexer
