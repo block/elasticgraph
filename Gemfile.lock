@@ -387,7 +387,7 @@ GEM
     mercenary (0.4.0)
     method_source (1.1.0)
     metrics (0.12.2)
-    mini_portile2 (2.8.8)
+    mini_portile2 (2.8.9)
     minitest (5.25.5)
     module_methods (0.1.0)
     multi_json (1.15.0)
