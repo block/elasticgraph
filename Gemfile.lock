@@ -341,7 +341,7 @@ GEM
       http-2 (>= 1.0.0)
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
-    io-event (1.10.0)
+    io-event (1.11.2)
     jekyll (4.4.1)
       addressable (~> 2.4)
       base64 (~> 0.2)
