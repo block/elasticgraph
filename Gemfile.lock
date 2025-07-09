@@ -643,7 +643,7 @@ DEPENDENCIES
   nokogiri (~> 1.18, >= 1.18.8)
   rack-test (~> 2.2)
   redcarpet (~> 3.6, >= 3.6.1)
-  rspec (~> 3.13)
+  rspec (~> 3.13, >= 3.13.1)
   rspec-retry (~> 0.6, >= 0.6.2)
   rubocop-factory_bot (~> 2.26.1)
   rubocop-rake (~> 0.6.0)

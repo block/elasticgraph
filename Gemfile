@@ -20,7 +20,7 @@ group :development do
   gem "memory_profiler", "~> 1.1"
   gem "method_source", "~> 1.1"
   gem "rack-test", "~> 2.2"
-  gem "rspec", "~> 3.13"
+  gem "rspec", "~> 3.13", ">= 3.13.1"
   gem "rspec-retry", "~> 0.6", ">= 0.6.2"
   # We are waiting to upgrade to >= 2.27 until standardrb compatibility with rubocop plugins is fixed:
   # https://github.com/standardrb/standard/issues/701
