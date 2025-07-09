@@ -311,10 +311,10 @@ GEM
       flatware (= 2.3.4)
       rspec (>= 3.6)
     forwardable-extended (2.6.0)
-    google-protobuf (4.30.2)
+    google-protobuf (4.31.1)
       bigdecimal
       rake (>= 13)
-    google-protobuf (4.30.2-arm64-darwin)
+    google-protobuf (4.31.1-arm64-darwin)
       bigdecimal
       rake (>= 13)
     graphql (2.5.10)
