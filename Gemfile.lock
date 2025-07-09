@@ -441,7 +441,7 @@ GEM
     redcarpet (3.6.1)
     regexp_parser (2.10.0)
     rexml (3.4.0)
-    rouge (4.5.1)
+    rouge (4.5.2)
     rspec (3.13.1)
       rspec-core (~> 3.13.0)
       rspec-expectations (~> 3.13.0)
