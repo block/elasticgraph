@@ -424,7 +424,7 @@ GEM
       ruby-rc4
       ttfunk
     prism (1.4.0)
-    public_suffix (6.0.1)
+    public_suffix (6.0.2)
     racc (1.8.1)
     rack (3.1.16)
     rack-test (2.2.0)
