@@ -637,7 +637,7 @@ DEPENDENCIES
   filewatcher (~> 2.1)
   flatware-rspec (~> 2.3, >= 2.3.4)
   html-proofer (~> 5.0, >= 5.0.10)
-  httpx (~> 1.5)
+  httpx (~> 1.5, >= 1.5.1)
   jekyll (~> 4.4, >= 4.4.1)
   memory_profiler (~> 1.1)
   method_source (~> 1.1)
