@@ -406,7 +406,7 @@ GEM
     opensearch-ruby (3.4.0)
       faraday (>= 1.0, < 3)
       multi_json (>= 1.0)
-    optimist (3.2.0)
+    optimist (3.2.1)
     ox (2.14.23)
       bigdecimal (>= 3.0)
     parallel (1.27.0)
@@ -557,7 +557,7 @@ GEM
       terminal-table (>= 2, < 5)
       uri (>= 0.12.0)
     strscan (3.1.2)
-    super_diff (0.15.0)
+    super_diff (0.16.0)
       attr_extras (>= 6.2.4)
       diff-lcs
       patience_diff
@@ -652,7 +652,7 @@ DEPENDENCIES
   simplecov-console (~> 0.9, >= 0.9.3)
   standard (~> 1.50.0)
   steep (~> 1.10.0)
-  super_diff (~> 0.15)
+  super_diff (~> 0.16)
   vcr (~> 6.3, >= 6.3.1)
   yard (~> 0.9, >= 0.9.37)
   yard-doctest (~> 0.1, >= 0.1.17)
