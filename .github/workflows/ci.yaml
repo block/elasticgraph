@@ -28,8 +28,8 @@ jobs:
         ruby:
           - "3.4"
         datastore:
-          - "elasticsearch:9.0.0"
-          - "opensearch:3.0.0"
+          - "elasticsearch:9.0.3"
+          - "opensearch:3.1.0"
           - "opensearch:2.19.0"
         include:
           # We have 4 build parts. The "primary" one is `run_each_gem_spec`, and we need that to be run on
@@ -38,13 +38,13 @@ jobs:
           # configuration here.
           - build_part: "run_misc_checks"
             ruby: "3.4"
-            datastore: "elasticsearch:9.0.0"
+            datastore: "elasticsearch:9.0.3"
           - build_part: "run_specs_with_vcr"
             ruby: "3.4"
-            datastore: "elasticsearch:9.0.0"
+            datastore: "elasticsearch:9.0.3"
           - build_part: "run_specs_file_by_file"
             ruby: "3.4"
-            datastore: "elasticsearch:9.0.0"
+            datastore: "elasticsearch:9.0.3"
 
     steps:
       - name: Harden Runner
@@ -84,7 +84,7 @@ jobs:
       contents: read
       packages: write
     env:
-      OPENSEARCH_VERSION: "3.0.0"
+      OPENSEARCH_VERSION: "3.1.0"
 
     steps:
       - name: Harden Runner
