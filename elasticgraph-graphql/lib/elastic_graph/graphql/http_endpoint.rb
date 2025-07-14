@@ -98,7 +98,7 @@ module ElasticGraph
       def with_request_params(request)
         params =
           # POST with application/json is the most common form requests take, so we have it as the first branch here.
-          if request.http_method == :post && request.content_type == APPLICATION_JSON
+          if request.http_method == :post && request.mime_type == APPLICATION_JSON
             begin
               ::JSON.parse(request.body.to_s)
             rescue ::JSON::ParserError
@@ -107,11 +107,11 @@ module ElasticGraph
               # standard:enable Lint/NoReturnInBeginEndBlocks
             end
 
-          elsif request.http_method == :post && request.content_type == APPLICATION_GRAPHQL
+          elsif request.http_method == :post && request.mime_type == APPLICATION_GRAPHQL
             {"query" => request.body}
 
           elsif request.http_method == :post
-            return HTTPResponse.error(415, "`#{request.content_type}` is not a supported content type. Only `#{APPLICATION_JSON}` and `#{APPLICATION_GRAPHQL}` are supported.")
+            return HTTPResponse.error(415, "`#{request.mime_type}` is not a supported content type. Only `#{APPLICATION_JSON}` and `#{APPLICATION_GRAPHQL}` are supported.")
 
           elsif request.http_method == :get
             ::URI.decode_www_form(::URI.parse(request.url).query.to_s).to_h.tap do |hash|
@@ -196,8 +196,8 @@ module ElasticGraph
         end
       end
 
-      def content_type
-        normalized_headers["CONTENT-TYPE"]
+      def mime_type
+        @mime_type ||= normalized_headers["CONTENT-TYPE"].to_s.split(";").first # strip ; delimiter and any trailing parameters
       end
 
       def self.normalize_header_name(header)

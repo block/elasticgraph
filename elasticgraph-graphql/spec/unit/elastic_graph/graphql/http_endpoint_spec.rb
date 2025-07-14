@@ -231,6 +231,16 @@ module ElasticGraph
           expect([r1, r2, r3, r4, r5]).to all eq("data" => {"widgets" => {"__typename" => "WidgetConnection"}})
         end
 
+        it "tolerates the Content-Type being followed by a semicolon and encoding or other information" do
+          r1 = process_graphql_expecting(200, query: "query { widgets { __typename } }", headers: {"Content-Type" => "application/json;charset=UTF-8"})
+          r2 = process_graphql_expecting(200, query: "query { widgets { __typename } }", headers: {"Content-Type" => "application/json;a=b"})
+          r3 = process_graphql_expecting(200, query: "query { widgets { __typename } }", headers: {"Content-Type" => "application/json;"})
+          r4 = process_graphql_expecting(200, query: "query { widgets { __typename } }", headers: {"Content-Type" => "application/json; "})
+          r5 = process_graphql_expecting(200, query: "query { widgets { __typename } }", headers: {"Content-Type" => "application/json;;;;;"})
+
+          expect([r1, r2, r3, r4, r5]).to all eq("data" => {"widgets" => {"__typename" => "WidgetConnection"}})
+        end
+
         def process_graphql_expecting(status_code, query: default_query, variables: nil, operation_name: nil, **options)
           body = ::JSON.generate({
             "query" => query,
