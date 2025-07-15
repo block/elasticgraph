@@ -59,13 +59,17 @@ module ElasticGraph
       private
 
       def build_and_execute_query(query_string:, variables:, operation_name:, context:, client:)
-        query, errors = @registry.build_and_validate_query(
+        query, errors, query_registered = @registry.build_and_validate_query_with_registration_status(
           query_string,
           variables: variables,
           operation_name: operation_name,
           context: context,
           client: client
         )
+
+        # Set the query_registered field in the query tracker
+        query_tracker = context[:elastic_graph_query_tracker]
+        query_tracker.set_extension_data("query_registered", query_registered.to_s)
 
         if errors.empty?
           [query, execute_query(query, client: client)]
