@@ -6,7 +6,7 @@ There are many ways to be an open source contributor, and we're here to help you
 * Raise an issue or feature request in our [issue tracker](https://github.com/block/elasticgraph/issues)
 * Help another contributor with one of their questions, or a code review
 * Suggest improvements to our Getting Started documentation by supplying a Pull Request
-* Evangelize our work together in conferences, podcasts, and social media spaces.
+* Evangelize our work together in conferences, podcasts, and social media spaces
 
 This guide is for you.
 
@@ -45,7 +45,7 @@ To install Ruby dependencies, run:
 $ bundle install
 ```
 
-Once that is done, prefix Ruby commands with `bundle exec` in order to run them in the context of the project bundle.
+Once that is done, prefix Ruby commands (`ruby`, `rspec`, `rake`, etc) with `bundle exec` in order to run them in the context of the project bundle.
 
 ### Docker and Docker Compose
 
@@ -75,11 +75,26 @@ so that `bundle exec` will run in the context of your custom bundle.
 
 To understand how the different parts of the codebase fit together, see the [codebase overview](CODEBASE_OVERVIEW.md).
 
+## Using AI Tools
+
+Using AI tools such as [Goose](https://block.github.io/goose/), [ChatGPT](https://chatgpt.com/), [Cursor](https://cursor.com/),
+or [Claude](https://claude.ai/) to contribute is encouraged. However:
+
+* AI tools are assistants and should not replace critical thinking and judgement.
+* We expect contributors to understand every line of code submitted in a PR--in the long run, humans are on the hook for maintaining it!
+
+If you use an AI agent, feel free to leverage the growing [AI memory bank](https://github.com/block/elasticgraph/tree/main/ai-memory),
+and if updates made by your AI agent to that directory seem worth keeping, please include them in your submitted PR!
+
+We also maintain a [hints file for Goose](https://github.com/block/elasticgraph/blob/main/.goosehints) which you can adapt for use by
+other AI agents.
+
 ## Build Scripts and Executables
 
 The codebase includes a variety of build scripts and executables which are useful for local development:
 
 * `script/quick_build`: Performs an abridged version of the CI build. This is generally the most complete CI build we run locally.
+  **We recommend running it before opening a PR.**
 * `script/type_check`: Runs a [steep](https://github.com/soutaro/steep) type check.
 * `script/spellcheck`: Spellchecks the codebase using [codespell](https://github.com/codespell-project/codespell).
 * `script/run_specs`: Runs the test suite.
@@ -134,11 +149,14 @@ bundle exec rspec --only-failures
 bundle exec rspec --next-failure
 ```
 
-In addition, you can run tests in parallel by prefixing the `rspec` command with `flatware`:
+In addition, you can run tests in parallel by using `script/flatware_rspec` instead of `bundle exec rspec`:
 
 ```bash
-bundle exec flatware rspec path/to/dir
+script/flatware_rspec path/to/dir
 ```
+
+Running tests in parallel using flatware tends to be faster for large test suite runs, but is usually slower for running a
+small subset of the test suite (e.g. one file or directory).
 
 `script/quick_build`, `script/run_specs`, and `script/run_gem_specs` use flatware when appropriate. (It's not always faster!)
 
@@ -217,27 +235,30 @@ to your valuable work:
 * Start by proposing a change either on Discord (most appropriate for small
   change requests or bug fixes) or in Discussions (most appropriate for design
   and architecture considerations, proposing a new feature, or where you'd
-  like insight and feedback)
+  like insight and feedback).
 * Cultivate consensus around your ideas; the project leads will help you
   pre-flight how beneficial the proposal might be to the project. Developing early
   buy-in will help others understand what you're looking to do, and give you a
   greater chance of your contributions making it into the codebase! No one wants to
   see work done in an area that's unlikely to be incorporated into the codebase.
-* Fork the repo into your own namespace/remote
+* Fork the repo into your own namespace/remote.
 * Work in a dedicated feature branch. Atlassian wrote a great
-  [description of this workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/feature-branch-workflow)
-* When you're ready to offer your work to the project, first:
-* Squash your commits into a single one (or an appropriate small number of commits), and
-  rebase atop the upstream `main` branch. This will limit the potential for merge
-  conflicts during review, and helps keep the audit trail clean. A good writeup for
-  how this is done is
-  [here](https://medium.com/@slamflipstrom/a-beginners-guide-to-squashing-commits-with-git-rebase-8185cf6e62ec), and if you're
-  having trouble - feel free to ask a member or the community for help or leave the commits as-is, and flag that you'd like
-  rebasing assistance in your PR! We're here to support you.
-* Open a PR in the project to bring in the code from your feature branch.
-* The maintainers noted in the [CODEOWNERS file](https://github.com/block/elasticgraph/blob/main/.github/CODEOWNERS)
-  will review your PR and optionally open a discussion about its contents before moving forward.
-* Remain responsive to follow-up questions, be open to making requested changes, and...
-  You're a contributor!
-* And remember to respect everyone in our global development community. Guidelines
+  [description of this workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/feature-branch-workflow).
+* When you're ready to submit a pull request:
+    * Squash your commits into a single one (or an appropriate small number of commits), and
+      rebase atop the upstream `main` branch. This will limit the potential for merge
+      conflicts during review, and helps keep the audit trail clean. A good writeup for
+      how this is done is
+      [here](https://medium.com/@slamflipstrom/a-beginners-guide-to-squashing-commits-with-git-rebase-8185cf6e62ec), and if you're
+      having trouble - feel free to ask a member or the community for help or leave the commits as-is, and flag that you'd like
+      rebasing assistance in your PR! We're here to support you.
+    * Please run `script/quick_build` and fix any failures (it'll be faster to get your change merged if it already passes the build!)
+      * If you're not sure how to fix the failures (and an AI agent isn't helping), feel free to submit what you have and we'll
+        recommend the fix.
+    * Open a PR in the project to bring in the code from your feature branch.
+    * The maintainers noted in the [CODEOWNERS file](https://github.com/block/elasticgraph/blob/main/.github/CODEOWNERS)
+      will review your PR and optionally open a discussion about its contents before moving forward.
+    * Remain responsive to follow-up questions, be open to making requested changes, and...
+      You're a contributor!
+* Remember to respect everyone in our development community. Guidelines
   are established in our [Code of Conduct](https://github.com/block/elasticgraph/blob/main/CODE_OF_CONDUCT.md).
