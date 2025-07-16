@@ -474,7 +474,7 @@ module ElasticGraph
           # ElasticGraph has special handling for the nested type (e.g. we generate sub-aggregation types in the GraphQL schema for
           # nested fields), and that special handling requires that `nested` only be used on list-of-objects fields; otherwise
           # confusing errors can result when dumping schema artifacts. It only makes sense to use `nested` on a list-of-objects
-          # field, anyway.'
+          # field, anyway.
           if options[:type] == "nested"
             schema_def_state.after_user_definition_complete do
               unless type_for_derived_types.list? && type.fully_unwrapped.object?
