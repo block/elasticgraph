@@ -63,21 +63,6 @@ module ElasticGraph
         expect_list_counts_mappings(mapping, LIST_COUNTS_FIELD, %w[past_names])
       end
 
-      # TODO: consider dropping this test as part of disallowing `type: "nested"` on a list-of-scalar field.
-      it "does not attempt to find the subfields of a scalar list field that wrongly uses `type: nested`", :dont_validate_graphql_schema do
-        mapping = index_mapping_for "teams" do |schema|
-          schema.object_type "Team" do |t|
-            t.field "id", "ID!"
-            t.field "past_names", "[String!]!" do |f|
-              f.mapping type: "nested"
-            end
-            t.index "teams"
-          end
-        end
-
-        expect_list_counts_mappings(mapping, LIST_COUNTS_FIELD, %w[past_names])
-      end
-
       it "uses pipe-separated paths for list fields embedded on object fields, since dots get interpreted as object nesting by the datastore" do
         mapping = index_mapping_for "teams" do |schema|
           schema.object_type "TeamHistory" do |t|

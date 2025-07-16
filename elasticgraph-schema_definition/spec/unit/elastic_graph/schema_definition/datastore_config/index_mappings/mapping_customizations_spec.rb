@@ -206,6 +206,51 @@ module ElasticGraph
           }
         })
       end
+
+      it "provides a clear error when a list-of-scalar field is configured to use the `nested` mapping type as that is only valid on list-of-object fields" do
+        expect {
+          index_mapping_for "my_type" do |s|
+            s.object_type "MyType" do |t|
+              t.field "id", "ID!"
+
+              t.field "texts", "[MyText!]!" do |f|
+                f.mapping type: "nested"
+              end
+
+              t.index "my_type"
+            end
+
+            s.scalar_type "MyText" do |t|
+              t.json_schema type: "string"
+              t.mapping type: "text"
+            end
+          end
+        }.to raise_error Errors::SchemaError, a_string_including(
+          "The `nested` mapping type has been used on field `MyType.texts: [MyText!]!`, but `nested` is only valid on a list-of-objects field."
+        )
+      end
+
+      it "provides a clear error when a non-list object field is configured to use the `nested` mapping type as that is only valid on list-of-object fields" do
+        expect {
+          index_mapping_for "my_type" do |s|
+            s.object_type "MyType" do |t|
+              t.field "id", "ID!"
+
+              t.field "options", "MyOptions!" do |f|
+                f.mapping type: "nested"
+              end
+
+              t.index "my_type"
+            end
+
+            s.object_type "MyOptions" do |t|
+              t.field "name", "String"
+            end
+          end
+        }.to raise_error Errors::SchemaError, a_string_including(
+          "The `nested` mapping type has been used on field `MyType.options: MyOptions!`, but `nested` is only valid on a list-of-objects field."
+        )
+      end
     end
   end
 end

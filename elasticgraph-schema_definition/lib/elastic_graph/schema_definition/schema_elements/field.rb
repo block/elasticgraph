@@ -99,7 +99,7 @@ module ElasticGraph
         include Mixins::HasDocumentation
         include Mixins::HasDirectives
         include Mixins::HasTypeInfo
-        include Mixins::HasReadableToSAndInspect.new { |f| "#{f.parent_type.name}.#{f.name}: #{f.type}" }
+        include Mixins::HasReadableToSAndInspect.new(&:to_qualified_sdl)
 
         # @private
         def initialize(
@@ -469,6 +469,24 @@ module ElasticGraph
           super(**options)
         end
 
+        # (see Mixins::HasTypeInfo#mapping)
+        def mapping(**options)
+          # ElasticGraph has special handling for the nested type (e.g. we generate sub-aggregation types in the GraphQL schema for
+          # nested fields), and that special handling requires that `nested` only be used on list-of-objects fields; otherwise
+          # confusing errors can result when dumping schema artifacts. It only makes sense to use `nested` on a list-of-objects
+          # field, anyway.'
+          if options[:type] == "nested"
+            schema_def_state.after_user_definition_complete do
+              unless type_for_derived_types.list? && type.fully_unwrapped.object?
+                raise Errors::SchemaError, "The `nested` mapping type has been used on field `#{to_qualified_sdl}`, " \
+                  'but `nested` is only valid on a list-of-objects field. Remove `field.mapping type: "nested"` to continue.'
+              end
+            end
+          end
+
+          super
+        end
+
         # Configures ElasticGraph to source a field’s value from a related object. This can be used to denormalize data at ingestion time to
         # support filtering, grouping, sorting, or aggregating data on a field from a related object.
         #
@@ -587,6 +605,12 @@ module ElasticGraph
             args_sdl = args_sdl(joiner: "\n  ", after_opening_paren: "\n  ", &arg_selector)
             "#{formatted_documentation}#{name}#{args_sdl}: #{type.name}#{default_value_sdl} #{directives_sdl}".strip
           end
+        end
+
+        # Returns the definition of this field in SDL form, qualified by the parent type.
+        # @private
+        def to_qualified_sdl
+          "#{parent_type.name}.#{name}: #{type}"
         end
 
         # Indicates if this field is sortable. Sortable fields will have corresponding `_ASC` and `_DESC` values generated in the
