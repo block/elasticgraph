@@ -504,26 +504,7 @@ module ElasticGraph
           end
 
           unless datastore_status_code == "200"
-            if elasticsearch_versions.empty?
-              raise <<~EOS
-                OpenSearch is not running locally. You need to start it in another terminal using this command:
-
-                bundle exec rake opensearch:local:boot
-              EOS
-            elsif opensearch_versions.empty?
-              raise <<~EOS
-                Elasticsearch is not running locally. You need to start it in another terminal using this command:
-
-                bundle exec rake elasticsearch:local:boot
-              EOS
-            else
-              raise <<~EOS
-                Neither Elasticsearch nor OpenSearch are running locally. You need to start one of them in another terminal using one of these commands:
-
-                bundle exec rake elasticsearch:local:boot
-                bundle exec rake opensearch:local:boot
-              EOS
-            end
+            ::Rake::Task["#{datastore_to_boot.downcase}:local:daemon"].invoke
           end
         end
 

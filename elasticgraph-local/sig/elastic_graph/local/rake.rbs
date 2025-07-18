@@ -1,0 +1,6 @@
+module Rake
+  class Task
+    def self.[]: (::String) -> Task
+    def invoke: () -> void
+  end
+end

@@ -22,8 +22,8 @@ module ElasticGraph
 
       it "supports fully booting from scratch via a single `boot_locally` rake task" do
         rack_port = 9620
-        kill_daemon_after("rackup.pid") do |pid_file|
-          halt_datastore_daemon_after(:elasticsearch) do
+        kill_daemon_after "rackup.pid" do |pid_file|
+          halt_datastore_daemon_after :elasticsearch do
             output = run_rake "boot_locally[#{rack_port}, --daemonize --pid #{pid_file}, no_open]"
 
             expect(output).to include(
@@ -56,34 +56,44 @@ module ElasticGraph
       end
 
       context "when the datastore is not running" do
-        it "gives a clear error when booting GraphiQL is attempted" do
-          expect {
-            kill_daemon_after("rackup.pid") do |pid_file|
-              run_rake "boot_graphiql[9621, --daemonize --pid #{pid_file}, no_open]"
-            end
-          }.to raise_error a_string_including("Neither Elasticsearch nor OpenSearch are running locally")
+        it "boots the datastore as a daemon to support booting GraphiQL" do
+          halt_datastore_daemon_after :elasticsearch do |datastore_port|
+            expect {
+              kill_daemon_after("rackup.pid") do |pid_file|
+                run_rake "boot_graphiql[9621, --daemonize --pid #{pid_file}, no_open]"
+              end
+            }.to change { datastore_running? }.from(false).to(true)
+          end
         end
 
-        it "gives a clear error when configuring the datastore is attempted" do
-          expect {
-            run_rake "clusters:configure:dry_run" do |t|
-              t.opensearch_versions = []
-            end
-          }.to raise_error a_string_including("Elasticsearch is not running locally")
+        it "boots the datastore as a daemon to support configuring the datastore" do
+          halt_datastore_daemon_after :elasticsearch do
+            expect {
+              run_rake "clusters:configure:dry_run"
+            }.to change { datastore_running? }.from(false).to(true)
+          end
 
-          expect {
-            run_rake "clusters:configure:perform" do |t|
-              t.opensearch_versions = []
-            end
-          }.to raise_error a_string_including("Elasticsearch is not running locally")
+          halt_datastore_daemon_after :elasticsearch do
+            expect {
+              run_rake "clusters:configure:perform"
+            }.to change { datastore_running? }.from(false).to(true)
+          end
         end
 
-        it "gives a clear error when indexing data locally is attempted" do
-          expect {
-            run_rake "index_fake_data:widgets[1]" do |t|
-              t.elasticsearch_versions = []
-            end
-          }.to raise_error a_string_including("OpenSearch is not running locally")
+        it "boots the datastore as a daemon to support indexing data locally" do
+          halt_datastore_daemon_after :elasticsearch do
+            expect {
+              run_rake "index_fake_data:widgets[1]"
+            }.to change { datastore_running? }.from(false).to(true)
+          end
+        end
+
+        def datastore_running?
+          local_port = 9334
+          expect(query_server_on(local_port).keys).to include("version")
+          true
+        rescue Errno::ECONNREFUSED, EOFError
+          false
         end
       end
 
@@ -102,7 +112,7 @@ module ElasticGraph
 
         # Give a longer timeout to CI than we tolerate locally.
         # :nocov: -- only one of the two sides of the ternary gets covered.
-        daemon_timeout ||= ENV["CI"] ? 120 : 30
+        daemon_timeout ||= ENV["CI"] ? 120 : 60
         # :nocov:
 
         # We need to run without bundler because some tasks shell out and run `bundle exec` and
@@ -122,8 +132,6 @@ module ElasticGraph
               t.opensearch_versions = ["2.7.0"]
               t.output = output
               t.daemon_timeout = daemon_timeout
-
-              yield t if block_given?
 
               t.define_fake_data_batch_for(:widgets) do
                 Array.new(batch_size) { build(:widget) }
@@ -168,6 +176,7 @@ module ElasticGraph
             end
 
             ::Process.kill(9, pid) if pid
+            ::FileUtils.rm_rf(pid_file) # Necessary to avoid an Errno::ENOTEMPTY
             # :nocov:
           end
         end
