@@ -5,7 +5,8 @@ module ElasticGraph
     attr_reader schema_artifacts: schemaArtifacts
     attr_reader client_customization_block: (^(untyped) -> void)?
 
-    def self.from_parsed_yaml: (parsedYamlSettings) ?{ (untyped) -> void } -> DatastoreCore
+    extend _BuildableFromParsedYaml[DatastoreCore]
+    extend Support::FromYamlFile[DatastoreCore]
 
     def initialize: (
       config: Config,

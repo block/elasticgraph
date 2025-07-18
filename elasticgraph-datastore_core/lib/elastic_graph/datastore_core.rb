@@ -7,13 +7,16 @@
 # frozen_string_literal: true
 
 require "elastic_graph/datastore_core/config"
-require "elastic_graph/schema_artifacts/from_disk"
+require "elastic_graph/schema_artifacts"
+require "elastic_graph/support/from_yaml_file"
 require "elastic_graph/support/logger"
 
 module ElasticGraph
   # The entry point into this library. Create an instance of this class to get access to
   # the public interfaces provided by this library.
   class DatastoreCore
+    extend Support::FromYamlFile
+
     # @dynamic config, schema_artifacts, logger, client_customization_block
     attr_reader :config, :schema_artifacts, :logger, :client_customization_block
 

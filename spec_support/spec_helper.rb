@@ -282,7 +282,7 @@ module ElasticGraph
 
     def self.stock_schema_artifacts
       @stock_schema_artifacts ||= begin
-        require "elastic_graph/schema_artifacts/from_disk"
+        require "elastic_graph/schema_artifacts"
         SchemaArtifacts.from_parsed_yaml(parsed_test_settings_yaml)
       end
     end

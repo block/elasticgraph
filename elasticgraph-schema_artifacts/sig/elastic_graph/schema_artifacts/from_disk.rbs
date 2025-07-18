@@ -1,23 +1,5 @@
 module ElasticGraph
-  type datastoreScriptContext = ::String
-  type datastoreScriptLanguage = "painless" | "expression" | "mustache" | "java"
-  type datastoreScriptScriptHash = {"lang" => datastoreScriptLanguage, "source" => ::String}
-  type datastoreScriptPayloadHash = {"context" => datastoreScriptContext, "script" => datastoreScriptScriptHash}
-  type datastoreScriptsByIdHash = ::Hash[::String, datastoreScriptPayloadHash]
-  type schemaArtifacts = _SchemaArtifacts & SchemaArtifacts::ArtifactsHelperMethods
-
-  interface _SchemaArtifacts
-    def graphql_schema_string: () -> ::String
-    def datastore_config: () -> ::Hash[::String, untyped]
-    def runtime_metadata: () -> SchemaArtifacts::RuntimeMetadata::Schema
-    def json_schemas_for: (::Integer) -> ::Hash[::String, untyped]
-    def available_json_schema_versions: () -> ::Set[::Integer]
-    def latest_json_schema_version: () -> ::Integer
-  end
-
   module SchemaArtifacts
-    def self.from_parsed_yaml: (parsedYamlSettings) ?{ (untyped) -> void } -> FromDisk
-
     class FromDiskSupertype
       attr_reader artifacts_dir: ::String
       def initialize: (artifacs_dir: ::String) -> void

@@ -22,6 +22,14 @@ module ElasticGraph
       ))
     end
 
+    describe ".from_yaml_file" do
+      it "can build an instance from an on-disk YAML file" do
+        datastore_core = DatastoreCore.from_yaml_file(CommonSpecHelpers.test_settings_file)
+
+        expect(datastore_core).to be_an(DatastoreCore)
+      end
+    end
+
     describe ".from_parsed_yaml" do
       it "can build an instance from a parsed settings YAML file" do
         datastore_core = DatastoreCore.from_parsed_yaml(parsed_test_settings_yaml)
