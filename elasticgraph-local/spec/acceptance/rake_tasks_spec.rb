@@ -23,36 +23,35 @@ module ElasticGraph
       it "supports fully booting from scratch via a single `boot_locally` rake task" do
         rack_port = 9620
         kill_daemon_after("rackup.pid") do |pid_file|
-          output = run_rake "boot_locally[#{rack_port}, --daemonize --pid #{pid_file}, no_open]", port: 9612
+          halt_datastore_daemon_after(:elasticsearch) do
+            output = run_rake "boot_locally[#{rack_port}, --daemonize --pid #{pid_file}, no_open]"
 
-          expect(output).to include(
-            # It boots Elasticsearch...
-            "Success! elasticsearch", "has been booted for the local environment",
-            # ...dumps schema artifacts...
-            "datastore_config.yaml` is already up to date",
-            # ...configures Elasticsearch...
-            "Updated index template: `widgets`",
-            # ...indexes a document...
-            "Published batch of 1 document"
-          )
+            expect(output).to include(
+              # It boots Elasticsearch...
+              "Success! elasticsearch", "has been booted for the local environment",
+              # ...dumps schema artifacts...
+              "datastore_config.yaml` is already up to date",
+              # ...configures Elasticsearch...
+              "Updated index template: `widgets`",
+              # ...indexes a document...
+              "Published batch of 1 document"
+            )
 
-          # ...and then boots GraphiQL, but given how it boots with Rake's `sh`, it's not captured in `output`.
+            # ...and then boots GraphiQL, but given how it boots with Rake's `sh`, it's not captured in `output`.
 
-          wait_for_server_readiness(rack_port, path: "/graphql")
+            wait_for_server_readiness(rack_port, path: "/graphql")
 
-          # Validate that we can query the booted server!
-          response = query_server_on(rack_port, path: "/graphql?query=#{::CGI.escape(<<~EOS)}")
-            query {
-              widgets {
-                total_edge_count
+            # Validate that we can query the booted server!
+            response = query_server_on(rack_port, path: "/graphql?query=#{::CGI.escape(<<~EOS)}")
+              query {
+                widgets {
+                  total_edge_count
+                }
               }
-            }
-          EOS
+            EOS
 
-          expect(response).to eq({"data" => {"widgets" => {"total_edge_count" => 1}}})
-        ensure
-          # Ensure this doesn't "leak" the running Elasticsearch server.
-          run_rake "elasticsearch:local:halt", port: 9612
+            expect(response).to eq({"data" => {"widgets" => {"total_edge_count" => 1}}})
+          end
         end
       end
 
@@ -86,21 +85,17 @@ module ElasticGraph
             end
           }.to raise_error a_string_including("OpenSearch is not running locally")
         end
-
-        def run_rake(command)
-          super(command, port: 9617)
-        end
       end
 
       describe "elasticsearch/opensearch tasks" do
         it "times out if booting takes too long" do
           expect {
-            run_rake "elasticsearch:example:9.0.0:daemon", daemon_timeout: 0.1, port: 9615
+            run_rake "elasticsearch:example:9.0.0:daemon", daemon_timeout: 0.1
           }.to raise_error a_string_including("Timed out after 0.1 seconds.")
         end
       end
 
-      def run_rake(*cli_args, port:, daemon_timeout: nil, batch_size: 1)
+      def run_rake(*cli_args, daemon_timeout: nil, batch_size: 1)
         outer_output = nil
 
         config_dir = ::Pathname.new(::File.join(CommonSpecHelpers::REPO_ROOT, "config"))
@@ -122,7 +117,7 @@ module ElasticGraph
             ) do |t|
               t.index_document_sizes = true
               t.schema_element_name_form = :snake_case
-              t.env_port_mapping = {"example" => port}
+              t.env_port_mapping = {"example" => 9615}
               t.elasticsearch_versions = ["8.18.0", "9.0.0"]
               t.opensearch_versions = ["2.7.0"]
               t.output = output
@@ -176,6 +171,12 @@ module ElasticGraph
             # :nocov:
           end
         end
+      end
+
+      def halt_datastore_daemon_after(datastore)
+        yield
+      ensure
+        run_rake "#{datastore}:local:halt"
       end
 
       def wait_for_server_readiness(port, path:)
