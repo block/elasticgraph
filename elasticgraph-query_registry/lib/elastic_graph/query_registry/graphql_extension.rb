@@ -25,7 +25,8 @@ module ElasticGraph
             slow_query_threshold_ms: config.slow_query_latency_warning_threshold_in_ms,
             registry_directory: registry_config.path_to_registry,
             allow_unregistered_clients: registry_config.allow_unregistered_clients,
-            allow_any_query_for_clients: registry_config.allow_any_query_for_clients
+            allow_any_query_for_clients: registry_config.allow_any_query_for_clients,
+            warn_on_unregistered_query_for_clients: registry_config.warn_on_unregistered_query_for_clients
           )
         end
       end
@@ -36,6 +37,7 @@ module ElasticGraph
         registry_directory:,
         allow_unregistered_clients:,
         allow_any_query_for_clients:,
+        warn_on_unregistered_query_for_clients:,
         schema:,
         monotonic_clock:,
         logger:,
@@ -52,7 +54,9 @@ module ElasticGraph
           schema,
           registry_directory,
           allow_unregistered_clients: allow_unregistered_clients,
-          allow_any_query_for_clients: allow_any_query_for_clients
+          allow_any_query_for_clients: allow_any_query_for_clients,
+          warn_on_unregistered_query_for_clients: warn_on_unregistered_query_for_clients,
+          logger: logger
         )
       end
 
@@ -80,21 +84,25 @@ module ElasticGraph
       end
     end
 
-    class Config < ::Data.define(:path_to_registry, :allow_unregistered_clients, :allow_any_query_for_clients)
+    class Config < ::Data.define(:path_to_registry, :allow_unregistered_clients, :allow_any_query_for_clients, :warn_on_unregistered_query_for_clients)
       def self.from_parsed_yaml(hash)
         hash = hash.fetch("query_registry") { return DEFAULT }
 
         new(
           path_to_registry: hash.fetch("path_to_registry"),
           allow_unregistered_clients: hash.fetch("allow_unregistered_clients"),
-          allow_any_query_for_clients: hash.fetch("allow_any_query_for_clients")
+          allow_any_query_for_clients: hash.fetch("allow_any_query_for_clients"),
+          warn_on_unregistered_query_for_clients: hash.fetch("warn_on_unregistered_query_for_clients") {
+            [] # : ::Array[::String]
+          }
         )
       end
 
       DEFAULT = new(
         path_to_registry: (_ = __dir__),
         allow_unregistered_clients: true,
-        allow_any_query_for_clients: []
+        allow_any_query_for_clients: [], # : ::Array[::String]
+        warn_on_unregistered_query_for_clients: [] # : ::Array[::String]
       )
     end
   end

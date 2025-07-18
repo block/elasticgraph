@@ -6,14 +6,18 @@ module ElasticGraph
         GraphQL::Schema,
         ::String,
         allow_unregistered_clients: bool,
-        allow_any_query_for_clients: ::Array[::String]
+        allow_any_query_for_clients: ::Array[::String],
+        warn_on_unregistered_query_for_clients: ::Array[::String],
+        logger: ::Logger
       ) -> Registry
 
       def initialize: (
         GraphQL::Schema,
         client_names: ::Array[::String],
         allow_unregistered_clients: bool,
-        allow_any_query_for_clients: ::Array[::String]
+        allow_any_query_for_clients: ::Array[::String],
+        warn_on_unregistered_query_for_clients: ::Array[::String],
+        logger: ::Logger
       ) { (String) -> ::Array[::String] } -> void
 
       def build_and_validate_query: (
