@@ -15,7 +15,7 @@ Gem::Specification.new do |spec|
   spec.email = ["myron@squareup.com"]
   spec.homepage = "https://block.github.io/elasticgraph/"
   spec.license = "MIT"
-  spec.summary = "ElasticGraph gem that monitors OpenSearch CPU utilization to autoscale indexer lambda concurrency."
+  spec.summary = "Monitors OpenSearch CPU utilization to autoscale elasticgraph-indexer_lambda concurrency."
 
   # See https://guides.rubygems.org/specification-reference/#metadata
   # for metadata entries understood by rubygems.org.

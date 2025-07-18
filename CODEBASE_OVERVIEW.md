@@ -8,13 +8,13 @@ easier. The libraries that ship with ElasticGraph can be broken down into severa
 
 These libraries form the core backbone of ElasticGraph that is designed to run in a production deployment. Every ElasticGraph deployment will need to use all of these.
 
-* [elasticgraph-admin](elasticgraph-admin/README.md): ElasticGraph gem that provides datastore administrative tasks, to keep a datastore up-to-date with an ElasticGraph schema.
-* [elasticgraph-datastore_core](elasticgraph-datastore_core/README.md): ElasticGraph gem containing the core datastore support types and logic.
-* [elasticgraph-graphql](elasticgraph-graphql/README.md): The ElasticGraph GraphQL query engine.
-* [elasticgraph-indexer](elasticgraph-indexer/README.md): ElasticGraph gem that provides APIs to robustly index data into a datastore.
-* [elasticgraph-json_schema](elasticgraph-json_schema/README.md): ElasticGraph gem that provides JSON Schema validation.
-* [elasticgraph-schema_artifacts](elasticgraph-schema_artifacts/README.md): ElasticGraph gem containing code related to generated schema artifacts.
-* [elasticgraph-support](elasticgraph-support/README.md): ElasticGraph gem providing support utilities to the other ElasticGraph gems.
+* [elasticgraph-admin](elasticgraph-admin/README.md): Administers a datastore for an ElasticGraph project.
+* [elasticgraph-datastore_core](elasticgraph-datastore_core/README.md): Contains the core datastore logic used by the rest of ElasticGraph.
+* [elasticgraph-graphql](elasticgraph-graphql/README.md): Provides the ElasticGraph GraphQL query engine.
+* [elasticgraph-indexer](elasticgraph-indexer/README.md): Indexes ElasticGraph data into a datastore.
+* [elasticgraph-json_schema](elasticgraph-json_schema/README.md): Provides JSON Schema validation for ElasticGraph.
+* [elasticgraph-schema_artifacts](elasticgraph-schema_artifacts/README.md): Provides access to ElasticGraph schema artifacts.
+* [elasticgraph-support](elasticgraph-support/README.md): Provides support utilities for other ElasticGraph gems.
 
 #### Dependency Diagram
 
@@ -85,11 +85,11 @@ graph LR;
 
 These libraries wrap the the core ElasticGraph libraries so that they can be deployed using AWS Lambda.
 
-* [elasticgraph-admin_lambda](elasticgraph-admin_lambda/README.md): ElasticGraph gem that wraps elasticgraph-admin in an AWS Lambda.
-* [elasticgraph-graphql_lambda](elasticgraph-graphql_lambda/README.md): ElasticGraph gem that wraps elasticgraph-graphql in an AWS Lambda.
-* [elasticgraph-indexer_autoscaler_lambda](elasticgraph-indexer_autoscaler_lambda/README.md): ElasticGraph gem that monitors OpenSearch CPU utilization to autoscale indexer lambda concurrency.
-* [elasticgraph-indexer_lambda](elasticgraph-indexer_lambda/README.md): Provides an AWS Lambda interface for an elasticgraph API
-* [elasticgraph-lambda_support](elasticgraph-lambda_support/README.md): ElasticGraph gem that supports running ElasticGraph using AWS Lambda.
+* [elasticgraph-admin_lambda](elasticgraph-admin_lambda/README.md): Adapts elasticgraph-admin to run as an AWS Lambda.
+* [elasticgraph-graphql_lambda](elasticgraph-graphql_lambda/README.md): Adapts elasticgraph-graphql to run as an AWS Lambda.
+* [elasticgraph-indexer_autoscaler_lambda](elasticgraph-indexer_autoscaler_lambda/README.md): Monitors OpenSearch CPU utilization to autoscale elasticgraph-indexer_lambda concurrency.
+* [elasticgraph-indexer_lambda](elasticgraph-indexer_lambda/README.md): Adapts elasticgraph-indexer to run in an AWS Lambda.
+* [elasticgraph-lambda_support](elasticgraph-lambda_support/README.md): Supports running ElasticGraph using AWS Lambda.
 
 #### Dependency Diagram
 
@@ -162,10 +162,10 @@ graph LR;
 
 These libraries extend ElasticGraph to provide optional but commonly needed functionality.
 
-* [elasticgraph-apollo](elasticgraph-apollo/README.md): An ElasticGraph extension that implements the Apollo federation spec.
-* [elasticgraph-health_check](elasticgraph-health_check/README.md): An ElasticGraph extension that provides a health check for high availability deployments.
-* [elasticgraph-query_interceptor](elasticgraph-query_interceptor/README.md): An ElasticGraph extension for intercepting datastore queries.
-* [elasticgraph-query_registry](elasticgraph-query_registry/README.md): An ElasticGraph extension that supports safer schema evolution by limiting GraphQL queries based on a registry and validating registered queries against the schema.
+* [elasticgraph-apollo](elasticgraph-apollo/README.md): Transforms an ElasticGraph project into an Apollo subgraph.
+* [elasticgraph-health_check](elasticgraph-health_check/README.md): Provides a health check for high availability ElasticGraph deployments.
+* [elasticgraph-query_interceptor](elasticgraph-query_interceptor/README.md): Intercepts ElasticGraph datastore queries.
+* [elasticgraph-query_registry](elasticgraph-query_registry/README.md): Provides a source-controlled query registry for ElasticGraph applications.
 
 #### Dependency Diagram
 
@@ -267,9 +267,9 @@ These libraries are used for local development of ElasticGraph applications, but
 
 * [elasticgraph](elasticgraph/README.md): Bootstraps ElasticGraph projects.
 * [elasticgraph-graphiql](elasticgraph-graphiql/README.md): Provides a GraphiQL IDE for ElasticGraph projects.
-* [elasticgraph-local](elasticgraph-local/README.md): Provides support for developing and running ElasticGraph applications locally.
-* [elasticgraph-rack](elasticgraph-rack/README.md): ElasticGraph gem for serving an ElasticGraph GraphQL endpoint using rack.
-* [elasticgraph-schema_definition](elasticgraph-schema_definition/README.md): ElasticGraph gem that provides the schema definition API and generates schema artifacts.
+* [elasticgraph-local](elasticgraph-local/README.md): Provides support for developing ElasticGraph applications locally.
+* [elasticgraph-rack](elasticgraph-rack/README.md): Serves an ElasticGraph application using Rack.
+* [elasticgraph-schema_definition](elasticgraph-schema_definition/README.md): Provides the ElasticGraph schema definition API.
 
 #### Dependency Diagram
 

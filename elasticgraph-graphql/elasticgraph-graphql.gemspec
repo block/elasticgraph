@@ -15,7 +15,7 @@ Gem::Specification.new do |spec|
   spec.email = ["myron@squareup.com"]
   spec.homepage = "https://block.github.io/elasticgraph/"
   spec.license = "MIT"
-  spec.summary = "The ElasticGraph GraphQL query engine."
+  spec.summary = "Provides the ElasticGraph GraphQL query engine."
 
   # See https://guides.rubygems.org/specification-reference/#metadata
   # for metadata entries understood by rubygems.org.

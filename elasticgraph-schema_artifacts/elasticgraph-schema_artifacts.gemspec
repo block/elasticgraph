@@ -15,7 +15,7 @@ Gem::Specification.new do |spec|
   spec.email = ["myron@squareup.com"]
   spec.homepage = "https://block.github.io/elasticgraph/"
   spec.license = "MIT"
-  spec.summary = "ElasticGraph gem containing code related to generated schema artifacts."
+  spec.summary = "Provides access to ElasticGraph schema artifacts."
 
   # See https://guides.rubygems.org/specification-reference/#metadata
   # for metadata entries understood by rubygems.org.

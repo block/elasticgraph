@@ -15,7 +15,7 @@ Gem::Specification.new do |spec|
   spec.email = ["myron@squareup.com"]
   spec.homepage = "https://block.github.io/elasticgraph/"
   spec.license = "MIT"
-  spec.summary = "ElasticGraph gem that supports running ElasticGraph using AWS Lambda."
+  spec.summary = "Supports running ElasticGraph using AWS Lambda."
 
   # See https://guides.rubygems.org/specification-reference/#metadata
   # for metadata entries understood by rubygems.org.

@@ -15,8 +15,7 @@ Gem::Specification.new do |spec|
   spec.email = ["myron@squareup.com"]
   spec.homepage = "https://block.github.io/elasticgraph/"
   spec.license = "MIT"
-  spec.summary = "An ElasticGraph extension that supports safer schema evolution by limiting GraphQL queries based on " \
-    "a registry and validating registered queries against the schema."
+  spec.summary = "Provides a source-controlled query registry for ElasticGraph applications."
 
   # See https://guides.rubygems.org/specification-reference/#metadata
   # for metadata entries understood by rubygems.org.
