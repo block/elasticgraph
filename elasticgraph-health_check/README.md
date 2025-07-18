@@ -46,7 +46,7 @@ graph LR;
 
 To use, simply register the `EnvoyExtension` when defining your schema:
 
-```ruby
+```
 require(envoy_extension_path = "elastic_graph/health_check/envoy_extension")
 schema.register_graphql_extension ElasticGraph::HealthCheck::EnvoyExtension,
   defined_at: envoy_extension_path,

@@ -35,7 +35,7 @@ example of using it in a Rack `config.ru` file:
 require 'elastic_graph/graphql'
 require 'elastic_graph/rack/graphql_endpoint'
 
-graphql = ElasticGraph::GraphQL.from_yaml_file("path/to/config.yaml")
+graphql = ElasticGraph::GraphQL.from_yaml_file("config/settings/local.yaml")
 run ElasticGraph::Rack::GraphQLEndpoint.new(graphql)
 ```
 

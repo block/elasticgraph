@@ -4,8 +4,10 @@ source "https://rubygems.org"
 elasticgraph_details = <%= ElasticGraph.setup_env.gemfile_elasticgraph_details_code_snippet %>
 
 gem "elasticgraph-local", *elasticgraph_details
-gem "elasticgraph-<%= ElasticGraph.setup_env.datastore %>", *elasticgraph_details
 gem "elasticgraph-query_registry", *elasticgraph_details
+
+# Can be elasticgraph-elasticsearch or elasticgraph-opensearch based on the datastore you want to use.
+gem "elasticgraph-<%= ElasticGraph.setup_env.datastore %>", *elasticgraph_details
 
 gem "httpx", "~> 1.3"
 

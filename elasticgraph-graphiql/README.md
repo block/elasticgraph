@@ -4,11 +4,11 @@ Provides a GraphiQL IDE for ElasticGraph projects.
 
 Here's an example `config.ru`:
 
-``` ruby
+```ruby
 require 'elastic_graph/graphql'
 require 'elastic_graph/graphiql'
 
-graphql = ElasticGraph::GraphQL.from_yaml_file("path/to/config.yaml")
+graphql = ElasticGraph::GraphQL.from_yaml_file("config/settings/local.yaml")
 run ElasticGraph::GraphiQL.new(graphql)
 ```
 

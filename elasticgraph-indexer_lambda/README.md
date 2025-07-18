@@ -32,7 +32,7 @@ graph LR;
 We use [JSON Lines](http://jsonlines.org/) to encode our indexing events. It is just individual JSON objects
 delimited by a newline control character(not the `\n` string sequence), such as:
 
-```jsonl
+```
 {"op": "upsert", "__typename": "Payment", "id": "123", "version": "1", "record": {...} }
 {"op": "upsert", "__typename": "Payment", "id": "123", "version": "2", record: {...} }
 {"op": "delete", "__typename": "Payment", "id": "123", "version": "3"}

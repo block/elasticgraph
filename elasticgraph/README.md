@@ -25,6 +25,6 @@ graph LR;
 
 Run this command to bootstrap a new local project:
 
-```bash
+```
 elasticgraph new my_app
 ```

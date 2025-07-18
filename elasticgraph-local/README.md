@@ -46,7 +46,7 @@ graph LR;
 
 Add `elasticgraph-local` to a new project `Gemfile`:
 
-```ruby
+```
 source "https://rubygems.org"
 
 group :development do
@@ -64,7 +64,7 @@ deployment).
 
 Next, install the `elasticgraph-local` rake tasks in your `Rakefile`, with code like:
 
-``` ruby
+```
 require 'elastic_graph/local/rake_tasks'
 
 ElasticGraph::Local::RakeTasks.new(
@@ -85,7 +85,7 @@ end
 Everything you need is provided by rake tasks. Run the following to see what they are:
 
 ```bash
-$ bundle exec rake -T
+bundle exec rake -T
 ```
 
 At a high level, this provides tasks that help you to:

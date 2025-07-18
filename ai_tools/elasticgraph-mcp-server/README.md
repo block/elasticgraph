@@ -6,7 +6,7 @@ This provides a Model Context Protocol (MCP) server for [ElasticGraph](https://b
 
 1. Install dependencies:
 
-```bash
+```
 # make install
 uv sync
 
@@ -17,7 +17,7 @@ source .venv/bin/activate
 
 The server runs on port 3000, and though there are no logs displayed, it is actively waiting for input.
 
-```bash
+```
 # make server
 uv pip install .
 elasticgraph-mcp-server
@@ -31,7 +31,7 @@ You can test your MCP server with Anthropic's [Inspector](https://modelcontextpr
 
 1. Run the following command, which starts the server as a subprocess and launches the Inspector UI:
 
-```bash
+```
 # make inspector
 mcp dev src/elasticgraph_mcp/server.py
 ```
@@ -46,7 +46,7 @@ Add a development build to Goose:
 2. Set **Type** to **StandardIO**.
 3. Paste the run command for your local development version, it will start with `uv run </path/to/elasticgraph_mcp/.venv/bin/elasticgraph-mcp-server>`
 
-```bash
+```
 # Copy the run command to your clipboard
 echo "uv run $(realpath .venv/bin/elasticgraph-mcp-server)" | pbcopy
 ```
@@ -60,7 +60,7 @@ Ask goose: What tools and resources for ElasticGraph do you have?
 
 This project uses `make` for common development tasks. To see all available commands, run:
 
-```bash
+```
 make help
 ```
 
@@ -72,7 +72,7 @@ You can use [Goose](https://block.github.io/goose/) to improve this MCP server. 
 
 1. **Navigate to this MCP Server Directory:**
 
-```bash
+```
 cd ai_tools/elasticgraph-mcp-server
 ```
 
@@ -94,7 +94,7 @@ touch tmp/mcp_for_llm_instructions.md
 
 4. **Start a Goose Session:**
 
-```bash
+```
 goose session
 ```
 

@@ -25,7 +25,7 @@ graph LR;
 
 First, add `elasticgraph-query_interceptor` to your `Gemfile`:
 
-``` ruby
+```
 gem "elasticgraph-query_interceptor"
 ```
 
@@ -33,7 +33,7 @@ Next, configure this library in your ElasticGraph config YAML files.
 An optional "config" dictionary can be provided to pass in values to
 your interceptor when it is initialized.
 
-``` yaml
+```yaml
 extension_modules:
 - require_path: elastic_graph/query_interceptor/graphql_extension
   name: ElasticGraph::QueryInterceptor::GraphQLExtension
@@ -48,7 +48,7 @@ query_interceptor:
 Define your interceptors at the configured paths. Each interceptor must
 implement this interface:
 
-``` ruby
+```ruby
 module YourApp
   class ExampleInterceptor
     def initialize(elasticgraph_graphql:, config:)

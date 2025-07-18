@@ -2,6 +2,16 @@
 
 This document serves as the primary, single source of truth for understanding the ElasticGraph project.
 
+## Development Requirements for AI Agents
+
+**CRITICAL - Ruby Code Standards**: All AI agents working on this project MUST run `bundle exec standardrb --fix` on any Ruby code before completing tasks. This is a mandatory step in the ElasticGraph project workflow. StandardRB linting should be applied to:
+- New Ruby scripts in script/ directory
+- Modified Ruby files
+- Any Ruby code changes
+- Before considering any Ruby coding task complete
+
+The ElasticGraph project uses StandardRB for consistent code formatting and style enforcement. This step is non-negotiable and should be done automatically as part of the development process.
+
 ## Project Context
 
 -   **Why this project exists**: ElasticGraph is a general purpose, near real-time data query and search platform.
@@ -349,6 +359,7 @@ The `script/` directory contains various scripts for development, maintenance, a
 -   `update_licenses`: Scans and updates license information for project dependencies.
 -   `quick_build`: Provides a potentially faster, possibly less comprehensive, build option for local development.
 -   `spellcheck`: Runs spell-checking across the codebase.
+-   `validate_readme_snippets`: Validates all Ruby code snippets and diff snippets in README.md files throughout the repository, following the ElasticGraph principle of "validating all documentation snippets".
 -   `run_gem_specs`: A utility to execute RSpec tests for individual gems or all gems within the monorepo.
 -   `flatware_rspec`: Likely executes RSpec tests in parallel using the Flatware tool.
 -   `update_ci_yaml`: Automates updates to the GitHub Actions CI workflow configuration (`.github/workflows/ci.yaml`), especially for the matrix of datastore versions being tested. It reads version information from `config/tested_datastore_versions.yaml`.

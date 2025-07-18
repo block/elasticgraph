@@ -34,7 +34,7 @@ graph LR;
 
 First, add `elasticgraph-apollo` to your `Gemfile`:
 
-``` ruby
+```
 gem "elasticgraph-apollo"
 ```
 
@@ -42,7 +42,7 @@ Finally, update your ElasticGraph schema artifact rake tasks in your `Rakefile`
 so that `ElasticGraph::GraphQL::Apollo::SchemaDefinition::APIExtension` is
 passed as one of the `extension_modules`:
 
-``` ruby
+```
 require "elastic_graph/schema_definition/rake_tasks"
 require "elastic_graph/apollo/schema_definition/api_extension"
 
@@ -69,7 +69,7 @@ This library supports multiple versions of Apollo federation. As of Jan. 2024, i
 By default, the newest version is targeted. If you need an older version (e.g. because your organization is
 running an older Apollo version), you can configure it in your schema definition with:
 
-```ruby
+```
 schema.target_apollo_federation_version "2.3"
 ```
 

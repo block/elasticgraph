@@ -1,0 +1,30 @@
+#!/usr/bin/env ruby
+
+# This script validates all Ruby code snippets found in README.md files
+# throughout the repository, following the ElasticGraph principle of
+# "validating all documentation snippets".
+
+require "optparse"
+require_relative "readme_snippets/readme_snippet_validator"
+
+options = {}
+
+OptionParser.new do |opts|
+  opts.banner = "Usage: #{$0} [options]"
+
+  opts.on("-v", "--verbose", "Show detailed output for each snippet and debug information") do |v|
+    options[:verbose] = v
+  end
+
+  opts.on("-f", "--file FILE", "Validate only a specific README.md file") do |f|
+    options[:specific_file] = f
+  end
+
+  opts.on("-h", "--help", "Show this help message") do
+    puts opts
+    exit
+  end
+end.parse!
+
+validator = ReadmeSnippetValidator.new
+validator.validate_all(options)
