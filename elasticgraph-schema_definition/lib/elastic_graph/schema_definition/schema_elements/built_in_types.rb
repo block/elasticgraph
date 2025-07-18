@@ -1424,6 +1424,7 @@ module ElasticGraph
           define_grouping_argument_offset(grouping_field, calendar_type, offset_example_description)
           define_grouping_argument_time_zone(grouping_field, calendar_type) unless omit_timezone
           define_grouping_argument_truncation_unit(grouping_field, calendar_type) unless omit_truncation_unit
+          define_grouping_argument_min_doc_count(grouping_field)
         end
 
         def define_grouping_argument_offset(grouping_field, calendar_type, example_description)
@@ -1446,6 +1447,20 @@ module ElasticGraph
         def define_grouping_argument_truncation_unit(grouping_field, calendar_type)
           grouping_field.argument schema_def_state.schema_elements.truncation_unit, "#{calendar_type.name}GroupingTruncationUnit!" do |a|
             a.documentation "Determines the grouping truncation unit for this field."
+          end
+        end
+
+        def define_grouping_argument_min_doc_count(grouping_field)
+          grouping_field.argument :min_doc_count, "Int" do |a|
+            a.documentation <<~EOS
+              The minimum number of documents required for a grouping bucket to be included in the results.
+              
+              This is useful for excluding buckets with very few documents, which can help reduce noise in
+              aggregation results and improve query performance. For example, when grouping by year and there
+              are documents with incorrect timestamps hundreds of years ago, setting a higher min_doc_count
+              can exclude those sparse buckets.
+            EOS
+            a.default 1
           end
         end
 
