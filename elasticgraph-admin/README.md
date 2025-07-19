@@ -1,6 +1,6 @@
 # ElasticGraph::Admin
 
-Provides datastore administrative tasks for ElasticGraph.
+Administers a datastore for an ElasticGraph project.
 
 ## Dependency Diagram
 
@@ -33,4 +33,32 @@ graph LR;
     elasticgraph-local --> elasticgraph-admin;
     class elasticgraph-local otherEgGemStyle;
     click rake href "https://rubygems.org/gems/rake" "Open on RubyGems.org" _blank;
+```
+
+## Usage
+
+This gem provides rake tasks for administering a datastore. To see what changes will be made, run:
+
+```bash
+bundle exec rake clusters:configure:dry_run
+```
+
+Then, to apply the changes, run:
+
+```bash
+bundle exec rake clusters:configure:perform
+```
+
+These tasks are automatically pulled into a project via `elasticgraph-local`, but they can also be manually
+installed in a `Rakefile` (e.g. for production environments):
+
+```ruby
+# in Rakefile
+
+require "elastic_graph/admin"
+require "elastic_graph/admin/rake_tasks"
+
+ElasticGraph::Admin::RakeTasks.new do
+  ElasticGraph::Admin.from_yaml_file("config/settings/local.yaml")
+end
 ```

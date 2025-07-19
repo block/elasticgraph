@@ -1,9 +1,7 @@
 # ElasticGraph::Rack
 
-Uses [Rack](https://github.com/rack/rack) to serve an ElasticGraph application.
-Intended primarily to make it easy to boot ElasticGraph applications locally,
-but could also be used to serve an ElasticGraph application from any Rack
-compatible web server.
+Serves an ElasticGraph application using [Rack](https://github.com/rack/rack).
+Can be used to serve an ElasticGraph application from any Rack compatible web server.
 
 ## Dependency Diagram
 
@@ -26,10 +24,9 @@ graph LR;
     click rack href "https://rubygems.org/gems/rack" "Open on RubyGems.org" _blank;
 ```
 
-## Serving an ElasticGraph GraphQL Endpoint
+## Usage
 
-`ElasticGraph::Rack::GraphQLEndpoint` is a Rack application. Here's an
-example of using it in a Rack `config.ru` file:
+Use this gem with any rack-compatible server. Here's an example `config.ru`:
 
 ```ruby
 require 'elastic_graph/graphql'
