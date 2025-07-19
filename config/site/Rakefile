@@ -542,6 +542,10 @@ module ElasticGraph
       doc_output = IO.popen(command).read
       t2 = ::Time.now
 
+      # Post processing: get mermaid diagrams to render correctly.
+      require_relative "support/mermaid_processor"
+      ElasticGraph::MermaidProcessor.new(YARD_OUTPUT_DIR).process!
+
       ignored_warnings_output = YARD_WARNINGS_TO_IGNORE.filter_map do |warning, regex|
         if (count = doc_output.scan(regex).count) > 0
           "Ignored #{count} #{warning} warning(s)."
@@ -558,20 +562,63 @@ module ElasticGraph
       EOS
     end
 
-    yardopts_from_file = ::File.read(::File.expand_path("yardopts", __dir__))
+    ::File.read(::File.expand_path("yardopts", __dir__))
       .split("\n")
       .map(&:strip)
       .reject(&:empty?)
 
-    YARD_DOC_OPTS = [
-      "--output-dir #{YARD_OUTPUT_DIR}",
-      "--db #{SITE_CONFIG_DIR}/.yardoc",
-      *yardopts_from_file,
-      *DOCUMENTED_GEMS
-    ].join(" ")
-
     def yard_cmd(subcmd)
-      "bundle exec yard #{subcmd} #{YARD_DOC_OPTS}"
+      yardopts_from_file = ::File.read(::File.expand_path("yardopts", __dir__))
+        .split("\n")
+        .map(&:strip)
+        .reject(&:empty?)
+
+      # Stage markdown files with unique names before generating docs
+      staged_markdown_files = stage_markdown_files
+
+      yard_opts = [
+        "--output-dir #{YARD_OUTPUT_DIR}",
+        "--db #{SITE_CONFIG_DIR}/.yardoc",
+        "--files #{staged_markdown_files.join(",")}",
+        *yardopts_from_file,
+        *DOCUMENTED_GEMS
+      ].compact.join(" ")
+
+      # Run YARD from the repository root so relative paths work
+      "cd #{REPO_ROOT} && bundle exec yard #{subcmd} #{yard_opts}"
+    end
+
+    private
+
+    def stage_markdown_files
+      staging_dir = File.join(REPO_ROOT, "tmp", "staged_markdown")
+
+      # Clean and recreate staging directory
+      FileUtils.rm_rf(staging_dir)
+      FileUtils.mkdir_p(staging_dir)
+
+      # Stage README from every gem using ElasticGraphGems.list
+      ::ElasticGraphGems.list.each do |gem_name|
+        readme_path = File.join(REPO_ROOT, gem_name, "README.md")
+        staged_filename = "#{gem_name}.md"
+        staged_path = File.join(staging_dir, staged_filename)
+
+        FileUtils.cp(readme_path, staged_path)
+        puts "Staged #{gem_name}/README.md as #{staged_filename}"
+      end
+
+      # Stage CODEBASE_OVERVIEW.md
+      codebase_overview_path = File.join(REPO_ROOT, "CODEBASE_OVERVIEW.md")
+      staged_path = File.join(staging_dir, "CODEBASE_OVERVIEW.md")
+      FileUtils.cp(codebase_overview_path, staged_path)
+      puts "Staged CODEBASE_OVERVIEW.md"
+
+      puts "Staged #{Dir.glob(File.join(staging_dir, "*.md")).size} README files for documentation"
+
+      # Get the list of staged markdown files (use relative paths from repo root)
+      Dir.glob(File.join(staging_dir, "*.md")).map do |absolute_path|
+        Pathname.new(absolute_path).relative_path_from(Pathname.new(REPO_ROOT)).to_s
+      end
     end
 
     COMMON_JEKYLL_ARGS = [
