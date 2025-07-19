@@ -11,7 +11,7 @@ down/should not be used under any circumstances".
 
 The returned status is the worst of the status values from the individual sub-checks:
 1. The datastore clusters' own health statuses. The datastore clusters reflect their status as green/yellow/red. See
-   [the Elasticsearch documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-health.html#cluster-health-api-response-body)
+   [the Elasticsearch documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-health.html)
    for details on the meaning of these statuses.
    - `green` maps to `healthy`, `yellow` to `degraded`, and `red` to `unhealthy`.
 
