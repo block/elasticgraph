@@ -17,14 +17,18 @@ module ElasticGraph
       class ForRegisteredClient < ::Data.define(
         :schema,
         :allow_any_query_for_clients,
+        :warn_on_unregistered_query_for_clients,
+        :logger,
         :client_data_by_client_name,
         :client_cache_mutex,
         :provide_query_strings_for_client
       )
-        def initialize(schema:, client_names:, allow_any_query_for_clients:, provide_query_strings_for_client:)
+        def initialize(schema:, client_names:, allow_any_query_for_clients:, warn_on_unregistered_query_for_clients:, logger:, provide_query_strings_for_client:)
           super(
             schema: schema,
             allow_any_query_for_clients: allow_any_query_for_clients,
+            warn_on_unregistered_query_for_clients: warn_on_unregistered_query_for_clients,
+            logger: logger,
             client_cache_mutex: ::Mutex.new,
             provide_query_strings_for_client: provide_query_strings_for_client,
             client_data_by_client_name: client_names.to_h { |name| [name, nil] }.merge(
@@ -49,14 +53,28 @@ module ElasticGraph
 
           query = yield
 
+          canonical_query_string = ClientData.canonical_query_string_from(query, schema_element_names: schema.element_names)
+          is_unregistered = !client_data.canonical_query_strings.include?(canonical_query_string)
+
+          # Log warning if this client is in the warning list and the query is unregistered
+          if is_unregistered && warn_on_unregistered_query_for_clients.include?(client.name)
+            log_unregistered_query_warning(query, client, client_data)
+          end
+
           # This client allows any query, so we can just return the query with no errors here.
           # Note: we could put this at the top of the method, but if the query is registered and matches
           # the registered form, the `cached_query` above is more efficient as it avoids unnecessarily
           # parsing the query.
           return [query, []] if allow_any_query_for_clients.include?(client.name)
 
-          if !client_data.canonical_query_strings.include?(ClientData.canonical_query_string_from(query, schema_element_names: schema.element_names))
-            return [query, [client_data.unregistered_query_error_for(query, client)]]
+          if is_unregistered
+            # Check if we should warn instead of reject
+            if warn_on_unregistered_query_for_clients.include?(client.name)
+              # Warning was already logged above
+              return [query, []]
+            else
+              return [query, [client_data.unregistered_query_error_for(query, client)]]
+            end
           end
 
           # The query is slightly different from a registered query, but not in any material fashion
@@ -78,6 +96,11 @@ module ElasticGraph
         end
 
         private
+
+        def log_unregistered_query_warning(query, client, client_data)
+          warning_message = "Query registry warning: #{client_data.unregistered_query_error_for(query, client)}"
+          logger.warn(warning_message)
+        end
 
         def client_data_for(client_name)
           if (client_data = client_data_by_client_name[client_name])

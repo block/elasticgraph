@@ -121,6 +121,9 @@ query_registry:
   allow_unregistered_clients: false
   allow_any_query_for_clients:
   - adhoc_client
+  warn_on_unregistered_query_for_clients:
+  - migration_client
+  - test_client
   path_to_registry: config/queries
 ```
 
@@ -152,6 +155,28 @@ will be allowed to execute _all_ queries! We recommend you set
 `allow_unregistered_clients` to `false` unless you specifically need
 to allow unregistered clients. For specific clients that need to be
 allowed to run any query, you can list them in `allow_any_query_for_clients`.
+
+## Warning Mode
+
+In addition to strict enforcement, this library also supports a warning mode
+that can help with gradual migration to the query registry. When clients are
+listed in `warn_on_unregistered_query_for_clients`, their unregistered queries
+will be allowed to execute but will generate warning logs. This is useful for:
+
+* Discovering what queries clients are using before enforcing registration
+* Gradually migrating clients to use registered queries
+* Monitoring query usage patterns during development
+
+The warning logs include:
+* Client name and description
+* Query fingerprint for identification
+* Operation name (if present)
+* Whether the query differs from a registered version
+
+Note that warnings are logged even if a client is listed in both 
+`allow_any_query_for_clients` and `warn_on_unregistered_query_for_clients`.
+This allows you to monitor query usage patterns even for clients that
+are allowed to run any query.
 
 ## Workflow
 
