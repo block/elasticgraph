@@ -144,6 +144,26 @@ module ElasticGraph
             }.to raise_error ArgumentError, a_string_including("unsupported interval", "fortnight")
           end
         end
+
+        describe "#non_composite_clause_for" do
+          it "includes min_doc_count in the grouping options" do
+            grouping = date_histogram_grouping_of("foo", "bar", "day", min_doc_count: 5)
+            query = double("Query")
+
+            clause = grouping.non_composite_clause_for(query)
+
+            expect(clause.dig("date_histogram", "min_doc_count")).to eq(5)
+          end
+
+          it "defaults to min_doc_count of 1 when not specified" do
+            grouping = date_histogram_grouping_of("foo", "bar", "day")
+            query = double("Query")
+
+            clause = grouping.non_composite_clause_for(query)
+
+            expect(clause.dig("date_histogram", "min_doc_count")).to eq(1)
+          end
+        end
       end
     end
   end
