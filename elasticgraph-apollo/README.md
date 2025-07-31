@@ -79,7 +79,7 @@ That's it!
 
 ## Federation Version Support
 
-This library supports multiple versions of Apollo federation. As of Jan. 2024, it supports:
+This library supports multiple versions of Apollo federation. The latest release supports:
 
 * v2.0
 * v2.3

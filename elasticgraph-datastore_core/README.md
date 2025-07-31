@@ -36,8 +36,7 @@ graph LR;
 
 ## Usage
 
-This gem is an internal "support" gem that other parts of ElasticGraph rely on but which ElasticGraph users are not expected to interact with.
-However, here's a usage example if you want to poke around:
+The other parts of ElasticGraph depend on and use this gem automatically. Here's a usage example if you want to poke around:
 
 ```ruby
 require "elastic_graph/datastore_core"

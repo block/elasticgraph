@@ -38,6 +38,8 @@ To use an ElasticGraph project with Elasticsearch, bootstrap an ElasticGraph pro
 gem exec elasticgraph new path/to/project --datastore elasticsearch
 ```
 
+### Migrate from OpenSearch to Elasticsearch
+
 If you need to convert an existing project to use Elasticsearch instead of OpenSearch, here's how to do that.
 
 First, replace `elasticgraph-opensearch` with `elasticgraph-elasticsearch` in the `Gemfile`:

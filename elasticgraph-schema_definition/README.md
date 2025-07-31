@@ -68,7 +68,7 @@ ElasticGraph.define_schema do |schema|
     t.field "formedOn", "Date"
     t.field "currentName", "String"
     t.field "pastNames", "[String!]!"
-    t.field "stadium_location", "GeoLocation"
+    t.field "stadiumLocation", "GeoLocation"
 
     t.index "teams"
   end

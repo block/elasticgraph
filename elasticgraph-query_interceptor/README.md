@@ -2,7 +2,11 @@
 
 An ElasticGraph extension for intercepting datastore queries.
 
-Interceptors can customize/modify datastore queries before they are submitted.
+Interceptors can customize/modify datastore queries before they are submitted to Elasticsearch or OpenSearch.
+Some of the use cases for query interceptors include:
+
+* **Automatic filtering**: A query interceptor can apply default filtering to a query. For example, this can be used to automatically exclude soft-deleted/tombstoned records.
+* **Query optimization**: When querying an index that uses shard routing or rollover, queries that filter on the shard routing or rollover timestamp fields are much more performant. A query interceptor can apply filters on these fields after querying a derived index for the appropriate values.
 
 ## Dependency Diagram
 
@@ -46,13 +50,25 @@ Next, define the interceptor. Interceptor must implement this interface:
 # lib/example_interceptor.rb
 class ExampleInterceptor
   def initialize(elasticgraph_graphql:, config:)
-    # elasticgraph_graphql is the `ElasticGraph::GraphQL` instance and has access
-    # to things like the datastore client in case you need it in your interceptor.
+    # `elasticgraph_graphql` is the `ElasticGraph::GraphQL` instance and has access to things like the
+    # datastore client in case you need it in your interceptor. This can be useful if you need to perform
+    # lookups on a derived index as part of your interceptor logic.
+    #
+    # `config` is a hash containing parameterized configuration values specific in the YAML settings
+    # (see below for an example).
   end
 
   def intercept(query, field:, args:, http_request:, context:)
-    # Call `query.merge_with(...)` as desired to merge in query overrides like filters.
-    # This method must return a query.
+    # `query` is an `ElasticGraph::GraphQL::DatastoreQuery` that will be submitted to the datastore
+    # as part of satisfying a GraphQL query.
+    #
+    # `field`, `args`, and `context` provide access to GraphQL query information which can be used
+    # in your interceptor logic to influence how you modify the datastore query.
+    #
+    # `http_request` provides access to the original HTTP request and can likewise be used in your logic.
+    #
+    # Use `query.merge_with(...)` as desired to merge in query overrides like filters, or just return `query`.
+    # (This method must return a query.)
   end
 end
 ```
