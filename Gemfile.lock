@@ -648,7 +648,7 @@ DEPENDENCIES
   rubocop-rake (~> 0.6.0)
   rubocop-rspec (~> 3.4.0)
   simplecov (~> 0.22)
-  simplecov-console (~> 0.9)
+  simplecov-console (~> 0.9, >= 0.9.4)
   standard (~> 1.50.0)
   steep (~> 1.10.0)
   super_diff (~> 0.16)
