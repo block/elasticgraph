@@ -22,9 +22,9 @@ script_dir=$(dirname $0)
 # Default to the Apollo federation version 2.6, as higher versions are not supported by the test suite properly.
 apollo_federation_version=${1:-2.6}
 
-# Latest version as of 2024-05-08. Gotten from:
+# Latest version as of 2025-08-01. Gotten from:
 # https://www.npmjs.com/package/@apollo/federation-subgraph-compatibility?activeTab=versions
-apollo_subgraph_tests_version=2.2.0
+apollo_subgraph_tests_version=2.2.1
 
 TARGET_APOLLO_FEDERATION_VERSION=$apollo_federation_version bundle exec rake \
   --rakefile $script_dir/../apollo_tests_implementation/Rakefile schema_artifacts:dump
