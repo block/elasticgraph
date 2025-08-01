@@ -13,7 +13,7 @@ updates:
       # build on upgrade, we want to keep them in their own PRs. We've listed them in `exclude_patterns` below.
       transitive-and-easy-upgrade-dependencies:
         patterns: ["*"]
-        exclude_patterns:
+        exclude-patterns:
           - "elasticsearch" # listed here as gem releases align with releases of Elasticsearch itself, and a PR notifies us of it
           - "graphql"
           - "json_schemer"
