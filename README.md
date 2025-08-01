@@ -18,7 +18,7 @@
 </p>
 
 [ElasticGraph](https://block.github.io/elasticgraph/) provides schema-driven, scalable, cloud-native,
-batteries-included GraphQL with superpowers, backed by Elasticsearch / OpenSearch.
+batteries-included GraphQL, backed by Elasticsearch / OpenSearch.
 
 ## Try ElasticGraph in 1 Minute
 

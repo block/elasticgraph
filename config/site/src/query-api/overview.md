@@ -14,7 +14,7 @@ If you're just getting started with GraphQL, we recommend you review the [graphq
 learning materials](https://graphql.org/learn/queries/).
 
 ElasticGraph offers a number of query features that go far beyond a traditional GraphQL
-API (we like to call it "GraphQL with superpowers"). Each of these features is implemented
+API (we like to call it "batteries included GraphQL"). Each of these features is implemented
 directly by the ElasticGraph framework, ensuring consistent, predictable behavior across your
 entire schema.
 

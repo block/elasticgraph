@@ -9,7 +9,7 @@ x_url: https://x.com/elasticgraph
 x_username: "@ElasticGraph"
 support_email: elasticgraph@squareup.com
 description: Open source framework for indexing, searching, and aggregating data powered by GraphQL and Elasticsearch / OpenSearch
-tagline: Schema-driven, scalable, cloud-native, batteries-included GraphQL with superpowers, backed by Elasticsearch / OpenSearch
+tagline: Schema-driven, scalable, cloud-native, batteries-included GraphQL, backed by Elasticsearch / OpenSearch
 
 # Include `_index.html` file from docs directories
 # https://github.com/lsegal/yard/issues/1027
