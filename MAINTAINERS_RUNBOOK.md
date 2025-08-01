@@ -169,10 +169,14 @@ Dependabot PRs can be reviewed and merged without the approval of another mainta
 
 * Review the release notes provided by Dependabot in the PR description. If there are any new features of a dependency that we should
   take advantage of, please [open an issue](https://github.com/block/elasticgraph/issues/new/choose) so we can track that work.
-* Confirm the CI build fully passes.
+* Confirm the CI build fully passes. If the build has a non-transient failure and the PR is upgrading multiple dependencies, consider
+  updating [.github/dependabot.yml](https://github.com/block/elasticgraph/blob/main/.github/dependabot.yml) to exclude the culprit from
+  inclusion in a multiple-dependency PR. (It's nice to isolate such a dependency into its own PR.)
 * Review the diff to make sure it looks reasonable.
 
-When merging, please use the "Squash and merge" option as we don't need to keep the two commits in the PR separate.
+When merging, please use the "Squash and merge" option as we don't need to keep the two commits in the PR separate. If a Dependabot PR
+has merge conflicts, comment on the PR with `@dependabot recreate` rather than `@dependabot rebase` so that the updates from
+`script/update_gem_constraints` get recreated as well.
 
 ### Triggering Dependabot
 

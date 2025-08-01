@@ -7,6 +7,20 @@ updates:
       - dependency-type: "all" # Allow both direct and transitive updates for all packages.
     schedule:
       interval: monthly
+    groups:
+      # 1 PR for every single dependency is overkill (it's tedious to have to wade through 20 dependabot PRs!).
+      # However, for certain key dependencies that are important or have had a history of initially failing the
+      # build on upgrade, we want to keep them in their own PRs. We've listed them in `exclude_patterns` below.
+      transitive-and-easy-upgrade-dependencies:
+        patterns: ["*"]
+        exclude_patterns:
+          - "elasticsearch" # listed here as gem releases align with releases of Elasticsearch itself, and a PR notifies us of it
+          - "graphql"
+          - "json_schemer"
+          - "rack"
+          - "rbs"
+          - "standard"
+          - "steep"
 
   - package-ecosystem: bundler
     open-pull-requests-limit: 20

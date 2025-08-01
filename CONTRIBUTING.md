@@ -205,6 +205,10 @@ bundle exec rake site:preview_docs:elasticgraph-schema_definition
 
 Then visit http://localhost:8808/. The preview task will rebuild the parts of the generated docs impacted by your edits, and is quite fast.
 
+## Maintenance Tasks
+
+Common codebase maintenance tasks are documented in the [maintainer's runbook](MAINTAINERS_RUNBOOK.md).
+
 ---
 
 ## Communications
