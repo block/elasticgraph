@@ -1,12 +1,23 @@
 version: 2
 updates:
   - package-ecosystem: github-actions
-    open-pull-requests-limit: 10
     directory: /
     allow:
       - dependency-type: "all" # Allow both direct and transitive updates for all packages.
     schedule:
       interval: monthly
+    open-pull-requests-limit: 1
+    groups:
+      all:
+        patterns: ["*"]
+
+  - package-ecosystem: bundler
+    directory: /
+    allow:
+      - dependency-type: "all" # Allow both direct and transitive updates for all packages.
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
     groups:
       # 1 PR for every single dependency is overkill (it's tedious to have to wade through 20 dependabot PRs!).
       # However, for certain key dependencies that are important or have had a history of initially failing the
@@ -23,20 +34,15 @@ updates:
           - "steep"
 
   - package-ecosystem: bundler
-    open-pull-requests-limit: 20
-    directory: /
-    allow:
-      - dependency-type: "all" # Allow both direct and transitive updates for all packages.
-    schedule:
-      interval: weekly
-
-  - package-ecosystem: bundler
-    open-pull-requests-limit: 10
     directory: /config/release
     allow:
       - dependency-type: "all" # Allow both direct and transitive updates for all packages.
     schedule:
       interval: weekly
+    open-pull-requests-limit: 1
+    groups:
+      all:
+        patterns: ["*"]
 
   - package-ecosystem: npm
     directory: /config/site
@@ -44,6 +50,10 @@ updates:
       - dependency-type: "all" # Allow both direct and transitive updates for all packages.
     schedule:
       interval: weekly
+    open-pull-requests-limit: 1
+    groups:
+      all:
+        patterns: ["*"]
 
   - package-ecosystem: docker
     directory: /elasticgraph-apollo/apollo_tests_implementation
@@ -51,6 +61,10 @@ updates:
       - dependency-type: "all" # Allow both direct and transitive updates for all packages.
     schedule:
       interval: weekly
+    open-pull-requests-limit: 1
+    groups:
+      all:
+        patterns: ["*"]
 
   - package-ecosystem: docker
     directory: /elasticgraph-local/lib/elastic_graph/local/elasticsearch
@@ -58,6 +72,10 @@ updates:
       - dependency-type: "all" # Allow both direct and transitive updates for all packages.
     schedule:
       interval: weekly
+    open-pull-requests-limit: 1
+    groups:
+      all:
+        patterns: ["*"]
 
   - package-ecosystem: docker
     directory: /elasticgraph-local/lib/elastic_graph/local/opensearch
@@ -65,6 +83,10 @@ updates:
       - dependency-type: "all" # Allow both direct and transitive updates for all packages.
     schedule:
       interval: weekly
+    open-pull-requests-limit: 1
+    groups:
+      all:
+        patterns: ["*"]
 
   - package-ecosystem: pip
     directory: /ai_tools/elasticgraph-mcp-server
@@ -72,3 +94,7 @@ updates:
       - dependency-type: "all" # Allow both direct and transitive updates for all packages.
     schedule:
       interval: weekly
+    open-pull-requests-limit: 1
+    groups:
+      all:
+        patterns: ["*"]
