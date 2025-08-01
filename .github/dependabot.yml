@@ -8,7 +8,7 @@ updates:
       interval: monthly
     open-pull-requests-limit: 1
     groups:
-      all:
+      github-actions:
         patterns: ["*"]
 
   - package-ecosystem: bundler
@@ -22,7 +22,7 @@ updates:
       # 1 PR for every single dependency is overkill (it's tedious to have to wade through 20 dependabot PRs!).
       # However, for certain key dependencies that are important or have had a history of initially failing the
       # build on upgrade, we want to keep them in their own PRs. We've listed them in `exclude_patterns` below.
-      transitive-and-easy-upgrade-dependencies:
+      most-gems:
         patterns: ["*"]
         exclude-patterns:
           - "elasticsearch" # listed here as gem releases align with releases of Elasticsearch itself, and a PR notifies us of it
@@ -41,7 +41,7 @@ updates:
       interval: weekly
     open-pull-requests-limit: 1
     groups:
-      all:
+      release-gems:
         patterns: ["*"]
 
   - package-ecosystem: npm
@@ -52,7 +52,7 @@ updates:
       interval: weekly
     open-pull-requests-limit: 1
     groups:
-      all:
+      npm:
         patterns: ["*"]
 
   - package-ecosystem: docker
@@ -63,7 +63,7 @@ updates:
       interval: weekly
     open-pull-requests-limit: 1
     groups:
-      all:
+      apollo-docker:
         patterns: ["*"]
 
   - package-ecosystem: docker
@@ -74,7 +74,7 @@ updates:
       interval: weekly
     open-pull-requests-limit: 1
     groups:
-      all:
+      elasticsearch-docker:
         patterns: ["*"]
 
   - package-ecosystem: docker
@@ -85,7 +85,7 @@ updates:
       interval: weekly
     open-pull-requests-limit: 1
     groups:
-      all:
+      opensearch-docker:
         patterns: ["*"]
 
   - package-ecosystem: pip
@@ -96,5 +96,5 @@ updates:
       interval: weekly
     open-pull-requests-limit: 1
     groups:
-      all:
+      pip:
         patterns: ["*"]
