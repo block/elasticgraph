@@ -499,7 +499,7 @@ module ElasticGraph
         task :ensure_local_datastore_running do
           datastore_status_code = begin
             ::Net::HTTP.get_response(URI(local_datastore_url)).code
-          rescue ::SystemCallError
+          rescue ::SystemCallError, ::EOFError
             "500"
           end
 
