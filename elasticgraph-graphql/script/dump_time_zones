@@ -60,22 +60,5 @@ if ARGV.include?("--print")
 else
   filename = "#{__dir__}/../lib/elastic_graph/graphql/scalar_coercion_adapters/valid_time_zones.rb"
   ::FileUtils.cp(updated_code_filename, filename)
-  puts "Timezones have been written to `#{filename}`"
+  puts "Time zones have been written to `#{filename}`"
 end
-
-# if ARGV.include?("--verify")
-#   existing_contents = ::File.exist?(filename) ? ::File.read(filename) : ""
-#
-#   if existing_contents == valid_timezones_ruby_code
-#     puts "`#{filename}` is up to date!"
-#   else
-#     diff = `git diff --no-index #{"--color" if $stdout.tty?} --binary #{updated_code_filename} #{filename}`
-#
-#     abort <<~EOS.strip
-#       `#{filename}` is not up to date! Rerun `script/dump_time_zones` to correct.
-#
-#       #{diff}
-#     EOS
-#   end
-# else
-# end

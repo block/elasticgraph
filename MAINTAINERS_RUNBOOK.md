@@ -128,6 +128,25 @@ script/update_ci_yaml
 
 See https://github.com/block/elasticgraph/pull/545 for an example PR.
 
+## Maintaining Time Zones
+
+ElasticGraph maintains a [set of valid time zones](https://github.com/block/elasticgraph/blob/main/elasticgraph-graphql/lib/elastic_graph/graphql/scalar_coercion_adapters/valid_time_zones.rb),
+which is used to validate client-provided values for the `TimeZone` scalar type. The set is maintained and validated in a few ways:
+
+* [elasticgraph-graphql/script/dump_time_zones](https://github.com/block/elasticgraph/blob/main/elasticgraph-graphql/script/dump_time_zones)
+  generates `valid_time_zones.rb` by querying the JVM (in order to match OpenSearch and Elasticsearch since they run on the JVM).
+* A [unit test](https://github.com/block/elasticgraph/blob/v1.0.0.rc3/elasticgraph-graphql/spec/unit/elastic_graph/graphql/scalar_coercion_adapters/time_zone_spec.rb#L90)
+  verifies that `valid_time_zones.rb` is up-to-date.
+* An [acceptance test](https://github.com/block/elasticgraph/blob/v1.0.0.rc3/elasticgraph-graphql/spec/acceptance/aggregations_spec.rb#L947)
+  executes a GraphQL query using every time zone, to verify that all time zones accepted by our `TimeZone` scalar type are in fact handled
+  by our supported Elasticsearch and OpenSearch versions.
+
+The folks who maintain the tzdata database occasionally add new time zones to the database. After that happens, the aforementioned unit test
+may begin to fail (e.g. once the updated `tzdata` file has landed on the GitHub actions workers...). Initially, we can just ignore/exclude
+the new time zone (given that old OpenSearch and Elasticsearch docker images bundle a `tzdata` file that lacks it). See [this
+PR](https://github.com/block/elasticgraph/pull/710) for an example. Once it's handled by all supported datastore versions, we can stop
+ignoring it.
+
 ## Dependabot
 
 We use [Dependabot](https://docs.github.com/en/code-security/getting-started/dependabot-quickstart-guide) to automatically keep dependencies
