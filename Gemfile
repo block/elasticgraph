@@ -32,7 +32,7 @@ group :development do
   # https://github.com/standardrb/standard/issues/701
   gem "rubocop-rspec", "~> 3.4.0"
   gem "simplecov", "~> 0.22"
-  gem "simplecov-console", "~> 0.9", ">= 0.9.3"
+  gem "simplecov-console", "~> 0.9"
   gem "standard", "~> 1.50.0"
   gem "steep", "~> 1.10.0"
   gem "super_diff", "~> 0.16"
