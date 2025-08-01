@@ -33,4 +33,5 @@ The following tracks only contain "You" or "Eye" (but not both) and would not be
 * _With or Without You_
 
 {: .alert-tip}
+**Tip**{: .alert-title}
 When searching on a single substring, `anySubstringOf` and `allSubstringsOf` behave the same, so feel free to use either.

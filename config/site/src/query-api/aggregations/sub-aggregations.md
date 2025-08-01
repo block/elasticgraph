@@ -29,7 +29,7 @@ Sub-aggregation nodes offer the standard set of aggregation operations:
 * [Aggregated Values]({% link query-api/aggregations/aggregated-values.md %})
 * [Counts]({% link query-api/aggregations/counts.md %})
 * [Grouping]({% link query-api/aggregations/grouping.md %})
-* Sub-aggregations
+* (Further) Sub-aggregations
 
 ### Filtering Sub-Aggregations
 
@@ -41,7 +41,7 @@ sales of all albums released in the 21st century:
 ### Sub-Aggregation Limitations
 
 Sub-aggregation pagination support is limited. You can use `first` to request how many
-nodes are returned, but there is no `pageInfo` and you cannot request the next page of data:
+nodes are returned, but you cannot request the next page of data:
 
 {% include copyable_code_snippet.html language="graphql" data="music_queries.aggregations.AlbumSalesByReleaseMonth" %}
 
