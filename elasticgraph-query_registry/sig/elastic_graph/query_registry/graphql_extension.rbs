@@ -43,8 +43,4 @@ module ElasticGraph
       DEFAULT: Config
     end
   end
-
-  class Config
-    attr_reader query_registry: QueryRegistry::Config
-  end
 end
