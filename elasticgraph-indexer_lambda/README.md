@@ -30,7 +30,7 @@ graph LR;
 ## SQS Message Payload Format
 
 This gem is designed to run in an AWS lambda that consumes from an SQS queue. Messages in the SQS queue should use
-[JSON Lines](http://jsonlines.org/) format to encode indexing events.
+[JSON Lines](https://jsonlines.org/) format to encode indexing events.
 
 JSON lines format contains individual JSON objects
 delimited by a newline control character(not the `\n` string sequence), such as:

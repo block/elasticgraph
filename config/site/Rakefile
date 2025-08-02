@@ -23,6 +23,7 @@ module ElasticGraph
     JEKYLL_SITE_DIR = SITE_CONFIG_DIR / "_site"
     JEKYLL_API_DOCS_DIR = JEKYLL_SITE_DIR / "api-docs"
     JEKYLL_DATA_DIR = SITE_SOURCE_DIR / "_data"
+    STAGED_MARKDOWN_DIR = REPO_ROOT / "tmp" / "staged_markdown"
     EXAMPLE_SCHEMA_FILES_BY_NAME = SITE_CONFIG_DIR.glob("examples/*/schema.rb").to_h do |file|
       [file.parent.basename.to_s, file]
     end
@@ -535,12 +536,20 @@ module ElasticGraph
     }
 
     def run_yard_doc_ignoring_expected_warnings
-      command = yard_cmd("doc")
+      staged_markdown_mappings = nil
+      command = yard_cmd("doc") do |smm|
+        staged_markdown_mappings = smm
+      end
+
       puts "#{command}\n\n"
 
       t1 = ::Time.now
       doc_output = IO.popen(command).read
       t2 = ::Time.now
+
+      # Post processing: get mermaid diagrams to render correctly and fix relative links.
+      require_relative "support/markdown_post_processor"
+      ElasticGraph::MarkdownPostProcessor.new(YARD_OUTPUT_DIR, staged_markdown_mappings).process!
 
       ignored_warnings_output = YARD_WARNINGS_TO_IGNORE.filter_map do |warning, regex|
         if (count = doc_output.scan(regex).count) > 0
@@ -558,20 +567,68 @@ module ElasticGraph
       EOS
     end
 
-    yardopts_from_file = ::File.read(::File.expand_path("yardopts", __dir__))
+    ::File.read(::File.expand_path("yardopts", __dir__))
       .split("\n")
       .map(&:strip)
       .reject(&:empty?)
 
-    YARD_DOC_OPTS = [
-      "--output-dir #{YARD_OUTPUT_DIR}",
-      "--db #{SITE_CONFIG_DIR}/.yardoc",
-      *yardopts_from_file,
-      *DOCUMENTED_GEMS
-    ].join(" ")
-
     def yard_cmd(subcmd)
-      "bundle exec yard #{subcmd} #{YARD_DOC_OPTS}"
+      yardopts_from_file = ::File.read(::File.expand_path("yardopts", __dir__))
+        .split("\n")
+        .map(&:strip)
+        .reject(&:empty?)
+
+      # Stage markdown files with unique names before generating docs
+      staged_markdown_files, staged_markdown_mappings = stage_markdown_files
+
+      yield staged_markdown_mappings if block_given?
+
+      yard_opts = [
+        "--output-dir #{YARD_OUTPUT_DIR}",
+        "--db #{SITE_CONFIG_DIR}/.yardoc",
+        "--files #{staged_markdown_files.join(",")}",
+        *yardopts_from_file,
+        *DOCUMENTED_GEMS
+      ].compact.join(" ")
+
+      # Run YARD from the repository root so relative paths work
+      "cd #{REPO_ROOT} && bundle exec yard #{subcmd} #{yard_opts}"
+    end
+
+    private
+
+    def stage_markdown_files
+      # Clean and recreate staging directory
+      FileUtils.rm_rf(STAGED_MARKDOWN_DIR)
+      FileUtils.mkdir_p(STAGED_MARKDOWN_DIR)
+
+      # Stage README from every gem using ElasticGraphGems.list
+      staged_markdown_mappings = ::ElasticGraphGems.list.to_h do |gem_name|
+        readme_path = REPO_ROOT / gem_name / "README.md"
+        staged_filename = "#{gem_name}.md"
+        staged_path = STAGED_MARKDOWN_DIR / staged_filename
+
+        FileUtils.cp(readme_path, staged_path)
+        puts "Staged #{gem_name}/README.md as #{staged_filename}"
+
+        # Track the mapping from original relative path to staged filename
+        ["#{gem_name}/README.md", staged_filename]
+      end
+
+      # Stage CODEBASE_OVERVIEW.md
+      codebase_overview_path = REPO_ROOT / "CODEBASE_OVERVIEW.md"
+      staged_path = STAGED_MARKDOWN_DIR / "CODEBASE_OVERVIEW.md"
+      FileUtils.cp(codebase_overview_path, staged_path)
+      puts "Staged CODEBASE_OVERVIEW.md"
+
+      puts "Staged #{STAGED_MARKDOWN_DIR.glob("*.md").size} README files for documentation"
+
+      # Get the list of staged markdown files (use relative paths from repo root)
+      staged_files = STAGED_MARKDOWN_DIR.glob("*.md").map do |absolute_path|
+        Pathname.new(absolute_path).relative_path_from(REPO_ROOT).to_s
+      end
+
+      [staged_files, staged_markdown_mappings]
     end
 
     COMMON_JEKYLL_ARGS = [
