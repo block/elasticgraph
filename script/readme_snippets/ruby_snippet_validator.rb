@@ -109,7 +109,7 @@ class RubySnippetValidator < SnippetValidator
     rackup_output = "tmp/rackup_output.log"
 
     success, output = execute_process_with_timeout(RACK_TIMEOUT_SECONDS) do
-      spawn("bundle exec rackup #{Shellwords.escape(config_file_path)} --port 0 2>&1", out: rackup_output, err: rackup_output)
+      spawn("bundle", "exec", "rackup", config_file_path, "--port", "0", out: rackup_output, err: rackup_output)
     end
 
     # For rack configs, we need to check the output file for success indicators
