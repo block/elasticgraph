@@ -8,19 +8,22 @@ module ElasticGraph
         attr_reader interval: timeGroupingInterval
         attr_reader time_zone: ::String?
         attr_reader offset: ::String?
+        attr_reader min_doc_count: ::Integer
 
         def initialize: (
           field_path: fieldPath,
           interval: timeGroupingInterval,
           time_zone: ::String?,
-          offset: ::String?
+          offset: ::String?,
+          min_doc_count: ::Integer
         ) -> void
 
         def with: (
           ?field_path: fieldPath,
           ?interval: timeGroupingInterval,
           ?time_zone: ::String?,
-          ?offset: ::String?
+          ?offset: ::String?,
+          ?min_doc_count: ::Integer
         ) -> DateHistogramGrouping
       end
 
