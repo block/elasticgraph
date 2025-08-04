@@ -1,9 +1,21 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    csv (3.3.5)
     gem-release (2.2.4)
+    mini_portile2 (2.8.9)
+    nokogiri (1.18.9)
+      mini_portile2 (~> 2.8.2)
+      racc (~> 1.4)
+    nokogiri (1.18.9-x86_64-linux-gnu)
+      racc (~> 1.4)
+    racc (1.8.1)
     rake (13.3.0)
+    redcarpet (3.6.1)
     yard (0.9.37)
+    yard-markdown (0.5.0)
+      csv
+      yard
 
 PLATFORMS
   ruby
@@ -11,8 +23,11 @@ PLATFORMS
 
 DEPENDENCIES
   gem-release (~> 2.2)
+  nokogiri (~> 1.18, >= 1.18.9)
   rake (~> 13.3)
+  redcarpet (~> 3.6, >= 3.6.1)
   yard (~> 0.9, >= 0.9.37)
+  yard-markdown (~> 0.5)
 
 BUNDLED WITH
    2.5.22
