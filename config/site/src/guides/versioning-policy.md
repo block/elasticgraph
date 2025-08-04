@@ -44,7 +44,3 @@ MINOR-level changes in addition to backwards incompatibilities that may impact *
 Note that _all_ gems in this repository share the same version number. Every time we cut a release, we increment the version
 for _all_ gems and release _all_ gems, even if a gem has had no changes since the last release. This is simpler to work with
 than the alternatives.
-
-{: .alert-note}
-**Note**{: .alert-title}
-We'll be releasing 1.0.0 soon! Before then, this same versioning policy applies, but our version numbers use a `0.MAJOR.MINOR.PATCH` format.
