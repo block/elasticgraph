@@ -7,6 +7,7 @@ module ElasticGraph
       attr_accessor datastore_query_server_duration_ms: ::Integer
       attr_accessor datastore_query_client_duration_ms: ::Integer
       attr_accessor queried_shard_count: ::Integer
+      attr_accessor extension_data: ::Hash[::String, ::String]
       attr_accessor mutex: ::Thread::Mutex
 
       def initialize: (
@@ -16,6 +17,7 @@ module ElasticGraph
         datastore_query_server_duration_ms: ::Integer,
         datastore_query_client_duration_ms: ::Integer,
         queried_shard_count: ::Integer,
+        extension_data: ::Hash[::String, ::String],
         mutex: ::Thread::Mutex
       ) -> void
     end
@@ -30,6 +32,7 @@ module ElasticGraph
       ) -> void
 
       def datastore_request_transport_duration_ms: () -> ::Integer
+      def set_extension_data: (::String, ::String) -> void
     end
   end
 end

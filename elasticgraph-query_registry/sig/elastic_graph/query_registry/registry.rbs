@@ -24,6 +24,14 @@ module ElasticGraph
         ?context: ::Hash[::Symbol, untyped]
       ) -> [::GraphQL::Query, ::Array[::String]]
 
+      def build_and_validate_query_with_registration_status: (
+        ::String?,
+        client: GraphQL::Client,
+        ?variables: ::Hash[::String, untyped],
+        ?operation_name: ::String?,
+        ?context: ::Hash[::Symbol, untyped]
+      ) -> [::GraphQL::Query, ::Array[::String], bool]
+
       private
 
       @schema: GraphQL::Schema
