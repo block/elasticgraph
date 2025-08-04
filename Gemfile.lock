@@ -1,42 +1,42 @@
 PATH
   remote: elasticgraph-admin_lambda
   specs:
-    elasticgraph-admin_lambda (1.0.0.pre)
-      elasticgraph-admin (= 1.0.0.pre)
-      elasticgraph-lambda_support (= 1.0.0.pre)
+    elasticgraph-admin_lambda (1.0.0)
+      elasticgraph-admin (= 1.0.0)
+      elasticgraph-lambda_support (= 1.0.0)
       rake (~> 13.3)
 
 PATH
   remote: elasticgraph-admin
   specs:
-    elasticgraph-admin (1.0.0.pre)
-      elasticgraph-datastore_core (= 1.0.0.pre)
-      elasticgraph-indexer (= 1.0.0.pre)
-      elasticgraph-schema_artifacts (= 1.0.0.pre)
-      elasticgraph-support (= 1.0.0.pre)
+    elasticgraph-admin (1.0.0)
+      elasticgraph-datastore_core (= 1.0.0)
+      elasticgraph-indexer (= 1.0.0)
+      elasticgraph-schema_artifacts (= 1.0.0)
+      elasticgraph-support (= 1.0.0)
       rake (~> 13.3)
 
 PATH
   remote: elasticgraph-apollo
   specs:
-    elasticgraph-apollo (1.0.0.pre)
+    elasticgraph-apollo (1.0.0)
       apollo-federation (~> 3.10, >= 3.10.1)
-      elasticgraph-graphql (= 1.0.0.pre)
-      elasticgraph-support (= 1.0.0.pre)
+      elasticgraph-graphql (= 1.0.0)
+      elasticgraph-support (= 1.0.0)
       graphql (~> 2.5.11)
 
 PATH
   remote: elasticgraph-datastore_core
   specs:
-    elasticgraph-datastore_core (1.0.0.pre)
-      elasticgraph-schema_artifacts (= 1.0.0.pre)
-      elasticgraph-support (= 1.0.0.pre)
+    elasticgraph-datastore_core (1.0.0)
+      elasticgraph-schema_artifacts (= 1.0.0)
+      elasticgraph-support (= 1.0.0)
 
 PATH
   remote: elasticgraph-elasticsearch
   specs:
-    elasticgraph-elasticsearch (1.0.0.pre)
-      elasticgraph-support (= 1.0.0.pre)
+    elasticgraph-elasticsearch (1.0.0)
+      elasticgraph-support (= 1.0.0)
       elasticsearch (~> 9.1)
       faraday (~> 2.13, >= 2.13.4)
       faraday-retry (~> 2.3, >= 2.3.2)
@@ -44,87 +44,87 @@ PATH
 PATH
   remote: elasticgraph-graphiql
   specs:
-    elasticgraph-graphiql (1.0.0.pre)
-      elasticgraph-rack (= 1.0.0.pre)
+    elasticgraph-graphiql (1.0.0)
+      elasticgraph-rack (= 1.0.0)
 
 PATH
   remote: elasticgraph-graphql_lambda
   specs:
-    elasticgraph-graphql_lambda (1.0.0.pre)
-      elasticgraph-graphql (= 1.0.0.pre)
-      elasticgraph-lambda_support (= 1.0.0.pre)
+    elasticgraph-graphql_lambda (1.0.0)
+      elasticgraph-graphql (= 1.0.0)
+      elasticgraph-lambda_support (= 1.0.0)
 
 PATH
   remote: elasticgraph-graphql
   specs:
-    elasticgraph-graphql (1.0.0.pre)
+    elasticgraph-graphql (1.0.0)
       base64 (~> 0.3)
-      elasticgraph-datastore_core (= 1.0.0.pre)
-      elasticgraph-schema_artifacts (= 1.0.0.pre)
+      elasticgraph-datastore_core (= 1.0.0)
+      elasticgraph-schema_artifacts (= 1.0.0)
       graphql (~> 2.5.11)
       graphql-c_parser (~> 1.1, >= 1.1.3)
 
 PATH
   remote: elasticgraph-health_check
   specs:
-    elasticgraph-health_check (1.0.0.pre)
-      elasticgraph-datastore_core (= 1.0.0.pre)
-      elasticgraph-graphql (= 1.0.0.pre)
-      elasticgraph-support (= 1.0.0.pre)
+    elasticgraph-health_check (1.0.0)
+      elasticgraph-datastore_core (= 1.0.0)
+      elasticgraph-graphql (= 1.0.0)
+      elasticgraph-support (= 1.0.0)
 
 PATH
   remote: elasticgraph-indexer_autoscaler_lambda
   specs:
-    elasticgraph-indexer_autoscaler_lambda (1.0.0.pre)
+    elasticgraph-indexer_autoscaler_lambda (1.0.0)
       aws-sdk-cloudwatch (~> 1.118)
       aws-sdk-lambda (~> 1.156)
       aws-sdk-sqs (~> 1.99)
-      elasticgraph-datastore_core (= 1.0.0.pre)
-      elasticgraph-lambda_support (= 1.0.0.pre)
+      elasticgraph-datastore_core (= 1.0.0)
+      elasticgraph-lambda_support (= 1.0.0)
       ox (~> 2.14, >= 2.14.23)
 
 PATH
   remote: elasticgraph-indexer_lambda
   specs:
-    elasticgraph-indexer_lambda (1.0.0.pre)
+    elasticgraph-indexer_lambda (1.0.0)
       aws-sdk-s3 (~> 1.195)
-      elasticgraph-indexer (= 1.0.0.pre)
-      elasticgraph-lambda_support (= 1.0.0.pre)
+      elasticgraph-indexer (= 1.0.0)
+      elasticgraph-lambda_support (= 1.0.0)
       ox (~> 2.14, >= 2.14.23)
 
 PATH
   remote: elasticgraph-indexer
   specs:
-    elasticgraph-indexer (1.0.0.pre)
-      elasticgraph-datastore_core (= 1.0.0.pre)
-      elasticgraph-json_schema (= 1.0.0.pre)
-      elasticgraph-schema_artifacts (= 1.0.0.pre)
-      elasticgraph-support (= 1.0.0.pre)
+    elasticgraph-indexer (1.0.0)
+      elasticgraph-datastore_core (= 1.0.0)
+      elasticgraph-json_schema (= 1.0.0)
+      elasticgraph-schema_artifacts (= 1.0.0)
+      elasticgraph-support (= 1.0.0)
       hashdiff (~> 1.2)
 
 PATH
   remote: elasticgraph-json_schema
   specs:
-    elasticgraph-json_schema (1.0.0.pre)
-      elasticgraph-support (= 1.0.0.pre)
+    elasticgraph-json_schema (1.0.0)
+      elasticgraph-support (= 1.0.0)
       json_schemer (~> 2.4)
 
 PATH
   remote: elasticgraph-lambda_support
   specs:
-    elasticgraph-lambda_support (1.0.0.pre)
-      elasticgraph-opensearch (= 1.0.0.pre)
+    elasticgraph-lambda_support (1.0.0)
+      elasticgraph-opensearch (= 1.0.0)
       faraday_middleware-aws-sigv4 (~> 1.0, >= 1.0.1)
 
 PATH
   remote: elasticgraph-local
   specs:
-    elasticgraph-local (1.0.0.pre)
-      elasticgraph-admin (= 1.0.0.pre)
-      elasticgraph-graphiql (= 1.0.0.pre)
-      elasticgraph-graphql (= 1.0.0.pre)
-      elasticgraph-indexer (= 1.0.0.pre)
-      elasticgraph-schema_definition (= 1.0.0.pre)
+    elasticgraph-local (1.0.0)
+      elasticgraph-admin (= 1.0.0)
+      elasticgraph-graphiql (= 1.0.0)
+      elasticgraph-graphql (= 1.0.0)
+      elasticgraph-indexer (= 1.0.0)
+      elasticgraph-schema_definition (= 1.0.0)
       rackup (~> 2.2, >= 2.2.1)
       rake (~> 13.3)
       webrick (~> 1.9, >= 1.9.1)
@@ -132,8 +132,8 @@ PATH
 PATH
   remote: elasticgraph-opensearch
   specs:
-    elasticgraph-opensearch (1.0.0.pre)
-      elasticgraph-support (= 1.0.0.pre)
+    elasticgraph-opensearch (1.0.0)
+      elasticgraph-support (= 1.0.0)
       faraday (~> 2.13, >= 2.13.4)
       faraday-retry (~> 2.3, >= 2.3.2)
       opensearch-ruby (~> 3.4)
@@ -141,16 +141,16 @@ PATH
 PATH
   remote: elasticgraph-query_interceptor
   specs:
-    elasticgraph-query_interceptor (1.0.0.pre)
-      elasticgraph-graphql (= 1.0.0.pre)
-      elasticgraph-schema_artifacts (= 1.0.0.pre)
+    elasticgraph-query_interceptor (1.0.0)
+      elasticgraph-graphql (= 1.0.0)
+      elasticgraph-schema_artifacts (= 1.0.0)
 
 PATH
   remote: elasticgraph-query_registry
   specs:
-    elasticgraph-query_registry (1.0.0.pre)
-      elasticgraph-graphql (= 1.0.0.pre)
-      elasticgraph-support (= 1.0.0.pre)
+    elasticgraph-query_registry (1.0.0)
+      elasticgraph-graphql (= 1.0.0)
+      elasticgraph-support (= 1.0.0)
       graphql (~> 2.5.11)
       graphql-c_parser (~> 1.1, >= 1.1.3)
       rake (~> 13.3)
@@ -158,25 +158,25 @@ PATH
 PATH
   remote: elasticgraph-rack
   specs:
-    elasticgraph-rack (1.0.0.pre)
-      elasticgraph-graphql (= 1.0.0.pre)
+    elasticgraph-rack (1.0.0)
+      elasticgraph-graphql (= 1.0.0)
       rack (~> 3.2)
 
 PATH
   remote: elasticgraph-schema_artifacts
   specs:
-    elasticgraph-schema_artifacts (1.0.0.pre)
-      elasticgraph-support (= 1.0.0.pre)
+    elasticgraph-schema_artifacts (1.0.0)
+      elasticgraph-support (= 1.0.0)
 
 PATH
   remote: elasticgraph-schema_definition
   specs:
-    elasticgraph-schema_definition (1.0.0.pre)
-      elasticgraph-graphql (= 1.0.0.pre)
-      elasticgraph-indexer (= 1.0.0.pre)
-      elasticgraph-json_schema (= 1.0.0.pre)
-      elasticgraph-schema_artifacts (= 1.0.0.pre)
-      elasticgraph-support (= 1.0.0.pre)
+    elasticgraph-schema_definition (1.0.0)
+      elasticgraph-graphql (= 1.0.0)
+      elasticgraph-indexer (= 1.0.0)
+      elasticgraph-json_schema (= 1.0.0)
+      elasticgraph-schema_artifacts (= 1.0.0)
+      elasticgraph-support (= 1.0.0)
       graphql (~> 2.5.11)
       graphql-c_parser (~> 1.1, >= 1.1.3)
       rake (~> 13.3)
@@ -184,14 +184,14 @@ PATH
 PATH
   remote: elasticgraph-support
   specs:
-    elasticgraph-support (1.0.0.pre)
+    elasticgraph-support (1.0.0)
       logger (~> 1.7)
 
 PATH
   remote: elasticgraph
   specs:
-    elasticgraph (1.0.0.pre)
-      elasticgraph-support (= 1.0.0.pre)
+    elasticgraph (1.0.0)
+      elasticgraph-support (= 1.0.0)
       thor (~> 1.4)
 
 GEM
@@ -608,29 +608,29 @@ DEPENDENCIES
   aws_lambda_ric (~> 3.1, >= 3.1.3)
   benchmark-ips (~> 2.14)
   coderay (~> 1.1, >= 1.1.3)
-  elasticgraph (= 1.0.0.pre)!
-  elasticgraph-admin (= 1.0.0.pre)!
-  elasticgraph-admin_lambda (= 1.0.0.pre)!
-  elasticgraph-apollo (= 1.0.0.pre)!
-  elasticgraph-datastore_core (= 1.0.0.pre)!
-  elasticgraph-elasticsearch (= 1.0.0.pre)!
-  elasticgraph-graphiql (= 1.0.0.pre)!
-  elasticgraph-graphql (= 1.0.0.pre)!
-  elasticgraph-graphql_lambda (= 1.0.0.pre)!
-  elasticgraph-health_check (= 1.0.0.pre)!
-  elasticgraph-indexer (= 1.0.0.pre)!
-  elasticgraph-indexer_autoscaler_lambda (= 1.0.0.pre)!
-  elasticgraph-indexer_lambda (= 1.0.0.pre)!
-  elasticgraph-json_schema (= 1.0.0.pre)!
-  elasticgraph-lambda_support (= 1.0.0.pre)!
-  elasticgraph-local (= 1.0.0.pre)!
-  elasticgraph-opensearch (= 1.0.0.pre)!
-  elasticgraph-query_interceptor (= 1.0.0.pre)!
-  elasticgraph-query_registry (= 1.0.0.pre)!
-  elasticgraph-rack (= 1.0.0.pre)!
-  elasticgraph-schema_artifacts (= 1.0.0.pre)!
-  elasticgraph-schema_definition (= 1.0.0.pre)!
-  elasticgraph-support (= 1.0.0.pre)!
+  elasticgraph (= 1.0.0)!
+  elasticgraph-admin (= 1.0.0)!
+  elasticgraph-admin_lambda (= 1.0.0)!
+  elasticgraph-apollo (= 1.0.0)!
+  elasticgraph-datastore_core (= 1.0.0)!
+  elasticgraph-elasticsearch (= 1.0.0)!
+  elasticgraph-graphiql (= 1.0.0)!
+  elasticgraph-graphql (= 1.0.0)!
+  elasticgraph-graphql_lambda (= 1.0.0)!
+  elasticgraph-health_check (= 1.0.0)!
+  elasticgraph-indexer (= 1.0.0)!
+  elasticgraph-indexer_autoscaler_lambda (= 1.0.0)!
+  elasticgraph-indexer_lambda (= 1.0.0)!
+  elasticgraph-json_schema (= 1.0.0)!
+  elasticgraph-lambda_support (= 1.0.0)!
+  elasticgraph-local (= 1.0.0)!
+  elasticgraph-opensearch (= 1.0.0)!
+  elasticgraph-query_interceptor (= 1.0.0)!
+  elasticgraph-query_registry (= 1.0.0)!
+  elasticgraph-rack (= 1.0.0)!
+  elasticgraph-schema_artifacts (= 1.0.0)!
+  elasticgraph-schema_definition (= 1.0.0)!
+  elasticgraph-support (= 1.0.0)!
   factory_bot (~> 6.5, >= 6.5.4)
   faker (~> 3.5, >= 3.5.2)
   filewatcher (~> 2.1)
