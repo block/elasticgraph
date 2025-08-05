@@ -285,9 +285,13 @@ module ElasticGraph
             ignore_missing_alt: true,
             allow_missing_href: true,
             disable_external: true,
-            # An invalid URL that made its way into old versions of the docs. We don't want to update old versions of the
-            # API docs to fix broken links.
-            ignore_urls: ["elasticgraph-rack/lib/elastic_graph/rack/graphiql/index.html"]
+            ignore_urls: [
+              # An invalid URL that made its way into old versions of the docs. We don't want to update old versions of the
+              # API docs to fix broken links.
+              "elasticgraph-rack/lib/elastic_graph/rack/graphiql/index.html",
+              # We have links to locally booted ElasticGraph, which HTMLProofer can't resolve.
+              "http://localhost:9000/"
+            ]
           )
 
           # We use stricter settings for the newly generated YARD docs, since we can actually fix these.
