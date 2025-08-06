@@ -15,7 +15,7 @@ module ElasticGraph
 
       it "reports a monotonically increasing time value suitable for tracking durations and deadlines without worrying about leap seconds, etc" do
         expect {
-          sleep(0.002) # sleep for 2 ms; ensuring it's > 1 ms so the montonic clock value is guaranteed to change
+          sleep(0.002) # sleep for 2 ms; ensuring it's > 1 ms so the monotonic clock value is guaranteed to change
         }.to change { clock.now_in_ms }.by(a_value_between(
           1, # maybe it's possible with rounding for the sleep to be *slightly* less than 2 ms and this only increase by 1
           1000 # give plenty of time (up to a second) for GC pauses, etc so our test doesn't flicker

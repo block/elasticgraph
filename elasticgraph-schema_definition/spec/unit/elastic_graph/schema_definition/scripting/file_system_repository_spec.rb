@@ -92,7 +92,7 @@ module ElasticGraph
           }.to raise_error Errors::InvalidScriptDirectoryError, a_string_including("multiple scripts with the same scoped name", "filter/by_age")
         end
 
-        it "allows a script name to be re-used for a different context" do
+        it "allows a script name to be reused for a different context" do
           repo = repo_for_fixture_dir("duplicate_name_in_different_contexts")
 
           expect(repo.scripts).to contain_exactly(

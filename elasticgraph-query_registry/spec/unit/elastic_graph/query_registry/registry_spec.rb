@@ -280,7 +280,7 @@ module ElasticGraph
                 modified_query_string2 => 1
               )
 
-              # ...but so long as `modified_query_string1` keeps getting re-used, no further re-parsings should be required.
+              # ...but so long as `modified_query_string1` keeps getting reused, no further re-parsings should be required.
               3.times do
                 get_allowed_query(registry, modified_query_string1, client: client_named("my_client"))
               end
