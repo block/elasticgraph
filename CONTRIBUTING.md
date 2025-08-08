@@ -169,7 +169,7 @@ bundle exec rake elasticsearch:test:boot
 bundle exec rake opensearch:test:boot
 ```
 
-Note: our integration and acceptance tests hammer Elasticsearch/OpenSearh pretty hard, particularly when running
+Note: our integration and acceptance tests hammer Elasticsearch/OpenSearch pretty hard, particularly when running
 tests in parallel. Sometimes that puts the datastore into a bad state. When this happens, simply kill the `rake *:test:boot`
 process, and run it again; then re-run the tests.
 
