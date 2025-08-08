@@ -97,17 +97,9 @@ PATH
   specs:
     elasticgraph-indexer (1.0.1.pre)
       elasticgraph-datastore_core (= 1.0.1.pre)
-      elasticgraph-json_schema (= 1.0.1.pre)
       elasticgraph-schema_artifacts (= 1.0.1.pre)
       elasticgraph-support (= 1.0.1.pre)
       hashdiff (~> 1.2)
-
-PATH
-  remote: elasticgraph-json_schema
-  specs:
-    elasticgraph-json_schema (1.0.1.pre)
-      elasticgraph-support (= 1.0.1.pre)
-      json_schemer (~> 2.4)
 
 PATH
   remote: elasticgraph-lambda_support
@@ -174,7 +166,6 @@ PATH
     elasticgraph-schema_definition (1.0.1.pre)
       elasticgraph-graphql (= 1.0.1.pre)
       elasticgraph-indexer (= 1.0.1.pre)
-      elasticgraph-json_schema (= 1.0.1.pre)
       elasticgraph-schema_artifacts (= 1.0.1.pre)
       elasticgraph-support (= 1.0.1.pre)
       graphql (~> 2.5.11)
@@ -185,6 +176,7 @@ PATH
   remote: elasticgraph-support
   specs:
     elasticgraph-support (1.0.1.pre)
+      json_schemer (~> 2.4)
       logger (~> 1.7)
 
 PATH
@@ -621,7 +613,6 @@ DEPENDENCIES
   elasticgraph-indexer (= 1.0.1.pre)!
   elasticgraph-indexer_autoscaler_lambda (= 1.0.1.pre)!
   elasticgraph-indexer_lambda (= 1.0.1.pre)!
-  elasticgraph-json_schema (= 1.0.1.pre)!
   elasticgraph-lambda_support (= 1.0.1.pre)!
   elasticgraph-local (= 1.0.1.pre)!
   elasticgraph-opensearch (= 1.0.1.pre)!

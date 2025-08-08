@@ -1,0 +1,15 @@
+module ElasticGraph
+  module Support
+    module JSONSchema
+      self.@strict_meta_schema_validator: Validator
+      def self.strict_meta_schema_validator: () -> Validator
+
+      self.@elastic_graph_internal_meta_schema_validator: Validator
+      def self.elastic_graph_internal_meta_schema_validator: () -> Validator
+
+      module MetaSchemaLoader
+        def self.load_strict_validator: (?::Hash[::String, untyped]) -> Validator
+      end
+    end
+  end
+end

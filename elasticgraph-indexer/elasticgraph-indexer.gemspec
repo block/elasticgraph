@@ -42,7 +42,6 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = [">= 3.4", "< 3.5"]
 
   spec.add_dependency "elasticgraph-datastore_core", ElasticGraph::VERSION
-  spec.add_dependency "elasticgraph-json_schema", ElasticGraph::VERSION
   spec.add_dependency "elasticgraph-schema_artifacts", ElasticGraph::VERSION
   spec.add_dependency "elasticgraph-support", ElasticGraph::VERSION
   spec.add_dependency "hashdiff", "~> 1.2"

@@ -11,7 +11,7 @@ require "elastic_graph/indexer/event_id"
 require "elastic_graph/indexer/failed_event_error"
 require "elastic_graph/indexer/operation/update"
 require "elastic_graph/indexer/record_preparer"
-require "elastic_graph/json_schema/validator_factory"
+require "elastic_graph/support/json_schema/validator_factory"
 require "elastic_graph/support/memoizable_data"
 
 module ElasticGraph
@@ -95,13 +95,13 @@ module ElasticGraph
         end
 
         def validator(type, selected_json_schema_version)
-          factory = validator_factories_by_version[selected_json_schema_version] # : JSONSchema::ValidatorFactory
+          factory = validator_factories_by_version[selected_json_schema_version] # : Support::JSONSchema::ValidatorFactory
           factory.validator_for(type)
         end
 
         def validator_factories_by_version
           @validator_factories_by_version ||= ::Hash.new do |hash, json_schema_version|
-            factory = JSONSchema::ValidatorFactory.new(
+            factory = Support::JSONSchema::ValidatorFactory.new(
               schema: schema_artifacts.json_schemas_for(json_schema_version),
               sanitize_pii: true
             )

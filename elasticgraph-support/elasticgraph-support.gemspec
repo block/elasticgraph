@@ -44,6 +44,7 @@ Gem::Specification.new do |spec|
   # Ruby 3.4 warns about using `logger` being moved out of the standard library, and in Ruby 3.5
   # it'll no longer be available without declaring a dependency.
   spec.add_dependency "logger", "~> 1.7"
+  spec.add_dependency "json_schemer", "~> 2.4"
 
   spec.add_development_dependency "faraday", "~> 2.13", ">= 2.13.4"
 end

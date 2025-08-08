@@ -1,8 +1,8 @@
 module ElasticGraph
   class Indexer
     type event = ::Hash[::String, untyped]
-    type validator = JSONSchema::Validator
-    type validatorFactory = JSONSchema::ValidatorFactory
+    type validator = Support::JSONSchema::Validator
+    type validatorFactory = Support::JSONSchema::ValidatorFactory
 
     module Operation
       class FactorySupertype
@@ -37,10 +37,10 @@ module ElasticGraph
 
         private
 
-        def validator: (::String, ::Integer) -> JSONSchema::Validator
+        def validator: (::String, ::Integer) -> Support::JSONSchema::Validator
 
-        @validator_factories_by_version: ::Hash[::Integer, JSONSchema::ValidatorFactory]?
-        def validator_factories_by_version: () -> ::Hash[::Integer, JSONSchema::ValidatorFactory]
+        @validator_factories_by_version: ::Hash[::Integer, Support::JSONSchema::ValidatorFactory]?
+        def validator_factories_by_version: () -> ::Hash[::Integer, Support::JSONSchema::ValidatorFactory]
 
         def select_json_schema_version: (event) { (BuildResult) -> bot } -> (::Integer | bot)
         def prepare_event: (event) -> event

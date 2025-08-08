@@ -3,8 +3,11 @@
 This gem provides support utilities for the rest of the ElasticGraph gems. As
 such, it is not intended to provide any public APIs for ElasticGraph users.
 
+It includes JSON Schema validation functionality and other common utilities.
+
 Importantly, it is intended to have as few dependencies as possible: it currently
-only depends on `logger` (which originated in the Ruby standard library).
+only depends on `logger` (which originated in the Ruby standard library) and
+`json_schemer` for JSON Schema validation.
 
 ## Dependency Diagram
 
@@ -18,6 +21,9 @@ graph LR;
     logger["logger"];
     elasticgraph-support --> logger;
     class logger externalGemStyle;
+    json_schemer["json_schemer"];
+    elasticgraph-support --> json_schemer;
+    class json_schemer externalGemStyle;
     elasticgraph["elasticgraph"];
     elasticgraph --> elasticgraph-support;
     class elasticgraph otherEgGemStyle;
@@ -39,9 +45,6 @@ graph LR;
     elasticgraph-indexer["elasticgraph-indexer"];
     elasticgraph-indexer --> elasticgraph-support;
     class elasticgraph-indexer otherEgGemStyle;
-    elasticgraph-json_schema["elasticgraph-json_schema"];
-    elasticgraph-json_schema --> elasticgraph-support;
-    class elasticgraph-json_schema otherEgGemStyle;
     elasticgraph-opensearch["elasticgraph-opensearch"];
     elasticgraph-opensearch --> elasticgraph-support;
     class elasticgraph-opensearch otherEgGemStyle;
@@ -55,4 +58,5 @@ graph LR;
     elasticgraph-schema_definition --> elasticgraph-support;
     class elasticgraph-schema_definition otherEgGemStyle;
     click logger href "https://rubygems.org/gems/logger" "Open on RubyGems.org" _blank;
+    click json_schemer href "https://rubygems.org/gems/json_schemer" "Open on RubyGems.org" _blank;
 ```

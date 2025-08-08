@@ -196,25 +196,20 @@ The project is a monorepo composed of many gems. Each gem typically resides in i
     -   **Dependencies**: `base64`, `elasticgraph-datastore_core`, `elasticgraph-schema_artifacts`, `graphql`, `graphql-c_parser`.
     -   **Provides**: The core GraphQL query processing capabilities for ElasticGraph.
 -   `elasticgraph-indexer/`: Provides APIs to robustly index data into a datastore.
-    -   **Purpose**: Handles the process of indexing data, including preparing records according to the schema, validating data (using `elasticgraph-json_schema`), detecting changes in documents for efficient updates (using `hashdiff`), and routing indexing operations to the appropriate datastore indices. Supports schema evolution and multi-source indexing.
+    -   **Purpose**: Handles the process of indexing data, including preparing records according to the schema, validating data (using JSON Schema validation functionality from `elasticgraph-support`), detecting changes in documents for efficient updates (using `hashdiff`), and routing indexing operations to the appropriate datastore indices. Supports schema evolution and multi-source indexing.
     -   **Key Files**: `lib/elastic_graph/indexer.rb` (main entry), `lib/elastic_graph/indexer/processor.rb`, `lib/elastic_graph/indexer/operation/` (modules for different indexing operations), `lib/elastic_graph/indexer/record_preparer.rb`, `lib/elastic_graph/indexer/hash_differ.rb`, `lib/elastic_graph/indexer/datastore_indexing_router.rb`.
-    -   **Dependencies**: `elasticgraph-datastore_core`, `elasticgraph-json_schema`, `elasticgraph-schema_artifacts`, `elasticgraph-support`, `hashdiff`.
+    -   **Dependencies**: `elasticgraph-datastore_core`, `elasticgraph-schema_artifacts`, `elasticgraph-support`, `hashdiff`.
     -   **Provides**: Robust and schema-aware data indexing capabilities.
--   `elasticgraph-json_schema/`: Provides JSON Schema validation for ElasticGraph.
-    -   **Purpose**: Validates incoming data against predefined JSON Schemas (using the `json_schemer` gem). It also includes functionality to validate the JSON Schemas themselves against the meta-schema (Draft 7).
-    -   **Key Files**: `lib/elastic_graph/json_schema/validator.rb`, `lib/elastic_graph/json_schema/validator_factory.rb`, `lib/elastic_graph/json_schema/meta_schema_validator.rb`.
-    -   **Dependencies**: `elasticgraph-support`, `json_schemer`.
-    -   **Provides**: Data validation capabilities crucial for maintaining data integrity during indexing.
 -   `elasticgraph-schema_artifacts/`: Contains code related to ElasticGraph's generated schema artifacts.
     -   **Purpose**: Loads, parses, and provides an in-memory Ruby object representation of the generated schema artifacts (e.g., from YAML/JSON files). This allows other gems like `elasticgraph-graphql` and `elasticgraph-indexer` to access schema information (types, fields, relations, index definitions, etc.) at runtime. It includes an extensible mechanism for schema elements.
     -   **Key Files**: `lib/elastic_graph/schema_artifacts/from_disk.rb` (loads artifacts), `lib/elastic_graph/schema_artifacts/runtime_metadata/` (directory containing Ruby classes like `schema.rb`, `object_type.rb`, `scalar_type.rb`, `index_field.rb` that model the schema).
     -   **Dependencies**: `elasticgraph-support`.
     -   **Provides**: A runtime, object-oriented representation of the generated schema.
 -   `elasticgraph-support/`: Provides common support utilities for other ElasticGraph gems.
-    -   **Purpose**: Offers a collection of shared, internal utilities with minimal external dependencies. This includes custom error definitions, memoization, time utilities, YAML loading, Faraday middleware, data encoders, threading helpers, hash utilities, logging, a monotonic clock, GraphQL formatting helpers, and a central place for project constants and versioning.
-    -   **Key Files**: `lib/elastic_graph/errors.rb`, `lib/elastic_graph/constants.rb`, `lib/elastic_graph/version.rb`, and various modules under `lib/elastic_graph/support/` (e.g., `hash_util.rb`, `time_util.rb`, `logger.rb`, `faraday_middleware/`).
-    -   **Dependencies**: `logger`.
-    -   **Provides**: Foundational helper functions and constants used throughout the ElasticGraph codebase.
+    -   **Purpose**: Offers a collection of shared, internal utilities with minimal external dependencies. This includes custom error definitions, memoization, time utilities, YAML loading, Faraday middleware, data encoders, threading helpers, hash utilities, logging, a monotonic clock, GraphQL formatting helpers, JSON Schema validation functionality (using `json_schemer`), and a central place for project constants and versioning.
+    -   **Key Files**: `lib/elastic_graph/errors.rb`, `lib/elastic_graph/constants.rb`, `lib/elastic_graph/version.rb`, various modules under `lib/elastic_graph/support/` (e.g., `hash_util.rb`, `time_util.rb`, `logger.rb`, `faraday_middleware/`), and JSON Schema validation modules under `lib/elastic_graph/support/json_schema/`.
+    -   **Dependencies**: `logger`, `json_schemer`.
+    -   **Provides**: Foundational helper functions, constants, and JSON Schema validation used throughout the ElasticGraph codebase.
 
 **AWS Lambda Integration Libraries:**
 -   `elasticgraph-admin_lambda/`: Wraps `elasticgraph-admin` to enable its execution within an AWS Lambda environment.
@@ -304,7 +299,7 @@ The project is a monorepo composed of many gems. Each gem typically resides in i
 -   `elasticgraph-schema_definition/`: Provides the Ruby DSL and tools for defining an ElasticGraph schema and generating all necessary runtime artifacts.
     -   **Purpose**: Allows developers to define their GraphQL schema, types, fields, relationships, indexing strategies (including Painless scripts for updates and derived fields), and datastore script configurations using a Ruby-based DSL. This gem then processes these definitions to generate artifacts (GraphQL schema, JSON schemas, datastore mappings, runtime metadata) used by other ElasticGraph components. It is not intended for production deployment itself.
     -   **Key Files**: `lib/elastic_graph/schema_definition/api.rb` (core DSL), `lib/elastic_graph/schema_definition/schema_elements/` (classes for schema parts), `lib/elastic_graph/schema_definition/indexing/` (indexing definitions), `lib/elastic_graph/schema_definition/scripting/` (datastore script definitions), `lib/elastic_graph/schema_definition/schema_artifact_manager.rb`, `lib/elastic_graph/schema_definition/rake_tasks.rb`.
-    -   **Dependencies**: `elasticgraph-graphql`, `elasticgraph-indexer`, `elasticgraph-json_schema`, `elasticgraph-schema_artifacts`, `elasticgraph-support`, `graphql`, `graphql-c_parser`, `rake`.
+    -   **Dependencies**: `elasticgraph-graphql`, `elasticgraph-indexer`, `elasticgraph-schema_artifacts`, `elasticgraph-support`, `graphql`, `graphql-c_parser`, `rake`.
     -   **Provides**: The schema definition framework and artifact generation capabilities.
 
 ## Other Key Information

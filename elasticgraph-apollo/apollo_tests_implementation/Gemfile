@@ -16,7 +16,6 @@ source "https://rubygems.org"
   graphiql
   graphql
   indexer
-  json_schema
   rack
   schema_artifacts
   schema_definition

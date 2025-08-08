@@ -6,8 +6,8 @@
 #
 # frozen_string_literal: true
 
-require "elastic_graph/json_schema/meta_schema_validator"
-require "elastic_graph/json_schema/validator_factory"
+require "elastic_graph/support/json_schema/meta_schema_validator"
+require "elastic_graph/support/json_schema/validator_factory"
 require "json"
 
 RSpec::Matchers.define :have_json_schema_like do |type, expected_schema, options = {}|
@@ -43,9 +43,9 @@ RSpec::Matchers.define :have_json_schema_like do |type, expected_schema, options
     actual_schema = strip_descriptions_from(actual_schema) if ignore_descriptions
     @actual = JSON.pretty_generate(actual_schema)
 
-    @validator_factory = ElasticGraph::JSONSchema::ValidatorFactory.new(schema: full_schema, sanitize_pii: false)
+    @validator_factory = ElasticGraph::Support::JSONSchema::ValidatorFactory.new(schema: full_schema, sanitize_pii: false)
 
-    @meta_schema_validation_errors = ElasticGraph::JSONSchema.elastic_graph_internal_meta_schema_validator.validate(modified_expected_schema)
+    @meta_schema_validation_errors = ElasticGraph::Support::JSONSchema.elastic_graph_internal_meta_schema_validator.validate(modified_expected_schema)
 
     if @meta_schema_validation_errors.empty? && actual_schema == modified_expected_schema
       validator = @validator_factory.validator_for(type)
