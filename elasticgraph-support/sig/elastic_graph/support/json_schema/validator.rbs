@@ -1,0 +1,20 @@
+module ElasticGraph
+  module Support
+    module JSONSchema
+      type dataHash = ::Hash[::String, untyped]
+
+      class ValidatorValueSuperType
+        attr_reader schema: ::JSONSchemer::Schema
+        attr_reader sanitize_pii: bool
+        def initialize: (schema: ::JSONSchemer::Schema, sanitize_pii: bool) -> void
+        def with: (?schema: ::JSONSchemer::Schema, ?sanitize_pii: bool) -> self
+      end
+
+      class Validator < ValidatorValueSuperType
+        def valid?: (dataHash) -> bool
+        def validate: (dataHash) -> ::Array[JSONSchemer::error]
+        def validate_with_error_message: (dataHash) -> ::String?
+      end
+    end
+  end
+end

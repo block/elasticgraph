@@ -4,7 +4,7 @@ ElasticGraph is designed to be modular, with a small core, and many built-in ext
 for specific use cases. This minimizes exposure to vulnerabilities, reduces bloat, and makes ongoing upgrades
 easier. The libraries that ship with ElasticGraph can be broken down into several categories.
 
-### Core Libraries (7 gems)
+### Core Libraries (6 gems)
 
 These libraries form the core backbone of ElasticGraph that is designed to run in a production deployment. Every ElasticGraph deployment will need to use all of these.
 
@@ -12,7 +12,6 @@ These libraries form the core backbone of ElasticGraph that is designed to run i
 * [elasticgraph-datastore_core](elasticgraph-datastore_core/README.md): Contains the core datastore logic used by the rest of ElasticGraph.
 * [elasticgraph-graphql](elasticgraph-graphql/README.md): Provides the ElasticGraph GraphQL query engine.
 * [elasticgraph-indexer](elasticgraph-indexer/README.md): Indexes ElasticGraph data into a datastore.
-* [elasticgraph-json_schema](elasticgraph-json_schema/README.md): Provides JSON Schema validation for ElasticGraph.
 * [elasticgraph-schema_artifacts](elasticgraph-schema_artifacts/README.md): Provides access to ElasticGraph schema artifacts.
 * [elasticgraph-support](elasticgraph-support/README.md): Provides support utilities for other ElasticGraph gems.
 
@@ -33,10 +32,9 @@ graph LR;
     base64["base64"];
     graphql["graphql"];
     graphql-c_parser["graphql-c_parser"];
-    elasticgraph-json_schema["elasticgraph-json_schema"];
     hashdiff["hashdiff"];
-    json_schemer["json_schemer"];
     logger["logger"];
+    json_schemer["json_schemer"];
     elasticgraph-admin --> elasticgraph-datastore_core;
     elasticgraph-admin --> elasticgraph-indexer;
     elasticgraph-admin --> elasticgraph-schema_artifacts;
@@ -50,14 +48,12 @@ graph LR;
     elasticgraph-graphql --> graphql;
     elasticgraph-graphql --> graphql-c_parser;
     elasticgraph-indexer --> elasticgraph-datastore_core;
-    elasticgraph-indexer --> elasticgraph-json_schema;
     elasticgraph-indexer --> elasticgraph-schema_artifacts;
     elasticgraph-indexer --> elasticgraph-support;
     elasticgraph-indexer --> hashdiff;
-    elasticgraph-json_schema --> elasticgraph-support;
-    elasticgraph-json_schema --> json_schemer;
     elasticgraph-schema_artifacts --> elasticgraph-support;
     elasticgraph-support --> logger;
+    elasticgraph-support --> json_schemer;
     class elasticgraph-admin targetGemStyle;
     class elasticgraph-datastore_core targetGemStyle;
     class elasticgraph-indexer targetGemStyle;
@@ -68,17 +64,16 @@ graph LR;
     class base64 externalGemCatStyle;
     class graphql externalGemCatStyle;
     class graphql-c_parser externalGemCatStyle;
-    class elasticgraph-json_schema targetGemStyle;
     class hashdiff externalGemCatStyle;
-    class json_schemer externalGemCatStyle;
     class logger externalGemCatStyle;
+    class json_schemer externalGemCatStyle;
     click rake href "https://rubygems.org/gems/rake" "Open on RubyGems.org" _blank;
     click base64 href "https://rubygems.org/gems/base64" "Open on RubyGems.org" _blank;
     click graphql href "https://rubygems.org/gems/graphql" "Open on RubyGems.org" _blank;
     click graphql-c_parser href "https://rubygems.org/gems/graphql-c_parser" "Open on RubyGems.org" _blank;
     click hashdiff href "https://rubygems.org/gems/hashdiff" "Open on RubyGems.org" _blank;
-    click json_schemer href "https://rubygems.org/gems/json_schemer" "Open on RubyGems.org" _blank;
     click logger href "https://rubygems.org/gems/logger" "Open on RubyGems.org" _blank;
+    click json_schemer href "https://rubygems.org/gems/json_schemer" "Open on RubyGems.org" _blank;
 ```
 
 ### AWS Lambda Integration Libraries (5 gems)
@@ -292,7 +287,6 @@ graph LR;
     rake["rake"];
     webrick["webrick"];
     rack["rack"];
-    elasticgraph-json_schema["elasticgraph-json_schema"];
     elasticgraph-schema_artifacts["elasticgraph-schema_artifacts"];
     graphql["graphql"];
     graphql-c_parser["graphql-c_parser"];
@@ -311,7 +305,6 @@ graph LR;
     elasticgraph-rack --> rack;
     elasticgraph-schema_definition --> elasticgraph-graphql;
     elasticgraph-schema_definition --> elasticgraph-indexer;
-    elasticgraph-schema_definition --> elasticgraph-json_schema;
     elasticgraph-schema_definition --> elasticgraph-schema_artifacts;
     elasticgraph-schema_definition --> elasticgraph-support;
     elasticgraph-schema_definition --> graphql;
@@ -331,7 +324,6 @@ graph LR;
     class rake externalGemCatStyle;
     class webrick externalGemCatStyle;
     class rack externalGemCatStyle;
-    class elasticgraph-json_schema otherEgGemStyle;
     class elasticgraph-schema_artifacts otherEgGemStyle;
     class graphql externalGemCatStyle;
     class graphql-c_parser externalGemCatStyle;

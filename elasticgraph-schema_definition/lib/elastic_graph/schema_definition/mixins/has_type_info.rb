@@ -6,7 +6,7 @@
 #
 # frozen_string_literal: true
 
-require "elastic_graph/json_schema/meta_schema_validator"
+require "elastic_graph/support/json_schema/meta_schema_validator"
 
 module ElasticGraph
   module SchemaDefinition
@@ -169,7 +169,7 @@ module ElasticGraph
         def json_schema(**options)
           validatable_json_schema = Support::HashUtil.stringify_keys(options)
 
-          if (error_msg = JSONSchema.strict_meta_schema_validator.validate_with_error_message(validatable_json_schema))
+          if (error_msg = Support::JSONSchema.strict_meta_schema_validator.validate_with_error_message(validatable_json_schema))
             raise Errors::SchemaError, "Invalid JSON schema options set on #{self}:\n\n#{error_msg}"
           end
 

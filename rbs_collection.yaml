@@ -70,8 +70,6 @@ gems:
     ignore: true
   - name: elasticgraph-indexer_lambda
     ignore: true
-  - name: elasticgraph-json_schema
-    ignore: true
   - name: elasticgraph-lambda_support
     ignore: true
   - name: elasticgraph-local
