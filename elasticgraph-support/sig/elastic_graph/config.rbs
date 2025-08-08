@@ -1,0 +1,18 @@
+module ElasticGraph
+  module Config
+    def self.define: [T] (*::Symbol) ?{ (ClassMethods[T]) -> void } -> T
+
+    module ClassMethods[T]: ::Class
+      attr_reader validator: Support::JSONSchema::Validator
+      attr_reader path: ::String
+
+      def json_schema: (at: ::String, **untyped) -> void
+      def from_parsed_yaml: (parsedYamlSettings) -> T?
+      def from_parsed_yaml!: (parsedYamlSettings) -> T
+    end
+
+    module InstanceMethods
+      def initialize: (**untyped) -> void
+    end
+  end
+end

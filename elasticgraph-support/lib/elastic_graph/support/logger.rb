@@ -6,6 +6,7 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/config"
 require "elastic_graph/errors"
 require "json"
 require "logger"
@@ -17,17 +18,49 @@ module ElasticGraph
     module Logger
       # Builds a logger instance from the given parsed YAML config.
       def self.from_parsed_yaml(parsed_yaml)
-        Factory.build(config: Config.from_parsed_yaml(parsed_yaml))
+        Factory.build(config: Config.from_parsed_yaml(parsed_yaml) || Config.new)
       end
 
       # @private
-      module Factory
-        def self.build(config:, device: nil)
-          ::Logger.new(
-            device || config.prepared_device,
-            level: config.level,
-            formatter: config.formatter
-          )
+      class Config < ElasticGraph::Config.define(:level, :device, :formatter)
+        # @dynamic self.from_parsed_yaml
+
+        json_schema at: "logger",
+          properties: {
+            level: {
+              description: "Determines what severity level we log.",
+              examples: %w[INFO WARN],
+              enum: %w[DEBUG debug INFO info WARN warn ERROR error FATAL fatal UNKNOWN unknown],
+              default: "INFO"
+            },
+            device: {
+              description: 'Determines where we log to. Must be a string. "stdout" or "stderr" are interpreted ' \
+                "as being those output streams; any other value is assumed to be a file path.",
+              examples: %w[stdout logs/development.log],
+              default: "stdout",
+              type: "string"
+            },
+            formatter: {
+              description: "Class used to format log messages.",
+              examples: %w[ElasticGraph::Support::Logger::JSONAwareFormatter MyAlternateFormatter],
+              type: "string",
+              pattern: /^[A-Z]\w+(::[A-Z]\w+)*$/.source, # https://rubular.com/r/UuqAz4fR3kdMip
+              default: "ElasticGraph::Support::Logger::JSONAwareFormatter"
+            }
+          }
+
+        def prepared_device
+          case device
+          when "stdout" then $stdout
+          when "stderr" then $stderr
+          else
+            ::Pathname.new(device).parent.mkpath
+            device
+          end
+        end
+
+        def formatter
+          ::Object.const_get(super).new
         end
       end
 
@@ -44,42 +77,14 @@ module ElasticGraph
       end
 
       # @private
-      class Config < ::Data.define(
-        # Determines what severity level we log. Valid values are `DEBUG`, `INFO`, `WARN`,
-        # `ERROR`, `FATAL` and `UNKNOWN`.
-        :level,
-        # Determines where we log to. Must be a string. "stdout" or "stderr" are interpreted
-        # as being those output streams; any other value is assumed to be a file path.
-        :device,
-        # Object used to format log messages. Defaults to an instance of `JSONAwareFormatter`.
-        :formatter
-      )
-        def prepared_device
-          case device
-          when "stdout" then $stdout
-          when "stderr" then $stderr
-          else
-            ::Pathname.new(device).parent.mkpath
-            device
-          end
-        end
-
-        def self.from_parsed_yaml(hash)
-          hash = hash.fetch("logger")
-          extra_keys = hash.keys - EXPECTED_KEYS
-
-          unless extra_keys.empty?
-            raise Errors::ConfigError, "Unknown `logger` config settings: #{extra_keys.join(", ")}"
-          end
-
-          new(
-            level: hash["level"] || "INFO",
-            device: hash.fetch("device"),
-            formatter: ::Object.const_get(hash.fetch("formatter", JSONAwareFormatter.name)).new
+      module Factory
+        def self.build(config:, device: nil)
+          ::Logger.new(
+            device || config.prepared_device,
+            level: config.level,
+            formatter: config.formatter
           )
         end
-
-        EXPECTED_KEYS = members.map(&:to_s)
       end
     end
   end

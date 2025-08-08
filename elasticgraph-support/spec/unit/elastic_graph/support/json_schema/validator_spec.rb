@@ -193,6 +193,38 @@ module ElasticGraph
           expect(validator.validate_with_error_message({"word" => "before\nfoo\nafter"})).to include('"schema_pointer": "/$defs/MyType/properties/word"')
         end
 
+        it "can merge in defaults specified in the JSON schema" do
+          validator = validator_for({
+            "type" => "object",
+            "properties" => {
+              "size" => {
+                "type" => "integer",
+                "default" => 7
+              },
+              "name" => {
+                "type" => "string",
+                "default" => "example"
+              },
+              "good" => {
+                "type" => "boolean",
+                "default" => false
+              }
+            }
+          })
+
+          data = {"other" => 12, "good" => true}
+
+          expect(validator.merge_defaults(data)).to eq({
+            "other" => 12,
+            "good" => true,
+            "size" => 7,
+            "name" => "example"
+          })
+
+          # verify that `data` wasn't mutated
+          expect(data).to eq({"other" => 12, "good" => true})
+        end
+
         def validator_for(schema, type_name: nil, sanitize_pii: false)
           if type_name.nil?
             schema = {"$defs" => {"SomeTypeName" => schema}}

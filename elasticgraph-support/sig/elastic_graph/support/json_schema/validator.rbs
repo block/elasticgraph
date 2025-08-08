@@ -1,7 +1,7 @@
 module ElasticGraph
   module Support
     module JSONSchema
-      type dataHash = ::Hash[::String, untyped]
+      type dataHash = ::Hash[::String | ::Symbol, untyped]
 
       class ValidatorValueSuperType
         attr_reader schema: ::JSONSchemer::Schema
@@ -12,8 +12,13 @@ module ElasticGraph
 
       class Validator < ValidatorValueSuperType
         def valid?: (dataHash) -> bool
-        def validate: (dataHash) -> ::Array[JSONSchemer::error]
+        def validate: (dataHash) -> ::Array[::JSONSchemer::error]
         def validate_with_error_message: (dataHash) -> ::String?
+        def merge_defaults: (dataHash) -> dataHash
+
+        private
+
+        attr_reader defaulting_schema: ::JSONSchemer::Schema
       end
     end
   end

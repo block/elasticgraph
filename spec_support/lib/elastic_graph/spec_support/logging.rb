@@ -14,30 +14,35 @@ module LogCaptureSupport
     @log_device ||= StringIO.new
   end
 
-  def logger
-    @logger ||= begin
-      original_formatter = ElasticGraph::Support::Logger::JSONAwareFormatter.new
-      ElasticGraph::Support::Logger::Factory.build(
-        device: log_device,
-        config: ElasticGraph::Support::Logger::Config.new(
-          device: "stdout", # ignored given `device:` above, but required to be set
-          level: "INFO",
-          formatter: ->(*args, msg) do
-            # Don't log VCR UnhandledHTTPRequestErrors. The `GraphQL::QueryExecutor` logs any
-            # exceptions that happen during query execution, and this exception will happen if
-            # the recorded VCR cassette differs from the datastore requests being made.
-            #
-            # Our VCR support will automatically retry the test when it hits this error after deleting
-            # the VCR cassette. However, since we also assert that there are no logged warnings in
-            # many tests, if we allow the VCR errors to get written to our logs, tests can fail
-            # non-deterministically. So here we exclude them from our logs.
-            # :nocov: -- the `unless` branch isn't usually covered.
-            original_formatter.call(*args, msg) unless msg.include?("VCR::Errors::UnhandledHTTPRequestError")
-            # :nocov:
-          end
-        )
-      )
+  class LogFormatter
+    def call(*args, msg)
+      # Don't log VCR UnhandledHTTPRequestErrors. The `GraphQL::QueryExecutor` logs any
+      # exceptions that happen during query execution, and this exception will happen if
+      # the recorded VCR cassette differs from the datastore requests being made.
+      #
+      # Our VCR support will automatically retry the test when it hits this error after deleting
+      # the VCR cassette. However, since we also assert that there are no logged warnings in
+      # many tests, if we allow the VCR errors to get written to our logs, tests can fail
+      # non-deterministically. So here we exclude them from our logs.
+      # :nocov: -- the `unless` branch isn't usually covered.
+      original_formatter.call(*args, msg) unless msg.include?("VCR::Errors::UnhandledHTTPRequestError")
+      # :nocov:
     end
+
+    def original_formatter
+      @original_formatter ||= ElasticGraph::Support::Logger::JSONAwareFormatter.new
+    end
+  end
+
+  def logger
+    @logger ||= ElasticGraph::Support::Logger::Factory.build(
+      device: log_device,
+      config: ElasticGraph::Support::Logger::Config.new(
+        device: "stdout", # ignored given `device:` above, but required to be set
+        level: "INFO",
+        formatter: LogFormatter.name
+      )
+    )
   end
 
   # this method must be prepended so that we can force `log_device` so

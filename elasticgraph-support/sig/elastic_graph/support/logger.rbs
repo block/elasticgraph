@@ -16,14 +16,16 @@ module ElasticGraph
       end
 
       class ConfigSupertype
+        extend ::ElasticGraph::Config::ClassMethods[Config]
+
         attr_reader level: ::String
         attr_reader device: ::String
-        attr_reader formatter: ::Logger::_Formatter
+        attr_reader formatter: untyped
 
         def initialize: (
-          level: ::String,
-          device: ::String,
-          formatter: ::Logger::_Formatter
+          ?level: ::String,
+          ?device: ::String,
+          ?formatter: untyped
         ) -> void
 
         def with: (
@@ -36,9 +38,9 @@ module ElasticGraph
       end
 
       class Config < ConfigSupertype
-        extend _BuildableFromParsedYaml[Config]
         def prepared_device: () -> (::String | ::IO)
-        EXPECTED_KEYS: ::Array[::String]
+        attr_reader formatter: ::Logger::_Formatter
+        def self.from_parsed_yaml: (::Hash[::String, untyped]) -> Config
       end
     end
   end
