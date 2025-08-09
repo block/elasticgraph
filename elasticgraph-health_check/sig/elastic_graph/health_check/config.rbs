@@ -36,8 +36,4 @@ module ElasticGraph
       end
     end
   end
-
-  class Config
-    attr_reader health_check: HealthCheck::Config
-  end
 end

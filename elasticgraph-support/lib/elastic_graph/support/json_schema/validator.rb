@@ -6,6 +6,7 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/support/memoizable_data"
 require "json"
 
 module ElasticGraph
@@ -17,7 +18,7 @@ module ElasticGraph
       #   @return [Hash<String, Object>] a JSON schema
       # @!attribute [r] sanitize_pii
       #   @return [Boolean] whether to omit data that may contain PII from error messages
-      class Validator < ::Data.define(:schema, :sanitize_pii)
+      class Validator < MemoizableData.define(:schema, :sanitize_pii)
         # Validates the given data against the JSON schema, returning true if the data is valid.
         #
         # @param data [Object] JSON data to validate
@@ -63,6 +64,26 @@ module ElasticGraph
           errors.each { |error| error.delete("data") } if sanitize_pii
 
           "Validation errors:\n\n#{errors.map { |e| ::JSON.pretty_generate(e) }.join("\n\n")}"
+        end
+
+        # Merges default values defined in the JSON schema into the given `data` without mutating it.
+        #
+        # @param data [Object] JSON data to populate with defaults from the schema
+        # @return [Object] data updated with defaults for missing properties
+        def merge_defaults(data)
+          ::Marshal.load(::Marshal.dump(data)).tap do |deep_duped_data|
+            defaulting_schema.valid?(deep_duped_data)
+          end
+        end
+
+        private
+
+        def defaulting_schema
+          @defaulting_schema ||= begin
+            config = schema.configuration.dup
+            config.insert_property_defaults = true
+            ::JSONSchemer.schema(schema.value, configuration: config)
+          end
         end
       end
     end

@@ -527,9 +527,9 @@ module ElasticGraph
       # `Data.define` metaprograms a superclass and there's not a way to avoid the warning:
       # https://github.com/lsegal/yard/issues/1533
       # https://github.com/lsegal/yard/issues/1477#issuecomment-1399339983
-      "`Data.define` superclass" =>
+      "Undocumentable superclass" =>
         # https://rubular.com/r/lecYmbp981T4LY
-        /^\[warn\]: in YARD::Handlers::Ruby::ClassHandler: Undocumentable superclass \(class was added without superclass\)\n\s+in file[^\n]+\n\n\s+\d+:[^\n]*?(Data\.define|Struct.new)[^\n]*\n\n/m,
+        /^\[warn\]: in YARD::Handlers::Ruby::ClassHandler: Undocumentable superclass \(class was added without superclass\)\n\s+in file[^\n]+\n\n\s+\d+:[^\n]*?(Data\.define|Struct\.new|ElasticGraph::Config\.define)[^\n]*\n\n/m,
 
       # We sometimes include/extend/prepend a mixin that is a dynamic module
       # (e.g. `include Mixins::HasReadableToSAndInspect.new`) and YARD isn't able to understand this.

@@ -10,14 +10,21 @@ module JSONSchemer
   }
 
   class Schema
+    attr_reader value: ::Hash[::String, untyped]
+    attr_reader configuration: Configuration
     def ref: (::String) -> Schema
-    def valid?: (::Hash[::String, untyped]) -> bool
-    def validate: (::Hash[::String, untyped]) -> ::Enumerator[error, error]
+    def valid?: (::Hash[::String | ::Symbol, untyped]) -> bool
+    def validate: (::Hash[::String | ::Symbol, untyped]) -> ::Enumerator[error, error]
   end
 
   def self.schema: (
-    ::Hash[::String, untyped],
+    ::Hash[::String | ::Symbol, untyped],
+    ?configuration: Configuration,
     ?meta_schema: ::String,
     ?regexp_resolver: "ruby" | "ecma"
   ) -> Schema
+
+  class Configuration
+    attr_accessor insert_property_defaults: bool
+  end
 end

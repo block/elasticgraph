@@ -14,16 +14,25 @@ module ElasticGraph
     module Logger
       RSpec.describe Logger, ".from_parsed_yaml" do
         it "builds a logger instance from a parsed config file" do
+          expect(parsed_test_settings_yaml.keys).to include("logger")
           logger = Logger.from_parsed_yaml(parsed_test_settings_yaml)
 
           expect(logger).to be_a(::Logger)
+        end
+
+        it "logs INFO messages to stdout if there are not `logger` config settings" do
+          expect {
+            logger = Logger.from_parsed_yaml(parsed_test_settings_yaml.except("logger"))
+
+            logger.info "info message"
+            logger.debug "debug message"
+          }.to output(a_string_including("info message").and(excluding("debug message"))).to_stdout
         end
       end
 
       RSpec.describe Factory, ".build" do
         it "respects the configured log level" do
           log_io = StringIO.new
-
           logger = build_logger(device: log_io, config: {"level" => "WARN"})
           logger.info "Some info"
           logger.warn "Some warning"
@@ -63,11 +72,14 @@ module ElasticGraph
         it "lets a formatter be configured (which can do things like ignore messages)" do
           log_io = StringIO.new
           original_formatter = ::Logger::Formatter.new
-          formatter = ->(*args, msg) do
-            original_formatter.call(*args, msg) unless msg.include?("password")
+          formatter = ::Class.new do
+            define_method :call do |*args, msg|
+              original_formatter.call(*args, msg) unless msg.include?("password")
+            end
           end
+          stub_const("MyFormatter", formatter)
 
-          config = Config.new(device: nil, level: :info, formatter: formatter)
+          config = Config.new(device: "/dev/null", level: "info", formatter: "MyFormatter")
           logger = Factory.build(device: log_io, config: config)
 
           logger.info "username: guest"
