@@ -4,6 +4,8 @@ module ElasticGraph
       class ForRegisteredClientSupertype
         attr_reader schema: GraphQL::Schema
         attr_reader allow_any_query_for_clients: ::Set[::String]
+        attr_reader warn_on_unregistered_query_for_clients: ::Set[::String]
+        attr_reader logger: ::Logger
         attr_reader client_cache_mutex: ::Thread::Mutex
         attr_reader provide_query_strings_for_client: ^(::String) -> ::Array[::String]
         attr_reader client_data_by_client_name: ::Hash[::String, ClientData?]
@@ -11,6 +13,8 @@ module ElasticGraph
         def initialize: (
           schema: GraphQL::Schema,
           allow_any_query_for_clients: ::Set[::String],
+          warn_on_unregistered_query_for_clients: ::Set[::String],
+          logger: ::Logger?,
           client_cache_mutex: ::Thread::Mutex,
           provide_query_strings_for_client: ^(::String) -> ::Array[::String],
           client_data_by_client_name: ::Hash[::String, ClientData?]
@@ -22,6 +26,8 @@ module ElasticGraph
           schema: GraphQL::Schema,
           client_names: ::Array[::String],
           allow_any_query_for_clients: ::Set[::String],
+          warn_on_unregistered_query_for_clients: ::Set[::String],
+          logger: ::Logger,
           provide_query_strings_for_client: ^(String) -> ::Array[::String]
         ) -> void
 
@@ -37,6 +43,7 @@ module ElasticGraph
 
         private
 
+        def log_unregistered_query_warning: (::GraphQL::Query, GraphQL::Client, ClientData) -> void
         def client_data_for: (::String) -> ClientData
         def atomically_update_cached_client_data_for: (::String) { (ClientData?) -> ClientData } -> ClientData
 

@@ -9,6 +9,8 @@
 require "elastic_graph/graphql"
 require "elastic_graph/graphql/client"
 require "elastic_graph/query_registry/registry"
+require "logger"
+require "stringio"
 
 module ElasticGraph
   module QueryRegistry
@@ -203,6 +205,32 @@ module ElasticGraph
                 registry = registry_with({"my_client" => [query1]}, allow_any_query_for_clients: ["my_client"])
 
                 expect(execute_allowed_query(registry, query2, client: client_named("my_client")).to_h).to eq({"data" => {"t" => "Query"}})
+              end
+            end
+
+            context "when the client is also in `warn_on_unregistered_query_for_clients`" do
+              it "logs warnings even though the client is in allow list" do
+                logger = Logger.new(StringIO.new)
+                allow(logger).to receive(:warn)
+
+                query1 = "query SomeQuery { __typename }"
+                query2 = "query SomeQuery { t: __typename }"
+
+                registry = Registry.new(
+                  schema,
+                  client_names: ["my_client"],
+                  allow_unregistered_clients: false,
+                  allow_any_query_for_clients: ["my_client"],
+                  warn_on_unregistered_query_for_clients: ["my_client"],
+                  logger: logger
+                ) { |client_name| [query1] }
+
+                query, errors = registry.build_and_validate_query(query2, client: client_named("my_client"))
+
+                expect(errors).to be_empty
+                expect(query.query_string).to eq(query2)
+                # Should log warning even though client is in allow list
+                expect(logger).to have_received(:warn).with(a_string_including("Query registry warning"))
               end
             end
           end
@@ -439,6 +467,28 @@ module ElasticGraph
               super(registry, query_string, client: client, **options)
             end
           end
+
+          context "when the client is in `warn_on_unregistered_query_for_clients`" do
+            it "allows the query to execute and logs a warning" do
+              logger = Logger.new(StringIO.new)
+              allow(logger).to receive(:warn)
+
+              registry = Registry.new(
+                schema,
+                client_names: [client.name], # Include the client in the registered clients list
+                allow_unregistered_clients: false,
+                allow_any_query_for_clients: [],
+                warn_on_unregistered_query_for_clients: [client.name],
+                logger: logger
+              ) { |client_name| [] } # But provide no registered queries for this client
+
+              query, errors = registry.build_and_validate_query(widget_name_string, client: client)
+
+              expect(errors).to be_empty
+              expect(query.query_string).to eq(widget_name_string)
+              expect(logger).to have_received(:warn).with(a_string_including("Query registry warning"))
+            end
+          end
         end
 
         context "for a client with no `name`" do
@@ -471,12 +521,14 @@ module ElasticGraph
           expect(parse_counts_by_query_string).to eq(widget_name_string => 1, part_name_string => 1)
         end
 
-        def registry_with(queries_by_client_name, allow_unregistered_clients: false, allow_any_query_for_clients: [])
+        def registry_with(queries_by_client_name, allow_unregistered_clients: false, allow_any_query_for_clients: [], warn_on_unregistered_query_for_clients: [])
           Registry.new(
             schema,
             client_names: queries_by_client_name.keys,
             allow_unregistered_clients: allow_unregistered_clients,
-            allow_any_query_for_clients: allow_any_query_for_clients
+            allow_any_query_for_clients: allow_any_query_for_clients,
+            warn_on_unregistered_query_for_clients: warn_on_unregistered_query_for_clients,
+            logger: Logger.new(StringIO.new) # Use a dummy logger for tests
           ) do |client_name|
             # We use `fetch` here to demonstrate that the registry does not call our block
             # with any client names outside of the passed list.
@@ -522,7 +574,9 @@ module ElasticGraph
             schema,
             query_registry_dir,
             allow_unregistered_clients: false,
-            allow_any_query_for_clients: []
+            allow_any_query_for_clients: [],
+            warn_on_unregistered_query_for_clients: [],
+            logger: Logger.new(StringIO.new) # Use a dummy logger for tests
           )
         end
 
