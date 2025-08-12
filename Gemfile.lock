@@ -37,7 +37,7 @@ PATH
   specs:
     elasticgraph-elasticsearch (1.0.1.pre)
       elasticgraph-support (= 1.0.1.pre)
-      elasticsearch (~> 9.1)
+      elasticsearch (~> 9.1, >= 9.1.1)
       faraday (~> 2.13, >= 2.13.4)
       faraday-retry (~> 2.3, >= 2.3.2)
 
@@ -77,7 +77,7 @@ PATH
   specs:
     elasticgraph-indexer_autoscaler_lambda (1.0.1.pre)
       aws-sdk-cloudwatch (~> 1.119)
-      aws-sdk-lambda (~> 1.157)
+      aws-sdk-lambda (~> 1.158)
       aws-sdk-sqs (~> 1.100)
       elasticgraph-datastore_core (= 1.0.1.pre)
       elasticgraph-lambda_support (= 1.0.1.pre)
@@ -87,7 +87,7 @@ PATH
   remote: elasticgraph-indexer_lambda
   specs:
     elasticgraph-indexer_lambda (1.0.1.pre)
-      aws-sdk-s3 (~> 1.196)
+      aws-sdk-s3 (~> 1.196, >= 1.196.1)
       elasticgraph-indexer (= 1.0.1.pre)
       elasticgraph-lambda_support (= 1.0.1.pre)
       ox (~> 2.14, >= 2.14.23)
