@@ -177,12 +177,6 @@ process, and run it again; then re-run the tests.
 
 The source code for https://block.github.io/elasticgraph/ lives in [config/site](config/site).
 
-To build it locally, run:
-
-```bash
-bundle exec rake site:build
-```
-
 To serve it locally, run:
 
 ```bash
@@ -205,11 +199,107 @@ bundle exec rake site:preview_docs:elasticgraph-schema_definition
 
 Then visit http://localhost:8808/. The preview task will rebuild the parts of the generated docs impacted by your edits, and is quite fast.
 
+## Adding a New Query API Feature
+
+One common type of contribution to ElasticGraph is adding a new query API feature, such as a new filtering predicate or aggregation function.
+This section walks through the process using the substring filtering feature (added in
+[#555](https://github.com/block/elasticgraph/discussions/555), [#557](https://github.com/block/elasticgraph/pull/557),
+[#559](https://github.com/block/elasticgraph/pull/559), and [#560](https://github.com/block/elasticgraph/pull/560)) as an example.
+
+### Step 1: Design and Discussion
+
+Before implementing a new query API feature:
+
+1. **Create a GitHub Discussion** to propose the feature and gather feedback
+2. **Research the underlying datastore capabilities** (Elasticsearch/OpenSearch features)
+3. **Design the GraphQL API** considering [ElasticGraph's guiding principles](https://block.github.io/elasticgraph/guides/guiding-principles/):
+   - Maximize functionality while minimizing API surface area
+   - Ensure query validity can be statically verified
+   - Maintain consistency with existing patterns
+
+See the [substring filtering discussion](https://github.com/block/elasticgraph/discussions/555) for an example.
+
+### Step 2: Define Schema Elements
+
+The first implementation step is to define the new GraphQL schema elements in the schema definition DSL. For this step, the changes usually include:
+
+* New [schema element names](https://github.com/block/elasticgraph/pull/557/files#diff-10fb8f31c5a5f5ebf0a391f657092c0b71c22a4e57d68357351420f2bda66922)
+  for any new fields or arguments. The `SchemaElementNames` class allows ElasticGraph users to customize the names used in the generated GraphQL schema.
+  For example, in this case, it would allow a user to name the new prefix filtering predicate `beginsWith` instead of `startsWith`.
+* New [built-in types](https://github.com/block/elasticgraph/pull/557/files#diff-7c9b0d43e7f3a56832eb9dbb7388b2c99861e84d63113fe7c992133c50c05f4d) or updates
+  to existing built-in types to expose the new functionality. Be sure to include documentation on any new types or fields.
+* [Test coverage](https://github.com/block/elasticgraph/pull/557/files#diff-a231c0a4083d375901ca2becb92428b88013a43f2c7df737935799910742a31a)
+  of the new GraphQL schema elements.
+* [Artifact updates](https://github.com/block/elasticgraph/pull/557/files#diff-5185e837ecb7d102d3a047e802db34381560388ffa5e90d8ca0b47bdc8175426) for
+  the local/test schema used in this repo. The artifacts can be updated by running `bundle exec schema_artifacts:dump`.
+
+See the [substring schema definition PR](https://github.com/block/elasticgraph/discussions/557) for a complete example.
+
+### Step 3: Implement Query Translation
+
+Next, implement the logic to translate from GraphQL to the appropriate datastore query form. For this step, the changes usually include:
+
+* Updates to the core query engine logic. The place to make changes depends on what kind of functionality you're adding:
+  * Changes may need to be made to [ElasticGraph::GraphQL::DatastoreQuery](https://github.com/block/elasticgraph/blob/main/elasticgraph-graphql/lib/elastic_graph/graphql/datastore_query.rb),
+    which is the intermediate form used by ElasticGraph internally to model an OpenSearch/Elasticsearch query.
+  * For a new filtering predicate, add a new entry to the map of filter operators in
+    [filter_node_interpreter.rb](https://github.com/block/elasticgraph/pull/559/files#diff-59bf7147ee82aa3a9d418645c86652be6e1318cd1a9a190697c2944f03e9a454).
+  * For a new aggregation feature, multiple changes are typically needed under the
+    [ElasticGraph::GraphQL::Aggregation](https://github.com/block/elasticgraph/tree/main/elasticgraph-graphql/lib/elastic_graph/graphql/aggregation) module:
+    * [ElasticGraph::GraphQL::Aggregation::Query](https://github.com/block/elasticgraph/blob/main/elasticgraph-graphql/lib/elastic_graph/graphql/aggregation/query.rb)
+      models an aggregation query.
+    * [ElasticGraph::GraphQL:::Aggregation::QueryAdapter](https://github.com/block/elasticgraph/blob/main/elasticgraph-graphql/lib/elastic_graph/graphql/aggregation/query_adapter.rb)
+      is responsible for building an `ElasticGraph::GraphQL::Aggregation::Query` from the GraphQL query AST.
+    * The [ElasticGraph::GraphQL::Aggregation::Resolvers module](https://github.com/block/elasticgraph/tree/main/elasticgraph-graphql/lib/elastic_graph/graphql/aggregation/resolvers)
+      is responsible for resolving GraphQL aggregation fields by extracting values from the datastore response.
+* Multiple levels of comprehensive test coverage:
+  * The [acceptance tests](https://github.com/block/elasticgraph/pull/559/files#diff-2635a27e95de68f2fec3cb6a23215484017065820183c89a404b867b1ee1271e) exercise the new
+    GraphQL feature end-to-end, and are the ultimate demonstration that your new feature works. We intentionally do _not_ follow a "one assertion per test" rule with
+    these tests; instead, we optimize for test speed by running multiple GraphQL queries after indexing some documents.
+  * The [integration tests](https://github.com/block/elasticgraph/pull/559/files#diff-131e35b788a101aa59a75c26be5fc7e979c475cf19348ef6f15f3c58f629fffe)
+    still hit the datastore "for real", but do not exercise the GraphQL layer. Instead, these tests directly build and execute a `DatastoreQuery`.
+  * The [unit tests](https://github.com/block/elasticgraph/pull/559/files#diff-de5c6b5a9cff3c7202554ee120716d0ba795dc26cb77f4db7ad9e0192ea52f48) also directly
+    build a `DatastoreQuery`. However, instead of executing the `DatastoreQuery`, we inspect the body of the produced query to verify it is correct.
+* For new filtering predicates, be sure to consider what impact your change may have on [shard
+  routing](https://github.com/block/elasticgraph/blob/main/elasticgraph-graphql/spec/unit/elastic_graph/graphql/datastore_query/shard_routing_spec.rb)
+  and [search index expressions](https://github.com/block/elasticgraph/blob/main/elasticgraph-graphql/spec/unit/elastic_graph/graphql/datastore_query/search_index_expression_spec.rb).
+  Otherwise, the queries may target the wrong shards or indices!
+
+See the [substring query translation PR](https://github.com/block/elasticgraph/discussions/559) for a complete example.
+
+### Step 4: Update Documentation
+
+Finally, add user-facing documentation to the ElasticGraph website to help users understand and use the new feature. This could take
+the form of a brand new page and/or updates to an existing page. As you work on the updates, run the following so you can view the site
+locally in your browser (at http://localhost:4000/elasticgraph/):
+
+```bash
+bundle exec rake site:serve
+```
+
+We aim to include working examples throughout our docs, so please add one or more example queries demonstrating usage of the new feature.
+[Example GraphQL queries](https://github.com/block/elasticgraph/pull/560/files#diff-a55ad82ae9cb900fad024d36947c6d00dd2a5e270ff011bfc12a25b6e839ce7a)
+are defined under `config/site/examples/*/queries` and then [included in a documentation
+page](https://github.com/block/elasticgraph/pull/560/files#diff-af80e36cdc284bb4861e26b2d1854c8d4c94d827e1634163038501803f344c55)
+using `{% include copyable_code_snippet.html language="graphql" data="..." %}`.
+
+All example queries are validated as part of the CI build against the example schema provided by `elasticgraph new` when
+bootstrapping a project, to verify that they return no errors and return some data. To try an example query out locally, run:
+
+```bash
+ELASTICGRAPH_GEMS_PATH=`pwd` bundle exec elasticgraph new tmp/demo_app
+cd tmp/demo_app
+bundle exec rake boot_locally
+```
+
+You may need to update the schema or factories provided in [the project template](https://github.com/block/elasticgraph/tree/main/elasticgraph/lib/elastic_graph/project_template)
+so that the new query feature is available and produces matching results.
+
+See the [substring documentation PR](https://github.com/block/elasticgraph/discussions/560) for a complete example.
+
 ## Maintenance Tasks
 
 Common codebase maintenance tasks are documented in the [maintainer's runbook](MAINTAINERS_RUNBOOK.md).
-
----
 
 ## Communications
 
