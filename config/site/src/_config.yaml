@@ -4,10 +4,7 @@ kramdown:
 
 # Site-wide variables available to all pages via the `site` variable, ex: `{{ site.github_url }}`
 github_url: https://github.com/block/elasticgraph
-discord_url: https://discord.gg/8m9FqJ7a7F
-x_url: https://x.com/elasticgraph
-x_username: "@ElasticGraph"
-support_email: elasticgraph@squareup.com
+discord_url: https://discord.gg/block-opensource
 description: Open source framework for indexing, searching, and aggregating data powered by GraphQL and Elasticsearch / OpenSearch
 tagline: Schema-driven, scalable, cloud-native, batteries-included GraphQL, backed by Elasticsearch / OpenSearch
 

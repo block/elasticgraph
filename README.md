@@ -58,7 +58,7 @@ The [project website](https://block.github.io/elasticgraph/) has extensive user 
 
 We welcome contributions to ElasticGraph!
 
-* Join the community on [Discord](https://discord.gg/8m9FqJ7a7F).
+* Join the community in the `#elasticgraph` channel on the [Block Open Source Discord server](https://discord.gg/block-opensource).
 * Read [CONTRIBUTING.md](https://github.com/block/elasticgraph/blob/main/CONTRIBUTING.md) to learn how you can help, including our development workflow and coding conventions.
 
 ## License

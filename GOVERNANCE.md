@@ -12,7 +12,8 @@
 
 Anyone may be a contributor to Block open source projects. Contribution may take the form of:
 
-* Asking and answering questions on the [Discord](https://discord.gg/8m9FqJ7a7F) or [GitHub Issues](https://github.com/block/elasticgraph/issues).
+* Asking and answering questions in the `#elasticgraph` channel on the [Block Open Source Discord server](https://discord.gg/block-opensource)
+  or [GitHub Issues](https://github.com/block/elasticgraph/issues)
 * Filing an issue
 * Offering a feature or bug fix via a Pull Request
 * Suggesting documentation improvements

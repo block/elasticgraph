@@ -173,7 +173,8 @@ can be used in your publishing system to validate the indexing payloads or for c
 ## Feedback
 
 We'd love to hear your feedback. If you encounter any issues or have suggestions, please start a discussion in
-our [discord channel](https://discord.gg/8m9FqJ7a7F) or on [GitHub](https://github.com/block/elasticgraph/discussions).
+the `#elasticgraph` channel on the [Block Open Source Discord server](https://discord.gg/block-opensource) or on
+[GitHub](https://github.com/block/elasticgraph/discussions).
 
 ---
 

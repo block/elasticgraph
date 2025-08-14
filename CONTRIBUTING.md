@@ -2,7 +2,7 @@
 
 There are many ways to be an open source contributor, and we're here to help you on your way! You may:
 
-* Propose ideas in our [discord](https://discord.gg/8m9FqJ7a7F)
+* Propose ideas in the `#elasticgraph` channel on the [Block Open Source Discord server](https://discord.gg/block-opensource)
 * Raise an issue or feature request in our [issue tracker](https://github.com/block/elasticgraph/issues)
 * Help another contributor with one of their questions, or a code review
 * Suggest improvements to our Getting Started documentation by supplying a Pull Request
@@ -330,8 +330,8 @@ Anyone from the community is welcome (and encouraged!) to raise issues via
 Design discussions and proposals take place on [GitHub discussions](https://github.com/block/elasticgraph/discussions).
 We advocate an asynchronous, written discussion model - so write up your thoughts and invite the community to join in!
 
-In addition, we have a [discord channel](https://discord.gg/8m9FqJ7a7F) for synchronous communication. Discord is best
-for questions and general conversation.
+In addition, we have a discord channel (`#elasticgraph`) on the [Block Open Source Discord server](https://discord.gg/block-opensource)
+for synchronous communication. Discord is best for questions and general conversation.
 
 ### Continuous Integration
 
