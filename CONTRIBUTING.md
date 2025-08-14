@@ -217,6 +217,23 @@ Before implementing a new query API feature:
    - Ensure query validity can be statically verified
    - Maintain consistency with existing patterns
 
+> [!NOTE]
+> What if a breaking API change is needed? We prioritize API stability and aim to avoid that as much as possible. However,
+> if a breaking change unlocks the ability to offer a significant improvement, it's something we'll allow using a multi-step
+> process:
+>
+> 1. Offer a schema definition option (e.g. `legacy_grouping_schema: true`) that lets users opt-out of the breaking change, while
+>    defaulting to the new GraphQL schema (so that new projects automatically get the new-and-improved schema). As per our
+>    [versioning policy](https://block.github.io/elasticgraph/guides/versioning-policy/), such a change can only go in a minor or
+>    major release, not a patch release. Be sure to update the example test schema to have fields/types using both the new and old
+>    schema features, so that we can maintain comprehensive test coverage of both the old and new approaches.
+> 2. In the next major release (which may be much, much later), we'll plan to remove the provided legacy option. Such a removal can
+>    only happen in a major release as per our versioning policy, since the upgrade may impact GraphQL clients. The release notes
+>    will need to include detailed upgrade instructions. See "Remove `legacy_grouping_schema: true`" from our [v1.0.0 release
+>    notes](https://github.com/block/elasticgraph/releases/tag/v1.0.0) for an example.
+>
+> If you decide a breaking API change is needed, be sure to document your plans in the discussion proposing the feature.
+
 See the [substring filtering discussion](https://github.com/block/elasticgraph/discussions/555) for an example.
 
 ### Step 2: Define Schema Elements
@@ -233,7 +250,7 @@ The first implementation step is to define the new GraphQL schema elements in th
 * [Artifact updates](https://github.com/block/elasticgraph/pull/557/files#diff-5185e837ecb7d102d3a047e802db34381560388ffa5e90d8ca0b47bdc8175426) for
   the local/test schema used in this repo. The artifacts can be updated by running `bundle exec schema_artifacts:dump`.
 
-See the [substring schema definition PR](https://github.com/block/elasticgraph/discussions/557) for a complete example.
+See the [substring schema definition PR](https://github.com/block/elasticgraph/pull/557) for a complete example.
 
 ### Step 3: Implement Query Translation
 
@@ -265,7 +282,7 @@ Next, implement the logic to translate from GraphQL to the appropriate datastore
   and [search index expressions](https://github.com/block/elasticgraph/blob/main/elasticgraph-graphql/spec/unit/elastic_graph/graphql/datastore_query/search_index_expression_spec.rb).
   Otherwise, the queries may target the wrong shards or indices!
 
-See the [substring query translation PR](https://github.com/block/elasticgraph/discussions/559) for a complete example.
+See the [substring query translation PR](https://github.com/block/elasticgraph/pull/559) for a complete example.
 
 ### Step 4: Update Documentation
 
@@ -295,7 +312,7 @@ bundle exec rake boot_locally
 You may need to update the schema or factories provided in [the project template](https://github.com/block/elasticgraph/tree/main/elasticgraph/lib/elastic_graph/project_template)
 so that the new query feature is available and produces matching results.
 
-See the [substring documentation PR](https://github.com/block/elasticgraph/discussions/560) for a complete example.
+See the [substring documentation PR](https://github.com/block/elasticgraph/pull/560) for a complete example.
 
 ## Maintenance Tasks
 
