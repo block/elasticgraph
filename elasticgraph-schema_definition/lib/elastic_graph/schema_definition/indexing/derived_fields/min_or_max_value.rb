@@ -44,9 +44,25 @@ module ElasticGraph
             <<~EOS
               boolean #{min_or_max}Value_idempotentlyUpdateValue(List values, def parentObject, String fieldName) {
                 def currentFieldValue = parentObject[fieldName];
-                def #{min_or_max}NewValue = values.isEmpty() ? null : Collections.#{min_or_max}(values);
+                // Normalize incoming list numerics to long to avoid Integer/Long class cast issues
+                List coercedValues = new ArrayList();
+                for (def v : values) {
+                  if (v != null) {
+                    if (v instanceof Number) {
+                      coercedValues.add(((Number)v).longValue());
+                    } else {
+                      coercedValues.add(v);
+                    }
+                  }
+                }
+                def #{min_or_max}NewValue = coercedValues.isEmpty() ? null : Collections.#{min_or_max}(coercedValues);
 
-                if (currentFieldValue == null || (#{min_or_max}NewValue != null && #{min_or_max}NewValue.compareTo(currentFieldValue) #{operator} 0)) {
+                def coercedCurrentFieldValue = null;
+                if (currentFieldValue != null) {
+                  coercedCurrentFieldValue = (currentFieldValue instanceof Number) ? ((Number)currentFieldValue).longValue() : currentFieldValue;
+                }
+
+                if (coercedCurrentFieldValue == null || (#{min_or_max}NewValue != null && #{min_or_max}NewValue.compareTo(coercedCurrentFieldValue) #{operator} 0)) {
                   parentObject[fieldName] = #{min_or_max}NewValue;
                   return true;
                 }

@@ -161,6 +161,7 @@ ElasticGraph.define_schema do |schema|
       derive.append_only_set "widget_tags", from: "tags"
       derive.append_only_set "widget_fee_currencies", from: "fees.currency"
       derive.max_value "nested_fields.max_widget_cost", from: "cost.amount_cents"
+      derive.max_value "max_weight_in_ng", from: "weight_in_ng"
       derive.min_value "oldest_widget_created_at", from: "created_at"
     end
   end
@@ -192,6 +193,7 @@ ElasticGraph.define_schema do |schema|
     t.field "widget_options", "WidgetOptionSets"
     t.field "nested_fields", "WidgetCurrencyNestedFields"
     t.field "oldest_widget_created_at", "DateTime"
+    t.field "max_weight_in_ng", "JsonSafeLong"
     t.index "widget_currencies" do |i|
       i.rollover :yearly, "introduced_on"
       i.route_with "primary_continent"

@@ -782,6 +782,14 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: introduced_on
+      max_weight_in_ng_ASC:
+        sort_field:
+          direction: asc
+          field_path: max_weight_in_ng
+      max_weight_in_ng_DESC:
+        sort_field:
+          direction: desc
+          field_path: max_weight_in_ng
       name_ASC:
         sort_field:
           direction: asc
@@ -2491,6 +2499,8 @@ index_definitions_by_name:
       id:
         source: __self
       introduced_on:
+        source: __self
+      max_weight_in_ng:
         source: __self
       name:
         source: __self
@@ -6374,10 +6384,12 @@ object_types_by_name:
           cardinality: many
         tags:
           cardinality: many
+        weight_in_ng:
+          cardinality: many
       id_source: cost.currency
       rollover_timestamp_value_source: cost_currency_introduced_on
       routing_value_source: cost_currency_primary_continent
-      script_id: update_WidgetCurrency_from_Widget_0f26b3e9ea093af29e5cef02a25e75ca
+      script_id: update_WidgetCurrency_from_Widget_70a98186a925c781260b3d3532ce0208
       type: WidgetCurrency
     - data_params:
         amount_cents:
@@ -6634,6 +6646,9 @@ object_types_by_name:
       introduced_on:
         resolver:
           name: get_record_field_value
+      max_weight_in_ng:
+        resolver:
+          name: get_record_field_value
       name:
         resolver:
           name: get_record_field_value
@@ -6666,6 +6681,8 @@ object_types_by_name:
         details:
           cardinality: one
         introduced_on:
+          cardinality: one
+        max_weight_in_ng:
           cardinality: one
         name:
           cardinality: one
@@ -6709,6 +6726,9 @@ object_types_by_name:
         resolver:
           name: object_with_lookahead
       introduced_on:
+        resolver:
+          name: object_with_lookahead
+      max_weight_in_ng:
         resolver:
           name: object_with_lookahead
       name:
@@ -6810,6 +6830,9 @@ object_types_by_name:
         resolver:
           name: object_with_lookahead
       introduced_on:
+        resolver:
+          name: object_with_lookahead
+      max_weight_in_ng:
         resolver:
           name: object_with_lookahead
       name:

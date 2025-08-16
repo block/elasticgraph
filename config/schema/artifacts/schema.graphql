@@ -13005,6 +13005,7 @@ type WidgetCurrency {
   details: CurrencyDetails
   id: ID!
   introduced_on: Date
+  max_weight_in_ng: JsonSafeLong
   name: String
   nested_fields: WidgetCurrencyNestedFields
   oldest_widget_created_at: DateTime
@@ -13071,6 +13072,11 @@ type WidgetCurrencyAggregatedValues {
   Computed aggregate values for the `introduced_on` field.
   """
   introduced_on: DateAggregatedValues
+
+  """
+  Computed aggregate values for the `max_weight_in_ng` field.
+  """
+  max_weight_in_ng: JsonSafeLongAggregatedValues
 
   """
   Computed aggregate values for the `name` field.
@@ -13283,6 +13289,13 @@ input WidgetCurrencyFilterInput {
   introduced_on: DateFilterInput
 
   """
+  Used to filter on the `max_weight_in_ng` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  max_weight_in_ng: JsonSafeLongFilterInput
+
+  """
   Used to filter on the `name` field.
 
   When `null` or an empty object is passed, matches all documents.
@@ -13360,6 +13373,11 @@ type WidgetCurrencyGroupedBy {
   Offers the different grouping options for the `introduced_on` value within this group.
   """
   introduced_on: DateGroupedBy
+
+  """
+  The `max_weight_in_ng` field value for this group.
+  """
+  max_weight_in_ng: JsonSafeLong
 
   """
   The `name` field value for this group.
@@ -13548,6 +13566,16 @@ enum WidgetCurrencySortOrderInput {
   Sorts descending by the `introduced_on` field.
   """
   introduced_on_DESC
+
+  """
+  Sorts ascending by the `max_weight_in_ng` field.
+  """
+  max_weight_in_ng_ASC
+
+  """
+  Sorts descending by the `max_weight_in_ng` field.
+  """
+  max_weight_in_ng_DESC
 
   """
   Sorts ascending by the `name` field.

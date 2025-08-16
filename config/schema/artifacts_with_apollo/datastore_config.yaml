@@ -1293,6 +1293,8 @@ index_templates:
           oldest_widget_created_at:
             type: date
             format: strict_date_time
+          max_weight_in_ng:
+            type: long
           __counts:
             properties:
               widget_names2:
@@ -1705,7 +1707,7 @@ indices:
       index.number_of_shards: 1
       index.max_result_window: 10000
 scripts:
-  update_WidgetCurrency_from_Widget_0f26b3e9ea093af29e5cef02a25e75ca:
+  update_WidgetCurrency_from_Widget_70a98186a925c781260b3d3532ce0208:
     context: update
     script:
       lang: painless
@@ -1795,9 +1797,25 @@ scripts:
 
         boolean maxValue_idempotentlyUpdateValue(List values, def parentObject, String fieldName) {
           def currentFieldValue = parentObject[fieldName];
-          def maxNewValue = values.isEmpty() ? null : Collections.max(values);
+          // Normalize incoming list numerics to long to avoid Integer/Long class cast issues
+          List coercedValues = new ArrayList();
+          for (def v : values) {
+            if (v != null) {
+              if (v instanceof Number) {
+                coercedValues.add(((Number)v).longValue());
+              } else {
+                coercedValues.add(v);
+              }
+            }
+          }
+          def maxNewValue = coercedValues.isEmpty() ? null : Collections.max(coercedValues);
 
-          if (currentFieldValue == null || (maxNewValue != null && maxNewValue.compareTo(currentFieldValue) > 0)) {
+          def coercedCurrentFieldValue = null;
+          if (currentFieldValue != null) {
+            coercedCurrentFieldValue = (currentFieldValue instanceof Number) ? ((Number)currentFieldValue).longValue() : currentFieldValue;
+          }
+
+          if (coercedCurrentFieldValue == null || (maxNewValue != null && maxNewValue.compareTo(coercedCurrentFieldValue) > 0)) {
             parentObject[fieldName] = maxNewValue;
             return true;
           }
@@ -1807,9 +1825,25 @@ scripts:
 
         boolean minValue_idempotentlyUpdateValue(List values, def parentObject, String fieldName) {
           def currentFieldValue = parentObject[fieldName];
-          def minNewValue = values.isEmpty() ? null : Collections.min(values);
+          // Normalize incoming list numerics to long to avoid Integer/Long class cast issues
+          List coercedValues = new ArrayList();
+          for (def v : values) {
+            if (v != null) {
+              if (v instanceof Number) {
+                coercedValues.add(((Number)v).longValue());
+              } else {
+                coercedValues.add(v);
+              }
+            }
+          }
+          def minNewValue = coercedValues.isEmpty() ? null : Collections.min(coercedValues);
 
-          if (currentFieldValue == null || (minNewValue != null && minNewValue.compareTo(currentFieldValue) < 0)) {
+          def coercedCurrentFieldValue = null;
+          if (currentFieldValue != null) {
+            coercedCurrentFieldValue = (currentFieldValue instanceof Number) ? ((Number)currentFieldValue).longValue() : currentFieldValue;
+          }
+
+          if (coercedCurrentFieldValue == null || (minNewValue != null && minNewValue.compareTo(coercedCurrentFieldValue) < 0)) {
             parentObject[fieldName] = minNewValue;
             return true;
           }
@@ -1848,6 +1882,7 @@ scripts:
         boolean details__symbol_was_noop = !immutableValue_idempotentlyUpdateValue(scriptErrors, data["cost_currency_symbol"], ctx._source.details, "details.symbol", "symbol", true, true);
         boolean details__unit_was_noop = !immutableValue_idempotentlyUpdateValue(scriptErrors, data["cost_currency_unit"], ctx._source.details, "details.unit", "unit", false, false);
         boolean introduced_on_was_noop = !immutableValue_idempotentlyUpdateValue(scriptErrors, data["cost_currency_introduced_on"], ctx._source, "introduced_on", "introduced_on", true, false);
+        boolean max_weight_in_ng_was_noop = !maxValue_idempotentlyUpdateValue(data["weight_in_ng"], ctx._source, "max_weight_in_ng");
         boolean name_was_noop = !immutableValue_idempotentlyUpdateValue(scriptErrors, data["cost_currency_name"], ctx._source, "name", "name", true, false);
         boolean nested_fields__max_widget_cost_was_noop = !maxValue_idempotentlyUpdateValue(data["cost.amount_cents"], ctx._source.nested_fields, "max_widget_cost");
         boolean oldest_widget_created_at_was_noop = !minValue_idempotentlyUpdateValue(data["created_at"], ctx._source, "oldest_widget_created_at");
@@ -1864,7 +1899,7 @@ scripts:
 
         // For records with no new values to index, only skip the update if the document itself doesn't already exist.
         // Otherwise create an (empty) document to reflect the fact that the id has been seen.
-        if (ctx._source.id != null && details__symbol_was_noop && details__unit_was_noop && introduced_on_was_noop && name_was_noop && nested_fields__max_widget_cost_was_noop && oldest_widget_created_at_was_noop && primary_continent_was_noop && widget_fee_currencies_was_noop && widget_names2_was_noop && widget_options__colors_was_noop && widget_options__sizes_was_noop && widget_tags_was_noop) {
+        if (ctx._source.id != null && details__symbol_was_noop && details__unit_was_noop && introduced_on_was_noop && max_weight_in_ng_was_noop && name_was_noop && nested_fields__max_widget_cost_was_noop && oldest_widget_created_at_was_noop && primary_continent_was_noop && widget_fee_currencies_was_noop && widget_names2_was_noop && widget_options__colors_was_noop && widget_options__sizes_was_noop && widget_tags_was_noop) {
           ctx.op = 'none';
         } else {
           // Here we set `_source.id` because if we don't, it'll never be set, making these docs subtly

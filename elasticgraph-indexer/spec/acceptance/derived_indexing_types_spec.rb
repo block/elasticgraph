@@ -234,6 +234,39 @@ module ElasticGraph
       end
     end
 
+    it "derives a max `JsonSafeLong` when an integer-range value is indexed before a long-range value" do
+      small = widget("SMALL", "RED", "USD", name: "small_weight", tags: [], weight_in_ng: 1_000)
+      large = widget("LARGE", "RED", "USD", name: "large_weight", tags: [], weight_in_ng: large_value = 99_000_000_000_000)
+
+      index_records(small)
+      index_records(large)
+
+      doc = fetch_from_index("WidgetCurrency", "USD")
+      expect(doc.dig("max_weight_in_ng")).to eq(large_value)
+    end
+
+    it "derives a max `JsonSafeLong` when an long-range value is indexed before an integer-range value" do
+      small = widget("SMALL", "RED", "USD", name: "small_weight", tags: [], weight_in_ng: 1_000)
+      large = widget("LARGE", "RED", "USD", name: "large_weight", tags: [], weight_in_ng: large_value = 99_000_000_000_000)
+
+      index_records(large)
+      index_records(small)
+
+      doc = fetch_from_index("WidgetCurrency", "USD")
+      expect(doc.dig("max_weight_in_ng")).to eq(large_value)
+    end
+
+    it "handles numeric min/max when source values are Integers" do
+      large_value = 200_000_000
+      small = widget("SMALL", "RED", "USD", name: "small_cost", tags: [], cost: {amount_cents: 100, currency: "USD"})
+      large = widget("LARGE", "RED", "USD", name: "large_cost", tags: [], cost: {amount_cents: large_value, currency: "USD"})
+
+      index_records(small, large)
+
+      doc = fetch_from_index("WidgetCurrency", "USD")
+      expect(doc.dig("nested_fields", "max_widget_cost")).to eq(large_value)
+    end
+
     def expect_payload_from_lookup_and_search(payload)
       doc = fetch_from_index("WidgetCurrency", payload.fetch("id"))
       expect(doc).to include(payload)
