@@ -750,6 +750,14 @@ module ElasticGraph
               When `null` is passed, matches all documents.
               """
               #{schema_elements.matches_phrase}: MatchesPhraseFilterInput
+              """
+              Matches records where the field value matches the provided query with the last term treated as a prefix.
+              This is useful for search-as-you-type functionality, where users expect to see results as they type.
+              Similar to `#{schema_elements.matches_query}`, but allows prefix matching on the last term.
+
+              When `null` is passed, matches all documents.
+              """
+              #{schema_elements.matches_query_with_prefix}: MatchesQueryWithPrefixFilterInput
             }
           EOS
 
@@ -794,6 +802,14 @@ module ElasticGraph
               When `null` is passed, matches all documents.
               """
               #{schema_elements.matches_phrase}: MatchesPhraseFilterInput
+              """
+              Matches records where the field value matches the provided query with the last term treated as a prefix.
+              This is useful for search-as-you-type functionality, where users expect to see results as they type.
+              Similar to `#{schema_elements.matches_query}`, but allows prefix matching on the last term.
+
+              When `null` is passed, matches all documents.
+              """
+              #{schema_elements.matches_query_with_prefix}: MatchesQueryWithPrefixFilterInput
             }
           EOS
         end
@@ -917,6 +933,32 @@ module ElasticGraph
               The input phrase to search for.
               """
               #{schema_elements.phrase}: String!
+            }
+          EOS
+        end
+
+        it "defines a `MatchesQueryWithPrefixFilterInput` type" do
+          expect(type_named("MatchesQueryWithPrefixFilterInput", include_docs: true)).to eq(<<~EOS.strip)
+            """
+            Input type used to specify parameters for the `#{schema_elements.matches_query_with_prefix}` filtering operator.
+
+            When `null` is passed, matches all documents.
+            """
+            input MatchesQueryWithPrefixFilterInput {
+              """
+              The input query to search for, with the last term treated as a prefix.
+              """
+              #{schema_elements.query_with_prefix}: String!
+              """
+              Number of allowed modifications per term to arrive at a match. For example, if set to 'ONE', the input
+              term 'glue' would match 'blue' but not 'clued', since the latter requires two modifications.
+              """
+              #{schema_elements.allowed_edits_per_term}: MatchesQueryAllowedEditsPerTermInput! = "DYNAMIC"
+              """
+              Set to `true` to match only if all terms in `#{schema_elements.query_with_prefix}` are found, or
+              `false` to only require one term to be found.
+              """
+              #{schema_elements.require_all_terms}: Boolean! = false
             }
           EOS
         end

@@ -24,6 +24,7 @@ module ElasticGraph
         attr_reader lte: ::String
         attr_reader matches_query: ::String
         attr_reader matches_phrase: ::String
+        attr_reader matches_query_with_prefix: ::String
         attr_reader all_of: ::String
         attr_reader any_of: ::String
         attr_reader not: ::String
@@ -84,6 +85,7 @@ module ElasticGraph
 
         attr_reader query: ::String
         attr_reader phrase: ::String
+        attr_reader query_with_prefix: ::String
         attr_reader allowed_edits_per_term: ::Integer
         attr_reader require_all_terms: bool
 

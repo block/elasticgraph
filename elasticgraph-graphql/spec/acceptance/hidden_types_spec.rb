@@ -120,7 +120,7 @@ module ElasticGraph
               DayOfWeek DayOfWeekGroupingOffsetInput DistanceUnitInput GeoLocationFilterInput GeoLocationDistanceFilterInput
               IntListFilterInput IntListElementFilterInput AggregationCountDetail
               LocalTimeGroupingOffsetInput LocalTimeGroupingTruncationUnitInput LocalTimeUnitInput MatchesQueryFilterInput
-              MatchesPhraseFilterInput MatchesQueryAllowedEditsPerTermInput StringContainsFilterInput StringStartsWithFilterInput
+              MatchesPhraseFilterInput MatchesQueryWithPrefixFilterInput MatchesQueryAllowedEditsPerTermInput StringContainsFilterInput StringStartsWithFilterInput
               SearchHighlight
             ]
 

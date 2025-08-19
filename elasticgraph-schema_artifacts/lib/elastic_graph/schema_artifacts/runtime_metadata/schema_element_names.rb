@@ -137,7 +137,7 @@ module ElasticGraph
       SchemaElementNames = SchemaElementNamesDefinition.new(
         # Filter arg and operation names:
         :filter,
-        :equal_to_any_of, :gt, :gte, :lt, :lte, :matches_phrase, :matches_query, :any_of, :all_of, :not,
+        :equal_to_any_of, :gt, :gte, :lt, :lte, :matches_phrase, :matches_query, :matches_query_with_prefix, :any_of, :all_of, :not,
         :time_of_day, :any_satisfy, :contains, :starts_with, :all_substrings_of, :any_substring_of, :ignore_case, :any_prefix_of,
         # Directives
         :eg_latency_slo, :ms,
@@ -159,8 +159,8 @@ module ElasticGraph
         :page_info, :start_cursor, :end_cursor, :total_edge_count, :has_previous_page, :has_next_page,
         # Subfields of `GeoLocation`/`GeoLocationFilterInput`:
         :latitude, :longitude, :near, :max_distance,
-        # Subfields of `MatchesQueryFilterInput`/`MatchesPhraseFilterInput`
-        :query, :phrase, :allowed_edits_per_term, :require_all_terms,
+        # Subfields of `MatchesQueryFilterInput`/`MatchesPhraseFilterInput`/`MatchesQueryWithPrefixFilterInput`
+        :query, :phrase, :query_with_prefix, :allowed_edits_per_term, :require_all_terms,
         # Aggregated values field names:
         :exact_min, :exact_max, :approximate_min, :approximate_max, :approximate_avg, :approximate_sum, :exact_sum,
         :approximate_distinct_value_count

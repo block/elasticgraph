@@ -4974,6 +4974,30 @@ input MatchesQueryFilterInput {
   require_all_terms: Boolean! = false
 }
 
+"""
+Input type used to specify parameters for the `matches_query_with_prefix` filtering operator.
+
+When `null` is passed, matches all documents.
+"""
+input MatchesQueryWithPrefixFilterInput {
+  """
+  Number of allowed modifications per term to arrive at a match. For example, if set to 'ONE', the input
+  term 'glue' would match 'blue' but not 'clued', since the latter requires two modifications.
+  """
+  allowed_edits_per_term: MatchesQueryAllowedEditsPerTermInput! = DYNAMIC
+
+  """
+  The input query to search for, with the last term treated as a prefix.
+  """
+  query_with_prefix: String!
+
+  """
+  Set to `true` to match only if all terms in `query_with_prefix` are found, or
+  `false` to only require one term to be found.
+  """
+  require_all_terms: Boolean! = false
+}
+
 enum Material {
   ALLOY
   CARBON_FIBER
@@ -12869,6 +12893,14 @@ input TextFilterInput {
   When `null` is passed, matches all documents.
   """
   matches_query: MatchesQueryFilterInput
+
+  """
+  Matches records where the field value matches the provided query with the last term treated as a prefix.
+  Similar to `matches_query`, but allows prefix matching on the last term.
+
+  When `null` is passed, matches all documents.
+  """
+  matches_query_with_prefix: MatchesQueryWithPrefixFilterInput
 
   """
   Matches records where the provided sub-filter evaluates to false.

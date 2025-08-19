@@ -222,6 +222,15 @@ module ElasticGraph
                 When `null` is passed, matches all documents.
               EOS
             end
+
+            t.field names.matches_query_with_prefix, schema_def_state.type_ref("MatchesQueryWithPrefix").as_filter_input.name do |f|
+              f.documentation <<~EOS
+                Matches records where the field value matches the provided query with the last term treated as a prefix.
+                Similar to `#{names.matches_query}`, but allows prefix matching on the last term.
+
+                When `null` is passed, matches all documents.
+              EOS
+            end
           end.each do |input_type|
             field_type = input_type.type_ref.list_filter_input? ? "[String]" : "String"
             input_type.documentation <<~EOS
@@ -278,6 +287,42 @@ module ElasticGraph
 
             t.field names.phrase, "String!" do |f|
               f.documentation "The input phrase to search for."
+            end
+
+            # any_of/all_of/not don't really make sense on this filter because it doesn't make sense
+            # to apply an OR operator or negation to the fields of this type since they are all an
+            # indivisible part of a single filter operation on a specific field. So we remove them
+            # here.
+            remove_any_of_and_all_of_and_not_filter_operators_on(t)
+          end
+
+          register_filter "MatchesQueryWithPrefix" do |t|
+            t.documentation <<~EOS
+              Input type used to specify parameters for the `#{names.matches_query_with_prefix}` filtering operator.
+
+              When `null` is passed, matches all documents.
+            EOS
+
+            t.field names.query_with_prefix, "String!" do |f|
+              f.documentation "The input query to search for, with the last term treated as a prefix."
+            end
+
+            t.field names.allowed_edits_per_term, "MatchesQueryAllowedEditsPerTerm!" do |f|
+              f.documentation <<~EOS
+                Number of allowed modifications per term to arrive at a match. For example, if set to 'ONE', the input
+                term 'glue' would match 'blue' but not 'clued', since the latter requires two modifications.
+              EOS
+
+              f.default "DYNAMIC"
+            end
+
+            t.field names.require_all_terms, "Boolean!" do |f|
+              f.documentation <<~EOS
+                Set to `true` to match only if all terms in `#{names.query_with_prefix}` are found, or
+                `false` to only require one term to be found.
+              EOS
+
+              f.default false
             end
 
             # any_of/all_of/not don't really make sense on this filter because it doesn't make sense
