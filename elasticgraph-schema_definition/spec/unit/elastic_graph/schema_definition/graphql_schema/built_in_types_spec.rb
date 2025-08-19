@@ -752,7 +752,6 @@ module ElasticGraph
               #{schema_elements.matches_phrase}: MatchesPhraseFilterInput
               """
               Matches records where the field value matches the provided query with the last term treated as a prefix.
-              This is useful for search-as-you-type functionality, where users expect to see results as they type.
               Similar to `#{schema_elements.matches_query}`, but allows prefix matching on the last term.
 
               When `null` is passed, matches all documents.
@@ -804,7 +803,6 @@ module ElasticGraph
               #{schema_elements.matches_phrase}: MatchesPhraseFilterInput
               """
               Matches records where the field value matches the provided query with the last term treated as a prefix.
-              This is useful for search-as-you-type functionality, where users expect to see results as they type.
               Similar to `#{schema_elements.matches_query}`, but allows prefix matching on the last term.
 
               When `null` is passed, matches all documents.
