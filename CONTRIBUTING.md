@@ -248,7 +248,7 @@ The first implementation step is to define the new GraphQL schema elements in th
 * [Test coverage](https://github.com/block/elasticgraph/pull/557/files#diff-a231c0a4083d375901ca2becb92428b88013a43f2c7df737935799910742a31a)
   of the new GraphQL schema elements.
 * [Artifact updates](https://github.com/block/elasticgraph/pull/557/files#diff-5185e837ecb7d102d3a047e802db34381560388ffa5e90d8ca0b47bdc8175426) for
-  the local/test schema used in this repo. The artifacts can be updated by running `bundle exec schema_artifacts:dump`.
+  the local/test schema used in this repo. The artifacts can be updated by running `bundle exec rake schema_artifacts:dump`.
 
 See the [substring schema definition PR](https://github.com/block/elasticgraph/pull/557) for a complete example.
 
