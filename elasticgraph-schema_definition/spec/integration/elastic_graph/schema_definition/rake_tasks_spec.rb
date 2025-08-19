@@ -370,7 +370,7 @@ module ElasticGraph
             DayOfWeekGroupingOffsetInput
             LocalTimeGroupingOffsetInput LocalTimeGroupingTruncationUnitInput LocalTimeUnitInput
             NonNumericAggregatedValues TextFilterInput
-            MatchesQueryFilterInput MatchesQueryAllowedEditsPerTermInput MatchesPhraseFilterInput
+            MatchesQueryFilterInput MatchesQueryAllowedEditsPerTermInput MatchesPhraseFilterInput MatchesQueryWithPrefixFilterInput
           ]
 
           expect(filtered_types).to match_array(allowed_list)
