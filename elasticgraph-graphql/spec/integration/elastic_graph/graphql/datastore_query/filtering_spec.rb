@@ -1010,15 +1010,16 @@ module ElasticGraph
       specify "`matches_query_with_prefix` performs bool prefix matching with exact term matching" do
         index_into(
           graphql,
-          widget1 = build(:widget, description_text: "red widget small"),
-          widget2 = build(:widget, description_text: "red widget medium")
+          widget1 = build(:widget, description: "red widget small"),
+          widget2 = build(:widget, description: "red widget medium"),
+          _widget3 = build(:widget, description: "rad widget large")
         )
 
         results = search_with_filter(
-          "description_text",
+          "description",
           "matches_query_with_prefix",
           {
-            "query_with_prefix" => "re",
+            "query_with_prefix" => "red widg",
             "allowed_edits_per_term" => enum_value("MatchesQueryAllowedEditsPerTermInput", "NONE"),
             "require_all_terms" => true
           }
@@ -1030,11 +1031,12 @@ module ElasticGraph
       specify "`matches_query_with_prefix` performs bool prefix matching with fuzzy term matching" do
         index_into(
           graphql,
-          widget1 = build(:widget, description_text: "red widget small")
+          widget1 = build(:widget, description: "red widget small"),
+          _widget2 = build(:widget, description: "blue widget medium")
         )
 
         results = search_with_filter(
-          "description_text",
+          "description",
           "matches_query_with_prefix",
           {
             "query_with_prefix" => "rxd widge sma",
@@ -1049,11 +1051,12 @@ module ElasticGraph
       specify "`matches_query_with_prefix` performs bool prefix matching with different term order" do
         index_into(
           graphql,
-          widget1 = build(:widget, description_text: "red widget medium")
+          widget1 = build(:widget, description: "red widget medium"),
+          _widget2 = build(:widget, description: "blue widget medium")
         )
 
         results = search_with_filter(
-          "description_text",
+          "description",
           "matches_query_with_prefix",
           {
             "query_with_prefix" => "widge rxd med",
@@ -1068,13 +1071,14 @@ module ElasticGraph
       specify "`matches_query_with_prefix` supports different fuzziness levels via allowed_edits_per_term" do
         index_into(
           graphql,
-          widget1 = build(:widget, description_text: "red widget small"),
-          widget2 = build(:widget, description_text: "red widget medium")
+          widget1 = build(:widget, description: "red widget small"),
+          widget2 = build(:widget, description: "red widget medium"),
+          _widget3 = build(:widget, description: "blue widget medium")
         )
 
         # With NONE - should only find exact prefixes
         results = search_with_filter(
-          "description_text",
+          "description",
           "matches_query_with_prefix",
           {
             "query_with_prefix" => "red widget sma",
@@ -1086,7 +1090,7 @@ module ElasticGraph
 
         # With ONE - should find with one edit per term
         results = search_with_filter(
-          "description_text",
+          "description",
           "matches_query_with_prefix",
           {
             "query_with_prefix" => "rd widg",
@@ -1098,7 +1102,7 @@ module ElasticGraph
 
         # With TWO - should find with two edits per term
         results = search_with_filter(
-          "description_text",
+          "description",
           "matches_query_with_prefix",
           {
             "query_with_prefix" => "rxw widg",
@@ -1110,7 +1114,7 @@ module ElasticGraph
 
         # With DYNAMIC - should use auto fuzziness
         results = search_with_filter(
-          "description_text",
+          "description",
           "matches_query_with_prefix",
           {
             "query_with_prefix" => "rxd wiget sma",
@@ -1124,15 +1128,16 @@ module ElasticGraph
       specify "`matches_query_with_prefix` supports controlling term matching via require_all_terms" do
         index_into(
           graphql,
-          widget1 = build(:widget, description_text: "blue widget small"),
-          widget2 = build(:widget, description_text: "red widget small"),
-          widget3 = build(:widget, description_text: "red widget medium"),
-          widget4 = build(:widget, description_text: "red widget large")
+          widget1 = build(:widget, description: "blue widget small"),
+          widget2 = build(:widget, description: "red widget small"),
+          widget3 = build(:widget, description: "red widget medium"),
+          widget4 = build(:widget, description: "red widget large"),
+          _widget5 = build(:widget, description: "blue medium")
         )
 
         # With require_all_terms = true, should require all terms to match
         results = search_with_filter(
-          "description_text",
+          "description",
           "matches_query_with_prefix",
           {
             "query_with_prefix" => "rxd widgxt sma",
@@ -1144,7 +1149,7 @@ module ElasticGraph
 
         # With require_all_terms = false, should match documents with any term
         results = search_with_filter(
-          "description_text",
+          "description",
           "matches_query_with_prefix",
           {
             "query_with_prefix" => "rxd widge",

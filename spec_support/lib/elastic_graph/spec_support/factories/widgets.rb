@@ -93,7 +93,6 @@ FactoryBot.define do
     name { Faker::Device.model_name }
     name_text { name }
     description { "this is #{Faker::Device.model_name}" }
-    description_text { description }
     created_at { Faker::Time.between(from: recent_date - 30, to: recent_date).utc.iso8601 }
     created_at_time_of_day { ::Time.iso8601(created_at).strftime("%H:%M:%S") }
     created_on { ::Time.iso8601(created_at).to_date.iso8601 }

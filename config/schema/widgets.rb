@@ -94,8 +94,7 @@ ElasticGraph.define_schema do |schema|
     t.field "name_text", "String" do |f|
       f.mapping type: "text"
     end
-    t.field "description", "String"
-    t.field "description_text", "String" do |f|
+    t.field "description", "String" do |f|
       f.mapping type: "text"
     end
     t.field "created_at", "DateTime!"

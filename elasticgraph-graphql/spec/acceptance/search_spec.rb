@@ -578,19 +578,19 @@ module ElasticGraph
         ])
 
         # Test the matches_query_with_prefix filter functionality with prefix matching
-        query_with_prefix_search_results = list_widgets_with(:description, filter: {"description_text" => {matches_query_with_prefix: {query_with_prefix: "re", allowed_edits_per_term: :NONE, require_all_terms: true}}}, order_by: [:description_ASC])
+        query_with_prefix_search_results = list_widgets_with(:description, filter: {"description" => {matches_query_with_prefix: {query_with_prefix: "re", allowed_edits_per_term: :NONE, require_all_terms: true}}}, order_by: [:name_ASC])
         expect(query_with_prefix_search_results).to match([
           string_hash_of(widget3, :id, :description),
           string_hash_of(widget2, :id, :description)
         ])
 
-        fuzzy_query_with_prefix_results = list_widgets_with(:description, filter: {"description_text" => {matches_query_with_prefix: {query_with_prefix: "re widg", allowed_edits_per_term: :ONE, require_all_terms: true}}}, order_by: [:description_ASC])
+        fuzzy_query_with_prefix_results = list_widgets_with(:description, filter: {"description" => {matches_query_with_prefix: {query_with_prefix: "re widg", allowed_edits_per_term: :ONE, require_all_terms: true}}}, order_by: [:name_ASC])
         expect(fuzzy_query_with_prefix_results).to match([
           string_hash_of(widget3, :id, :description),
           string_hash_of(widget2, :id, :description)
         ])
 
-        unordered_query_with_prefix_results = list_widgets_with(:description, filter: {"description_text" => {matches_query_with_prefix: {query_with_prefix: "widge blu sma", allowed_edits_per_term: :ONE, require_all_terms: true}}}, order_by: [:description_ASC])
+        unordered_query_with_prefix_results = list_widgets_with(:description, filter: {"description" => {matches_query_with_prefix: {query_with_prefix: "widge blu sma", allowed_edits_per_term: :ONE, require_all_terms: true}}}, order_by: [:name_ASC])
         expect(unordered_query_with_prefix_results).to match([
           string_hash_of(widget1, :id, :description)
         ])

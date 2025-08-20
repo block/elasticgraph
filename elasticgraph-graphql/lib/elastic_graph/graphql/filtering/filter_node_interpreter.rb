@@ -109,6 +109,7 @@ module ElasticGraph
             },
             schema_names.matches_query_with_prefix => ->(field_name, value) do
               allowed_edits_per_term = value.fetch(schema_names.allowed_edits_per_term).runtime_metadata.datastore_abbreviation
+
               BooleanQuery.filter({match_bool_prefix: {field_name => {
                 query: value.fetch(schema_names.query_with_prefix),
                 # This is always a string field, even though the value is often an integer
