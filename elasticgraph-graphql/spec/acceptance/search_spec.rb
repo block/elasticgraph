@@ -23,6 +23,7 @@ module ElasticGraph
             options: build(:widget_options, size: "SMALL", color: "BLUE"),
             cost_currency: "USD",
             name: "thing123",
+            description: "this is a small blue widget",
             created_at: "2019-06-02T06:00:00.000Z",
             created_at_time_of_day: "06:00:00",
             tags: ["abc", "def"],
@@ -35,6 +36,7 @@ module ElasticGraph
             options: build(:widget_options, size: "SMALL", color: "RED"),
             cost_currency: "USD",
             name: "thing234",
+            description: "this is a small red widget",
             created_at: "2019-07-02T12:00:00.000Z",
             created_at_time_of_day: "12:00:00.1",
             tags: ["ghi", "jkl"],
@@ -46,6 +48,7 @@ module ElasticGraph
             amount_cents: 300,
             cost_currency: "USD",
             name: nil, # expected to be nil by some queries below
+            description: "this is a medium red widget",
             options: build(:widget_options, size: "MEDIUM", color: "RED"),
             created_at: "2019-08-02T18:00:00.000Z",
             created_at_time_of_day: "18:00:00.123",
@@ -572,6 +575,26 @@ module ElasticGraph
         expect(phrase_search_results).to match([
           string_hash_of(widget1, :id, :name),
           string_hash_of(widget2, :id, :name)
+        ])
+
+        # Test the matches_query_with_prefix filter functionality with prefix matching
+        query_with_prefix_search_results = list_widgets_with(:description, filter: {"description_text" => {matches_query_with_prefix: {query_with_prefix: "thi", allowed_edits_per_term: :NONE, require_all_terms: true}}}, order_by: [:description_ASC])
+        expect(query_with_prefix_search_results).to match([
+          string_hash_of(widget3, :id, :description),
+          string_hash_of(widget1, :id, :description),
+          string_hash_of(widget2, :id, :description)
+        ])
+
+        fuzzy_query_with_prefix_results = list_widgets_with(:description, filter: {"description_text" => {matches_query_with_prefix: {query_with_prefix: "ths i smal", allowed_edits_per_term: :ONE, require_all_terms: true}}}, order_by: [:description_ASC])
+        expect(fuzzy_query_with_prefix_results).to match([
+          string_hash_of(widget1, :id, :description),
+          string_hash_of(widget2, :id, :description)
+        ])
+
+        unordered_query_with_prefix_results = list_widgets_with(:description, filter: {"description_text" => {matches_query_with_prefix: {query_with_prefix: "i ths smal", allowed_edits_per_term: :ONE, require_all_terms: true}}}, order_by: [:description_ASC])
+        expect(unordered_query_with_prefix_results).to match([
+          string_hash_of(widget1, :id, :description),
+          string_hash_of(widget2, :id, :description)
         ])
 
         # Test all_of with complex combinations

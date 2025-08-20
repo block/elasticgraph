@@ -203,6 +203,128 @@ module ElasticGraph
         expect(datastore_body_of(query)).to query_datastore_with(bool: {filter: [{match_phrase_prefix: {"name_text" => {query: "foo"}}}]})
       end
 
+      it "builds a `match_bool_prefix` filter condition when given a `matches_query_with_prefix`: 'MatchesQueryWithPrefixFilterInput' filter" do
+        query = new_query(
+          client_filter: {
+            "name_text" => {
+              "matches_query_with_prefix" => {
+                "query_with_prefix" => "foo",
+                "allowed_edits_per_term" => enum_value("MatchesQueryAllowedEditsPerTermInput", "DYNAMIC"),
+                "require_all_terms" => false
+              }
+            }
+          }
+        )
+
+        expect(datastore_body_of(query)).to query_datastore_with(bool: {filter: [{match_bool_prefix: {
+          "name_text" => {
+            query: "foo",
+            fuzziness: "AUTO",
+            operator: "OR"
+          }
+        }}]})
+      end
+
+      it "builds a `match_bool_prefix` filter condition with specified fuzziness when given a `matches_query_with_prefix` filter" do
+        query = new_query(
+          client_filter: {
+            "name_text" => {
+              "matches_query_with_prefix" => {
+                "query_with_prefix" => "foo",
+                "allowed_edits_per_term" => enum_value("MatchesQueryAllowedEditsPerTermInput", "NONE"),
+                "require_all_terms" => false
+              }
+            }
+          }
+        )
+        expect(datastore_body_of(query)).to query_datastore_with(bool: {filter: [{match_bool_prefix: {
+          "name_text" => {
+            query: "foo",
+            fuzziness: "0",
+            operator: "OR"
+          }
+        }}]})
+
+        query = new_query(
+          client_filter: {
+            "name_text" => {
+              "matches_query_with_prefix" => {
+                "query_with_prefix" => "foo",
+                "allowed_edits_per_term" => enum_value("MatchesQueryAllowedEditsPerTermInput", "ONE"),
+                "require_all_terms" => false
+              }
+            }
+          }
+        )
+        expect(datastore_body_of(query)).to query_datastore_with(bool: {filter: [{match_bool_prefix: {
+          "name_text" => {
+            query: "foo",
+            fuzziness: "1",
+            operator: "OR"
+          }
+        }}]})
+
+        query = new_query(
+          client_filter: {
+            "name_text" => {
+              "matches_query_with_prefix" => {
+                "query_with_prefix" => "foo",
+                "allowed_edits_per_term" => enum_value("MatchesQueryAllowedEditsPerTermInput", "TWO"),
+                "require_all_terms" => false
+              }
+            }
+          }
+        )
+        expect(datastore_body_of(query)).to query_datastore_with(bool: {filter: [{match_bool_prefix: {
+          "name_text" => {
+            query: "foo",
+            fuzziness: "2",
+            operator: "OR"
+          }
+        }}]})
+
+        query = new_query(
+          client_filter: {
+            "name_text" => {
+              "matches_query_with_prefix" => {
+                "query_with_prefix" => "foo",
+                "allowed_edits_per_term" => enum_value("MatchesQueryAllowedEditsPerTermInput", "DYNAMIC"),
+                "require_all_terms" => false
+              }
+            }
+          }
+        )
+        expect(datastore_body_of(query)).to query_datastore_with(bool: {filter: [{match_bool_prefix: {
+          "name_text" => {
+            query: "foo",
+            fuzziness: "AUTO",
+            operator: "OR"
+          }
+        }}]})
+      end
+
+      it "builds a `match_bool_prefix` filter condition with specified operator when given a `matches_query_with_prefix` filter" do
+        query = new_query(
+          client_filter: {
+            "name_text" => {
+              "matches_query_with_prefix" => {
+                "query_with_prefix" => "foo",
+                "allowed_edits_per_term" => enum_value("MatchesQueryAllowedEditsPerTermInput", "DYNAMIC"),
+                "require_all_terms" => true
+              }
+            }
+          }
+        )
+
+        expect(datastore_body_of(query)).to query_datastore_with(bool: {filter: [{match_bool_prefix: {
+          "name_text" => {
+            query: "foo",
+            fuzziness: "AUTO",
+            operator: "AND"
+          }
+        }}]})
+      end
+
       it "builds a `terms` condition on a nested path when given a deeply nested (3 levels) `equal_to_any_of: [...]` filter" do
         query = new_query(client_filter: {"options" => {"color" => {"red" => {"equal_to_any_of" => [100, 200]}}}})
 
