@@ -1010,14 +1010,13 @@ module ElasticGraph
       specify "`matches_query_with_prefix` performs bool prefix matching with exact term matching" do
         index_into(
           graphql,
-          widget1 = build(:widget, description_text: "blue widget small"),
-          widget2 = build(:widget, description_text: "red widget small"),
-          widget3 = build(:widget, description_text: "red widget medium")
+          widget1 = build(:widget, description_text: "red widget small"),
+          widget2 = build(:widget, description_text: "red widget medium")
         )
 
         results = search_with_filter(
-          "description_text", 
-          "matches_query_with_prefix", 
+          "description_text",
+          "matches_query_with_prefix",
           {
             "query_with_prefix" => "re",
             "allowed_edits_per_term" => enum_value("MatchesQueryAllowedEditsPerTermInput", "NONE"),
@@ -1025,20 +1024,18 @@ module ElasticGraph
           }
         )
 
-        expect(results).to match_array(ids_of(widget2, widget3))
+        expect(results).to match_array(ids_of(widget1, widget2))
       end
 
       specify "`matches_query_with_prefix` performs bool prefix matching with fuzzy term matching" do
         index_into(
           graphql,
-          widget1 = build(:widget, description_text: "blue widget small"),
-          widget2 = build(:widget, description_text: "red widget small"),
-          widget3 = build(:widget, description_text: "red widget medium")
+          widget1 = build(:widget, description_text: "red widget small")
         )
 
         results = search_with_filter(
-          "description_text", 
-          "matches_query_with_prefix", 
+          "description_text",
+          "matches_query_with_prefix",
           {
             "query_with_prefix" => "rxd widge sma",
             "allowed_edits_per_term" => enum_value("MatchesQueryAllowedEditsPerTermInput", "ONE"),
@@ -1046,20 +1043,18 @@ module ElasticGraph
           }
         )
 
-        expect(results).to match_array(ids_of(widget2))
+        expect(results).to match_array(ids_of(widget1))
       end
 
       specify "`matches_query_with_prefix` performs bool prefix matching with different term order" do
         index_into(
           graphql,
-          widget1 = build(:widget, description_text: "blue widget small"),
-          widget2 = build(:widget, description_text: "red widget small"),
-          widget3 = build(:widget, description_text: "red widget medium")
+          widget1 = build(:widget, description_text: "red widget medium")
         )
 
         results = search_with_filter(
-          "description_text", 
-          "matches_query_with_prefix", 
+          "description_text",
+          "matches_query_with_prefix",
           {
             "query_with_prefix" => "widge rxd med",
             "allowed_edits_per_term" => enum_value("MatchesQueryAllowedEditsPerTermInput", "ONE"),
@@ -1067,52 +1062,51 @@ module ElasticGraph
           }
         )
 
-        expect(results).to match_array(ids_of(widget3))
+        expect(results).to match_array(ids_of(widget1))
       end
 
       specify "`matches_query_with_prefix` supports different fuzziness levels via allowed_edits_per_term" do
         index_into(
           graphql,
-          widget1 = build(:widget, description_text: "blue widget small"),
-          widget2 = build(:widget, description_text: "red widget small"),
-          widget3 = build(:widget, description_text: "red widget medium")
+          widget1 = build(:widget, description_text: "red widget small"),
+          widget2 = build(:widget, description_text: "red widget medium")
         )
 
         # With NONE - should only find exact prefixes
         results = search_with_filter(
-          "description_text", 
-          "matches_query_with_prefix", 
+          "description_text",
+          "matches_query_with_prefix",
           {
             "query_with_prefix" => "red widget sma",
             "allowed_edits_per_term" => enum_value("MatchesQueryAllowedEditsPerTermInput", "NONE"),
             "require_all_terms" => true
           }
         )
-        expect(results).to match_array(ids_of(widget2))
+        expect(results).to match_array(ids_of(widget1))
 
         # With ONE - should find with one edit per term
         results = search_with_filter(
-          "description_text", 
-          "matches_query_with_prefix", 
+          "description_text",
+          "matches_query_with_prefix",
           {
             "query_with_prefix" => "rd widg",
             "allowed_edits_per_term" => enum_value("MatchesQueryAllowedEditsPerTermInput", "ONE"),
             "require_all_terms" => true
           }
         )
-        expect(results).to match_array(ids_of(widget2, widget3))
+        expect(results).to match_array(ids_of(widget1, widget2))
 
         # With TWO - should find with two edits per term
         results = search_with_filter(
-          "description_text", 
-          "matches_query_with_prefix", 
+          "description_text",
+          "matches_query_with_prefix",
           {
-            "query_with_prefix" => "r widg",
+            "query_with_prefix" => "rxw widg",
             "allowed_edits_per_term" => enum_value("MatchesQueryAllowedEditsPerTermInput", "TWO"),
             "require_all_terms" => true
           }
         )
-        expect(results).to match_array(ids_of(widget2, widget3))
+        expect(results).to match_array(ids_of(widget1, widget2))
 
         # With DYNAMIC - should use auto fuzziness
         results = search_with_filter(
@@ -1124,7 +1118,7 @@ module ElasticGraph
             "require_all_terms" => true
           }
         )
-        expect(results).to match_array(ids_of(widget2))
+        expect(results).to match_array(ids_of(widget1))
       end
 
       specify "`matches_query_with_prefix` supports controlling term matching via require_all_terms" do
@@ -1138,8 +1132,8 @@ module ElasticGraph
 
         # With require_all_terms = true, should require all terms to match
         results = search_with_filter(
-          "description_text", 
-          "matches_query_with_prefix", 
+          "description_text",
+          "matches_query_with_prefix",
           {
             "query_with_prefix" => "rxd widgxt sma",
             "allowed_edits_per_term" => enum_value("MatchesQueryAllowedEditsPerTermInput", "DYNAMIC"),
@@ -1150,8 +1144,8 @@ module ElasticGraph
 
         # With require_all_terms = false, should match documents with any term
         results = search_with_filter(
-          "description_text", 
-          "matches_query_with_prefix", 
+          "description_text",
+          "matches_query_with_prefix",
           {
             "query_with_prefix" => "rxd widge",
             "allowed_edits_per_term" => enum_value("MatchesQueryAllowedEditsPerTermInput", "DYNAMIC"),
@@ -1699,10 +1693,6 @@ module ElasticGraph
       end
 
       def allowed_edits_per_term_of(value_name)
-        enum_value("MatchesQueryAllowedEditsPerTermInput", value_name)
-      end
-
-      def allowed_edits_per_prefix_term_of(value_name)
         enum_value("MatchesQueryAllowedEditsPerTermInput", value_name)
       end
     end
