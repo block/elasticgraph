@@ -47,6 +47,12 @@
   .alert-tip div.highlight {
     margin-bottom: 0px;
   }
+
+  /* Reduce line spacing in code blocks */
+  div.highlight pre,
+  div.highlight code {
+    line-height: 1.4;
+  }
 }
 
 @layer components {
