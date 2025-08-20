@@ -5732,6 +5732,11 @@ type NamedEntityAggregatedValues {
   created_on: DateAggregatedValues
 
   """
+  Computed aggregate values for the `description` field.
+  """
+  description: NonNumericAggregatedValues
+
+  """
   Computed aggregate values for the `fees` field.
   """
   fees: MoneyAggregatedValues
@@ -6092,6 +6097,20 @@ input NamedEntityFilterInput {
   created_on: DateFilterInput
 
   """
+  Used to filter on the `description` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  description: StringFilterInput
+
+  """
+  Used to filter on the `description_text` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  description_text: TextFilterInput
+
+  """
   Used to filter on the `fees` field.
 
   When `null` or an empty object is passed, matches all documents.
@@ -6340,6 +6359,11 @@ type NamedEntityGroupedBy {
   created_on: DateGroupedBy
 
   """
+  The `description` field value for this group.
+  """
+  description: String
+
+  """
   The `fees` field value for this group.
 
   Note: `fees` is a collection field, but selecting this field will group on
@@ -6504,6 +6528,16 @@ type NamedEntityHighlights {
   Search highlights for the `cost_currency_unit`, providing snippets of the matching text.
   """
   cost_currency_unit: [String!]!
+
+  """
+  Search highlights for the `description`, providing snippets of the matching text.
+  """
+  description: [String!]!
+
+  """
+  Search highlights for the `description_text`, providing snippets of the matching text.
+  """
+  description_text: [String!]!
 
   """
   Search highlights for the `fees`, providing snippets of the matching text.
@@ -6734,6 +6768,16 @@ enum NamedEntitySortOrderInput {
   Sorts descending by the `created_on` field.
   """
   created_on_DESC
+
+  """
+  Sorts ascending by the `description` field.
+  """
+  description_ASC
+
+  """
+  Sorts descending by the `description` field.
+  """
+  description_DESC
 
   """
   Sorts ascending by the `id` field.
@@ -13092,6 +13136,8 @@ type Widget implements NamedEntity @key(fields: "id") {
   created_at2: DateTime!
   created_at_time_of_day: LocalTime
   created_on: Date
+  description: String
+  description_text: String
   fees: [Money!]!
   id: ID!
   inventor: Inventor
@@ -13180,6 +13226,11 @@ type WidgetAggregatedValues {
   Computed aggregate values for the `created_on` field.
   """
   created_on: DateAggregatedValues
+
+  """
+  Computed aggregate values for the `description` field.
+  """
+  description: NonNumericAggregatedValues
 
   """
   Computed aggregate values for the `fees` field.
@@ -14122,6 +14173,20 @@ input WidgetFilterInput {
   created_on: DateFilterInput
 
   """
+  Used to filter on the `description` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  description: StringFilterInput
+
+  """
+  Used to filter on the `description_text` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  description_text: TextFilterInput
+
+  """
   Used to filter on the `fees` field.
 
   When `null` or an empty object is passed, matches all documents.
@@ -14314,6 +14379,11 @@ type WidgetGroupedBy {
   created_on: DateGroupedBy
 
   """
+  The `description` field value for this group.
+  """
+  description: String
+
+  """
   The `fees` field value for this group.
 
   Note: `fees` is a collection field, but selecting this field will group on
@@ -14443,6 +14513,16 @@ type WidgetHighlights {
   Search highlights for the `cost_currency_unit`, providing snippets of the matching text.
   """
   cost_currency_unit: [String!]!
+
+  """
+  Search highlights for the `description`, providing snippets of the matching text.
+  """
+  description: [String!]!
+
+  """
+  Search highlights for the `description_text`, providing snippets of the matching text.
+  """
+  description_text: [String!]!
 
   """
   Search highlights for the `fees`, providing snippets of the matching text.
@@ -14808,6 +14888,11 @@ type WidgetOrAddressAggregatedValues {
   created_on: DateAggregatedValues
 
   """
+  Computed aggregate values for the `description` field.
+  """
+  description: NonNumericAggregatedValues
+
+  """
   Computed aggregate values for the `fees` field.
   """
   fees: MoneyAggregatedValues
@@ -15148,6 +15233,20 @@ input WidgetOrAddressFilterInput {
   created_on: DateFilterInput
 
   """
+  Used to filter on the `description` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  description: StringFilterInput
+
+  """
+  Used to filter on the `description_text` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  description_text: TextFilterInput
+
+  """
   Used to filter on the `fees` field.
 
   When `null` or an empty object is passed, matches all documents.
@@ -15361,6 +15460,11 @@ type WidgetOrAddressGroupedBy {
   created_on: DateGroupedBy
 
   """
+  The `description` field value for this group.
+  """
+  description: String
+
+  """
   The `fees` field value for this group.
 
   Note: `fees` is a collection field, but selecting this field will group on
@@ -15500,6 +15604,16 @@ type WidgetOrAddressHighlights {
   Search highlights for the `cost_currency_unit`, providing snippets of the matching text.
   """
   cost_currency_unit: [String!]!
+
+  """
+  Search highlights for the `description`, providing snippets of the matching text.
+  """
+  description: [String!]!
+
+  """
+  Search highlights for the `description_text`, providing snippets of the matching text.
+  """
+  description_text: [String!]!
 
   """
   Search highlights for the `fees`, providing snippets of the matching text.
@@ -15705,6 +15819,16 @@ enum WidgetOrAddressSortOrderInput {
   Sorts descending by the `created_on` field.
   """
   created_on_DESC
+
+  """
+  Sorts ascending by the `description` field.
+  """
+  description_ASC
+
+  """
+  Sorts descending by the `description` field.
+  """
+  description_DESC
 
   """
   Sorts ascending by the `full_address` field.
@@ -16060,6 +16184,16 @@ enum WidgetSortOrderInput {
   Sorts descending by the `created_on` field.
   """
   created_on_DESC
+
+  """
+  Sorts ascending by the `description` field.
+  """
+  description_ASC
+
+  """
+  Sorts descending by the `description` field.
+  """
+  description_DESC
 
   """
   Sorts ascending by the `id` field.

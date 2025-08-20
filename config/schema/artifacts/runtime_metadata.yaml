@@ -406,6 +406,14 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: created_on
+      description_ASC:
+        sort_field:
+          direction: asc
+          field_path: description
+      description_DESC:
+        sort_field:
+          direction: desc
+          field_path: description
       id_ASC:
         sort_field:
           direction: asc
@@ -928,6 +936,14 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: created_on
+      description_ASC:
+        sort_field:
+          direction: asc
+          field_path: description
+      description_DESC:
+        sort_field:
+          direction: desc
+          field_path: description
       full_address_ASC:
         sort_field:
           direction: asc
@@ -1210,6 +1226,14 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: created_on
+      description_ASC:
+        sort_field:
+          direction: asc
+          field_path: description
+      description_DESC:
+        sort_field:
+          direction: desc
+          field_path: description
       id_ASC:
         sort_field:
           direction: asc
@@ -2557,6 +2581,10 @@ index_definitions_by_name:
       created_at_time_of_day:
         source: __self
       created_on:
+        source: __self
+      description:
+        source: __self
+      description_text:
         source: __self
       fees.amount_cents:
         source: __self
@@ -4017,6 +4045,12 @@ object_types_by_name:
       created_on:
         resolver:
           name: get_record_field_value
+      description:
+        resolver:
+          name: get_record_field_value
+      description_text:
+        resolver:
+          name: get_record_field_value
       dollar_widget:
         relation:
           additional_filter:
@@ -4202,6 +4236,9 @@ object_types_by_name:
         resolver:
           name: object_with_lookahead
       created_on:
+        resolver:
+          name: object_with_lookahead
+      description:
         resolver:
           name: object_with_lookahead
       fees:
@@ -4398,6 +4435,9 @@ object_types_by_name:
       created_on:
         resolver:
           name: object_with_lookahead
+      description:
+        resolver:
+          name: object_with_lookahead
       fees:
         resolver:
           name: object_with_lookahead
@@ -4486,6 +4526,12 @@ object_types_by_name:
         resolver:
           name: get_record_field_value
       cost_currency_unit:
+        resolver:
+          name: get_record_field_value
+      description:
+        resolver:
+          name: get_record_field_value
+      description_text:
         resolver:
           name: get_record_field_value
       fees:
@@ -6167,6 +6213,12 @@ object_types_by_name:
       created_on:
         resolver:
           name: get_record_field_value
+      description:
+        resolver:
+          name: get_record_field_value
+      description_text:
+        resolver:
+          name: get_record_field_value
       fees:
         resolver:
           name: get_record_field_value
@@ -6287,6 +6339,10 @@ object_types_by_name:
           cardinality: one
         created_on:
           cardinality: one
+        description:
+          cardinality: one
+        description_text:
+          cardinality: one
         fees:
           cardinality: one
         inventor:
@@ -6404,6 +6460,9 @@ object_types_by_name:
         resolver:
           name: object_with_lookahead
       created_on:
+        resolver:
+          name: object_with_lookahead
+      description:
         resolver:
           name: object_with_lookahead
       fees:
@@ -6831,6 +6890,9 @@ object_types_by_name:
       created_on:
         resolver:
           name: object_with_lookahead
+      description:
+        resolver:
+          name: object_with_lookahead
       fees:
         resolver:
           name: object_with_lookahead
@@ -6897,6 +6959,12 @@ object_types_by_name:
         resolver:
           name: get_record_field_value
       cost_currency_unit:
+        resolver:
+          name: get_record_field_value
+      description:
+        resolver:
+          name: get_record_field_value
+      description_text:
         resolver:
           name: get_record_field_value
       fees:
@@ -7081,6 +7149,12 @@ object_types_by_name:
       created_on:
         resolver:
           name: get_record_field_value
+      description:
+        resolver:
+          name: get_record_field_value
+      description_text:
+        resolver:
+          name: get_record_field_value
       fees:
         resolver:
           name: get_record_field_value
@@ -7200,6 +7274,9 @@ object_types_by_name:
         resolver:
           name: object_with_lookahead
       created_on:
+        resolver:
+          name: object_with_lookahead
+      description:
         resolver:
           name: object_with_lookahead
       fees:
@@ -7381,6 +7458,9 @@ object_types_by_name:
       created_on:
         resolver:
           name: object_with_lookahead
+      description:
+        resolver:
+          name: object_with_lookahead
       fees:
         resolver:
           name: object_with_lookahead
@@ -7453,6 +7533,12 @@ object_types_by_name:
         resolver:
           name: get_record_field_value
       cost_currency_unit:
+        resolver:
+          name: get_record_field_value
+      description:
+        resolver:
+          name: get_record_field_value
+      description_text:
         resolver:
           name: get_record_field_value
       fees:

@@ -1357,6 +1357,10 @@ index_templates:
             type: keyword
           name_text:
             type: text
+          description:
+            type: keyword
+          description_text:
+            type: text
           created_at:
             type: date
             format: strict_date_time

@@ -1164,6 +1164,24 @@ json_schema_version: 1
         ElasticGraph:
           type: String
           nameInIndex: name_text
+      description:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/String"
+          - maxLength: 8191
+        - type: 'null'
+        ElasticGraph:
+          type: String
+          nameInIndex: description
+      description_text:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/String"
+          - maxLength: 104857600
+        - type: 'null'
+        ElasticGraph:
+          type: String
+          nameInIndex: description_text
       created_at:
         "$ref": "#/$defs/DateTime"
         ElasticGraph:
@@ -1292,6 +1310,8 @@ json_schema_version: 1
     - cost_currency_introduced_on
     - name
     - name_text
+    - description
+    - description_text
     - created_at
     - created_at_time_of_day
     - created_on
