@@ -5,7 +5,7 @@ permalink: "/query-api/filtering/full-text-search/"
 nav_title: Full Text Search
 menu_order: 50
 ---
-ElasticGraph supports two full-text search filtering predicates:
+ElasticGraph supports three full-text search filtering predicates:
 
 {% include filtering_predicate_definitions/fulltext.md %}
 
@@ -34,8 +34,22 @@ are supported to control both aspects to make matching stricter:
 
 {% include copyable_code_snippet.html language="graphql" data="music_queries.filtering.PhraseSearch" %}
 
-### Bypassing matchesPhrase and matchesQuery
+### Matches Query With Prefix
 
-In order to make a `matchesPhrase` or `matchesQuery` filter optional, you can supply `null` to the `MatchesQueryFilterInput` parameter, like this:
+`matchesQueryWithPrefix` is similar to `matchesQuery` but additionally supports prefix matching on the last term of the query. This is especially useful when you want to implement search-as-you-type functionality:
+
+{% include copyable_code_snippet.html language="graphql" data="music_queries.filtering.MatchesSearchWithPrefix" %}
+
+This query will match artists with bios like:
+
+> Renowned for his mesmerizing performances, Luca "The Breeze" Fontana captivates audiences with his accordion, weaving intricate melodies that dance between the notes of traditional folk and modern jazz.
+
+> Sylvia Varela's avant-garde violin playing defies tradition, blending haunting dissonance with unexpected rhythms.
+
+Notice that it matches "violin" even though the query is for "viol" (prefix match), and because `requireAllTerms: true` is specified, the bio must also contain "accordion". By setting `allowEditsPerTerm: NONE`, we're ensuring exact matching for the terms (except for the prefix behavior on the last term).
+
+### Bypassing matchesPhrase, matchesQuery, and matchesQueryWithPrefix
+
+In order to make a `matchesPhrase`, `matchesQuery`, or `matchesQueryWithPrefix` filter optional, you can supply `null` to the filter input parameter, like this:
 
 {% include copyable_code_snippet.html language="graphql" data="music_queries.filtering.OptionalMatchingFilter" %}

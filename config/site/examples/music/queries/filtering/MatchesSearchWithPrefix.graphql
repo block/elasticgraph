@@ -1,0 +1,20 @@
+query MatchesSearchWithPrefix {
+  artists(filter: {
+    bio: {
+      description:{
+        matchesQueryWithPrefix: {
+          queryWithPrefix: "accordion viol"
+          requireAllTerms: true
+          allowedEditsPerTerm: NONE
+        }
+      }
+    }
+  }) {
+    nodes {
+      name
+      bio {
+        description
+      }
+    }
+  }
+}

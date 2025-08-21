@@ -11,3 +11,9 @@
   only one search term is required to be in the field value.
 
   When `null` is passed, matches all documents.
+
+[`matchesQueryWithPrefix`]({% link query-api/filtering/full-text-search.md %}#matches-query-with-prefix)
+: Matches records where the field value matches the provided query terms with prefix matching using full text search.
+  Similar to `matchesQuery` but allows prefix matching on the last term in the query.
+
+  When `null` is passed, matches all documents.
