@@ -9,7 +9,7 @@
       <!-- Dropdown pip -->
       <div class="{{site.style.dropdown_pip}}"></div>
       <div class="relative py-1">
-        {% assign guides = site.pages | where_exp: "item", "item.path contains 'guides/'" | where_exp: "item", "item.url != '/guides/'" | sort: "menu_order" %}
+        {% assign guides = site.pages | where_exp: "item", "item.path contains 'guides/'" | where_exp: "item", "item.url != '/guides/'" | where_exp: "item", "item.path contains '.md'" | sort: "menu_order" %}
         {% for guide in guides %}
           <a href="{{ guide.url | relative_url }}" class="{{site.style.dropdown_item}}">
             {{ guide.nav_title }}

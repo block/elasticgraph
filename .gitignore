@@ -65,12 +65,10 @@ config/site/doc/
 # Ignore Jekyll generated site artifacts
 config/site/_site
 config/site/src/api-docs
+config/site/src/guides/configuration/*/*.yaml
+config/site/src/guides/configuration/*/*.json
 config/site/src/config/site
-config/site/src/_data/*_queries.yaml
-config/site/src/_data/music.yaml
-config/site/src/_data/music_simplified.yaml
-config/site/src/_data/custom_resolver.yaml
-config/site/src/_data/content.yaml
+config/site/src/_data/*.yaml
 config/site/.jekyll-metadata
 config/site/package-lock.json
 config/site/examples/*/schema_artifacts

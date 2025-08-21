@@ -127,8 +127,10 @@ module ElasticGraph
           end
         end
 
+        task build_all_but_jekyll: [:build_docs, :build_css, "examples:extract_snippets", :extract_config_artifacts, :extract_content]
+
         desc "Build Jekyll site with freshly generated YARD documentation"
-        task build: [:build_docs, :build_css, "examples:extract_snippets", :extract_content] do
+        task build: :build_all_but_jekyll do
           run_jekyll :build
         end
 
@@ -198,7 +200,7 @@ module ElasticGraph
         end
 
         desc "Serve Jekyll site locally"
-        task serve: [:build_docs, :build_css, "examples:extract_snippets", :extract_content] do
+        task serve: :build_all_but_jekyll do
           require "filewatcher"
 
           # Regenerate the YARD docs anytime we change anything in the source code of the gems that are documented.
@@ -321,7 +323,7 @@ module ElasticGraph
             # Skip directories, files in directories that don't contain pages, binary files, and specific file types
             File.directory?(file) ||
               %w[/_data/ /api-docs/ /_includes/ /_layouts/ /_plugins/ /_config.yaml dc.yml /examples/ /assets/].any? { |dir| file.include?(dir) } ||
-              %w[.js .css .png .jpg .jpeg .gif .ico .svg .woff .woff2 .ttf .eot .webmanifest .yaml .graphql].include?(File.extname(file).downcase) ||
+              %w[.js .css .png .jpg .jpeg .gif .ico .svg .woff .woff2 .ttf .eot .webmanifest .json .yaml .graphql].include?(File.extname(file).downcase) ||
               file.end_with?(".graphql.txt")
           end
 
@@ -388,6 +390,45 @@ module ElasticGraph
             sh "npm run build:css"
             ::File.write("assets/css/highlight.css", ::ElasticGraph::SyntaxTheme.new.render)
           end
+        end
+
+        desc "Generate configuration artifacts from the API docs for inclusion in the configuration guide"
+        task extract_config_artifacts: :build_docs do
+          require "tmpdir"
+
+          config_artifacts_output_dir = SITE_SOURCE_DIR / "guides" / "configuration"
+          versions_with_config_artifacts = ::Set.new
+
+          # Copy the config files over to where we can download them.
+          API_DOCS_DIR.glob("**/elasticgraph-config-*.*").each do |artifact|
+            relative_artifact_path = artifact.relative_path_from(API_DOCS_DIR)
+            downloadable_path = config_artifacts_output_dir / relative_artifact_path
+            versions_with_config_artifacts << relative_artifact_path.descend.first.to_s
+
+            ::FileUtils.rm_rf(downloadable_path.to_s)
+            downloadable_path.parent.mkpath
+            ::FileUtils.ln_s(artifact.to_s, downloadable_path.to_s)
+          end
+
+          ordered_versions = (versions_with_config_artifacts - ["main"]).sort_by do |v|
+            ::Gem::Version.new(v.delete_prefix("v"))
+          end.reverse
+
+          latest_api_docs_dir = API_DOCS_DIR.children.reject { |c| c.basename.to_s == "main" }.max_by do |dir|
+            ::Gem::Version.new(dir.basename.to_s.delete_prefix("v"))
+          end
+
+          files = latest_api_docs_dir.glob("elasticgraph-config-*.*").to_h do |artifact|
+            [artifact.relative_path_from(API_DOCS_DIR).basename.to_s.tr(".", "_"), artifact.read]
+          end
+
+          config_data = {
+            "ordered_versions" => ordered_versions + ["main"],
+            "files" => files
+          }
+
+          ::FileUtils.mkdir_p(JEKYLL_DATA_DIR)
+          ::File.write(JEKYLL_DATA_DIR / "config_artifacts.yaml", ::YAML.dump(config_data))
         end
 
         # When we are releasing gems, these dependencies aren't available.

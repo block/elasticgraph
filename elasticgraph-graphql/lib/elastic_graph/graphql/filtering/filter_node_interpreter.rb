@@ -107,6 +107,16 @@ module ElasticGraph
                 query: value.fetch(schema_names.phrase)
               }}})
             },
+            schema_names.matches_query_with_prefix => ->(field_name, value) do
+              allowed_edits_per_term = value.fetch(schema_names.allowed_edits_per_term).runtime_metadata.datastore_abbreviation
+
+              BooleanQuery.filter({match_bool_prefix: {field_name => {
+                query: value.fetch(schema_names.query_with_prefix),
+                # This is always a string field, even though the value is often an integer
+                fuzziness: allowed_edits_per_term.to_s,
+                operator: value[schema_names.require_all_terms] ? "AND" : "OR"
+              }}})
+            end,
 
             schema_names.contains => ->(field_name, value) {
               case_insensitive = value[schema_names.ignore_case] || false

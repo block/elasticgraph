@@ -94,6 +94,9 @@ ElasticGraph.define_schema do |schema|
     t.field "name_text", "String" do |f|
       f.mapping type: "text"
     end
+    t.field "description", "String" do |f|
+      f.mapping type: "text"
+    end
     t.field "created_at", "DateTime!"
     # `created_at2` is defined with a different `name_in_index` so we can demonstrate grouping works
     # when a selected grouping field has a different name in the index vs GraphQL.

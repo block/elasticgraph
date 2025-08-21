@@ -861,6 +861,12 @@ json_schema_version: 1
           - "$ref": "#/$defs/String"
           - maxLength: 104857600
         - type: 'null'
+      description:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/String"
+          - maxLength: 104857600
+        - type: 'null'
       created_at:
         "$ref": "#/$defs/DateTime"
       created_at_time_of_day:
@@ -941,6 +947,7 @@ json_schema_version: 1
     - cost_currency_introduced_on
     - name
     - name_text
+    - description
     - created_at
     - created_at_time_of_day
     - created_on

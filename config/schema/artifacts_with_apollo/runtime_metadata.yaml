@@ -2587,6 +2587,8 @@ index_definitions_by_name:
         source: __self
       created_on:
         source: __self
+      description:
+        source: __self
       fees.amount_cents:
         source: __self
       fees.currency:
@@ -4119,6 +4121,9 @@ object_types_by_name:
       created_on:
         resolver:
           name: get_record_field_value
+      description:
+        resolver:
+          name: get_record_field_value
       dollar_widget:
         relation:
           additional_filter:
@@ -4609,6 +4614,9 @@ object_types_by_name:
         resolver:
           name: get_record_field_value
       cost_currency_unit:
+        resolver:
+          name: get_record_field_value
+      description:
         resolver:
           name: get_record_field_value
       fees:
@@ -6296,6 +6304,9 @@ object_types_by_name:
       created_on:
         resolver:
           name: get_record_field_value
+      description:
+        resolver:
+          name: get_record_field_value
       fees:
         resolver:
           name: get_record_field_value
@@ -6415,6 +6426,8 @@ object_types_by_name:
         created_at_time_of_day:
           cardinality: one
         created_on:
+          cardinality: one
+        description:
           cardinality: one
         fees:
           cardinality: one
@@ -7028,6 +7041,9 @@ object_types_by_name:
       cost_currency_unit:
         resolver:
           name: get_record_field_value
+      description:
+        resolver:
+          name: get_record_field_value
       fees:
         resolver:
           name: get_record_field_value
@@ -7208,6 +7224,9 @@ object_types_by_name:
         resolver:
           name: get_record_field_value
       created_on:
+        resolver:
+          name: get_record_field_value
+      description:
         resolver:
           name: get_record_field_value
       fees:
@@ -7582,6 +7601,9 @@ object_types_by_name:
         resolver:
           name: get_record_field_value
       cost_currency_unit:
+        resolver:
+          name: get_record_field_value
+      description:
         resolver:
           name: get_record_field_value
       fees:

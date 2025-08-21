@@ -6092,6 +6092,13 @@ input NamedEntityFilterInput {
   created_on: DateFilterInput
 
   """
+  Used to filter on the `description` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  description: TextFilterInput
+
+  """
   Used to filter on the `fees` field.
 
   When `null` or an empty object is passed, matches all documents.
@@ -6504,6 +6511,11 @@ type NamedEntityHighlights {
   Search highlights for the `cost_currency_unit`, providing snippets of the matching text.
   """
   cost_currency_unit: [String!]!
+
+  """
+  Search highlights for the `description`, providing snippets of the matching text.
+  """
+  description: [String!]!
 
   """
   Search highlights for the `fees`, providing snippets of the matching text.
@@ -13092,6 +13104,7 @@ type Widget implements NamedEntity @key(fields: "id") {
   created_at2: DateTime!
   created_at_time_of_day: LocalTime
   created_on: Date
+  description: String
   fees: [Money!]!
   id: ID!
   inventor: Inventor
@@ -14122,6 +14135,13 @@ input WidgetFilterInput {
   created_on: DateFilterInput
 
   """
+  Used to filter on the `description` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  description: TextFilterInput
+
+  """
   Used to filter on the `fees` field.
 
   When `null` or an empty object is passed, matches all documents.
@@ -14443,6 +14463,11 @@ type WidgetHighlights {
   Search highlights for the `cost_currency_unit`, providing snippets of the matching text.
   """
   cost_currency_unit: [String!]!
+
+  """
+  Search highlights for the `description`, providing snippets of the matching text.
+  """
+  description: [String!]!
 
   """
   Search highlights for the `fees`, providing snippets of the matching text.
@@ -15148,6 +15173,13 @@ input WidgetOrAddressFilterInput {
   created_on: DateFilterInput
 
   """
+  Used to filter on the `description` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  description: TextFilterInput
+
+  """
   Used to filter on the `fees` field.
 
   When `null` or an empty object is passed, matches all documents.
@@ -15500,6 +15532,11 @@ type WidgetOrAddressHighlights {
   Search highlights for the `cost_currency_unit`, providing snippets of the matching text.
   """
   cost_currency_unit: [String!]!
+
+  """
+  Search highlights for the `description`, providing snippets of the matching text.
+  """
+  description: [String!]!
 
   """
   Search highlights for the `fees`, providing snippets of the matching text.
