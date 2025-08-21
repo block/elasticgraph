@@ -170,7 +170,7 @@ module ElasticGraph
         "    classDef otherEgGemStyle #{STYLE_OTHER_EG_GEM};",
         "    classDef externalGemCatStyle #{STYLE_EXTERNAL_GEM};"
       ]
-      node_definitions = all_nodes_in_category_diagrams.map { |name| "    #{name}[\"#{name}\"];" }
+      node_definitions = all_nodes_in_category_diagrams.map { |name| "    #{name}[\"#{name.sub("elasticgraph", "eg")}\"];" }
 
       <<~MERMAID
         ```mermaid
@@ -231,24 +231,23 @@ module ElasticGraph
   class CategoryInfo < ::Data.define(:description, :discussion)
     BY_NAME = {
       "core" => new("Core Libraries", <<~EOS),
-        These libraries form the core backbone of ElasticGraph that is designed to run in a production deployment. Every ElasticGraph deployment will need to use all of these.
+        These libraries form the core backbone of ElasticGraph and are typically all included in production deployments.
       EOS
 
-      "lambda" => new("AWS Lambda Integration Libraries", <<~EOS),
-        These libraries wrap the the core ElasticGraph libraries so that they can be deployed using AWS Lambda.
-      EOS
-
-      "extension" => new("Extensions", <<~EOS),
-        These libraries extend ElasticGraph to provide optional but commonly needed functionality.
+      "local" => new("Local Development Libraries", <<~EOS),
+        These libraries are used for local development of ElasticGraph applications.
       EOS
 
       "datastore_adapter" => new("Datastore Adapters", <<~EOS),
         These libraries adapt ElasticGraph to your choice of datastore (Elasticsearch or OpenSearch).
       EOS
 
-      "local" => new("Local Development Libraries", <<~EOS)
-        These libraries are used for local development of ElasticGraph applications, but are not intended to be deployed to production (except for `elasticgraph-rack`).
-        `elasticgraph-rack` is used to boot ElasticGraph locally but can also be used to run ElasticGraph in any rack-compatible server (including a Rails application).
+      "extension" => new("Extensions", <<~EOS),
+        These libraries extend ElasticGraph to provide optional but commonly needed functionality.
+      EOS
+
+      "lambda" => new("AWS Lambda Integration Libraries", <<~EOS)
+        These libraries wrap the the core ElasticGraph libraries so that they can be deployed using AWS Lambda.
       EOS
     }
   end

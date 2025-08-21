@@ -25,7 +25,7 @@ Gem::Specification.new do |spec|
     "documentation_uri" => "https://block.github.io/elasticgraph/api-docs/v#{ElasticGraph::VERSION}/",
     "homepage_uri" => "https://block.github.io/elasticgraph/",
     "source_code_uri" => "https://github.com/block/elasticgraph/tree/v#{ElasticGraph::VERSION}/#{spec.name}",
-    "gem_category" => "local" # used by script/update_dependency_diagrams
+    "gem_category" => "core" # used by script/update_dependency_diagrams
   }
 
   # Specify which files should be added to the gem when it is released.
