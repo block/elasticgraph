@@ -180,7 +180,7 @@ module ElasticGraph
         check_for_circular_dependencies!
 
         index_templates, indices = state.object_types_by_name.values
-          .flat_map(&:indices)
+          .filter_map(&:index_def)
           .sort_by(&:name)
           .partition(&:rollover_config)
 
@@ -220,7 +220,7 @@ module ElasticGraph
           .to_h { |t| [t.name, t.runtime_metadata] }
           .merge(indexed_enum_types_by_name)
 
-        index_definitions_by_name = state.object_types_by_name.values.flat_map(&:indices).to_h do |index|
+        index_definitions_by_name = state.object_types_by_name.values.filter_map(&:index_def).to_h do |index|
           [index.name, index.runtime_metadata]
         end
 
@@ -246,7 +246,7 @@ module ElasticGraph
           ::Hash.new { |h, k| h[k] = [] } # : ::Hash[untyped, ::Array[SchemaArtifacts::RuntimeMetadata::UpdateTarget]]
         ) do |object_type, accum|
           fields_with_sources_by_relationship_name =
-            if object_type.indices.empty?
+            if object_type.index_def.nil?
               # only indexed types can have `sourced_from` fields, and resolving `fields_with_sources` on an unindexed union type
               # such as `_Entity` when we are using apollo can lead to exceptions when multiple entity types have the same field name
               # that use different mapping types.
@@ -274,7 +274,7 @@ module ElasticGraph
             resolved_relationship, relationship_error = relationship_resolver.resolve
             relationship_errors << relationship_error if relationship_error
 
-            if object_type.indices.any? && resolved_relationship && sourced_fields.any?
+            if object_type.index_def && resolved_relationship && sourced_fields.any?
               update_target_resolver = Indexing::UpdateTargetResolver.new(
                 object_type: object_type,
                 resolved_relationship: resolved_relationship,

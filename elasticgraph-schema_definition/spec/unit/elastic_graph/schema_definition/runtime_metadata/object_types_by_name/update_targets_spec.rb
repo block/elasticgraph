@@ -147,7 +147,7 @@ module ElasticGraph
           )
         end
 
-        it "does not dump any update targets for interface types with no defined indices, even if they are implemented by other types with defined indices" do
+        it "does not dump any update targets for interface types with no defined index, even if they are implemented by other types with defined indices" do
           metadata = object_type_metadata_for "WidgetWorkspace" do |s|
             s.interface_type "NamedEntity" do |t|
               t.field "name", "String"

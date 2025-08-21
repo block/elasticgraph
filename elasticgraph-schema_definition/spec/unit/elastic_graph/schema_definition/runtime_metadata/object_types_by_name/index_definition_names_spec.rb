@@ -40,6 +40,21 @@ module ElasticGraph
             end
           }.to raise_error(ElasticGraph::Errors::SchemaError, a_string_including("Cannot define an index on `Widget` after initialization is complete"))
         end
+
+        it "does not allow two indices to be defined on the same type" do
+          expect {
+            object_type_metadata_for "Widget" do |schema|
+              schema.object_type "Widget" do |t|
+                t.field "id", "ID!"
+                t.field "name", "String"
+
+                t.index "widgets1"
+
+                t.index "widgets2"
+              end
+            end
+          }.to raise_error(ElasticGraph::Errors::SchemaError, /Cannot define multiple indices on `Widget`/)
+        end
       end
 
       context "on an embedded object type" do

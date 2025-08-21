@@ -160,11 +160,11 @@ module ElasticGraph
               type.indexed? && !@derived_indexing_type_names.include?(type.name)
             end
 
-            types_to_check.flat_map do |object_type|
-              object_type.indices.flat_map do |index_def|
+            types_to_check.filter_map do |object_type|
+              if (index_def = object_type.index_def)
                 identify_missing_necessary_fields_for_index_def(object_type, index_def, json_schema_resolver, version)
               end
-            end
+            end.flatten
           end
 
           def identify_missing_necessary_fields_for_index_def(object_type, index_def, json_schema_resolver, json_schema_version)

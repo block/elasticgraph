@@ -137,10 +137,9 @@ module ElasticGraph
         #
         # Returns a tuple of the resolved source (if successful) and an error (if invalid).
         def resolve_field_source(adapter)
-          # For now we only support one index (so we can use the first index) but someday we may need to support multiple.
-          index = object_type.indices.first # : Index
+          index_def = object_type.index_def # : Index
 
-          field_source_graphql_path_string = adapter.get_field_source(resolved_relationship.relationship, index) do |local_need|
+          field_source_graphql_path_string = adapter.get_field_source(resolved_relationship.relationship, index_def) do |local_need|
             relationship_name = resolved_relationship.relationship_name
 
             error = "Cannot update `#{object_type.name}` documents with data from related `#{relationship_name}` events, " \

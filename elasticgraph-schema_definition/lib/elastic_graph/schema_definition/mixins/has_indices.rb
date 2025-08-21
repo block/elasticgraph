@@ -72,7 +72,12 @@ module ElasticGraph
               "Indices must be configured during initial type definition."
           end
 
-          indices.replace([Indexing::Index.new(name, settings, schema_def_state, self, &block)])
+          if @index_def
+            raise Errors::SchemaError, "Cannot define multiple indices on `#{self.name}`. " \
+              "Only one index per type is supported. An index named `#{@index_def.name}` has already been defined."
+          end
+
+          @index_def = Indexing::Index.new(name, settings, schema_def_state, self, &block)
         end
 
         # Configures the default GraphQL resolver that will be used to resolve the fields of this type. Individual fields
@@ -88,16 +93,14 @@ module ElasticGraph
           end
         end
 
-        # List of indices. (Currently we only store one but we may support multiple in the future).
-        #
-        # @private
-        def indices
-          @indices ||= []
+        # @return [Indexing::Index, nil] the defined index for this type, or nil if no index is defined
+        def index_def
+          @index_def
         end
 
         # @return [Boolean] true if this type has an index
         def indexed?
-          indices.any?
+          !@index_def.nil?
         end
 
         # Abstract types are rare, so return false. This can be overridden in the host class.
@@ -185,7 +188,7 @@ module ElasticGraph
         def runtime_metadata(extra_update_targets)
           SchemaArtifacts::RuntimeMetadata::ObjectType.new(
             update_targets: derived_indexed_types.map(&:runtime_metadata_for_source_type) + [self_update_target].compact + extra_update_targets,
-            index_definition_names: indices.map(&:name),
+            index_definition_names: [index_def&.name].compact,
             graphql_fields_by_name: runtime_metadata_graphql_fields_by_name,
             elasticgraph_category: nil,
             source_type: nil,
@@ -270,7 +273,7 @@ module ElasticGraph
             [field, SchemaArtifacts::RuntimeMetadata::DynamicParam.new(source_path: field, cardinality: :one)]
           end
 
-          index_runtime_metadata = indices.first.runtime_metadata
+          index_runtime_metadata = index_def.runtime_metadata
 
           Indexing::UpdateTargetFactory.new_normal_indexing_update_target(
             type: name,
