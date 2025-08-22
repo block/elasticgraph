@@ -44,9 +44,9 @@ This query will match artists with bios like:
 
 > Marco Romano is renowned for his masterful accordion performances accompanied by violin, creating a fusion of traditional and contemporary sounds.
 
-> The ensemble features virtuoso accordion players alongside talented violinists, producing a distinctive chamber music experience.
+> The ensemble features virtuoso accordion players, producing a distinctive chamber music experience.
 
-Notice that it matches "violin" even though the query is for "vi" (prefix match), and because `requireAllTerms: true` is specified, the bio must also contain "accordion". By setting `allowedEditsPerTerm: NONE`, we're ensuring exact matching for the terms (except for the prefix behavior on the last term).
+Notice that it matches "violin" and "virtuoso" even though the query is for "vi" (prefix match), and because `requireAllTerms: true` is specified, the bio must also contain "accordion". By setting `allowedEditsPerTerm: NONE`, we're ensuring exact matching for the terms (except for the prefix behavior on the last term).
 
 ### Bypassing matchesPhrase, matchesQuery, and matchesQueryWithPrefix
 
