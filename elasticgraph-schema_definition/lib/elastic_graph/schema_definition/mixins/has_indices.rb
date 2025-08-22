@@ -27,12 +27,10 @@ module ElasticGraph
         def initialize(*args, **options)
           super(*args, **options)
           @runtime_metadata_overrides = {}
+          @can_configure_index = true
           resolve_fields_with :get_record_field_value
           yield self
-
-          # Freeze `indices` so that the indexable status of a type does not change after instantiation.
-          # (That would cause problems.)
-          indices.freeze
+          @can_configure_index = false
         end
 
         # Converts the current type from being an _embedded_ type (that is, a type that is embedded within another indexed type) to an
@@ -69,6 +67,11 @@ module ElasticGraph
         #     end
         #   end
         def index(name, **settings, &block)
+          unless @can_configure_index
+            raise Errors::SchemaError, "Cannot define an index on `#{self.name}` after initialization is complete. " \
+              "Indices must be configured during initial type definition."
+          end
+
           indices.replace([Indexing::Index.new(name, settings, schema_def_state, self, &block)])
         end
 

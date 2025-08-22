@@ -94,7 +94,7 @@ PATH
   remote: elasticgraph-indexer_lambda
   specs:
     elasticgraph-indexer_lambda (1.0.2.pre)
-      aws-sdk-s3 (~> 1.196, >= 1.196.1)
+      aws-sdk-s3 (~> 1.197)
       elasticgraph-indexer (= 1.0.2.pre)
       elasticgraph-lambda_support (= 1.0.2.pre)
       ox (~> 2.14, >= 2.14.23)
@@ -197,7 +197,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     Ascii85 (2.0.1)
-    activesupport (8.0.2)
+    activesupport (8.0.2.1)
       base64
       benchmark (>= 0.3)
       bigdecimal
@@ -212,13 +212,13 @@ GEM
       uri (>= 0.13.1)
     addressable (2.8.7)
       public_suffix (>= 2.0.2, < 7.0)
-    afm (0.2.2)
+    afm (1.0.0)
     ansi (1.5.0)
     apollo-federation (3.10.1)
       google-protobuf (< 5)
       graphql
     ast (2.4.3)
-    async (2.27.2)
+    async (2.27.4)
       console (~> 1.29)
       fiber-annotation
       io-event (~> 1.11)
@@ -226,11 +226,11 @@ GEM
       traces (~> 0.15)
     attr_extras (7.1.0)
     aws-eventstream (1.4.0)
-    aws-partitions (1.1145.0)
+    aws-partitions (1.1150.0)
     aws-sdk-cloudwatch (1.119.0)
       aws-sdk-core (~> 3, >= 3.228.0)
       aws-sigv4 (~> 1.5)
-    aws-sdk-core (3.229.0)
+    aws-sdk-core (3.230.0)
       aws-eventstream (~> 1, >= 1.3.0)
       aws-partitions (~> 1, >= 1.992.0)
       aws-sigv4 (~> 1.9)
@@ -244,11 +244,11 @@ GEM
     aws-sdk-lambda (1.158.0)
       aws-sdk-core (~> 3, >= 3.228.0)
       aws-sigv4 (~> 1.5)
-    aws-sdk-s3 (1.196.1)
+    aws-sdk-s3 (1.197.0)
       aws-sdk-core (~> 3, >= 3.228.0)
       aws-sdk-kms (~> 1)
       aws-sigv4 (~> 1.5)
-    aws-sdk-sqs (1.100.0)
+    aws-sdk-sqs (1.101.0)
       aws-sdk-core (~> 3, >= 3.228.0)
       aws-sigv4 (~> 1.5)
     aws-sigv4 (1.12.1)
@@ -281,10 +281,10 @@ GEM
     em-websocket (0.5.3)
       eventmachine (>= 0.12.9)
       http_parser.rb (~> 0)
-    ethon (0.16.0)
+    ethon (0.17.0)
       ffi (>= 1.15.0)
     eventmachine (1.2.7)
-    factory_bot (6.5.4)
+    factory_bot (6.5.5)
       activesupport (>= 6.1.0)
     faker (3.5.2)
       i18n (>= 1.8.11, < 2)
@@ -317,10 +317,10 @@ GEM
       flatware (= 2.3.4)
       rspec (>= 3.6)
     forwardable-extended (2.6.0)
-    google-protobuf (4.31.1)
+    google-protobuf (4.32.0)
       bigdecimal
       rake (>= 13)
-    google-protobuf (4.31.1-arm64-darwin)
+    google-protobuf (4.32.0-arm64-darwin)
       bigdecimal
       rake (>= 13)
     graphql (2.5.11)
@@ -423,9 +423,9 @@ GEM
       forwardable-extended (~> 2.6)
     patience_diff (1.2.0)
       optimist (~> 3.0)
-    pdf-reader (2.14.1)
+    pdf-reader (2.15.0)
       Ascii85 (>= 1.0, < 3.0, != 2.0.0)
-      afm (~> 0.2.1)
+      afm (>= 0.2.1, < 2)
       hashery (~> 2.0)
       ruby-rc4
       ttfunk
@@ -445,7 +445,7 @@ GEM
     rbs (3.9.4)
       logger
     redcarpet (3.6.1)
-    regexp_parser (2.11.1)
+    regexp_parser (2.11.2)
     rexml (3.4.1)
     rspec (3.13.1)
       rspec-core (~> 3.13.0)
@@ -561,7 +561,7 @@ GEM
     terminal-table (3.0.2)
       unicode-display_width (>= 1.1.1, < 3)
     thor (1.4.0)
-    traces (0.16.2)
+    traces (0.17.0)
     ttfunk (1.8.0)
       bigdecimal (~> 3.1)
     typhoeus (1.4.1)
@@ -628,7 +628,7 @@ DEPENDENCIES
   elasticgraph-schema_artifacts (= 1.0.2.pre)!
   elasticgraph-schema_definition (= 1.0.2.pre)!
   elasticgraph-support (= 1.0.2.pre)!
-  factory_bot (~> 6.5, >= 6.5.4)
+  factory_bot (~> 6.5, >= 6.5.5)
   faker (~> 3.5, >= 3.5.2)
   filewatcher (~> 2.1)
   flatware-rspec (~> 2.3, >= 2.3.4)

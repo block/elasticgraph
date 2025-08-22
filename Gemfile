@@ -13,7 +13,7 @@ group :development do
   gem "aws_lambda_ric", "~> 3.1", ">= 3.1.3"
   gem "benchmark-ips", "~> 2.14"
   gem "coderay", "~> 1.1", ">= 1.1.3"
-  gem "factory_bot", "~> 6.5", ">= 6.5.4"
+  gem "factory_bot", "~> 6.5", ">= 6.5.5"
   gem "faker", "~> 3.5", ">= 3.5.2"
   gem "flatware-rspec", "~> 2.3", ">= 2.3.4"
   gem "httpx", "~> 1.5", ">= 1.5.1"

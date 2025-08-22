@@ -34,12 +34,11 @@ module ElasticGraph
                 the_type = t
                 t.field "id", "ID"
                 t.field "description", "String", name_in_index: "description_index"
-                t.index "widgets"
               end
 
-              the_type.indices.clear
+              the_type.index "widgets"
             end
-          }.to raise_error(a_string_including("can't modify frozen Array"))
+          }.to raise_error(ElasticGraph::Errors::SchemaError, a_string_including("Cannot define an index on `Widget` after initialization is complete"))
         end
       end
 
@@ -67,7 +66,7 @@ module ElasticGraph
 
               the_type.index "widgets"
             end
-          }.to raise_error(a_string_including("can't modify frozen Array"))
+          }.to raise_error(ElasticGraph::Errors::SchemaError, a_string_including("Cannot define an index on `Widget` after initialization is complete"))
         end
       end
 
@@ -139,7 +138,7 @@ module ElasticGraph
 
               the_type.index "widgets"
             end
-          }.to raise_error(a_string_including("can't modify frozen Array"))
+          }.to raise_error(ElasticGraph::Errors::SchemaError, a_string_including("Cannot define an index on `Thing` after initialization is complete"))
         end
       end
     end
