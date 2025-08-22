@@ -3,7 +3,7 @@ query MatchesSearchWithPrefix {
     bio: {
       description:{
         matchesQueryWithPrefix: {
-          queryWithPrefix: "accordion viol"
+          queryWithPrefix: "accordion vi"
           requireAllTerms: true
           allowedEditsPerTerm: NONE
         }
@@ -18,3 +18,4 @@ query MatchesSearchWithPrefix {
     }
   }
 }
+

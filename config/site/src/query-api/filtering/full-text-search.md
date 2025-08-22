@@ -42,11 +42,11 @@ are supported to control both aspects to make matching stricter:
 
 This query will match artists with bios like:
 
-> Renowned for his mesmerizing performances, Luca "The Breeze" Fontana captivates audiences with his accordion, weaving intricate melodies that dance between the notes of traditional folk and modern jazz.
+> Marco Romano is renowned for his masterful accordion performances accompanied by violin, creating a fusion of traditional and contemporary sounds.
 
-> Sylvia Varela's avant-garde violin playing defies tradition, blending haunting dissonance with unexpected rhythms.
+> The ensemble features virtuoso accordion players alongside talented violinists, producing a distinctive chamber music experience.
 
-Notice that it matches "violin" even though the query is for "viol" (prefix match), and because `requireAllTerms: true` is specified, the bio must also contain "accordion". By setting `allowEditsPerTerm: NONE`, we're ensuring exact matching for the terms (except for the prefix behavior on the last term).
+Notice that it matches "violin" even though the query is for "vi" (prefix match), and because `requireAllTerms: true` is specified, the bio must also contain "accordion". By setting `allowedEditsPerTerm: NONE`, we're ensuring exact matching for the terms (except for the prefix behavior on the last term).
 
 ### Bypassing matchesPhrase, matchesQuery, and matchesQueryWithPrefix
 
