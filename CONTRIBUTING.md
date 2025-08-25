@@ -15,6 +15,7 @@ This guide is for you.
 | Requirement    | Tested Version | Installation Instructions                                                 |
 |----------------|----------------|---------------------------------------------------------------------------|
 | Ruby           | 3.4.x          | [ruby-lang.org](https://www.ruby-lang.org/en/documentation/installation/) |
+| Java           | JDK 11+        | [java.com](https://www.oracle.com/java/technologies/downloads/)           |
 | Docker Engine  | 27.x           | [docker.com](https://docs.docker.com/engine/install/)                     |
 | Docker Compose | 2.29.x         | [docker.com](https://docs.docker.com/compose/install/)                    |
 
@@ -51,6 +52,11 @@ Once that is done, prefix Ruby commands (`ruby`, `rspec`, `rake`, etc) with `bun
 
 This project uses Docker Engine and Docker Compose to run Elasticsearch and OpenSearch locally. We recommend installing
 [Docker Desktop](https://docs.docker.com/desktop/) to get both Docker dependencies.
+
+### Java
+
+The test suite requires Java 11 or greater to be available on `$PATH`. You can install a modern JDK using
+your package manager (i.e. `brew install java`).
 
 ## Customizing the Development Environment
 
