@@ -34,6 +34,8 @@ module ElasticGraph
         include Mixins::HasSubtypes
         include Mixins::HasReadableToSAndInspect.new { |t| t.name }
 
+        # @dynamic to_indexing_field_type
+
         # @private
         def initialize(schema_def_state, name)
           field_factory = schema_def_state.factory.method(:new_field)
