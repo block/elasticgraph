@@ -204,7 +204,7 @@ module ElasticGraph
 
     def todo_comments_in(dir)
       ::Dir.chdir(dir) do
-        `git grep TODO`.split("\n").map do |match|
+        `git grep --no-color TODO`.split("\n").map do |match|
           match.sub(/^[^:]+:\s*/, "")
         end
       end

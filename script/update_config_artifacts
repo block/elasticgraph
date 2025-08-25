@@ -93,7 +93,7 @@ module ElasticGraph
     private
 
     def config_definition_lines
-      @config_definition_lines ||= `git grep "Config.define"`.lines.reject do |line|
+      @config_definition_lines ||= `git grep --no-color "Config.define"`.lines.reject do |line|
         line.include?("elasticgraph-support/lib/elastic_graph/support/config") ||
           line.include?("/spec/") ||
           line.include?(::File.basename(__FILE__))

@@ -34,7 +34,7 @@ module ElasticGraph
 
       let(:gemspec) { gemspecs_by_gem_name[gem_name] }
       let(:config_definition_lines) do
-        `git grep "Config =" -- lib`.strip.lines + `git grep "class Config\\b" -- lib`.strip.lines
+        `git grep --no-color "Config =" -- lib`.strip.lines + `git grep --no-color "class Config\\b" -- lib`.strip.lines
       end
 
       it "has the correct name" do
