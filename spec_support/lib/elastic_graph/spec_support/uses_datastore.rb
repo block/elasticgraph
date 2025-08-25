@@ -18,7 +18,7 @@ require_relative "cluster_configuration_manager"
 require_relative "profiling"
 
 datastore_url = YAML.safe_load_file(ElasticGraph::CommonSpecHelpers::TEST_SETTINGS_FILE_TEMPLATE, aliases: true).fetch("datastore").fetch("clusters").fetch("main").fetch("url")
-datastore_logs = "#{ElasticGraph::CommonSpecHelpers::REPO_ROOT}/log/datastore_client.test.log"
+datastore_logs = ::Logger.new("#{ElasticGraph::CommonSpecHelpers::REPO_ROOT}/log/datastore_client.test.log")
 
 module ElasticGraph
   # A `Logger` implementation that internally delegates to multiple underlying loggers so that we can both observe/assert on the logs
@@ -526,7 +526,7 @@ RSpec.configure do |config|
       client_class = (datastore_backend == :opensearch) ? ElasticGraph::OpenSearch::Client : ElasticGraph::Elasticsearch::Client
       # :nocov:
 
-      client_class.new(name, faraday_adapter: :httpx, url: datastore_url, logger: ElasticGraph::SplitLogger.new(logger, Logger.new(datastore_logs))) do |conn|
+      client_class.new(name, faraday_adapter: :httpx, url: datastore_url, logger: ElasticGraph::SplitLogger.new(logger, datastore_logs)) do |conn|
         conn.use DisallowUnsupportedAWSOperations
         conn.use RequestTracker, datastore_requests_by_cluster_name[name]
       end
