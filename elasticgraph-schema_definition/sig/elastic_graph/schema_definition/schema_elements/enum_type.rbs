@@ -25,6 +25,7 @@ module ElasticGraph
         def value: (::String) ?{ (EnumValue) -> void } -> void
         def values: (*::String) -> void
         def runtime_metadata: () -> SchemaArtifacts::RuntimeMetadata::Enum::Type
+        def to_indexing_field_type: () -> Indexing::_FieldType
         def as_input: () -> EnumType
       end
     end
