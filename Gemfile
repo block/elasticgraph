@@ -16,7 +16,7 @@ group :development do
   gem "factory_bot", "~> 6.5", ">= 6.5.5"
   gem "faker", "~> 3.5", ">= 3.5.2"
   gem "flatware-rspec", "~> 2.3", ">= 2.3.4"
-  gem "httpx", "~> 1.5", ">= 1.5.1"
+  gem "httpx", "~> 1.6"
   gem "memory_profiler", "~> 1.1"
   gem "method_source", "~> 1.1"
   gem "rack-test", "~> 2.2"
