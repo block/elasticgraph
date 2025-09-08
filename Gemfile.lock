@@ -273,10 +273,10 @@ GEM
     elastic-transport (8.4.0)
       faraday (< 3)
       multi_json
-    elasticsearch (9.1.1)
+    elasticsearch (9.1.2)
       elastic-transport (~> 8.3)
-      elasticsearch-api (= 9.1.1)
-    elasticsearch-api (9.1.1)
+      elasticsearch-api (= 9.1.2)
+    elasticsearch-api (9.1.2)
       multi_json
     em-websocket (0.5.3)
       eventmachine (>= 0.12.9)
