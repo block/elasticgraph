@@ -353,7 +353,7 @@ module ElasticGraph
               t.graphql_only?
           end
           .sort_by(&:name)
-          .to_h { |type| [type.name, type.to_indexing_field_type] }
+          .to_h { |type| [type.name, (_ = type).to_indexing_field_type] }
       end
 
       def verify_runtime_metadata(runtime_metadata)
