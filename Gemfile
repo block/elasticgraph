@@ -44,7 +44,7 @@ group :site do
   gem "filewatcher", "~> 2.1"
   gem "html-proofer", "~> 5.0", ">= 5.0.10"
   gem "jekyll", "~> 4.4", ">= 4.4.1"
-  gem "nokogiri", "~> 1.18", ">= 1.18.9"
+  gem "nokogiri", "~> 1.18"
   gem "redcarpet", "~> 3.6", ">= 3.6.1"
 
   # Pull in a YAML syntax highlighting fix so that our JSON schemas render correctly at the website:
