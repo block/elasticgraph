@@ -86,7 +86,7 @@ module ElasticGraph
         end
 
         unless client == Client::ELASTICGRAPH_INTERNAL
-          @logger.info({
+          log_data = {
             "message_type" => "ElasticGraphQueryExecutorQueryDuration",
             "client" => client.name,
             "query_fingerprint" => fingerprint_for(query),
@@ -117,7 +117,12 @@ module ElasticGraph
             "datastore_query_count" => query_tracker.query_counts_per_datastore_request.sum,
             "over_slow_threshold" => (duration > @slow_query_threshold_ms).to_s,
             "slo_result" => slo_result_for(query, duration)
-          })
+          }
+
+          # Merge in any extension-provided data
+          log_data.merge!(query_tracker.extension_data)
+
+          @logger.info(log_data)
         end
 
         result
