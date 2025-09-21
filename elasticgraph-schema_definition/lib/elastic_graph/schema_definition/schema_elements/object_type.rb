@@ -47,6 +47,16 @@ module ElasticGraph
             end
           end
         end
+
+        # @private
+        def to_indexing_field_type
+          Indexing::FieldType::Object.new(
+            type_name: name,
+            subfields: indexing_fields_by_name_in_index.values.map(&:to_indexing_field).compact,
+            mapping_options: mapping_options,
+            json_schema_options: json_schema_options
+          )
+        end
       end
     end
   end
