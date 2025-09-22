@@ -386,11 +386,9 @@ module ElasticGraph
           expect(main_datastore_client).not_to have_received(:bulk)
         end
 
-        it "validates the index mapping consistency of the destination index of each operation before performing the bulk request" do
+        it "does not validate the index mapping consistency of the destination index before performing the bulk request" do
           call_sequence = []
-          allow(index_mapping_checker).to receive(:validate_mapping_completeness_of!) do |index_cluster_name_method, *index_defs|
-            call_sequence << [:validate_indices, index_cluster_name_method, index_defs]
-          end
+          allow(index_mapping_checker).to receive(:validate_mapping_completeness_of!)
 
           allow(main_datastore_client).to receive(:bulk) do |request|
             call_sequence << :bulk
@@ -400,7 +398,6 @@ module ElasticGraph
           router.bulk(operations)
 
           expect(call_sequence).to eq [
-            [:validate_indices, :accessible_cluster_names_to_index_into, operations.map(&:destination_index_def).uniq],
             :bulk
           ]
         end
