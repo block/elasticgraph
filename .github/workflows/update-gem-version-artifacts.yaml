@@ -1,6 +1,8 @@
 name: Update Gem Version Artifacts
 
 on:
+  workflow_dispatch:
+    inputs: {}
   workflow_run:
     workflows: ["Dependabot Gem PR Check"]
     types:
