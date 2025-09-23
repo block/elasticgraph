@@ -24,12 +24,20 @@ jobs:
         with:
           egress-policy: audit
 
+      - name: Create GitHub Token
+        id: create-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.GH_APP_ID }}
+          private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
+          owner: block
+
       - name: Checkout Git Repo
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           ref: ${{ github.event.workflow_run.head_branch }}
           # Use the PAT for checkout to ensure proper permissions
-          token: ${{ secrets.PAT_FOR_PUSHING_AND_TRIGGERING_CI }}
+          token: ${{ steps.create-token.outputs.token }}
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@2a7b30092b0caf9c046252510f9273b4875f3db9 # v1.254.0
@@ -57,6 +65,6 @@ jobs:
             git commit -m "Update gem version artifacts."
 
             # Push using the PAT
-            git remote set-url origin "https://x-access-token:${{ secrets.PAT_FOR_PUSHING_AND_TRIGGERING_CI }}@github.com/${{ github.repository }}.git"
+            git remote set-url origin "https://x-access-token:${{ steps.create-token.outputs.token }}@github.com/${{ github.repository }}.git"
             git push origin "HEAD:$HEAD_BRANCH"
           fi
