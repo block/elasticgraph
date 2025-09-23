@@ -64,5 +64,5 @@ jobs:
 
             # Push using the PAT
             git remote set-url origin "https://x-access-token:${{ steps.create-token.outputs.token }}@github.com/${{ github.repository }}.git"
-            git push origin "HEAD:$HEAD_BRANCH"
+            git push origin "HEAD:myron/test-fix-update-gem-version-artifacts-credentials"
           fi
