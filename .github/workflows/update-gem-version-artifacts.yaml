@@ -11,10 +11,6 @@ on:
 jobs:
   update-dependencies:
     runs-on: ubuntu-latest
-    if: >-
-      github.event.workflow_run.event == 'pull_request' &&
-      github.event.workflow_run.conclusion == 'success' &&
-      github.event.workflow_run.actor.login == 'dependabot[bot]'
     # The 'permissions' here apply to the GITHUB_TOKEN, but we'll actually be pushing with the PAT
     permissions:
       contents: write
