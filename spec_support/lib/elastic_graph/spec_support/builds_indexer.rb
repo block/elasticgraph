@@ -18,6 +18,7 @@ module ElasticGraph
       datastore_core: nil,
       latency_slo_thresholds_by_timestamp_in_ms: {},
       skip_derived_indexing_type_updates: {},
+      skip_mapping_completeness_validation: false,
       datastore_router: nil,
       clock: nil,
       monotonic_clock: nil,
@@ -28,7 +29,8 @@ module ElasticGraph
         datastore_core: datastore_core || build_datastore_core(**datastore_core_options, &customize_datastore_config),
         config: Indexer::Config.new(
           latency_slo_thresholds_by_timestamp_in_ms: latency_slo_thresholds_by_timestamp_in_ms,
-          skip_derived_indexing_type_updates: skip_derived_indexing_type_updates
+          skip_derived_indexing_type_updates: skip_derived_indexing_type_updates,
+          skip_mapping_completeness_validation: skip_mapping_completeness_validation
         ),
         datastore_router: datastore_router,
         clock: clock,
