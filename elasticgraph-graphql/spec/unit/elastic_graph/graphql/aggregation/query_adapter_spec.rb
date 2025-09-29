@@ -990,6 +990,33 @@ module ElasticGraph
                 ]
               )])
             end
+
+            it "respects the `min_doc_count` option" do
+              aggregations = aggregations_from_datastore_query("Query", :widget_aggregations, <<~QUERY)
+                query {
+                  widget_aggregations {
+                    #{before_nodes}
+                      grouped_by {
+                        created_at {
+                          as_date_time(truncation_unit: DAY, min_doc_count: 5)
+                        }
+                      }
+
+                      count
+                    #{after_nodes}
+                  }
+                }
+              QUERY
+
+              expect(aggregations).to eq([aggregation_query_of(
+                name: "widget_aggregations",
+                computations: [],
+                needs_doc_count: true,
+                groupings: [
+                  date_histogram_grouping_of("created_at", "day", time_zone: "UTC", min_doc_count: 5, graphql_subfield: "as_date_time")
+                ]
+              )])
+            end
           end
 
           it "omits grouping fields that have a `@skip(if: true)` directive" do
