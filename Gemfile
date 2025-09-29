@@ -16,7 +16,7 @@ group :development do
   gem "factory_bot", "~> 6.5", ">= 6.5.5"
   gem "faker", "~> 3.5", ">= 3.5.2"
   gem "flatware-rspec", "~> 2.3", ">= 2.3.4"
-  gem "httpx", "~> 1.6"
+  gem "httpx", "~> 1.6", ">= 1.6.2"
   gem "memory_profiler", "~> 1.1"
   gem "method_source", "~> 1.1"
   gem "rack-test", "~> 2.2"
@@ -44,7 +44,7 @@ group :site do
   gem "filewatcher", "~> 2.1"
   gem "html-proofer", "~> 5.0", ">= 5.0.10"
   gem "jekyll", "~> 4.4", ">= 4.4.1"
-  gem "nokogiri", "~> 1.18"
+  gem "nokogiri", "~> 1.18", ">= 1.18.10"
   gem "redcarpet", "~> 3.6", ">= 3.6.1"
 
   # Pull in a YAML syntax highlighting fix so that our JSON schemas render correctly at the website:
