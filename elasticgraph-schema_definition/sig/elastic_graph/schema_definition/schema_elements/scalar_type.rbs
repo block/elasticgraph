@@ -30,6 +30,7 @@ module ElasticGraph
         def runtime_metadata: () -> SchemaArtifacts::RuntimeMetadata::ScalarType
         def mapping_options: () -> Mixins::HasTypeInfo::optionsHash
         def json_schema_options: () -> Mixins::HasTypeInfo::optionsHash
+        def to_indexing_field_type: () -> Indexing::_FieldType
 
         private
 

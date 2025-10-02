@@ -8,6 +8,7 @@ module ElasticGraph
       end
 
       module HasSubtypes: _AbstractType
+        def to_indexing_field_type: () -> Indexing::_FieldType
         def recursively_resolve_subtypes: () -> ::Array[SchemaElements::ObjectType]
         def graphql_fields_by_name: () -> ::Hash[::String, SchemaElements::Field]
         def indexing_fields_by_name_in_index: () -> ::Hash[::String, SchemaElements::Field]

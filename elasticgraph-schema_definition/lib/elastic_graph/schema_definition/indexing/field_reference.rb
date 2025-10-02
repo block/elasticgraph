@@ -28,7 +28,8 @@ module ElasticGraph
       class FieldReference < ::Data
         # @return [Field, nil] the {Field} this reference resolves to (if it can be resolved)
         def resolve
-          return nil unless (resolved_type = type.fully_unwrapped.resolved)
+          resolved_type = type.fully_unwrapped.resolved # : nonInputType?
+          return nil unless resolved_type
 
           Indexing::Field.new(
             name: name,
