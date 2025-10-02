@@ -40,12 +40,14 @@ module ElasticGraph
         datastore_clients_by_name:,
         mappings_by_index_def_name:,
         monotonic_clock:,
-        logger:
+        logger:,
+        skip_mapping_completeness_validation: false
       )
         @datastore_clients_by_name = datastore_clients_by_name
         @logger = logger
         @monotonic_clock = monotonic_clock
         @cached_mappings = {}
+        @skip_mapping_completeness_validation = skip_mapping_completeness_validation
 
         @mappings_by_index_def_name = mappings_by_index_def_name.transform_values do |mappings|
           DatastoreCore::IndexConfigNormalizer.normalize_mappings(mappings)
@@ -74,8 +76,8 @@ module ElasticGraph
       # Note: before any operations are attempted, the datastore indices are validated for consistency
       # with the mappings we expect, meaning that no bulk operations will be attempted if that is not up-to-date.
       def bulk(operations, refresh: false)
-        # Before writing these operations, verify their destination index mapping are consistent.
-        validate_mapping_completeness_of!(:accessible_cluster_names_to_index_into, *operations.map(&:destination_index_def).uniq)
+        # Before writing these operations, verify their destination index mapping are consistent unless explicitly skipped.
+        validate_mapping_completeness_of!(:accessible_cluster_names_to_index_into, *operations.map(&:destination_index_def).uniq) unless @skip_mapping_completeness_validation
 
         ops_by_client = ::Hash.new { |h, k| h[k] = [] } # : ::Hash[DatastoreCore::_Client, ::Array[_Operation]]
         unsupported_ops = ::Set.new # : ::Set[_Operation]
