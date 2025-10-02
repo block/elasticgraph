@@ -44,7 +44,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "base64", "~> 0.3"
   spec.add_dependency "elasticgraph-datastore_core", ElasticGraph::VERSION
   spec.add_dependency "elasticgraph-schema_artifacts", ElasticGraph::VERSION
-  spec.add_dependency "graphql", "2.5.11" # Build break in 2.5.12, investigating.
+  spec.add_dependency "graphql", "~> 2.5.11" # Build break in 2.5.12, investigating.
   spec.add_dependency "graphql-c_parser", "~> 1.1", ">= 1.1.3"
 
   spec.add_development_dependency "elasticgraph-admin", ElasticGraph::VERSION
