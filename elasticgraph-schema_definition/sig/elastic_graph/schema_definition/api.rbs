@@ -20,7 +20,6 @@ module ElasticGraph
       def indexed?: () -> bool
       def to_sdl: () ?{ (SchemaElements::Field::argument) -> boolish } -> ::String
       def derived_graphql_types: () -> ::Array[SchemaElements::graphQLType]
-      def to_indexing_field_type: () -> Indexing::_FieldType
     end
 
     interface _IndexableType
@@ -37,6 +36,7 @@ module ElasticGraph
       def derived_indexed_types: () -> ::Array[Indexing::DerivedIndexedType]
       def verify_graphql_correctness!: () -> void
       def relay_pagination_type: () -> bool
+      def to_indexing_field_type: () -> Indexing::_FieldType
     end
 
     # Here we make a type alias that should be used in place of `_IndexableType`. All types
@@ -46,6 +46,9 @@ module ElasticGraph
     #
     # We could list other mixins here but will do that as there is need over time.
     type indexableType = _IndexableType & Mixins::HasDirectives & Mixins::SupportsFilteringAndAggregation & Mixins::HasIndices
+
+    # Type t
+    type nonInputType = SchemaElements::EnumType | SchemaElements::InterfaceType | SchemaElements::ObjectType | SchemaElements::UnionType | SchemaElements::ScalarType
 
     class API
       attr_reader state: State
