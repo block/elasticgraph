@@ -24,6 +24,7 @@ module ElasticGraph
     module RuntimeMetadata
       # Entry point for runtime metadata for an entire schema.
       class Schema < ::Data.define(
+        :elasticgraph_version,
         :object_types_by_name,
         :scalar_types_by_name,
         :enum_types_by_name,
@@ -33,6 +34,8 @@ module ElasticGraph
         :graphql_resolvers_by_name,
         :static_script_ids_by_scoped_name
       )
+        # @private
+        ELASTICGRAPH_VERSION = "elasticgraph_version"
         # @private
         OBJECT_TYPES_BY_NAME = "object_types_by_name"
         # @private
@@ -55,6 +58,8 @@ module ElasticGraph
         # @param hash [Hash<String, Hash<String, Object>>] runtime metadata hash loaded from YAML
         # @return [Schema] the runtime metadata schema instance
         def self.from_hash(hash)
+          elasticgraph_version = hash[ELASTICGRAPH_VERSION]
+
           object_types_by_name = hash[OBJECT_TYPES_BY_NAME]&.transform_values do |type_hash|
             ObjectType.from_hash(type_hash)
           end || {}
@@ -85,6 +90,7 @@ module ElasticGraph
           static_script_ids_by_scoped_name = hash[STATIC_SCRIPT_IDS_BY_NAME] || {}
 
           new(
+            elasticgraph_version: elasticgraph_version,
             object_types_by_name: object_types_by_name,
             scalar_types_by_name: scalar_types_by_name,
             enum_types_by_name: enum_types_by_name,
@@ -102,6 +108,7 @@ module ElasticGraph
         def to_dumpable_hash
           Support::HashUtil.recursively_prune_nils_and_empties_from({
             # Keys here are ordered alphabetically; please keep them that way.
+            ELASTICGRAPH_VERSION => elasticgraph_version,
             ENUM_TYPES_BY_NAME => HashDumper.dump_hash(enum_types_by_name, &:to_dumpable_hash),
             GRAPHQL_EXTENSION_MODULES => graphql_extension_modules.map(&:to_dumpable_hash),
             GRAPHQL_RESOLVERS_BY_NAME => HashDumper.dump_hash(graphql_resolvers_by_name.transform_keys(&:to_s), &:to_dumpable_hash),

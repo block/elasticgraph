@@ -28,6 +28,7 @@ module ElasticGraph
 
         it "can roundtrip a schema through a primitive ruby hash for easy serialization and deserialization" do
           schema = Schema.new(
+            elasticgraph_version: "2.9.7",
             object_types_by_name: {
               "Widget" => ObjectType.new(
                 index_definition_names: ["widgets"],
@@ -153,6 +154,7 @@ module ElasticGraph
           hash = schema.to_dumpable_hash
 
           expect(hash).to eq(
+            "elasticgraph_version" => "2.9.7",
             "object_types_by_name" => {
               "Widget" => {
                 "index_definition_names" => ["widgets"],
@@ -342,6 +344,7 @@ module ElasticGraph
           schema = Schema.from_hash({"schema_element_names" => {"form" => "camelCase"}})
 
           expect(schema).to eq Schema.new(
+            elasticgraph_version: nil,
             object_types_by_name: {},
             scalar_types_by_name: {},
             enum_types_by_name: {},

@@ -18,6 +18,7 @@ require "elastic_graph/schema_definition/mixins/has_readable_to_s_and_inspect"
 require "elastic_graph/schema_definition/schema_elements/field_path"
 require "elastic_graph/schema_definition/scripting/file_system_repository"
 require "elastic_graph/support/memoizable_data"
+require "elastic_graph/version"
 
 module ElasticGraph
   module SchemaDefinition
@@ -225,6 +226,7 @@ module ElasticGraph
         end
 
         SchemaArtifacts::RuntimeMetadata::Schema.new(
+          elasticgraph_version: ElasticGraph::VERSION,
           object_types_by_name: object_types_by_name,
           scalar_types_by_name: scalar_types_by_name,
           enum_types_by_name: enum_types_by_name,

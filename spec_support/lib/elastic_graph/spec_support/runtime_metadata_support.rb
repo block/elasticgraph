@@ -13,6 +13,7 @@ module ElasticGraph
     module RuntimeMetadata
       module RuntimeMetadataSupport
         def schema_with(
+          elasticgraph_version: ElasticGraph::VERSION,
           object_types_by_name: {},
           scalar_types_by_name: {},
           enum_types_by_name: {},
@@ -23,6 +24,7 @@ module ElasticGraph
           static_script_ids_by_scoped_name: {}
         )
           Schema.new(
+            elasticgraph_version: elasticgraph_version,
             object_types_by_name: object_types_by_name,
             scalar_types_by_name: scalar_types_by_name,
             enum_types_by_name: enum_types_by_name,
