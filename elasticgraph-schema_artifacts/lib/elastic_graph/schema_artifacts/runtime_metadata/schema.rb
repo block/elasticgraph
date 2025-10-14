@@ -60,6 +60,11 @@ module ElasticGraph
         def self.from_hash(hash)
           elasticgraph_version = hash[ELASTICGRAPH_VERSION]
 
+          if elasticgraph_version && elasticgraph_version != ElasticGraph::VERSION
+            raise Errors::SchemaError,
+                  "ElasticGraph version mismatch: runtime metadata is for version #{elasticgraph_version}, but current version is #{ElasticGraph::VERSION}"
+          end
+
           object_types_by_name = hash[OBJECT_TYPES_BY_NAME]&.transform_values do |type_hash|
             ObjectType.from_hash(type_hash)
           end || {}
