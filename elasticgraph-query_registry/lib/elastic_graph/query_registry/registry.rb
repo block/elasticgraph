@@ -60,6 +60,18 @@ module ElasticGraph
       # and whitespace). If the query differs in a significant way from a registered query, it
       # will not be recognized as registered.
       def build_and_validate_query(query_string, client:, variables: {}, operation_name: nil, context: {})
+        query, errors, _ = build_and_validate_query_with_registration_status(
+          query_string,
+          client: client,
+          variables: variables,
+          operation_name: operation_name,
+          context: context
+        )
+        [query, errors]
+      end
+
+      # Same as build_and_validate_query but also returns whether the query was registered
+      def build_and_validate_query_with_registration_status(query_string, client:, variables: {}, operation_name: nil, context: {})
         validator =
           if @registered_client_validator.applies_to?(client)
             @registered_client_validator
@@ -67,7 +79,7 @@ module ElasticGraph
             @unregistered_client_validator
           end
 
-        validator.build_and_validate_query(query_string, client: client, variables: variables, operation_name: operation_name, context: context) do
+        validator.build_and_validate_query_with_registration_status(query_string, client: client, variables: variables, operation_name: operation_name, context: context) do
           @schema.new_graphql_query(
             query_string,
             variables: variables,
