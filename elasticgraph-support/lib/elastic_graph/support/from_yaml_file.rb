@@ -43,7 +43,7 @@ module ElasticGraph
             rescue => e
               raise <<~EOS
                 Failed to load `#{component_class}` with `#{yaml_file}`. This can happen if the schema artifacts are out of date.
-                Run `rake schema_artifacts:dump` and try again.
+                Run `bundle exec rake schema_artifacts:dump` and try again.
 
                 #{e.class}: #{e.message}
               EOS

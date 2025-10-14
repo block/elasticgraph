@@ -109,7 +109,7 @@ module ElasticGraph
             run_rake "use_component"
           }.to raise_error(a_string_including(
             "Failed to load `ExampleComponent` with `settings.yaml`. This can happen if the schema artifacts are out of date.",
-            "Run `rake schema_artifacts:dump` and try again.",
+            "Run `bundle exec rake schema_artifacts:dump` and try again.",
             "No such file or directory"
           ))
         end
