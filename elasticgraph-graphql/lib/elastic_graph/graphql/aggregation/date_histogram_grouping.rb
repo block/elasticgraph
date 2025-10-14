@@ -17,7 +17,7 @@ module ElasticGraph
       # For the relevant Elasticsearch docs, see:
       # https://www.elastic.co/guide/en/elasticsearch/reference/7.12/search-aggregations-bucket-datehistogram-aggregation.html
       # https://www.elastic.co/guide/en/elasticsearch/reference/7.12/search-aggregations-bucket-composite-aggregation.html#_date_histogram
-      class DateHistogramGrouping < Support::MemoizableData.define(:field_path, :interval, :time_zone, :offset)
+      class DateHistogramGrouping < Support::MemoizableData.define(:field_path, :interval, :time_zone, :offset, :min_doc_count)
         def key
           @key ||= FieldPathEncoder.encode(field_path.map(&:name_in_graphql_query))
         end
@@ -42,11 +42,12 @@ module ElasticGraph
         end
 
         def non_composite_clause_for(query)
-          # `min_doc_count: 1` is important so we don't have excess buckets when there is a large gap
+          # `min_doc_count` is important so we don't have excess buckets when there is a large gap
           # between document dates. For example, if you group on a field at the year truncation unit, and
           # a one-off rogue document has an incorrect timestamp for hundreds of years ago, you'll wind
-          # up with a bucket for each intervening year. `min_doc_count: 1` excludes those empty buckets.
-          composite_clause(grouping_options: {"min_doc_count" => 1})
+          # up with a bucket for each intervening year. `min_doc_count` excludes those buckets with
+          # fewer documents than the specified threshold.
+          composite_clause(grouping_options: {"min_doc_count" => min_doc_count})
         end
 
         def inner_meta
