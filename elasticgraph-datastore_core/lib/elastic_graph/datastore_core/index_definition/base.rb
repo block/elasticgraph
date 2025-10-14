@@ -66,18 +66,19 @@ module ElasticGraph
         def searches_could_hit_incomplete_docs?
           return @searches_could_hit_incomplete_docs if defined?(@searches_could_hit_incomplete_docs)
 
-          if current_sources.size > 1
+          @searches_could_hit_incomplete_docs = if current_sources.size > 1
             # We know that incomplete docs are possible, without needing to check sources recorded in `_meta`.
-            @searches_could_hit_incomplete_docs = true
+            true
           else
             # While our current configuration can't produce incomplete documents, some may already exist in the index
             # if we previously had some `sourced_from` fields (but no longer have them). Here we check for the sources
             # we've recorded in `_meta` to account for that.
-            client = datastore_clients_by_name.fetch(cluster_to_query)
-            recorded_sources = mappings_in_datastore(client).dig("_meta", "ElasticGraph", "sources") || []
-            sources = recorded_sources.union(current_sources.to_a)
+            # Comment out to avoid boot-time Elasticsearch API calls.
+            # client = datastore_clients_by_name.fetch(cluster_to_query)
+            # recorded_sources = mappings_in_datastore(client).dig("_meta", "ElasticGraph", "sources") || []
+            # sources = recorded_sources.union(current_sources.to_a)
 
-            @searches_could_hit_incomplete_docs = sources.size > 1
+            current_sources.size > 1
           end
         end
 
