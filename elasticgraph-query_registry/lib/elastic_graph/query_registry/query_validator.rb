@@ -55,7 +55,7 @@ module ElasticGraph
       private
 
       def variables_errors_for(operation_name, old_dumped_variables, new_dumped_variables, client_name, query_name)
-        rake_task = "rake \"query_registry:dump_variables[#{client_name}, #{query_name}]\""
+        rake_task = "bundle exec rake \"query_registry:dump_variables[#{client_name}, #{query_name}]\""
 
         if old_dumped_variables.nil? || old_dumped_variables[operation_name].nil?
           return [{"message" => "No dumped variables for this operation exist. Correct by running: `#{rake_task}`"}]
