@@ -17,6 +17,7 @@ require "elastic_graph/schema_artifacts/runtime_metadata/object_type"
 require "elastic_graph/schema_artifacts/runtime_metadata/scalar_type"
 require "elastic_graph/schema_artifacts/runtime_metadata/schema_element_names"
 require "elastic_graph/support/hash_util"
+require "elastic_graph/version"
 
 module ElasticGraph
   module SchemaArtifacts
