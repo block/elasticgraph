@@ -71,7 +71,7 @@ module ElasticGraph
             .reverse # resolve layers from innermost to outermost wrappings
             .reduce(inner_json_schema) { |acc, layer| process_layer(layer, acc) }
             .merge(outer_json_schema_customizations)
-            .merge(doc_comment ? {"description" => doc_comment} : {})
+            .merge({"description" => doc_comment}.compact)
             .then { |h| Support::HashUtil.stringify_keys(h) }
         end
 
