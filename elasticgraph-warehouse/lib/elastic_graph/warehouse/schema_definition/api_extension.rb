@@ -10,8 +10,7 @@ require "elastic_graph/warehouse/patches"
 require "elastic_graph/warehouse/schema_definition/factory_extension"
 require "elastic_graph/warehouse/schema_definition/scalar_type_extension"
 require "elastic_graph/warehouse/schema_definition/enum_type_extension"
-require "elastic_graph/warehouse/schema_definition/object_type_extension"
-require "elastic_graph/warehouse/schema_definition/interface_type_extension"
+require "elastic_graph/warehouse/schema_definition/object_and_interface_extension"
 
 module ElasticGraph
   module Warehouse
@@ -21,6 +20,7 @@ module ElasticGraph
     module SchemaDefinition
       # Module designed to be extended onto an {ElasticGraph::SchemaDefinition::API} instance
       # to add Data Warehouse configuration generation capabilities.
+      #
       #
       # To use this module, pass it in `schema_definition_extension_modules` when defining your {ElasticGraph::Local::RakeTasks}.
       #
@@ -34,30 +34,33 @@ module ElasticGraph
       #     tasks.schema_definition_extension_modules = [ElasticGraph::Warehouse::SchemaDefinition::APIExtension]
       #   end
       module APIExtension
-        # Extends the API with warehouse functionality when this module is extended
+        # Maps built-in ElasticGraph scalar types to their warehouse column types.
+        COLUMN_TYPES_BY_BUILT_IN_SCALAR_TYPE = {
+          "Boolean" => "BOOLEAN",
+          "Cursor" => "STRING",
+          "Date" => "DATE",
+          "DateTime" => "TIMESTAMP",
+          "Float" => "DOUBLE",
+          "ID" => "STRING",
+          "Int" => "INT",
+          "JsonSafeLong" => "BIGINT",
+          "LocalTime" => "STRING",
+          "LongString" => "BIGINT",
+          "String" => "STRING",
+          "TimeZone" => "STRING",
+          "Untyped" => "STRING"
+        }.freeze
+        # Extends the API with warehouse functionality when this module is extended.
         #
         # @param api [ElasticGraph::SchemaDefinition::API] the API instance to extend
         # @return [void]
         def self.extended(api)
           api.factory.extend FactoryExtension
 
-          # Apply warehouse extensions to built-in types so they have to_warehouse_field_type method
           api.on_built_in_types do |type|
             case type
             when ::ElasticGraph::SchemaDefinition::SchemaElements::ScalarType
-              type.extend ScalarTypeExtension
-            when ::ElasticGraph::SchemaDefinition::SchemaElements::EnumType
-              type.extend EnumTypeExtension
-            when ::ElasticGraph::SchemaDefinition::SchemaElements::ObjectType
-              type.extend ObjectTypeExtension
-            when ::ElasticGraph::SchemaDefinition::SchemaElements::InterfaceType
-              # :nocov: -- No built-in InterfaceTypes currently exist in ElasticGraph. This branch is here for
-              # future-proofing in case built-in interface types are added. User-defined interface types are
-              # extended via FactoryExtension instead.
-              type.extend InterfaceTypeExtension
-              # :nocov:
-            else
-              # Other types (e.g., UnionType, InputType) don't yet support warehouse configs
+              type.warehouse_column type: COLUMN_TYPES_BY_BUILT_IN_SCALAR_TYPE.fetch(type.name)
             end
           end
         end

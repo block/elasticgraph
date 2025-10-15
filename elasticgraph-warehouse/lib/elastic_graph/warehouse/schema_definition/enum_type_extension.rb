@@ -6,18 +6,16 @@
 #
 # frozen_string_literal: true
 
-require "elastic_graph/warehouse/warehouse_config/field_type/enum"
-
 module ElasticGraph
   module Warehouse
     module SchemaDefinition
-      # Extends {ElasticGraph::SchemaDefinition::SchemaElements::EnumType} to add warehouse field type conversion.
+      # Extends {ElasticGraph::SchemaDefinition::SchemaElements::EnumType} to add warehouse column type conversion.
       module EnumTypeExtension
-        # Converts this enum type to a warehouse field type
+        # Returns the warehouse column type representation for this enum type.
         #
-        # @return [ElasticGraph::Warehouse::WarehouseConfig::FieldType::Enum]
-        def to_warehouse_field_type
-          ::ElasticGraph::Warehouse::WarehouseConfig::FieldType::Enum.new(enum_value_names: values_by_name.keys)
+        # @return [String] the SQL type string "STRING"
+        def to_warehouse_column_type
+          "STRING"
         end
       end
     end

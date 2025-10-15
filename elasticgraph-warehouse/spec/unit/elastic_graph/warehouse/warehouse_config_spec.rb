@@ -69,7 +69,7 @@ RSpec.describe "elasticgraph-warehouse integration", :unit do
     )
   end
 
-  it "allows overriding table type via scalar.warehouse_table options" do
+  it "allows overriding table type via scalar.warehouse_column options" do
     require "elastic_graph/warehouse/schema_definition/api_extension"
 
     results = define_schema(schema_element_name_form: :snake_case, extension_modules: [ElasticGraph::Warehouse::SchemaDefinition::APIExtension]) do |s|
@@ -78,7 +78,7 @@ RSpec.describe "elasticgraph-warehouse integration", :unit do
       s.scalar_type "URL" do |t|
         t.mapping type: "keyword"
         t.json_schema type: "string", format: "uri"
-        t.warehouse_table table_type: "STRING" # table schema type
+        t.warehouse_column type: "STRING"
       end
 
       s.object_type "Page" do |t|

@@ -6,10 +6,12 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/warehouse/schema_definition/api_extension"
+
 RSpec.describe ElasticGraph::Warehouse::WarehouseConfig::WarehouseTable, :unit do
   include ElasticGraph::SchemaDefinition::TestSupport
 
-  it "handles non-null scalars and accepts a block during construction" do
+  it "handles non-null scalars" do
     require "elastic_graph/warehouse/schema_definition/api_extension"
 
     results = define_schema(
@@ -19,10 +21,7 @@ RSpec.describe ElasticGraph::Warehouse::WarehouseConfig::WarehouseTable, :unit d
       s.json_schema_version 1
       s.object_type "Doc" do |t|
         t.field "id", "ID!"
-        # pass a block to exercise the block-yield in WarehouseTable#initialize
-        t.warehouse_table "doc" do |_table|
-          # no-op
-        end
+        t.warehouse_table "doc"
       end
     end
 
@@ -95,7 +94,7 @@ RSpec.describe ElasticGraph::Warehouse::WarehouseConfig::WarehouseTable, :unit d
       )
 
       # Should return ARRAY<STRING> fallback for unresolved list type
-      expect(table.fields_to_table_type).to include("items ARRAY<STRING>")
+      expect(table.table_schema).to include("items ARRAY<STRING>")
     end
 
     it "handles fields where resolved type does not respond to to_warehouse_field_type" do
@@ -103,7 +102,7 @@ RSpec.describe ElasticGraph::Warehouse::WarehouseConfig::WarehouseTable, :unit d
 
       # Create a mock resolved type that doesn't respond to to_warehouse_field_type
       mock_resolved = instance_double("ResolvedType")
-      allow(mock_resolved).to receive(:respond_to?).with(:to_warehouse_field_type).and_return(false)
+      allow(mock_resolved).to receive(:respond_to?).with(:to_warehouse_column_type).and_return(false)
 
       mock_type = instance_double("Type")
       allow(mock_type).to receive(:list?).and_return(false)
@@ -127,44 +126,7 @@ RSpec.describe ElasticGraph::Warehouse::WarehouseConfig::WarehouseTable, :unit d
       )
 
       # Should return STRING fallback for type without warehouse_field_type method
-      expect(table.fields_to_table_type).to include("custom_field STRING")
-    end
-  end
-
-  describe "warehouse table configuration with block" do
-    it "yields self when block is given" do
-      require "elastic_graph/warehouse/schema_definition/api_extension"
-
-      mock_indexed_type = instance_double("IndexedType")
-      allow(mock_indexed_type).to receive(:indexing_fields_by_name_in_index).and_return({})
-
-      yielded_table = nil
-      table = ElasticGraph::Warehouse::WarehouseConfig::WarehouseTable.new(
-        "test_table",
-        {},
-        instance_double("state"),
-        mock_indexed_type
-      ) do |t|
-        yielded_table = t
-      end
-
-      expect(yielded_table).to eq(table)
-    end
-
-    it "works without a block" do
-      require "elastic_graph/warehouse/schema_definition/api_extension"
-
-      mock_indexed_type = instance_double("IndexedType")
-      allow(mock_indexed_type).to receive(:indexing_fields_by_name_in_index).and_return({})
-
-      expect {
-        ElasticGraph::Warehouse::WarehouseConfig::WarehouseTable.new(
-          "test_table",
-          {},
-          instance_double("state"),
-          mock_indexed_type
-        )
-      }.not_to raise_error
+      expect(table.table_schema).to include("custom_field STRING")
     end
   end
 end

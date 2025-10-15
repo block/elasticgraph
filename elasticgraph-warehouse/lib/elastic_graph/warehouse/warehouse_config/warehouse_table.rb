@@ -8,50 +8,46 @@
 
 module ElasticGraph
   module Warehouse
-    # Contains warehouse configuration classes
+    # Contains warehouse configuration classes.
     module WarehouseConfig
-      # Represents a warehouse table configuration
+      # Represents a warehouse table configuration.
       class WarehouseTable < Struct.new(:name, :settings, :schema_def_state, :indexed_type)
-        # Initializes a new warehouse table
+        # Initializes a new warehouse table.
         #
         # @param name [String] the name of the warehouse table
         # @param settings [Hash] table-specific settings
         # @param schema_def_state [Object] the schema definition state
         # @param indexed_type [Object] the indexed type this table represents
-        # @yield [self] optional block that receives the table instance for configuration
         # @return [WarehouseTable] the initialized warehouse table
         def initialize(name, settings, schema_def_state, indexed_type)
           super
-          yield self if block_given?
         end
 
-        # Converts the warehouse table to a configuration hash
+        # Converts the warehouse table to a configuration hash.
         #
         # @return [Hash] configuration hash with settings and table_schema
         def to_config
           {
             "settings" => settings,
-            "table_schema" => fields_to_table_type
+            "table_schema" => table_schema
           }
         end
 
-        # Generates the SQL CREATE TABLE statement for this warehouse table
+        # Generates the SQL CREATE TABLE statement for this warehouse table.
         #
         # @return [String] SQL CREATE TABLE statement with all fields
-        def fields_to_table_type
-          @fields_to_table_type ||= begin
-            fields = indexed_type
-              .indexing_fields_by_name_in_index
-              .values
-              .map { |field| "  #{table_field(field)}" }
-              .join(",\n")
+        def table_schema
+          fields = indexed_type
+            .indexing_fields_by_name_in_index
+            .values
+            .map { |field| "  #{table_field(field)}" }
+            .join(",\n")
 
-            <<~SQL.strip
-              CREATE TABLE IF NOT EXISTS #{name} (
-              #{fields}
-              )
-            SQL
-          end
+          <<~SQL.strip
+            CREATE TABLE IF NOT EXISTS #{name} (
+            #{fields}
+            )
+          SQL
         end
 
         private
@@ -66,12 +62,12 @@ module ElasticGraph
             field_type.unwrap_non_null.resolved
           end
 
-          # Handle unresolved types gracefully
-          unless resolved_type&.respond_to?(:to_warehouse_field_type)
+          # Handle unresolved types gracefully.
+          unless resolved_type&.respond_to?(:to_warehouse_column_type)
             return field_type.list? ? "#{field_name} ARRAY<STRING>" : "#{field_name} STRING"
           end
 
-          warehouse_type = resolved_type.to_warehouse_field_type.to_table_type
+          warehouse_type = resolved_type.to_warehouse_column_type
 
           if field_type.list?
             "#{field_name} ARRAY<#{warehouse_type}>"

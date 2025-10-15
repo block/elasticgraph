@@ -6,10 +6,12 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/warehouse/schema_definition/api_extension"
+
 RSpec.describe ElasticGraph::Warehouse::SchemaDefinition::FactoryExtension, :unit do
   include ElasticGraph::SchemaDefinition::TestSupport
 
-  it "extends new object types with ObjectTypeExtension" do
+  it "extends new object types with ObjectAndInterfaceExtension" do
     require "elastic_graph/warehouse/schema_definition/api_extension"
 
     results = define_schema(schema_element_name_form: :snake_case, extension_modules: [ElasticGraph::Warehouse::SchemaDefinition::APIExtension]) do |s|
@@ -25,7 +27,7 @@ RSpec.describe ElasticGraph::Warehouse::SchemaDefinition::FactoryExtension, :uni
     expect(results.warehouse_config).to have_key("products")
   end
 
-  it "extends new interface types with InterfaceTypeExtension" do
+  it "extends new interface types with ObjectAndInterfaceExtension" do
     require "elastic_graph/warehouse/schema_definition/api_extension"
 
     results = define_schema(schema_element_name_form: :snake_case, extension_modules: [ElasticGraph::Warehouse::SchemaDefinition::APIExtension]) do |s|

@@ -7,8 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/warehouse/schema_definition/enum_type_extension"
-require "elastic_graph/warehouse/schema_definition/interface_type_extension"
-require "elastic_graph/warehouse/schema_definition/object_type_extension"
+require "elastic_graph/warehouse/schema_definition/object_and_interface_extension"
 require "elastic_graph/warehouse/schema_definition/scalar_type_extension"
 
 module ElasticGraph
@@ -18,7 +17,7 @@ module ElasticGraph
       #
       # @private
       module FactoryExtension
-        # Creates a new enum type with warehouse extensions
+        # Creates a new enum type with warehouse extensions.
         #
         # @param name [String] the name of the enum type
         # @yield [type] the newly created enum type
@@ -30,31 +29,31 @@ module ElasticGraph
           end
         end
 
-        # Creates a new interface type with warehouse extensions
+        # Creates a new interface type with warehouse extensions.
         #
         # @param name [String] the name of the interface type
         # @yield [type] the newly created interface type
         # @return [ElasticGraph::SchemaDefinition::SchemaElements::InterfaceType] the created interface type
         def new_interface_type(name)
           super(name) do |type|
-            type.extend InterfaceTypeExtension
+            type.extend ObjectAndInterfaceExtension
             yield type
           end
         end
 
-        # Creates a new object type with warehouse extensions
+        # Creates a new object type with warehouse extensions.
         #
         # @param name [String] the name of the object type
         # @yield [type] the newly created object type (optional)
         # @return [ElasticGraph::SchemaDefinition::SchemaElements::ObjectType] the created object type
         def new_object_type(name)
           super(name) do |type|
-            type.extend ObjectTypeExtension
+            type.extend ObjectAndInterfaceExtension
             yield type if block_given?
           end
         end
 
-        # Creates a new scalar type with warehouse extensions
+        # Creates a new scalar type with warehouse extensions.
         #
         # @param name [String] the name of the scalar type
         # @yield [type] the newly created scalar type

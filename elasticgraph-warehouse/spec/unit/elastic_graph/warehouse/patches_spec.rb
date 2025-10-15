@@ -6,6 +6,8 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/warehouse/schema_definition/api_extension"
+
 RSpec.describe ElasticGraph::Warehouse::Patches, :unit do
   include ElasticGraph::SchemaDefinition::TestSupport
 

@@ -6,10 +6,12 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/warehouse/schema_definition/api_extension"
+
 RSpec.describe ElasticGraph::Warehouse::SchemaDefinition::ScalarTypeExtension, :unit do
   include ElasticGraph::SchemaDefinition::TestSupport
 
-  it "allows configuring warehouse table options on scalar types" do
+  it "allows configuring warehouse column options on scalar types" do
     require "elastic_graph/warehouse/schema_definition/api_extension"
 
     results = define_schema(schema_element_name_form: :snake_case, extension_modules: [ElasticGraph::Warehouse::SchemaDefinition::APIExtension]) do |s|
@@ -18,7 +20,7 @@ RSpec.describe ElasticGraph::Warehouse::SchemaDefinition::ScalarTypeExtension, :
       s.scalar_type "CustomTimestamp" do |t|
         t.mapping type: "date"
         t.json_schema type: "string", format: "date-time"
-        t.warehouse_table type: "TIMESTAMP"
+        t.warehouse_column type: "TIMESTAMP"
       end
 
       s.object_type "Event" do |t|
@@ -30,10 +32,10 @@ RSpec.describe ElasticGraph::Warehouse::SchemaDefinition::ScalarTypeExtension, :
 
     # Verify the scalar type has warehouse options
     scalar_type = results.state.scalar_types_by_name["CustomTimestamp"]
-    expect(scalar_type.warehouse_table_options).to eq({type: "TIMESTAMP"})
+    expect(scalar_type.warehouse_column_options).to eq({type: "TIMESTAMP"})
   end
 
-  it "merges hash argument with keyword arguments in warehouse_table" do
+  it "allows additional options in warehouse_column" do
     require "elastic_graph/warehouse/schema_definition/api_extension"
 
     results = define_schema(schema_element_name_form: :snake_case, extension_modules: [ElasticGraph::Warehouse::SchemaDefinition::APIExtension]) do |s|
@@ -42,7 +44,7 @@ RSpec.describe ElasticGraph::Warehouse::SchemaDefinition::ScalarTypeExtension, :
       s.scalar_type "CustomDecimal" do |t|
         t.mapping type: "scaled_float"
         t.json_schema type: "number"
-        t.warehouse_table({precision: 10}, scale: 2)
+        t.warehouse_column type: "DECIMAL", precision: 10, scale: 2
       end
 
       s.object_type "Price" do |t|
@@ -52,7 +54,7 @@ RSpec.describe ElasticGraph::Warehouse::SchemaDefinition::ScalarTypeExtension, :
     end
 
     scalar_type = results.state.scalar_types_by_name["CustomDecimal"]
-    expect(scalar_type.warehouse_table_options).to eq({precision: 10, scale: 2})
+    expect(scalar_type.warehouse_column_options).to eq({type: "DECIMAL", precision: 10, scale: 2})
   end
 
   it "converts scalar type to warehouse field type" do
@@ -73,10 +75,9 @@ RSpec.describe ElasticGraph::Warehouse::SchemaDefinition::ScalarTypeExtension, :
     end
 
     scalar_type = results.state.scalar_types_by_name["UUID"]
-    field_type = scalar_type.to_warehouse_field_type
+    table_type = scalar_type.to_warehouse_column_type
 
-    expect(field_type).to be_a(ElasticGraph::Warehouse::WarehouseConfig::FieldType::Scalar)
-    expect(field_type.scalar_type).to eq(scalar_type)
+    expect(table_type).to eq("STRING")
   end
 
   it "handles built-in scalar types" do
@@ -103,7 +104,7 @@ RSpec.describe ElasticGraph::Warehouse::SchemaDefinition::ScalarTypeExtension, :
     expect(table.fetch("table_schema")).to include("id_field STRING")
   end
 
-  it "handles scalar types with warehouse_table_options[:type] set" do
+  it "handles scalar types with warehouse_column_options[:type] set" do
     require "elastic_graph/warehouse/schema_definition/api_extension"
 
     results = define_schema(schema_element_name_form: :snake_case, extension_modules: [ElasticGraph::Warehouse::SchemaDefinition::APIExtension]) do |s|
@@ -112,7 +113,7 @@ RSpec.describe ElasticGraph::Warehouse::SchemaDefinition::ScalarTypeExtension, :
       s.scalar_type "CustomType" do |t|
         t.mapping type: "keyword"
         t.json_schema type: "string"
-        t.warehouse_table type: "BINARY"
+        t.warehouse_column type: "BINARY"
       end
 
       s.object_type "TestType" do |t|

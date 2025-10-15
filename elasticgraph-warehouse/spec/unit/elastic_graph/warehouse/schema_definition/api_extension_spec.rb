@@ -6,6 +6,8 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/warehouse/schema_definition/api_extension"
+
 RSpec.describe ElasticGraph::Warehouse::SchemaDefinition::APIExtension, :unit do
   include ElasticGraph::SchemaDefinition::TestSupport
 
@@ -66,7 +68,7 @@ RSpec.describe ElasticGraph::Warehouse::SchemaDefinition::APIExtension, :unit do
     expect(table.fetch("table_schema")).to include("status STRING")
   end
 
-  it "extends built-in object types with ObjectTypeExtension" do
+  it "extends built-in object types with ObjectAndInterfaceExtension" do
     require "elastic_graph/warehouse/schema_definition/api_extension"
 
     # Test with a schema that uses built-in object types
@@ -84,7 +86,7 @@ RSpec.describe ElasticGraph::Warehouse::SchemaDefinition::APIExtension, :unit do
     expect(results.warehouse_config).to have_key("page_info")
   end
 
-  it "extends built-in interface types with InterfaceTypeExtension" do
+  it "extends built-in interface types with ObjectAndInterfaceExtension" do
     require "elastic_graph/warehouse/schema_definition/api_extension"
 
     results = define_schema(schema_element_name_form: :snake_case, extension_modules: [ElasticGraph::Warehouse::SchemaDefinition::APIExtension]) do |s|
@@ -124,7 +126,7 @@ RSpec.describe ElasticGraph::Warehouse::SchemaDefinition::APIExtension, :unit do
 
     # Verify the scalar type has the extension
     scalar_type = results.state.scalar_types_by_name["TestScalar"]
-    expect(scalar_type).to respond_to(:to_warehouse_field_type)
+    expect(scalar_type).to respond_to(:to_warehouse_column_type)
 
     # Count how many times the module appears
     count = scalar_type.singleton_class.included_modules.count do |m|
@@ -218,11 +220,11 @@ RSpec.describe ElasticGraph::Warehouse::SchemaDefinition::APIExtension, :unit do
 
     # Union types should not be extended with warehouse methods
     union_type = results.state.types_by_name["PaymentMethod"]
-    expect(union_type).not_to respond_to(:to_warehouse_field_type)
+    expect(union_type).not_to respond_to(:to_warehouse_column_type)
 
     # But object types should still be extended
     object_type = results.state.object_types_by_name["Payment"]
-    expect(object_type).to respond_to(:to_warehouse_field_type)
+    expect(object_type).to respond_to(:to_warehouse_column_type)
 
     # Verify warehouse config only contains the object type with warehouse_table
     expect(results.warehouse_config.keys).to eq(["payments"])
@@ -258,14 +260,14 @@ RSpec.describe ElasticGraph::Warehouse::SchemaDefinition::APIExtension, :unit do
     # Get the interface type from the results
     interface_type = results.state.types_by_name["TestNode"]
 
-    # Verify the interface type was extended with InterfaceTypeExtension
+    # Verify the interface type was extended with ObjectAndInterfaceExtension
     # (this happens via FactoryExtension, not on_built_in_types, but tests the same code path)
     expect(interface_type).to be_a(ElasticGraph::SchemaDefinition::SchemaElements::InterfaceType)
-    expect(interface_type).to respond_to(:to_warehouse_field_type)
+    expect(interface_type).to respond_to(:to_warehouse_column_type)
 
-    # Verify it has the InterfaceTypeExtension
+    # Verify it has the ObjectAndInterfaceExtension
     expect(interface_type.singleton_class.included_modules).to include(
-      ElasticGraph::Warehouse::SchemaDefinition::InterfaceTypeExtension
+      ElasticGraph::Warehouse::SchemaDefinition::ObjectAndInterfaceExtension
     )
 
     # Verify warehouse tables were created for both types

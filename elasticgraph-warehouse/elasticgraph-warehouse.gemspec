@@ -15,7 +15,7 @@ Gem::Specification.new do |spec|
   spec.email = ["myron@squareup.com"]
   spec.homepage = "https://block.github.io/elasticgraph/"
   spec.license = "MIT"
-  spec.summary = "Adds Data Warehouse configuration generation to ElasticGraph"
+  spec.summary = "Extends ElasticGraph to support ingestion into a data warehouse."
 
   spec.metadata = {
     "bug_tracker_uri" => "https://github.com/block/elasticgraph/issues",

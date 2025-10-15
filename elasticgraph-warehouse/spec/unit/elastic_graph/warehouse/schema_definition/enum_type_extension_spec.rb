@@ -6,10 +6,12 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/warehouse/schema_definition/api_extension"
+
 RSpec.describe ElasticGraph::Warehouse::SchemaDefinition::EnumTypeExtension, :unit do
   include ElasticGraph::SchemaDefinition::TestSupport
 
-  it "converts enum type to warehouse field type" do
+  it "converts enum type to warehouse table type" do
     require "elastic_graph/warehouse/schema_definition/api_extension"
 
     results = define_schema(schema_element_name_form: :snake_case, extension_modules: [ElasticGraph::Warehouse::SchemaDefinition::APIExtension]) do |s|
@@ -29,10 +31,9 @@ RSpec.describe ElasticGraph::Warehouse::SchemaDefinition::EnumTypeExtension, :un
     end
 
     enum_type = results.state.enum_types_by_name["Status"]
-    field_type = enum_type.to_warehouse_field_type
+    table_type = enum_type.to_warehouse_column_type
 
-    expect(field_type).to be_a(ElasticGraph::Warehouse::WarehouseConfig::FieldType::Enum)
-    expect(field_type.enum_value_names).to eq(["ACTIVE", "INACTIVE", "PENDING"])
+    expect(table_type).to eq("STRING")
   end
 
   it "maps enum types to STRING in warehouse tables" do
@@ -81,8 +82,8 @@ RSpec.describe ElasticGraph::Warehouse::SchemaDefinition::EnumTypeExtension, :un
     end
 
     enum_type = results.state.enum_types_by_name["Country"]
-    field_type = enum_type.to_warehouse_field_type
+    table_type = enum_type.to_warehouse_column_type
 
-    expect(field_type.enum_value_names).to eq(["USA", "CANADA", "MEXICO", "UK", "FRANCE", "GERMANY"])
+    expect(table_type).to eq("STRING")
   end
 end

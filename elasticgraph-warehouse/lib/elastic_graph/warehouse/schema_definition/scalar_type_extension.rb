@@ -6,33 +6,43 @@
 #
 # frozen_string_literal: true
 
-require "elastic_graph/warehouse/warehouse_config/field_type/scalar"
-
 module ElasticGraph
   module Warehouse
     module SchemaDefinition
-      # Extends {ElasticGraph::SchemaDefinition::SchemaElements::ScalarType} to add warehouse field type conversion.
+      # Extends {ElasticGraph::SchemaDefinition::SchemaElements::ScalarType} to add warehouse column type conversion.
       module ScalarTypeExtension
-        # Warehouse table options configured on this scalar type
-        def warehouse_table_options
-          @warehouse_table_options ||= {}
+        # Warehouse column options configured on this scalar type.
+        def warehouse_column_options
+          @warehouse_column_options ||= {}
         end
 
-        # Configures warehouse table type options for this scalar type
+        # Configures warehouse column type options for this scalar type.
         #
-        # @param arg [Hash, nil] options hash or nil
+        # @param type [String] the warehouse column type (e.g., "TIMESTAMP", "BINARY")
         # @param options [Hash] additional options
-        # @return [Hash] updated warehouse table options
-        def warehouse_table(arg = nil, **options)
-          opts = arg.is_a?(Hash) ? arg.merge(options) : options
-          warehouse_table_options.update(opts)
+        # @return [Hash] updated warehouse column options
+        def warehouse_column(type:, **options)
+          warehouse_column_options.update(options.merge(type: type))
         end
 
-        # Converts this scalar type to a warehouse field type
+        # Returns the warehouse column type representation for this scalar type.
         #
-        # @return [ElasticGraph::Warehouse::WarehouseConfig::FieldType::Scalar]
-        def to_warehouse_field_type
-          ::ElasticGraph::Warehouse::WarehouseConfig::FieldType::Scalar.new(scalar_type: self)
+        # @return [String] the SQL type string (e.g., "INT", "DOUBLE", "BOOLEAN", "STRING")
+        def to_warehouse_column_type
+          warehouse_type = warehouse_column_options[:type]
+          return warehouse_type if warehouse_type
+
+          # Map common ElasticGraph scalar types to warehouse types.
+          case name
+          when "Int"
+            "INT"
+          when "Float"
+            "DOUBLE"
+          when "Boolean"
+            "BOOLEAN"
+          else
+            "STRING"
+          end
         end
       end
     end

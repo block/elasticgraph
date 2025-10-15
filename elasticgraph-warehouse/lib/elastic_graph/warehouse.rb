@@ -6,7 +6,7 @@
 #
 # frozen_string_literal: true
 
-# Warehouse extension: adds Data Warehouse config generation to ElasticGraph
+# Warehouse extension: adds Data Warehouse config generation to ElasticGraph.
 # This gem follows the same extension pattern as elasticgraph-apollo, using factory extensions
 # to add warehouse capabilities to schema elements.
 #
@@ -20,8 +20,11 @@
 #     ]
 #   end
 
-require_relative "warehouse/version"
-require_relative "warehouse/constants"
-# Don't load patches here - they need to be loaded after the core classes
-# require_relative "warehouse/patches"
-require_relative "warehouse/schema_definition/api_extension"
+module ElasticGraph
+  module Warehouse
+    # The name of the generated data warehouse configuration file.
+    DATA_WAREHOUSE_FILE = "data_warehouse.yaml"
+  end
+end
+
+require "elastic_graph/warehouse/patches"
