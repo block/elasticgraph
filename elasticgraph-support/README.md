@@ -57,6 +57,9 @@ graph LR;
     elasticgraph-schema_definition["elasticgraph-schema_definition"];
     elasticgraph-schema_definition --> elasticgraph-support;
     class elasticgraph-schema_definition otherEgGemStyle;
+    elasticgraph-warehouse["elasticgraph-warehouse"];
+    elasticgraph-warehouse --> elasticgraph-support;
+    class elasticgraph-warehouse otherEgGemStyle;
     click logger href "https://rubygems.org/gems/logger" "Open on RubyGems.org" _blank;
     click json_schemer href "https://rubygems.org/gems/json_schemer" "Open on RubyGems.org" _blank;
 ```

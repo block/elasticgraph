@@ -154,6 +154,7 @@ module ElasticGraph
     [
       "ElasticGraph::Apollo@Use elasticgraph-apollo in a project",
       "ElasticGraph::Apollo::SchemaDefinition::APIExtension@Define local rake tasks with this extension module",
+      "ElasticGraph::Warehouse::SchemaDefinition::APIExtension@Define local rake tasks with this extension module",
       "ElasticGraph::Local::RakeTasks"
     ].each do |description|
       doctest.before description do
