@@ -405,6 +405,25 @@ module ElasticGraph
           ]
         end
 
+        it "does not validate the index mapping consistency when skip flag is enabled" do
+          call_sequence = []
+          indexer_with_skip = build_indexer(skip_mapping_completeness_validation: true)
+          router_with_skip = indexer_with_skip.datastore_router
+          index_mapping_checker_with_skip = router_with_skip
+          expect(index_mapping_checker_with_skip).not_to receive(:validate_mapping_completeness_of!)
+
+          allow(main_datastore_client).to receive(:bulk) do |request|
+            call_sequence << :bulk
+            respond_to_datastore_client_bulk_request(request)
+          end
+
+          router_with_skip.bulk(operations)
+
+          expect(call_sequence).to eq [
+            :bulk
+          ]
+        end
+
         it "includes the exception class and message in the return failure result when scripted updates fail" do
           # Make sure the stubbed response ONLY contains keys that match the `filter_path` in DATASTORE_BULK_FILTER_PATH
           fake_resp = {"items" => [
@@ -676,7 +695,7 @@ module ElasticGraph
         {"items" => items}
       end
 
-      def build_indexer(index_to_clusters: {})
+      def build_indexer(index_to_clusters: {}, **extra_args)
         super(clients_by_name: {"main" => main_datastore_client, "other" => other_datastore_client}, schema_definition: lambda do |schema|
           schema.object_type "Component" do |t|
             t.field "id", "ID!"
@@ -700,7 +719,7 @@ module ElasticGraph
             t.field "widget_names", "[String!]!"
             t.index "widget_currencies"
           end
-        end) do |config|
+        end, **extra_args) do |config|
           config.with(index_definitions: config.index_definitions.merge(
             index_to_clusters.to_h do |index, clusters|
               [index, config_index_def_of(index_into_clusters: clusters["index_into_clusters"])]

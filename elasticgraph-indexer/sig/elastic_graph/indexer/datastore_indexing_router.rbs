@@ -7,7 +7,8 @@ module ElasticGraph
         datastore_clients_by_name: ::Hash[::String, DatastoreCore::_Client],
         mappings_by_index_def_name: ::Hash[::String, untyped],
         monotonic_clock: Support::MonotonicClock,
-        logger: ::Logger
+        logger: ::Logger,
+        ?skip_mapping_completeness_validation: bool
       ) -> void
 
       def bulk: (::Array[_Operation], ?refresh: bool) -> BulkResult
@@ -27,6 +28,7 @@ module ElasticGraph
         [DatastoreCore::_Client, DatastoreCore::indexDefinition],
         CachedMapping
       ]
+      @skip_mapping_completeness_validation: bool
 
       def mapping_diffs_for: (
         DatastoreCore::indexDefinition,
