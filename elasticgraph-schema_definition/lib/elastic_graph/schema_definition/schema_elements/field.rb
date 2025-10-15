@@ -968,7 +968,8 @@ module ElasticGraph
             json_schema_options: json_schema_options,
             accuracy_confidence: accuracy_confidence,
             source: source,
-            runtime_field_script: runtime_field_script
+            runtime_field_script: runtime_field_script,
+            doc_comment: doc_comment
           )
         end
 

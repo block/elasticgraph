@@ -12,6 +12,7 @@ module ElasticGraph
         attr_reader mapping_customizations: ::Hash[::Symbol, untyped]
         attr_reader source: SchemaElements::FieldSource?
         attr_accessor runtime_field_script: ::String?
+        attr_reader doc_comment: ::String?
 
         def initialize: (
           name: ::String,
@@ -23,7 +24,8 @@ module ElasticGraph
           json_schema_customizations: ::Hash[::Symbol, untyped],
           mapping_customizations: ::Hash[::Symbol, untyped],
           source: SchemaElements::FieldSource?,
-          runtime_field_script: ::String?
+          runtime_field_script: ::String?,
+          doc_comment: ::String?
         ) -> Field
 
         def with: (
@@ -36,7 +38,8 @@ module ElasticGraph
           ?json_schema_customizations: ::Hash[::Symbol, untyped],
           ?mapping_customizations: ::Hash[::Symbol, untyped],
           ?source: SchemaElements::FieldSource?,
-          ?runtime_field_script: ::String?
+          ?runtime_field_script: ::String?,
+          ?doc_comment: ::String?
         ) -> Field
       end
 

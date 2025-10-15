@@ -18,7 +18,8 @@ module ElasticGraph
         :json_schema_options,
         :accuracy_confidence,
         :source,
-        :runtime_field_script
+        :runtime_field_script,
+        :doc_comment
       )
 
       # A lazy reference to a {Field}. It contains all attributes needed to build a {Field}, but the referenced `type` may not be
@@ -40,11 +41,12 @@ module ElasticGraph
             json_schema_customizations: json_schema_options,
             mapping_customizations: mapping_options,
             source: source,
-            runtime_field_script: runtime_field_script
+            runtime_field_script: runtime_field_script,
+            doc_comment: doc_comment
           )
         end
 
-        # @dynamic initialize, with, name, name_in_index, type, mapping_options, json_schema_options, accuracy_confidence, source, runtime_field_script
+        # @dynamic initialize, with, name, name_in_index, type, mapping_options, json_schema_options, accuracy_confidence, source, runtime_field_script, doc_comment
       end
     end
   end

@@ -150,7 +150,7 @@ module ElasticGraph
               }
             },
             "required" => %w[latitude longitude]
-          }).which_matches(
+          }, ignore_descriptions: true).which_matches(
             {"latitude" => 0, "longitude" => 0},
             {"latitude" => -90, "longitude" => -180},
             {"latitude" => 90, "longitude" => 180}
@@ -1478,7 +1478,7 @@ module ElasticGraph
               "user_id" => shard_routing_string_field
             },
             "required" => %w[id user_id]
-          }).which_matches(
+          }, ignore_descriptions: true).which_matches(
             {"id" => "abc", "user_id" => "def"},
             {"id" => "abc", "user_id" => " d"},
             {"id" => "abc", "user_id" => "\td"},
@@ -1513,7 +1513,7 @@ module ElasticGraph
               "user_id" => shard_routing_string_field
             },
             "required" => ["user_id"]
-          })
+          }, ignore_descriptions: true)
 
           expect(json_schema).to have_json_schema_like("Widget", {
             "type" => "object",
@@ -1522,7 +1522,7 @@ module ElasticGraph
               "widget_ids" => json_schema_ref("WidgetIDs!")
             },
             "required" => %w[id widget_ids]
-          })
+          }, ignore_descriptions: true)
         end
 
         it "raises an error if the specified custom shard routing field is absent from the index" do
@@ -2882,6 +2882,35 @@ module ElasticGraph
 
         widget_def = json_schema.fetch("$defs").fetch("Widget")
         expect(widget_def["properties"].keys).not_to include("test_runtime_field")
+      end
+
+      it "includes description fields from documentation in the JSON schema" do
+        json_schema = dump_schema do |schema|
+          schema.object_type "Widget" do |t|
+            t.documentation "A reusable widget component."
+
+            t.field "id", "ID!" do |f|
+              f.documentation "The Widget's unique identifier."
+            end
+
+            t.field "name", "String" do |f|
+              f.documentation "The display name of the widget."
+            end
+
+            t.field "undocumented_field", "Int"
+
+            t.index "widgets"
+          end
+        end
+
+        widget_schema = json_schema.dig("$defs", "Widget")
+
+        expect(widget_schema["description"]).to eq("A reusable widget component.")
+
+        expect(widget_schema.dig("properties", "id", "description")).to eq("The Widget's unique identifier.")
+        expect(widget_schema.dig("properties", "name", "description")).to eq("The display name of the widget.")
+
+        expect(widget_schema.dig("properties", "undocumented_field")).not_to have_key("description")
       end
 
       def all_type_definitions_for(&schema_definition)

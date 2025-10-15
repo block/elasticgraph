@@ -28,7 +28,8 @@ module ElasticGraph
         :json_schema_customizations,
         :mapping_customizations,
         :source,
-        :runtime_field_script
+        :runtime_field_script,
+        :doc_comment
       )
         # JSON schema overrides that automatically apply to specific mapping types so that the JSON schema
         # validation will reject values which cannot be indexed into fields of a specific mapping type.
@@ -70,6 +71,7 @@ module ElasticGraph
             .reverse # resolve layers from innermost to outermost wrappings
             .reduce(inner_json_schema) { |acc, layer| process_layer(layer, acc) }
             .merge(outer_json_schema_customizations)
+            .merge(doc_comment ? {"description" => doc_comment} : {})
             .then { |h| Support::HashUtil.stringify_keys(h) }
         end
 

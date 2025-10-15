@@ -24,9 +24,11 @@ module ElasticGraph
         #   @return [Hash<String, ::Object>] options to be included in the mapping
         # @!attribute [r] json_schema_options
         #   @return [Hash<String, ::Object>] options to be included in the JSON schema
+        # @!attribute [r] doc_comment
+        #   @return [String, nil] documentation for the type
         #
         # @api private
-        class Object < Support::MemoizableData.define(:type_name, :subfields, :mapping_options, :json_schema_options)
+        class Object < Support::MemoizableData.define(:type_name, :subfields, :mapping_options, :json_schema_options, :doc_comment)
           # @return [Hash<String, ::Object>] the datastore mapping for this object type.
           def to_mapping
             @to_mapping ||= begin
@@ -55,8 +57,9 @@ module ElasticGraph
                   # Note: `__typename` is intentionally not included in the `required` list. If `__typename` is present
                   # we want it validated (as we do by merging in `json_schema_typename_field`) but we only want
                   # to require it in the context of a union type. The union's json schema requires the field.
-                  "required" => json_schema_subfields.map(&:name).freeze
-                }.freeze
+                  "required" => json_schema_subfields.map(&:name).freeze,
+                  "description" => doc_comment
+                }.compact.freeze
               else
                 Support::HashUtil.stringify_keys(json_schema_options)
               end

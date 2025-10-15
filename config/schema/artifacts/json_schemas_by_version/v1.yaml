@@ -358,6 +358,8 @@ json_schema_version: 1
         - "$ref": "#/$defs/Float"
         - minimum: -90
           maximum: 90
+        description: Angular distance north or south of the Earth's equator, measured
+          in degrees from -90 to +90.
         ElasticGraph:
           type: Float!
           nameInIndex: lat
@@ -366,6 +368,8 @@ json_schema_version: 1
         - "$ref": "#/$defs/Float"
         - minimum: -180
           maximum: 180
+        description: Angular distance east or west of the Prime Meridian at Greenwich,
+          UK, measured in degrees from -180 to +180.
         ElasticGraph:
           type: Float!
           nameInIndex: lon
@@ -376,6 +380,7 @@ json_schema_version: 1
     required:
     - latitude
     - longitude
+    description: Geographic coordinates representing a location on the Earth's surface.
   GeoShape:
     type: object
     properties:
@@ -885,6 +890,8 @@ json_schema_version: 1
     - seasons_object
     - nested_fields
     - nested_fields2
+    description: For more performant queries on this type, please filter on `league`
+      if possible.
   TeamDetails:
     type: object
     properties:
@@ -1318,6 +1325,8 @@ json_schema_version: 1
     - amounts
     - fees
     - metadata
+    description: For more performant queries on this type, please filter on `workspace_id`
+      if possible.
   WidgetOptions:
     type: object
     properties:
