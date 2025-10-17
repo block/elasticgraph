@@ -29,6 +29,8 @@ module ElasticGraph
       attr_reader type_namer: SchemaElements::TypeNamer
       attr_reader enum_value_namer: SchemaElements::EnumValueNamer
       attr_accessor output: io
+      attr_accessor allow_omitted_fields: bool
+      attr_accessor allow_extra_fields: bool
 
       def initialize: (
         api: API,
@@ -58,7 +60,9 @@ module ElasticGraph
         type_refs_by_name: ::Hash[::String, SchemaElements::TypeReference],
         type_namer: SchemaElements::TypeNamer,
         enum_value_namer: SchemaElements::EnumValueNamer,
-        output: io
+        output: io,
+        allow_omitted_fields: bool,
+        allow_extra_fields: bool,
       ) -> void
     end
 

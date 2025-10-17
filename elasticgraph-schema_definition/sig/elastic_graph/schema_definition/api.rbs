@@ -61,6 +61,7 @@ module ElasticGraph
         ?output: io
       ) -> void
 
+      def json_schema_strictness: (?allow_omitted_fields: bool, ?allow_extra_fields: bool) -> void
       def raw_sdl: (::String) -> void
       def object_type: (::String) { (SchemaElements::ObjectType) -> void } -> void
       def interface_type: (::String) { (SchemaElements::InterfaceType) -> void } -> void

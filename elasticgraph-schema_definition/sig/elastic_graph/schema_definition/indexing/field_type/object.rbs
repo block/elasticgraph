@@ -8,13 +8,15 @@ module ElasticGraph
           attr_reader mapping_options: Mixins::HasTypeInfo::optionsHash
           attr_reader json_schema_options: Mixins::HasTypeInfo::optionsHash
           attr_reader doc_comment: ::String?
+          attr_reader schema_def_state: State
 
           def initialize: (
             type_name: ::String,
             subfields: ::Array[Field],
             mapping_options: Mixins::HasTypeInfo::optionsHash,
             json_schema_options: Mixins::HasTypeInfo::optionsHash,
-            doc_comment: ::String?
+            doc_comment: ::String?,
+            schema_def_state: State
           ) -> void
 
           def with: (
@@ -22,7 +24,8 @@ module ElasticGraph
             ?subfields: ::Array[Field],
             ?mapping_options: Mixins::HasTypeInfo::optionsHash,
             ?json_schema_options: Mixins::HasTypeInfo::optionsHash,
-            ?doc_comment: ::String?
+            ?doc_comment: ::String?,
+            schema_def_state: State
           ) -> Object
         end
 

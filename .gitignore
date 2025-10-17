@@ -77,3 +77,6 @@ config/site/examples/*/queries/*/*.variables.yaml
 # Ignore the generated CSS
 config/site/src/assets/css/main.css
 config/site/src/assets/css/highlight.css
+
+.idea/*
+**.iml
