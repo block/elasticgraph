@@ -61,6 +61,8 @@ module ElasticGraph
             expect(datastore_body_of(merged)).to filter_datastore_with(
               {terms: {"age" => [25, 30]}},
               {terms: {"size" => [10]}}
+#               {bool: {filter: [{terms: {"age" => [25, 30]}}]}},
+#               {bool: {filter: [{terms: {"size" => [10]}}]}}
             )
           end
 
@@ -73,6 +75,8 @@ module ElasticGraph
             expect(datastore_body_of(merged)).to filter_datastore_with(
               {terms: {"age" => [25, 30]}},
               {terms: {"age" => [35, 30]}}
+#               {bool: {filter: [{terms: {"age" => [25, 30]}}]}},
+#               {bool: {filter: [{terms: {"age" => [35, 30]}}]}}
             )
           end
 
