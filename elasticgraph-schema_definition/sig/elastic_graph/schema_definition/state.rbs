@@ -29,8 +29,8 @@ module ElasticGraph
       attr_reader type_namer: SchemaElements::TypeNamer
       attr_reader enum_value_namer: SchemaElements::EnumValueNamer
       attr_accessor output: io
-      attr_accessor allow_omitted_fields: bool
-      attr_accessor allow_extra_fields: bool
+      attr_accessor allow_omitted_json_schema_fields: bool
+      attr_accessor allow_extra_json_schema_fields: bool
 
       def initialize: (
         api: API,
@@ -61,8 +61,8 @@ module ElasticGraph
         type_namer: SchemaElements::TypeNamer,
         enum_value_namer: SchemaElements::EnumValueNamer,
         output: io,
-        allow_omitted_fields: bool,
-        allow_extra_fields: bool,
+        allow_omitted_json_schema_fields: bool,
+        allow_extra_json_schema_fields: bool,
       ) -> void
     end
 

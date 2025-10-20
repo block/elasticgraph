@@ -50,20 +50,17 @@ module ElasticGraph
                 other_source_subfields, json_schema_candidate_subfields = subfields.partition(&:source)
                 validate_sourced_fields_have_no_json_schema_overrides(other_source_subfields)
                 json_schema_subfields = json_schema_candidate_subfields.reject(&:runtime_field_script)
-                required_fields = if schema_def_state.allow_omitted_fields
-                  json_schema_subfields.reject(&:nullable?).map(&:name).freeze
-                else
-                  json_schema_subfields.map(&:name).freeze
-                end
-                additional_properties = schema_def_state.allow_extra_fields ? true : false
+                required_fields = json_schema_subfields
+                required_fields = required_fields.reject(&:nullable?) if schema_def_state.allow_omitted_json_schema_fields
+
                 {
                   "type" => "object",
                   "properties" => json_schema_subfields.to_h { |f| [f.name, f.json_schema] }.merge(json_schema_typename_field),
                   # Note: `__typename` is intentionally not included in the `required` list. If `__typename` is present
                   # we want it validated (as we do by merging in `json_schema_typename_field`) but we only want
                   # to require it in the context of a union type. The union's json schema requires the field.
-                  "required" => required_fields,
-                  "additionalProperties" => additional_properties,
+                  "required" => required_fields.map(&:name).freeze,
+                  "additionalProperties" => (false unless schema_def_state.allow_extra_json_schema_fields),
                   "description" => doc_comment
                 }.compact.freeze
               else

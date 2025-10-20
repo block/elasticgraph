@@ -53,8 +53,8 @@ module ElasticGraph
       :output,
       :type_namer,
       :enum_value_namer,
-      :allow_omitted_fields,
-      :allow_extra_fields
+      :allow_omitted_json_schema_fields,
+      :allow_extra_json_schema_fields
     )
       include Mixins::HasReadableToSAndInspect.new
 
@@ -102,8 +102,8 @@ module ElasticGraph
           ),
           enum_value_namer: SchemaElements::EnumValueNamer.new(enum_value_overrides_by_type),
           output: output,
-          allow_omitted_fields: false,
-          allow_extra_fields: true
+          allow_omitted_json_schema_fields: false,
+          allow_extra_json_schema_fields: true
         )
       end
 

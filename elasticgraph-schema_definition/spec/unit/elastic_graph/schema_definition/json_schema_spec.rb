@@ -2897,7 +2897,20 @@ module ElasticGraph
         expect(widget_def["required"]).to contain_exactly("test_expected_field")
       end
 
-      it "disallowed additional properties if `allow_extra_fields` is `false`" do
+      it "includes nullable fields in `required` if `allow_omitted_fields` is `false`" do
+        json_schema = dump_schema do |schema|
+          schema.json_schema_strictness allow_omitted_fields: false
+          schema.object_type "Widget" do |t|
+            t.field "nullable_string", "String"
+            t.field "nonnull_string", "String!"
+          end
+        end
+
+        widget_def = json_schema.fetch("$defs").fetch("Widget")
+        expect(widget_def["required"]).to contain_exactly("nonnull_string", "nullable_string")
+      end
+
+      it "disallows additional properties if `allow_extra_fields` is `false`" do
         json_schema = dump_schema do |schema|
           schema.json_schema_strictness allow_extra_fields: false
           schema.object_type "Widget" do |t|
@@ -2907,6 +2920,22 @@ module ElasticGraph
 
         widget_def = json_schema.fetch("$defs").fetch("Widget")
         expect(widget_def["additionalProperties"]).to eq(false)
+      end
+
+      it "raises an error when `json_schema_strictness` is called with invalid `allow_omitted_fields` value" do
+        expect {
+          dump_schema do |s|
+            s.json_schema_strictness allow_omitted_fields: "true"
+          end
+        }.to raise_error(Errors::SchemaError, a_string_including("`allow_omitted_fields` must be true or false"))
+      end
+
+      it "raises an error when `json_schema_strictness` is called with invalid `allow_extra_fields` value" do
+        expect {
+          dump_schema do |s|
+            s.json_schema_strictness allow_extra_fields: "true"
+          end
+        }.to raise_error(Errors::SchemaError, a_string_including("`allow_extra_fields` must be true or false"))
       end
 
       it "includes description fields from documentation in the JSON schema" do

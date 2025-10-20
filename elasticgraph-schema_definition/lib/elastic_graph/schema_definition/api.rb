@@ -448,8 +448,8 @@ module ElasticGraph
           raise Errors::SchemaError, "`allow_extra_fields` must be true or false"
         end
 
-        @state.allow_omitted_fields = allow_omitted_fields
-        @state.allow_extra_fields = allow_extra_fields
+        @state.allow_omitted_json_schema_fields = allow_omitted_fields
+        @state.allow_extra_json_schema_fields = allow_extra_fields
         nil
       end
 

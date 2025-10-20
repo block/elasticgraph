@@ -25,7 +25,7 @@ module ElasticGraph
             ?mapping_options: Mixins::HasTypeInfo::optionsHash,
             ?json_schema_options: Mixins::HasTypeInfo::optionsHash,
             ?doc_comment: ::String?,
-            schema_def_state: State
+            ?schema_def_state: State
           ) -> Object
         end
 
