@@ -2922,6 +2922,17 @@ module ElasticGraph
         expect(widget_def["additionalProperties"]).to eq(false)
       end
 
+      it "implicitly allows additional properties (the JSON schema default) if `allow_extra_fields` is `true`" do
+        json_schema = dump_schema do |schema|
+          schema.json_schema_strictness allow_extra_fields: true
+          schema.object_type "Widget" do |t|
+            t.field "test_expected_field", "String!"
+          end
+        end
+        widget_def = json_schema.fetch("$defs").fetch("Widget")
+        expect(widget_def.keys).not_to include "additionalProperties"
+      end
+
       it "raises an error when `json_schema_strictness` is called with invalid `allow_omitted_fields` value" do
         expect {
           dump_schema do |s|
