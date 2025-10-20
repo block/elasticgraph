@@ -28,7 +28,7 @@ module ElasticGraph
 
         it "can roundtrip a schema through a primitive ruby hash for easy serialization and deserialization" do
           stub_const("ElasticGraph::VERSION", "3.14.1592654")
-          
+
           schema = Schema.new(
             elasticgraph_version: "3.14.1592654",
             object_types_by_name: {
