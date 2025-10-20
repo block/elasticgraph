@@ -378,7 +378,7 @@ module ElasticGraph
 
             expect { Schema.from_hash(hash) }.to raise_error(
               Errors::SchemaError,
-              /`runtime_metadata.yaml` is missing `elasticgraph_version`. To proceed, regenerate the schema artifacts./
+              a_string_including("`runtime_metadata.yaml` is missing `elasticgraph_version`. To proceed, regenerate the schema artifacts.")
             )
           end
 
@@ -391,7 +391,7 @@ module ElasticGraph
 
             expect { Schema.from_hash(hash) }.to raise_error(
               Errors::SchemaError,
-              /ElasticGraph version mismatch: schema artifacts were dumped by version 0.0.1, but current version is/
+              a_string_including("ElasticGraph version mismatch: schema artifacts were dumped by version 0.0.1, but current version is")
             )
           end
         end
