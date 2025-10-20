@@ -4,6 +4,7 @@
 source "script/ci_parts/setup_env" "local" $1 $2
 
 script/spellcheck
+script/lint
 script/type_check
 script/update_config_artifacts --verify
 script/update_dependency_diagrams --verify
@@ -12,7 +13,6 @@ script/update_licenses --verify
 script/validate_readme_snippets
 script/validate_release_workflow
 
-bundle exec standardrb
 bundle exec rake schema_artifacts:check VERBOSE=true
 
 # verify that we can index fake data locally. Note: this must come _after_ `rake schema_artifacts:check`

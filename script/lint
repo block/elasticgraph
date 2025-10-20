@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+# Abort script at first error, when a command exits with non-zero status.
+# Verbose form of `set -e`.
+set -o errexit
+
+# Attempt to use undefined variable outputs error message, and forces an exit
+# Verbose form of `set -u`.
+set -o nounset
+
+# If set, the return value of a pipeline is the value of the last (rightmost)
+# command to exit with a non-zero status, or zero if all commands in the
+# pipeline exit successfully.
+set -o pipefail
+
+# Print a trace of simple commands.
+# Verbose form of `set -x`.
+set -o xtrace
+
+bundle exec standardrb $@
