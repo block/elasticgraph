@@ -57,6 +57,8 @@ module ElasticGraph
         def inner_json_schema: () -> ::Hash[::String, untyped]
         def outer_json_schema_customizations: () -> ::Hash[::String, untyped]
 
+        def nullable?: () -> bool
+
         def user_specified_json_schema_customizations_go_on_outside?: () -> bool
         def process_layer: (::Symbol, ::Hash[::String, untyped]) -> ::Hash[::String, untyped]
         def make_nullable: (::Hash[::String, untyped]) -> ::Hash[::String, untyped]

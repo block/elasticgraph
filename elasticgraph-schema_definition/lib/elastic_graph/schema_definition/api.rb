@@ -421,6 +421,38 @@ module ElasticGraph
         nil
       end
 
+      # Defines strictness of the JSON schema validation. By default, the JSON schema will require all fields to be provided by the
+      # publisher (but they can be nullable) and will ignore extra fields that are not defined in the schema. Use this method to
+      # configure this behavior.
+      #
+      # @param allow_omitted_fields [bool] Whether nullable fields can be omitted from indexing events.
+      # @param allow_extra_fields [bool] Whether extra fields (e.g. beyond fields defined in the schema) can be included in indexing events.
+      # @return [void]
+      #
+      # @note If you allow both omitted fields and extra fields, ElasticGraph's JSON schema validation will allow (and ignore) misspelled
+      #   field names in indexing events. For example, if the ElasticGraph schema has a nullable field named `parentId` but the publisher
+      #   accidentally provides it as `parent_id`, ElasticGraph would happily ignore the `parent_id` field entirely, because `parentId`
+      #   is allowed to be omitted and `parent_id` would be treated as an extra field. Therefore, we recommend that you only set one of
+      #   these to `true` (or none).
+      #
+      # @example Allow omitted fields and disallow extra fields
+      #   ElasticGraph.define_schema do |schema|
+      #     schema.json_schema_strictness allow_omitted_fields: true, allow_extra_fields: false
+      #   end
+      def json_schema_strictness(allow_omitted_fields: false, allow_extra_fields: true)
+        unless [true, false].include?(allow_omitted_fields)
+          raise Errors::SchemaError, "`allow_omitted_fields` must be true or false"
+        end
+
+        unless [true, false].include?(allow_extra_fields)
+          raise Errors::SchemaError, "`allow_extra_fields` must be true or false"
+        end
+
+        @state.allow_omitted_json_schema_fields = allow_omitted_fields
+        @state.allow_extra_json_schema_fields = allow_extra_fields
+        nil
+      end
+
       # Registers a customization callback that will be applied to every built-in type automatically provided by ElasticGraph. Provides
       # an opportunity to customize the built-in types (e.g. to add directives to them or whatever).
       #

@@ -28,7 +28,7 @@ module ElasticGraph
         #   @return [String, nil] documentation for the type
         #
         # @api private
-        class Object < Support::MemoizableData.define(:type_name, :subfields, :mapping_options, :json_schema_options, :doc_comment)
+        class Object < Support::MemoizableData.define(:schema_def_state, :type_name, :subfields, :mapping_options, :json_schema_options, :doc_comment)
           # @return [Hash<String, ::Object>] the datastore mapping for this object type.
           def to_mapping
             @to_mapping ||= begin
@@ -50,6 +50,8 @@ module ElasticGraph
                 other_source_subfields, json_schema_candidate_subfields = subfields.partition(&:source)
                 validate_sourced_fields_have_no_json_schema_overrides(other_source_subfields)
                 json_schema_subfields = json_schema_candidate_subfields.reject(&:runtime_field_script)
+                required_fields = json_schema_subfields
+                required_fields = required_fields.reject(&:nullable?) if schema_def_state.allow_omitted_json_schema_fields
 
                 {
                   "type" => "object",
@@ -57,7 +59,8 @@ module ElasticGraph
                   # Note: `__typename` is intentionally not included in the `required` list. If `__typename` is present
                   # we want it validated (as we do by merging in `json_schema_typename_field`) but we only want
                   # to require it in the context of a union type. The union's json schema requires the field.
-                  "required" => json_schema_subfields.map(&:name).freeze,
+                  "required" => required_fields.map(&:name).freeze,
+                  "additionalProperties" => (false unless schema_def_state.allow_extra_json_schema_fields),
                   "description" => doc_comment
                 }.compact.freeze
               else
