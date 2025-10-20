@@ -341,10 +341,13 @@ module ElasticGraph
         end
 
         it "builds from a minimal hash" do
-          schema = Schema.from_hash({"schema_element_names" => {"form" => "camelCase"}})
+          schema = Schema.from_hash({
+            "elasticgraph_version" => ElasticGraph::VERSION,
+            "schema_element_names" => {"form" => "camelCase"}
+          })
 
           expect(schema).to eq Schema.new(
-            elasticgraph_version: nil,
+            elasticgraph_version: ElasticGraph::VERSION,
             object_types_by_name: {},
             scalar_types_by_name: {},
             enum_types_by_name: {},
@@ -366,16 +369,18 @@ module ElasticGraph
             expect { Schema.from_hash(hash) }.not_to raise_error
           end
 
-          it "allows loading when elasticgraph_version is nil (for backwards compatibility)" do
+          it "raises error when elasticgraph_version is missing" do
             hash = {
-              "elasticgraph_version" => nil,
               "schema_element_names" => {"form" => "camelCase"}
             }
 
-            expect { Schema.from_hash(hash) }.not_to raise_error
+            expect { Schema.from_hash(hash) }.to raise_error(
+              Errors::SchemaError,
+              /`runtime_metadata.yaml` is missing `elasticgraph_version`. To proceed, regenerate the schema artifacts./
+            )
           end
 
-          it "raises VersionMismatchError when elasticgraph_version differs from ElasticGraph::VERSION" do
+          it "raises error when elasticgraph_version differs from ElasticGraph::VERSION" do
             mismatched_version = "0.0.1"
             hash = {
               "elasticgraph_version" => mismatched_version,
@@ -384,7 +389,7 @@ module ElasticGraph
 
             expect { Schema.from_hash(hash) }.to raise_error(
               Errors::SchemaError,
-              "ElasticGraph version mismatch: runtime metadata is for version 0.0.1, but current version is 1.0.3.pre"
+              /ElasticGraph version mismatch: schema artifacts were dumped by version 0.0.1, but current version is/
             )
           end
         end

@@ -6,6 +6,7 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/constants"
 require "elastic_graph/schema_artifacts/runtime_metadata/enum"
 require "elastic_graph/schema_artifacts/runtime_metadata/extension"
 require "elastic_graph/schema_artifacts/runtime_metadata/extension_loader"
@@ -59,11 +60,14 @@ module ElasticGraph
         # @param hash [Hash<String, Hash<String, Object>>] runtime metadata hash loaded from YAML
         # @return [Schema] the runtime metadata schema instance
         def self.from_hash(hash)
-          elasticgraph_version = hash[ELASTICGRAPH_VERSION]
-
-          if elasticgraph_version && elasticgraph_version != ElasticGraph::VERSION
-            raise Errors::SchemaError,
-              "ElasticGraph version mismatch: runtime metadata is for version #{elasticgraph_version}, but current version is #{ElasticGraph::VERSION}"
+          elasticgraph_version = hash.fetch(ELASTICGRAPH_VERSION) do
+            raise Errors::SchemaError, "`#{RUNTIME_METADATA_FILE}` is missing `#{ELASTICGRAPH_VERSION}`. To proceed, regenerate the schema artifacts."
+          end
+          if elasticgraph_version != ElasticGraph::VERSION
+            raise Errors::SchemaError, <<~EOS
+              ElasticGraph version mismatch: schema artifacts were dumped by version #{elasticgraph_version}, but current version is #{ElasticGraph::VERSION}.
+              To proceed, regenerate the schema artifacts using ElasticGraph v#{ElasticGraph::VERSION} or boot with these artifacts using ElasticGraph v#{elasticgraph_version}.
+            EOS
           end
 
           object_types_by_name = hash[OBJECT_TYPES_BY_NAME]&.transform_values do |type_hash|
