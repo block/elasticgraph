@@ -27,8 +27,10 @@ module ElasticGraph
         include RuntimeMetadataSupport
 
         it "can roundtrip a schema through a primitive ruby hash for easy serialization and deserialization" do
+          stub_const("ElasticGraph::VERSION", "3.14.1592654")
+          
           schema = Schema.new(
-            elasticgraph_version: "1.0.3.pre",
+            elasticgraph_version: "3.14.1592654",
             object_types_by_name: {
               "Widget" => ObjectType.new(
                 index_definition_names: ["widgets"],
@@ -154,7 +156,7 @@ module ElasticGraph
           hash = schema.to_dumpable_hash
 
           expect(hash).to eq(
-            "elasticgraph_version" => "1.0.3.pre",
+            "elasticgraph_version" => "3.14.1592654",
             "object_types_by_name" => {
               "Widget" => {
                 "index_definition_names" => ["widgets"],
