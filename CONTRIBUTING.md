@@ -101,8 +101,11 @@ The codebase includes a variety of build scripts and executables which are usefu
 
 * `script/quick_build`: Performs an abridged version of the CI build. This is generally the most complete CI build we run locally.
   **We recommend running it before opening a PR.**
+* `script/lint`: Runs the linter on the codebase, surfacing style and formatting issues.
+  * Run `script/lint --fix` to autocorrect most linting issues.
 * `script/type_check`: Runs a [steep](https://github.com/soutaro/steep) type check.
 * `script/spellcheck`: Spellchecks the codebase using [codespell](https://github.com/codespell-project/codespell).
+  * Run `script/spellcheck -w` to write autocorrections back to source files.
 * `script/run_specs`: Runs the test suite.
 * `script/run_gem_specs [gem_name]`: Runs the test suite for one ElasticGraph gem.
 

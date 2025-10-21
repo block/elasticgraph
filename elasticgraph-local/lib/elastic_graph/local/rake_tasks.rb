@@ -444,7 +444,7 @@ module ElasticGraph
 
         desc "Boots #{description} #{version} as a background daemon for the #{env} environment on port #{port} (and #{ui_variant} on port #{ui_port})"
         task(:daemon) do |t|
-          docker_runner.boot_as_daemon(halt_command: "rake #{t.name.sub(/:\w+\z/, ":halt")}")
+          docker_runner.boot_as_daemon(halt_command: "bundle exec rake #{t.name.sub(/:\w+\z/, ":halt")}")
         end
 
         desc "Halts the #{description} #{version} daemon for the #{env} environment"

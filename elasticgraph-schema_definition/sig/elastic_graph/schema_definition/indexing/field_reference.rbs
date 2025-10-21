@@ -10,6 +10,7 @@ module ElasticGraph
         attr_reader accuracy_confidence: Field::accuracyConfidence
         attr_reader source: SchemaElements::FieldSource?
         attr_reader runtime_field_script: ::String?
+        attr_reader doc_comment: ::String?
 
         def initialize: (
           name: ::String,
@@ -19,7 +20,8 @@ module ElasticGraph
           json_schema_options: ::Hash[::Symbol, untyped],
           accuracy_confidence: Field::accuracyConfidence,
           source: SchemaElements::FieldSource?,
-          runtime_field_script: ::String?
+          runtime_field_script: ::String?,
+          doc_comment: ::String?
         ) -> void
 
         def with: (
@@ -30,7 +32,8 @@ module ElasticGraph
           ?json_schema_options: ::Hash[::Symbol, untyped],
           ?accuracy_confidence: Field::accuracyConfidence,
           ?source: SchemaElements::FieldSource?,
-          ?runtime_field_script: ::String?
+          ?runtime_field_script: ::String?,
+          ?doc_comment: ::String?
         ) -> FieldReference
 
         def resolve: () -> Field?

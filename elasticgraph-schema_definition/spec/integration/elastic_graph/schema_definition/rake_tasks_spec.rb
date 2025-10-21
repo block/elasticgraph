@@ -964,7 +964,7 @@ module ElasticGraph
             run_rake("schema_artifacts:check")
           }.to abort_with { |error|
             expect(error.message).to eq(<<~EOS.strip)
-              5 schema artifact(s) are out of date. Run `rake schema_artifacts:dump` to update the following artifact(s):
+              5 schema artifact(s) are out of date. Run `bundle exec rake schema_artifacts:dump` to update the following artifact(s):
 
               1. config/schema/artifacts/datastore_config.yaml (file does not exist)
               2. config/schema/artifacts/json_schemas.yaml (file does not exist)
@@ -980,7 +980,7 @@ module ElasticGraph
             run_rake("schema_artifacts:check")
           }.to abort_with { |error|
             expect(error.message).to eq(<<~EOS.strip)
-              1 schema artifact(s) are out of date. Run `rake schema_artifacts:dump` to update the following artifact(s):
+              1 schema artifact(s) are out of date. Run `bundle exec rake schema_artifacts:dump` to update the following artifact(s):
 
               1. config/schema/artifacts/json_schemas_by_version/#{version_file} (file does not exist)
             EOS
@@ -992,7 +992,7 @@ module ElasticGraph
             run_rake("schema_artifacts:check", pretend_tty: test_color)
           }.to abort_with { |error|
             expect(error.message.lines.first(8).join).to eq(<<~EOS)
-              6 schema artifact(s) are out of date. Run `rake schema_artifacts:dump` to update the following artifact(s):
+              6 schema artifact(s) are out of date. Run `bundle exec rake schema_artifacts:dump` to update the following artifact(s):
 
               1. config/schema/artifacts/datastore_config.yaml (see [1] below for the diff)
               2. config/schema/artifacts/json_schemas.yaml (see [2] below for the first 50 lines of the diff)

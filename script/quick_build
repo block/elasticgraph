@@ -29,8 +29,7 @@ set -o pipefail
 set -o xtrace
 
 script/spellcheck
-bundle exec standardrb
-
+script/lint
 script/type_check
 
 bundle exec rake schema_artifacts:check
