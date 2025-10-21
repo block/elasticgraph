@@ -2,6 +2,7 @@ module ElasticGraph
   module SchemaArtifacts
     module RuntimeMetadata
       class SchemaSupertype
+        attr_reader elasticgraph_version: ::String
         attr_reader object_types_by_name: ::Hash[::String, ObjectType]
         attr_reader scalar_types_by_name: ::Hash[::String, ScalarType]
         attr_reader enum_types_by_name: ::Hash[::String, Enum::Type]
@@ -12,6 +13,7 @@ module ElasticGraph
         attr_reader static_script_ids_by_scoped_name: ::Hash[::String, ::String]
 
         def initialize: (
+          elasticgraph_version: ::String,
           object_types_by_name: ::Hash[::String, ObjectType],
           scalar_types_by_name: ::Hash[::String, ScalarType],
           enum_types_by_name: ::Hash[::String, Enum::Type],
@@ -22,6 +24,7 @@ module ElasticGraph
           static_script_ids_by_scoped_name: ::Hash[::String, ::String]) -> void
 
         def with: (
+          ?elasticgraph_version: ::String,
           ?object_types_by_name: ::Hash[::String, ObjectType],
           ?scalar_types_by_name: ::Hash[::String, ScalarType],
           ?enum_types_by_name: ::Hash[::String, Enum::Type],
@@ -33,6 +36,7 @@ module ElasticGraph
       end
 
       class Schema < SchemaSupertype
+        ELASTICGRAPH_VERSION: "elasticgraph_version"
         OBJECT_TYPES_BY_NAME: "object_types_by_name"
         SCALAR_TYPES_BY_NAME: "scalar_types_by_name"
         ENUM_TYPES_BY_NAME: "enum_types_by_name"

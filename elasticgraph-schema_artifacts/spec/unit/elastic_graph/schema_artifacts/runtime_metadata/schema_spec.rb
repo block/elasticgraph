@@ -27,7 +27,10 @@ module ElasticGraph
         include RuntimeMetadataSupport
 
         it "can roundtrip a schema through a primitive ruby hash for easy serialization and deserialization" do
+          stub_const("ElasticGraph::VERSION", "3.14.1592654")
+
           schema = Schema.new(
+            elasticgraph_version: "3.14.1592654",
             object_types_by_name: {
               "Widget" => ObjectType.new(
                 index_definition_names: ["widgets"],
@@ -153,6 +156,7 @@ module ElasticGraph
           hash = schema.to_dumpable_hash
 
           expect(hash).to eq(
+            "elasticgraph_version" => "3.14.1592654",
             "object_types_by_name" => {
               "Widget" => {
                 "index_definition_names" => ["widgets"],
@@ -339,9 +343,13 @@ module ElasticGraph
         end
 
         it "builds from a minimal hash" do
-          schema = Schema.from_hash({"schema_element_names" => {"form" => "camelCase"}})
+          schema = Schema.from_hash({
+            "elasticgraph_version" => ElasticGraph::VERSION,
+            "schema_element_names" => {"form" => "camelCase"}
+          })
 
           expect(schema).to eq Schema.new(
+            elasticgraph_version: ElasticGraph::VERSION,
             object_types_by_name: {},
             scalar_types_by_name: {},
             enum_types_by_name: {},
@@ -351,6 +359,41 @@ module ElasticGraph
             graphql_resolvers_by_name: {},
             static_script_ids_by_scoped_name: {}
           )
+        end
+
+        describe "version checking" do
+          it "allows loading when elasticgraph_version matches ElasticGraph::VERSION" do
+            hash = {
+              "elasticgraph_version" => ElasticGraph::VERSION,
+              "schema_element_names" => {"form" => "camelCase"}
+            }
+
+            expect { Schema.from_hash(hash) }.not_to raise_error
+          end
+
+          it "raises error when elasticgraph_version is missing" do
+            hash = {
+              "schema_element_names" => {"form" => "camelCase"}
+            }
+
+            expect { Schema.from_hash(hash) }.to raise_error(
+              Errors::SchemaError,
+              a_string_including("`runtime_metadata.yaml` is missing `elasticgraph_version`. To proceed, regenerate the schema artifacts.")
+            )
+          end
+
+          it "raises error when elasticgraph_version differs from ElasticGraph::VERSION" do
+            mismatched_version = "0.0.1"
+            hash = {
+              "elasticgraph_version" => mismatched_version,
+              "schema_element_names" => {"form" => "camelCase"}
+            }
+
+            expect { Schema.from_hash(hash) }.to raise_error(
+              Errors::SchemaError,
+              a_string_including("ElasticGraph version mismatch: schema artifacts were dumped by version 0.0.1, but current version is")
+            )
+          end
         end
 
         it "dumps all hashes in alphabetical order for consistency" do
