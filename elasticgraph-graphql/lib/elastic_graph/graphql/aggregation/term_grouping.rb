@@ -31,12 +31,21 @@ module ElasticGraph
 
         def non_composite_clause_for(query)
           clause_value = work_around_elasticsearch_bug(terms_subclause)
+          clause_value["missing"] = missing_value_placeholder if handles_missing_values?
           {
             "terms" => clause_value.merge({
               "size" => query.paginator.requested_page_size,
               "show_term_doc_count_error" => query.needs_doc_count_error
             })
           }
+        end
+
+        def missing_value_placeholder
+          nil
+        end
+
+        def handles_missing_values?
+          missing_value_placeholder != nil
         end
 
         INNER_META = {"key_path" => ["key"], "merge_into_bucket" => {}}

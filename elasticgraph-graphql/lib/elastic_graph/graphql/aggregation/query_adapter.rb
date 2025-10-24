@@ -211,7 +211,7 @@ module ElasticGraph
               date_time_groupings_from(field_path: field_path, node: node)
             elsif !field.type.object?
               # Non-date/time grouping
-              [FieldTermGrouping.new(field_path: field_path)]
+              [FieldTermGrouping.new(field_path: field_path, field: field)]
             end
           end
         end
