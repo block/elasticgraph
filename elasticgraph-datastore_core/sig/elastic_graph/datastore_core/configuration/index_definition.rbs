@@ -4,6 +4,7 @@ module ElasticGraph
       class IndexDefinitionSupertype
         attr_reader ignore_routing_values: ::Set[::String]
         attr_reader query_cluster: ::String
+        attr_reader skip_meta_sources_lookup: bool
         attr_reader index_into_clusters: ::Array[::String]
         attr_reader setting_overrides: ::Hash[::String, untyped]
         attr_reader setting_overrides_by_timestamp: ::Hash[::String, ::Hash[::String, untyped]]
@@ -12,6 +13,7 @@ module ElasticGraph
         def initialize: (
           ignore_routing_values: ::Set[::String],
           query_cluster: ::String,
+          skip_meta_sources_lookup: bool,
           index_into_clusters: ::Array[::String],
           setting_overrides: ::Hash[::String, untyped],
           setting_overrides_by_timestamp: ::Hash[::String, ::Hash[::String, untyped]],
@@ -21,6 +23,7 @@ module ElasticGraph
         def with: (
           ?ignore_routing_values: ::Set[::String],
           ?query_cluster: ::String,
+          ?skip_meta_sources_lookup: bool,
           ?index_into_clusters: ::Array[::String],
           ?setting_overrides: ::Hash[::String, untyped],
           ?setting_overrides_by_timestamp: ::Hash[::String, ::Hash[::String, untyped]],
