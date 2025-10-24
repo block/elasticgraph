@@ -290,12 +290,21 @@ module ElasticGraph
 
     def download_file(url, destination)
       uri = URI(url)
-      response = Net::HTTP.get_response(uri)
 
-      if response.is_a?(Net::HTTPSuccess)
-        File.write(destination, response.body)
-      else
-        raise "Failed to download #{url}: #{response.code} #{response.message}"
+      # Some ElasticGraph contributors have reported issues where the downloads here fail due to outdated certs on
+      # their machine. We can just skip that verification in non-CI environments. After all, this isn't production
+      # code--it's just downloading some JS files to include in the HTML generated from our markdown files.
+      verify_opts = ENV["CI"] ? {} : {verify_mode: OpenSSL::SSL::VERIFY_NONE}
+
+      Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https", **verify_opts) do |http|
+        request = Net::HTTP::Get.new(uri.request_uri)
+        response = http.request(request)
+
+        if response.is_a?(Net::HTTPSuccess)
+          File.write(destination, response.body)
+        else
+          raise "Failed to download #{url}: #{response.code} #{response.message}"
+        end
       end
     end
 
