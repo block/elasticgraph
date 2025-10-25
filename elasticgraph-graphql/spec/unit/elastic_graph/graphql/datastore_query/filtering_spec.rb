@@ -2018,6 +2018,8 @@ module ElasticGraph
         expect(datastore_body_of(query)).to filter_datastore_with(
           {range: {"age" => {gt: 10}}},
           {terms: {"some_id" => ["testid"]}}
+#             {bool: {filter: [{range: {"age" => {gt: 10}}}]}},
+#             {bool: {filter: [{terms: {"some_id" => ["testid"]}}]}}
         )
       end
 

@@ -45,6 +45,28 @@ module ElasticGraph
           end
         end
 
+#         def build_query(filter_hashes, from_field_path: FieldPath.empty)
+#           # If there's only a single top-level filter hash, preserve the historical
+#           # structure by processing it directly into the outer bool. When multiple
+#           # hashes are provided (e.g., client + internal), process each into its own
+#           # sub-bool and AND them together to avoid cross-source merging.
+#           if filter_hashes.size <= 1
+#             build_bool_hash do |bool_node|
+#               filter_hash = filter_hashes.first
+#               process_filter_hash(bool_node, filter_hash, from_field_path) if filter_hash
+#             end
+#           else
+#             build_bool_hash do |outer_bool_node|
+#               filter_hashes.each do |filter_hash|
+#                 sub = build_bool_hash do |inner_bool_node|
+#                   process_filter_hash(inner_bool_node, filter_hash, from_field_path)
+#                 end
+#                 outer_bool_node[:filter] << sub if sub
+#               end
+#             end
+#           end
+#         end
+#
         def to_s
           # The inspect/to_s output of `filter_node_interpreter` and `logger` can be quite large and noisy. We generally don't care about
           # those details but want to be able to tell at a glance if two `FilterInterpreter` instances are equal or not--and, if they
