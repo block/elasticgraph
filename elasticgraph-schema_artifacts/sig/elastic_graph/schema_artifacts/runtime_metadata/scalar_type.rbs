@@ -4,15 +4,18 @@ module ElasticGraph
       class ScalarTypeSupertype
         attr_reader coercion_adapter_ref: ::Hash[::String, ::String]
         attr_reader indexing_preparer_ref: ::Hash[::String, ::String]
+        attr_reader grouping_missing_value_placeholder: ::String?
 
         def initialize: (
           coercion_adapter_ref: ::Hash[::String, ::String],
-          indexing_preparer_ref: ::Hash[::String, ::String]
+          indexing_preparer_ref: ::Hash[::String, ::String],
+          grouping_missing_value_placeholder: ::String?
         ) -> void
 
         def with: (
           ?coercion_adapter_ref: ::Hash[::String, ::String],
-          ?indexing_preparer_ref: ::Hash[::String, ::String]
+          ?indexing_preparer_ref: ::Hash[::String, ::String],
+          ?grouping_missing_value_placeholder: ::String?
         ) -> ScalarType
       end
 

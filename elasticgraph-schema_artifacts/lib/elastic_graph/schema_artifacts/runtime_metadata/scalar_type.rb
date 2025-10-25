@@ -14,7 +14,7 @@ module ElasticGraph
       # Provides runtime metadata related to scalar types.
       #
       # @private
-      class ScalarType < ::Data.define(:coercion_adapter_ref, :indexing_preparer_ref)
+      class ScalarType < ::Data.define(:coercion_adapter_ref, :indexing_preparer_ref, :grouping_missing_value_placeholder)
         def self.coercion_adapter_extension_loader
           @coercion_adapter_extension_loader ||= ExtensionLoader.new(ScalarCoercionAdapterInterface)
         end
@@ -41,11 +41,8 @@ module ElasticGraph
           scalar_type_hashes_by_name.transform_values do |hash|
             new(
               coercion_adapter_ref: hash.fetch("coercion_adapter"),
-              # `indexing_preparer` is new as of Q4 2022, and as such is not present in schema artifacts
-              # dumped before then. Therefore, we allow for the key to not be present in the runtime
-              # metadata--important so that we don't have a "chicken and egg" problem where the rake tasks
-              # that need to be loaded to dump new schema artifacts fail at load time due to the missing key.
-              indexing_preparer_ref: hash.fetch("indexing_preparer", DEFAULT_INDEXING_PREPARER_REF)
+              indexing_preparer_ref: hash.fetch("indexing_preparer", DEFAULT_INDEXING_PREPARER_REF),
+              grouping_missing_value_placeholder: hash["grouping_missing_value_placeholder"]
             )
           end
         end
@@ -71,6 +68,7 @@ module ElasticGraph
           {
             # Keys here are ordered alphabetically; please keep them that way.
             "coercion_adapter" => load_coercion_adapter.to_dumpable_hash,
+            "grouping_missing_value_placeholder" => grouping_missing_value_placeholder,
             "indexing_preparer" => load_indexing_preparer.to_dumpable_hash
           }
         end

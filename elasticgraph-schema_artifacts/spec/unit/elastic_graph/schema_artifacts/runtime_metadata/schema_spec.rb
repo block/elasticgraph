@@ -90,23 +90,24 @@ module ElasticGraph
               )
             },
             scalar_types_by_name: {
-              "ScalarType1" => ScalarType.new(
-                scalar_coercion_adapter1.to_dumpable_hash,
-                indexing_preparer1.to_dumpable_hash
+              "ScalarType1" => scalar_type_with(
+                coercion_adapter_ref: scalar_coercion_adapter1.to_dumpable_hash,
+                indexing_preparer_ref: indexing_preparer1.to_dumpable_hash
               ),
-              "ScalarType2" => ScalarType.new(
-                scalar_coercion_adapter2.to_dumpable_hash,
-                indexing_preparer2.to_dumpable_hash
+              "ScalarType2" => scalar_type_with(
+                coercion_adapter_ref: scalar_coercion_adapter2.to_dumpable_hash,
+                indexing_preparer_ref: indexing_preparer2.to_dumpable_hash,
+                grouping_missing_value_placeholder: "NaN"
               )
             },
             enum_types_by_name: {
-              "WidgetSort" => Enum::Type.new({
-                "id_ASC" => Enum::Value.new(SortField.new("id", :asc), nil, nil, nil),
-                "id_DESC" => Enum::Value.new(SortField.new("id", :desc), nil, nil, nil)
+              "WidgetSort" => enum_type_with(values_by_name: {
+                "id_ASC" => enum_value_with(sort_field: SortField.new("id", :asc)),
+                "id_DESC" => enum_value_with(sort_field: SortField.new("id", :desc))
               }),
-              "DistanceUnit" => Enum::Type.new({
-                "MILE" => Enum::Value.new(nil, nil, :mi, nil),
-                "KILOMETER" => Enum::Value.new(nil, nil, :km, nil)
+              "DistanceUnit" => enum_type_with(values_by_name: {
+                "MILE" => enum_value_with(datastore_abbreviation: :mi),
+                "KILOMETER" => enum_value_with(datastore_abbreviation: :km)
               })
             },
             index_definitions_by_name: {
@@ -218,6 +219,7 @@ module ElasticGraph
                   "name" => "ElasticGraph::SchemaArtifacts::ScalarCoercionAdapter2",
                   "require_path" => "support/example_extensions/scalar_coercion_adapters"
                 },
+                "grouping_missing_value_placeholder" => "NaN",
                 "indexing_preparer" => {
                   "name" => "ElasticGraph::SchemaArtifacts::IndexingPreparer2",
                   "require_path" => "support/example_extensions/indexing_preparers"
@@ -331,8 +333,8 @@ module ElasticGraph
         it "ignores enum types that have no meaningful runtime metadata" do
           schema = schema_with(enum_types_by_name: {
             "HasValues" => enum_type_with(values_by_name: {
-              "id_ASC" => Enum::Value.new(SortField.new("id", :asc), nil, nil, nil),
-              "id_DESC" => Enum::Value.new(SortField.new("id", :desc), nil, nil, nil)
+              "id_ASC" => enum_value_with(sort_field: SortField.new("id", :asc)),
+              "id_DESC" => enum_value_with(sort_field: SortField.new("id", :desc))
             }),
             "NoValues" => enum_type_with(values_by_name: {})
           })

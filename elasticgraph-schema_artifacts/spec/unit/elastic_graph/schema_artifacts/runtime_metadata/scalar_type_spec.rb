@@ -18,7 +18,7 @@ module ElasticGraph
         include RuntimeMetadataSupport
 
         it "allows `with:` to be used to update a single attribute" do
-          scalar_type = ScalarType.new(
+          scalar_type = scalar_type_with(
             coercion_adapter_ref: scalar_coercion_adapter1.to_dumpable_hash,
             indexing_preparer_ref: indexing_preparer1.to_dumpable_hash
           )

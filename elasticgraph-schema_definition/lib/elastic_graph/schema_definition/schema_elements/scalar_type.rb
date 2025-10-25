@@ -71,7 +71,8 @@ module ElasticGraph
           # Default the runtime metadata before yielding, so it can be overridden as needed.
           self.runtime_metadata = SchemaArtifacts::RuntimeMetadata::ScalarType.new(
             coercion_adapter_ref: SchemaArtifacts::RuntimeMetadata::ScalarType::DEFAULT_COERCION_ADAPTER_REF,
-            indexing_preparer_ref: SchemaArtifacts::RuntimeMetadata::ScalarType::DEFAULT_INDEXING_PREPARER_REF
+            indexing_preparer_ref: SchemaArtifacts::RuntimeMetadata::ScalarType::DEFAULT_INDEXING_PREPARER_REF,
+            grouping_missing_value_placeholder: nil
           )
 
           yield self
