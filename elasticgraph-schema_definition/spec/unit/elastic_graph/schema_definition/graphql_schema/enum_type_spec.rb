@@ -240,6 +240,19 @@ module ElasticGraph
           }.to raise_invalid_graphql_name_error_for("INVALID.NAME")
         end
 
+        it "doesn't allow an enum value that conflicts with MISSING_ENUM_PLACEHOLDER" do
+          expect {
+            # The placeholder "**missing**" contains special characters that are not allowed
+            # in GraphQL enums, so it can never conflict with a valid enum value.
+            # This test documents that behavior.
+            define_schema do |api|
+              api.enum_type "Color" do |e|
+                e.value MISSING_ENUM_PLACEHOLDER
+              end
+            end
+          }.to raise_error(Errors::InvalidGraphQLNameError)
+        end
+
         it "raises a clear error when the type name has the type wrapping characters" do
           expect {
             define_schema do |api|

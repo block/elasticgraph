@@ -7851,6 +7851,7 @@ scalar_types_by_name:
     coercion_adapter:
       name: ElasticGraph::GraphQL::ScalarCoercionAdapters::Cursor
       require_path: elastic_graph/graphql/scalar_coercion_adapters/cursor
+    grouping_missing_value_placeholder: "$SECURE_RANDOM_VALUE"
     indexing_preparer:
       name: ElasticGraph::Indexer::IndexingPreparers::NoOp
       require_path: elastic_graph/indexer/indexing_preparers/no_op
@@ -7879,6 +7880,7 @@ scalar_types_by_name:
     coercion_adapter:
       name: ElasticGraph::GraphQL::ScalarCoercionAdapters::NoOp
       require_path: elastic_graph/graphql/scalar_coercion_adapters/no_op
+    grouping_missing_value_placeholder: NaN
     indexing_preparer:
       name: ElasticGraph::Indexer::IndexingPreparers::NoOp
       require_path: elastic_graph/indexer/indexing_preparers/no_op
@@ -7886,6 +7888,7 @@ scalar_types_by_name:
     coercion_adapter:
       name: ElasticGraph::GraphQL::ScalarCoercionAdapters::NoOp
       require_path: elastic_graph/graphql/scalar_coercion_adapters/no_op
+    grouping_missing_value_placeholder: "$SECURE_RANDOM_VALUE"
     indexing_preparer:
       name: ElasticGraph::Indexer::IndexingPreparers::NoOp
       require_path: elastic_graph/indexer/indexing_preparers/no_op
@@ -7893,6 +7896,7 @@ scalar_types_by_name:
     coercion_adapter:
       name: ElasticGraph::GraphQL::ScalarCoercionAdapters::NoOp
       require_path: elastic_graph/graphql/scalar_coercion_adapters/no_op
+    grouping_missing_value_placeholder: NaN
     indexing_preparer:
       name: ElasticGraph::Indexer::IndexingPreparers::Integer
       require_path: elastic_graph/indexer/indexing_preparers/integer
@@ -7900,6 +7904,7 @@ scalar_types_by_name:
     coercion_adapter:
       name: ElasticGraph::GraphQL::ScalarCoercionAdapters::JsonSafeLong
       require_path: elastic_graph/graphql/scalar_coercion_adapters/longs
+    grouping_missing_value_placeholder: NaN
     indexing_preparer:
       name: ElasticGraph::Indexer::IndexingPreparers::Integer
       require_path: elastic_graph/indexer/indexing_preparers/integer
@@ -7921,6 +7926,7 @@ scalar_types_by_name:
     coercion_adapter:
       name: ElasticGraph::GraphQL::ScalarCoercionAdapters::NoOp
       require_path: elastic_graph/graphql/scalar_coercion_adapters/no_op
+    grouping_missing_value_placeholder: "$SECURE_RANDOM_VALUE"
     indexing_preparer:
       name: ElasticGraph::Indexer::IndexingPreparers::NoOp
       require_path: elastic_graph/indexer/indexing_preparers/no_op
@@ -7928,6 +7934,7 @@ scalar_types_by_name:
     coercion_adapter:
       name: ElasticGraph::GraphQL::ScalarCoercionAdapters::TimeZone
       require_path: elastic_graph/graphql/scalar_coercion_adapters/time_zone
+    grouping_missing_value_placeholder: "$SECURE_RANDOM_VALUE"
     indexing_preparer:
       name: ElasticGraph::Indexer::IndexingPreparers::NoOp
       require_path: elastic_graph/indexer/indexing_preparers/no_op
@@ -7935,6 +7942,7 @@ scalar_types_by_name:
     coercion_adapter:
       name: ElasticGraph::GraphQL::ScalarCoercionAdapters::Untyped
       require_path: elastic_graph/graphql/scalar_coercion_adapters/untyped
+    grouping_missing_value_placeholder: "$SECURE_RANDOM_VALUE"
     indexing_preparer:
       name: ElasticGraph::Indexer::IndexingPreparers::Untyped
       require_path: elastic_graph/indexer/indexing_preparers/untyped

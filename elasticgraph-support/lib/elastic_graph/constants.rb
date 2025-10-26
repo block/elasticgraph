@@ -6,6 +6,8 @@
 #
 # frozen_string_literal: true
 
+require "securerandom"
+
 # Root namespace for all ElasticGraph code.
 module ElasticGraph
   # Here we enumerate constants that are used from multiple places in the code.
@@ -248,6 +250,33 @@ module ElasticGraph
   # The name of the visibility profile we use with the GraphQL gem.
   # @private
   VISIBILITY_PROFILE = :main
+
+  # Value used as the missing value placeholder for subaggregation on enum fields.
+  # This never collides with any real enum value since GraphQL enum values cannot contain `*` characters.
+  # @private
+  MISSING_ENUM_PLACEHOLDER = "**missing**"
+
+  # This is a placeholder for the actual placeholder value used for string types (keyword, text).
+  # When a type is configured with this placeholder value then in the graphql query layer
+  # we use the random valued MISSING_STRING_PLACEHOLDER_VALUE instead.
+  # @private
+  MISSING_STRING_PLACEHOLDER = "$SECURE_RANDOM_VALUE"
+
+  # A random 18 byte (24 character) base64 string used as the missing value placeholder
+  # for subaggregation on string fields. UUID are generally consider safe to use without
+  # risk of collision and since this has more random bits than a UUID it should have even
+  # less risk of collision. This uses a value generated randomly at runtime instead
+  # of using a hard-coded value in order to avoid intentional collision attacks.
+  # @private
+  MISSING_STRING_PLACEHOLDER_VALUE = SecureRandom.urlsafe_base64(18)
+
+  # Value used as the missing value placeholder for subaggregation on numeric fields.
+  # This never collides with any numeric values in the datastore because JSON, ElasticSearch,
+  # and OpenSearch aren't capable of storing NaN.
+  # NaN works as a placeholder for missing numeric values, but it does have the side-effect of coercing
+  # integers to floats so we only use it on types limited to the the JsonSafeLong range.
+  # @private
+  MISSING_NUMERIC_PLACEHOLDER = "NaN"
 
   # TODO(steep): it complains about `define_schema` not being defined but it is defined
   # in another file; I shouldn't have to say it's dynamic here. For now this works though.

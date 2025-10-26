@@ -4,12 +4,13 @@ module ElasticGraph
       class ScalarTypeSuperClass
         attr_accessor schema_def_state: State
         attr_accessor type_ref: TypeReference
+        attr_accessor grouping_missing_value_placeholder_overridden: bool
         attr_accessor mapping_type: ::String
         attr_accessor runtime_metadata: SchemaArtifacts::RuntimeMetadata::ScalarType
         attr_accessor aggregated_values_customizations: (^(ObjectType) -> void)?
         attr_accessor filter_input_customizations: (^(InputType) -> void)?
 
-        def initialize: (State, TypeReference) -> void
+        def initialize: (State, TypeReference, bool) -> void
       end
 
       class ScalarType < ScalarTypeSuperClass
@@ -24,6 +25,7 @@ module ElasticGraph
         def aggregated_values_type: () -> TypeReference
         def coerce_with: (::String, defined_at: ::String) -> void
         def prepare_for_indexing_with: (::String, defined_at: ::String) -> void
+        def grouping_missing_value_placeholder: (::String | ::Numeric) -> void
         def customize_aggregated_values_type: () { (ObjectType) -> void } -> void
         def customize_filter_input_type: () { (InputType) -> void } -> void
 
@@ -41,8 +43,12 @@ module ElasticGraph
 
         def to_input_filters: () -> ::Array[SchemaElements::InputType]
         def to_aggregated_values_type: () -> SchemaElements::ObjectType?
+        def inferred_grouping_missing_value_placeholder: () -> ::String?
 
+        FLOAT_TYPES: ::Set[::String]
+        INTEGER_TYPES: ::Set[::String]
         NUMERIC_TYPES: ::Set[::String]
+        STRING_TYPES: ::Set[::String]
         DATE_TYPES: ::Set[::String]
         COMPARABLE_TYPES: ::Set[::String]
 
