@@ -30,7 +30,7 @@ module ElasticGraph
 
       def define_tasks: () -> void
       def schema_artifact_manager: () -> SchemaArtifactManager
-      def schema_definition_results: () -> Results
+      def schema_def_api: () -> API
     end
   end
 end

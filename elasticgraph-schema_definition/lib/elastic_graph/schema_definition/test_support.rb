@@ -85,7 +85,7 @@ module ElasticGraph
         # Reloading the schema artifacts takes extra time that we don't usually want to spend (so it's opt-in)
         # but it can be useful in some cases because there is a bit of extra pruning/validation that it applies.
         tmp_dir = ::Dir.mktmpdir
-        artifacts_manager = SchemaDefinition::SchemaArtifactManager.new(
+        artifacts_manager = api.factory.new_schema_artifact_manager(
           schema_definition_results: api.results,
           schema_artifacts_directory: tmp_dir,
           enforce_json_schema_version: false,

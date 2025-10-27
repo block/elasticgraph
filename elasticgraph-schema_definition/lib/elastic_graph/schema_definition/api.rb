@@ -387,7 +387,7 @@ module ElasticGraph
 
       # @return the results of the schema definition
       def results
-        @results ||= Results.new(@state)
+        @results ||= @factory.new_results
       end
 
       # Defines the version number of the current JSON schema. Importantly, every time a change is made that impacts the JSON schema

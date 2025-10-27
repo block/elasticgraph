@@ -121,7 +121,8 @@ task :update_artifact_derived_constants do
   script_id_pattern = "update_index_data_[0-9a-f]+"
 
   update_index_data_script_id = schema_def_rake_tasks
-    .send(:schema_definition_results)
+    .send(:schema_def_api)
+    .results
     .datastore_scripts.keys
     .grep(/\A#{script_id_pattern}\z/)
     .first
