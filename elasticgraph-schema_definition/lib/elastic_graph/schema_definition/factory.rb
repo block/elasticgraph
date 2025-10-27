@@ -8,6 +8,8 @@
 
 require "elastic_graph/constants"
 require "elastic_graph/schema_definition/mixins/has_readable_to_s_and_inspect"
+require "elastic_graph/schema_definition/results"
+require "elastic_graph/schema_definition/schema_artifact_manager"
 require "elastic_graph/schema_definition/schema_elements/argument"
 require "elastic_graph/schema_definition/schema_elements/built_in_types"
 require "elastic_graph/schema_definition/schema_elements/deprecated_element"
@@ -274,6 +276,28 @@ module ElasticGraph
         )
       end
       @@relationship_new = prevent_non_factory_instantiation_of(SchemaElements::Relationship)
+
+      def new_results
+        @@results_new.call(@state)
+      end
+      @@results_new = prevent_non_factory_instantiation_of(Results)
+
+      def new_schema_artifact_manager(
+        schema_definition_results:,
+        schema_artifacts_directory:,
+        enforce_json_schema_version:,
+        output:,
+        max_diff_lines: 50
+      )
+        @@schema_artifact_manager_new.call(
+          schema_definition_results:,
+          schema_artifacts_directory:,
+          enforce_json_schema_version:,
+          output:,
+          max_diff_lines:
+        )
+      end
+      @@schema_artifact_manager_new = prevent_non_factory_instantiation_of(SchemaArtifactManager)
 
       # Responsible for creating a new `*AggregatedValues` type for an index leaf type.
       #

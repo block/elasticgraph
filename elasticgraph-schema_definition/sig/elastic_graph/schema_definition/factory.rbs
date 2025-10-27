@@ -113,6 +113,18 @@ module ElasticGraph
       ) -> SchemaElements::Relationship
       @@relationship_new: ::Method
 
+      def new_results: () -> Results
+      @@results_new: ::Method
+
+      def new_schema_artifact_manager: (
+        schema_definition_results: Results,
+        schema_artifacts_directory: ::String,
+        enforce_json_schema_version: bool,
+        output: io,
+        ?max_diff_lines: ::Integer
+      ) -> SchemaArtifactManager
+      @@schema_artifact_manager_new: ::Method
+
       def new_aggregated_values_type_for_index_leaf_type: (
         ::String
       ) { (SchemaElements::ObjectType) -> void } -> SchemaElements::ObjectType

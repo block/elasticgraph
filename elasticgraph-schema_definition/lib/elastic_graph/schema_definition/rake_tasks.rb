@@ -155,14 +155,14 @@ module ElasticGraph
       end
 
       def schema_artifact_manager
-        require "elastic_graph/schema_definition/schema_artifact_manager"
+        require "elastic_graph/schema_definition/api"
 
         # :nocov: -- tests don't cover the `VERBOSE` side
         max_diff_lines = ENV["VERBOSE"] ? 999999999 : 50
         # :nocov:
 
-        SchemaArtifactManager.new(
-          schema_definition_results: schema_definition_results,
+        schema_def_api.factory.new_schema_artifact_manager(
+          schema_definition_results: schema_def_api.results,
           schema_artifacts_directory: @schema_artifacts_directory.to_s,
           enforce_json_schema_version: @enforce_json_schema_version,
           output: @output,
@@ -170,7 +170,7 @@ module ElasticGraph
         )
       end
 
-      def schema_definition_results
+      def schema_def_api
         require "elastic_graph/schema_definition/api"
 
         API.new(
@@ -183,7 +183,7 @@ module ElasticGraph
           output: @output
         ).tap do |api|
           api.as_active_instance { load @path_to_schema.to_s }
-        end.results
+        end
       end
     end
   end

@@ -154,8 +154,14 @@ module ElasticGraph
 
               updated_schema = schema_def(configure_widget: ->(t) { t.field "amount_cents", "Int" })
 
-              SchemaDefinition::SchemaArtifactManager.new(
-                schema_definition_results: generate_schema_artifacts(&updated_schema),
+              factory = nil
+              schema_def_results = generate_schema_artifacts do |api|
+                updated_schema.call(api)
+                factory = api.factory
+              end
+
+              factory.new_schema_artifact_manager(
+                schema_definition_results: schema_def_results,
                 schema_artifacts_directory: Dir.pwd,
                 enforce_json_schema_version: true,
                 output: output_io
