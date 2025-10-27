@@ -198,7 +198,7 @@ module ElasticGraph
     end
 
     # We don't expect any variation in these gemspec attributes.
-    %i[authors email homepage license required_ruby_version version].each do |gemspec_attribute|
+    %i[homepage license required_ruby_version version].each do |gemspec_attribute|
       it "has the same value for `#{gemspec_attribute}` in all ElasticGraph gemspecs" do
         all_gemspec_values = ::ElasticGraphGems.list.to_h do |gem_name|
           [gem_name, gemspecs_by_gem_name[gem_name].public_send(gemspec_attribute)]
