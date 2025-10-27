@@ -53,6 +53,7 @@ module ElasticGraph
             index_definitions_by_graphql_type[key.graphql_name] || [],
             runtime_metadata.object_types_by_name[key.graphql_name],
             runtime_metadata.enum_types_by_name[key.graphql_name],
+            runtime_metadata.scalar_types_by_name[key.graphql_name],
             resolvers_needing_lookahead
           )
         end
