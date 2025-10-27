@@ -260,7 +260,7 @@ graph LR;
     click rake href "https://rubygems.org/gems/rake" "Open on RubyGems.org" _blank;
 ```
 
-### AWS Lambda Integration Libraries (5 gems)
+### AWS Lambda Integration Libraries (6 gems)
 
 These libraries wrap the the core ElasticGraph libraries so that they can be deployed using AWS Lambda.
 
@@ -269,6 +269,7 @@ These libraries wrap the the core ElasticGraph libraries so that they can be dep
 * [elasticgraph-indexer_autoscaler_lambda](elasticgraph-indexer_autoscaler_lambda/README.md): Monitors OpenSearch CPU utilization to autoscale elasticgraph-indexer_lambda concurrency.
 * [elasticgraph-indexer_lambda](elasticgraph-indexer_lambda/README.md): Adapts elasticgraph-indexer to run in an AWS Lambda.
 * [elasticgraph-lambda_support](elasticgraph-lambda_support/README.md): Supports running ElasticGraph using AWS Lambda.
+* [elasticgraph-warehouse_lambda](elasticgraph-warehouse_lambda/README.md): ElasticGraph lambda for ingesting data into a warehouse.
 
 #### Dependency Diagram
 
@@ -294,6 +295,7 @@ graph LR;
     aws-sdk-s3["aws-sdk-s3"];
     elasticgraph-opensearch["eg-opensearch"];
     faraday_middleware-aws-sigv4["faraday_middleware-aws-sigv4"];
+    elasticgraph-warehouse_lambda["eg-warehouse_lambda"];
     elasticgraph-admin_lambda --> rake;
     elasticgraph-admin_lambda --> elasticgraph-admin;
     elasticgraph-admin_lambda --> elasticgraph-lambda_support;
@@ -311,6 +313,10 @@ graph LR;
     elasticgraph-indexer_lambda --> ox;
     elasticgraph-lambda_support --> elasticgraph-opensearch;
     elasticgraph-lambda_support --> faraday_middleware-aws-sigv4;
+    elasticgraph-warehouse_lambda --> elasticgraph-indexer_lambda;
+    elasticgraph-warehouse_lambda --> elasticgraph-lambda_support;
+    elasticgraph-warehouse_lambda --> aws-sdk-s3;
+    elasticgraph-warehouse_lambda --> ox;
     class elasticgraph-admin_lambda targetGemStyle;
     class rake externalGemCatStyle;
     class elasticgraph-admin otherEgGemStyle;
@@ -328,6 +334,7 @@ graph LR;
     class aws-sdk-s3 externalGemCatStyle;
     class elasticgraph-opensearch otherEgGemStyle;
     class faraday_middleware-aws-sigv4 externalGemCatStyle;
+    class elasticgraph-warehouse_lambda targetGemStyle;
     click rake href "https://rubygems.org/gems/rake" "Open on RubyGems.org" _blank;
     click aws-sdk-lambda href "https://rubygems.org/gems/aws-sdk-lambda" "Open on RubyGems.org" _blank;
     click aws-sdk-sqs href "https://rubygems.org/gems/aws-sdk-sqs" "Open on RubyGems.org" _blank;

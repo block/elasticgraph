@@ -187,6 +187,15 @@ PATH
       logger (~> 1.7)
 
 PATH
+  remote: elasticgraph-warehouse_lambda
+  specs:
+    elasticgraph-warehouse_lambda (1.0.3.pre)
+      aws-sdk-s3 (~> 1.182)
+      elasticgraph-indexer_lambda (= 1.0.3.pre)
+      elasticgraph-lambda_support (= 1.0.3.pre)
+      ox (~> 2.14, >= 2.14.22)
+
+PATH
   remote: elasticgraph
   specs:
     elasticgraph (1.0.3.pre)
@@ -629,6 +638,7 @@ DEPENDENCIES
   elasticgraph-schema_artifacts (= 1.0.3.pre)!
   elasticgraph-schema_definition (= 1.0.3.pre)!
   elasticgraph-support (= 1.0.3.pre)!
+  elasticgraph-warehouse_lambda (= 1.0.3.pre)!
   factory_bot (~> 6.5, >= 6.5.5)
   faker (~> 3.5, >= 3.5.2)
   filewatcher (~> 2.1)
