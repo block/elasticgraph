@@ -39,11 +39,12 @@ module ElasticGraph
       interval,
       time_zone: "UTC",
       offset: nil,
+      min_doc_count: 1,
       graphql_subfield: nil,
       field_names_in_graphql_query: field_names_in_index + [graphql_subfield].compact
     )
       field_path = build_field_path(names_in_index: field_names_in_index, names_in_graphql_query: field_names_in_graphql_query)
-      GraphQL::Aggregation::DateHistogramGrouping.new(field_path, interval, time_zone, offset)
+      GraphQL::Aggregation::DateHistogramGrouping.new(field_path, interval, time_zone, offset, min_doc_count)
     end
 
     def as_time_of_day_grouping_of(
