@@ -1,0 +1,9 @@
+module ElasticGraph
+  module Warehouse
+    module SchemaDefinition
+      module ObjectAndInterfaceExtension: ::ElasticGraph::SchemaDefinition::SchemaElements::TypeWithSubfields
+        def to_warehouse_column_type: () -> ::String
+      end
+    end
+  end
+end

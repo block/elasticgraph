@@ -1,0 +1,5 @@
+module ElasticGraph
+  module Warehouse
+    DATA_WAREHOUSE_FILE: ::String
+  end
+end

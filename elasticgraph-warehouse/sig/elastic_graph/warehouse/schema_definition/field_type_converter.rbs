@@ -1,0 +1,9 @@
+module ElasticGraph
+  module Warehouse
+    module SchemaDefinition
+      class FieldTypeConverter
+        def self.convert: (untyped) -> ::String
+      end
+    end
+  end
+end

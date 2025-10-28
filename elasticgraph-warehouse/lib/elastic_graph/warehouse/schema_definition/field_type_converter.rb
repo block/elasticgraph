@@ -8,15 +8,14 @@
 
 module ElasticGraph
   module Warehouse
-    # Provides configuration utilities for warehouse integrations.
-    module WarehouseConfig
+    module SchemaDefinition
       # Converts ElasticGraph field types to warehouse column types.
       class FieldTypeConverter
         # Converts a field type to a warehouse column type string.
         #
         # Handles both scalar and list types, unwrapping nullability and delegating to
         # the resolved type's `to_warehouse_column_type` method. Supports
-        # nested arrays like [[String!]] which become ARRAY<ARRAY<STRING>>.
+        # nested arrays like `[[String!]]` which become `ARRAY<ARRAY<STRING>>`.
         #
         # @param field_type [Object] the field type to convert
         # @return [String] the warehouse column type (e.g., "STRING", "ARRAY<INT>", "ARRAY<ARRAY<DOUBLE>>")

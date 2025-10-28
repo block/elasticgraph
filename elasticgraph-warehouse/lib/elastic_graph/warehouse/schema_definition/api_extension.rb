@@ -20,7 +20,6 @@ module ElasticGraph
       # Module designed to be extended onto an {ElasticGraph::SchemaDefinition::API} instance
       # to add Data Warehouse configuration generation capabilities.
       #
-      #
       # To use this module, pass it in `schema_definition_extension_modules` when defining your {ElasticGraph::Local::RakeTasks}.
       #
       # @example Define local rake tasks with this extension module
@@ -51,16 +50,18 @@ module ElasticGraph
           "TimeZone" => "STRING",
           "Untyped" => "STRING"
         }.freeze
+
         # Extends the API with warehouse functionality when this module is extended.
         #
         # @param api [ElasticGraph::SchemaDefinition::API] the API instance to extend
         # @return [void]
+        # @api private
         def self.extended(api)
           api.factory.extend FactoryExtension
 
           api.on_built_in_types do |type|
             case type
-            when ::ElasticGraph::SchemaDefinition::SchemaElements::ScalarType
+            when ScalarTypeExtension
               type.warehouse_column type: COLUMN_TYPES_BY_BUILT_IN_SCALAR_TYPE.fetch(type.name)
             end
           end

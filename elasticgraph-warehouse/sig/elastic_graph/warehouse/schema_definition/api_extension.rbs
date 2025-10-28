@@ -1,0 +1,11 @@
+module ElasticGraph
+  module Warehouse
+    module SchemaDefinition
+      module APIExtension: ::ElasticGraph::SchemaDefinition::API
+        COLUMN_TYPES_BY_BUILT_IN_SCALAR_TYPE: ::Hash[::String, ::String]
+
+        def self.extended: (::ElasticGraph::SchemaDefinition::API) -> void
+      end
+    end
+  end
+end

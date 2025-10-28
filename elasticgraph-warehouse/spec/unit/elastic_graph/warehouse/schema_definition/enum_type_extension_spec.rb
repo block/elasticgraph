@@ -23,30 +23,7 @@ module ElasticGraph
             end
           end
 
-          enum_type = results.state.enum_types_by_name["Status"]
-          table_type = enum_type.to_warehouse_column_type
-
-          expect(table_type).to eq("STRING")
-        end
-
-        it "handles enum types with many values" do
-          results = define_warehouse_schema do |s|
-            s.json_schema_version 1
-
-            s.enum_type "Country" do |t|
-              t.value "USA"
-              t.value "CANADA"
-              t.value "MEXICO"
-              t.value "UK"
-              t.value "FRANCE"
-              t.value "GERMANY"
-            end
-          end
-
-          enum_type = results.state.enum_types_by_name["Country"]
-          table_type = enum_type.to_warehouse_column_type
-
-          expect(table_type).to eq("STRING")
+          expect(warehouse_column_type_for(results, "Status")).to eq "STRING"
         end
       end
     end
