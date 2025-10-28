@@ -200,7 +200,7 @@ graph LR;
     click opensearch-ruby href "https://rubygems.org/gems/opensearch-ruby" "Open on RubyGems.org" _blank;
 ```
 
-### Extensions (4 gems)
+### Extensions (5 gems)
 
 These libraries extend ElasticGraph to provide optional but commonly needed functionality.
 
@@ -208,6 +208,7 @@ These libraries extend ElasticGraph to provide optional but commonly needed func
 * [elasticgraph-health_check](elasticgraph-health_check/README.md): Provides a health check for high availability ElasticGraph deployments.
 * [elasticgraph-query_interceptor](elasticgraph-query_interceptor/README.md): Intercepts ElasticGraph datastore queries.
 * [elasticgraph-query_registry](elasticgraph-query_registry/README.md): Provides a source-controlled query registry for ElasticGraph applications.
+* [elasticgraph-warehouse](elasticgraph-warehouse/README.md): Extends ElasticGraph to support ingestion into a data warehouse.
 
 #### Dependency Diagram
 
@@ -228,6 +229,7 @@ graph LR;
     elasticgraph-query_registry["eg-query_registry"];
     graphql-c_parser["graphql-c_parser"];
     rake["rake"];
+    elasticgraph-warehouse["eg-warehouse"];
     elasticgraph-apollo --> elasticgraph-graphql;
     elasticgraph-apollo --> elasticgraph-support;
     elasticgraph-apollo --> graphql;
@@ -242,6 +244,7 @@ graph LR;
     elasticgraph-query_registry --> graphql;
     elasticgraph-query_registry --> graphql-c_parser;
     elasticgraph-query_registry --> rake;
+    elasticgraph-warehouse --> elasticgraph-support;
     class elasticgraph-apollo targetGemStyle;
     class elasticgraph-graphql otherEgGemStyle;
     class elasticgraph-support otherEgGemStyle;
@@ -254,6 +257,7 @@ graph LR;
     class elasticgraph-query_registry targetGemStyle;
     class graphql-c_parser externalGemCatStyle;
     class rake externalGemCatStyle;
+    class elasticgraph-warehouse targetGemStyle;
     click graphql href "https://rubygems.org/gems/graphql" "Open on RubyGems.org" _blank;
     click apollo-federation href "https://rubygems.org/gems/apollo-federation" "Open on RubyGems.org" _blank;
     click graphql-c_parser href "https://rubygems.org/gems/graphql-c_parser" "Open on RubyGems.org" _blank;
