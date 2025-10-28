@@ -107,6 +107,38 @@ module ElasticGraph
           end
         end
 
+        it "allows factory extensions to call new_interface_type without requiring an outer block" do
+          # This tests that the factory method properly checks `block_given?` before yielding.
+          # This is important for extension libraries that override factory methods.
+          factory_extension = Module.new do
+            define_method :new_interface_type do |name, &block|
+              super(name) do |t|
+                t.field "name", "String"
+                # If a block was provided by the caller, call it
+                block&.call(t)
+              end
+            end
+          end
+
+          api_extension = Module.new do
+            define_singleton_method :extended do |api|
+              api.factory.extend factory_extension
+            end
+          end
+
+          result = define_schema(extension_modules: [api_extension]) do |api|
+            # Call new_interface_type without a block - this would fail without `if block_given?`
+            interface_type = api.factory.new_interface_type("Named")
+            api.state.register_object_interface_or_union_type(interface_type)
+          end
+
+          expect(type_def_from(result, "Named")).to eq(<<~EOS.strip)
+            interface Named {
+              name: String
+            }
+          EOS
+        end
+
         describe "#implements" do
           include_examples "#implements",
             graphql_definition_keyword: "interface",

@@ -218,7 +218,7 @@ module ElasticGraph
 
       def new_interface_type(name)
         @@interface_type_new.call(@state, name.to_s) do |interface_type|
-          yield interface_type
+          yield interface_type if block_given?
         end
       end
       @@interface_type_new = prevent_non_factory_instantiation_of(SchemaElements::InterfaceType)
@@ -232,7 +232,7 @@ module ElasticGraph
 
       def new_scalar_type(name)
         @@scalar_type_new.call(@state, name.to_s) do |scalar_type|
-          yield scalar_type
+          yield scalar_type if block_given?
         end
       end
       @@scalar_type_new = prevent_non_factory_instantiation_of(SchemaElements::ScalarType)

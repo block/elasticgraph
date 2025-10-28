@@ -296,6 +296,37 @@ module ElasticGraph
           }.to raise_invalid_graphql_name_error_for("Invalid.Name")
         end
 
+        it "allows factory extensions to call new_scalar_type without requiring an outer block" do
+          # This tests that the factory method properly checks `block_given?` before yielding.
+          # This is important for extension libraries that override factory methods.
+          factory_extension = Module.new do
+            define_method :new_scalar_type do |name, &block|
+              super(name) do |t|
+                t.mapping type: "long"
+                t.json_schema type: "integer"
+                # If a block was provided by the caller, call it
+                block&.call(t)
+              end
+            end
+          end
+
+          api_extension = Module.new do
+            define_singleton_method :extended do |api|
+              api.factory.extend factory_extension
+            end
+          end
+
+          result = define_schema(extension_modules: [api_extension]) do |api|
+            # Call new_scalar_type without a block - this would fail without `if block_given?`
+            scalar_type = api.factory.new_scalar_type("BigInt")
+            api.state.register_scalar_type(scalar_type)
+          end
+
+          expect(type_def_from(result, "BigInt")).to eq(<<~EOS.strip)
+            scalar BigInt
+          EOS
+        end
+
         def scalar_type(...)
           define_schema do |api|
             api.scalar_type(...)
