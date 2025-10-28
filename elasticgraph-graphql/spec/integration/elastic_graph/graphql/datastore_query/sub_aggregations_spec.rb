@@ -369,7 +369,7 @@ module ElasticGraph
               "meta" => outer_meta({"buckets_path" => ["seasons_nested.notes"]}),
               "doc_count" => 4,
               "seasons_nested.notes" => {
-                "meta" => inner_terms_meta({"key_path" => ["key"], "grouping_fields" => ["seasons_nested.notes"]}),
+                "meta" => inner_terms_meta("seasons_nested.notes", {"missing_values" => [MISSING_STRING_PLACEHOLDER_VALUE]}),
                 "doc_count_error_upper_bound" => 0,
                 "sum_other_doc_count" => 0,
                 "buckets" => [
@@ -390,11 +390,7 @@ module ElasticGraph
                   })
                 ]
               }
-            }.with_missing_value_bucket(0, {
-              "seasons_nested:seasons_nested.year:exact_min" => {"value" => nil},
-              "seasons_nested:seasons_nested.the_record.win_count:exact_max" => {"value" => nil},
-              "seasons_nested:seasons_nested.the_record.win_count:approximate_avg" => {"value" => nil}
-            })
+            }
           }]
         end
 
@@ -444,7 +440,7 @@ module ElasticGraph
         it "can group sub-aggregations on a single non-date field" do
           query = aggregation_query_of(name: "teams", sub_aggregations: [
             nested_sub_aggregation_of(path_in_index: ["seasons_nested"], query: sub_aggregation_query_of(name: "seasons_nested", groupings: [
-              field_term_grouping_of("seasons_nested", "year")
+              field_term_grouping_of("seasons_nested", "year", missing_value_placeholder: MISSING_NUMERIC_PLACEHOLDER)
             ]))
           ])
 
@@ -457,23 +453,23 @@ module ElasticGraph
               "doc_count" => 4,
               "meta" => outer_meta({"buckets_path" => ["seasons_nested.year"]}),
               "seasons_nested.year" => {
-                "meta" => inner_terms_meta({"grouping_fields" => ["seasons_nested.year"], "key_path" => ["key"]}),
+                "meta" => inner_terms_meta("seasons_nested.year", {"missing_values" => [MISSING_NUMERIC_PLACEHOLDER]}),
                 "buckets" => [
-                  term_bucket(2022, 2),
-                  term_bucket(2020, 1),
-                  term_bucket(2021, 1)
+                  term_bucket(2022.0, 2),
+                  term_bucket(2020.0, 1),
+                  term_bucket(2021.0, 1)
                 ],
                 "doc_count_error_upper_bound" => 0,
                 "sum_other_doc_count" => 0
               }
-            }.with_missing_value_bucket(0)
+            }
           }])
         end
 
         it "can group sub-aggregations on multiple non-date fields" do
           query = aggregation_query_of(name: "teams", sub_aggregations: [
             nested_sub_aggregation_of(path_in_index: ["seasons_nested"], query: sub_aggregation_query_of(name: "seasons_nested", groupings: [
-              field_term_grouping_of("seasons_nested", "year"),
+              field_term_grouping_of("seasons_nested", "year", missing_value_placeholder: MISSING_NUMERIC_PLACEHOLDER),
               field_term_grouping_of("seasons_nested", "notes")
             ]))
           ])
@@ -487,42 +483,34 @@ module ElasticGraph
               "doc_count" => 4,
               "meta" => outer_meta({"buckets_path" => ["seasons_nested.year"]}),
               "seasons_nested.year" => {
-                "meta" => inner_terms_meta({
+                "meta" => inner_terms_meta("seasons_nested.year", {
                   "buckets_path" => ["seasons_nested.notes"],
-                  "key_path" => ["key"],
-                  "grouping_fields" => ["seasons_nested.year"]
+                  "missing_values" => [MISSING_NUMERIC_PLACEHOLDER]
                 }),
                 "doc_count_error_upper_bound" => 0,
                 "sum_other_doc_count" => 0,
                 "buckets" => [
-                  term_bucket(2022, 2, {"seasons_nested.notes" => {
-                    "meta" => inner_terms_meta({"key_path" => ["key"], "grouping_fields" => ["seasons_nested.notes"]}),
+                  term_bucket(2022.0, 2, {"seasons_nested.notes" => {
+                    "meta" => inner_terms_meta("seasons_nested.notes", {"missing_values" => [MISSING_STRING_PLACEHOLDER_VALUE]}),
                     "doc_count_error_upper_bound" => 0,
                     "sum_other_doc_count" => 0,
                     "buckets" => [term_bucket("new rules", 2)]
-                  }}.with_missing_value_bucket(0)),
-                  term_bucket(2020, 1, {"seasons_nested.notes" => {
-                    "meta" => inner_terms_meta({"key_path" => ["key"], "grouping_fields" => ["seasons_nested.notes"]}),
+                  }}),
+                  term_bucket(2020.0, 1, {"seasons_nested.notes" => {
+                    "meta" => inner_terms_meta("seasons_nested.notes", {"missing_values" => [MISSING_STRING_PLACEHOLDER_VALUE]}),
                     "doc_count_error_upper_bound" => 0,
                     "sum_other_doc_count" => 0,
                     "buckets" => [term_bucket("old rules", 1), term_bucket("pandemic", 1)]
-                  }}.with_missing_value_bucket(0)),
-                  term_bucket(2021, 1, {"seasons_nested.notes" => {
-                    "meta" => inner_terms_meta({"key_path" => ["key"], "grouping_fields" => ["seasons_nested.notes"]}),
+                  }}),
+                  term_bucket(2021.0, 1, {"seasons_nested.notes" => {
+                    "meta" => inner_terms_meta("seasons_nested.notes", {"missing_values" => [MISSING_STRING_PLACEHOLDER_VALUE]}),
                     "doc_count_error_upper_bound" => 0,
                     "sum_other_doc_count" => 0,
                     "buckets" => [term_bucket("old rules", 1)]
-                  }}.with_missing_value_bucket(0))
+                  }})
                 ]
               }
-            }.with_missing_value_bucket(0, {
-              "seasons_nested.notes" => {
-                "meta" => inner_terms_meta({"key_path" => ["key"], "grouping_fields" => ["seasons_nested.notes"]}),
-                "doc_count_error_upper_bound" => 0,
-                "sum_other_doc_count" => 0,
-                "buckets" => []
-              }
-            }.with_missing_value_bucket(0))
+            }
           }])
         end
 
@@ -531,7 +519,7 @@ module ElasticGraph
             nested_sub_aggregation_of(path_in_index: ["seasons_nested"], query: sub_aggregation_query_of(
               name: "seasons_nested",
               first: 1,
-              groupings: [field_term_grouping_of("seasons_nested", "year")]
+              groupings: [field_term_grouping_of("seasons_nested", "year", missing_value_placeholder: MISSING_NUMERIC_PLACEHOLDER)]
             ))
           ])
 
@@ -544,13 +532,13 @@ module ElasticGraph
               "doc_count" => 4,
               "meta" => outer_meta({"buckets_path" => ["seasons_nested.year"]}, size: 1),
               "seasons_nested.year" => {
-                "meta" => inner_terms_meta({"grouping_fields" => ["seasons_nested.year"], "key_path" => ["key"]}),
+                "meta" => inner_terms_meta("seasons_nested.year", {"missing_values" => [MISSING_NUMERIC_PLACEHOLDER]}),
                 # To support `page_info.has_next_page` we request one additional bucket, so we get back 2 here.
                 "buckets" => [term_bucket(2022, 2), term_bucket(2020, 1)],
                 "doc_count_error_upper_bound" => 0,
                 "sum_other_doc_count" => 1
               }
-            }.with_missing_value_bucket(0)
+            }
           }])
         end
 
@@ -559,7 +547,7 @@ module ElasticGraph
             nested_sub_aggregation_of(path_in_index: ["seasons_nested"], query: sub_aggregation_query_of(
               name: "seasons_nested",
               first: 1,
-              groupings: [field_term_grouping_of("seasons_nested", "year"), field_term_grouping_of("seasons_nested", "notes")]
+              groupings: [field_term_grouping_of("seasons_nested", "year", missing_value_placeholder: MISSING_NUMERIC_PLACEHOLDER), field_term_grouping_of("seasons_nested", "notes")]
             ))
           ])
 
@@ -572,38 +560,31 @@ module ElasticGraph
               "doc_count" => 4,
               "meta" => outer_meta({"buckets_path" => ["seasons_nested.year"]}, size: 1),
               "seasons_nested.year" => {
-                "meta" => inner_terms_meta({"buckets_path" => ["seasons_nested.notes"], "grouping_fields" => ["seasons_nested.year"], "key_path" => ["key"]}),
+                "meta" => inner_terms_meta("seasons_nested.year", {"buckets_path" => ["seasons_nested.notes"], "missing_values" => [MISSING_NUMERIC_PLACEHOLDER]}),
                 # To support `page_info.has_next_page` we request one additional bucket, so we get back 2 here.
                 "buckets" => [
-                  term_bucket(2022, 2, {
+                  term_bucket(2022.0, 2, {
                     "seasons_nested.notes" => {
-                      "meta" => inner_terms_meta({"grouping_fields" => ["seasons_nested.notes"], "key_path" => ["key"]}),
+                      "meta" => inner_terms_meta("seasons_nested.notes", {"missing_values" => [MISSING_STRING_PLACEHOLDER_VALUE]}),
                       "buckets" => [term_bucket("new rules", 2)],
                       "doc_count_error_upper_bound" => 0,
                       "sum_other_doc_count" => 0
                     }
-                  }.with_missing_value_bucket(0)),
-                  term_bucket(2020, 1, {
+                  }),
+                  term_bucket(2020.0, 1, {
                     "seasons_nested.notes" => {
-                      "meta" => inner_terms_meta({"grouping_fields" => ["seasons_nested.notes"], "key_path" => ["key"]}),
+                      "meta" => inner_terms_meta("seasons_nested.notes", {"missing_values" => [MISSING_STRING_PLACEHOLDER_VALUE]}),
                       # To support `page_info.has_next_page` we request one additional bucket, so we get back 2 here.
                       "buckets" => [term_bucket("old rules", 1), term_bucket("pandemic", 1)],
                       "doc_count_error_upper_bound" => 0,
                       "sum_other_doc_count" => 0
                     }
-                  }.with_missing_value_bucket(0))
+                  })
                 ],
                 "doc_count_error_upper_bound" => 0,
                 "sum_other_doc_count" => 1
               }
-            }.with_missing_value_bucket(0, {
-              "seasons_nested.notes" => {
-                "meta" => inner_terms_meta({"grouping_fields" => ["seasons_nested.notes"], "key_path" => ["key"]}),
-                "buckets" => [],
-                "doc_count_error_upper_bound" => 0,
-                "sum_other_doc_count" => 0
-              }
-            }.with_missing_value_bucket(0))
+            }
           }])
         end
 
@@ -612,7 +593,7 @@ module ElasticGraph
             nested_sub_aggregation_of(path_in_index: ["seasons_nested"], query: sub_aggregation_query_of(
               name: "seasons_nested",
               first: 0,
-              groupings: [field_term_grouping_of("seasons_nested", "year"), field_term_grouping_of("seasons_nested", "notes")]
+              groupings: [field_term_grouping_of("seasons_nested", "year", missing_value_placeholder: MISSING_NUMERIC_PLACEHOLDER), field_term_grouping_of("seasons_nested", "notes")]
             ))
           ])
 
@@ -637,7 +618,7 @@ module ElasticGraph
               "doc_count" => 4,
               "meta" => outer_meta({"buckets_path" => ["seasons_nested.started_at"]}),
               "seasons_nested.started_at" => {
-                "meta" => inner_date_meta({"grouping_fields" => ["seasons_nested.started_at"], "key_path" => ["key_as_string"]}),
+                "meta" => inner_date_meta("seasons_nested.started_at"),
                 "buckets" => [
                   date_histogram_bucket(2020, 1),
                   date_histogram_bucket(2021, 1),
@@ -665,24 +646,24 @@ module ElasticGraph
               "doc_count" => 4,
               "meta" => outer_meta({"buckets_path" => ["seasons_nested.started_at"]}),
               "seasons_nested.started_at" => {
-                "meta" => inner_date_meta({"grouping_fields" => ["seasons_nested.started_at"], "buckets_path" => ["seasons_nested.won_games_at"], "key_path" => ["key_as_string"]}),
+                "meta" => inner_date_meta("seasons_nested.started_at", {"buckets_path" => ["seasons_nested.won_games_at"]}),
                 "buckets" => [
                   date_histogram_bucket(2020, 1, {"seasons_nested.won_games_at" => {
-                    "meta" => inner_date_meta({"grouping_fields" => ["seasons_nested.won_games_at"], "key_path" => ["key_as_string"]}),
+                    "meta" => inner_date_meta("seasons_nested.won_games_at"),
                     "buckets" => [date_histogram_bucket(2020, 1)]
                   }}.with_missing_value_bucket(0)),
                   date_histogram_bucket(2021, 1, {"seasons_nested.won_games_at" => {
-                    "meta" => inner_date_meta({"grouping_fields" => ["seasons_nested.won_games_at"], "key_path" => ["key_as_string"]}),
+                    "meta" => inner_date_meta("seasons_nested.won_games_at"),
                     "buckets" => [date_histogram_bucket(2021, 1)]
                   }}.with_missing_value_bucket(0)),
                   date_histogram_bucket(2022, 2, {"seasons_nested.won_games_at" => {
-                    "meta" => inner_date_meta({"grouping_fields" => ["seasons_nested.won_games_at"], "key_path" => ["key_as_string"]}),
+                    "meta" => inner_date_meta("seasons_nested.won_games_at"),
                     "buckets" => [date_histogram_bucket(2022, 2)]
                   }}.with_missing_value_bucket(0))
                 ]
               }
             }.with_missing_value_bucket(0, {"seasons_nested.won_games_at" => {
-              "meta" => inner_date_meta({"grouping_fields" => ["seasons_nested.won_games_at"], "key_path" => ["key_as_string"]}),
+              "meta" => inner_date_meta("seasons_nested.won_games_at"),
               "buckets" => []
             }}.with_missing_value_bucket(0))
           }])
@@ -705,41 +686,41 @@ module ElasticGraph
               "meta" => outer_meta({"buckets_path" => ["seasons_nested.started_at"]}),
               "doc_count" => 4,
               "seasons_nested.started_at" => {
-                "meta" => inner_date_meta({"buckets_path" => ["seasons_nested.notes"], "key_path" => ["key_as_string"], "grouping_fields" => ["seasons_nested.started_at"]}),
+                "meta" => inner_date_meta("seasons_nested.started_at", {"buckets_path" => ["seasons_nested.notes"]}),
                 "buckets" => [
                   date_histogram_bucket(2020, 1, {"seasons_nested.notes" => {
-                    "meta" => inner_terms_meta({"key_path" => ["key"], "grouping_fields" => ["seasons_nested.notes"]}),
+                    "meta" => inner_terms_meta("seasons_nested.notes", {"missing_values" => [MISSING_STRING_PLACEHOLDER_VALUE]}),
                     "doc_count_error_upper_bound" => 0,
                     "sum_other_doc_count" => 0,
                     "buckets" => [
                       term_bucket("old rules", 1),
                       term_bucket("pandemic", 1)
                     ]
-                  }}.with_missing_value_bucket(0)),
+                  }}),
                   date_histogram_bucket(2021, 1, {"seasons_nested.notes" => {
-                    "meta" => inner_terms_meta({"key_path" => ["key"], "grouping_fields" => ["seasons_nested.notes"]}),
+                    "meta" => inner_terms_meta("seasons_nested.notes", {"missing_values" => [MISSING_STRING_PLACEHOLDER_VALUE]}),
                     "doc_count_error_upper_bound" => 0,
                     "sum_other_doc_count" => 0,
                     "buckets" => [
                       term_bucket("old rules", 1)
                     ]
-                  }}.with_missing_value_bucket(0)),
+                  }}),
                   date_histogram_bucket(2022, 2, {"seasons_nested.notes" => {
-                    "meta" => inner_terms_meta({"key_path" => ["key"], "grouping_fields" => ["seasons_nested.notes"]}),
+                    "meta" => inner_terms_meta("seasons_nested.notes", {"missing_values" => [MISSING_STRING_PLACEHOLDER_VALUE]}),
                     "doc_count_error_upper_bound" => 0,
                     "sum_other_doc_count" => 0,
                     "buckets" => [
                       term_bucket("new rules", 2)
                     ]
-                  }}.with_missing_value_bucket(0))
+                  }})
                 ]
               }
             }.with_missing_value_bucket(0, {"seasons_nested.notes" => {
-              "meta" => inner_terms_meta({"key_path" => ["key"], "grouping_fields" => ["seasons_nested.notes"]}),
+              "meta" => inner_terms_meta("seasons_nested.notes", {"missing_values" => [MISSING_STRING_PLACEHOLDER_VALUE]}),
               "doc_count_error_upper_bound" => 0,
               "sum_other_doc_count" => 0,
               "buckets" => []
-            }}.with_missing_value_bucket(0))
+            }})
           }])
         end
 
@@ -747,7 +728,7 @@ module ElasticGraph
           query = aggregation_query_of(name: "teams", sub_aggregations: [
             nested_sub_aggregation_of(path_in_index: ["seasons_nested"], query: sub_aggregation_query_of(name: "seasons_nested", groupings: [
               date_histogram_grouping_of("seasons_nested", "started_at", "year"),
-              field_term_grouping_of("seasons_nested", "year"),
+              field_term_grouping_of("seasons_nested", "year", missing_value_placeholder: MISSING_NUMERIC_PLACEHOLDER),
               field_term_grouping_of("seasons_nested", "notes")
             ]))
           ])
@@ -761,82 +742,62 @@ module ElasticGraph
               "meta" => outer_meta({"buckets_path" => ["seasons_nested.started_at"]}),
               "doc_count" => 4,
               "seasons_nested.started_at" => {
-                "meta" => inner_date_meta({"buckets_path" => ["seasons_nested.year"], "key_path" => ["key_as_string"], "grouping_fields" => ["seasons_nested.started_at"]}),
+                "meta" => inner_date_meta("seasons_nested.started_at", {"buckets_path" => ["seasons_nested.year"]}),
                 "buckets" => [
                   date_histogram_bucket(2020, 1, {"seasons_nested.year" => {
-                    "meta" => inner_terms_meta({"key_path" => ["key"], "grouping_fields" => ["seasons_nested.year"], "buckets_path" => ["seasons_nested.notes"]}),
+                    "meta" => inner_terms_meta("seasons_nested.year", {"buckets_path" => ["seasons_nested.notes"], "missing_values" => [MISSING_NUMERIC_PLACEHOLDER]}),
                     "doc_count_error_upper_bound" => 0,
                     "sum_other_doc_count" => 0,
                     "buckets" => [
-                      term_bucket(2020, 1, {"seasons_nested.notes" => {
-                        "meta" => inner_terms_meta({"key_path" => ["key"], "grouping_fields" => ["seasons_nested.notes"]}),
+                      term_bucket(2020.0, 1, {"seasons_nested.notes" => {
+                        "meta" => inner_terms_meta("seasons_nested.notes", {"missing_values" => [MISSING_STRING_PLACEHOLDER_VALUE]}),
                         "doc_count_error_upper_bound" => 0,
                         "sum_other_doc_count" => 0,
                         "buckets" => [
                           term_bucket("old rules", 1),
                           term_bucket("pandemic", 1)
                         ]
-                      }}.with_missing_value_bucket(0))
+                      }})
                     ]
-                  }}.with_missing_value_bucket(0, {"seasons_nested.notes" => {
-                    "meta" => inner_terms_meta({"key_path" => ["key"], "grouping_fields" => ["seasons_nested.notes"]}),
-                    "doc_count_error_upper_bound" => 0,
-                    "sum_other_doc_count" => 0,
-                    "buckets" => []
-                  }}.with_missing_value_bucket(0))),
+                  }}),
                   date_histogram_bucket(2021, 1, {"seasons_nested.year" => {
-                    "meta" => inner_terms_meta({"key_path" => ["key"], "grouping_fields" => ["seasons_nested.year"], "buckets_path" => ["seasons_nested.notes"]}),
+                    "meta" => inner_terms_meta("seasons_nested.year", {"buckets_path" => ["seasons_nested.notes"], "missing_values" => [MISSING_NUMERIC_PLACEHOLDER]}),
                     "doc_count_error_upper_bound" => 0,
                     "sum_other_doc_count" => 0,
                     "buckets" => [
-                      term_bucket(2021, 1, {"seasons_nested.notes" => {
-                        "meta" => inner_terms_meta({"key_path" => ["key"], "grouping_fields" => ["seasons_nested.notes"]}),
+                      term_bucket(2021.0, 1, {"seasons_nested.notes" => {
+                        "meta" => inner_terms_meta("seasons_nested.notes", {"missing_values" => [MISSING_STRING_PLACEHOLDER_VALUE]}),
                         "doc_count_error_upper_bound" => 0,
                         "sum_other_doc_count" => 0,
                         "buckets" => [
                           term_bucket("old rules", 1)
                         ]
-                      }}.with_missing_value_bucket(0))
+                      }})
                     ]
-                  }}.with_missing_value_bucket(0, {"seasons_nested.notes" => {
-                    "meta" => inner_terms_meta({"key_path" => ["key"], "grouping_fields" => ["seasons_nested.notes"]}),
-                    "doc_count_error_upper_bound" => 0,
-                    "sum_other_doc_count" => 0,
-                    "buckets" => []
-                  }}.with_missing_value_bucket(0))),
+                  }}),
                   date_histogram_bucket(2022, 2, {"seasons_nested.year" => {
-                    "meta" => inner_terms_meta({"key_path" => ["key"], "grouping_fields" => ["seasons_nested.year"], "buckets_path" => ["seasons_nested.notes"]}),
+                    "meta" => inner_terms_meta("seasons_nested.year", {"buckets_path" => ["seasons_nested.notes"], "missing_values" => [MISSING_NUMERIC_PLACEHOLDER]}),
                     "doc_count_error_upper_bound" => 0,
                     "sum_other_doc_count" => 0,
                     "buckets" => [
-                      term_bucket(2022, 2, {"seasons_nested.notes" => {
-                        "meta" => inner_terms_meta({"key_path" => ["key"], "grouping_fields" => ["seasons_nested.notes"]}),
+                      term_bucket(2022.0, 2, {"seasons_nested.notes" => {
+                        "meta" => inner_terms_meta("seasons_nested.notes", {"missing_values" => [MISSING_STRING_PLACEHOLDER_VALUE]}),
                         "doc_count_error_upper_bound" => 0,
                         "sum_other_doc_count" => 0,
                         "buckets" => [
                           term_bucket("new rules", 2)
                         ]
-                      }}.with_missing_value_bucket(0))
+                      }})
                     ]
-                  }}.with_missing_value_bucket(0, {"seasons_nested.notes" => {
-                    "meta" => inner_terms_meta({"key_path" => ["key"], "grouping_fields" => ["seasons_nested.notes"]}),
-                    "doc_count_error_upper_bound" => 0,
-                    "sum_other_doc_count" => 0,
-                    "buckets" => []
-                  }}.with_missing_value_bucket(0)))
+                  }})
                 ]
               }
             }.with_missing_value_bucket(0, {"seasons_nested.year" => {
-              "meta" => inner_terms_meta({"key_path" => ["key"], "grouping_fields" => ["seasons_nested.year"], "buckets_path" => ["seasons_nested.notes"]}),
+              "meta" => inner_terms_meta("seasons_nested.year", {"buckets_path" => ["seasons_nested.notes"], "missing_values" => [MISSING_NUMERIC_PLACEHOLDER]}),
               "doc_count_error_upper_bound" => 0,
               "sum_other_doc_count" => 0,
               "buckets" => []
-            }}.with_missing_value_bucket(0, {"seasons_nested.notes" => {
-              "meta" => inner_terms_meta({"key_path" => ["key"], "grouping_fields" => ["seasons_nested.notes"]}),
-              "doc_count_error_upper_bound" => 0,
-              "sum_other_doc_count" => 0,
-              "buckets" => []
-            }}.with_missing_value_bucket(0)))
+            }})
           }])
         end
 
@@ -845,7 +806,7 @@ module ElasticGraph
             nested_sub_aggregation_of(path_in_index: ["seasons_nested"], query: sub_aggregation_query_of(name: "seasons_nested", groupings: [
               date_histogram_grouping_of("seasons_nested", "started_at", "year"),
               date_histogram_grouping_of("seasons_nested", "won_games_at", "year"),
-              field_term_grouping_of("seasons_nested", "year"),
+              field_term_grouping_of("seasons_nested", "year", missing_value_placeholder: MISSING_NUMERIC_PLACEHOLDER),
               field_term_grouping_of("seasons_nested", "notes")
             ]))
           ])
@@ -859,130 +820,95 @@ module ElasticGraph
               "meta" => outer_meta({"buckets_path" => ["seasons_nested.started_at"]}),
               "doc_count" => 4,
               "seasons_nested.started_at" => {
-                "meta" => inner_date_meta({"buckets_path" => ["seasons_nested.won_games_at"], "key_path" => ["key_as_string"], "grouping_fields" => ["seasons_nested.started_at"]}),
+                "meta" => inner_date_meta("seasons_nested.started_at", {"buckets_path" => ["seasons_nested.won_games_at"]}),
                 "buckets" => [
                   date_histogram_bucket(2020, 1, {"seasons_nested.won_games_at" => {
-                    "meta" => inner_date_meta({"buckets_path" => ["seasons_nested.year"], "key_path" => ["key_as_string"], "grouping_fields" => ["seasons_nested.won_games_at"]}),
+                    "meta" => inner_date_meta("seasons_nested.won_games_at", {"buckets_path" => ["seasons_nested.year"]}),
                     "buckets" => [
                       date_histogram_bucket(2020, 1, {"seasons_nested.year" => {
-                        "meta" => inner_terms_meta({"buckets_path" => ["seasons_nested.notes"], "key_path" => ["key"], "grouping_fields" => ["seasons_nested.year"]}),
+                        "meta" => inner_terms_meta("seasons_nested.year", {"buckets_path" => ["seasons_nested.notes"], "missing_values" => [MISSING_NUMERIC_PLACEHOLDER]}),
                         "doc_count_error_upper_bound" => 0,
                         "sum_other_doc_count" => 0,
                         "buckets" => [
-                          term_bucket(2020, 1, {"seasons_nested.notes" => {
-                            "meta" => inner_terms_meta({"key_path" => ["key"], "grouping_fields" => ["seasons_nested.notes"]}),
+                          term_bucket(2020.0, 1, {"seasons_nested.notes" => {
+                            "meta" => inner_terms_meta("seasons_nested.notes", {"missing_values" => [MISSING_STRING_PLACEHOLDER_VALUE]}),
                             "doc_count_error_upper_bound" => 0,
                             "sum_other_doc_count" => 0,
                             "buckets" => [
                               term_bucket("old rules", 1),
                               term_bucket("pandemic", 1)
                             ]
-                          }}.with_missing_value_bucket(0))
+                          }})
                         ]
-                      }}.with_missing_value_bucket(0, {"seasons_nested.notes" => {
-                        "meta" => inner_terms_meta({"key_path" => ["key"], "grouping_fields" => ["seasons_nested.notes"]}),
-                        "doc_count_error_upper_bound" => 0,
-                        "sum_other_doc_count" => 0,
-                        "buckets" => []
-                      }}.with_missing_value_bucket(0)))
+                      }})
                     ]
                   }}.with_missing_value_bucket(0, {"seasons_nested.year" => {
-                    "meta" => inner_terms_meta({"buckets_path" => ["seasons_nested.notes"], "key_path" => ["key"], "grouping_fields" => ["seasons_nested.year"]}),
+                    "meta" => inner_terms_meta("seasons_nested.year", {"buckets_path" => ["seasons_nested.notes"], "missing_values" => [MISSING_NUMERIC_PLACEHOLDER]}),
                     "doc_count_error_upper_bound" => 0,
                     "sum_other_doc_count" => 0,
                     "buckets" => []
-                  }}.with_missing_value_bucket(0, {"seasons_nested.notes" => {
-                    "meta" => inner_terms_meta({"key_path" => ["key"], "grouping_fields" => ["seasons_nested.notes"]}),
-                    "doc_count_error_upper_bound" => 0,
-                    "sum_other_doc_count" => 0,
-                    "buckets" => []
-                  }}.with_missing_value_bucket(0)))),
+                  }})),
                   date_histogram_bucket(2021, 1, {"seasons_nested.won_games_at" => {
-                    "meta" => inner_date_meta({"buckets_path" => ["seasons_nested.year"], "key_path" => ["key_as_string"], "grouping_fields" => ["seasons_nested.won_games_at"]}),
+                    "meta" => inner_date_meta("seasons_nested.won_games_at", {"buckets_path" => ["seasons_nested.year"]}),
                     "buckets" => [
                       date_histogram_bucket(2021, 1, {"seasons_nested.year" => {
-                        "meta" => inner_terms_meta({"buckets_path" => ["seasons_nested.notes"], "key_path" => ["key"], "grouping_fields" => ["seasons_nested.year"]}),
+                        "meta" => inner_terms_meta("seasons_nested.year", {"buckets_path" => ["seasons_nested.notes"], "missing_values" => [MISSING_NUMERIC_PLACEHOLDER]}),
                         "doc_count_error_upper_bound" => 0,
                         "sum_other_doc_count" => 0,
                         "buckets" => [
-                          term_bucket(2021, 1, {"seasons_nested.notes" => {
-                            "meta" => inner_terms_meta({"key_path" => ["key"], "grouping_fields" => ["seasons_nested.notes"]}),
+                          term_bucket(2021.0, 1, {"seasons_nested.notes" => {
+                            "meta" => inner_terms_meta("seasons_nested.notes", {"missing_values" => [MISSING_STRING_PLACEHOLDER_VALUE]}),
                             "doc_count_error_upper_bound" => 0,
                             "sum_other_doc_count" => 0,
                             "buckets" => [
                               term_bucket("old rules", 1)
                             ]
-                          }}.with_missing_value_bucket(0))
+                          }})
                         ]
-                      }}.with_missing_value_bucket(0, {"seasons_nested.notes" => {
-                        "meta" => inner_terms_meta({"key_path" => ["key"], "grouping_fields" => ["seasons_nested.notes"]}),
-                        "doc_count_error_upper_bound" => 0,
-                        "sum_other_doc_count" => 0,
-                        "buckets" => []
-                      }}.with_missing_value_bucket(0)))
+                      }})
                     ]
                   }}.with_missing_value_bucket(0, {"seasons_nested.year" => {
-                    "meta" => inner_terms_meta({"buckets_path" => ["seasons_nested.notes"], "key_path" => ["key"], "grouping_fields" => ["seasons_nested.year"]}),
+                    "meta" => inner_terms_meta("seasons_nested.year", {"buckets_path" => ["seasons_nested.notes"], "missing_values" => [MISSING_NUMERIC_PLACEHOLDER]}),
                     "doc_count_error_upper_bound" => 0,
                     "sum_other_doc_count" => 0,
                     "buckets" => []
-                  }}.with_missing_value_bucket(0, {"seasons_nested.notes" => {
-                    "meta" => inner_terms_meta({"key_path" => ["key"], "grouping_fields" => ["seasons_nested.notes"]}),
-                    "doc_count_error_upper_bound" => 0,
-                    "sum_other_doc_count" => 0,
-                    "buckets" => []
-                  }}.with_missing_value_bucket(0)))),
+                  }})),
                   date_histogram_bucket(2022, 2, {"seasons_nested.won_games_at" => {
-                    "meta" => inner_date_meta({"buckets_path" => ["seasons_nested.year"], "key_path" => ["key_as_string"], "grouping_fields" => ["seasons_nested.won_games_at"]}),
+                    "meta" => inner_date_meta("seasons_nested.won_games_at", {"buckets_path" => ["seasons_nested.year"]}),
                     "buckets" => [
                       date_histogram_bucket(2022, 2, {"seasons_nested.year" => {
-                        "meta" => inner_terms_meta({"buckets_path" => ["seasons_nested.notes"], "key_path" => ["key"], "grouping_fields" => ["seasons_nested.year"]}),
+                        "meta" => inner_terms_meta("seasons_nested.year", {"buckets_path" => ["seasons_nested.notes"], "missing_values" => [MISSING_NUMERIC_PLACEHOLDER]}),
                         "doc_count_error_upper_bound" => 0,
                         "sum_other_doc_count" => 0,
                         "buckets" => [
-                          term_bucket(2022, 2, {"seasons_nested.notes" => {
-                            "meta" => inner_terms_meta({"key_path" => ["key"], "grouping_fields" => ["seasons_nested.notes"]}),
+                          term_bucket(2022.0, 2, {"seasons_nested.notes" => {
+                            "meta" => inner_terms_meta("seasons_nested.notes", {"missing_values" => [MISSING_STRING_PLACEHOLDER_VALUE]}),
                             "doc_count_error_upper_bound" => 0,
                             "sum_other_doc_count" => 0,
                             "buckets" => [
                               term_bucket("new rules", 2)
                             ]
-                          }}.with_missing_value_bucket(0))
+                          }})
                         ]
-                      }}.with_missing_value_bucket(0, {"seasons_nested.notes" => {
-                        "meta" => inner_terms_meta({"key_path" => ["key"], "grouping_fields" => ["seasons_nested.notes"]}),
-                        "doc_count_error_upper_bound" => 0,
-                        "sum_other_doc_count" => 0,
-                        "buckets" => []
-                      }}.with_missing_value_bucket(0)))
+                      }})
                     ]
                   }}.with_missing_value_bucket(0, {"seasons_nested.year" => {
-                    "meta" => inner_terms_meta({"buckets_path" => ["seasons_nested.notes"], "key_path" => ["key"], "grouping_fields" => ["seasons_nested.year"]}),
+                    "meta" => inner_terms_meta("seasons_nested.year", {"buckets_path" => ["seasons_nested.notes"], "missing_values" => [MISSING_NUMERIC_PLACEHOLDER]}),
                     "doc_count_error_upper_bound" => 0,
                     "sum_other_doc_count" => 0,
                     "buckets" => []
-                  }}.with_missing_value_bucket(0, {"seasons_nested.notes" => {
-                    "meta" => inner_terms_meta({"key_path" => ["key"], "grouping_fields" => ["seasons_nested.notes"]}),
-                    "doc_count_error_upper_bound" => 0,
-                    "sum_other_doc_count" => 0,
-                    "buckets" => []
-                  }}.with_missing_value_bucket(0))))
+                  }}))
                 ]
               }
             }.with_missing_value_bucket(0, {"seasons_nested.won_games_at" => {
-              "meta" => inner_date_meta({"buckets_path" => ["seasons_nested.year"], "key_path" => ["key_as_string"], "grouping_fields" => ["seasons_nested.won_games_at"]}),
+              "meta" => inner_date_meta("seasons_nested.won_games_at", {"buckets_path" => ["seasons_nested.year"]}),
               "buckets" => []
             }}.with_missing_value_bucket(0, {"seasons_nested.year" => {
-              "meta" => inner_terms_meta({"buckets_path" => ["seasons_nested.notes"], "key_path" => ["key"], "grouping_fields" => ["seasons_nested.year"]}),
+              "meta" => inner_terms_meta("seasons_nested.year", {"buckets_path" => ["seasons_nested.notes"], "missing_values" => [MISSING_NUMERIC_PLACEHOLDER]}),
               "doc_count_error_upper_bound" => 0,
               "sum_other_doc_count" => 0,
               "buckets" => []
-            }}.with_missing_value_bucket(0, {"seasons_nested.notes" => {
-              "meta" => inner_terms_meta({"key_path" => ["key"], "grouping_fields" => ["seasons_nested.notes"]}),
-              "doc_count_error_upper_bound" => 0,
-              "sum_other_doc_count" => 0,
-              "buckets" => []
-            }}.with_missing_value_bucket(0))))
+            }}))
           }])
         end
 
@@ -990,7 +916,7 @@ module ElasticGraph
           query = aggregation_query_of(name: "teams", sub_aggregations: [
             nested_sub_aggregation_of(path_in_index: ["seasons_nested"], query: sub_aggregation_query_of(
               name: "seasons_nested",
-              groupings: [field_term_grouping_of("seasons_nested", "year")],
+              groupings: [field_term_grouping_of("seasons_nested", "year", missing_value_placeholder: MISSING_NUMERIC_PLACEHOLDER)],
               filter: {"year" => {"gt" => 2020}}
             ))
           ])
@@ -1006,7 +932,7 @@ module ElasticGraph
               "seasons_nested:filtered" => {
                 "doc_count" => 3,
                 "seasons_nested.year" => {
-                  "meta" => inner_terms_meta({"grouping_fields" => ["seasons_nested.year"], "key_path" => ["key"]}),
+                  "meta" => inner_terms_meta("seasons_nested.year", {"missing_values" => [MISSING_NUMERIC_PLACEHOLDER]}),
                   "buckets" => [
                     term_bucket(2022, 2),
                     term_bucket(2021, 1)
@@ -1014,7 +940,7 @@ module ElasticGraph
                   "doc_count_error_upper_bound" => 0,
                   "sum_other_doc_count" => 0
                 }
-              }.with_missing_value_bucket(0)
+              }
             }
           }])
         end
@@ -1053,7 +979,7 @@ module ElasticGraph
               nested_sub_aggregation_of(path_in_index: ["seasons_nested"], query: sub_aggregation_query_of(
                 name: "seasons_nested",
                 needs_doc_count_error: needs_doc_count_error,
-                groupings: [field_term_grouping_of("seasons_nested", "year")]
+                groupings: [field_term_grouping_of("seasons_nested", "year", missing_value_placeholder: MISSING_NUMERIC_PLACEHOLDER)]
               ))
             ])
 
@@ -1090,7 +1016,7 @@ module ElasticGraph
               ],
               groupings: [
                 date_histogram_grouping_of("seasons_nested", "started_at", "year"),
-                field_term_grouping_of("seasons_nested", "year"),
+                field_term_grouping_of("seasons_nested", "year", missing_value_placeholder: MISSING_NUMERIC_PLACEHOLDER),
                 field_term_grouping_of("seasons_nested", "notes")
               ]
             ))

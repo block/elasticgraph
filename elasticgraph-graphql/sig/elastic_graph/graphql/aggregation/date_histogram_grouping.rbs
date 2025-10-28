@@ -28,6 +28,7 @@ module ElasticGraph
         attr_reader key: ::String
         attr_reader encoded_index_field_path: ::String
 
+        def handles_missing_values?: () -> bool
         def composite_clause: (?grouping_options: ::Hash[::String, untyped]) -> ::Hash[::String, untyped]
         def non_composite_clause_for: (Query) -> ::Hash[::String, untyped]
         def inner_meta: () -> ::Hash[::String, untyped]

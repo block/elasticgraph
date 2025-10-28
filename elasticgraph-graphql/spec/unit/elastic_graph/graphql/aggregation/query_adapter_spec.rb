@@ -501,7 +501,7 @@ module ElasticGraph
                 nested_sub_aggregation_of(path_in_index: ["seasons_nested"], query: sub_aggregation_query_of(
                   name: "seasons_nested",
                   groupings: [
-                    field_term_grouping_of("seasons_nested", "year"),
+                    field_term_grouping_of("seasons_nested", "year", missing_value_placeholder: MISSING_NUMERIC_PLACEHOLDER),
                     field_term_grouping_of("seasons_nested", "notes", field_names_in_graphql_query: ["seasons_nested", "note"]),
                     date_histogram_grouping_of("seasons_nested", "started_at", "year", field_names_in_graphql_query: ["seasons_nested", "started_at", "as_date_time"])
                   ],

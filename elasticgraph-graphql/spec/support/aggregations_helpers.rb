@@ -85,9 +85,9 @@ module ElasticGraph
       GraphQL::Aggregation::ScriptTermGrouping.new(field_path: field_path, script_id: script_id, params: params)
     end
 
-    def field_term_grouping_of(*field_names_in_index, field_names_in_graphql_query: field_names_in_index)
+    def field_term_grouping_of(*field_names_in_index, field_names_in_graphql_query: field_names_in_index, missing_value_placeholder: MISSING_STRING_PLACEHOLDER_VALUE)
       field_path = build_field_path(names_in_index: field_names_in_index, names_in_graphql_query: field_names_in_graphql_query)
-      GraphQL::Aggregation::FieldTermGrouping.new(field_path: field_path)
+      GraphQL::Aggregation::FieldTermGrouping.new(field_path: field_path, missing_value_placeholder: missing_value_placeholder)
     end
 
     def nested_sub_aggregation_of(path_in_index: nil, query: nil, path_in_graphql_query: path_in_index)

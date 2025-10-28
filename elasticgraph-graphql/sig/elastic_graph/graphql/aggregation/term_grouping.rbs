@@ -19,6 +19,7 @@ module ElasticGraph
       interface _TermGroupingSubtype
         def field_path: () -> fieldPath
         def terms_subclause: () -> ::Hash[::String, untyped]
+        def handles_missing_values?: () -> bool
       end
     end
   end

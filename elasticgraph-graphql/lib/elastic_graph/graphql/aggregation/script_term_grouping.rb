@@ -16,6 +16,10 @@ module ElasticGraph
         # @dynamic field_path
         include TermGrouping
 
+        def handles_missing_values?
+          false
+        end
+
         private
 
         def terms_subclause
