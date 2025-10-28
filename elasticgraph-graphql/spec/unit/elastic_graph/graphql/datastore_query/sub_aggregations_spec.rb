@@ -391,8 +391,8 @@ module ElasticGraph
               "meta" => outer_meta({"buckets_path" => ["seasons_nested.notes"]}),
               "aggs" => {
                 "seasons_nested.notes" => {
-                  "meta" => inner_terms_meta({"grouping_fields" => ["seasons_nested.notes"], "key_path" => ["key"]}),
-                  "terms" => terms({"field" => "seasons_nested.notes", "collect_mode" => "depth_first"}),
+                  "meta" => inner_terms_meta("seasons_nested.notes", {"missing_values" => [MISSING_STRING_PLACEHOLDER_VALUE]}),
+                  "terms" => terms({"field" => "seasons_nested.notes", "collect_mode" => "depth_first", "missing" => MISSING_STRING_PLACEHOLDER_VALUE}),
                   "aggs" => {
                     "seasons_nested:seasons_nested.year:exact_min" => {
                       "min" => {"field" => "seasons_nested.year"}
@@ -405,7 +405,7 @@ module ElasticGraph
                     }
                   }
                 }
-              }.with_missing_value_agg
+              }
             }
           })
         end
@@ -424,7 +424,7 @@ module ElasticGraph
           ])])
 
           expect(datastore_body_of(query).dig(:aggs, "teams:seasons_nested", "aggs", "sea_nest.the_notes", "meta")).to eq(
-            inner_terms_meta({"grouping_fields" => ["sea_nest.the_notes"], "key_path" => ["key"]})
+            inner_terms_meta("sea_nest.the_notes", {"missing_values" => [MISSING_STRING_PLACEHOLDER_VALUE]})
           )
         end
 
@@ -492,10 +492,10 @@ module ElasticGraph
               "meta" => outer_meta({"buckets_path" => ["seasons_nested.year"]}),
               "aggs" => {
                 "seasons_nested.year" => {
-                  "meta" => inner_terms_meta({"grouping_fields" => ["seasons_nested.year"], "key_path" => ["key"]}),
-                  "terms" => terms({"field" => "seasons_nested.year", "collect_mode" => "depth_first"})
+                  "meta" => inner_terms_meta("seasons_nested.year", {"missing_values" => [MISSING_STRING_PLACEHOLDER_VALUE]}),
+                  "terms" => terms({"field" => "seasons_nested.year", "collect_mode" => "depth_first", "missing" => MISSING_STRING_PLACEHOLDER_VALUE})
                 }
-              }.with_missing_value_agg
+              }
             }
           })
         end
@@ -514,16 +514,16 @@ module ElasticGraph
               "meta" => outer_meta({"buckets_path" => ["seasons_nested.year"]}),
               "aggs" => {
                 "seasons_nested.year" => {
-                  "meta" => inner_terms_meta({"grouping_fields" => ["seasons_nested.year"], "key_path" => ["key"], "buckets_path" => ["seasons_nested.notes"]}),
-                  "terms" => terms({"field" => "seasons_nested.year", "collect_mode" => "depth_first"}),
+                  "meta" => inner_terms_meta("seasons_nested.year", {"buckets_path" => ["seasons_nested.notes"], "missing_values" => [MISSING_STRING_PLACEHOLDER_VALUE]}),
+                  "terms" => terms({"field" => "seasons_nested.year", "collect_mode" => "depth_first", "missing" => MISSING_STRING_PLACEHOLDER_VALUE}),
                   "aggs" => {
                     "seasons_nested.notes" => {
-                      "meta" => inner_terms_meta({"grouping_fields" => ["seasons_nested.notes"], "key_path" => ["key"]}),
-                      "terms" => terms({"field" => "seasons_nested.notes", "collect_mode" => "depth_first"})
+                      "meta" => inner_terms_meta("seasons_nested.notes", {"missing_values" => [MISSING_STRING_PLACEHOLDER_VALUE]}),
+                      "terms" => terms({"field" => "seasons_nested.notes", "collect_mode" => "depth_first", "missing" => MISSING_STRING_PLACEHOLDER_VALUE})
                     }
-                  }.with_missing_value_agg
+                  }
                 }
-              }.with_missing_value_agg
+              }
             }
           })
         end
@@ -543,10 +543,10 @@ module ElasticGraph
               "meta" => outer_meta({"buckets_path" => ["seasons_nested.year"]}, size: 14),
               "aggs" => {
                 "seasons_nested.year" => {
-                  "meta" => inner_terms_meta({"grouping_fields" => ["seasons_nested.year"], "key_path" => ["key"]}),
-                  "terms" => terms({"field" => "seasons_nested.year", "collect_mode" => "depth_first"}, size: 14)
+                  "meta" => inner_terms_meta("seasons_nested.year", {"missing_values" => [MISSING_STRING_PLACEHOLDER_VALUE]}),
+                  "terms" => terms({"field" => "seasons_nested.year", "collect_mode" => "depth_first", "missing" => MISSING_STRING_PLACEHOLDER_VALUE}, size: 14)
                 }
-              }.with_missing_value_agg
+              }
             }
           })
         end
@@ -569,16 +569,16 @@ module ElasticGraph
               "meta" => outer_meta({"buckets_path" => ["seasons_nested.year"]}, size: 17),
               "aggs" => {
                 "seasons_nested.year" => {
-                  "meta" => inner_terms_meta({"buckets_path" => ["seasons_nested.notes"], "grouping_fields" => ["seasons_nested.year"], "key_path" => ["key"]}),
-                  "terms" => terms({"field" => "seasons_nested.year", "collect_mode" => "depth_first"}, size: 17),
+                  "meta" => inner_terms_meta("seasons_nested.year", {"buckets_path" => ["seasons_nested.notes"], "missing_values" => [MISSING_STRING_PLACEHOLDER_VALUE]}),
+                  "terms" => terms({"field" => "seasons_nested.year", "collect_mode" => "depth_first", "missing" => MISSING_STRING_PLACEHOLDER_VALUE}, size: 17),
                   "aggs" => {
                     "seasons_nested.notes" => {
-                      "meta" => inner_terms_meta({"grouping_fields" => ["seasons_nested.notes"], "key_path" => ["key"]}),
-                      "terms" => terms({"field" => "seasons_nested.notes", "collect_mode" => "depth_first"}, size: 17)
+                      "meta" => inner_terms_meta("seasons_nested.notes", {"missing_values" => [MISSING_STRING_PLACEHOLDER_VALUE]}),
+                      "terms" => terms({"field" => "seasons_nested.notes", "collect_mode" => "depth_first", "missing" => MISSING_STRING_PLACEHOLDER_VALUE}, size: 17)
                     }
-                  }.with_missing_value_agg
+                  }
                 }
-              }.with_missing_value_agg
+              }
             }
           })
         end
@@ -596,7 +596,7 @@ module ElasticGraph
               "meta" => outer_meta({"buckets_path" => ["seasons_nested.started_at"]}),
               "aggs" => {
                 "seasons_nested.started_at" => {
-                  "meta" => inner_date_meta({"grouping_fields" => ["seasons_nested.started_at"], "key_path" => ["key_as_string"]}),
+                  "meta" => inner_date_meta("seasons_nested.started_at"),
                   "date_histogram" => {
                     "calendar_interval" => "year",
                     "field" => "seasons_nested.started_at",
@@ -618,7 +618,7 @@ module ElasticGraph
           ])])
 
           expect(datastore_body_of(query).dig(:aggs, "teams:seasons_nested", "aggs", "sea_nest.started", "meta")).to eq(
-            inner_date_meta({"grouping_fields" => ["sea_nest.started"], "key_path" => ["key_as_string"]})
+            inner_date_meta("sea_nest.started")
           )
         end
 
@@ -635,7 +635,7 @@ module ElasticGraph
               "meta" => outer_meta({"buckets_path" => ["seasons_nested.started_at"]}),
               "aggs" => {
                 "seasons_nested.started_at" => {
-                  "meta" => inner_date_meta({"grouping_fields" => ["seasons_nested.started_at"], "key_path" => ["key_as_string"]}),
+                  "meta" => inner_date_meta("seasons_nested.started_at"),
                   "date_histogram" => {
                     "calendar_interval" => "year",
                     "field" => "seasons_nested.started_at",
@@ -663,7 +663,7 @@ module ElasticGraph
               "meta" => outer_meta({"buckets_path" => ["seasons_nested.started_at"]}),
               "aggs" => {
                 "seasons_nested.started_at" => {
-                  "meta" => inner_date_meta({"grouping_fields" => ["seasons_nested.started_at"], "buckets_path" => ["seasons_nested.won_games_at"], "key_path" => ["key_as_string"]}),
+                  "meta" => inner_date_meta("seasons_nested.started_at", {"buckets_path" => ["seasons_nested.won_games_at"]}),
                   "date_histogram" => {
                     "calendar_interval" => "year",
                     "field" => "seasons_nested.started_at",
@@ -673,7 +673,7 @@ module ElasticGraph
                   },
                   "aggs" => {
                     "seasons_nested.won_games_at" => {
-                      "meta" => inner_date_meta({"grouping_fields" => ["seasons_nested.won_games_at"], "key_path" => ["key_as_string"]}),
+                      "meta" => inner_date_meta("seasons_nested.won_games_at"),
                       "date_histogram" => {
                         "calendar_interval" => "year",
                         "field" => "seasons_nested.won_games_at",
@@ -703,7 +703,7 @@ module ElasticGraph
               "meta" => outer_meta({"buckets_path" => ["seasons_nested.started_at"]}),
               "aggs" => {
                 "seasons_nested.started_at" => {
-                  "meta" => inner_date_meta({"grouping_fields" => ["seasons_nested.started_at"], "buckets_path" => ["seasons_nested.notes"], "key_path" => ["key_as_string"]}),
+                  "meta" => inner_date_meta("seasons_nested.started_at", {"buckets_path" => ["seasons_nested.notes"]}),
                   "date_histogram" => {
                     "calendar_interval" => "year",
                     "field" => "seasons_nested.started_at",
@@ -713,10 +713,10 @@ module ElasticGraph
                   },
                   "aggs" => {
                     "seasons_nested.notes" => {
-                      "meta" => inner_terms_meta({"grouping_fields" => ["seasons_nested.notes"], "key_path" => ["key"]}),
-                      "terms" => terms({"field" => "seasons_nested.notes", "collect_mode" => "depth_first"})
+                      "meta" => inner_terms_meta("seasons_nested.notes", {"missing_values" => [MISSING_STRING_PLACEHOLDER_VALUE]}),
+                      "terms" => terms({"field" => "seasons_nested.notes", "collect_mode" => "depth_first", "missing" => MISSING_STRING_PLACEHOLDER_VALUE})
                     }
-                  }.with_missing_value_agg
+                  }
                 }
               }.with_missing_value_agg
             }
@@ -738,7 +738,7 @@ module ElasticGraph
               "meta" => outer_meta({"buckets_path" => ["seasons_nested.started_at"]}),
               "aggs" => {
                 "seasons_nested.started_at" => {
-                  "meta" => inner_date_meta({"grouping_fields" => ["seasons_nested.started_at"], "buckets_path" => ["seasons_nested.year"], "key_path" => ["key_as_string"]}),
+                  "meta" => inner_date_meta("seasons_nested.started_at", {"buckets_path" => ["seasons_nested.year"]}),
                   "date_histogram" => {
                     "calendar_interval" => "year",
                     "field" => "seasons_nested.started_at",
@@ -748,16 +748,16 @@ module ElasticGraph
                   },
                   "aggs" => {
                     "seasons_nested.year" => {
-                      "meta" => inner_terms_meta({"grouping_fields" => ["seasons_nested.year"], "buckets_path" => ["seasons_nested.notes"], "key_path" => ["key"]}),
-                      "terms" => terms({"field" => "seasons_nested.year", "collect_mode" => "depth_first"}),
+                      "meta" => inner_terms_meta("seasons_nested.year", {"buckets_path" => ["seasons_nested.notes"], "missing_values" => [MISSING_STRING_PLACEHOLDER_VALUE]}),
+                      "terms" => terms({"field" => "seasons_nested.year", "collect_mode" => "depth_first", "missing" => MISSING_STRING_PLACEHOLDER_VALUE}),
                       "aggs" => {
                         "seasons_nested.notes" => {
-                          "meta" => inner_terms_meta({"grouping_fields" => ["seasons_nested.notes"], "key_path" => ["key"]}),
-                          "terms" => terms({"field" => "seasons_nested.notes", "collect_mode" => "depth_first"})
+                          "meta" => inner_terms_meta("seasons_nested.notes", {"missing_values" => [MISSING_STRING_PLACEHOLDER_VALUE]}),
+                          "terms" => terms({"field" => "seasons_nested.notes", "collect_mode" => "depth_first", "missing" => MISSING_STRING_PLACEHOLDER_VALUE})
                         }
-                      }.with_missing_value_agg
+                      }
                     }
-                  }.with_missing_value_agg
+                  }
                 }
               }.with_missing_value_agg
             }
@@ -780,7 +780,7 @@ module ElasticGraph
               "meta" => outer_meta({"buckets_path" => ["seasons_nested.started_at"]}),
               "aggs" => {
                 "seasons_nested.started_at" => {
-                  "meta" => inner_date_meta({"grouping_fields" => ["seasons_nested.started_at"], "buckets_path" => ["seasons_nested.won_games_at"], "key_path" => ["key_as_string"]}),
+                  "meta" => inner_date_meta("seasons_nested.started_at", {"buckets_path" => ["seasons_nested.won_games_at"]}),
                   "date_histogram" => {
                     "calendar_interval" => "year",
                     "field" => "seasons_nested.started_at",
@@ -790,7 +790,7 @@ module ElasticGraph
                   },
                   "aggs" => {
                     "seasons_nested.won_games_at" => {
-                      "meta" => inner_date_meta({"grouping_fields" => ["seasons_nested.won_games_at"], "buckets_path" => ["seasons_nested.year"], "key_path" => ["key_as_string"]}),
+                      "meta" => inner_date_meta("seasons_nested.won_games_at", {"buckets_path" => ["seasons_nested.year"]}),
                       "date_histogram" => {
                         "calendar_interval" => "year",
                         "field" => "seasons_nested.won_games_at",
@@ -800,16 +800,16 @@ module ElasticGraph
                       },
                       "aggs" => {
                         "seasons_nested.year" => {
-                          "meta" => inner_terms_meta({"grouping_fields" => ["seasons_nested.year"], "buckets_path" => ["seasons_nested.notes"], "key_path" => ["key"]}),
-                          "terms" => terms({"field" => "seasons_nested.year", "collect_mode" => "depth_first"}),
+                          "meta" => inner_terms_meta("seasons_nested.year", {"buckets_path" => ["seasons_nested.notes"], "missing_values" => [MISSING_STRING_PLACEHOLDER_VALUE]}),
+                          "terms" => terms({"field" => "seasons_nested.year", "collect_mode" => "depth_first", "missing" => MISSING_STRING_PLACEHOLDER_VALUE}),
                           "aggs" => {
                             "seasons_nested.notes" => {
-                              "meta" => inner_terms_meta({"grouping_fields" => ["seasons_nested.notes"], "key_path" => ["key"]}),
-                              "terms" => terms({"field" => "seasons_nested.notes", "collect_mode" => "depth_first"})
+                              "meta" => inner_terms_meta("seasons_nested.notes", {"missing_values" => [MISSING_STRING_PLACEHOLDER_VALUE]}),
+                              "terms" => terms({"field" => "seasons_nested.notes", "collect_mode" => "depth_first", "missing" => MISSING_STRING_PLACEHOLDER_VALUE})
                             }
-                          }.with_missing_value_agg
+                          }
                         }
-                      }.with_missing_value_agg
+                      }
                     }
                   }.with_missing_value_agg
                 }
@@ -838,10 +838,10 @@ module ElasticGraph
                   },
                   "aggs" => {
                     "seasons_nested.year" => {
-                      "meta" => inner_terms_meta({"grouping_fields" => ["seasons_nested.year"], "key_path" => ["key"]}),
-                      "terms" => terms({"field" => "seasons_nested.year", "collect_mode" => "depth_first"})
+                      "meta" => inner_terms_meta("seasons_nested.year", {"missing_values" => [MISSING_STRING_PLACEHOLDER_VALUE]}),
+                      "terms" => terms({"field" => "seasons_nested.year", "collect_mode" => "depth_first", "missing" => MISSING_STRING_PLACEHOLDER_VALUE})
                     }
-                  }.with_missing_value_agg
+                  }
                 }
               }
             }

@@ -26,7 +26,7 @@ module ElasticGraph
                 "meta" => outer_meta({"buckets_path" => ["seasons_nested.started_at.as_date_time"]}),
                 "doc_count" => 6,
                 "seasons_nested.started_at.as_date_time" => {
-                  "meta" => inner_date_meta({"grouping_fields" => ["seasons_nested.started_at.as_date_time"], "key_path" => ["key_as_string"]}),
+                  "meta" => inner_date_meta("seasons_nested.started_at.as_date_time"),
                   "doc_count_error_upper_bound" => 0,
                   "sum_other_doc_count" => 0,
                   "buckets" => [
@@ -68,7 +68,7 @@ module ElasticGraph
                 "meta" => outer_meta({"buckets_path" => ["seasons_nested.year"]}),
                 "doc_count" => 4,
                 "seasons_nested.year" => {
-                  "meta" => inner_terms_meta({"grouping_fields" => ["seasons_nested.year"], "key_path" => ["key"]}),
+                  "meta" => inner_terms_meta("seasons_nested.year"),
                   "doc_count_error_upper_bound" => 0,
                   "sum_other_doc_count" => 0,
                   "buckets" => [
@@ -128,7 +128,7 @@ module ElasticGraph
                   "meta" => outer_meta({"buckets_path" => ["seasons_nested.year"]}, size: first),
                   "doc_count" => 4,
                   "seasons_nested.year" => {
-                    "meta" => inner_terms_meta({"grouping_fields" => ["seasons_nested.year"], "key_path" => ["key"]}),
+                    "meta" => inner_terms_meta("seasons_nested.year"),
                     "doc_count_error_upper_bound" => 0,
                     "sum_other_doc_count" => 0,
                     "buckets" => [
@@ -216,7 +216,7 @@ module ElasticGraph
                 "meta" => outer_meta({"buckets_path" => ["seasons_nested.year"]}),
                 "doc_count" => 4,
                 "seasons_nested.year" => {
-                  "meta" => inner_terms_meta({"grouping_fields" => ["seasons_nested.year"], "key_path" => ["key"]}),
+                  "meta" => inner_terms_meta("seasons_nested.year"),
                   "doc_count_error_upper_bound" => 0,
                   "sum_other_doc_count" => 0,
                   "buckets" => [
@@ -271,7 +271,7 @@ module ElasticGraph
                 "meta" => outer_meta({"buckets_path" => ["seasons_nested.was_shortened"]}),
                 "doc_count" => 6,
                 "seasons_nested.was_shortened" => {
-                  "meta" => inner_terms_meta({"grouping_fields" => ["seasons_nested.was_shortened"], "key_path" => ["key"]}),
+                  "meta" => inner_terms_meta("seasons_nested.was_shortened"),
                   "doc_count_error_upper_bound" => 0,
                   "sum_other_doc_count" => 0,
                   "buckets" => [
@@ -326,7 +326,7 @@ module ElasticGraph
                   "meta" => outer_meta({"buckets_path" => ["seasons_nested.year"]}),
                   "doc_count" => 4,
                   "seasons_nested.year" => {
-                    "meta" => inner_terms_meta({"grouping_fields" => ["seasons_nested.year"], "key_path" => ["key"]}),
+                    "meta" => inner_terms_meta("seasons_nested.year"),
                     "doc_count_error_upper_bound" => 0,
                     "sum_other_doc_count" => 0,
                     "buckets" => [
@@ -385,7 +385,7 @@ module ElasticGraph
                 "seasons_nested:filtered" => {
                   "doc_count" => 5,
                   "seasons_nested.year" => {
-                    "meta" => inner_terms_meta({"grouping_fields" => ["seasons_nested.year"], "key_path" => ["key"]}),
+                    "meta" => inner_terms_meta("seasons_nested.year"),
                     "doc_count_error_upper_bound" => 0,
                     "sum_other_doc_count" => 0,
                     "buckets" => [
@@ -432,7 +432,7 @@ module ElasticGraph
                 "meta" => outer_meta({"buckets_path" => ["seasons_nested.year"]}),
                 "doc_count" => 4,
                 "seasons_nested.year" => {
-                  "meta" => inner_terms_meta({"buckets_path" => ["seasons_nested.count"], "grouping_fields" => ["seasons_nested.year"], "key_path" => ["key"]}),
+                  "meta" => inner_terms_meta("seasons_nested.year", {"buckets_path" => ["seasons_nested.count"]}),
                   "doc_count_error_upper_bound" => 0,
                   "sum_other_doc_count" => 0,
                   "buckets" => [
@@ -442,7 +442,7 @@ module ElasticGraph
                       "doc_count_error_upper_bound" => 0,
                       "sum_other_doc_count" => 0,
                       "seasons_nested.count" => {
-                        "meta" => inner_terms_meta({"grouping_fields" => ["seasons_nested.count"], "key_path" => ["key"]}),
+                        "meta" => inner_terms_meta("seasons_nested.count"),
                         "buckets" => [{"key" => 3, "doc_count" => 2}]
                       }
                     }.with_missing_value_bucket(0),
@@ -452,7 +452,7 @@ module ElasticGraph
                       "doc_count_error_upper_bound" => 0,
                       "sum_other_doc_count" => 0,
                       "seasons_nested.count" => {
-                        "meta" => inner_terms_meta({"grouping_fields" => ["seasons_nested.count"], "key_path" => ["key"]}),
+                        "meta" => inner_terms_meta("seasons_nested.count"),
                         "buckets" => [{"key" => 4, "doc_count" => 1}]
                       }
                     }.with_missing_value_bucket(0),
@@ -462,7 +462,7 @@ module ElasticGraph
                       "doc_count_error_upper_bound" => 0,
                       "sum_other_doc_count" => 0,
                       "seasons_nested.count" => {
-                        "meta" => inner_terms_meta({"grouping_fields" => ["seasons_nested.count"], "key_path" => ["key"]}),
+                        "meta" => inner_terms_meta("seasons_nested.count"),
                         "buckets" => [{"key" => 1, "doc_count" => 1}]
                       }
                     }.with_missing_value_bucket(0)
@@ -509,7 +509,7 @@ module ElasticGraph
                 "meta" => outer_meta({"buckets_path" => ["seasons_nested.year_and_count"]}),
                 "doc_count" => 4,
                 "seasons_nested.year_and_count" => {
-                  "meta" => inner_terms_meta({"grouping_fields" => ["seasons_nested.year", "seasons_nested.count"], "key_path" => ["key"]}),
+                  "meta" => inner_terms_meta(["seasons_nested.year", "seasons_nested.count"]),
                   "doc_count_error_upper_bound" => 0,
                   "sum_other_doc_count" => 0,
                   "buckets" => [
@@ -564,7 +564,7 @@ module ElasticGraph
                 "meta" => outer_meta({"buckets_path" => ["seasons_nested.year"]}, size: 3),
                 "doc_count" => 10,
                 "seasons_nested.year" => {
-                  "meta" => inner_terms_meta({"grouping_fields" => ["seasons_nested.year"], "key_path" => ["key"]}),
+                  "meta" => inner_terms_meta("seasons_nested.year"),
                   "doc_count_error_upper_bound" => 0,
                   "sum_other_doc_count" => 0,
                   "buckets" => [
@@ -623,7 +623,7 @@ module ElasticGraph
                 "meta" => outer_meta({"buckets_path" => ["seasons_nested.note"]}, size: 2),
                 "doc_count" => 6,
                 "seasons_nested.note" => {
-                  "meta" => inner_terms_meta({"buckets_path" => ["seasons_nested.record.losses"], "grouping_fields" => ["seasons_nested.note"], "key_path" => ["key"]}),
+                  "meta" => inner_terms_meta("seasons_nested.note", {"buckets_path" => ["seasons_nested.record.losses"]}),
                   "doc_count_error_upper_bound" => 0,
                   "sum_other_doc_count" => 0,
                   "buckets" => [
@@ -632,7 +632,7 @@ module ElasticGraph
                       "doc_count" => 2,
                       "doc_count_error_upper_bound" => 0,
                       "seasons_nested.record.losses" => {
-                        "meta" => inner_terms_meta({"key_path" => ["key"], "grouping_fields" => ["seasons_nested.record.losses"]}),
+                        "meta" => inner_terms_meta("seasons_nested.record.losses"),
                         "doc_count_error_upper_bound" => 0,
                         "sum_other_doc_count" => 0,
                         "buckets" => [
@@ -647,7 +647,7 @@ module ElasticGraph
                       "doc_count" => 1,
                       "doc_count_error_upper_bound" => 0,
                       "seasons_nested.record.losses" => {
-                        "meta" => inner_terms_meta({"key_path" => ["key"], "grouping_fields" => ["seasons_nested.record.losses"]}),
+                        "meta" => inner_terms_meta("seasons_nested.record.losses"),
                         "doc_count_error_upper_bound" => 0,
                         "sum_other_doc_count" => 0,
                         "buckets" => [
@@ -659,10 +659,10 @@ module ElasticGraph
                   ]
                 },
                 "seasons_nested.note:m" => {
-                  "meta" => inner_terms_meta({"buckets_path" => ["seasons_nested.record.losses"], "grouping_fields" => ["seasons_nested.note"], "key_path" => ["key"]}),
+                  "meta" => inner_terms_meta("seasons_nested.note", {"buckets_path" => ["seasons_nested.record.losses"]}),
                   "doc_count" => 3,
                   "seasons_nested.record.losses" => {
-                    "meta" => inner_terms_meta({"key_path" => ["key"], "grouping_fields" => ["seasons_nested.record.losses"]}),
+                    "meta" => inner_terms_meta("seasons_nested.record.losses"),
                     "doc_count_error_upper_bound" => 0,
                     "sum_other_doc_count" => 0,
                     "buckets" => [
@@ -708,7 +708,7 @@ module ElasticGraph
                 "meta" => outer_meta({"buckets_path" => ["seasons_nested.year"]}, size: 3),
                 "doc_count" => 21,
                 "seasons_nested.year" => {
-                  "meta" => inner_terms_meta({"buckets_path" => ["seasons_nested.count"], "grouping_fields" => ["seasons_nested.year"], "key_path" => ["key"]}),
+                  "meta" => inner_terms_meta("seasons_nested.year", {"buckets_path" => ["seasons_nested.count"]}),
                   "doc_count_error_upper_bound" => 0,
                   "sum_other_doc_count" => 0,
                   "buckets" => [
@@ -718,7 +718,7 @@ module ElasticGraph
                       "doc_count_error_upper_bound" => 0,
                       "sum_other_doc_count" => 0,
                       "seasons_nested.count" => {
-                        "meta" => inner_terms_meta({"grouping_fields" => ["seasons_nested.count"], "key_path" => ["key"]}),
+                        "meta" => inner_terms_meta("seasons_nested.count"),
                         "buckets" => [
                           {"key" => 1, "doc_count" => 4}
                         ]
@@ -730,7 +730,7 @@ module ElasticGraph
                       "doc_count_error_upper_bound" => 0,
                       "sum_other_doc_count" => 0,
                       "seasons_nested.count" => {
-                        "meta" => inner_terms_meta({"grouping_fields" => ["seasons_nested.count"], "key_path" => ["key"]}),
+                        "meta" => inner_terms_meta("seasons_nested.count"),
                         "buckets" => [
                           {"key" => 1, "doc_count" => 4},
                           {"key" => 3, "doc_count" => 4}
@@ -743,7 +743,7 @@ module ElasticGraph
                       "doc_count_error_upper_bound" => 0,
                       "sum_other_doc_count" => 0,
                       "seasons_nested.count" => {
-                        "meta" => inner_terms_meta({"grouping_fields" => ["seasons_nested.count"], "key_path" => ["key"]}),
+                        "meta" => inner_terms_meta("seasons_nested.count"),
                         "buckets" => [
                           {"key" => 4, "doc_count" => 9}
                         ]
@@ -792,7 +792,7 @@ module ElasticGraph
                 "meta" => outer_meta({"buckets_path" => ["seasons_nested.year_and_count"]}, size: 3),
                 "doc_count" => 21,
                 "seasons_nested.year_and_count" => {
-                  "meta" => inner_terms_meta({"grouping_fields" => ["seasons_nested.year", "seasons_nested.count"], "key_path" => ["key"]}),
+                  "meta" => inner_terms_meta(["seasons_nested.year", "seasons_nested.count"]),
                   "doc_count_error_upper_bound" => 0,
                   "sum_other_doc_count" => 0,
                   "buckets" => [
@@ -851,7 +851,7 @@ module ElasticGraph
                 "meta" => outer_meta({"buckets_path" => ["seasons_nested.started_at.as_date_time"]}),
                 "doc_count" => 6,
                 "seasons_nested.started_at.as_date_time" => {
-                  "meta" => inner_date_meta({"grouping_fields" => ["seasons_nested.started_at.as_date_time"], "key_path" => ["key_as_string"]}),
+                  "meta" => inner_date_meta("seasons_nested.started_at.as_date_time"),
                   "doc_count_error_upper_bound" => 0,
                   "sum_other_doc_count" => 0,
                   "buckets" => [
@@ -910,7 +910,7 @@ module ElasticGraph
                 "meta" => outer_meta({"buckets_path" => ["seasons_nested.year"]}),
                 "doc_count" => 18,
                 "seasons_nested.year" => {
-                  "meta" => inner_terms_meta({"buckets_path" => ["seasons_nested.started_at.as_date_time"], "key_path" => ["key"], "grouping_fields" => ["seasons_nested.year"]}),
+                  "meta" => inner_terms_meta("seasons_nested.year", {"buckets_path" => ["seasons_nested.started_at.as_date_time"]}),
                   "doc_count_error_upper_bound" => 0,
                   "sum_other_doc_count" => 0,
                   "buckets" => [
@@ -918,14 +918,14 @@ module ElasticGraph
                       "key" => 2020,
                       "doc_count" => 11,
                       "seasons_nested.started_at.as_date_time" => {
-                        "meta" => inner_date_meta({"buckets_path" => ["seasons_nested.won_games_at"], "key_path" => ["key_as_string"], "grouping_fields" => ["seasons_nested.started_at.as_date_time"]}),
+                        "meta" => inner_date_meta("seasons_nested.started_at.as_date_time", {"buckets_path" => ["seasons_nested.won_games_at"]}),
                         "buckets" => [
                           {
                             "key_as_string" => "2020-01-01T00:00:00.000Z",
                             "key" => 1577836800000,
                             "doc_count" => 11,
                             "seasons_nested.won_games_at" => {
-                              "meta" => inner_date_meta({"key_path" => ["key_as_string"], "grouping_fields" => ["seasons_nested.won_game_at.as_date_time"]}),
+                              "meta" => inner_date_meta("seasons_nested.won_game_at.as_date_time"),
                               "buckets" => [
                                 {
                                   "key_as_string" => "2020-01-01T00:00:00.000Z",
@@ -947,14 +947,14 @@ module ElasticGraph
                       "key" => 2019,
                       "doc_count" => 7,
                       "seasons_nested.started_at.as_date_time" => {
-                        "meta" => inner_date_meta({"buckets_path" => ["seasons_nested.won_games_at"], "key_path" => ["key_as_string"], "grouping_fields" => ["seasons_nested.started_at.as_date_time"]}),
+                        "meta" => inner_date_meta("seasons_nested.started_at.as_date_time", {"buckets_path" => ["seasons_nested.won_games_at"]}),
                         "buckets" => [
                           {
                             "key_as_string" => "2019-01-01T00:00:00.000Z",
                             "key" => 1546300800000,
                             "doc_count" => 4,
                             "seasons_nested.won_games_at" => {
-                              "meta" => inner_date_meta({"key_path" => ["key_as_string"], "grouping_fields" => ["seasons_nested.won_game_at.as_date_time"]}),
+                              "meta" => inner_date_meta("seasons_nested.won_game_at.as_date_time"),
                               "buckets" => [
                                 {
                                   "key_as_string" => "2019-01-01T00:00:00.000Z",
@@ -969,7 +969,7 @@ module ElasticGraph
                             "key" => 1609459200000,
                             "doc_count" => 3,
                             "seasons_nested.won_games_at" => {
-                              "meta" => inner_date_meta({"key_path" => ["key_as_string"], "grouping_fields" => ["seasons_nested.won_game_at.as_date_time"]}),
+                              "meta" => inner_date_meta("seasons_nested.won_game_at.as_date_time"),
                               "buckets" => [
                                 {
                                   "key_as_string" => "2021-01-01T00:00:00.000Z",
@@ -993,21 +993,21 @@ module ElasticGraph
                 "meta" => outer_meta({"buckets_path" => ["seasons_nested.started_at.as_date_time"]}),
                 "doc_count" => 18,
                 "seasons_nested.started_at.as_date_time" => {
-                  "meta" => inner_date_meta({"buckets_path" => ["seasons_nested.won_games_at"], "key_path" => ["key_as_string"], "grouping_fields" => ["seasons_nested.started_at.as_date_time"]}),
+                  "meta" => inner_date_meta("seasons_nested.started_at.as_date_time", {"buckets_path" => ["seasons_nested.won_games_at"]}),
                   "buckets" => [
                     {
                       "key_as_string" => "2019-01-01T00:00:00.000Z",
                       "key" => 1546300800000,
                       "doc_count" => 4,
                       "seasons_nested.won_games_at" => {
-                        "meta" => inner_date_meta({"buckets_path" => ["seasons_nested.year"], "key_path" => ["key_as_string"], "grouping_fields" => ["seasons_nested.won_game_at.as_date_time"]}),
+                        "meta" => inner_date_meta("seasons_nested.won_game_at.as_date_time", {"buckets_path" => ["seasons_nested.year"]}),
                         "buckets" => [
                           {
                             "key_as_string" => "2019-01-01T00:00:00.000Z",
                             "key" => 1546300800000,
                             "doc_count" => 4,
                             "seasons_nested.year" => {
-                              "meta" => inner_terms_meta({"key_path" => ["key"], "grouping_fields" => ["seasons_nested.year"]}),
+                              "meta" => inner_terms_meta("seasons_nested.year"),
                               "doc_count_error_upper_bound" => 0,
                               "sum_other_doc_count" => 0,
                               "buckets" => [
@@ -1026,14 +1026,14 @@ module ElasticGraph
                       "key" => 1577836800000,
                       "doc_count" => 2,
                       "seasons_nested.won_games_at" => {
-                        "meta" => inner_date_meta({"buckets_path" => ["seasons_nested.year"], "key_path" => ["key_as_string"], "grouping_fields" => ["seasons_nested.won_game_at.as_date_time"]}),
+                        "meta" => inner_date_meta("seasons_nested.won_game_at.as_date_time", {"buckets_path" => ["seasons_nested.year"]}),
                         "buckets" => [
                           {
                             "key_as_string" => "2019-01-01T00:00:00.000Z",
                             "key" => 1546300800000,
                             "doc_count" => 5,
                             "seasons_nested.year" => {
-                              "meta" => inner_terms_meta({"key_path" => ["key"], "grouping_fields" => ["seasons_nested.year"]}),
+                              "meta" => inner_terms_meta("seasons_nested.year"),
                               "doc_count_error_upper_bound" => 0,
                               "sum_other_doc_count" => 0,
                               "buckets" => [
@@ -1049,7 +1049,7 @@ module ElasticGraph
                             "key" => 1577836800000,
                             "doc_count" => 6,
                             "seasons_nested.year" => {
-                              "meta" => inner_terms_meta({"key_path" => ["key"], "grouping_fields" => ["seasons_nested.year"]}),
+                              "meta" => inner_terms_meta("seasons_nested.year"),
                               "doc_count_error_upper_bound" => 0,
                               "sum_other_doc_count" => 0,
                               "buckets" => [
@@ -1068,14 +1068,14 @@ module ElasticGraph
                       "key" => 1609459200000,
                       "doc_count" => 1,
                       "seasons_nested.won_games_at" => {
-                        "meta" => inner_date_meta({"buckets_path" => ["seasons_nested.year"], "key_path" => ["key_as_string"], "grouping_fields" => ["seasons_nested.won_game_at.as_date_time"]}),
+                        "meta" => inner_date_meta("seasons_nested.won_game_at.as_date_time", {"buckets_path" => ["seasons_nested.year"]}),
                         "buckets" => [
                           {
                             "key_as_string" => "2021-01-01T00:00:00.000Z",
                             "key" => 1609459200000,
                             "doc_count" => 3,
                             "seasons_nested.year" => {
-                              "meta" => inner_terms_meta({"key_path" => ["key"], "grouping_fields" => ["seasons_nested.year"]}),
+                              "meta" => inner_terms_meta("seasons_nested.year"),
                               "doc_count_error_upper_bound" => 0,
                               "sum_other_doc_count" => 0,
                               "buckets" => [
@@ -1167,7 +1167,7 @@ module ElasticGraph
                 "meta" => outer_meta({"buckets_path" => ["seasons_nested.started_at.as_date_time"]}, size: 3),
                 "doc_count" => 18,
                 "seasons_nested.started_at.as_date_time" => {
-                  "meta" => inner_date_meta({"grouping_fields" => ["seasons_nested.started_at.as_date_time"], "key_path" => ["key_as_string"]}),
+                  "meta" => inner_date_meta("seasons_nested.started_at.as_date_time"),
                   "doc_count_error_upper_bound" => 0,
                   "sum_other_doc_count" => 0,
                   "buckets" => [
@@ -1230,7 +1230,7 @@ module ElasticGraph
                 "meta" => outer_meta({"buckets_path" => ["seasons_nested.year"]}, size: 5),
                 "doc_count" => 18,
                 "seasons_nested.year" => {
-                  "meta" => inner_terms_meta({"buckets_path" => ["seasons_nested.started_at.as_date_time"], "key_path" => ["key"], "grouping_fields" => ["seasons_nested.year"]}),
+                  "meta" => inner_terms_meta("seasons_nested.year", {"buckets_path" => ["seasons_nested.started_at.as_date_time"]}),
                   "doc_count_error_upper_bound" => 0,
                   "sum_other_doc_count" => 0,
                   "buckets" => [
@@ -1238,14 +1238,14 @@ module ElasticGraph
                       "key" => 2020,
                       "doc_count" => 18,
                       "seasons_nested.started_at.as_date_time" => {
-                        "meta" => inner_date_meta({"buckets_path" => ["seasons_nested.won_games_at"], "key_path" => ["key_as_string"], "grouping_fields" => ["seasons_nested.started_at.as_date_time"]}),
+                        "meta" => inner_date_meta("seasons_nested.started_at.as_date_time", {"buckets_path" => ["seasons_nested.won_games_at"]}),
                         "buckets" => [
                           {
                             "key_as_string" => "2020-01-01T00:00:00.000Z",
                             "key" => 1577836800000,
                             "doc_count" => 18,
                             "seasons_nested.won_games_at" => {
-                              "meta" => inner_date_meta({"key_path" => ["key_as_string"], "grouping_fields" => ["seasons_nested.won_game_at.as_date_time"]}),
+                              "meta" => inner_date_meta("seasons_nested.won_game_at.as_date_time"),
                               "buckets" => [
                                 {
                                   "key_as_string" => "2019-01-01T00:00:00.000Z",
@@ -1277,14 +1277,14 @@ module ElasticGraph
                       "key" => 2019,
                       "doc_count" => 11,
                       "seasons_nested.started_at.as_date_time" => {
-                        "meta" => inner_date_meta({"buckets_path" => ["seasons_nested.won_games_at"], "key_path" => ["key_as_string"], "grouping_fields" => ["seasons_nested.started_at.as_date_time"]}),
+                        "meta" => inner_date_meta("seasons_nested.started_at.as_date_time", {"buckets_path" => ["seasons_nested.won_games_at"]}),
                         "buckets" => [
                           {
                             "key_as_string" => "2019-01-01T00:00:00.000Z",
                             "key" => 1546300800000,
                             "doc_count" => 11,
                             "seasons_nested.won_games_at" => {
-                              "meta" => inner_date_meta({"key_path" => ["key_as_string"], "grouping_fields" => ["seasons_nested.won_game_at.as_date_time"]}),
+                              "meta" => inner_date_meta("seasons_nested.won_game_at.as_date_time"),
                               "buckets" => [
                                 {
                                   "key_as_string" => "2019-01-01T00:00:00.000Z",
@@ -1299,7 +1299,7 @@ module ElasticGraph
                             "key" => 1609459200000,
                             "doc_count" => 2,
                             "seasons_nested.won_games_at" => {
-                              "meta" => inner_date_meta({"key_path" => ["key_as_string"], "grouping_fields" => ["seasons_nested.won_game_at.as_date_time"]}),
+                              "meta" => inner_date_meta("seasons_nested.won_game_at.as_date_time"),
                               "buckets" => [
                                 {
                                   "key_as_string" => "2021-01-01T00:00:00.000Z",
