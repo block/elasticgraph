@@ -1,0 +1,11 @@
+module ElasticGraph
+  module Warehouse
+    module SchemaDefinition
+      module ScalarTypeExtension: ::ElasticGraph::SchemaDefinition::SchemaElements::ScalarType
+        attr_reader warehouse_column_type: ::String
+        def warehouse_column: (type: ::String) -> void
+        def to_warehouse_column_type: () -> ::String
+      end
+    end
+  end
+end
