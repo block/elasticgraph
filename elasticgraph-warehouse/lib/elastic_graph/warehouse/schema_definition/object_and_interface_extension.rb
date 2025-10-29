@@ -6,7 +6,7 @@
 #
 # frozen_string_literal: true
 
-require "elastic_graph/warehouse/warehouse_config/field_type_converter"
+require "elastic_graph/warehouse/schema_definition/field_type_converter"
 
 module ElasticGraph
   module Warehouse
@@ -21,7 +21,7 @@ module ElasticGraph
           subfields = indexing_fields_by_name_in_index.values.map(&:to_indexing_field).compact
 
           struct_field_expressions = subfields.map do |subfield|
-            warehouse_type = WarehouseConfig::FieldTypeConverter.convert(subfield.type)
+            warehouse_type = FieldTypeConverter.convert(subfield.type)
             "#{subfield.name} #{warehouse_type}"
           end.join(", ")
 

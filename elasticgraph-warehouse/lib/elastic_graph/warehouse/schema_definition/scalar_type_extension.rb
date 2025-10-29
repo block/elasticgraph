@@ -6,12 +6,15 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/errors"
+
 module ElasticGraph
   module Warehouse
     module SchemaDefinition
       # Extends {ElasticGraph::SchemaDefinition::SchemaElements::ScalarType} to add warehouse column type conversion.
       module ScalarTypeExtension
         # Warehouse column type configured on this scalar type.
+        # @dynamic warehouse_column_type
         attr_reader :warehouse_column_type
 
         # Configures warehouse column type for this scalar type.
@@ -29,8 +32,8 @@ module ElasticGraph
         # @note Built-in ElasticGraph scalar types are automatically configured with appropriate warehouse column types.
         #   Custom scalar types must explicitly call `warehouse_column` to specify their warehouse type.
         def to_warehouse_column_type
-          warehouse_column_type || raise("Warehouse column type not configured for scalar type #{name.inspect}. " \
-            "Call `warehouse_column type: \"TYPE\"` in the scalar type definition.")
+          warehouse_column_type || raise(Errors::SchemaError, "Warehouse column type not configured for scalar type `#{name}`. " \
+            'To proceed, call `warehouse_column type: "TYPE"` on the scalar type definition.')
         end
       end
     end

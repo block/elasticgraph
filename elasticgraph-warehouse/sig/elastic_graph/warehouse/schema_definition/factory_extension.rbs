@@ -1,0 +1,23 @@
+module ElasticGraph
+  module Warehouse
+    module SchemaDefinition
+      module FactoryExtension: ::ElasticGraph::SchemaDefinition::Factory
+        def new_enum_type: (::String) ?{
+          (::ElasticGraph::SchemaDefinition::SchemaElements::EnumType) -> void
+        } -> ::ElasticGraph::SchemaDefinition::SchemaElements::EnumType
+
+        def new_interface_type: (::String) ?{
+          (::ElasticGraph::SchemaDefinition::SchemaElements::InterfaceType) -> void
+        } -> ::ElasticGraph::SchemaDefinition::SchemaElements::InterfaceType
+
+        def new_object_type: (::String) ?{
+          (::ElasticGraph::SchemaDefinition::SchemaElements::ObjectType) -> void
+        } -> ::ElasticGraph::SchemaDefinition::SchemaElements::ObjectType
+
+        def new_scalar_type: (::String) ?{
+          (::ElasticGraph::SchemaDefinition::SchemaElements::ScalarType) -> void
+        } -> ::ElasticGraph::SchemaDefinition::SchemaElements::ScalarType
+      end
+    end
+  end
+end

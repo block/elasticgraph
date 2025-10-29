@@ -15,8 +15,6 @@ module ElasticGraph
         describe "object types" do
           it "converts object type to warehouse column type" do
             results = define_warehouse_schema do |s|
-              s.json_schema_version 1
-
               s.object_type "Address" do |t|
                 t.field "street", "String"
                 t.field "city", "String"
@@ -24,50 +22,25 @@ module ElasticGraph
               end
             end
 
-            # Ensure on_built_in_types callbacks are executed before accessing types
-            results.send(:all_types)
-
-            object_type = results.state.object_types_by_name["Address"]
-            table_type = object_type.to_warehouse_column_type
-
-            expect(table_type).to be_a(String)
-            expect(table_type).to start_with("STRUCT<")
-            expect(table_type).to include("street STRING", "city STRING", "zip STRING")
+            expect(warehouse_column_type_for(results, "Address")).to eq("STRUCT<street STRING, city STRING, zip STRING>")
           end
 
           it "handles nested object types" do
             results = define_warehouse_schema do |s|
-              s.json_schema_version 1
-
-              s.object_type "Location" do |t|
-                t.field "lat", "Float"
-                t.field "lng", "Float"
-              end
-
               s.object_type "Venue" do |t|
                 t.field "id", "ID"
                 t.field "name", "String"
-                t.field "location", "Location"
+                t.field "location", "GeoLocation"
               end
             end
 
-            # Ensure on_built_in_types callbacks are executed before accessing types
-            results.send(:all_types)
-
-            venue_type = results.state.object_types_by_name["Venue"]
-            table_type = venue_type.to_warehouse_column_type
-
-            expect(table_type).to be_a(String)
-            expect(table_type).to start_with("STRUCT<")
-            expect(table_type).to include("location STRUCT<lat DOUBLE, lng DOUBLE>")
+            expect(warehouse_column_type_for(results, "Venue")).to eq("STRUCT<id STRING, name STRING, location STRUCT<latitude DOUBLE, longitude DOUBLE>>")
           end
         end
 
         describe "interface types" do
           it "converts interface type to warehouse column type" do
             results = define_warehouse_schema do |s|
-              s.json_schema_version 1
-
               s.interface_type "Identifiable" do |t|
                 t.field "id", "ID"
                 t.field "name", "String"
@@ -81,15 +54,7 @@ module ElasticGraph
               end
             end
 
-            # Ensure on_built_in_types callbacks are executed before accessing types
-            results.send(:all_types)
-
-            interface_type = results.state.types_by_name["Identifiable"]
-            table_type = interface_type.to_warehouse_column_type
-
-            expect(table_type).to be_a(String)
-            expect(table_type).to start_with("STRUCT<")
-            expect(table_type).to include("id STRING", "name STRING", "__typename STRING")
+            expect(warehouse_column_type_for(results, "Identifiable")).to eq("STRUCT<id STRING, name STRING, price DOUBLE, __typename STRING>")
           end
         end
       end

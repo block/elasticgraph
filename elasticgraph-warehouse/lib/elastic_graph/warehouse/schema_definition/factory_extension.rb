@@ -15,12 +15,12 @@ module ElasticGraph
     module SchemaDefinition
       # Extension module applied to `ElasticGraph::SchemaDefinition::Factory` to add warehouse field type support.
       #
-      # @private
+      # @api private
       module FactoryExtension
         # Creates a new enum type with warehouse extensions.
         #
         # @param name [String] the name of the enum type
-        # @yield [type] the newly created enum type
+        # @yield [ElasticGraph::SchemaDefinition::SchemaElements::EnumType] the newly created enum type
         # @return [ElasticGraph::SchemaDefinition::SchemaElements::EnumType] the created enum type
         def new_enum_type(name)
           super(name) do |type|
@@ -34,7 +34,7 @@ module ElasticGraph
         # Creates a new interface type with warehouse extensions.
         #
         # @param name [String] the name of the interface type
-        # @yield [type] the newly created interface type
+        # @yield [ElasticGraph::SchemaDefinition::SchemaElements::InterfaceType] the newly created interface type
         # @return [ElasticGraph::SchemaDefinition::SchemaElements::InterfaceType] the created interface type
         def new_interface_type(name)
           super(name) do |type|
@@ -48,19 +48,21 @@ module ElasticGraph
         # Creates a new object type with warehouse extensions.
         #
         # @param name [String] the name of the object type
-        # @yield [type] the newly created object type (optional)
+        # @yield [ElasticGraph::SchemaDefinition::SchemaElements::ObjectType] the newly created object type (optional)
         # @return [ElasticGraph::SchemaDefinition::SchemaElements::ObjectType] the created object type
         def new_object_type(name)
           super(name) do |type|
             type.extend ObjectAndInterfaceExtension
+            # :nocov: -- currently all invocations have a block
             yield type if block_given?
+            # :nocov:
           end
         end
 
         # Creates a new scalar type with warehouse extensions.
         #
         # @param name [String] the name of the scalar type
-        # @yield [type] the newly created scalar type
+        # @yield [ElasticGraph::SchemaDefinition::SchemaElements::ScalarType] the newly created scalar type
         # @return [ElasticGraph::SchemaDefinition::SchemaElements::ScalarType] the created scalar type
         def new_scalar_type(name)
           super(name) do |type|

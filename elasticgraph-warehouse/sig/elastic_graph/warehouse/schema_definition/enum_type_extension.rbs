@@ -1,0 +1,9 @@
+module ElasticGraph
+  module Warehouse
+    module SchemaDefinition
+      module EnumTypeExtension: ::ElasticGraph::SchemaDefinition::SchemaElements::EnumType
+        def to_warehouse_column_type: () -> ::String
+      end
+    end
+  end
+end

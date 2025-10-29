@@ -10,9 +10,6 @@
 # It is loaded by the shared spec helper at `spec_support/spec_helper.rb`.
 
 RSpec.configure do |config|
-  config.define_derived_metadata(absolute_file_path: %r{/elasticgraph-warehouse/}) do |meta|
-    meta[:builds_graphql] = true # we need GraphQL/schema_definition loaded for these specs
-  end
   config.when_first_matching_example_defined(:warehouse_schema) do
     require "support/warehouse_schema_support"
   end

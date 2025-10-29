@@ -88,3 +88,5 @@ gems:
     ignore: true
   - name: elasticgraph-support
     ignore: true
+  - name: elasticgraph-warehouse
+    ignore: true
