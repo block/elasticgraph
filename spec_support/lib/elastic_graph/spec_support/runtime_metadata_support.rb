@@ -130,6 +130,20 @@ module ElasticGraph
           Enum::Type.new(values_by_name: values_by_name)
         end
 
+        def enum_value_with(
+          sort_field: nil,
+          datastore_value: nil,
+          datastore_abbreviation: nil,
+          alternate_original_name: nil
+        )
+          Enum::Value.new(
+            sort_field: sort_field,
+            datastore_value: datastore_value,
+            datastore_abbreviation: datastore_abbreviation,
+            alternate_original_name: alternate_original_name
+          )
+        end
+
         def sort_field_with(field_path: "path.to.some.field", direction: :asc)
           SortField.new(
             field_path: field_path,
@@ -168,11 +182,13 @@ module ElasticGraph
 
         def scalar_type_with(
           coercion_adapter_ref: ScalarType::DEFAULT_COERCION_ADAPTER_REF,
-          indexing_preparer_ref: ScalarType::DEFAULT_INDEXING_PREPARER_REF
+          indexing_preparer_ref: ScalarType::DEFAULT_INDEXING_PREPARER_REF,
+          grouping_missing_value_placeholder: nil
         )
           ScalarType.new(
             coercion_adapter_ref: coercion_adapter_ref,
-            indexing_preparer_ref: indexing_preparer_ref
+            indexing_preparer_ref: indexing_preparer_ref,
+            grouping_missing_value_placeholder: grouping_missing_value_placeholder
           )
         end
 
