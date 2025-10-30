@@ -72,6 +72,27 @@ module ElasticGraph
             end
           end
 
+          context "when skip_meta_sources_lookup is true" do
+            it "returns `false` and avoids datastore calls when there are no `sourced_from` fields" do
+              index = define_index(skip_meta_sources_lookup: true)
+
+              expect {
+                expect(index.searches_could_hit_incomplete_docs?).to be false
+              }.not_to change { datastore_requests("main").count }
+            end
+
+            it "returns `false` on an index that no longer has `sourced_from` fields but used to, without datastore calls" do
+              define_index(skip_meta_sources_lookup: true) do |t|
+                t.field "owner_name", "String" do |f|
+                  f.sourced_from "owner", "name"
+                end
+              end
+
+              index = define_index(skip_meta_sources_lookup: true)
+              expect(index.searches_could_hit_incomplete_docs?).to be false
+            end
+          end
+
           describe "#mappings_in_datastore" do
             it "returns the mappings in normalized form" do
               index = define_index
@@ -84,7 +105,7 @@ module ElasticGraph
             end
           end
 
-          def define_index(skip_configure_datastore: false, &schema_definition)
+          def define_index(skip_configure_datastore: false, skip_meta_sources_lookup: false, &schema_definition)
             datastore_core = build_datastore_core(schema_definition: lambda do |schema|
               schema.object_type "MyType" do |t|
                 t.field "id", "ID!"
@@ -105,7 +126,15 @@ module ElasticGraph
                 t.field "my_type_id", "ID"
                 t.index "#{unique_index_name}_owners"
               end
-            end)
+            end) do |config|
+              if skip_meta_sources_lookup
+                config.with(index_definitions: config.index_definitions.merge(
+                  unique_index_name => config.index_definitions[unique_index_name].with(skip_meta_sources_lookup: true)
+                ))
+              else
+                config
+              end
+            end
 
             unless skip_configure_datastore
               build_admin(datastore_core: datastore_core).cluster_configurator.configure_cluster(output_io)

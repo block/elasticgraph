@@ -11,7 +11,7 @@ require "elastic_graph/errors"
 
 module ElasticGraph
   class Indexer
-    class Config < Support::Config.define(:latency_slo_thresholds_by_timestamp_in_ms, :skip_derived_indexing_type_updates)
+    class Config < Support::Config.define(:latency_slo_thresholds_by_timestamp_in_ms, :skip_derived_indexing_type_updates, :skip_mapping_completeness_validation)
       json_schema at: "indexer",
         optional: false,
         description: "Configuration for indexing operations and metrics used by `elasticgraph-indexer`.",
@@ -42,15 +42,22 @@ module ElasticGraph
               {}, # : untyped
               {"WidgetWorkspace" => ["ABC12345678"]}
             ]
+          },
+          skip_mapping_completeness_validation: {
+            description: "Skips checking datastore index mappings for completeness before indexing. Useful to avoid boot-time and periodic mapping fetches.",
+            type: "boolean",
+            default: false,
+            examples: [false, true]
           }
         }
 
       private
 
-      def convert_values(skip_derived_indexing_type_updates:, latency_slo_thresholds_by_timestamp_in_ms:)
+      def convert_values(skip_derived_indexing_type_updates:, latency_slo_thresholds_by_timestamp_in_ms:, skip_mapping_completeness_validation:)
         {
           skip_derived_indexing_type_updates: skip_derived_indexing_type_updates.transform_values(&:to_set),
-          latency_slo_thresholds_by_timestamp_in_ms: latency_slo_thresholds_by_timestamp_in_ms
+          latency_slo_thresholds_by_timestamp_in_ms: latency_slo_thresholds_by_timestamp_in_ms,
+          skip_mapping_completeness_validation: skip_mapping_completeness_validation
         }
       end
     end

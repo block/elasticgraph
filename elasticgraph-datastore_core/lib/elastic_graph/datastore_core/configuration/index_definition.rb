@@ -28,12 +28,14 @@ module ElasticGraph
       class IndexDefinition < ::Data.define(
         :ignore_routing_values,
         :query_cluster,
+        :skip_meta_sources_lookup,
         :index_into_clusters,
         :setting_overrides,
         :setting_overrides_by_timestamp,
         :custom_timestamp_ranges
       )
         def initialize(ignore_routing_values:, **rest)
+          rest = {skip_meta_sources_lookup: false, **rest}
           __skip__ = super(ignore_routing_values: ignore_routing_values.to_set, **rest)
 
           # Verify the custom ranges are disjoint.
@@ -67,6 +69,7 @@ module ElasticGraph
         end
 
         def self.from(custom_timestamp_ranges:, **rest)
+          rest = {skip_meta_sources_lookup: false, **rest}
           __skip__ = new(
             custom_timestamp_ranges: CustomTimestampRange.ranges_from(custom_timestamp_ranges),
             **rest

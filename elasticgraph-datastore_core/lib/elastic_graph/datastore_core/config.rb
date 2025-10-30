@@ -136,6 +136,12 @@ module ElasticGraph
                     description: "Named search cluster to be used for queries on this index. The value must match be a key in the `clusters` map.",
                     examples: ["main", "search_cluster"]
                   },
+                  skip_meta_sources_lookup: {
+                    type: "boolean",
+                    description: "If true, skip `_meta.ElasticGraph.sources` lookup; determine incomplete-docs purely from current_sources.",
+                    default: false,
+                    examples: [false, true]
+                  },
                   index_into_clusters: {
                     type: "array",
                     items: {type: "string", minLength: 1},
