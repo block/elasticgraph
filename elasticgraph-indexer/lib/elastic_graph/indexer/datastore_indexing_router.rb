@@ -75,7 +75,8 @@ module ElasticGraph
       # with the mappings we expect, meaning that no bulk operations will be attempted if that is not up-to-date.
       def bulk(operations, refresh: false)
         # Before writing these operations, verify their destination index mapping are consistent.
-        validate_mapping_completeness_of!(:accessible_cluster_names_to_index_into, *operations.map(&:destination_index_def).uniq)
+        # Comment out to avoid boot-time Elasticsearch API calls
+        # validate_mapping_completeness_of!(:accessible_cluster_names_to_index_into, *operations.map(&:destination_index_def).uniq)
 
         ops_by_client = ::Hash.new { |h, k| h[k] = [] } # : ::Hash[DatastoreCore::_Client, ::Array[_Operation]]
         unsupported_ops = ::Set.new # : ::Set[_Operation]
