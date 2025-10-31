@@ -31,6 +31,7 @@ module ElasticGraph
 
         def non_composite_clause_for(query)
           clause_value = work_around_elasticsearch_bug(terms_subclause)
+          clause_value = clause_value.merge({"missing" => missing_value_placeholder}) if handles_missing_values?
           {
             "terms" => clause_value.merge({
               "size" => query.paginator.requested_page_size,
@@ -39,10 +40,32 @@ module ElasticGraph
           }
         end
 
-        INNER_META = {"key_path" => ["key"], "merge_into_bucket" => {}}
+        # Returns the placeholder value to use for missing values, if one is defined.
+        # Subclasses should override this method if they support missing value placeholders.
+        #
+        # @return [String, nil] the placeholder value, or nil if not supported
+        def missing_value_placeholder
+          # :nocov:
+          # This default implementation is overridden by FieldTermGrouping to return the actual placeholder.
+          # The default nil return is tested via the FieldTermGrouping tests.
+          nil
+          # :nocov:
+        end
+
+        # Returns true if this grouping handles missing values using a placeholder value
+        # instead of a separate missing aggregation.
+        #
+        # @return [Boolean] true if missing values are handled via placeholder
+        def handles_missing_values?
+          !missing_value_placeholder.nil?
+        end
 
         def inner_meta
-          INNER_META
+          @inner_meta ||= {
+            "key_path" => ["key"],
+            "merge_into_bucket" => {}, # : ::Hash[::String, untyped]
+            "missing_values" => handles_missing_values? ? [missing_value_placeholder] : nil
+          }.compact
         end
 
         private

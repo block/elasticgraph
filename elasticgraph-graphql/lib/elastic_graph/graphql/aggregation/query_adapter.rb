@@ -211,7 +211,8 @@ module ElasticGraph
               date_time_groupings_from(field_path: field_path, node: node)
             elsif !field.type.object?
               # Non-date/time grouping
-              [FieldTermGrouping.new(field_path: field_path)]
+              missing_value_placeholder = field.type.unwrap_fully.grouping_missing_value_placeholder
+              [FieldTermGrouping.new(field_path: field_path, missing_value_placeholder: missing_value_placeholder)]
             end
           end
         end
