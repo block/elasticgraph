@@ -17,5 +17,14 @@ module ElasticGraph
 
       expect(encoded_data).to eq({"uuid" => "dca02d20-baee-4ee9-a027-feece0a6de3a"})
     end
+
+    specify "MISSING_STRING_PLACEHOLDER_VALUE is a 24-character string (18 bytes encoded as base64)" do
+      # Should be a 24-character string (18 bytes encoded as base64)
+      expect(MISSING_STRING_PLACEHOLDER_VALUE).to be_a(String)
+      expect(MISSING_STRING_PLACEHOLDER_VALUE.length).to eq(24)
+
+      # Should be URL-safe base64 (no +, /, or = characters)
+      expect(MISSING_STRING_PLACEHOLDER_VALUE).to match(/\A[A-Za-z0-9_-]+\z/)
+    end
   end
 end
