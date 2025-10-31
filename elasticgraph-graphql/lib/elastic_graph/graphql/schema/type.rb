@@ -19,12 +19,19 @@ module ElasticGraph
       class Type
         attr_reader :graphql_type, :fields_by_name, :index_definitions, :elasticgraph_category, :graphql_only_return_type
 
+        # Returns the grouping missing value placeholder for this type, if one is defined.
+        # This is used to handle missing values in aggregations without creating separate
+        # missing subaggregations, reducing the exponential explosion of subaggregations.
+        # @return [String, Numeric, nil] the placeholder value to use for missing values in grouping operations
+        attr_reader :grouping_missing_value_placeholder
+
         def initialize(
           schema,
           graphql_type,
           index_definitions,
           object_runtime_metadata,
           enum_runtime_metadata,
+          scalar_runtime_metadata,
           resolvers_needing_lookahead
         )
           @schema = schema
@@ -44,6 +51,7 @@ module ElasticGraph
           end
 
           @fields_by_name = build_fields_by_name_hash(schema, graphql_type).freeze
+          @grouping_missing_value_placeholder = determine_grouping_missing_value_placeholder(scalar_runtime_metadata&.grouping_missing_value_placeholder)
         end
 
         def name
@@ -231,6 +239,21 @@ module ElasticGraph
         end
 
         private
+
+        def determine_grouping_missing_value_placeholder(scalar_placeholder)
+          if enum?
+            MISSING_ENUM_PLACEHOLDER
+          elsif scalar_placeholder == MISSING_STRING_PLACEHOLDER
+            # We replace the MISSING_STRING_PLACEHOLDER ($SECURE_RANDOM) with the secure random value
+            # generated and stored at MISSING_STRING_PLACEHOLDER_VALUE.
+            MISSING_STRING_PLACEHOLDER_VALUE
+          else
+            # Note that if the type is not a scalar then scalar_placeholder will be nil.
+            # We don't use missing value placeholders (or group aggregations) on fields
+            # that are not scalars or enums.
+            scalar_placeholder
+          end
+        end
 
         def lookup_enum_value_by_name(enum_value_name)
           graphql_enum_value = @graphql_type.values.fetch(enum_value_name)

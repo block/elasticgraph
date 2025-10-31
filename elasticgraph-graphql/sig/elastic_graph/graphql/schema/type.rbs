@@ -7,6 +7,7 @@ module ElasticGraph
         attr_reader fields_by_name: ::Hash[::String, Field]
         attr_reader elasticgraph_category: SchemaArtifacts::RuntimeMetadata::elasticGraphCategory?
         attr_reader graphql_type: ::GraphQL::Schema::_Type
+        attr_reader grouping_missing_value_placeholder: ::String? | ::Numeric?
         def search_index_definitions: () -> ::Array[DatastoreCore::_IndexDefinition]
         def unwrap_fully: () -> Type
         def field_named: (::String) -> Field

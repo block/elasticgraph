@@ -818,6 +818,88 @@ module ElasticGraph
           end
         end
 
+        describe "#grouping_missing_value_placeholder" do
+          it "returns the inferred placeholder for a scalar type" do
+            schema = define_schema do |s|
+              s.scalar_type "CustomScalar" do |t|
+                t.mapping type: "keyword"
+                t.json_schema type: "string"
+              end
+            end
+
+            type = schema.type_named("CustomScalar")
+            expect(type.grouping_missing_value_placeholder).to eq MISSING_STRING_PLACEHOLDER_VALUE
+          end
+
+          it "returns the placeholder for a scalar type that has one defined" do
+            schema = define_schema do |s|
+              s.scalar_type "CustomScalar" do |t|
+                t.mapping type: "keyword"
+                t.json_schema type: "string"
+                t.grouping_missing_value_placeholder "MISSING"
+              end
+            end
+
+            type = schema.type_named("CustomScalar")
+            expect(type.grouping_missing_value_placeholder).to eq "MISSING"
+          end
+
+          it "returns nil for a scalar type that explicitly sets placeholder to nil" do
+            schema = define_schema do |s|
+              s.scalar_type "CustomScalar" do |t|
+                t.mapping type: "keyword"
+                t.json_schema type: "string"
+                t.grouping_missing_value_placeholder nil
+              end
+            end
+
+            type = schema.type_named("CustomScalar")
+            expect(type.grouping_missing_value_placeholder).to be_nil
+          end
+
+          it "returns the automatic placeholder for an enum type" do
+            schema = define_schema do |s|
+              s.enum_type "Status" do |t|
+                t.values "active", "inactive"
+              end
+            end
+
+            type = schema.type_named("Status")
+            expect(type.grouping_missing_value_placeholder).to eq MISSING_ENUM_PLACEHOLDER
+          end
+
+          it "returns the placeholder for built-in scalar types" do
+            schema = define_schema do |s|
+              s.object_type "Thing" do |t|
+                t.field "id", "ID!"
+                t.field "name", "String"
+                t.field "count", "Int"
+                t.field "price", "Float"
+                t.field "big_number", "JsonSafeLong"
+                t.index "things"
+              end
+            end
+
+            # String uses a random UUID-like placeholder
+            expect(schema.type_named("String").grouping_missing_value_placeholder).to eq MISSING_STRING_PLACEHOLDER_VALUE
+            expect(schema.type_named("Int").grouping_missing_value_placeholder).to eq MISSING_NUMERIC_PLACEHOLDER
+            expect(schema.type_named("Float").grouping_missing_value_placeholder).to eq MISSING_NUMERIC_PLACEHOLDER
+            expect(schema.type_named("JsonSafeLong").grouping_missing_value_placeholder).to eq MISSING_NUMERIC_PLACEHOLDER
+          end
+
+          it "returns nil for object types" do
+            schema = define_schema do |s|
+              s.object_type "Thing" do |t|
+                t.field "id", "ID!"
+                t.index "things"
+              end
+            end
+
+            type = schema.type_named("Thing")
+            expect(type.grouping_missing_value_placeholder).to be_nil
+          end
+        end
+
         def define_schema(index_definitions: nil, **overrides, &schema_def)
           build_graphql(schema_definition: schema_def, index_definitions: index_definitions, **overrides).schema
         end
