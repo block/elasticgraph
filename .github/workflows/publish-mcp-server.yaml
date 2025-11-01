@@ -67,7 +67,7 @@ jobs:
       run: python -m build
 
     - name: Upload dist as artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: python-package-distributions
         path: ai_tools/elasticgraph-mcp-server/dist/
@@ -83,7 +83,7 @@ jobs:
 
     steps:
     - name: Download dist artifacts
-      uses: actions/download-artifact@v5
+      uses: actions/download-artifact@v6
       with:
         name: python-package-distributions
         path: dist
