@@ -13,14 +13,14 @@ group :development do
   gem "aws_lambda_ric", "~> 3.1", ">= 3.1.3"
   gem "benchmark-ips", "~> 2.14"
   gem "coderay", "~> 1.1", ">= 1.1.3"
-  gem "factory_bot", "~> 6.5", ">= 6.5.5"
+  gem "factory_bot", "~> 6.5"
   gem "faker", "~> 3.5", ">= 3.5.2"
   gem "flatware-rspec", "~> 2.3", ">= 2.3.4"
   gem "httpx", "~> 1.6"
   gem "memory_profiler", "~> 1.1"
   gem "method_source", "~> 1.1"
   gem "rack-test", "~> 2.2"
-  gem "rspec", "~> 3.13", ">= 3.13.1"
+  gem "rspec", "~> 3.13"
   gem "rspec-retry", "~> 0.6", ">= 0.6.2"
   # We are waiting to upgrade to >= 2.27 until standardrb compatibility with rubocop plugins is fixed:
   # https://github.com/standardrb/standard/issues/701
@@ -35,7 +35,7 @@ group :development do
   gem "simplecov-console", "~> 0.9", ">= 0.9.4"
   gem "standard", "~> 1.51.1"
   gem "steep", "~> 1.10.0"
-  gem "super_diff", "~> 0.16"
+  gem "super_diff", "~> 0.17"
   gem "vcr", "~> 6.3", ">= 6.3.1"
 end
 
