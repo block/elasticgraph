@@ -357,16 +357,27 @@ module ElasticGraph
             # In this case, users can set grouping_missing_value_placeholder to nil.
             if (json_schema_options[:minimum] || LONG_STRING_MIN) >= JSON_SAFE_LONG_MIN &&
                 (json_schema_options[:maximum] || LONG_STRING_MAX) <= JSON_SAFE_LONG_MAX
-              MISSING_NUMERIC_PLACEHOLDER
+              inferred_numeric_placeholder_for_integer_type
             end
           elsif mapping_type == "unsigned_long"
             # Similar to the checks above for long except we only need to check the max
             # (since the min is zero even if not specified)
             if (json_schema_options[:maximum] || LONG_STRING_MAX) <= JSON_SAFE_LONG_MAX
-              MISSING_NUMERIC_PLACEHOLDER
+              inferred_numeric_placeholder_for_integer_type
             end
           elsif INTEGER_TYPES.include?(mapping_type)
             # All other integer types can safely be coerced to float without loss of precision
+            inferred_numeric_placeholder_for_integer_type
+          end
+        end
+
+        def inferred_numeric_placeholder_for_integer_type
+          # Using NaN as the missing value placeholder causes the datastore to coerce all bucket keys to float.
+          # If using the default coercion adapter (which is a no-op), the values won't be coerced back to integers,
+          # causing a type change in the returned values. Only use NaN if a custom coercion adapter is configured.
+          if runtime_metadata.coercion_adapter_ref == SchemaArtifacts::RuntimeMetadata::ScalarType::DEFAULT_COERCION_ADAPTER_REF
+            nil
+          else
             MISSING_NUMERIC_PLACEHOLDER
           end
         end

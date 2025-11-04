@@ -112,10 +112,12 @@ module ElasticGraph
         end
 
         it "does not infer placeholder when placeholder is set to nil" do
+          grouping_missing_value_placeholder = grouping_missing_value_placeholder_for("keyword", type: "string")
+          expect(grouping_missing_value_placeholder).not_to be_nil
+
           grouping_missing_value_placeholder = grouping_missing_value_placeholder_for("keyword", type: "string") do |t|
             t.grouping_missing_value_placeholder nil
           end
-
           expect(grouping_missing_value_placeholder).to be_nil
         end
 
@@ -185,82 +187,132 @@ module ElasticGraph
         end
 
         integer_types.grep_v(/long/).each do |int_type|
-          it "infers 'NaN' for safe integer type #{int_type}" do
+          it "does not infer placeholder for safe integer type #{int_type} with default coercion adapter" do
             grouping_missing_value_placeholder = grouping_missing_value_placeholder_for(int_type, type: "integer")
+
+            expect(grouping_missing_value_placeholder).to be_nil
+          end
+
+          it "infers 'NaN' for safe integer type #{int_type} with custom coercion adapter" do
+            grouping_missing_value_placeholder = grouping_missing_value_placeholder_for(int_type, type: "integer") do |t|
+              t.coerce_with "ExampleScalarCoercionAdapter", defined_at: "support/example_extensions/scalar_coercion_adapter"
+            end
 
             expect(grouping_missing_value_placeholder).to eq(MISSING_NUMERIC_PLACEHOLDER)
           end
         end
 
-        it "infers 'NaN' for long types with JSON-safe min/max range" do
+        it "does not infer placeholder for long types with JSON-safe min/max range and default coercion adapter" do
           grouping_missing_value_placeholder = grouping_missing_value_placeholder_for("long", type: "integer", minimum: JSON_SAFE_LONG_MIN, maximum: JSON_SAFE_LONG_MAX)
+
+          expect(grouping_missing_value_placeholder).to be_nil
+        end
+
+        it "infers 'NaN' for long types with JSON-safe min/max range and custom coercion adapter" do
+          grouping_missing_value_placeholder = grouping_missing_value_placeholder_for("long", type: "integer", minimum: JSON_SAFE_LONG_MIN, maximum: JSON_SAFE_LONG_MAX) do |t|
+            t.coerce_with "ExampleScalarCoercionAdapter", defined_at: "support/example_extensions/scalar_coercion_adapter"
+          end
 
           expect(grouping_missing_value_placeholder).to eq(MISSING_NUMERIC_PLACEHOLDER)
         end
 
         it "does not infer a value for long types with max too large" do
-          grouping_missing_value_placeholder = grouping_missing_value_placeholder_for("long", type: "integer", minimum: -(2**53) + 1, maximum: (2**60) - 1)
+          grouping_missing_value_placeholder = grouping_missing_value_placeholder_for("long", type: "integer", minimum: -(2**53) + 1, maximum: (2**60) - 1) do |t|
+            t.coerce_with "ExampleScalarCoercionAdapter", defined_at: "support/example_extensions/scalar_coercion_adapter"
+          end
 
           expect(grouping_missing_value_placeholder).to be_nil
         end
 
         it "does not infer placeholder for long types with min too small" do
-          grouping_missing_value_placeholder = grouping_missing_value_placeholder_for("long", type: "integer", minimum: -(2**60), maximum: (2**53) - 1)
+          grouping_missing_value_placeholder = grouping_missing_value_placeholder_for("long", type: "integer", minimum: -(2**60), maximum: (2**53) - 1) do |t|
+            t.coerce_with "ExampleScalarCoercionAdapter", defined_at: "support/example_extensions/scalar_coercion_adapter"
+          end
 
           expect(grouping_missing_value_placeholder).to be_nil
         end
 
         it "does not infer placeholder for long types with only minimum specified" do
-          grouping_missing_value_placeholder = grouping_missing_value_placeholder_for("long", type: "integer", minimum: 0)
+          grouping_missing_value_placeholder = grouping_missing_value_placeholder_for("long", type: "integer", minimum: 0) do |t|
+            t.coerce_with "ExampleScalarCoercionAdapter", defined_at: "support/example_extensions/scalar_coercion_adapter"
+          end
 
           expect(grouping_missing_value_placeholder).to be_nil
         end
 
         it "does not infer placeholder for long types with only maximum specified" do
-          grouping_missing_value_placeholder = grouping_missing_value_placeholder_for("long", type: "integer", maximum: 1000)
+          grouping_missing_value_placeholder = grouping_missing_value_placeholder_for("long", type: "integer", maximum: 1000) do |t|
+            t.coerce_with "ExampleScalarCoercionAdapter", defined_at: "support/example_extensions/scalar_coercion_adapter"
+          end
 
           expect(grouping_missing_value_placeholder).to be_nil
         end
 
         it "does not infer placeholder for long types without min/max specified" do
-          grouping_missing_value_placeholder = grouping_missing_value_placeholder_for("long", type: "integer")
+          grouping_missing_value_placeholder = grouping_missing_value_placeholder_for("long", type: "integer") do |t|
+            t.coerce_with "ExampleScalarCoercionAdapter", defined_at: "support/example_extensions/scalar_coercion_adapter"
+          end
 
           expect(grouping_missing_value_placeholder).to be_nil
         end
 
-        it "infers 'NaN' for unsigned_long types with safe maximum" do
+        it "does not infer placeholder for unsigned_long types with safe maximum and default coercion adapter" do
           grouping_missing_value_placeholder = grouping_missing_value_placeholder_for("unsigned_long", type: "integer", maximum: (2**53) - 1)
+
+          expect(grouping_missing_value_placeholder).to be_nil
+        end
+
+        it "infers 'NaN' for unsigned_long types with safe maximum and custom coercion adapter" do
+          grouping_missing_value_placeholder = grouping_missing_value_placeholder_for("unsigned_long", type: "integer", maximum: (2**53) - 1) do |t|
+            t.coerce_with "ExampleScalarCoercionAdapter", defined_at: "support/example_extensions/scalar_coercion_adapter"
+          end
 
           expect(grouping_missing_value_placeholder).to eq(MISSING_NUMERIC_PLACEHOLDER)
         end
 
         it "does not infer placeholder for unsigned_long types with unsafe maximum" do
-          grouping_missing_value_placeholder = grouping_missing_value_placeholder_for("unsigned_long", type: "integer", maximum: (2**60) - 1)
+          grouping_missing_value_placeholder = grouping_missing_value_placeholder_for("unsigned_long", type: "integer", maximum: (2**60) - 1) do |t|
+            t.coerce_with "ExampleScalarCoercionAdapter", defined_at: "support/example_extensions/scalar_coercion_adapter"
+          end
 
           expect(grouping_missing_value_placeholder).to be_nil
         end
 
         it "does not infer placeholder for unsigned_long types without maximum specified" do
-          grouping_missing_value_placeholder = grouping_missing_value_placeholder_for("unsigned_long", type: "integer")
+          grouping_missing_value_placeholder = grouping_missing_value_placeholder_for("unsigned_long", type: "integer") do |t|
+            t.coerce_with "ExampleScalarCoercionAdapter", defined_at: "support/example_extensions/scalar_coercion_adapter"
+          end
 
           expect(grouping_missing_value_placeholder).to be_nil
         end
 
         describe "boundary conditions for JSON-safe long ranges" do
-          it "infers 'NaN' when exactly at safe boundaries" do
+          it "does not infer placeholder when exactly at safe boundaries with default coercion adapter" do
             grouping_missing_value_placeholder = grouping_missing_value_placeholder_for("long", type: "integer", minimum: JSON_SAFE_LONG_MIN, maximum: JSON_SAFE_LONG_MAX)
+
+            expect(grouping_missing_value_placeholder).to be_nil
+          end
+
+          it "infers 'NaN' when exactly at safe boundaries with custom coercion adapter" do
+            grouping_missing_value_placeholder = grouping_missing_value_placeholder_for("long", type: "integer", minimum: JSON_SAFE_LONG_MIN, maximum: JSON_SAFE_LONG_MAX) do |t|
+              t.coerce_with "ExampleScalarCoercionAdapter", defined_at: "support/example_extensions/scalar_coercion_adapter"
+            end
 
             expect(grouping_missing_value_placeholder).to eq(MISSING_NUMERIC_PLACEHOLDER)
           end
 
           it "does not infer placeholder when minimum is one below safe range" do
-            grouping_missing_value_placeholder = grouping_missing_value_placeholder_for("long", type: "integer", minimum: JSON_SAFE_LONG_MIN - 1, maximum: JSON_SAFE_LONG_MAX)
+            grouping_missing_value_placeholder = grouping_missing_value_placeholder_for("long", type: "integer", minimum: JSON_SAFE_LONG_MIN - 1, maximum: JSON_SAFE_LONG_MAX) do |t|
+              t.coerce_with "ExampleScalarCoercionAdapter", defined_at: "support/example_extensions/scalar_coercion_adapter"
+            end
 
             expect(grouping_missing_value_placeholder).to be_nil
           end
 
           it "does not infer placeholder when maximum is one above safe range" do
-            grouping_missing_value_placeholder = grouping_missing_value_placeholder_for("long", type: "integer", minimum: JSON_SAFE_LONG_MIN, maximum: JSON_SAFE_LONG_MAX + 1)
+            grouping_missing_value_placeholder = grouping_missing_value_placeholder_for("long", type: "integer", minimum: JSON_SAFE_LONG_MIN, maximum: JSON_SAFE_LONG_MAX + 1) do |t|
+              t.coerce_with "ExampleScalarCoercionAdapter", defined_at: "support/example_extensions/scalar_coercion_adapter"
+            end
 
             expect(grouping_missing_value_placeholder).to be_nil
           end
@@ -282,8 +334,8 @@ module ElasticGraph
             "DateTime" => nil,
             "Float" => MISSING_NUMERIC_PLACEHOLDER,
             "ID" => MISSING_STRING_PLACEHOLDER,
-            "Int" => MISSING_NUMERIC_PLACEHOLDER,
-            "JsonSafeLong" => MISSING_NUMERIC_PLACEHOLDER,
+            "Int" => MISSING_NUMERIC_PLACEHOLDER, # GraphQL automatically coerces Int values
+            "JsonSafeLong" => MISSING_NUMERIC_PLACEHOLDER, # custom coercion adapter coerces floats back to integers
             "LocalTime" => nil,
             "LongString" => nil, # outside of the JSON safe range.
             "String" => MISSING_STRING_PLACEHOLDER,
