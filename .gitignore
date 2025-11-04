@@ -10,6 +10,7 @@
 /*/.bundle
 /*/Gemfile.lock
 /*/rbs_collection.lock.yaml
+.claude
 
 config/release/bin
 config/release/bundle
