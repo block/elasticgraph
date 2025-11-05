@@ -719,6 +719,11 @@ module ElasticGraph
             t.prepare_for_indexing_with "ElasticGraph::Indexer::IndexingPreparers::Integer",
               defined_at: "elastic_graph/indexer/indexing_preparers/integer"
 
+            # The GraphQL gem automatically coerces Int values, so we can safely use MISSING_NUMERIC_PLACEHOLDER
+            # as the grouping missing value placeholder even though we don't override the default (no-op) ElasticGraph
+            # scalar coercion adapter.
+            t.grouping_missing_value_placeholder MISSING_NUMERIC_PLACEHOLDER
+
             define_integral_aggregated_values_for(t)
           end
 

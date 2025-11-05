@@ -44,6 +44,7 @@ module ElasticGraph
         def to_input_filters: () -> ::Array[SchemaElements::InputType]
         def to_aggregated_values_type: () -> SchemaElements::ObjectType?
         def inferred_grouping_missing_value_placeholder: () -> ::String?
+        def inferred_numeric_placeholder_for_integer_type: () -> ::String?
 
         FLOAT_TYPES: ::Set[::String]
         INTEGER_TYPES: ::Set[::String]
