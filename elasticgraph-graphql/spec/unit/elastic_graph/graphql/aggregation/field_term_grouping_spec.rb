@@ -74,14 +74,87 @@ module ElasticGraph
         end
 
         describe "#inner_meta" do
-          it "returns inner meta" do
-            grouping = field_term_grouping_of("foo", "bar")
+          it "returns inner meta without missing_values when no placeholder is provided" do
+            grouping = field_term_grouping_of("foo", "bar", missing_value_placeholder: nil)
             expect(grouping.inner_meta).to eq({
-              "key_path" => [
-                "key"
-              ],
+              "key_path" => ["key"],
               "merge_into_bucket" => {}
             })
+          end
+
+          it "includes missing_value in inner meta when placeholder is provided" do
+            grouping = field_term_grouping_of("foo", "bar", missing_value_placeholder: "MISSING")
+            expect(grouping.inner_meta).to eq({
+              "key_path" => ["key"],
+              "merge_into_bucket" => {},
+              "missing_values" => ["MISSING"]
+            })
+          end
+        end
+
+        describe "#missing_value_placeholder" do
+          it "returns the placeholder value when provided" do
+            grouping = field_term_grouping_of("foo", "bar", missing_value_placeholder: "MISSING")
+            expect(grouping.missing_value_placeholder).to eq("MISSING")
+          end
+
+          it "returns nil when no placeholder is provided" do
+            grouping = field_term_grouping_of("foo", "bar", missing_value_placeholder: nil)
+            expect(grouping.missing_value_placeholder).to be_nil
+          end
+        end
+
+        describe "#handles_missing_values?" do
+          it "returns true when a placeholder is provided" do
+            grouping = field_term_grouping_of("foo", "bar", missing_value_placeholder: "MISSING")
+            expect(grouping.handles_missing_values?).to be(true)
+          end
+
+          it "returns false when no placeholder is provided" do
+            grouping = field_term_grouping_of("foo", "bar", missing_value_placeholder: nil)
+            expect(grouping.handles_missing_values?).to be(false)
+          end
+        end
+
+        describe "#non_composite_clause_for" do
+          let(:query) do
+            aggregation_query_of(
+              first: 11,
+              needs_doc_count_error: true
+            )
+          end
+
+          context "when a missing value placeholder is provided" do
+            it "includes the missing parameter in the terms clause" do
+              grouping = field_term_grouping_of("foo", "bar", missing_value_placeholder: "MISSING")
+              clause = grouping.non_composite_clause_for(query)
+
+              expect(clause).to eq({
+                "terms" => {
+                  "field" => "foo.bar",
+                  "collect_mode" => "depth_first",
+                  "missing" => "MISSING",
+                  "size" => query.paginator.requested_page_size,
+                  "show_term_doc_count_error" => true
+                }
+              })
+            end
+          end
+
+          context "when no missing value placeholder is provided" do
+            it "does not include the missing parameter in the terms clause" do
+              grouping = field_term_grouping_of("foo", "bar", missing_value_placeholder: nil)
+              clause = grouping.non_composite_clause_for(query)
+
+              expect(clause).to eq({
+                "terms" => {
+                  "field" => "foo.bar",
+                  "collect_mode" => "depth_first",
+                  "size" => query.paginator.requested_page_size,
+                  "show_term_doc_count_error" => true
+                }
+              })
+            end
           end
         end
       end

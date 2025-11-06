@@ -65,29 +65,38 @@ module ElasticGraph
           def format_buckets(sub_agg, buckets_path, parent_key_fields: {}, parent_key_values: [])
             agg_with_buckets = sub_agg.dig(*buckets_path)
 
-            missing_bucket = {
-              # Doc counts in missing value buckets are always perfectly accurate.
-              "doc_count_error_upper_bound" => 0
-            }.merge(sub_agg.dig(*missing_bucket_path_from(buckets_path))) # : ::Hash[::String, untyped]
-
             meta = agg_with_buckets.fetch("meta")
 
             grouping_field_names = meta.fetch("grouping_fields") # provides the names of the fields being grouped on
             key_path = meta.fetch("key_path") # indicates whether we want to get the key values from `key` or `key_as_string`.
             sub_buckets_path = meta["buckets_path"] # buckets_path is optional, so we don't use fetch.
+            missing_values = meta["missing_values"] # missing_values is optional, so we don't use fetch.
             merge_into_bucket = meta.fetch("merge_into_bucket")
 
             raw_buckets = agg_with_buckets.fetch("buckets") # : ::Array[::Hash[::String, untyped]]
 
             # If the missing bucket is non-empty, include it. This matches the behavior of composite aggregations
             # when the `missing_bucket` option is used.
-            raw_buckets += [missing_bucket] if missing_bucket.fetch("doc_count") > 0
+            missing_bucket = sub_agg.dig(*missing_bucket_path_from(buckets_path)) || {}
+            if missing_bucket.fetch("doc_count", 0) > 0
+              # Doc counts in missing value buckets are always perfectly accurate.
+              raw_buckets += [{"doc_count_error_upper_bound" => 0}.merge(missing_bucket)]
+            end
 
             raw_buckets.flat_map do |raw_bucket|
+              key_values = Array(raw_bucket.dig(*key_path))
+              if missing_values
+                # if missing_values are present, then for each element in key_values, replace with nil if it matches the placeholder value from missing_values
+                key_values = key_values.each_with_index.map do |value, index|
+                  # @type var value: untyped
+                  # @type var index: Integer
+                  (value == missing_values[index]) ? nil : value
+                end
+              end
+
               # The key will either be a single value (e.g. `47`) if we used a `terms`/`date_histogram` aggregation,
               # or a tuple of values (e.g. `[47, "abc"]`) if we used a `multi_terms` aggregation. Here we convert it
               # to the form needed for resolving `grouped_by` fields: a hash like `{"size" => 47, "tag" => "abc"}`.
-              key_values = Array(raw_bucket.dig(*key_path))
               key_fields_hash = grouping_field_names.zip(key_values).to_h
 
               # If we have multiple levels of aggregations, we need to merge the key fields hash with the key fields from the parent levels.

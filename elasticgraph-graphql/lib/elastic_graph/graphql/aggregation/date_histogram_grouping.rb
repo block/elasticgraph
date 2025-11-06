@@ -53,6 +53,10 @@ module ElasticGraph
           INNER_META
         end
 
+        def handles_missing_values?
+          false
+        end
+
         INNER_META = {
           # On a date histogram aggregation, the `key` is formatted as a number (milliseconds since epoch). We
           # need it formatted as a string, which `key_as_string` provides.

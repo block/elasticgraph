@@ -3,8 +3,9 @@ module ElasticGraph
     module Aggregation
       class FieldTermGroupingSupertype
         attr_reader field_path: fieldPath
-        def initialize: (field_path: fieldPath) -> void
-        def self.new: (field_path: fieldPath) -> instance | (fieldPath) -> instance
+        attr_reader missing_value_placeholder: (::String | ::Numeric)?
+        def initialize: (field_path: fieldPath, missing_value_placeholder: (::String | ::Numeric)?) -> void
+        def self.new: (field_path: fieldPath, missing_value_placeholder: (::String | ::Numeric)?) -> instance | (fieldPath, ::String?) -> instance
       end
 
       class FieldTermGrouping < FieldTermGroupingSupertype

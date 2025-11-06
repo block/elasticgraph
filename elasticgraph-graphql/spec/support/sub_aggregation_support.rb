@@ -16,12 +16,20 @@ module ElasticGraph
           {"size" => size, "adapter" => grouping_adapter.meta_name}.merge(hash)
         end
 
-        def inner_terms_meta(hash = {})
-          {"merge_into_bucket" => {}}.merge(hash)
+        def inner_terms_meta(grouping_fields, hash = {})
+          {
+            "grouping_fields" => Array(grouping_fields),
+            "key_path" => ["key"],
+            "merge_into_bucket" => {}
+          }.merge(hash)
         end
 
-        def inner_date_meta(hash = {})
-          {"merge_into_bucket" => {"doc_count_error_upper_bound" => 0}}.merge(hash)
+        def inner_date_meta(grouping_fields, hash = {})
+          {
+            "grouping_fields" => Array(grouping_fields),
+            "key_path" => ["key_as_string"],
+            "merge_into_bucket" => {"doc_count_error_upper_bound" => 0}
+          }.merge(hash)
         end
 
         define_method :sub_aggregation_query_of do |**options|
