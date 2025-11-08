@@ -94,12 +94,18 @@ class DependencyUpdater
   end
 
   def format_version_constraint(version, original_constraint)
-    # Extract the original ~> version and any >= version if present
-    tilde_match = original_constraint.match(/["']~>\s*(\d+\.\d+(?:\.\d+)?)["']/)
-    return "\"~> #{version}\"" unless tilde_match # fallback if no ~> found
+    # Parse the original constraint to understand its structure
+    requirement = parse_requirement(original_constraint)
 
-    original_tilde_version = tilde_match[1]
-    dots = original_tilde_version.count(".")
+    # If this is a pinned version (using = operator), leave it unchanged
+    return original_constraint if pinned_version?(requirement)
+
+    # Find the ~> requirement to determine specificity level
+    tilde_req = requirement.requirements.find { |op, _| op == "~>" }
+    return "\"~> #{version}\"" unless tilde_req # fallback if no ~> found
+
+    original_tilde_version = tilde_req[1]
+    dots = original_tilde_version.segments[0..2].join(".").count(".")
 
     # Extract the same level of specificity from the new version
     parts = version.split(".")
@@ -127,6 +133,17 @@ class DependencyUpdater
     else
       "\"~> #{new_tilde_version}\", \">= #{version}\""
     end
+  end
+
+  def parse_requirement(constraint_string)
+    # Remove quotes and split on commas to handle multiple constraints
+    constraints = constraint_string.scan(/["']([^"']+)["']/).flatten
+    Gem::Requirement.new(constraints)
+  end
+
+  def pinned_version?(requirement)
+    # A pinned version has exactly one requirement with the = operator
+    requirement.requirements.size == 1 && requirement.requirements.first[0] == "="
   end
 
   def record_change(file, gem_name, old_constraint, new_constraint)
