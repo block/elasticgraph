@@ -46,5 +46,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency "logger", "~> 1.7"
   spec.add_dependency "json_schemer", "~> 2.4"
 
-  spec.add_development_dependency "faraday", "~> 2.13", ">= 2.13.4"
+  spec.add_development_dependency "faraday", "~> 2.14"
 end
