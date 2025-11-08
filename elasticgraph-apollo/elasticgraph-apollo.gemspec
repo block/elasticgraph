@@ -44,7 +44,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "elasticgraph-graphql", ElasticGraph::VERSION
   spec.add_dependency "elasticgraph-support", ElasticGraph::VERSION
   spec.add_dependency "graphql", "2.5.11" # 2.5.12 introduces a failure in elasticgraph-apollo.
-  spec.add_dependency "apollo-federation", "~> 3.10", ">= 3.10.1"
+  spec.add_dependency "apollo-federation", "~> 3.10", ">= 3.10.3"
 
   # Note: technically, this is not purely a development dependency, but since `eg-schema_def`
   # isn't intended to be used in production (or even included in a deployed bundle) we don't

@@ -45,7 +45,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "elasticgraph-support", ElasticGraph::VERSION
   spec.add_dependency "graphql", "2.5.11" # 2.5.12 introduces a failure in elasticgraph-apollo.
   spec.add_dependency "graphql-c_parser", "~> 1.1", ">= 1.1.3"
-  spec.add_dependency "rake", "~> 13.3"
+  spec.add_dependency "rake", "~> 13.3", ">= 13.3.1"
 
   spec.add_development_dependency "elasticgraph-elasticsearch", ElasticGraph::VERSION
   spec.add_development_dependency "elasticgraph-opensearch", ElasticGraph::VERSION
