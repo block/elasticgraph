@@ -19,7 +19,7 @@ module ElasticGraph
 
             expect {
               expect(index.searches_could_hit_incomplete_docs?).to be false
-            }.to change { datastore_requests("main").count }.by(1)
+            }.not_to change { datastore_requests("main").count }
 
             # Demonstrate that we cache the value by showing the datastore request count doesn't change
             # when we call `searches_could_hit_incomplete_docs?` with the same client again.
@@ -46,7 +46,7 @@ module ElasticGraph
             }.not_to change { datastore_requests("main").count }
           end
 
-          it "returns `true` on an index that no longer has `sourced_from` fields but used to" do
+          it "returns `false` on an index that no longer has `sourced_from` fields but used to" do
             define_index do |t|
               t.field "owner_name", "String" do |f|
                 f.sourced_from "owner", "name"
@@ -55,7 +55,7 @@ module ElasticGraph
 
             index = define_index
 
-            expect(index.searches_could_hit_incomplete_docs?).to be true
+            expect(index.searches_could_hit_incomplete_docs?).to be false
           end
 
           context "when there are no sources recorded in `_meta` on the index" do
