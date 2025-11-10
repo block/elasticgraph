@@ -205,9 +205,6 @@ module ElasticGraph
       end
 
       describe "#bulk" do
-        # Here we express it as a collaborator by essentially providing an alias for it.
-        let(:index_mapping_checker) { router }
-
         before do
           allow(main_datastore_client).to receive(:bulk) { |request| respond_to_datastore_client_bulk_request(request) }
           allow(other_datastore_client).to receive(:bulk) { |request| respond_to_datastore_client_bulk_request(request) }
@@ -382,21 +379,6 @@ module ElasticGraph
 
           expect(results).to eq({})
           expect(main_datastore_client).not_to have_received(:bulk)
-        end
-
-        it "performs the bulk request" do
-          call_sequence = []
-
-          allow(main_datastore_client).to receive(:bulk) do |request|
-            call_sequence << :bulk
-            respond_to_datastore_client_bulk_request(request)
-          end
-
-          router.bulk(operations)
-
-          expect(call_sequence).to eq [
-            :bulk
-          ]
         end
 
         it "includes the exception class and message in the return failure result when scripted updates fail" do

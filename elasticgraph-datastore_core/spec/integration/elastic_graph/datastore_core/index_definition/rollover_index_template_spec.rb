@@ -547,7 +547,6 @@ module ElasticGraph
 
         def derive_index_from_template(record, datastore_core)
           indexer = build_indexer(datastore_core: datastore_core)
-          # The tests above use a slightly different schema definition than the main test schema definition.
           index_into(indexer, record)
         end
 
