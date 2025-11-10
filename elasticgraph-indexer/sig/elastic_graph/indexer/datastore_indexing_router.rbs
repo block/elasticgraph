@@ -1,53 +1,18 @@
 module ElasticGraph
   class Indexer
     class DatastoreIndexingRouter
-      MAPPING_CACHE_MAX_AGE_IN_MS_RANGE: ::Range[::Integer]
-
       def initialize: (
         datastore_clients_by_name: ::Hash[::String, DatastoreCore::_Client],
-        mappings_by_index_def_name: ::Hash[::String, untyped],
-        monotonic_clock: Support::MonotonicClock,
         logger: ::Logger
       ) -> void
 
       def bulk: (::Array[_Operation], ?refresh: bool) -> BulkResult
       def source_event_versions_in_index: (::Array[_Operation]) -> ::Hash[_Operation, ::Hash[::String, ::Array[::Integer]]]
-      def validate_mapping_completeness_of!: (
-        ::Symbol,
-        *DatastoreCore::indexDefinition
-      ) -> void
 
       private
 
       @datastore_clients_by_name: ::Hash[::String, DatastoreCore::_Client]
-      @mappings_by_index_def_name: ::Hash[::String, untyped]
       @logger: ::Logger
-      @monotonic_clock: Support::MonotonicClock
-      @cached_mappings: ::Hash[
-        [DatastoreCore::_Client, DatastoreCore::indexDefinition],
-        CachedMapping
-      ]
-
-      def mapping_diffs_for: (
-        DatastoreCore::indexDefinition,
-        ::Symbol
-      ) -> ::Hash[[::String, ::String], ::String]
-
-      def cached_mappings_for: (
-        DatastoreCore::indexDefinition,
-        DatastoreCore::_Client
-      ) -> ::Hash[DatastoreCore::indexDefinition, ::Hash[::String, untyped]]
-
-      def fetch_mappings_from_datastore: (
-        DatastoreCore::indexDefinition,
-        DatastoreCore::_Client
-      ) -> ::Hash[DatastoreCore::indexDefinition, ::Hash[::String, untyped]]
-
-      def new_cached_mapping: (
-        ::Hash[DatastoreCore::indexDefinition, ::Hash[::String, untyped]]
-      ) -> CachedMapping
-
-      def datastore_client_named: (::String) -> DatastoreCore::_Client
 
       class BulkResultSupertype
         attr_reader ops_and_results_by_cluster: ::Hash[::String, ::Array[[_Operation, Operation::Result]]]
@@ -81,16 +46,6 @@ module ElasticGraph
         def successful_operations: (
           ?check_failures: bool
         ) -> ::Array[_Operation]
-      end
-
-      class CachedMapping
-        attr_reader mappings: ::Hash[DatastoreCore::indexDefinition, ::Hash[::String, untyped]]
-        attr_reader expires_at: ::Integer
-
-        def initialize: (
-          ::Hash[DatastoreCore::indexDefinition, ::Hash[::String, untyped]],
-          ::Integer
-        ) -> void
       end
     end
   end

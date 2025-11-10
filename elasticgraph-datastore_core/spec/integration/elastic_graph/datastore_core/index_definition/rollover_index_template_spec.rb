@@ -500,15 +500,6 @@ module ElasticGraph
                   end
                 end
 
-                before do
-                  # The tests below use a slightly different schema from our main test schema, in order to
-                  # exercise different relationships (e.g. with foreign keys pointing both directions for
-                  # any kind of relationship). As a result, calls to `validate_mapping_completeness_of!` will
-                  # raise exceptions. Since the mapping difference is intentional in these tests, we want
-                  # to silence the exception here, which we can do by stubbing it to be a no-op.
-                  allow(indexer.datastore_router).to receive(:validate_mapping_completeness_of!)
-                end
-
                 it "is correctly able to infer the timestamp range from indices created from timestamps with both single and double digit numbers" do
                   index_into(
                     indexer,
@@ -556,11 +547,7 @@ module ElasticGraph
 
         def derive_index_from_template(record, datastore_core)
           indexer = build_indexer(datastore_core: datastore_core)
-          # The tests above use a slightly different schema definition than the main test schema definition,
-          # and as a result calls to `validate_mapping_completeness_of!` will fail. This is intentional, and
-          # we want to allow it, so here we stub it to be a no-op.
-          allow(indexer.datastore_router).to receive(:validate_mapping_completeness_of!)
-
+          # The tests above use a slightly different schema definition than the main test schema definition.
           index_into(indexer, record)
         end
 
