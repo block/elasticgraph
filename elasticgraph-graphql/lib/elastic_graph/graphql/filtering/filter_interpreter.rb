@@ -36,11 +36,25 @@ module ElasticGraph
         # Returns `nil` if there are no query clauses, to make it easy for a caller to `compact` out
         # `query: {}` in a larger search request body.
         #
+        # When multiple filter hashes are provided (e.g. client_filters + internal_filters),
+        # process each into its own bool query so they are ANDed together. This ensures
+        # that range queries from different sources intersect instead of override.
+        #
         # https://www.elastic.co/guide/en/elasticsearch/reference/8.11/query-dsl.html
         def build_query(filter_hashes, from_field_path: FieldPath.empty)
-          build_bool_hash do |bool_node|
-            filter_hashes.each do |filter_hash|
-              process_filter_hash(bool_node, filter_hash, from_field_path)
+          if filter_hashes.size <= 1
+            build_bool_hash do |bool_node|
+              filter_hash = filter_hashes.first
+              process_filter_hash(bool_node, filter_hash, from_field_path) if filter_hash
+            end
+          else
+            build_bool_hash do |outer_bool_node|
+              filter_hashes.each do |filter_hash|
+                sub_query = build_bool_hash do |inner_bool_node|
+                  process_filter_hash(inner_bool_node, filter_hash, from_field_path)
+                end
+                outer_bool_node[:filter] << sub_query if sub_query
+              end
             end
           end
         end
