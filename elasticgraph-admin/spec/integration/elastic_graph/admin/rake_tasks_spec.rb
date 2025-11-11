@@ -14,7 +14,7 @@ module ElasticGraph
     RSpec.describe RakeTasks, :rake_task do
       describe "clusters:configure", :uses_datastore do
         describe ":perform" do
-          it "updates the settings and mappings in the datastore, then verifies the index consistency" do
+          it "updates the settings and mappings in the datastore" do
             admin = build_admin
 
             expect {
@@ -23,12 +23,6 @@ module ElasticGraph
             }.to change { main_datastore_client.get_index(unique_index_name) }.from({}).to(a_hash_including("mappings"))
               .and change { main_datastore_client.get_index("#{unique_index_name}2") }.from({}).to(a_hash_including("mappings"))
               .and change { datastore_write_requests("main") }
-
-            expect(admin.datastore_indexing_router).to have_received(:validate_mapping_completeness_of!).with(
-              :all_accessible_cluster_names,
-              an_object_having_attributes(name: unique_index_name),
-              an_object_having_attributes(name: "#{unique_index_name}2")
-            )
           end
 
           it "works when the cluster configuration has omitted a named cluster" do
@@ -47,16 +41,11 @@ module ElasticGraph
             }.to change { main_datastore_client.get_index(unique_index_name) }.from({}).to(a_hash_including("mappings"))
               .and maintain { main_datastore_client.get_index("#{unique_index_name}2") }.from({})
               .and change { datastore_write_requests("main") }
-
-            expect(admin.datastore_indexing_router).to have_received(:validate_mapping_completeness_of!).with(
-              :all_accessible_cluster_names,
-              an_object_having_attributes(name: unique_index_name)
-            )
           end
         end
 
         describe ":dry_run" do
-          it "dry-runs the settings and mappings in the datastore, but does not verify the index consistency" do
+          it "dry-runs the settings and mappings in the datastore" do
             admin = build_admin
 
             expect {
@@ -65,8 +54,6 @@ module ElasticGraph
             }.to maintain { main_datastore_client.get_index(unique_index_name) }.from({})
               .and maintain { main_datastore_client.get_index("#{unique_index_name}2") }.from({})
               .and make_no_datastore_write_calls("main")
-
-            expect(admin.datastore_indexing_router).not_to have_received(:validate_mapping_completeness_of!)
           end
         end
 
@@ -94,9 +81,7 @@ module ElasticGraph
             end
           end
 
-          super(schema_definition: schema_def, **config_overrides).tap do |admin|
-            allow(admin.datastore_indexing_router).to receive(:validate_mapping_completeness_of!).and_call_original
-          end
+          super(schema_definition: schema_def, **config_overrides)
         end
       end
 

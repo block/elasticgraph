@@ -8,9 +8,7 @@
 
 require "elastic_graph/constants"
 require "elastic_graph/errors"
-require "elastic_graph/datastore_core/index_config_normalizer"
 require "elastic_graph/indexer/event_id"
-require "elastic_graph/indexer/hash_differ"
 require "elastic_graph/indexer/indexing_failures_error"
 require "elastic_graph/support/threading"
 
@@ -18,38 +16,12 @@ module ElasticGraph
   class Indexer
     # Responsible for routing datastore indexing requests to the appropriate cluster and index.
     class DatastoreIndexingRouter
-      # In this class, we internally cache the datastore mapping for an index definition, so that we don't have to
-      # fetch the mapping from the datastore on each call to `bulk`. It rarely changes and ElasticGraph is designed so that
-      # mapping updates are applied before deploying the indexer with a new mapping.
-      #
-      # However, if an engineer forgets to apply a mapping update before deploying, they'll run into "mappings are incomplete"
-      # errors. They can updated the mapping to fix it, but the use of caching in this class could mean that the fix doesn't
-      # necessarily work right away. The app would have to be deployed or restarted so that the caches are cleared. That could
-      # be annoying.
-      #
-      # To address this issue, we're adding an expiration on the caching of the index mappings. Re-fetching the index
-      # mapping once every few minutes is no big deal and will allow the indexer to recover on its own after a mapping
-      # update has been applied without requiring a deploy or a restart.
-      #
-      # The expiration is a range so that, when we have many processes running, and they all started around the same time,
-      # (say, after a deploy!), they don't all expire their caches in sync, leading to spiky load on the datastore. Instead,
-      # the random distribution of expiration times will spread out the load.
-      MAPPING_CACHE_MAX_AGE_IN_MS_RANGE = (5 * 60 * 1000)..(10 * 60 * 1000)
-
       def initialize(
         datastore_clients_by_name:,
-        mappings_by_index_def_name:,
-        monotonic_clock:,
         logger:
       )
         @datastore_clients_by_name = datastore_clients_by_name
         @logger = logger
-        @monotonic_clock = monotonic_clock
-        @cached_mappings = {}
-
-        @mappings_by_index_def_name = mappings_by_index_def_name.transform_values do |mappings|
-          DatastoreCore::IndexConfigNormalizer.normalize_mappings(mappings)
-        end
       end
 
       # Proxies `client#bulk` by converting `operations` to their bulk
@@ -70,13 +42,7 @@ module ElasticGraph
       #
       # It is the caller's responsibility to deal with any returned failures as this method does not
       # raise an exception in that case.
-      #
-      # Note: before any operations are attempted, the datastore indices are validated for consistency
-      # with the mappings we expect, meaning that no bulk operations will be attempted if that is not up-to-date.
       def bulk(operations, refresh: false)
-        # Before writing these operations, verify their destination index mapping are consistent.
-        validate_mapping_completeness_of!(:accessible_cluster_names_to_index_into, *operations.map(&:destination_index_def).uniq)
-
         ops_by_client = ::Hash.new { |h, k| h[k] = [] } # : ::Hash[DatastoreCore::_Client, ::Array[_Operation]]
         unsupported_ops = ::Set.new # : ::Set[_Operation]
 
@@ -290,108 +256,6 @@ module ElasticGraph
             "for document versions:\n\n#{failures.join("\n")}"
         end
       end
-
-      # Queries the datastore mapping(s) for the given index definition(s) to verify that they are up-to-date
-      # with our schema artifacts, raising an error if the datastore mappings are missing fields that we
-      # expect. (Extra fields are allowed, though--we'll just ignore them).
-      #
-      # This is intended for use when you want a strong guarantee before proceeding that the indices are current,
-      # such as before indexing data, or after applying index updates (to "prove" that everything is how it should
-      # be).
-      #
-      # This correctly queries the datastore clusters specified via `index_into_clusters` in config,
-      # but ignores clusters specified via `query_cluster` (since this isn't intended to be used as part
-      # of the query flow).
-      #
-      # For a rollover template, this takes care of verifying the template itself and also any indices that originated
-      # from the template.
-      #
-      # Note also that this caches the datastore mappings, since this is intended to be used to verify an index
-      # before we index data into it, and we do not want to impose a huge performance penalty on that process (requiring
-      # multiple datastore requests before we index each document...). In general, the index mapping only changes
-      # when we make it change, and we deploy and restart ElasticGraph after any index mapping changes, so we do not
-      # need to worry about it mutating during the lifetime of a single process (particularly given the expense of doing
-      # so).
-      def validate_mapping_completeness_of!(index_cluster_name_method, *index_definitions)
-        diffs_by_cluster_and_index_name =
-          index_definitions.reduce({}) do |accum, index_def| # $ ::Hash[[::String, ::String], ::String]
-            accum.merge(mapping_diffs_for(index_def, index_cluster_name_method))
-          end
-
-        if diffs_by_cluster_and_index_name.any?
-          formatted_diffs = diffs_by_cluster_and_index_name.map do |(cluster_name, index_name), diff|
-            <<~EOS
-              On cluster `#{cluster_name}` and index/template `#{index_name}`:
-              #{diff}
-            EOS
-          end.join("\n\n")
-
-          raise Errors::ConfigError, "Datastore index mappings are incomplete compared to the current schema. " \
-            "The diff below uses the datastore index mapping as the base, and shows the expected mapping as a diff. " \
-            "\n\n#{formatted_diffs}"
-        end
-      end
-
-      private
-
-      def mapping_diffs_for(index_definition, index_cluster_name_method)
-        expected_mapping = @mappings_by_index_def_name.fetch(index_definition.name)
-
-        index_definition.public_send(index_cluster_name_method).flat_map do |cluster_name|
-          datastore_client = datastore_client_named(cluster_name)
-
-          cached_mappings_for(index_definition, datastore_client).filter_map do |index, mapping_in_index|
-            if (diff = HashDiffer.diff(mapping_in_index, expected_mapping, ignore_ops: [:-]))
-              [[cluster_name, index.name], diff]
-            end
-          end
-        end.to_h
-      end
-
-      def cached_mappings_for(index_definition, datastore_client)
-        key = [datastore_client, index_definition] # : [DatastoreCore::_Client, DatastoreCore::indexDefinition]
-        cached_mapping = @cached_mappings[key] ||= new_cached_mapping(fetch_mappings_from_datastore(index_definition, datastore_client))
-
-        return cached_mapping.mappings if @monotonic_clock.now_in_ms < cached_mapping.expires_at
-
-        begin
-          fetch_mappings_from_datastore(index_definition, datastore_client).tap do |mappings|
-            @logger.info "Mapping cache expired for #{index_definition.name}; cleared it from the cache and re-fetched the mapping."
-            @cached_mappings[key] = new_cached_mapping(mappings)
-          end
-        rescue => e
-          @logger.warn <<~EOS
-            Mapping cache expired for #{index_definition.name}; attempted to re-fetch it but got an error[1]. Will continue using expired mapping information for now.
-
-            [1] #{e.class}: #{e.message}
-            #{e.backtrace.join("\n")}
-          EOS
-
-          # Update the cached mapping so that the expiration is reset.
-          @cached_mappings[key] = new_cached_mapping(cached_mapping.mappings)
-
-          cached_mapping.mappings
-        end
-      end
-
-      def fetch_mappings_from_datastore(index_definition, datastore_client)
-        # We need to also check any related indices...
-        indices_to_check = [index_definition] + index_definition.related_rollover_indices(datastore_client)
-
-        indices_to_check.to_h do |index|
-          [index, index.mappings_in_datastore(datastore_client)]
-        end
-      end
-
-      def new_cached_mapping(mappings)
-        CachedMapping.new(mappings, @monotonic_clock.now_in_ms + rand(MAPPING_CACHE_MAX_AGE_IN_MS_RANGE).to_i)
-      end
-
-      def datastore_client_named(name)
-        @datastore_clients_by_name.fetch(name)
-      end
-
-      CachedMapping = ::Data.define(:mappings, :expires_at)
     end
   end
 end

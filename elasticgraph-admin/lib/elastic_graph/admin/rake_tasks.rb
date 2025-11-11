@@ -34,10 +34,8 @@ module ElasticGraph
             task :perform do
               print_in_color "#{"=" * 80}\nNOTE: Performing datastore cluster updates for real!\n#{"=" * 80}", RED_COLOR_CODE
 
-              index_defs = update_clusters_for(admin)
-              output.puts "Finished updating datastore clusters. Validating index consistency..."
-              admin.datastore_indexing_router.validate_mapping_completeness_of!(:all_accessible_cluster_names, *index_defs)
-              output.puts "Done."
+              update_clusters_for(admin)
+              output.puts "Finished updating datastore clusters."
             end
 
             desc "Dry-runs the configuration of datastore clusters, including indices, settings, and scripts"

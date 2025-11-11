@@ -47,8 +47,6 @@ module ElasticGraph
         require "elastic_graph/indexer/datastore_indexing_router"
         DatastoreIndexingRouter.new(
           datastore_clients_by_name: datastore_core.clients_by_name,
-          mappings_by_index_def_name: schema_artifacts.index_mappings_by_index_def_name,
-          monotonic_clock: monotonic_clock,
           logger: datastore_core.logger
         )
       end
