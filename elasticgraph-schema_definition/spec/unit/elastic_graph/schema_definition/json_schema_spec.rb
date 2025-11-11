@@ -454,7 +454,9 @@ module ElasticGraph
                 f.sourced_from "widget", "name"
               end
 
-              t.index "components"
+              t.index "components" do |i|
+                i.has_had_multiple_sources!
+              end
             end
           end
 
@@ -494,7 +496,9 @@ module ElasticGraph
                   f.sourced_from "widget", "size"
                 end
 
-                t.index "components"
+                t.index "components" do |i|
+                  i.has_had_multiple_sources!
+                end
               end
             end
           }.to raise_error a_string_including(

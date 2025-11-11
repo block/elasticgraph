@@ -16,20 +16,22 @@ module ElasticGraph
       # Runtime metadata related to a datastore index definition.
       #
       # @private
-      class IndexDefinition < ::Data.define(:route_with, :rollover, :default_sort_fields, :current_sources, :fields_by_path)
+      class IndexDefinition < ::Data.define(:route_with, :rollover, :default_sort_fields, :current_sources, :fields_by_path, :has_had_multiple_sources)
         ROUTE_WITH = "route_with"
         ROLLOVER = "rollover"
         DEFAULT_SORT_FIELDS = "default_sort_fields"
         CURRENT_SOURCES = "current_sources"
         FIELDS_BY_PATH = "fields_by_path"
+        HAS_HAD_MULTIPLE_SOURCES = "has_had_multiple_sources"
 
-        def initialize(route_with:, rollover:, default_sort_fields:, current_sources:, fields_by_path:)
+        def initialize(route_with:, rollover:, default_sort_fields:, current_sources:, fields_by_path:, has_had_multiple_sources: false)
           super(
             route_with: route_with,
             rollover: rollover,
             default_sort_fields: default_sort_fields,
             current_sources: current_sources.to_set,
-            fields_by_path: fields_by_path
+            fields_by_path: fields_by_path,
+            has_had_multiple_sources: has_had_multiple_sources
           )
         end
 
@@ -39,7 +41,8 @@ module ElasticGraph
             rollover: hash[ROLLOVER]&.then { |h| Rollover.from_hash(h) },
             default_sort_fields: hash[DEFAULT_SORT_FIELDS]&.map { |h| SortField.from_hash(h) } || [],
             current_sources: hash[CURRENT_SOURCES] || [],
-            fields_by_path: (hash[FIELDS_BY_PATH] || {}).transform_values { |h| IndexField.from_hash(h) }
+            fields_by_path: (hash[FIELDS_BY_PATH] || {}).transform_values { |h| IndexField.from_hash(h) },
+            has_had_multiple_sources: hash[HAS_HAD_MULTIPLE_SOURCES] || false
           )
         end
 
@@ -49,6 +52,7 @@ module ElasticGraph
             CURRENT_SOURCES => current_sources.sort,
             DEFAULT_SORT_FIELDS => default_sort_fields.map(&:to_dumpable_hash),
             FIELDS_BY_PATH => HashDumper.dump_hash(fields_by_path, &:to_dumpable_hash),
+            HAS_HAD_MULTIPLE_SOURCES => has_had_multiple_sources,
             ROLLOVER => rollover&.to_dumpable_hash,
             ROUTE_WITH => route_with
           }

@@ -326,7 +326,9 @@ module ElasticGraph
               t.field "id", "ID"
               t.field "cost", "Int"
 
-              t.index "components"
+              t.index "components" do |i|
+                i.has_had_multiple_sources!
+              end
             end
 
             schema.object_type "Widget" do |t|
@@ -334,7 +336,9 @@ module ElasticGraph
               t.relates_to_one "related_component", "Component", via: "component_id", dir: :out
               t.field "embedded_component", "Component"
 
-              t.index "widgets"
+              t.index "widgets" do |i|
+                i.has_had_multiple_sources!
+              end
             end
           end
 

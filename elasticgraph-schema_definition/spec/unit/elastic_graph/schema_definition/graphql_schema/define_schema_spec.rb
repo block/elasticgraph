@@ -87,7 +87,9 @@ module ElasticGraph
             "Component" => lambda do |t|
               t.field "id", "ID!"
               t.relates_to_one "widget", "Widget", via: "widget_id", dir: :out
-              t.index "components"
+              t.index "components" do |i|
+                i.has_had_multiple_sources!
+              end
             end,
 
             "Widget" => lambda do |t|
@@ -96,7 +98,9 @@ module ElasticGraph
                 f.mapping type: "nested"
               end
               t.relates_to_many "components", "Component", via: "widget_id", dir: :in, singular: "component"
-              t.index "widgets"
+              t.index "widgets" do |i|
+                i.has_had_multiple_sources!
+              end
             end,
 
             "WidgetVersion" => lambda do |t|

@@ -19,7 +19,9 @@ module ElasticGraph
             t.field "id", "ID!"
             t.field "options", "WidgetOptions"
             t.field "description", "String", name_in_index: "description_in_index"
-            t.index "widgets"
+            t.index "widgets" do |i|
+              i.has_had_multiple_sources!
+            end
           end
 
           s.object_type "WidgetOptions" do |t|

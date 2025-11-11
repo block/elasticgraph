@@ -462,7 +462,7 @@ module ElasticGraph
                   f.sourced_from "related_thing", "strings"
                 end
               end
-            end)
+            end) { |i| i.has_had_multiple_sources! }
 
             expect(index.list_counts_field_paths_for_source(SELF_RELATIONSHIP_NAME)).to eq [
               "#{LIST_COUNTS_FIELD}.ints"
@@ -530,7 +530,7 @@ module ElasticGraph
                   f.sourced_from "related_thing", "strings"
                 end
               end
-            end)
+            end) { |i| i.has_had_multiple_sources! }
 
             expect(index.list_counts_field_paths_for_source(SELF_RELATIONSHIP_NAME)).to be(
               index.list_counts_field_paths_for_source(SELF_RELATIONSHIP_NAME)

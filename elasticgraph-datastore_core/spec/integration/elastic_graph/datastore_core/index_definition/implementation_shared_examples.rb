@@ -17,59 +17,46 @@ module ElasticGraph
           it "returns `false` on an index that has no `sourced_from` fields" do
             index = define_index
 
-            expect {
-              expect(index.searches_could_hit_incomplete_docs?).to be false
-            }.to change { datastore_requests("main").count }.by(1)
-
-            # Demonstrate that we cache the value by showing the datastore request count doesn't change
-            # when we call `searches_could_hit_incomplete_docs?` with the same client again.
-            expect {
-              expect(index.searches_could_hit_incomplete_docs?).to be false
-            }.not_to change { datastore_requests("main").count }
+            expect(index.searches_could_hit_incomplete_docs?).to be false
           end
 
-          it "returns `true` on an index that has `sourced_from` fields, without hitting the datastore (since it is not needed!)" do
-            index = define_index do |t|
+          it "returns `true` on an index that has `sourced_from` fields" do
+            index = define_index(has_sourced_from: true) do |t|
               t.field "owner_name", "String" do |f|
                 f.sourced_from "owner", "name"
               end
             end
-
-            expect {
-              expect(index.searches_could_hit_incomplete_docs?).to be true
-            }.not_to change { datastore_requests("main").count }
-
-            # Demonstrate that we cache the value by showing the datastore request count doesn't change
-            # when we call `searches_could_hit_incomplete_docs?` with the same client again.
-            expect {
-              expect(index.searches_could_hit_incomplete_docs?).to be true
-            }.not_to change { datastore_requests("main").count }
-          end
-
-          it "returns `true` on an index that no longer has `sourced_from` fields but used to" do
-            define_index do |t|
-              t.field "owner_name", "String" do |f|
-                f.sourced_from "owner", "name"
-              end
-            end
-
-            index = define_index
 
             expect(index.searches_could_hit_incomplete_docs?).to be true
           end
 
-          context "when there are no sources recorded in `_meta` on the index" do
-            it "uses the `current_sources` to determine the value" do
-              index = define_index(skip_configure_datastore: true)
-              expect(index.searches_could_hit_incomplete_docs?).to be false
-
-              index = define_index(skip_configure_datastore: true) do |t|
-                t.field "owner_name", "String" do |f|
-                  f.sourced_from "owner", "name"
-                end
+          it "returns `true` on an index that no longer has `sourced_from` fields but the `has_had_multiple_sources!` flag remains set" do
+            # First, configure the index with sourced_from fields
+            define_index(has_sourced_from: true) do |t|
+              t.field "owner_name", "String" do |f|
+                f.sourced_from "owner", "name"
               end
-              expect(index.searches_could_hit_incomplete_docs?).to be true
             end
+
+            # Now test with the flag still set, but without sourced_from fields in the schema.
+            # The flag persists to remember that this index historically had multiple sources.
+            index = define_index(has_sourced_from: true)
+
+            expect(index.searches_could_hit_incomplete_docs?).to be true
+          end
+
+          it "uses the `has_had_multiple_sources` flag from runtime metadata" do
+            index_without_flag = define_index(skip_configure_datastore: true)
+
+            expect(index_without_flag.searches_could_hit_incomplete_docs?).to be false
+
+            index_with_flag = define_index(skip_configure_datastore: true, has_sourced_from: true) do |t|
+              t.field "owner_name", "String" do |f|
+                f.sourced_from "owner", "name"
+              end
+            end
+
+            expect(index_with_flag.searches_could_hit_incomplete_docs?).to be true
           end
 
           describe "#mappings_in_datastore" do
@@ -84,7 +71,7 @@ module ElasticGraph
             end
           end
 
-          def define_index(skip_configure_datastore: false, &schema_definition)
+          def define_index(skip_configure_datastore: false, has_sourced_from: false, &schema_definition)
             datastore_core = build_datastore_core(schema_definition: lambda do |schema|
               schema.object_type "MyType" do |t|
                 t.field "id", "ID!"
@@ -94,6 +81,7 @@ module ElasticGraph
                 end
                 schema_definition&.call(t)
                 t.index unique_index_name do |i|
+                  i.has_had_multiple_sources! if has_sourced_from
                   configure_index(i)
                 end
               end

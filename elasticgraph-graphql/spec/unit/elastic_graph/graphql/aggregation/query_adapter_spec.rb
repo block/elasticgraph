@@ -1978,7 +1978,9 @@ module ElasticGraph
             t.field "id", "ID!"
             t.field "name", "String!"
             t.relates_to_many "widgets", "Widget", via: "component_ids", dir: :in, singular: "widget"
-            t.index "components"
+            t.index "components" do |i|
+              i.has_had_multiple_sources!
+            end
           end
         end
 

@@ -32,7 +32,9 @@ module ElasticGraph
               t.field "the_options", "WidgetOptions"
               t.field "cost", "Int"
 
-              t.index "widgets"
+              t.index "widgets" do |i|
+                i.has_had_multiple_sources!
+              end
             end
           end
 
@@ -212,7 +214,9 @@ module ElasticGraph
               t.field "id", "ID!"
               t.field "nullable_options", "WidgetOptions"
               t.field "non_nullable_options", "WidgetOptions!"
-              t.index "widgets"
+              t.index "widgets" do |i|
+                i.has_had_multiple_sources!
+              end
             end
           end
 
@@ -246,7 +250,9 @@ module ElasticGraph
               t.field "non_null_point_with_custom_mapping", "PointWithCustomMapping!"
               t.field "nullable_point", "Point"
               t.field "non_null_point", "Point!"
-              t.index "widgets"
+              t.index "widgets" do |i|
+                i.has_had_multiple_sources!
+              end
             end
           end
 
@@ -280,7 +286,9 @@ module ElasticGraph
               t.field "id", "ID!"
               t.field "nullable_point", "Point"
               t.field "non_null_point", "Point!"
-              t.index "widgets"
+              t.index "widgets" do |i|
+                i.has_had_multiple_sources!
+              end
             end
           end
 
@@ -311,7 +319,9 @@ module ElasticGraph
               t.field "id", "ID!"
               t.field "nullable_point", "Point"
               t.field "non_null_point", "Point!"
-              t.index "widgets"
+              t.index "widgets" do |i|
+                i.has_had_multiple_sources!
+              end
             end
           end
 
@@ -335,13 +345,17 @@ module ElasticGraph
             api.object_type "Component" do |t|
               t.field "id", "ID"
               t.relates_to_one "widget", "Widget", via: "widget_id", dir: :out
-              t.index "components"
+              t.index "components" do |i|
+                i.has_had_multiple_sources!
+              end
             end
 
             api.object_type "Widget" do |t|
               t.field "id", "ID!"
               t.relates_to_many "components", "Component", via: "widget_id", dir: :in, singular: "component"
-              t.index "widgets"
+              t.index "widgets" do |i|
+                i.has_had_multiple_sources!
+              end
             end
           end
 
@@ -360,7 +374,9 @@ module ElasticGraph
             api.object_type "Widget" do |t|
               t.field "id", "ID", filterable: false
               t.relates_to_one "parent_widget", "Widget", via: "parent_widget_id", dir: :in
-              t.index "widgets"
+              t.index "widgets" do |i|
+                i.has_had_multiple_sources!
+              end
             end
           end
 
@@ -546,7 +562,9 @@ module ElasticGraph
               t.field "id", "ID!"
               t.field "cost", "Int"
               t.relates_to_one "inventor", "Person", via: "inventor_id", dir: :out
-              t.index "widgets"
+              t.index "widgets" do |i|
+                i.has_had_multiple_sources!
+              end
             end
 
             api.object_type "Person" do |t|
@@ -589,7 +607,9 @@ module ElasticGraph
             api.object_type "Widget" do |t|
               t.field "id", "ID!"
               t.field "location", "GeoLocation"
-              t.index "widgets"
+              t.index "widgets" do |i|
+                i.has_had_multiple_sources!
+              end
             end
           end
 
@@ -632,7 +652,9 @@ module ElasticGraph
           result = define_schema do |api|
             api.object_type "Widget" do |t|
               t.field "id", "ID!", filterable: false
-              t.index "widgets"
+              t.index "widgets" do |i|
+                i.has_had_multiple_sources!
+              end
             end
           end
 
@@ -1120,7 +1142,9 @@ module ElasticGraph
               api.object_type "Widget" do |t|
                 t.field "id", "ID!"
                 t.field "options", "[WidgetOptions]"
-                t.index "widgets"
+                t.index "widgets" do |i|
+                  i.has_had_multiple_sources!
+                end
               end
             end
           }.to raise_error Errors::SchemaError, a_string_including(

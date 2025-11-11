@@ -75,7 +75,9 @@ module ElasticGraph
                 f.sourced_from "widget", "nested_options"
               end
 
-              t.index "components"
+              t.index "components" do |i|
+                i.has_had_multiple_sources!
+              end
             end
 
             schema.union_type "WidgetOrComponent" do |t|
