@@ -98,7 +98,9 @@ module ElasticGraph
               t.relates_to_many "parts", "Part", via: "part_ids", dir: :out, singular: "part"
               t.field "owner_id", "ID", indexing_only: true
               t.field "owner", "ComponentOwner", name_in_index: "owner_id", graphql_only: true
-              t.index "components"
+              t.index "components" do |i|
+                i.has_had_multiple_sources!
+              end
             end
 
             schema.object_type "ComponentOwner" do |t|

@@ -112,8 +112,9 @@ module ElasticGraph
         #         f.sourced_from "launchPlan", "launchDate"
         #       end
         #
-        #       t.index "campaigns"do |i|
+        #       t.index "campaigns" do |i|
         #         i.rollover :yearly, "createdAt"
+        #         i.has_had_multiple_sources!
         #       end
         #     end
         #

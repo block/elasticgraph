@@ -657,7 +657,9 @@ module ElasticGraph
           schema.object_type "Component" do |t|
             t.field "id", "ID!"
             t.field "some_field", "String!"
-            t.index "components"
+            t.index "components" do |i|
+              i.has_had_multiple_sources!
+            end
           end
 
           schema.object_type "Widget" do |t|
