@@ -39,15 +39,35 @@ module ElasticGraph
       # a value > 10 and a value < 100 (even though no single value satisfies both parts!). When we combine
       # the clauses into a single `range` query then the filtering works like we expect.
       class RangeQuery < ::Data.define(:field_name, :operator, :value)
+        UPPER_BOUND_OPERATORS = [:lt, :lte].freeze
+        LOWER_BOUND_OPERATORS = [:gt, :gte].freeze
+
         def merge_into(bool_node)
           existing_range_index = bool_node[:filter].find_index { |clause| clause.dig(:range, field_name) }
           new_range_clause = {range: {field_name => {operator => value}}}
 
           if existing_range_index
             existing_range_clause = bool_node[:filter][existing_range_index]
-            bool_node[:filter][existing_range_index] = Support::HashUtil.deep_merge(existing_range_clause, new_range_clause)
+            existing_operators = existing_range_clause.dig(:range, field_name).keys
+
+            # If the new operator conflicts with any existing operator (both are upper bounds or lower bounds),
+            # add it as a separate filter so they are ANDed together.
+            if has_conflicting_operator?(existing_operators)
+              bool_node[:filter] << new_range_clause
+            else
+              bool_node[:filter][existing_range_index] = Support::HashUtil.deep_merge(existing_range_clause, new_range_clause)
+            end
           else
             bool_node[:filter] << new_range_clause
+          end
+        end
+
+        private
+
+        def has_conflicting_operator?(existing_operators)
+          existing_operators.any? do |existing_op|
+            (UPPER_BOUND_OPERATORS.include?(operator) && UPPER_BOUND_OPERATORS.include?(existing_op)) ||
+              (LOWER_BOUND_OPERATORS.include?(operator) && LOWER_BOUND_OPERATORS.include?(existing_op))
           end
         end
       end
