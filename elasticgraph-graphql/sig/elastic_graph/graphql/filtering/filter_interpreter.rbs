@@ -23,7 +23,7 @@ module ElasticGraph
         ) -> void
 
         def build_query: (
-          ::Enumerable[stringHash],
+          ::Array[stringHash],
           ?from_field_path: FieldPath
         ) -> stringOrSymbolHash?
 

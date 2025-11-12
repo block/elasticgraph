@@ -16,7 +16,14 @@ module ElasticGraph
       end
 
       class RangeQuery < RangeQuerySupertype
+        UPPER_BOUND_OPERATORS: ::Array[::Symbol]
+        LOWER_BOUND_OPERATORS: ::Array[::Symbol]
+
         def merge_into: (stringOrSymbolHash) -> void
+
+        private
+
+        def has_conflicting_operator?: (::Array[::Symbol] existing_operators) -> bool
       end
     end
   end
