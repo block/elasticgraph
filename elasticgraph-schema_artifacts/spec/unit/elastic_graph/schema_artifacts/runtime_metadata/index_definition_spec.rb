@@ -23,20 +23,32 @@ module ElasticGraph
             rollover: nil,
             default_sort_fields: [],
             current_sources: Set.new,
-            fields_by_path: {}
+            fields_by_path: {},
+            has_had_multiple_sources: false
           )
         end
 
         it "includes fields that only have default values when serializing, even though other default runtime metadata elements get dropped, so our GraphQL logic can easily see what all the valid field paths are" do
-          index_def = index_definition_with(fields_by_path: {
-            "foo.bar" => index_field_with(source: SELF_RELATIONSHIP_NAME),
-            "foo.bazz" => index_field_with(source: "other")
-          })
+          index_def = index_definition_with(
+            fields_by_path: {
+              "foo.bar" => index_field_with(source: SELF_RELATIONSHIP_NAME),
+              "foo.bazz" => index_field_with(source: "other")
+            },
+            has_had_multiple_sources: false
+          )
 
           expect(index_def.to_dumpable_hash["fields_by_path"]).to eq({
             "foo.bar" => index_field_with(source: SELF_RELATIONSHIP_NAME).to_dumpable_hash,
             "foo.bazz" => index_field_with(source: "other").to_dumpable_hash
           })
+        end
+
+        it "prunes `has_had_multiple_sources: false` from the dumped hash but includes `has_had_multiple_sources: true`" do
+          index_def_without_flag = index_definition_with(has_had_multiple_sources: false)
+          expect(index_def_without_flag.to_dumpable_hash["has_had_multiple_sources"]).to be_nil
+
+          index_def_with_flag = index_definition_with(has_had_multiple_sources: true)
+          expect(index_def_with_flag.to_dumpable_hash["has_had_multiple_sources"]).to eq true
         end
 
         describe IndexDefinition::Rollover do

@@ -30,9 +30,7 @@ module ElasticGraph
                 t.field "name", "String"
                 t.field "weight", "Int"
                 link_subtype_to_supertype(t, "Thing")
-                t.index "components" do |i|
-                  i.has_had_multiple_sources!
-                end
+                t.index "components"
               end
 
               s.public_send type_def_method, "Thing" do |t|

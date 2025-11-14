@@ -24,7 +24,7 @@ module ElasticGraph
         FIELDS_BY_PATH = "fields_by_path"
         HAS_HAD_MULTIPLE_SOURCES = "has_had_multiple_sources"
 
-        def initialize(route_with:, rollover:, default_sort_fields:, current_sources:, fields_by_path:, has_had_multiple_sources: false)
+        def initialize(route_with:, rollover:, default_sort_fields:, current_sources:, fields_by_path:, has_had_multiple_sources:)
           super(
             route_with: route_with,
             rollover: rollover,
@@ -52,7 +52,7 @@ module ElasticGraph
             CURRENT_SOURCES => current_sources.sort,
             DEFAULT_SORT_FIELDS => default_sort_fields.map(&:to_dumpable_hash),
             FIELDS_BY_PATH => HashDumper.dump_hash(fields_by_path, &:to_dumpable_hash),
-            HAS_HAD_MULTIPLE_SOURCES => has_had_multiple_sources,
+            HAS_HAD_MULTIPLE_SOURCES => (true if has_had_multiple_sources),
             ROLLOVER => rollover&.to_dumpable_hash,
             ROUTE_WITH => route_with
           }

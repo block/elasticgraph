@@ -30,21 +30,6 @@ module ElasticGraph
             expect(index.searches_could_hit_incomplete_docs?).to be true
           end
 
-          it "returns `true` on an index that no longer has `sourced_from` fields but the `has_had_multiple_sources!` flag remains set" do
-            # First, configure the index with sourced_from fields
-            define_index(has_sourced_from: true) do |t|
-              t.field "owner_name", "String" do |f|
-                f.sourced_from "owner", "name"
-              end
-            end
-
-            # Now test with the flag still set, but without sourced_from fields in the schema.
-            # The flag persists to remember that this index historically had multiple sources.
-            index = define_index(has_sourced_from: true)
-
-            expect(index.searches_could_hit_incomplete_docs?).to be true
-          end
-
           it "uses the `has_had_multiple_sources` flag from runtime metadata" do
             index_without_flag = define_index(skip_configure_datastore: true)
 

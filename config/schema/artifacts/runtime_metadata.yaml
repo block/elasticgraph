@@ -1461,7 +1461,6 @@ index_definitions_by_name:
         source: __self
       timestamps.created_at:
         source: __self
-    has_had_multiple_sources: false
     route_with: id
   components:
     current_sources:
@@ -1528,7 +1527,6 @@ index_definitions_by_name:
         source: __self
       voltage:
         source: __self
-    has_had_multiple_sources: false
     route_with: id
   manufacturers:
     current_sources:
@@ -1543,7 +1541,6 @@ index_definitions_by_name:
         source: __self
       name:
         source: __self
-    has_had_multiple_sources: false
     route_with: id
   mechanical_parts:
     current_sources:
@@ -1562,7 +1559,6 @@ index_definitions_by_name:
         source: __self
       name:
         source: __self
-    has_had_multiple_sources: false
     route_with: id
   sponsors:
     current_sources:
@@ -1572,7 +1568,6 @@ index_definitions_by_name:
         source: __self
       name:
         source: __self
-    has_had_multiple_sources: false
     route_with: id
   teams:
     current_sources:
@@ -2452,7 +2447,6 @@ index_definitions_by_name:
         source: __self
       won_championships_at:
         source: __self
-    has_had_multiple_sources: false
     rollover:
       frequency: yearly
       timestamp_field_path: formed_on
@@ -2499,7 +2493,6 @@ index_definitions_by_name:
         source: __self
       widget_tags:
         source: __self
-    has_had_multiple_sources: false
     rollover:
       frequency: yearly
       timestamp_field_path: introduced_on
@@ -2516,7 +2509,6 @@ index_definitions_by_name:
         source: __self
       widget.id:
         source: __self
-    has_had_multiple_sources: false
     route_with: id
   widgets:
     current_sources:

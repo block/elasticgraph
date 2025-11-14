@@ -112,9 +112,7 @@ module ElasticGraph
               t.field "id", "ID!"
               t.field "name", "String!"
               t.field "position", "Position!"
-              t.index "components" do |i|
-                i.has_had_multiple_sources!
-              end
+              t.index "components"
             end
           end
 
@@ -168,9 +166,7 @@ module ElasticGraph
               t.field "id", "ID!"
               t.field "name", "String!"
               t.field "position", "Position!"
-              t.index "components" do |i|
-                i.has_had_multiple_sources!
-              end
+              t.index "components"
             end
           end
 

@@ -53,17 +53,15 @@ module ElasticGraph
         end
 
         # Indicates if a search on this index definition may hit incomplete documents. An incomplete document
-        # can occur when multiple event types flow into the same index. An index that has only one source type
-        # can never have incomplete documents, but an index that has 2 or more sources can have incomplete
+        # can occur when multiple event types flow into the same index. An index that has had only one source type
+        # can never have incomplete documents, but an index that has had 2 or more sources can have incomplete
         # documents when the "primary" event type hasn't yet been received for a document.
         #
         # This case is notable because we need to apply automatic filtering in order to hide documents that are
         # not yet complete.
+        #
+        # This flag should be set via `has_had_multiple_sources!` in the schema definition when `sourced_from` is used.
         def searches_could_hit_incomplete_docs?
-          return true if current_sources.size > 1
-
-          # Check if this index has ever had multiple sources in its history.
-          # This flag should be set via `has_had_multiple_sources!` in the schema definition when `sourced_from` is used.
           has_had_multiple_sources
         end
 
