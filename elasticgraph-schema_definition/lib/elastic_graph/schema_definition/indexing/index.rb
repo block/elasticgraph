@@ -36,7 +36,9 @@ module ElasticGraph
       #   @return [Array<String>] path to the field used for shard routing
       # @!attribute [r] rollover_config
       #   @return [RolloverConfig, nil] rollover configuration for the index
-      class Index < Struct.new(:name, :default_sort_pairs, :settings, :schema_def_state, :indexed_type, :routing_field_path, :rollover_config)
+      # @!attribute [r] has_had_multiple_sources_flag
+      #   @return [Boolean] whether this index has ever had multiple sources
+      class Index < Struct.new(:name, :default_sort_pairs, :settings, :schema_def_state, :indexed_type, :routing_field_path, :rollover_config, :has_had_multiple_sources_flag)
         include Mixins::HasReadableToSAndInspect.new { |i| i.name }
 
         # @param name [String] name of the index
@@ -53,7 +55,7 @@ module ElasticGraph
 
           settings = DEFAULT_SETTINGS.merge(Support::HashUtil.flatten_and_stringify_keys(settings, prefix: "index"))
 
-          super(name, [], settings, schema_def_state, indexed_type, nil, nil)
+          super(name, [], settings, schema_def_state, indexed_type, nil, nil, false)
 
           schema_def_state.after_user_definition_complete do
             # `id` is the field Elasticsearch/OpenSearch use for routing by default:
@@ -188,6 +190,38 @@ module ElasticGraph
           end
         end
 
+        # Declares that this index has had (or currently has) multiple sources. This should be called when using
+        # `sourced_from` fields on an indexed type, as it indicates that the index may contain incomplete documents.
+        # Once set, this flag should remain set even if all `sourced_from` fields are later removed, because the index
+        # may still contain historical incomplete documents.
+        #
+        # @return [void]
+        #
+        # @example Declare that the index has had multiple sources
+        #   ElasticGraph.define_schema do |schema|
+        #     schema.object_type "Widget" do |t|
+        #       t.field "id", "ID!"
+        #       t.relates_to_one "owner", "Owner", via: "widget_ids", dir: :in
+        #       t.field "owner_name", "String" do |f|
+        #         f.sourced_from "owner", "name"
+        #       end
+        #
+        #       t.index "widgets" do |i|
+        #         i.has_had_multiple_sources!
+        #       end
+        #     end
+        #
+        #     schema.object_type "Owner" do |t|
+        #       t.field "id", "ID!"
+        #       t.field "name", "String"
+        #       t.field "widget_ids", "[ID!]!"
+        #       t.index "owners"
+        #     end
+        #   end
+        def has_had_multiple_sources!
+          self.has_had_multiple_sources_flag = true
+        end
+
         # @see #route_with
         # @return [Boolean] whether or not this index uses custom shard routing
         def uses_custom_routing?
@@ -227,7 +261,8 @@ module ElasticGraph
                 field_path: public_field_path(graphql_field_path_name, explanation: "it is referenced as an index `default_sort` field").path_in_index,
                 direction: direction
               )
-            end
+            end,
+            has_had_multiple_sources: has_had_multiple_sources_flag
           )
         end
 

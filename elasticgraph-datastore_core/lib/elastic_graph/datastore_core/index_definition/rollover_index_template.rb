@@ -23,11 +23,11 @@ module ElasticGraph
       class RolloverIndexTemplate < Support::MemoizableData.define(
         :name, :route_with, :default_sort_clauses, :current_sources, :fields_by_path, :env_index_config,
         :index_args, :defined_clusters, :datastore_clients_by_name, :timestamp_field_path, :frequency,
-        :env_agnostic_settings
+        :env_agnostic_settings, :has_had_multiple_sources
       )
         # `Data.define` provides all these methods:
         # @dynamic name, route_with, default_sort_clauses, current_sources, fields_by_path, env_index_config, env_agnostic_settings
-        # @dynamic index_args, defined_clusters, datastore_clients_by_name, timestamp_field_path, frequency, initialize
+        # @dynamic index_args, defined_clusters, datastore_clients_by_name, timestamp_field_path, frequency, initialize, has_had_multiple_sources
 
         # `include IndexDefinition::Base` provides all these methods. Steep should be able to detect it
         # but can't for some reason so we have to declare them with `@dynamic`.

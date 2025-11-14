@@ -25,6 +25,7 @@ module ElasticGraph
       def default_sort_clauses: () -> ::Array[::Hash[::String, ::String]]
       def current_sources: () -> ::Set[::String]
       def fields_by_path: () -> ::Hash[::String, SchemaArtifacts::RuntimeMetadata::IndexField]
+      def has_had_multiple_sources: () -> bool
       def env_index_config: () -> Configuration::IndexDefinition
       def env_agnostic_settings: () -> ::Hash[::String, untyped]
       def defined_clusters: () -> ::Set[::String]

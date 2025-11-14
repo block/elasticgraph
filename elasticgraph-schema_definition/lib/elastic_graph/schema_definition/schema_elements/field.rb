@@ -515,7 +515,9 @@ module ElasticGraph
         #         f.sourced_from "capitalOf", "currency"
         #       end
         #
-        #       t.index "cities"
+        #       t.index "cities" do |i|
+        #         i.has_had_multiple_sources!
+        #       end
         #     end
         #   end
         def sourced_from(relationship, field_path)

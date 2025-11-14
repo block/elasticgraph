@@ -287,6 +287,15 @@ module ElasticGraph
               update_target, errors = update_target_resolver.resolve
               accum[resolved_relationship.related_type.name] << update_target if update_target
               sourced_field_errors.concat(errors)
+
+              # Validate that has_had_multiple_sources! has been called when sourced_from is used
+              if (index_def = object_type.index_def) && !index_def.has_had_multiple_sources_flag
+                sourced_field_errors << "Type `#{object_type.name}` uses `sourced_from` fields but its index `#{index_def.name}` " \
+                  "has not been configured with `has_had_multiple_sources!`. To resolve this, add `i.has_had_multiple_sources!` within the " \
+                  "`t.index \"#{index_def.name}\"` block. This flag is required because indices with multiple sources can contain " \
+                  "incomplete documents, and ElasticGraph needs to know this to apply proper filtering. Once set, this flag should remain even " \
+                  "if you later remove all `sourced_from` fields, as the index may still contain historical incomplete documents."
+              end
             end
           end
         end.tap do

@@ -121,21 +121,24 @@ module ElasticGraph
                 current_sources: [SELF_RELATIONSHIP_NAME],
                 fields_by_path: {
                   "foo.bar" => IndexField.new(source: "other")
-                }
+                },
+                has_had_multiple_sources: false
               ),
               "addresses" => IndexDefinition.new(
                 route_with: nil,
                 rollover: IndexDefinition::Rollover.new(:yearly, nil),
                 default_sort_fields: [],
                 current_sources: [SELF_RELATIONSHIP_NAME],
-                fields_by_path: {}
+                fields_by_path: {},
+                has_had_multiple_sources: false
               ),
               "components" => IndexDefinition.new(
                 route_with: "group_id",
                 rollover: nil,
                 default_sort_fields: [],
                 current_sources: [SELF_RELATIONSHIP_NAME],
-                fields_by_path: {}
+                fields_by_path: {},
+                has_had_multiple_sources: true
               )
             },
             schema_element_names: SchemaElementNames.new(
@@ -266,7 +269,8 @@ module ElasticGraph
               },
               "components" => {
                 "route_with" => "group_id",
-                "current_sources" => [SELF_RELATIONSHIP_NAME]
+                "current_sources" => [SELF_RELATIONSHIP_NAME],
+                "has_had_multiple_sources" => true
               }
             },
             "schema_element_names" => {
