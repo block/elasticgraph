@@ -243,7 +243,6 @@ module ElasticGraph
       def identify_extra_update_targets_by_object_type_name
         sourced_field_errors = [] # : ::Array[::String]
         relationship_errors = [] # : ::Array[::String]
-        has_had_multiple_sources_errors = [] # : ::Array[::String]
 
         state.object_types_by_name.except("Query").values.each_with_object(
           ::Hash.new { |h, k| h[k] = [] } # : ::Hash[untyped, ::Array[SchemaArtifacts::RuntimeMetadata::UpdateTarget]]
@@ -291,7 +290,7 @@ module ElasticGraph
 
               # Validate that has_had_multiple_sources! has been called when sourced_from is used
               if (index_def = object_type.index_def) && !index_def.has_had_multiple_sources_flag
-                has_had_multiple_sources_errors << "Type `#{object_type.name}` uses `sourced_from` fields but its index `#{index_def.name}` " \
+                sourced_field_errors << "Type `#{object_type.name}` uses `sourced_from` fields but its index `#{index_def.name}` " \
                   "has not been configured with `has_had_multiple_sources!`. To resolve this, add `i.has_had_multiple_sources!` within the " \
                   "`t.index \"#{index_def.name}\"` block. This flag is required because indices with multiple sources can contain " \
                   "incomplete documents, and ElasticGraph needs to know this to apply proper filtering. Once set, this flag should remain even " \
@@ -308,10 +307,6 @@ module ElasticGraph
 
           if relationship_errors.any?
             full_errors << "Schema had #{relationship_errors.size} error(s) related to relationship fields:\n\n#{relationship_errors.map.with_index(1) { |e, i| "#{i}. #{e}" }.join("\n\n")}"
-          end
-
-          if has_had_multiple_sources_errors.any?
-            full_errors << "Schema had #{has_had_multiple_sources_errors.size} error(s) related to `has_had_multiple_sources!`:\n\n#{has_had_multiple_sources_errors.map.with_index(1) { |e, i| "#{i}. #{e}" }.join("\n\n")}"
           end
 
           unless full_errors.empty?

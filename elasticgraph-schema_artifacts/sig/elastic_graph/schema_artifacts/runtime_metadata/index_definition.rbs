@@ -42,7 +42,7 @@ module ElasticGraph
           default_sort_fields: ::Array[SortField],
           current_sources: ::Enumerable[::String],
           fields_by_path: ::Hash[::String, IndexField],
-          ?has_had_multiple_sources: bool
+          has_had_multiple_sources: bool
         ) -> void
 
         def self.from_hash: (::Hash[::String, untyped]) -> IndexDefinition

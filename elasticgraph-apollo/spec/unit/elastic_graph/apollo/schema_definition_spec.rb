@@ -445,17 +445,13 @@ module ElasticGraph
             schema.object_type "Component" do |t|
               t.field "id", "ID"
               t.field "number", "String"
-              t.index "components" do |i|
-                i.has_had_multiple_sources!
-              end
+              t.index "components"
             end
 
             schema.object_type "Widget" do |t|
               t.field "id", "ID"
               t.field "number", "Int"
-              t.index "widgets" do |i|
-                i.has_had_multiple_sources!
-              end
+              t.index "widgets"
             end
 
             if define_manual_union_type
@@ -520,9 +516,7 @@ module ElasticGraph
             schema.object_type "NotABuiltInType" do |t|
               t.field "id", "ID!"
               t.field "name", "String"
-              t.index "widgets" do |i|
-                i.has_had_multiple_sources!
-              end
+              t.index "widgets"
             end
 
             schema.tag_built_in_types_with("tag1")
@@ -627,9 +621,7 @@ module ElasticGraph
                   f.documentation "A component entity reference."
                 end
 
-                t.index "widgets" do |i|
-                  i.has_had_multiple_sources!
-                end
+                t.index "widgets"
               end
             end
 
@@ -720,9 +712,7 @@ module ElasticGraph
                   f.documentation "Component entity references."
                 end
 
-                t.index "widgets" do |i|
-                  i.has_had_multiple_sources!
-                end
+                t.index "widgets"
               end
             end
 
@@ -811,9 +801,7 @@ module ElasticGraph
                   f.directive "deprecated"
                 end
 
-                t.index "widgets" do |i|
-                  i.has_had_multiple_sources!
-                end
+                t.index "widgets"
               end
             end
 
@@ -907,9 +895,7 @@ module ElasticGraph
                   f.directive "deprecated"
                 end
 
-                t.index "widgets" do |i|
-                  i.has_had_multiple_sources!
-                end
+                t.index "widgets"
               end
             end
 
@@ -999,9 +985,7 @@ module ElasticGraph
                   t.field "id", "ID"
                   t.field "component_id", "ID"
                   t.apollo_entity_ref_field "component", "String", id_field_name_in_index: "component_id"
-                  t.index "widgets" do |i|
-                    i.has_had_multiple_sources!
-                  end
+                  t.index "widgets"
                 end
               end
             }.to raise_error Errors::SchemaError, a_string_including(
@@ -1017,9 +1001,7 @@ module ElasticGraph
                   t.field "id", "ID"
                   t.field "component_id", "ID"
                   t.apollo_entity_ref_field "component", "Component", id_field_name_in_index: "component_id"
-                  t.index "widgets" do |i|
-                    i.has_had_multiple_sources!
-                  end
+                  t.index "widgets"
                 end
 
                 schema.object_type "Component" do |t|
@@ -1040,9 +1022,7 @@ module ElasticGraph
                   t.field "id", "ID"
                   t.field "component_id", "ID"
                   t.apollo_entity_ref_field "component", "Component", id_field_name_in_index: "component_id"
-                  t.index "widgets" do |i|
-                    i.has_had_multiple_sources!
-                  end
+                  t.index "widgets"
                 end
 
                 schema.object_type "Component" do |t|
@@ -1081,9 +1061,7 @@ module ElasticGraph
                   t.field "id", "ID"
                   t.field "component_id", "ID"
                   t.apollo_entity_ref_field "component", "Component", id_field_name_in_index: "component_id2"
-                  t.index "widgets" do |i|
-                    i.has_had_multiple_sources!
-                  end
+                  t.index "widgets"
                 end
 
                 schema.object_type "Component" do |t|
@@ -1102,9 +1080,7 @@ module ElasticGraph
                   t.field "id", "ID"
                   t.field "component_id", "String"
                   t.apollo_entity_ref_field "component", "Component", id_field_name_in_index: "component_id"
-                  t.index "widgets" do |i|
-                    i.has_had_multiple_sources!
-                  end
+                  t.index "widgets"
                 end
 
                 schema.object_type "Component" do |t|
@@ -1123,9 +1099,7 @@ module ElasticGraph
                   t.field "id", "ID"
                   t.field "component_id", "ID"
                   t.apollo_entity_ref_paginated_collection_field "component", "Component", id_field_name_in_index: "component_id"
-                  t.index "widgets" do |i|
-                    i.has_had_multiple_sources!
-                  end
+                  t.index "widgets"
                 end
 
                 schema.object_type "Component" do |t|
@@ -1183,9 +1157,7 @@ module ElasticGraph
                 f.tag_with "public"
               end
 
-              t.index "widgets" do |i|
-                i.has_had_multiple_sources!
-              end
+              t.index "widgets"
             end
           end
 

@@ -37,9 +37,7 @@ module ElasticGraph
             api.object_type "Widget" do |t|
               t.field "id", "ID!"
               t.paginated_collection_field "names", "String"
-              t.index "widgets" do |i|
-                i.has_had_multiple_sources!
-              end
+              t.index "widgets"
             end
           end
 
@@ -79,9 +77,7 @@ module ElasticGraph
               t.paginated_collection_field "optionses", "WidgetOptions" do |f|
                 f.mapping type: "object"
               end
-              t.index "widgets" do |i|
-                i.has_had_multiple_sources!
-              end
+              t.index "widgets"
             end
           end
 
@@ -178,9 +174,7 @@ module ElasticGraph
             api.object_type "Widget" do |t|
               t.field "id", "ID!"
               t.paginated_collection_field "names", "String"
-              t.index "widgets" do |i|
-                i.has_had_multiple_sources!
-              end
+              t.index "widgets"
             end
           end
 
@@ -262,9 +256,7 @@ module ElasticGraph
                 aggregatable: false,
                 highlightable: false
 
-              t.index "widgets" do |i|
-                i.has_had_multiple_sources!
-              end
+              t.index "widgets"
             end
           end
 

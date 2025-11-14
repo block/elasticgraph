@@ -138,7 +138,7 @@ module ElasticGraph
                 default_sort_fields: [],
                 current_sources: [SELF_RELATIONSHIP_NAME],
                 fields_by_path: {},
-                has_had_multiple_sources: false
+                has_had_multiple_sources: true
               )
             },
             schema_element_names: SchemaElementNames.new(
@@ -251,28 +251,26 @@ module ElasticGraph
             },
             "index_definitions_by_name" => {
               "widgets" => {
-                "current_sources" => [SELF_RELATIONSHIP_NAME],
+                "rollover" => {"frequency" => "monthly", "timestamp_field_path" => "created_at"},
                 "default_sort_fields" => [
                   {"field_path" => "path.to.field1", "direction" => "desc"},
                   {"field_path" => "path.to.field2", "direction" => "asc"}
                 ],
+                "current_sources" => [SELF_RELATIONSHIP_NAME],
                 "fields_by_path" => {
                   "foo.bar" => {
                     "source" => "other"
                   }
-                },
-                "has_had_multiple_sources" => false,
-                "rollover" => {"frequency" => "monthly", "timestamp_field_path" => "created_at"}
+                }
               },
               "addresses" => {
-                "current_sources" => [SELF_RELATIONSHIP_NAME],
-                "has_had_multiple_sources" => false,
-                "rollover" => {"frequency" => "yearly"}
+                "rollover" => {"frequency" => "yearly"},
+                "current_sources" => [SELF_RELATIONSHIP_NAME]
               },
               "components" => {
+                "route_with" => "group_id",
                 "current_sources" => [SELF_RELATIONSHIP_NAME],
-                "has_had_multiple_sources" => false,
-                "route_with" => "group_id"
+                "has_had_multiple_sources" => true
               }
             },
             "schema_element_names" => {
