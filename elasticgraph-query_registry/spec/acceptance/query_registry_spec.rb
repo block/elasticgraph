@@ -104,6 +104,100 @@ module ElasticGraph
       }.to log_warning a_string_including("is unregistered")
     end
 
+    it "logs query_registered=true when a query is registered for the client" do
+      register_query "client1", "WidgetName", widget_name_string
+
+      query_executor = build_query_executor_with_registry_options(
+        allow_unregistered_clients: false,
+        allow_any_query_for_clients: [],
+        path_to_registry: query_registry_dir
+      )
+
+      expect {
+        execute(query_executor, widget_name_string, on_behalf_of: "client1")
+      }.to log a_string_including('"query_registered": "true"')
+    end
+
+    it "logs query_registered=false when a query is not registered for the client" do
+      register_query "client1", "WidgetName", widget_name_string
+
+      query_executor = build_query_executor_with_registry_options(
+        allow_unregistered_clients: false,
+        allow_any_query_for_clients: [],
+        path_to_registry: query_registry_dir
+      )
+
+      expect {
+        execute(query_executor, part_name_string, on_behalf_of: "client1")
+      }.to log a_string_including('"query_registered": "false"')
+    end
+
+    it "logs query_registered=false for unregistered clients" do
+      register_query "client1", "WidgetName", widget_name_string
+
+      query_executor = build_query_executor_with_registry_options(
+        allow_unregistered_clients: true,
+        allow_any_query_for_clients: [],
+        path_to_registry: query_registry_dir
+      )
+
+      expect {
+        execute(query_executor, widget_name_string, on_behalf_of: "unregistered_client")
+      }.to log a_string_including('"query_registered": "false"')
+    end
+
+    it "logs query_registered=true when a client in allow_any_query_for_clients uses a registered query" do
+      register_query "adhoc_client", "WidgetName", widget_name_string
+
+      query_executor = build_query_executor_with_registry_options(
+        allow_unregistered_clients: false,
+        allow_any_query_for_clients: ["adhoc_client"],
+        path_to_registry: query_registry_dir
+      )
+
+      expect {
+        execute(query_executor, widget_name_string, on_behalf_of: "adhoc_client")
+      }.to log a_string_including('"query_registered": "true"')
+    end
+
+    it "logs query_registered=false when a client in allow_any_query_for_clients uses an unregistered query" do
+      register_query "adhoc_client", "WidgetName", widget_name_string
+
+      query_executor = build_query_executor_with_registry_options(
+        allow_unregistered_clients: false,
+        allow_any_query_for_clients: ["adhoc_client"],
+        path_to_registry: query_registry_dir
+      )
+
+      expect {
+        execute(query_executor, part_name_string, on_behalf_of: "adhoc_client")
+      }.to log a_string_including('"query_registered": "false"')
+    end
+
+    it "logs query_registered=true when a query differs only in whitespace or comments from a registered query" do
+      register_query "client1", "WidgetName", widget_name_string
+
+      query_executor = build_query_executor_with_registry_options(
+        allow_unregistered_clients: false,
+        allow_any_query_for_clients: [],
+        path_to_registry: query_registry_dir
+      )
+
+      # Add extra whitespace and a comment
+      modified_query = <<~EOS.strip
+        # This is a comment
+        query WidgetName {
+          __type(name:    "Widget") {
+            name
+          }
+        }
+      EOS
+
+      expect {
+        execute(query_executor, modified_query, on_behalf_of: "client1")
+      }.to log a_string_including('"query_registered": "true"')
+    end
+
     def build_query_executor_with_registry_options(**options)
       build_graphql_with_registry_options(**options).graphql_query_executor
     end
