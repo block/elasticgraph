@@ -264,9 +264,7 @@ module ElasticGraph
             s.object_type "Component" do |t|
               t.field "id", "ID!"
               t.field "widget_fields", "ComponentWidgetFields"
-              t.index "components" do |i|
-                i.has_had_multiple_sources!
-              end
+              t.index "components"
             end
 
             s.object_type "Widget" do |t|
@@ -406,9 +404,7 @@ module ElasticGraph
             s.object_type "Component" do |t|
               t.field "id", "ID!"
               t.field "widget_fields", "ComponentWidgetFields"
-              t.index "components" do |i|
-                i.has_had_multiple_sources!
-              end
+              t.index "components"
             end
 
             s.object_type "Widget" do |t|
@@ -462,9 +458,7 @@ module ElasticGraph
             s.object_type "Component" do |t|
               t.field "id", "ID!"
               t.field "widget_fields", "ComponentWidgetFields", name_in_index: "nested"
-              t.index "components" do |i|
-                i.has_had_multiple_sources!
-              end
+              t.index "components"
             end
 
             s.object_type "Widget" do |t|

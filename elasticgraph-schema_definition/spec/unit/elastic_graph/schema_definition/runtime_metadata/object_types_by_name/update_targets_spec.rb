@@ -477,6 +477,19 @@ module ElasticGraph
                 "Once set, this flag should remain even if you later remove all `sourced_from` fields"
               )
             end
+
+            it "allows `has_had_multiple_sources!` to be called on an index that has no current `sourced_from` fields" do
+              expect {
+                object_type_metadata_for "Widget" do |s|
+                  s.object_type "Widget" do |t|
+                    t.field "id", "ID!"
+                    t.index "widgets" do |i|
+                      i.has_had_multiple_sources!
+                    end
+                  end
+                end
+              }.not_to raise_error
+            end
           end
 
           context "on the relationship" do
@@ -1304,7 +1317,7 @@ module ElasticGraph
               define_relation_and_sourced_from_fields.call(t)
 
               t.index "widgets" do |index|
-                index.has_had_multiple_sources!
+                index.has_had_multiple_sources! if t.fields_with_sources.any?
                 on_widgets_index&.call(index)
               end
             end
