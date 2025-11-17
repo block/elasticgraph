@@ -42,7 +42,7 @@ end
 # Documentation/website gems
 group :site do
   gem "filewatcher", "~> 2.1"
-  gem "html-proofer", "~> 5.1"
+  gem "html-proofer", "~> 5.1", ">= 5.1.1"
   gem "jekyll", "~> 4.4", ">= 4.4.1"
   gem "nokogiri", "~> 1.18", ">= 1.18.10"
   gem "redcarpet", "~> 3.6", ">= 3.6.1"
