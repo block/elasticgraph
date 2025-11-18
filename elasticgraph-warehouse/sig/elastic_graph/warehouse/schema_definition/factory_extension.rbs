@@ -17,6 +17,10 @@ module ElasticGraph
         def new_scalar_type: (::String) ?{
           (::ElasticGraph::SchemaDefinition::SchemaElements::ScalarType) -> void
         } -> ::ElasticGraph::SchemaDefinition::SchemaElements::ScalarType
+
+        def new_union_type: (::String) ?{
+          (::ElasticGraph::SchemaDefinition::SchemaElements::UnionType) -> void
+        } -> ::ElasticGraph::SchemaDefinition::SchemaElements::UnionType
       end
     end
   end

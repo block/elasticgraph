@@ -11,12 +11,15 @@ require "elastic_graph/warehouse/schema_definition/field_type_converter"
 module ElasticGraph
   module Warehouse
     module SchemaDefinition
-      # Extends {ElasticGraph::SchemaDefinition::SchemaElements::ObjectType} and
-      # {ElasticGraph::SchemaDefinition::SchemaElements::InterfaceType} to add warehouse column type conversion.
-      module ObjectAndInterfaceExtension
-        # Returns the warehouse column type representation for this object or interface type.
+      # Extends {ElasticGraph::SchemaDefinition::SchemaElements::ObjectType},
+      # {ElasticGraph::SchemaDefinition::SchemaElements::InterfaceType}, and
+      # {ElasticGraph::SchemaDefinition::SchemaElements::UnionType} to add warehouse column type conversion.
+      module ObjectInterfaceAndUnionExtension
+        # Returns the warehouse column type representation for this object, interface, or union type.
         #
         # @return [String] a STRUCT SQL type containing all subfields
+        # @note For union types, the STRUCT includes all fields from all subtypes, following the same pattern used
+        #   in the datastore mapping (see {ElasticGraph::SchemaDefinition::Indexing::FieldType::Union#to_mapping}).
         def to_warehouse_column_type
           subfields = indexing_fields_by_name_in_index.values.map(&:to_indexing_field).compact
 
