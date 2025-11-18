@@ -100,6 +100,32 @@ module ElasticGraph
           expect(convert_field_type(results, "Order", "items")).to eq "ARRAY<STRUCT<id STRING, quantity INT>>"
         end
 
+        it "converts arrays of union types to ARRAY<STRUCT>" do
+          results = define_warehouse_schema do |s|
+            s.object_type "Email" do |t|
+              t.field "id", "ID"
+              t.field "address", "String"
+            end
+
+            s.object_type "Phone" do |t|
+              t.field "id", "ID"
+              t.field "number", "String"
+            end
+
+            s.union_type "ContactInfo" do |t|
+              t.subtypes "Email", "Phone"
+            end
+
+            s.object_type "User" do |t|
+              t.field "contacts", "[ContactInfo!]!" do |f|
+                f.mapping type: "nested"
+              end
+            end
+          end
+
+          expect(convert_field_type(results, "User", "contacts")).to eq "ARRAY<STRUCT<id STRING, address STRING, number STRING, __typename STRING>>"
+        end
+
         it "converts custom scalar types with warehouse_column configuration" do
           results = define_warehouse_schema do |s|
             s.scalar_type "CustomTimestamp" do |t|

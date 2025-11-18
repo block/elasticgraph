@@ -11,7 +11,7 @@ require "elastic_graph/warehouse/schema_definition/api_extension"
 module ElasticGraph
   module Warehouse
     module SchemaDefinition
-      RSpec.describe ObjectAndInterfaceExtension, :warehouse_schema do
+      RSpec.describe ObjectInterfaceAndUnionExtension, :warehouse_schema do
         describe "object types" do
           it "converts object type to warehouse column type" do
             results = define_warehouse_schema do |s|
@@ -55,6 +55,28 @@ module ElasticGraph
             end
 
             expect(warehouse_column_type_for(results, "Identifiable")).to eq("STRUCT<id STRING, name STRING, price DOUBLE, __typename STRING>")
+          end
+        end
+
+        describe "union types" do
+          it "converts union type to warehouse column type" do
+            results = define_warehouse_schema do |s|
+              s.object_type "Card" do |t|
+                t.field "id", "ID"
+                t.field "last_four", "String"
+              end
+
+              s.object_type "BankAccount" do |t|
+                t.field "id", "ID"
+                t.field "account_number", "String"
+              end
+
+              s.union_type "PaymentMethod" do |t|
+                t.subtypes "Card", "BankAccount"
+              end
+            end
+
+            expect(warehouse_column_type_for(results, "PaymentMethod")).to eq("STRUCT<id STRING, last_four STRING, account_number STRING, __typename STRING>")
           end
         end
       end

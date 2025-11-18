@@ -7,7 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/warehouse/schema_definition/enum_type_extension"
-require "elastic_graph/warehouse/schema_definition/object_and_interface_extension"
+require "elastic_graph/warehouse/schema_definition/object_interface_and_union_extension"
 require "elastic_graph/warehouse/schema_definition/scalar_type_extension"
 
 module ElasticGraph
@@ -38,7 +38,7 @@ module ElasticGraph
         # @return [ElasticGraph::SchemaDefinition::SchemaElements::InterfaceType] the created interface type
         def new_interface_type(name)
           super(name) do |type|
-            type.extend ObjectAndInterfaceExtension
+            type.extend ObjectInterfaceAndUnionExtension
             # :nocov: -- currently all invocations have a block
             yield type if block_given?
             # :nocov:
@@ -52,7 +52,7 @@ module ElasticGraph
         # @return [ElasticGraph::SchemaDefinition::SchemaElements::ObjectType] the created object type
         def new_object_type(name)
           super(name) do |type|
-            type.extend ObjectAndInterfaceExtension
+            type.extend ObjectInterfaceAndUnionExtension
             # :nocov: -- currently all invocations have a block
             yield type if block_given?
             # :nocov:
@@ -67,6 +67,20 @@ module ElasticGraph
         def new_scalar_type(name)
           super(name) do |type|
             type.extend ScalarTypeExtension
+            # :nocov: -- currently all invocations have a block
+            yield type if block_given?
+            # :nocov:
+          end
+        end
+
+        # Creates a new union type with warehouse extensions.
+        #
+        # @param name [String] the name of the union type
+        # @yield [ElasticGraph::SchemaDefinition::SchemaElements::UnionType] the newly created union type
+        # @return [ElasticGraph::SchemaDefinition::SchemaElements::UnionType] the created union type
+        def new_union_type(name)
+          super(name) do |type|
+            type.extend ObjectInterfaceAndUnionExtension
             # :nocov: -- currently all invocations have a block
             yield type if block_given?
             # :nocov:

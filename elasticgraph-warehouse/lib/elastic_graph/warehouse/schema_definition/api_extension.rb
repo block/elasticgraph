@@ -9,7 +9,7 @@
 require "elastic_graph/warehouse/schema_definition/factory_extension"
 require "elastic_graph/warehouse/schema_definition/scalar_type_extension"
 require "elastic_graph/warehouse/schema_definition/enum_type_extension"
-require "elastic_graph/warehouse/schema_definition/object_and_interface_extension"
+require "elastic_graph/warehouse/schema_definition/object_interface_and_union_extension"
 
 module ElasticGraph
   module Warehouse
