@@ -169,7 +169,9 @@ module ElasticGraph
                 f.sourced_from "widget", "type"
               end
 
-              t.index "components"
+              t.index "components" do |i|
+                i.has_had_multiple_sources!
+              end
             end
 
             s.object_type "Widget" do |t|
@@ -194,7 +196,9 @@ module ElasticGraph
                 f.sourced_from "widget", "name"
               end
 
-              t.index "components"
+              t.index "components" do |i|
+                i.has_had_multiple_sources!
+              end
             end
 
             s.object_type "Widget" do |t|
@@ -226,7 +230,9 @@ module ElasticGraph
                 f.sourced_from "widget", "type"
               end
 
-              t.index "components"
+              t.index "components" do |i|
+                i.has_had_multiple_sources!
+              end
             end
 
             s.object_type "Widget" do |t|
@@ -294,7 +300,9 @@ module ElasticGraph
 
             s.union_type "WidgetOrComponent" do |t|
               t.subtypes "Widget", "Component"
-              t.index "widgets_or_components"
+              t.index "widgets_or_components" do |i|
+                i.has_had_multiple_sources!
+              end
             end
           end
 
@@ -324,7 +332,9 @@ module ElasticGraph
 
             s.interface_type "TypeWithID" do |t|
               t.field "id", "ID!"
-              t.index "types_with_ids"
+              t.index "types_with_ids" do |i|
+                i.has_had_multiple_sources!
+              end
             end
           end
 
@@ -355,7 +365,9 @@ module ElasticGraph
                 f.sourced_from "widget", "type"
               end
 
-              t.index "components"
+              t.index "components" do |i|
+                i.has_had_multiple_sources!
+              end
             end
 
             s.object_type "Widget" do |t|
@@ -487,7 +499,9 @@ module ElasticGraph
 
             s.union_type "WidgetOrComponent" do |t|
               t.subtypes "Widget", "Component"
-              t.index "widgets_or_components"
+              t.index "widgets_or_components" do |i|
+                i.has_had_multiple_sources!
+              end
             end
           end
 
@@ -523,7 +537,9 @@ module ElasticGraph
 
             s.interface_type "TypeWithID" do |t|
               t.field "id", "ID!"
-              t.index "types_with_ids"
+              t.index "types_with_ids" do |i|
+                i.has_had_multiple_sources!
+              end
             end
           end
 
@@ -551,7 +567,9 @@ module ElasticGraph
                 f.sourced_from "widget", "name_and_type"
               end
 
-              t.index "components"
+              t.index "components" do |i|
+                i.has_had_multiple_sources!
+              end
             end
 
             s.object_type "Widget" do |t|
@@ -584,7 +602,9 @@ module ElasticGraph
                 f.sourced_from "widget", "tags"
               end
 
-              t.index "components"
+              t.index "components" do |i|
+                i.has_had_multiple_sources!
+              end
             end
 
             s.object_type "Widget" do |t|
@@ -621,7 +641,9 @@ module ElasticGraph
                 f.sourced_from "widget", "subfield"
               end
 
-              t.index "components"
+              t.index "components" do |i|
+                i.has_had_multiple_sources!
+              end
             end
 
             s.object_type "Widget" do |t|
@@ -655,7 +677,9 @@ module ElasticGraph
                 f.sourced_from "widget", "name_and_type"
               end
 
-              t.index "components"
+              t.index "components" do |i|
+                i.has_had_multiple_sources!
+              end
             end
 
             s.object_type "Widget" do |t|
@@ -700,7 +724,9 @@ module ElasticGraph
                 f.sourced_from "widget", "details"
               end
 
-              t.index "components"
+              t.index "components" do |i|
+                i.has_had_multiple_sources!
+              end
             end
 
             s.object_type "Widget" do |t|
@@ -748,7 +774,9 @@ module ElasticGraph
                 f.sourced_from "widget", "details"
               end
 
-              t.index "components"
+              t.index "components" do |i|
+                i.has_had_multiple_sources!
+              end
             end
 
             s.object_type "Widget" do |t|

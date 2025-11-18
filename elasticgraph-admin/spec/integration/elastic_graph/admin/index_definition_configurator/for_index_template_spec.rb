@@ -20,7 +20,11 @@ module ElasticGraph
 
           prepend Module.new {
             def schema_def(**options)
-              configure_index = ->(index) { index.rollover :monthly, "created_at" }
+              original_configure_index = options.delete(:configure_index)
+              configure_index = ->(index) {
+                index.rollover :monthly, "created_at"
+                original_configure_index&.call(index)
+              }
               super(configure_index: configure_index, **options)
             end
           }

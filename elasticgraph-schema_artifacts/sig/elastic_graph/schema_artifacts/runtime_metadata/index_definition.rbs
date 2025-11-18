@@ -7,13 +7,15 @@ module ElasticGraph
         attr_reader default_sort_fields: ::Array[SortField]
         attr_reader current_sources: ::Set[::String]
         attr_reader fields_by_path: ::Hash[::String, IndexField]
+        attr_reader has_had_multiple_sources: bool
 
         def initialize: (
           route_with: ::String,
           rollover: IndexDefinition::Rollover?,
           default_sort_fields: ::Array[SortField],
           current_sources: ::Set[::String],
-          fields_by_path: ::Hash[::String, IndexField]
+          fields_by_path: ::Hash[::String, IndexField],
+          has_had_multiple_sources: bool
         ) -> void
 
         def with: (
@@ -21,7 +23,8 @@ module ElasticGraph
           ?rollover: IndexDefinition::Rollover?,
           ?default_sort_fields: ::Array[SortField],
           ?current_sources: ::Enumerable[::String],
-          ?fields_by_path: ::Hash[::String, IndexField]
+          ?fields_by_path: ::Hash[::String, IndexField],
+          ?has_had_multiple_sources: bool
         ) -> IndexDefinition
       end
 
@@ -31,13 +34,15 @@ module ElasticGraph
         DEFAULT_SORT_FIELDS: "default_sort_fields"
         CURRENT_SOURCES: "current_sources"
         FIELDS_BY_PATH: "fields_by_path"
+        HAS_HAD_MULTIPLE_SOURCES: "has_had_multiple_sources"
 
         def initialize: (
           route_with: ::String,
           rollover: IndexDefinition::Rollover?,
           default_sort_fields: ::Array[SortField],
           current_sources: ::Enumerable[::String],
-          fields_by_path: ::Hash[::String, IndexField]
+          fields_by_path: ::Hash[::String, IndexField],
+          has_had_multiple_sources: bool
         ) -> void
 
         def self.from_hash: (::Hash[::String, untyped]) -> IndexDefinition

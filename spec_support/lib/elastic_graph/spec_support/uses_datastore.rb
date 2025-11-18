@@ -419,20 +419,18 @@ RSpec.shared_context "datastore support", :capture_logs do
     events
   end
 
-  # Helper method that forces the `known_related_query_rollover_indices` and `searches_could_hit_incomplete_docs?`
-  # to be computed and cached. This is useful since some tests strictly verify what datastore requests are
-  # made and `known_related_query_rollover_indices` is called as part of preparing to query the datastore. Since
-  # it caches the result it can non-determnistically trigger a new datastore request in the middle of a test
-  # that is unexpected. We can use this in such a test to make it deterministic.
+  # Helper method that forces the `known_related_query_rollover_indices` to be computed and cached. This is
+  # useful since some tests strictly verify what datastore requests are made and `known_related_query_rollover_indices`
+  # is called as part of preparing to query the datastore. Since it caches the result it can non-determnistically
+  # trigger a new datastore request in the middle of a test that is unexpected. We can use this in such a test
+  # to make it deterministic.
   def pre_cache_index_state(graphql)
     graphql.datastore_core.index_definitions_by_name.values.each do |i|
       # :nocov: -- which side of the conditional is executed depends on the order the tests run in.
       i.remove_instance_variable(:@known_related_query_rollover_indices) if i.instance_variable_defined?(:@known_related_query_rollover_indices)
-      i.remove_instance_variable(:@search_could_hit_incomplete_docs) if i.instance_variable_defined?(:@search_could_hit_incomplete_docs)
       # :nocov:
 
       i.known_related_query_rollover_indices
-      i.searches_could_hit_incomplete_docs?
     end
   end
 end

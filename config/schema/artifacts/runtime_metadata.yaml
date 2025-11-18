@@ -1508,6 +1508,7 @@ index_definitions_by_name:
         source: widget
       widget_workspace_id3:
         source: widget
+    has_had_multiple_sources: true
     route_with: id
   electrical_parts:
     current_sources:
@@ -2615,6 +2616,7 @@ index_definitions_by_name:
         source: __self
       workspace_name:
         source: workspace
+    has_had_multiple_sources: true
     rollover:
       frequency: yearly
       timestamp_field_path: created_at

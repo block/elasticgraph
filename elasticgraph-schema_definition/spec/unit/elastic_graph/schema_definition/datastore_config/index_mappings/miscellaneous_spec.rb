@@ -134,7 +134,9 @@ module ElasticGraph
               f.sourced_from "widget", "name"
             end
 
-            t.index "components"
+            t.index "components" do |i|
+              i.has_had_multiple_sources!
+            end
           end
         end
 

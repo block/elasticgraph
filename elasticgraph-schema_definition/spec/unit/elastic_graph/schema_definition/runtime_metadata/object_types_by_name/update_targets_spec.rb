@@ -163,7 +163,9 @@ module ElasticGraph
                 f.sourced_from "workspace", "name"
               end
 
-              t.index "widgets"
+              t.index "widgets" do |i|
+                i.has_had_multiple_sources!
+              end
             end
 
             s.object_type "WidgetWorkspace" do |t|
@@ -446,6 +448,50 @@ module ElasticGraph
         end
 
         describe "validations" do
+          context "on `has_had_multiple_sources!` usage" do
+            it "raises an error when `sourced_from` is used but `has_had_multiple_sources!` is not called on the index" do
+              expect {
+                object_type_metadata_for "Widget" do |s|
+                  s.object_type "Widget" do |t|
+                    t.field "id", "ID!"
+                    t.relates_to_one "workspace", "WidgetWorkspace", via: "widget_ids", dir: :in
+
+                    t.field "workspace_name", "String" do |f|
+                      f.sourced_from "workspace", "name"
+                    end
+
+                    t.index "widgets"
+                  end
+
+                  s.object_type "WidgetWorkspace" do |t|
+                    t.field "id", "ID!"
+                    t.field "name", "String"
+                    t.field "widget_ids", "[ID!]!"
+                    t.index "widget_workspaces"
+                  end
+                end
+              }.to raise_error Errors::SchemaError, a_string_including(
+                "Type `Widget` uses `sourced_from` fields but its index `widgets` has not been configured with `has_had_multiple_sources!`",
+                "To resolve this, add `i.has_had_multiple_sources!` within the `t.index \"widgets\"` block",
+                "This flag is required because indices with multiple sources can contain incomplete documents",
+                "Once set, this flag should remain even if you later remove all `sourced_from` fields"
+              )
+            end
+
+            it "allows `has_had_multiple_sources!` to be called on an index that has no current `sourced_from` fields" do
+              expect {
+                object_type_metadata_for "Widget" do |s|
+                  s.object_type "Widget" do |t|
+                    t.field "id", "ID!"
+                    t.index "widgets" do |i|
+                      i.has_had_multiple_sources!
+                    end
+                  end
+                end
+              }.not_to raise_error
+            end
+          end
+
           context "on the relationship" do
             it "respects a type name override on the related type" do
               expect {
@@ -1271,6 +1317,7 @@ module ElasticGraph
               define_relation_and_sourced_from_fields.call(t)
 
               t.index "widgets" do |index|
+                index.has_had_multiple_sources! if t.fields_with_sources.any?
                 on_widgets_index&.call(index)
               end
             end

@@ -53,32 +53,16 @@ module ElasticGraph
         end
 
         # Indicates if a search on this index definition may hit incomplete documents. An incomplete document
-        # can occur when multiple event types flow into the same index. An index that has only one source type
-        # can never have incomplete documents, but an index that has 2 or more sources can have incomplete
+        # can occur when multiple event types flow into the same index. An index that has had only one source type
+        # can never have incomplete documents, but an index that has had 2 or more sources can have incomplete
         # documents when the "primary" event type hasn't yet been received for a document.
         #
         # This case is notable because we need to apply automatic filtering in order to hide documents that are
         # not yet complete.
         #
-        # Note: determining this value sometimes requires that we query the datastore for the record of all
-        # sources that an index has ever had. This value changes very, very rarely, and we don't want to slow
-        # down every GraphQL query by adding the extra query against the datastore, so we cache the value here.
+        # This flag should be set via `has_had_multiple_sources!` in the schema definition when `sourced_from` is used.
         def searches_could_hit_incomplete_docs?
-          return @searches_could_hit_incomplete_docs if defined?(@searches_could_hit_incomplete_docs)
-
-          if current_sources.size > 1
-            # We know that incomplete docs are possible, without needing to check sources recorded in `_meta`.
-            @searches_could_hit_incomplete_docs = true
-          else
-            # While our current configuration can't produce incomplete documents, some may already exist in the index
-            # if we previously had some `sourced_from` fields (but no longer have them). Here we check for the sources
-            # we've recorded in `_meta` to account for that.
-            client = datastore_clients_by_name.fetch(cluster_to_query)
-            recorded_sources = mappings_in_datastore(client).dig("_meta", "ElasticGraph", "sources") || []
-            sources = recorded_sources.union(current_sources.to_a)
-
-            @searches_could_hit_incomplete_docs = sources.size > 1
-          end
+          has_had_multiple_sources
         end
 
         def cluster_to_query

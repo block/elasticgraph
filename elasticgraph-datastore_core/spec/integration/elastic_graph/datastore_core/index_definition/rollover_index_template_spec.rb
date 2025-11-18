@@ -556,7 +556,8 @@ module ElasticGraph
             rollover: SchemaArtifacts::RuntimeMetadata::IndexDefinition::Rollover.new(**rollover),
             default_sort_fields: [],
             current_sources: [SELF_RELATIONSHIP_NAME],
-            fields_by_path: {}
+            fields_by_path: {},
+            has_had_multiple_sources: false
           )
 
           DatastoreCore::IndexDefinition.with(

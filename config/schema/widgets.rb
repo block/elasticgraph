@@ -145,6 +145,7 @@ ElasticGraph.define_schema do |schema|
       i.rollover :yearly, "created_at"
       i.route_with "workspace_id"
       i.default_sort "created_at", :desc
+      i.has_had_multiple_sources!
     end
 
     t.derive_indexed_type_fields "WidgetCurrency", from_id: "cost.currency", route_with: "cost_currency_primary_continent", rollover_with: "cost_currency_introduced_on" do |derive|
@@ -280,6 +281,7 @@ ElasticGraph.define_schema do |schema|
 
     t.index "components" do |i|
       i.default_sort "created_at", :desc
+      i.has_had_multiple_sources!
     end
   end
 

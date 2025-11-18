@@ -231,6 +231,9 @@ module ElasticGraph
                 t.field "owner_name", "String" do |f|
                   f.sourced_from "owner", "name"
                 end
+              end,
+              configure_index: lambda do |i|
+                i.has_had_multiple_sources!
               end
             ))
           }.to change { get_index_definition_configuration(unique_index_name).dig("mappings", "_meta") }
@@ -247,6 +250,9 @@ module ElasticGraph
                 t.field "owner_name", "String" do |f|
                   f.sourced_from "owner2", "name"
                 end
+              end,
+              configure_index: lambda do |i|
+                i.has_had_multiple_sources!
               end
             ))
           }.to change { get_index_definition_configuration(unique_index_name).dig("mappings", "_meta") }
