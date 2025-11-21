@@ -170,6 +170,7 @@ module ElasticGraph
     ].each do |description|
       doctest.before description do
         require "elasticsearch"
+        require "open3"
         ::FileUtils.ln_s "#{project_root}/config", "config"
 
         # These examples are the contents of a config.ru file which is evaluated in the context of a Rack::Builder
