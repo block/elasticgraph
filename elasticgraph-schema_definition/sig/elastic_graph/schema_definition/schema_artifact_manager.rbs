@@ -24,6 +24,7 @@ module ElasticGraph
       @artifacts: ::Array[SchemaArtifact[untyped]]
       @json_schemas_artifact: SchemaArtifact[untyped]
 
+      def artifacts_from_schema_def: () -> ::Array[SchemaArtifact[untyped]]
       def notify_about_unused_type_name_overrides: () -> void
       def notify_about_unused_enum_value_overrides: () -> void
       def build_desired_versioned_json_schemas: (::Hash[::String, untyped]) -> ::Hash[::Integer, ::Hash[::String, untyped]]
