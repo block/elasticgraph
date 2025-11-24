@@ -46,25 +46,7 @@ module ElasticGraph
           ]
         )
 
-        # Here we round-trip the SDL string through the GraphQL gem's formatting logic. This provides
-        # nice, consistent formatting (alphabetical order, consistent spacing, etc) and also prunes out
-        # any "orphaned" schema types (that is, types that are defined but never referenced).
-        # We also prepend a line break so there's a blank line between the comment block and the
-        # schema elements.
-        graphql_schema = ::GraphQL::Schema.from_definition(schema_definition_results.graphql_schema_string).to_definition.chomp
-
-        unversioned_artifacts = [
-          new_yaml_artifact(DATASTORE_CONFIG_FILE, schema_definition_results.datastore_config),
-          new_yaml_artifact(RUNTIME_METADATA_FILE, pruned_runtime_metadata(graphql_schema).to_dumpable_hash),
-          @json_schemas_artifact,
-          new_raw_artifact(GRAPHQL_SCHEMA_FILE, "\n" + graphql_schema)
-        ]
-
-        versioned_artifacts = build_desired_versioned_json_schemas(@json_schemas_artifact.desired_contents).values.map do |versioned_schema|
-          new_versioned_json_schema_artifact(versioned_schema)
-        end
-
-        @artifacts = (unversioned_artifacts + versioned_artifacts).sort_by(&:file_name)
+        @artifacts = artifacts_from_schema_def.sort_by(&:file_name)
         notify_about_unused_type_name_overrides
         notify_about_unused_enum_value_overrides
       end
@@ -114,6 +96,28 @@ module ElasticGraph
       end
 
       private
+
+      def artifacts_from_schema_def
+        # Here we round-trip the SDL string through the GraphQL gem's formatting logic. This provides
+        # nice, consistent formatting (alphabetical order, consistent spacing, etc) and also prunes out
+        # any "orphaned" schema types (that is, types that are defined but never referenced).
+        # We also prepend a line break so there's a blank line between the comment block and the
+        # schema elements.
+        graphql_schema = ::GraphQL::Schema.from_definition(schema_definition_results.graphql_schema_string).to_definition.chomp
+
+        unversioned_artifacts = [
+          new_yaml_artifact(DATASTORE_CONFIG_FILE, schema_definition_results.datastore_config),
+          new_yaml_artifact(RUNTIME_METADATA_FILE, pruned_runtime_metadata(graphql_schema).to_dumpable_hash),
+          @json_schemas_artifact,
+          new_raw_artifact(GRAPHQL_SCHEMA_FILE, "\n" + graphql_schema)
+        ]
+
+        versioned_artifacts = build_desired_versioned_json_schemas(@json_schemas_artifact.desired_contents).values.map do |versioned_schema|
+          new_versioned_json_schema_artifact(versioned_schema)
+        end
+
+        unversioned_artifacts + versioned_artifacts
+      end
 
       def notify_about_unused_type_name_overrides
         type_namer = @schema_definition_results.state.type_namer
