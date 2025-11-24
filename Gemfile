@@ -30,10 +30,10 @@ group :development do
   gem "rubocop-rake", "~> 0.6.0"
   # We are waiting to upgrade to >= 3.5 until standardrb compatibility with rubocop plugins is fixed:
   # https://github.com/standardrb/standard/issues/701
-  gem "rubocop-rspec", "~> 3.7.0"
+  gem "rubocop-rspec", "~> 3.8.0"
   gem "simplecov", "~> 0.22"
   gem "simplecov-console", "~> 0.9", ">= 0.9.4"
-  gem "standard", "~> 1.51.1"
+  gem "standard", "~> 1.52.0"
   gem "steep", "~> 1.10.0"
   gem "super_diff", "~> 0.17"
   gem "vcr", "~> 6.3", ">= 6.3.1"
