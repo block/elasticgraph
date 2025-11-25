@@ -45,10 +45,6 @@ module ElasticGraph
             "they can perform code generation and event validation."
           ]
         )
-
-        @artifacts = artifacts_from_schema_def.sort_by(&:file_name)
-        notify_about_unused_type_name_overrides
-        notify_about_unused_enum_value_overrides
       end
 
       # Dumps all the schema artifacts to disk.
@@ -76,15 +72,15 @@ module ElasticGraph
         end
 
         ::FileUtils.mkdir_p(@schema_artifacts_directory)
-        @artifacts.each { |artifact| artifact.dump(@output) }
+        artifacts.each { |artifact| artifact.dump(@output) }
       end
 
       # Checks that all schema artifacts are up-to-date, raising an exception if not.
       def check_artifacts
-        out_of_date_artifacts = @artifacts.select(&:out_of_date?)
+        out_of_date_artifacts = artifacts.select(&:out_of_date?)
 
         if out_of_date_artifacts.empty?
-          descriptions = @artifacts.map.with_index(1) { |art, i| "#{i}. #{art.file_name}" }
+          descriptions = artifacts.map.with_index(1) { |art, i| "#{i}. #{art.file_name}" }
           @output.puts <<~EOS
             Your schema artifacts are all up to date:
             #{descriptions.join("\n")}
@@ -97,6 +93,16 @@ module ElasticGraph
 
       private
 
+      def artifacts
+        @artifacts ||= artifacts_from_schema_def.sort_by(&:file_name).tap do
+          # This must be deferred until artifacts are generated, as we can't fully detect
+          # unused things until after we've used things to generate artifacts.
+          notify_about_unused_type_name_overrides
+          notify_about_unused_enum_value_overrides
+        end
+      end
+
+      # Defined to offer a convenient method to override in an extension in order to add a new schema artifact.
       def artifacts_from_schema_def
         # Here we round-trip the SDL string through the GraphQL gem's formatting logic. This provides
         # nice, consistent formatting (alphabetical order, consistent spacing, etc) and also prunes out
