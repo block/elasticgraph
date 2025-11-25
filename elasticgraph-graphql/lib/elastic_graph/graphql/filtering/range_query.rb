@@ -59,6 +59,8 @@ module ElasticGraph
           conflicting_op = case operator
           when :gt, :gte then existing_range_hash.keys.find { |k| [:gt, :gte].include?(k) }
           when :lt, :lte then existing_range_hash.keys.find { |k| [:lt, :lte].include?(k) }
+          else
+            raise "Unexpected range operator: #{operator.inspect}"
           end
 
           if conflicting_op
