@@ -108,7 +108,6 @@ module ElasticGraph
         type_def_keyword = '^(type|input|enum|union|interface|scalar|directive)\b'
         # capture from the start of the type definition for `type` until the next type definition (or `\z` for end of string)
         type_extraction_regex = /(#{DOC_COMMENTS}?#{type_def_keyword} #{type}\b.*?)(?:(?:#{DOC_COMMENTS}?#{type_def_keyword})|\z)/m
-        # type_defs = sdl.scan(type_extraction_regex).map(&:first)
         type_defs = sdl.scan(type_extraction_regex).map { |match| [match].flatten.first }
 
         if type_defs.size >= 2
