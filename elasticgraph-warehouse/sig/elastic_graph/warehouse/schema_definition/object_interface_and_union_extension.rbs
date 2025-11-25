@@ -2,11 +2,15 @@ module ElasticGraph
   module Warehouse
     module SchemaDefinition
       module ObjectInterfaceAndUnionExtension : _ObjectInterfaceAndUnionExtensionInterface
-        def warehouse_table_def: () -> WarehouseTable?
-        def warehouse_table: (::String) -> void
-        def to_warehouse_column_type: () -> ::String
+        EXCLUDED_FROM_WAREHOUSE: ::Symbol
 
-        @warehouse_table_def: WarehouseTable?
+        def warehouse_table: (::String) -> void
+        def exclude_from_warehouse: () -> void
+        def index: (::String name, **untyped settings) ?{ (untyped) -> void } -> void
+        def to_warehouse_column_type: () -> ::String
+        def warehouse_table_def: () -> (WarehouseTable | ::Symbol)?
+
+        @warehouse_table_def: (WarehouseTable | ::Symbol)?
       end
 
       interface _ObjectInterfaceAndUnionExtensionInterface

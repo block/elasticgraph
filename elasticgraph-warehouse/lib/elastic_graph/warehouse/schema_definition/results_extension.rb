@@ -29,7 +29,12 @@ module ElasticGraph
         # @return [Hash<String, Hash>] a hash mapping table names to their configuration
         def generate_warehouse_config
           tables = all_types
-            .filter_map { |type| type.warehouse_table_def if type.respond_to?(:warehouse_table_def) }
+            .filter_map do |type|
+              next unless type.respond_to?(:warehouse_table_def)
+              table_def = type.warehouse_table_def
+              # Filter out nil (no warehouse table) and the excluded sentinel value
+              table_def if table_def.is_a?(WarehouseTable)
+            end
             .sort_by(&:name)
 
           {"tables" => tables.to_h { |table| [table.name, table.to_config] }}
