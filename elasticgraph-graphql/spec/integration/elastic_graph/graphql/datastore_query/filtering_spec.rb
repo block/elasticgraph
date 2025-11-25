@@ -495,13 +495,10 @@ module ElasticGraph
               "forbes_valuations", "any_satisfy", {"gt" => 10_000, "lt" => 500_000_000}
             )).to match_array(ids_of(team2, team4))
 
-            # Using conflicting range operators (e.g. both gt and gte or both lt and lte) in any_satisfy
-            # raises an error because they would be split into multiple clauses, which doesn't work with any_satisfy
-            expect {
-              search_with_filter(
-                "forbes_valuations", "any_satisfy", {"gt" => 10_000, "gte" => 20_000, "lt" => 500_000_000, "lte" => 100_000_000}
-              )
-            }.to raise_error(::GraphQL::ExecutionError, /is not supported because it produces multiple filtering clauses/)
+            expect(search_with_filter(
+              # We don't expect users to use all 4 range operators, but if they do it should work!
+              "forbes_valuations", "any_satisfy", {"gt" => 10_000, "gte" => 20_000, "lt" => 500_000_000, "lte" => 100_000_000}
+            )).to match_array(ids_of(team2))
           end
         end
 
@@ -1363,9 +1360,9 @@ module ElasticGraph
         it "correctly ANDs internal and client filters for upper bounds (lt/lte)" do
           index_into(
             graphql,
-            build(:widget, id: "w1", created_at: "2025-09-03T00:00:00.000Z"),  # Before both timestamps
-            build(:widget, id: "w2", created_at: "2025-09-04T00:00:00.000Z"),   # Exactly at the boundary
-            build(:widget, id: "w3", created_at: "2025-09-04T12:00:00.000Z"),  # Between the timestamps
+            build(:widget, id: "w1", created_at: "2025-09-03T00:00:00.000Z"), # Before both timestamps
+            build(:widget, id: "w2", created_at: "2025-09-04T00:00:00.000Z"), # Exactly at the boundary
+            build(:widget, id: "w3", created_at: "2025-09-04T12:00:00.000Z"), # Between the timestamps
             build(:widget, id: "w4", created_at: "2025-09-05T00:00:00.000Z")  # Exactly at the boundary
           )
 
@@ -1431,10 +1428,10 @@ module ElasticGraph
         it "correctly ANDs internal and client filters for lower bounds (gt/gte)" do
           index_into(
             graphql,
-            build(:widget, id: "w1", created_at: "2025-09-03T00:00:00.000Z"),
-            build(:widget, id: "w2", created_at: "2025-09-04T00:00:00.000Z"),
-            build(:widget, id: "w3", created_at: "2025-09-04T12:00:00.000Z"),
-            build(:widget, id: "w4", created_at: "2025-09-05T00:00:00.000Z")
+            build(:widget, id: "w1", created_at: "2025-09-03T00:00:00.000Z"), # Exactly at the boundary
+            build(:widget, id: "w2", created_at: "2025-09-04T00:00:00.000Z"), # Exactly at the boundary
+            build(:widget, id: "w3", created_at: "2025-09-04T12:00:00.000Z"), # After the timestamps
+            build(:widget, id: "w4", created_at: "2025-09-05T00:00:00.000Z")  # After the timestamps
           )
 
           # client filter is more restrictive for results 1-4
@@ -1499,10 +1496,10 @@ module ElasticGraph
         it "correctly ANDs internal and client filters for mixed bounds" do
           index_into(
             graphql,
-            build(:widget, id: "w1", created_at: "2025-09-03T00:00:00.000Z"),
-            build(:widget, id: "w2", created_at: "2025-09-04T00:00:00.000Z"),
-            build(:widget, id: "w3", created_at: "2025-09-04T12:00:00.000Z"),
-            build(:widget, id: "w4", created_at: "2025-09-05T00:00:00.000Z")
+            build(:widget, id: "w1", created_at: "2025-09-03T00:00:00.000Z"), # Exactly at the boundary
+            build(:widget, id: "w2", created_at: "2025-09-04T00:00:00.000Z"), # Exactly at the boundary
+            build(:widget, id: "w3", created_at: "2025-09-04T12:00:00.000Z"), # Between the timestamps
+            build(:widget, id: "w4", created_at: "2025-09-05T00:00:00.000Z")  # Exactly at the boundary
           )
 
           res1 = search_datastore(
@@ -1529,16 +1526,15 @@ module ElasticGraph
       end
 
       context "mixed operators in client filters", :expect_index_exclusions do
-        it "correctly handles conflicting operators by ANDing them for upper bounds (lt/lte)" do
+        it "correctly handles conflicting operators by keeping the stricter one for upper bounds (lt/lte)" do
           index_into(
             graphql,
-            build(:widget, id: "w1", created_at: "2025-09-03T00:00:00.000Z"),  # Before both timestamps
-            build(:widget, id: "w2", created_at: "2025-09-04T00:00:00.000Z"),   # Exactly at the boundary
-            build(:widget, id: "w3", created_at: "2025-09-04T12:00:00.000Z"),  # Between the timestamps
+            build(:widget, id: "w1", created_at: "2025-09-03T00:00:00.000Z"), # Before both timestamps
+            build(:widget, id: "w2", created_at: "2025-09-04T00:00:00.000Z"), # Exactly at the boundary
+            build(:widget, id: "w3", created_at: "2025-09-04T12:00:00.000Z"), # Between the timestamps
             build(:widget, id: "w4", created_at: "2025-09-05T00:00:00.000Z")  # Exactly at the boundary
           )
 
-          # Test ordering independence: both operators are ANDed together
           results1 = search_datastore(
             client_filters: [{"created_at" => {"lte" => "2025-09-05T00:00:00.000Z", "lt" => "2025-09-04T00:00:00.000Z"}}],
             index_def_name: "widgets"
@@ -1564,16 +1560,15 @@ module ElasticGraph
           expect(results4.map(&:id)).to match_array(["w1"])
         end
 
-        it "correctly handles conflicting operators by ANDing them for lower bounds (gt/gte)" do
+        it "correctly handles conflicting operators by keeping the stricter one for lower bounds (gt/gte)" do
           index_into(
             graphql,
-            build(:widget, id: "w1", created_at: "2025-09-03T00:00:00.000Z"),
-            build(:widget, id: "w2", created_at: "2025-09-04T00:00:00.000Z"),
-            build(:widget, id: "w3", created_at: "2025-09-04T12:00:00.000Z"),
-            build(:widget, id: "w4", created_at: "2025-09-05T00:00:00.000Z")
+            build(:widget, id: "w1", created_at: "2025-09-03T00:00:00.000Z"), # Exactly at the boundary
+            build(:widget, id: "w2", created_at: "2025-09-04T00:00:00.000Z"), # Exactly at the boundary
+            build(:widget, id: "w3", created_at: "2025-09-04T12:00:00.000Z"), # After the timestamps
+            build(:widget, id: "w4", created_at: "2025-09-05T00:00:00.000Z")  # After the timestamps
           )
 
-          # Test ordering independence: both operators are ANDed together
           r1 = search_datastore(
             client_filters: [{"created_at" => {"gte" => "2025-09-03T00:00:00.000Z", "gt" => "2025-09-04T00:00:00.000Z"}}],
             index_def_name: "widgets"
@@ -1599,16 +1594,15 @@ module ElasticGraph
           expect(r4.map(&:id)).to match_array(["w3", "w4"])
         end
 
-        it "correctly handles conflicting operators by ANDing them for mixed bounds" do
+        it "correctly handles conflicting operators by keeping the stricter one for mixed bounds" do
           index_into(
             graphql,
-            build(:widget, id: "w1", created_at: "2025-09-03T00:00:00.000Z"),  # Before both timestamps
-            build(:widget, id: "w2", created_at: "2025-09-04T00:00:00.000Z"),   # Exactly at the boundary
-            build(:widget, id: "w3", created_at: "2025-09-04T12:00:00.000Z"),  # Between the timestamps
+            build(:widget, id: "w1", created_at: "2025-09-03T00:00:00.000Z"), # Before both timestamps
+            build(:widget, id: "w2", created_at: "2025-09-04T00:00:00.000Z"), # Exactly at the boundary
+            build(:widget, id: "w3", created_at: "2025-09-04T12:00:00.000Z"), # Between the timestamps
             build(:widget, id: "w4", created_at: "2025-09-05T00:00:00.000Z")  # Exactly at the boundary
           )
 
-          # Test ordering independence with all four operators
           results1 = search_datastore(
             client_filters: [{"created_at" => {"lte" => "2025-09-04T00:00:00.000Z", "lt" => "2025-09-05T00:00:00.000Z", "gte" => "2025-09-04T00:00:00.000Z", "gt" => "2025-09-02T00:00:00.000Z"}}],
             index_def_name: "widgets"

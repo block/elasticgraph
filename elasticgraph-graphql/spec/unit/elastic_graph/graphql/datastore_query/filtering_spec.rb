@@ -99,11 +99,7 @@ module ElasticGraph
         expect(datastore_body_of(query1)).to filter_datastore_with(range: {"age" => {gt: 10, lte: 25}})
 
         query2 = new_query(client_filter: {"age" => {"gt" => 10, "lte" => 25, "gte" => 20, "lt" => 50}})
-        expect(datastore_body_of(query2)).to filter_datastore_with(
-          {range: {"age" => {gt: 10, lte: 25}}},
-          {range: {"age" => {gte: 20}}},
-          {range: {"age" => {lt: 50}}}
-        )
+        expect(datastore_body_of(query2)).to filter_datastore_with(range: {"age" => {gte: 20, lte: 25}})
       end
 
       it "leaves multiple `range` clauses that are on different fields unmerged" do
@@ -2020,8 +2016,8 @@ module ElasticGraph
         )
 
         expect(datastore_body_of(query)).to filter_datastore_with(
-          {bool: {filter: [{range: {"age" => {gt: 10}}}]}},
-          {bool: {filter: [{terms: {"some_id" => ["testid"]}}]}}
+          {range: {"age" => {gt: 10}}},
+          {terms: {"some_id" => ["testid"]}}
         )
       end
 
