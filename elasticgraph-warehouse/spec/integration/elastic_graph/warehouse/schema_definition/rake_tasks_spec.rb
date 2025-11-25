@@ -42,12 +42,12 @@ module ElasticGraph
             expect(warehouse_config["tables"]["products"]["table_schema"]).to start_with("CREATE TABLE IF NOT EXISTS products")
           end
 
-          it "does not dump warehouse artifact when no warehouse tables are defined" do
+          it "does not dump warehouse artifact when all indexed types are excluded from warehouse" do
             write_warehouse_schema(table_defs: <<~EOS)
               s.object_type "User" do |t|
                 t.field "id", "ID"
                 t.field "name", "String"
-                # No warehouse_table definition
+                # No index - this is an embedded type only, so no warehouse table will be created
               end
             EOS
 
@@ -165,9 +165,11 @@ module ElasticGraph
 
               # Add a dummy indexed type to ensure the Query type has at least one field.
               # This prevents GraphQL-Ruby warnings about empty Query types in tests.
+              # We exclude it from the warehouse so it doesn't interfere with test expectations.
               s.object_type "_DummyWarehouseTestType" do |t|
                 t.field "id", "ID"
                 t.index "dummy_warehouse_test_indices"
+                t.exclude_from_warehouse
               end
 
               #{table_defs}

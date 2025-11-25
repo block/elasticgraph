@@ -10,6 +10,7 @@ require "delegate"
 require "elastic_graph/apollo/schema_definition/api_extension"
 require "elastic_graph/local/rake_tasks"
 require "elastic_graph/schema_definition/rake_tasks"
+require "elastic_graph/warehouse/schema_definition/api_extension"
 require "yaml"
 
 project_root = File.expand_path(__dir__)
@@ -49,6 +50,7 @@ configure_local_rake_tasks = ->(tasks) do
   tasks.index_document_sizes = true
   tasks.env_port_mapping = {test: test_port}
   tasks.output = schema_def_output
+  tasks.schema_definition_extension_modules << ElasticGraph::Warehouse::SchemaDefinition::APIExtension
 
   tasks.define_fake_data_batch_for(:widgets) do
     require "rspec/core" # the factories file expects RSpec to be loaded, so load it.
@@ -99,7 +101,7 @@ namespace :apollo do
     path_to_schema: "config/schema.rb"
   ) do |tasks|
     configure_local_rake_tasks.call(tasks)
-    tasks.schema_definition_extension_modules = [ElasticGraph::Apollo::SchemaDefinition::APIExtension]
+    tasks.schema_definition_extension_modules << ElasticGraph::Apollo::SchemaDefinition::APIExtension
   end
 end
 
