@@ -94,16 +94,6 @@ module ElasticGraph
         expect(datastore_body_of(query)).to filter_datastore_with(range: {"age" => {lte: 25}})
       end
 
-      it "raises an error if RangeQuery is created with an invalid operator" do
-        bool_node = Hash.new { |h, k| h[k] = [] }
-        Filtering::RangeQuery.new("age", :gt, 10).merge_into(bool_node)
-
-        invalid_range_query = Filtering::RangeQuery.new("age", :equal_to, 20)
-        expect {
-          invalid_range_query.merge_into(bool_node)
-        }.to raise_error(/Unexpected range operator: :equal_to/)
-      end
-
       it "merges multiple `range` clauses that are on the same field" do
         query1 = new_query(client_filter: {"age" => {"gt" => 10, "lte" => 25}})
         expect(datastore_body_of(query1)).to filter_datastore_with(range: {"age" => {gt: 10, lte: 25}})

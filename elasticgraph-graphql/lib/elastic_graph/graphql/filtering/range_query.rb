@@ -39,6 +39,13 @@ module ElasticGraph
       # a value > 10 and a value < 100 (even though no single value satisfies both parts!). When we combine
       # the clauses into a single `range` query then the filtering works like we expect.
       class RangeQuery < ::Data.define(:field_name, :operator, :value)
+        SAME_TYPE_OPS = {
+          gt: [:gt, :gte],
+          gte: [:gt, :gte],
+          lt: [:lt, :lte],
+          lte: [:lt, :lte]
+        }.freeze
+
         def merge_into(bool_node)
           existing_range_index = bool_node[:filter].find_index { |clause| clause.dig(:range, field_name) }
 
@@ -56,17 +63,12 @@ module ElasticGraph
         # Merges the new operator with existing operators.
         # Keeps the stricter one (gt vs gte or lt vs lte) when there are conflicts.
         def merge_operators(existing_range_hash)
-          conflicting_op = case operator
-          when :gt, :gte then existing_range_hash.keys.find { |k| [:gt, :gte].include?(k) }
-          when :lt, :lte then existing_range_hash.keys.find { |k| [:lt, :lte].include?(k) }
-          else
-            raise "Unexpected range operator: #{operator.inspect}"
-          end
+          conflicting_op = SAME_TYPE_OPS.fetch(operator).find { |op| existing_range_hash.key?(op) }
 
           if conflicting_op
             existing_val = existing_range_hash[conflicting_op]
             stricter_op, stricter_val = stricter_operator(operator, value, conflicting_op, existing_val)
-            existing_range_hash.merge(conflicting_op => nil, stricter_op => stricter_val).compact
+            existing_range_hash.except(conflicting_op).merge(stricter_op => stricter_val)
           else
             existing_range_hash.merge(operator => value)
           end

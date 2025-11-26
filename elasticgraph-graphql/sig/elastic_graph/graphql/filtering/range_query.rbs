@@ -16,6 +16,8 @@ module ElasticGraph
       end
 
       class RangeQuery < RangeQuerySupertype
+        SAME_TYPE_OPS: ::Hash[::Symbol, ::Array[::Symbol]]
+
         def merge_into: (stringOrSymbolHash) -> void
 
         private
