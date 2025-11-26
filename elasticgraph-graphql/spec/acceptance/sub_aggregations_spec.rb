@@ -393,23 +393,6 @@ module ElasticGraph
           }.to raise_error(Errors::SearchFailedError, error_msg).and log_warning(error_msg)
         end
 
-        # Likewise, OpenSearch can't handle a composite agg under a filter agg, until they release this fix:
-        # https://github.com/opensearch-project/OpenSearch/pull/11499
-        #
-        # ...but this works on Elasticsearch, and now works on OpenSearch 2.13+.
-        def verify_filtered_sub_aggregations_with_grouped_by
-          # :nocov: -- only one side of this conditional is covered in any given test suite run.
-          return super if datastore_backend == :elasticsearch
-          return super if ::Gem::Version.new(datastore_version) >= ::Gem::Version.new("2.13.0")
-
-          error_msg = a_string_including("[composite] aggregation cannot be used with a parent aggregation of type: [FilterAggregatorFactory]")
-
-          expect {
-            super
-          }.to raise_error(Errors::SearchFailedError, error_msg).and log_warning(error_msg)
-          # :nocov:
-        end
-
         # When the `CompositeGroupingAdapter` is used, aggregation groupings are sorted by the fields
         # we group on. This results in a different first 2 from the `NonCompositeGroupingAdapter` case.
         let(:first_two_counts_grouped_by_year_and_note) do
