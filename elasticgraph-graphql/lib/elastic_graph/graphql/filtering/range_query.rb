@@ -39,15 +39,49 @@ module ElasticGraph
       # a value > 10 and a value < 100 (even though no single value satisfies both parts!). When we combine
       # the clauses into a single `range` query then the filtering works like we expect.
       class RangeQuery < ::Data.define(:field_name, :operator, :value)
+        SAME_TYPE_OPS = {
+          gt: [:gt, :gte],
+          gte: [:gt, :gte],
+          lt: [:lt, :lte],
+          lte: [:lt, :lte]
+        }.freeze
+
         def merge_into(bool_node)
           existing_range_index = bool_node[:filter].find_index { |clause| clause.dig(:range, field_name) }
-          new_range_clause = {range: {field_name => {operator => value}}}
 
           if existing_range_index
-            existing_range_clause = bool_node[:filter][existing_range_index]
-            bool_node[:filter][existing_range_index] = Support::HashUtil.deep_merge(existing_range_clause, new_range_clause)
+            existing_range_hash = bool_node[:filter][existing_range_index].dig(:range, field_name)
+            merged_range_hash = merge_operators(existing_range_hash)
+            bool_node[:filter][existing_range_index] = {range: {field_name => merged_range_hash}}
           else
-            bool_node[:filter] << new_range_clause
+            bool_node[:filter] << {range: {field_name => {operator => value}}}
+          end
+        end
+
+        private
+
+        # Merges the new operator with existing operators.
+        # Keeps the stricter one (gt vs gte or lt vs lte) when there are conflicts.
+        def merge_operators(existing_range_hash)
+          conflicting_op = SAME_TYPE_OPS.fetch(operator).find { |op| existing_range_hash.key?(op) }
+
+          if conflicting_op
+            existing_val = existing_range_hash[conflicting_op]
+            stricter_op, stricter_val = stricter_operator(operator, value, conflicting_op, existing_val)
+            existing_range_hash.except(conflicting_op).merge(stricter_op => stricter_val)
+          else
+            existing_range_hash.merge(operator => value)
+          end
+        end
+
+        # Returns the stricter of two operators/values in the same direction.
+        def stricter_operator(op1, val1, op2, val2)
+          if [:gt, :gte].include?(op1)
+            # lower bound: higher is stricter, gt wins ties
+            (val1 > val2 || (val1 == val2 && op1 == :gt)) ? [op1, val1] : [op2, val2]
+          else
+            # upper bound: lower is stricter; lt wins ties
+            (val1 < val2 || (val1 == val2 && op1 == :lt)) ? [op1, val1] : [op2, val2]
           end
         end
       end
