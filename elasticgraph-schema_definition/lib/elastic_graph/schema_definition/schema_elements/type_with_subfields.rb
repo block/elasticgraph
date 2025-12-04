@@ -146,7 +146,7 @@ module ElasticGraph
         #
         # @note Be careful about defining non-nullable fields. Changing a field’s type from non-nullable (e.g. `Int!`) to nullable (e.g.
         #   `Int`) is a breaking change for clients. Making a field non-nullable may also prevent you from applying permissioning to a field
-        #   via an AuthZ layer (as such a layer would have no way to force a field value to `null` when for a client denied field access).
+        #   via an AuthZ layer (as such a layer would have no way to force a field value to `null` for a client denied field access).
         #   Therefore, we recommend limiting your use of `!` to only a few situations such as defining a type’s primary key (e.g.
         #   `t.field "id", "ID!"`) or defining a list field (e.g. `t.field "authors", "[String!]!"`) since empty lists already provide a
         #   "no data" representation. You can still configure the ElasticGraph indexer to require a non-null value for a field using

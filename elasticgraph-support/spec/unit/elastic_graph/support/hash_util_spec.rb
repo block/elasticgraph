@@ -456,7 +456,7 @@ module ElasticGraph
           expect(HashUtil.fetch_value_at_path(hash, ["foo", "bar", "unknown", "bazz"]) { |key| "#{key.inspect} is missing" }).to eq '["foo", "bar", "unknown"] is missing'
         end
 
-        it "does not use a provided block when for cases where a parent key is not a hash" do
+        it "does not use a provided block when parent key is not a hash" do
           expect {
             HashUtil.fetch_value_at_path({"foo" => {"bar" => 3}}, ["foo", "bar", "bazz"]) { 3 }
           }.to raise_error KeyError, a_string_including('Value at key ["foo", "bar"] is not a `Hash` as expected; instead, was a `Integer`')
