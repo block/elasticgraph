@@ -369,6 +369,31 @@ module ElasticGraph
           }.to log(a_string_including("resulted in errors"))
         end
 
+        context "when extensions provide additional log data" do
+          it "includes extension data in the logged duration message" do
+            # Simulate an extension setting data in the query tracker
+            allow(::GraphQL::Execution::Interpreter).to receive(:run_all).and_wrap_original do |original, schema, queries, context:|
+              query_tracker = context[:elastic_graph_query_tracker]
+              query_tracker.set_extension_data("custom_field", "custom_value")
+              query_tracker.set_extension_data("another_field", "another_value")
+              original.call(schema, queries, context: context)
+            end
+
+            execute_expecting_no_errors(<<-QUERY, client: Client.new(name: "client-name", source_description: "client-description"))
+              query GetColors {
+                colors(args: {red: 12}) {
+                  red
+                }
+              }
+            QUERY
+
+            expect(logged_duration_message).to include(
+              "custom_field" => "custom_value",
+              "another_field" => "another_value"
+            )
+          end
+        end
+
         context "when the schema has been customized (as in an extension like elasticgraph-apollo)" do
           before(:context) do
             multiply_resolver = Class.new do
