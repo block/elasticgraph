@@ -14,7 +14,7 @@ group :development do
   gem "benchmark-ips", "~> 2.14"
   gem "coderay", "~> 1.1", ">= 1.1.3"
   gem "factory_bot", "~> 6.5", ">= 6.5.6"
-  gem "faker", "~> 3.5", ">= 3.5.2"
+  gem "faker", "~> 3.5"
   gem "flatware-rspec", "~> 2.3", ">= 2.3.4"
   gem "httpx", "~> 1.6", ">= 1.6.3"
   gem "memory_profiler", "~> 1.1"
@@ -35,7 +35,7 @@ group :development do
   gem "simplecov-console", "~> 0.9", ">= 0.9.4"
   gem "standard", "~> 1.52.0"
   gem "steep", "~> 1.10.0"
-  gem "super_diff", "~> 0.17"
+  gem "super_diff", "~> 0.18"
   gem "vcr", "~> 6.3", ">= 6.3.1"
 end
 
@@ -53,7 +53,7 @@ group :site do
   # TODO: switch back to a release version once that fix is merged and released.
   gem "rouge", github: "myronmarston/rouge", ref: "12c0da6aa98e0d0a0762c47103b64290c88620a1"
 
-  gem "yard", "~> 0.9", ">= 0.9.37"
+  gem "yard", "~> 0.9"
   gem "yard-doctest", "~> 0.1", ">= 0.1.17"
   gem "yard-markdown", "~> 0.5"
 end
