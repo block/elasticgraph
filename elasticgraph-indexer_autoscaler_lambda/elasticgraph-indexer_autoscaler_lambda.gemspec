@@ -43,7 +43,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "elasticgraph-datastore_core", ElasticGraph::VERSION
   spec.add_dependency "elasticgraph-lambda_support", ElasticGraph::VERSION
-  spec.add_dependency "aws-sdk-lambda", "~> 1.167"
+  spec.add_dependency "aws-sdk-lambda", "~> 1.170"
   spec.add_dependency "aws-sdk-sqs", "~> 1.107"
   spec.add_dependency "aws-sdk-cloudwatch", "~> 1.125"
   # aws-sdk-sqs requires an XML library be available. On Ruby < 3 it'll use rexml from the standard library but on Ruby 3.0+
