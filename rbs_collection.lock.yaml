@@ -38,7 +38,7 @@ gems:
   source:
     type: rubygems
 - name: aws-sdk-core
-  version: 3.239.1
+  version: 3.239.2
   source:
     type: rubygems
 - name: aws-sdk-kms
@@ -46,11 +46,11 @@ gems:
   source:
     type: rubygems
 - name: aws-sdk-lambda
-  version: 1.167.0
+  version: 1.170.0
   source:
     type: rubygems
 - name: aws-sdk-s3
-  version: 1.205.0
+  version: 1.206.0
   source:
     type: rubygems
 - name: aws-sdk-sqs
@@ -350,7 +350,7 @@ gems:
   source:
     type: stdlib
 - name: webrick
-  version: 1.9.1
+  version: 1.9.2
   source:
     type: rubygems
 - name: yard
