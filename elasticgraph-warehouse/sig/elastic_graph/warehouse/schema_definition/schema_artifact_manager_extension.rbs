@@ -1,0 +1,16 @@
+module ElasticGraph
+  module Warehouse
+    module SchemaDefinition
+      module SchemaArtifactManagerExtension : _SchemaArtifactManagerExtensionInterface
+        def add_warehouse_artifact: () -> void
+
+        @schema_artifacts_directory: ::String
+        @artifacts: ::Array[untyped]
+      end
+
+      interface _SchemaArtifactManagerExtensionInterface
+        def schema_definition_results: () -> untyped
+      end
+    end
+  end
+end
