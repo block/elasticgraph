@@ -39,24 +39,29 @@ module ElasticGraph
           client_data_by_client_name.key?(client_name)
         end
 
-        def build_and_validate_query(query_string, client:, variables: {}, operation_name: nil, context: {})
+        def build_and_validate_query_with_registration_status(query_string, client:, variables: {}, operation_name: nil, context: {})
           client_data = client_data_for(client.name)
 
           if (cached_query = client_data.cached_query_for(query_string.to_s))
             prepared_query = prepare_query_for_execution(cached_query, variables: variables, operation_name: operation_name, context: context)
-            return [prepared_query, []]
+            return [prepared_query, [], true] # Query was found in cache, so it's registered
           end
 
           query = yield
+
+          # Check if the query matches a registered query
+          query_is_registered = client_data.canonical_query_strings.include?(
+            ClientData.canonical_query_string_from(query, schema_element_names: schema.element_names)
+          )
 
           # This client allows any query, so we can just return the query with no errors here.
           # Note: we could put this at the top of the method, but if the query is registered and matches
           # the registered form, the `cached_query` above is more efficient as it avoids unnecessarily
           # parsing the query.
-          return [query, []] if allow_any_query_for_clients.include?(client.name)
+          return [query, [], query_is_registered] if allow_any_query_for_clients.include?(client.name)
 
-          if !client_data.canonical_query_strings.include?(ClientData.canonical_query_string_from(query, schema_element_names: schema.element_names))
-            return [query, [client_data.unregistered_query_error_for(query, client)]]
+          if !query_is_registered
+            return [query, [client_data.unregistered_query_error_for(query, client)], false]
           end
 
           # The query is slightly different from a registered query, but not in any material fashion
@@ -74,7 +79,7 @@ module ElasticGraph
             (_ = cached_client_data).with_updated_last_query(query_string, cachable_query)
           end
 
-          [query, []]
+          [query, [], true]
         end
 
         private
