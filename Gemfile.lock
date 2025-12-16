@@ -330,7 +330,7 @@ GEM
     google-protobuf (4.33.1-arm64-darwin)
       bigdecimal
       rake (>= 13)
-    graphql (2.5.14)
+    graphql (2.5.16)
       base64
       fiber-storage
       logger
