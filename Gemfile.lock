@@ -83,8 +83,8 @@ PATH
   remote: elasticgraph-indexer_autoscaler_lambda
   specs:
     elasticgraph-indexer_autoscaler_lambda (1.0.3.pre)
-      aws-sdk-cloudwatch (>= 1.125, < 1.127)
-      aws-sdk-lambda (~> 1.167)
+      aws-sdk-cloudwatch (~> 1.126.0)
+      aws-sdk-lambda (~> 1.171)
       aws-sdk-sqs (~> 1.107)
       elasticgraph-datastore_core (= 1.0.3.pre)
       elasticgraph-lambda_support (= 1.0.3.pre)
@@ -94,7 +94,7 @@ PATH
   remote: elasticgraph-indexer_lambda
   specs:
     elasticgraph-indexer_lambda (1.0.3.pre)
-      aws-sdk-s3 (~> 1.205)
+      aws-sdk-s3 (~> 1.208)
       elasticgraph-indexer (= 1.0.3.pre)
       elasticgraph-lambda_support (= 1.0.3.pre)
       ox (~> 2.14, >= 2.14.23)
@@ -124,9 +124,9 @@ PATH
       elasticgraph-graphql (= 1.0.3.pre)
       elasticgraph-indexer (= 1.0.3.pre)
       elasticgraph-schema_definition (= 1.0.3.pre)
-      rackup (~> 2.2, >= 2.2.1)
+      rackup (~> 2.3, >= 2.3.1)
       rake (~> 13.3, >= 13.3.1)
-      webrick (~> 1.9, >= 1.9.1)
+      webrick (~> 1.9, >= 1.9.2)
 
 PATH
   remote: elasticgraph-opensearch
@@ -640,7 +640,7 @@ DEPENDENCIES
   elasticgraph-support (= 1.0.3.pre)!
   elasticgraph-warehouse (= 1.0.3.pre)!
   factory_bot (~> 6.5, >= 6.5.6)
-  faker (~> 3.5)
+  faker (~> 3.5, >= 3.5.3)
   filewatcher (~> 2.1)
   flatware-rspec (~> 2.3, >= 2.3.4)
   html-proofer (~> 5.1, >= 5.1.1)
@@ -663,7 +663,7 @@ DEPENDENCIES
   steep (~> 1.10.0)
   super_diff (~> 0.18)
   vcr (~> 6.3, >= 6.3.1)
-  yard (~> 0.9)
+  yard (~> 0.9, >= 0.9.38)
   yard-doctest (~> 0.1, >= 0.1.17)
   yard-markdown (~> 0.5)
 
