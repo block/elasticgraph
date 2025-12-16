@@ -183,7 +183,7 @@ PATH
   remote: elasticgraph-support
   specs:
     elasticgraph-support (1.0.3.pre)
-      json_schemer (~> 2.4)
+      json_schemer (~> 2.5)
       logger (~> 1.7)
 
 PATH
