@@ -159,7 +159,7 @@ PATH
   specs:
     elasticgraph-rack (1.0.3.pre)
       elasticgraph-graphql (= 1.0.3.pre)
-      rack (~> 3.2, >= 3.2.2)
+      rack (~> 3.2, >= 3.2.4)
 
 PATH
   remote: elasticgraph-schema_artifacts
