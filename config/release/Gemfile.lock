@@ -5,7 +5,7 @@ GEM
     csv (3.3.5)
     gem-release (2.2.4)
     hana (1.3.7)
-    json_schemer (2.4.0)
+    json_schemer (2.5.0)
       bigdecimal
       hana (~> 1.3)
       regexp_parser (~> 2.0)
@@ -32,7 +32,7 @@ PLATFORMS
 
 DEPENDENCIES
   gem-release (~> 2.2)
-  json_schemer (~> 2.4)
+  json_schemer (~> 2.5)
   nokogiri (~> 1.18)
   rake (~> 13.3)
   redcarpet (~> 3.6, >= 3.6.1)
