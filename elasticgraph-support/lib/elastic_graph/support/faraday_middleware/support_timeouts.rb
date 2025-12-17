@@ -20,8 +20,16 @@ module ElasticGraph
       #
       # This middleware helps us work around this deficiency by looking for the TIMEOUT_MS_HEADER. If present, it deletes
       # it from the headers and instead sets it as the request timeout.
+      # @private
       SupportTimeouts = ::Data.define(:app) do
         # @implements SupportTimeouts
+
+        # Processes a Faraday request, extracting timeout from headers and applying it to the request.
+        # Converts {TIMEOUT_MS_HEADER} from request headers into a Faraday request timeout setting.
+        #
+        # @param env [Faraday::Env] the Faraday request environment
+        # @return [Faraday::Response] the response from the next middleware in the stack
+        # @raise [Errors::RequestExceededDeadlineError] if the request times out
         def call(env)
           if (timeout_ms = env.request_headers.delete(TIMEOUT_MS_HEADER))
             env.request.timeout = Integer(timeout_ms) / 1000.0
