@@ -20,8 +20,14 @@ module ElasticGraph
       # did for years.
       #
       # For more info, see: https://github.com/elastic/elasticsearch-ruby/issues/1005
+      # @private
       MSearchUsingGetInsteadOfPost = ::Data.define(:app) do
         # @implements MSearchUsingGetInsteadOfPost
+
+        # Processes a Faraday request, converting `_msearch` POST requests to GET requests.
+        #
+        # @param env [Faraday::Env] the Faraday request environment
+        # @return [Faraday::Response] the response from the next middleware in the stack
         def call(env)
           env.method = :get if env.url.path.to_s.end_with?("/_msearch")
           app.call(env)

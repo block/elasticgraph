@@ -155,9 +155,17 @@ module ElasticGraph
             )
           end
 
+          # @private
           Adapter = ::Data.define(:type, :schema_element_names) do
             # @implements Adapter
 
+            # Customizes the given query to filter to entities matching the provided representations.
+            # Builds a filter matching all IDs from the representations and configures pagination
+            # and requested fields.
+            #
+            # @param query [ElasticGraph::GraphQL::DatastoreQuery] the query to customize
+            # @param representations [Array<RepresentationWithId>] the representations to query for
+            # @return [ElasticGraph::GraphQL::DatastoreQuery] the customized query
             def customize_query(query, representations)
               # Given a set of representations, builds a filter that will match all of them (and only them).
               all_ids = representations.map(&:id).reject { |id| id.is_a?(::Array) or id.is_a?(::Hash) }

@@ -583,7 +583,7 @@ GEM
     vcr (6.3.1)
       base64
     webrick (1.9.1)
-    yard (0.9.37)
+    yard (0.9.38)
     yard-doctest (0.1.17)
       minitest
       yard
@@ -663,7 +663,7 @@ DEPENDENCIES
   steep (~> 1.10.0)
   super_diff (~> 0.17)
   vcr (~> 6.3, >= 6.3.1)
-  yard (~> 0.9, >= 0.9.37)
+  yard (~> 0.9, >= 0.9.38)
   yard-doctest (~> 0.1, >= 0.1.17)
   yard-markdown (~> 0.5)
 

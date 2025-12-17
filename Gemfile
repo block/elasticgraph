@@ -53,7 +53,7 @@ group :site do
   # TODO: switch back to a release version once that fix is merged and released.
   gem "rouge", github: "myronmarston/rouge", ref: "12c0da6aa98e0d0a0762c47103b64290c88620a1"
 
-  gem "yard", "~> 0.9", ">= 0.9.37"
+  gem "yard", "~> 0.9", ">= 0.9.38"
   gem "yard-doctest", "~> 0.1", ">= 0.1.17"
   gem "yard-markdown", "~> 0.5"
 end
