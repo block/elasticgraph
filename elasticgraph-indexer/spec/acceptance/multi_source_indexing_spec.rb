@@ -149,8 +149,9 @@ module ElasticGraph
     end
 
     it "is compatible with custom shard routing and rollover indices, so long as `equivalent_field` is used on the schema definition" do
-      timestamp_in_2023 = "2023-08-09T10:12:14Z"
-      timestamp_in_2021 = "2021-08-09T10:12:14Z"
+      # Use timestamps with explicit 3-digit millisecond precision to match what the indexer normalizes to
+      timestamp_in_2023 = "2023-08-09T10:12:14.000Z"
+      timestamp_in_2021 = "2021-08-09T10:12:14.000Z"
 
       widget = build_upsert_event(:widget, id: "w1", workspace_id: "wid_23", created_at: timestamp_in_2023)
       workspace = build_upsert_event(:widget_workspace, id: "wid_23", name: "Garage", created_at: timestamp_in_2021, widget: {

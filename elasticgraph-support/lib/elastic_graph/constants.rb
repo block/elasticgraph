@@ -22,6 +22,15 @@ module ElasticGraph
   # @private
   DATASTORE_DATE_TIME_FORMAT = "strict_date_time"
 
+  # The precision (number of decimal places) used when formatting DateTime values.
+  # A precision of 3 means millisecond precision (e.g., "2025-12-19T04:15:47.530Z").
+  #
+  # Consistent precision is critical for min/max value tracking which uses string comparison.
+  # Without it, string comparison produces incorrect results (e.g., "47.53Z" > "47.531Z"
+  # because 'Z' (ASCII 90) > '1' (ASCII 49)).
+  # @private
+  DATE_TIME_PRECISION = 3
+
   # HTTP header that ElasticGraph HTTP implementations (e.g. elasticgraph-rack, elasticgraph-lambda)
   # look at to determine a client-specified request timeout.
   # @private

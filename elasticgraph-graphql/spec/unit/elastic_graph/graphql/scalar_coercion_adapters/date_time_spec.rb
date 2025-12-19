@@ -26,6 +26,14 @@ module ElasticGraph
             expect_input_value_to_be_accepted("2021-11-05T12:30:00.123Z")
           end
 
+          it "preserves trailing zeros in milliseconds to ensure consistent string comparison" do
+            # This is critical for min/max value tracking which uses string comparison.
+            # Without consistent precision, ".530Z" > ".531Z" in string comparison because 'Z' > '1'.
+            expect_input_value_to_be_accepted("2021-11-05T12:30:00.530Z", as: "2021-11-05T12:30:00.530Z")
+            expect_input_value_to_be_accepted("2021-11-05T12:30:00.500Z", as: "2021-11-05T12:30:00.500Z")
+            expect_input_value_to_be_accepted("2021-11-05T12:30:00.100Z", as: "2021-11-05T12:30:00.100Z")
+          end
+
           it "accepts an ISO8601 formatted timestamp string with s precision" do
             string_time = "2021-11-05T12:30:05Z"
 
@@ -81,6 +89,16 @@ module ElasticGraph
             string, time = string_time_pair_from("2021-11-05T12:30:00.123Z")
 
             expect_result_to_be_returned(time, as: string)
+          end
+
+          it "preserves trailing zeros in milliseconds for consistent string comparison" do
+            # This is critical for min/max value tracking which uses string comparison.
+            # Without consistent precision, ".530Z" > ".531Z" in string comparison because 'Z' > '1'.
+            _, time = string_time_pair_from("2021-11-05T12:30:00.530Z")
+            expect_result_to_be_returned(time, as: "2021-11-05T12:30:00.530Z")
+
+            _, time = string_time_pair_from("2021-11-05T12:30:00.500Z")
+            expect_result_to_be_returned(time, as: "2021-11-05T12:30:00.500Z")
           end
 
           it "formats a Time result with ms precision even if the time value only really has second precision" do

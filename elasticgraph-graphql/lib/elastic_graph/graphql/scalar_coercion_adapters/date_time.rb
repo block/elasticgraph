@@ -6,14 +6,13 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/constants"
 require "time"
 
 module ElasticGraph
   class GraphQL
     module ScalarCoercionAdapters
       class DateTime
-        PRECISION = 3 # millisecond precision
-
         def self.coerce_input(value, ctx)
           return value if value.nil?
 
@@ -33,7 +32,7 @@ module ElasticGraph
           # format, so here we convert it to that format (which is just ISO8601 format). Ultimately,
           # that means that this method just "roundtrips" the input string back to a string, but it validates
           # the string is formatted correctly and returns a string in the exact format we need for the datastore.
-          time.iso8601(PRECISION)
+          time.iso8601(DATE_TIME_PRECISION)
         rescue ::ArgumentError, ::TypeError
           raise_coercion_error(value)
         end
@@ -41,9 +40,9 @@ module ElasticGraph
         def self.coerce_result(value, ctx)
           case value
           when ::Time
-            value.iso8601(PRECISION)
+            value.iso8601(DATE_TIME_PRECISION)
           when ::String
-            ::Time.iso8601(value).iso8601(PRECISION)
+            ::Time.iso8601(value).iso8601(DATE_TIME_PRECISION)
           end
         rescue ::ArgumentError
           nil
