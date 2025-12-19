@@ -25,7 +25,7 @@ module ElasticGraph
 
           struct_field_expressions = subfields.map do |subfield|
             warehouse_type = FieldTypeConverter.convert(subfield.type)
-            "#{subfield.name} #{warehouse_type}"
+            "#{subfield.name_in_index} #{warehouse_type}"
           end.join(", ")
 
           "STRUCT<#{struct_field_expressions}>"
