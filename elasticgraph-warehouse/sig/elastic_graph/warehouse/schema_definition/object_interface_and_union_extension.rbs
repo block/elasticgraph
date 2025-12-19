@@ -1,8 +1,17 @@
 module ElasticGraph
   module Warehouse
     module SchemaDefinition
-      module ObjectInterfaceAndUnionExtension: ::ElasticGraph::SchemaDefinition::SchemaElements::TypeWithSubfields
+      module ObjectInterfaceAndUnionExtension : _ObjectInterfaceAndUnionExtensionInterface
+        def warehouse_table_def: () -> WarehouseTable?
+        def warehouse_table: (::String) -> void
         def to_warehouse_column_type: () -> ::String
+
+        @warehouse_table_def: WarehouseTable?
+      end
+
+      interface _ObjectInterfaceAndUnionExtensionInterface
+        def schema_def_state: () -> ::ElasticGraph::SchemaDefinition::State
+        def indexing_fields_by_name_in_index: () -> ::Hash[::String, ::ElasticGraph::SchemaDefinition::SchemaElements::Field]
       end
     end
   end
