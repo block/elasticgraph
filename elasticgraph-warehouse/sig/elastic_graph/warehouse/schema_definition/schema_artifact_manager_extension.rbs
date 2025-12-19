@@ -1,0 +1,8 @@
+module ElasticGraph
+  module Warehouse
+    module SchemaDefinition
+      module SchemaArtifactManagerExtension : ::ElasticGraph::SchemaDefinition::SchemaArtifactManager
+      end
+    end
+  end
+end

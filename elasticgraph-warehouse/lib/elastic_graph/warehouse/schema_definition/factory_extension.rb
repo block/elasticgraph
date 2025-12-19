@@ -11,6 +11,7 @@ require "elastic_graph/warehouse/schema_definition/index_extension"
 require "elastic_graph/warehouse/schema_definition/object_interface_and_union_extension"
 require "elastic_graph/warehouse/schema_definition/results_extension"
 require "elastic_graph/warehouse/schema_definition/scalar_type_extension"
+require "elastic_graph/warehouse/schema_definition/schema_artifact_manager_extension"
 
 module ElasticGraph
   module Warehouse
@@ -109,6 +110,15 @@ module ElasticGraph
         def new_results
           super.tap do |results|
             results.extend ResultsExtension
+          end
+        end
+
+        # Creates a new SchemaArtifactManager instance with warehouse extensions.
+        #
+        # @return [ElasticGraph::SchemaDefinition::SchemaArtifactManager] the created artifact manager
+        def new_schema_artifact_manager(...)
+          super.tap do |manager|
+            manager.extend SchemaArtifactManagerExtension
           end
         end
       end
