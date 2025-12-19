@@ -1,0 +1,35 @@
+module ElasticGraph
+  module Warehouse
+    class Lambda
+      extend _BuildableFromParsedYaml[Lambda]
+      extend Support::FromYamlFile[Lambda]
+
+      attr_reader logger: ::Logger
+      attr_reader indexer: Indexer
+      attr_reader clock: singleton(::Time)
+
+      def self.from_env: () -> Lambda
+
+      def initialize: (
+        config: Config,
+        indexer: Indexer,
+        ?s3_client: ::Aws::S3::Client?,
+        ?s3_bucket_name: ::String?,
+        ?clock: singleton(::Time)
+      ) -> void
+
+      def processor: () -> Indexer::Processor
+      def warehouse_dumper: () -> WarehouseDumper
+      def s3_client: () -> ::Aws::S3::Client
+      def s3_bucket_name: () -> ::String
+
+      @logger: ::Logger
+      @indexer: Indexer
+      @s3_client: ::Aws::S3::Client?
+      @s3_bucket_name: ::String?
+      @config: Config
+      @clock: singleton(::Time)
+      @warehouse_dumper: WarehouseDumper?
+    end
+  end
+end

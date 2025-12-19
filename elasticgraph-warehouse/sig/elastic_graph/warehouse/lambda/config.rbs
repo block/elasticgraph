@@ -1,0 +1,25 @@
+module ElasticGraph
+  module Warehouse
+    class Lambda
+      class ConfigValueSuperType
+        attr_reader s3_path_prefix: ::String
+
+        def initialize: (s3_path_prefix: ::String) -> void
+
+        def with: (?s3_path_prefix: ::String) -> Config
+
+        private
+
+        def to_h: () -> ::Hash[::Symbol, untyped]
+      end
+
+      class Config < ConfigValueSuperType
+        def self.from_parsed_yaml: (::Hash[::String, untyped] hash) -> Config
+
+        EXPECTED_KEYS: ::Array[::String]
+        S3_PATH_PREFIX_PATTERN: ::Regexp
+        def self.members: () -> ::Array[::Symbol]
+      end
+    end
+  end
+end

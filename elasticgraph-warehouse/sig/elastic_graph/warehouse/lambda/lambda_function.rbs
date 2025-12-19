@@ -1,0 +1,14 @@
+module ElasticGraph
+  module Warehouse
+    class Lambda
+      class LambdaFunction
+        include LambdaSupport::LambdaFunction[void]
+        include LambdaSupport::_LambdaFunctionClass[void]
+
+        @sqs_processor: IndexerLambda::SqsProcessor
+      end
+    end
+  end
+end
+
+ElasticGraphWarehouse: ElasticGraph::Warehouse::Lambda::LambdaFunction

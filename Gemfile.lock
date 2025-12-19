@@ -190,7 +190,11 @@ PATH
   remote: elasticgraph-warehouse
   specs:
     elasticgraph-warehouse (1.0.3.pre)
+      aws-sdk-s3 (~> 1.208)
+      elasticgraph-indexer_lambda (= 1.0.3.pre)
+      elasticgraph-lambda_support (= 1.0.3.pre)
       elasticgraph-support (= 1.0.3.pre)
+      ox (~> 2.14, >= 2.14.23)
 
 PATH
   remote: elasticgraph
