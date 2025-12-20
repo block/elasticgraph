@@ -2,10 +2,13 @@ module ElasticGraph
   module Warehouse
     module SchemaDefinition
       module IndexExtension : ::ElasticGraph::SchemaDefinition::Indexing::Index
-        def warehouse_table_def: () -> WarehouseTable?
-        def warehouse_table: (::String) -> void
+        EXCLUDED_FROM_WAREHOUSE: ::Symbol
 
-        @warehouse_table_def: WarehouseTable?
+        def warehouse_table_def: () -> (WarehouseTable | ::Symbol)?
+        def warehouse_table: (::String) -> void
+        def exclude_from_warehouse: () -> void
+
+        @warehouse_table_def: (WarehouseTable | ::Symbol)?
       end
     end
   end

@@ -13,6 +13,10 @@ module ElasticGraph
     module SchemaDefinition
       # Extends {ElasticGraph::SchemaDefinition::Indexing::Index} to add warehouse table definition support.
       module IndexExtension
+        # Sentinel value used to indicate that this index should be excluded from the data warehouse.
+        EXCLUDED_FROM_WAREHOUSE = :excluded_from_warehouse
+        private_constant :EXCLUDED_FROM_WAREHOUSE
+
         # Returns the warehouse table definition for this index, if one has been defined via {#warehouse_table}.
         #
         # @return [WarehouseTable, nil] the warehouse table definition, or `nil` if none has been defined
@@ -37,6 +41,26 @@ module ElasticGraph
         #   end
         def warehouse_table(name)
           @warehouse_table_def = WarehouseTable.new(name: name, index: self)
+        end
+
+        # Excludes this index from the data warehouse configuration.
+        # This is useful when you have an index but don't want it to be included
+        # in the data warehouse.
+        #
+        # @return [void]
+        #
+        # @example Exclude an internal/test index from the warehouse
+        #   ElasticGraph.define_schema do |schema|
+        #     schema.object_type "InternalMetrics" do |t|
+        #       t.field "id", "ID"
+        #
+        #       t.index "internal_metrics" do |i|
+        #         i.exclude_from_warehouse  # This index won't be in the data warehouse
+        #       end
+        #     end
+        #   end
+        def exclude_from_warehouse
+          @warehouse_table_def = EXCLUDED_FROM_WAREHOUSE
         end
       end
     end
