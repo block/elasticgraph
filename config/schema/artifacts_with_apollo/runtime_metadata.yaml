@@ -7869,8 +7869,8 @@ scalar_types_by_name:
       name: ElasticGraph::GraphQL::ScalarCoercionAdapters::DateTime
       require_path: elastic_graph/graphql/scalar_coercion_adapters/date_time
     indexing_preparer:
-      name: ElasticGraph::Indexer::IndexingPreparers::NoOp
-      require_path: elastic_graph/indexer/indexing_preparers/no_op
+      name: ElasticGraph::Indexer::IndexingPreparers::DateTime
+      require_path: elastic_graph/indexer/indexing_preparers/date_time
   FieldSet:
     coercion_adapter:
       name: ElasticGraph::GraphQL::ScalarCoercionAdapters::NoOp

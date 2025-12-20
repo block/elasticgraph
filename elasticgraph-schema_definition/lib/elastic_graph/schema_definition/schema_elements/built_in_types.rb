@@ -794,6 +794,8 @@ module ElasticGraph
             t.json_schema type: "string", format: "date-time"
             t.coerce_with "ElasticGraph::GraphQL::ScalarCoercionAdapters::DateTime",
               defined_at: "elastic_graph/graphql/scalar_coercion_adapters/date_time"
+            t.prepare_for_indexing_with "ElasticGraph::Indexer::IndexingPreparers::DateTime",
+              defined_at: "elastic_graph/indexer/indexing_preparers/date_time"
 
             t.documentation <<~EOS
               A timestamp, represented as an [ISO 8601 time string](https://en.wikipedia.org/wiki/ISO_8601).

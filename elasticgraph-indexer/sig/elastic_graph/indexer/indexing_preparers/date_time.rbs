@@ -1,0 +1,9 @@
+module ElasticGraph
+  class Indexer
+    module IndexingPreparers
+      class DateTime
+        extend SchemaArtifacts::_IndexingPreparer[::String?, ::String?]
+      end
+    end
+  end
+end

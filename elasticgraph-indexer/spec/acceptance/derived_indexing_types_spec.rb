@@ -16,7 +16,13 @@ module ElasticGraph
       # is a bit different for an update to an existing document vs the insertion of a new one.
       # Previously, we had a bug that was hidden because we didn't verify JUST the result of
       # processing one source document.
-      w1 = index_records(widget("LARGE", "RED", "USD", name: "foo1", tags: ["b1", "c2", "a3"], fee_currencies: ["CAD", "GBP"])).first
+      #
+      # We use specific created_at timestamps with different millisecond precision to verify
+      # that DateTime normalization works correctly for min value tracking. Without normalization,
+      # string comparison of ".531Z" vs ".53Z" would incorrectly pick .531Z as the minimum
+      # because 'Z' (ASCII 90) > '1' (ASCII 49).
+      w1_created_at = "2023-11-01T10:30:00.531Z"  # 531 milliseconds
+      w1 = index_records(widget("LARGE", "RED", "USD", name: "foo1", tags: ["b1", "c2", "a3"], fee_currencies: ["CAD", "GBP"], created_at: w1_created_at)).first
 
       expect_payload_from_lookup_and_search({
         "id" => "USD",
@@ -32,25 +38,26 @@ module ElasticGraph
         "nested_fields" => {
           "max_widget_cost" => w1.fetch("record").fetch("cost").fetch("amount_cents")
         },
-        "oldest_widget_created_at" => w1.fetch("record").fetch("created_at")
+        "oldest_widget_created_at" => "2023-11-01T10:30:00.531Z"
       })
 
       # Now index a lot more documents so we can verify that we maintain a sorted list of unique values.
+      # Include a widget with 2-digit milliseconds (.53Z = 530ms) that is earlier than w1 (.531Z = 531ms).
+      # Without DateTime normalization, string comparison would incorrectly select .531Z as the minimum.
+      oldest_created_at = "2023-11-01T10:30:00.53Z"  # 530 milliseconds - the oldest
       widgets = index_records(
-        widget("SMALL", "RED", "USD", name: "bar1", tags: ["d4", "d4", "e5"]),
-        widget("LARGE", "RED", "USD", name: "foo1", tags: [], fee_currencies: ["CAD", "USD"]),
+        widget("SMALL", "RED", "USD", name: "bar1", tags: ["d4", "d4", "e5"], created_at: oldest_created_at),
+        widget("LARGE", "RED", "USD", name: "foo1", tags: [], fee_currencies: ["CAD", "USD"], created_at: "2023-11-02T10:30:00.000Z"),
         widget("SMALL", "BLUE", "CAD", name: "bazz", tags: ["a6"]),
-        widget("LARGE", "BLUE", "USD", name: "bar2", tags: ["a6", "a5"]),
-        widget("SMALL", "BLUE", "USD", name: "foo1", tags: []),
-        widget("LARGE", "BLUE", "USD", name: "foo2", tags: []),
-        widget(nil, nil, "USD", name: nil, tags: []), # nils scalars should be ignored.
-        widget(nil, nil, "USD", name: nil, options: nil, tags: []), # ...as should nil parent objects
+        widget("LARGE", "BLUE", "USD", name: "bar2", tags: ["a6", "a5"], created_at: "2023-11-03T10:30:00.000Z"),
+        widget("SMALL", "BLUE", "USD", name: "foo1", tags: [], created_at: "2023-11-04T10:30:00.000Z"),
+        widget("LARGE", "BLUE", "USD", name: "foo2", tags: [], created_at: "2023-11-05T10:30:00.000Z"),
+        widget(nil, nil, "USD", name: nil, tags: [], created_at: "2023-11-06T10:30:00.000Z"), # nils scalars should be ignored.
+        widget(nil, nil, "USD", name: nil, options: nil, tags: [], created_at: "2023-11-07T10:30:00.000Z"), # ...as should nil parent objects
         widget("MEDIUM", "GREEN", nil, name: "foo3", tags: ["z12"]), # ...as should events with `nil` for the derived indexing type id
         widget("MEDIUM", "GREEN", "", name: "foo3", tags: ["z12"]), # ...as should events with empty string for the derived indexing type id
-        widget("SMALL", "RED", "USD", name: "", tags: ["g8"]) # but empty string values can be put in the set. It's odd but seems more correct then not allowing it.
+        widget("SMALL", "RED", "USD", name: "", tags: ["g8"], created_at: "2023-11-08T10:30:00.000Z") # but empty string values can be put in the set. It's odd but seems more correct then not allowing it.
       )
-
-      usd_widgets = ([w1] + widgets).select { |w| w.dig("record", "cost", "currency") == "USD" }
 
       expect_payload_from_lookup_and_search({
         "id" => "USD",
@@ -64,14 +71,18 @@ module ElasticGraph
           "sizes" => ["LARGE", "SMALL"]
         },
         "nested_fields" => {
-          "max_widget_cost" => usd_widgets.map { |w| w.fetch("record").fetch("cost").fetch("amount_cents") }.max
+          "max_widget_cost" => ([w1] + widgets).select { |w| w.dig("record", "cost", "currency") == "USD" }.map { |w| w.fetch("record").fetch("cost").fetch("amount_cents") }.max
         },
-        "oldest_widget_created_at" => usd_widgets.map { |w| w.fetch("record").fetch("created_at") }.min
+        # Without DateTime normalization, this would incorrectly be "2023-11-01T10:30:00.531Z"
+        # because ".53Z" > ".531Z" in string comparison ('Z' > '1').
+        # With normalization, ".53Z" becomes ".530Z" and correctly compares as less than ".531Z".
+        "oldest_widget_created_at" => "2023-11-01T10:30:00.530Z"
       })
     end
 
     it "creates the derived document with empty field values when indexing a source document that lacks field values" do
-      w1 = widget(nil, nil, "GBP", name: nil, tags: [], cost_currency_name: nil, cost_currency_symbol: nil, cost_currency_unit: "dollars")
+      w1_created_at = "2023-11-15T10:30:00.123Z"
+      w1 = widget(nil, nil, "GBP", name: nil, tags: [], cost_currency_name: nil, cost_currency_symbol: nil, cost_currency_unit: "dollars", created_at: w1_created_at)
       w1[:cost][:amount_cents] = nil
 
       index_records(w1)
@@ -90,12 +101,13 @@ module ElasticGraph
         "nested_fields" => {
           "max_widget_cost" => nil
         },
-        "oldest_widget_created_at" => w1.fetch(:created_at)
+        "oldest_widget_created_at" => "2023-11-15T10:30:00.123Z"
       })
     end
 
     it "logs the noop result when a DerivedIndexUpdate operation results in no state change in the datastore" do
-      w1 = widget(nil, nil, "GBP", name: "widget1", tags: [])
+      w1_created_at = "2023-11-20T10:30:00.456Z"
+      w1 = widget(nil, nil, "GBP", name: "widget1", tags: [], created_at: w1_created_at)
       index_records(w1)
 
       expect { index_records(w1) }.to change { logged_output }.from(a_string_excluding("noop")).to(a_string_including("noop"))
@@ -114,7 +126,7 @@ module ElasticGraph
         "nested_fields" => {
           "max_widget_cost" => w1.fetch(:cost).fetch(:amount_cents)
         },
-        "oldest_widget_created_at" => w1.fetch(:created_at)
+        "oldest_widget_created_at" => "2023-11-20T10:30:00.456Z"
       })
     end
 
