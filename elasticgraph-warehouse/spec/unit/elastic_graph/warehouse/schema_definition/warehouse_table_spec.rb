@@ -12,65 +12,72 @@ module ElasticGraph
   module Warehouse
     module SchemaDefinition
       RSpec.describe WarehouseTable, :warehouse_schema do
-        it "generates table schema with warehouse_table definition" do
+        it "generates table schema with warehouse_table definition on index" do
           results = define_warehouse_schema do |s|
             s.object_type "Product" do |t|
               t.field "id", "ID"
               t.field "name", "String"
               t.field "price", "Float"
-              t.warehouse_table "products"
+              t.index "products" do |i|
+                i.warehouse_table "products"
+              end
             end
           end
 
           product_type = results.state.object_types_by_name.fetch("Product")
-          table = product_type.warehouse_table_def
+          index = product_type.index_def
+          table = index.warehouse_table_def
 
           expect(table).to be_a(WarehouseTable)
           expect(table.name).to eq("products")
 
-          expect(table.indexed_type).to eq(product_type)
+          expect(table.index).to eq(index)
         end
 
         it "converts table to configuration hash" do
           results = define_warehouse_schema do |s|
             s.object_type "Order" do |t|
-              t.field "order_id", "ID"
+              t.field "id", "ID"
               t.field "total", "Float"
-              t.warehouse_table "orders"
+              t.index "orders" do |i|
+                i.warehouse_table "orders"
+              end
             end
           end
 
           order_type = results.state.object_types_by_name.fetch("Order")
-          table = order_type.warehouse_table_def
+          table = order_type.index_def.warehouse_table_def
 
           config = table.to_config
           expect(config).to have_key("table_schema")
           expect(config["table_schema"]).to eq(<<~SQL.strip)
             CREATE TABLE IF NOT EXISTS orders (
-              order_id STRING,
+              id STRING,
               total DOUBLE
             )
           SQL
         end
 
-        it "generates complete CREATE TABLE SQL statement" do
+        it "generates complete CREATE TABLE SQL statement with all common scalar types" do
           results = define_warehouse_schema do |s|
             s.object_type "User" do |t|
-              t.field "user_id", "ID"
+              t.field "id", "ID"
               t.field "email", "String"
               t.field "age", "Int"
               t.field "is_active", "Boolean"
-              t.warehouse_table "users"
+              t.index "users" do |i|
+                i.warehouse_table "users"
+              end
             end
           end
 
           user_type = results.state.object_types_by_name.fetch("User")
-          table = user_type.warehouse_table_def
+          table = user_type.index_def.warehouse_table_def
 
           table_schema = table.to_config["table_schema"]
           expect(table_schema).to eq(<<~SQL.strip)
             CREATE TABLE IF NOT EXISTS users (
-              user_id STRING,
+              id STRING,
               email STRING,
               age INT,
               is_active BOOLEAN
@@ -84,12 +91,14 @@ module ElasticGraph
               t.field "id", "ID"
               t.field "amount", "Int", name_in_index: "amount_cents"
               t.field "currencyCode", "String", name_in_index: "currency"
-              t.warehouse_table "payments"
+              t.index "payments" do |i|
+                i.warehouse_table "payments"
+              end
             end
           end
 
           payment_type = results.state.object_types_by_name.fetch("Payment")
-          table = payment_type.warehouse_table_def
+          table = payment_type.index_def.warehouse_table_def
 
           table_schema = table.to_config["table_schema"]
           expect(table_schema).to eq(<<~SQL.strip)

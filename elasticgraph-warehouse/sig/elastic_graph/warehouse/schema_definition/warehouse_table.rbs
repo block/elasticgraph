@@ -3,9 +3,9 @@ module ElasticGraph
     module SchemaDefinition
       class WarehouseTableSupertype
         attr_reader name: ::String
-        attr_reader indexed_type: _IndexedTypeInterface
+        attr_reader index: ::ElasticGraph::SchemaDefinition::Indexing::Index
 
-        def initialize: (name: ::String, indexed_type: _IndexedTypeInterface) -> void
+        def initialize: (name: ::String, index: ::ElasticGraph::SchemaDefinition::Indexing::Index) -> void
       end
 
       class WarehouseTable < WarehouseTableSupertype
@@ -15,10 +15,6 @@ module ElasticGraph
         private
 
         def table_field: (::ElasticGraph::SchemaDefinition::Indexing::Field) -> ::String
-      end
-
-      interface _IndexedTypeInterface
-        def indexing_fields_by_name_in_index: () -> ::Hash[::String, ::ElasticGraph::SchemaDefinition::SchemaElements::Field]
       end
     end
   end

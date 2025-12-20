@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/warehouse/schema_definition/enum_type_extension"
+require "elastic_graph/warehouse/schema_definition/index_extension"
 require "elastic_graph/warehouse/schema_definition/object_interface_and_union_extension"
 require "elastic_graph/warehouse/schema_definition/scalar_type_extension"
 
@@ -28,6 +29,20 @@ module ElasticGraph
             # :nocov: -- currently all invocations have a block
             yield type if block_given?
             # :nocov:
+          end
+        end
+
+        # Creates a new index with warehouse extensions.
+        #
+        # @param name [String] the name of the index
+        # @param settings [Hash] additional settings for the index
+        # @param type [Object] the type this index is for
+        # @yield [ElasticGraph::SchemaDefinition::Indexing::Index] the newly created index (optional)
+        # @return [ElasticGraph::SchemaDefinition::Indexing::Index] the created index
+        def new_index(name, settings, type, &block)
+          super(name, settings, type) do |index|
+            index.extend IndexExtension
+            block&.call(index)
           end
         end
 

@@ -1,0 +1,12 @@
+module ElasticGraph
+  module Warehouse
+    module SchemaDefinition
+      module IndexExtension : ::ElasticGraph::SchemaDefinition::Indexing::Index
+        def warehouse_table_def: () -> WarehouseTable?
+        def warehouse_table: (::String) -> void
+
+        @warehouse_table_def: WarehouseTable?
+      end
+    end
+  end
+end
