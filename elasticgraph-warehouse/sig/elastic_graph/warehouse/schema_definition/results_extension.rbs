@@ -1,0 +1,15 @@
+module ElasticGraph
+  module Warehouse
+    module SchemaDefinition
+      module ResultsExtension : ::ElasticGraph::SchemaDefinition::Results
+        def warehouse_config: () -> ::Hash[::String, ::Hash[::String, untyped]]
+
+        private
+
+        def generate_warehouse_config: () -> ::Hash[::String, ::Hash[::String, untyped]]
+
+        @warehouse_config: ::Hash[::String, ::Hash[::String, untyped]]?
+      end
+    end
+  end
+end
