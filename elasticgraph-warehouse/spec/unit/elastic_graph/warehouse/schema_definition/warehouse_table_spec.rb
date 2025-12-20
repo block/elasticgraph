@@ -18,9 +18,7 @@ module ElasticGraph
               t.field "id", "ID"
               t.field "name", "String"
               t.field "price", "Float"
-              t.index "products" do |i|
-                i.warehouse_table "products"
-              end
+              t.index "products"
             end
           end
 
@@ -34,14 +32,53 @@ module ElasticGraph
           expect(table.index).to eq(index)
         end
 
+        it "allows overriding warehouse_table name to differ from index name" do
+          results = define_warehouse_schema do |s|
+            s.object_type "Product" do |t|
+              t.field "id", "ID"
+              t.field "name", "String"
+              t.index "products" do |i|
+                i.warehouse_table "custom_products_table"
+              end
+            end
+          end
+
+          product_type = results.state.object_types_by_name.fetch("Product")
+          table = product_type.index_def.warehouse_table_def
+
+          expect(table).to be_a(WarehouseTable)
+          expect(table.name).to eq("custom_products_table")
+        end
+
+        it "does not include excluded indices in warehouse config" do
+          results = define_warehouse_schema do |s|
+            s.object_type "Product" do |t|
+              t.field "id", "ID"
+              t.index "products"
+              # This will automatically get a warehouse table
+            end
+
+            s.object_type "InternalMetrics" do |t|
+              t.field "id", "ID"
+              t.index "internal_metrics" do |i|
+                i.exclude_from_warehouse
+              end
+            end
+          end
+
+          warehouse_config = results.warehouse_config
+          table_names = warehouse_config["tables"].keys
+
+          expect(table_names).to eq(["products"])
+          expect(table_names).not_to include("internal_metrics")
+        end
+
         it "converts table to configuration hash" do
           results = define_warehouse_schema do |s|
             s.object_type "Order" do |t|
               t.field "id", "ID"
               t.field "total", "Float"
-              t.index "orders" do |i|
-                i.warehouse_table "orders"
-              end
+              t.index "orders"
             end
           end
 
@@ -65,9 +102,7 @@ module ElasticGraph
               t.field "email", "String"
               t.field "age", "Int"
               t.field "is_active", "Boolean"
-              t.index "users" do |i|
-                i.warehouse_table "users"
-              end
+              t.index "users"
             end
           end
 
@@ -91,9 +126,7 @@ module ElasticGraph
               t.field "id", "ID"
               t.field "amount", "Int", name_in_index: "amount_cents"
               t.field "currencyCode", "String", name_in_index: "currency"
-              t.index "payments" do |i|
-                i.warehouse_table "payments"
-              end
+              t.index "payments"
             end
           end
 

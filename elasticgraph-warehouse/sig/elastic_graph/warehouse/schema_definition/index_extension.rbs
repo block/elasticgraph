@@ -4,6 +4,7 @@ module ElasticGraph
       module IndexExtension : ::ElasticGraph::SchemaDefinition::Indexing::Index
         def warehouse_table_def: () -> WarehouseTable?
         def warehouse_table: (::String) -> void
+        def exclude_from_warehouse: () -> void
 
         @warehouse_table_def: WarehouseTable?
       end
