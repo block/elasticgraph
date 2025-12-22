@@ -83,8 +83,8 @@ PATH
   remote: elasticgraph-indexer_autoscaler_lambda
   specs:
     elasticgraph-indexer_autoscaler_lambda (1.0.3.pre)
-      aws-sdk-cloudwatch (>= 1.125, < 1.127)
-      aws-sdk-lambda (~> 1.167)
+      aws-sdk-cloudwatch (~> 1.126.0)
+      aws-sdk-lambda (~> 1.171)
       aws-sdk-sqs (~> 1.107)
       elasticgraph-datastore_core (= 1.0.3.pre)
       elasticgraph-lambda_support (= 1.0.3.pre)
@@ -124,9 +124,9 @@ PATH
       elasticgraph-graphql (= 1.0.3.pre)
       elasticgraph-indexer (= 1.0.3.pre)
       elasticgraph-schema_definition (= 1.0.3.pre)
-      rackup (~> 2.2, >= 2.2.1)
+      rackup (~> 2.3, >= 2.3.1)
       rake (~> 13.3, >= 13.3.1)
-      webrick (~> 1.9, >= 1.9.1)
+      webrick (~> 1.9, >= 1.9.2)
 
 PATH
   remote: elasticgraph-opensearch
@@ -640,7 +640,7 @@ DEPENDENCIES
   elasticgraph-support (= 1.0.3.pre)!
   elasticgraph-warehouse (= 1.0.3.pre)!
   factory_bot (~> 6.5, >= 6.5.6)
-  faker (~> 3.5)
+  faker (~> 3.5, >= 3.5.3)
   filewatcher (~> 2.1)
   flatware-rspec (~> 2.3, >= 2.3.4)
   html-proofer (~> 5.1, >= 5.1.1)

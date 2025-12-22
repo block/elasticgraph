@@ -14,7 +14,7 @@ group :development do
   gem "benchmark-ips", "~> 2.14"
   gem "coderay", "~> 1.1", ">= 1.1.3"
   gem "factory_bot", "~> 6.5", ">= 6.5.6"
-  gem "faker", "~> 3.5"
+  gem "faker", "~> 3.5", ">= 3.5.3"
   gem "flatware-rspec", "~> 2.3", ">= 2.3.4"
   gem "httpx", "~> 1.6", ">= 1.6.3"
   gem "memory_profiler", "~> 1.1"
