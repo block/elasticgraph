@@ -9,6 +9,7 @@
 require "elastic_graph/constants"
 require "elastic_graph/schema_definition/mixins/has_readable_to_s_and_inspect"
 require "elastic_graph/schema_definition/results"
+require "elastic_graph/schema_definition/indexing/index"
 require "elastic_graph/schema_definition/schema_artifact_manager"
 require "elastic_graph/schema_definition/schema_elements/argument"
 require "elastic_graph/schema_definition/schema_elements/built_in_types"
@@ -276,6 +277,11 @@ module ElasticGraph
         )
       end
       @@relationship_new = prevent_non_factory_instantiation_of(SchemaElements::Relationship)
+
+      def new_index(name, settings, type, &block)
+        @@index_new.call(name, settings, @state, type, &block)
+      end
+      @@index_new = prevent_non_factory_instantiation_of(Indexing::Index)
 
       def new_results
         @@results_new.call(@state)
