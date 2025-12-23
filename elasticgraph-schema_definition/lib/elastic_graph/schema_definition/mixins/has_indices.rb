@@ -77,7 +77,7 @@ module ElasticGraph
               "Only one index per type is supported. An index named `#{@index_def.name}` has already been defined."
           end
 
-          @index_def = Indexing::Index.new(name, settings, schema_def_state, self, &block)
+          @index_def = schema_def_state.factory.new_index(name, settings, self, &block)
         end
 
         # Configures the default GraphQL resolver that will be used to resolve the fields of this type. Individual fields
