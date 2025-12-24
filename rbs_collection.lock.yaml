@@ -34,7 +34,7 @@ gems:
     remote: https://github.com/ruby/gem_rbs_collection.git
     repo_dir: gems
 - name: aws-sdk-cloudwatch
-  version: 1.125.0
+  version: 1.126.0
   source:
     type: rubygems
 - name: aws-sdk-core
@@ -46,7 +46,7 @@ gems:
   source:
     type: rubygems
 - name: aws-sdk-lambda
-  version: 1.167.0
+  version: 1.171.0
   source:
     type: rubygems
 - name: aws-sdk-s3
@@ -238,7 +238,7 @@ gems:
     remote: https://github.com/ruby/gem_rbs_collection.git
     repo_dir: gems
 - name: prism
-  version: 1.6.0
+  version: 1.7.0
   source:
     type: rubygems
 - name: rack
@@ -350,7 +350,7 @@ gems:
   source:
     type: stdlib
 - name: webrick
-  version: 1.9.1
+  version: 1.9.2
   source:
     type: rubygems
 - name: yard
