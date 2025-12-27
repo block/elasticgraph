@@ -2,7 +2,6 @@ module ElasticGraph
   module Warehouse
     module SchemaDefinition
       module FactoryExtension: ::ElasticGraph::SchemaDefinition::Factory
-        def new_results: () -> ::ElasticGraph::SchemaDefinition::Results
       end
     end
   end
