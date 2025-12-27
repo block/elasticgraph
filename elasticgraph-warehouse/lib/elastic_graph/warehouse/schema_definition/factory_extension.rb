@@ -9,6 +9,7 @@
 require "elastic_graph/warehouse/schema_definition/enum_type_extension"
 require "elastic_graph/warehouse/schema_definition/index_extension"
 require "elastic_graph/warehouse/schema_definition/object_interface_and_union_extension"
+require "elastic_graph/warehouse/schema_definition/results_extension"
 require "elastic_graph/warehouse/schema_definition/scalar_type_extension"
 
 module ElasticGraph
@@ -99,6 +100,15 @@ module ElasticGraph
             # :nocov: -- currently all invocations have a block
             yield type if block_given?
             # :nocov:
+          end
+        end
+
+        # Creates a new Results instance with warehouse extensions.
+        #
+        # @return [ElasticGraph::SchemaDefinition::Results] the created results instance
+        def new_results
+          super.tap do |results|
+            results.extend ResultsExtension
           end
         end
       end
