@@ -12,7 +12,7 @@ module ElasticGraph
   module Warehouse
     module SchemaDefinition
       # Represents a warehouse table configuration.
-      class WarehouseTable < ::Data.define(:name, :indexed_type)
+      class WarehouseTable < ::Data.define(:name, :index)
         # Converts the warehouse table to a configuration hash.
         #
         # @return [Hash] configuration hash with table_schema
@@ -28,7 +28,7 @@ module ElasticGraph
         #
         # @return [String] SQL CREATE TABLE statement with all fields
         def table_schema
-          fields = indexed_type
+          fields = index.indexed_type
             .indexing_fields_by_name_in_index
             .values
             .filter_map(&:to_indexing_field)

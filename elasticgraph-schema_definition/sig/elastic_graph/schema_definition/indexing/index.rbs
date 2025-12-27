@@ -7,6 +7,8 @@ module ElasticGraph
         attr_reader routing_field_path: SchemaElements::FieldPath?
         attr_reader rollover_config: RolloverConfig?
         attr_reader has_had_multiple_sources_flag: bool
+        attr_reader indexed_type: indexableType
+
         def uses_custom_routing?: () -> bool
         def to_index_config: () -> ::Hash[::String, untyped]
         def to_index_template_config: () -> ::Hash[::String, untyped]

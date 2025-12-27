@@ -10,6 +10,7 @@ require "elastic_graph/apollo/schema_definition/api_extension"
 require "elastic_graph/schema_artifacts/runtime_metadata/schema_element_names"
 require "elastic_graph/schema_definition/api"
 require "elastic_graph/schema_definition/schema_artifact_manager"
+require "elastic_graph/warehouse/schema_definition/api_extension"
 require "rspec/mocks"
 require "stringio"
 require "tmpdir"
@@ -50,7 +51,8 @@ module ElasticGraph
     descriptions_needing_schema_def_api_and_extension_modules = {
       "ElasticGraph.define_schema" => [],
       "ElasticGraph::Apollo::SchemaDefinition" => [ElasticGraph::Apollo::SchemaDefinition::APIExtension],
-      "ElasticGraph::SchemaDefinition" => []
+      "ElasticGraph::SchemaDefinition" => [],
+      "ElasticGraph::Warehouse::SchemaDefinition" => [ElasticGraph::Warehouse::SchemaDefinition::APIExtension]
     }
 
     descriptions_needing_schema_def_api_and_extension_modules.each do |description, extension_modules|
