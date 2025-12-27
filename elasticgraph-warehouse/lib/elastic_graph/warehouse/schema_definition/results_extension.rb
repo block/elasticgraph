@@ -30,7 +30,7 @@ module ElasticGraph
         def generate_warehouse_config
           tables = all_types
             .filter_map { |type| (_ = type).index_def if type.respond_to?(:index_def) }
-            .filter_map(&:warehouse_table_def)
+            .filter_map { |index| (_ = index).warehouse_table_def if (_ = index).warehouse_table_def.is_a?(WarehouseTable) }
             .sort_by(&:name)
 
           {"tables" => tables.to_h { |table| [table.name, table.to_config] }}

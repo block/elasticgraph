@@ -70,7 +70,7 @@ module ElasticGraph
           expect(config).to eq({"tables" => {}})
         end
 
-        it "excludes indices without warehouse_table definitions" do
+        it "excludes indices that are explicitly excluded from the warehouse" do
           results = define_warehouse_schema do |s|
             s.object_type "Product" do |t|
               t.field "id", "ID"
@@ -83,8 +83,9 @@ module ElasticGraph
             s.object_type "Category" do |t|
               t.field "id", "ID"
               t.field "name", "String"
-              t.index "categories"
-              # No warehouse_table definition
+              t.index "categories" do |i|
+                i.exclude_from_warehouse
+              end
             end
           end
 
