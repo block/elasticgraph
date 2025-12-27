@@ -44,6 +44,8 @@ bundle exec rake opensearch:test:boot
 - API documentation uses YARD
 - Website source: `config/site/`
 - Example queries: `config/site/examples/*/queries/`
+- When writing links in documentation, use permalinks (links to a specific commit/version)
+- Prefer relative links to ElasticGraph documentation over external links to ruby-doc.org
 
 ## Architecture
 
@@ -136,6 +138,28 @@ Custom gems can be added via `Gemfile-custom` (see `Gemfile-custom.example`), th
 - **Coverage**: 100% required (enforced by SimpleCov)
 - **Ruby Version**: 3.4.x
 - **Standard Comment Header**: Required on most Ruby files (copyright notice)
+
+### Ruby Idioms
+
+- Prefer `filter_map` over `.select { ... }.map { ... }` chains. For example, instead of:
+  ```ruby
+  items.select { |item| item.value }.map { |item| item.value }
+  ```
+  Use:
+  ```ruby
+  items.filter_map { |item| item.value }
+  ```
+- Prefer `::Data.define` over `::Struct.new` for immutable data classes. Use `Struct` only when mutability is required.
+- Don't rely on exceptions for control flow (exceptions are slow). Handle edge cases explicitly instead (e.g., check for `nil` before calling a method that would raise `ArgumentError`).
+- For constants accessed from multiple EG gems, define them in `elasticgraph-support/lib/elastic_graph/constants.rb`.
+
+### RBS Type Signatures
+
+- When defining RBS signatures for extension modules, prefer declaring the concrete type a module extends rather than defining custom interfaces. For example, use `module IndexExtension : ::ElasticGraph::SchemaDefinition::Indexing::Index` instead of creating a custom `_IndexExtensionInterface`.
+
+### Testing
+
+- Avoid duplicate tests. If two tests will always pass/fail together, keep only one.
 
 ## Important Patterns
 
