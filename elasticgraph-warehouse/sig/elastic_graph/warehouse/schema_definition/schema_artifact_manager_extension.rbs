@@ -1,0 +1,14 @@
+module ElasticGraph
+  module Warehouse
+    module SchemaDefinition
+      module SchemaArtifactManagerExtension : ::ElasticGraph::SchemaDefinition::SchemaArtifactManager
+        # Override to indicate that when this extension is used, Results has been extended with ResultsExtension
+        def schema_definition_results: () -> ResultsExtension
+
+        private
+
+        def artifacts_from_schema_def: () -> ::Array[::ElasticGraph::SchemaDefinition::SchemaArtifact[untyped]]
+      end
+    end
+  end
+end
