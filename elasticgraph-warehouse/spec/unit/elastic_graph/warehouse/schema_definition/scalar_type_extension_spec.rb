@@ -30,7 +30,7 @@ module ElasticGraph
 
           # Test the scalar types directly
           expect(warehouse_column_type_for(results, "Int")).to eq("INT")
-          expect(warehouse_column_type_for(results, "Float")).to eq("DOUBLE")
+          expect(warehouse_column_type_for(results, "Float")).to eq("FLOAT")
           expect(warehouse_column_type_for(results, "Boolean")).to eq("BOOLEAN")
           expect(warehouse_column_type_for(results, "String")).to eq("STRING")
           expect(warehouse_column_type_for(results, "ID")).to eq("STRING")

@@ -35,7 +35,7 @@ module ElasticGraph
             end
 
             # GeoLocation uses name_in_index: "lat" and "lon" for its fields
-            expect(warehouse_column_type_for(results, "Venue")).to eq("STRUCT<id STRING, name STRING, location STRUCT<lat DOUBLE, lon DOUBLE>>")
+            expect(warehouse_column_type_for(results, "Venue")).to eq("STRUCT<id STRING, name STRING, location STRUCT<lat FLOAT, lon FLOAT>>")
           end
 
           it "respects name_in_index for nested object fields" do
@@ -66,7 +66,7 @@ module ElasticGraph
               end
             end
 
-            expect(warehouse_column_type_for(results, "Identifiable")).to eq("STRUCT<id STRING, name STRING, price DOUBLE, __typename STRING>")
+            expect(warehouse_column_type_for(results, "Identifiable")).to eq("STRUCT<id STRING, name STRING, price FLOAT, __typename STRING>")
           end
         end
 
