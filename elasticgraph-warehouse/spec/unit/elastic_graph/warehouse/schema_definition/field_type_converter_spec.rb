@@ -40,7 +40,7 @@ module ElasticGraph
             end
           end
 
-          expect(convert_field_type(results, "Matrix", "values")).to eq "ARRAY<ARRAY<DOUBLE>>"
+          expect(convert_field_type(results, "Matrix", "values")).to eq "ARRAY<ARRAY<FLOAT>>"
         end
 
         it "unwraps non-null wrapper before checking if type is a list" do
