@@ -170,8 +170,8 @@ module ElasticGraph
               "subtypes of `Thing`",
               "Widget",
               "Component",
-              inspect_output_of('"type" => "keyword"'),
-              inspect_output_of('"type" => "integer"')
+              '"type" => "keyword"',
+              '"type" => "integer"'
             ).and(excluding("Animal")))
           end
 
