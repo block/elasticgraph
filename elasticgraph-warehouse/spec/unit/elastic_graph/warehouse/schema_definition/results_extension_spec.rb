@@ -40,7 +40,7 @@ module ElasticGraph
                 "table_schema" => <<~SQL.strip
                   CREATE TABLE IF NOT EXISTS orders (
                     id STRING,
-                    total DOUBLE
+                    total FLOAT
                   )
                 SQL
               },
@@ -49,7 +49,7 @@ module ElasticGraph
                   CREATE TABLE IF NOT EXISTS products (
                     id STRING,
                     name STRING,
-                    price DOUBLE
+                    price FLOAT
                   )
                 SQL
               }

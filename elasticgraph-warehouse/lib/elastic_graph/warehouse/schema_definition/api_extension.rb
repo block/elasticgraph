@@ -40,7 +40,7 @@ module ElasticGraph
           "Cursor" => "STRING",
           "Date" => "DATE",
           "DateTime" => "TIMESTAMP",
-          "Float" => "DOUBLE",
+          "Float" => "FLOAT",
           "ID" => "STRING",
           "Int" => "INT",
           "JsonSafeLong" => "BIGINT",

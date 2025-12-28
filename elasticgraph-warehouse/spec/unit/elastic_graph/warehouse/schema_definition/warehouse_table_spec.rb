@@ -53,7 +53,7 @@ module ElasticGraph
           expect(config["table_schema"]).to eq(<<~SQL.strip)
             CREATE TABLE IF NOT EXISTS orders (
               id STRING,
-              total DOUBLE
+              total FLOAT
             )
           SQL
         end
