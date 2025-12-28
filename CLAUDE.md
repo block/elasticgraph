@@ -136,7 +136,7 @@ Custom gems can be added via `Gemfile-custom` (see `Gemfile-custom.example`), th
 - **Type Checker**: Steep (`Steepfile`)
 - **Test Framework**: RSpec
 - **Coverage**: 100% required (enforced by SimpleCov)
-- **Ruby Version**: 3.4.x
+- **Ruby Version**: 3.4.x or 4.0.x
 - **Standard Comment Header**: Required on most Ruby files (copyright notice)
 
 ### Ruby Idioms

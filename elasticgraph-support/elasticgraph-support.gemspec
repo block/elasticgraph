@@ -39,10 +39,8 @@ Gem::Specification.new do |spec|
     end - [".rspec", "Gemfile", ".yardopts"]
   end
 
-  spec.required_ruby_version = [">= 3.4", "< 3.5"]
+  spec.required_ruby_version = [">= 3.4", "< 4.1"]
 
-  # Ruby 3.4 warns about using `logger` being moved out of the standard library, and in Ruby 3.5
-  # it'll no longer be available without declaring a dependency.
   spec.add_dependency "logger", "~> 1.7"
   spec.add_dependency "json_schemer", "~> 2.5"
 
