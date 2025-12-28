@@ -141,11 +141,15 @@ ElasticGraph.define_schema do |schema|
     # Also, to demonstrate that custom shard routing works correctly, we need multiple shards.
     # That way, our documents wind up on multiple shards and we can demonstrate that our
     # queries are directly routed to the correct shards.
+    # Customize the warehouse table name to demonstrate renaming capability.
     t.index "widgets", number_of_shards: 3 do |i|
       i.rollover :yearly, "created_at"
       i.route_with "workspace_id"
       i.default_sort "created_at", :desc
       i.has_had_multiple_sources!
+      # :nocov: -- test suite only covers one side of the conditional
+      i.warehouse_table "widget_records" if ENV["DEMONSTRATE_WAREHOUSE_APIS"]
+      # :nocov:
     end
 
     t.derive_indexed_type_fields "WidgetCurrency", from_id: "cost.currency", route_with: "cost_currency_primary_continent", rollover_with: "cost_currency_introduced_on" do |derive|
@@ -213,7 +217,12 @@ ElasticGraph.define_schema do |schema|
     t.field "widget", "WorkspaceWidget"
     # t.field "widgets", "[WorkspaceWidget!]!"
 
-    t.index "widget_workspaces"
+    # Exclude this internal lookup table from the data warehouse.
+    t.index "widget_workspaces" do |i|
+      # :nocov: -- test suite only covers one side of the conditional
+      i.exclude_from_warehouse if ENV["DEMONSTRATE_WAREHOUSE_APIS"]
+      # :nocov:
+    end
   end
 
   schema.object_type "WorkspaceWidget" do |t|
