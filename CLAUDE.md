@@ -156,6 +156,11 @@ Custom gems can be added via `Gemfile-custom` (see `Gemfile-custom.example`), th
 ### RBS Type Signatures
 
 - When defining RBS signatures for extension modules, prefer declaring the concrete type a module extends rather than defining custom interfaces. For example, use `module IndexExtension : ::ElasticGraph::SchemaDefinition::Indexing::Index` instead of creating a custom `_IndexExtensionInterface`.
+- When calling methods from an extension module on an extended object, use an inline type annotation to help Steep understand the intersection type. For example:
+  ```ruby
+  extended_index = index.extend IndexExtension # : ::ElasticGraph::SchemaDefinition::Indexing::Index & IndexExtension
+  extended_index.warehouse_table(name)
+  ```
 
 ### Testing
 
