@@ -10,7 +10,7 @@ source "https://rubygems.org"
 
 gem "gem-release", "~> 2.2"
 gem "json_schemer", "~> 2.5"
-gem "nokogiri", "~> 1.18"
+gem "nokogiri", "~> 1.19"
 gem "rake", "~> 13.3"
 gem "redcarpet", "~> 3.6", ">= 3.6.1"
 gem "yard", "~> 0.9"
