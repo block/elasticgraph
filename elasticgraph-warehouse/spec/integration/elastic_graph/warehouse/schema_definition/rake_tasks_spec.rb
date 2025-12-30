@@ -22,9 +22,7 @@ module ElasticGraph
                 t.field "id", "ID"
                 t.field "name", "String"
                 t.field "price", "Float"
-                t.index "products" do |i|
-                  i.warehouse_table "products"
-                end
+                t.index "products"
               end
             EOS
 
@@ -44,12 +42,12 @@ module ElasticGraph
             expect(warehouse_config["tables"]["products"]["table_schema"]).to start_with("CREATE TABLE IF NOT EXISTS products")
           end
 
-          it "does not dump warehouse artifact when no warehouse tables are defined" do
+          it "does not dump warehouse artifact when no indexed types are defined" do
             write_warehouse_schema(table_defs: <<~EOS)
               s.object_type "User" do |t|
                 t.field "id", "ID"
                 t.field "name", "String"
-                # No warehouse_table definition
+                # No index - this is an embedded type only, so no warehouse table will be created
               end
             EOS
 
@@ -63,9 +61,7 @@ module ElasticGraph
             write_warehouse_schema(table_defs: <<~EOS)
               s.object_type "Product" do |t|
                 t.field "id", "ID"
-                t.index "products" do |i|
-                  i.warehouse_table "products"
-                end
+                t.index "products"
               end
             EOS
 
@@ -81,9 +77,7 @@ module ElasticGraph
             write_warehouse_schema(table_defs: <<~EOS)
               s.object_type "Product" do |t|
                 t.field "id", "ID"
-                t.index "products" do |i|
-                  i.warehouse_table "products"
-                end
+                t.index "products"
               end
             EOS
 
@@ -95,9 +89,7 @@ module ElasticGraph
               s.object_type "Product" do |t|
                 t.field "id", "ID"
                 t.field "added_field", "String"
-                t.index "products" do |i|
-                  i.warehouse_table "products"
-                end
+                t.index "products"
               end
             EOS
 
@@ -112,23 +104,17 @@ module ElasticGraph
             write_warehouse_schema(table_defs: <<~EOS)
               s.object_type "Zebra" do |t|
                 t.field "id", "ID"
-                t.index "zebras" do |i|
-                  i.warehouse_table "zebras"
-                end
+                t.index "zebras"
               end
 
               s.object_type "Apple" do |t|
                 t.field "id", "ID"
-                t.index "apples" do |i|
-                  i.warehouse_table "apples"
-                end
+                t.index "apples"
               end
 
               s.object_type "Middle" do |t|
                 t.field "id", "ID"
-                t.index "middles" do |i|
-                  i.warehouse_table "middles"
-                end
+                t.index "middles"
               end
             EOS
 
@@ -144,24 +130,18 @@ module ElasticGraph
                 t.field "id", "ID"
                 t.field "name", "String"
                 t.field "price", "Float"
-                t.index "products" do |i|
-                  i.warehouse_table "products"
-                end
+                t.index "products"
               end
 
               s.object_type "User" do |t|
                 t.field "id", "ID"
                 t.field "email", "String"
-                t.index "users" do |i|
-                  i.warehouse_table "users"
-                end
+                t.index "users"
               end
 
               s.object_type "Order" do |t|
                 t.field "id", "ID"
-                t.index "orders" do |i|
-                  i.warehouse_table "orders"
-                end
+                t.index "orders"
               end
             EOS
 
@@ -184,9 +164,12 @@ module ElasticGraph
 
               # Add a dummy indexed type to ensure the Query type has at least one field.
               # This prevents GraphQL-Ruby warnings about empty Query types in tests.
+              # We exclude it from the warehouse so it doesn't interfere with test expectations.
               s.object_type "_DummyWarehouseTestType" do |t|
                 t.field "id", "ID"
-                t.index "dummy_warehouse_test_indices"
+                t.index "dummy_warehouse_test_indices" do |i|
+                  i.exclude_from_warehouse
+                end
               end
 
               #{table_defs}

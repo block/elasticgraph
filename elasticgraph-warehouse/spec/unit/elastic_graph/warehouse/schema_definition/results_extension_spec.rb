@@ -12,23 +12,19 @@ module ElasticGraph
   module Warehouse
     module SchemaDefinition
       RSpec.describe ResultsExtension, :warehouse_schema do
-        it "generates warehouse config for indices with warehouse_table definitions" do
+        it "generates warehouse config for indices by default" do
           results = define_warehouse_schema do |s|
             s.object_type "Product" do |t|
               t.field "id", "ID"
               t.field "name", "String"
               t.field "price", "Float"
-              t.index "products" do |i|
-                i.warehouse_table "products"
-              end
+              t.index "products"
             end
 
             s.object_type "Order" do |t|
               t.field "id", "ID"
               t.field "total", "Float"
-              t.index "orders" do |i|
-                i.warehouse_table "orders"
-              end
+              t.index "orders"
             end
           end
 
@@ -57,7 +53,7 @@ module ElasticGraph
           })
         end
 
-        it "returns empty hash when no warehouse tables are defined" do
+        it "returns empty hash when no indices are defined" do
           results = define_warehouse_schema do |s|
             s.object_type "User" do |t|
               t.field "id", "ID"
@@ -70,21 +66,20 @@ module ElasticGraph
           expect(config).to eq({"tables" => {}})
         end
 
-        it "excludes indices without warehouse_table definitions" do
+        it "excludes indices that are explicitly excluded from the warehouse" do
           results = define_warehouse_schema do |s|
             s.object_type "Product" do |t|
               t.field "id", "ID"
               t.field "name", "String"
-              t.index "products" do |i|
-                i.warehouse_table "products"
-              end
+              t.index "products"
             end
 
             s.object_type "Category" do |t|
               t.field "id", "ID"
               t.field "name", "String"
-              t.index "categories"
-              # No warehouse_table definition
+              t.index "categories" do |i|
+                i.exclude_from_warehouse
+              end
             end
           end
 
@@ -97,23 +92,17 @@ module ElasticGraph
           results = define_warehouse_schema do |s|
             s.object_type "Zebra" do |t|
               t.field "id", "ID"
-              t.index "zebras" do |i|
-                i.warehouse_table "zebras"
-              end
+              t.index "zebras"
             end
 
             s.object_type "Apple" do |t|
               t.field "id", "ID"
-              t.index "apples" do |i|
-                i.warehouse_table "apples"
-              end
+              t.index "apples"
             end
 
             s.object_type "Mango" do |t|
               t.field "id", "ID"
-              t.index "mangos" do |i|
-                i.warehouse_table "mangos"
-              end
+              t.index "mangos"
             end
           end
 
@@ -126,9 +115,7 @@ module ElasticGraph
           results = define_warehouse_schema do |s|
             s.object_type "Product" do |t|
               t.field "id", "ID"
-              t.index "products" do |i|
-                i.warehouse_table "products"
-              end
+              t.index "products"
             end
           end
 

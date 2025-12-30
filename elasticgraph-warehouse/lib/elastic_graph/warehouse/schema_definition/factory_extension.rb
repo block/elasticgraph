@@ -35,6 +35,8 @@ module ElasticGraph
         end
 
         # Creates a new index with warehouse extensions.
+        # Automatically creates a warehouse table with the same name as the index
+        # unless one is explicitly defined or the index is excluded from the warehouse.
         #
         # @param name [String] the name of the index
         # @param settings [Hash] additional settings for the index
@@ -43,8 +45,9 @@ module ElasticGraph
         # @return [ElasticGraph::SchemaDefinition::Indexing::Index] the created index
         def new_index(name, settings, type, &block)
           super(name, settings, type) do |index|
-            index.extend IndexExtension
-            block&.call(index)
+            extended_index = index.extend IndexExtension # : ::ElasticGraph::SchemaDefinition::Indexing::Index & IndexExtension
+            extended_index.warehouse_table(name)
+            block&.call(extended_index)
           end
         end
 
