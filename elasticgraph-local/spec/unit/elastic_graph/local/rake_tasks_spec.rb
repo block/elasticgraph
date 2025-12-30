@@ -143,7 +143,7 @@ module ElasticGraph
             end
           }.to raise_error a_string_including(
             "`env_port_mapping` has invalid ports: ",
-            inspect_output_of('{local: "123"}')
+            '{local: "123"}'
           )
         end
 
@@ -154,7 +154,7 @@ module ElasticGraph
             end
           }.to raise_error a_string_including(
             "`env_port_mapping` has invalid ports: ",
-            inspect_output_of('{local: "45000"}')
+            '{local: "45000"}'
           )
         end
 
