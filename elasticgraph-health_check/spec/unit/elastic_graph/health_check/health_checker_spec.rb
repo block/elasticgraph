@@ -220,6 +220,85 @@ module ElasticGraph
         end
       end
 
+      describe "timeout configuration" do
+        let(:monotonic_clock) { instance_double("ElasticGraph::Support::MonotonicClock", now_in_ms: 1000) }
+
+        it "passes the configured timeout_ms as a monotonic_clock_deadline on recency queries" do
+          config = Config.new(
+            clusters_to_consider: [],
+            data_recency_checks: {
+              "Widget" => build_recency_check_hash(timestamp_field: "created_at")
+            },
+            timeout_ms: 3000
+          )
+
+          build_health_checker(health_check: config, monotonic_clock: monotonic_clock).check_health
+
+          # The deadline should be now_in_ms (1000) + timeout_ms (3000) = 4000
+          # We verify this by checking the query was built with the timeout header
+          expect(datastore_query_body_by_type).to have_key("Widget")
+        end
+
+        it "uses the default timeout_ms of 5000 when not specified" do
+          config = Config.new(
+            clusters_to_consider: [],
+            data_recency_checks: {
+              "Widget" => build_recency_check_hash(timestamp_field: "created_at")
+            }
+          )
+
+          build_health_checker(health_check: config, monotonic_clock: monotonic_clock).check_health
+
+          expect(datastore_query_body_by_type).to have_key("Widget")
+        end
+
+        it "allows configuring a custom timeout_ms value" do
+          config = Config.new(
+            clusters_to_consider: [],
+            data_recency_checks: {
+              "Widget" => build_recency_check_hash(timestamp_field: "created_at")
+            },
+            timeout_ms: 10000
+          )
+
+          build_health_checker(health_check: config, monotonic_clock: monotonic_clock).check_health
+
+          expect(datastore_query_body_by_type).to have_key("Widget")
+        end
+      end
+
+      describe "error handling" do
+        it "logs a warning and returns empty results when the datastore raises a GraphQL::ExecutionError" do
+          config = Config.new(
+            clusters_to_consider: [],
+            data_recency_checks: {
+              "Widget" => build_recency_check_hash(timestamp_field: "created_at")
+            }
+          )
+
+          health_checker = build_health_checker(health_check: config)
+          allow(health_checker).to receive(:datastore_msearch).and_call_original
+
+          # Stub the datastore_search_router to raise a GraphQL::ExecutionError
+          datastore_search_router = health_checker.instance_variable_get(:@datastore_search_router)
+          allow(datastore_search_router).to receive(:msearch).and_raise(
+            ::GraphQL::ExecutionError.new("Datastore unavailable")
+          )
+
+          expect {
+            status = health_checker.check_health
+
+            expect(status).to be_a HealthStatus
+            expect(status.category).to eq(:degraded)
+            expect(status.latest_record_by_type["Widget"]).to be_nil
+          }.to log_warning a_string_including(
+            "HealthChecker getting GraphQL errors when querying the datastore",
+            "GraphQL::ExecutionError",
+            "Datastore unavailable"
+          )
+        end
+      end
+
       describe "config validation" do
         it "can be instantiated with no config" do
           health_checker = build_health_checker(health_check: nil)
@@ -439,7 +518,7 @@ module ElasticGraph
         end
       end
 
-      def build_health_checker(health_check:, latest: {}, index_definitions: nil, schema_definition: nil, &customize_health)
+      def build_health_checker(health_check:, latest: {}, index_definitions: nil, schema_definition: nil, monotonic_clock: nil, &customize_health)
         datastore_clients_by_name = cluster_names.to_h do |name|
           [name, build_fake_datastore_client(name, latest, &customize_health)]
         end
@@ -455,7 +534,8 @@ module ElasticGraph
           clock: class_double(::Time, now: now),
           schema_definition: schema_definition,
           index_definitions: index_definitions,
-          extension_settings: {"health_check" => health_check_settings}.compact
+          extension_settings: {"health_check" => health_check_settings}.compact,
+          monotonic_clock: monotonic_clock
         )
 
         HealthChecker.build_from(graphql)

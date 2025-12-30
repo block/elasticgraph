@@ -7,24 +7,28 @@ module ElasticGraph
 
       attr_reader clusters_to_consider: ::Array[::String]
       attr_reader data_recency_checks: ::Hash[::String, Config::DataRecencyCheck]
+      attr_reader timeout_ms: ::Integer
 
       def self.new: (
         ::Array[::String],
-        ::Hash[::String, dataRecencyCheckHash]
+        ::Hash[::String, dataRecencyCheckHash],
+        ::Integer
       ) -> Config | (
         ?clusters_to_consider: ::Array[::String],
-        ?data_recency_checks: ::Hash[::String, dataRecencyCheckHash]
+        ?data_recency_checks: ::Hash[::String, dataRecencyCheckHash],
+        ?timeout_ms: ::Integer
       ) -> Config
 
       def with: (
         ?clusters_to_consider: ::Array[::String],
-        ?data_recency_checks: ::Hash[::String, Config::DataRecencyCheck]) -> Config
+        ?data_recency_checks: ::Hash[::String, Config::DataRecencyCheck],
+        ?timeout_ms: ::Integer) -> Config
     end
 
     class Config < ConfigSupertype
       private
 
-      def convert_values: (clusters_to_consider: untyped, data_recency_checks: untyped) -> untyped
+      def convert_values: (clusters_to_consider: untyped, data_recency_checks: untyped, timeout_ms: untyped) -> untyped
 
       class DataRecencyCheck
         attr_reader expected_max_recency_seconds: ::Integer

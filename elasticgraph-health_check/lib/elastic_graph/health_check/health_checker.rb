@@ -26,6 +26,7 @@ module ElasticGraph
           datastore_query_builder: graphql.datastore_query_builder,
           datastore_clients_by_name: graphql.datastore_core.clients_by_name,
           clock: graphql.clock,
+          monotonic_clock: graphql.monotonic_clock,
           logger: graphql.logger
         )
       end
@@ -37,6 +38,7 @@ module ElasticGraph
         datastore_query_builder:,
         datastore_clients_by_name:,
         clock:,
+        monotonic_clock:,
         logger:
       )
         @schema = schema
@@ -44,6 +46,7 @@ module ElasticGraph
         @datastore_query_builder = datastore_query_builder
         @datastore_clients_by_name = datastore_clients_by_name
         @clock = clock
+        @monotonic_clock = monotonic_clock
         @logger = logger
         @indexed_document_types_by_name = @schema.indexed_document_types.to_h { |t| [t.name.to_s, t] }
 
@@ -88,8 +91,13 @@ module ElasticGraph
           internal_filters: [build_index_optimization_filter_for(recency_config)],
           requested_fields: ["id", recency_config.timestamp_field],
           document_pagination: {first: 1},
-          sort: [{recency_config.timestamp_field => {"order" => "desc"}}]
+          sort: [{recency_config.timestamp_field => {"order" => "desc"}}],
+          monotonic_clock_deadline: monotonic_clock_deadline
         )
+      end
+
+      def monotonic_clock_deadline
+        @monotonic_clock.now_in_ms + @config.timeout_ms
       end
 
       # To make the recency query more optimal, we filter on the timestamp field. This can provide

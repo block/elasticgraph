@@ -10,7 +10,7 @@ require "elastic_graph/support/config"
 
 module ElasticGraph
   module HealthCheck
-    class Config < Support::Config.define(:clusters_to_consider, :data_recency_checks)
+    class Config < Support::Config.define(:clusters_to_consider, :data_recency_checks, :timeout_ms)
       json_schema at: "health_check",
         optional: true,
         description: "Configuration for health checks used by `elasticgraph-health_check`.",
@@ -56,12 +56,21 @@ module ElasticGraph
               {}, # : untyped
               {"Widget" => {"timestamp_field" => "createdAt", "expected_max_recency_seconds" => 30}}
             ]
+          },
+          timeout_ms: {
+            description: "The timeout in milliseconds for health check datastore queries. If the queries take longer than this, " \
+              "the health check will fail with a timeout error. This prevents slow or unresponsive datastores from causing " \
+              "the health check endpoint to hang.",
+            type: "integer",
+            minimum: 1,
+            default: 5000,
+            examples: [1000, 5000, 10000]
           }
         }
 
       private
 
-      def convert_values(clusters_to_consider:, data_recency_checks:)
+      def convert_values(clusters_to_consider:, data_recency_checks:, timeout_ms:)
         {
           clusters_to_consider: clusters_to_consider,
           data_recency_checks: data_recency_checks.transform_values do |value_hash|
@@ -69,7 +78,8 @@ module ElasticGraph
               expected_max_recency_seconds: value_hash.fetch("expected_max_recency_seconds"),
               timestamp_field: value_hash.fetch("timestamp_field")
             )
-          end
+          end,
+          timeout_ms: timeout_ms
         }
       end
 

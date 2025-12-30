@@ -49,6 +49,24 @@ module ElasticGraph
         config = Config.new
         expect(config.clusters_to_consider).to be_empty
         expect(config.data_recency_checks).to be_empty
+        expect(config.timeout_ms).to eq(5000)
+      end
+
+      it "allows configuring a custom timeout_ms" do
+        config = Config.new(timeout_ms: 3000)
+        expect(config.timeout_ms).to eq(3000)
+      end
+
+      it "parses timeout_ms from YAML" do
+        parsed_yaml = ::YAML.safe_load(<<~EOS)
+          health_check:
+            clusters_to_consider: []
+            data_recency_checks: {}
+            timeout_ms: 10000
+        EOS
+
+        config = Config.from_parsed_yaml(parsed_yaml)
+        expect(config.timeout_ms).to eq(10000)
       end
     end
   end

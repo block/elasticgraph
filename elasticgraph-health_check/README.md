@@ -86,6 +86,7 @@ Finally, configure it:
 
 ```yaml
 health_check:
+  timeout_ms: 5000
   clusters_to_consider: ["main"]
   data_recency_checks:
     Widget:
@@ -93,6 +94,9 @@ health_check:
       expected_max_recency_seconds: 30
 ```
 
+- `timeout_ms` (optional, default: 5000) - The timeout in milliseconds for health check datastore queries. If queries take longer than this,
+  the health check will fail fast with a timeout error. This prevents slow or unresponsive datastores from causing the health check endpoint
+  to hang, which can lead to cascading health check requests from load balancers like Envoy.
 - `clusters_to_consider` configures the first check (datastore cluster health), and specifies which clusters' health status is monitored.
 - `data_recency_checks` configures the second check (data recency), and configures the recency check described above. In this example, if no new "Widgets"
   are indexed for thirty seconds (perhaps because of an infrastructure issue), a `degraded` status will be returned.

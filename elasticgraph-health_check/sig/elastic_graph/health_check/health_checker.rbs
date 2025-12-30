@@ -10,6 +10,7 @@ module ElasticGraph
         datastore_query_builder: GraphQL::DatastoreQuery::Builder,
         datastore_clients_by_name: ::Hash[::String, DatastoreCore::_Client],
         clock: singleton(::Time),
+        monotonic_clock: Support::MonotonicClock,
         logger: ::Logger
       ) -> void
 
@@ -22,12 +23,14 @@ module ElasticGraph
       @datastore_query_builder: GraphQL::DatastoreQuery::Builder
       @datastore_clients_by_name: ::Hash[::String, DatastoreCore::_Client]
       @clock: singleton(::Time)
+      @monotonic_clock: Support::MonotonicClock
       @logger: ::Logger
       @indexed_document_types_by_name: ::Hash[::String, GraphQL::Schema::Type]
       @config: Config
 
       def datastore_msearch: (::Array[GraphQL::DatastoreQuery]) -> ::Hash[GraphQL::DatastoreQuery, GraphQL::DatastoreResponse::SearchResponse]
       def build_recency_query_for: (::String, Config::DataRecencyCheck) -> GraphQL::DatastoreQuery
+      def monotonic_clock_deadline: () -> ::Integer
       def build_index_optimization_filter_for: (Config::DataRecencyCheck) -> ::Hash[::String, untyped]?
       def execute_in_parallel: (*::Proc) -> ::Array[untyped]
 
