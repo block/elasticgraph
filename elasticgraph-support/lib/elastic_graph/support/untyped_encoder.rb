@@ -25,15 +25,7 @@ module ElasticGraph
       # Encodes the given untyped value to a String so it can be indexed in a Elasticsearch/OpenSearch `keyword` field.
       def self.encode(value)
         return nil if value.nil?
-        # Note: we use `fast_generate` here instead of `generate`. They basically act the same, except
-        # `generate` includes an extra check for self-referential data structures. `value` here ultimately
-        # comes out of a parsed JSON document (e.g. either from an ElasticGraph event at indexing time, or
-        # as a GraphQL query variable at search time), and JSON cannot express self-referential data
-        # structures, so we do not have to worry about that happening.
-        #
-        # ...but even if it did, we would get an error either way: `JSON.generate` would raise
-        # `JSON::NestingError` whereas `:JSON.fast_generate` would give us a `SystemStackError`.
-        ::JSON.fast_generate(canonicalize(value))
+        ::JSON.generate(canonicalize(value))
       end
 
       # Decodes a previously encoded Untyped value, returning its original value.
