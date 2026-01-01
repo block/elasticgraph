@@ -76,7 +76,6 @@ target :elasticgraph_gems do
     "forwardable",
     "json",
     "open3",
-    "pathname",
     "shellwords",
     "tmpdir",
     "tempfile",
