@@ -1,4 +1,4 @@
-# Copyright 2024 - 2025 Block, Inc.
+# Copyright 2024 - 2026 Block, Inc.
 #
 # Use of this source code is governed by an MIT-style
 # license that can be found in the LICENSE file or at
@@ -7,6 +7,8 @@
 # frozen_string_literal: true
 
 require "elastic_graph/errors"
+require "elastic_graph/health_check/caching_health_checker"
+require "elastic_graph/health_check/config"
 require "elastic_graph/health_check/envoy_extension/graphql_http_endpoint_decorator"
 require "elastic_graph/health_check/health_checker"
 
@@ -30,10 +32,23 @@ module ElasticGraph
                 "via `register_graphql_extension`."
             end
 
+            health_check_config = HealthCheck::Config.from_parsed_yaml(config.extension_settings) || HealthCheck::Config.new
+            health_checker = HealthChecker.build_from(self)
+
+            # Wrap with caching if any TTL is configured
+            if health_check_config.healthy_ttl_seconds > 0 || health_check_config.unhealthy_ttl_seconds > 0
+              health_checker = CachingHealthChecker.new(
+                health_checker: health_checker,
+                healthy_ttl_seconds: health_check_config.healthy_ttl_seconds,
+                unhealthy_ttl_seconds: health_check_config.unhealthy_ttl_seconds,
+                clock: clock
+              )
+            end
+
             GraphQLHTTPEndpointDecorator.new(
               super,
               health_check_http_path_segment: http_path_segment,
-              health_checker: HealthChecker.build_from(self),
+              health_checker: health_checker,
               logger: logger
             )
           end

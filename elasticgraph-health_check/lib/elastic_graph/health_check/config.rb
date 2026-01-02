@@ -1,4 +1,4 @@
-# Copyright 2024 - 2025 Block, Inc.
+# Copyright 2024 - 2026 Block, Inc.
 #
 # Use of this source code is governed by an MIT-style
 # license that can be found in the LICENSE file or at
@@ -10,7 +10,7 @@ require "elastic_graph/support/config"
 
 module ElasticGraph
   module HealthCheck
-    class Config < Support::Config.define(:clusters_to_consider, :data_recency_checks)
+    class Config < Support::Config.define(:clusters_to_consider, :data_recency_checks, :healthy_ttl_seconds, :unhealthy_ttl_seconds)
       json_schema at: "health_check",
         optional: true,
         description: "Configuration for health checks used by `elasticgraph-health_check`.",
@@ -56,12 +56,41 @@ module ElasticGraph
               {}, # : untyped
               {"Widget" => {"timestamp_field" => "createdAt", "expected_max_recency_seconds" => 30}}
             ]
+          },
+          healthy_ttl_seconds: {
+            description: "The number of seconds to cache a healthy health check result. When set, health check results " \
+              "with a `healthy` category will be cached for this duration, reducing load on the datastore. " \
+              "Set to 0 or omit to disable caching of healthy results.",
+            type: "number",
+            minimum: 0,
+            default: 0, # : untyped
+            examples: [0, 28, 60]
+          },
+          unhealthy_ttl_seconds: {
+            description: "The number of seconds to cache an unhealthy or degraded health check result. When set, " \
+              "health check results with an `unhealthy` or `degraded` category will be cached for this duration. " \
+              "This is typically shorter than `healthy_ttl_seconds` to allow faster recovery detection. " \
+              "Set to 0 or omit to disable caching of unhealthy results.",
+            type: "number",
+            minimum: 0,
+            default: 0, # : untyped
+            examples: [0, 1, 5]
+          },
+          http_path_segment: {
+            description: "The HTTP path segment used to identify health check requests. When a GET request's URL " \
+              "contains this segment as one of its path segments, it will be handled as a health check request " \
+              "instead of a GraphQL query.",
+            type: "string",
+            minLength: 1,
+            examples: ["health", "healthz", "healthcheck"]
           }
         }
 
       private
 
-      def convert_values(clusters_to_consider:, data_recency_checks:)
+      # Note: http_path_segment is accepted but not stored in the Config since it's handled
+      # separately by EnvoyExtension (which reads it directly from extension_settings).
+      def convert_values(clusters_to_consider:, data_recency_checks:, healthy_ttl_seconds:, unhealthy_ttl_seconds:, http_path_segment: nil)
         {
           clusters_to_consider: clusters_to_consider,
           data_recency_checks: data_recency_checks.transform_values do |value_hash|
@@ -69,7 +98,9 @@ module ElasticGraph
               expected_max_recency_seconds: value_hash.fetch("expected_max_recency_seconds"),
               timestamp_field: value_hash.fetch("timestamp_field")
             )
-          end
+          end,
+          healthy_ttl_seconds: healthy_ttl_seconds,
+          unhealthy_ttl_seconds: unhealthy_ttl_seconds
         }
       end
 

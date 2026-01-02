@@ -1,4 +1,4 @@
-# Copyright 2024 - 2025 Block, Inc.
+# Copyright 2024 - 2026 Block, Inc.
 #
 # Use of this source code is governed by an MIT-style
 # license that can be found in the LICENSE file or at
@@ -49,6 +49,36 @@ module ElasticGraph
         config = Config.new
         expect(config.clusters_to_consider).to be_empty
         expect(config.data_recency_checks).to be_empty
+        expect(config.healthy_ttl_seconds).to eq(0)
+        expect(config.unhealthy_ttl_seconds).to eq(0)
+      end
+
+      it "parses healthy_ttl_seconds and unhealthy_ttl_seconds when provided" do
+        parsed_yaml = ::YAML.safe_load(<<~EOS)
+          health_check:
+            clusters_to_consider: []
+            data_recency_checks: {}
+            healthy_ttl_seconds: 28
+            unhealthy_ttl_seconds: 5
+        EOS
+
+        config = Config.from_parsed_yaml(parsed_yaml)
+
+        expect(config.healthy_ttl_seconds).to eq(28)
+        expect(config.unhealthy_ttl_seconds).to eq(5)
+      end
+
+      it "defaults TTL values to 0 when not provided" do
+        parsed_yaml = ::YAML.safe_load(<<~EOS)
+          health_check:
+            clusters_to_consider: []
+            data_recency_checks: {}
+        EOS
+
+        config = Config.from_parsed_yaml(parsed_yaml)
+
+        expect(config.healthy_ttl_seconds).to eq(0)
+        expect(config.unhealthy_ttl_seconds).to eq(0)
       end
     end
   end

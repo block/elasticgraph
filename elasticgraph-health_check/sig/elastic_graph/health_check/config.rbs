@@ -7,24 +7,32 @@ module ElasticGraph
 
       attr_reader clusters_to_consider: ::Array[::String]
       attr_reader data_recency_checks: ::Hash[::String, Config::DataRecencyCheck]
+      attr_reader healthy_ttl_seconds: ::Numeric
+      attr_reader unhealthy_ttl_seconds: ::Numeric
 
       def self.new: (
         ::Array[::String],
-        ::Hash[::String, dataRecencyCheckHash]
+        ::Hash[::String, dataRecencyCheckHash],
+        ::Numeric,
+        ::Numeric
       ) -> Config | (
         ?clusters_to_consider: ::Array[::String],
-        ?data_recency_checks: ::Hash[::String, dataRecencyCheckHash]
+        ?data_recency_checks: ::Hash[::String, dataRecencyCheckHash],
+        ?healthy_ttl_seconds: ::Numeric,
+        ?unhealthy_ttl_seconds: ::Numeric
       ) -> Config
 
       def with: (
         ?clusters_to_consider: ::Array[::String],
-        ?data_recency_checks: ::Hash[::String, Config::DataRecencyCheck]) -> Config
+        ?data_recency_checks: ::Hash[::String, Config::DataRecencyCheck],
+        ?healthy_ttl_seconds: ::Numeric,
+        ?unhealthy_ttl_seconds: ::Numeric) -> Config
     end
 
     class Config < ConfigSupertype
       private
 
-      def convert_values: (clusters_to_consider: untyped, data_recency_checks: untyped) -> untyped
+      def convert_values: (clusters_to_consider: untyped, data_recency_checks: untyped, healthy_ttl_seconds: untyped, unhealthy_ttl_seconds: untyped, ?http_path_segment: untyped) -> untyped
 
       class DataRecencyCheck
         attr_reader expected_max_recency_seconds: ::Integer

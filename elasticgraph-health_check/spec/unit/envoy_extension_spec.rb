@@ -1,4 +1,4 @@
-# Copyright 2024 - 2025 Block, Inc.
+# Copyright 2024 - 2026 Block, Inc.
 #
 # Use of this source code is governed by an MIT-style
 # license that can be found in the LICENSE file or at
@@ -166,6 +166,73 @@ module ElasticGraph
             "data_recency_checks" => {},
             "http_path_segment" => http_path_segment
           }.compact})
+        end
+      end
+
+      describe "caching behavior" do
+        let(:processed_graphql_queries) { [] }
+        let(:check_health_call_count) { [0] }
+
+        it "wraps the health checker with caching when healthy_ttl_seconds is configured" do
+          graphql = build_graphql(
+            extension_modules: [EnvoyExtension],
+            extension_settings: {"health_check" => {
+              "clusters_to_consider" => [],
+              "data_recency_checks" => {},
+              "http_path_segment" => "/health",
+              "healthy_ttl_seconds" => 30,
+              "unhealthy_ttl_seconds" => 0
+            }}
+          )
+
+          health_checker = graphql.graphql_http_endpoint.instance_variable_get(:@health_checker)
+          expect(health_checker).to be_a(HealthCheck::CachingHealthChecker)
+        end
+
+        it "wraps the health checker with caching when unhealthy_ttl_seconds is configured" do
+          graphql = build_graphql(
+            extension_modules: [EnvoyExtension],
+            extension_settings: {"health_check" => {
+              "clusters_to_consider" => [],
+              "data_recency_checks" => {},
+              "http_path_segment" => "/health",
+              "healthy_ttl_seconds" => 0,
+              "unhealthy_ttl_seconds" => 5
+            }}
+          )
+
+          health_checker = graphql.graphql_http_endpoint.instance_variable_get(:@health_checker)
+          expect(health_checker).to be_a(HealthCheck::CachingHealthChecker)
+        end
+
+        it "does not wrap the health checker when both TTLs are 0" do
+          graphql = build_graphql(
+            extension_modules: [EnvoyExtension],
+            extension_settings: {"health_check" => {
+              "clusters_to_consider" => [],
+              "data_recency_checks" => {},
+              "http_path_segment" => "/health",
+              "healthy_ttl_seconds" => 0,
+              "unhealthy_ttl_seconds" => 0
+            }}
+          )
+
+          health_checker = graphql.graphql_http_endpoint.instance_variable_get(:@health_checker)
+          expect(health_checker).to be_a(HealthCheck::HealthChecker)
+        end
+
+        it "does not wrap the health checker when TTLs are not configured (defaults to 0)" do
+          graphql = build_graphql(
+            extension_modules: [EnvoyExtension],
+            extension_settings: {"health_check" => {
+              "clusters_to_consider" => [],
+              "data_recency_checks" => {},
+              "http_path_segment" => "/health"
+            }}
+          )
+
+          health_checker = graphql.graphql_http_endpoint.instance_variable_get(:@health_checker)
+          expect(health_checker).to be_a(HealthCheck::HealthChecker)
         end
       end
     end

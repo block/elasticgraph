@@ -1,0 +1,28 @@
+module ElasticGraph
+  module HealthCheck
+    class CachingHealthChecker
+      def initialize: (
+        health_checker: _HealthChecker,
+        healthy_ttl_seconds: ::Numeric,
+        unhealthy_ttl_seconds: ::Numeric,
+        clock: singleton(::Time)
+      ) -> void
+
+      def check_health: () -> HealthStatus
+
+      private
+
+      @health_checker: _HealthChecker
+      @healthy_ttl_seconds: ::Numeric
+      @unhealthy_ttl_seconds: ::Numeric
+      @clock: singleton(::Time)
+      @mutex: ::Mutex
+      @cached_status: HealthStatus?
+      @cache_expires_at: ::Time?
+
+      interface _HealthChecker
+        def check_health: () -> HealthStatus
+      end
+    end
+  end
+end
