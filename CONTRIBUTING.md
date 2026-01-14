@@ -14,7 +14,7 @@ This guide is for you.
 
 | Requirement    | Tested Version | Installation Instructions                                                 |
 |----------------|----------------|---------------------------------------------------------------------------|
-| Ruby           | 3.4.x          | [ruby-lang.org](https://www.ruby-lang.org/en/documentation/installation/) |
+| Ruby           | 3.4.x or 4.0.x | [ruby-lang.org](https://www.ruby-lang.org/en/documentation/installation/) |
 | Java           | JDK 11+        | [java.com](https://www.oracle.com/java/technologies/downloads/)           |
 | Docker Engine  | 27.x           | [docker.com](https://docs.docker.com/engine/install/)                     |
 | Docker Compose | 2.29.x         | [docker.com](https://docs.docker.com/compose/install/)                    |

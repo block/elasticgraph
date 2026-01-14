@@ -15,7 +15,10 @@ group :development do
   gem "coderay", "~> 1.1", ">= 1.1.3"
   gem "factory_bot", "~> 6.5", ">= 6.5.6"
   gem "faker", "~> 3.5", ">= 3.5.3"
-  gem "flatware-rspec", "~> 2.3", ">= 2.3.4"
+
+  # Pin to a GitHub SHA until Ruby 4.0 support has been released
+  gem "flatware-rspec", "~> 2.3", ">= 2.3.4", github: "briandunn/flatware", ref: "0403ac1137cc7958fe06db2c0563dfbab0bd24db"
+
   gem "httpx", "~> 1.7"
   gem "memory_profiler", "~> 1.1"
   gem "method_source", "~> 1.1"
@@ -41,7 +44,9 @@ end
 
 # Documentation/website gems
 group :site do
-  gem "filewatcher", "~> 2.1"
+  # Pin to a GitHub SHA until Ruby 4.0 support has been released: https://github.com/filewatcher/filewatcher/issues/286
+  gem "filewatcher", "~> 2.1", github: "filewatcher/filewatcher", ref: "596fad65f3b442fee6cf30a3d8daf2767d63f8c9"
+
   gem "html-proofer", "~> 5.2"
   gem "jekyll", "~> 4.4", ">= 4.4.1"
   gem "nokogiri", "~> 1.19"
@@ -56,6 +61,7 @@ group :site do
   gem "yard", "~> 0.9", ">= 0.9.38"
   gem "yard-doctest", "~> 0.1", ">= 0.1.17"
   gem "yard-markdown", "~> 0.5"
+  gem "irb", "~> 1.16" # Needed for yard on Ruby 4.0
 end
 
 # Since this file gets symlinked both at the repo root and into each Gem directory, we have

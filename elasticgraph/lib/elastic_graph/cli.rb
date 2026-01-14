@@ -104,7 +104,7 @@ module ElasticGraph
     end
 
     def ruby_major_minor
-      "3.4"
+      "4.0"
     end
   end
 

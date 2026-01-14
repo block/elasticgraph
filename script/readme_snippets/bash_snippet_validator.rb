@@ -13,6 +13,11 @@ class BashSnippetValidator < SnippetValidator
   BASH_TIMEOUT_SECONDS = 5
 
   def validate(snippet)
+    # TODO(#971): remove this work around once ElasticGraph 1.0.3 is released.
+    if RUBY_VERSION.start_with?("4.0") && snippet.content.include?("gem exec elasticgraph new")
+      return ValidationResult.skipped("Can't run `gem exec elasticgraph new` on Ruby 4.0 until we've released a version of the `elasticgraph` gem compatible with 4.0.")
+    end
+
     execute_in_temp_project do
       Tempfile.create do |output_file|
         success, _ = execute_process_with_timeout(BASH_TIMEOUT_SECONDS) do
