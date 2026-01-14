@@ -1,5 +1,3 @@
-require "pathname"
-
 ElasticGraph.define_schema do |schema|
   # ElasticGraph will tell you when you need to bump this.
   schema.json_schema_version 1
