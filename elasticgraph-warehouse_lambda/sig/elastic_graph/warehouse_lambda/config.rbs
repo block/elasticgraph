@@ -1,0 +1,15 @@
+module ElasticGraph
+  class WarehouseLambda
+    class ConfigSupertype
+      extend Support::Config::ClassMethods[Config]
+
+      attr_reader s3_path_prefix: ::String
+
+      def initialize: (?s3_path_prefix: ::String) -> void
+      def with: (?s3_path_prefix: ::String) -> Config
+    end
+
+    class Config < ConfigSupertype
+    end
+  end
+end

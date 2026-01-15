@@ -34,5 +34,8 @@ graph LR;
     elasticgraph-indexer_lambda["elasticgraph-indexer_lambda"];
     elasticgraph-indexer_lambda --> elasticgraph-lambda_support;
     class elasticgraph-indexer_lambda otherEgGemStyle;
+    elasticgraph-warehouse_lambda["elasticgraph-warehouse_lambda"];
+    elasticgraph-warehouse_lambda --> elasticgraph-lambda_support;
+    class elasticgraph-warehouse_lambda otherEgGemStyle;
     click faraday_middleware-aws-sigv4 href "https://rubygems.org/gems/faraday_middleware-aws-sigv4" "Open on RubyGems.org" _blank;
 ```
