@@ -685,4 +685,37 @@ properties:
     required:
     - path_to_registry
     additionalProperties: false
+  warehouse:
+    description: Configuration for the warehouse lambda used by `elasticgraph-warehouse_lambda`.
+    properties:
+      s3_path_prefix:
+        description: The S3 path prefix to use when storing data files.
+        type: string
+        pattern: "^\\S+$"
+        examples:
+        - Data001
+        - my-prefix
+      s3_bucket_name:
+        description: The S3 bucket name to write JSONL files into.
+        type: string
+        pattern: "^\\S+$"
+        examples:
+        - my-warehouse-bucket
+        - data-lake-prod
+      aws_region:
+        description: Optional AWS region for the S3 bucket. If not specified, uses
+          AWS SDK default region resolution (AWS_REGION env var, instance metadata,
+          etc.).
+        type:
+        - string
+        - 'null'
+        pattern: "^\\S+$"
+        examples:
+        - us-west-2
+        - eu-central-1
+        default:
+    required:
+    - s3_path_prefix
+    - s3_bucket_name
+    additionalProperties: false
 additionalProperties: true
