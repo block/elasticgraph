@@ -26,9 +26,7 @@ module ElasticGraph
 
     # Builds an `ElasticGraph::WarehouseLambda` instance from our lambda ENV vars.
     def self.from_env
-      # :nocov: covered by lambda_function_spec in commit 3
       ::ElasticGraph::LambdaSupport.build_from_env(self)
-      # :nocov:
     end
 
     def self.from_parsed_yaml(parsed_yaml)
