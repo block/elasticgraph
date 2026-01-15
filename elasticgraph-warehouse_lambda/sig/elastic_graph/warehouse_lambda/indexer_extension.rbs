@@ -1,0 +1,9 @@
+module ElasticGraph
+  class WarehouseLambda
+    module IndexerExtension : Indexer
+      attr_accessor warehouse_lambda: WarehouseLambda
+
+      def datastore_router: () -> WarehouseDumper
+    end
+  end
+end
