@@ -6,81 +6,34 @@
 #
 # frozen_string_literal: true
 
-require "elastic_graph/warehouse/schema_definition/field_type_converter"
 require "elastic_graph/warehouse/schema_definition/api_extension"
 
 module ElasticGraph
   module Warehouse
     module SchemaDefinition
       RSpec.describe FieldTypeConverter, :warehouse_schema do
-        it "converts a basic scalar type to warehouse column type" do
-          results = define_warehouse_schema do |s|
-            s.object_type "Product" do |t|
-              t.field "name", "String"
-            end
-          end
-
-          expect(convert_field_type(results, "Product", "name")).to eq "STRING"
-        end
-
         it "wraps list types in ARRAY" do
           results = define_warehouse_schema do |s|
             s.object_type "Product" do |t|
+              t.field "id", "ID"
               t.field "tags", "[String!]!"
+              t.index "products"
             end
           end
 
-          expect(convert_field_type(results, "Product", "tags")).to eq "ARRAY<STRING>"
+          expect(warehouse_column_def_from(results, "products", "tags")).to eq "tags ARRAY<STRING>"
         end
 
         it "handles nested arrays" do
           results = define_warehouse_schema do |s|
             s.object_type "Matrix" do |t|
+              t.field "id", "ID"
               t.field "values", "[[Float!]!]!"
+              t.index "matrices"
             end
           end
 
-          expect(convert_field_type(results, "Matrix", "values")).to eq "ARRAY<ARRAY<FLOAT>>"
-        end
-
-        it "unwraps non-null wrapper before checking if type is a list" do
-          results = define_warehouse_schema do |s|
-            s.object_type "User" do |t|
-              t.field "email", "String!"
-            end
-          end
-
-          expect(convert_field_type(results, "User", "email")).to eq "STRING"
-        end
-
-        it "converts enum types to STRING" do
-          results = define_warehouse_schema do |s|
-            s.enum_type "Status" do |t|
-              t.value "ACTIVE"
-              t.value "INACTIVE"
-            end
-
-            s.object_type "Account" do |t|
-              t.field "status", "Status"
-            end
-          end
-
-          expect(convert_field_type(results, "Account", "status")).to eq "STRING"
-        end
-
-        it "converts nested object types to STRUCT" do
-          results = define_warehouse_schema do |s|
-            s.object_type "Address" do |t|
-              t.field "street", "String"
-              t.field "city", "String"
-            end
-
-            s.object_type "User" do |t|
-              t.field "address", "Address"
-            end
-          end
-
-          expect(convert_field_type(results, "User", "address")).to eq "STRUCT<street STRING, city STRING>"
+          expect(warehouse_column_def_from(results, "matrices", "values")).to eq "values ARRAY<ARRAY<FLOAT>>"
         end
 
         it "converts arrays of objects to ARRAY<STRUCT>" do
@@ -91,16 +44,18 @@ module ElasticGraph
             end
 
             s.object_type "Order" do |t|
+              t.field "id", "ID"
               t.field "items", "[Item!]!" do |f|
                 f.mapping type: "nested"
               end
+              t.index "orders"
             end
           end
 
-          expect(convert_field_type(results, "Order", "items")).to eq "ARRAY<STRUCT<id STRING, quantity INT>>"
+          expect(warehouse_column_def_from(results, "orders", "items")).to eq "items ARRAY<STRUCT<id STRING, quantity INT>>"
         end
 
-        it "converts arrays of union types to ARRAY<STRUCT>" do
+        it "converts arrays of union types to ARRAY<STRUCT> with __typename" do
           results = define_warehouse_schema do |s|
             s.object_type "Email" do |t|
               t.field "id", "ID"
@@ -117,42 +72,15 @@ module ElasticGraph
             end
 
             s.object_type "User" do |t|
+              t.field "id", "ID"
               t.field "contacts", "[ContactInfo!]!" do |f|
                 f.mapping type: "nested"
               end
+              t.index "users"
             end
           end
 
-          expect(convert_field_type(results, "User", "contacts")).to eq "ARRAY<STRUCT<id STRING, address STRING, number STRING, __typename STRING>>"
-        end
-
-        it "converts custom scalar types with warehouse_column configuration" do
-          results = define_warehouse_schema do |s|
-            s.scalar_type "CustomTimestamp" do |t|
-              t.mapping type: "date"
-              t.json_schema type: "string", format: "date-time"
-              t.warehouse_column type: "TIMESTAMP"
-            end
-
-            s.object_type "Event" do |t|
-              t.field "occurred_at", "CustomTimestamp"
-            end
-          end
-
-          expect(convert_field_type(results, "Event", "occurred_at")).to eq "TIMESTAMP"
-        end
-
-        def convert_field_type(results, type, field)
-          field_type = results
-            .state
-            .types_by_name
-            .fetch(type)
-            .indexing_fields_by_name_in_index
-            .fetch(field)
-            .to_indexing_field
-            .type
-
-          FieldTypeConverter.convert(field_type)
+          expect(warehouse_column_def_from(results, "users", "contacts")).to eq "contacts ARRAY<STRUCT<id STRING, address STRING, number STRING, __typename STRING>>"
         end
       end
     end

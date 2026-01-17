@@ -13,45 +13,58 @@ module ElasticGraph
     module SchemaDefinition
       RSpec.describe ObjectInterfaceAndUnionExtension, :warehouse_schema do
         describe "object types" do
-          it "converts object type to warehouse column type" do
+          it "maps nested object fields to STRUCT columns" do
             results = define_warehouse_schema do |s|
               s.object_type "Address" do |t|
                 t.field "street", "String"
                 t.field "city", "String"
                 t.field "zip", "String"
               end
+
+              s.object_type "User" do |t|
+                t.field "id", "ID"
+                t.field "address", "Address"
+                t.index "users"
+              end
             end
 
-            expect(warehouse_column_type_for(results, "Address")).to eq("STRUCT<street STRING, city STRING, zip STRING>")
+            expect(warehouse_column_def_from(results, "users", "address")).to eq "address STRUCT<street STRING, city STRING, zip STRING>"
           end
 
-          it "handles nested object types" do
+          it "handles deeply nested object types" do
             results = define_warehouse_schema do |s|
               s.object_type "Venue" do |t|
                 t.field "id", "ID"
                 t.field "name", "String"
                 t.field "location", "GeoLocation"
+                t.index "venues"
               end
             end
 
             # GeoLocation uses name_in_index: "lat" and "lon" for its fields
-            expect(warehouse_column_type_for(results, "Venue")).to eq("STRUCT<id STRING, name STRING, location STRUCT<lat FLOAT, lon FLOAT>>")
+            expect(warehouse_column_def_from(results, "venues", "location")).to eq "location STRUCT<lat FLOAT, lon FLOAT>"
           end
 
-          it "respects name_in_index for nested object fields" do
+          it "respects name_in_index for nested object struct fields" do
             results = define_warehouse_schema do |s|
               s.object_type "Address" do |t|
                 t.field "street_name", "String", name_in_index: "street"
                 t.field "city_name", "String", name_in_index: "city"
               end
+
+              s.object_type "User" do |t|
+                t.field "id", "ID"
+                t.field "address", "Address"
+                t.index "users"
+              end
             end
 
-            expect(warehouse_column_type_for(results, "Address")).to eq("STRUCT<street STRING, city STRING>")
+            expect(warehouse_column_def_from(results, "users", "address")).to eq "address STRUCT<street STRING, city STRING>"
           end
         end
 
         describe "interface types" do
-          it "converts interface type to warehouse column type" do
+          it "maps interface fields to STRUCT columns with __typename" do
             results = define_warehouse_schema do |s|
               s.interface_type "Identifiable" do |t|
                 t.field "id", "ID"
@@ -64,14 +77,20 @@ module ElasticGraph
                 t.field "name", "String"
                 t.field "price", "Float"
               end
+
+              s.object_type "Container" do |t|
+                t.field "id", "ID"
+                t.field "item", "Identifiable"
+                t.index "containers"
+              end
             end
 
-            expect(warehouse_column_type_for(results, "Identifiable")).to eq("STRUCT<id STRING, name STRING, price FLOAT, __typename STRING>")
+            expect(warehouse_column_def_from(results, "containers", "item")).to eq "item STRUCT<id STRING, name STRING, price FLOAT, __typename STRING>"
           end
         end
 
         describe "union types" do
-          it "converts union type to warehouse column type" do
+          it "maps union fields to STRUCT columns with __typename" do
             results = define_warehouse_schema do |s|
               s.object_type "Card" do |t|
                 t.field "id", "ID"
@@ -86,9 +105,15 @@ module ElasticGraph
               s.union_type "PaymentMethod" do |t|
                 t.subtypes "Card", "BankAccount"
               end
+
+              s.object_type "Transaction" do |t|
+                t.field "id", "ID"
+                t.field "payment", "PaymentMethod"
+                t.index "transactions"
+              end
             end
 
-            expect(warehouse_column_type_for(results, "PaymentMethod")).to eq("STRUCT<id STRING, last_four STRING, account_number STRING, __typename STRING>")
+            expect(warehouse_column_def_from(results, "transactions", "payment")).to eq "payment STRUCT<id STRING, last_four STRING, account_number STRING, __typename STRING>"
           end
         end
       end

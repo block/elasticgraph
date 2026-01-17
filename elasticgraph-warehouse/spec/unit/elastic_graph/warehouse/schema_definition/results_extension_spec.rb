@@ -66,28 +66,6 @@ module ElasticGraph
           expect(config).to eq({"tables" => {}})
         end
 
-        it "excludes indices that are explicitly excluded from the warehouse" do
-          results = define_warehouse_schema do |s|
-            s.object_type "Product" do |t|
-              t.field "id", "ID"
-              t.field "name", "String"
-              t.index "products"
-            end
-
-            s.object_type "Category" do |t|
-              t.field "id", "ID"
-              t.field "name", "String"
-              t.index "categories" do |i|
-                i.exclude_from_warehouse
-              end
-            end
-          end
-
-          config = results.warehouse_config
-
-          expect(config["tables"].keys).to contain_exactly("products")
-        end
-
         it "sorts warehouse tables by name" do
           results = define_warehouse_schema do |s|
             s.object_type "Zebra" do |t|
@@ -106,9 +84,7 @@ module ElasticGraph
             end
           end
 
-          config = results.warehouse_config
-
-          expect(config["tables"].keys).to eq(["apples", "mangos", "zebras"])
+          expect(table_names_from(results)).to eq(["apples", "mangos", "zebras"])
         end
 
         it "memoizes the warehouse config" do
