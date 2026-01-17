@@ -84,8 +84,8 @@ All gems follow the pattern: `elasticgraph-[name]/` containing:
 - `elasticgraph-query_registry`: Source-controlled query registry
 - `elasticgraph-warehouse`: Data warehouse ingestion
 
-**AWS Lambda Integration** (5 gems):
-- `elasticgraph-admin_lambda`, `elasticgraph-graphql_lambda`, `elasticgraph-indexer_lambda`, `elasticgraph-indexer_autoscaler_lambda`, `elasticgraph-lambda_support`
+**AWS Lambda Integration** (6 gems):
+- `elasticgraph-admin_lambda`, `elasticgraph-graphql_lambda`, `elasticgraph-indexer_lambda`, `elasticgraph-indexer_autoscaler_lambda`, `elasticgraph-warehouse_lambda`, `elasticgraph-lambda_support`
 
 ### Key Components
 
