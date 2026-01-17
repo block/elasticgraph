@@ -11,13 +11,13 @@ module ElasticGraph
     def initialize: (
       config: Config,
       datastore_core: DatastoreCore,
-      ?datastore_router: DatastoreIndexingRouter?,
+      ?datastore_router: Indexer::_DatastoreRouter?,
       ?monotonic_clock: Support::MonotonicClock?,
       ?clock: singleton(::Time)?
     ) -> void
 
-    @datastore_router: DatastoreIndexingRouter?
-    def datastore_router: () -> DatastoreIndexingRouter
+    @datastore_router: Indexer::_DatastoreRouter?
+    def datastore_router: () -> Indexer::_DatastoreRouter
 
     @record_preparer_factory: RecordPreparer::Factory?
     def record_preparer_factory: () -> RecordPreparer::Factory

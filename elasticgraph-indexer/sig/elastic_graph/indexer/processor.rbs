@@ -2,7 +2,7 @@ module ElasticGraph
   class Indexer
     class Processor
       def initialize: (
-        datastore_router: DatastoreIndexingRouter,
+        datastore_router: _DatastoreRouter,
         operation_factory: Operation::Factory,
         logger: ::Logger,
         indexing_latency_slo_thresholds_by_timestamp_in_ms: ::Hash[::String, ::Integer],
@@ -14,7 +14,7 @@ module ElasticGraph
 
       private
 
-      @datastore_router: DatastoreIndexingRouter
+      @datastore_router: _DatastoreRouter
       @operation_factory: Operation::Factory
       @logger: ::Logger
       @indexing_latency_slo_thresholds_by_timestamp_in_ms: ::Hash[::String, ::Integer]

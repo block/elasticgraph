@@ -80,7 +80,8 @@ target :elasticgraph_gems do
     "tmpdir",
     "tempfile",
     "time",
-    "uri"
+    "uri",
+    "zlib"
 
   configure_code_diagnostics(::Steep::Diagnostic::Ruby.all_error) do |config|
     # Setting these to :hint for now, as some branches are unreachable by steep

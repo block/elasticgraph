@@ -1,0 +1,30 @@
+module ElasticGraph
+  class WarehouseLambda
+    extend Support::FromYamlFile[WarehouseLambda]
+
+    attr_reader logger: ::Logger
+    attr_reader indexer: Indexer
+    attr_reader warehouse_dumper: WarehouseDumper
+    attr_reader clock: singleton(::Time)
+
+    def self.from_env: () -> WarehouseLambda
+
+    def self.from_parsed_yaml: (parsedYamlSettings) ?{ (untyped) -> void } -> WarehouseLambda
+
+    def initialize: (
+      indexer: Indexer,
+      warehouse_dumper: WarehouseDumper,
+      ?clock: singleton(::Time)
+    ) -> void
+
+    def processor: () -> Indexer::Processor
+
+    private
+
+    def self.build_warehouse_dumper: (
+      config: WarehouseLambda::Config,
+      logger: ::Logger,
+      latest_json_schema_version: ::Integer
+    ) -> WarehouseDumper
+  end
+end
