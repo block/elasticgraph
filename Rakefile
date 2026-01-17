@@ -8,6 +8,7 @@
 
 require "delegate"
 require "elastic_graph/apollo/schema_definition/api_extension"
+require "elastic_graph/warehouse/schema_definition/api_extension"
 require "elastic_graph/local/rake_tasks"
 require "elastic_graph/schema_definition/rake_tasks"
 require "yaml"
@@ -83,6 +84,9 @@ configure_local_rake_tasks = ->(tasks) do
   tested_datastore_versions = ::YAML.load_file(::File.expand_path("config/tested_datastore_versions.yaml", __dir__))
   tasks.elasticsearch_versions = tested_datastore_versions.fetch("elasticsearch")
   tasks.opensearch_versions = tested_datastore_versions.fetch("opensearch")
+
+  ENV["DEMONSTRATE_WAREHOUSE_APIS"] = "true"
+  tasks.schema_definition_extension_modules << ElasticGraph::Warehouse::SchemaDefinition::APIExtension
 end
 
 ElasticGraph::Local::RakeTasks.new(
@@ -99,7 +103,7 @@ namespace :apollo do
     path_to_schema: "config/schema.rb"
   ) do |tasks|
     configure_local_rake_tasks.call(tasks)
-    tasks.schema_definition_extension_modules = [ElasticGraph::Apollo::SchemaDefinition::APIExtension]
+    tasks.schema_definition_extension_modules << ElasticGraph::Apollo::SchemaDefinition::APIExtension
   end
 end
 
