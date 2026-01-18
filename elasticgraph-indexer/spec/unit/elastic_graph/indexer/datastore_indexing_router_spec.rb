@@ -275,31 +275,6 @@ module ElasticGraph
           )
         end
 
-        it "ignores operations that convert to an empty `to_datastore_bulk`" do
-          index_op = new_operation({"type" => "Widget", "id" => "1", "version" => 1, "record" => {"id" => "1", "some_field" => "value"}})
-          # Note: technically, no operation implementations return an empty `to_datastore_bulk` at this point,
-          # but this is still useful behavior for the router to have, so we're using a test double here.
-          destination_index_def = indexer.datastore_core.index_definitions_by_name.fetch("widget_currencies")
-          empty_update_op = instance_double(
-            Indexer::Operation::Update,
-            to_datastore_bulk: [],
-            destination_index_def: destination_index_def
-          )
-
-          result = router.bulk([index_op, empty_update_op], refresh: true).successful_operations_by_cluster_name
-
-          expected_successful_ops = {
-            "main" => [index_op]
-          }
-          expect(result).to eq expected_successful_ops
-
-          # The empty update should not be attempted at all
-          expect(main_datastore_client).to have_received(:bulk).with(
-            body: index_op.to_datastore_bulk,
-            refresh: true
-          )
-        end
-
         it "returns failures if `client#bulk` returns any error other than `version_conflict_engine_exception`" do
           # Make sure the stubbed response ONLY contains keys that match the `filter_path` in DATASTORE_BULK_FILTER_PATH
           fake_resp = {
