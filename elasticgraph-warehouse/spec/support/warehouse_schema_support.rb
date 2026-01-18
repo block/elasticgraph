@@ -15,24 +15,30 @@ module ElasticGraph
       include ElasticGraph::SchemaDefinition::TestSupport
 
       def define_warehouse_schema(**options, &block)
-        results = define_schema(
+        define_schema(
           schema_element_name_form: :snake_case,
           extension_modules: [SchemaDefinition::APIExtension],
           **options,
           &block
         )
-
-        # Customization callbacks are applied from `results.all_types`, so we need to call it to
-        # ensure our `on_built_in_types` callback is executed.
-        #
-        # TODO(jwils/myronmarston): figure out a better solution--the callback should be called automatically.
-        results.send(:all_types)
-
-        results
+        # Note: `warehouse_config` automatically triggers `all_types` which applies
+        # customization callbacks. No need to call it manually here.
       end
 
-      def warehouse_column_type_for(results, type)
-        results.state.types_by_name.fetch(type).to_warehouse_column_type
+      def table_schema_from(results, table_name)
+        results.warehouse_config.fetch("tables").fetch(table_name).fetch("table_schema")
+      end
+
+      def warehouse_column_def_from(results, table_name, column_name)
+        table_schema_from(results, table_name)
+          .lines
+          .map(&:strip)
+          .find { |line| line.start_with?("#{column_name} ") }
+          .sub(/,?\z/, "")
+      end
+
+      def table_names_from(results)
+        results.warehouse_config["tables"].keys
       end
     end
 

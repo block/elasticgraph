@@ -12,28 +12,41 @@ module ElasticGraph
   module Warehouse
     module SchemaDefinition
       RSpec.describe ScalarTypeExtension, :warehouse_schema do
-        it "allows configuring warehouse column type on scalar types" do
+        it "maps built-in scalar types to warehouse column types" do
+          results = define_warehouse_schema do |s|
+            s.object_type "Widget" do |t|
+              t.field "id", "ID"
+              t.field "name", "String"
+              t.field "quantity", "Int"
+              t.field "price", "Float"
+              t.field "active", "Boolean"
+              t.index "widgets"
+            end
+          end
+
+          expect(warehouse_column_def_from(results, "widgets", "id")).to eq "id STRING"
+          expect(warehouse_column_def_from(results, "widgets", "name")).to eq "name STRING"
+          expect(warehouse_column_def_from(results, "widgets", "quantity")).to eq "quantity INT"
+          expect(warehouse_column_def_from(results, "widgets", "price")).to eq "price FLOAT"
+          expect(warehouse_column_def_from(results, "widgets", "active")).to eq "active BOOLEAN"
+        end
+
+        it "uses custom warehouse_column type for custom scalars" do
           results = define_warehouse_schema do |s|
             s.scalar_type "CustomTimestamp" do |t|
               t.mapping type: "date"
               t.json_schema type: "string", format: "date-time"
               t.warehouse_column type: "TIMESTAMP"
             end
+
+            s.object_type "Event" do |t|
+              t.field "id", "ID"
+              t.field "occurred_at", "CustomTimestamp"
+              t.index "events"
+            end
           end
 
-          # Verify the scalar type has warehouse column type configured
-          expect(warehouse_column_type_for(results, "CustomTimestamp")).to eq "TIMESTAMP"
-        end
-
-        it "handles built-in scalar types" do
-          results = define_warehouse_schema
-
-          # Test the scalar types directly
-          expect(warehouse_column_type_for(results, "Int")).to eq("INT")
-          expect(warehouse_column_type_for(results, "Float")).to eq("FLOAT")
-          expect(warehouse_column_type_for(results, "Boolean")).to eq("BOOLEAN")
-          expect(warehouse_column_type_for(results, "String")).to eq("STRING")
-          expect(warehouse_column_type_for(results, "ID")).to eq("STRING")
+          expect(warehouse_column_def_from(results, "events", "occurred_at")).to eq "occurred_at TIMESTAMP"
         end
 
         it "raises an error when a custom scalar type does not configure warehouse_column" do
@@ -43,10 +56,16 @@ module ElasticGraph
               t.json_schema type: "string"
               # Intentionally NOT calling t.warehouse_column
             end
+
+            s.object_type "Widget" do |t|
+              t.field "id", "ID"
+              t.field "value", "UnconfiguredScalar"
+              t.index "widgets"
+            end
           end
 
           expect {
-            warehouse_column_type_for(results, "UnconfiguredScalar")
+            results.warehouse_config
           }.to raise_error(Errors::SchemaError, a_string_including(
             "Warehouse column type not configured for scalar type `UnconfiguredScalar`.",
             "call `warehouse_column type:"

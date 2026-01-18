@@ -12,18 +12,22 @@ module ElasticGraph
   module Warehouse
     module SchemaDefinition
       RSpec.describe EnumTypeExtension, :warehouse_schema do
-        it "converts enum type to warehouse column type" do
+        it "maps enum fields to STRING columns" do
           results = define_warehouse_schema do |s|
-            s.json_schema_version 1
-
             s.enum_type "Status" do |t|
               t.value "ACTIVE"
               t.value "INACTIVE"
               t.value "PENDING"
             end
+
+            s.object_type "Account" do |t|
+              t.field "id", "ID"
+              t.field "status", "Status"
+              t.index "accounts"
+            end
           end
 
-          expect(warehouse_column_type_for(results, "Status")).to eq "STRING"
+          expect(warehouse_column_def_from(results, "accounts", "status")).to eq "status STRING"
         end
       end
     end

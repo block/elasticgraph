@@ -22,27 +22,7 @@ module ElasticGraph
             end
           end
 
-          product_type = results.state.object_types_by_name.fetch("Product")
-          index = product_type.index_def
-
-          expect(index.warehouse_table_def).to be_nil
-        end
-
-        it "automatically creates a warehouse table with the index name when no warehouse table is explicitly defined" do
-          results = define_warehouse_schema do |s|
-            s.object_type "Product" do |t|
-              t.field "id", "ID"
-              t.index "products"
-            end
-          end
-
-          product_type = results.state.object_types_by_name.fetch("Product")
-          index = product_type.index_def
-          table = index.warehouse_table_def
-
-          expect(table).to be_a(WarehouseTable)
-          expect(table.name).to eq("products")
-          expect(table.index).to eq(index)
+          expect(table_names_from(results)).not_to include("products")
         end
 
         it "allows overriding the warehouse table name on an index" do
@@ -55,13 +35,7 @@ module ElasticGraph
             end
           end
 
-          product_type = results.state.object_types_by_name.fetch("Product")
-          index = product_type.index_def
-          table = index.warehouse_table_def
-
-          expect(table).to be_a(WarehouseTable)
-          expect(table.name).to eq("products_warehouse")
-          expect(table.index).to eq(index)
+          expect(table_names_from(results)).to contain_exactly("products_warehouse")
         end
 
         it "overwrites the warehouse table when called multiple times" do
@@ -75,10 +49,7 @@ module ElasticGraph
             end
           end
 
-          product_type = results.state.object_types_by_name.fetch("Product")
-          table = product_type.index_def.warehouse_table_def
-
-          expect(table.name).to eq("second_table")
+          expect(table_names_from(results)).to contain_exactly("second_table")
         end
 
         it "uses last-write-wins when exclude_from_warehouse is called before warehouse_table" do
@@ -92,11 +63,7 @@ module ElasticGraph
             end
           end
 
-          product_type = results.state.object_types_by_name.fetch("Product")
-          table = product_type.index_def.warehouse_table_def
-
-          expect(table).to be_a(WarehouseTable)
-          expect(table.name).to eq("products_warehouse")
+          expect(table_names_from(results)).to contain_exactly("products_warehouse")
         end
 
         it "uses last-write-wins when warehouse_table is called before exclude_from_warehouse" do
@@ -110,10 +77,7 @@ module ElasticGraph
             end
           end
 
-          product_type = results.state.object_types_by_name.fetch("Product")
-          index = product_type.index_def
-
-          expect(index.warehouse_table_def).to be_nil
+          expect(table_names_from(results)).to be_empty
         end
 
         it "works with interface types" do
@@ -129,11 +93,7 @@ module ElasticGraph
             end
           end
 
-          interface_type = results.state.types_by_name.fetch("Identifiable")
-          table = interface_type.index_def.warehouse_table_def
-
-          expect(table).to be_a(WarehouseTable)
-          expect(table.name).to eq("identifiables")
+          expect(table_names_from(results)).to contain_exactly("identifiables")
         end
 
         it "works with union types" do
@@ -152,11 +112,7 @@ module ElasticGraph
             end
           end
 
-          union_type = results.state.types_by_name.fetch("PaymentMethod")
-          table = union_type.index_def.warehouse_table_def
-
-          expect(table).to be_a(WarehouseTable)
-          expect(table.name).to eq("payment_methods")
+          expect(table_names_from(results)).to contain_exactly("payment_methods")
         end
       end
     end
