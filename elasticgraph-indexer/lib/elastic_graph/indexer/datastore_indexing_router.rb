@@ -46,7 +46,7 @@ module ElasticGraph
         ops_by_client = ::Hash.new { |h, k| h[k] = [] } # : ::Hash[DatastoreCore::_Client, ::Array[_Operation]]
         unsupported_ops = ::Set.new # : ::Set[_Operation]
 
-        operations.reject { |op| op.to_datastore_bulk.empty? }.each do |op|
+        operations.each do |op|
           # Note: this intentionally does not use `accessible_cluster_names_to_index_into`.
           # We want to fail with clear error if any clusters are inaccessible instead of silently ignoring
           # the named cluster. The `IndexingFailuresError` provides a clear error.
