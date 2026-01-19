@@ -143,10 +143,7 @@ module ElasticGraph
             end
           end
 
-          define_method :person_object_and_schema_field do |
-            field:, name_form: :snake_case, overrides: {},
-            name: "John", birth_date: "2002-09-01", quote: "To be, or not to be, that is the question."
-          |
+          define_method :person_object_and_schema_field do |field:, name_form: :snake_case, overrides: {}, name: "John", birth_date: "2002-09-01", quote: "To be, or not to be, that is the question."|
             element_names = PersonFieldNames.new(form: name_form, overrides: overrides)
             schema = build_graphql(element_names).schema
             allow(schema).to receive(:element_names).and_return(element_names)
