@@ -28,35 +28,49 @@ module ElasticGraph
           "type" => "Widget",
           "id" => "1",
           "version" => 3,
+          "json_schema_version" => 1,
           "record" => {"id" => "1", "dayOfWeek" => "MON", "created_at" => "2024-09-15T12:30:12Z", "workspace_id" => "ws-1"}
         })
       end
 
       it "writes operations to S3 as gzipped JSONL files and returns success results" do
-        op1 = new_primary_indexing_op({"type" => "Widget", "id" => "1", "version" => 3, "record" => {"id" => "1", "dayOfWeek" => "MON", "created_at" => "2024-09-15T12:30:12Z", "workspace_id" => "ws-1"}})
-        op2 = new_primary_indexing_op({"type" => "Widget", "id" => "2", "version" => 5, "record" => {"id" => "2", "dayOfWeek" => "TUE", "created_at" => "2024-09-15T13:30:12Z", "workspace_id" => "ws-2"}})
+        op1 = new_primary_indexing_op({"type" => "Widget", "id" => "1", "version" => 3, "json_schema_version" => 1, "record" => {"id" => "1", "dayOfWeek" => "MON", "created_at" => "2024-09-15T12:30:12Z", "workspace_id" => "ws-1"}})
+        op2 = new_primary_indexing_op({"type" => "Widget", "id" => "2", "version" => 5, "json_schema_version" => 2, "record" => {"id" => "2", "dayOfWeek" => "TUE", "created_at" => "2024-09-15T13:30:12Z", "workspace_id" => "ws-2"}})
         operations = [op1, op2]
 
         results = warehouse_dumper.bulk(operations)
 
-        # Verify S3 upload
-        expect(s3_client.api_requests.map { |req| req[:operation_name] }).to eq [:put_object]
+        # Verify S3 uploads - should have 2 files (one for json_schema_version 1, one for json_schema_version 2)
+        expect(s3_client.api_requests.map { |req| req[:operation_name] }).to eq [:put_object, :put_object]
 
-        # Verify S3 upload parameters
-        params = s3_client.api_requests.first.fetch(:params)
-        expect(params[:bucket]).to eq s3_bucket_name
-        expect(params[:key]).to match %r{Data001/Widget/v1/2024-09-15/[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}\.jsonl\.gz}
-        expect(params[:checksum_algorithm]).to eq "sha256"
-        expect(params[:if_none_match]).to eq "*"
+        # Verify first file (json_schema_version 1)
+        params1 = s3_client.api_requests[0].fetch(:params)
+        expect(params1[:bucket]).to eq s3_bucket_name
+        expect(params1[:key]).to match %r{Data0001/Widget/v1/2024-09-15/[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}\.jsonl\.gz}
+        expect(params1[:checksum_algorithm]).to eq "sha256"
+        expect(params1[:if_none_match]).to eq "*"
 
         # Verify compression (gzip actually reduces size)
-        compressed_body = params[:body]
-        jsonl_content = ::Zlib::GzipReader.new(StringIO.new(compressed_body)).read
-        expect(compressed_body.bytesize).to be < jsonl_content.bytesize
+        compressed_body1 = params1[:body]
+        jsonl_content1 = ::Zlib::GzipReader.new(StringIO.new(compressed_body1)).read
+        expect(compressed_body1.bytesize).to be < jsonl_content1.bytesize
 
-        # Verify JSONL content has both records
-        lines = jsonl_content.split("\n")
-        expect(lines.size).to eq 2
+        # Verify first file has one record
+        lines1 = jsonl_content1.split("\n")
+        expect(lines1.size).to eq 1
+
+        # Verify second file (json_schema_version 2)
+        params2 = s3_client.api_requests[1].fetch(:params)
+        expect(params2[:key]).to match %r{Data0001/Widget/v2/2024-09-15/[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}\.jsonl\.gz}
+
+        compressed_body2 = params2[:body]
+        jsonl_content2 = ::Zlib::GzipReader.new(StringIO.new(compressed_body2)).read
+
+        lines2 = jsonl_content2.split("\n")
+        expect(lines2.size).to eq 1
+
+        # Verify both records (combine from both files)
+        lines = lines1 + lines2
 
         record1 = ::JSON.parse(lines[0])
         record2 = ::JSON.parse(lines[1])
@@ -77,14 +91,14 @@ module ElasticGraph
 
         ops_and_results.each do |op, result|
           expect(operations).to include(op)
-          expect(result).to be_a ::ElasticGraph::Indexer::Operation::Result
+          expect(result).to be_a Indexer::Operation::Result
           expect(result.category).to eq :success
         end
       end
 
       it "writes operations of different types to separate S3 files" do
-        widget_op = new_primary_indexing_op({"type" => "Widget", "id" => "1", "version" => 3, "record" => {"id" => "1", "dayOfWeek" => "MON", "created_at" => "2024-09-15T12:30:12Z", "workspace_id" => "ws-1"}})
-        component_op = new_primary_indexing_op({"type" => "Component", "id" => "c1", "version" => 2, "record" => {"id" => "c1", "created_at" => "2024-09-15T12:30:12Z"}})
+        widget_op = new_primary_indexing_op({"type" => "Widget", "id" => "1", "version" => 3, "json_schema_version" => 1, "record" => {"id" => "1", "dayOfWeek" => "MON", "created_at" => "2024-09-15T12:30:12Z", "workspace_id" => "ws-1"}})
+        component_op = new_primary_indexing_op({"type" => "Component", "id" => "c1", "version" => 2, "json_schema_version" => 1, "record" => {"id" => "c1", "created_at" => "2024-09-15T12:30:12Z"}})
         operations = [widget_op, component_op]
 
         warehouse_dumper.bulk(operations)
@@ -92,13 +106,13 @@ module ElasticGraph
         expect(s3_client.api_requests.size).to eq 2
         keys = s3_client.api_requests.map { |req| req[:params][:key] }
 
-        expect(keys[0]).to match %r{Data001/Widget/v1/2024-09-15/}
-        expect(keys[1]).to match %r{Data001/Component/v1/2024-09-15/}
+        expect(keys[0]).to match %r{Data0001/Widget/v1/2024-09-15/}
+        expect(keys[1]).to match %r{Data0001/Component/v1/2024-09-15/}
       end
 
       it "logs structured information about received batch and dumped files" do
-        widget_op = new_primary_indexing_op({"type" => "Widget", "id" => "1", "version" => 3, "record" => {"id" => "1", "dayOfWeek" => "MON", "created_at" => "2024-09-15T12:30:12Z", "workspace_id" => "ws-1"}})
-        component_op = new_primary_indexing_op({"type" => "Component", "id" => "c1", "version" => 2, "record" => {"id" => "c1", "created_at" => "2024-09-15T12:30:12Z"}})
+        widget_op = new_primary_indexing_op({"type" => "Widget", "id" => "1", "version" => 3, "json_schema_version" => 1, "record" => {"id" => "1", "dayOfWeek" => "MON", "created_at" => "2024-09-15T12:30:12Z", "workspace_id" => "ws-1"}})
+        component_op = new_primary_indexing_op({"type" => "Component", "id" => "c1", "version" => 2, "json_schema_version" => 1, "record" => {"id" => "c1", "created_at" => "2024-09-15T12:30:12Z"}})
         operations = [widget_op, component_op]
 
         warehouse_dumper.bulk(operations)
@@ -111,11 +125,13 @@ module ElasticGraph
           a_hash_including({
             "s3_bucket" => s3_bucket_name,
             "type" => "Widget",
+            "json_schema_version" => 1,
             "record_count" => 1
           }),
           a_hash_including({
             "s3_bucket" => s3_bucket_name,
             "type" => "Component",
+            "json_schema_version" => 1,
             "record_count" => 1
           })
         ]
@@ -153,37 +169,6 @@ module ElasticGraph
         }.to raise_error(Aws::S3::Errors::ServiceUnavailable)
       end
 
-      it "skips operations with empty to_datastore_bulk" do
-        # Create two Widget operations - one valid, one with empty datastore_bulk
-        valid_widget = new_primary_indexing_op({
-          "type" => "Widget",
-          "id" => "1",
-          "version" => 3,
-          "record" => {"id" => "1", "dayOfWeek" => "MON", "created_at" => "2024-09-15T12:30:12Z", "workspace_id" => "ws-1"}
-        })
-
-        empty_widget = new_primary_indexing_op({
-          "type" => "Widget",
-          "id" => "2",
-          "version" => 4,
-          "record" => {"id" => "2", "dayOfWeek" => "TUE", "created_at" => "2024-09-15T13:30:12Z", "workspace_id" => "ws-2"}
-        })
-
-        # Stub to_datastore_bulk to return empty on empty_widget
-        allow(empty_widget).to receive(:to_datastore_bulk).and_return([])
-
-        warehouse_dumper.bulk([valid_widget, empty_widget])
-
-        # Verify only one record in the JSONL
-        params = s3_client.api_requests.first.fetch(:params)
-        jsonl_content = ::Zlib::GzipReader.new(StringIO.new(params[:body])).read
-        lines = jsonl_content.split("\n")
-
-        expect(lines.size).to eq 1
-        record = ::JSON.parse(lines[0])
-        expect(record["id"]).to eq "1"
-      end
-
       it "handles empty operations list without creating S3 files" do
         warehouse_dumper.bulk([])
 
@@ -196,6 +181,7 @@ module ElasticGraph
           "type" => "Widget",
           "id" => "1",
           "version" => 3,
+          "json_schema_version" => 1,
           "record" => {"id" => "1", "dayOfWeek" => "MON", "created_at" => "2024-09-15T12:30:12Z", "workspace_id" => "ws-1"}
         })
 

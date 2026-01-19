@@ -6,11 +6,12 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/constants"
 require "elastic_graph/indexer/datastore_indexing_router"
 require "elastic_graph/indexer/operation/result"
 require "json"
-require "time"
 require "securerandom"
+require "time"
 require "zlib"
 
 module ElasticGraph
@@ -24,30 +25,29 @@ module ElasticGraph
       # @return [String] message type for logging when a file is dumped to S3
       LOG_MSG_DUMPED_FILE = "DumpedToWarehouseFile"
 
-      def initialize(logger:, s3_client:, s3_bucket_name:, s3_file_prefix:, latest_json_schema_version:, clock:)
+      def initialize(logger:, s3_client:, s3_bucket_name:, s3_file_prefix:, clock:)
         @logger = logger
         @s3_client = s3_client
         @s3_bucket_name = s3_bucket_name
         @s3_file_prefix = s3_file_prefix
-        @latest_json_schema_version = latest_json_schema_version
         @clock = clock
       end
 
       # Processes a batch of indexing operations by dumping them to S3 as gzipped JSONL files.
-      # Operations are grouped by GraphQL type, with each type written to a separate file.
+      # Operations are grouped by GraphQL type and JSON schema version, with each group written to a separate file.
       #
       # @param operations [Array<Operation>] the indexing operations to process
       # @param refresh [Boolean] ignored (included for interface compatibility with DatastoreIndexingRouter)
       # @return [BulkResult] result containing success status for all operations
       def bulk(operations, refresh: false)
-        operations_by_type = operations.group_by { |op| op.event.fetch("type") }
+        operations_by_type_and_json_schema_version = operations.group_by { |op| [op.event.fetch("type"), op.event.fetch(JSON_SCHEMA_VERSION_KEY)] }
 
         @logger.info({
           "message_type" => LOG_MSG_RECEIVED_BATCH,
-          "record_counts_by_type" => operations_by_type.transform_values(&:size)
+          "record_counts_by_type" => operations_by_type_and_json_schema_version.transform_keys { |(type, _json_schema_version)| type }.transform_values(&:size)
         })
 
-        operations_by_type.each do |type, operations|
+        operations_by_type_and_json_schema_version.each do |(type, json_schema_version), operations|
           # Operations coming from the indexer are always Update operations for warehouse dumping
           update_operations = operations # : ::Array[::ElasticGraph::Indexer::Operation::Update]
           jsonl_data = build_jsonl_file_from(update_operations)
@@ -56,7 +56,7 @@ module ElasticGraph
           next if jsonl_data.empty?
 
           gzip_data = compress(jsonl_data)
-          s3_key = generate_s3_key_for(type)
+          s3_key = generate_s3_key_for(type, json_schema_version)
 
           # Use if_none_match: "*" to prevent overwrites (defense-in-depth, though UUIDs make collisions impossible)
           @s3_client.put_object(
@@ -72,6 +72,7 @@ module ElasticGraph
             "s3_bucket" => @s3_bucket_name,
             "s3_key" => s3_key,
             "type" => type,
+            JSON_SCHEMA_VERSION_KEY => json_schema_version,
             "record_count" => operations.size,
             "json_size" => jsonl_data.bytesize,
             "gzip_size" => gzip_data.bytesize
@@ -96,14 +97,14 @@ module ElasticGraph
 
       private
 
-      def generate_s3_key_for(type)
+      def generate_s3_key_for(type, json_schema_version)
         date = @clock.now.utc.strftime("%Y-%m-%d")
         uuid = ::SecureRandom.uuid
 
         [
           @s3_file_prefix,
           type,
-          "v#{@latest_json_schema_version}",
+          "v#{json_schema_version}",
           date,
           "#{uuid}.jsonl.gz"
         ].join("/")
@@ -113,11 +114,8 @@ module ElasticGraph
         operation_payloads = operations.filter_map do |op|
           # Only include operations where the update target matches the event type (excludes derived indices)
           next nil if op.update_target.type != op.event.fetch("type")
-          # Skip operations with no datastore payload (e.g., delete operations or invalid data)
-          next nil if op.to_datastore_bulk.empty?
 
-          payload_body = op.to_datastore_bulk[1]
-          params = payload_body.fetch(:script).fetch(:params)
+          params = op.to_datastore_bulk[1].fetch(:script).fetch(:params)
           data = params.fetch("data").merge({
             "id" => params.fetch("id"),
             "__eg_version" => params.fetch("version")

@@ -13,7 +13,7 @@ module ElasticGraph
   RSpec.describe WarehouseLambda do
     include BuildsWarehouseLambda
 
-    # Without these ENV vars, instanting the S3 client causes it to try to fetch instance profile creds, which significantly
+    # Without these ENV vars, instantiating the S3 client causes it to try to fetch instance profile creds, which significantly
     # slows these tests down and produces warnings:
     # > Error retrieving instance profile credentials: Failed to open TCP connection to 169.254.169.254:80 (execution expired)
     around do |ex|
@@ -35,14 +35,14 @@ module ElasticGraph
         warehouse_lambda = WarehouseLambda.from_parsed_yaml(parsed_yaml)
 
         expect(warehouse_lambda).to be_a WarehouseLambda
-        expect(warehouse_lambda.indexer).to be_a ::ElasticGraph::Indexer
+        expect(warehouse_lambda.indexer).to be_a Indexer
         expect(warehouse_lambda.warehouse_dumper).to be_a WarehouseLambda::WarehouseDumper
       end
 
       it "raises an error when warehouse config is missing" do
         expect {
           WarehouseLambda.from_parsed_yaml(CommonSpecHelpers.parsed_test_settings_yaml)
-        }.to raise_error ::ElasticGraph::Errors::ConfigError, a_string_including("warehouse")
+        }.to raise_error Errors::ConfigError, a_string_including("warehouse")
       end
     end
 

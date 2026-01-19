@@ -11,7 +11,6 @@ module ElasticGraph
         s3_client: Aws::S3::Client,
         s3_bucket_name: ::String,
         s3_file_prefix: ::String,
-        latest_json_schema_version: ::Integer,
         clock: singleton(::Time)
       ) -> void
 
@@ -21,10 +20,9 @@ module ElasticGraph
       @s3_client: Aws::S3::Client
       @s3_bucket_name: ::String
       @s3_file_prefix: ::String
-      @latest_json_schema_version: ::Integer
       @clock: singleton(::Time)
 
-      def generate_s3_key_for: (::String) -> ::String
+      def generate_s3_key_for: (::String, ::Integer) -> ::String
 
       def build_jsonl_file_from: (
         ::Array[Indexer::Operation::Update]
