@@ -9,8 +9,6 @@ module ElasticGraph
     attr_reader logger: ::Logger
     attr_reader clock: singleton(::Time)
 
-    def self.from_parsed_yaml: (parsedYamlSettings) ?{ (untyped) -> void } -> WarehouseLambda
-
     def initialize: (
       config: Config,
       indexer_config: Indexer::Config,
