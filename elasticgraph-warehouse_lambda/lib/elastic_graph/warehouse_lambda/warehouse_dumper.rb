@@ -15,7 +15,7 @@ require "zlib"
 
 module ElasticGraph
   class WarehouseLambda
-    # Responsible for dumping data into the data warehouse. Implements the same interface as `DatastoreIndexingRouter` from
+    # Responsible for dumping data into a data warehouse. Implements the same interface as `DatastoreIndexingRouter` from
     # `elasticgraph-indexer` so that it can be used in place of the standard datastore indexing router.
     class WarehouseDumper
       # @return [String] message type for logging when a batch is received
@@ -49,7 +49,7 @@ module ElasticGraph
 
         operations_by_type.each do |type, operations|
           # Operations coming from the indexer are always Update operations for warehouse dumping
-          update_operations = operations #: ::Array[::ElasticGraph::Indexer::Operation::Update]
+          update_operations = operations # : ::Array[::ElasticGraph::Indexer::Operation::Update]
           jsonl_data = build_jsonl_file_from(update_operations)
 
           # Skip S3 upload if all operations were filtered out (no data to write)
@@ -80,7 +80,7 @@ module ElasticGraph
 
         ops_and_results = operations.map do |op|
           [op, ::ElasticGraph::Indexer::Operation::Result.success_of(op)]
-        end #: ::Array[[::ElasticGraph::Indexer::_Operation, ::ElasticGraph::Indexer::Operation::Result]]
+        end # : ::Array[[::ElasticGraph::Indexer::_Operation, ::ElasticGraph::Indexer::Operation::Result]]
 
         ::ElasticGraph::Indexer::DatastoreIndexingRouter::BulkResult.new({"warehouse" => ops_and_results})
       end
@@ -117,8 +117,7 @@ module ElasticGraph
           next nil if op.to_datastore_bulk.empty?
 
           payload_body = op.to_datastore_bulk[1]
-          script = payload_body.fetch(:script)
-          params = script.fetch(:params)
+          params = payload_body.fetch(:script).fetch(:params)
           data = params.fetch("data").merge({
             "id" => params.fetch("id"),
             "__eg_version" => params.fetch("version")

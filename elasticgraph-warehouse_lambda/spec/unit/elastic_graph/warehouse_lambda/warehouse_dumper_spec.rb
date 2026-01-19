@@ -6,45 +6,22 @@
 #
 # frozen_string_literal: true
 
-require "elastic_graph/spec_support/lambda_function"
-
 require "aws-sdk-s3"
-require "elastic_graph/indexer"
 require "elastic_graph/indexer/operation/update"
-require "elastic_graph/warehouse_lambda"
 require "elastic_graph/warehouse_lambda/warehouse_dumper"
-require "elastic_graph/warehouse_lambda/config"
+require "support/builds_warehouse_lambda"
 
 module ElasticGraph
   class WarehouseLambda
-    RSpec.describe WarehouseDumper do
-      include_context "lambda function", config_overrides_in_yaml: {"warehouse" => {"s3_path_prefix" => "Data001", "s3_bucket_name" => "test-bucket"}}
+    RSpec.describe WarehouseDumper, :capture_logs do
+      include BuildsWarehouseLambda
 
-      let(:parsed_yaml) { CommonSpecHelpers.parsed_test_settings_yaml.merge("warehouse" => {"s3_path_prefix" => "Data001", "s3_bucket_name" => "warehouse-bucket"}) }
       let(:s3_client) { ::Aws::S3::Client.new(stub_responses: true) }
       let(:s3_bucket_name) { "warehouse-bucket" }
       let(:clock) { class_double(::Time, now: ::Time.utc(2024, 9, 15, 12, 30, 12.123454)) }
-
-      let(:warehouse_dumper) do
-        datastore_core = ::ElasticGraph::DatastoreCore.from_parsed_yaml(parsed_yaml)
-        WarehouseDumper.new(
-          logger: datastore_core.logger,
-          s3_client: s3_client,
-          s3_bucket_name: s3_bucket_name,
-          s3_file_prefix: "Data001",
-          latest_json_schema_version: datastore_core.schema_artifacts.latest_json_schema_version,
-          clock: clock
-        )
-      end
-
-      let(:indexer) do
-        datastore_core = ::ElasticGraph::DatastoreCore.from_parsed_yaml(parsed_yaml)
-        ::ElasticGraph::Indexer.new(
-          config: ::ElasticGraph::Indexer::Config.new,
-          datastore_core: datastore_core,
-          datastore_router: warehouse_dumper
-        )
-      end
+      let(:warehouse_lambda) { build_warehouse_lambda(s3_client: s3_client, clock: clock, s3_bucket_name: s3_bucket_name) }
+      let(:warehouse_dumper) { warehouse_lambda.warehouse_dumper }
+      let(:indexer) { warehouse_lambda.indexer }
 
       let(:widget_primary_indexing_op) do
         new_primary_indexing_op({
@@ -124,37 +101,24 @@ module ElasticGraph
         component_op = new_primary_indexing_op({"type" => "Component", "id" => "c1", "version" => 2, "record" => {"id" => "c1", "created_at" => "2024-09-15T12:30:12Z"}})
         operations = [widget_op, component_op]
 
-        logger = instance_double(::Logger)
-        datastore_core = ::ElasticGraph::DatastoreCore.from_parsed_yaml(parsed_yaml)
-        custom_warehouse_dumper = WarehouseDumper.new(
-          logger: logger,
-          s3_client: s3_client,
-          s3_bucket_name: s3_bucket_name,
-          s3_file_prefix: "Data001",
-          latest_json_schema_version: datastore_core.schema_artifacts.latest_json_schema_version,
-          clock: clock
-        )
+        warehouse_dumper.bulk(operations)
 
-        expect(logger).to receive(:info).with(hash_including(
-          "message_type" => WarehouseDumper::LOG_MSG_RECEIVED_BATCH,
+        expect(logged_jsons_of_type(WarehouseDumper::LOG_MSG_RECEIVED_BATCH)).to match [a_hash_including({
           "record_counts_by_type" => {"Widget" => 1, "Component" => 1}
-        ))
+        })]
 
-        expect(logger).to receive(:info).with(hash_including(
-          "message_type" => WarehouseDumper::LOG_MSG_DUMPED_FILE,
-          "s3_bucket" => s3_bucket_name,
-          "type" => "Widget",
-          "record_count" => 1
-        )).once
-
-        expect(logger).to receive(:info).with(hash_including(
-          "message_type" => WarehouseDumper::LOG_MSG_DUMPED_FILE,
-          "s3_bucket" => s3_bucket_name,
-          "type" => "Component",
-          "record_count" => 1
-        )).once
-
-        custom_warehouse_dumper.bulk(operations)
+        expect(logged_jsons_of_type(WarehouseDumper::LOG_MSG_DUMPED_FILE)).to match [
+          a_hash_including({
+            "s3_bucket" => s3_bucket_name,
+            "type" => "Widget",
+            "record_count" => 1
+          }),
+          a_hash_including({
+            "s3_bucket" => s3_bucket_name,
+            "type" => "Component",
+            "record_count" => 1
+          })
+        ]
       end
 
       it "generates unique S3 keys using UUIDs" do
