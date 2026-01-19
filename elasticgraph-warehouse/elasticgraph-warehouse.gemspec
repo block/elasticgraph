@@ -11,7 +11,7 @@ require_relative "../elasticgraph-support/lib/elastic_graph/version"
 Gem::Specification.new do |spec|
   spec.name = "elasticgraph-warehouse"
   spec.version = ElasticGraph::VERSION
-  spec.authors = ["Josh Wilson", "Block Engineering"]
+  spec.authors = ["Josh Wilson", "Myron Marston", "Block Engineering"]
   spec.email = ["joshuaw@squareup.com"]
   spec.homepage = "https://block.github.io/elasticgraph/"
   spec.license = "MIT"
