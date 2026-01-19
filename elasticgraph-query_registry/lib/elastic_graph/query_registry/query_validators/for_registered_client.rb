@@ -8,6 +8,7 @@
 
 require "elastic_graph/graphql/client"
 require "elastic_graph/query_registry/client_data"
+require "elastic_graph/query_registry/registration_status"
 require "graphql"
 
 module ElasticGraph
@@ -44,19 +45,34 @@ module ElasticGraph
 
           if (cached_query = client_data.cached_query_for(query_string.to_s))
             prepared_query = prepare_query_for_execution(cached_query, variables: variables, operation_name: operation_name, context: context)
-            return [prepared_query, []]
+            return [prepared_query, [], RegistrationStatus::MATCHED_REGISTERED_QUERY]
           end
 
           query = yield
+
+          # Check operation name first (fast O(1) set lookup) to avoid canonicalization when not needed.
+          # Note: we use `selected_operation_name` instead of `operation_name` because `operation_name` returns
+          # `nil` for single-operation queries when no explicit operation_name parameter is passed, whereas
+          # `selected_operation_name` returns the operation name from the query document in that case.
+          registration_status =
+            if client_data.operation_names.include?(query.selected_operation_name.to_s)
+              if client_data.canonical_query_strings.include?(ClientData.canonical_query_string_from(query, schema_element_names: schema.element_names))
+                RegistrationStatus::MATCHED_REGISTERED_QUERY
+              else
+                RegistrationStatus::DIFFERING_REGISTERED_QUERY
+              end
+            else
+              RegistrationStatus::UNREGISTERED_QUERY
+            end
 
           # This client allows any query, so we can just return the query with no errors here.
           # Note: we could put this at the top of the method, but if the query is registered and matches
           # the registered form, the `cached_query` above is more efficient as it avoids unnecessarily
           # parsing the query.
-          return [query, []] if allow_any_query_for_clients.include?(client.name)
+          return [query, [], registration_status] if allow_any_query_for_clients.include?(client.name)
 
-          if !client_data.canonical_query_strings.include?(ClientData.canonical_query_string_from(query, schema_element_names: schema.element_names))
-            return [query, [client_data.unregistered_query_error_for(query, client)]]
+          unless registration_status == RegistrationStatus::MATCHED_REGISTERED_QUERY
+            return [query, [client_data.unregistered_query_error_for(query, client)], registration_status]
           end
 
           # The query is slightly different from a registered query, but not in any material fashion
@@ -74,7 +90,7 @@ module ElasticGraph
             (_ = cached_client_data).with_updated_last_query(query_string, cachable_query)
           end
 
-          [query, []]
+          [query, [], registration_status]
         end
 
         private

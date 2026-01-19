@@ -6,6 +6,8 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/query_registry/registration_status"
+
 module ElasticGraph
   module QueryRegistry
     module QueryValidators
@@ -15,15 +17,15 @@ module ElasticGraph
         def build_and_validate_query(query_string, client:, variables: {}, operation_name: nil, context: {})
           query = yield
 
-          return [query, []] if allow_unregistered_clients
+          return [query, [], RegistrationStatus::UNREGISTERED_CLIENT] if allow_unregistered_clients
 
           client_name = client&.name
-          return [query, []] if client_name && allow_any_query_for_clients.include?(client_name)
+          return [query, [], RegistrationStatus::UNREGISTERED_CLIENT] if client_name && allow_any_query_for_clients.include?(client_name)
 
           [query, [
             "Client #{client&.description || "(unknown)"} is not a registered client, it is not in " \
             "`allow_any_query_for_clients` and `allow_unregistered_clients` is false."
-          ]]
+          ], RegistrationStatus::UNREGISTERED_CLIENT]
         end
       end
     end

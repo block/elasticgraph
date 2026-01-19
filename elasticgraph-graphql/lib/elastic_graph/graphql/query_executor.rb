@@ -117,7 +117,7 @@ module ElasticGraph
             "datastore_query_count" => query_tracker.query_counts_per_datastore_request.sum,
             "over_slow_threshold" => (duration > @slow_query_threshold_ms).to_s,
             "slo_result" => slo_result_for(query, duration)
-          })
+          }.merge(query_tracker.extension_data))
         end
 
         result

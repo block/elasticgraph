@@ -1,0 +1,10 @@
+module ElasticGraph
+  module QueryRegistry
+    module RegistrationStatus
+      MATCHED_REGISTERED_QUERY: ::String
+      DIFFERING_REGISTERED_QUERY: ::String
+      UNREGISTERED_QUERY: ::String
+      UNREGISTERED_CLIENT: ::String
+    end
+  end
+end

@@ -9,6 +9,7 @@
 require "elastic_graph/elasticsearch/client"
 require "elastic_graph/graphql/client"
 require "elastic_graph/query_registry/graphql_extension"
+require "elastic_graph/query_registry/registration_status"
 require "elastic_graph/support/hash_util"
 require "fileutils"
 require "graphql"
@@ -38,30 +39,50 @@ module ElasticGraph
       EOS
     end
 
-    it "responds to unregistered queries with a clear error while allowing registered queries" do
+    it "responds to unregistered queries with a clear error while allowing registered queries, logging appropriate registration status" do
       register_query "client1", "WidgetName", widget_name_string
       register_query "client2", "PartName", part_name_string
 
+      differing_widget_name_string = <<~EOS.strip
+        query WidgetName {
+          __type(name: "Widget") {
+            name
+            description
+          }
+        }
+      EOS
+
       query_executor = build_query_executor_with_registry_options(
         allow_unregistered_clients: false,
-        allow_any_query_for_clients: ["adhoc_client"],
+        allow_any_query_for_clients: ["adhoc_client", "client1"],
         path_to_registry: query_registry_dir
       )
 
       expect(execute(query_executor, widget_name_string, on_behalf_of: "client1")).to eq("data" => {"__type" => {"name" => "Widget"}})
+      expect(logged_duration_messages.last).to include("query_registration_status" => QueryRegistry::RegistrationStatus::MATCHED_REGISTERED_QUERY)
+
       expect(execute(query_executor, part_name_string, on_behalf_of: "client2")).to eq("data" => {"__type" => {"name" => "Part"}})
+      expect(logged_duration_messages.last).to include("query_registration_status" => QueryRegistry::RegistrationStatus::MATCHED_REGISTERED_QUERY)
+
       expect(execute(query_executor, part_name_string, on_behalf_of: "adhoc_client")).to eq("data" => {"__type" => {"name" => "Part"}})
+      expect(logged_duration_messages.last).to include("query_registration_status" => QueryRegistry::RegistrationStatus::UNREGISTERED_CLIENT)
+
+      expect(execute(query_executor, differing_widget_name_string, on_behalf_of: "client1")).to include("data" => hash_including("__type" => hash_including("name" => "Widget")))
+      expect(logged_duration_messages.last).to include("query_registration_status" => QueryRegistry::RegistrationStatus::DIFFERING_REGISTERED_QUERY)
 
       expect {
         expect(execute(query_executor, widget_name_string, on_behalf_of: "client2")).to match("errors" => [
           {"message" => a_string_including("Query WidgetName", "is unregistered", "client2")}
         ])
-        expect(execute(query_executor, part_name_string, on_behalf_of: "client1")).to match("errors" => [
-          {"message" => a_string_including("Query PartName", "is unregistered", "client1")}
-        ])
+        expect(logged_duration_messages.last).to include("query_registration_status" => QueryRegistry::RegistrationStatus::UNREGISTERED_QUERY)
+
+        expect(execute(query_executor, part_name_string, on_behalf_of: "client1")).to eq("data" => {"__type" => {"name" => "Part"}})
+        expect(logged_duration_messages.last).to include("query_registration_status" => QueryRegistry::RegistrationStatus::UNREGISTERED_QUERY)
+
         expect(execute(query_executor, part_name_string, on_behalf_of: "client3")).to match("errors" => [
           {"message" => a_string_including("client3", "is not a registered client")}
         ])
+        expect(logged_duration_messages.last).to include("query_registration_status" => QueryRegistry::RegistrationStatus::UNREGISTERED_CLIENT)
       }.to log_warning a_string_including("is unregistered")
     end
 
@@ -147,6 +168,10 @@ module ElasticGraph
       end
 
       executed_query_strings
+    end
+
+    def logged_duration_messages
+      logged_jsons_of_type("ElasticGraphQueryExecutorQueryDuration")
     end
   end
 end
