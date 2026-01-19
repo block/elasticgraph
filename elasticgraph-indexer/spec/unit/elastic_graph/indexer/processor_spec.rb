@@ -11,12 +11,15 @@ require "elastic_graph/indexer/test_support/converters"
 require "elastic_graph/indexer/processor"
 require "elastic_graph/indexer/datastore_indexing_router"
 require "elastic_graph/support/hash_util"
+require "support/primary_indexing_operation_support"
 require "json"
 
 module ElasticGraph
   class Indexer
     RSpec.describe Processor do
       describe ".process", :factories, :capture_logs do
+        include PrimaryIndexingOperationSupport
+
         let(:clock) { class_double(Time, now: Time.iso8601("2020-09-15T12:30:00Z")) }
         let(:datastore_router) { instance_spy(ElasticGraph::Indexer::DatastoreIndexingRouter) }
         let(:component_to_ignore) { build_upsert_event(:component, id: ignored_event_id.id, __version: ignored_event_id.version) }
@@ -381,37 +384,6 @@ module ElasticGraph
               "name" => 17 # must be an string
             ))
           end
-        end
-
-        def new_primary_indexing_operation(event)
-          update_targets = indexer
-            .schema_artifacts
-            .runtime_metadata
-            .object_types_by_name
-            .fetch(event.fetch("type"))
-            .update_targets
-            .select { |ut| ut.type == event.fetch("type") }
-
-          expect(update_targets.size).to eq(1)
-
-          index_name = {
-            "Component" => "components",
-            "Address" => "addresses"
-          }.fetch(event.fetch("type"))
-
-          index_def = indexer.datastore_core.index_definitions_by_name.fetch(index_name)
-
-          Operation::Update.new(
-            event: event,
-            prepared_record: indexer.record_preparer_factory.for_latest_json_schema_version.prepare_for_index(
-              event.fetch("type"),
-              event.fetch("record")
-            ),
-            destination_index_def: index_def,
-            update_target: update_targets.first,
-            doc_id: event.fetch("id"),
-            destination_index_mapping: indexer.schema_artifacts.index_mappings_by_index_def_name.fetch(index_def.name)
-          )
         end
 
         def build_indexer_with(latency_thresholds:)

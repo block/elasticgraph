@@ -11,10 +11,13 @@ require "elastic_graph/constants"
 require "elastic_graph/elasticsearch/client"
 require "elastic_graph/indexer/datastore_indexing_router"
 require "elastic_graph/indexer/operation/factory"
+require "support/primary_indexing_operation_support"
 
 module ElasticGraph
   class Indexer
     RSpec.describe DatastoreIndexingRouter, :capture_logs do
+      include PrimaryIndexingOperationSupport
+
       let(:main_datastore_client) { instance_spy(Elasticsearch::Client, cluster_name: "main") }
       let(:other_datastore_client) { instance_spy(Elasticsearch::Client, cluster_name: "other") }
       let(:indexer) { build_indexer }
@@ -29,8 +32,8 @@ module ElasticGraph
 
         let(:requested_docs_by_client) { ::Hash.new { |h, k| h[k] = [] } }
         let(:stubbed_versions_by_index_and_id) { {} }
-        let(:widget_primary_indexing_op) { new_primary_indexing_op({"type" => "Widget", "id" => "1", "version" => 1, "record" => {"id" => "1", "some_field" => "value", "created_at" => "2021-08-24T23:30:00Z", "workspace_id" => "ws123"}}) }
-        let(:component_primary_indexing_op) { new_primary_indexing_op({"type" => "Component", "id" => "7", "version" => 1, "record" => {"id" => "1", "some_field" => "value"}}) }
+        let(:widget_primary_indexing_op) { new_primary_indexing_operation({"type" => "Widget", "id" => "1", "version" => 1, "record" => {"id" => "1", "some_field" => "value", "created_at" => "2021-08-24T23:30:00Z", "workspace_id" => "ws123"}}) }
+        let(:component_primary_indexing_op) { new_primary_indexing_operation({"type" => "Component", "id" => "7", "version" => 1, "record" => {"id" => "1", "some_field" => "value"}}) }
         let(:widget_derived_update_op) do
           new_operation(
             {"type" => "Widget", "id" => "4", "version" => 1, "record" => {"id" => "1", "currency" => "USD", "name" => "thing1"}},
@@ -136,31 +139,6 @@ module ElasticGraph
 
           # The derived document doesn't keep track of `__versions` so it doesn't have a version it can return.
           expect(results[widget_derived_update_op]).to eq("main" => [])
-        end
-
-        def new_primary_indexing_op(event)
-          update_targets = indexer
-            .schema_artifacts
-            .runtime_metadata
-            .object_types_by_name
-            .fetch(event.fetch("type"))
-            .update_targets
-            .select { |ut| ut.type == event.fetch("type") }
-
-          expect(update_targets.size).to eq(1)
-          index_def = indexer.datastore_core.index_definitions_by_graphql_type.fetch(event.fetch("type")).first
-
-          Operation::Update.new(
-            event: event,
-            prepared_record: indexer.record_preparer_factory.for_latest_json_schema_version.prepare_for_index(
-              event.fetch("type"),
-              event.fetch("record")
-            ),
-            destination_index_def: index_def,
-            update_target: update_targets.first,
-            doc_id: event.fetch("id"),
-            destination_index_mapping: indexer.schema_artifacts.index_mappings_by_index_def_name.fetch(index_def.name)
-          )
         end
 
         def stub_msearch_on(client, client_name)
