@@ -90,3 +90,5 @@ gems:
     ignore: true
   - name: elasticgraph-warehouse
     ignore: true
+  - name: elasticgraph-warehouse_lambda
+    ignore: true

@@ -51,7 +51,7 @@ Gem::Specification.new do |spec|
   # best choice: it leads benchmarks, is well-maintained, has no dependencies, and is MIT-licensed.
   spec.add_dependency "ox", "~> 2.14", ">= 2.14.23"
 
-  spec.add_development_dependency "aws_lambda_ric", "~> 3.0"
+  spec.add_development_dependency "aws_lambda_ric", "~> 3.1", ">= 3.1.3"
   spec.add_development_dependency "elasticgraph-elasticsearch", ElasticGraph::VERSION
   spec.add_development_dependency "elasticgraph-opensearch", ElasticGraph::VERSION
 end
