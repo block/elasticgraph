@@ -9,6 +9,7 @@
 require "elastic_graph/indexer"
 require "elastic_graph/constants"
 require "elastic_graph/indexer/operation/factory"
+require "support/primary_indexing_operation_support"
 require "json"
 
 module ElasticGraph
@@ -16,6 +17,8 @@ module ElasticGraph
     module Operation
       RSpec.describe Factory, :capture_logs do
         describe "#build", :factories do
+          include PrimaryIndexingOperationSupport
+
           let(:indexer) { build_indexer }
           let(:component_index_definition) { index_def_named("components") }
 
@@ -37,7 +40,7 @@ module ElasticGraph
             }
 
             expect(build_expecting_success(event)).to contain_exactly(
-              new_primary_indexing_operation(formatted_event, index_def_named("widgets")),
+              new_primary_indexing_operation(formatted_event, index_def: index_def_named("widgets")),
               widget_currency_derived_update_operation_for(formatted_event)
             )
           end
@@ -54,7 +57,7 @@ module ElasticGraph
               usd_event = build_upsert_event(:widget, cost: build(:money, currency: "USD"))
 
               expect(build_expecting_success(usd_event)).to contain_exactly(
-                new_primary_indexing_operation(usd_event, index_def_named("widgets"))
+                new_primary_indexing_operation(usd_event, index_def: index_def_named("widgets"))
               )
 
               expect(logged_jsons_of_type("SkippingUpdate").size).to eq 1
@@ -64,7 +67,7 @@ module ElasticGraph
               cad_event = build_upsert_event(:widget, cost: build(:money, currency: "CAD"))
 
               expect(build_expecting_success(cad_event)).to contain_exactly(
-                new_primary_indexing_operation(cad_event, index_def_named("widgets")),
+                new_primary_indexing_operation(cad_event, index_def: index_def_named("widgets")),
                 widget_currency_derived_update_operation_for(cad_event)
               )
 
@@ -284,7 +287,7 @@ module ElasticGraph
                 "version" => 1,
                 "record" => event["record"],
                 JSON_SCHEMA_VERSION_KEY => 4
-              }, index_def_named("widgets")))
+              }, index_def: index_def_named("widgets")))
             end
 
             it "validates against the closest version if the requested version is newer than what's available" do
@@ -299,7 +302,7 @@ module ElasticGraph
                 "version" => 1,
                 "record" => event["record"],
                 JSON_SCHEMA_VERSION_KEY => 5 # Originally-specified version.
-              }, index_def_named("widgets")))
+              }, index_def: index_def_named("widgets")))
 
               expect(logged_jsons_of_type("ElasticGraphMissingJSONSchemaVersion").last).to include(
                 "event_id" => "Widget:1@v1",
@@ -342,7 +345,7 @@ module ElasticGraph
                 "version" => 1,
                 "record" => event["record"],
                 JSON_SCHEMA_VERSION_KEY => 3 # Originally-specified version.
-              }, index_def_named("widgets")))
+              }, index_def: index_def_named("widgets")))
 
               expect(logged_jsons_of_type("ElasticGraphMissingJSONSchemaVersion").last).to include(
                 "event_id" => "Widget:1@v1",
@@ -386,30 +389,6 @@ module ElasticGraph
             expect(operations.map(&:event)).to all eq event
             expect(operations.map(&:destination_index_def)).to all eq index_def_named("components")
             expect(operations.map(&:doc_id)).to contain_exactly("c1", "c2", "c3")
-          end
-
-          def new_primary_indexing_operation(event, index_def = component_index_definition, idxr = indexer)
-            update_targets = idxr
-              .schema_artifacts
-              .runtime_metadata
-              .object_types_by_name
-              .fetch(event.fetch("type"))
-              .update_targets
-              .select { |ut| ut.type == event.fetch("type") }
-
-            expect(update_targets.size).to eq(1)
-
-            Update.new(
-              event: event,
-              prepared_record: indexer.record_preparer_factory.for_latest_json_schema_version.prepare_for_index(
-                event.fetch("type"),
-                event.fetch("record")
-              ),
-              destination_index_def: index_def,
-              update_target: update_targets.first,
-              doc_id: event.fetch("id"),
-              destination_index_mapping: idxr.schema_artifacts.index_mappings_by_index_def_name.fetch(index_def.name)
-            )
           end
 
           def expect_failed_event_error(event, *error_message_snippets, factory: indexer.operation_factory, expect_no_ops: false)
