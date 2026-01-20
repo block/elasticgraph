@@ -15,12 +15,7 @@ require "elastic_graph/support/json_schema/validator"
 require "factory_bot"
 require "json_schemer"
 
-RSpec.shared_examples "an ElasticGraph project" do |repo_root: Dir.pwd,
-  settings_dir: "config/settings",
-  use_settings_yaml: "local.yaml",
-  ignored_factories: [],
-  factory_iterations: 100|
-
+RSpec.shared_examples "an ElasticGraph project" do |repo_root: Dir.pwd, settings_dir: "config/settings", use_settings_yaml: "local.yaml", ignored_factories: [], factory_iterations: 100|
   settings_yaml_file_to_use = ::File.join(settings_dir, use_settings_yaml)
 
   # Our settings files reference some files relative to the repo root, but we want to support
