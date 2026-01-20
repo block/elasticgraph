@@ -11,14 +11,14 @@ require "elastic_graph/indexer/test_support/converters"
 require "elastic_graph/indexer/processor"
 require "elastic_graph/indexer/datastore_indexing_router"
 require "elastic_graph/support/hash_util"
-require "support/primary_indexing_operation_support"
+require "elastic_graph/spec_support/builds_indexer_operation"
 require "json"
 
 module ElasticGraph
   class Indexer
     RSpec.describe Processor do
       describe ".process", :factories, :capture_logs do
-        include PrimaryIndexingOperationSupport
+        include SpecSupport::BuildsIndexerOperation
 
         let(:clock) { class_double(Time, now: Time.iso8601("2020-09-15T12:30:00Z")) }
         let(:datastore_router) { instance_spy(ElasticGraph::Indexer::DatastoreIndexingRouter) }

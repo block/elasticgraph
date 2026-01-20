@@ -9,7 +9,7 @@
 require "elastic_graph/indexer"
 require "elastic_graph/constants"
 require "elastic_graph/indexer/operation/factory"
-require "support/primary_indexing_operation_support"
+require "elastic_graph/spec_support/builds_indexer_operation"
 require "json"
 
 module ElasticGraph
@@ -17,7 +17,7 @@ module ElasticGraph
     module Operation
       RSpec.describe Factory, :capture_logs do
         describe "#build", :factories do
-          include PrimaryIndexingOperationSupport
+          include SpecSupport::BuildsIndexerOperation
 
           let(:indexer) { build_indexer }
           let(:component_index_definition) { index_def_named("components") }

@@ -11,12 +11,12 @@ require "elastic_graph/constants"
 require "elastic_graph/elasticsearch/client"
 require "elastic_graph/indexer/datastore_indexing_router"
 require "elastic_graph/indexer/operation/factory"
-require "support/primary_indexing_operation_support"
+require "elastic_graph/spec_support/builds_indexer_operation"
 
 module ElasticGraph
   class Indexer
     RSpec.describe DatastoreIndexingRouter, :capture_logs do
-      include PrimaryIndexingOperationSupport
+      include SpecSupport::BuildsIndexerOperation
 
       let(:main_datastore_client) { instance_spy(Elasticsearch::Client, cluster_name: "main") }
       let(:other_datastore_client) { instance_spy(Elasticsearch::Client, cluster_name: "other") }
