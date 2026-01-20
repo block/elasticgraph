@@ -1,0 +1,34 @@
+module ElasticGraph
+  class WarehouseLambda
+    class WarehouseDumper
+      include Indexer::_DatastoreRouter
+
+      LOG_MSG_RECEIVED_BATCH: ::String
+      LOG_MSG_DUMPED_FILE: ::String
+
+      def initialize: (
+        logger: ::Logger,
+        s3_client: Aws::S3::Client,
+        s3_bucket_name: ::String,
+        s3_file_prefix: ::String,
+        clock: singleton(::Time)
+      ) -> void
+
+      private
+
+      @logger: ::Logger
+      @s3_client: Aws::S3::Client
+      @s3_bucket_name: ::String
+      @s3_file_prefix: ::String
+      @clock: singleton(::Time)
+
+      def generate_s3_key_for: (::String, ::Integer) -> ::String
+
+      def build_jsonl_file_from: (
+        ::Array[Indexer::Operation::Update]
+      ) -> ::String
+
+      def compress: (::String) -> ::String
+    end
+  end
+end

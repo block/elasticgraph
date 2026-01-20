@@ -1,13 +1,19 @@
 module ElasticGraph
   class Indexer
+    # Interface for routing indexing operations to a datastore (or alternative destination like S3).
+    # Implemented by DatastoreIndexingRouter and WarehouseDumper.
+    interface _DatastoreRouter
+      def bulk: (::Array[_Operation], ?refresh: bool) -> DatastoreIndexingRouter::BulkResult
+      def source_event_versions_in_index: (::Array[_Operation]) -> ::Hash[_Operation, ::Hash[::String, ::Array[::Integer]]]
+    end
+
     class DatastoreIndexingRouter
+      include _DatastoreRouter
+
       def initialize: (
         datastore_clients_by_name: ::Hash[::String, DatastoreCore::_Client],
         logger: ::Logger
       ) -> void
-
-      def bulk: (::Array[_Operation], ?refresh: bool) -> BulkResult
-      def source_event_versions_in_index: (::Array[_Operation]) -> ::Hash[_Operation, ::Hash[::String, ::Array[::Integer]]]
 
       private
 

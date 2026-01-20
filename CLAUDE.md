@@ -42,6 +42,7 @@ bundle exec rake opensearch:test:boot
 
 ### Documentation
 - API documentation uses YARD
+- 100% documentation coverage is required for all public methods and classes.
 - Website source: `config/site/`
 - Example queries: `config/site/examples/*/queries/`
 - When writing links in documentation, use permalinks (links to a specific commit/version)
@@ -152,6 +153,9 @@ Custom gems can be added via `Gemfile-custom` (see `Gemfile-custom.example`), th
 - Prefer `::Data.define` over `::Struct.new` for immutable data classes. Use `Struct` only when mutability is required.
 - Don't rely on exceptions for control flow (exceptions are slow). Handle edge cases explicitly instead (e.g., check for `nil` before calling a method that would raise `ArgumentError`).
 - For constants accessed from multiple EG gems, define them in `elasticgraph-support/lib/elastic_graph/constants.rb`.
+- Always put a blank space after `#` in comments. This applies to all comments, including RBS type annotation comments (e.g., `# : String` not `#: String`).
+- Avoid defensive code for impossible cases. Don't add checks, tests, or handling for scenarios that should never occur due to the design of the system. If something can only happen due to a bug in the implementation, it's better to fail fast than to silently handle it.
+- Drop unnecessary namespace prefixes. When code is already inside `module ElasticGraph`, use `Indexer` instead of `::ElasticGraph::Indexer`, and `Errors::ConfigError` instead of `::ElasticGraph::Errors::ConfigError`. Use fully qualified names only when necessary to avoid ambiguity.
 
 ### RBS Type Signatures
 
@@ -160,6 +164,9 @@ Custom gems can be added via `Gemfile-custom` (see `Gemfile-custom.example`), th
 ### Testing
 
 - Avoid duplicate tests. If two tests will always pass/fail together, keep only one.
+- Use `expect_to_return_non_nil_values_from_all_attributes` to test wrapper classes (like `WarehouseLambda`, `GraphQL`, `Indexer`, etc.). This automatically exercises every zero-argument method and verifies all dependencies are built successfully.
+- Use the `:capture_logs` RSpec tag instead of logger test doubles for verifying log output. Access logs with `logged_jsons_of_type(message_type)`.
+- Use `build_*` helper methods from `spec/support/builds_*.rb` to construct test objects. These helpers provide sensible defaults while allowing selective overrides for testing specific scenarios.
 
 ## Important Patterns
 

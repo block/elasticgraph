@@ -4,7 +4,7 @@ Write ElasticGraph-shaped JSONL files to S3, packaged for AWS Lambda.
 
 This gem adapts ElasticGraph's indexing pipeline so that, instead of writing to the datastore,
 it writes batched, gzipped [JSON Lines](https://jsonlines.org/) (JSONL) files to Amazon S3. Each line in the file
-conforms to your ElasticGraph schema's latest JSON Schema for the corresponding object type.
+conforms to a specific JSON Schema version for the corresponding object type, with files partitioned by schema version.
 
 **Note:** This code does not deduplicate when writing to S3, so the data will contain all events
 and versions published, plus any Lambda retries. Consumers of the S3 bucket are responsible for
@@ -37,9 +37,9 @@ graph LR;
 
 ## What it does
 
-- Consumes ElasticGraph indexing operations and groups them by GraphQL type
+- Consumes ElasticGraph indexing operations and groups them by GraphQL type and JSON schema version
 - Transforms each operation into a flattened JSON document that matches your ElasticGraph schema
-- Writes one gzipped JSONL file per type per batch to S3 with deterministic keys:
+- Writes one gzipped JSONL file per type per JSON schema version per batch to S3 with deterministic keys:
   - `s3://<bucket>/<s3_path_prefix>/<TypeName>/v<json_schema_version>/<YYYY-MM-DD>/<uuid>.jsonl.gz`
 - Emits structured logs for observability (counts, sizes, S3 key, etc.)
 

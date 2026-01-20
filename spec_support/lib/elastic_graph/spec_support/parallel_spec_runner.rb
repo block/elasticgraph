@@ -63,6 +63,7 @@ module ElasticGraph
         "ElasticGraph::GraphQL::DatastoreQuery::Paginator" => "elastic_graph/graphql/datastore_query",
         "ElasticGraph::GraphQL::DatastoreSearchRouter" => "elastic_graph/graphql/datastore_search_router",
         "ElasticGraph::SchemaArtifacts::FromDisk" => "elastic_graph/schema_artifacts/from_disk",
+        "ElasticGraph::SchemaArtifacts::RuntimeMetadata::UpdateTarget" => "elastic_graph/schema_artifacts/runtime_metadata/update_target",
         "ElasticGraph::Support::MonotonicClock" => "elastic_graph/support/monotonic_clock",
         "GraphQL::Execution::Lookahead" => "graphql/execution/lookahead"
       }
