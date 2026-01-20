@@ -3,6 +3,8 @@ module ElasticGraph
     extend Support::FromYamlFile[WarehouseLambda]
     extend _BuildableFromParsedYaml[WarehouseLambda]
 
+    def self.warehouse_lambda_from_env: () -> WarehouseLambda
+
     attr_reader config: Config
     attr_reader indexer_config: Indexer::Config
     attr_reader datastore_core: DatastoreCore
