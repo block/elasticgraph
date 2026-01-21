@@ -6,6 +6,8 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/datastore_core"
+require "elastic_graph/indexer/config"
 require "elastic_graph/lambda_support"
 require "elastic_graph/support/from_yaml_file"
 require "elastic_graph/warehouse_lambda/config"
@@ -19,6 +21,11 @@ module ElasticGraph
   # @private
   class WarehouseLambda
     extend Support::FromYamlFile
+
+    # Builds an `ElasticGraph::WarehouseLambda` instance from our lambda ENV vars.
+    def self.warehouse_lambda_from_env
+      LambdaSupport.build_from_env(WarehouseLambda)
+    end
 
     # @return [Config] warehouse configuration
     # @return [Indexer::Config] indexer configuration
@@ -44,7 +51,7 @@ module ElasticGraph
     # Initializes a WarehouseLambda instance.
     #
     # @param config [Config] warehouse configuration
-    # @param indexer_config [Indexer::Config] indexer configuration
+    # @param indexer_config [Config] indexer configuration
     # @param datastore_core [DatastoreCore] datastore core for accessing schema artifacts
     # @param clock [Module] clock module for time generation (defaults to {::Time})
     # @param s3_client [Aws::S3::Client, nil] optional S3 client (for testing)
