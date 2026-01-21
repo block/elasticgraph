@@ -33,7 +33,7 @@ module ElasticGraph
       end
 
       def handle_request(event:, context:)
-        @sqs_processor.process(event)
+        sqs_processor.process(event)
       end
     end
   end
