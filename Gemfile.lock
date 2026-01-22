@@ -690,7 +690,7 @@ DEPENDENCIES
   filewatcher (~> 2.1)!
   flatware-rspec (~> 2.3, >= 2.3.4)!
   html-proofer (~> 5.2)
-  httpx (~> 1.7)
+  httpx (~> 1.7, >= 1.7.1)
   irb (~> 1.16)
   jekyll (~> 4.4, >= 4.4.1)
   memory_profiler (~> 1.1)
