@@ -65,7 +65,7 @@ module ElasticGraph
 
         unless result.to_h.fetch("errors", []).empty?
           @logger.error <<~EOS
-            Query #{query.operation_name}[1] for client #{client.description} resulted in errors[2].
+            Query #{query.selected_operation_name}[1] for client #{client.description} resulted in errors[2].
 
             [1] #{full_description_of(query)}
 
@@ -79,7 +79,7 @@ module ElasticGraph
         # returns `nil` on an invalid query, and I don't want to risk leaking PII by logging the raw query string, so
         # we don't log any form of the query in that case.
         if duration > @slow_query_threshold_ms
-          @logger.warn "Query #{query.operation_name} for client #{client.description} with shard routing values " \
+          @logger.warn "Query #{query.selected_operation_name} for client #{client.description} with shard routing values " \
             "#{query_tracker.shard_routing_values.sort.inspect} and search index expressions #{query_tracker.search_index_expressions.sort.inspect} took longer " \
             "(#{duration} ms) than the configured slow query threshold (#{@slow_query_threshold_ms} ms). " \
             "Sanitized query:\n\n#{query.sanitized_query_string}"
@@ -90,7 +90,7 @@ module ElasticGraph
             "message_type" => "ElasticGraphQueryExecutorQueryDuration",
             "client" => client.name,
             "query_fingerprint" => fingerprint_for(query),
-            "query_name" => query.operation_name,
+            "query_name" => query.selected_operation_name,
             "duration_ms" => duration,
             # How long the datastore queries took according to what the datastore itself reported.
             "datastore_server_duration_ms" => query_tracker.datastore_query_server_duration_ms,
@@ -147,7 +147,7 @@ module ElasticGraph
         query.result
       rescue => ex
         @logger.error <<~EOS
-          Query #{query.operation_name}[1] for client #{client.description} failed with an exception[2].
+          Query #{query.selected_operation_name}[1] for client #{client.description} failed with an exception[2].
 
           [1] #{full_description_of(query)}
 
