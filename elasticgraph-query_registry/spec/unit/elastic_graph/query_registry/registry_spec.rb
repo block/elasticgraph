@@ -8,6 +8,7 @@
 
 require "elastic_graph/graphql"
 require "elastic_graph/graphql/client"
+require "elastic_graph/query_registry/registration_status"
 require "elastic_graph/query_registry/registry"
 
 module ElasticGraph
@@ -142,12 +143,13 @@ module ElasticGraph
               registry = registry_with({"my_client" => [widget_name_string, part_name_string]})
               modified_parts_query = add_query_directives_to(part_name_string, "@some_other_directive")
 
-              query, errors = registry.build_and_validate_query(modified_parts_query, client: client_named("my_client"))
+              query, errors, status = registry.build_and_validate_query(modified_parts_query, client: client_named("my_client"))
 
               expect(errors).to contain_exactly(a_string_including(
                 "Query PartName", "differs from the registered form of `PartName`", "my_client"
               ))
               expect(query.query_string).to eq(modified_parts_query)
+              expect(status).to eq(RegistrationStatus::DIFFERING_REGISTERED_QUERY)
             end
           end
 
@@ -155,12 +157,13 @@ module ElasticGraph
             it "returns a validation error since the extra directive could be a substantive difference" do
               registry = registry_with({"my_client" => [widget_name_string, add_query_directives_to(part_name_string, "@some_other_directive")]})
 
-              query, errors = registry.build_and_validate_query(part_name_string, client: client_named("my_client"))
+              query, errors, status = registry.build_and_validate_query(part_name_string, client: client_named("my_client"))
 
               expect(errors).to contain_exactly(a_string_including(
                 "Query PartName", "differs from the registered form of `PartName`", "my_client"
               ))
               expect(query.query_string).to eq(part_name_string)
+              expect(status).to eq(RegistrationStatus::DIFFERING_REGISTERED_QUERY)
             end
           end
 
@@ -222,17 +225,19 @@ module ElasticGraph
 
               expect(execute_allowed_query(registry, query1, client: client_named("my_client")).to_h).to eq({"data" => {"__typename" => "Query"}})
 
-              query, errors = registry.build_and_validate_query(query2, client: client_named("my_client"))
+              query, errors, status = registry.build_and_validate_query(query2, client: client_named("my_client"))
               expect(errors).to contain_exactly(a_string_including(
                 "Query SomeQuery", "differs from the registered form of `SomeQuery`", "my_client"
               ))
               expect(query.query_string).to eq(query2)
+              expect(status).to eq(RegistrationStatus::DIFFERING_REGISTERED_QUERY)
 
-              query, errors = registry.build_and_validate_query(query3, client: client_named("my_client"))
+              query, errors, status = registry.build_and_validate_query(query3, client: client_named("my_client"))
               expect(errors).to contain_exactly(a_string_including(
                 "Query SomeQuery3", "is unregistered", "my_client"
               ))
               expect(query.query_string).to eq(query3)
+              expect(status).to eq(RegistrationStatus::UNREGISTERED_QUERY)
             end
           end
 
@@ -310,24 +315,26 @@ module ElasticGraph
             registry = registry_with({"my_client" => [widget_name_string, part_name_string]})
             modified_parts_query = part_name_string.sub("name\n", "the_name: name\n")
 
-            query, errors = registry.build_and_validate_query(modified_parts_query, client: client_named("my_client"))
+            query, errors, status = registry.build_and_validate_query(modified_parts_query, client: client_named("my_client"))
 
             expect(errors).to contain_exactly(a_string_including(
               "Query PartName", "differs from the registered form of `PartName`", "my_client"
             ))
             expect(query.query_string).to eq(modified_parts_query)
+            expect(status).to eq(RegistrationStatus::DIFFERING_REGISTERED_QUERY)
           end
 
           it "returns a validation error for an unregistered invalid query" do
             registry = registry_with({"my_client" => [widget_name_string, part_name_string]})
 
-            query, errors = registry.build_and_validate_query("not_a_query", client: client_named("my_client"))
+            query, errors, status = registry.build_and_validate_query("not_a_query", client: client_named("my_client"))
 
             expect(errors).to contain_exactly(a_string_including(
               "Query anonymous", "is unregistered", "my_client",
               "no registered query with a `` operation"
             ))
             expect(query.query_string).to eq("not_a_query")
+            expect(status).to eq(RegistrationStatus::UNREGISTERED_QUERY)
           end
 
           it "echoes no validation errors for a registered invalid query when it is byte-for-byte the same" do
@@ -342,16 +349,18 @@ module ElasticGraph
           it "does not consider a query registered by a different client" do
             registry = registry_with({"client1" => [widget_name_string], "client2" => [part_name_string]})
 
-            query, errors = registry.build_and_validate_query(part_name_string, client: client_named("client1"))
+            query, errors, status = registry.build_and_validate_query(part_name_string, client: client_named("client1"))
             expect(errors).to contain_exactly(a_string_including(
               "Query PartName", "is unregistered", "client1",
               "no registered query with a `PartName` operation"
             ))
             expect(query.query_string).to eq(part_name_string)
+            expect(status).to eq(RegistrationStatus::UNREGISTERED_QUERY)
 
-            query, errors = registry.build_and_validate_query(part_name_string, client: client_named("client2"))
+            query, errors, status = registry.build_and_validate_query(part_name_string, client: client_named("client2"))
             expect(errors).to be_empty
             expect(query.query_string).to eq(part_name_string)
+            expect(status).to eq(RegistrationStatus::MATCHED_REGISTERED_QUERY)
           end
 
           it "avoids re-parsing the query string when the query string is byte-for-byte identical to a registered one, for efficiency" do
@@ -386,19 +395,21 @@ module ElasticGraph
             it "returns validation errors when given a valid query" do
               registry = registry_with({"my_client" => [widget_name_string, part_name_string]}, allow_unregistered_clients: false)
 
-              query, errors = registry.build_and_validate_query(part_name_string, client: client)
+              query, errors, status = registry.build_and_validate_query(part_name_string, client: client)
 
               expect(errors).to contain_exactly(a_string_including("not a registered client", client&.name.to_s))
               expect(query.query_string).to eq(part_name_string)
+              expect(status).to eq(RegistrationStatus::UNREGISTERED_CLIENT)
             end
 
             it "returns validation errors when given an invalid query" do
               registry = registry_with({"my_client" => [widget_name_string, part_name_string]}, allow_unregistered_clients: false)
 
-              query, errors = registry.build_and_validate_query("not_a_query", client: client)
+              query, errors, status = registry.build_and_validate_query("not_a_query", client: client)
 
               expect(errors).to contain_exactly(a_string_including("not a registered client", client&.name.to_s))
               expect(query.query_string).to eq("not_a_query")
+              expect(status).to eq(RegistrationStatus::UNREGISTERED_CLIENT)
             end
           end
 
@@ -408,10 +419,11 @@ module ElasticGraph
             it "returns no validation errors for an invalid query" do
               registry = registry_with({}, allow_unregistered_clients: true)
 
-              query, errors = registry.build_and_validate_query("not_a_query", client: client)
+              query, errors, status = registry.build_and_validate_query("not_a_query", client: client)
 
               expect(errors).to be_empty
               expect(query.result["errors"].to_s).to include('IDENTIFIER (\"not_a_query\")')
+              expect(status).to eq(RegistrationStatus::UNREGISTERED_CLIENT)
             end
 
             def prepare_registry_with(query_string)
@@ -529,20 +541,23 @@ module ElasticGraph
         it "builds an instance based on the queries in the given directory" do
           register_query("client1", "WidgetName.graphql", widget_name_string)
 
-          query, errors = registry.build_and_validate_query(widget_name_string, client: client_named("client1"))
+          query, errors, status = registry.build_and_validate_query(widget_name_string, client: client_named("client1"))
           expect(errors).to be_empty
           expect(query.query_string).to eq(widget_name_string)
+          expect(status).to eq(RegistrationStatus::MATCHED_REGISTERED_QUERY)
 
-          query, errors = registry.build_and_validate_query(part_name_string, client: client_named("client1"))
+          query, errors, status = registry.build_and_validate_query(part_name_string, client: client_named("client1"))
           expect(errors).to contain_exactly(a_string_including(
             "Query PartName", "is unregistered", "client1",
             "no registered query with a `PartName` operation"
           ))
           expect(query.query_string).to eq(part_name_string)
+          expect(status).to eq(RegistrationStatus::UNREGISTERED_QUERY)
 
-          query, errors = registry.build_and_validate_query(widget_name_string, client: client_named("other-client"))
+          query, errors, status = registry.build_and_validate_query(widget_name_string, client: client_named("other-client"))
           expect(errors).to contain_exactly(a_string_including("not a registered client", "other-client"))
           expect(query.query_string).to eq(widget_name_string)
+          expect(status).to eq(RegistrationStatus::UNREGISTERED_CLIENT)
         end
 
         it "defers reading from disk until it needs to, and caches the disk results after that" do
@@ -581,9 +596,10 @@ module ElasticGraph
           register_query("client1", "WidgetName.graphql", widget_name_string)
           register_query("client1", "README.md", "## Not a GraphQL query")
 
-          query, errors = registry.build_and_validate_query(widget_name_string, client: client_named("client1"))
+          query, errors, status = registry.build_and_validate_query(widget_name_string, client: client_named("client1"))
           expect(errors).to be_empty
           expect(query.query_string).to eq(widget_name_string)
+          expect(status).to eq(RegistrationStatus::MATCHED_REGISTERED_QUERY)
 
           expect(file_reads_by_name.keys).to contain_exactly(
             "registered_queries/client1/WidgetName.graphql"

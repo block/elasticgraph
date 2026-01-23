@@ -54,12 +54,18 @@ module ElasticGraph
       end
 
       def unregistered_query_error_for(query, client)
-        if operation_names.include?(query.operation_name.to_s)
-          "Query #{fingerprint_for(query)} differs from the registered form of `#{query.operation_name}` " \
+        # Note: we use `selected_operation_name` instead of `operation_name` because `operation_name` can return
+        # `nil` for single-operation queries when no explicit operation_name parameter is passed if accessed before
+        # the query AST is parsed, whereas `selected_operation_name`  parses the query AST and returns the operation
+        # name from the query document in that case.
+        selected_op_name = query.selected_operation_name.to_s
+
+        if operation_names.include?(selected_op_name)
+          "Query #{fingerprint_for(query)} differs from the registered form of `#{selected_op_name}` " \
           "for client #{client.description}."
         else
           "Query #{fingerprint_for(query)} is unregistered; client #{client.description} has no " \
-          "registered query with a `#{query.operation_name}` operation."
+          "registered query with a `#{selected_op_name}` operation."
         end
       end
 

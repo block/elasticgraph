@@ -113,6 +113,7 @@ module GraphQL
     attr_reader query_string: ::String?
 
     def selected_operation: () -> Language::Nodes::OperationDefinition?
+    def selected_operation_name: () -> ::String?
     def static_errors: () -> ::Array[_ValidationError]
 
     class Context
