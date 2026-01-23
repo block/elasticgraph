@@ -14,13 +14,13 @@ By the end of this tutorial, you'll have a working ElasticGraph instance running
 Before you begin, ensure you have the following installed on your system:
 
 - **Docker** and **Docker Compose**
-- **Ruby** (version 3.4 or higher)
+- **Ruby** (version 3.4.x or 4.0.x)
 - **Git**
 
 Confirm these are installed using your terminal:
 
 {% include copyable_code_snippet.html language="shell" code="$ ruby -v
-ruby 3.4.2 (2025-02-15 revision d2930f8e7a) +PRISM [arm64-darwin24]
+ruby 4.0.0 (2025-12-25 revision 553f1675f3) +PRISM [arm64-darwin25]
 $ docker compose version
 Docker Compose version v2.32.4-desktop.1
 $ git -v
@@ -28,7 +28,7 @@ git version 2.46.0" %}
 
 {: .alert-note}
 **Note**{: .alert-title}
-You don't need these exact versions (these are just examples). Your Ruby version does need to be 3.4.x or greater, though.
+You don't need these exact versions (these are just examples). Your Ruby version does need to be 3.4.x or 4.0.x, though.
 
 ## Step 1: Bootstrap a new ElasticGraph Project
 
