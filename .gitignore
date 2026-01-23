@@ -11,6 +11,7 @@
 /*/Gemfile.lock
 /*/rbs_collection.lock.yaml
 .claude
+!.claude/skills/
 
 config/release/bin
 config/release/bundle

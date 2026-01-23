@@ -27,8 +27,19 @@ checklist. The release notes can be authored after cutting a release if needed (
 
 ## Release Notes
 
-Over time, we hope to automate the authoring of release notes using AI, but for now they are still (largely) written by hand. They should
-follow this general structure:
+A Claude Code skill is available to help draft release notes:
+
+```bash
+# Generate notes from most recent release to HEAD
+/release-notes 1.1.0
+
+# Generate notes from a specific version
+/release-notes 1.1.0 --from 1.0.2
+```
+
+The skill gathers all PRs, categorizes them, identifies new contributors, and drafts release notes following the structure below. Review and refine the output as needed.
+
+Release notes should follow this general structure:
 
 ```markdown
 ElasticGraph vX.Y.Z has been released! This release includes...
