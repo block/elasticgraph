@@ -105,7 +105,11 @@ module GraphQL
     ) -> void
 
     attr_reader document: Language::Nodes::Document
-    attr_reader operation_name: ::String?
+
+    # Commented out to discourage use--`selected_operation_name` should be preferred since `operation_name`
+    # may only be populated after the query AST is parsed.
+    # attr_reader operation_name: ::String?
+
     attr_reader operations: ::Hash[::String, Language::Nodes::OperationDefinition]
     attr_reader fingerprint: ::String
     attr_reader sanitized_query_string: ::String?
