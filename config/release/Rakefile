@@ -29,12 +29,21 @@ bump_version = lambda do |version:, message:|
 
     ::Gem::Release::Cmds::Runner.new(:bump, ["elasticgraph-support"], opts).run
 
-    # We also want to commit an update to `Gemfile.lock` as part of the version bump.
+    # We also want to commit updates to `Gemfile.lock` and schema artifacts as part of the version bump.
+    # The runtime_metadata.yaml files embed the ElasticGraph version and must be updated.
     ::Bundler.with_unbundled_env do
       sh "bundle install"
-      sh "git add Gemfile.lock"
-      sh "git commit --amend --no-edit"
     end
+
+    # Update the version in runtime_metadata.yaml files.
+    # (`rake schema_artifacts:dump` isn't available when releasing since it replaces the root `Rakefile` with this one)
+    runtime_metadata_files = ::Dir.glob("#{project_root}/config/schema/**/runtime_metadata.yaml")
+    runtime_metadata_files.each do |path|
+      ::File.write(path, ::File.read(path).sub(/^elasticgraph_version: .+$/, "elasticgraph_version: #{version}"))
+    end
+
+    sh "git add Gemfile.lock #{runtime_metadata_files.join(" ")}"
+    sh "git commit --amend --no-edit"
   end
 end
 
