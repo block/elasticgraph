@@ -7,6 +7,10 @@ on:
     branches:
       - main
   pull_request:
+  # Allows triggering CI manually or from other workflows. Used by the release workflow
+  # to trigger CI on release PRs, since PRs created by GITHUB_TOKEN don't automatically
+  # trigger the `pull_request` event (GitHub prevents this to avoid infinite loops).
+  workflow_dispatch:
 
 env:
   # It's recommended to run ElasticGraph with this option to get better performance. We want to run
