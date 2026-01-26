@@ -108,7 +108,7 @@ PATH
     elasticgraph-indexer_autoscaler_lambda (1.1.1.pre)
       aws-sdk-cloudwatch (~> 1.129.0)
       aws-sdk-lambda (~> 1.174)
-      aws-sdk-sqs (~> 1.110)
+      aws-sdk-sqs (~> 1.111)
       elasticgraph-datastore_core (= 1.1.1.pre)
       elasticgraph-lambda_support (= 1.1.1.pre)
       ox (~> 2.14, >= 2.14.23)
@@ -690,7 +690,7 @@ DEPENDENCIES
   filewatcher (~> 2.1)!
   flatware-rspec (~> 2.3, >= 2.3.4)!
   html-proofer (~> 5.2)
-  httpx (~> 1.7)
+  httpx (~> 1.7, >= 1.7.2)
   irb (~> 1.16)
   jekyll (~> 4.4, >= 4.4.1)
   memory_profiler (~> 1.1)

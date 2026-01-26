@@ -19,7 +19,7 @@ group :development do
   # Pin to a GitHub SHA until Ruby 4.0 support has been released
   gem "flatware-rspec", "~> 2.3", ">= 2.3.4", github: "briandunn/flatware", ref: "0403ac1137cc7958fe06db2c0563dfbab0bd24db"
 
-  gem "httpx", "~> 1.7"
+  gem "httpx", "~> 1.7", ">= 1.7.2"
   gem "memory_profiler", "~> 1.1"
   gem "method_source", "~> 1.1"
   gem "rack-test", "~> 2.2"
