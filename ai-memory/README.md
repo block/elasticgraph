@@ -327,7 +327,7 @@ This section highlights other important aspects of the ElasticGraph project:
     -   The presence of an `ai_tools/` directory containing `elasticgraph-mcp-server` (a Python-based tool) suggests potential or planned integration with AI/ML model control planes or related functionalities. The exact nature and usage are not fully detailed within the current primary codebase documentation.
 
 -   **Ruby and Datastore Versioning**:
-    -   The project specifies Ruby `~> 3.4` as its required version.
+    -   The project supports Ruby 3.4.x and 4.0.x.
     -   It actively tests against a defined set of Elasticsearch and OpenSearch versions, managed in `config/tested_datastore_versions.yaml` and enforced in the CI pipeline.
 
 ### Configuration Management and Schema
