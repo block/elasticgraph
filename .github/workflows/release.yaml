@@ -29,6 +29,7 @@ jobs:
       url: https://rubygems.org/search?query=elasticgraph
 
     permissions:
+      actions: write
       contents: write
       id-token: write
       pull-requests: write
@@ -102,7 +103,7 @@ jobs:
       - name: Create pull request for the version bump
         uses: peter-evans/create-pull-request@98357b18bf14b5342f975ff684046ec3b2a07725 # v8.0.0
         with:
-          sign-commits: true
+          sign-commits: false
           branch: release-v${{ inputs.version }}
           title: "Release v${{ inputs.version }}"
           body: |
@@ -114,6 +115,14 @@ jobs:
             - [ ] Confirm the [release action](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) succeeded before merging
             - [ ] Confirm this version bump should be merged into [${{ github.ref_name }}](https://github.com/${{ github.repository }}/tree/${{ github.ref_name }}) or change the base branch
             - [ ] Review and edit the [GitHub Draft Release](https://github.com/${{ github.repository }}/releases) (can be done after this PR is merged)
+
+      # PRs created using GITHUB_TOKEN don't trigger `pull_request` workflows (GitHub prevents
+      # this to avoid infinite loops). We explicitly trigger CI here so that the release PR
+      # gets the required `All CI Checks Passed` status check for branch protection.
+      - name: Trigger CI on release branch
+        run: gh workflow run ci.yaml --ref release-v${{ inputs.version }}
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - name: Create GitHub Release
         uses: ncipollo/release-action@b7eabc95ff50cbeeedec83973935c8f306dfcd0b # v1.20.0
