@@ -264,7 +264,7 @@ GEM
       traces (~> 0.18)
     attr_extras (7.1.0)
     aws-eventstream (1.4.0)
-    aws-partitions (1.1208.0)
+    aws-partitions (1.1209.0)
     aws-sdk-cloudwatch (1.129.0)
       aws-sdk-core (~> 3, >= 3.241.4)
       aws-sigv4 (~> 1.5)
@@ -286,7 +286,7 @@ GEM
       aws-sdk-core (~> 3, >= 3.241.4)
       aws-sdk-kms (~> 1)
       aws-sigv4 (~> 1.5)
-    aws-sdk-sqs (1.110.0)
+    aws-sdk-sqs (1.111.0)
       aws-sdk-core (~> 3, >= 3.241.4)
       aws-sigv4 (~> 1.5)
     aws-sigv4 (1.12.1)
@@ -377,7 +377,7 @@ GEM
       zeitwerk (~> 2.5)
     http-2 (1.1.1)
     http_parser.rb (0.8.1)
-    httpx (1.7.1)
+    httpx (1.7.2)
       http-2 (>= 1.0.0)
     i18n (1.14.8)
       concurrent-ruby (~> 1.0)
@@ -690,7 +690,7 @@ DEPENDENCIES
   filewatcher (~> 2.1)!
   flatware-rspec (~> 2.3, >= 2.3.4)!
   html-proofer (~> 5.2)
-  httpx (~> 1.7, >= 1.7.1)
+  httpx (~> 1.7)
   irb (~> 1.16)
   jekyll (~> 4.4, >= 4.4.1)
   memory_profiler (~> 1.1)
@@ -725,13 +725,13 @@ CHECKSUMS
   async (2.36.0) sha256=090623f4c65706664355c9efa6c7bfb86771a513e65cd681c51cb27747530550
   attr_extras (7.1.0) sha256=d96fc9a9dd5d85ba2d37762440a816f840093959ae26bb90da994c2d9f1fc827
   aws-eventstream (1.4.0) sha256=116bf85c436200d1060811e6f5d2d40c88f65448f2125bc77ffce5121e6e183b
-  aws-partitions (1.1208.0) sha256=352a86fd13589cd734c64dd2aea486d73e6698fa515fd88b8e7b260f74c4454d
+  aws-partitions (1.1209.0) sha256=c60a2e305dfdd9e21ecb92f8f78befe95c31eaa984750a733b16903928922981
   aws-sdk-cloudwatch (1.129.0) sha256=3fa45aaf60f92908b28e855db4ef466b93d907a451e8c1a98edacc2247a170ee
   aws-sdk-core (3.241.4) sha256=a42ccba8c24ea9800e7b6c40aa201c967458f7c460044a6eebf64fbf1226e4fd
   aws-sdk-kms (1.121.0) sha256=d563c1cfb4b5754efbc671216c8eca875338748adad0f42518c28dfa0a2d01e0
   aws-sdk-lambda (1.174.0) sha256=e28dfbeca7dcd871ab385eacc33ced96352121b4c68f3efdcd033f9c6db53b72
   aws-sdk-s3 (1.212.0) sha256=1e8ec4eee6914818dc79840e05c04fba9e61e8aa4822eef283fe593b93397c19
-  aws-sdk-sqs (1.110.0) sha256=38b3adc9cabafadb9a8cce24d04178d44092f1a1cb1cf11f45c510fc66d62781
+  aws-sdk-sqs (1.111.0) sha256=b5bf7986ba3002c6f48472454fa009b4e68fe1023b38124aa7594c00a7d8df99
   aws-sigv4 (1.12.1) sha256=6973ff95cb0fd0dc58ba26e90e9510a2219525d07620c8babeb70ef831826c00
   aws_lambda_ric (3.1.3) sha256=7d7551c91d2070bb1427cd05d7b0b94076d42084f743b117522659a76935dfbc
   base64 (0.3.0) sha256=27337aeabad6ffae05c265c450490628ef3ebd4b67be58257393227588f5a97b
@@ -808,7 +808,7 @@ CHECKSUMS
   html-proofer (5.2.0) sha256=9d137cc437628b4dfc1191a9f80c5329dfb0a66b895aef021bf10758d80ec69d
   http-2 (1.1.1) sha256=1141a5a03c2f4e6b8d2fa62394de581e1ff6387711cd7ed577212e9d95562bba
   http_parser.rb (0.8.1) sha256=9ae8df145b39aa5398b2f90090d651c67bd8e2ebfe4507c966579f641e11097a
-  httpx (1.7.1) sha256=ae380461539203c92f3ee65c13b22dfccb0d975156426869f57820505cacdf56
+  httpx (1.7.2) sha256=10cdcd5b03794de743bec87e8cdba2ca93e2124084b6cdb1ad01b00c192a51f7
   i18n (1.14.8) sha256=285778639134865c5e0f6269e0b818256017e8cde89993fdfcbfb64d088824a5
   io-console (0.8.2) sha256=d6e3ae7a7cc7574f4b8893b4fca2162e57a825b223a177b7afa236c5ef9814cc
   io-event (1.14.2) sha256=b0a069190eafe86005c22f7464f744971b5bd82f153740d34e6ab49548d4f613
