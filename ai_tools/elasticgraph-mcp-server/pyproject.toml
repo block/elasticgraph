@@ -19,8 +19,8 @@ classifiers = [
 ]
 dependencies = [
     "httpx~=0.28.1",
-    "mcp[cli]~=1.25.0",
-    "packaging~=25.0",
+    "mcp[cli]~=1.26.0",
+    "packaging~=26.0",
 ]
 
 [project.scripts]
