@@ -117,7 +117,8 @@ module ElasticGraph
           # hide the wrapping we're doing here, so here we want `new` to accept the direct arguments that `new` on the `Data` class
           # would accept. Here we instantiate the data class and the wrap it.
           def new(*args, **kwargs)
-            data_instance = self::DATA_CLASS.new(*args, **kwargs)
+            # JRuby's Data.new doesn't handle empty **kwargs the same as MRI, so we conditionally pass it.
+            data_instance = kwargs.empty? ? self::DATA_CLASS.new(*args) : self::DATA_CLASS.new(*args, **kwargs)
 
             # Here we re-implement `new` (rather than using `super`) because `initialize` may be overridden.
             allocate.instance_eval do
