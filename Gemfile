@@ -88,8 +88,9 @@ if repo_root == __dir__
   require_relative "elasticgraph-support/lib/elastic_graph/version"
 
   # Depend on each ElasticGraph gem in the repo.
+  # Use absolute paths for JRuby compatibility (JRuby resolves `path:` relative to cwd, not Gemfile)
   gems_in_this_repo.map do |name|
-    gem name, ::ElasticGraph::VERSION, path: name
+    gem name, ::ElasticGraph::VERSION, path: "#{repo_root}/#{name}"
   end
 else
   # Otherwise, we just load the local `.gemspec` file in the current directory.
