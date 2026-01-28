@@ -33,10 +33,10 @@ module ElasticGraph
         with_pipe do |read_io, write_io|
           halt
 
-          pid = nil
-          prepare_docker_compose_run "up" do |command|
-            pid = spawn(command, out: write_io, err: write_io)
-            Process.detach(pid)
+          pid = prepare_docker_compose_run "up" do |command|
+            spawned_pid = spawn(command, out: write_io, err: write_io)
+            Process.detach(spawned_pid)
+            spawned_pid
           end
 
           write_io.close # Close write end in parent so read_io gets EOF when child exits
