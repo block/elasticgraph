@@ -17,7 +17,8 @@ group :development do
   gem "faker", "~> 3.6"
 
   # Pin to a GitHub SHA until Ruby 4.0 support has been released
-  gem "flatware-rspec", "~> 2.3", ">= 2.3.4", github: "briandunn/flatware", ref: "0403ac1137cc7958fe06db2c0563dfbab0bd24db"
+  # flatware uses io-event which has native extensions not available on JRuby
+  gem "flatware-rspec", "~> 2.3", ">= 2.3.4", github: "briandunn/flatware", ref: "0403ac1137cc7958fe06db2c0563dfbab0bd24db", platforms: :ruby
 
   gem "httpx", "~> 1.7", ">= 1.7.2"
   gem "memory_profiler", "~> 1.1"
@@ -37,7 +38,8 @@ group :development do
   gem "simplecov", "~> 0.22"
   gem "simplecov-console", "~> 0.9", ">= 0.9.4"
   gem "standard", "~> 1.53.0"
-  gem "steep", "~> 1.10.0"
+  # steep type checker doesn't support JRuby
+  gem "steep", "~> 1.10.0", platforms: :ruby
   gem "super_diff", "~> 0.18"
   gem "vcr", "~> 6.4"
 end
