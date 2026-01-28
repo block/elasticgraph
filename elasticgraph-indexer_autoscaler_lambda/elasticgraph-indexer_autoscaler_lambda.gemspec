@@ -46,15 +46,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency "aws-sdk-lambda", "~> 1.174"
   spec.add_dependency "aws-sdk-sqs", "~> 1.111"
   spec.add_dependency "aws-sdk-cloudwatch", "~> 1.129.0"
-  # aws-sdk-sqs requires an XML library be available. On Ruby < 3 it'll use rexml from the standard library but on Ruby 3.0+
-  # we have to add an explicit dependency. It supports ox, oga, libxml, nokogiri or rexml, and of those, ox seems to be the
-  # best choice: it leads benchmarks, is well-maintained, has no dependencies, and is MIT-licensed.
-  # ox is MRI-only; use nokogiri on JRuby.
-  if RUBY_ENGINE == "ruby"
-    spec.add_dependency "ox", "~> 2.14", ">= 2.14.23"
-  else
-    spec.add_dependency "nokogiri", "~> 1.19"
-  end
 
   spec.add_development_dependency "elasticgraph-elasticsearch", ElasticGraph::VERSION
   spec.add_development_dependency "elasticgraph-opensearch", ElasticGraph::VERSION

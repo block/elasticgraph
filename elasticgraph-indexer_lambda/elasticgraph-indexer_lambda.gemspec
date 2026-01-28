@@ -44,14 +44,4 @@ Gem::Specification.new do |spec|
   spec.add_dependency "elasticgraph-indexer", ElasticGraph::VERSION
   spec.add_dependency "elasticgraph-lambda_support", ElasticGraph::VERSION
   spec.add_dependency "aws-sdk-s3", "~> 1.212"
-
-  # aws-sdk-s3 requires an XML library be available. On Ruby < 3 it'll use rexml from the standard library but on Ruby 3.0+
-  # we have to add an explicit dependency. It supports ox, oga, libxml, nokogiri or rexml, and of those, ox seems to be the
-  # best choice: it leads benchmarks, is well-maintained, has no dependencies, and is MIT-licensed.
-  # ox is MRI-only; use nokogiri on JRuby.
-  if RUBY_ENGINE == "ruby"
-    spec.add_dependency "ox", "~> 2.14", ">= 2.14.23"
-  else
-    spec.add_dependency "nokogiri", "~> 1.19"
-  end
 end

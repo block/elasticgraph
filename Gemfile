@@ -40,6 +40,14 @@ group :development do
   gem "standard", "~> 1.53.0"
   # steep type checker doesn't support JRuby
   gem "steep", "~> 1.10.0", platforms: :ruby
+
+  # MRI-only performance optimization (graphql has pure Ruby fallback)
+  gem "graphql-c_parser", "~> 1.1", ">= 1.1.3", platforms: :ruby
+
+  # XML library for aws-sdk (ox is MRI-only, nokogiri works on JRuby)
+  gem "ox", "~> 2.14", ">= 2.14.23", platforms: :ruby
+  gem "nokogiri", "~> 1.19", platforms: :jruby
+
   gem "super_diff", "~> 0.18"
   gem "vcr", "~> 6.4"
 end
