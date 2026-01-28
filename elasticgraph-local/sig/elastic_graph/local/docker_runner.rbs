@@ -21,6 +21,7 @@ module ElasticGraph
       @daemon_timeout: ::Integer
       @output: io
 
+      def boot: () -> void
       def halt: () -> void
       def boot_as_daemon: (halt_command: ::String) -> void
 

@@ -23,6 +23,13 @@ module ElasticGraph
         @output = output
       end
 
+      def boot
+        halt
+        prepare_docker_compose_run "up" do |command|
+          exec(command)
+        end
+      end
+
       def halt
         prepare_docker_compose_run "down --volumes" do |command|
           system(command)
