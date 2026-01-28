@@ -9,7 +9,11 @@
 require "elastic_graph/query_registry/variable_backward_incompatibility_detector"
 require "elastic_graph/query_registry/variable_dumper"
 require "graphql"
-require "graphql/c_parser"
+begin
+  require "graphql/c_parser"
+rescue LoadError
+  # graphql-c_parser is optional; graphql gem has pure Ruby fallback
+end
 
 module ElasticGraph
   module QueryRegistry

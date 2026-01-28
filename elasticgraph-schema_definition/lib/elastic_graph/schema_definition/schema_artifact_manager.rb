@@ -12,7 +12,11 @@ require "elastic_graph/schema_definition/json_schema_pruner"
 require "elastic_graph/support/memoizable_data"
 require "fileutils"
 require "graphql"
-require "graphql/c_parser"
+begin
+  require "graphql/c_parser"
+rescue LoadError
+  # graphql-c_parser is optional; graphql gem has pure Ruby fallback
+end
 require "tempfile"
 require "yaml"
 
