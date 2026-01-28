@@ -44,9 +44,8 @@ group :development do
   # MRI-only performance optimization (graphql has pure Ruby fallback)
   gem "graphql-c_parser", "~> 1.1", ">= 1.1.3", platforms: :ruby
 
-  # XML library for aws-sdk (ox is MRI-only, nokogiri works on JRuby)
+  # XML library for aws-sdk (ox is MRI-only; nokogiri from :site group used on JRuby)
   gem "ox", "~> 2.14", ">= 2.14.23", platforms: :ruby
-  gem "nokogiri", "~> 1.19", platforms: :jruby
 
   gem "super_diff", "~> 0.18"
   gem "vcr", "~> 6.4"
