@@ -23,15 +23,15 @@ module ElasticGraph
         @output = output
       end
 
+      # :nocov: -- difficult to test `exec` behavior (replaces current process)
       def boot
-        # :nocov: -- this is actually covered via a call from `boot_as_daemon` but it happens in a forked process so simplecov doesn't see it.
         halt
 
         prepare_docker_compose_run "up" do |command|
           exec(command) # we use `exec` so that our process is replaced with that one.
         end
-        # :nocov:
       end
+      # :nocov:
 
       def halt
         prepare_docker_compose_run "down --volumes" do |command|
@@ -40,26 +40,11 @@ module ElasticGraph
       end
 
       def boot_as_daemon(halt_command:)
-        with_pipe do |read_io, write_io|
-          fork do
-            # :nocov: -- simplecov can't track coverage that happens in another process
-            read_io.close
-            Process.daemon
-            pid = Process.pid
-            $stdout.reopen(write_io)
-            $stderr.reopen(write_io)
-            puts pid
-            boot
-            write_io.close
-            # :nocov:
-          end
+        halt
 
-          # The `Process.daemon` call in the subprocess changes the pid so we have to capture it this way instead of using
-          # the return value of `fork`.
-          pid = read_io.gets.to_i
+        @output.puts "Booting #{@variant}; monitoring logs for readiness..."
 
-          @output.puts "Booting #{@variant}; monitoring logs for readiness..."
-
+        pid = spawn_docker_compose_up do |read_io|
           ::Timeout.timeout(
             @daemon_timeout,
             ::Timeout::Error,
@@ -76,19 +61,45 @@ module ElasticGraph
               break if @ready_log_line.match?(line.to_s)
             end
           end
-
-          @output.puts
-          @output.puts
-          @output.puts <<~EOS
-            Success! #{@variant} #{@version} (pid: #{pid}) has been booted for the #{@env} environment on port #{@port}.
-            It will continue to run in the background as a daemon. To halt it, run:
-
-            #{halt_command}
-          EOS
         end
+
+        # Detach so the process continues running after this Ruby process exits.
+        ::Process.detach(pid)
+
+        @output.puts
+        @output.puts
+        @output.puts <<~EOS
+          Success! #{@variant} #{@version} (pid: #{pid}) has been booted for the #{@env} environment on port #{@port}.
+          It will continue to run in the background as a daemon. To halt it, run:
+
+          #{halt_command}
+        EOS
       end
 
       private
+
+      def spawn_docker_compose_up
+        read_io, write_io = ::IO.pipe
+
+        pid = prepare_docker_compose_run("up") do |command|
+          spawn(
+            command,
+            chdir: ::Dir.pwd,
+            out: write_io,
+            err: write_io
+          )
+        end
+
+        write_io.close # We don't write from the parent process
+
+        begin
+          yield read_io
+        ensure
+          read_io.close
+        end
+
+        pid
+      end
 
       def prepare_docker_compose_run(*commands)
         name = "#{@env}-#{@version.tr(".", "_")}"
@@ -99,17 +110,6 @@ module ElasticGraph
 
         ::Dir.chdir(::File.join(__dir__.to_s, @variant.to_s)) do
           yield full_command
-        end
-      end
-
-      def with_pipe
-        read_io, write_io = ::IO.pipe
-
-        begin
-          yield read_io, write_io
-        ensure
-          read_io.close
-          write_io.close
         end
       end
     end
