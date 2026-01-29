@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+# This script runs only the datastore-specific tests (tagged with :uses_datastore).
+# It's used for non-primary datastores where we only need to verify datastore compatibility,
+# not run the full test suite (which would be redundant since non-datastore tests don't vary
+# by datastore).
+
+source "script/ci_parts/setup_env" "test" $1 $2
+
+# No coverage checking for datastore-specific tests. Coverage is verified by run_each_gem_spec
+# on the primary datastore.
+unset COVERAGE
+
+script/run_specs --tag uses_datastore
