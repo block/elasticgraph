@@ -13,6 +13,8 @@
 .claude
 !.claude/skills/
 
+.tool-versions
+
 config/release/bin
 config/release/bundle
 config/release/.bundle
