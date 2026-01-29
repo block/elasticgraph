@@ -46,7 +46,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency "elasticgraph-schema_artifacts", ElasticGraph::VERSION
   spec.add_dependency "elasticgraph-support", ElasticGraph::VERSION
   spec.add_dependency "graphql", "~> 2.5.18"
-  spec.add_dependency "graphql-c_parser", "~> 1.1", ">= 1.1.3"
   spec.add_dependency "rake", "~> 13.3", ">= 13.3.1"
 
   spec.add_development_dependency "elasticgraph-admin", ElasticGraph::VERSION
