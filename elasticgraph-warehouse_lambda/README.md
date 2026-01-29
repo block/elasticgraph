@@ -28,11 +28,7 @@ graph LR;
     aws-sdk-s3["aws-sdk-s3"];
     elasticgraph-warehouse_lambda --> aws-sdk-s3;
     class aws-sdk-s3 externalGemStyle;
-    ox["ox"];
-    elasticgraph-warehouse_lambda --> ox;
-    class ox externalGemStyle;
     click aws-sdk-s3 href "https://rubygems.org/gems/aws-sdk-s3" "Open on RubyGems.org" _blank;
-    click ox href "https://rubygems.org/gems/ox" "Open on RubyGems.org" _blank;
 ```
 
 ## What it does
