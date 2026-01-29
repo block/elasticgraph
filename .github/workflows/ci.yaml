@@ -51,6 +51,9 @@ jobs:
           - build_part: "run_specs_file_by_file"
             ruby: "4.0"
             datastore: "elasticsearch:9.2.4"
+          - build_part: "run_specs_with_vcr"
+            ruby: "jruby-10.0"
+            datastore: "opensearch:3.4.0"
 
     steps:
       - name: Harden Runner

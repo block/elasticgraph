@@ -8,10 +8,16 @@
 
 require "elastic_graph/graphiql"
 require "stringio"
-require "nokogiri"
+
+begin
+  require "nokogiri"
+  NOKOGIRI_AVAILABLE = true
+rescue LoadError
+  NOKOGIRI_AVAILABLE = false
+end
 
 module ElasticGraph
-  RSpec.describe GraphiQL, :rack_app do
+  RSpec.describe GraphiQL, :rack_app, skip: (!NOKOGIRI_AVAILABLE && "nokogiri not available") do
     let(:app_to_test) { GraphiQL.new(build_graphql, output: ::StringIO.new) }
 
     it "serves a GraphiQL UI at the root with all assets available" do

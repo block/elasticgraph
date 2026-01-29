@@ -138,7 +138,11 @@ module ElasticGraph
         # providing greater efficiency.
         #
         # We load it here since this is where we load the GraphQL gem.
-        require "graphql/c_parser"
+        begin
+          require "graphql/c_parser"
+        rescue LoadError
+          # graphql-c_parser is optional; graphql gem has pure Ruby fallback
+        end
 
         {
           # We depend on this to avoid N+1 calls to the datastore.
@@ -269,7 +273,11 @@ module ElasticGraph
     # it's nice to load dependencies when needed.
     def load_dependencies_eagerly
       require "graphql"
-      require "graphql/c_parser"
+      begin
+        require "graphql/c_parser"
+      rescue LoadError
+        # graphql-c_parser is optional; graphql gem has pure Ruby fallback
+      end
 
       ::GraphQL.eager_load!
 

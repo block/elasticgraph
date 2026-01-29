@@ -24,13 +24,10 @@ module ElasticGraph
       end
 
       def boot
-        # :nocov: -- this is actually covered via a call from `boot_as_daemon` but it happens in a forked process so simplecov doesn't see it.
         halt
-
         prepare_docker_compose_run "up" do |command|
-          exec(command) # we use `exec` so that our process is replaced with that one.
+          exec(command)
         end
-        # :nocov:
       end
 
       def halt
@@ -41,22 +38,15 @@ module ElasticGraph
 
       def boot_as_daemon(halt_command:)
         with_pipe do |read_io, write_io|
-          fork do
-            # :nocov: -- simplecov can't track coverage that happens in another process
-            read_io.close
-            Process.daemon
-            pid = Process.pid
-            $stdout.reopen(write_io)
-            $stderr.reopen(write_io)
-            puts pid
-            boot
-            write_io.close
-            # :nocov:
+          halt
+
+          pid = prepare_docker_compose_run "up" do |command|
+            spawned_pid = spawn(command, out: write_io, err: write_io)
+            Process.detach(spawned_pid)
+            spawned_pid
           end
 
-          # The `Process.daemon` call in the subprocess changes the pid so we have to capture it this way instead of using
-          # the return value of `fork`.
-          pid = read_io.gets.to_i
+          write_io.close # Close write end in parent so read_io gets EOF when child exits
 
           @output.puts "Booting #{@variant}; monitoring logs for readiness..."
 

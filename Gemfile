@@ -17,7 +17,8 @@ group :development do
   gem "faker", "~> 3.6"
 
   # Pin to a GitHub SHA until Ruby 4.0 support has been released
-  gem "flatware-rspec", "~> 2.3", ">= 2.3.4", github: "briandunn/flatware", ref: "0403ac1137cc7958fe06db2c0563dfbab0bd24db"
+  # flatware uses io-event which has native extensions not available on JRuby
+  gem "flatware-rspec", "~> 2.3", ">= 2.3.4", github: "briandunn/flatware", ref: "0403ac1137cc7958fe06db2c0563dfbab0bd24db", platforms: :ruby
 
   gem "httpx", "~> 1.7", ">= 1.7.2"
   gem "memory_profiler", "~> 1.1"
@@ -37,7 +38,15 @@ group :development do
   gem "simplecov", "~> 0.22"
   gem "simplecov-console", "~> 0.9", ">= 0.9.4"
   gem "standard", "~> 1.53.0"
-  gem "steep", "~> 1.10.0"
+  # steep type checker doesn't support JRuby
+  gem "steep", "~> 1.10.0", platforms: :ruby
+
+  # MRI-only performance optimization (graphql has pure Ruby fallback)
+  gem "graphql-c_parser", "~> 1.1", ">= 1.1.3", platforms: :ruby
+
+  # XML library for aws-sdk (ox is MRI-only; nokogiri from :site group used on JRuby)
+  gem "ox", "~> 2.14", ">= 2.14.23", platforms: :ruby
+
   gem "super_diff", "~> 0.18"
   gem "vcr", "~> 6.4"
 end
@@ -47,10 +56,10 @@ group :site do
   # Pin to a GitHub SHA until Ruby 4.0 support has been released: https://github.com/filewatcher/filewatcher/issues/286
   gem "filewatcher", "~> 2.1", github: "filewatcher/filewatcher", ref: "596fad65f3b442fee6cf30a3d8daf2767d63f8c9"
 
-  gem "html-proofer", "~> 5.2"
-  gem "jekyll", "~> 4.4", ">= 4.4.1"
+  gem "html-proofer", "~> 5.2", platforms: :ruby
+  gem "jekyll", "~> 4.4", ">= 4.4.1", platforms: :ruby
   gem "nokogiri", "~> 1.19"
-  gem "redcarpet", "~> 3.6", ">= 3.6.1"
+  gem "redcarpet", "~> 3.6", ">= 3.6.1", platforms: :ruby
 
   # Pull in a YAML syntax highlighting fix so that our JSON schemas render correctly at the website:
   # https://github.com/rouge-ruby/rouge/pull/2156
@@ -79,8 +88,9 @@ if repo_root == __dir__
   require_relative "elasticgraph-support/lib/elastic_graph/version"
 
   # Depend on each ElasticGraph gem in the repo.
+  # Use absolute paths for JRuby compatibility (JRuby resolves `path:` relative to cwd, not Gemfile)
   gems_in_this_repo.map do |name|
-    gem name, ::ElasticGraph::VERSION, path: name
+    gem name, ::ElasticGraph::VERSION, path: "#{repo_root}/#{name}"
   end
 else
   # Otherwise, we just load the local `.gemspec` file in the current directory.
