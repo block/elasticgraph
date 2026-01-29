@@ -9,6 +9,10 @@
 require "delegate"
 require "stringio"
 
+# :nocov: -- only loaded on JRuby
+require "elastic_graph/support/jruby_patches" if RUBY_ENGINE == "jruby"
+# :nocov:
+
 module ElasticGraph
   module Support
     # `::Data.define` in Ruby 3.2+ is *very* handy for defining immutable value objects. However, one annoying

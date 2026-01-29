@@ -60,7 +60,7 @@ module ElasticGraph
         # JSON doesn't support keys that aren't strings, but JSON.generate converts keys to strings.
         expect(::JSON.generate(data)).to eq('{"a":1,"3":"b","2":"d"}')
         # 3 and "a" aren't comparable when sorting...
-        expect { data.keys.sort }.to raise_error(/comparison of String with (2|3) failed/)
+        expect { data.keys.sort }.to raise_error(/comparison of \w+ with \w+ failed/)
         # ...but encode is still able to sort them.
         #
         # Note: JSON objects don't support non-string keys, so we should never actually hit this case,

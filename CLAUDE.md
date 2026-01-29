@@ -156,6 +156,7 @@ Custom gems can be added via `Gemfile-custom` (see `Gemfile-custom.example`), th
 - Always put a blank space after `#` in comments. This applies to all comments, including RBS type annotation comments (e.g., `# : String` not `#: String`).
 - Avoid defensive code for impossible cases. Don't add checks, tests, or handling for scenarios that should never occur due to the design of the system. If something can only happen due to a bug in the implementation, it's better to fail fast than to silently handle it.
 - Drop unnecessary namespace prefixes. When code is already inside `module ElasticGraph`, use `Indexer` instead of `::ElasticGraph::Indexer`, and `Errors::ConfigError` instead of `::ElasticGraph::Errors::ConfigError`. Use fully qualified names only when necessary to avoid ambiguity.
+- Prefer using `prepend` + `super` rather than `alias_method` when needing to hook in and override a method.
 
 ### RBS Type Signatures
 

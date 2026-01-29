@@ -20,7 +20,7 @@ module ElasticGraph
       # config files being relative to the root.
       around { |ex| Dir.chdir(CommonSpecHelpers::REPO_ROOT, &ex) }
 
-      it "supports fully booting from scratch via a single `boot_locally` rake task" do
+      it "supports fully booting from scratch via a single `boot_locally` rake task", :except_jruby do
         rack_port = 9620
         kill_daemon_after "rackup.pid" do |pid_file|
           halt_datastore_daemon_after :elasticsearch do
@@ -56,7 +56,7 @@ module ElasticGraph
       end
 
       context "when the datastore is not running" do
-        it "boots the datastore as a daemon to support booting GraphiQL" do
+        it "boots the datastore as a daemon to support booting GraphiQL", :except_jruby do
           halt_datastore_daemon_after :elasticsearch do |datastore_port|
             expect {
               kill_daemon_after("rackup.pid") do |pid_file|

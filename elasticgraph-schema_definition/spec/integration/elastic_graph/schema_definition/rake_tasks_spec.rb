@@ -16,6 +16,16 @@ require "yaml"
 module ElasticGraph
   module SchemaDefinition
     RSpec.describe RakeTasks, :rake_task do
+      # JRuby has a bug (https://github.com/jruby/jruby/issues/9242) that causes spurious
+      # "keyword arguments" warnings on stderr when `initialize(...)` + `super(...)` is used
+      # in a module prepended on a Struct subclass. Our jruby_patches.rb works around this,
+      # but a load-order regression can silently re-expose the warnings. This hook ensures
+      # we catch that. We use `to_stderr_from_any_process` (fd-level) rather than `to_stderr`
+      # ($stderr-level) because one test below nests `to_stderr_from_any_process` inside this.
+      around do |example|
+        expect { example.run }.not_to output(/./).to_stderr_from_any_process
+      end
+
       describe "schema_artifacts:dump", :in_temp_dir do
         it "idempotently dumps all schema artifacts, and is able to check if they are current with `:check`" do
           write_elastic_graph_schema_def_code(json_schema_version: 1)
