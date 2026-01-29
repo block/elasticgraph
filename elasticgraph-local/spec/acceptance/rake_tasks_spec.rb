@@ -103,6 +103,13 @@ module ElasticGraph
             run_rake "elasticsearch:example:9.0.0:daemon", daemon_timeout: 0.1
           }.to raise_error a_string_including("Timed out after 0.1 seconds.")
         end
+
+        it "supports booting OpenSearch" do
+          halt_datastore_daemon_after :opensearch do
+            output = run_rake "opensearch:local:2.19.0:daemon"
+            expect(output).to include("Success! opensearch")
+          end
+        end
       end
 
       def run_rake(*cli_args, daemon_timeout: nil, batch_size: 1)
@@ -129,7 +136,7 @@ module ElasticGraph
               t.schema_element_name_form = :snake_case
               t.env_port_mapping = {"example" => 9615}
               t.elasticsearch_versions = ["8.18.0", "9.0.0"]
-              t.opensearch_versions = ["2.7.0"]
+              t.opensearch_versions = ["2.19.0"]
               t.output = output
               t.daemon_timeout = daemon_timeout
 
