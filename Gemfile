@@ -23,6 +23,7 @@ group :development do
 
   gem "httpx", "~> 1.7", ">= 1.7.2"
   gem "memory_profiler", "~> 1.1"
+  gem "nokogiri", "~> 1.19"
   gem "method_source", "~> 1.1"
   gem "rack-test", "~> 2.2"
   gem "rspec", "~> 3.13", ">= 3.13.2"
@@ -51,7 +52,6 @@ group :site do
 
   gem "html-proofer", "~> 5.2"
   gem "jekyll", "~> 4.4", ">= 4.4.1"
-  gem "nokogiri", "~> 1.19"
   gem "redcarpet", "~> 3.6", ">= 3.6.1"
 
   # Pull in a YAML syntax highlighting fix so that our JSON schemas render correctly at the website:
