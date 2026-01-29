@@ -27,8 +27,8 @@ module ElasticGraph
 
       private
 
-      def prepare_docker_compose_run: (*::String) { (::String) -> void } -> void
-      def with_pipe: [T] () { (::IO, ::IO) -> T } -> T
+      def spawn_docker_compose_up: () { (::IO) -> void } -> ::Integer
+      def prepare_docker_compose_run: [T] (*::String) { (::String) -> T } -> T
     end
   end
 end
