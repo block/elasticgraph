@@ -33,8 +33,13 @@ module ElasticGraph
     def updated_content
       content = @content.dup
       content = update_datastore_matrix(content)
-      content = update_primary_datastore(content)
+      content = update_includes_primary_datastore(content)
+      content = update_run_datastore_specs_includes(content)
       update_opensearch_version(content)
+    end
+
+    def non_primary_datastore_versions
+      datastore_versions - [primary_datastore_version]
     end
 
     def show_diff
@@ -76,22 +81,36 @@ module ElasticGraph
     end
 
     def update_datastore_matrix(content)
-      # Find the datastore matrix section and preserve its exact indentation
+      # Matrix now has single primary datastore only.
+      # Non-primary datastores use run_datastore_specs via includes.
       matrix_pattern = /(        datastore:\n)([^\n]*\n)*?        include:/m
       match = content.match(matrix_pattern)
       return content unless match
 
       matrix_start = match[1]
-      new_versions = datastore_versions.map { |v| '          - "' + v + "\"\n" }.join
-      content.sub(matrix_pattern, "#{matrix_start}#{new_versions}        include:")
+      new_version = '          - "' + primary_datastore_version + "\"\n"
+      content.sub(matrix_pattern, "#{matrix_start}#{new_version}        include:")
     end
 
-    def update_primary_datastore(content)
-      # Update each primary datastore version in the includes section
-      content.gsub(
-        /(?<=datastore: ")[^"]+(?="\n)/,
-        primary_datastore_version
-      )
+    def update_includes_primary_datastore(content)
+      # Update ALL datastore entries in includes section to primary.
+      # run_datastore_specs entries will be overridden by update_run_datastore_specs_includes.
+      parts = content.split(/^        include:\n/, 2)
+      return content unless parts.size == 2
+
+      updated = parts[1].gsub(/(?<=datastore: ")[^"]+(?=")/, primary_datastore_version)
+      parts[0] + "        include:\n" + updated
+    end
+
+    def update_run_datastore_specs_includes(content)
+      # Override run_datastore_specs entries with non-primary datastores
+      versions = non_primary_datastore_versions
+      idx = 0
+      content.gsub(/(?<=build_part: "run_datastore_specs"\n            ruby: "4.0"\n            datastore: ")[^"]+(?=")/) do
+        version = versions[idx]
+        idx += 1
+        version
+      end
     end
 
     def update_opensearch_version(content)
