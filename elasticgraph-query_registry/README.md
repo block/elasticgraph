@@ -47,14 +47,10 @@ graph LR;
     graphql["graphql"];
     elasticgraph-query_registry --> graphql;
     class graphql externalGemStyle;
-    graphql-c_parser["graphql-c_parser"];
-    elasticgraph-query_registry --> graphql-c_parser;
-    class graphql-c_parser externalGemStyle;
     rake["rake"];
     elasticgraph-query_registry --> rake;
     class rake externalGemStyle;
     click graphql href "https://rubygems.org/gems/graphql" "Open on RubyGems.org" _blank;
-    click graphql-c_parser href "https://rubygems.org/gems/graphql-c_parser" "Open on RubyGems.org" _blank;
     click rake href "https://rubygems.org/gems/rake" "Open on RubyGems.org" _blank;
 ```
 
