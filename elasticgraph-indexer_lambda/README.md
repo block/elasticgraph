@@ -20,14 +20,10 @@ graph LR;
     aws-sdk-s3["aws-sdk-s3"];
     elasticgraph-indexer_lambda --> aws-sdk-s3;
     class aws-sdk-s3 externalGemStyle;
-    ox["ox"];
-    elasticgraph-indexer_lambda --> ox;
-    class ox externalGemStyle;
     elasticgraph-warehouse_lambda["elasticgraph-warehouse_lambda"];
     elasticgraph-warehouse_lambda --> elasticgraph-indexer_lambda;
     class elasticgraph-warehouse_lambda otherEgGemStyle;
     click aws-sdk-s3 href "https://rubygems.org/gems/aws-sdk-s3" "Open on RubyGems.org" _blank;
-    click ox href "https://rubygems.org/gems/ox" "Open on RubyGems.org" _blank;
 ```
 
 ## SQS Message Payload Format

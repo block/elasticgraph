@@ -110,7 +110,6 @@ PATH
       aws-sdk-sqs (~> 1.111)
       elasticgraph-datastore_core (= 1.1.1.pre)
       elasticgraph-lambda_support (= 1.1.1.pre)
-      ox (~> 2.14, >= 2.14.23)
 
 PATH
   remote: elasticgraph-indexer_lambda
@@ -119,7 +118,6 @@ PATH
       aws-sdk-s3 (~> 1.212)
       elasticgraph-indexer (= 1.1.1.pre)
       elasticgraph-lambda_support (= 1.1.1.pre)
-      ox (~> 2.14, >= 2.14.23)
 
 PATH
   remote: elasticgraph-indexer
@@ -213,7 +211,6 @@ PATH
       aws-sdk-s3 (~> 1.212)
       elasticgraph-indexer_lambda (= 1.1.1.pre)
       elasticgraph-lambda_support (= 1.1.1.pre)
-      ox (~> 2.14, >= 2.14.23)
 
 PATH
   remote: elasticgraph-warehouse
@@ -451,8 +448,6 @@ GEM
       faraday (>= 1.0, < 3)
       multi_json (>= 1.0)
     optimist (3.2.1)
-    ox (2.14.23)
-      bigdecimal (>= 3.0)
     parallel (1.27.0)
     parser (3.3.10.1)
       ast (~> 2.4.1)
@@ -840,7 +835,6 @@ CHECKSUMS
   nokogiri (1.19.0-arm64-darwin) sha256=0811dfd936d5f6dd3f6d32ef790568bf29b2b7bead9ba68866847b33c9cf5810
   opensearch-ruby (3.4.0) sha256=0a8621686bed3c59b4c23e08cbaef873685a3fe4568e9d2703155ca92b8ca05d
   optimist (3.2.1) sha256=8cf8a0fd69f3aa24ab48885d3a666717c27bc3d9edd6e976e18b9d771e72e34e
-  ox (2.14.23) sha256=4a9aedb4d6c78c5ebac1d7287dc7cc6808e14a8831d7adb727438f6a1b461b66
   parallel (1.27.0) sha256=4ac151e1806b755fb4e2dc2332cbf0e54f2e24ba821ff2d3dcf86bf6dc4ae130
   parser (3.3.10.1) sha256=06f6a725d2cd91e5e7f2b7c32ba143631e1f7c8ae2fb918fc4cebec187e6a688
   pathutil (0.16.2) sha256=e43b74365631cab4f6d5e4228f812927efc9cb2c71e62976edcb252ee948d589
