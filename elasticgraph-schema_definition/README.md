@@ -30,9 +30,6 @@ graph LR;
     graphql["graphql"];
     elasticgraph-schema_definition --> graphql;
     class graphql externalGemStyle;
-    graphql-c_parser["graphql-c_parser"];
-    elasticgraph-schema_definition --> graphql-c_parser;
-    class graphql-c_parser externalGemStyle;
     rake["rake"];
     elasticgraph-schema_definition --> rake;
     class rake externalGemStyle;
@@ -40,7 +37,6 @@ graph LR;
     elasticgraph-local --> elasticgraph-schema_definition;
     class elasticgraph-local otherEgGemStyle;
     click graphql href "https://rubygems.org/gems/graphql" "Open on RubyGems.org" _blank;
-    click graphql-c_parser href "https://rubygems.org/gems/graphql-c_parser" "Open on RubyGems.org" _blank;
     click rake href "https://rubygems.org/gems/rake" "Open on RubyGems.org" _blank;
 ```
 

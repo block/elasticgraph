@@ -9,12 +9,13 @@
 require "did_you_mean"
 require "elastic_graph/constants"
 require "elastic_graph/schema_definition/json_schema_pruner"
+require "elastic_graph/support/graphql_gem_loader"
 require "elastic_graph/support/memoizable_data"
 require "fileutils"
-require "graphql"
-require "graphql/c_parser"
 require "tempfile"
 require "yaml"
+
+ElasticGraph::Support::GraphQLGemLoader.load
 
 module ElasticGraph
   module SchemaDefinition

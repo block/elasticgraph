@@ -10,6 +10,7 @@ require "elastic_graph/datastore_core"
 require "elastic_graph/graphql/config"
 require "elastic_graph/constants"
 require "elastic_graph/support/from_yaml_file"
+require "elastic_graph/support/graphql_gem_loader"
 
 module ElasticGraph
   # The main entry point for ElasticGraph GraphQL handling. Instantiate this to get access to the
@@ -132,13 +133,7 @@ module ElasticGraph
     # @private
     def graphql_gem_plugins
       @graphql_gem_plugins ||= begin
-        require "graphql"
-        # As per https://graphql-ruby.org/language_tools/c_parser.html, loading the
-        # C parser causes the faster parser to be assigned as the `::GraphQL.default_parser`,
-        # providing greater efficiency.
-        #
-        # We load it here since this is where we load the GraphQL gem.
-        require "graphql/c_parser"
+        Support::GraphQLGemLoader.load
 
         {
           # We depend on this to avoid N+1 calls to the datastore.
@@ -268,9 +263,7 @@ module ElasticGraph
     # at boot time instead of deferring dependency loading until we handle the first query. In other environments (such as tests),
     # it's nice to load dependencies when needed.
     def load_dependencies_eagerly
-      require "graphql"
-      require "graphql/c_parser"
-
+      Support::GraphQLGemLoader.load
       ::GraphQL.eager_load!
 
       # run a simple GraphQL query to force load any dependencies needed to handle GraphQL queries
