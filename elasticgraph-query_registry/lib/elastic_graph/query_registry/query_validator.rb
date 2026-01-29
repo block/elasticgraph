@@ -8,8 +8,9 @@
 
 require "elastic_graph/query_registry/variable_backward_incompatibility_detector"
 require "elastic_graph/query_registry/variable_dumper"
-require "graphql"
-require "graphql/c_parser"
+require "elastic_graph/support/graphql_gem_loader"
+
+ElasticGraph::Support::GraphQLGemLoader.load
 
 module ElasticGraph
   module QueryRegistry
