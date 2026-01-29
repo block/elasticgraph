@@ -70,11 +70,17 @@ module ElasticGraph
       end
 
       it "raises an error if `aws_region` is not configured and `AWS_REGION` env var is not set" do
-        warehouse_lambda = build_warehouse_lambda(aws_region: nil)
+        # Clear all AWS region sources to ensure MissingRegionError is raised.
+        # We must also reset `Aws.shared_config` since it caches parsed config from ~/.aws/config.
+        with_env("AWS_REGION" => nil, "AWS_DEFAULT_REGION" => nil, "AWS_CONFIG_FILE" => "/nonexistent") do
+          ::Aws.instance_variable_set(:@shared_config, nil)
 
-        expect {
-          warehouse_lambda.s3_client
-        }.to raise_error ::Aws::Errors::MissingRegionError
+          warehouse_lambda = build_warehouse_lambda(aws_region: nil)
+
+          expect {
+            warehouse_lambda.s3_client
+          }.to raise_error ::Aws::Errors::MissingRegionError
+        end
       end
     end
   end
