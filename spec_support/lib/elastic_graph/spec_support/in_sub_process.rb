@@ -14,7 +14,13 @@ module ElasticGraph
     # Runs the provided block in a subprocess. Any failures in the sub process get
     # caught and re-raised in the parent process. Also, this returns the return value
     # of the child process (using `Marshal` to send it across a pipe).
+    #
+    # On JRuby, fork is unavailable, so this skips the test instead.
     def in_sub_process(&block)
+      # :nocov: -- we only cover one side of this conditional for a given run of the test suite
+      skip "Test requires fork (unavailable on JRuby)" if RUBY_ENGINE == "jruby"
+      # :nocov:
+
       SubProcess.new.run(&block)
     end
   end
