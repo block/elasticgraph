@@ -121,7 +121,7 @@ module ElasticGraph
             # When we have positional args and no keyword args, convert them to keyword args.
             if args.any? && kwargs.empty?
               members = self::DATA_CLASS.members
-              kwargs = members.zip(args).to_h
+              kwargs = members.first(args.size).zip(args).to_h
               args = []
             end
 
