@@ -107,7 +107,7 @@ PATH
   specs:
     elasticgraph-indexer_autoscaler_lambda (1.1.1.pre)
       aws-sdk-cloudwatch (~> 1.129.0)
-      aws-sdk-lambda (~> 1.174)
+      aws-sdk-lambda (~> 1.175)
       aws-sdk-sqs (~> 1.111)
       elasticgraph-datastore_core (= 1.1.1.pre)
       elasticgraph-lambda_support (= 1.1.1.pre)
@@ -117,7 +117,7 @@ PATH
   remote: elasticgraph-indexer_lambda
   specs:
     elasticgraph-indexer_lambda (1.1.1.pre)
-      aws-sdk-s3 (~> 1.212)
+      aws-sdk-s3 (~> 1.213)
       elasticgraph-indexer (= 1.1.1.pre)
       elasticgraph-lambda_support (= 1.1.1.pre)
       ox (~> 2.14, >= 2.14.23)
@@ -213,7 +213,7 @@ PATH
   remote: elasticgraph-warehouse_lambda
   specs:
     elasticgraph-warehouse_lambda (1.1.1.pre)
-      aws-sdk-s3 (~> 1.212)
+      aws-sdk-s3 (~> 1.213)
       elasticgraph-indexer_lambda (= 1.1.1.pre)
       elasticgraph-lambda_support (= 1.1.1.pre)
       ox (~> 2.14, >= 2.14.23)
@@ -705,7 +705,7 @@ DEPENDENCIES
   rubocop-rake (~> 0.6.0)
   rubocop-rspec (~> 3.9.0)
   simplecov (~> 0.22)
-  simplecov-console (~> 0.9)
+  simplecov-console (~> 0.9, >= 0.9.5)
   standard (~> 1.53.0)
   steep (~> 1.10.0)
   super_diff (~> 0.18)
