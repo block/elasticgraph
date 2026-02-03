@@ -666,6 +666,7 @@ PLATFORMS
   riscv64-linux-gnu
   riscv64-linux-musl
   ruby
+  universal-java-21
   universal-java-24
   x86-cygwin
   x86-linux-android

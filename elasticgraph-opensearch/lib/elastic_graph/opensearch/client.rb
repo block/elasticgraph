@@ -62,7 +62,15 @@ module ElasticGraph
         #
         # Without this, we would instead get an error when the client was used to make
         # a request for the first time, which isn't as ideal.
-        @raw_client.transport.transport.connections.each { |c| c.connection.app }
+        #
+        # Note: We skip this check on JRuby due to a bug with `*args, **kwargs` forwarding
+        # in JRuby 10.0 that causes Faraday's middleware stack construction to fail.
+        # This means missing dependencies won't be caught until the first request on JRuby.
+        # See: https://github.com/jruby/jruby/issues/...
+        # TODO: Remove this workaround once the JRuby bug is fixed.
+        unless RUBY_PLATFORM == "java"
+          @raw_client.transport.transport.connections.each { |c| c.connection.app }
+        end
       end
 
       # Cluster APIs
