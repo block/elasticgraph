@@ -21,8 +21,13 @@ module ElasticGraph
       # This middleware helps us work around this deficiency by looking for the TIMEOUT_MS_HEADER. If present, it deletes
       # it from the headers and instead sets it as the request timeout.
       # @private
-      SupportTimeouts = ::Data.define(:app) do
-        # @implements SupportTimeouts
+      class SupportTimeouts
+        # @dynamic app
+        attr_reader :app
+
+        def initialize(app)
+          @app = app
+        end
 
         # Processes a Faraday request, extracting timeout from headers and applying it to the request.
         # Converts {TIMEOUT_MS_HEADER} from request headers into a Faraday request timeout setting.

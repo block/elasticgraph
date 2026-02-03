@@ -21,8 +21,13 @@ module ElasticGraph
       #
       # For more info, see: https://github.com/elastic/elasticsearch-ruby/issues/1005
       # @private
-      MSearchUsingGetInsteadOfPost = ::Data.define(:app) do
-        # @implements MSearchUsingGetInsteadOfPost
+      class MSearchUsingGetInsteadOfPost
+        # @dynamic app
+        attr_reader :app
+
+        def initialize(app)
+          @app = app
+        end
 
         # Processes a Faraday request, converting `_msearch` POST requests to GET requests.
         #
