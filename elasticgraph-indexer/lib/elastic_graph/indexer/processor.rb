@@ -62,39 +62,10 @@ module ElasticGraph
 
       private
 
+      # TODO: Temporarily skip failure categorization to avoid unnecessary datastore queries during
+      # indexing failures. The version check will be re-enabled behind a configurable flag in a follow-up.
       def categorize_failures(failures, events)
-        source_event_versions_by_cluster_by_op = @datastore_router.source_event_versions_in_index(
-          failures.flat_map { |f| f.versioned_operations.to_a }
-        )
-
-        superseded_failures, outstanding_failures = failures.partition do |failure|
-          failure.versioned_operations.size > 0 && failure.versioned_operations.all? do |op|
-            # Under normal conditions, we expect to get back only one version per operation per cluster.
-            # However, when a field used for routing or index rollover has mutated, we can wind up with
-            # multiple copies of the document in different indexes or shards. `source_event_versions_in_index`
-            # returns a list of found versions.
-            #
-            # We only need to consider the largest version when deciding if a failure has been supeseded or not.
-            # An event with a larger version is considered to be a full replacement for an earlier event for the
-            # same entity, so if we've processed an event for the same entity with a larger version, we can consider
-            # the failure superseded.
-            max_version_per_cluster = source_event_versions_by_cluster_by_op.fetch(op).values.map(&:max)
-
-            # We only consider an event to be superseded if the document version in the datastore
-            # for all its versioned operations is greater than the version of the failing event.
-            max_version_per_cluster.all? { |v| v && v > failure.version }
-          end
-        end
-
-        if superseded_failures.any?
-          superseded_ids = superseded_failures.map { |f| EventID.from_event(f.event).to_s }
-          @logger.warn(
-            "Ignoring #{superseded_ids.size} malformed event(s) because they have been superseded " \
-            "by corrected events targeting the same id: #{superseded_ids.join(", ")}."
-          )
-        end
-
-        outstanding_failures
+        failures
       end
 
       def calculate_latency_metrics(successful_operations, noop_results)

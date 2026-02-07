@@ -147,7 +147,10 @@ module ElasticGraph
         })
       end
 
-      it "ignores an event that tries to change the value if that event has already been superseded by a corrected event with a greater version" do
+      # TODO: Re-enable superseded event detection when failure categorization is re-enabled behind a configurable flag.
+      # Failure categorization (the datastore version check that detects superseded failures) is
+      # temporarily disabled, so malformed events always raise regardless of whether they've been superseded.
+      it "always raises for a malformed event even if it has been superseded by a corrected event with a greater version" do
         # Original widget.
         widget_v1 = widget("LARGE", "RED", "USD", cost_currency_symbol: "$", id: "w1", workspace_id: "wid23")
 
@@ -170,10 +173,14 @@ module ElasticGraph
 
         index_records(widget_v3)
 
-        # ...but if we retry after the event has been superseded by a corrected event, it just logs a warning instead.
+        # With failure categorization disabled, retrying the malformed event still raises even though
+        # a corrected event (v3) has been indexed.
         expect {
           index_records(widget_v2)
-        }.to log_warning(a_string_including("superseded by corrected events", widget_v2_event_id))
+        }.to raise_error(
+          Indexer::IndexingFailuresError,
+          a_string_including("Field `details.symbol` cannot be changed ($ => US$).", widget_v2_event_id)
+        )
       end
 
       it "allows it to be set to `null` unless `nullable: false` was passed on the definition" do

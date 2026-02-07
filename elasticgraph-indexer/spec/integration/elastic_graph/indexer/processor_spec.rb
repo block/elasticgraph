@@ -79,35 +79,15 @@ module ElasticGraph
               expect(get_component_names_from_response(response)).to contain_exactly("valid1", "valid2")
             end
 
-            it "ignores the malformed event if it has been superseded by an indexed event with the same id and a greater version" do
-              process_batches([make_valid(malformed_event, version_offset: -1)])
-              expect { process_batches([malformed_event]) }.to raise_error IndexingFailuresError, a_string_including("c789")
-
-              process_batches([make_valid(malformed_event, version_offset: 0)])
-              expect { process_batches([malformed_event]) }.to raise_error IndexingFailuresError, a_string_including("c789")
-
+            # TODO: Re-enable these tests when failure categorization is re-enabled behind a configurable flag.
+            # Failure categorization (the datastore version check that detects superseded failures) is
+            # temporarily disabled, so malformed events always raise regardless of whether they've been superseded.
+            it "always raises for malformed events even if a newer version exists in the datastore" do
               process_batches([make_valid(malformed_event, version_offset: 1)])
-              expect { process_batches([malformed_event]) }.to log_warning a_string_including(
-                "Ignoring 1 malformed event",
-                EventID.from_event(malformed_event).to_s
-              )
+              expect { process_batches([malformed_event]) }.to raise_error IndexingFailuresError, a_string_including("c789")
 
               response = search
               expect(get_component_names_from_response(response)).to contain_exactly("same_id_valid_event")
-            end
-
-            it "ignores the version of a derived indexing type update when determining if an event has been superseded since the derived document's version is not related to the event version" do
-              valid_widget = build_upsert_event(:widget, id: "widget_34512")
-              superseded_invalid_widget = update_event(valid_widget, version_offset: -1) do |record|
-                record.merge("name" => 18)
-              end
-
-              process_batches([valid_widget])
-
-              expect { process_batches([superseded_invalid_widget]) }.to log_warning a_string_including(
-                "Ignoring 1 malformed event",
-                EventID.from_event(superseded_invalid_widget).to_s
-              )
             end
 
             def make_valid(event, version_offset:)
