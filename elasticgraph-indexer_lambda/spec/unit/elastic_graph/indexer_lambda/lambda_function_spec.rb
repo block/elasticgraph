@@ -19,6 +19,7 @@ RSpec.describe "Indexer lambda function" do
       response = lambda_function.handle_request(event: {"Records" => []}, context: {})
       expect(response).to eq({"batchItemFailures" => []})
       expect(lambda_function.sqs_processor.ignore_sqs_latency_timestamps_from_arns).to eq([].to_set)
+      expect(lambda_function.sqs_processor.categorize_failures_only_from_arns).to eq([].to_set)
     end
   end
 
@@ -35,6 +36,24 @@ RSpec.describe "Indexer lambda function" do
         expect(lambda_function.sqs_processor.ignore_sqs_latency_timestamps_from_arns).to eq([
           "ignored-arn1",
           "ignored-arn2"
+        ].to_set)
+      end
+    end
+  end
+
+  it "configures `categorize_failures_only_from_arns` based on an ENV var" do
+    env_var_value = ::JSON.generate(["dlq-arn1", "dlq-arn2"])
+
+    with_env "CATEGORIZE_FAILURES_ONLY_FROM_ARNS" => env_var_value do
+      expect_loading_lambda_to_define_constant(
+        lambda: "elastic_graph/indexer_lambda/lambda_function.rb",
+        const: :ProcessEventStreamEvent
+      ) do |lambda_function|
+        response = lambda_function.handle_request(event: {"Records" => []}, context: {})
+        expect(response).to eq({"batchItemFailures" => []})
+        expect(lambda_function.sqs_processor.categorize_failures_only_from_arns).to eq([
+          "dlq-arn1",
+          "dlq-arn2"
         ].to_set)
       end
     end

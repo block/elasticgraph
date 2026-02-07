@@ -276,6 +276,59 @@ module ElasticGraph
           end
         end
 
+        context "when `categorize_failures_only_from_arns` is configured" do
+          let(:sqs_processor) { build_sqs_processor(categorize_failures_only_from_arns: ["dlq-arn1", "dlq-arn2"].to_set) }
+
+          it "injects `skip_failure_categorization` on events from ARNs not in the configured list" do
+            lambda_event = {
+              "Records" => [
+                sqs_message("a", {"field1" => {}}, event_source_arn: "other-arn"),
+                sqs_message("b", {"field2" => {}}, event_source_arn: "dlq-arn1"),
+                sqs_message("c", {"field3" => {}}, event_source_arn: "dlq-arn2"),
+                sqs_message("d", {"field4" => {}}, event_source_arn: "another-arn")
+              ]
+            }
+
+            sqs_processor.process(lambda_event)
+
+            expect(indexer_processor).to have_received(:process_returning_failures) do |events|
+              expect(events.map { |e| e["skip_failure_categorization"] }).to eq [true, nil, nil, true]
+            end
+          end
+
+          it "does not inject the flag on events from ARNs in the configured list" do
+            lambda_event = {
+              "Records" => [
+                sqs_message("a", {"field1" => {}}, event_source_arn: "dlq-arn1"),
+                sqs_message("b", {"field2" => {}}, event_source_arn: "dlq-arn2")
+              ]
+            }
+
+            sqs_processor.process(lambda_event)
+
+            expect(indexer_processor).to have_received(:process_returning_failures) do |events|
+              expect(events.none? { |e| e.key?("skip_failure_categorization") }).to be true
+            end
+          end
+        end
+
+        context "when `categorize_failures_only_from_arns` is empty (default)" do
+          it "does not inject the flag on any events" do
+            lambda_event = {
+              "Records" => [
+                sqs_message("a", {"field1" => {}}, event_source_arn: "any-arn"),
+                sqs_message("b", {"field2" => {}}, event_source_arn: "other-arn")
+              ]
+            }
+
+            sqs_processor.process(lambda_event)
+
+            expect(indexer_processor).to have_received(:process_returning_failures) do |events|
+              expect(events.none? { |e| e.key?("skip_failure_categorization") }).to be true
+            end
+          end
+        end
+
         context "when one or more events fail to process" do
           let(:sqs_processor) { build_sqs_processor }
 

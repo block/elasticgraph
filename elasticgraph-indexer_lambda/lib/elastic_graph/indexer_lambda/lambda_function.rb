@@ -24,10 +24,12 @@ module ElasticGraph
 
         indexer = ElasticGraph::IndexerLambda.indexer_from_env
         ignore_sqs_latency_timestamps_from_arns = ::JSON.parse(ENV.fetch("IGNORE_SQS_LATENCY_TIMESTAMPS_FROM_ARNS", "[]")).to_set
+        categorize_failures_only_from_arns = ::JSON.parse(ENV.fetch("CATEGORIZE_FAILURES_ONLY_FROM_ARNS", "[]")).to_set
 
         @sqs_processor = ElasticGraph::IndexerLambda::SqsProcessor.new(
           indexer.processor,
           ignore_sqs_latency_timestamps_from_arns: ignore_sqs_latency_timestamps_from_arns,
+          categorize_failures_only_from_arns: categorize_failures_only_from_arns,
           logger: indexer.logger
         )
       end

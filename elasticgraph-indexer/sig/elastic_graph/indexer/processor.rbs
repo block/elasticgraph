@@ -21,6 +21,7 @@ module ElasticGraph
       @clock: singleton(::Time)
 
       def categorize_failures: (::Array[FailedEventError], ::Array[event]) -> ::Array[FailedEventError]
+      def categorize_failures_via_datastore: (::Array[FailedEventError]) -> ::Array[FailedEventError]
       def calculate_latency_metrics: (::Array[_Operation], ::Array[Operation::Result]) -> void
     end
   end

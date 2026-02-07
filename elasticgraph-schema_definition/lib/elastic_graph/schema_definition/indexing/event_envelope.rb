@@ -65,6 +65,10 @@ module ElasticGraph
               "message_id" => {
                 "description" => "The optional ID of the message containing this event from whatever messaging system is being used between the publisher and the ElasticGraph indexer.",
                 "type" => "string"
+              },
+              "skip_failure_categorization" => {
+                "description" => "When true, ElasticGraph will skip checking if a failed event has been superseded by a newer version in the datastore. This is useful to avoid unnecessary datastore queries during normal indexing. When absent or false, the version check runs as usual.",
+                "type" => "boolean"
               }
             },
             "additionalProperties" => false,

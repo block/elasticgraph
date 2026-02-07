@@ -319,6 +319,67 @@ module ElasticGraph
           end
         end
 
+        context "when failing events have `skip_failure_categorization` set" do
+          let(:component1) { build_upsert_event(:component, id: "c123", __version: 1) }
+          let(:component2) { build_upsert_event(:component, id: "c234", __version: 1) }
+          let(:component3) { build_upsert_event(:component, id: "c345", __version: 1) }
+
+          before do
+            allow(datastore_router).to receive(:bulk) do |ops, **options|
+              DatastoreIndexingRouter::BulkResult.new({"main" => ops.map do |op|
+                [op, Operation::Result.failure_of(op, "overloaded!")]
+              end})
+            end
+          end
+
+          it "skips `source_event_versions_in_index` entirely when all failing events have the flag set" do
+            flagged_events = [component1, component2, component3].map do |e|
+              e.merge("skip_failure_categorization" => true)
+            end
+
+            failures = process_returning_failures(flagged_events)
+
+            expect(failures.size).to eq(3)
+            expect(datastore_router).not_to have_received(:source_event_versions_in_index)
+          end
+
+          it "only queries the datastore for failures without the flag when some events have it set" do
+            flagged_component1 = component1.merge("skip_failure_categorization" => true)
+
+            failures = process_returning_failures([flagged_component1, component2, component3])
+
+            expect(failures.size).to eq(3)
+            expect(datastore_router).to have_received(:source_event_versions_in_index) do |ops|
+              event_ids = ops.map { |op| op.event.fetch("id") }
+              expect(event_ids).not_to include("c123")
+              expect(event_ids).to include("c234", "c345")
+            end
+          end
+
+          it "only treats a literal boolean `true` as the skip flag" do
+            malformed_flag_component1 = component1.merge("skip_failure_categorization" => "true")
+
+            failures = process_returning_failures([malformed_flag_component1, component2, component3])
+
+            expect(failures.size).to eq(3)
+            expect(datastore_router).to have_received(:source_event_versions_in_index) do |ops|
+              event_ids = ops.map { |op| op.event.fetch("id") }
+              expect(event_ids).to include("c123", "c234", "c345")
+            end
+          end
+        end
+
+        context "when failures have no versioned operations" do
+          it "does not query source event versions from the datastore" do
+            malformed_event = build_upsert_event(:component, id: "123", __version: 1).merge("type" => "Color")
+
+            failures = process_returning_failures([malformed_event])
+
+            expect(failures.size).to eq(1)
+            expect(datastore_router).not_to have_received(:source_event_versions_in_index)
+          end
+        end
+
         context "when the list of events includes some invalid ones" do
           let(:good_component) { build_upsert_event(:component, id: "123", __version: 1) }
           let(:good_address) { build_upsert_event(:address, id: "456", __version: 1) }

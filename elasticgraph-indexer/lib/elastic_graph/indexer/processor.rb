@@ -63,8 +63,25 @@ module ElasticGraph
       private
 
       def categorize_failures(failures, events)
+        skip_categorization_failures, needs_categorization_failures = failures.partition do |failure|
+          failure.event["skip_failure_categorization"] == true
+        end
+
+        outstanding_from_categorized = if needs_categorization_failures.any?
+          categorize_failures_via_datastore(needs_categorization_failures)
+        else
+          [] # : ::Array[FailedEventError]
+        end
+
+        skip_categorization_failures + outstanding_from_categorized
+      end
+
+      def categorize_failures_via_datastore(failures)
+        versioned_operations = failures.flat_map { |f| f.versioned_operations.to_a }
+        return failures if versioned_operations.empty?
+
         source_event_versions_by_cluster_by_op = @datastore_router.source_event_versions_in_index(
-          failures.flat_map { |f| f.versioned_operations.to_a }
+          versioned_operations
         )
 
         superseded_failures, outstanding_failures = failures.partition do |failure|

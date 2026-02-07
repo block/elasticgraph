@@ -5,6 +5,7 @@ module ElasticGraph
         Indexer::Processor,
         logger: ::Logger,
         ignore_sqs_latency_timestamps_from_arns: ::Set[::String],
+        ?categorize_failures_only_from_arns: ::Set[::String],
         ?s3_client: Aws::S3::Client?,
       ) -> void
 
@@ -17,6 +18,7 @@ module ElasticGraph
       @s3_client: Aws::S3::Client?
 
       attr_reader ignore_sqs_latency_timestamps_from_arns: ::Set[::String]
+      attr_reader categorize_failures_only_from_arns: ::Set[::String]
 
       def events_from: (::Hash[::String, untyped]) -> ::Array[::Hash[::String, untyped]]
       S3_OFFLOADING_INDICATOR: String

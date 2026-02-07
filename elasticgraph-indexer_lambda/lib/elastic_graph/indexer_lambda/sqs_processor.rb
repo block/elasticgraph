@@ -16,14 +16,16 @@ module ElasticGraph
     #
     # @private
     class SqsProcessor
-      # @dynamic ignore_sqs_latency_timestamps_from_arns
+      # @dynamic ignore_sqs_latency_timestamps_from_arns, categorize_failures_only_from_arns
       attr_reader :ignore_sqs_latency_timestamps_from_arns
+      attr_reader :categorize_failures_only_from_arns
 
-      def initialize(indexer_processor, logger:, ignore_sqs_latency_timestamps_from_arns:, s3_client: nil)
+      def initialize(indexer_processor, logger:, ignore_sqs_latency_timestamps_from_arns:, categorize_failures_only_from_arns: Set.new, s3_client: nil)
         @indexer_processor = indexer_processor
         @logger = logger
         @s3_client = s3_client
         @ignore_sqs_latency_timestamps_from_arns = ignore_sqs_latency_timestamps_from_arns
+        @categorize_failures_only_from_arns = categorize_failures_only_from_arns
       end
 
       # Processes the ElasticGraph events in the given `lambda_event`, indexing the data in the datastore.
@@ -80,8 +82,12 @@ module ElasticGraph
             sqs_metadata = sqs_metadata.except("latency_timestamps")
           end
 
+          skip_failure_categorization = !@categorize_failures_only_from_arns.empty? &&
+            !@categorize_failures_only_from_arns.include?(record.fetch("eventSourceARN"))
+
           parse_jsonl(record.fetch("body")).map do |event|
-            ElasticGraph::Support::HashUtil.deep_merge(event, sqs_metadata)
+            merged = ElasticGraph::Support::HashUtil.deep_merge(event, sqs_metadata)
+            skip_failure_categorization ? merged.merge("skip_failure_categorization" => true) : merged
           end
         end.tap do
           @logger.info({
