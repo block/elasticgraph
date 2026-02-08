@@ -18,9 +18,25 @@ if (source.__versions[relationship] == null) {
 }
 
 Map relationshipVersionsMap = source.__versions.get(relationship);
-List previousSourceIdsForRelationship = relationshipVersionsMap.keySet().stream().filter(id -> id != sourceId).collect(Collectors.toList());
 
-if (previousSourceIdsForRelationship.size() > 0) {
+// Check if any other source IDs exist for this relationship (indicating a forbidden mutation).
+// Uses a simple loop instead of stream().filter().collect() to avoid lambda/stream allocation overhead on every update.
+String firstOtherSourceId = null;
+for (String id : relationshipVersionsMap.keySet()) {
+  if (id != sourceId) {
+    firstOtherSourceId = id;
+    break;
+  }
+}
+
+if (firstOtherSourceId != null) {
+  // Build the full previous IDs list only in the rare error case.
+  List previousSourceIdsForRelationship = new ArrayList();
+  for (String id : relationshipVersionsMap.keySet()) {
+    if (id != sourceId) {
+      previousSourceIdsForRelationship.add(id);
+    }
+  }
   String previousIdDescription = previousSourceIdsForRelationship.size() == 1 ? previousSourceIdsForRelationship.get(0) : previousSourceIdsForRelationship.toString();
   throw new IllegalArgumentException(
     "Cannot update document " + params.id + " " +
