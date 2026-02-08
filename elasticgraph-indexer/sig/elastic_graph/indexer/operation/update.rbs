@@ -39,6 +39,7 @@ module ElasticGraph
 
       class Update < UpdateSupertype
         include _Operation
+        include UpdateCategorization
 
         def self.operations_for: (
           event:  event,
@@ -48,15 +49,14 @@ module ElasticGraph
           destination_index_mapping: ::Hash[::String, untyped]
         ) -> ::Array[Update]
 
+        def metadata: () -> ::Hash[::Symbol, untyped]
+        def script_params: () -> ::Hash[::String, untyped]
+
         private
 
         CONFLICT_RETRIES: ::Integer
-        def metadata: () -> ::Hash[::Symbol, untyped]
 
         def update_request: () -> ::Hash[::Symbol, untyped]
-        def noop_result?: (::Hash[::String, untyped]) -> bool
-        def message_from_thrown_painless_exception: (::Hash[::String, untyped]) -> ::String?
-        def script_params: () -> ::Hash[::String, untyped]
 
         @to_datastore_bulk: datastoreBulkPayload?
       end

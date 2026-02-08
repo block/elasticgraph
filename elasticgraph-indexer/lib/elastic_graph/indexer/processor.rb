@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/errors"
+require "elastic_graph/indexer/derived_update_coalescer"
 require "elastic_graph/indexer/event_id"
 require "elastic_graph/indexer/indexing_failures_error"
 require "time"
@@ -45,14 +46,20 @@ module ElasticGraph
 
         factory_results = factory_results_by_event.values
 
-        bulk_result = @datastore_router.bulk(factory_results.flat_map(&:operations), refresh: refresh_indices)
-        successful_operations = bulk_result.successful_operations(check_failures: false)
+        all_operations = factory_results.flat_map(&:operations)
+        coalescer = DerivedUpdateCoalescer.new(@operation_factory.schema_artifacts.datastore_scripts)
+        coalesced_operations = coalescer.coalesce(all_operations)
 
-        calculate_latency_metrics(successful_operations, bulk_result.noop_results)
+        bulk_result = @datastore_router.bulk(coalesced_operations, refresh: refresh_indices)
+        expanded_bulk_result = coalescer.expand_results(bulk_result)
+
+        successful_operations = expanded_bulk_result.successful_operations(check_failures: false)
+
+        calculate_latency_metrics(successful_operations, expanded_bulk_result.noop_results)
 
         all_failures =
           factory_results.map(&:failed_event_error).compact +
-          bulk_result.failure_results.map do |result|
+          expanded_bulk_result.failure_results.map do |result|
             all_operations_for_event = factory_results_by_event.fetch(result.event).operations
             FailedEventError.from_failed_operation_result(result, all_operations_for_event.to_set)
           end

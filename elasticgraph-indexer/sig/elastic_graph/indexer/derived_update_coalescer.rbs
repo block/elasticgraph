@@ -1,0 +1,21 @@
+module ElasticGraph
+  class Indexer
+    class DerivedUpdateCoalescer
+      IMMUTABLE_VALUE_FUNCTION_NAME: ::String
+
+      def initialize: (::Hash[::String, untyped]) -> void
+
+      def coalesce: (::Array[_Operation]) -> ::Array[_Operation]
+      def expand_results: (DatastoreIndexingRouter::BulkResult) -> DatastoreIndexingRouter::BulkResult
+
+      private
+
+      def coalescable_derived_update?: (untyped) -> bool
+      def routing_and_index_key: (untyped) -> ::Array[untyped]
+      def build_coalescable_script_ids: (::Hash[::String, untyped]) -> ::Hash[::String, bool]
+
+      @coalescable_script_ids: ::Hash[::String, bool]
+      @coalesced_mapping: ::Hash[Operation::CoalescedUpdate, ::Array[Operation::Update]]
+    end
+  end
+end

@@ -1,0 +1,20 @@
+module ElasticGraph
+  class Indexer
+    module Operation
+      # Including classes must provide `update_target` and `doc_id`.
+      module UpdateCategorization : _CategorizableOperation
+        def categorize: (::Hash[::String, untyped]) -> Result
+
+        private
+
+        def noop_result?: (::Hash[::String, untyped]) -> bool
+        def message_from_thrown_painless_exception: (::Hash[::String, untyped]) -> ::String?
+      end
+
+      interface _CategorizableOperation
+        def update_target: () -> SchemaArtifacts::RuntimeMetadata::UpdateTarget
+        def doc_id: () -> ::String
+      end
+    end
+  end
+end

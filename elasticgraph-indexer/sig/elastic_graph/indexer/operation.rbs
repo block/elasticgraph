@@ -6,6 +6,7 @@ module ElasticGraph
     interface _Operation
       def to_datastore_bulk: () -> datastoreBulkPayload
       def event: () -> event
+      def all_events: () -> ::Array[event]
       def destination_index_def: () -> DatastoreCore::indexDefinition
       def categorize: (::Hash[::String, untyped]) -> Operation::Result
       def doc_id: () -> ::String

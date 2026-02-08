@@ -159,6 +159,22 @@ module ElasticGraph
         })
       end
 
+      it "does not hide immutable value conflicts when conflicting source events are processed in the same batch" do
+        expect {
+          index_records(
+            widget("LARGE", "RED", "USD", id: "batch_widget_1", workspace_id: "wid_1", cost_currency_symbol: "$"),
+            widget("LARGE", "RED", "USD", id: "batch_widget_2", workspace_id: "wid_2", cost_currency_symbol: "US$")
+          )
+        }.to raise_error(Indexer::IndexingFailuresError, a_string_including(
+          "Field `details.symbol` cannot be changed ($ => US$)."
+        ))
+
+        expect_payload_from_lookup_and_search({
+          "id" => "USD",
+          "details" => {"symbol" => "$", "unit" => "dollars"}
+        })
+      end
+
       it "ignores an event that tries to change the value if that event has already been superseded by a corrected event with a greater version" do
         # Original widget.
         widget_v1 = widget("LARGE", "RED", "USD", cost_currency_symbol: "$", id: "w1", workspace_id: "wid23")

@@ -11,6 +11,7 @@ require "elastic_graph/constants"
 require "elastic_graph/elasticsearch/client"
 require "elastic_graph/indexer/datastore_indexing_router"
 require "elastic_graph/indexer/operation/factory"
+require "elastic_graph/indexer/operation/coalesced_update"
 require "elastic_graph/spec_support/builds_indexer_operation"
 
 module ElasticGraph
@@ -531,6 +532,45 @@ module ElasticGraph
 
           it "fails with a clear error before any calls to the datastore are made, because we don't want to drop the event on the floor, and want to treat the batch consistently" do
             expect_inaccessible_error
+          end
+        end
+
+        context "when a derived indexing type is configured to index into no clusters" do
+          let(:indexer) do
+            build_indexer(index_to_clusters: {
+              "widget_currencies" => {"index_into_clusters" => []},
+              "widgets" => {"index_into_clusters" => ["main"]}
+            })
+          end
+
+          it "includes all source event ids when an inaccessible operation was coalesced" do
+            derived_update_target = indexer
+              .schema_artifacts
+              .runtime_metadata
+              .object_types_by_name
+              .fetch("Widget")
+              .update_targets
+              .reject(&:for_normal_indexing?)
+              .first
+
+            derived_index_def = indexer.datastore_core.index_definitions_by_name.fetch("widget_currencies")
+
+            event1 = {"type" => "Widget", "id" => "1", "version" => 1, "record" => {"id" => "1", "currency" => "USD", "name" => "a", "some_field" => "value"}}
+            event2 = {"type" => "Widget", "id" => "2", "version" => 1, "record" => {"id" => "2", "currency" => "USD", "name" => "b", "some_field" => "value"}}
+
+            op1 = new_operation(event1, update_target: derived_update_target, destination_index_def: derived_index_def, doc_id: "USD")
+            op2 = new_operation(event2, update_target: derived_update_target, destination_index_def: derived_index_def, doc_id: "USD")
+            coalesced = Operation::CoalescedUpdate.new([op1, op2])
+
+            expect {
+              router.bulk([coalesced], refresh: true)
+            }.to raise_error IndexingFailuresError, a_string_including(
+              "configured to be inaccessible",
+              "Widget:1@v1",
+              "Widget:2@v1"
+            )
+
+            expect(main_datastore_client).not_to have_received(:bulk)
           end
         end
 

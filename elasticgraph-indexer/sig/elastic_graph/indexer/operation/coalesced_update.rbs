@@ -1,0 +1,35 @@
+module ElasticGraph
+  class Indexer
+    module Operation
+      class CoalescedUpdate
+        include UpdateCategorization
+
+        attr_reader source_operations: ::Array[Update]
+        attr_reader doc_id: ::String
+        attr_reader destination_index_def: DatastoreCore::_IndexDefinition
+        attr_reader update_target: SchemaArtifacts::RuntimeMetadata::UpdateTarget
+
+        def initialize: (::Array[Update]) -> void
+
+        def event: () -> event
+        def all_events: () -> ::Array[event]
+        def type: () -> operationType
+        def versioned?: () -> bool
+        def description: () -> ::String
+        def to_datastore_bulk: () -> datastoreBulkPayload
+
+        private
+
+        def metadata: () -> ::Hash[::Symbol, untyped]
+        def update_request: () -> ::Hash[::Symbol, untyped]
+        def merged_script_params: () -> ::Hash[::String, untyped]
+
+        @source_operations: ::Array[Update]
+        @doc_id: ::String
+        @destination_index_def: DatastoreCore::_IndexDefinition
+        @update_target: SchemaArtifacts::RuntimeMetadata::UpdateTarget
+        @to_datastore_bulk: datastoreBulkPayload?
+      end
+    end
+  end
+end

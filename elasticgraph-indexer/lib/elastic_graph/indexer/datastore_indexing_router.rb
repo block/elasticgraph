@@ -65,9 +65,13 @@ module ElasticGraph
         end
 
         unless unsupported_ops.empty?
+          unsupported_event_ids = unsupported_ops.flat_map do |op|
+            op.all_events.map { |event| Indexer::EventID.from_event(event).to_s }
+          end.uniq
+
           raise IndexingFailuresError,
             "The index definitions for #{unsupported_ops.size} operations " \
-            "(#{unsupported_ops.map { |o| Indexer::EventID.from_event(o.event) }.join(", ")}) " \
+            "(#{unsupported_event_ids.join(", ")}) " \
             "were configured to be inaccessible. Check the configuration, or avoid sending " \
             "events of this type to this ElasticGraph indexer."
         end
