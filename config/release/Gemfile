@@ -9,7 +9,7 @@
 source "https://rubygems.org"
 
 gem "gem-release", "~> 2.2"
-gem "irb", "~> 1.16" # Needed for yard on Ruby 4.0
+gem "irb", "~> 1.17" # Needed for yard on Ruby 4.0
 gem "json_schemer", "~> 2.5"
 gem "nokogiri", "~> 1.19"
 gem "rake", "~> 13.3"
