@@ -17,8 +17,15 @@ module ElasticGraph
       # the GraphQL name pattern as the object is built.
       module VerifiesGraphQLName
         # @private
-        def initialize(...)
-          __skip__ = super(...) # __skip__ tells Steep to ignore this
+        def initialize(*args, **kwargs)
+          # Workaround for JRuby bug: https://github.com/jruby/jruby/issues/...
+          # When kwargs is empty, JRuby incorrectly passes it as an extra argument.
+          # __skip__ tells Steep to ignore this line.
+          __skip__ = if kwargs.empty?
+            super(*args)
+          else
+            super(*args, **kwargs)
+          end
 
           VerifiesGraphQLName.verify_name!(name)
         end
