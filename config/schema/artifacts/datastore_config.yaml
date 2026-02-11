@@ -1709,7 +1709,7 @@ indices:
       index.number_of_shards: 1
       index.max_result_window: 10000
 scripts:
-  update_WidgetCurrency_from_Widget_70a98186a925c781260b3d3532ce0208:
+  update_WidgetCurrency_from_Widget_a63538953d45f84cba67edd655d129a8:
     context: update
     script:
       lang: painless
@@ -1817,7 +1817,7 @@ scripts:
             coercedCurrentFieldValue = (currentFieldValue instanceof Number) ? ((Number)currentFieldValue).longValue() : currentFieldValue;
           }
 
-          if (coercedCurrentFieldValue == null || (maxNewValue != null && maxNewValue.compareTo(coercedCurrentFieldValue) > 0)) {
+          if (maxNewValue != null && (coercedCurrentFieldValue == null || maxNewValue.compareTo(coercedCurrentFieldValue) > 0)) {
             parentObject[fieldName] = maxNewValue;
             return true;
           }
@@ -1845,7 +1845,7 @@ scripts:
             coercedCurrentFieldValue = (currentFieldValue instanceof Number) ? ((Number)currentFieldValue).longValue() : currentFieldValue;
           }
 
-          if (coercedCurrentFieldValue == null || (minNewValue != null && minNewValue.compareTo(coercedCurrentFieldValue) < 0)) {
+          if (minNewValue != null && (coercedCurrentFieldValue == null || minNewValue.compareTo(coercedCurrentFieldValue) < 0)) {
             parentObject[fieldName] = minNewValue;
             return true;
           }

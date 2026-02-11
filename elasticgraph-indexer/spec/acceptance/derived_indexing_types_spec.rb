@@ -98,9 +98,7 @@ module ElasticGraph
           "colors" => [],
           "sizes" => []
         },
-        "nested_fields" => {
-          "max_widget_cost" => nil
-        },
+        "nested_fields" => {},
         "oldest_widget_created_at" => "2023-11-15T10:30:00.123Z"
       })
     end
@@ -128,6 +126,20 @@ module ElasticGraph
         },
         "oldest_widget_created_at" => "2023-11-20T10:30:00.456Z"
       })
+    end
+
+    it "treats re-indexing as a noop when min/max source fields are null" do
+      w1_created_at = "2023-11-22T10:30:00.789Z"
+      w1 = widget(nil, nil, "GBP", name: "widget1", tags: [], created_at: w1_created_at)
+      w1[:cost][:amount_cents] = nil
+
+      index_records(w1)
+
+      # Re-indexing the same widget should be detected as a noop. Previously, the min/max
+      # painless functions treated null-over-null writes as updates (returning true instead
+      # of false), which prevented the ctx.op='none' optimization and caused unnecessary
+      # document writes and version conflict errors under concurrent indexing.
+      expect { index_records(w1) }.to change { logged_output }.from(a_string_excluding("noop")).to(a_string_including("noop"))
     end
 
     describe "`immutable_value` fields" do

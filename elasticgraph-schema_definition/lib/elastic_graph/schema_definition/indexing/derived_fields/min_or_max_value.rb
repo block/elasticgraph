@@ -62,7 +62,7 @@ module ElasticGraph
                   coercedCurrentFieldValue = (currentFieldValue instanceof Number) ? ((Number)currentFieldValue).longValue() : currentFieldValue;
                 }
 
-                if (coercedCurrentFieldValue == null || (#{min_or_max}NewValue != null && #{min_or_max}NewValue.compareTo(coercedCurrentFieldValue) #{operator} 0)) {
+                if (#{min_or_max}NewValue != null && (coercedCurrentFieldValue == null || #{min_or_max}NewValue.compareTo(coercedCurrentFieldValue) #{operator} 0)) {
                   parentObject[fieldName] = #{min_or_max}NewValue;
                   return true;
                 }
