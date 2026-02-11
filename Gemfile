@@ -35,7 +35,7 @@ group :development do
   # https://github.com/standardrb/standard/issues/701
   gem "rubocop-rspec", "~> 3.9.0"
   gem "simplecov", "~> 0.22"
-  gem "simplecov-console", "~> 0.9", ">= 0.9.4"
+  gem "simplecov-console", "~> 0.9", ">= 0.9.5"
   gem "standard", "~> 1.53.0"
   gem "steep", "~> 1.10.0"
   gem "super_diff", "~> 0.18"
@@ -61,7 +61,7 @@ group :site do
   gem "yard", "~> 0.9", ">= 0.9.38"
   gem "yard-doctest", "~> 0.1", ">= 0.1.17"
   gem "yard-markdown", "~> 0.5"
-  gem "irb", "~> 1.16" # Needed for yard on Ruby 4.0
+  gem "irb", "~> 1.17" # Needed for yard on Ruby 4.0
 end
 
 # Since this file gets symlinked both at the repo root and into each Gem directory, we have
