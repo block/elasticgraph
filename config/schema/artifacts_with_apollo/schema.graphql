@@ -3828,6 +3828,12 @@ Will match all documents if passed as an empty object (or as `null`).
 """
 input InventorFilterInput {
   """
+  Used to filter `Inventor` documents by which concrete subtype they belong to.
+  Analogous to the `__typename` return field.
+  """
+  _typename: StringFilterInput
+
+  """
   Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
@@ -5980,6 +5986,12 @@ Will match all documents if passed as an empty object (or as `null`).
 """
 input NamedEntityFilterInput {
   """
+  Used to filter `NamedEntity` documents by which concrete subtype they belong to.
+  Analogous to the `__typename` return field.
+  """
+  _typename: StringFilterInput
+
+  """
   Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
@@ -7069,6 +7081,12 @@ Will match all documents if passed as an empty object (or as `null`).
 """
 input NamedInventorFilterInput {
   """
+  Used to filter `NamedInventor` documents by which concrete subtype they belong to.
+  Analogous to the `__typename` return field.
+  """
+  _typename: StringFilterInput
+
+  """
   Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
@@ -7362,6 +7380,12 @@ Input type used to specify filters on `Part` fields.
 Will match all documents if passed as an empty object (or as `null`).
 """
 input PartFilterInput {
+  """
+  Used to filter `Part` documents by which concrete subtype they belong to.
+  Analogous to the `__typename` return field.
+  """
+  _typename: StringFilterInput
+
   """
   Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
 
@@ -15060,6 +15084,12 @@ Input type used to specify filters on `WidgetOrAddress` fields.
 Will match all documents if passed as an empty object (or as `null`).
 """
 input WidgetOrAddressFilterInput {
+  """
+  Used to filter `WidgetOrAddress` documents by which concrete subtype they belong to.
+  Analogous to the `__typename` return field.
+  """
+  _typename: StringFilterInput
+
   """
   Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
 
