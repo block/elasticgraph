@@ -6403,7 +6403,7 @@ object_types_by_name:
       id_source: cost.currency
       rollover_timestamp_value_source: cost_currency_introduced_on
       routing_value_source: cost_currency_primary_continent
-      script_id: update_WidgetCurrency_from_Widget_70a98186a925c781260b3d3532ce0208
+      script_id: update_WidgetCurrency_from_Widget_a63538953d45f84cba67edd655d129a8
       type: WidgetCurrency
     - data_params:
         amount_cents:
