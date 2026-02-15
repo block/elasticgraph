@@ -31,7 +31,6 @@ module ElasticGraph
           fields = index.indexed_type
             .indexing_fields_by_name_in_index
             .values
-            .filter_map(&:to_indexing_field)
             .map { |field| table_field(field) }
             .join(",\n  ")
 
@@ -43,8 +42,8 @@ module ElasticGraph
         end
 
         def table_field(field)
-          field_name = field.name_in_index
-          warehouse_type = FieldTypeConverter.convert(field.type)
+          field_name = field.name_for_warehouse
+          warehouse_type = FieldTypeConverter.convert(field.to_indexing_field.type)
           "#{field_name} #{warehouse_type}"
         end
       end

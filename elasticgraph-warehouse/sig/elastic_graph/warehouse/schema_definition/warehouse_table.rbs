@@ -14,7 +14,7 @@ module ElasticGraph
 
         private
 
-        def table_field: (::ElasticGraph::SchemaDefinition::Indexing::Field) -> ::String
+        def table_field: (untyped) -> ::String
       end
     end
   end

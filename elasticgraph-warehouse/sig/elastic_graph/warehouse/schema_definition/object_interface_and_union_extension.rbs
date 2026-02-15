@@ -6,7 +6,7 @@ module ElasticGraph
       end
 
       interface _ObjectInterfaceAndUnionExtensionInterface
-        def indexing_fields_by_name_in_index: () -> ::Hash[::String, ::ElasticGraph::SchemaDefinition::SchemaElements::Field]
+        def indexing_fields_by_name_in_index: () -> ::Hash[::String, _WarehouseField]
       end
     end
   end

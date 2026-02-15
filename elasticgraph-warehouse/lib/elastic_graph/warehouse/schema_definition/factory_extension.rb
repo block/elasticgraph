@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/warehouse/schema_definition/enum_type_extension"
+require "elastic_graph/warehouse/schema_definition/field_extension"
 require "elastic_graph/warehouse/schema_definition/index_extension"
 require "elastic_graph/warehouse/schema_definition/object_interface_and_union_extension"
 require "elastic_graph/warehouse/schema_definition/results_extension"
@@ -31,6 +32,18 @@ module ElasticGraph
             # :nocov: -- currently all invocations have a block
             yield type if block_given?
             # :nocov:
+          end
+        end
+
+        # Creates a new field with warehouse extensions.
+        #
+        # @param kwargs [Hash] keyword arguments passed to the field constructor
+        # @yield [ElasticGraph::SchemaDefinition::SchemaElements::Field] the newly created field (optional)
+        # @return [ElasticGraph::SchemaDefinition::SchemaElements::Field] the created field
+        def new_field(**kwargs)
+          super(**kwargs) do |field|
+            field.extend FieldExtension
+            yield field if block_given?
           end
         end
 

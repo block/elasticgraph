@@ -61,6 +61,45 @@ module ElasticGraph
 
             expect(warehouse_column_def_from(results, "users", "address")).to eq "address STRUCT<street STRING, city STRING>"
           end
+
+          it "excludes graphql_only fields from nested STRUCT columns" do
+            results = define_warehouse_schema do |s|
+              s.object_type "Address" do |t|
+                t.field "street", "String"
+                t.field "city", "String"
+                t.field "display_label", "String", graphql_only: true
+              end
+
+              s.object_type "User" do |t|
+                t.field "id", "ID"
+                t.field "address", "Address"
+                t.index "users"
+              end
+            end
+
+            expect(warehouse_column_def_from(results, "users", "address")).to eq "address STRUCT<street STRING, city STRING>"
+          end
+
+          it "uses warehouse_column_name to override name_in_index for nested struct fields" do
+            results = define_warehouse_schema do |s|
+              s.object_type "Address" do |t|
+                t.field "streetName", "String", name_in_index: "street" do |f|
+                  f.warehouse_column_name name: "streetName"
+                end
+                t.field "cityName", "String", name_in_index: "city" do |f|
+                  f.warehouse_column_name name: "cityName"
+                end
+              end
+
+              s.object_type "User" do |t|
+                t.field "id", "ID"
+                t.field "address", "Address"
+                t.index "users"
+              end
+            end
+
+            expect(warehouse_column_def_from(results, "users", "address")).to eq "address STRUCT<streetName STRING, cityName STRING>"
+          end
         end
 
         describe "interface types" do

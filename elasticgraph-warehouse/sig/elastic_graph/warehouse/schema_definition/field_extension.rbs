@@ -1,0 +1,20 @@
+module ElasticGraph
+  module Warehouse
+    module SchemaDefinition
+      # Interface for fields accessed in warehouse context from indexing_fields_by_name_in_index.
+      # These fields are guaranteed to have a FieldExtension (providing name_for_warehouse)
+      # and a non-nil to_indexing_field (since they come from indexing_fields_by_name_in_index).
+      interface _WarehouseField
+        def name_for_warehouse: () -> ::String
+        def to_indexing_field: () -> ::ElasticGraph::SchemaDefinition::Indexing::Field
+      end
+
+      module FieldExtension : ::ElasticGraph::SchemaDefinition::SchemaElements::Field
+        def name_for_warehouse: () -> ::String
+        def warehouse_column_name: (name: ::String) -> void
+
+        @warehouse_column_name: ::String?
+      end
+    end
+  end
+end

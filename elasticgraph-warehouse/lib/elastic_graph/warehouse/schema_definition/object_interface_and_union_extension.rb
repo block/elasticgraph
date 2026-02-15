@@ -21,11 +21,10 @@ module ElasticGraph
         # @note For union types, the STRUCT includes all fields from all subtypes, following the same pattern used
         #   in the datastore mapping (see {ElasticGraph::SchemaDefinition::Indexing::FieldType::Union#to_mapping}).
         def to_warehouse_column_type
-          subfields = indexing_fields_by_name_in_index.values.filter_map(&:to_indexing_field)
-
-          struct_field_expressions = subfields.map do |subfield|
-            warehouse_type = FieldTypeConverter.convert(subfield.type)
-            "#{subfield.name_in_index} #{warehouse_type}"
+          struct_field_expressions = indexing_fields_by_name_in_index.values.map do |field|
+            field_name = field.name_for_warehouse
+            warehouse_type = FieldTypeConverter.convert(field.to_indexing_field.type)
+            "#{field_name} #{warehouse_type}"
           end.join(", ")
 
           "STRUCT<#{struct_field_expressions}>"

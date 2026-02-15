@@ -51,6 +51,45 @@ module ElasticGraph
             )
           SQL
         end
+
+        it "excludes graphql_only fields from the CREATE TABLE statement" do
+          results = define_warehouse_schema do |s|
+            s.object_type "Payment" do |t|
+              t.field "id", "ID"
+              t.field "amount", "Int"
+              t.field "display_label", "String", graphql_only: true
+              t.index "payments"
+            end
+          end
+
+          expect(table_schema_from(results, "payments")).to eq(<<~SQL.strip)
+            CREATE TABLE IF NOT EXISTS payments (
+              id STRING,
+              amount INT
+            )
+          SQL
+        end
+
+        it "uses warehouse_column_name to override name_in_index when configured" do
+          results = define_warehouse_schema do |s|
+            s.object_type "Payment" do |t|
+              t.field "id", "ID"
+              t.field "amount", "Int", name_in_index: "amount_cents" do |f|
+                f.warehouse_column_name name: "amount"
+              end
+              t.field "currencyCode", "String", name_in_index: "currency"
+              t.index "payments"
+            end
+          end
+
+          expect(table_schema_from(results, "payments")).to eq(<<~SQL.strip)
+            CREATE TABLE IF NOT EXISTS payments (
+              id STRING,
+              amount INT,
+              currency STRING
+            )
+          SQL
+        end
       end
     end
   end
