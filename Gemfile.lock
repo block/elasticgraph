@@ -106,7 +106,7 @@ PATH
   remote: elasticgraph-indexer_autoscaler_lambda
   specs:
     elasticgraph-indexer_autoscaler_lambda (1.1.1.pre)
-      aws-sdk-cloudwatch (~> 1.129.0)
+      aws-sdk-cloudwatch (>= 1.129, < 1.131)
       aws-sdk-lambda (~> 1.175)
       aws-sdk-sqs (~> 1.111)
       elasticgraph-datastore_core (= 1.1.1.pre)
@@ -264,8 +264,8 @@ GEM
       traces (~> 0.18)
     attr_extras (7.1.0)
     aws-eventstream (1.4.0)
-    aws-partitions (1.1213.0)
-    aws-sdk-cloudwatch (1.129.0)
+    aws-partitions (1.1214.0)
+    aws-sdk-cloudwatch (1.130.0)
       aws-sdk-core (~> 3, >= 3.241.4)
       aws-sigv4 (~> 1.5)
     aws-sdk-core (3.242.0)
@@ -276,7 +276,7 @@ GEM
       bigdecimal
       jmespath (~> 1, >= 1.6.1)
       logger
-    aws-sdk-kms (1.121.0)
+    aws-sdk-kms (1.122.0)
       aws-sdk-core (~> 3, >= 3.241.4)
       aws-sigv4 (~> 1.5)
     aws-sdk-lambda (1.175.0)
@@ -300,7 +300,7 @@ GEM
     colorator (1.1.0)
     concurrent-ruby (1.3.6)
     connection_pool (3.0.2)
-    console (1.34.2)
+    console (1.34.3)
       fiber-annotation
       fiber-local (~> 1.1)
       json
@@ -635,8 +635,9 @@ GEM
     yard-doctest (0.1.17)
       minitest
       yard
-    yard-markdown (0.5.0)
+    yard-markdown (0.6.0)
       csv
+      rdoc
       yard
     yell (2.2.2)
     zeitwerk (2.7.4)
@@ -715,7 +716,7 @@ DEPENDENCIES
   vcr (~> 6.4)
   yard (~> 0.9, >= 0.9.38)
   yard-doctest (~> 0.1, >= 0.1.17)
-  yard-markdown (~> 0.5)
+  yard-markdown (~> 0.6)
 
 CHECKSUMS
   Ascii85 (2.0.1) sha256=15cb5d941808543cbb9e7e6aea3c8ec3877f154c3461e8b3673e97f7ecedbe5a
@@ -728,10 +729,10 @@ CHECKSUMS
   async (2.36.0) sha256=090623f4c65706664355c9efa6c7bfb86771a513e65cd681c51cb27747530550
   attr_extras (7.1.0) sha256=d96fc9a9dd5d85ba2d37762440a816f840093959ae26bb90da994c2d9f1fc827
   aws-eventstream (1.4.0) sha256=116bf85c436200d1060811e6f5d2d40c88f65448f2125bc77ffce5121e6e183b
-  aws-partitions (1.1213.0) sha256=5ec132d91d44ef2702125b8f71f0e4fc2cd7de040e02c5d0aefb87219fd2e05e
-  aws-sdk-cloudwatch (1.129.0) sha256=3fa45aaf60f92908b28e855db4ef466b93d907a451e8c1a98edacc2247a170ee
+  aws-partitions (1.1214.0) sha256=347f2bc1e8e778db219072892450b8c63d0ffcf411be64bbc1831f9bcd694b1f
+  aws-sdk-cloudwatch (1.130.0) sha256=6dc17db4636ed8cbeeccf929d4fe21a894e8e11ed8384f6879bee454ca3feac8
   aws-sdk-core (3.242.0) sha256=c17b3003acc78d80c1a8437b285a1cfc5e4d7749ce7821cf3071e847535a29a0
-  aws-sdk-kms (1.121.0) sha256=d563c1cfb4b5754efbc671216c8eca875338748adad0f42518c28dfa0a2d01e0
+  aws-sdk-kms (1.122.0) sha256=47ce3f51b26bd7d76f1270cfdfca17b40073ecd3219c8c9400788712abfb4eb8
   aws-sdk-lambda (1.175.0) sha256=74b9c26a42d2332d225a92f1aef183a5bfc37081a728a1bc0930c5fa3b59eac0
   aws-sdk-s3 (1.213.0) sha256=af596ccf544582406db610e95cc9099276eaf03142f57a2f30f76940e598e50d
   aws-sdk-sqs (1.111.0) sha256=b5bf7986ba3002c6f48472454fa009b4e68fe1023b38124aa7594c00a7d8df99
@@ -745,7 +746,7 @@ CHECKSUMS
   colorator (1.1.0) sha256=e2f85daf57af47d740db2a32191d1bdfb0f6503a0dfbc8327d0c9154d5ddfc38
   concurrent-ruby (1.3.6) sha256=6b56837e1e7e5292f9864f34b69c5a2cbc75c0cf5338f1ce9903d10fa762d5ab
   connection_pool (3.0.2) sha256=33fff5ba71a12d2aa26cb72b1db8bba2a1a01823559fb01d29eb74c286e62e0a
-  console (1.34.2) sha256=1c036abf606ccec83f9dc28f0c31710fe5936ffe7ba5d235ae2865590a482d58
+  console (1.34.3) sha256=869fbd74697efc4c606f102d2812b0b008e4e7fd738a91c591e8577140ec0dcc
   csv (3.3.5) sha256=6e5134ac3383ef728b7f02725d9872934f523cb40b961479f69cf3afa6c8e73f
   date (3.5.1) sha256=750d06384d7b9c15d562c76291407d89e368dda4d4fff957eb94962d325a0dc0
   diff-lcs (1.6.2) sha256=9ae0d2cba7d4df3075fe8cd8602a8604993efc0dfa934cff568969efb1909962
@@ -923,7 +924,7 @@ CHECKSUMS
   webrick (1.9.2) sha256=beb4a15fc474defed24a3bda4ffd88a490d517c9e4e6118c3edce59e45864131
   yard (0.9.38) sha256=721fb82afb10532aa49860655f6cc2eaa7130889df291b052e1e6b268283010f
   yard-doctest (0.1.17) sha256=7cb35a75d99f58fc42ee72d3542a36e227237b621a40aebc391c95988b72847f
-  yard-markdown (0.5.0) sha256=83dd53982ac3cca1e2dc1eaf0b8b71a3af36542ea1703ba76e0ca5c29f6c0d53
+  yard-markdown (0.6.0) sha256=d01ebb21929f43b4f69e6577dda04b488cd629d623b8367a2835c53cc8b64de3
   yell (2.2.2) sha256=1d166f3cc3b6dc49a59778ea7156ed6d8de794c15106d48ffd6cbb061b9b26bc
   zeitwerk (2.7.4) sha256=2bef90f356bdafe9a6c2bd32bcd804f83a4f9b8bc27f3600fff051eb3edcec8b
 
