@@ -483,7 +483,26 @@ module ElasticGraph
           end
           # :nocov:
 
-          sh "ELASTICGRAPH_YAML_FILE=#{@local_config_yaml.shellescape} bundle exec rackup #{::File.join(__dir__.to_s, "config.ru").shellescape} --port #{port} #{args.fetch(:rackup_args)}"
+          rackup_args = args.fetch(:rackup_args)
+          config_ru = ::File.join(__dir__.to_s, "config.ru").shellescape
+          base_command = "ELASTICGRAPH_YAML_FILE=#{@local_config_yaml.shellescape} bundle exec rackup #{config_ru} --port #{port}"
+
+          if rackup_args.include?("--daemonize")
+            # rackup --daemonize uses fork(), which is unavailable on JRuby.
+            # Handle daemonization manually with Process.spawn for cross-platform compatibility.
+            pid_file = rackup_args[/--pid\s+(\S+)/, 1]
+            remaining_args = rackup_args.gsub("--daemonize", "").gsub(/--pid\s+\S+/, "").strip
+            full_command = remaining_args.empty? ? base_command : "#{base_command} #{remaining_args}"
+
+            log_file = pid_file ? "#{pid_file}.log" : ::File::NULL
+            pid = ::Process.spawn(full_command, [:out, :err] => [log_file, "w"])
+            ::Process.detach(pid)
+            ::File.write(pid_file, pid.to_s) if pid_file
+          else
+            # :nocov: -- tests only cover daemonized version (above)
+            sh "#{base_command} #{rackup_args}"
+            # :nocov:
+          end
         end
 
         namespace :index_fake_data do
