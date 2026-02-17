@@ -21,11 +21,11 @@ module ElasticGraph
             const_set(:ELEMENT_NAMES, element_names)
 
             define_method :initialize do |form:, overrides: {}|
-              extend(CONVERTERS.fetch(form.to_s) do
+              converter = CONVERTERS.fetch(form.to_s) do
                 raise Errors::SchemaError,
                   "Invalid schema element name form: #{form.inspect}. " \
                   "Only valid values are: #{CONVERTERS.keys.inspect}."
-              end)
+              end
 
               unused_keys = overrides.keys.map(&:to_s) - element_names.map(&:to_s)
               if unused_keys.any?
@@ -37,7 +37,7 @@ module ElasticGraph
               exposed_name_by_canonical_name = element_names.each_with_object({}) do |element, names|
                 names[element] = overrides.fetch(element) do
                   overrides.fetch(element.to_s) do
-                    normalize_case(element.to_s)
+                    converter.normalize_case(element.to_s)
                   end
                 end.to_s
               end.freeze
@@ -57,6 +57,11 @@ module ElasticGraph
             element_names.each do |element|
               method_name = SnakeCaseConverter.normalize_case(element.to_s)
               define_method(method_name) { exposed_name_by_canonical_name.fetch(element) }
+            end
+
+            # Converts a name to the configured case form (snake_case or camelCase).
+            def normalize_case(name)
+              CONVERTERS.fetch(form.to_s).normalize_case(name)
             end
 
             # Returns the _canonical_ name for the given _exposed name_. The canonical name
