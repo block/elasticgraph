@@ -23,9 +23,6 @@ graph LR;
     graphql["graphql"];
     elasticgraph-graphql --> graphql;
     class graphql externalGemStyle;
-    graphql-c_parser["graphql-c_parser"];
-    elasticgraph-graphql --> graphql-c_parser;
-    class graphql-c_parser externalGemStyle;
     elasticgraph-apollo["elasticgraph-apollo"];
     elasticgraph-apollo --> elasticgraph-graphql;
     class elasticgraph-apollo otherEgGemStyle;
@@ -52,7 +49,6 @@ graph LR;
     class elasticgraph-schema_definition otherEgGemStyle;
     click base64 href "https://rubygems.org/gems/base64" "Open on RubyGems.org" _blank;
     click graphql href "https://rubygems.org/gems/graphql" "Open on RubyGems.org" _blank;
-    click graphql-c_parser href "https://rubygems.org/gems/graphql-c_parser" "Open on RubyGems.org" _blank;
 ```
 
 ## Usage
