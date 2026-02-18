@@ -64,7 +64,7 @@ group :site do
 
   gem "yard", "~> 0.9", ">= 0.9.38"
   gem "yard-doctest", "~> 0.1", ">= 0.1.17"
-  gem "yard-markdown", "~> 0.5"
+  gem "yard-markdown", "~> 0.6"
   gem "irb", "~> 1.17" # Needed for yard on Ruby 4.0
 end
 
