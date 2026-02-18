@@ -112,6 +112,16 @@ module ElasticGraph
             run_validate_task(after_dumping_variables: true)
           }.to raise_error(a_string_including("Found 4 validation errors total across all queries."))
 
+          # :nocov: -- only one side of this conditional is covered on a given test run
+          # The exact error provided by the GraphQL gem varies based on if the C parser has been loaded or not.
+          syntax_error =
+            if defined?(::GraphQL::CParser)
+              'syntax error, unexpected IDENTIFIER ("parts"), expecting LCURLY at [2, 3]'
+            else
+              'Expected LCURLY, actual: IDENTIFIER ("parts") at [2, 3]'
+            end
+          # :nocov:
+
           expect(last_task_output.string.strip).to eq(<<~EOS.strip)
             For client `client_bob`:
               - CountComponents.graphql (2 operations):
@@ -145,7 +155,7 @@ module ElasticGraph
             For client `client_jane`:
               - CountParts.graphql (1 operation):
                 - (no operation name): 🛑. Got 1 validation error:
-                  1) syntax error, unexpected IDENTIFIER ("parts"), expecting LCURLY at [2, 3]
+                  1) #{syntax_error}
                      source: query_registry/client_jane/CountParts.graphql:2:3
           EOS
         end

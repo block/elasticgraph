@@ -201,6 +201,12 @@ RSpec.configure do |config|
   # as the one that triggered the failure.
   Kernel.srand config.seed
 
+  # :nocov: -- only one side of this conditional is covered on any given Ruby engine.
+  if RUBY_ENGINE == "jruby"
+    config.before(:example, :except_jruby) { pending "Expected to fail on JRuby" }
+  end
+  # :nocov:
+
   config.raise_on_warning = true
   config.raise_errors_for_deprecations!
 

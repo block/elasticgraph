@@ -1,5 +1,8 @@
 source "https://rubygems.org"
 
+# Recommended for better GraphQL parsing performance.
+gem "graphql-c_parser", "~> 1.1", platforms: :ruby
+
 # Gem details for the elasticgraph gems.
 elasticgraph_details = <%= ElasticGraph.setup_env.gemfile_elasticgraph_details_code_snippet %>
 

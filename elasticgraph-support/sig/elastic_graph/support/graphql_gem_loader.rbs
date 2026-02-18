@@ -1,0 +1,14 @@
+module ElasticGraph
+  module Support
+    module GraphQLGemLoader
+      YELLOW: ::String
+      RESET: ::String
+
+      self.@warning_printed: bool
+
+      def self.load: () -> void
+      def self.print_warning_once: () -> void
+      def self.reset_warning_state!: () -> void
+    end
+  end
+end
