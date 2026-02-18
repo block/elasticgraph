@@ -8,6 +8,10 @@
 
 require "elastic_graph/graphql/resolvers/query_source"
 
+# :nocov:
+require "elastic_graph/graphql/jruby_patches" if RUBY_ENGINE == "jruby"
+# :nocov:
+
 module ElasticGraph
   class GraphQL
     module Resolvers

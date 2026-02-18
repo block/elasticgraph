@@ -13,6 +13,10 @@ require "elastic_graph/schema_definition/mixins/has_readable_to_s_and_inspect"
 require "elastic_graph/schema_definition/results"
 require "elastic_graph/schema_definition/state"
 
+# :nocov: -- only loaded on JRuby
+require "elastic_graph/schema_definition/jruby_patches" if RUBY_ENGINE == "jruby"
+# :nocov:
+
 module ElasticGraph
   # The main entry point for schema definition from ElasticGraph applications.
   #

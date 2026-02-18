@@ -109,6 +109,9 @@ SimpleCov.start do
   # ignore them here.
   add_filter "lib/elastic_graph/version.rb" if defined?(::ElasticGraph::VERSION)
 
+  # Don't track coverage of JRuby patch files as we only enforce coverage on MRI..
+  add_filter "jruby_patches"
+
   formatter SimpleCov::Formatter::MultiFormatter.new([
     SimpleCov::Formatter::HTMLFormatter,
     SimpleCov::Formatter::Console,

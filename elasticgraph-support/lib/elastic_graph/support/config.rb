@@ -12,6 +12,10 @@ require "elastic_graph/support/from_yaml_file"
 require "elastic_graph/support/hash_util"
 require "json_schemer"
 
+# :nocov: -- only loaded on JRuby
+require "elastic_graph/support/jruby_patches" if RUBY_ENGINE == "jruby"
+# :nocov:
+
 module ElasticGraph
   module Support
     # Provides a standard way to define an ElasticGraph configuration class.

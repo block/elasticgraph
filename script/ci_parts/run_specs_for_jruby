@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+source "script/ci_parts/setup_env" "test" $1 $2
+
+# We don't want to bother checking coverage on JRuby, for a few reasons:
+# - The Ruby coverage APIs don't fully work on JRuby.
+# - It slows things down.
+# - We've chosen to annotate files with `# :nocov:` from an MRI perspective. Lines of code which are run on MRI but not JRuby don't have `# :nocov:
+unset COVERAGE
+
+# On CI, this is quite slow, and when we use the progress formatter the CI build can appear to get stuck
+# because 20+ minutes may pass before the line of progress dots completes, and GitHub actions streams build
+# output line-by-line. We use the documentation formatter here so that the output has many lines and there's
+# more obviously ongoing progress on CI.
+script/run_specs --format documentation
+
+halt_datastore_daemon
+
+for gem in $gems_to_build_with_datastore_halted; do
+  bundle exec rspec $gem/spec --backtrace --format progress
+done

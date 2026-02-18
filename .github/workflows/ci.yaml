@@ -46,6 +46,10 @@ jobs:
           - build_part: "run_datastore_specs"
             ruby: "4.0"
             datastore: "opensearch:2.19.0"
+          # We have a special build part for JRuby.
+          - build_part: "run_specs_for_jruby"
+            ruby: "jruby-10.0"
+            datastore: "elasticsearch:9.2.4"
           # Other build parts run on max Ruby and primary datastore only.
           - build_part: "run_misc_checks"
             ruby: "4.0"

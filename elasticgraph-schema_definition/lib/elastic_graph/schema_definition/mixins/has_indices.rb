@@ -26,11 +26,7 @@ module ElasticGraph
         # @private
         def initialize(*args, **options)
           super(*args, **options)
-          @runtime_metadata_overrides = {}
-          @can_configure_index = true
-          resolve_fields_with :get_record_field_value
-          yield self
-          @can_configure_index = false
+          initialize_has_indices { yield self }
         end
 
         # Converts the current type from being an _embedded_ type (that is, a type that is embedded within another indexed type) to an
@@ -260,6 +256,14 @@ module ElasticGraph
         end
 
         private
+
+        def initialize_has_indices
+          @runtime_metadata_overrides = {}
+          @can_configure_index = true
+          resolve_fields_with :get_record_field_value
+          yield
+          @can_configure_index = false
+        end
 
         def self_update_target
           return nil if abstract? || !indexed?
