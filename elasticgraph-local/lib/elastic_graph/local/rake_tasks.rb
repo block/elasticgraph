@@ -475,9 +475,10 @@ module ElasticGraph
 
           # :nocov: -- we can't test `open` behavior through a test
           unless args.fetch(:no_open)
-            fork do
+            Thread.new do
               sleep 3 # give the app a bit of time to boot before we try to open it.
-              sh "open http://localhost:#{port}/"
+              url = "http://localhost:#{port}/"
+              system("open", url) || system("xdg-open", url)
             end
           end
           # :nocov:
