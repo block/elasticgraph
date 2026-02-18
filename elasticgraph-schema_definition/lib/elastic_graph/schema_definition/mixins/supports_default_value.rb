@@ -12,14 +12,7 @@ module ElasticGraph
   module SchemaDefinition
     module Mixins
       # A mixin designed to be included in a schema element class that supports default values.
-      # Designed to be `prepended` so that it can hook into `initialize`.
       module SupportsDefaultValue
-        # @private
-        def initialize(...)
-          __skip__ = super # steep can't type this.
-          @default_value = NO_DEFAULT_PROVIDED
-        end
-
         # Used to specify the default value for this field or argument.
         #
         # @param default_value [Object] default value for this field or argument
@@ -32,15 +25,9 @@ module ElasticGraph
         #
         # @return [String]
         def default_value_sdl
-          return nil if @default_value == NO_DEFAULT_PROVIDED
+          return nil unless instance_variable_defined?(:@default_value)
           " = #{Support::GraphQLFormatter.serialize(@default_value)}"
         end
-
-        private
-
-        # A sentinel value that we can use to detect when a default has been provided.
-        # We can't use `nil` to detect if a default has been provided because `nil` is a valid default value!
-        NO_DEFAULT_PROVIDED = Module.new
       end
     end
   end
