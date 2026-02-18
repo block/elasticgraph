@@ -34,7 +34,7 @@ gems:
     remote: https://github.com/ruby/gem_rbs_collection.git
     repo_dir: gems
 - name: aws-sdk-cloudwatch
-  version: 1.129.0
+  version: 1.130.0
   source:
     type: rubygems
 - name: aws-sdk-core
@@ -42,7 +42,7 @@ gems:
   source:
     type: rubygems
 - name: aws-sdk-kms
-  version: 1.121.0
+  version: 1.122.0
   source:
     type: rubygems
 - name: aws-sdk-lambda
@@ -390,7 +390,7 @@ gems:
     remote: https://github.com/ruby/gem_rbs_collection.git
     repo_dir: gems
 - name: yard-markdown
-  version: 0.5.0
+  version: 0.6.0
   source:
     type: rubygems
 gemfile_lock_path: Gemfile.lock
