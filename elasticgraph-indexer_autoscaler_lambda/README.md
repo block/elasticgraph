@@ -26,11 +26,7 @@ graph LR;
     aws-sdk-cloudwatch["aws-sdk-cloudwatch"];
     elasticgraph-indexer_autoscaler_lambda --> aws-sdk-cloudwatch;
     class aws-sdk-cloudwatch externalGemStyle;
-    ox["ox"];
-    elasticgraph-indexer_autoscaler_lambda --> ox;
-    class ox externalGemStyle;
     click aws-sdk-lambda href "https://rubygems.org/gems/aws-sdk-lambda" "Open on RubyGems.org" _blank;
     click aws-sdk-sqs href "https://rubygems.org/gems/aws-sdk-sqs" "Open on RubyGems.org" _blank;
     click aws-sdk-cloudwatch href "https://rubygems.org/gems/aws-sdk-cloudwatch" "Open on RubyGems.org" _blank;
-    click ox href "https://rubygems.org/gems/ox" "Open on RubyGems.org" _blank;
 ```
