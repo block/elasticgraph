@@ -23,7 +23,7 @@ group :development do
 
   gem "httpx", "~> 1.7", ">= 1.7.2"
   gem "memory_profiler", "~> 1.1"
-  gem "nokogiri", "~> 1.19"
+  gem "nokogiri", "~> 1.19", ">= 1.19.1"
   gem "method_source", "~> 1.1"
   gem "rack-test", "~> 2.2"
   gem "rspec", "~> 3.13", ">= 3.13.2"

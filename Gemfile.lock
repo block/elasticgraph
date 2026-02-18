@@ -105,7 +105,7 @@ PATH
   remote: elasticgraph-indexer_autoscaler_lambda
   specs:
     elasticgraph-indexer_autoscaler_lambda (1.1.1.pre)
-      aws-sdk-cloudwatch (>= 1.129, < 1.131)
+      aws-sdk-cloudwatch (~> 1.130.0)
       aws-sdk-lambda (~> 1.175)
       aws-sdk-sqs (~> 1.111)
       elasticgraph-datastore_core (= 1.1.1.pre)
@@ -716,7 +716,7 @@ DEPENDENCIES
   jekyll (~> 4.4, >= 4.4.1)
   memory_profiler (~> 1.1)
   method_source (~> 1.1)
-  nokogiri (~> 1.19)
+  nokogiri (~> 1.19, >= 1.19.1)
   rack-test (~> 2.2)
   redcarpet (~> 3.6, >= 3.6.1)
   rouge!
