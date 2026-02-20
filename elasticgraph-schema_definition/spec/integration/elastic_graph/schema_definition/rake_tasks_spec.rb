@@ -768,7 +768,7 @@ module ElasticGraph
           # which isn't loaded in this test suite. We filter the diff output since `git diff --no-index`
           # doesn't support pathspec exclusions.
           diff = `git diff --no-index #{File.join(config_dir, "schema", "artifacts")} config/schema/artifacts #{"--color" if $stdout.tty?}`
-          filtered_diff = diff.gsub(/^diff --git.*?data_warehouse\.yaml.*?(?=^diff --git|\z)/m, '')
+          filtered_diff = diff.gsub(/^diff --git.*?data_warehouse\.yaml.*?(?=^diff --git|\z)/m, "")
 
           unless filtered_diff == ""
             RSpec.world.reporter.message("\n\nThe schema artifact diff:\n\n#{filtered_diff}")
