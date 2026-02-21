@@ -20,7 +20,7 @@ module ElasticGraph
       # config files being relative to the root.
       around { |ex| Dir.chdir(CommonSpecHelpers::REPO_ROOT, &ex) }
 
-      it "supports fully booting from scratch via a single `boot_locally` rake task", :except_jruby do
+      it "supports fully booting from scratch via a single `boot_locally` rake task" do
         rack_port = 9620
         kill_daemon_after "rackup.pid" do |pid_file|
           halt_datastore_daemon_after :elasticsearch do
@@ -39,7 +39,7 @@ module ElasticGraph
 
             # ...and then boots GraphiQL, but given how it boots with Rake's `sh`, it's not captured in `output`.
 
-            wait_for_server_readiness(rack_port, path: "/graphql")
+            wait_for_server_readiness(rack_port, path: "/graphql", log_file: "#{pid_file}.log")
 
             # Validate that we can query the booted server!
             response = query_server_on(rack_port, path: "/graphql?query=#{::CGI.escape(<<~EOS)}")
@@ -56,7 +56,7 @@ module ElasticGraph
       end
 
       context "when the datastore is not running" do
-        it "boots the datastore as a daemon to support booting GraphiQL", :except_jruby do
+        it "boots the datastore as a daemon to support booting GraphiQL" do
           halt_datastore_daemon_after :elasticsearch do |datastore_port|
             expect {
               kill_daemon_after("rackup.pid") do |pid_file|
@@ -195,15 +195,15 @@ module ElasticGraph
         run_rake "#{datastore}:local:halt"
       end
 
-      def wait_for_server_readiness(port, path:)
+      def wait_for_server_readiness(port, path:, log_file: nil)
         started_waiting_at = ::Time.now
         last_error = nil
 
-        # Wait up to 30 seconds on CI or 5 seconds locally. (We give CI more time because we have occasionally seen it
-        # fail at 10 seconds there, and can tolerate it taking longer. Locally you want quick feedback when you run these
-        # tests, you want to know if a server didn't boot right away, and it doesn't need to need more than 5 seconds).
+        # Wait up to 30 seconds on CI or 15 seconds locally. JRuby's JVM startup adds ~7 seconds
+        # of overhead, so 5 seconds was insufficient. The loop returns as soon as the server responds,
+        # so the extra headroom doesn't slow CRuby tests.
         # :nocov: -- we give CI more time than we do locally, so only one branch will be covered.
-        iterations = ENV["CI"] ? 300 : 50
+        iterations = ENV["CI"] ? 300 : 150
         # :nocov:
 
         iterations.times do
@@ -218,7 +218,10 @@ module ElasticGraph
         end
 
         # :nocov: -- only hit when the server fails to boot (which doesn't happen on a successful test run)
-        raise "Server on port #{port} failed to boot in #{::Time.now - started_waiting_at} seconds; Last error from #{path} was: #{last_error.class}: #{last_error.message}"
+        log_output = log_file && ::File.exist?(log_file) ? ::File.read(log_file) : "(no log file)"
+        raise "Server on port #{port} failed to boot in #{::Time.now - started_waiting_at} seconds; " \
+          "Last error from #{path} was: #{last_error.class}: #{last_error.message}\n" \
+          "Server log output:\n#{log_output}"
         # :nocov:
       end
     end
