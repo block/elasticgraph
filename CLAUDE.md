@@ -116,6 +116,10 @@ When adding filtering predicates or aggregation functions:
 3. **Query Translation**: Implement GraphQL → datastore query translation with unit, integration, and acceptance tests
 4. **Documentation**: Add user-facing docs with working examples to `config/site/`
 
+### Verification
+
+After completing a chunk of work, run `script/run_specs` and `script/type_check` to verify correctness across all gems and type signatures.
+
 ### Test Strategy
 
 Three layers of testing:
@@ -170,6 +174,10 @@ Custom gems can be added via `Gemfile-custom` (see `Gemfile-custom.example`), th
 - Use `build_*` helper methods from `spec/support/builds_*.rb` to construct test objects. These helpers provide sensible defaults while allowing selective overrides for testing specific scenarios.
 
 ## Important Patterns
+
+### Schema Definition
+
+- When referencing derived type names (e.g. filter input types), never hardcode names like `"StringFilterInput"`. Always use `schema_def_state.type_ref("String").as_filter_input.name` (or similar `as_*` methods on type references). Hardcoded names break when schema element names are customized (e.g. camelCase schemas).
 
 ### Schema Artifacts
 After schema definition changes, always run:
