@@ -258,7 +258,7 @@ GEM
       traces (~> 0.18)
     attr_extras (7.1.0)
     aws-eventstream (1.4.0)
-    aws-partitions (1.1215.0)
+    aws-partitions (1.1218.0)
     aws-sdk-cloudwatch (1.130.0)
       aws-sdk-core (~> 3, >= 3.241.4)
       aws-sigv4 (~> 1.5)
@@ -317,8 +317,8 @@ GEM
     em-websocket (0.5.3)
       eventmachine (>= 0.12.9)
       http_parser.rb (~> 0)
-    erb (6.0.1)
-    erb (6.0.1-java)
+    erb (6.0.2)
+    erb (6.0.2-java)
     ethon (0.15.0)
       ffi (>= 1.15.0)
     eventmachine (1.2.7)
@@ -446,7 +446,8 @@ GEM
     method_source (1.1.0)
     metrics (0.15.0)
     mini_portile2 (2.8.9)
-    minitest (6.0.1)
+    minitest (6.0.2)
+      drb (~> 2.0)
       prism (~> 1.5)
     module_methods (0.1.0)
     multi_json (1.19.1)
@@ -655,7 +656,7 @@ GEM
       rdoc
       yard
     yell (2.2.2)
-    zeitwerk (2.7.4)
+    zeitwerk (2.7.5)
 
 PLATFORMS
   aarch64-linux-android
@@ -746,7 +747,7 @@ CHECKSUMS
   async (2.36.0) sha256=090623f4c65706664355c9efa6c7bfb86771a513e65cd681c51cb27747530550
   attr_extras (7.1.0) sha256=d96fc9a9dd5d85ba2d37762440a816f840093959ae26bb90da994c2d9f1fc827
   aws-eventstream (1.4.0) sha256=116bf85c436200d1060811e6f5d2d40c88f65448f2125bc77ffce5121e6e183b
-  aws-partitions (1.1215.0) sha256=462be54e811a42a5d6b9cf0403e9a79dd46fac2031a9e98019328c49ad584b87
+  aws-partitions (1.1218.0) sha256=d7f06aea9cb119d5bc9fe7c42914428e568d536711de68fcff45cc944274126e
   aws-sdk-cloudwatch (1.130.0) sha256=6dc17db4636ed8cbeeccf929d4fe21a894e8e11ed8384f6879bee454ca3feac8
   aws-sdk-core (3.242.0) sha256=c17b3003acc78d80c1a8437b285a1cfc5e4d7749ce7821cf3071e847535a29a0
   aws-sdk-kms (1.122.0) sha256=47ce3f51b26bd7d76f1270cfdfca17b40073ecd3219c8c9400788712abfb4eb8
@@ -799,8 +800,8 @@ CHECKSUMS
   elasticsearch (9.3.0) sha256=f64d6c379c1fdf7afbeb94b4ed3f435b917e0911f8fa5bcbe65f0e696b0d0cfd
   elasticsearch-api (9.3.0) sha256=f18d7a236adf3d495d7e057408e2fb8c8eff5d3c6a05863dca9b3b02decf2b80
   em-websocket (0.5.3) sha256=f56a92bde4e6cb879256d58ee31f124181f68f8887bd14d53d5d9a292758c6a8
-  erb (6.0.1) sha256=28ecdd99c5472aebd5674d6061e3c6b0a45c049578b071e5a52c2a7f13c197e5
-  erb (6.0.1-java) sha256=5c6b8d885fb0220d4a8ad158f70430d805845939dd44827e5130ef7fdbaed8ba
+  erb (6.0.2) sha256=9fe6264d44f79422c87490a1558479bd0e7dad4dd0e317656e67ea3077b5242b
+  erb (6.0.2-java) sha256=38f0e2e15453963fda1754d6b555b26650631cad72567304d59e6c3d847cd1be
   ethon (0.15.0) sha256=0809805a035bc10f54162ca99f15ded49e428e0488bcfe1c08c821e18261a74d
   eventmachine (1.2.7) sha256=994016e42aa041477ba9cff45cbe50de2047f25dd418eba003e84f0d16560972
   eventmachine (1.2.7-java) sha256=11ab7af3505f53ed7565d6a13fe73568fe0d6fac647c8816430e9c3171c8c58f
@@ -862,7 +863,7 @@ CHECKSUMS
   method_source (1.1.0) sha256=181301c9c45b731b4769bc81e8860e72f9161ad7d66dd99103c9ab84f560f5c5
   metrics (0.15.0) sha256=61ded5bac95118e995b1bc9ed4a5f19bc9814928a312a85b200abbdac9039072
   mini_portile2 (2.8.9) sha256=0cd7c7f824e010c072e33f68bc02d85a00aeb6fce05bb4819c03dfd3c140c289
-  minitest (6.0.1) sha256=7854c74f48e2e975969062833adc4013f249a4b212f5e7b9d5c040bf838d54bb
+  minitest (6.0.2) sha256=db6e57956f6ecc6134683b4c87467d6dd792323c7f0eea7b93f66bd284adbc3d
   module_methods (0.1.0) sha256=71cabd8e5b8537316a2e4a543a778726f34fab048d6d5fe97f3766c7b4e406a1
   multi_json (1.19.1) sha256=7aefeff8f2c854bf739931a238e4aea64592845e0c0395c8a7d2eea7fdd631b7
   mutex_m (0.3.0) sha256=cfcb04ac16b69c4813777022fdceda24e9f798e48092a2b817eb4c0a782b0751
@@ -956,7 +957,7 @@ CHECKSUMS
   yard-doctest (0.1.17) sha256=7cb35a75d99f58fc42ee72d3542a36e227237b621a40aebc391c95988b72847f
   yard-markdown (0.6.0) sha256=d01ebb21929f43b4f69e6577dda04b488cd629d623b8367a2835c53cc8b64de3
   yell (2.2.2) sha256=1d166f3cc3b6dc49a59778ea7156ed6d8de794c15106d48ffd6cbb061b9b26bc
-  zeitwerk (2.7.4) sha256=2bef90f356bdafe9a6c2bd32bcd804f83a4f9b8bc27f3600fff051eb3edcec8b
+  zeitwerk (2.7.5) sha256=d8da92128c09ea6ec62c949011b00ed4a20242b255293dd66bf41545398f73dd
 
 BUNDLED WITH
   4.0.3
