@@ -646,7 +646,7 @@ GEM
     uri (1.1.1)
     vcr (6.4.0)
     webrick (1.9.2)
-    yard (0.9.38)
+    yard (0.9.37)
     yard-doctest (0.1.17)
       minitest
       yard
@@ -731,7 +731,7 @@ DEPENDENCIES
   steep (~> 1.10.0)
   super_diff (~> 0.18)
   vcr (~> 6.4)
-  yard (~> 0.9, >= 0.9.38)
+  yard (~> 0.9, >= 0.9.37, != 0.9.38)
   yard-doctest (~> 0.1, >= 0.1.17)
   yard-markdown (~> 0.6)
 
@@ -952,7 +952,7 @@ CHECKSUMS
   uri (1.1.1) sha256=379fa58d27ffb1387eaada68c749d1426738bd0f654d812fcc07e7568f5c57c6
   vcr (6.4.0) sha256=077ac92cc16efc5904eb90492a18153b5e6ca5398046d8a249a7c96a9ea24ae6
   webrick (1.9.2) sha256=beb4a15fc474defed24a3bda4ffd88a490d517c9e4e6118c3edce59e45864131
-  yard (0.9.38) sha256=721fb82afb10532aa49860655f6cc2eaa7130889df291b052e1e6b268283010f
+  yard (0.9.37) sha256=a6e910399e78e613f80ba9add9ba7c394b1a935f083cccbef82903a3d2a26992
   yard-doctest (0.1.17) sha256=7cb35a75d99f58fc42ee72d3542a36e227237b621a40aebc391c95988b72847f
   yard-markdown (0.6.0) sha256=d01ebb21929f43b4f69e6577dda04b488cd629d623b8367a2835c53cc8b64de3
   yell (2.2.2) sha256=1d166f3cc3b6dc49a59778ea7156ed6d8de794c15106d48ffd6cbb061b9b26bc
