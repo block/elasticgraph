@@ -47,6 +47,25 @@ module ElasticGraph
             end
           end
         end
+
+        # Override to check for transitive indexing via abstract parent types.
+        # A type is indexed if it has its own index OR if it's a subtype of an indexed abstract type.
+        def indexed?
+          super || transitively_indexed_via_abstract_parent?
+        end
+
+        private
+
+        def transitively_indexed_via_abstract_parent?
+          # Check if any indexed abstract type (union or interface) has this type as a subtype.
+          # We use `index_def` to check for a direct index, avoiding recursion through `indexed?`
+          # which would check subtypes and cause infinite recursion.
+          schema_def_state.types_by_name.values.any? do |type|
+            type.respond_to?(:index_def) && !type.index_def.nil? &&
+              type.abstract? && type.respond_to?(:recursively_resolve_subtypes) &&
+              type.recursively_resolve_subtypes.any? { |subtype| subtype.name == name }
+          end
+        end
       end
     end
   end

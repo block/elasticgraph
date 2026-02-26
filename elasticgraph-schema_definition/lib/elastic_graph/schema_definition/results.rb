@@ -335,10 +335,25 @@ module ElasticGraph
           raise Errors::SchemaError, "`json_schema_version` must be specified in the schema. To resolve, add `schema.json_schema_version 1` in a schema definition block."
         end
 
-        indexed_type_names = state.object_types_by_name.values
+        # Get directly indexed concrete types
+        directly_indexed = state.object_types_by_name.values
           .select { |type| type.indexed? && !type.abstract? }
           .reject { |type| derived_indexing_type_names.include?(type.name) }
+
+        # Get indexed abstract types (unions and interfaces)
+        indexed_abstract_types = state.types_by_name.values
+          .select { |type| type.indexed? && type.abstract? }
+
+        # Get concrete subtypes of indexed abstract types
+        transitively_indexed = indexed_abstract_types
+          .flat_map { |abstract_type| abstract_type.recursively_resolve_subtypes }
+          .reject { |type| derived_indexing_type_names.include?(type.name) }
+
+        # Combine and deduplicate
+        indexed_type_names = (directly_indexed + transitively_indexed)
           .map(&:name)
+          .uniq
+          .sort
 
         definitions_by_name = json_schema_indexing_field_types_by_name
           .transform_values(&:to_json_schema)

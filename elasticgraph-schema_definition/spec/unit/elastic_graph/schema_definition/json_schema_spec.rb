@@ -2810,6 +2810,151 @@ module ElasticGraph
         expect(envelope_type_enum_values(schemas)).to eq ["Widget"]
       end
 
+      context "transitive indexing via abstract types" do
+        it "includes subtypes of indexed unions in the type enum, even when subtypes lack their own index" do
+          schemas = dump_schema do |s|
+            s.json_schema_version 1
+
+            s.object_type "MechanicalPart" do |t|
+              t.field "id", "ID!"
+              t.field "material", "String"
+              # No index defined on MechanicalPart
+            end
+
+            s.object_type "ElectricalPart" do |t|
+              t.field "id", "ID!"
+              t.field "voltage", "Int"
+              t.index "electrical_parts" # Has its own index
+            end
+
+            s.union_type "Part" do |t|
+              t.subtypes "MechanicalPart", "ElectricalPart"
+              t.index "parts" # Union has index
+            end
+          end
+
+          # Both subtypes should appear in enum (MechanicalPart via transitive indexing)
+          expect(envelope_type_enum_values(schemas.fetch("$defs"))).to contain_exactly("ElectricalPart", "MechanicalPart")
+        end
+
+        it "includes implementations of indexed interfaces in the type enum, even when implementations lack their own index" do
+          schemas = dump_schema do |s|
+            s.json_schema_version 1
+
+            s.interface_type "NamedEntity" do |t|
+              t.root_query_fields plural: "named_entities"
+              t.field "id", "ID!"
+              t.field "name", "String"
+              # Interface doesn't have t.index, but root_query_fields makes it indexed
+            end
+
+            s.object_type "Widget" do |t|
+              t.implements "NamedEntity"
+              t.field "id", "ID!"
+              t.field "name", "String"
+              t.index "widgets" # Has its own index
+            end
+
+            s.object_type "Component" do |t|
+              t.implements "NamedEntity"
+              t.field "id", "ID!"
+              t.field "name", "String"
+              # No index defined on Component
+            end
+
+            s.union_type "Thing" do |t|
+              t.subtypes "Widget", "Component"
+              t.index "things" # Union has index
+            end
+          end
+
+          # Both should appear - Widget directly indexed, Component via union
+          expect(envelope_type_enum_values(schemas.fetch("$defs"))).to contain_exactly("Component", "Widget")
+        end
+
+        it "deduplicates types that are both directly indexed and transitively indexed via unions" do
+          schemas = dump_schema do |s|
+            s.json_schema_version 1
+
+            s.object_type "Widget" do |t|
+              t.field "id", "ID!"
+              t.index "widgets" # Widget has its own index
+            end
+
+            s.object_type "Component" do |t|
+              t.field "id", "ID!"
+              t.index "components" # Component has its own index
+            end
+
+            s.union_type "Thing" do |t|
+              t.subtypes "Widget", "Component"
+              t.index "things" # Union also has index
+            end
+          end
+
+          # Each should appear exactly once despite being indexed multiple ways
+          expect(envelope_type_enum_values(schemas.fetch("$defs"))).to eq(["Component", "Widget"])
+        end
+
+        it "includes concrete types when unions contain interfaces (nested abstract types)" do
+          schemas = dump_schema do |s|
+            s.json_schema_version 1
+
+            s.object_type "Person" do |t|
+              t.implements "NamedEntity"
+              t.field "id", "ID!"
+              t.field "name", "String"
+              # No index on Person
+            end
+
+            s.object_type "Company" do |t|
+              t.implements "NamedEntity"
+              t.field "id", "ID!"
+              t.field "name", "String"
+              # No index on Company
+            end
+
+            s.interface_type "NamedEntity" do |t|
+              t.field "id", "ID!"
+              t.field "name", "String"
+              # No index on interface
+            end
+
+            s.union_type "EntityUnion" do |t|
+              t.subtypes "Person", "Company"
+              t.index "entities" # Only the union has an index
+            end
+          end
+
+          # Both concrete types should appear via transitive indexing
+          expect(envelope_type_enum_values(schemas.fetch("$defs"))).to contain_exactly("Company", "Person")
+        end
+
+        it "maintains alphabetical ordering of type enum with transitively indexed types" do
+          schemas = dump_schema do |s|
+            s.json_schema_version 1
+
+            s.object_type "Zebra" do |t|
+              t.field "id", "ID!"
+              t.index "zebras" # Directly indexed
+            end
+
+            s.object_type "Apple" do |t|
+              t.field "id", "ID!"
+              # No index - will be transitively indexed
+            end
+
+            s.union_type "Thing" do |t|
+              t.subtypes "Apple", "Zebra"
+              t.index "things"
+            end
+          end
+
+          # Should be in alphabetical order
+          expect(envelope_type_enum_values(schemas.fetch("$defs"))).to eq(["Apple", "Zebra"])
+        end
+      end
+
       it "raises a clear error if the schema defines a type with a reserved name" do
         dump_schema do |s|
           expect {
