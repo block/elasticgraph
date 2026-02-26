@@ -483,7 +483,7 @@ module ElasticGraph
           end
           # :nocov:
 
-          sh "ELASTICGRAPH_YAML_FILE=#{@local_config_yaml.shellescape} bundle exec rackup #{::File.join(__dir__.to_s, "config.ru").shellescape} --port #{port} #{args.fetch(:rackup_args)}"
+          run_rackup "ELASTICGRAPH_YAML_FILE=#{@local_config_yaml.shellescape} bundle exec rackup #{::File.join(__dir__.to_s, "config.ru").shellescape} --port #{port} #{args.fetch(:rackup_args)}"
         end
 
         namespace :index_fake_data do
@@ -521,6 +521,10 @@ module ElasticGraph
             task subtask => [:ensure_local_datastore_running, "schema_artifacts:dump"]
           end
         end
+      end
+
+      def run_rackup(command)
+        sh command
       end
 
       def local_datastore_url
