@@ -20,7 +20,7 @@ module ElasticGraph
       # config files being relative to the root.
       around { |ex| Dir.chdir(CommonSpecHelpers::REPO_ROOT, &ex) }
 
-      it "supports fully booting from scratch via a single `boot_locally` rake task", :except_jruby do
+      it "supports fully booting from scratch via a single `boot_locally` rake task" do
         rack_port = 9620
         kill_daemon_after "rackup.pid" do |pid_file|
           halt_datastore_daemon_after :elasticsearch do
@@ -56,7 +56,7 @@ module ElasticGraph
       end
 
       context "when the datastore is not running" do
-        it "boots the datastore as a daemon to support booting GraphiQL", :except_jruby do
+        it "boots the datastore as a daemon to support booting GraphiQL" do
           halt_datastore_daemon_after :elasticsearch do |datastore_port|
             expect {
               kill_daemon_after("rackup.pid") do |pid_file|
@@ -143,6 +143,20 @@ module ElasticGraph
               t.define_fake_data_batch_for(:widgets) do
                 Array.new(batch_size) { build(:widget) }
               end
+
+              # :nocov: -- only runs on JRuby
+              if RUBY_ENGINE == "jruby"
+                # rackup --daemonize uses fork(), unavailable on JRuby.
+                # Override run_rackup to use Process.spawn instead.
+                t.define_singleton_method(:run_rackup) do |command|
+                  pid_file = command[/--pid\s+(\S+)/, 1]
+                  clean_command = command.gsub(/\s*--daemonize/, "").gsub(/\s*--pid\s+\S+/, "")
+                  pid = ::Process.spawn(clean_command, [:out, :err] => [::File::NULL, "w"])
+                  ::Process.detach(pid)
+                  ::File.write(pid_file, pid.to_s) if pid_file
+                end
+              end
+              # :nocov:
             end
           end
         end
@@ -199,11 +213,11 @@ module ElasticGraph
         started_waiting_at = ::Time.now
         last_error = nil
 
-        # Wait up to 30 seconds on CI or 5 seconds locally. (We give CI more time because we have occasionally seen it
-        # fail at 10 seconds there, and can tolerate it taking longer. Locally you want quick feedback when you run these
-        # tests, you want to know if a server didn't boot right away, and it doesn't need to need more than 5 seconds).
+        # Wait up to 30 seconds on CI or 15 seconds locally. (We give CI more time because we have occasionally seen it
+        # fail at 10 seconds there, and can tolerate it taking longer. The local timeout accommodates JRuby's JVM startup
+        # overhead; the loop returns as soon as the server responds, so this doesn't slow MRI tests).
         # :nocov: -- we give CI more time than we do locally, so only one branch will be covered.
-        iterations = ENV["CI"] ? 300 : 50
+        iterations = ENV["CI"] ? 300 : 150
         # :nocov:
 
         iterations.times do
