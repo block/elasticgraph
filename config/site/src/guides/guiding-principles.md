@@ -52,7 +52,7 @@ These are the "north stars" that guide ElasticGraph development. They guide the 
    that the data in your index might "regress" to a prior state.
  * It makes it easy to operate multiple ElasticGraph instances (e.g. each in a different AWS region) which are guaranteed to
    converge on the same indexed state. (This is how we recommend deploying ElasticGraph for projects that require high availability.)
- * It allows you to recover from a [red OpenSearch or Elasticsearch cluster](https://www.elastic.co/guide/en/elasticsearch/reference/current/red-yellow-cluster-status.html#fix-cluster-status-recover-nodes)
+ * It allows you to recover from a [red OpenSearch or Elasticsearch cluster](https://www.elastic.co/guide/en/elasticsearch/reference/current/red-yellow-cluster-status.html)
    by restoring from a snapshot and playing back the indexing events after the snapshot was taken--this is guaranteed to converge
    on the indexed state you started with.
 
