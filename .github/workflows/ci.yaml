@@ -46,10 +46,25 @@ jobs:
           - build_part: "run_datastore_specs"
             ruby: "4.0"
             datastore: "opensearch:2.19.0"
-          # We have a special build part for JRuby.
+          # We have a special build part for JRuby, split into 4 parallel parts for speed.
+          # Part 1: graphql (excl. acceptance), Part 2: schema_definition+indexer,
+          # Part 3: graphql acceptance + local (halted), Part 4: all remaining gems.
           - build_part: "run_specs_for_jruby"
             ruby: "jruby-10.0"
             datastore: "elasticsearch:9.2.4"
+            build_part_args: "1"
+          - build_part: "run_specs_for_jruby"
+            ruby: "jruby-10.0"
+            datastore: "elasticsearch:9.2.4"
+            build_part_args: "2"
+          - build_part: "run_specs_for_jruby"
+            ruby: "jruby-10.0"
+            datastore: "elasticsearch:9.2.4"
+            build_part_args: "3"
+          - build_part: "run_specs_for_jruby"
+            ruby: "jruby-10.0"
+            datastore: "elasticsearch:9.2.4"
+            build_part_args: "4"
           # Other build parts run on max Ruby and primary datastore only.
           - build_part: "run_misc_checks"
             ruby: "4.0"
@@ -91,7 +106,7 @@ jobs:
         # Note: the `10` argument on the end is a number of seconds to sleep after booting the datastore.
         # We've found that there is a minor race condition where the shards aren't fully ready for the tests
         # to hit them if we don't wait a bit after booting.
-        run: script/ci_parts/${{ matrix.build_part }} ${{ matrix.datastore }} 10
+        run: script/ci_parts/${{ matrix.build_part }} ${{ matrix.datastore }} 10 ${{ matrix.build_part_args }}
 
   docker-demo:
     runs-on: ubuntu-latest

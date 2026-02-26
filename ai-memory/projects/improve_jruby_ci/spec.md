@@ -2,7 +2,7 @@
 
 We recently added JRuby to the CI build matrix in #999. It's working well but there are a few loose ends to tie up.
 
-## TODO: Remove `:except_jruby` from `elasticgraph-local` specs
+## DONE: Remove `:except_jruby` from `elasticgraph-local` specs
 
 To get the JRuby CI build to pass, we tagged a couple of `elasticgraph-local` specs with `:except_jruby`. These
 specs pass `--daemonize` when booting ElasticGraph locally, and `--daemonize` doesn't work on JRuby because the
