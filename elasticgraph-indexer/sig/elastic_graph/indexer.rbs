@@ -12,6 +12,7 @@ module ElasticGraph
       config: Config,
       datastore_core: DatastoreCore,
       ?datastore_router: Indexer::_DatastoreRouter?,
+      ?ingestion_schema: IngestionSchemas::_IngestionSchema?,
       ?monotonic_clock: Support::MonotonicClock?,
       ?clock: singleton(::Time)?
     ) -> void
@@ -33,6 +34,7 @@ module ElasticGraph
 
     private
 
+    @ingestion_schema: IngestionSchemas::_IngestionSchema?
     @clock: singleton(::Time)
   end
 end

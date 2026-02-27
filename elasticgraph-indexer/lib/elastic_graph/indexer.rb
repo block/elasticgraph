@@ -30,6 +30,7 @@ module ElasticGraph
       config:,
       datastore_core:,
       datastore_router: nil,
+      ingestion_schema: nil,
       monotonic_clock: nil,
       clock: nil
     )
@@ -38,6 +39,7 @@ module ElasticGraph
       @logger = datastore_core.logger
       @datastore_router = datastore_router
       @schema_artifacts = @datastore_core.schema_artifacts
+      @ingestion_schema = ingestion_schema
       @monotonic_clock = monotonic_clock
       @clock = clock || ::Time
     end
@@ -81,7 +83,8 @@ module ElasticGraph
           record_preparer_factory: record_preparer_factory,
           logger: datastore_core.logger,
           skip_derived_indexing_type_updates: config.skip_derived_indexing_type_updates,
-          configure_record_validator: nil
+          configure_record_validator: nil,
+          ingestion_schema: @ingestion_schema
         )
       end
     end
