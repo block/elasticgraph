@@ -2837,29 +2837,20 @@ module ElasticGraph
           expect(envelope_type_enum_values(schemas.fetch("$defs"))).to contain_exactly("ElectricalPart", "MechanicalPart")
         end
 
-        it "includes implementations of indexed interfaces in the type enum, even when implementations lack their own index" do
+        it "includes subtypes in the type enum when only the union has an index" do
           schemas = dump_schema do |s|
             s.json_schema_version 1
 
-            s.interface_type "NamedEntity" do |t|
-              t.root_query_fields plural: "named_entities"
-              t.field "id", "ID!"
-              t.field "name", "String"
-              # Interface doesn't have t.index, but root_query_fields makes it indexed
-            end
-
             s.object_type "Widget" do |t|
-              t.implements "NamedEntity"
               t.field "id", "ID!"
               t.field "name", "String"
               t.index "widgets" # Has its own index
             end
 
             s.object_type "Component" do |t|
-              t.implements "NamedEntity"
               t.field "id", "ID!"
-              t.field "name", "String"
-              # No index defined on Component
+              t.field "description", "String"
+              # No index defined on Component - only transitively indexed via Thing union
             end
 
             s.union_type "Thing" do |t|
@@ -2868,7 +2859,7 @@ module ElasticGraph
             end
           end
 
-          # Both should appear - Widget directly indexed, Component via union
+          # Both should appear - Widget directly indexed, Component via union transitive indexing
           expect(envelope_type_enum_values(schemas.fetch("$defs"))).to contain_exactly("Component", "Widget")
         end
 
