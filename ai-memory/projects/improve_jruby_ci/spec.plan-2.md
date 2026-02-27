@@ -6,34 +6,52 @@
 
 ## Context
 
-The JRuby CI build takes 50+ minutes (single job running all gems sequentially, no flatware parallelization since it requires fork). The longest non-JRuby build part takes ~20 minutes. Goal: split JRuby into parallel jobs so it's no longer the bottleneck.
+The JRuby CI build takes 50+ minutes (single job running all gems sequentially, no flatware parallelization since flatware requires fork). The longest non-JRuby build part takes ~20 minutes. Goal: split JRuby into parallel jobs so it's no longer the bottleneck.
+
+Key constraints:
+- Flatware unavailable on JRuby (uses fork); `script/flatware_rspec` falls back to `bundle exec rspec`
+- `elasticgraph-local` must run with datastore halted (separate from other gems)
+- `script/update_ci_yaml` auto-updates all `datastore:` values in the includes section; no changes needed there
+- The `run` step passes args positionally: `$1`=datastore, `$2`=sleep_after_boot; we add `$3`=part
 
 ## Approach
 
-**Phase A: Measure.** Measure actual per-gem JRuby runtimes first (spec file counts aren't accurate—e.g., elasticgraph-local is particularly slow despite few files). This informs the grouping.
+**Phase A: Measure.** Measure actual per-gem JRuby runtimes to inform grouping. Spec file counts don't correlate well with runtime (e.g., `elasticgraph-local` is slow despite few files). Use a measurement script to time each gem individually.
 
-**Phase B: Split.** Parameterize `run_specs_for_jruby` to accept a part number. Split gems into groups balanced by measured runtime. Initial estimate (to be revised after measurement):
+**Phase B: Split.** Parameterize `run_specs_for_jruby` to accept a part number via `$3`. Split gems into groups balanced by measured runtime. Initial estimate (to be revised after measurement):
 
-- **Part 1** (80 specs): `elasticgraph-graphql`
-- **Part 2** (83 specs): `elasticgraph-schema_definition`, `elasticgraph-indexer`
-- **Part 3** (~107 specs): all remaining gems + `elasticgraph-local`
+- **Part 1** (~80 specs): `elasticgraph-graphql`
+- **Part 2** (~83 specs): `elasticgraph-schema_definition`, `elasticgraph-indexer`
+- **Part 3** (~107 specs): all remaining gems + `elasticgraph-local` (datastore halted)
 
-Add JRuby CI matrix entries with `build_part_args`. Modify the `run` step to pass this extra arg. Keep `*)` default case for standalone runs.
+Add 3 JRuby CI matrix entries with `build_part_args`. Modify `run` step to pass `${{ matrix.build_part_args }}`. Keep `*)` default case for standalone runs.
 
 ## Files to Modify
 
-1. `script/ci_parts/run_specs_for_jruby` - add part-based gem splitting
-2. `.github/workflows/ci.yaml` - multiple JRuby matrix entries, pass `build_part_args`
+1. `script/ci_parts/run_specs_for_jruby` — add part-based gem splitting
+2. `.github/workflows/ci.yaml` — 3 JRuby matrix entries, pass `build_part_args`
 
 ## Detailed Changes
 
 ### Step 1: Measure actual JRuby per-gem runtimes
 
-Run each gem's specs individually on JRuby and record wall clock time. Use results to balance the N-part split. Adjust gem grouping accordingly.
+Boot datastore, then time each gem individually on JRuby. Example:
+
+```bash
+# Boot datastore first, then for each gem:
+for gem in $(script/list_eg_gems.rb | grep -v elasticgraph-local); do
+  if [ -d "$gem/spec" ]; then
+    echo "=== $gem ==="
+    time bundle exec rspec $gem/spec --format progress 2>&1 | tail -1
+  fi
+done
+```
+
+Use results to balance the 3-part split so each part targets ≤20 minutes.
 
 ### Step 2: Parameterize `run_specs_for_jruby`
 
-Rewrite `script/ci_parts/run_specs_for_jruby` (gem grouping subject to adjustment after Step 1 measurements):
+Replace `script/ci_parts/run_specs_for_jruby` with:
 
 ```bash
 #!/usr/bin/env bash
@@ -95,13 +113,20 @@ case "$part" in
 esac
 ```
 
+Notes:
+- `flatware_rspec` automatically falls back to `bundle exec rspec` on JRuby (flatware requires fork)
+- Part 3 uses dynamic filtering via `grep -v` so new gems are automatically included
+- `*)` default preserves standalone usage (e.g., running locally without a part number)
+- Gem grouping subject to adjustment based on Step 1 measurements
+
 ### Step 3: Update CI yaml
 
 In `.github/workflows/ci.yaml`:
 
-1. Replace the single JRuby include entry with 3 entries (number may change based on Step 1):
+1. Replace the single JRuby include entry with 3 entries:
 
 ```yaml
+          # We have a special build part for JRuby, split into 3 parallel parts for speed.
           - build_part: "run_specs_for_jruby"
             ruby: "jruby-10.0"
             datastore: "elasticsearch:9.2.4"
@@ -122,20 +147,24 @@ In `.github/workflows/ci.yaml`:
         run: script/ci_parts/${{ matrix.build_part }} ${{ matrix.datastore }} 10 ${{ matrix.build_part_args }}
 ```
 
+For non-JRuby entries, `build_part_args` is undefined → empty string → shell ignores it. No impact on other build parts.
+
 ### Step 4: Verify `update_ci_yaml` handles new entries
 
-Run `script/update_ci_yaml --verify` to confirm the script still works. The `update_includes_primary_datastore` method replaces ALL `datastore:` values in the includes section, so the new JRuby entries will be auto-updated when datastore versions change. No changes needed to `update_ci_yaml`.
+Run `script/update_ci_yaml --verify`. The `update_includes_primary_datastore` method replaces ALL `datastore:` values in the includes section via `gsub`, so new JRuby entries get auto-updated when datastore versions change. No changes needed to `update_ci_yaml`.
 
 ## Verification
 
-1. Run `script/update_ci_yaml --verify` to confirm CI yaml consistency.
-2. Push branch and verify CI creates separate JRuby jobs with balanced runtimes.
-3. Confirm each JRuby part completes in ~20 minutes or less.
+1. Run `script/update_ci_yaml --verify` — confirms CI yaml consistency.
+2. Push branch and verify CI creates 3 separate JRuby jobs.
+3. Confirm each JRuby part completes in ≤20 minutes.
+4. Verify the `*)` default case still works for standalone local runs.
 
 ## Planning Session
 
-`/Users/myron.marston/.claude/projects/-Users-myron-marston-code-elasticgraph/f2f27953-57fc-4169-8f1d-35ce9c3e571e.jsonl`
+`/Users/myron.marston/.claude/projects/-Users-myron-marston-code-elasticgraph/c6374ad5-86cc-4fa6-8f49-a6aad217f8a6.jsonl`
 
 ## Unresolved Questions
 
-(None — gem grouping will be finalized after runtime measurements in Step 1)
+1. Gem grouping TBD — need Step 1 runtime measurements first. Want to do that now, or just push with the spec-file-count estimate and adjust after seeing CI times?
+2. Number of parts: 3 was chosen assuming ~50 min / 3 ≈ 17 min each. If measurements show lopsided distribution, might want 4 parts instead?

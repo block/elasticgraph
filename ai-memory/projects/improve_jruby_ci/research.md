@@ -92,3 +92,17 @@ Total: ~270 spec files
 
 ### CI Matrix Change
 Replace single JRuby entry with 3 entries, each with different `build_part_args` ("1", "2", "3"). `update_ci_yaml` auto-updates datastore versions for all include entries - no changes needed there.
+
+### Additional Findings (Session 2)
+
+**`flatware_rspec` fallback on JRuby**: `script/flatware_rspec` checks `bundle show flatware` — on JRuby flatware isn't available, so it falls back to `bundle exec rspec`. The plan's `run_gems_with_datastore` function correctly uses `flatware_rspec`, which does the right thing on both platforms.
+
+**`setup_env` positional args**: `setup_env` takes 3 args: `$1`=boot_env ("test"), `$2`=datastore, `$3`=sleep_after_boot (default 0). The part number must be captured in `run_specs_for_jruby` *before* sourcing `setup_env`, since `source` doesn't create a subshell but we pass different args to it.
+
+**`update_ci_yaml` compatibility confirmed**: `update_includes_primary_datastore` uses `gsub` to replace ALL `datastore: "..."` values in the includes section. New JRuby entries will be auto-updated when datastore versions change. No changes needed to `update_ci_yaml`.
+
+**GitHub Actions job naming**: With `build_part_args` in the matrix, jobs will display as e.g. `ci-check (run_specs_for_jruby, jruby-10.0, elasticsearch:9.2.4, 1)`. For entries without `build_part_args`, the field is absent from the name.
+
+**Empty `build_part_args` for non-JRuby entries**: When `build_part_args` isn't defined in a matrix entry, `${{ matrix.build_part_args }}` evaluates to empty string. Shell word-splitting means no extra arg is passed. Other scripts don't reference `$3` so no impact.
+
+**`run_each_gem_spec` uses per-gem bundler contexts** (for dependency verification). Not applicable to JRuby split since JRuby's purpose is just "does it work on JRuby" not "are deps correct".

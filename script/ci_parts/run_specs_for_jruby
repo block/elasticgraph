@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Capture part number before `source` potentially alters positional params.
+part=${3:-}
+
 source "script/ci_parts/setup_env" "test" $1 $2
 
 # We don't want to bother checking coverage on JRuby, for a few reasons:
@@ -12,10 +15,47 @@ unset COVERAGE
 # because 20+ minutes may pass before the line of progress dots completes, and GitHub actions streams build
 # output line-by-line. We use the documentation formatter here so that the output has many lines and there's
 # more obviously ongoing progress on CI.
-script/run_specs --format documentation
+rspec_format="--format documentation"
 
-halt_datastore_daemon
+run_gems() {
+  local spec_dirs=""
+  for gem in "$@"; do
+    if [ -d "$gem/spec" ]; then
+      spec_dirs="$spec_dirs $gem/spec"
+    fi
+  done
+  if [ -n "$spec_dirs" ]; then
+    script/flatware_rspec $spec_dirs $rspec_format
+  fi
+}
 
-for gem in $gems_to_build_with_datastore_halted; do
-  bundle exec rspec $gem/spec --backtrace --format progress
-done
+run_gems_with_datastore_halted() {
+  halt_datastore_daemon
+  run_gems $gems_to_build_with_datastore_halted
+}
+
+case "$part" in
+  1)
+    # graphql excluding acceptance (~19m); acceptance specs split to part 3.
+    script/flatware_rspec elasticgraph-graphql/spec $rspec_format --tag ~type:acceptance
+    ;;
+  2)
+    run_gems elasticgraph-schema_definition elasticgraph-indexer
+    ;;
+  3)
+    # The two slowest individual spec groups: graphql acceptance (~8m) and
+    # elasticgraph-local (~6m, requires halted datastore).
+    script/flatware_rspec elasticgraph-graphql/spec $rspec_format --tag type:acceptance
+    run_gems_with_datastore_halted
+    ;;
+  4)
+    # All remaining gems not covered by parts 1-3.
+    remaining=$(echo $gems_to_build_with_datastore_booted | tr ' ' '\n' | grep -v -E "^(elasticgraph-graphql|elasticgraph-schema_definition|elasticgraph-indexer)$" | tr '\n' ' ')
+    run_gems $remaining
+    ;;
+  *)
+    # Default: run everything (backward-compatible with no part argument).
+    script/run_specs $rspec_format
+    run_gems_with_datastore_halted
+    ;;
+esac
