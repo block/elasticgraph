@@ -158,6 +158,12 @@ PATH
       opensearch-ruby (~> 3.4)
 
 PATH
+  remote: elasticgraph-proto
+  specs:
+    elasticgraph-proto (1.1.1.pre)
+      elasticgraph-support (= 1.1.1.pre)
+
+PATH
   remote: elasticgraph-query_interceptor
   specs:
     elasticgraph-query_interceptor (1.1.1.pre)
@@ -698,6 +704,7 @@ DEPENDENCIES
   elasticgraph-lambda_support (= 1.1.1.pre)!
   elasticgraph-local (= 1.1.1.pre)!
   elasticgraph-opensearch (= 1.1.1.pre)!
+  elasticgraph-proto (= 1.1.1.pre)!
   elasticgraph-query_interceptor (= 1.1.1.pre)!
   elasticgraph-query_registry (= 1.1.1.pre)!
   elasticgraph-rack (= 1.1.1.pre)!
@@ -789,6 +796,7 @@ CHECKSUMS
   elasticgraph-lambda_support (1.1.1.pre)
   elasticgraph-local (1.1.1.pre)
   elasticgraph-opensearch (1.1.1.pre)
+  elasticgraph-proto (1.1.1.pre)
   elasticgraph-query_interceptor (1.1.1.pre)
   elasticgraph-query_registry (1.1.1.pre)
   elasticgraph-rack (1.1.1.pre)
