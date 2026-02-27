@@ -1,0 +1,19 @@
+module ElasticGraph
+  module Proto
+    module SchemaDefinition
+      class Identifier
+        PROTO_KEYWORDS: ::Set[::String]
+
+        def self.package_name: (::String) -> ::String
+        def self.message_name: (::String) -> ::String
+        def self.enum_name: (::String) -> ::String
+        def self.field_name: (::String) -> ::String
+        def self.enum_value_name: (::String) -> ::String
+
+        private
+
+        def self.escape_keyword: (::String) -> ::String
+      end
+    end
+  end
+end

@@ -1,0 +1,13 @@
+module ElasticGraph
+  module Proto
+    module SchemaDefinition
+      module ObjectInterfaceAndUnionExtension : _ObjectInterfaceAndUnionExtensionInterface
+        def to_proto_field_type: () -> ::String
+      end
+
+      interface _ObjectInterfaceAndUnionExtensionInterface
+        def name: () -> ::String
+      end
+    end
+  end
+end

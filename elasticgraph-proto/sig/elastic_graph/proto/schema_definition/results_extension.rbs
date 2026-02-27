@@ -1,0 +1,19 @@
+module ElasticGraph
+  module Proto
+    module SchemaDefinition
+      module ResultsExtension : ::ElasticGraph::SchemaDefinition::Results
+        def proto_schema: () -> ::String
+        def proto_field_number_mappings: () -> untyped
+        def replace_json_schema_artifacts_with_proto?: () -> bool
+
+        private
+
+        def proto_schema_generator: () -> Schema
+        def build_proto_schema_generator: () -> Schema
+
+        @proto_schema: ::String?
+        @proto_schema_generator: Schema?
+      end
+    end
+  end
+end

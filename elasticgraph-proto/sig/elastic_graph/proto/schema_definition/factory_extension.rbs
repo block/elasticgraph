@@ -1,0 +1,8 @@
+module ElasticGraph
+  module Proto
+    module SchemaDefinition
+      module FactoryExtension: ::ElasticGraph::SchemaDefinition::Factory
+      end
+    end
+  end
+end

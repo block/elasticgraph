@@ -1,0 +1,12 @@
+module ElasticGraph
+  module Proto
+    module SchemaDefinition
+      module ScalarTypeExtension: ::ElasticGraph::SchemaDefinition::SchemaElements::ScalarType
+        attr_reader proto_field_type: ::String
+
+        def proto_field: (type: ::String) -> void
+        def to_proto_field_type: () -> ::String
+      end
+    end
+  end
+end

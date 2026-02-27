@@ -1,0 +1,6 @@
+module ElasticGraph
+  module Proto
+    PROTO_SCHEMA_FILE: ::String
+    PROTO_FIELD_NUMBERS_FILE: ::String
+  end
+end
