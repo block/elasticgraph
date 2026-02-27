@@ -1317,6 +1317,7 @@ module ElasticGraph
           # the tagging of those source fields. That's why `name`, `options1`, etc are tagged with `public` below.
           expect(type_def_for.call("IdentifiableFilterInput")).to eq(<<~EOS.strip)
             input IdentifiableFilterInput {
+              #{schema_elements._typename}: StringFilterInput
               #{schema_elements.all_of}: [IdentifiableFilterInput!]
               #{schema_elements.any_of}: [IdentifiableFilterInput!]
               id: IDFilterInput

@@ -1148,15 +1148,14 @@ module ElasticGraph
               end
             end
 
-            # Note: we would like to support filtering on `__typename` but this is invalid according to the
-            # GraphQL Spec: http://spec.graphql.org/June2018/#sec-Input-Objects
-            # > For each input field of an Input Object type:
-            # > 2. The input field must not have a name which begins with the characters "__" (two underscores).
+            # Uses `_typename` (single underscore) since the GraphQL spec prohibits `__` prefix on input fields:
+            # http://spec.graphql.org/June2018/#sec-Input-Objects
             expect(filter_type_from(result, "Inventor")).to eq(<<~EOS.strip)
               input InventorFilterInput {
                 #{schema_elements.any_of}: [InventorFilterInput!]
                 #{schema_elements.all_of}: [InventorFilterInput!]
                 #{schema_elements.not}: InventorFilterInput
+                #{schema_elements._typename}: StringFilterInput
                 name: StringFilterInput
                 nationality: StringFilterInput
                 stock_ticker: StringFilterInput
@@ -1222,6 +1221,7 @@ module ElasticGraph
                 #{schema_elements.any_of}: [ClothingItemFilterInput!]
                 #{schema_elements.all_of}: [ClothingItemFilterInput!]
                 #{schema_elements.not}: ClothingItemFilterInput
+                #{schema_elements._typename}: StringFilterInput
                 size: SizeFilterInput
                 shirt_color: StringFilterInput
                 pants_color: StringFilterInput
@@ -1279,6 +1279,7 @@ module ElasticGraph
                 #{schema_elements.any_of}: [InventorFilterInput!]
                 #{schema_elements.all_of}: [InventorFilterInput!]
                 #{schema_elements.not}: InventorFilterInput
+                #{schema_elements._typename}: StringFilterInput
                 name: StringFilterInput
                 stock_ticker: StringFilterInput
               }
@@ -1340,6 +1341,7 @@ module ElasticGraph
                 #{schema_elements.any_of}: [InventorFilterInput!]
                 #{schema_elements.all_of}: [InventorFilterInput!]
                 #{schema_elements.not}: InventorFilterInput
+                #{schema_elements._typename}: StringFilterInput
                 name: StringFilterInput
                 nationality: StringFilterInput
                 stock_ticker: StringFilterInput
