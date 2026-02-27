@@ -12,14 +12,56 @@ require "elastic_graph/proto/schema_definition/identifier"
 
 module ElasticGraph
   module Proto
+    # Protocol Buffers schema-generation support for ElasticGraph schema-definition results.
     module SchemaDefinition
       # Builds a `proto3` schema string from an ElasticGraph schema definition.
       class Schema
+        # Internal representation of a protobuf field definition.
+        #
+        # @!attribute [r] name
+        #   @return [String]
+        # @!attribute [r] type
+        #   @return [String]
+        # @!attribute [r] field_number
+        #   @return [Integer]
+        # @!attribute [r] repeated
+        #   @return [Boolean]
+        # @!attribute [r] comment
+        #   @return [String, nil]
         FieldDefinition = ::Data.define(:name, :type, :field_number, :repeated, :comment)
+        # Internal representation of a protobuf message definition.
+        #
+        # @!attribute [r] name
+        #   @return [String]
+        # @!attribute [r] fields
+        #   @return [Array<FieldDefinition>]
         MessageDefinition = ::Data.define(:name, :fields)
+        # Internal representation of a protobuf enum value definition.
+        #
+        # @!attribute [r] name
+        #   @return [String]
+        # @!attribute [r] number
+        #   @return [Integer]
+        # @!attribute [r] comment
+        #   @return [String, nil]
         EnumValueDefinition = ::Data.define(:name, :number, :comment)
+        # Internal representation of a protobuf enum definition.
+        #
+        # @!attribute [r] name
+        #   @return [String]
+        # @!attribute [r] zero_value_name
+        #   @return [String]
+        # @!attribute [r] values
+        #   @return [Array<EnumValueDefinition>]
         EnumDefinition = ::Data.define(:name, :zero_value_name, :values)
 
+        # Generates the full `proto3` schema text for indexed types.
+        #
+        # @param results [ElasticGraph::SchemaDefinition::Results]
+        # @param package_name [String]
+        # @param proto_enums_by_graphql_enum [Hash]
+        # @param proto_field_number_mappings [Hash]
+        # @return [String]
         def self.generate(
           results,
           package_name: "elasticgraph",
@@ -52,6 +94,9 @@ module ElasticGraph
           @type_name_by_enum_name = {}
         end
 
+        # Renders the schema as a valid `proto3` file.
+        #
+        # @return [String]
         def to_proto
           root_types = indexed_types
           return "" if root_types.empty?
@@ -253,6 +298,9 @@ module ElasticGraph
 
         public
 
+        # Exposes normalized field-number mappings for writing to artifact YAML.
+        #
+        # @return [Hash<String, Hash<String, Hash<String, Integer>>>]
         def field_number_mappings_for_artifact
           {
             "messages" => @proto_field_number_mappings_by_message

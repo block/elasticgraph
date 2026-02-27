@@ -13,6 +13,11 @@ module ElasticGraph
     module SchemaDefinition
       # Converts non-list ElasticGraph field types to protobuf field types.
       class FieldTypeConverter
+        # Converts a non-list schema field type reference to a protobuf field type name.
+        #
+        # @param field_type [ElasticGraph::SchemaDefinition::SchemaElements::TypeReference]
+        # @return [String]
+        # @raise [Errors::SchemaError] when the type cannot be converted
         def self.convert(field_type)
           type = field_type.unwrap_non_null
 

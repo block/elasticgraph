@@ -13,6 +13,9 @@ module ElasticGraph
     module SchemaDefinition
       # Extends ScalarType with proto field type conversion.
       module ScalarTypeExtension
+        # Fallback mapping from JSON schema scalar types to protobuf scalar field types.
+        #
+        # @return [Hash<String, String>]
         PROTO_FIELD_TYPE_BY_JSON_SCHEMA_TYPE = {
           "boolean" => "bool",
           "integer" => "int64",

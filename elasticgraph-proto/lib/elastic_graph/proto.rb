@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 module ElasticGraph
+  # Namespace for Protocol Buffers schema artifact generation extensions.
   module Proto
     # The name of the generated Protocol Buffers schema file.
     PROTO_SCHEMA_FILE = "schema.proto"
