@@ -103,8 +103,12 @@ If your project already maintains GraphQL-to-proto enum mappings (for example in
 you can reuse them for proto schema generation:
 
 ```ruby
+# in config/schema/proto_enum_mappings.rb
+
 ElasticGraph.define_schema do |schema|
-  schema.proto_enum_mappings SalesEg::ProtoEnumMappings::PROTO_ENUMS_BY_GRAPHQL_ENUM
+  schema.proto_enum_mappings(
+    SalesEg::ProtoEnumMappings::PROTO_ENUMS_BY_GRAPHQL_ENUM
+  ) if defined?(SalesEg::ProtoEnumMappings)
 end
 ```
 
@@ -116,6 +120,11 @@ as the source of enum values (respecting `exclusions`, `expected_extras`, and `n
 To ensure protobuf field numbers never drift, configure a mapping artifact file:
 
 ```ruby
+# in config/schema/proto_field_numbers.rb
+
+mapping_file = File.expand_path("artifacts/proto_field_numbers.yaml", __dir__)
+File.write(mapping_file, "---\nmessages: {}\n") unless File.exist?(mapping_file)
+
 ElasticGraph.define_schema do |schema|
   schema.proto_schema_artifacts(
     field_number_mapping_file: "proto_field_numbers.yaml",
