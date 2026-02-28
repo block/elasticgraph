@@ -1,16 +1,15 @@
 # ElasticGraph Project Memory Bank
 
-This document serves as the primary, single source of truth for understanding the ElasticGraph project.
+This document captures long-lived project context and architecture for ElasticGraph.
+For agent workflow, coding standards, and execution guidance, use `AGENTS.md` as the canonical source.
 
-## Development Requirements for AI Agents
+## Agent Instruction Hierarchy
 
-**CRITICAL - Ruby Code Standards**: All AI agents working on this project MUST run `bundle exec standardrb --fix` on any Ruby code before completing tasks. This is a mandatory step in the ElasticGraph project workflow. StandardRB linting should be applied to:
-- New Ruby scripts in script/ directory
-- Modified Ruby files
-- Any Ruby code changes
-- Before considering any Ruby coding task complete
+To avoid conflicting instructions across files:
+- `AGENTS.md` is the canonical, tool-neutral agent instructions file for this repository.
+- `ai-memory/README.md` should focus on durable project context, architecture, and decisions, and should not duplicate broad workflow guidance from `AGENTS.md`.
 
-The ElasticGraph project uses StandardRB for consistent code formatting and style enforcement. This step is non-negotiable and should be done automatically as part of the development process.
+When in doubt, follow `AGENTS.md` for workflow and coding practices.
 
 ## Project Context
 
@@ -152,10 +151,10 @@ This section lists key folders and files in the repository with a short descript
 ### Top-Level Files & Directories:
 
 -   `README.md`: Project overview, purpose, and license.
+-   `AGENTS.md`: Canonical AI agent instructions for repository workflow, commands, coding standards, and testing guidance.
 -   `CODEBASE_OVERVIEW.md`: Detailed breakdown of gem categories and their roles, including dependency diagrams. This is a critical document for understanding the architecture.
 -   `Gemfile` & `Gemfile.lock`: Manages Ruby dependencies for the entire monorepo. The `Gemfile` dynamically loads gemspecs from subdirectories.
 -   `Rakefile`: Defines and configures Rake tasks for development, testing, artifact generation, and deployment.
--   `.goosehints`: Hints for the Goose AI agent.
 -   `.rspec`: RSpec configuration.
 -   `.standard.yml`: StandardRB linter configuration.
 -   `rbs_collection.yaml` & `Steepfile`: Configuration for Steep (Ruby type checker).

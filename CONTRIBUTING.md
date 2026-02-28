@@ -92,8 +92,7 @@ or [Claude](https://claude.ai/) to contribute is encouraged. However:
 If you use an AI agent, feel free to leverage the growing [AI memory bank](https://github.com/block/elasticgraph/tree/main/ai-memory),
 and if updates made by your AI agent to that directory seem worth keeping, please include them in your submitted PR!
 
-We also maintain a [hints file for Goose](https://github.com/block/elasticgraph/blob/main/.goosehints) which you can adapt for use by
-other AI agents.
+Primary agent instructions are maintained in [AGENTS.md](AGENTS.md). We keep [CLAUDE.md](CLAUDE.md) as a compatibility symlink.
 
 ## Build Scripts and Executables
 
