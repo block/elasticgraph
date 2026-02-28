@@ -28,6 +28,26 @@ module ElasticGraph
             expect(build_expecting_success(event)).to eq([new_primary_indexing_operation(event)])
           end
 
+          it "injects __typename into the record when the type requires it (for mixed-type indices)" do
+            # Mock the schema artifacts to make Component require __typename
+            modified_schema = ::Marshal.load(::Marshal.dump(indexer.schema_artifacts.json_schemas_for(1)))
+            modified_schema["$defs"]["Component"]["required"] ||= []
+            modified_schema["$defs"]["Component"]["required"] << "__typename" unless modified_schema["$defs"]["Component"]["required"].include?("__typename")
+
+            allow(indexer.schema_artifacts).to receive(:latest_json_schema_version).and_return(1)
+            allow(indexer.schema_artifacts).to receive(:json_schemas_for).with(1).and_return(modified_schema)
+
+            event = build_upsert_event(:component, id: "1", __version: 1)
+            # Verify the event doesn't already have __typename
+            expect(event["record"]).not_to have_key("__typename")
+
+            operations = build_expecting_success(event)
+            primary_op = operations.first
+
+            # Verify __typename was injected into the prepared record
+            expect(primary_op.prepared_record["__typename"]).to eq("Component")
+          end
+
           it "also generates derived index update operations for an upsert event for the source type of a derived indexing type" do
             event = build_upsert_event(:widget, id: "1", __version: 1)
             formatted_event = {
