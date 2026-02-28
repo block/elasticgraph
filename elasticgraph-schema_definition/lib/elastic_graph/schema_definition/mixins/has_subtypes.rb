@@ -92,7 +92,8 @@ module ElasticGraph
 
         def subtypes_indexed?
           indexed_by_subtype_name = resolve_subtypes.to_h do |subtype, acc|
-            [subtype.name, subtype.indexed?]
+            has_resolved_index = subtype.respond_to?(:resolved_index_def) && !subtype.resolved_index_def.nil?
+            [subtype.name, has_resolved_index]
           end
 
           uniq_indexed = indexed_by_subtype_name.values.uniq

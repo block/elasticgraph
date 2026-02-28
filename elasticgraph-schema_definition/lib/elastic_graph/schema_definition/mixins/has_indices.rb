@@ -184,7 +184,7 @@ module ElasticGraph
         def runtime_metadata(extra_update_targets)
           SchemaArtifacts::RuntimeMetadata::ObjectType.new(
             update_targets: derived_indexed_types.map(&:runtime_metadata_for_source_type) + [self_update_target].compact + extra_update_targets,
-            index_definition_names: [index_def&.name].compact,
+            index_definition_names: resolved_index_def ? [resolved_index_def.name] : [],
             graphql_fields_by_name: runtime_metadata_graphql_fields_by_name,
             elasticgraph_category: nil,
             source_type: nil,
@@ -255,6 +255,32 @@ module ElasticGraph
           indexing_fields_by_name_in_index.values.reject { |f| f.source.nil? }
         end
 
+        # Returns the index definition that this type resolves to: either this type's own
+        # index_def (if defined), or the single parent abstract type's index_def (if this
+        # type is a subtype of exactly one indexed abstract type). Raises an error if this
+        # type has no index and is a subtype of multiple indexed abstract types.
+        def resolved_index_def
+          return index_def if index_def
+
+          indexed_parents = schema_def_state.types_by_name.values.filter_map do |type|
+            next unless type.respond_to?(:abstract?) && type.abstract?
+            next unless type.respond_to?(:index_def) && type.index_def
+
+            if type.respond_to?(:recursively_resolve_subtypes)
+              type if type.recursively_resolve_subtypes.any? { |subtype| subtype.name == name }
+            end
+          end
+
+          if indexed_parents.size > 1
+            parent_names = indexed_parents.map { |p| p.index_def.name }.join(", ")
+            raise Errors::SchemaError,
+              "The `#{name}` type is a subtype of multiple indexed abstract types (#{parent_names}). " \
+              "If a concrete type does not define an index, it cannot be a member of multiple indexed abstract types."
+          end
+
+          indexed_parents.first&.index_def
+        end
+
         private
 
         def initialize_has_indices
@@ -266,7 +292,8 @@ module ElasticGraph
         end
 
         def self_update_target
-          return nil if abstract? || !indexed?
+          return nil if abstract?
+          return nil if resolved_index_def.nil?
 
           # We exclude `id` from `data_params` because `Indexer::Operator::Update` automatically includes
           # `params.id` so we don't want it duplicated at `params.data.id` alongside other data params.
@@ -277,7 +304,8 @@ module ElasticGraph
             [field, SchemaArtifacts::RuntimeMetadata::DynamicParam.new(source_path: field, cardinality: :one)]
           end
 
-          index_runtime_metadata = index_def.runtime_metadata
+          routing_value_source = resolved_index_def&.runtime_metadata&.route_with
+          rollover_timestamp_value_source = resolved_index_def&.runtime_metadata&.rollover&.timestamp_field_path
 
           Indexing::UpdateTargetFactory.new_normal_indexing_update_target(
             type: name,
@@ -287,8 +315,8 @@ module ElasticGraph
             # Some day we may want to consider supporting multiple indices. If/when we add support for that,
             # we'll need to change the runtime metadata here to have a map of these values, keyed by index
             # name.
-            routing_value_source: index_runtime_metadata.route_with,
-            rollover_timestamp_value_source: index_runtime_metadata.rollover&.timestamp_field_path
+            routing_value_source: routing_value_source,
+            rollover_timestamp_value_source: rollover_timestamp_value_source
           )
         end
 

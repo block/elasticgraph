@@ -193,11 +193,22 @@ module ElasticGraph
       def indexed_document_types_by_index_definition_name
         @indexed_document_types_by_index_definition_name ||= indexed_document_types.each_with_object({}) do |type, hash|
           type.index_definitions.each do |index_def|
-            if hash.key?(index_def.name)
-              raise Errors::SchemaError, "DatastoreCore::IndexDefinition #{index_def.name} is used multiple times: #{type} vs #{hash[index_def.name]}"
-            end
+            if (existing_type = hash[index_def.name])
+              # Allow subtypes of an indexed union/interface to share the parent's index for indexing purposes.
+              # The parent (abstract type) is the "document type" for GraphQL queries, while subtypes can be
+              # indexed into that same index to support filtering by _typename (issue #1024).
+              is_subtype_of_existing = existing_type.subtypes.any? { |subtype| subtype.name == type.name }
+              is_existing_subtype_of_current = type.subtypes.any? { |subtype| subtype.name == existing_type.name }
 
-            hash[index_def.name] = type
+              unless is_subtype_of_existing || is_existing_subtype_of_current
+                raise Errors::SchemaError, "DatastoreCore::IndexDefinition #{index_def.name} is used multiple times: #{type} vs #{existing_type}"
+              end
+
+              # Prefer the abstract type (union/interface) as the document type for queries
+              hash[index_def.name] = type if type.subtypes.any?
+            else
+              hash[index_def.name] = type
+            end
           end
         end.freeze
       end

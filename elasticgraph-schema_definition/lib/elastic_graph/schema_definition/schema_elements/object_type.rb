@@ -38,6 +38,20 @@ module ElasticGraph
         include Mixins::ImplementsInterfaces
         include Mixins::HasReadableToSAndInspect.new { |t| t.name }
 
+        # Override to add __typename for types in mixed-type indices (where multiple concrete
+        # types are indexed into a parent union/interface's shared index).
+        def indexing_fields_by_name_in_index
+          fields = super
+
+          # For types indexed into a parent union/interface's mixed-type index, add __typename
+          # so it gets indexed and can be used for query-time type resolution.
+          if index_def.nil? && resolved_index_def
+            fields.merge("__typename" => schema_def_state.factory.new_field(name: "__typename", type: "String", parent_type: self))
+          else
+            fields
+          end
+        end
+
         # @private
         def initialize(schema_def_state, name)
           field_factory = schema_def_state.factory.method(:new_field)
