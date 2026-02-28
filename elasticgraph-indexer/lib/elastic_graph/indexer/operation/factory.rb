@@ -134,7 +134,9 @@ module ElasticGraph
         def type_requires_typename?(type_name)
           @types_requiring_typename ||= begin
             # Check the latest JSON schema to see which types require __typename.
-            # We use the latest version here because all versions should have consistent __typename requirements.
+            # Note: we use the latest version for simplicity, accepting the risk that __typename requirements
+            # could differ across schema versions. This is unlikely since __typename requirements are structural
+            # (based on mixed-type indices), not version-specific, but schema evolution could theoretically change them.
             json_schemas = schema_artifacts.json_schemas_for(schema_artifacts.latest_json_schema_version)
             json_schemas.fetch("$defs").filter_map do |type, type_def|
               required_fields = type_def["required"] || []
