@@ -266,9 +266,7 @@ module ElasticGraph
             next unless type.respond_to?(:abstract?) && type.abstract?
             next unless type.respond_to?(:index_def) && type.index_def
 
-            if type.respond_to?(:recursively_resolve_subtypes)
-              type if type.recursively_resolve_subtypes.any? { |subtype| subtype.name == name }
-            end
+            type if type.recursively_resolve_subtypes.any? { |subtype| subtype.name == name }
           end
 
           if indexed_parents.size > 1
@@ -304,8 +302,8 @@ module ElasticGraph
             [field, SchemaArtifacts::RuntimeMetadata::DynamicParam.new(source_path: field, cardinality: :one)]
           end
 
-          routing_value_source = resolved_index_def&.runtime_metadata&.route_with
-          rollover_timestamp_value_source = resolved_index_def&.runtime_metadata&.rollover&.timestamp_field_path
+          routing_value_source = resolved_index_def.runtime_metadata.route_with
+          rollover_timestamp_value_source = resolved_index_def.runtime_metadata.rollover&.timestamp_field_path
 
           Indexing::UpdateTargetFactory.new_normal_indexing_update_target(
             type: name,

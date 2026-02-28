@@ -371,8 +371,12 @@ module ElasticGraph
                 runtime_metadata: indexer.schema_artifacts.runtime_metadata,
                 indices: indexer.schema_artifacts.indices,
                 index_templates: indexer.schema_artifacts.index_templates,
-                index_mappings_by_index_def_name: indexer.schema_artifacts.index_mappings_by_index_def_name
+                index_mappings_by_index_def_name: indexer.schema_artifacts.index_mappings_by_index_def_name,
+                latest_json_schema_version: nil
               )
+
+              # Stub json_schemas_for to return an empty schema structure
+              allow(fake_empty_schema_artifacts).to receive(:json_schemas_for).and_return({"$defs" => {}})
 
               operation_factory = build_indexer(schema_artifacts: fake_empty_schema_artifacts).operation_factory
 
