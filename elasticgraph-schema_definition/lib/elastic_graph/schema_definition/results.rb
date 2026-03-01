@@ -353,7 +353,6 @@ module ElasticGraph
         indexed_type_names = (directly_indexed + transitively_indexed)
           .map(&:name)
           .uniq
-          .sort
 
         definitions_by_name = json_schema_indexing_field_types_by_name
           .transform_values(&:to_json_schema)
