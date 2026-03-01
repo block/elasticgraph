@@ -25,7 +25,11 @@ module ElasticGraph
           it "generates a primary indexing operation" do
             event = build_upsert_event(:component, id: "1", __version: 1)
 
-            expect(build_expecting_success(event)).to eq([new_primary_indexing_operation(event)])
+            operations = build_expecting_success(event)
+            expect(operations).to eq([new_primary_indexing_operation(event)])
+
+            # Verify __typename is NOT injected for single-type indices
+            expect(operations.first.prepared_record).not_to have_key("__typename")
           end
 
           it "injects __typename into the record when the type requires it (for mixed-type indices)" do
