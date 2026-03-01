@@ -32,7 +32,7 @@ module ElasticGraph
             # Mock the schema artifacts to make Component require __typename
             modified_schema = ::Marshal.load(::Marshal.dump(indexer.schema_artifacts.json_schemas_for(1)))
             modified_schema["$defs"]["Component"]["required"] ||= []
-            modified_schema["$defs"]["Component"]["required"] << "__typename" unless modified_schema["$defs"]["Component"]["required"].include?("__typename")
+            modified_schema["$defs"]["Component"]["required"] << "__typename"
 
             allow(indexer.schema_artifacts).to receive(:latest_json_schema_version).and_return(1)
             allow(indexer.schema_artifacts).to receive(:json_schemas_for).with(1).and_return(modified_schema)
