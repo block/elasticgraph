@@ -148,6 +148,22 @@ module ElasticGraph
         EOS
       end
 
+      it "does not warn when Apollo's optional resolvers are registered but never used" do
+        output = StringIO.new
+
+        graphql_resolvers_by_name(output: output) do |schema|
+          schema.register_graphql_resolver :apollo_entity_ref,
+            GraphQLResolverWithoutLookahead,
+            defined_at: "elastic_graph/apollo/graphql/apollo_entity_ref_resolver"
+
+          schema.register_graphql_resolver :apollo_entities,
+            GraphQLResolverWithoutLookahead,
+            defined_at: "elastic_graph/apollo/graphql/entities_field_resolver"
+        end
+
+        expect(output.string).to eq("")
+      end
+
       def graphql_resolvers_by_name(...)
         define_schema(...).runtime_metadata.graphql_resolvers_by_name
       end

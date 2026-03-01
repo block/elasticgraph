@@ -383,7 +383,8 @@ module ElasticGraph
 
         unused_resolvers = registered_resolvers.except(*fields_by_resolvers.keys).reject do |name, res|
           # Ignore our built-in resolvers.
-          res.resolver_ref.fetch("require_path").start_with?("elastic_graph/graphql/resolvers/")
+          require_path = res.resolver_ref.fetch("require_path")
+          require_path.start_with?("elastic_graph/graphql/resolvers/", "elastic_graph/apollo/graphql/")
         end.keys
 
         unless unused_resolvers.empty?
