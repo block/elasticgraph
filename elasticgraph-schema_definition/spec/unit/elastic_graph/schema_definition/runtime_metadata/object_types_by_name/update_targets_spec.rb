@@ -1618,6 +1618,9 @@ module ElasticGraph
           expect(component_target.rollover_timestamp_value_source).to eq("created_at")
         end
 
+        # This test covers the early return branches in `routing_value_source_for_index` and
+        # `rollover_timestamp_value_source_for_index` when the inherited index has no custom
+        # routing or rollover configuration.
         it "defaults to standard routing when the parent abstract type's index has no custom routing or rollover configuration" do
           widget_metadata = object_type_metadata_for("Widget") do |s|
             s.object_type "Widget" do |t|
