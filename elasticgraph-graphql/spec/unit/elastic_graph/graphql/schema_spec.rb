@@ -151,12 +151,10 @@ module ElasticGraph
           schema = define_schema do |s|
             s.object_type "MechanicalPart" do |t|
               t.field "id", "ID!"
-              t.field "material", "String"
             end
 
             s.object_type "ElectricalPart" do |t|
               t.field "id", "ID!"
-              t.field "voltage", "Int"
             end
 
             s.union_type "Part" do |t|
@@ -165,10 +163,7 @@ module ElasticGraph
             end
           end
 
-          document_type = schema.document_type_stored_in("parts")
-
-          # The union should be the document type for the "parts" index, not either subtype
-          expect(document_type.name).to eq("Part")
+          expect(schema.document_type_stored_in("parts")).to eq(schema.type_named("Part"))
         end
 
         def schema_with_indices(index_name_by_type)
