@@ -147,6 +147,30 @@ module ElasticGraph
           }.to raise_error(Errors::SchemaError, a_string_including("widgets", "Person", "Widget"))
         end
 
+        it "returns the abstract type (union/interface) when subtypes share the parent's index" do
+          schema = define_schema do |s|
+            s.object_type "MechanicalPart" do |t|
+              t.field "id", "ID!"
+              t.field "material", "String"
+            end
+
+            s.object_type "ElectricalPart" do |t|
+              t.field "id", "ID!"
+              t.field "voltage", "Int"
+            end
+
+            s.union_type "Part" do |t|
+              t.subtypes "MechanicalPart", "ElectricalPart"
+              t.index "parts"
+            end
+          end
+
+          document_type = schema.document_type_stored_in("parts")
+
+          # The union should be the document type for the "parts" index, not either subtype
+          expect(document_type.name).to eq("Part")
+        end
+
         def schema_with_indices(index_name_by_type)
           define_schema do |s|
             define_indexed_type(s, "Person", index_name_by_type.fetch("Person"))
@@ -251,32 +275,6 @@ module ElasticGraph
               schema.field_named("#{type_name_root}#{suffix}", field)
             end
           end
-        end
-      end
-
-      describe "#document_type_stored_in" do
-        it "returns the abstract type (union/interface) when subtypes share the parent's index" do
-          schema = define_schema do |s|
-            s.object_type "MechanicalPart" do |t|
-              t.field "id", "ID!"
-              t.field "material", "String"
-            end
-
-            s.object_type "ElectricalPart" do |t|
-              t.field "id", "ID!"
-              t.field "voltage", "Int"
-            end
-
-            s.union_type "Part" do |t|
-              t.subtypes "MechanicalPart", "ElectricalPart"
-              t.index "parts"
-            end
-          end
-
-          document_type = schema.document_type_stored_in("parts")
-
-          # The union should be the document type for the "parts" index, not either subtype
-          expect(document_type.name).to eq("Part")
         end
       end
 
