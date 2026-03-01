@@ -2735,6 +2735,31 @@ module ElasticGraph
             # Both subtypes should appear in enum (mixed direct + transitive indexing)
             expect(envelope_type_enum_values(schemas.fetch("$defs"))).to contain_exactly("ElectricalPart", "MechanicalPart")
           end
+
+          it "includes __typename in required fields for subtypes that inherit their index" do
+            json_schema = dump_schema do |s|
+              s.object_type "MechanicalPart" do |t|
+                t.field "id", "ID!"
+                t.field "material", "String"
+                link_subtype_to_supertype(t, "Part")
+              end
+
+              s.object_type "ElectricalPart" do |t|
+                t.field "id", "ID!"
+                t.field "voltage", "Int"
+                link_subtype_to_supertype(t, "Part")
+              end
+
+              s.public_send type_def_method, "Part" do |t|
+                link_supertype_to_subtypes(t, "MechanicalPart", "ElectricalPart")
+                t.index "parts"
+              end
+            end
+
+            # Subtypes without their own index should require __typename for mixed-type index resolution
+            expect(json_schema.dig("$defs", "MechanicalPart", "required")).to include("__typename")
+            expect(json_schema.dig("$defs", "ElectricalPart", "required")).to include("__typename")
+          end
         end
       end
 
