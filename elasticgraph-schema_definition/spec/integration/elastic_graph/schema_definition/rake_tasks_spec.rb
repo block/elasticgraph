@@ -26,6 +26,10 @@ module ElasticGraph
         expect { example.run }.not_to output(/./).to_stderr_from_any_process
       end
 
+      after do
+        Thread.current[:eg_schema_load_count] = nil
+      end
+
       describe "schema_artifacts:dump", :in_temp_dir do
         it "idempotently dumps all schema artifacts, and is able to check if they are current with `:check`" do
           write_elastic_graph_schema_def_code(json_schema_version: 1)
@@ -888,16 +892,21 @@ module ElasticGraph
         end
 
         let(:json_schema_version_setter_location_regex) do
-          # In `write_elastic_graph_schema_def_code` `json_schema_version` is called on the 2nd line of
-          # the file written to `schema.rb`. See below.
+          # In `write_elastic_graph_schema_def_code` `json_schema_version` is called on the 7th line of
+          # the file written to `schema.rb` (after the 5-line double-load guard). See below.
           #
           # Note: on Ruby 3.3, the path here winds up being slightly different; instead of just `schema.rb` it is something like:
           # `../d20240216-23551-cvdjzo/schema.rb`. I think it's related to the temp directory we run these specs within.
-          /line 2 at `(\S*\/?)schema\.rb`/
+          /line 7 at `(\S*\/?)schema\.rb`/
         end
 
         def write_elastic_graph_schema_def_code(json_schema_version:, component_suffix: "", extra_sdl: "", component_name_extras: "", component_extras: "", omit_component_name_field: false)
           code = <<~EOS
+            Thread.current[:eg_schema_load_count] = (Thread.current[:eg_schema_load_count] || 0) + 1
+            if Thread.current[:eg_schema_load_count] > 1
+              raise "Schema file \#{__FILE__} was loaded \#{Thread.current[:eg_schema_load_count]} times in a single run!"
+            end
+
             ElasticGraph.define_schema do |schema|
               schema.json_schema_version #{json_schema_version}
               schema.enum_type "Size" do |t|
@@ -949,6 +958,11 @@ module ElasticGraph
 
         def runtime_metadata_for_elastic_graph_schema_def_code(include_date_time_fields:)
           ::File.write("schema.rb", <<~EOS)
+            Thread.current[:eg_schema_load_count] = (Thread.current[:eg_schema_load_count] || 0) + 1
+            if Thread.current[:eg_schema_load_count] > 1
+              raise "Schema file \#{__FILE__} was loaded \#{Thread.current[:eg_schema_load_count]} times in a single run!"
+            end
+
             ElasticGraph.define_schema do |schema|
               schema.json_schema_version 1
 
@@ -1052,6 +1066,8 @@ module ElasticGraph
         type_name_overrides: {},
         enum_value_overrides_by_type: {}
       )
+        Thread.current[:eg_schema_load_count] = nil
+
         if include_extension_module
           extension_module = Module.new do
             def as_active_instance
