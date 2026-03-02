@@ -53,13 +53,23 @@ module ElasticGraph
                 required_fields = json_schema_subfields
                 required_fields = required_fields.reject(&:nullable?) if schema_def_state.allow_omitted_json_schema_fields
 
+                required_field_names = required_fields.map(&:name)
+                # For types that are indexed into a parent union/interface's mixed-type index (an index shared
+                # with other concrete types), we need __typename to resolve the concrete type at query time,
+                # since we can't infer it from the index name alone.
+                type = schema_def_state.types_by_name[type_name]
+                if type.index_def.nil? && type.respond_to?(:resolved_index_def) && type.resolved_index_def
+                  required_field_names += ["__typename"]
+                end
+
                 {
                   "type" => "object",
                   "properties" => json_schema_subfields.to_h { |f| [f.name, f.json_schema] }.merge(json_schema_typename_field),
-                  # Note: `__typename` is intentionally not included in the `required` list. If `__typename` is present
-                  # we want it validated (as we do by merging in `json_schema_typename_field`) but we only want
-                  # to require it in the context of a union type. The union's json schema requires the field.
-                  "required" => required_fields.map(&:name).freeze,
+                  # Note: `__typename` may be included in the `required` list. If `__typename` is present
+                  # we want it validated (as we do by merging in `json_schema_typename_field`), and we require
+                  # it for: 1) embedded union/interface types (handled in union.rb), or 2) types in mixed-type
+                  # indices (as determined by the check above).
+                  "required" => required_field_names.freeze,
                   "additionalProperties" => (false unless schema_def_state.allow_extra_json_schema_fields),
                   "description" => doc_comment
                 }.compact.freeze

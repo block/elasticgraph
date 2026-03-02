@@ -147,6 +147,25 @@ module ElasticGraph
           }.to raise_error(Errors::SchemaError, a_string_including("widgets", "Person", "Widget"))
         end
 
+        it "returns the abstract type (union/interface) when subtypes share the parent's index" do
+          schema = define_schema do |s|
+            s.object_type "MechanicalPart" do |t|
+              t.field "id", "ID!"
+            end
+
+            s.object_type "ElectricalPart" do |t|
+              t.field "id", "ID!"
+            end
+
+            s.union_type "Part" do |t|
+              t.subtypes "MechanicalPart", "ElectricalPart"
+              t.index "parts"
+            end
+          end
+
+          expect(schema.document_type_stored_in("parts")).to eq(schema.type_named("Part"))
+        end
+
         def schema_with_indices(index_name_by_type)
           define_schema do |s|
             define_indexed_type(s, "Person", index_name_by_type.fetch("Person"))

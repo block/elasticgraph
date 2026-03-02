@@ -1559,6 +1559,86 @@ module ElasticGraph
           expect(metadata.update_targets.first.data_params).to eq({"id" => dynamic_param_with(source_path: "id", cardinality: :many)})
           expect(metadata.update_targets.first.metadata_params).to eq({})
         end
+
+        it "inherits routing configuration from the parent abstract type's index when the concrete type has no direct index" do
+          widget_metadata, component_metadata = object_type_metadata_for("Widget", "Component") do |s|
+            s.object_type "Widget" do |t|
+              t.field "id", "ID!"
+              t.field "workspace_id", "ID!"
+              link_subtype_to_supertype(t, "Thing")
+            end
+
+            s.object_type "Component" do |t|
+              t.field "id", "ID!"
+              t.field "workspace_id", "ID!"
+              link_subtype_to_supertype(t, "Thing")
+            end
+
+            s.public_send type_def_method, "Thing" do |t|
+              link_supertype_to_subtypes(t, "Widget", "Component")
+              t.index "things" do |i|
+                i.route_with "workspace_id"
+              end
+            end
+          end
+
+          widget_target = widget_metadata.update_targets.find { |t| t.type == "Widget" }
+          expect(widget_target.routing_value_source).to eq("workspace_id")
+
+          component_target = component_metadata.update_targets.find { |t| t.type == "Component" }
+          expect(component_target.routing_value_source).to eq("workspace_id")
+        end
+
+        it "inherits rollover configuration from the parent abstract type's index when the concrete type has no direct index" do
+          widget_metadata, component_metadata = object_type_metadata_for("Widget", "Component") do |s|
+            s.object_type "Widget" do |t|
+              t.field "id", "ID!"
+              t.field "created_at", "DateTime!"
+              link_subtype_to_supertype(t, "Thing")
+            end
+
+            s.object_type "Component" do |t|
+              t.field "id", "ID!"
+              t.field "created_at", "DateTime!"
+              link_subtype_to_supertype(t, "Thing")
+            end
+
+            s.public_send type_def_method, "Thing" do |t|
+              link_supertype_to_subtypes(t, "Widget", "Component")
+              t.index "things" do |i|
+                i.rollover :monthly, "created_at"
+              end
+            end
+          end
+
+          widget_target = widget_metadata.update_targets.find { |t| t.type == "Widget" }
+          expect(widget_target.rollover_timestamp_value_source).to eq("created_at")
+
+          component_target = component_metadata.update_targets.find { |t| t.type == "Component" }
+          expect(component_target.rollover_timestamp_value_source).to eq("created_at")
+        end
+
+        # This test covers the early return branches in `routing_value_source_for_index` and
+        # `rollover_timestamp_value_source_for_index` when the inherited index has no custom
+        # routing or rollover configuration.
+        it "defaults to standard routing when the parent abstract type's index has no custom routing or rollover configuration" do
+          widget_metadata = object_type_metadata_for("Widget") do |s|
+            s.object_type "Widget" do |t|
+              t.field "id", "ID!"
+              t.field "name", "String"
+              link_subtype_to_supertype(t, "Thing")
+            end
+
+            s.public_send type_def_method, "Thing" do |t|
+              link_supertype_to_subtypes(t, "Widget")
+              t.index "things"
+            end
+          end
+
+          widget_target = widget_metadata.update_targets.find { |t| t.type == "Widget" }
+          expect(widget_target.routing_value_source).to eq("id") # defaults to id when no custom routing
+          expect(widget_target.rollover_timestamp_value_source).to be_nil # no default for rollover
+        end
       end
 
       def standard_metadata_params(relationship:)

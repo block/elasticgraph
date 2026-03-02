@@ -25,7 +25,31 @@ module ElasticGraph
           it "generates a primary indexing operation" do
             event = build_upsert_event(:component, id: "1", __version: 1)
 
-            expect(build_expecting_success(event)).to eq([new_primary_indexing_operation(event)])
+            operations = build_expecting_success(event)
+            expect(operations).to eq([new_primary_indexing_operation(event)])
+
+            # Verify __typename is NOT injected for single-type indices
+            expect(operations.first.prepared_record).not_to have_key("__typename")
+          end
+
+          it "injects __typename into the record when the type requires it (for mixed-type indices)" do
+            # Mock the schema artifacts to make Component require __typename
+            modified_schema = ::Marshal.load(::Marshal.dump(indexer.schema_artifacts.json_schemas_for(1)))
+            modified_schema["$defs"]["Component"]["required"] ||= []
+            modified_schema["$defs"]["Component"]["required"] << "__typename"
+
+            allow(indexer.schema_artifacts).to receive(:latest_json_schema_version).and_return(1)
+            allow(indexer.schema_artifacts).to receive(:json_schemas_for).with(1).and_return(modified_schema)
+
+            event = build_upsert_event(:component, id: "1", __version: 1)
+            # Verify the event doesn't already have __typename
+            expect(event["record"]).not_to have_key("__typename")
+
+            operations = build_expecting_success(event)
+            primary_op = operations.first
+
+            # Verify __typename was injected into the prepared record
+            expect(primary_op.prepared_record["__typename"]).to eq("Component")
           end
 
           it "also generates derived index update operations for an upsert event for the source type of a derived indexing type" do
@@ -371,8 +395,12 @@ module ElasticGraph
                 runtime_metadata: indexer.schema_artifacts.runtime_metadata,
                 indices: indexer.schema_artifacts.indices,
                 index_templates: indexer.schema_artifacts.index_templates,
-                index_mappings_by_index_def_name: indexer.schema_artifacts.index_mappings_by_index_def_name
+                index_mappings_by_index_def_name: indexer.schema_artifacts.index_mappings_by_index_def_name,
+                latest_json_schema_version: nil
               )
+
+              # Stub json_schemas_for to return an empty schema structure
+              allow(fake_empty_schema_artifacts).to receive(:json_schemas_for).and_return({"$defs" => {}})
 
               operation_factory = build_indexer(schema_artifacts: fake_empty_schema_artifacts).operation_factory
 

@@ -76,6 +76,9 @@ configure_local_rake_tasks = ->(tasks) do
       FactoryBot.build(:widget, components: widget_components)
     end)
 
+    batch.concat(Array.new(10) { FactoryBot.build(:online_store) })
+    batch.concat(Array.new(10) { FactoryBot.build(:physical_store) })
+
     batch.concat(sponsors = Array.new(10) { FactoryBot.build(:sponsor) })
     batch.concat(Array.new(10) { FactoryBot.build(:team, sponsors: sponsors.sample(rand(3))) })
     batch

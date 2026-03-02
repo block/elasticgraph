@@ -699,6 +699,56 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: name
+  StoreSortOrderInput:
+    values_by_name:
+      address_ASC:
+        sort_field:
+          direction: asc
+          field_path: address
+      address_DESC:
+        sort_field:
+          direction: desc
+          field_path: address
+      established_on_ASC:
+        sort_field:
+          direction: asc
+          field_path: established_on
+      established_on_DESC:
+        sort_field:
+          direction: desc
+          field_path: established_on
+      id_ASC:
+        sort_field:
+          direction: asc
+          field_path: id
+      id_DESC:
+        sort_field:
+          direction: desc
+          field_path: id
+      platform_ASC:
+        sort_field:
+          direction: asc
+          field_path: platform
+      platform_DESC:
+        sort_field:
+          direction: desc
+          field_path: platform
+      square_footage_ASC:
+        sort_field:
+          direction: asc
+          field_path: square_footage
+      square_footage_DESC:
+        sort_field:
+          direction: desc
+          field_path: square_footage
+      url_ASC:
+        sort_field:
+          direction: asc
+          field_path: url
+      url_DESC:
+        sort_field:
+          direction: desc
+          field_path: url
   TeamSortOrderInput:
     values_by_name:
       country_code_ASC:
@@ -1567,6 +1617,26 @@ index_definitions_by_name:
       id:
         source: __self
       name:
+        source: __self
+    route_with: id
+  stores:
+    current_sources:
+    - __self
+    default_sort_fields:
+    - direction: desc
+      field_path: id
+    fields_by_path:
+      address:
+        source: __self
+      established_on:
+        source: __self
+      id:
+        source: __self
+      platform:
+        source: __self
+      square_footage:
+        source: __self
+      url:
         source: __self
     route_with: id
   teams:
@@ -4614,6 +4684,48 @@ object_types_by_name:
         resolver:
           name: object_with_lookahead
     graphql_only_return_type: true
+  OnlineStore:
+    graphql_fields_by_name:
+      established_on:
+        resolver:
+          name: get_record_field_value
+      id:
+        resolver:
+          name: get_record_field_value
+      platform:
+        resolver:
+          name: get_record_field_value
+      url:
+        resolver:
+          name: get_record_field_value
+    index_definition_names:
+    - stores
+    update_targets:
+    - data_params:
+        __typename:
+          cardinality: one
+        established_on:
+          cardinality: one
+        platform:
+          cardinality: one
+        url:
+          cardinality: one
+      id_source: id
+      metadata_params:
+        relationship:
+          value: __self
+        sourceId:
+          cardinality: one
+          source_path: id
+        sourceType:
+          cardinality: one
+          source_path: type
+        version:
+          cardinality: one
+      relationship: __self
+      routing_value_source: id
+      script_id: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
+      type: OnlineStore
   PageInfo:
     graphql_fields_by_name:
       end_cursor:
@@ -4778,6 +4890,48 @@ object_types_by_name:
       nationality:
         resolver:
           name: get_record_field_value
+  PhysicalStore:
+    graphql_fields_by_name:
+      address:
+        resolver:
+          name: get_record_field_value
+      established_on:
+        resolver:
+          name: get_record_field_value
+      id:
+        resolver:
+          name: get_record_field_value
+      square_footage:
+        resolver:
+          name: get_record_field_value
+    index_definition_names:
+    - stores
+    update_targets:
+    - data_params:
+        __typename:
+          cardinality: one
+        address:
+          cardinality: one
+        established_on:
+          cardinality: one
+        square_footage:
+          cardinality: one
+      id_source: id
+      metadata_params:
+        relationship:
+          value: __self
+        sourceId:
+          cardinality: one
+          source_path: id
+        sourceType:
+          cardinality: one
+          source_path: type
+        version:
+          cardinality: one
+      relationship: __self
+      routing_value_source: id
+      script_id: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
+      type: PhysicalStore
   Player:
     graphql_fields_by_name:
       affiliations:
@@ -4960,6 +5114,12 @@ object_types_by_name:
         resolver:
           name: list_records
       sponsors:
+        resolver:
+          name: list_records
+      store_aggregations:
+        resolver:
+          name: list_records
+      stores:
         resolver:
           name: list_records
       team_aggregations:
@@ -5190,6 +5350,143 @@ object_types_by_name:
     graphql_fields_by_name:
       count:
         name_in_index: __counts
+  Store:
+    graphql_fields_by_name:
+      address:
+        resolver:
+          name: get_record_field_value
+      established_on:
+        resolver:
+          name: get_record_field_value
+      id:
+        resolver:
+          name: get_record_field_value
+      platform:
+        resolver:
+          name: get_record_field_value
+      square_footage:
+        resolver:
+          name: get_record_field_value
+      url:
+        resolver:
+          name: get_record_field_value
+    index_definition_names:
+    - stores
+  StoreAggregatedValues:
+    graphql_fields_by_name:
+      address:
+        resolver:
+          name: object_with_lookahead
+      established_on:
+        resolver:
+          name: object_with_lookahead
+      id:
+        resolver:
+          name: object_with_lookahead
+      platform:
+        resolver:
+          name: object_with_lookahead
+      square_footage:
+        resolver:
+          name: object_with_lookahead
+      url:
+        resolver:
+          name: object_with_lookahead
+  StoreAggregation:
+    elasticgraph_category: indexed_aggregation
+    graphql_fields_by_name:
+      aggregated_values:
+        resolver:
+          name: object_without_lookahead
+      count:
+        resolver:
+          name: object_without_lookahead
+      grouped_by:
+        resolver:
+          name: object_without_lookahead
+    source_type: Store
+  StoreAggregationConnection:
+    elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver:
+          name: object_without_lookahead
+      nodes:
+        resolver:
+          name: object_without_lookahead
+      page_info:
+        resolver:
+          name: object_without_lookahead
+  StoreAggregationEdge:
+    elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      cursor:
+        resolver:
+          name: object_without_lookahead
+      node:
+        resolver:
+          name: object_without_lookahead
+  StoreConnection:
+    elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver:
+          name: object_without_lookahead
+      nodes:
+        resolver:
+          name: object_without_lookahead
+      page_info:
+        resolver:
+          name: object_without_lookahead
+      total_edge_count:
+        resolver:
+          name: object_without_lookahead
+  StoreEdge:
+    elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      all_highlights:
+        resolver:
+          name: object_without_lookahead
+      cursor:
+        resolver:
+          name: object_without_lookahead
+      highlights:
+        resolver:
+          name: object_without_lookahead
+      node:
+        resolver:
+          name: object_without_lookahead
+  StoreGroupedBy:
+    graphql_fields_by_name:
+      address:
+        resolver:
+          name: object_with_lookahead
+      established_on:
+        resolver:
+          name: object_with_lookahead
+      platform:
+        resolver:
+          name: object_with_lookahead
+      square_footage:
+        resolver:
+          name: object_with_lookahead
+      url:
+        resolver:
+          name: object_with_lookahead
+  StoreHighlights:
+    graphql_fields_by_name:
+      address:
+        resolver:
+          name: get_record_field_value
+      id:
+        resolver:
+          name: get_record_field_value
+      platform:
+        resolver:
+          name: get_record_field_value
+      url:
+        resolver:
+          name: get_record_field_value
   StringConnection:
     elasticgraph_category: relay_connection
     graphql_fields_by_name:

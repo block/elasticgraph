@@ -328,6 +328,31 @@ ElasticGraph.define_schema do |schema|
     t.subtypes "MechanicalPart", "ElectricalPart"
   end
 
+  schema.interface_type "Store" do |t|
+    t.field "id", "ID!"
+    t.field "established_on", "Date"
+
+    t.index "stores" do |i|
+      i.default_sort "id", :desc
+    end
+  end
+
+  schema.object_type "OnlineStore" do |t|
+    t.implements "Store"
+    t.field "id", "ID!"
+    t.field "url", "String!"
+    t.field "platform", "String"  # e.g., "Shopify", "WooCommerce"
+    t.field "established_on", "Date"
+  end
+
+  schema.object_type "PhysicalStore" do |t|
+    t.implements "Store"
+    t.field "id", "ID!"
+    t.field "address", "String!"
+    t.field "square_footage", "Int"
+    t.field "established_on", "Date"
+  end
+
   # Note: `Manufacturer` is used in our tests as an example of an indexed type that has no list fields, so we should
   # not add any list fields to this type in the future.
   schema.object_type "Manufacturer" do |t|
