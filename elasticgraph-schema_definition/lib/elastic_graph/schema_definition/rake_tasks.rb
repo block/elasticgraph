@@ -171,18 +171,20 @@ module ElasticGraph
       end
 
       def schema_def_api
-        require "elastic_graph/schema_definition/api"
+        @schema_def_api ||= begin
+          require "elastic_graph/schema_definition/api"
 
-        API.new(
-          @schema_element_names,
-          @index_document_sizes,
-          extension_modules: @extension_modules,
-          derived_type_name_formats: @derived_type_name_formats,
-          type_name_overrides: @type_name_overrides,
-          enum_value_overrides_by_type: @enum_value_overrides_by_type,
-          output: @output
-        ).tap do |api|
-          api.as_active_instance { load @path_to_schema.to_s }
+          API.new(
+            @schema_element_names,
+            @index_document_sizes,
+            extension_modules: @extension_modules,
+            derived_type_name_formats: @derived_type_name_formats,
+            type_name_overrides: @type_name_overrides,
+            enum_value_overrides_by_type: @enum_value_overrides_by_type,
+            output: @output
+          ).tap do |api|
+            api.as_active_instance { load @path_to_schema.to_s }
+          end
         end
       end
     end
