@@ -25,6 +25,7 @@ datastore:
     widgets: *main_index_settings
     widget_workspaces: *main_index_settings
     sponsors: *main_index_settings
+    stores: *main_index_settings
   max_client_retries: 3
 graphql:
   default_page_size: 50
