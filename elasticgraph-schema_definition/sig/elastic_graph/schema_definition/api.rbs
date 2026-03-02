@@ -74,7 +74,7 @@ module ElasticGraph
       def results: () -> Results
       def json_schema_version: (::Integer) -> void
       def register_graphql_extension: (::Module, defined_at: ::String, **untyped) -> void
-      def register_graphql_resolver: (::Symbol, ::Class, defined_at: ::String, **untyped) -> void
+      def register_graphql_resolver: (::Symbol, ::Class, defined_at: ::String, ?built_in: bool, **untyped) -> void
       def on_built_in_types: () { (SchemaElements::graphQLType) -> void } -> void
       def on_root_query_type: () { (SchemaElements::ObjectType) -> void } -> void
     end
