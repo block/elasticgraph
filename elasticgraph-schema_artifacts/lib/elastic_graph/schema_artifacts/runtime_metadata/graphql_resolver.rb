@@ -12,7 +12,7 @@ module ElasticGraph
   module SchemaArtifacts
     module RuntimeMetadata
       # @private
-      class GraphQLResolver < ::Data.define(:needs_lookahead, :resolver_ref)
+      class GraphQLResolver < ::Data.define(:needs_lookahead, :resolver_ref, :built_in)
         def self.with_lookahead_loader
           @with_lookahead_loader ||= ExtensionLoader.new(InterfaceWithLookahead)
         end
@@ -21,6 +21,7 @@ module ElasticGraph
           @without_lookahead_loader ||= ExtensionLoader.new(InterfaceWithoutLookahead)
         end
 
+        BUILT_IN = "built_in"
         NEEDS_LOOKAHEAD = "needs_lookahead"
         RESOLVER_REF = "resolver_ref"
 
@@ -32,13 +33,15 @@ module ElasticGraph
         def self.from_hash(hash)
           new(
             needs_lookahead: hash.fetch(NEEDS_LOOKAHEAD),
-            resolver_ref: hash.fetch(RESOLVER_REF)
+            resolver_ref: hash.fetch(RESOLVER_REF),
+            built_in: hash.fetch(BUILT_IN) { false }
           )
         end
 
         def to_dumpable_hash
           {
             # Keys here are ordered alphabetically; please keep them that way.
+            BUILT_IN => built_in,
             NEEDS_LOOKAHEAD => needs_lookahead,
             RESOLVER_REF => resolver_ref
           }
