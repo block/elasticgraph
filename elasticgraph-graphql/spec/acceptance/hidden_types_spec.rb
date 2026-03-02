@@ -78,6 +78,8 @@ module ElasticGraph
             all_types_related_to("WidgetCurrency") +
             all_types_related_to("Team") +
             all_types_related_to("Sponsor") +
+            all_types_related_to("Store") +
+            ["OnlineStore", "PhysicalStore"] +
             relay_types_related_to("String", include_list_filter: true) - ["StringSortOrderInput"] +
             type_and_filters_for("Boolean", include_list: true) +
             type_and_filters_for("Color", include_list: true, as_input_enum: true) +

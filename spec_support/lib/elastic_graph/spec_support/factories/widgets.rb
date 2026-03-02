@@ -198,4 +198,18 @@ FactoryBot.define do
       parts { [] }
     end
   end
+
+  factory :online_store, parent: :indexed_type do
+    __typename { "OnlineStore" }
+    url { "https://#{Faker::Internet.domain_name}" }
+    platform { Faker::Base.sample(["Shopify", "WooCommerce", "Magento", "Custom"]) }
+    established_on { Faker::Date.between(from: recent_date - 365, to: recent_date).iso8601 }
+  end
+
+  factory :physical_store, parent: :indexed_type do
+    __typename { "PhysicalStore" }
+    address { Faker::Address.full_address }
+    square_footage { Faker::Number.between(from: 500, to: 50000) }
+    established_on { Faker::Date.between(from: recent_date - 365, to: recent_date).iso8601 }
+  end
 end
