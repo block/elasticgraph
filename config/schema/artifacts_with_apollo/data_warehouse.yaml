@@ -62,6 +62,17 @@ tables:
         id STRING,
         name STRING
       )
+  stores:
+    table_schema: |-
+      CREATE TABLE IF NOT EXISTS stores (
+        id STRING,
+        url STRING,
+        platform STRING,
+        established_on DATE,
+        __typename STRING,
+        address STRING,
+        square_footage INT
+      )
   teams:
     table_schema: |-
       CREATE TABLE IF NOT EXISTS teams (

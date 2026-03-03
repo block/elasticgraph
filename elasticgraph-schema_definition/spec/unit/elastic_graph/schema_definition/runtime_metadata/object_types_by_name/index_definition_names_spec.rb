@@ -155,6 +155,28 @@ module ElasticGraph
             end
           }.to raise_error(ElasticGraph::Errors::SchemaError, a_string_including("Cannot define an index on `Thing` after initialization is complete"))
         end
+
+        it "raises an error when a concrete type without an index is a subtype of multiple indexed abstract types" do
+          expect {
+            object_type_metadata_for "Widget" do |s|
+              s.object_type "Widget" do |t|
+                t.field "id", "ID!"
+                link_subtype_to_supertype(t, "ThingA")
+                link_subtype_to_supertype(t, "ThingB")
+              end
+
+              s.public_send type_def_method, "ThingA" do |t|
+                link_supertype_to_subtypes(t, "Widget")
+                t.index "things_a"
+              end
+
+              s.public_send type_def_method, "ThingB" do |t|
+                link_supertype_to_subtypes(t, "Widget")
+                t.index "things_b"
+              end
+            end
+          }.to raise_error(ElasticGraph::Errors::SchemaError, a_string_including("The `Widget` type is a subtype of multiple indexed abstract types", "things_a, things_b"))
+        end
       end
     end
   end

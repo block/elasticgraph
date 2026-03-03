@@ -86,7 +86,10 @@ module ElasticGraph
             requested_fields_for(child, index_field_paths, path_prefix: path_prefix)
           end
 
-          fields << "#{path_prefix}__typename" if field_for(node.field)&.type&.abstract?
+          # For abstract types (unions/interfaces), we need __typename to resolve the concrete type.
+          # We must fully unwrap the type to check the innermost type, since the field type could be
+          # wrapped in lists (e.g., `[Part!]!`) or non-null wrappers.
+          fields << "#{path_prefix}__typename" if field_for(node.field)&.type&.unwrap_fully&.abstract?
           fields
         end
 

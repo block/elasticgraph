@@ -695,6 +695,87 @@ module ElasticGraph
         test_widget_search_highlighting(widget1, widget2, widget3)
       end
 
+      it "queries union types with transitive indexing", :expect_search_routing do
+        # Build order_by enum values with proper casing
+        established_on_asc = :"#{case_correctly("established_on")}_ASC"
+        id_desc = :"#{case_correctly("id")}_DESC"
+
+        # Set up test data
+        index_records(
+          online_store1 = build(:online_store, url: "https://shop1.example.com", platform: "Shopify", established_on: "2020-01-15"),
+          online_store2 = build(:online_store, url: "https://shop2.example.com", platform: "WooCommerce", established_on: "2021-06-20"),
+          physical_store1 = build(:physical_store, address: "123 Main St, Anytown USA", square_footage: 5000, established_on: "2019-03-10"),
+          physical_store2 = build(:physical_store, address: "456 Oak Ave, Other City", square_footage: 10000, established_on: "2022-08-05")
+        )
+
+        # Test 1: Query all stores through union
+        stores = list_stores_with("...on OnlineStore { id __typename url platform }", "...on PhysicalStore { id __typename address square_footage }")
+        expect(stores.size).to eq(4)
+        expect(stores.map { |s| s["__typename"] }).to contain_exactly("OnlineStore", "OnlineStore", "PhysicalStore", "PhysicalStore")
+
+        # Test 2: Filter by common field across types
+        stores = list_stores_with(
+          "...on OnlineStore { id __typename url }",
+          "...on PhysicalStore { id __typename address }",
+          filter: {established_on: {gte: "2020-01-01"}}
+        )
+        expect(stores.size).to eq(3)
+        expect(stores.map { |s| s["id"] }).to contain_exactly(
+          online_store1.fetch(:id),
+          online_store2.fetch(:id),
+          physical_store2.fetch(:id)
+        )
+
+        # Test 3: Filter by ID
+        stores = list_stores_with(
+          "...on OnlineStore { id __typename url }",
+          "...on PhysicalStore { id __typename address }",
+          filter: {id: {equal_to_any_of: [online_store1.fetch(:id), physical_store1.fetch(:id)]}}
+        )
+        expect(stores.size).to eq(2)
+        expect(stores.map { |s| [s["id"], s["__typename"]] }).to contain_exactly(
+          [online_store1.fetch(:id), "OnlineStore"],
+          [physical_store1.fetch(:id), "PhysicalStore"]
+        )
+
+        # Test 4: Sort by common field
+        stores = list_stores_with(
+          "...on OnlineStore { id __typename url }",
+          "...on PhysicalStore { id __typename address }",
+          order_by: [established_on_asc]
+        )
+        expect(stores.map { |s| s["id"] }).to eq([
+          physical_store1.fetch(:id),
+          online_store1.fetch(:id),
+          online_store2.fetch(:id),
+          physical_store2.fetch(:id)
+        ])
+        expect(stores.map { |s| s["__typename"] }).to eq(["PhysicalStore", "OnlineStore", "OnlineStore", "PhysicalStore"])
+
+        # Test 5: Pagination
+        stores, page_info = list_stores_and_page_info_with(
+          "...on OnlineStore { id __typename url }",
+          "...on PhysicalStore { id __typename address }",
+          first: 2,
+          order_by: [id_desc]
+        )
+        expect(stores.size).to eq(2)
+        expect(page_info).to include(case_correctly("has_next_page") => true)
+
+        # Test 6: NOT filter
+        stores = list_stores_with(
+          "...on OnlineStore { id __typename url }",
+          "...on PhysicalStore { id __typename address }",
+          filter: {id: {not: {equal_to_any_of: [online_store1.fetch(:id)]}}}
+        )
+        expect(stores.size).to eq(3)
+        expect(stores.map { |s| s["id"] }).to contain_exactly(
+          online_store2.fetch(:id),
+          physical_store1.fetch(:id),
+          physical_store2.fetch(:id)
+        )
+      end
+
       it "supports fetching interface fields" do
         index_into(
           graphql,
@@ -1473,6 +1554,37 @@ module ElasticGraph
                   ...on Widget {
                     id
                   }
+                }
+              }
+            }
+          }
+        QUERY
+      end
+
+      def list_stores_with(*fragments, **query_args)
+        query_stores_with(*fragments, **query_args).dig("data", "stores", "edges").map { |e| e.fetch("node") }
+      end
+
+      def list_stores_and_page_info_with(*fragments, **query_args)
+        response = query_stores_with(*fragments, **query_args).dig("data", "stores")
+        page_info = response.fetch(case_correctly("page_info"))
+        nodes = response.fetch("edges").map { |e| e.fetch("node") }
+        [nodes, page_info]
+      end
+
+      def query_stores_with(*fragments, allow_errors: false, **query_args)
+        fragment_string = fragments.join("\n")
+        call_graphql_query(<<~QUERY, allow_errors: allow_errors)
+          query {
+            stores#{graphql_args(query_args)} {
+              page_info {
+                end_cursor
+                has_next_page
+                has_previous_page
+              }
+              edges {
+                node {
+                  #{fragment_string}
                 }
               }
             }

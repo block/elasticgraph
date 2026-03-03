@@ -53,12 +53,17 @@ module ElasticGraph
                 t.field "name", "String"
               end
 
+              schema.object_type "Tag" do |t|
+                t.field "id", "ID"
+                t.field "label", "String"
+              end
+
               schema.union_type "Attribute" do |t|
-                t.subtypes "Color", "Velocity"
+                t.subtypes "Color"
               end
 
               schema.union_type "IndexedAttribute" do |t|
-                t.subtypes "Color", "Velocity"
+                t.subtypes "Tag"
                 t.index "attributes"
               end
 

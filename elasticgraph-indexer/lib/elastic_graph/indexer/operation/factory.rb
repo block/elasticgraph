@@ -112,9 +112,39 @@ module ElasticGraph
 
         # This copies the `id` from event into the actual record
         # This is necessary because we want to index `id` as part of the record so that the datastore will include `id` in returned search payloads.
+        #
+        # Additionally, for types in mixed-type indices (where multiple concrete types share one index),
+        # this injects `__typename` from the event envelope into the record when it's required but missing.
         def prepare_event(event)
-          return event unless event["record"].is_a?(::Hash) && event["id"]
-          event.merge("record" => event["record"].merge("id" => event.fetch("id")))
+          return event unless event["record"].is_a?(::Hash)
+
+          updated_record = event["record"].dup
+          updated_record["id"] = event["id"] if event["id"]
+
+          # If __typename is required for this type but not present in the record, inject it from the event type.
+          # This is needed for types indexed into mixed-type indices (e.g., subtypes of an indexed union/interface)
+          # where the type must be stored in the document for query-time type resolution.
+          if event["type"] && !updated_record.key?("__typename") && type_requires_typename?(event["type"])
+            updated_record["__typename"] = event["type"]
+          end
+
+          event.merge("record" => updated_record)
+        end
+
+        def type_requires_typename?(type_name)
+          @types_requiring_typename ||= begin
+            # Check the latest JSON schema to see which types require __typename.
+            # Note: we use the latest version for simplicity, accepting the risk that __typename requirements
+            # could differ across schema versions. This is unlikely since __typename requirements are structural
+            # (based on mixed-type indices), not version-specific, but schema evolution could theoretically change them.
+            json_schemas = schema_artifacts.json_schemas_for(schema_artifacts.latest_json_schema_version)
+            json_schemas.fetch("$defs").filter_map do |type, type_def|
+              required_fields = type_def["required"] || []
+              type if required_fields.include?("__typename")
+            end.to_set
+          end
+
+          @types_requiring_typename.include?(type_name)
         end
 
         def validate_record_returning_failure(event, selected_json_schema_version)

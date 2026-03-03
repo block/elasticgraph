@@ -1679,6 +1679,39 @@ indices:
       index.number_of_replicas: 1
       index.number_of_shards: 1
       index.max_result_window: 10000
+  stores:
+    aliases: {}
+    mappings:
+      dynamic: strict
+      properties:
+        id:
+          type: keyword
+        url:
+          type: keyword
+        platform:
+          type: keyword
+        established_on:
+          type: date
+          format: strict_date
+        address:
+          type: keyword
+        square_footage:
+          type: integer
+        __typename:
+          type: keyword
+        __sources:
+          type: keyword
+        __versions:
+          type: object
+          dynamic: 'false'
+      _size:
+        enabled: true
+    settings:
+      index.mapping.ignore_malformed: false
+      index.mapping.coerce: false
+      index.number_of_replicas: 1
+      index.number_of_shards: 1
+      index.max_result_window: 10000
   widget_workspaces:
     aliases: {}
     mappings:
