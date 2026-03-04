@@ -12,6 +12,7 @@ module ElasticGraph
         attr_reader logger: ::Logger
         attr_reader skip_derived_indexing_type_updates: ::Hash[::String, ::Set[::String]]
         attr_reader configure_record_validator: (^(validatorFactory) -> validatorFactory)?
+        attr_reader ingestion_schema: IngestionSchemas::_IngestionSchema?
 
         def initialize: (
           schema_artifacts: schemaArtifacts,
@@ -19,7 +20,8 @@ module ElasticGraph
           record_preparer_factory: RecordPreparer::Factory,
           logger: ::Logger,
           skip_derived_indexing_type_updates: ::Hash[::String, ::Set[::String]],
-          configure_record_validator: (^(validatorFactory) -> validatorFactory)?
+          configure_record_validator: (^(validatorFactory) -> validatorFactory)?,
+          ingestion_schema: IngestionSchemas::_IngestionSchema?
         ) -> void
 
         def with: (
@@ -28,7 +30,8 @@ module ElasticGraph
           ?record_preparer_factory: RecordPreparer::Factory,
           ?logger: ::Logger,
           ?skip_derived_indexing_type_updates: ::Hash[::String, ::Set[::String]],
-          ?configure_record_validator: (^(validatorFactory) -> validatorFactory)?
+          ?configure_record_validator: (^(validatorFactory) -> validatorFactory)?,
+          ?ingestion_schema: IngestionSchemas::_IngestionSchema?
         ) -> instance
       end
 
@@ -39,10 +42,11 @@ module ElasticGraph
 
         def validator: (::String, ::Integer) -> Support::JSONSchema::Validator
 
-        @validator_factories_by_version: ::Hash[::Integer, Support::JSONSchema::ValidatorFactory]?
-        def validator_factories_by_version: () -> ::Hash[::Integer, Support::JSONSchema::ValidatorFactory]
+        @resolved_ingestion_schema: IngestionSchemas::_IngestionSchema?
+        def resolved_ingestion_schema: () -> IngestionSchemas::_IngestionSchema
+        def validate_ingestion_schema!: (untyped) -> IngestionSchemas::_IngestionSchema
 
-        def select_json_schema_version: (event) { (BuildResult) -> bot } -> (::Integer | bot)
+        def select_schema_version: (event) { (BuildResult) -> bot } -> (::Integer | bot)
         def prepare_event: (event) -> event
         def validate_record_returning_failure: (event, ::Integer) -> BuildResult?
         def build_failed_result: (event, ::String, ::String) -> BuildResult

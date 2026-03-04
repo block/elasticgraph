@@ -19,6 +19,7 @@ module ElasticGraph
       latency_slo_thresholds_by_timestamp_in_ms: {},
       skip_derived_indexing_type_updates: {},
       datastore_router: nil,
+      ingestion_schema: nil,
       clock: nil,
       monotonic_clock: nil,
       **datastore_core_options,
@@ -31,6 +32,7 @@ module ElasticGraph
           skip_derived_indexing_type_updates: skip_derived_indexing_type_updates
         ),
         datastore_router: datastore_router,
+        ingestion_schema: ingestion_schema,
         clock: clock,
         monotonic_clock: monotonic_clock
       )

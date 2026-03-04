@@ -1,0 +1,30 @@
+module ElasticGraph
+  class Indexer
+    module IngestionSchemas
+      interface _IngestionSchema
+        def available_versions: () -> ::Set[::Integer]
+        def validator_for: (::String, ::Integer) -> Support::JSONSchema::Validator
+        def record_preparer_for: (::Integer) -> _RecordPreparer
+      end
+
+      class JSONSchema
+        include _IngestionSchema
+
+        def initialize: (
+          schema_artifacts: schemaArtifacts,
+          record_preparer_factory: RecordPreparer::Factory,
+          configure_record_validator: (^(Support::JSONSchema::ValidatorFactory) -> Support::JSONSchema::ValidatorFactory)?
+        ) -> void
+
+        private
+
+        @schema_artifacts: schemaArtifacts
+        @record_preparer_factory: RecordPreparer::Factory
+        @configure_record_validator: (^(Support::JSONSchema::ValidatorFactory) -> Support::JSONSchema::ValidatorFactory)?
+        @validator_factories_by_version: ::Hash[::Integer, Support::JSONSchema::ValidatorFactory]?
+
+        def validator_factories_by_version: () -> ::Hash[::Integer, Support::JSONSchema::ValidatorFactory]
+      end
+    end
+  end
+end

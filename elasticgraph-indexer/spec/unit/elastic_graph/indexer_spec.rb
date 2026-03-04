@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/indexer"
+require "elastic_graph/indexer/ingestion_schemas/json_schema"
 
 module ElasticGraph
   RSpec.describe Indexer do
@@ -28,6 +29,13 @@ module ElasticGraph
 
         expect(indexer).to be_a(Indexer)
       end
+    end
+
+    it "allows overriding ingestion schema behavior" do
+      ingestion_schema = instance_double(Indexer::IngestionSchemas::JSONSchema)
+      indexer = build_indexer(ingestion_schema: ingestion_schema)
+
+      expect(indexer.operation_factory.ingestion_schema).to be(ingestion_schema)
     end
   end
 end
