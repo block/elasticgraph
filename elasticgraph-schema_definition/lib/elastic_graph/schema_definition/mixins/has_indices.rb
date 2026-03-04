@@ -273,7 +273,7 @@ module ElasticGraph
         end
 
         def self_update_target
-          return nil if abstract? || !has_own_index_def?
+          return nil if abstract? || !root_document_type?
 
           # We exclude `id` from `data_params` because `Indexer::Operator::Update` automatically includes
           # `params.id` so we don't want it duplicated at `params.data.id` alongside other data params.

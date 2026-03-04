@@ -17,7 +17,7 @@ require "elastic_graph/schema_definition/schema_elements/deprecated_element"
 require "elastic_graph/schema_definition/schema_elements/directive"
 require "elastic_graph/schema_definition/schema_elements/enum_type"
 require "elastic_graph/schema_definition/schema_elements/enum_value"
-require "elastic_graph/schema_definition/schema_elements/enums_for_indexed_types"
+require "elastic_graph/schema_definition/schema_elements/enums_for_root_document_types"
 require "elastic_graph/schema_definition/schema_elements/field"
 require "elastic_graph/schema_definition/schema_elements/field_source"
 require "elastic_graph/schema_definition/schema_elements/graphql_sdl_enumerator"
@@ -106,10 +106,10 @@ module ElasticGraph
       end
       @@enum_value_new = prevent_non_factory_instantiation_of(SchemaElements::EnumValue)
 
-      def new_enums_for_indexed_types
-        @@enums_for_indexed_types_new.call(@state)
+      def new_enums_for_root_document_types
+        @@enums_for_root_document_types_new.call(@state)
       end
-      @@enums_for_indexed_types_new = prevent_non_factory_instantiation_of(SchemaElements::EnumsForIndexedTypes)
+      @@enums_for_root_document_types_new = prevent_non_factory_instantiation_of(SchemaElements::EnumsForRootDocumentTypes)
 
       # Hard to type check this.
       # @dynamic new_field

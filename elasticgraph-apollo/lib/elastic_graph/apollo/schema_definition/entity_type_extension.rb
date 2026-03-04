@@ -12,8 +12,8 @@ module ElasticGraph
       # The Apollo `_Entity` type is a type union of _all_ entity subtypes in an ElasticGraph schema.
       # However, unlike a normal union type:
       #
-      # - `_Entity` is never a root document type, and should not be treated as one (even though its subtypes are all indexed, which would
-      #   usually cause it to be treated as a root document type!).
+      # - `_Entity` is never a root document type, and should not be treated as one (even though its subtypes are all root document types,
+      #   which would usually cause it to be treated as a root document type!).
       # - A merged set of `graphql_fields_by_name` cannot be safely computed. That method raises errors if a field with the same name
       #   has conflicting definitions on different subtypes, but we must allow that on `_Entity` subtypes.
       #

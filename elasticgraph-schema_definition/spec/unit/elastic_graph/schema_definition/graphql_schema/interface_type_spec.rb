@@ -57,7 +57,7 @@ module ElasticGraph
                 t.field "name", "String"
               end
             end
-          }.to raise_error Errors::SchemaError, a_string_including("Inventor", "indexed")
+          }.to raise_error Errors::SchemaError, a_string_including("Inventor", "root document type")
         end
 
         it "respects a configured type name override" do

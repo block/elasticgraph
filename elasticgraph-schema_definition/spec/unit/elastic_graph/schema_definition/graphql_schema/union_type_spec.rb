@@ -255,7 +255,7 @@ module ElasticGraph
                 t.subtypes "Person", "Company"
               end
             end
-          }.to raise_error Errors::SchemaError, a_string_including("Inventor", "indexed")
+          }.to raise_error Errors::SchemaError, a_string_including("Inventor", "root document type")
         end
 
         it "allows the same field on two subtypes to have different documentation" do

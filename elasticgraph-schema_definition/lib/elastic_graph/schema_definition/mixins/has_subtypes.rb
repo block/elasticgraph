@@ -35,7 +35,7 @@ module ElasticGraph
         end
 
         def root_document_type?
-          super || subtypes_root_document_type?
+          super || subtypes_are_root_document_types?
         end
 
         def recursively_resolve_subtypes
@@ -90,26 +90,28 @@ module ElasticGraph
           end
         end
 
-        def subtypes_root_document_type?
-          indexed_by_subtype_name = resolve_subtypes.to_h do |subtype, acc|
+        def subtypes_are_root_document_types?
+          root_document_type_by_subtype_name = resolve_subtypes.to_h do |subtype, acc|
             [subtype.name, subtype.root_document_type?]
           end
 
-          uniq_indexed = indexed_by_subtype_name.values.uniq
+          uniq_root_document_type_vals = root_document_type_by_subtype_name.values.uniq
 
-          if uniq_indexed.size > 1
-            descriptions = indexed_by_subtype_name.map do |name_value|
+          if uniq_root_document_type_vals.size > 1
+            descriptions = root_document_type_by_subtype_name.map do |name_value|
               name, value = name_value
               "#{name}: root_document_type? = #{value}"
             end
 
             raise Errors::SchemaError,
-              "The #{self.class.name} #{name} has some indexed subtypes, and some non-indexed subtypes. " \
-              "All subtypes must be indexed or all must NOT be indexed. Subtypes:\n" \
+              "The #{self.class.name} #{name} has some subtypes that are root document types, and some that are not. " \
+              "All subtypes must be root document types or all must NOT be root document types. " \
+              "(A type is a root document type when it has an index definition or, for abstract types, when its subtypes have index definitions.) " \
+              "Subtypes:\n" \
               "#{descriptions.join("\n")}"
           end
 
-          !!uniq_indexed.first
+          !!uniq_root_document_type_vals.first
         end
       end
     end

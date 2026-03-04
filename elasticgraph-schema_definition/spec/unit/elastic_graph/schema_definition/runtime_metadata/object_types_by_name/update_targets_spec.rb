@@ -724,7 +724,7 @@ module ElasticGraph
                   end
                 end
               }.to raise_error_about_workspace_relationship(
-                "references a type which is not indexed: `WidgetWorkspace`. Only indexed types can be used in relations."
+                "references a type which is not a root document type: `WidgetWorkspace`. Only root document types can be used in relations."
               )
 
               expect {
@@ -733,7 +733,7 @@ module ElasticGraph
                   expect(t.fields_with_sources).to be_empty
                 end
               }.to raise_error_about_workspace_relationship(
-                "references a type which is not indexed: `WidgetWorkspace`. Only indexed types can be used in relations.",
+                "references a type which is not a root document type: `WidgetWorkspace`. Only root document types can be used in relations.",
                 sourced_fields: false
               )
             end

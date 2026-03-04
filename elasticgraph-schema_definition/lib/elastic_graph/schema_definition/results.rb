@@ -120,27 +120,27 @@ module ElasticGraph
           query_type.resolve_fields_with nil
 
           state.types_by_name.values.select(&:root_document_type?).sort_by(&:name).each do |type|
-            # @type var indexed_type: Mixins::HasIndices & _Type
-            indexed_type = _ = type
+            # @type var root_doc_type: Mixins::HasIndices & _Type
+            root_doc_type = _ = type
 
             query_type.relates_to_many(
-              indexed_type.plural_root_query_field_name,
-              indexed_type.name,
+              root_doc_type.plural_root_query_field_name,
+              root_doc_type.name,
               via: "ignore",
               dir: :in,
-              singular: indexed_type.singular_root_query_field_name
+              singular: root_doc_type.singular_root_query_field_name
             ) do |f|
-              f.documentation "Fetches `#{indexed_type.name}`s based on the provided arguments."
+              f.documentation "Fetches `#{root_doc_type.name}`s based on the provided arguments."
               f.resolve_with :list_records
               f.hide_relationship_runtime_metadata = true
-              indexed_type.root_query_fields_customizations&.call(f)
+              root_doc_type.root_query_fields_customizations&.call(f)
             end
 
             # Add additional efficiency hints to the aggregation field documentation if we have any such hints.
             # This needs to be outside the `relates_to_many` block because `relates_to_many` adds its own "suffix" to
             # the field documentation, and here we add another one.
-            if (agg_efficiency_hint = aggregation_efficiency_hints_for(indexed_type.derived_indexed_types))
-              agg_name = state.schema_elements.normalize_case("#{indexed_type.singular_root_query_field_name}_aggregations")
+            if (agg_efficiency_hint = aggregation_efficiency_hints_for(root_doc_type.derived_indexed_types))
+              agg_name = state.schema_elements.normalize_case("#{root_doc_type.singular_root_query_field_name}_aggregations")
               agg_field = query_type.graphql_fields_by_name.fetch(agg_name)
               agg_field.documentation "#{agg_field.doc_comment}\n\n#{agg_efficiency_hint}"
             end
@@ -209,7 +209,7 @@ module ElasticGraph
 
         scalar_types_by_name = state.scalar_types_by_name.transform_values(&:runtime_metadata)
 
-        enum_generator = state.factory.new_enums_for_indexed_types
+        enum_generator = state.factory.new_enums_for_root_document_types
 
         sort_order_enum_types_by_name = state.object_types_by_name.values
           .select(&:root_document_type?)

@@ -93,8 +93,8 @@ module ElasticGraph
       @factory: Factory?
       def factory: () -> Factory
 
-      @enums_for_indexed_types: SchemaElements::EnumsForIndexedTypes?
-      def enums_for_indexed_types: () -> SchemaElements::EnumsForIndexedTypes
+      @enums_for_root_document_types: SchemaElements::EnumsForRootDocumentTypes?
+      def enums_for_root_document_types: () -> SchemaElements::EnumsForRootDocumentTypes
 
       def sub_aggregation_paths_for: (Mixins::SupportsFilteringAndAggregation) -> ::Array[SchemaElements::SubAggregationPath]
 
