@@ -68,12 +68,12 @@ module ElasticGraph
               "Indices must be configured during initial type definition."
           end
 
-          if @index_def
+          if @own_index_def
             raise Errors::SchemaError, "Cannot define multiple indices on `#{self.name}`. " \
-              "Only one index per type is supported. An index named `#{@index_def.name}` has already been defined."
+              "Only one index per type is supported. An index named `#{@own_index_def.name}` has already been defined."
           end
 
-          @index_def = schema_def_state.factory.new_index(name, settings, self, &block)
+          @own_index_def = schema_def_state.factory.new_index(name, settings, self, &block)
         end
 
         # Configures the default GraphQL resolver that will be used to resolve the fields of this type. Individual fields
@@ -89,14 +89,21 @@ module ElasticGraph
           end
         end
 
-        # @return [Indexing::Index, nil] the defined index for this type, or nil if no index is defined
-        def index_def
-          @index_def
+        # @return [Indexing::Index, nil] the index definition directly defined on this type, or nil if no index is defined directly.
+        #   This will be nil when a type is inheriting an index definition from an abstract parent type.
+        def own_index_def
+          @own_index_def
         end
 
-        # @return [Boolean] true if this type has an index
-        def indexed?
-          !@index_def.nil?
+        # @return [Boolean] true if this type has its own index definition (not inherited from an abstract parent)
+        def has_own_index_def?
+          !@own_index_def.nil?
+        end
+
+        # @return [Boolean] true if this type is a root document type that lives at the document root in the datastore.
+        #   For types with `own_index_def`, returns true. For abstract types with indexed subtypes, overridden in {HasSubtypes}.
+        def root_document_type?
+          has_own_index_def?
         end
 
         # Abstract types are rare, so return false. This can be overridden in the host class.
@@ -184,7 +191,7 @@ module ElasticGraph
         def runtime_metadata(extra_update_targets)
           SchemaArtifacts::RuntimeMetadata::ObjectType.new(
             update_targets: derived_indexed_types.map(&:runtime_metadata_for_source_type) + [self_update_target].compact + extra_update_targets,
-            index_definition_names: [index_def&.name].compact,
+            index_definition_names: [own_index_def&.name].compact,
             graphql_fields_by_name: runtime_metadata_graphql_fields_by_name,
             elasticgraph_category: nil,
             source_type: nil,
@@ -266,7 +273,7 @@ module ElasticGraph
         end
 
         def self_update_target
-          return nil if abstract? || !indexed?
+          return nil if abstract? || !has_own_index_def?
 
           # We exclude `id` from `data_params` because `Indexer::Operator::Update` automatically includes
           # `params.id` so we don't want it duplicated at `params.data.id` alongside other data params.
@@ -277,7 +284,7 @@ module ElasticGraph
             [field, SchemaArtifacts::RuntimeMetadata::DynamicParam.new(source_path: field, cardinality: :one)]
           end
 
-          index_runtime_metadata = index_def.runtime_metadata
+          index_runtime_metadata = own_index_def.runtime_metadata
 
           Indexing::UpdateTargetFactory.new_normal_indexing_update_target(
             type: name,

@@ -74,7 +74,7 @@ module ElasticGraph
 
             yield type if block_given?
 
-            if type.indexed? && type.graphql_fields_by_name.key?("id")
+            if type.root_document_type? && type.graphql_fields_by_name.key?("id")
               type.apollo_key fields: "id"
             end
           end

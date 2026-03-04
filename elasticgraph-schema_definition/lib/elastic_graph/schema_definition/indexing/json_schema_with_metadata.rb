@@ -156,15 +156,9 @@ module ElasticGraph
             json_schema_resolver = JSONSchemaResolver.new(@state, json_schema, old_type_name_by_current_name)
             version = json_schema.fetch(JSON_SCHEMA_VERSION_KEY)
 
-            types_to_check = @state.object_types_by_name.values.select do |type|
-              type.indexed? && !@derived_indexing_type_names.include?(type.name)
-            end
-
-            types_to_check.filter_map do |object_type|
-              if (index_def = object_type.index_def)
-                identify_missing_necessary_fields_for_index_def(object_type, index_def, json_schema_resolver, version)
-              end
-            end.flatten
+            @state.object_types_by_name.values
+              .select { |type| type.has_own_index_def? && !@derived_indexing_type_names.include?(type.name) }
+              .flat_map { |object_type| identify_missing_necessary_fields_for_index_def(object_type, object_type.own_index_def, json_schema_resolver, version) }
           end
 
           def identify_missing_necessary_fields_for_index_def(object_type, index_def, json_schema_resolver, json_schema_version)

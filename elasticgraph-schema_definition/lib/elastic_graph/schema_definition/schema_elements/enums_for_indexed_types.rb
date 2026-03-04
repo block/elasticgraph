@@ -22,7 +22,7 @@ module ElasticGraph
 
         # Generates a `SortOrder` enum type for the given indexed type.
         def sort_order_enum_for(indexed_type)
-          return nil unless indexed_type.indexed?
+          return nil unless indexed_type.root_document_type?
 
           build_enum(indexed_type, :sort_order, :sortable?, "sorted") do |enum_type, field_path|
             value_name_parts = field_path.map(&:name)

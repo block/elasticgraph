@@ -17,7 +17,7 @@ module ElasticGraph
       include _NamedElement
       def type_ref: () -> SchemaElements::TypeReference
       def graphql_only?: () -> bool
-      def indexed?: () -> bool
+      def root_document_type?: () -> bool
       def to_sdl: () ?{ (SchemaElements::Field::argument) -> boolish } -> ::String
       def derived_graphql_types: () -> ::Array[SchemaElements::graphQLType]
       def to_indexing_field_type: () -> Indexing::_FieldType

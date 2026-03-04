@@ -28,7 +28,7 @@ module ElasticGraph
 
         # Determines the set of sub aggregation paths for the given type.
         def self.paths_for(type, schema_def_state:)
-          root_paths = type.indexed? ? [SubAggregationPath.new([type.name], [])] : [] # : ::Array[SubAggregationPath]
+          root_paths = type.root_document_type? ? [SubAggregationPath.new([type.name], [])] : [] # : ::Array[SubAggregationPath]
 
           non_relation_field_refs = schema_def_state
             .user_defined_field_references_by_type_name.fetch(type.name) { [] }

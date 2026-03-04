@@ -680,7 +680,7 @@ module ElasticGraph
           # We don't want the `id` field of an indexed type to be available to group by, because it's the unique primary key
           # and the groupings would each contain one document. It's simpler and more efficient to just query the raw documents
           # instead.
-          return false if parent_type.indexed? && name == "id"
+          return false if parent_type.root_document_type? && name == "id"
 
           return false if relationship || type.fully_unwrapped.as_object_type&.does_not_support?(&:groupable?)
 

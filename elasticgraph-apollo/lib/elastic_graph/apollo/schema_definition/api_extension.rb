@@ -426,7 +426,7 @@ module ElasticGraph
 
         def validate_entity_types_can_all_be_resolved(entity_types)
           unresolvable_field_errors =
-            entity_types.reject(&:indexed?).filter_map do |object_type|
+            entity_types.reject(&:root_document_type?).filter_map do |object_type|
               key_field_names = object_type.directives
                 .select { |dir| dir.name == "key" }
                 # https://rubular.com/r/JEuYKzqnyR712A
@@ -463,7 +463,7 @@ module ElasticGraph
         end
 
         private_class_method def self.customize_root_query_type(type)
-          if type.schema_def_state.object_types_by_name.values.any?(&:indexed?)
+          if type.schema_def_state.object_types_by_name.values.any?(&:root_document_type?)
             type.field "_entities", "[_Entity]!", graphql_only: true do |f|
               f.documentation <<~EOS
                 A field required by the [Apollo Federation subgraph

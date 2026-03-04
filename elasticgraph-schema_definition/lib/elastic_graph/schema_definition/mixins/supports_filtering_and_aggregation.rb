@@ -51,7 +51,7 @@ module ElasticGraph
           end
 
           document_pagination_types =
-            if indexed?
+            if root_document_type?
               schema_def_state.factory.build_relay_pagination_types(name, include_total_edge_count: true, derived_indexed_types: (_ = self).derived_indexed_types)
             elsif schema_def_state.paginated_collection_element_types.include?(name)
               schema_def_state.factory.build_relay_pagination_types(name, include_total_edge_count: true)
@@ -199,7 +199,7 @@ module ElasticGraph
         end
 
         def to_indexed_aggregation_type
-          return nil unless indexed?
+          return nil unless root_document_type?
 
           schema_def_state.factory.new_object_type type_ref.as_aggregation.name do |t|
             t.documentation "Return type representing a bucket of `#{name}` documents for an aggregations query."

@@ -489,7 +489,7 @@ module ElasticGraph
             EOS
           end
 
-          if object_type&.indexed?
+          if object_type&.root_document_type?
             t.field @state.schema_elements.all_highlights, "[SearchHighlight!]!" do |f|
               f.documentation "All search highlights for this `#{type_name}`, indicating where in the indexed document the query matched."
             end

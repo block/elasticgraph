@@ -47,7 +47,7 @@ module ElasticGraph
             index: ::Integer
           ) -> (ElasticGraph::GraphQL::DatastoreResponse::Document | ::Hash[::String, untyped])?
 
-          def indexed? : -> boolish
+          def root_document_type? : -> boolish
         end
 
         class RepresentationWithIdSupertype

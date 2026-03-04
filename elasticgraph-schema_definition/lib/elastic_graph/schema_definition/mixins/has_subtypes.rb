@@ -34,8 +34,8 @@ module ElasticGraph
             .merge("__typename" => schema_def_state.factory.new_field(name: "__typename", type: "String", parent_type: _ = self))
         end
 
-        def indexed?
-          super || subtypes_indexed?
+        def root_document_type?
+          super || subtypes_root_document_type?
         end
 
         def recursively_resolve_subtypes
@@ -90,9 +90,9 @@ module ElasticGraph
           end
         end
 
-        def subtypes_indexed?
+        def subtypes_root_document_type?
           indexed_by_subtype_name = resolve_subtypes.to_h do |subtype, acc|
-            [subtype.name, subtype.indexed?]
+            [subtype.name, subtype.root_document_type?]
           end
 
           uniq_indexed = indexed_by_subtype_name.values.uniq
@@ -100,7 +100,7 @@ module ElasticGraph
           if uniq_indexed.size > 1
             descriptions = indexed_by_subtype_name.map do |name_value|
               name, value = name_value
-              "#{name}: indexed? = #{value}"
+              "#{name}: root_document_type? = #{value}"
             end
 
             raise Errors::SchemaError,

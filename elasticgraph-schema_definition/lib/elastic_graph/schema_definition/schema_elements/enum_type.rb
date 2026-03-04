@@ -161,8 +161,8 @@ module ElasticGraph
           Indexing::FieldType::Enum.new(values_by_name.keys)
         end
 
-        # @return [false] enum types are never directly indexed
-        def indexed?
+        # @return [false] enum types are never root document types
+        def root_document_type?
           false
         end
 

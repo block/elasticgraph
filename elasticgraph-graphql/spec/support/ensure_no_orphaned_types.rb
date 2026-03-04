@@ -25,8 +25,8 @@ module ElasticGraph
           original_types = schema.state.types_by_name.keys
           schema_definition.call(schema)
 
-          # If a test is taking are of defining its own indexed types, we don't need to do anything further.
-          return if schema.state.object_types_by_name.values.any?(&:indexed?)
+          # If a test is taking care of defining its own root document types, we don't need to do anything further.
+          return if schema.state.object_types_by_name.values.any?(&:root_document_type?)
 
           added_types = schema.state.types_by_name.keys - original_types
 

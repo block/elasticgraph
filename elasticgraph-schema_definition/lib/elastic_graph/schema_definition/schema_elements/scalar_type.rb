@@ -237,7 +237,7 @@ module ElasticGraph
         end
 
         # @private
-        def indexed?
+        def root_document_type?
           false
         end
 

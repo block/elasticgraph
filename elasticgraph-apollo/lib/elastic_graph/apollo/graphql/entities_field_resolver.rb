@@ -67,7 +67,7 @@ module ElasticGraph
 
         # Builds a datastore query for the given specific representation.
         def build_query(adapter, representations, query_attributes)
-          return nil unless adapter.indexed?
+          return nil unless adapter.root_document_type?
 
           type = adapter.type
           query = @datastore_query_builder.new_query(search_index_definitions: type.search_index_definitions, **query_attributes)
@@ -190,7 +190,7 @@ module ElasticGraph
               hit if hit && match?(representation.other_fields, hit.payload)
             end
 
-            def indexed?
+            def root_document_type?
               true
             end
 
@@ -268,7 +268,7 @@ module ElasticGraph
             end
           end
 
-          def indexed?
+          def root_document_type?
             true
           end
 
@@ -294,7 +294,7 @@ module ElasticGraph
             self
           end
 
-          # :nocov: -- these methods are not called on an adapter when `indexed?` returns `false`.
+          # :nocov: -- these methods are not called on an adapter when `root_document_type?` returns `false`.
           def customize_query(query, representations)
             nil
           end
@@ -308,7 +308,7 @@ module ElasticGraph
             representation.representation_hash
           end
 
-          def indexed?
+          def root_document_type?
             false
           end
         end

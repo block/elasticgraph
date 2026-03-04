@@ -34,7 +34,7 @@ module ElasticGraph
               end
 
             [nil, "#{relationship_error_prefix} #{issue}"]
-          elsif !related_type.indexed?
+          elsif !related_type.root_document_type?
             [nil, "#{relationship_error_prefix} references a type which is not indexed: `#{related_type.name}`. Only indexed types can be used in relations."]
           else
             relation_metadata = relation_field.runtime_metadata_graphql_field.relation # : SchemaArtifacts::RuntimeMetadata::Relation
