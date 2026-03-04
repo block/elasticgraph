@@ -28,8 +28,8 @@ module ElasticGraph
       def new_enum_value: (::String, ::String) ?{ (SchemaElements::EnumValue) -> void } -> SchemaElements::EnumValue
       @@enum_value_new: ::Method
 
-      def new_enums_for_indexed_types: () -> SchemaElements::EnumsForIndexedTypes
-      @@enums_for_indexed_types_new: ::Method
+      def new_enums_for_root_document_types: () -> SchemaElements::EnumsForRootDocumentTypes
+      @@enums_for_root_document_types_new: ::Method
 
       def new_field: (
         name: ::String,

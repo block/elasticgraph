@@ -6,7 +6,7 @@ module ElasticGraph
         def name: () -> ::String
         def type_ref: () -> SchemaElements::TypeReference
         def mapping_options: () -> HasTypeInfo::optionsHash
-        def indexed?: () -> bool
+        def root_document_type?: () -> bool
         def abstract?: () -> bool
         def graphql_only?: () -> bool
         def runtime_metadata: (::Array[SchemaArtifacts::RuntimeMetadata::UpdateTarget]) -> SchemaArtifacts::RuntimeMetadata::ObjectType
@@ -24,7 +24,7 @@ module ElasticGraph
         def to_input_filters: () -> ::Array[SchemaElements::InputType]
         def sub_aggregation_types_for_nested_field_references: () -> ::Array[SchemaElements::ObjectType]
         def build_aggregation_sub_aggregations_types: () -> ::Array[SchemaElements::ObjectType]
-        def to_indexed_aggregation_type: () -> SchemaElements::ObjectType?
+        def to_root_aggregation_type: () -> SchemaElements::ObjectType?
         def to_grouped_by_type: () -> SchemaElements::ObjectType?
         def to_aggregated_values_type: () -> SchemaElements::ObjectType?
         def to_highlights_type: () -> SchemaElements::ObjectType?

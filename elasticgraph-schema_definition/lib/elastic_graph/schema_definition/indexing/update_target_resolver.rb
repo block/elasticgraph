@@ -137,7 +137,7 @@ module ElasticGraph
         #
         # Returns a tuple of the resolved source (if successful) and an error (if invalid).
         def resolve_field_source(adapter)
-          index_def = object_type.index_def # : Index
+          index_def = object_type.own_index_def # : Index
 
           field_source_graphql_path_string = adapter.get_field_source(resolved_relationship.relationship, index_def) do |local_need|
             relationship_name = resolved_relationship.relationship_name

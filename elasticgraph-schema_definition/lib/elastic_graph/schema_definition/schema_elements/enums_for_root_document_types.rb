@@ -12,19 +12,19 @@ require "elastic_graph/schema_artifacts/runtime_metadata/sort_field"
 module ElasticGraph
   module SchemaDefinition
     module SchemaElements
-      # Responsible for generating enum types based on specific indexed types.
+      # Responsible for generating enum types based on specific root document types.
       #
       # @private
-      class EnumsForIndexedTypes
+      class EnumsForRootDocumentTypes
         def initialize(schema_def_state)
           @schema_def_state = schema_def_state
         end
 
-        # Generates a `SortOrder` enum type for the given indexed type.
-        def sort_order_enum_for(indexed_type)
-          return nil unless indexed_type.indexed?
+        # Generates a `SortOrder` enum type for the given root document type.
+        def sort_order_enum_for(type)
+          return nil unless type.root_document_type?
 
-          build_enum(indexed_type, :sort_order, :sortable?, "sorted") do |enum_type, field_path|
+          build_enum(type, :sort_order, :sortable?, "sorted") do |enum_type, field_path|
             value_name_parts = field_path.map(&:name)
             index_field = field_path.map(&:name_in_index).join(".")
 
@@ -45,12 +45,12 @@ module ElasticGraph
 
         private
 
-        def build_enum(indexed_type, category, field_predicate, past_tense_verb, &block)
-          derived_type_ref = indexed_type.type_ref.as_static_derived_type(category)
+        def build_enum(type, category, field_predicate, past_tense_verb, &block)
+          derived_type_ref = type.type_ref.as_static_derived_type(category)
 
           enum = @schema_def_state.factory.new_enum_type(derived_type_ref.name) do |enum_type|
-            enum_type.documentation "Enumerates the ways `#{indexed_type.name}`s can be #{past_tense_verb}."
-            define_enum_values_for_type(enum_type, indexed_type, field_predicate, &block)
+            enum_type.documentation "Enumerates the ways `#{type.name}`s can be #{past_tense_verb}."
+            define_enum_values_for_type(enum_type, type, field_predicate, &block)
           end.as_input
 
           enum unless enum.values_by_name.empty?

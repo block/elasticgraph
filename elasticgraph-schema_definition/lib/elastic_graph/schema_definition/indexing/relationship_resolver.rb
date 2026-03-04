@@ -34,8 +34,8 @@ module ElasticGraph
               end
 
             [nil, "#{relationship_error_prefix} #{issue}"]
-          elsif !related_type.indexed?
-            [nil, "#{relationship_error_prefix} references a type which is not indexed: `#{related_type.name}`. Only indexed types can be used in relations."]
+          elsif !related_type.root_document_type?
+            [nil, "#{relationship_error_prefix} references a type which is not a root document type: `#{related_type.name}`. Only root document types can be used in relations."]
           else
             relation_metadata = relation_field.runtime_metadata_graphql_field.relation # : SchemaArtifacts::RuntimeMetadata::Relation
             foreign_key_parent_type = (relation_metadata.direction == :in) ? related_type : object_type

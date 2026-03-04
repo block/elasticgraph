@@ -119,28 +119,28 @@ module ElasticGraph
           query_type.documentation "The query entry point for the entire schema."
           query_type.resolve_fields_with nil
 
-          state.types_by_name.values.select(&:indexed?).sort_by(&:name).each do |type|
-            # @type var indexed_type: Mixins::HasIndices & _Type
-            indexed_type = _ = type
+          state.types_by_name.values.select(&:root_document_type?).sort_by(&:name).each do |type|
+            # @type var root_doc_type: Mixins::HasIndices & _Type
+            root_doc_type = _ = type
 
             query_type.relates_to_many(
-              indexed_type.plural_root_query_field_name,
-              indexed_type.name,
+              root_doc_type.plural_root_query_field_name,
+              root_doc_type.name,
               via: "ignore",
               dir: :in,
-              singular: indexed_type.singular_root_query_field_name
+              singular: root_doc_type.singular_root_query_field_name
             ) do |f|
-              f.documentation "Fetches `#{indexed_type.name}`s based on the provided arguments."
+              f.documentation "Fetches `#{root_doc_type.name}`s based on the provided arguments."
               f.resolve_with :list_records
               f.hide_relationship_runtime_metadata = true
-              indexed_type.root_query_fields_customizations&.call(f)
+              root_doc_type.root_query_fields_customizations&.call(f)
             end
 
             # Add additional efficiency hints to the aggregation field documentation if we have any such hints.
             # This needs to be outside the `relates_to_many` block because `relates_to_many` adds its own "suffix" to
             # the field documentation, and here we add another one.
-            if (agg_efficiency_hint = aggregation_efficiency_hints_for(indexed_type.derived_indexed_types))
-              agg_name = state.schema_elements.normalize_case("#{indexed_type.singular_root_query_field_name}_aggregations")
+            if (agg_efficiency_hint = aggregation_efficiency_hints_for(root_doc_type.derived_indexed_types))
+              agg_name = state.schema_elements.normalize_case("#{root_doc_type.singular_root_query_field_name}_aggregations")
               agg_field = query_type.graphql_fields_by_name.fetch(agg_name)
               agg_field.documentation "#{agg_field.doc_comment}\n\n#{agg_efficiency_hint}"
             end
@@ -181,7 +181,7 @@ module ElasticGraph
         check_for_circular_dependencies!
 
         index_templates, indices = state.object_types_by_name.values
-          .filter_map(&:index_def)
+          .filter_map(&:own_index_def)
           .sort_by(&:name)
           .partition(&:rollover_config)
 
@@ -209,19 +209,19 @@ module ElasticGraph
 
         scalar_types_by_name = state.scalar_types_by_name.transform_values(&:runtime_metadata)
 
-        enum_generator = state.factory.new_enums_for_indexed_types
+        enum_generator = state.factory.new_enums_for_root_document_types
 
-        indexed_enum_types_by_name = state.object_types_by_name.values
-          .select(&:indexed?)
+        sort_order_enum_types_by_name = state.object_types_by_name.values
+          .select(&:root_document_type?)
           .filter_map { |type| enum_generator.sort_order_enum_for(_ = type) }
           .to_h { |enum_type| [(_ = enum_type).name, (_ = enum_type).runtime_metadata] }
 
         enum_types_by_name = all_types
           .grep(SchemaElements::EnumType) # : ::Array[SchemaElements::EnumType]
           .to_h { |t| [t.name, t.runtime_metadata] }
-          .merge(indexed_enum_types_by_name)
+          .merge(sort_order_enum_types_by_name)
 
-        index_definitions_by_name = state.object_types_by_name.values.filter_map(&:index_def).to_h do |index|
+        index_definitions_by_name = state.object_types_by_name.values.filter_map(&:own_index_def).to_h do |index|
           [index.name, index.runtime_metadata]
         end
 
@@ -248,7 +248,7 @@ module ElasticGraph
           ::Hash.new { |h, k| h[k] = [] } # : ::Hash[untyped, ::Array[SchemaArtifacts::RuntimeMetadata::UpdateTarget]]
         ) do |object_type, accum|
           fields_with_sources_by_relationship_name =
-            if object_type.index_def.nil?
+            if object_type.own_index_def.nil?
               # only indexed types can have `sourced_from` fields, and resolving `fields_with_sources` on an unindexed union type
               # such as `_Entity` when we are using apollo can lead to exceptions when multiple entity types have the same field name
               # that use different mapping types.
@@ -276,7 +276,7 @@ module ElasticGraph
             resolved_relationship, relationship_error = relationship_resolver.resolve
             relationship_errors << relationship_error if relationship_error
 
-            if object_type.index_def && resolved_relationship && sourced_fields.any?
+            if object_type.own_index_def && resolved_relationship && sourced_fields.any?
               update_target_resolver = Indexing::UpdateTargetResolver.new(
                 object_type: object_type,
                 resolved_relationship: resolved_relationship,
@@ -289,7 +289,7 @@ module ElasticGraph
               sourced_field_errors.concat(errors)
 
               # Validate that has_had_multiple_sources! has been called when sourced_from is used
-              if (index_def = object_type.index_def) && !index_def.has_had_multiple_sources_flag
+              if (index_def = object_type.own_index_def) && !index_def.has_had_multiple_sources_flag
                 sourced_field_errors << "Type `#{object_type.name}` uses `sourced_from` fields but its index `#{index_def.name}` " \
                   "has not been configured with `has_had_multiple_sources!`. To resolve this, add `i.has_had_multiple_sources!` within the " \
                   "`t.index \"#{index_def.name}\"` block. This flag is required because indices with multiple sources can contain " \
@@ -335,8 +335,8 @@ module ElasticGraph
           raise Errors::SchemaError, "`json_schema_version` must be specified in the schema. To resolve, add `schema.json_schema_version 1` in a schema definition block."
         end
 
-        indexed_type_names = state.object_types_by_name.values
-          .select { |type| type.indexed? && !type.abstract? }
+        root_document_type_names = state.object_types_by_name.values
+          .select { |type| type.root_document_type? && !type.abstract? }
           .reject { |type| derived_indexing_type_names.include?(type.name) }
           .map(&:name)
 
@@ -348,7 +348,7 @@ module ElasticGraph
           "$schema" => JSON_META_SCHEMA,
           JSON_SCHEMA_VERSION_KEY => json_schema_version,
           "$defs" => {
-            "ElasticGraphEventEnvelope" => Indexing::EventEnvelope.json_schema(indexed_type_names, json_schema_version)
+            "ElasticGraphEventEnvelope" => Indexing::EventEnvelope.json_schema(root_document_type_names, json_schema_version)
           }.merge(definitions_by_name)
         }
       end
