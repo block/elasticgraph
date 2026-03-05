@@ -1425,25 +1425,30 @@ module ElasticGraph
           require(require_path = "elastic_graph/graphql/resolvers/get_record_field_value")
           schema_def_api.register_graphql_resolver :get_record_field_value,
             GraphQL::Resolvers::GetRecordFieldValue,
-            defined_at: require_path
+            defined_at: require_path,
+            built_in: true
 
           require(require_path = "elastic_graph/graphql/resolvers/list_records")
           schema_def_api.register_graphql_resolver :list_records,
             GraphQL::Resolvers::ListRecords,
-            defined_at: require_path
+            defined_at: require_path,
+            built_in: true
 
           require(require_path = "elastic_graph/graphql/resolvers/nested_relationships")
           schema_def_api.register_graphql_resolver :nested_relationships,
             GraphQL::Resolvers::NestedRelationships,
-            defined_at: require_path
+            defined_at: require_path,
+            built_in: true
 
           require(require_path = "elastic_graph/graphql/resolvers/object")
           schema_def_api.register_graphql_resolver :object_with_lookahead,
             GraphQL::Resolvers::Object::WithLookahead,
-            defined_at: require_path
+            defined_at: require_path,
+            built_in: true
           schema_def_api.register_graphql_resolver :object_without_lookahead,
             GraphQL::Resolvers::Object::WithoutLookahead,
-            defined_at: require_path
+            defined_at: require_path,
+            built_in: true
         end
 
         def define_date_grouping_arguments(grouping_field, omit_timezone: false)

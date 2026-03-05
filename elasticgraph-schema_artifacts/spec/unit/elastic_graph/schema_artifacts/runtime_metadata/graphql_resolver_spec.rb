@@ -18,7 +18,8 @@ module ElasticGraph
             resolver_ref: {
               "name" => "ElasticGraph::GraphQLResolverWithLookahead",
               "require_path" => "elastic_graph/spec_support/example_extensions/graphql_resolvers"
-            }
+            },
+            built_in: false
           )
 
           expect(resolver.load_resolver.extension_class).to be GraphQLResolverWithLookahead
@@ -30,7 +31,8 @@ module ElasticGraph
             resolver_ref: {
               "name" => "ElasticGraph::GraphQLResolverWithoutLookahead",
               "require_path" => "elastic_graph/spec_support/example_extensions/graphql_resolvers"
-            }
+            },
+            built_in: false
           )
 
           expect(resolver.load_resolver.extension_class).to be GraphQLResolverWithoutLookahead
@@ -42,7 +44,8 @@ module ElasticGraph
             resolver_ref: {
               "name" => "ElasticGraph::GraphQLResolverWithoutLookahead",
               "require_path" => "elastic_graph/spec_support/example_extensions/graphql_resolvers"
-            }
+            },
+            built_in: false
           )
 
           expect {
@@ -56,7 +59,8 @@ module ElasticGraph
             resolver_ref: {
               "name" => "ElasticGraph::GraphQLResolverWithLookahead",
               "require_path" => "elastic_graph/spec_support/example_extensions/graphql_resolvers"
-            }
+            },
+            built_in: false
           )
 
           expect {

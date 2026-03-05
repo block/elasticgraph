@@ -369,7 +369,9 @@ module ElasticGraph
       #       end
       #     end
       #   end
-      def register_graphql_resolver(name, klass, defined_at:, **resolver_config)
+      # @param built_in [bool] Whether this resolver is built-in to ElasticGraph or one of its extensions.
+      #   Built-in resolvers that are unused in a schema will not trigger a warning.
+      def register_graphql_resolver(name, klass, defined_at:, built_in: false, **resolver_config)
         extension = SchemaArtifacts::RuntimeMetadata::Extension.new(klass, defined_at, resolver_config)
 
         needs_lookahead =
@@ -382,7 +384,8 @@ module ElasticGraph
 
         resolver = SchemaArtifacts::RuntimeMetadata::GraphQLResolver.new(
           needs_lookahead: needs_lookahead,
-          resolver_ref: extension.to_dumpable_hash
+          resolver_ref: extension.to_dumpable_hash,
+          built_in: built_in
         )
 
         @state.graphql_resolvers_by_name[name] = resolver
