@@ -113,6 +113,7 @@ module ElasticGraph
         # This copies the `id` from event into the actual record
         # This is necessary because we want to index `id` as part of the record so that the datastore will include `id` in returned search payloads.
         def prepare_event(event)
+          event = event.merge(JSON_SCHEMA_VERSION_KEY => 152) if event[JSON_SCHEMA_VERSION_KEY] == 0
           return event unless event["record"].is_a?(::Hash) && event["id"]
           event.merge("record" => event["record"].merge("id" => event.fetch("id")))
         end

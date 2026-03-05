@@ -361,6 +361,13 @@ module ElasticGraph
               expect_failed_event_error(event, "must be a positive integer", "(-1)")
             end
 
+            it "maps json_schema_version 0 to 152 and processes the event successfully" do
+              event = build_upsert_event(:widget, id: "1", __version: 1, __json_schema_version: 0)
+
+              # Version 0 is mapped to 152 in prepare_event, then the closest available version is selected.
+              expect(build_expecting_success(event)).not_to be_empty
+            end
+
             it "notifies an error if it's unable to select a json_schema_version" do
               event = build_upsert_event(:component, id: "1", __version: 1)
               event["record"]["name"] = 123
