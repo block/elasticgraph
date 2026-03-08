@@ -38,6 +38,15 @@ module ElasticGraph
         include Mixins::ImplementsInterfaces
         include Mixins::HasReadableToSAndInspect.new { |t| t.name }
 
+        # Returns all supertypes of this object type, including union memberships
+        # and interface ancestors.
+        #
+        # @return [Array<UnionType, InterfaceType>] list of supertypes
+        # @private
+        def recursively_resolve_supertypes
+          schema_def_state.union_types_by_member_ref[type_ref].to_a + resolve_interface_supertypes
+        end
+
         # @private
         def initialize(schema_def_state, name)
           field_factory = schema_def_state.factory.method(:new_field)

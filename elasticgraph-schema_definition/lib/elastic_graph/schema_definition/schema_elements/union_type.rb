@@ -94,6 +94,10 @@ module ElasticGraph
           end
 
           subtype_refs << type_ref
+
+          # Register reverse lookup so we can efficiently find which unions contain this type
+          union_types = schema_def_state.union_types_by_member_ref[type_ref] # : ::Set[UnionType]
+          union_types << self
         end
 
         # Defines multiple subtypes of this union type.
@@ -126,6 +130,15 @@ module ElasticGraph
           end
 
           "#{formatted_documentation}union #{name} #{directives_sdl(suffix_with: " ")}= #{subtype_refs.map(&:name).to_a.join(" | ")}"
+        end
+
+        # Union types cannot themselves be members of other unions or implement interfaces,
+        # so they have no supertypes.
+        #
+        # @return [Array] empty array
+        # @private
+        def recursively_resolve_supertypes
+          []
         end
 
         # @private

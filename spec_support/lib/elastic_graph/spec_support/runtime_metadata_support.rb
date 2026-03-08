@@ -42,7 +42,8 @@ module ElasticGraph
           graphql_fields_by_name: {},
           elasticgraph_category: nil,
           source_type: nil,
-          graphql_only_return_type: false
+          graphql_only_return_type: false,
+          requires_typename_for_mixed_index: false
         )
           ObjectType.new(
             index_definition_names: index_definition_names,
@@ -50,7 +51,8 @@ module ElasticGraph
             graphql_fields_by_name: graphql_fields_by_name,
             elasticgraph_category: elasticgraph_category,
             source_type: source_type,
-            graphql_only_return_type: graphql_only_return_type
+            graphql_only_return_type: graphql_only_return_type,
+            requires_typename_for_mixed_index: requires_typename_for_mixed_index
           )
         end
 

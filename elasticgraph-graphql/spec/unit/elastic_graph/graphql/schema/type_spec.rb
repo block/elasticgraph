@@ -53,12 +53,22 @@ module ElasticGraph
                 t.field "name", "String"
               end
 
+              schema.object_type "Temperature" do |t|
+                t.field "id", "ID"
+                t.field "value", "Float"
+              end
+
+              schema.object_type "Pressure" do |t|
+                t.field "id", "ID"
+                t.field "amount", "Int"
+              end
+
               schema.union_type "Attribute" do |t|
                 t.subtypes "Color", "Velocity"
               end
 
               schema.union_type "IndexedAttribute" do |t|
-                t.subtypes "Color", "Velocity"
+                t.subtypes "Temperature", "Pressure"
                 t.index "attributes"
               end
 
@@ -263,6 +273,26 @@ module ElasticGraph
             expect(type.name).to eq "Person"
             expect(type).to only_satisfy_predicates(:nullable?, :object?, :indexed_document?)
             expect(type.unwrap_fully).to be schema.type_named("Person")
+            expect(type.unwrap_non_null).to be type
+          end
+
+          it "can model a type that inherits an index from a union" do
+            # Temperature doesn't have its own index, but inherits from IndexedAttribute union
+            type = schema.type_named("Temperature")
+
+            expect(type.name).to eq "Temperature"
+            expect(type).to only_satisfy_predicates(:nullable?, :object?, :indexed_document?)
+            expect(type.unwrap_fully).to be schema.type_named("Temperature")
+            expect(type.unwrap_non_null).to be type
+          end
+
+          it "can model a type that inherits an index from an interface" do
+            # Velocity doesn't have its own index, but inherits from DirectlyIndexedInterface
+            type = schema.type_named("Velocity")
+
+            expect(type.name).to eq "Velocity"
+            expect(type).to only_satisfy_predicates(:nullable?, :object?, :indexed_document?)
+            expect(type.unwrap_fully).to be schema.type_named("Velocity")
             expect(type.unwrap_non_null).to be type
           end
 

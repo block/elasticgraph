@@ -15,6 +15,10 @@ module ElasticGraph
         include _IndexableType
 
         def initialize: (State, ::String) ?{ (ObjectType) -> void } -> void
+
+        private
+
+        def recursively_resolve_supertypes: () -> ::Array[UnionType | InterfaceType]
       end
     end
   end

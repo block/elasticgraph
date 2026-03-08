@@ -25,7 +25,10 @@ module ElasticGraph
         # imply that this type was user-defined; we have recently introduced this metadata and are not yet setting
         # it for all generated GraphQL types. For now, we are only setting it for specific cases where we need it.
         :source_type,
-        :graphql_only_return_type
+        :graphql_only_return_type,
+        # Indicates if this type requires __typename to be added during indexing for query-time type resolution.
+        # True for types in mixed-type indices (types that inherit an index from a parent union/interface).
+        :requires_typename_for_mixed_index
       )
         UPDATE_TARGETS = "update_targets"
         INDEX_DEFINITION_NAMES = "index_definition_names"
@@ -33,8 +36,9 @@ module ElasticGraph
         ELASTICGRAPH_CATEGORY = "elasticgraph_category"
         SOURCE_TYPE = "source_type"
         GRAPHQL_ONLY_RETURN_TYPE = "graphql_only_return_type"
+        REQUIRES_TYPENAME_FOR_MIXED_INDEX = "requires_typename_for_mixed_index"
 
-        def initialize(update_targets:, index_definition_names:, graphql_fields_by_name:, elasticgraph_category:, source_type:, graphql_only_return_type:)
+        def initialize(update_targets:, index_definition_names:, graphql_fields_by_name:, elasticgraph_category:, source_type:, graphql_only_return_type:, requires_typename_for_mixed_index:)
           graphql_fields_by_name = graphql_fields_by_name.select { |name, field| field.needed?(name) }
 
           super(
@@ -43,7 +47,8 @@ module ElasticGraph
             graphql_fields_by_name: graphql_fields_by_name,
             elasticgraph_category: elasticgraph_category,
             source_type: source_type,
-            graphql_only_return_type: graphql_only_return_type
+            graphql_only_return_type: graphql_only_return_type,
+            requires_typename_for_mixed_index: requires_typename_for_mixed_index
           )
         end
 
@@ -63,7 +68,8 @@ module ElasticGraph
             graphql_fields_by_name: graphql_fields_by_name,
             elasticgraph_category: hash[ELASTICGRAPH_CATEGORY]&.to_sym || nil,
             source_type: hash[SOURCE_TYPE] || nil,
-            graphql_only_return_type: !!hash[GRAPHQL_ONLY_RETURN_TYPE]
+            graphql_only_return_type: !!hash[GRAPHQL_ONLY_RETURN_TYPE],
+            requires_typename_for_mixed_index: !!hash[REQUIRES_TYPENAME_FOR_MIXED_INDEX]
           )
         end
 
@@ -80,6 +86,7 @@ module ElasticGraph
             GRAPHQL_FIELDS_BY_NAME => dumped_graphql_fields_by_name,
             GRAPHQL_ONLY_RETURN_TYPE => graphql_only_return_type ? true : nil,
             INDEX_DEFINITION_NAMES => index_definition_names,
+            REQUIRES_TYPENAME_FOR_MIXED_INDEX => requires_typename_for_mixed_index ? true : nil,
             SOURCE_TYPE => source_type,
             UPDATE_TARGETS => update_targets.map(&:to_dumpable_hash)
           }

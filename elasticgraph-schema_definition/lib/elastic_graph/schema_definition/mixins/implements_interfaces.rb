@@ -117,6 +117,18 @@ module ElasticGraph
 
           generate_sdl(name_section: name_section, &field_arg_selector)
         end
+
+        private
+
+        # Returns all interface types that this type implements, including ancestor interfaces.
+        #
+        # @return [Array<InterfaceType>] list of interface types this type implements
+        def resolve_interface_supertypes
+          implemented_interfaces.flat_map do |interface_ref|
+            interface = schema_def_state.types_by_name[interface_ref.name]
+            [interface] + interface.recursively_resolve_supertypes
+          end
+        end
       end
     end
   end

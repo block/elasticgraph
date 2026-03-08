@@ -4,6 +4,8 @@ module ElasticGraph
       module HasIndices
         def own_index_def: () -> Indexing::Index?
         def has_own_index_def?: () -> bool
+        def own_or_inherited_index_def: () -> Indexing::Index?
+        def inherits_index?: () -> bool
         def root_document_type?: () -> bool
         attr_reader runtime_metadata_overrides: ::Hash[::Symbol, untyped]
         attr_reader default_graphql_resolver: SchemaArtifacts::RuntimeMetadata::ConfiguredGraphQLResolver?
