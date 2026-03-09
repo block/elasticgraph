@@ -335,8 +335,8 @@ module ElasticGraph
           raise Errors::SchemaError, "`json_schema_version` must be specified in the schema. To resolve, add `schema.json_schema_version 1` in a schema definition block."
         end
 
-        root_document_type_names = state.object_types_by_name.values
-          .select { |type| type.root_document_type? && !type.abstract? }
+        indexed_type_names = state.object_types_by_name.values
+          .select { |type| !type.own_or_inherited_index_def.nil? && !type.abstract? }
           .reject { |type| derived_indexing_type_names.include?(type.name) }
           .map(&:name)
 
@@ -348,7 +348,7 @@ module ElasticGraph
           "$schema" => JSON_META_SCHEMA,
           JSON_SCHEMA_VERSION_KEY => json_schema_version,
           "$defs" => {
-            "ElasticGraphEventEnvelope" => Indexing::EventEnvelope.json_schema(root_document_type_names, json_schema_version)
+            "ElasticGraphEventEnvelope" => Indexing::EventEnvelope.json_schema(indexed_type_names, json_schema_version)
           }.merge(definitions_by_name)
         }
       end
