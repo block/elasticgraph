@@ -38,7 +38,7 @@ gems:
   source:
     type: rubygems
 - name: aws-sdk-core
-  version: 3.242.0
+  version: 3.243.0
   source:
     type: rubygems
 - name: aws-sdk-kms
@@ -50,7 +50,7 @@ gems:
   source:
     type: rubygems
 - name: aws-sdk-s3
-  version: 1.213.0
+  version: 1.215.0
   source:
     type: rubygems
 - name: aws-sdk-sqs
