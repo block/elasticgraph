@@ -56,9 +56,10 @@ module ElasticGraph
         # @implements CountAccumulator
         def self.merge_list_counts_into(params, mapping:, list_counts_field_paths_for_source:)
           # Here we compute the counts of our list elements so that we can index it.
+          mapping["type"] ||= "nested"
           data = compute_list_counts_of(params.fetch("data"), CountAccumulator.new_parent(
             # We merge in `type: nested` since the `nested` type indicates a new count accumulator parent and we want that applied at the root.
-            mapping.merge("type" => "nested"),
+            mapping,
             list_counts_field_paths_for_source
           ))
 
