@@ -246,6 +246,55 @@ module ElasticGraph
             }.to raise_error FailedEventError, a_string_including("extra_field")
           end
 
+          it "allows ingestion schema behavior to be fully overridden" do
+            event = build_upsert_event(:component, id: "1", __version: 1)
+
+            validator = instance_double(Support::JSONSchema::Validator, validate_with_error_message: nil)
+            ingestion_schema = instance_double(IngestionSchemas::JSONSchema)
+
+            expect(ingestion_schema).to receive(:available_versions).and_return(Set[1])
+            expect(ingestion_schema).to receive(:validator_for).with(EVENT_ENVELOPE_JSON_SCHEMA_NAME, 1).and_return(validator)
+            expect(ingestion_schema).to receive(:validator_for).with("Component", 1).and_return(validator)
+            expect(ingestion_schema).to receive(:record_preparer_for).with(1).and_return(indexer.record_preparer_factory.for_latest_json_schema_version)
+
+            expect(indexer.schema_artifacts).not_to receive(:available_json_schema_versions)
+            expect(indexer.schema_artifacts).not_to receive(:json_schemas_for)
+
+            operation_factory = indexer.operation_factory.with(ingestion_schema: ingestion_schema)
+            result = operation_factory.build(event)
+
+            expect(result.failed_event_error).to be_nil
+            expect(result.operations).not_to be_empty
+          end
+
+          it "raises a clear error when a custom ingestion schema does not satisfy the required interface" do
+            event = build_upsert_event(:component, id: "1", __version: 1)
+            operation_factory = indexer.operation_factory.with(ingestion_schema: Object.new)
+
+            expect {
+              operation_factory.build(event)
+            }.to raise_error(
+              ArgumentError,
+              a_string_including("Invalid ingestion schema override", "`available_versions`", "`validator_for`", "`record_preparer_for`")
+            )
+          end
+
+          it "surfaces validation failures from a custom ingestion schema implementation" do
+            event = build_upsert_event(:component, id: "1", __version: 1)
+            envelope_validator = instance_double(Support::JSONSchema::Validator, validate_with_error_message: nil)
+            record_validator = instance_double(Support::JSONSchema::Validator, validate_with_error_message: "custom schema says no")
+
+            ingestion_schema = instance_double(IngestionSchemas::JSONSchema)
+            expect(ingestion_schema).to receive(:available_versions).and_return(Set[1])
+            expect(ingestion_schema).to receive(:validator_for).with(EVENT_ENVELOPE_JSON_SCHEMA_NAME, 1).and_return(envelope_validator)
+            expect(ingestion_schema).to receive(:validator_for).with("Component", 1).and_return(record_validator)
+            expect(ingestion_schema).not_to receive(:record_preparer_for)
+
+            operation_factory = indexer.operation_factory.with(ingestion_schema: ingestion_schema)
+
+            expect_failed_event_error(event, "custom schema says no", factory: operation_factory)
+          end
+
           context "when the indexer has json schemas v2 and v4 (v4 adds yellow color)" do
             before do
               # With the "real" version one as a baseline, create a separate version with a small schema change.
