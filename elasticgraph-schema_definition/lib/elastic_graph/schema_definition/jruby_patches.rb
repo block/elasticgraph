@@ -34,26 +34,3 @@ module ElasticGraph
     end
   end
 end
-
-require "elastic_graph/schema_definition/mixins/verifies_graphql_name"
-require "elastic_graph/schema_definition/mixins/has_indices"
-
-# Bug: `def initialize(...)` + `super(...)` (or `super(*args, **kwargs)`) in a module
-# prepended/included on a Struct subclass incorrectly warns about keyword arguments
-# (3+ members) or crashes with ClassCastException (1 member).
-# Workaround: use `ruby2_keywords` to avoid separate `**kwargs` forwarding.
-# Reported upstream: https://github.com/jruby/jruby/issues/9242
-# TODO: remove once JRuby fixes this upstream.
-ElasticGraph::SchemaDefinition::Mixins::VerifiesGraphQLName.class_exec do
-  ruby2_keywords def initialize(*args, &block)
-    super(*args, &block)
-    ::ElasticGraph::SchemaDefinition::Mixins::VerifiesGraphQLName.verify_name!(name)
-  end
-end
-
-ElasticGraph::SchemaDefinition::Mixins::HasIndices.class_exec do
-  ruby2_keywords def initialize(*args, &block)
-    super(*args, &block)
-    initialize_has_indices { yield self }
-  end
-end
