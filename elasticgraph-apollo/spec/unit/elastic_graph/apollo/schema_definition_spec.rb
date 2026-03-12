@@ -18,6 +18,10 @@ module ElasticGraph
 
       include_context "SchemaDefinitionHelpers"
 
+      after do
+        expect(logged_output).to exclude(/warn/i)
+      end
+
       def self.with_both_casing_forms(&block)
         context "with schema elements configured to use camelCase" do
           let(:schema_element_name_form) { :camelCase }

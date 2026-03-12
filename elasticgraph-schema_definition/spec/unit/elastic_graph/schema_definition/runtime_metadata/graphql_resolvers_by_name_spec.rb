@@ -144,8 +144,22 @@ module ElasticGraph
           WARNING: 2 GraphQL resolver(s) have been registered but are unused:
             - resolver1
             - resolver2
-          These resolvers can be removed.
+          These resolvers can be removed. If you intended for them to be available as built-in/internal
+          resolvers, pass `built_in: true` when registering them.
         EOS
+      end
+
+      it "does not warn when a resolver is registered with `built_in: true` but never used" do
+        output = StringIO.new
+
+        graphql_resolvers_by_name(output: output) do |schema|
+          schema.register_graphql_resolver :resolver1,
+            GraphQLResolverWithoutLookahead,
+            defined_at: "some/path",
+            built_in: true
+        end
+
+        expect(output.string).to eq("")
       end
 
       def graphql_resolvers_by_name(...)
