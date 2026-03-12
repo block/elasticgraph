@@ -236,11 +236,6 @@ module ElasticGraph
           end
         end
 
-        # @private
-        def root_document_type?
-          false
-        end
-
         private
 
         EQUAL_TO_ANY_OF_DOC = <<~EOS

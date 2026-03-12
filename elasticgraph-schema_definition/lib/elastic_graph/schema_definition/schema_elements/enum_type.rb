@@ -161,11 +161,6 @@ module ElasticGraph
           Indexing::FieldType::Enum.new(values_by_name.keys)
         end
 
-        # @return [false] enum types are never root document types
-        def root_document_type?
-          false
-        end
-
         # @return [EnumType] converts the enum type to its input form for when different naming is used for input vs output enums.
         def as_input
           input_name = type_ref

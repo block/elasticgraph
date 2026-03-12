@@ -51,8 +51,7 @@ module ElasticGraph
             graphql_fields_by_name: graphql_input_fields_by_name,
             elasticgraph_category: nil,
             source_type: nil,
-            graphql_only_return_type: false,
-            requires_typename_for_mixed_index: false
+            graphql_only_return_type: false
           )
         end
 

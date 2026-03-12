@@ -24,8 +24,7 @@ module ElasticGraph
             graphql_fields_by_name: {},
             elasticgraph_category: nil,
             source_type: nil,
-            graphql_only_return_type: false,
-            requires_typename_for_mixed_index: false
+            graphql_only_return_type: false
           )
         end
 
@@ -46,18 +45,6 @@ module ElasticGraph
 
           expect(type.graphql_only_return_type).to eq true
           expect(type.to_dumpable_hash).to include("graphql_only_return_type" => true)
-        end
-
-        it "models `requires_typename_for_mixed_index` as `true` or `nil` so that our runtime metadata pruning can omit nils" do
-          type = ObjectType.from_hash({})
-
-          expect(type.requires_typename_for_mixed_index).to eq false
-          expect(type.to_dumpable_hash).to include("requires_typename_for_mixed_index" => nil)
-
-          type = ObjectType.from_hash({"requires_typename_for_mixed_index" => true})
-
-          expect(type.requires_typename_for_mixed_index).to eq true
-          expect(type.to_dumpable_hash).to include("requires_typename_for_mixed_index" => true)
         end
 
         it "omits `name_in_index` from dumped GraphQL fields when it matches the GraphQL field name" do

@@ -79,21 +79,6 @@ module ElasticGraph
             end
           end
 
-          describe "requires_typename_for_mixed_index" do
-            it "is true for types that inherit an index (sharing a mixed-type index)" do
-              expect(mobile_store_metadata.requires_typename_for_mixed_index).to eq true
-              expect(online_store_metadata.requires_typename_for_mixed_index).to eq true
-            end
-
-            it "is false for types with their own direct index (single-type index)" do
-              expect(physical_store_metadata.requires_typename_for_mixed_index).to eq false
-            end
-
-            it "is false for the parent abstract type with its own direct index" do
-              expect(store_metadata.requires_typename_for_mixed_index).to eq false
-            end
-          end
-
           describe "update_targets data_params" do
             it "includes __typename for types that inherit an index (needed for type resolution in mixed-type indices)" do
               mobile_store_target = mobile_store_metadata.update_targets.find { |t| t.type == "MobileStore" }
@@ -144,7 +129,6 @@ module ElasticGraph
               end
 
               expect(widget_metadata.index_definition_names).to eq ["things"]
-              expect(widget_metadata.requires_typename_for_mixed_index).to eq true
             end
           end
         end
@@ -176,7 +160,6 @@ module ElasticGraph
           end
 
           expect(gadget_metadata.index_definition_names).to eq ["indexed_interfaces"]
-          expect(gadget_metadata.requires_typename_for_mixed_index).to eq true
         end
       end
     end

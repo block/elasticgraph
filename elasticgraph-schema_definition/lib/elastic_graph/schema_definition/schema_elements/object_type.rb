@@ -38,13 +38,17 @@ module ElasticGraph
         include Mixins::ImplementsInterfaces
         include Mixins::HasReadableToSAndInspect.new { |t| t.name }
 
-        # Returns all supertypes of this object type, including union memberships
-        # and interface ancestors.
-        #
-        # @return [Array<UnionType, InterfaceType>] list of supertypes
+        # @return [Hash<String, Field>] fields that will be indexed, including __typename for mixed-type indices
         # @private
-        def recursively_resolve_supertypes
-          schema_def_state.union_types_by_member_ref[type_ref].to_a + resolve_interface_supertypes
+        def indexing_fields_by_name_in_index
+          fields = super
+
+          # Add __typename for types in mixed-type indices (types that inherit an index from a parent union/interface)
+          if !has_own_index_def? && !index_def.nil?
+            fields.merge("__typename" => schema_def_state.factory.new_field(name: "__typename", type: "String", parent_type: self))
+          else
+            fields
+          end
         end
 
         # @private

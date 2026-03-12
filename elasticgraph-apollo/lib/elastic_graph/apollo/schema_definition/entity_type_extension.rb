@@ -26,6 +26,10 @@ module ElasticGraph
         def root_document_type?
           false
         end
+
+        def directly_queryable?
+          false
+        end
       end
     end
   end

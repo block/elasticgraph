@@ -64,7 +64,7 @@ module ElasticGraph
               end
 
               schema.union_type "Attribute" do |t|
-                t.subtypes "Color", "Velocity"
+                t.subtypes "Color"
               end
 
               schema.union_type "IndexedAttribute" do |t|

@@ -100,16 +100,40 @@ module ElasticGraph
           !@own_index_def.nil?
         end
 
-        # @return [Boolean] true if this type is queryable at the root level of the GraphQL schema (i.e., has direct `Query` fields).
-        def root_document_type?
-          has_own_index_def?
+        # Resolves this type's index definition. This will be one of:
+        # - This type's own_index_def (if it directly defines an index)
+        # - An inherited index from a parent abstract type (union/interface) that defines an index
+        #
+        # A type can be a subtype of multiple abstract types (e.g., implement multiple interfaces),
+        # but at most one of those parent types may define an index. If multiple parent types are
+        # indexed, this method raises an error to prevent ambiguity about which index to inherit.
+        #
+        # @return [Indexing::Index, nil] the index definition, or nil if this type has no index
+        # @raise [Errors::SchemaError] if this type is a subtype of multiple indexed abstract types
+        def index_def
+          return own_index_def if has_own_index_def?
+
+          indexed_parents = recursively_resolve_supertypes.select(&:has_own_index_def?)
+
+          if indexed_parents.size > 1
+            parent_names = indexed_parents.map { |p| p.own_index_def.name }.join(", ")
+            raise Errors::SchemaError,
+              "The `#{name}` type is a subtype of multiple indexed abstract types (#{parent_names}). " \
+              "If a concrete type does not define an index, it may not be a member of multiple indexed abstract types."
+          end
+
+          indexed_parents.first&.own_index_def
         end
 
-        # @return [Boolean] true if this type inherits an index from a parent abstract type (union/interface).
-        #   When true, the type may share an index with other types (a "mixed-type index").
-        # @private
-        def inherits_index?
-          own_index_def.nil? && !own_or_inherited_index_def.nil?
+        # @return [Boolean] true if this type is a root document type that lives at a document root in the datastore (is indexed).
+        #   This returns true for types with their own index definition or types that inherit an index from a parent abstract type.
+        def root_document_type?
+          !index_def.nil?
+        end
+
+        # @return [Boolean] true if this type is directly queryable from the root `Query` type.
+        def directly_queryable?
+          has_own_index_def?
         end
 
         # Abstract types are rare, so return false. This can be overridden in the host class.
@@ -197,12 +221,11 @@ module ElasticGraph
         def runtime_metadata(extra_update_targets)
           SchemaArtifacts::RuntimeMetadata::ObjectType.new(
             update_targets: derived_indexed_types.map(&:runtime_metadata_for_source_type) + [self_update_target].compact + extra_update_targets,
-            index_definition_names: [own_or_inherited_index_def&.name].compact,
+            index_definition_names: [index_def&.name].compact,
             graphql_fields_by_name: runtime_metadata_graphql_fields_by_name,
             elasticgraph_category: nil,
             source_type: nil,
-            graphql_only_return_type: graphql_only?,
-            requires_typename_for_mixed_index: inherits_index?
+            graphql_only_return_type: graphql_only?
           ).with(**runtime_metadata_overrides)
         end
 
@@ -269,33 +292,6 @@ module ElasticGraph
           indexing_fields_by_name_in_index.values.reject { |f| f.source.nil? }
         end
 
-        # Returns the index definition that this type resolves to. This will be one of:
-        # - This type's own_index_def (if it directly defines an index)
-        # - An inherited index from a parent abstract type (union/interface) that defines an index
-        #
-        # A type can be a subtype of multiple abstract types (e.g., implement multiple interfaces),
-        # but at most one of those parent types may define an index. If multiple parent types define
-        # indices, this method raises an error to prevent ambiguity about which index to inherit.
-        #
-        # @return [Indexing::Index, nil] the index definition, or nil if this type has no index
-        # @raise [Errors::SchemaError] if this type is a subtype of multiple indexed abstract types
-        def own_or_inherited_index_def
-          return own_index_def if own_index_def
-
-          indexed_parents = recursively_resolve_supertypes.select do |supertype|
-            supertype.own_index_def
-          end
-
-          if indexed_parents.size > 1
-            parent_names = indexed_parents.map { |p| p.own_index_def.name }.join(", ")
-            raise Errors::SchemaError,
-              "The `#{name}` type is a subtype of multiple indexed abstract types (#{parent_names}). " \
-              "If a concrete type does not define an index, it may not be a member of multiple indexed abstract types."
-          end
-
-          indexed_parents.first&.own_index_def
-        end
-
         private
 
         def initialize_has_indices
@@ -308,7 +304,6 @@ module ElasticGraph
 
         def self_update_target
           # Only concrete types that are indexed in the datastore need an update target.
-          index_def = own_or_inherited_index_def
           return nil if abstract? || index_def.nil?
 
           # We exclude `id` from `data_params` because `Indexer::Operator::Update` automatically includes
@@ -318,12 +313,6 @@ module ElasticGraph
           # by a different event and we don't want to risk "stomping" their value via this update target.
           data_params = indexing_fields_by_name_in_index.select { |name, field| name != "id" && field.source.nil? }.to_h do |field|
             [field, SchemaArtifacts::RuntimeMetadata::DynamicParam.new(source_path: field, cardinality: :one)]
-          end
-
-          # Add __typename to data_params for types in mixed-type indices.
-          # RecordPreparer will add __typename during indexing and we need to include it in data_params so it gets indexed.
-          if inherits_index?
-            data_params["__typename"] = SchemaArtifacts::RuntimeMetadata::DynamicParam.new(source_path: "__typename", cardinality: :one)
           end
 
           index_runtime_metadata = index_def.runtime_metadata

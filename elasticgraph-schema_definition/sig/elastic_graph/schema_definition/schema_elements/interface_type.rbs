@@ -18,7 +18,6 @@ module ElasticGraph
         private
 
         def resolve_subtypes: () -> ::Set[SchemaElements::TypeWithSubfields]
-        def recursively_resolve_supertypes: () -> ::Array[InterfaceType]
       end
     end
   end

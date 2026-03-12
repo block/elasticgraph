@@ -86,8 +86,7 @@ module ElasticGraph
                 },
                 elasticgraph_category: :some_category,
                 source_type: "SomeType",
-                graphql_only_return_type: true,
-                requires_typename_for_mixed_index: false
+                graphql_only_return_type: true
               )
             },
             scalar_types_by_name: {

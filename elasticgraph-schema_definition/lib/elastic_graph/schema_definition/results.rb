@@ -119,7 +119,7 @@ module ElasticGraph
           query_type.documentation "The query entry point for the entire schema."
           query_type.resolve_fields_with nil
 
-          state.types_by_name.values.select(&:root_document_type?).sort_by(&:name).each do |type|
+          state.object_types_by_name.values.select(&:directly_queryable?).sort_by(&:name).each do |type|
             # @type var root_doc_type: Mixins::HasIndices & _Type
             root_doc_type = _ = type
 
@@ -212,7 +212,7 @@ module ElasticGraph
         enum_generator = state.factory.new_enums_for_root_document_types
 
         sort_order_enum_types_by_name = state.object_types_by_name.values
-          .select(&:root_document_type?)
+          .select(&:directly_queryable?)
           .filter_map { |type| enum_generator.sort_order_enum_for(_ = type) }
           .to_h { |enum_type| [(_ = enum_type).name, (_ = enum_type).runtime_metadata] }
 
@@ -335,8 +335,8 @@ module ElasticGraph
           raise Errors::SchemaError, "`json_schema_version` must be specified in the schema. To resolve, add `schema.json_schema_version 1` in a schema definition block."
         end
 
-        indexed_type_names = state.object_types_by_name.values
-          .select { |type| !type.own_or_inherited_index_def.nil? && !type.abstract? }
+        root_document_type_names = state.object_types_by_name.values
+          .select { |type| type.root_document_type? && !type.abstract? }
           .reject { |type| derived_indexing_type_names.include?(type.name) }
           .map(&:name)
 
@@ -348,7 +348,7 @@ module ElasticGraph
           "$schema" => JSON_META_SCHEMA,
           JSON_SCHEMA_VERSION_KEY => json_schema_version,
           "$defs" => {
-            "ElasticGraphEventEnvelope" => Indexing::EventEnvelope.json_schema(indexed_type_names, json_schema_version)
+            "ElasticGraphEventEnvelope" => Indexing::EventEnvelope.json_schema(root_document_type_names, json_schema_version)
           }.merge(definitions_by_name)
         }
       end

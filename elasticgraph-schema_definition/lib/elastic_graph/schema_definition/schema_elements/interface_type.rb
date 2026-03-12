@@ -61,14 +61,6 @@ module ElasticGraph
           __getobj__.graphql_fields_by_name
         end
 
-        # Returns all interface types that this interface implements, including ancestor interfaces.
-        #
-        # @return [Array<InterfaceType>] list of interface types this interface implements
-        # @private
-        def recursively_resolve_supertypes
-          resolve_interface_supertypes
-        end
-
         private
 
         def resolve_subtypes
