@@ -107,6 +107,30 @@ module ElasticGraph
           expect(metadata.index_definition_names).to eq ["things"]
         end
 
+        it "allows concrete subtypes to inherit the index from the supertype" do
+          widget_metadata, component_metadata = object_type_metadata_for("Widget", "Component") do |s|
+            s.object_type "Widget" do |t|
+              t.field "id", "ID!"
+              t.field "name", "String"
+              link_subtype_to_supertype(t, "Thing")
+            end
+
+            s.object_type "Component" do |t|
+              t.field "id", "ID!"
+              t.field "size", "Int"
+              link_subtype_to_supertype(t, "Thing")
+            end
+
+            s.public_send type_def_method, "Thing" do |t|
+              link_supertype_to_subtypes(t, "Widget", "Component")
+              t.index "things"
+            end
+          end
+
+          expect(widget_metadata.index_definition_names).to eq ["things"]
+          expect(component_metadata.index_definition_names).to eq ["things"]
+        end
+
         it "does not dump any when no direct index is defined on it (even if the subtypes have indices)" do
           metadata = object_type_metadata_for "Thing" do |s|
             s.object_type "Widget" do |t|
@@ -176,6 +200,32 @@ module ElasticGraph
               end
             end
           }.to raise_error(ElasticGraph::Errors::SchemaError, a_string_including("The `Widget` type is a subtype of multiple indexed abstract types", "things_a, things_b"))
+        end
+      end
+
+      context "with transitive interface inheritance" do
+        it "allows a concrete type to inherit an index from a grandparent interface" do
+          widget_metadata = object_type_metadata_for("Widget") do |s|
+            s.object_type "Widget" do |t|
+              t.field "id", "ID!"
+              t.field "name", "String"
+              t.field "category", "String"
+              t.implements "InterfaceA"
+            end
+
+            s.interface_type "InterfaceA" do |t|
+              t.field "name", "String"
+              t.field "category", "String"
+              t.implements "InterfaceB"
+            end
+
+            s.interface_type "InterfaceB" do |t|
+              t.field "name", "String"
+              t.index "indexed_interfaces"
+            end
+          end
+
+          expect(widget_metadata.index_definition_names).to eq ["indexed_interfaces"]
         end
       end
     end

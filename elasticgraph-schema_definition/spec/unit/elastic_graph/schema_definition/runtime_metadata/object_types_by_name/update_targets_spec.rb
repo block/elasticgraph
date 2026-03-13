@@ -1474,6 +1474,19 @@ module ElasticGraph
           widget_target = metadata.update_targets.find { |t| t.type == "Widget" }
           expect(widget_target.rollover_timestamp_value_source).to eq("created_at")
         end
+
+        it "does not include __typename in data_params for types with their own index (single-type index)" do
+          metadata = object_type_metadata_for "Widget" do |s|
+            s.object_type "Widget" do |t|
+              t.field "id", "ID!"
+              t.field "name", "String"
+              t.index "widgets"
+            end
+          end
+
+          widget_target = metadata.update_targets.find { |t| t.type == "Widget" }
+          expect(widget_target.data_params.keys).not_to include("__typename")
+        end
       end
 
       context "on an embedded object type" do
@@ -1635,6 +1648,35 @@ module ElasticGraph
           widget_target = widget_metadata.update_targets.find { |t| t.type == "Widget" }
           expect(widget_target.routing_value_source).to eq("id") # defaults to id when no custom routing
           expect(widget_target.rollover_timestamp_value_source).to be_nil # no default for rollover
+        end
+
+        it "includes __typename in data_params for types that inherit an index (needed for field extraction during indexing)" do
+          widget_metadata, component_metadata = object_type_metadata_for("Widget", "Component") do |s|
+            s.object_type "Widget" do |t|
+              t.field "id", "ID!"
+              t.field "name", "String"
+              link_subtype_to_supertype(t, "Thing")
+            end
+
+            s.object_type "Component" do |t|
+              t.field "id", "ID!"
+              t.field "size", "Int"
+              link_subtype_to_supertype(t, "Thing")
+            end
+
+            s.public_send type_def_method, "Thing" do |t|
+              link_supertype_to_subtypes(t, "Widget", "Component")
+              t.index "things"
+            end
+          end
+
+          widget_target = widget_metadata.update_targets.find { |t| t.type == "Widget" }
+          expect(widget_target.data_params.keys).to include("__typename")
+          expect(widget_target.data_params["__typename"].source_path).to eq "__typename"
+
+          component_target = component_metadata.update_targets.find { |t| t.type == "Component" }
+          expect(component_target.data_params.keys).to include("__typename")
+          expect(component_target.data_params["__typename"].source_path).to eq "__typename"
         end
       end
 

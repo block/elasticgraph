@@ -126,7 +126,8 @@ module ElasticGraph
           union_memberships = schema_def_state.union_types_by_member_ref[type_ref]
 
           interface_supertypes = implemented_interfaces.flat_map do |interface_ref|
-            [interface_ref.resolved] + interface.recursively_resolve_supertypes.to_a
+            interface = interface_ref.resolved
+            [interface] + interface.recursively_resolve_supertypes.to_a
           end.to_set
 
           union_memberships | interface_supertypes
