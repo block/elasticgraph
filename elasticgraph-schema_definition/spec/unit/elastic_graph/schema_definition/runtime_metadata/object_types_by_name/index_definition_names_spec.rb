@@ -205,27 +205,50 @@ module ElasticGraph
 
       context "with transitive interface inheritance" do
         it "allows a concrete type to inherit an index from a grandparent interface" do
-          widget_metadata = object_type_metadata_for("Widget") do |s|
-            s.object_type "Widget" do |t|
+          poodle_metadata = object_type_metadata_for("Poodle") do |s|
+            s.object_type "Poodle" do |t|
               t.field "id", "ID!"
               t.field "name", "String"
-              t.field "category", "String"
-              t.implements "InterfaceA"
+              t.field "breed", "String"
+              t.implements "Dog"
             end
 
-            s.interface_type "InterfaceA" do |t|
+            s.interface_type "Dog" do |t|
               t.field "name", "String"
-              t.field "category", "String"
-              t.implements "InterfaceB"
+              t.field "breed", "String"
+              t.implements "Animal"
             end
 
-            s.interface_type "InterfaceB" do |t|
+            s.interface_type "Animal" do |t|
               t.field "name", "String"
-              t.index "indexed_interfaces"
+              t.index "animals"
             end
           end
 
-          expect(widget_metadata.index_definition_names).to eq ["indexed_interfaces"]
+          expect(poodle_metadata.index_definition_names).to eq ["animals"]
+        end
+
+        it "raises an error when a concrete type's interface chain includes multiple indexed interfaces" do
+          expect {
+            object_type_metadata_for("Poodle") do |s|
+              s.object_type "Poodle" do |t|
+                t.field "id", "ID!"
+                t.field "name", "String"
+                t.implements "Dog"
+              end
+
+              s.interface_type "Dog" do |t|
+                t.field "name", "String"
+                t.implements "Animal"
+                t.index "dogs"
+              end
+
+              s.interface_type "Animal" do |t|
+                t.field "name", "String"
+                t.index "animals"
+              end
+            end
+          }.to raise_error(ElasticGraph::Errors::SchemaError, a_string_including("The `Poodle` type is a subtype of multiple indexed abstract types", "dogs, animals"))
         end
       end
     end
