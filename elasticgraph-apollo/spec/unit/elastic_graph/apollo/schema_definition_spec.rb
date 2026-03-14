@@ -291,24 +291,27 @@ module ElasticGraph
 
         it "avoids including indexed interfaces in the `_Entity` union (and does not add `@key` to it) since unions can't include interfaces" do
           schema_string = graphql_schema_string do |schema|
+            # Define subtypes before their indexed supertype to verify type references
+            # resolve correctly regardless of definition order.
             schema.object_type "IndexedType1" do |t|
               t.implements "NamedEntity"
               t.field "graphql", "String", name_in_index: "index"
               t.field "id", "ID!"
               t.field "name", "String"
-              t.index "index1"
+              # Inherits index from NamedEntity
             end
 
             schema.object_type "IndexedType2" do |t|
               t.implements "NamedEntity"
               t.field "id", "ID!"
               t.field "name", "String"
-              t.index "index1"
+              # Inherits index from NamedEntity
             end
 
             schema.interface_type "NamedEntity" do |t|
               t.field "id", "ID!"
               t.field "name", "String"
+              t.index "named_entities"
             end
           end
 
