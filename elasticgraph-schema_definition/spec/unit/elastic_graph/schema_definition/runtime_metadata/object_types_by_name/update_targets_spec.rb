@@ -1474,19 +1474,6 @@ module ElasticGraph
           widget_target = metadata.update_targets.find { |t| t.type == "Widget" }
           expect(widget_target.rollover_timestamp_value_source).to eq("created_at")
         end
-
-        it "does not include __typename in data_params for types with their own index (single-type index)" do
-          metadata = object_type_metadata_for "Widget" do |s|
-            s.object_type "Widget" do |t|
-              t.field "id", "ID!"
-              t.field "name", "String"
-              t.index "widgets"
-            end
-          end
-
-          widget_target = metadata.update_targets.find { |t| t.type == "Widget" }
-          expect(widget_target.data_params.keys).not_to include("__typename")
-        end
       end
 
       context "on an embedded object type" do

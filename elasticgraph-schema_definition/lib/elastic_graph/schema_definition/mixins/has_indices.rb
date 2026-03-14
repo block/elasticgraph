@@ -102,36 +102,36 @@ module ElasticGraph
 
         # Resolves this type's index definition. This will be one of:
         # - This type's own_index_def (if it directly defines an index)
-        # - An inherited index from a parent abstract type (union/interface) that defines an index
+        # - An inherited index from an abstract supertype (union/interface) that has an index
         #
-        # A type can be a subtype of multiple abstract types (e.g., implement multiple interfaces),
-        # but at most one of those parent types may define an index. If multiple parent types are
-        # indexed, this method raises an error to prevent ambiguity about which index to inherit.
+        # This type can be a subtype of multiple abstract types (e.g., implements multiple interfaces), but unless it
+        # defines its own index, at most one of its supertypes may have an index. If multiple parent types are indexed,
+        # this method raises an error to prevent ambiguity about which index to inherit.
         #
         # @return [Indexing::Index, nil] the index definition, or nil if this type has no index
         # @raise [Errors::SchemaError] if this type is a subtype of multiple indexed abstract types
         def index_def
           return own_index_def if has_own_index_def?
 
-          indexed_parents = recursively_resolve_supertypes.select(&:has_own_index_def?)
+          indexed_supertypes = recursively_resolve_supertypes.select(&:has_own_index_def?)
 
-          if indexed_parents.size > 1
-            parent_names = indexed_parents.map { |p| p.own_index_def.name }.join(", ")
+          if indexed_supertypes.size > 1
+            parent_names = indexed_supertypes.map { |p| p.own_index_def.name }.join(", ")
             raise Errors::SchemaError,
               "The `#{name}` type is a subtype of multiple indexed abstract types (#{parent_names}). " \
               "If a concrete type does not define an index, it may not be a member of multiple indexed abstract types."
           end
 
-          indexed_parents.first&.own_index_def
+          indexed_supertypes.first&.own_index_def
         end
 
         # @return [Boolean] true if this type is a root document type that lives at a document root in the datastore (is indexed).
-        #   This returns true for types with their own index definition or types that inherit an index from a parent abstract type.
+        #   This returns true for types with their own index definition or types that inherit an index from a supertype.
         def root_document_type?
           !index_def.nil?
         end
 
-        # @return [Boolean] true if this type is directly queryable from the root `Query` type.
+        # @return [Boolean] true if this type is directly queryable via a type-specific field on the root `Query` type.
         def directly_queryable?
           has_own_index_def?
         end
@@ -303,8 +303,7 @@ module ElasticGraph
         end
 
         def self_update_target
-          # Only concrete types that are indexed in the datastore need an update target.
-          return nil if abstract? || index_def.nil?
+          return nil if abstract? || !root_document_type?
 
           # We exclude `id` from `data_params` because `Indexer::Operator::Update` automatically includes
           # `params.id` so we don't want it duplicated at `params.data.id` alongside other data params.
