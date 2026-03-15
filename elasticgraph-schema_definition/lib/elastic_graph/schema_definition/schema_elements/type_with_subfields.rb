@@ -471,11 +471,6 @@ module ElasticGraph
         end
 
         # @private
-        def root_document_type?
-          false
-        end
-
-        # @private
         def to_indexing_field_type
           Indexing::FieldType::Object.new(
             schema_def_state: schema_def_state,

@@ -38,6 +38,13 @@ module ElasticGraph
           super || subtypes_are_root_document_types?
         end
 
+        # An abstract type is queryable if all of its subtypes are root document types (via a direct or inherited index)
+        # even if those subtypes aren't themselves directly queryable. This is why this doesn't delegate to a
+        # subtypes_are_directly_queryable helper.
+        def directly_queryable?
+          super || subtypes_are_root_document_types?
+        end
+
         def recursively_resolve_subtypes
           resolve_subtypes.flat_map do |type|
             type.is_a?(HasSubtypes) ? (_ = type).recursively_resolve_subtypes : [type]

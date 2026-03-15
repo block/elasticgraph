@@ -66,17 +66,12 @@ module ElasticGraph
           end
         end
 
-        # Here we override `object_type` in order to automatically add the apollo `@key` directive to indexed types.
         def new_object_type(name)
           super(name) do |raw_type|
             raw_type.extend ObjectTypeExtension
             type = raw_type # : ElasticGraph::SchemaDefinition::SchemaElements::ObjectType & ObjectTypeExtension
 
             yield type if block_given?
-
-            if type.root_document_type? && type.graphql_fields_by_name.key?("id")
-              type.apollo_key fields: "id"
-            end
           end
         end
 

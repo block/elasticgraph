@@ -107,6 +107,30 @@ module ElasticGraph
           expect(metadata.index_definition_names).to eq ["things"]
         end
 
+        it "allows concrete subtypes to inherit the index from the supertype" do
+          widget_metadata, component_metadata = object_type_metadata_for("Widget", "Component") do |s|
+            s.object_type "Widget" do |t|
+              t.field "id", "ID!"
+              t.field "name", "String"
+              link_subtype_to_supertype(t, "Thing")
+            end
+
+            s.object_type "Component" do |t|
+              t.field "id", "ID!"
+              t.field "size", "Int"
+              link_subtype_to_supertype(t, "Thing")
+            end
+
+            s.public_send type_def_method, "Thing" do |t|
+              link_supertype_to_subtypes(t, "Widget", "Component")
+              t.index "things"
+            end
+          end
+
+          expect(widget_metadata.index_definition_names).to eq ["things"]
+          expect(component_metadata.index_definition_names).to eq ["things"]
+        end
+
         it "does not dump any when no direct index is defined on it (even if the subtypes have indices)" do
           metadata = object_type_metadata_for "Thing" do |s|
             s.object_type "Widget" do |t|
@@ -154,6 +178,77 @@ module ElasticGraph
               the_type.index "widgets"
             end
           }.to raise_error(ElasticGraph::Errors::SchemaError, a_string_including("Cannot define an index on `Thing` after initialization is complete"))
+        end
+
+        it "raises an error when a concrete type without an index is a subtype of multiple indexed abstract types" do
+          expect {
+            object_type_metadata_for "Widget" do |s|
+              s.object_type "Widget" do |t|
+                t.field "id", "ID!"
+                link_subtype_to_supertype(t, "ThingA")
+                link_subtype_to_supertype(t, "ThingB")
+              end
+
+              s.public_send type_def_method, "ThingA" do |t|
+                link_supertype_to_subtypes(t, "Widget")
+                t.index "things_a"
+              end
+
+              s.public_send type_def_method, "ThingB" do |t|
+                link_supertype_to_subtypes(t, "Widget")
+                t.index "things_b"
+              end
+            end
+          }.to raise_error(ElasticGraph::Errors::SchemaError, a_string_including("The `Widget` type is a subtype of multiple indexed abstract types", "things_a, things_b"))
+        end
+      end
+
+      context "with transitive interface inheritance" do
+        it "allows a concrete type to inherit an index from a grandparent interface" do
+          poodle_metadata = object_type_metadata_for("Poodle") do |s|
+            s.object_type "Poodle" do |t|
+              t.field "id", "ID!"
+              t.field "name", "String"
+              t.field "breed", "String"
+              t.implements "Dog"
+            end
+
+            s.interface_type "Dog" do |t|
+              t.field "name", "String"
+              t.field "breed", "String"
+              t.implements "Animal"
+            end
+
+            s.interface_type "Animal" do |t|
+              t.field "name", "String"
+              t.index "animals"
+            end
+          end
+
+          expect(poodle_metadata.index_definition_names).to eq ["animals"]
+        end
+
+        it "raises an error when a concrete type's interface chain includes multiple indexed interfaces" do
+          expect {
+            object_type_metadata_for("Poodle") do |s|
+              s.object_type "Poodle" do |t|
+                t.field "id", "ID!"
+                t.field "name", "String"
+                t.implements "Dog"
+              end
+
+              s.interface_type "Dog" do |t|
+                t.field "name", "String"
+                t.implements "Animal"
+                t.index "dogs"
+              end
+
+              s.interface_type "Animal" do |t|
+                t.field "name", "String"
+                t.index "animals"
+              end
+            end
+          }.to raise_error(ElasticGraph::Errors::SchemaError, a_string_including("The `Poodle` type is a subtype of multiple indexed abstract types", "dogs, animals"))
         end
       end
     end

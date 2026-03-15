@@ -38,6 +38,16 @@ module ElasticGraph
         include Mixins::ImplementsInterfaces
         include Mixins::HasReadableToSAndInspect.new { |t| t.name }
 
+        # @return [Hash<String, Field>] fields that will be indexed, including __typename for mixed-type indices (types
+        # that inherit an index from an abstract supertype)
+        # @private
+        def indexing_fields_by_name_in_index
+          return super if has_own_index_def?
+          return super unless root_document_type?
+
+          super.merge("__typename" => schema_def_state.factory.new_field(name: "__typename", type: "String", parent_type: self))
+        end
+
         # @private
         def initialize(schema_def_state, name)
           field_factory = schema_def_state.factory.method(:new_field)

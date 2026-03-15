@@ -117,6 +117,21 @@ module ElasticGraph
 
           generate_sdl(name_section: name_section, &field_arg_selector)
         end
+
+        # Returns all supertypes of this type, including union memberships and interface ancestors.
+        #
+        # @return [Set<UnionType, InterfaceType>] set of supertypes
+        # @private
+        def recursively_resolve_supertypes
+          union_memberships = schema_def_state.union_types_by_member_ref[type_ref]
+
+          interface_supertypes = implemented_interfaces.flat_map do |interface_ref|
+            interface = interface_ref.resolved
+            [interface] + interface.recursively_resolve_supertypes.to_a
+          end.to_set
+
+          union_memberships | interface_supertypes
+        end
       end
     end
   end

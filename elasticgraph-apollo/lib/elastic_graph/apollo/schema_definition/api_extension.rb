@@ -336,6 +336,13 @@ module ElasticGraph
             end
           end
 
+          # Add @key directives to all root document types with an id field.
+          # This happens after schema definition is complete so root_document_type? sees the complete type hierarchy.
+          state.object_types_by_name.values
+            .grep(ElasticGraph::SchemaDefinition::SchemaElements::ObjectType)
+            .select { |object_type| object_type.root_document_type? && object_type.graphql_fields_by_name.key?("id") }
+            .each { |object_type| object_type.apollo_key fields: "id" }
+
           entity_types = state.object_types_by_name.values.select do |object_type|
             object_type.directives.any? do |directive|
               directive.name == "key" && directive.arguments.fetch(:resolvable, true)

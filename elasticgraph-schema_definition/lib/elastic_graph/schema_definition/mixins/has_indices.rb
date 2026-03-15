@@ -100,9 +100,39 @@ module ElasticGraph
           !@own_index_def.nil?
         end
 
-        # @return [Boolean] true if this type is a root document type that lives at the document root in the datastore.
-        #   For types with `own_index_def`, returns true. For abstract types with indexed subtypes, overridden in {HasSubtypes}.
+        # Resolves this type's index definition. This will be one of:
+        # - This type's own_index_def (if it directly defines an index)
+        # - An inherited index from an abstract supertype (union/interface) that has an index
+        #
+        # This type can be a subtype of multiple abstract types (e.g., implements multiple interfaces), but unless it
+        # defines its own index, at most one of its supertypes may have an index. If multiple parent types are indexed,
+        # this method raises an error to prevent ambiguity about which index to inherit.
+        #
+        # @return [Indexing::Index, nil] the index definition, or nil if this type has no index
+        # @raise [Errors::SchemaError] if this type is a subtype of multiple indexed abstract types
+        def index_def
+          return own_index_def if has_own_index_def?
+
+          indexed_supertypes = recursively_resolve_supertypes.select(&:has_own_index_def?)
+
+          if indexed_supertypes.size > 1
+            parent_names = indexed_supertypes.map { |p| p.own_index_def.name }.join(", ")
+            raise Errors::SchemaError,
+              "The `#{name}` type is a subtype of multiple indexed abstract types (#{parent_names}). " \
+              "If a concrete type does not define an index, it may not be a member of multiple indexed abstract types."
+          end
+
+          indexed_supertypes.first&.own_index_def
+        end
+
+        # @return [Boolean] true if this type is a root document type that lives at a document root in the datastore (is indexed).
+        #   This returns true for types with their own index definition or types that inherit an index from a supertype.
         def root_document_type?
+          !index_def.nil?
+        end
+
+        # @return [Boolean] true if this type is directly queryable via a type-specific field on the root `Query` type.
+        def directly_queryable?
           has_own_index_def?
         end
 
@@ -191,7 +221,7 @@ module ElasticGraph
         def runtime_metadata(extra_update_targets)
           SchemaArtifacts::RuntimeMetadata::ObjectType.new(
             update_targets: derived_indexed_types.map(&:runtime_metadata_for_source_type) + [self_update_target].compact + extra_update_targets,
-            index_definition_names: [own_index_def&.name].compact,
+            index_definition_names: [index_def&.name].compact,
             graphql_fields_by_name: runtime_metadata_graphql_fields_by_name,
             elasticgraph_category: nil,
             source_type: nil,
@@ -284,7 +314,7 @@ module ElasticGraph
             [field, SchemaArtifacts::RuntimeMetadata::DynamicParam.new(source_path: field, cardinality: :one)]
           end
 
-          index_runtime_metadata = own_index_def.runtime_metadata
+          index_runtime_metadata = index_def.runtime_metadata
 
           Indexing::UpdateTargetFactory.new_normal_indexing_update_target(
             type: name,
