@@ -2524,6 +2524,43 @@ module ElasticGraph
               nil
             )
           end
+
+          it "includes concrete subtypes (not the abstract supertype) in the event envelope type enum" do
+            json_schema = dump_schema do |s|
+              # PhysicalStore has its own index
+              s.object_type "PhysicalStore" do |t|
+                t.field "id", "ID!"
+                t.field "name", "String!"
+                link_subtype_to_supertype(t, "Store")
+                t.index "physical_stores"
+              end
+
+              # OnlineStore and MobileStore inherit index from Store
+              s.object_type "OnlineStore" do |t|
+                t.field "id", "ID!"
+                t.field "name", "String!"
+                link_subtype_to_supertype(t, "Store")
+              end
+
+              s.object_type "MobileStore" do |t|
+                t.field "id", "ID!"
+                t.field "name", "String!"
+                link_subtype_to_supertype(t, "Store")
+              end
+
+              s.public_send type_def_method, "Store" do |t|
+                link_supertype_to_subtypes(t, "PhysicalStore", "OnlineStore", "MobileStore")
+                t.index "stores"
+              end
+            end
+
+            # All concrete types should be in the enum:
+            # - PhysicalStore (has its own "physical_stores" index)
+            # - OnlineStore and MobileStore (inherit "stores" index from Store)
+            # The abstract Store type should NOT be in the enum.
+            type_definitions = json_schema.fetch("$defs")
+            expect(envelope_type_enum_values(type_definitions)).to contain_exactly("PhysicalStore", "OnlineStore", "MobileStore")
+          end
         end
 
         context "that is an embedded type" do
