@@ -115,7 +115,7 @@ PATH
   remote: elasticgraph-indexer_lambda
   specs:
     elasticgraph-indexer_lambda (1.1.1.pre)
-      aws-sdk-s3 (~> 1.215)
+      aws-sdk-s3 (~> 1.216)
       elasticgraph-indexer (= 1.1.1.pre)
       elasticgraph-lambda_support (= 1.1.1.pre)
 
@@ -208,7 +208,7 @@ PATH
   remote: elasticgraph-warehouse_lambda
   specs:
     elasticgraph-warehouse_lambda (1.1.1.pre)
-      aws-sdk-s3 (~> 1.215)
+      aws-sdk-s3 (~> 1.216)
       elasticgraph-indexer_lambda (= 1.1.1.pre)
       elasticgraph-lambda_support (= 1.1.1.pre)
 
