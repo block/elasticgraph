@@ -21,10 +21,18 @@ module ElasticGraph
             hash[type_name] = scalar_types_by_name[type_name]&.load_indexing_preparer&.extension_class
           end # : ::Hash[::String, SchemaArtifacts::RuntimeMetadata::extensionClass?]
 
+          # Derive the set of types that have __typename in their index mappings to supplement the set of types that
+          # explicitly require __typename in the JSON schema
+          mappings = schema_artifacts.index_mappings_by_index_def_name
+          types_with_typename_in_index_mapping = schema_artifacts.runtime_metadata.object_types_by_name.filter_map do |type_name, meta|
+            type_name if meta.index_definition_names.any? { |idx| mappings.dig(idx, "properties", "__typename") }
+          end.to_set
+
           @preparers_by_json_schema_version = ::Hash.new do |hash, version|
             hash[version] = RecordPreparer.new(
               indexing_preparer_by_scalar_type_name,
-              build_type_metas_from(@schema_artifacts.json_schemas_for(version))
+              build_type_metas_from(@schema_artifacts.json_schemas_for(version)),
+              types_with_typename_in_index_mapping
             )
           end
         end
@@ -81,7 +89,7 @@ module ElasticGraph
         end
       end
 
-      def initialize(indexing_preparer_by_scalar_type_name, type_metas)
+      def initialize(indexing_preparer_by_scalar_type_name, type_metas, types_with_typename_in_index_mapping)
         @indexing_preparer_by_scalar_type_name = indexing_preparer_by_scalar_type_name
         @eg_meta_by_field_name_by_concrete_type = type_metas.to_h do |meta|
           [meta.name, meta.eg_meta_by_field_name]
@@ -89,7 +97,7 @@ module ElasticGraph
 
         @types_requiring_typename = type_metas.filter_map do |meta|
           meta.name if meta.requires_typename
-        end.to_set
+        end.to_set | types_with_typename_in_index_mapping
       end
 
       # Prepares the given payload for being indexed into the named index.
@@ -133,7 +141,7 @@ module ElasticGraph
           # what the concrete subtype is. `__typename` is required on abstract types and indicates that.
           eg_meta_by_field_name = @eg_meta_by_field_name_by_concrete_type.fetch(value["__typename"] || type_name)
 
-          value.filter_map do |field_name, field_value|
+          prepared_fields = value.filter_map do |field_name, field_value|
             if field_name == "__typename"
               # We only want to include __typename if it we're dealing with a type that requires it.
               # (This is the case for an abstract type, so it can differentiate between which subtype we have
@@ -142,6 +150,13 @@ module ElasticGraph
               [eg_meta.fetch("nameInIndex"), prepare_value_for_indexing(field_value, eg_meta.fetch("type"))]
             end
           end.to_h
+
+          # Add __typename if required but absent (e.g. for a mixed-type index).
+          if @types_requiring_typename.include?(type_name) && !value.key?("__typename")
+            prepared_fields["__typename"] = type_name
+          end
+
+          prepared_fields
         else
           # We won't have a registered preparer for enum types, since those aren't dumped in
           # runtime metadata `scalar_types_by_name`, and we can just return the value as-is in
