@@ -238,6 +238,39 @@ module ElasticGraph
           expect(record).to eq({"id" => "1", "size" => 3, "__typename" => "TypeB"})
         end
 
+        it "includes __typename for types indexed only via union/interface, omits for directly indexed types" do
+          preparer = build_preparer do |s|
+            s.object_type "TypeA" do |t|
+              t.field "id", "ID!"
+              t.field "name", "String"
+            end
+
+            s.object_type "TypeB" do |t|
+              t.field "id", "ID!"
+              t.field "size", "Int"
+              t.index "type_b"
+            end
+
+            s.union_type "TypeAOrB" do |t|
+              t.subtype "TypeA"
+              t.subtype "TypeB"
+              t.index "type_a_or_b"
+            end
+          end
+
+          # Input record for TypeA without __typename
+          type_a_record = preparer.prepare_for_index("TypeA", {"id" => "1", "name" => "test"})
+
+          # __typename should be injected since the mixed supertype index requires it
+          expect(type_a_record).to eq({"id" => "1", "name" => "test", "__typename" => "TypeA"})
+
+          # Input record for TypeB with __typename
+          type_b_record = preparer.prepare_for_index("TypeB", {"id" => "1", "size" => 3, "__typename" => "TypeB"})
+
+          # __typename should be omitted since type_b is directly indexed
+          expect(type_b_record).to eq({"id" => "1", "size" => 3})
+        end
+
         it "handles nested abstract types, properly including `__typename` on them" do
           preparer = build_preparer do |s|
             s.object_type "Person" do |t|
