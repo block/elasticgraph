@@ -381,16 +381,14 @@ module ElasticGraph
             end
           end
 
-        unused_resolvers = registered_resolvers.except(*fields_by_resolvers.keys).reject do |name, res|
-          # Ignore our built-in resolvers.
-          res.resolver_ref.fetch("require_path").start_with?("elastic_graph/graphql/resolvers/")
-        end.keys
+        unused_resolvers = registered_resolvers.except(*fields_by_resolvers.keys, *state.built_in_graphql_resolvers).keys
 
         unless unused_resolvers.empty?
           state.output.puts <<~EOS
             WARNING: #{unused_resolvers.size} GraphQL resolver(s) have been registered but are unused:
               - #{unused_resolvers.sort.join("\n  - ")}
-            These resolvers can be removed.
+            These resolvers can be removed. If you intended for them to be available as built-in/internal
+            resolvers, pass `built_in: true` when registering them.
           EOS
         end
 

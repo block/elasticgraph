@@ -389,15 +389,15 @@ module ElasticGraph
           register_graphql_extension GraphQL::EngineExtension, defined_at: require_path
 
           require(require_path = "elastic_graph/apollo/graphql/entities_field_resolver")
-          register_graphql_resolver :apollo_entities, GraphQL::EntitiesFieldResolver, defined_at: require_path
+          register_graphql_resolver :apollo_entities, GraphQL::EntitiesFieldResolver, defined_at: require_path, built_in: true
 
           require(require_path = "elastic_graph/apollo/graphql/service_field_resolver")
-          register_graphql_resolver :apollo_service, GraphQL::ServiceFieldResolver, defined_at: require_path
+          register_graphql_resolver :apollo_service, GraphQL::ServiceFieldResolver, defined_at: require_path, built_in: true
 
           require(require_path = "elastic_graph/apollo/graphql/apollo_entity_ref_resolver")
-          register_graphql_resolver :apollo_entity_ref, GraphQL::ApolloEntityRefResolver::ForSingleId, defined_at: require_path
-          register_graphql_resolver :apollo_entity_ref_list, GraphQL::ApolloEntityRefResolver::ForIdList, defined_at: require_path
-          register_graphql_resolver :apollo_entity_ref_paginated, GraphQL::ApolloEntityRefResolver::ForPaginatedList, defined_at: require_path
+          register_graphql_resolver :apollo_entity_ref, GraphQL::ApolloEntityRefResolver::ForSingleId, defined_at: require_path, built_in: true
+          register_graphql_resolver :apollo_entity_ref_list, GraphQL::ApolloEntityRefResolver::ForIdList, defined_at: require_path, built_in: true
+          register_graphql_resolver :apollo_entity_ref_paginated, GraphQL::ApolloEntityRefResolver::ForPaginatedList, defined_at: require_path, built_in: true
         end
 
         def apollo_object_type(name, &block)
