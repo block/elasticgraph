@@ -302,6 +302,8 @@ module ElasticGraph
       # @param name [Symbol] unique name of the resolver
       # @param klass [Class] resolver class
       # @param defined_at [String] the `require` path of the resolver
+      # @param built_in [bool] Whether this resolver is built-in to ElasticGraph or one of its extensions.
+      #   Built-in resolvers that are unused in a schema will not trigger a warning.
       # @param resolver_config [Hash<Symbol, Object>] configuration options for the resolver, to support parameterized resolvers
       # @return [void]
       # @see Mixins::HasIndices#resolve_fields_with
@@ -369,8 +371,6 @@ module ElasticGraph
       #       end
       #     end
       #   end
-      # @param built_in [bool] Whether this resolver is built-in to ElasticGraph or one of its extensions.
-      #   Built-in resolvers that are unused in a schema will not trigger a warning.
       def register_graphql_resolver(name, klass, defined_at:, built_in: false, **resolver_config)
         extension = SchemaArtifacts::RuntimeMetadata::Extension.new(klass, defined_at, resolver_config)
 
@@ -384,11 +384,15 @@ module ElasticGraph
 
         resolver = SchemaArtifacts::RuntimeMetadata::GraphQLResolver.new(
           needs_lookahead: needs_lookahead,
-          resolver_ref: extension.to_dumpable_hash,
-          built_in: built_in
+          resolver_ref: extension.to_dumpable_hash
         )
 
         @state.graphql_resolvers_by_name[name] = resolver
+        if built_in
+          @state.built_in_graphql_resolvers << name
+        else
+          @state.built_in_graphql_resolvers.delete(name)
+        end
         nil
       end
 

@@ -162,6 +162,28 @@ module ElasticGraph
         expect(output.string).to eq("")
       end
 
+      it "warns when a built-in resolver name is re-registered as non-built-in and remains unused" do
+        output = StringIO.new
+
+        graphql_resolvers_by_name(output: output) do |schema|
+          schema.register_graphql_resolver :resolver1,
+            GraphQLResolverWithoutLookahead,
+            defined_at: "some/path",
+            built_in: true
+
+          schema.register_graphql_resolver :resolver1,
+            GraphQLResolverWithoutLookahead,
+            defined_at: "some/path"
+        end
+
+        expect(output.string).to eq(<<~EOS)
+          WARNING: 1 GraphQL resolver(s) have been registered but are unused:
+            - resolver1
+          These resolvers can be removed. If you intended for them to be available as built-in/internal
+          resolvers, pass `built_in: true` when registering them.
+        EOS
+      end
+
       def graphql_resolvers_by_name(...)
         define_schema(...).runtime_metadata.graphql_resolvers_by_name
       end

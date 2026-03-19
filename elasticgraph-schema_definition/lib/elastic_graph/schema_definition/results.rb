@@ -381,10 +381,7 @@ module ElasticGraph
             end
           end
 
-        unused_resolvers = registered_resolvers.except(*fields_by_resolvers.keys).reject do |name, res|
-          # Ignore our built-in resolvers.
-          res.built_in
-        end.keys
+        unused_resolvers = registered_resolvers.except(*fields_by_resolvers.keys, *state.built_in_graphql_resolvers).keys
 
         unless unused_resolvers.empty?
           state.output.puts <<~EOS

@@ -20,6 +20,7 @@ module ElasticGraph
       attr_accessor json_schema_version_setter_location: ::Thread::Backtrace::Location?
       attr_reader graphql_extension_modules: ::Array[SchemaArtifacts::RuntimeMetadata::GraphQLExtension]
       attr_reader graphql_resolvers_by_name: ::Hash[::Symbol, SchemaArtifacts::RuntimeMetadata::GraphQLResolver]
+      attr_reader built_in_graphql_resolvers: ::Set[::Symbol]
       attr_accessor initially_registered_built_in_types: ::Set[::String]
       attr_accessor built_in_types_customization_blocks: ::Array[^(SchemaElements::graphQLType) -> void]
       attr_accessor user_definition_complete: bool
@@ -50,8 +51,9 @@ module ElasticGraph
         deleted_fields_by_type_name_and_old_field_name: ::Hash[::String, ::Hash[::String, SchemaElements::DeprecatedElement]],
         json_schema_version: Integer?,
         json_schema_version_setter_location: ::Thread::Backtrace::Location?,
-        graphql_extension_modules: ::Array[SchemaArtifacts::RuntimeMetadata::Extension],
-        graphql_resolvers_by_name: ::Hash[::Symbol, SchemaArtifacts::RuntimeMetadata::Extension],
+        graphql_extension_modules: ::Array[SchemaArtifacts::RuntimeMetadata::GraphQLExtension],
+        graphql_resolvers_by_name: ::Hash[::Symbol, SchemaArtifacts::RuntimeMetadata::GraphQLResolver],
+        built_in_graphql_resolvers: ::Set[::Symbol],
         initially_registered_built_in_types: ::Set[::String],
         built_in_types_customization_blocks: ::Array[^(SchemaElements::graphQLType) -> void],
         user_definition_complete: bool,

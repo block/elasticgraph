@@ -174,11 +174,10 @@ module ElasticGraph
           "require_path" => "elastic_graph/graphql/resolvers/get_record_field_value"
         }
 
-        def graphql_resolver_with(needs_lookahead: false, resolver_ref: DEFAULT_RESOLVER_REF, built_in: false)
+        def graphql_resolver_with(needs_lookahead: false, resolver_ref: DEFAULT_RESOLVER_REF)
           GraphQLResolver.new(
             needs_lookahead: needs_lookahead,
-            resolver_ref: resolver_ref,
-            built_in: built_in
+            resolver_ref: resolver_ref
           )
         end
 

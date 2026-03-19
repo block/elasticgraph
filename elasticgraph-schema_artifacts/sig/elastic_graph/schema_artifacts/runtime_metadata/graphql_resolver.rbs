@@ -4,23 +4,20 @@ module ElasticGraph
       class GraphQLResolverSupertype
         attr_reader needs_lookahead: bool
         attr_reader resolver_ref: ::Hash[::String, ::String]
-        attr_reader built_in: bool
 
         def initialize: (
           needs_lookahead: bool,
-          resolver_ref: ::Hash[::String, ::String],
-          built_in: bool
+          resolver_ref: ::Hash[::String, ::String]
         ) -> void
 
         def with: (
           ?needs_lookahead: bool,
-          ?resolver_ref: ::Hash[::String, ::String],
-          ?built_in: bool
+          ?resolver_ref: ::Hash[::String, ::String]
         ) -> instance
 
         def self.new:
-          (needs_lookahead: bool, resolver_ref: ::Hash[::String, ::String], built_in: bool) -> instance
-          | (bool, ::Hash[::String, ::String], bool) -> instance
+          (needs_lookahead: bool, resolver_ref: ::Hash[::String, ::String]) -> instance
+          | (bool, ::Hash[::String, ::String]) -> instance
       end
 
       class GraphQLResolver < GraphQLResolverSupertype
@@ -30,7 +27,6 @@ module ElasticGraph
         self.@without_lookahead_loader: ExtensionLoader?
         def self.without_lookahead_loader: () -> ExtensionLoader
 
-        BUILT_IN: "built_in"
         NEEDS_LOOKAHEAD: "needs_lookahead"
         RESOLVER_REF: "resolver_ref"
 
