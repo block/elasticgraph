@@ -112,7 +112,9 @@ module ElasticGraph
             if implemented_interfaces.empty?
               name
             else
-              "#{name} implements #{implemented_interfaces.join(" & ")}"
+              # Include all ancestor interfaces in SDL
+              all_interfaces = recursively_resolve_supertypes.grep(SchemaElements::InterfaceType)
+              "#{name} implements #{all_interfaces.map(&:name).sort.join(" & ")}"
             end
 
           generate_sdl(name_section: name_section, &field_arg_selector)

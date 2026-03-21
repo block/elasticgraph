@@ -111,6 +111,47 @@ module ElasticGraph
           include_examples "#implements",
             graphql_definition_keyword: "interface",
             ruby_definition_method: :interface_type
+
+          context "SDL round-trip through GraphQL::Schema" do
+            it "preserves Edge node fields for all interfaces in deep hierarchy" do
+              # Uses specific alphabetical ordering to test that our SDL generation works around the GraphQL gem's
+              # sensitivity to type name ordering.
+              intermediate_sdl = define_schema do |api|
+                api.interface_type "Alpha" do |t|
+                  t.field "id", "ID!"
+                end
+
+                api.interface_type "Bravo" do |t|
+                  t.implements "Alpha"
+                  t.field "id", "ID!"
+                end
+
+                api.interface_type "Delta" do |t|
+                  t.implements "Bravo"
+                  t.field "id", "ID!"
+                end
+
+                api.interface_type "Echo" do |t|
+                  t.implements "Delta"
+                  t.field "id", "ID!"
+                end
+
+                api.object_type "Charlie" do |t|
+                  t.implements "Echo"
+                  t.field "id", "ID!"
+                  t.index "charlies"
+                end
+              end
+
+              round_tripped_sdl = ::GraphQL::Schema.from_definition(intermediate_sdl).to_definition
+
+              expect(edge_type_from(round_tripped_sdl, "Charlie")).to include("node: Charlie")
+              expect(edge_type_from(round_tripped_sdl, "Echo")).to include("node: Echo")
+              expect(edge_type_from(round_tripped_sdl, "Delta")).to include("node: Delta")
+              expect(edge_type_from(round_tripped_sdl, "Bravo")).to include("node: Bravo")
+              expect(edge_type_from(round_tripped_sdl, "Alpha")).to include("node: Alpha")
+            end
+          end
         end
       end
     end
