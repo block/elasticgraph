@@ -195,13 +195,14 @@ graph LR;
     click opensearch-ruby href "https://rubygems.org/gems/opensearch-ruby" "Open on RubyGems.org" _blank;
 ```
 
-### Extensions (6 gems)
+### Extensions (7 gems)
 
 These libraries extend ElasticGraph to provide optional but commonly needed functionality.
 
 * [elasticgraph-apollo](elasticgraph-apollo/README.md): Transforms an ElasticGraph project into an Apollo subgraph.
 * [elasticgraph-health_check](elasticgraph-health_check/README.md): Provides a health check for high availability ElasticGraph deployments.
 * [elasticgraph-json_ingestion](elasticgraph-json_ingestion/README.md): Pluggable JSON Schema ingestion serializer for ElasticGraph.
+* [elasticgraph-protobuf](elasticgraph-protobuf/README.md): Generates Protocol Buffers schema artifacts from ElasticGraph schemas.
 * [elasticgraph-query_interceptor](elasticgraph-query_interceptor/README.md): Intercepts ElasticGraph datastore queries.
 * [elasticgraph-query_registry](elasticgraph-query_registry/README.md): Provides a source-controlled query registry for ElasticGraph applications.
 * [elasticgraph-warehouse](elasticgraph-warehouse/README.md): Extends ElasticGraph to support ingestion into a data warehouse.
@@ -221,6 +222,7 @@ graph LR;
     elasticgraph-health_check["eg-health_check"];
     elasticgraph-datastore_core["eg-datastore_core"];
     elasticgraph-json_ingestion["eg-json_ingestion"];
+    elasticgraph-protobuf["eg-protobuf"];
     elasticgraph-query_interceptor["eg-query_interceptor"];
     elasticgraph-schema_artifacts["eg-schema_artifacts"];
     elasticgraph-query_registry["eg-query_registry"];
@@ -234,6 +236,7 @@ graph LR;
     elasticgraph-health_check --> elasticgraph-graphql;
     elasticgraph-health_check --> elasticgraph-support;
     elasticgraph-json_ingestion --> elasticgraph-support;
+    elasticgraph-protobuf --> elasticgraph-support;
     elasticgraph-query_interceptor --> elasticgraph-graphql;
     elasticgraph-query_interceptor --> elasticgraph-schema_artifacts;
     elasticgraph-query_registry --> elasticgraph-graphql;
@@ -249,6 +252,7 @@ graph LR;
     class elasticgraph-health_check targetGemStyle;
     class elasticgraph-datastore_core otherEgGemStyle;
     class elasticgraph-json_ingestion targetGemStyle;
+    class elasticgraph-protobuf targetGemStyle;
     class elasticgraph-query_interceptor targetGemStyle;
     class elasticgraph-schema_artifacts otherEgGemStyle;
     class elasticgraph-query_registry targetGemStyle;

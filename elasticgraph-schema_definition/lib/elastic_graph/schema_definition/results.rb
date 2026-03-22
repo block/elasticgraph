@@ -44,6 +44,15 @@ module ElasticGraph
         @runtime_metadata ||= build_runtime_metadata
       end
 
+      # Returns the fully customized GraphQL type list used by artifact generators.
+      #
+      # Built-in and derived-type customization callbacks have already been applied to these types.
+      #
+      # @return [Array<SchemaElements::graphQLType>]
+      def schema_artifact_types
+        all_types
+      end
+
       # @private
       STATIC_SCRIPT_REPO = Scripting::FileSystemRepository.new(::File.join(__dir__.to_s, "scripting", "scripts"))
 

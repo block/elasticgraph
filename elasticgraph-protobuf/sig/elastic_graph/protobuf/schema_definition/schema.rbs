@@ -1,0 +1,29 @@
+module ElasticGraph
+  module Protobuf
+    module SchemaDefinition
+      class Schema
+        def self.generate: (
+          ::ElasticGraph::SchemaDefinition::Results,
+          ?package_name: ::String,
+          ?proto_enums_by_graphql_enum: untyped,
+          ?proto_field_number_mappings: untyped
+        ) -> ::String
+
+        def initialize: (
+          ::ElasticGraph::SchemaDefinition::Results,
+          package_name: ::String,
+          proto_enums_by_graphql_enum: untyped,
+          ?proto_field_number_mappings: untyped
+        ) -> void
+        def to_proto: () -> ::String
+        def field_number_mappings_for_artifact: () -> untyped
+
+        private
+
+        def indexed_types: () -> ::Array[untyped]
+        def register_type: (untyped type) -> void
+        def register_type_ref: (::ElasticGraph::SchemaDefinition::SchemaElements::TypeReference) -> void
+      end
+    end
+  end
+end

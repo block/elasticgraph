@@ -1,0 +1,9 @@
+module ElasticGraph
+  module Protobuf
+    module SchemaDefinition
+      class FieldTypeConverter
+        def self.convert: (::ElasticGraph::SchemaDefinition::SchemaElements::TypeReference) -> ::String
+      end
+    end
+  end
+end

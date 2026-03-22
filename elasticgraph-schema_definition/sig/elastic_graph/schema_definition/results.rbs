@@ -9,6 +9,7 @@ module ElasticGraph
       include Support::_MemoizableDataClass
 
       def derived_indexing_type_names: () -> ::Set[::String]
+      def schema_artifact_types: () -> ::Array[SchemaElements::graphQLType]
 
       @graphql_schema_string: ::String?
       @datastore_config: ::Hash[::String, untyped]
