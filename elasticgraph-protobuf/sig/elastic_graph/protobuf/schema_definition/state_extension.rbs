@@ -1,0 +1,13 @@
+module ElasticGraph
+  module Protobuf
+    module SchemaDefinition
+      module StateExtension: ::ElasticGraph::SchemaDefinition::State
+        attr_accessor proto_schema_package_name: ::String
+        attr_accessor proto_enums_by_graphql_enum: untyped
+        attr_accessor proto_field_number_mappings: untyped
+
+        def self.extended: (::ElasticGraph::SchemaDefinition::State & StateExtension) -> void
+      end
+    end
+  end
+end

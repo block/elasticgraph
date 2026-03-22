@@ -1,0 +1,9 @@
+module ElasticGraph
+  module Protobuf
+    module SchemaDefinition
+      module EnumTypeExtension: ::ElasticGraph::SchemaDefinition::SchemaElements::EnumType
+        def to_proto_field_type: () -> ::String
+      end
+    end
+  end
+end

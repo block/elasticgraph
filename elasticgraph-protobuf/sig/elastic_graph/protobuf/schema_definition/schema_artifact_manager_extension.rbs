@@ -1,0 +1,14 @@
+module ElasticGraph
+  module Protobuf
+    module SchemaDefinition
+      module SchemaArtifactManagerExtension : ::ElasticGraph::SchemaDefinition::SchemaArtifactManager
+        private
+
+        def artifacts_from_schema_def: () -> ::Array[::ElasticGraph::SchemaDefinition::SchemaArtifact[untyped]]
+        def protobuf_schema_definition_results: () -> (::ElasticGraph::SchemaDefinition::Results & ResultsExtension)
+        def protobuf_state: () -> (::ElasticGraph::SchemaDefinition::State & StateExtension)
+        def protobuf_load_existing_field_number_mappings: () -> void
+      end
+    end
+  end
+end
