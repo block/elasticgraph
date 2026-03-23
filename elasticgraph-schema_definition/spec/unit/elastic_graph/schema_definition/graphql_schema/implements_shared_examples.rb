@@ -10,9 +10,10 @@ module ElasticGraph
   module SchemaDefinition
     RSpec.shared_examples_for "#implements" do |graphql_definition_keyword:, ruby_definition_method:|
       # Helper method to extract interface names from SDL implements clause
-      def extract_implemented_interfaces(sdl_string)
-        implements_match = sdl_string.match(/implements\s+([^{]+)/)
-        implements_match[1].split("&").map(&:strip).to_set
+      def implemented_interfaces_from(sdl, type_name)
+        type_def = type_def_from(sdl, type_name)
+        implements_match = type_def.match(/#{type_name}\s+implements\s+([^{]+)/)
+        implements_match[1].split("&").map(&:strip)
       end
 
       it "generates the correct `implements` syntax in the GraphQL SDL" do
@@ -39,8 +40,7 @@ module ElasticGraph
           end
         end
 
-        thing_def = type_def_from(result, "Thing")
-        expect(extract_implemented_interfaces(thing_def)).to eq(Set["HasID", "HasName", "HasColor"])
+        expect(implemented_interfaces_from(result, "Thing")).to contain_exactly("HasID", "HasName", "HasColor")
       end
 
       it "allows the `implements` call to come before the interface definition or the field implementations" do
@@ -380,8 +380,7 @@ module ElasticGraph
           end
         end
 
-        thing_def = type_def_from(result, "Thing")
-        expect(extract_implemented_interfaces(thing_def)).to eq(Set["A", "B"])
+        expect(implemented_interfaces_from(result, "Thing")).to contain_exactly("A", "B")
       end
     end
   end

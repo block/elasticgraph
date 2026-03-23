@@ -115,7 +115,8 @@ module ElasticGraph
           context "SDL round-trip through GraphQL::Schema" do
             it "preserves Edge node fields for all interfaces in deep hierarchy" do
               # Uses specific alphabetical ordering to test that our SDL generation works around the GraphQL gem's
-              # sensitivity to type name ordering.
+              # sensitivity to type name ordering. For context, see:
+              # https://github.com/rmosolgo/graphql-ruby/issues/5580
               intermediate_sdl = define_schema do |api|
                 api.interface_type "Alpha" do |t|
                   t.field "id", "ID!"
