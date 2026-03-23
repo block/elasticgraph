@@ -125,14 +125,31 @@ module ElasticGraph
         # @return [Set<UnionType, InterfaceType>] set of supertypes
         # @private
         def recursively_resolve_supertypes
+          recursively_resolve_supertypes_from(initial_interface_chain)
+        end
+
+        private
+
+        def recursively_resolve_supertypes_from(interface_chain)
           union_memberships = schema_def_state.union_types_by_member_ref[type_ref]
 
           interface_supertypes = implemented_interfaces.flat_map do |interface_ref|
             interface = interface_ref.resolved
-            [interface] + interface.recursively_resolve_supertypes.to_a
+
+            if interface_chain.include?(interface_ref.name)
+              raise Errors::SchemaError, "Your schema has self-referential types, which are not allowed, since " \
+                "it prevents the datastore mapping and GraphQL schema generation from terminating:\n" \
+                "- The set of #{(interface_chain + [interface_ref.name]).uniq.inspect} forms a circular reference chain."
+            end
+
+            [interface] + interface.send(:recursively_resolve_supertypes_from, interface_chain + [interface_ref.name]).to_a
           end.to_set
 
           union_memberships | interface_supertypes
+        end
+
+        def initial_interface_chain
+          is_a?(SchemaElements::InterfaceType) ? [name] : []
         end
       end
     end
