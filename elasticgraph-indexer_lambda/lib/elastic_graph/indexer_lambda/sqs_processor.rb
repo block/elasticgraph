@@ -9,6 +9,7 @@
 require "elastic_graph/errors"
 require "elastic_graph/indexer/indexing_failures_error"
 require "elastic_graph/indexer_lambda/jsonl_decoder"
+require "elastic_graph/indexer_lambda/sqs_message_body_loader"
 require "json"
 
 module ElasticGraph
@@ -21,12 +22,13 @@ module ElasticGraph
       attr_reader :ignore_sqs_latency_timestamps_from_arns
 
       # @param event_payload_decoder [#decode_events] decoder for resolved SQS message bodies
-      def initialize(indexer_processor, logger:, ignore_sqs_latency_timestamps_from_arns:, event_payload_decoder: JSONLDecoder.new, s3_client: nil)
+      # @param message_body_loader [#load_body] loader for SQS message bodies
+      def initialize(indexer_processor, logger:, ignore_sqs_latency_timestamps_from_arns:, event_payload_decoder: JSONLDecoder.new, message_body_loader: SqsMessageBodyLoader.new)
         @indexer_processor = indexer_processor
         @logger = logger
-        @s3_client = s3_client
         @ignore_sqs_latency_timestamps_from_arns = ignore_sqs_latency_timestamps_from_arns
         @event_payload_decoder = event_payload_decoder
+        @message_body_loader = message_body_loader
       end
 
       # Processes the ElasticGraph events in the given `lambda_event`, indexing the data in the datastore.
@@ -85,7 +87,7 @@ module ElasticGraph
 
           @event_payload_decoder.decode_events(
             sqs_record: record,
-            body: body_from(record.fetch("body"))
+            body: @message_body_loader.load_body(sqs_record: record)
           ).map do |event|
             ElasticGraph::Support::HashUtil.deep_merge(event, sqs_metadata)
           end
@@ -95,15 +97,6 @@ module ElasticGraph
             "sqs_received_at_by_message_id" => sqs_received_at_by_message_id
           })
         end
-      end
-
-      S3_OFFLOADING_INDICATOR = '["software.amazon.payloadoffloading.PayloadS3Pointer"'
-
-      def body_from(body)
-        if body.start_with?(S3_OFFLOADING_INDICATOR)
-          body = get_payload_from_s3(body)
-        end
-        body
       end
 
       def extract_sqs_metadata(record)
@@ -122,28 +115,6 @@ module ElasticGraph
         return unless millis
         seconds, millis = millis.to_i.divmod(1000)
         Time.at(seconds, millis, :millisecond).getutc.iso8601(3)
-      end
-
-      def get_payload_from_s3(json_string)
-        s3_pointer = JSON.parse(json_string)[1]
-        bucket_name = s3_pointer.fetch("s3BucketName")
-        object_key = s3_pointer.fetch("s3Key")
-
-        begin
-          s3_client.get_object(bucket: bucket_name, key: object_key).body.read
-        rescue Aws::S3::Errors::ServiceError => e
-          raise Errors::S3OperationFailedError, "Error reading large message from S3. bucket: `#{bucket_name}` key: `#{object_key}` message: `#{e.message}`"
-        end
-      end
-
-      # The s3 client is being lazily initialized, as it's slow to import/init and it will only be used
-      # in rare scenarios where large messages need offloaded from SQS -> S3.
-      # See: (https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-s3-messages.html)
-      def s3_client
-        @s3_client ||= begin
-          require "aws-sdk-s3"
-          Aws::S3::Client.new
-        end
       end
 
       # Formats the response, including any failures, based on

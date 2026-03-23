@@ -8,31 +8,37 @@ module ElasticGraph
         ) -> ::Array[::Hash[::String, untyped]]
       end
 
+      interface _MessageBodyLoader
+        def load_body: (
+          sqs_record: ::Hash[::String, untyped]
+        ) -> ::String
+      end
+
       def initialize: (
         Indexer::Processor,
         logger: ::Logger,
         ignore_sqs_latency_timestamps_from_arns: ::Set[::String],
         ?event_payload_decoder: _EventPayloadDecoder,
-        ?s3_client: Aws::S3::Client?,
+        ?message_body_loader: _MessageBodyLoader,
       ) -> void
 
-      def process: (::Hash[::String, untyped], ?refresh_indices: bool) -> void
+      def process: (
+        ::Hash[::String, untyped],
+        ?refresh_indices: bool
+      ) -> {"batchItemFailures" => ::Array[{"itemIdentifier" => ::String}]}
 
       private
 
       @indexer_processor: Indexer::Processor
       @logger: ::Logger
       @event_payload_decoder: _EventPayloadDecoder
-      @s3_client: Aws::S3::Client?
+      @message_body_loader: _MessageBodyLoader
 
       attr_reader ignore_sqs_latency_timestamps_from_arns: ::Set[::String]
 
       def events_from: (::Hash[::String, untyped]) -> ::Array[::Hash[::String, untyped]]
-      S3_OFFLOADING_INDICATOR: String
       def extract_sqs_metadata: (::Hash[String, untyped]) -> ::Hash[::String, untyped]
       def millis_to_iso8601: (::String) -> ::String?
-      def get_payload_from_s3: (::String) -> ::String
-      def s3_client: () -> Aws::S3::Client
       def format_response: (
         ::Array[Indexer::FailedEventError]
       ) -> {"batchItemFailures" => ::Array[{"itemIdentifier" => ::String}]}

@@ -1,0 +1,16 @@
+module ElasticGraph
+  module IndexerLambda
+    class SqsMessageBodyLoader
+      def initialize: (?s3_client: Aws::S3::Client?) -> void
+      def load_body: (sqs_record: ::Hash[::String, untyped]) -> ::String
+
+      private
+
+      @s3_client: Aws::S3::Client?
+
+      S3_OFFLOADING_INDICATOR: ::String
+      def get_payload_from_s3: (::String) -> ::String
+      def s3_client: () -> Aws::S3::Client
+    end
+  end
+end

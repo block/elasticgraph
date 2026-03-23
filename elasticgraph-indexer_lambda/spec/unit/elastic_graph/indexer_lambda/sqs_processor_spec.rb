@@ -11,8 +11,6 @@ require "elastic_graph/indexer/failed_event_error"
 require "elastic_graph/indexer/processor"
 require "elastic_graph/indexer_lambda/sqs_processor"
 require "elastic_graph/spec_support/lambda_function"
-require "json"
-require "aws-sdk-s3"
 
 module ElasticGraph
   module IndexerLambda
@@ -21,7 +19,6 @@ module ElasticGraph
       let(:indexer_processor) { instance_double(Indexer::Processor, process_returning_failures: []) }
 
       describe "#process" do
-        let(:s3_client) { Aws::S3::Client.new(stub_responses: true) }
         let(:sqs_processor) { build_sqs_processor }
 
         it "processes a lambda event containing a single SQS message with a single ElasticGraph event" do
@@ -81,7 +78,7 @@ module ElasticGraph
 
           lambda_event = {
             "Records" => [
-              sqs_message("a", {"field1" => {}})
+              sqs_message("a", "{\"field1\":{}}")
             ]
           }
 
@@ -90,6 +87,27 @@ module ElasticGraph
           expect(event_payload_decoder).to have_received(:decode_events).with(
             sqs_record: lambda_event.fetch("Records").first,
             body: "{\"field1\":{}}"
+          )
+
+          expect(indexer_processor).to have_received(:process_returning_failures).with([
+            {"field1" => {}, "message_id" => "a"}
+          ], refresh_indices: false)
+        end
+
+        it "loads message bodies using the configured message body loader" do
+          message_body_loader = instance_double(SqsMessageBodyLoader, load_body: "{\"field1\":{}}")
+          sqs_processor = build_sqs_processor(message_body_loader: message_body_loader)
+
+          lambda_event = {
+            "Records" => [
+              sqs_message("a", {"field1" => {}})
+            ]
+          }
+
+          sqs_processor.process(lambda_event)
+
+          expect(message_body_loader).to have_received(:load_body).with(
+            sqs_record: lambda_event.fetch("Records").first
           )
 
           expect(indexer_processor).to have_received(:process_returning_failures).with([
@@ -145,55 +163,6 @@ module ElasticGraph
           }.to raise_error(KeyError, a_string_including("body"))
 
           expect(indexer_processor).not_to have_received(:process_returning_failures)
-        end
-
-        it "retrieves large messages from s3 when an ElasticGraph event was offloaded there" do
-          bucket_name = "test-bucket-name"
-          s3_key = "88680f6d-53d4-4143-b8c7-f5b1189213b6"
-          event_payload = {"test" => "data"}
-
-          lambda_event = {
-            "Records" => [
-              sqs_message("a", JSON.generate([
-                "software.amazon.payloadoffloading.PayloadS3Pointer",
-                {"s3BucketName" => bucket_name, "s3Key" => s3_key}
-              ]))
-            ]
-          }
-
-          s3_client.stub_responses(:get_object, ->(context) {
-            expect(context.params).to include(bucket: bucket_name, key: s3_key)
-            {body: jsonl(event_payload)}
-          })
-
-          sqs_processor.process(lambda_event)
-
-          expect(indexer_processor).to have_received(:process_returning_failures).with(
-            [event_payload.merge("message_id" => "a")],
-            refresh_indices: false
-          )
-        end
-
-        it "throws a detailed error when fetching from s3 fails" do
-          bucket_name = "test-bucket-name"
-          s3_key = "88680f6d-53d4-4143-b8c7-f5b1189213b6"
-
-          lambda_event = {
-            "Records" => [
-              sqs_message("a", JSON.generate([
-                "software.amazon.payloadoffloading.PayloadS3Pointer",
-                {"s3BucketName" => bucket_name, "s3Key" => s3_key}
-              ]))
-            ]
-          }
-
-          s3_client.stub_responses(:get_object, "NoSuchkey")
-
-          expect {
-            sqs_processor.process(lambda_event)
-          }.to raise_error Errors::S3OperationFailedError, a_string_including(
-            "Error reading large message from S3. bucket: `#{bucket_name}` key: `#{s3_key}` message: `stubbed-response-error-message`"
-          )
         end
 
         it "parses and merges SQS timestamps into non-existing `latency_timestamps` field" do
@@ -360,18 +329,6 @@ module ElasticGraph
 
         def failure_of(id, message: "boom", event: {})
           instance_double(Indexer::FailedEventError, id: id, message: message, event: event)
-        end
-
-        def build_sqs_processor(**options)
-          super(s3_client: s3_client, **options)
-        end
-      end
-
-      context "when instantiated without an S3 client injection" do
-        include_context "lambda function"
-
-        it "lazily creates the S3 client when needed" do
-          expect(build_sqs_processor.send(:s3_client)).to be_a Aws::S3::Client
         end
       end
 
