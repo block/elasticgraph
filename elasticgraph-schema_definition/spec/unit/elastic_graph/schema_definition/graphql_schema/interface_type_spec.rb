@@ -107,6 +107,22 @@ module ElasticGraph
           end
         end
 
+        it "raises a clear error when interfaces recursively implement each other" do
+          expect {
+            define_schema do |schema|
+              schema.interface_type "A" do |t|
+                t.implements "B"
+                t.field "id", "ID!"
+              end
+
+              schema.interface_type "B" do |t|
+                t.implements "A"
+                t.field "id", "ID!"
+              end
+            end
+          }.to raise_error Errors::SchemaError, a_string_including("A", "B", "circular reference chain")
+        end
+
         describe "#implements" do
           include_examples "#implements",
             graphql_definition_keyword: "interface",

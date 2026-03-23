@@ -111,6 +111,8 @@ module ElasticGraph
         # Record that we are now generating results so that caching can kick in.
         state.user_definition_complete = true
         state.user_definition_complete_callbacks.each(&:call)
+        # Validate cycles before defining `Query`, since directly-queryable checks traverse supertypes.
+        check_for_circular_dependencies!
         define_root_graphql_type
       end
 
@@ -450,9 +452,15 @@ module ElasticGraph
       def recursively_add_referenced_types_to(source_type_ref, references_cache)
         return unless (source_type = source_type_ref.as_object_type)
         references_set = references_cache[source_type_ref.name] # : ::Set[::String]
+        graphql_fields =
+          if source_type.is_a?(SchemaElements::InterfaceType)
+            source_type.interface_fields_by_name
+          else
+            source_type.graphql_fields_by_name
+          end
 
         # Recursive references are allowed only when its a relation, so skip that case.
-        source_type.graphql_fields_by_name.values.reject { |f| f.relationship }.each do |field|
+        graphql_fields.values.reject { |f| f.relationship }.each do |field|
           field_type = field.type.fully_unwrapped
 
           if field_type.object? && references_set.add?(field_type.name)
@@ -461,6 +469,17 @@ module ElasticGraph
 
           field_type_references_set = references_cache[field_type.name] # : ::Set[::String]
           references_set.merge(field_type_references_set)
+        end
+
+        return unless source_type.is_a?(SchemaElements::InterfaceType)
+
+        source_type.implemented_interfaces.each do |interface_ref|
+          if references_set.add?(interface_ref.name)
+            recursively_add_referenced_types_to(interface_ref, references_cache)
+          end
+
+          interface_references_set = references_cache[interface_ref.name] # : ::Set[::String]
+          references_set.merge(interface_references_set)
         end
       end
 
