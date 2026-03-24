@@ -50,19 +50,19 @@ jobs:
           # Part 1: graphql (excl. acceptance), Part 2: schema_definition+indexer,
           # Part 3: graphql acceptance + local (halted), Part 4: all remaining gems.
           - build_part: "run_specs_for_jruby"
-            ruby: "jruby-10.0.4.0"
+            ruby: "jruby-10.0"
             datastore: "elasticsearch:9.2.4"
             build_part_args: "1"
           - build_part: "run_specs_for_jruby"
-            ruby: "jruby-10.0.4.0"
+            ruby: "jruby-10.0"
             datastore: "elasticsearch:9.2.4"
             build_part_args: "2"
           - build_part: "run_specs_for_jruby"
-            ruby: "jruby-10.0.4.0"
+            ruby: "jruby-10.0"
             datastore: "elasticsearch:9.2.4"
             build_part_args: "3"
           - build_part: "run_specs_for_jruby"
-            ruby: "jruby-10.0.4.0"
+            ruby: "jruby-10.0"
             datastore: "elasticsearch:9.2.4"
             build_part_args: "4"
           # Other build parts run on max Ruby and primary datastore only.
