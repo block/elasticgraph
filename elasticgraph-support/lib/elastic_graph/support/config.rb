@@ -188,13 +188,6 @@ module ElasticGraph
           instance
         end
       end
-
-      # @private
-      # Preserved for backward compatibility. Methods are now defined directly in the
-      # Data.define block due to a JRuby 10.0.4.0 bug where `include`-ing a module in
-      # a Data.define block causes subclass instances to have nil fields.
-      module InstanceMethods
-      end
     end
   end
 end
