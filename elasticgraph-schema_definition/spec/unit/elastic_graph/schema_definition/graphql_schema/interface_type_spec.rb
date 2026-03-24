@@ -123,6 +123,31 @@ module ElasticGraph
           }.to raise_error Errors::SchemaError, a_string_including("A", "B", "circular reference chain")
         end
 
+        it "allows interfaces to share a supertype without treating it as a cycle" do
+          expect {
+            define_schema do |schema|
+              schema.interface_type "A" do |t|
+                t.implements "B", "C"
+                t.field "id", "ID!"
+              end
+
+              schema.interface_type "B" do |t|
+                t.implements "D"
+                t.field "id", "ID!"
+              end
+
+              schema.interface_type "C" do |t|
+                t.implements "D"
+                t.field "id", "ID!"
+              end
+
+              schema.interface_type "D" do |t|
+                t.field "id", "ID!"
+              end
+            end
+          }.not_to raise_error
+        end
+
         describe "#implements" do
           include_examples "#implements",
             graphql_definition_keyword: "interface",
