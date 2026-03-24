@@ -52,7 +52,43 @@ module ElasticGraph
           # @implements ::Data
           alias_method :__data_initialize, :initialize
           extend ClassMethods
-          include InstanceMethods
+
+          # On JRuby 10.0.4.0, `include`-ing a module in a Data.define block causes
+          # subclass instances to have nil fields in certain call patterns. Define the
+          # instance methods directly instead of using `include InstanceMethods`.
+          # See: https://github.com/jruby/jruby/issues/XXXX
+
+          # Overrides `initialize` to apply JSON schema validation.
+          def initialize(**config)
+            klass = (_ = self.class) # : ClassMethods[::Data]
+            validator = klass.validator
+            config = validator.merge_defaults(config)
+
+            if (error = validator.validate_with_error_message(config))
+              klass.raise_invalid_config(error)
+            end
+
+            config = config.transform_keys(&:to_sym)
+            __skip__ = super(**convert_values(**config))
+          end
+
+          # Overrides `#with` to bypass the normal JSON schema validation that applies in `#initialize`.
+          # This is required so that `config.with(...)` can be used on config classes that use the
+          # `convert_values` hook to convert JSON data to some custom Ruby type. The custom Ruby type
+          # won't pass JSON schema validation, and if we didn't override `with` then we'd get validation
+          # failures due to the converted values failing validation.
+          def with(**updates)
+            (_ = self.class).new_without_validation(**to_h.merge(updates))
+          end
+
+          private
+
+          # Default implementation of a hook that allows config values to be converted during initialization.
+          def convert_values(**values)
+            values
+          end
+
+          public
 
           class_exec(&(_ = block)) if block
         end
@@ -154,36 +190,10 @@ module ElasticGraph
       end
 
       # @private
+      # Preserved for backward compatibility. Methods are now defined directly in the
+      # Data.define block due to a JRuby 10.0.4.0 bug where `include`-ing a module in
+      # a Data.define block causes subclass instances to have nil fields.
       module InstanceMethods
-        # Overrides `initialize` to apply JSON schema validation.
-        def initialize(**config)
-          klass = (_ = self.class) # : ClassMethods[::Data]
-          validator = klass.validator
-          config = validator.merge_defaults(config)
-
-          if (error = validator.validate_with_error_message(config))
-            klass.raise_invalid_config(error)
-          end
-
-          config = config.transform_keys(&:to_sym)
-          __skip__ = super(**convert_values(**config))
-        end
-
-        # Overrides `#with` to bypass the normal JSON schema validation that applies in `#initialize`.
-        # This is required so that `config.with(...)` can be used on config classes that use the
-        # `convert_values` hook to convert JSON data to some custom Ruby type. The custom Ruby type
-        # won't pass JSON schema validation, and if we didn't override `with` then we'd get validation
-        # failures due to the converted values failing validation.
-        def with(**updates)
-          (_ = self.class).new_without_validation(**to_h.merge(updates))
-        end
-
-        private
-
-        # Default implementation of a hook that allows config values to be converted during initialization.
-        def convert_values(**values)
-          values
-        end
       end
     end
   end
