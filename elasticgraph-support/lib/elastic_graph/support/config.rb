@@ -56,7 +56,7 @@ module ElasticGraph
           # On JRuby 10.0.4.0, `include`-ing a module in a Data.define block causes
           # subclass instances to have nil fields in certain call patterns. Define the
           # instance methods directly instead of using `include InstanceMethods`.
-          # See: https://github.com/jruby/jruby/issues/XXXX
+          # See: https://github.com/jruby/jruby/issues/9327
 
           # Overrides `initialize` to apply JSON schema validation.
           def initialize(**config)
