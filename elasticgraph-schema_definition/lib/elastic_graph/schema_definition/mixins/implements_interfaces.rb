@@ -125,31 +125,29 @@ module ElasticGraph
         # @return [Set<UnionType, InterfaceType>] set of supertypes
         # @private
         def recursively_resolve_supertypes
-          recursively_resolve_supertypes_from(initial_interface_chain)
-        end
-
-        private
-
-        def recursively_resolve_supertypes_from(interface_chain)
           union_memberships = schema_def_state.union_types_by_member_ref[type_ref]
 
-          interface_supertypes = implemented_interfaces.flat_map do |interface_ref|
-            interface = interface_ref.resolved
-
-            if interface_chain.include?(interface_ref.name)
+          interface_supertypes = lazily_resolve_interface_supertypes.each_with_object(Set.new) do |interface, seen|
+            unless seen.add?(interface)
               raise Errors::SchemaError, "Your schema has self-referential types, which are not allowed, since " \
                 "it prevents the datastore mapping and GraphQL schema generation from terminating:\n" \
-                "- The set of #{(interface_chain + [interface_ref.name]).uniq.inspect} forms a circular reference chain."
+                "- There is a circular reference chain involving #{seen.map(&:name).sort.inspect}."
             end
-
-            [interface] + interface.send(:recursively_resolve_supertypes_from, interface_chain + [interface_ref.name]).to_a
-          end.to_set
+          end
 
           union_memberships | interface_supertypes
         end
 
-        def initial_interface_chain
-          is_a?(SchemaElements::InterfaceType) ? [name] : []
+        private
+
+        def lazily_resolve_interface_supertypes
+          Enumerator.new do |yielder|
+            implemented_interfaces.each do |interface_ref|
+              interface = interface_ref.resolved
+              yielder << interface
+              interface.send(:lazily_resolve_interface_supertypes).each { |i| yielder << i }
+            end
+          end
         end
       end
     end
