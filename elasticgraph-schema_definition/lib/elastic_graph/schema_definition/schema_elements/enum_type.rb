@@ -46,10 +46,15 @@ module ElasticGraph
         include Mixins::HasReadableToSAndInspect.new { |e| e.name }
 
         # @private
-        def initialize(schema_def_state, name)
+        def initialize(schema_def_state, name, skip_name_override: false)
           # @type var values_by_name: ::Hash[::String, EnumValue]
           values_by_name = {}
-          super(schema_def_state, schema_def_state.type_ref(name).to_final_form, true, values_by_name)
+          type_ref = if skip_name_override
+            schema_def_state.type_ref(name)
+          else
+            schema_def_state.type_ref(name).to_final_form
+          end
+          super(schema_def_state, type_ref, true, values_by_name)
 
           # :nocov: -- currently all invocations have a block
           yield self if block_given?
@@ -150,7 +155,11 @@ module ElasticGraph
           end.derived_graphql_types
 
           if (input_enum = as_input).equal?(self)
-            derived_scalar_types
+            if schema_def_state.enums_in_transition.include?(name)
+              [build_transition_input_enum] + derived_scalar_types
+            else
+              derived_scalar_types
+            end
           else
             [input_enum] + derived_scalar_types
           end
@@ -173,6 +182,20 @@ module ElasticGraph
           schema_def_state.factory.new_enum_type(input_name) do |t|
             t.for_output = false # flag that it's not used as an output enum, and therefore `derived_graphql_types` will be empty on it.
             t.graphql_only true # input enums are always GraphQL-only.
+            t.documentation doc_comment
+            directives.each { |dir| dir.duplicate_on(t) }
+            values_by_name.each { |_, val| val.duplicate_on(t) }
+          end
+        end
+
+        private
+
+        def build_transition_input_enum
+          input_enum_name = schema_def_state.type_namer.generate_name_for(:InputEnum, base: name)
+
+          schema_def_state.factory.new_enum_type(input_enum_name, skip_name_override: true) do |t|
+            t.for_output = false
+            t.graphql_only true
             t.documentation doc_comment
             directives.each { |dir| dir.duplicate_on(t) }
             values_by_name.each { |_, val| val.duplicate_on(t) }

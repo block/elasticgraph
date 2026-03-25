@@ -116,6 +116,7 @@ module ElasticGraph
         derived_type_name_formats: {},
         type_name_overrides: {},
         enum_value_overrides_by_type: {},
+        enums_in_transition: [],
         extension_modules: [],
         enforce_json_schema_version: true,
         output: $stdout
@@ -128,6 +129,7 @@ module ElasticGraph
         @derived_type_name_formats = derived_type_name_formats
         @type_name_overrides = type_name_overrides
         @enum_value_overrides_by_type = enum_value_overrides_by_type
+        @enums_in_transition = enums_in_transition
         @index_document_sizes = index_document_sizes
         @path_to_schema = path_to_schema
         @schema_artifacts_directory = schema_artifacts_directory
@@ -181,6 +183,7 @@ module ElasticGraph
             derived_type_name_formats: @derived_type_name_formats,
             type_name_overrides: @type_name_overrides,
             enum_value_overrides_by_type: @enum_value_overrides_by_type,
+            enums_in_transition: @enums_in_transition,
             output: @output
           ).tap do |api|
             api.as_active_instance { load @path_to_schema.to_s }

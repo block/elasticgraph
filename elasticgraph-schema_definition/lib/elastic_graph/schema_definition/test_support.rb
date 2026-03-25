@@ -28,6 +28,7 @@ module ElasticGraph
         derived_type_name_formats: {},
         type_name_overrides: {},
         enum_value_overrides_by_type: {},
+        enums_in_transition: [],
         reload_schema_artifacts: false,
         output: nil,
         &block
@@ -45,6 +46,7 @@ module ElasticGraph
           derived_type_name_formats: derived_type_name_formats,
           type_name_overrides: type_name_overrides,
           enum_value_overrides_by_type: enum_value_overrides_by_type,
+          enums_in_transition: enums_in_transition,
           reload_schema_artifacts: reload_schema_artifacts,
           output: output,
           &block
@@ -59,6 +61,7 @@ module ElasticGraph
         derived_type_name_formats: {},
         type_name_overrides: {},
         enum_value_overrides_by_type: {},
+        enums_in_transition: [],
         reload_schema_artifacts: false,
         output: nil
       )
@@ -69,6 +72,7 @@ module ElasticGraph
           derived_type_name_formats: derived_type_name_formats,
           type_name_overrides: type_name_overrides,
           enum_value_overrides_by_type: enum_value_overrides_by_type,
+          enums_in_transition: enums_in_transition,
           output: output || $stdout
         )
 

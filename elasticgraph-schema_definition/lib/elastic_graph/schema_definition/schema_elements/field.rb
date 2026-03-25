@@ -87,6 +87,8 @@ module ElasticGraph
       #   @private
       # @!attribute [rw] as_input
       #   @private
+      # @!attribute [rw] type_already_final
+      #   @private
       class Field < Struct.new(
         :name, :original_type, :parent_type, :original_type_for_derived_types, :schema_def_state, :accuracy_confidence,
         :filter_customizations, :grouped_by_customizations, :highlights_customizations, :sub_aggregations_customizations,
@@ -94,7 +96,7 @@ module ElasticGraph
         :sortable, :filterable, :aggregatable, :groupable, :highlightable,
         :graphql_only, :source, :runtime_field_script, :relationship, :singular_name,
         :computation_detail, :non_nullable_in_json_schema, :as_input,
-        :name_in_index, :resolver
+        :name_in_index, :resolver, :type_already_final
       )
         include Mixins::HasDocumentation
         include Mixins::HasDirectives
@@ -107,7 +109,7 @@ module ElasticGraph
           accuracy_confidence: :high, name_in_index: name,
           type_for_derived_types: nil, graphql_only: nil, singular: nil,
           sortable: nil, filterable: nil, aggregatable: nil, groupable: nil, highlightable: nil,
-          as_input: false, resolver: nil
+          as_input: false, resolver: nil, type_already_final: false
         )
           type_ref = schema_def_state.type_ref(type)
           super(
@@ -139,7 +141,8 @@ module ElasticGraph
             name_in_index: name_in_index,
             non_nullable_in_json_schema: false,
             as_input: as_input,
-            resolver: resolver
+            resolver: resolver,
+            type_already_final: type_already_final
           )
 
           if name != name_in_index
@@ -172,6 +175,10 @@ module ElasticGraph
 
         # @return [TypeReference] the type of this field
         def type
+          # When `type_already_final` is set, the type reference has already been resolved to its final form
+          # (e.g. for transition input enum filter fields that must reference the InputEnum type directly).
+          return original_type if type_already_final
+
           # Here we lazily convert the `original_type` to an input type as needed. This must be lazy because
           # the logic of `as_input` depends on detecting whether the type is an enum type, which it may not
           # be able to do right away--we assume not if we can't tell, and retry every time this method is called.
@@ -182,6 +189,7 @@ module ElasticGraph
         #
         # @private
         def type_for_derived_types
+          return original_type_for_derived_types if type_already_final
           original_type_for_derived_types.to_final_form(as_input: as_input)
         end
 

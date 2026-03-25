@@ -54,38 +54,41 @@ module ElasticGraph
             .static_script_ids_by_scoped_name
             .fetch("filter/by_time_of_day")
 
-          {
-            schema_names.equal_to_any_of => ->(field_name, value) {
-              values = to_datastore_value(value.compact.uniq) # : ::Array[untyped]
+          equal_to_any_of_lambda = ->(field_name, value) {
+            values = to_datastore_value(value.compact.uniq) # : ::Array[untyped]
 
-              equality_sub_expression =
-                if field_name == "id"
-                  # Use specialized "ids" query when querying on ID field.
-                  # See: https://www.elastic.co/guide/en/elasticsearch/reference/7.15/query-dsl-ids-query.html
-                  #
-                  # We reject empty strings because we otherwise get an error from the datastore:
-                  # "failed to create query: Ids can't be empty"
-                  {ids: {values: values - [""]}}
-                else
-                  {terms: {field_name => values}}
-                end
-
-              exists_sub_expression = {exists: {"field" => field_name}}
-
-              if !value.empty? && value.all?(&:nil?)
-                BooleanQuery.new(:must_not, [{bool: {filter: [exists_sub_expression]}}])
-              elsif value.include?(nil)
-                BooleanQuery.filter({bool: {
-                  minimum_should_match: 1,
-                  should: [
-                    {bool: {filter: [equality_sub_expression]}},
-                    {bool: {must_not: [{bool: {filter: [exists_sub_expression]}}]}}
-                  ]
-                }})
+            equality_sub_expression =
+              if field_name == "id"
+                # Use specialized "ids" query when querying on ID field.
+                # See: https://www.elastic.co/guide/en/elasticsearch/reference/7.15/query-dsl-ids-query.html
+                #
+                # We reject empty strings because we otherwise get an error from the datastore:
+                # "failed to create query: Ids can't be empty"
+                {ids: {values: values - [""]}}
               else
-                BooleanQuery.filter(equality_sub_expression)
+                {terms: {field_name => values}}
               end
-            },
+
+            exists_sub_expression = {exists: {"field" => field_name}}
+
+            if !value.empty? && value.all?(&:nil?)
+              BooleanQuery.new(:must_not, [{bool: {filter: [exists_sub_expression]}}])
+            elsif value.include?(nil)
+              BooleanQuery.filter({bool: {
+                minimum_should_match: 1,
+                should: [
+                  {bool: {filter: [equality_sub_expression]}},
+                  {bool: {must_not: [{bool: {filter: [exists_sub_expression]}}]}}
+                ]
+              }})
+            else
+              BooleanQuery.filter(equality_sub_expression)
+            end
+          }
+
+          {
+            schema_names.equal_to_any_of => equal_to_any_of_lambda,
+            schema_names.equal_to_any_of_input => equal_to_any_of_lambda,
             schema_names.gt => ->(field_name, value) { RangeQuery.new(field_name, :gt, value) },
             schema_names.gte => ->(field_name, value) { RangeQuery.new(field_name, :gte, value) },
             schema_names.lt => ->(field_name, value) { RangeQuery.new(field_name, :lt, value) },

@@ -55,7 +55,8 @@ module ElasticGraph
       :type_namer,
       :enum_value_namer,
       :allow_omitted_json_schema_fields,
-      :allow_extra_json_schema_fields
+      :allow_extra_json_schema_fields,
+      :enums_in_transition
     )
       include Mixins::HasReadableToSAndInspect.new
 
@@ -66,6 +67,7 @@ module ElasticGraph
         derived_type_name_formats:,
         type_name_overrides:,
         enum_value_overrides_by_type:,
+        enums_in_transition: ::Set.new,
         output: $stdout
       )
         # @type var types_by_name: SchemaElements::typesByNameHash
@@ -106,7 +108,8 @@ module ElasticGraph
           enum_value_namer: SchemaElements::EnumValueNamer.new(enum_value_overrides_by_type),
           output: output,
           allow_omitted_json_schema_fields: false,
-          allow_extra_json_schema_fields: true
+          allow_extra_json_schema_fields: true,
+          enums_in_transition: enums_in_transition.to_set
         )
       end
 

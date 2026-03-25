@@ -308,6 +308,107 @@ module ElasticGraph
           }.to raise_invalid_graphql_name_error_for("RED GREEN")
         end
 
+        context "with enums_in_transition" do
+          it "generates a transition input enum alongside the collapsed output enum when the enum is in transition" do
+            result = define_schema(
+              type_name_overrides: {"ColorInput" => "Color"},
+              enums_in_transition: ["Color"]
+            ) do |schema|
+              schema.object_type "Widget" do |t|
+                t.paginated_collection_field "colors", "Color"
+              end
+
+              schema.enum_type "Color" do |t|
+                t.value "RED"
+                t.value "GREEN"
+              end
+            end
+
+            # The output enum is unchanged
+            expect(type_def_from(result, "Color")).to eq(<<~EOS.strip)
+              enum Color {
+                RED
+                GREEN
+              }
+            EOS
+
+            # A transition input enum is generated
+            expect(type_def_from(result, "ColorInput")).to eq(<<~EOS.strip)
+              enum ColorInput {
+                RED
+                GREEN
+              }
+            EOS
+          end
+
+          it "adds #{-> { schema_elements.equal_to_any_of_input }} filter field alongside #{-> { schema_elements.equal_to_any_of }}" do
+            result = define_schema(
+              type_name_overrides: {"ColorInput" => "Color"},
+              enums_in_transition: ["Color"]
+            ) do |schema|
+              schema.object_type "Widget" do |t|
+                t.paginated_collection_field "colors", "Color"
+              end
+
+              schema.enum_type "Color" do |t|
+                t.value "RED"
+                t.value "GREEN"
+              end
+            end
+
+            filter_def = filter_type_from(result, "Color")
+
+            # Existing field unchanged — uses output enum
+            expect(filter_def).to include("#{schema_elements.equal_to_any_of}: [Color]")
+
+            # New field uses input enum
+            expect(filter_def).to include("#{schema_elements.equal_to_any_of_input}: [ColorInput]")
+          end
+
+          it "adds #{-> { schema_elements.equal_to_any_of_input }} with non-null elements in list element filter context" do
+            result = define_schema(
+              type_name_overrides: {"ColorInput" => "Color"},
+              enums_in_transition: ["Color"]
+            ) do |schema|
+              schema.object_type "Widget" do |t|
+                t.paginated_collection_field "colors", "Color"
+              end
+
+              schema.enum_type "Color" do |t|
+                t.value "RED"
+                t.value "GREEN"
+              end
+            end
+
+            filter_def = list_element_filter_type_from(result, "Color")
+
+            # Both fields present in list element filter
+            expect(filter_def).to include("#{schema_elements.equal_to_any_of}: [Color!]")
+            expect(filter_def).to include("#{schema_elements.equal_to_any_of_input}: [ColorInput!]")
+          end
+
+          it "does not generate transition types when enum is not in enums_in_transition" do
+            result = define_schema(
+              type_name_overrides: {"ColorInput" => "Color"}
+            ) do |schema|
+              schema.object_type "Widget" do |t|
+                t.paginated_collection_field "colors", "Color"
+              end
+
+              schema.enum_type "Color" do |t|
+                t.value "RED"
+              end
+            end
+
+            # No ColorInput enum
+            expect(type_def_from(result, "ColorInput")).to eq nil
+
+            # No equal_to_any_of_input field
+            filter_def = filter_type_from(result, "Color")
+            expect(filter_def).not_to include(schema_elements.equal_to_any_of_input.to_s)
+          end
+        end
+
         def enum_type(name, *args, **options, &block)
           result = define_schema do |api|
             api.enum_type(name, *args, **options, &block)

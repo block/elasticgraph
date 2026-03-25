@@ -21,6 +21,7 @@ require "elastic_graph/schema_definition/test_support"
     derived_type_name_formats: {},
     type_name_overrides: {},
     enum_value_overrides_by_type: {},
+    enums_in_transition: [],
     reload_schema_artifacts: false,
     output: nil
   )
@@ -32,6 +33,7 @@ require "elastic_graph/schema_definition/test_support"
       derived_type_name_formats: derived_type_name_formats,
       type_name_overrides: type_name_overrides,
       enum_value_overrides_by_type: enum_value_overrides_by_type,
+      enums_in_transition: enums_in_transition,
       reload_schema_artifacts: false,
       output: output || log_device
     )

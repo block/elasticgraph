@@ -309,6 +309,16 @@ module ElasticGraph
               f.documentation EQUAL_TO_ANY_OF_DOC
             end
 
+            if schema_def_state.enums_in_transition.include?(name)
+              input_enum_name = schema_def_state.type_namer.generate_name_for(:InputEnum, base: name)
+              transition_type = t.type_ref.list_element_filter_input? ? "[#{input_enum_name}!]" : "[#{input_enum_name}]"
+
+              t.field schema_def_state.schema_elements.equal_to_any_of_input, transition_type do |f|
+                f.documentation "Like `#{schema_def_state.schema_elements.equal_to_any_of}`, but accepts the input enum type. Use this field during enum migration."
+                f.type_already_final = true
+              end
+            end
+
             if mapping_type_efficiently_comparable?
               t.field schema_def_state.schema_elements.gt, name do |f|
                 f.documentation GT_DOC

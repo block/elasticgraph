@@ -63,6 +63,7 @@ module ElasticGraph
         derived_type_name_formats: {},
         type_name_overrides: {},
         enum_value_overrides_by_type: {},
+        enums_in_transition: [],
         output: $stdout
       )
         @state = State.with(
@@ -72,6 +73,7 @@ module ElasticGraph
           derived_type_name_formats: derived_type_name_formats,
           type_name_overrides: type_name_overrides,
           enum_value_overrides_by_type: enum_value_overrides_by_type,
+          enums_in_transition: enums_in_transition,
           output: output
         )
 
