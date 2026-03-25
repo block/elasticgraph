@@ -107,7 +107,7 @@ module ElasticGraph
               IncludesNilSet,
               ExcludesNilSet
             ) do |operator, filter_value|
-              if operator == :equal_to_any_of && filter_value.include?(nil)
+              if (operator == :equal_to_any_of || operator == :equal_to_any_of_input) && filter_value.include?(nil)
                 IncludesNilSet
               else
                 ExcludesNilSet

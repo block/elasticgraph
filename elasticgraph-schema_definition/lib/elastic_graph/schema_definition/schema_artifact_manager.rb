@@ -100,6 +100,7 @@ module ElasticGraph
           # unused things until after we've used things to generate artifacts.
           notify_about_unused_type_name_overrides
           notify_about_unused_enum_value_overrides
+          notify_about_unrecognized_enums_in_transition
         end
       end
 
@@ -168,6 +169,27 @@ module ElasticGraph
 
         @output.puts <<~EOS
           WARNING: some of the `enum_value_overrides_by_type` do not match any type(s)/value(s) in your GraphQL schema:
+
+          #{warnings.join("\n")}
+        EOS
+      end
+
+      def notify_about_unrecognized_enums_in_transition
+        state = @schema_definition_results.state
+        return if state.enums_in_transition.empty?
+
+        unrecognized = state.enums_in_transition.reject { |name| state.enum_types_by_name.key?(name) }
+        return if unrecognized.empty?
+
+        suggester = ::DidYouMean::SpellChecker.new(dictionary: state.enum_types_by_name.keys)
+        warnings = unrecognized.map.with_index(1) do |name, index|
+          alternatives = suggester.correct(name).map { |alt| "`#{alt}`" }
+          "#{index}. `#{name}` does not match any enum type in your GraphQL schema." \
+            "#{" Possible alternatives: #{alternatives.join(", ")}." unless alternatives.empty?}"
+        end
+
+        @output.puts <<~EOS
+          WARNING: #{unrecognized.size} of the `enums_in_transition` do not match any enum type(s) in your GraphQL schema:
 
           #{warnings.join("\n")}
         EOS

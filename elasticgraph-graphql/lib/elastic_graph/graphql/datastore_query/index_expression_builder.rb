@@ -36,7 +36,7 @@ module ElasticGraph
               else
                 Support::TimeSet.of_range(operator => ::Time.iso8601(filter_value))
               end
-            when :equal_to_any_of
+            when :equal_to_any_of, :equal_to_any_of_input
               # This calls `.compact` to remove `nil` timestamp values.
               ranges = filter_value.compact.map do |iso8601_string|
                 if date_string?(iso8601_string)

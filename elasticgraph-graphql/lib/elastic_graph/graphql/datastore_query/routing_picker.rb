@@ -23,7 +23,7 @@ module ElasticGraph
             all_values_set,
             empty_set
           ) do |operator, filter_value|
-            if operator == :equal_to_any_of
+            if operator == :equal_to_any_of || operator == :equal_to_any_of_input
               # This calls `.compact` to remove `nil` filter_value values
               RoutingValueSet.of(filter_value.compact)
             end

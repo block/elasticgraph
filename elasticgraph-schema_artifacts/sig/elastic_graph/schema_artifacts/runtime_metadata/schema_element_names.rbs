@@ -18,6 +18,7 @@ module ElasticGraph
         def canonical_name_for: (::String | ::Symbol) -> ::Symbol
         attr_reader filter: ::String
         attr_reader equal_to_any_of: ::String
+        attr_reader equal_to_any_of_input: ::String
         attr_reader gt: ::String
         attr_reader gte: ::String
         attr_reader lt: ::String
