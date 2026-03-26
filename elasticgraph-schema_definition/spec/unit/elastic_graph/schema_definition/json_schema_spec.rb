@@ -77,16 +77,6 @@ module ElasticGraph
           }, include_typename: false, ignore_descriptions: true)
         end
 
-        it "places the `latency_timestamps` `patternProperties` description inside the pattern schema, not as a sibling key" do
-          pattern_properties = json_schema.dig("$defs", EVENT_ENVELOPE_JSON_SCHEMA_NAME, "properties", "latency_timestamps", "patternProperties")
-
-          expect(pattern_properties.keys).to eq(["^\\w+_at$"]),
-            "Expected `patternProperties` to only contain regex pattern keys, but found: #{pattern_properties.keys.inspect}. " \
-            "Per the JSON Schema spec, every key in `patternProperties` must be a regex pattern."
-
-          expect(pattern_properties.dig("^\\w+_at$", "description")).to be_a(String).and(include("latency"))
-        end
-
         %w[ID String].each do |type_name|
           example "for `#{type_name}`" do
             expect(json_schema).to have_json_schema_like(type_name, {

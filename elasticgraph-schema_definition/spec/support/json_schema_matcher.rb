@@ -33,13 +33,13 @@ RSpec::Matchers.define :have_json_schema_like do |type, expected_schema, include
 
     @expected = JSON.pretty_generate(modified_expected_schema)
 
-    actual_schema = normalize(full_schema.fetch("$defs").fetch(type))
-    actual_schema = strip_descriptions_from(actual_schema) if ignore_descriptions
+    @raw_actual_schema = normalize(full_schema.fetch("$defs").fetch(type))
+    actual_schema = ignore_descriptions ? strip_descriptions_from(@raw_actual_schema) : @raw_actual_schema
     @actual = JSON.pretty_generate(actual_schema)
 
     @validator_factory = ElasticGraph::Support::JSONSchema::ValidatorFactory.new(schema: full_schema, sanitize_pii: false)
 
-    @meta_schema_validation_errors = ElasticGraph::Support::JSONSchema.elastic_graph_internal_meta_schema_validator.validate(modified_expected_schema)
+    @meta_schema_validation_errors = ElasticGraph::Support::JSONSchema.elastic_graph_internal_meta_schema_validator.validate(@raw_actual_schema)
 
     if @meta_schema_validation_errors.empty? && actual_schema == modified_expected_schema
       validator = @validator_factory.validator_for(type)
@@ -66,16 +66,13 @@ RSpec::Matchers.define :have_json_schema_like do |type, expected_schema, include
   failure_message do |_actual_schema|
     if @meta_schema_validation_errors.any?
       <<~EOS
-        expected valid JSON schema[1] but got validation errors on the expected schema and got JSON schema[2]:
+        expected the generated JSON schema for `#{type}` to be valid according to the JSON schema meta-schema, but got validation errors:
 
         #{@meta_schema_validation_errors.map { |e| JSON.pretty_generate(e) }.join("\n\n")}
 
 
-        [1] The expected schema:
-        #{expected}
-
-        [2] Actual schema:
-        #{actual}
+        Actual schema:
+        #{JSON.pretty_generate(@raw_actual_schema)}
       EOS
     elsif @match_failures.any?
       <<~EOS
