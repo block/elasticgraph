@@ -53,9 +53,9 @@ json_schema_version: 1
         type: object
         additionalProperties: false
         patternProperties:
-          description: A timestamp from which ElasticGraph will measure indexing latency.
-            The timestamp name must end in `_at`.
           "^\\w+_at$":
+            description: A timestamp from which ElasticGraph will measure indexing
+              latency. The timestamp name must end in `_at`.
             type: string
             format: date-time
       json_schema_version:
