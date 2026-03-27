@@ -121,6 +121,30 @@ module ElasticGraph
       def derived_graphql_type_def_from(sdl, source_type, derived_graphql_type_suffix, include_docs: false)
         type_def_from(sdl, "#{source_type}#{derived_graphql_type_suffix}", include_docs: include_docs)
       end
+
+      def expect_all_derived_types_present(result, type_name)
+        expect(connection_type_from(result, type_name)).not_to be_nil
+        expect(edge_type_from(result, type_name)).not_to be_nil
+        expect(aggregation_type_from(result, type_name)).not_to be_nil
+        expect(aggregation_connection_type_from(result, type_name)).not_to be_nil
+        expect(aggregation_edge_type_from(result, type_name)).not_to be_nil
+        expect(highlights_type_from(result, type_name)).not_to be_nil
+        expect(grouped_by_type_from(result, type_name)).not_to be_nil
+        expect(aggregated_values_type_from(result, type_name)).not_to be_nil
+        expect(sort_order_type_from(result, type_name)).not_to be_nil
+      end
+
+      def expect_no_derived_types(result, type_name)
+        expect(connection_type_from(result, type_name)).to be_nil
+        expect(edge_type_from(result, type_name)).to be_nil
+        expect(aggregation_type_from(result, type_name)).to be_nil
+        expect(aggregation_connection_type_from(result, type_name)).to be_nil
+        expect(aggregation_edge_type_from(result, type_name)).to be_nil
+        expect(highlights_type_from(result, type_name)).to be_nil
+        expect(grouped_by_type_from(result, type_name)).to be_nil
+        expect(aggregated_values_type_from(result, type_name)).to be_nil
+        expect(sort_order_type_from(result, type_name)).to be_nil
+      end
     end
   end
 end

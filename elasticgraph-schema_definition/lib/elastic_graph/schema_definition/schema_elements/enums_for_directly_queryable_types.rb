@@ -12,17 +12,17 @@ require "elastic_graph/schema_artifacts/runtime_metadata/sort_field"
 module ElasticGraph
   module SchemaDefinition
     module SchemaElements
-      # Responsible for generating enum types based on specific root document types.
+      # Responsible for generating enum types based on specific directly queryable types.
       #
       # @private
-      class EnumsForRootDocumentTypes
+      class EnumsForDirectlyQueryableTypes
         def initialize(schema_def_state)
           @schema_def_state = schema_def_state
         end
 
-        # Generates a `SortOrder` enum type for the given root document type.
+        # Generates a `SortOrder` enum type for the given directly queryable type.
         def sort_order_enum_for(type)
-          return nil unless type.root_document_type?
+          return nil unless type.directly_queryable?
 
           build_enum(type, :sort_order, :sortable?, "sorted") do |enum_type, field_path|
             value_name_parts = field_path.map(&:name)

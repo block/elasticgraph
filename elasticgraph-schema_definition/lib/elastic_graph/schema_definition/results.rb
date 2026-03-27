@@ -209,7 +209,7 @@ module ElasticGraph
 
         scalar_types_by_name = state.scalar_types_by_name.transform_values(&:runtime_metadata)
 
-        enum_generator = state.factory.new_enums_for_root_document_types
+        enum_generator = state.factory.new_enums_for_directly_queryable_types
 
         sort_order_enum_types_by_name = state.object_types_by_name.values
           .select(&:directly_queryable?)

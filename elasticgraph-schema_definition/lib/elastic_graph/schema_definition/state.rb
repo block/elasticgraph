@@ -188,8 +188,8 @@ module ElasticGraph
         @factory ||= Factory.new(self)
       end
 
-      def enums_for_root_document_types
-        @enums_for_root_document_types ||= factory.new_enums_for_root_document_types
+      def enums_for_directly_queryable_types
+        @enums_for_directly_queryable_types ||= factory.new_enums_for_directly_queryable_types
       end
 
       def sub_aggregation_paths_for(type)

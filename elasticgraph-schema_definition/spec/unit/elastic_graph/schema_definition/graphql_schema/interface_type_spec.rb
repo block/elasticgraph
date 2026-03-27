@@ -148,6 +148,65 @@ module ElasticGraph
           }.not_to raise_error
         end
 
+        it "only generates derived types for directly queryable types, not for types that only inherit an index" do
+          result = define_schema do |api|
+            # Interface with an index - directly queryable, should get derived types
+            api.interface_type "DistributionChannel" do |t|
+              t.field "id", "ID!"
+              t.field "active", "Boolean"
+              t.index "distribution_channels"
+            end
+
+            # Interface inheriting an index - directly queryable (all subtypes are indexed), should get derived types
+            api.interface_type "Retail" do |t|
+              t.implements "DistributionChannel"
+              t.field "id", "ID!"
+              t.field "active", "Boolean"
+              t.field "established_on", "Date"
+            end
+
+            # Concrete type inheriting index (no own index) - NOT directly queryable, should NOT get derived types
+            api.object_type "OnlineStore" do |t|
+              t.implements "Retail"
+              t.field "id", "ID!"
+              t.field "url", "String!"
+              t.field "platform", "String"
+              t.field "established_on", "Date"
+              t.field "active", "Boolean"
+            end
+
+            # Concrete type with own index - directly queryable, should get derived types
+            api.object_type "PhysicalStore" do |t|
+              t.implements "Retail"
+              t.field "id", "ID!"
+              t.field "address", "String!"
+              t.field "square_footage", "Int"
+              t.field "established_on", "Date"
+              t.field "active", "Boolean"
+              t.index "physical_stores"
+            end
+          end
+
+          # DistributionChannel has index, should have all derived types
+          expect_all_derived_types_present(result, "DistributionChannel")
+
+          # Retail is directly queryable (all subtypes indexed), should have all derived types
+          expect_all_derived_types_present(result, "Retail")
+
+          # OnlineStore only inherits index, should NOT have any derived types
+          expect_no_derived_types(result, "OnlineStore")
+
+          # PhysicalStore has own index, should have all derived types
+          expect_all_derived_types_present(result, "PhysicalStore")
+
+          # Verify query fields exist for directly queryable types
+          expect(result).to include("#{correctly_cased("distribution_channels")}(")
+          expect(result).to include("#{correctly_cased("retails")}(")
+          expect(result).to include("#{correctly_cased("physical_stores")}(")
+          # OnlineStore should NOT have its own query fields
+          expect(result).not_to include("#{correctly_cased("online_stores")}(")
+        end
+
         describe "#implements" do
           include_examples "#implements",
             graphql_definition_keyword: "interface",

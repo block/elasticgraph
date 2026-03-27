@@ -1,7 +1,7 @@
 module ElasticGraph
   module SchemaDefinition
     module SchemaElements
-      class EnumsForRootDocumentTypes
+      class EnumsForDirectlyQueryableTypes
         def initialize: (State) -> void
         def sort_order_enum_for: (Mixins::_FilterableAndAggregatableType) -> EnumType?
       end
