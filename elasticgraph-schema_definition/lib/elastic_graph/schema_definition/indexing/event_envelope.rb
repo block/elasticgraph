@@ -54,8 +54,11 @@ module ElasticGraph
                 "type" => "object",
                 "additionalProperties" => false,
                 "patternProperties" => {
-                  "description" => "A timestamp from which ElasticGraph will measure indexing latency. The timestamp name must end in `_at`.",
-                  "^\\w+_at$" => {"type" => "string", "format" => "date-time"}
+                  "^\\w+_at$" => {
+                    "description" => "A timestamp from which ElasticGraph will measure indexing latency. The timestamp name must end in `_at`.",
+                    "type" => "string",
+                    "format" => "date-time"
+                  }
                 }
               },
               JSON_SCHEMA_VERSION_KEY => {
