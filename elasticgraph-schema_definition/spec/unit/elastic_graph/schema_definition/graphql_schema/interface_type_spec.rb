@@ -148,24 +148,25 @@ module ElasticGraph
           }.not_to raise_error
         end
 
-        it "only generates derived types for directly queryable types, not for types that only inherit an index" do
+        it "only generates root derived types for directly queryable types, not for types that only inherit an index" do
           result = define_schema do |api|
-            # Interface with an index - directly queryable, should get derived types
+            # Interface with an index - directly queryable, should get root derived types
             api.interface_type "DistributionChannel" do |t|
               t.field "id", "ID!"
               t.field "active", "Boolean"
               t.index "distribution_channels"
             end
 
-            # Interface inheriting an index - directly queryable (all subtypes are indexed), should get derived types
+            # Interface inheriting an index - directly queryable (all subtypes are indexed), should get root derived types
             api.interface_type "Retail" do |t|
+              t.root_query_fields plural: "retailers"
               t.implements "DistributionChannel"
               t.field "id", "ID!"
               t.field "active", "Boolean"
               t.field "established_on", "Date"
             end
 
-            # Concrete type inheriting index (no own index) - NOT directly queryable, should NOT get derived types
+            # Concrete type inheriting index (no own index) - NOT directly queryable, should NOT get root derived types
             api.object_type "OnlineStore" do |t|
               t.implements "Retail"
               t.field "id", "ID!"
@@ -175,7 +176,7 @@ module ElasticGraph
               t.field "active", "Boolean"
             end
 
-            # Concrete type with own index - directly queryable, should get derived types
+            # Concrete type with own index - directly queryable, should get root derived types
             api.object_type "PhysicalStore" do |t|
               t.implements "Retail"
               t.field "id", "ID!"
@@ -187,24 +188,25 @@ module ElasticGraph
             end
           end
 
-          # DistributionChannel has index, should have all derived types
-          expect_all_derived_types_present(result, "DistributionChannel")
+          # DistributionChannel has index, should have root derived types
+          expect_root_derived_types_present(result, "DistributionChannel")
 
-          # Retail is directly queryable (all subtypes indexed), should have all derived types
-          expect_all_derived_types_present(result, "Retail")
+          # Retail is directly queryable (all subtypes indexed), should have root derived types
+          expect_root_derived_types_present(result, "Retail")
 
-          # OnlineStore only inherits index, should NOT have any derived types
-          expect_no_derived_types(result, "OnlineStore")
+          # OnlineStore only inherits index, should NOT have root derived types
+          expect_root_derived_types_absent(result, "OnlineStore")
 
-          # PhysicalStore has own index, should have all derived types
-          expect_all_derived_types_present(result, "PhysicalStore")
+          # PhysicalStore has own index, should have root derived types
+          expect_root_derived_types_present(result, "PhysicalStore")
 
           # Verify query fields exist for directly queryable types
-          expect(result).to include("#{correctly_cased("distribution_channels")}(")
-          expect(result).to include("#{correctly_cased("retails")}(")
-          expect(result).to include("#{correctly_cased("physical_stores")}(")
+          query_type = type_def_from(result, "Query")
+          expect(query_type).to include("#{correctly_cased("distribution_channels")}(")
+          expect(query_type).to include("#{correctly_cased("retailers")}(")
+          expect(query_type).to include("#{correctly_cased("physical_stores")}(")
           # OnlineStore should NOT have its own query fields
-          expect(result).not_to include("#{correctly_cased("online_stores")}(")
+          expect(query_type).not_to include("#{correctly_cased("online_stores")}(")
         end
 
         describe "#implements" do

@@ -235,7 +235,6 @@ module ElasticGraph
         end
 
         def to_grouped_by_type
-          return nil if root_document_type? && !directly_queryable?
           # If the type uses a custom mapping type we don't know how it can be aggregated, so we assume it needs no aggregation type.
           # TODO: clean this up using an interface instead of checking mapping options.
           return nil if has_custom_mapping_type?
@@ -251,7 +250,6 @@ module ElasticGraph
         end
 
         def to_aggregated_values_type
-          return nil if root_document_type? && !directly_queryable?
           # If the type uses a custom mapping type we don't know how it can be aggregated, so we assume it needs no aggregation type.
           # TODO: clean this up using an interface instead of checking mapping options.
           return nil if has_custom_mapping_type?
@@ -267,7 +265,6 @@ module ElasticGraph
         end
 
         def to_highlights_type
-          return nil if root_document_type? && !directly_queryable?
           # If the type uses a custom mapping type we don't know how it can be highlighted, so we assume it needs no highlights type.
           return nil if does_not_support?(&:highlightable?)
 
