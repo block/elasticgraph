@@ -61,7 +61,7 @@ target :elasticgraph_gems do
     elasticgraph-schema_definition/lib/elastic_graph/schema_definition/indexing/index.rb
     elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/has_indices.rb
     elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/built_in_types.rb
-    elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/enums_for_root_document_types.rb
+    elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/enums_for_directly_queryable_types.rb
     elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb
     elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/union_type.rb
   ])
