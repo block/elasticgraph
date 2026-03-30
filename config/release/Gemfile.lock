@@ -1,7 +1,7 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    bigdecimal (4.0.1)
+    bigdecimal (4.1.0)
     csv (3.3.5)
     date (3.5.1)
     erb (6.0.2)
@@ -65,7 +65,7 @@ DEPENDENCIES
   yard-markdown (~> 0.6)
 
 CHECKSUMS
-  bigdecimal (4.0.1) sha256=8b07d3d065a9f921c80ceaea7c9d4ae596697295b584c296fe599dd0ad01c4a7
+  bigdecimal (4.1.0) sha256=6dc07767aa3dc456ccd48e7ae70a07b474e9afd7c5bc576f80bd6da5c8dd6cae
   csv (3.3.5) sha256=6e5134ac3383ef728b7f02725d9872934f523cb40b961479f69cf3afa6c8e73f
   date (3.5.1) sha256=750d06384d7b9c15d562c76291407d89e368dda4d4fff957eb94962d325a0dc0
   erb (6.0.2) sha256=9fe6264d44f79422c87490a1558479bd0e7dad4dd0e317656e67ea3077b5242b
