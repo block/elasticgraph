@@ -189,16 +189,16 @@ module ElasticGraph
           end
 
           # DistributionChannel has index, should have root derived types
-          expect_root_derived_types_present(result, "DistributionChannel")
+          expect(root_derived_types(result, "DistributionChannel")).to all be_present
 
           # Retail is directly queryable (all subtypes indexed), should have root derived types
-          expect_root_derived_types_present(result, "Retail")
+          expect(root_derived_types(result, "Retail")).to all be_present
 
           # OnlineStore only inherits index, should NOT have root derived types
-          expect_root_derived_types_absent(result, "OnlineStore")
+          expect(root_derived_types(result, "OnlineStore")).to all be_nil
 
           # PhysicalStore has own index, should have root derived types
-          expect_root_derived_types_present(result, "PhysicalStore")
+          expect(root_derived_types(result, "PhysicalStore")).to all be_present
 
           # Verify query fields exist for directly queryable types
           query_type = type_def_from(result, "Query")

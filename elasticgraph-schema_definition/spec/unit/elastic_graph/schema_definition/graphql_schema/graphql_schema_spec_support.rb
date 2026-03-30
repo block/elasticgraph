@@ -126,22 +126,15 @@ module ElasticGraph
       # Connection, Edge, Aggregation, AggregationConnection, AggregationEdge, SortOrderInput.
       # These are distinct from the remaining derived types (GroupedBy, AggregatedValues, Highlights),
       # which are potentially relevant for all types.
-      def expect_root_derived_types_present(sdl, type_name)
-        expect(connection_type_from(sdl, type_name)).not_to be_nil
-        expect(edge_type_from(sdl, type_name)).not_to be_nil
-        expect(aggregation_type_from(sdl, type_name)).not_to be_nil
-        expect(aggregation_connection_type_from(sdl, type_name)).not_to be_nil
-        expect(aggregation_edge_type_from(sdl, type_name)).not_to be_nil
-        expect(sort_order_type_from(sdl, type_name)).not_to be_nil
-      end
-
-      def expect_root_derived_types_absent(sdl, type_name)
-        expect(connection_type_from(sdl, type_name)).to be_nil
-        expect(edge_type_from(sdl, type_name)).to be_nil
-        expect(aggregation_type_from(sdl, type_name)).to be_nil
-        expect(aggregation_connection_type_from(sdl, type_name)).to be_nil
-        expect(aggregation_edge_type_from(sdl, type_name)).to be_nil
-        expect(sort_order_type_from(sdl, type_name)).to be_nil
+      def root_derived_types(sdl, type_name)
+        [
+          connection_type_from(sdl, type_name),
+          edge_type_from(sdl, type_name),
+          aggregation_type_from(sdl, type_name),
+          aggregation_connection_type_from(sdl, type_name),
+          aggregation_edge_type_from(sdl, type_name),
+          sort_order_type_from(sdl, type_name)
+        ]
       end
     end
   end

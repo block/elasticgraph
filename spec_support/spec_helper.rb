@@ -255,6 +255,7 @@ RSpec::Matchers.define_negated_matcher :maintain, :change
 RSpec::Matchers.define_negated_matcher :raise_no_error, :raise_error
 RSpec::Matchers.define_negated_matcher :avoid_outputting, :output
 RSpec::Matchers.define_negated_matcher :have_never_received, :have_received
+RSpec::Matchers.define_negated_matcher :be_present, :be_nil
 
 module ElasticGraph
   module CommonSpecHelpers
