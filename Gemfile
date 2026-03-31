@@ -51,7 +51,7 @@ group :site do
   gem "filewatcher", "~> 2.1", github: "filewatcher/filewatcher", ref: "596fad65f3b442fee6cf30a3d8daf2767d63f8c9"
 
   platforms :ruby do
-    gem "html-proofer", "~> 5.2"
+    gem "html-proofer", "~> 5.2", ">= 5.2.1"
     gem "jekyll", "~> 4.4", ">= 4.4.1"
     gem "redcarpet", "~> 3.6", ">= 3.6.1"
   end
