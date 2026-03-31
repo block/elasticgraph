@@ -38,8 +38,8 @@ module ElasticGraph
           end
         end
 
-        def new_enum_type(name)
-          super(name) do |type|
+        def new_enum_type(name, **kwargs)
+          super(name, **kwargs) do |type|
             type.extend EnumTypeExtension
             yield type
           end

@@ -32,6 +32,7 @@ module ElasticGraph
       attr_accessor output: io
       attr_accessor allow_omitted_json_schema_fields: bool
       attr_accessor allow_extra_json_schema_fields: bool
+      attr_reader enums_in_transition: ::Set[::String]
 
       def initialize: (
         api: API,
@@ -65,6 +66,7 @@ module ElasticGraph
         output: io,
         allow_omitted_json_schema_fields: bool,
         allow_extra_json_schema_fields: bool,
+        enums_in_transition: ::Set[::String],
       ) -> void
     end
 
@@ -76,6 +78,7 @@ module ElasticGraph
         derived_type_name_formats: ::Hash[::Symbol, ::String],
         type_name_overrides: ::Hash[::String, ::String] | ::Hash[::Symbol, ::String],
         enum_value_overrides_by_type: ::Hash[::String | ::Symbol, ::Hash[::String | ::Symbol, ::String]],
+        ?enums_in_transition: ::Set[::String] | ::Array[::String],
         ?output: io
       ) -> State
 

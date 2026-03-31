@@ -28,6 +28,7 @@ module ElasticGraph
       def artifacts_from_schema_def: () -> ::Array[SchemaArtifact[untyped]]
       def notify_about_unused_type_name_overrides: () -> void
       def notify_about_unused_enum_value_overrides: () -> void
+      def notify_about_unrecognized_enums_in_transition: () -> void
       def build_desired_versioned_json_schemas: (::Hash[::String, untyped]) -> ::Hash[::Integer, ::Hash[::String, untyped]]
       def report_json_schema_merge_errors: (::Array[Indexing::JSONSchemaWithMetadata]) -> void
       def report_json_schema_merge_warnings: () -> void

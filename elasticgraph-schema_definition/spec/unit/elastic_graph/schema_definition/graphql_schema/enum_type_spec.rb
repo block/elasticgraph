@@ -341,7 +341,7 @@ module ElasticGraph
             EOS
           end
 
-          it "adds #{-> { schema_elements.equal_to_any_of_input }} filter field alongside #{-> { schema_elements.equal_to_any_of }}" do
+          it "adds an equal_to_any_of_input filter field alongside equal_to_any_of" do
             result = define_schema(
               type_name_overrides: {"ColorInput" => "Color"},
               enums_in_transition: ["Color"]
@@ -365,7 +365,7 @@ module ElasticGraph
             expect(filter_def).to include("#{schema_elements.equal_to_any_of_input}: [ColorInput]")
           end
 
-          it "adds #{-> { schema_elements.equal_to_any_of_input }} with non-null elements in list element filter context" do
+          it "adds an equal_to_any_of_input filter field with non-null elements in list element filter context" do
             result = define_schema(
               type_name_overrides: {"ColorInput" => "Color"},
               enums_in_transition: ["Color"]

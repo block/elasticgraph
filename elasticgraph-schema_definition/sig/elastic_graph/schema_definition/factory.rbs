@@ -22,7 +22,7 @@ module ElasticGraph
       def new_directive: (::String, SchemaElements::directiveArgHash) -> SchemaElements::Directive
       @@directive_new: ::Method
 
-      def new_enum_type: (::String) ?{ (SchemaElements::EnumType) -> void } -> SchemaElements::EnumType
+      def new_enum_type: (::String, ?skip_name_override: bool) ?{ (SchemaElements::EnumType) -> void } -> SchemaElements::EnumType
       @@enum_type_new: ::Method
 
       def new_enum_value: (::String, ::String) ?{ (SchemaElements::EnumValue) -> void } -> SchemaElements::EnumValue

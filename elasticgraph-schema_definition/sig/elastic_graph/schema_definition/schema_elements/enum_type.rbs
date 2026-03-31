@@ -20,7 +20,7 @@ module ElasticGraph
         include Mixins::HasDocumentation
         include Mixins::HasDerivedGraphQLTypeCustomizations
         include _Type
-        def initialize: (State, ::String) ?{ (EnumType) -> void } -> void
+        def initialize: (State, ::String, ?skip_name_override: bool) ?{ (EnumType) -> void } -> void
         def aggregated_values_type: () -> TypeReference
         def value: (::String) ?{ (EnumValue) -> void } -> void
         def values: (*::String) -> void
