@@ -14,9 +14,10 @@ Located in [`elasticgraph-mcp-server/`](./elasticgraph-mcp-server/), this provid
 
 You can use the MCP server with a variety of tools and platforms, including:
 
+- in [Cursor](https://www.cursor.com) as an "MCP tool"
 - in [Goose](https://block.github.io/goose/) as an "extension"
-- in [Claude](https://docs.anthropic.com/en/docs/agents-and-tools/mcp) Desktop app as an "MCP server"
-- in [Cursor](https://docs.cursor.com/context/model-context-protocol) as an "MCP tool"
+- in [Claude Code](https://claude.com/product/claude-code) as an "MCP server"
+- in [Codex](https://github.com/openai/codex) as an "MCP server"
 
 ## Additional Resources
 
