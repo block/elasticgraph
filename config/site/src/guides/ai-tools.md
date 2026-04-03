@@ -53,9 +53,10 @@ Full documentation for [elasticgraph-mcp-server](https://pypi.org/project/elasti
 
 You can use the ElasticGraph MCP server with:
 
+- [Cursor](https://www.cursor.com) - as an MCP tool
 - [Goose](https://block.github.io/goose/) - as an extension
-- Claude - in the desktop app as an MCP server
-- [Cursor](https://docs.cursor.com/context/model-context-protocol) - as an MCP tool
+- [Claude Code](https://claude.com/product/claude-code) - as an MCP server
+- [Codex](https://github.com/openai/codex) - as an MCP server
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
