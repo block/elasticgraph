@@ -81,6 +81,38 @@ module ElasticGraph
         end
       end
 
+      it "raises a clear error when the rollover field is not a date or datetime type" do
+        expect {
+          index_definition_metadata_for("widgets") do |i|
+            i.rollover :monthly, "group_id"
+          end
+        }.to raise_error(Errors::SchemaError, a_string_including("cannot be used for rollover", "not a"))
+      end
+
+      it "raises a clear error when the rollover field is a list field" do
+        expect {
+          index_definition_metadata_for("widgets", on_my_type: ->(t) { t.field "timestamps", "[DateTime!]!" }) do |i|
+            i.rollover :monthly, "timestamps"
+          end
+        }.to raise_error(Errors::SchemaError, a_string_including("cannot be used for rollover", "list field"))
+      end
+
+      it "raises a clear error when the route_with field is not a leaf field" do
+        expect {
+          index_definition_metadata_for("widgets") do |i|
+            i.route_with "nested_fields_gql"
+          end
+        }.to raise_error(Errors::SchemaError, a_string_including("cannot be used for routing", "not a leaf field"))
+      end
+
+      it "raises a clear error for a nested field path that cannot be resolved" do
+        expect {
+          index_definition_metadata_for("widgets") do |i|
+            i.route_with "nested_fields_gql.nonexistent_field"
+          end
+        }.to raise_error(Errors::SchemaError, a_string_including("cannot be resolved", "Verify that all fields and types"))
+      end
+
       it "dumps the `default_sort_fields`" do
         widgets = index_definition_metadata_for("widgets") do |i|
           i.default_sort "created_at", :asc, "group_id", :desc

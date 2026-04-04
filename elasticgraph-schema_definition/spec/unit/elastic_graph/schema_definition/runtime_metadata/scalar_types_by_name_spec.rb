@@ -286,6 +286,17 @@ module ElasticGraph
           expect(grouping_missing_value_placeholder).to be_nil
         end
 
+        it "does not infer placeholder for unsigned_long types when ingestion serializer extensions are disabled" do
+          metadata = define_schema(ingestion_serializer_extension_modules: []) do |s|
+            s.scalar_type "CustomScalar" do |t|
+              t.mapping type: "unsigned_long"
+              t.coerce_with "ExampleScalarCoercionAdapter", defined_at: "support/example_extensions/scalar_coercion_adapter"
+            end
+          end.runtime_metadata.scalar_types_by_name.fetch("CustomScalar")
+
+          expect(metadata.grouping_missing_value_placeholder).to be_nil
+        end
+
         describe "boundary conditions for JSON-safe long ranges" do
           it "does not infer placeholder when exactly at safe boundaries with default coercion adapter" do
             grouping_missing_value_placeholder = grouping_missing_value_placeholder_for("long", type: "integer", minimum: JSON_SAFE_LONG_MIN, maximum: JSON_SAFE_LONG_MAX)

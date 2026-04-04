@@ -44,6 +44,22 @@ module ElasticGraph
         expect(output).to include(expected_snippet_1, expected_snippet_2, expected_snippet_3)
       end
 
+      it "passes configured ingestion serializer extensions through to schema definition rake tasks" do
+        allow(Admin::RakeTasks).to receive(:from_yaml_file)
+        allow(SchemaDefinition::RakeTasks).to receive(:new)
+
+        RakeTasks.new(
+          local_config_yaml: config_dir / "settings" / "development.yaml",
+          path_to_schema: config_dir / "schema.rb"
+        ) do |tasks|
+          tasks.schema_definition_ingestion_serializer_extension_modules = []
+        end
+
+        expect(SchemaDefinition::RakeTasks).to have_received(:new).with(hash_including(
+          ingestion_serializer_extension_modules: []
+        ))
+      end
+
       context "when the local config file configures an `elasticsearch` backend" do
         it "defines elasticsearch tasks" do
           output = run_rake_with_yaml_changes "-T" do |config|

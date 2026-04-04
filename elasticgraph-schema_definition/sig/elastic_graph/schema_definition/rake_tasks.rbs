@@ -11,6 +11,7 @@ module ElasticGraph
         ?type_name_overrides: ::Hash[::Symbol, ::String],
         ?enum_value_overrides_by_type: ::Hash[::Symbol, ::Hash[::Symbol, ::String]],
         ?extension_modules: ::Array[::Module],
+        ?ingestion_serializer_extension_modules: ::Array[::Module],
         ?enforce_json_schema_version: bool,
         ?output: io
       ) -> void
@@ -26,6 +27,7 @@ module ElasticGraph
       @schema_artifacts_directory: ::String | ::Pathname
       @enforce_json_schema_version: bool
       @extension_modules: ::Array[::Module]
+      @ingestion_serializer_extension_modules: ::Array[::Module]
       @output: io
 
       def define_tasks: () -> void

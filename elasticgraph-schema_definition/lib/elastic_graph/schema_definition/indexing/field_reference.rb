@@ -15,7 +15,6 @@ module ElasticGraph
         :name_in_index,
         :type,
         :mapping_options,
-        :json_schema_options,
         :accuracy_confidence,
         :source,
         :runtime_field_script,
@@ -35,10 +34,8 @@ module ElasticGraph
             name: name,
             name_in_index: name_in_index,
             type: type,
-            json_schema_layers: type.json_schema_layers,
             indexing_field_type: resolved_type.to_indexing_field_type,
             accuracy_confidence: accuracy_confidence,
-            json_schema_customizations: json_schema_options,
             mapping_customizations: mapping_options,
             source: source,
             runtime_field_script: runtime_field_script,
@@ -46,7 +43,7 @@ module ElasticGraph
           )
         end
 
-        # @dynamic initialize, with, name, name_in_index, type, mapping_options, json_schema_options, accuracy_confidence, source, runtime_field_script, doc_comment
+        # @dynamic initialize, with, name, name_in_index, type, mapping_options, accuracy_confidence, source, runtime_field_script, doc_comment
       end
     end
   end

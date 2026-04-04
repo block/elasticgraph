@@ -49,6 +49,72 @@ module ElasticGraph
           EOS
         end
 
+        it "exposes ingestion serializer APIs by default for backward compatibility" do
+          api = API.new(schema_elements, true, extension_modules: [Module.new])
+
+          expect(api).to respond_to(:json_schema_version)
+          expect(api).to respond_to(:json_schema_strictness)
+          expect(api.results).to respond_to(:json_schemas_for)
+          expect(api.results).to respond_to(:available_json_schema_versions)
+        end
+
+        it "allows the factory to build an object type even when no block is provided" do
+          api = API.new(schema_elements, true)
+
+          object_type = api.factory.new_object_type("Widget")
+
+          expect(object_type.name).to eq("Widget")
+        end
+
+        it "allows the default ingestion serializer APIs to be explicitly disabled" do
+          api = API.new(schema_elements, true, ingestion_serializer_extension_modules: [])
+
+          expect(api).not_to respond_to(:json_schema_version)
+          expect(api).not_to respond_to(:json_schema_strictness)
+          expect(api.results).not_to respond_to(:json_schemas_for)
+          expect(api.results).not_to respond_to(:available_json_schema_versions)
+        end
+
+        it "does not try to configure a JSON schema version when ingestion serializer extensions are disabled" do
+          expect {
+            define_schema(ingestion_serializer_extension_modules: []) do |schema|
+              schema.object_type("Widget") do |t|
+                t.field "id", "ID"
+              end
+            end
+          }.not_to raise_error
+        end
+
+        it "keeps ingestion serializer APIs disabled through the test support helpers" do
+          results = define_schema_with_schema_elements(
+            schema_elements,
+            ingestion_serializer_extension_modules: []
+          ) do |schema|
+            schema.object_type("Widget") do |t|
+              t.field "id", "ID"
+            end
+          end
+
+          expect(results).not_to respond_to(:json_schemas_for)
+          expect(results).not_to respond_to(:available_json_schema_versions)
+        end
+
+        it "raises an error when trying to register a reserved type name" do
+          reserved_extension = Module.new do
+            def self.extended(api)
+              api.instance_variable_get(:@state).ingestion_serializer_state[:reserved_type_names] = Set["ReservedName"]
+            end
+          end
+
+          expect {
+            define_schema(ingestion_serializer_extension_modules: [reserved_extension]) do |schema|
+              schema.object_type "ReservedName" do |t|
+                t.field "id", "ID!"
+              end
+            end
+          }.to raise_error Errors::SchemaError, a_string_including("`ReservedName`", "reserved name")
+        end
+
         it "raises a clear error when there is no active API instance" do
           expect {
             ElasticGraph.define_schema { |schema| }

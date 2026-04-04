@@ -405,19 +405,11 @@ module ElasticGraph
             # As per the Elasticsearch docs, the field MUST come in named `lat` in Elastisearch (but we want the full name in GraphQL).
             t.field names.latitude, "Float", name_in_index: "lat" do |f|
               f.documentation "Angular distance north or south of the Earth's equator, measured in degrees from -90 to +90."
-
-              # Note: we use `nullable: false` because we index it as a single `geo_point` field, and therefore can't
-              # support a `latitude` without a `longitude` or vice-versa.
-              f.json_schema minimum: -90, maximum: 90, nullable: false
             end
 
             # As per the Elasticsearch docs, the field MUST come in named `lon` in Elastisearch (but we want the full name in GraphQL).
             t.field names.longitude, "Float", name_in_index: "lon" do |f|
               f.documentation "Angular distance east or west of the Prime Meridian at Greenwich, UK, measured in degrees from -180 to +180."
-
-              # Note: we use `nullable: false` because we index it as a single `geo_point` field, and therefore can't
-              # support a `latitude` without a `longitude` or vice-versa.
-              f.json_schema minimum: -180, maximum: 180, nullable: false
             end
 
             t.mapping type: "geo_point"
@@ -659,17 +651,15 @@ module ElasticGraph
 
         # Registers the standard GraphQL scalar types. Note that the SDL for the scalar type itself isn't
         # included in the dumped SDL, but registering it allows us to derive a filter for each,
-        # which we need. In addition, this lets us define the mapping and JSON schema for each standard
-        # scalar type.
+        # which we need. In addition, this lets us define the mapping for each standard scalar type.
+        # Ingestion serializers can layer their own built-in configuration on top.
         def register_standard_graphql_scalars
           schema_def_api.scalar_type "Boolean" do |t|
             t.mapping type: "boolean"
-            t.json_schema type: "boolean"
           end
 
           schema_def_api.scalar_type "Float" do |t|
             t.mapping type: "double"
-            t.json_schema type: "number"
 
             t.customize_aggregated_values_type do |avt|
               # not nullable, since sum(empty_set) == 0
@@ -709,12 +699,10 @@ module ElasticGraph
 
           schema_def_api.scalar_type "ID" do |t|
             t.mapping type: "keyword"
-            t.json_schema type: "string"
           end
 
           schema_def_api.scalar_type "Int" do |t|
             t.mapping type: "integer"
-            t.json_schema type: "integer", minimum: INT_MIN, maximum: INT_MAX
 
             t.prepare_for_indexing_with "ElasticGraph::Indexer::IndexingPreparers::Integer",
               defined_at: "elastic_graph/indexer/indexing_preparers/integer"
@@ -729,7 +717,6 @@ module ElasticGraph
 
           schema_def_api.scalar_type "String" do |t|
             t.mapping type: "keyword"
-            t.json_schema type: "string"
 
             t.customize_filter_input_type do |fit|
               fit.field names.contains, schema_def_state.type_ref("StringContains").as_filter_input.name do |f|
@@ -753,12 +740,11 @@ module ElasticGraph
 
         def register_custom_elastic_graph_scalars
           schema_def_api.scalar_type "Cursor" do |t|
-            # Technically, we don't use the mapping or json_schema on this type since it's a return-only
+            # Technically, we don't use the mapping or ingestion config on this type since it's a return-only
             # type and isn't indexed. However, `scalar_type` requires them to be set (since custom scalars
             # defined by users will need those set) so we set them here to what they would be if we actually
             # used them.
             t.mapping type: "keyword"
-            t.json_schema type: "string"
             t.coerce_with "ElasticGraph::GraphQL::ScalarCoercionAdapters::Cursor",
               defined_at: "elastic_graph/graphql/scalar_coercion_adapters/cursor"
 
@@ -771,7 +757,6 @@ module ElasticGraph
 
           schema_def_api.scalar_type "Date" do |t|
             t.mapping type: "date", format: DATASTORE_DATE_FORMAT
-            t.json_schema type: "string", format: "date"
             t.coerce_with "ElasticGraph::GraphQL::ScalarCoercionAdapters::Date",
               defined_at: "elastic_graph/graphql/scalar_coercion_adapters/date"
 
@@ -791,7 +776,6 @@ module ElasticGraph
 
           schema_def_api.scalar_type "DateTime" do |t|
             t.mapping type: "date", format: DATASTORE_DATE_TIME_FORMAT
-            t.json_schema type: "string", format: "date-time"
             t.coerce_with "ElasticGraph::GraphQL::ScalarCoercionAdapters::DateTime",
               defined_at: "elastic_graph/graphql/scalar_coercion_adapters/date_time"
             t.prepare_for_indexing_with "ElasticGraph::Indexer::IndexingPreparers::DateTime",
@@ -882,8 +866,6 @@ module ElasticGraph
 
             t.mapping type: "date", format: "HH:mm:ss||HH:mm:ss.S||HH:mm:ss.SS||HH:mm:ss.SSS"
 
-            t.json_schema type: "string", pattern: VALID_LOCAL_TIME_JSON_SCHEMA_PATTERN
-
             t.customize_aggregated_values_type do |avt|
               define_exact_min_max_and_approx_avg_on_aggregated_values(avt, "LocalTime") do |adjective:, full_name:|
                 <<~EOS
@@ -896,7 +878,6 @@ module ElasticGraph
 
           schema_def_api.scalar_type "TimeZone" do |t|
             t.mapping type: "keyword"
-            t.json_schema type: "string", enum: GraphQL::ScalarCoercionAdapters::VALID_TIME_ZONES.to_a
             t.coerce_with "ElasticGraph::GraphQL::ScalarCoercionAdapters::TimeZone",
               defined_at: "elastic_graph/graphql/scalar_coercion_adapters/time_zone"
 
@@ -913,8 +894,6 @@ module ElasticGraph
             # https://github.com/json-schema-org/json-schema-spec/blob/draft-07/schema.json#L23-L29
             #
             # ...except we are omitting `null` here; it'll be added by the nullability decorator if the field is defined as nullable.
-            t.json_schema type: ["array", "boolean", "integer", "number", "object", "string"]
-
             # In the index we store this as a JSON string in a `keyword` field.
             t.mapping type: "keyword"
 
@@ -939,7 +918,6 @@ module ElasticGraph
 
           schema_def_api.scalar_type "JsonSafeLong" do |t|
             t.mapping type: "long"
-            t.json_schema type: "integer", minimum: JSON_SAFE_LONG_MIN, maximum: JSON_SAFE_LONG_MAX
             t.coerce_with "ElasticGraph::GraphQL::ScalarCoercionAdapters::JsonSafeLong",
               defined_at: "elastic_graph/graphql/scalar_coercion_adapters/longs"
 
@@ -983,7 +961,6 @@ module ElasticGraph
             # to do if we ingest them as strings. (The `pattern` regex to validate the range
             # would be *extremely* complicated).
             t.mapping type: "long"
-            t.json_schema type: "integer", minimum: LONG_STRING_MIN, maximum: LONG_STRING_MAX
             t.coerce_with "ElasticGraph::GraphQL::ScalarCoercionAdapters::LongString",
               defined_at: "elastic_graph/graphql/scalar_coercion_adapters/longs"
             t.prepare_for_indexing_with "ElasticGraph::Indexer::IndexingPreparers::Integer",

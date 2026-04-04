@@ -6,7 +6,6 @@
 #
 # frozen_string_literal: true
 
-require "elastic_graph/constants"
 require "elastic_graph/errors"
 require "elastic_graph/schema_definition/factory"
 require "elastic_graph/schema_definition/mixins/has_readable_to_s_and_inspect"
@@ -40,8 +39,7 @@ module ElasticGraph
       :deleted_types_by_old_name,
       :renamed_fields_by_type_name_and_old_field_name,
       :deleted_fields_by_type_name_and_old_field_name,
-      :json_schema_version,
-      :json_schema_version_setter_location,
+      :ingestion_serializer_state,
       :graphql_extension_modules,
       :graphql_resolvers_by_name,
       :built_in_graphql_resolvers,
@@ -53,9 +51,7 @@ module ElasticGraph
       :type_refs_by_name,
       :output,
       :type_namer,
-      :enum_value_namer,
-      :allow_omitted_json_schema_fields,
-      :allow_extra_json_schema_fields
+      :enum_value_namer
     )
       include Mixins::HasReadableToSAndInspect.new
 
@@ -88,8 +84,7 @@ module ElasticGraph
           deleted_types_by_old_name: {},
           renamed_fields_by_type_name_and_old_field_name: ::Hash.new { |h, k| h[k] = {} },
           deleted_fields_by_type_name_and_old_field_name: ::Hash.new { |h, k| h[k] = {} },
-          json_schema_version_setter_location: nil,
-          json_schema_version: nil,
+          ingestion_serializer_state: {},
           graphql_extension_modules: [],
           graphql_resolvers_by_name: {},
           built_in_graphql_resolvers: ::Set.new,
@@ -104,9 +99,7 @@ module ElasticGraph
             name_overrides: type_name_overrides
           ),
           enum_value_namer: SchemaElements::EnumValueNamer.new(enum_value_overrides_by_type),
-          output: output,
-          allow_omitted_json_schema_fields: false,
-          allow_extra_json_schema_fields: true
+          output: output
         )
       end
 
@@ -213,12 +206,11 @@ module ElasticGraph
 
       private
 
-      RESERVED_TYPE_NAMES = [EVENT_ENVELOPE_JSON_SCHEMA_NAME].to_set
-
       def register_type(type, additional_type_index = nil)
         name = (_ = type).name
 
-        if RESERVED_TYPE_NAMES.include?(name)
+        reserved_names = ingestion_serializer_state[:reserved_type_names]
+        if reserved_names&.include?(name)
           raise Errors::SchemaError, "`#{name}` cannot be used as a schema type because it is a reserved name."
         end
 

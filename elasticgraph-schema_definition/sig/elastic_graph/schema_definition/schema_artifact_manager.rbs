@@ -22,22 +22,11 @@ module ElasticGraph
       @output: io
       @max_diff_lines: ::Integer
       @artifacts: ::Array[SchemaArtifact[untyped]]?
-      @json_schemas_artifact: SchemaArtifact[untyped]
 
       def artifacts: () -> ::Array[SchemaArtifact[untyped]]
       def artifacts_from_schema_def: () -> ::Array[SchemaArtifact[untyped]]
       def notify_about_unused_type_name_overrides: () -> void
       def notify_about_unused_enum_value_overrides: () -> void
-      def build_desired_versioned_json_schemas: (::Hash[::String, untyped]) -> ::Hash[::Integer, ::Hash[::String, untyped]]
-      def report_json_schema_merge_errors: (::Array[Indexing::JSONSchemaWithMetadata]) -> void
-      def report_json_schema_merge_warnings: () -> void
-      def format_deprecated_elements: (::Enumerable[SchemaElements::DeprecatedElement]) -> ::String
-      def missing_field_error_for: (::String, ::Array[::Integer]) -> ::String
-      def missing_type_error_for: (::String, ::Array[::Integer]) -> ::String
-      def missing_necessary_field_error_for: (Indexing::JSONSchemaWithMetadata::MissingNecessaryField, ::Array[::Integer]) -> ::String
-      def describe_json_schema_versions: (::Array[::Integer], ::String) -> ::String
-      def old_versions: (::Array[::Integer]) -> ::String
-      def files_noun_phrase: (::Array[::Integer]) -> ::String
       def artifacts_out_of_date_error: (::Array[SchemaArtifact[untyped]]) -> ::String
       def truncate_diff: (::String, ::Integer) -> [::String, ::String]
 
@@ -47,9 +36,7 @@ module ElasticGraph
         ?extra_comment_lines: ::Array[::String]
       ) -> SchemaArtifact[::Hash[::String, untyped]]
 
-      def new_versioned_json_schema_artifact: (::Hash[::String, untyped]) -> SchemaArtifact[::Hash[::String, untyped]]
       def new_raw_artifact: (::String, ::String) -> SchemaArtifact[::String]
-      def check_if_needs_json_schema_version_bump: () { (::Integer) -> void } -> void
       def pruned_runtime_metadata: (::String) -> SchemaArtifacts::RuntimeMetadata::Schema
     end
 

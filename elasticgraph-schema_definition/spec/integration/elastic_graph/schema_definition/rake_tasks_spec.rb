@@ -276,6 +276,28 @@ module ElasticGraph
           expect(unprefixed_schema).to eq(uncustomized_graphql_schema)
         end
 
+        it "supports disabling the default JSON Schema ingestion serializer" do
+          ::File.write("schema.rb", <<~RUBY)
+            ElasticGraph.define_schema do |schema|
+              schema.object_type "Component" do |t|
+                t.field "id", "ID!"
+                t.index "components"
+              end
+            end
+          RUBY
+
+          output = run_rake("schema_artifacts:dump", ingestion_serializer_extension_modules: [])
+
+          expect(output.lines).to include(
+            a_string_including("Dumped", DATASTORE_CONFIG_FILE),
+            a_string_including("Dumped", RUNTIME_METADATA_FILE),
+            a_string_including("Dumped", GRAPHQL_SCHEMA_FILE)
+          )
+          expect(output.lines).to exclude(a_string_including(JSON_SCHEMAS_FILE))
+          expect(read_artifact(JSON_SCHEMAS_FILE)).to eq(false)
+          expect(read_artifact(versioned_json_schema_file(1))).to eq(false)
+        end
+
         it "generates separate input vs output enums by default, but allows them to be the same if desired" do
           write_elastic_graph_schema_def_code(json_schema_version: 1)
 
@@ -1062,6 +1084,7 @@ module ElasticGraph
         pretend_tty: false,
         path_to_schema: "schema.rb",
         include_extension_module: true,
+        ingestion_serializer_extension_modules: ExtensionModuleSupport.default_ingestion_serializer_extension_modules,
         derived_type_name_formats: {},
         type_name_overrides: {},
         enum_value_overrides_by_type: {}
@@ -1087,6 +1110,7 @@ module ElasticGraph
             schema_artifacts_directory: "config/schema/artifacts",
             enforce_json_schema_version: enforce_json_schema_version,
             extension_modules: [extension_module].compact,
+            ingestion_serializer_extension_modules: ingestion_serializer_extension_modules,
             derived_type_name_formats: derived_type_name_formats,
             type_name_overrides: type_name_overrides,
             enum_value_overrides_by_type: enum_value_overrides_by_type,

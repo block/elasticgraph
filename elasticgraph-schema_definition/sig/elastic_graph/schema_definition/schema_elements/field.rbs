@@ -22,7 +22,6 @@ module ElasticGraph
         attr_accessor computation_detail: SchemaArtifacts::RuntimeMetadata::ComputationDetail
         attr_reader filter_customizations: ::Array[^(Field) -> void]
         attr_reader sort_order_enum_value_customizations: ::Array[^(SortOrderEnumValue) -> void]
-        attr_reader non_nullable_in_json_schema: bool
         attr_reader source: FieldSource?
         attr_accessor relationship: Relationship?
         attr_reader resolver: SchemaArtifacts::RuntimeMetadata::ConfiguredGraphQLResolver?

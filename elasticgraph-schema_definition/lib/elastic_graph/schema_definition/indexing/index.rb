@@ -136,8 +136,6 @@ module ElasticGraph
               raise Errors::SchemaError, "rollover field `#{timestamp_field_path.full_description}` cannot be used for rollover since it is a list field."
             end
 
-            timestamp_field_path.path_parts.each { |f| f.json_schema nullable: false }
-
             self.rollover_config = RolloverConfig.new(
               frequency: frequency,
               timestamp_field_path: timestamp_field_path
@@ -184,8 +182,6 @@ module ElasticGraph
 
             self.routing_field_path = routing_field_path
 
-            routing_field_path.path_parts[0..-2].each { |f| f.json_schema nullable: false }
-            routing_field_path.last_part.json_schema nullable: false, pattern: HAS_NON_WHITE_SPACE_REGEX
             indexed_type.append_to_documentation "For more performant queries on this type, please filter on `#{routing_field_path_name}` if possible."
           end
         end

@@ -9,6 +9,7 @@ module ElasticGraph
       attr_reader scalar_types_by_name: ::Hash[::String, SchemaElements::ScalarType]
       attr_reader enum_types_by_name: ::Hash[::String, SchemaElements::EnumType]
       attr_reader implementations_by_interface_ref: ::Hash[SchemaElements::TypeReference, ::Set[SchemaElements::TypeWithSubfields]]
+      attr_reader union_types_by_member_ref: ::Hash[SchemaElements::TypeReference, ::Set[SchemaElements::UnionType]]
       attr_reader sdl_parts: ::Array[::String]
       attr_reader paginated_collection_element_types: ::Set[::String]
       attr_reader user_defined_fields: ::Set[SchemaElements::Field]
@@ -16,8 +17,7 @@ module ElasticGraph
       attr_reader deleted_types_by_old_name: ::Hash[::String, SchemaElements::DeprecatedElement]
       attr_reader renamed_fields_by_type_name_and_old_field_name: ::Hash[::String, ::Hash[::String, SchemaElements::DeprecatedElement]]
       attr_reader deleted_fields_by_type_name_and_old_field_name: ::Hash[::String, ::Hash[::String, SchemaElements::DeprecatedElement]]
-      attr_accessor json_schema_version: ::Integer?
-      attr_accessor json_schema_version_setter_location: ::Thread::Backtrace::Location?
+      attr_accessor ingestion_serializer_state: ::Hash[::Symbol, untyped]
       attr_reader graphql_extension_modules: ::Array[SchemaArtifacts::RuntimeMetadata::GraphQLExtension]
       attr_reader graphql_resolvers_by_name: ::Hash[::Symbol, SchemaArtifacts::RuntimeMetadata::GraphQLResolver]
       attr_reader built_in_graphql_resolvers: ::Set[::Symbol]
@@ -27,11 +27,9 @@ module ElasticGraph
       attr_accessor user_definition_complete_callbacks: ::Array[^() -> void]
       attr_accessor sub_aggregation_paths_by_type: ::Hash[Mixins::SupportsFilteringAndAggregation, ::Array[SchemaElements::SubAggregationPath]]
       attr_accessor type_refs_by_name: ::Hash[::String, SchemaElements::TypeReference]
+      attr_accessor output: io
       attr_reader type_namer: SchemaElements::TypeNamer
       attr_reader enum_value_namer: SchemaElements::EnumValueNamer
-      attr_accessor output: io
-      attr_accessor allow_omitted_json_schema_fields: bool
-      attr_accessor allow_extra_json_schema_fields: bool
 
       def initialize: (
         api: API,
@@ -42,6 +40,7 @@ module ElasticGraph
         scalar_types_by_name: ::Hash[::String, SchemaElements::ScalarType],
         enum_types_by_name: ::Hash[::String, SchemaElements::EnumType],
         implementations_by_interface_ref: ::Hash[SchemaElements::TypeReference, ::Set[SchemaElements::TypeWithSubfields]],
+        union_types_by_member_ref: ::Hash[SchemaElements::TypeReference, ::Set[SchemaElements::UnionType]],
         sdl_parts: ::Array[::String],
         paginated_collection_element_types: ::Set[::String],
         user_defined_fields: ::Set[SchemaElements::Field],
@@ -49,8 +48,7 @@ module ElasticGraph
         deleted_types_by_old_name: ::Hash[::String, SchemaElements::DeprecatedElement],
         renamed_fields_by_type_name_and_old_field_name: ::Hash[::String, ::Hash[::String, SchemaElements::DeprecatedElement]],
         deleted_fields_by_type_name_and_old_field_name: ::Hash[::String, ::Hash[::String, SchemaElements::DeprecatedElement]],
-        json_schema_version: Integer?,
-        json_schema_version_setter_location: ::Thread::Backtrace::Location?,
+        ingestion_serializer_state: ::Hash[::Symbol, untyped],
         graphql_extension_modules: ::Array[SchemaArtifacts::RuntimeMetadata::GraphQLExtension],
         graphql_resolvers_by_name: ::Hash[::Symbol, SchemaArtifacts::RuntimeMetadata::GraphQLResolver],
         built_in_graphql_resolvers: ::Set[::Symbol],
@@ -60,11 +58,9 @@ module ElasticGraph
         user_definition_complete_callbacks: ::Array[^() -> void],
         sub_aggregation_paths_by_type: ::Hash[Mixins::SupportsFilteringAndAggregation, ::Array[SchemaElements::SubAggregationPath]],
         type_refs_by_name: ::Hash[::String, SchemaElements::TypeReference],
+        output: io,
         type_namer: SchemaElements::TypeNamer,
         enum_value_namer: SchemaElements::EnumValueNamer,
-        output: io,
-        allow_omitted_json_schema_fields: bool,
-        allow_extra_json_schema_fields: bool,
       ) -> void
     end
 
@@ -110,7 +106,6 @@ module ElasticGraph
 
       private
 
-      RESERVED_TYPE_NAMES: ::Set[::String]
       def register_type: [T] (T & SchemaElements::graphQLType, ?::Hash[::String, T]?) -> T
     end
   end
