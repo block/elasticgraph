@@ -111,6 +111,7 @@ graph LR;
     rackup["rackup"];
     rake["rake"];
     webrick["webrick"];
+    elasticgraph-json_ingestion["eg-json_ingestion"];
     elasticgraph-schema_artifacts["eg-schema_artifacts"];
     graphql["graphql"];
     elasticgraph --> elasticgraph-support;
@@ -125,6 +126,7 @@ graph LR;
     elasticgraph-local --> webrick;
     elasticgraph-schema_definition --> elasticgraph-graphql;
     elasticgraph-schema_definition --> elasticgraph-indexer;
+    elasticgraph-schema_definition --> elasticgraph-json_ingestion;
     elasticgraph-schema_definition --> elasticgraph-schema_artifacts;
     elasticgraph-schema_definition --> elasticgraph-support;
     elasticgraph-schema_definition --> graphql;
@@ -141,6 +143,7 @@ graph LR;
     class rackup externalGemCatStyle;
     class rake externalGemCatStyle;
     class webrick externalGemCatStyle;
+    class elasticgraph-json_ingestion otherEgGemStyle;
     class elasticgraph-schema_artifacts otherEgGemStyle;
     class graphql externalGemCatStyle;
     click thor href "https://rubygems.org/gems/thor" "Open on RubyGems.org" _blank;
@@ -192,12 +195,13 @@ graph LR;
     click opensearch-ruby href "https://rubygems.org/gems/opensearch-ruby" "Open on RubyGems.org" _blank;
 ```
 
-### Extensions (5 gems)
+### Extensions (6 gems)
 
 These libraries extend ElasticGraph to provide optional but commonly needed functionality.
 
 * [elasticgraph-apollo](elasticgraph-apollo/README.md): Transforms an ElasticGraph project into an Apollo subgraph.
 * [elasticgraph-health_check](elasticgraph-health_check/README.md): Provides a health check for high availability ElasticGraph deployments.
+* [elasticgraph-json_ingestion](elasticgraph-json_ingestion/README.md): JSON Schema ingestion support for ElasticGraph.
 * [elasticgraph-query_interceptor](elasticgraph-query_interceptor/README.md): Intercepts ElasticGraph datastore queries.
 * [elasticgraph-query_registry](elasticgraph-query_registry/README.md): Provides a source-controlled query registry for ElasticGraph applications.
 * [elasticgraph-warehouse](elasticgraph-warehouse/README.md): Extends ElasticGraph to support ingestion into a data warehouse.
@@ -216,6 +220,7 @@ graph LR;
     apollo-federation["apollo-federation"];
     elasticgraph-health_check["eg-health_check"];
     elasticgraph-datastore_core["eg-datastore_core"];
+    elasticgraph-json_ingestion["eg-json_ingestion"];
     elasticgraph-query_interceptor["eg-query_interceptor"];
     elasticgraph-schema_artifacts["eg-schema_artifacts"];
     elasticgraph-query_registry["eg-query_registry"];
@@ -228,6 +233,7 @@ graph LR;
     elasticgraph-health_check --> elasticgraph-datastore_core;
     elasticgraph-health_check --> elasticgraph-graphql;
     elasticgraph-health_check --> elasticgraph-support;
+    elasticgraph-json_ingestion --> elasticgraph-support;
     elasticgraph-query_interceptor --> elasticgraph-graphql;
     elasticgraph-query_interceptor --> elasticgraph-schema_artifacts;
     elasticgraph-query_registry --> elasticgraph-graphql;
@@ -242,6 +248,7 @@ graph LR;
     class apollo-federation externalGemCatStyle;
     class elasticgraph-health_check targetGemStyle;
     class elasticgraph-datastore_core otherEgGemStyle;
+    class elasticgraph-json_ingestion targetGemStyle;
     class elasticgraph-query_interceptor targetGemStyle;
     class elasticgraph-schema_artifacts otherEgGemStyle;
     class elasticgraph-query_registry targetGemStyle;

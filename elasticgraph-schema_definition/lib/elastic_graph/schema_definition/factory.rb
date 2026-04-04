@@ -58,6 +58,10 @@ module ElasticGraph
     class Factory
       include Mixins::HasReadableToSAndInspect.new
 
+      # @dynamic state
+      # @return [State] schema definition state shared with the factory's API
+      attr_reader :state
+
       def initialize(state)
         @state = state
       end
@@ -226,7 +230,7 @@ module ElasticGraph
 
       def new_object_type(name)
         @@object_type_new.call(@state, name.to_s) do |object_type|
-          yield object_type if block_given?
+          yield object_type
         end
       end
       @@object_type_new = prevent_non_factory_instantiation_of(SchemaElements::ObjectType)
@@ -291,15 +295,15 @@ module ElasticGraph
       def new_schema_artifact_manager(
         schema_definition_results:,
         schema_artifacts_directory:,
-        enforce_json_schema_version:,
         output:,
+        extension_artifact_options: {},
         max_diff_lines: 50
       )
         @@schema_artifact_manager_new.call(
           schema_definition_results:,
           schema_artifacts_directory:,
-          enforce_json_schema_version:,
           output:,
+          extension_artifact_options:,
           max_diff_lines:
         )
       end

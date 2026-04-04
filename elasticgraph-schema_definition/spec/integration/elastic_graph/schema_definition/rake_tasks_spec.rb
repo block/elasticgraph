@@ -859,7 +859,7 @@ module ElasticGraph
               index_document_sizes: true,
               path_to_schema: "\#{project_root}/config/schema.rb",
               schema_artifacts_directory: "\#{project_root}/config/schema/artifacts",
-              enforce_json_schema_version: false
+              extension_artifact_options: {enforce_json_schema_version: false}
             )
           EOS
 
@@ -1086,8 +1086,11 @@ module ElasticGraph
             index_document_sizes: true,
             path_to_schema: path_to_schema,
             schema_artifacts_directory: "config/schema/artifacts",
-            enforce_json_schema_version: enforce_json_schema_version,
-            extension_modules: [extension_module].compact,
+            extension_artifact_options: {enforce_json_schema_version: enforce_json_schema_version},
+            # Always include the JSON ingestion default so tests exercise the same artifact set
+            # that production apps get (otherwise `json_schemas.yaml` and the versioned schema files
+            # are skipped, breaking artifact-count assertions).
+            extension_modules: ::ElasticGraph::SchemaDefinition::ExtensionModuleSupport.default_extension_modules + [extension_module].compact,
             derived_type_name_formats: derived_type_name_formats,
             type_name_overrides: type_name_overrides,
             enum_value_overrides_by_type: enum_value_overrides_by_type,

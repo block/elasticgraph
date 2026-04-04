@@ -1,0 +1,14 @@
+module ElasticGraph
+  module JSONIngestion
+    module SchemaDefinition
+      module StateExtension: ::ElasticGraph::SchemaDefinition::State
+        attr_accessor json_schema_version: ::Integer?
+        attr_accessor json_schema_version_setter_location: ::Thread::Backtrace::Location?
+        attr_accessor allow_omitted_json_schema_fields: bool
+        attr_accessor allow_extra_json_schema_fields: bool
+
+        def self.extended: (::ElasticGraph::SchemaDefinition::State & StateExtension) -> void
+      end
+    end
+  end
+end

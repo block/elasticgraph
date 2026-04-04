@@ -1,0 +1,7 @@
+module ElasticGraph
+  module SchemaDefinition
+    module ExtensionModuleSupport
+      def self.default_extension_modules: () -> ::Array[::Module]
+    end
+  end
+end

@@ -1,0 +1,13 @@
+module ElasticGraph
+  module JSONIngestion
+    module SchemaDefinition
+      module Indexing
+        module FieldType
+          module UnionExtension: ::ElasticGraph::SchemaDefinition::Indexing::FieldType::Union
+            include _JSONFieldType
+          end
+        end
+      end
+    end
+  end
+end

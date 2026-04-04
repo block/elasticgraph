@@ -1,0 +1,17 @@
+module ElasticGraph
+  module JSONIngestion
+    module SchemaDefinition
+      module FactoryExtension: ::ElasticGraph::SchemaDefinition::Factory
+        def new_enum_type: (::String) ?{ (::ElasticGraph::SchemaDefinition::SchemaElements::EnumType & SchemaElements::EnumTypeExtension) -> void } -> (::ElasticGraph::SchemaDefinition::SchemaElements::EnumType & SchemaElements::EnumTypeExtension)
+        def new_field: (**untyped) ?{ (::ElasticGraph::SchemaDefinition::SchemaElements::Field & SchemaElements::FieldExtension) -> void } -> (::ElasticGraph::SchemaDefinition::SchemaElements::Field & SchemaElements::FieldExtension)
+        def new_index: (::String, ::Hash[::String, untyped], ::ElasticGraph::SchemaDefinition::indexableType) ?{ (::ElasticGraph::SchemaDefinition::Indexing::Index & Indexing::IndexExtension) -> void } -> (::ElasticGraph::SchemaDefinition::Indexing::Index & Indexing::IndexExtension)
+        def new_interface_type: (::String) ?{ (::ElasticGraph::SchemaDefinition::SchemaElements::InterfaceType & SchemaElements::ObjectInterfaceExtension) -> void } -> (::ElasticGraph::SchemaDefinition::SchemaElements::InterfaceType & SchemaElements::ObjectInterfaceExtension)
+        def new_object_type: (::String) ?{ (::ElasticGraph::SchemaDefinition::SchemaElements::ObjectType & SchemaElements::ObjectInterfaceExtension) -> void } -> (::ElasticGraph::SchemaDefinition::SchemaElements::ObjectType & SchemaElements::ObjectInterfaceExtension)
+        def new_scalar_type: (::String) ?{ (::ElasticGraph::SchemaDefinition::SchemaElements::ScalarType & SchemaElements::ScalarTypeExtension) -> void } -> (::ElasticGraph::SchemaDefinition::SchemaElements::ScalarType & SchemaElements::ScalarTypeExtension)
+        def new_type_reference: (::String) -> ::ElasticGraph::SchemaDefinition::SchemaElements::TypeReference
+        def new_results: () -> ::ElasticGraph::SchemaDefinition::Results
+        def new_schema_artifact_manager: (**untyped) -> ::ElasticGraph::SchemaDefinition::SchemaArtifactManager
+      end
+    end
+  end
+end

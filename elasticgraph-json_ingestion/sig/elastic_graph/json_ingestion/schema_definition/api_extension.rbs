@@ -1,0 +1,18 @@
+module ElasticGraph
+  module JSONIngestion
+    module SchemaDefinition
+      module APIExtension: ::ElasticGraph::SchemaDefinition::API
+        BUILT_IN_SCALAR_JSON_SCHEMA_OPTIONS_BY_NAME: ::Hash[::String, ::Hash[::Symbol, untyped]]
+
+        def json_schema_version: (::Integer) -> void
+        def json_schema_strictness: (?allow_omitted_fields: bool, ?allow_extra_fields: bool) -> void
+
+        def self.extended: (::ElasticGraph::SchemaDefinition::API & APIExtension) -> void
+
+        private
+
+        def json_ingestion_state: () -> (::ElasticGraph::SchemaDefinition::State & StateExtension)
+      end
+    end
+  end
+end

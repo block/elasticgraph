@@ -3,29 +3,26 @@ module ElasticGraph
     module Indexing
       module FieldType
         class ObjectSuperType
+          attr_reader schema_def_state: State
           attr_reader type_name: ::String
           attr_reader subfields: ::Array[Field]
           attr_reader mapping_options: Mixins::HasTypeInfo::optionsHash
-          attr_reader json_schema_options: Mixins::HasTypeInfo::optionsHash
           attr_reader doc_comment: ::String?
-          attr_reader schema_def_state: State
 
           def initialize: (
+            schema_def_state: State,
             type_name: ::String,
             subfields: ::Array[Field],
             mapping_options: Mixins::HasTypeInfo::optionsHash,
-            json_schema_options: Mixins::HasTypeInfo::optionsHash,
-            doc_comment: ::String?,
-            schema_def_state: State
+            doc_comment: ::String?
           ) -> void
 
           def with: (
+            ?schema_def_state: State,
             ?type_name: ::String,
             ?subfields: ::Array[Field],
             ?mapping_options: Mixins::HasTypeInfo::optionsHash,
-            ?json_schema_options: Mixins::HasTypeInfo::optionsHash,
-            ?doc_comment: ::String?,
-            ?schema_def_state: State
+            ?doc_comment: ::String?
           ) -> Object
         end
 
@@ -34,12 +31,6 @@ module ElasticGraph
           include Support::_MemoizableDataClass
 
           @to_mapping: ::Hash[::String, untyped]?
-          @to_json_schema: ::Hash[::String, untyped]?
-
-          private
-
-          def json_schema_typename_field: () -> ::Hash[::String, untyped]
-          def validate_sourced_fields_have_no_json_schema_overrides: (::Array[Field]) -> void
         end
       end
     end

@@ -43,6 +43,10 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "elasticgraph-graphql", ElasticGraph::VERSION # needed since we validate that scalar `coerce_with` options are valid (which loads scalar coercion adapters)
   spec.add_dependency "elasticgraph-indexer", ElasticGraph::VERSION # needed since we validate that scalar `prepare_for_indexing_with` options are valid (which loads indexing preparer adapters)
+  # `elasticgraph-json_ingestion` is the default ingestion serializer extension. It's a soft dep here
+  # so `default_extension_modules` can fall back to `[]` when the gem isn't installed (e.g. for apps
+  # that supply a different serializer via `Gemfile-custom`), but most apps want it.
+  spec.add_dependency "elasticgraph-json_ingestion", ElasticGraph::VERSION
   spec.add_dependency "elasticgraph-schema_artifacts", ElasticGraph::VERSION
   spec.add_dependency "elasticgraph-support", ElasticGraph::VERSION
   spec.add_dependency "graphql", "~> 2.6.1"

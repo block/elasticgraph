@@ -5,10 +5,8 @@ module ElasticGraph
         attr_reader name: ::String
         attr_reader name_in_index: ::String
         attr_reader type: SchemaElements::TypeReference
-        attr_reader json_schema_layers: jsonSchemaLayersArray
         attr_reader indexing_field_type: _FieldType
         attr_reader accuracy_confidence: Field::accuracyConfidence
-        attr_reader json_schema_customizations: ::Hash[::Symbol, untyped]
         attr_reader mapping_customizations: ::Hash[::Symbol, untyped]
         attr_reader source: SchemaElements::FieldSource?
         attr_accessor runtime_field_script: ::String?
@@ -18,10 +16,8 @@ module ElasticGraph
           name: ::String,
           name_in_index: ::String,
           type: SchemaElements::TypeReference,
-          json_schema_layers: jsonSchemaLayersArray,
           indexing_field_type: _FieldType,
           accuracy_confidence: Field::accuracyConfidence,
-          json_schema_customizations: ::Hash[::Symbol, untyped],
           mapping_customizations: ::Hash[::Symbol, untyped],
           source: SchemaElements::FieldSource?,
           runtime_field_script: ::String?,
@@ -32,10 +28,8 @@ module ElasticGraph
           ?name: ::String,
           ?name_in_index: ::String,
           ?type: SchemaElements::TypeReference,
-          ?json_schema_layers: jsonSchemaLayersArray,
           ?indexing_field_type: _FieldType,
           ?accuracy_confidence: Field::accuracyConfidence,
-          ?json_schema_customizations: ::Hash[::Symbol, untyped],
           ?mapping_customizations: ::Hash[::Symbol, untyped],
           ?source: SchemaElements::FieldSource?,
           ?runtime_field_script: ::String?,
@@ -44,25 +38,11 @@ module ElasticGraph
       end
 
       class Field < FieldSupertype
-        JSON_SCHEMA_OVERRIDES_BY_MAPPING_TYPE: ::Hash[::String, untyped]
-
         type accuracyConfidence = SchemaElements::Field::accuracyConfidence
         @mapping: ::Hash[::String, untyped]?
         def mapping: () -> ::Hash[::String, untyped]
-        def json_schema: () -> ::Hash[::String, untyped]
-        def json_schema_metadata: () -> JSONSchemaFieldMetadata
 
         def self.normalized_mapping_hash_for: (::Array[Field]) -> ::Hash[::String, untyped]
-
-        def inner_json_schema: () -> ::Hash[::String, untyped]
-        def outer_json_schema_customizations: () -> ::Hash[::String, untyped]
-
-        def nullable?: () -> bool
-
-        def user_specified_json_schema_customizations_go_on_outside?: () -> bool
-        def process_layer: (::Symbol, ::Hash[::String, untyped]) -> ::Hash[::String, untyped]
-        def make_nullable: (::Hash[::String, untyped]) -> ::Hash[::String, untyped]
-        def make_array: (::Hash[::String, untyped]) -> ::Hash[::String, untyped]
       end
     end
   end

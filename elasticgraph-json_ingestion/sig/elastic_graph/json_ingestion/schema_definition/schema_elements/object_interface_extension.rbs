@@ -1,0 +1,15 @@
+module ElasticGraph
+  module JSONIngestion
+    module SchemaDefinition
+      module SchemaElements
+        module ObjectInterfaceExtension: ::ElasticGraph::SchemaDefinition::SchemaElements::TypeWithSubfields
+          @json_schema_options: ::Hash[::Symbol, untyped]
+
+          def json_schema_options: () -> ::Hash[::Symbol, untyped]
+          def json_schema: (**untyped) -> void
+          def to_indexing_field_type: () -> ((::ElasticGraph::SchemaDefinition::Indexing::FieldType::Object & Indexing::FieldType::ObjectExtension) | ::ElasticGraph::SchemaDefinition::Indexing::FieldType::Union)
+        end
+      end
+    end
+  end
+end

@@ -6,7 +6,6 @@ module ElasticGraph
         attr_reader name_in_index: ::String
         attr_reader type: SchemaElements::TypeReference
         attr_reader mapping_options: ::Hash[::Symbol, untyped]
-        attr_reader json_schema_options: ::Hash[::Symbol, untyped]
         attr_reader accuracy_confidence: Field::accuracyConfidence
         attr_reader source: SchemaElements::FieldSource?
         attr_reader runtime_field_script: ::String?
@@ -17,7 +16,6 @@ module ElasticGraph
           name_in_index: ::String,
           type: SchemaElements::TypeReference,
           mapping_options: ::Hash[::Symbol, untyped],
-          json_schema_options: ::Hash[::Symbol, untyped],
           accuracy_confidence: Field::accuracyConfidence,
           source: SchemaElements::FieldSource?,
           runtime_field_script: ::String?,
@@ -29,7 +27,6 @@ module ElasticGraph
           ?name_in_index: ::String,
           ?type: SchemaElements::TypeReference,
           ?mapping_options: ::Hash[::Symbol, untyped],
-          ?json_schema_options: ::Hash[::Symbol, untyped],
           ?accuracy_confidence: Field::accuracyConfidence,
           ?source: SchemaElements::FieldSource?,
           ?runtime_field_script: ::String?,

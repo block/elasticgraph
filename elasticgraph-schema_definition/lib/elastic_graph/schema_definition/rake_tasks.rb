@@ -8,6 +8,7 @@
 
 require "rake/tasklib"
 require "elastic_graph/schema_artifacts/runtime_metadata/schema_element_names"
+require "elastic_graph/schema_definition/extension_module_support"
 
 module ElasticGraph
   module SchemaDefinition
@@ -40,13 +41,11 @@ module ElasticGraph
       # @param enum_value_overrides_by_type [Hash<Symbol, Hash<Symbol, String>>] overrides for the names of specific enum values for
       #   specific enum types. For example, to rename the `DayOfWeek.MONDAY` enum to `DayOfWeek.MON`, pass `{DayOfWeek: {MONDAY: "MON"}}`.
       # @param extension_modules [Array<Module>] List of Ruby modules to extend onto the `SchemaDefinition::API` instance. Designed to
-      #   support ElasticGraph extension gems (such as `elasticgraph-apollo`).
-      # @param enforce_json_schema_version [Boolean] Whether or not to enforce the requirement that the JSON schema version is incremented
-      #   every time dumping the JSON schemas results in a changed artifact. Generally speaking, you will want this to be `true` for any
-      #   ElasticGraph application that is in production as the versioning of JSON schemas is what supports safe schema evolution as it
-      #   allows ElasticGraph to identify which version of the JSON schema the publishing system was operating on when it published an
-      #   event. It can be useful to set it to `false` before your application is in production, as you do not want to be forced to bump
-      #   the version after every single schema change while you are building an initial prototype.
+      #   support ElasticGraph extension gems (such as `elasticgraph-apollo` and `elasticgraph-json_ingestion`). Defaults to
+      #   {ExtensionModuleSupport.default_extension_modules}, which includes the JSON Schema ingestion serializer when
+      #   `elasticgraph-json_ingestion` is installed.
+      # @param extension_artifact_options [Hash<Symbol, Object>] Hash of options forwarded to extension-defined schema artifacts. The JSON
+      #   Schema serializer reads `:enforce_json_schema_version` from this hash; other ingestion serializer extensions can read their own keys.
       # @param output [IO] used for printing task output
       #
       # @example Minimal setup with defaults
@@ -116,8 +115,8 @@ module ElasticGraph
         derived_type_name_formats: {},
         type_name_overrides: {},
         enum_value_overrides_by_type: {},
-        extension_modules: [],
-        enforce_json_schema_version: true,
+        extension_modules: ExtensionModuleSupport.default_extension_modules,
+        extension_artifact_options: {},
         output: $stdout
       )
         @schema_element_names = SchemaArtifacts::RuntimeMetadata::SchemaElementNames.new(
@@ -131,7 +130,7 @@ module ElasticGraph
         @index_document_sizes = index_document_sizes
         @path_to_schema = path_to_schema
         @schema_artifacts_directory = schema_artifacts_directory
-        @enforce_json_schema_version = enforce_json_schema_version
+        @extension_artifact_options = extension_artifact_options
         @extension_modules = extension_modules
         @output = output
 
@@ -164,7 +163,7 @@ module ElasticGraph
         schema_def_api.factory.new_schema_artifact_manager(
           schema_definition_results: schema_def_api.results,
           schema_artifacts_directory: @schema_artifacts_directory.to_s,
-          enforce_json_schema_version: @enforce_json_schema_version,
+          extension_artifact_options: @extension_artifact_options,
           output: @output,
           max_diff_lines: max_diff_lines
         )

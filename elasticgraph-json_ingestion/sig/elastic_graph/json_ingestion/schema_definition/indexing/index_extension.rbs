@@ -1,0 +1,20 @@
+module ElasticGraph
+  module JSONIngestion
+    module SchemaDefinition
+      module Indexing
+        interface _JSONFieldPath
+          def last_part: () -> (::ElasticGraph::SchemaDefinition::SchemaElements::Field & SchemaElements::FieldExtension)
+          def path_parts: () -> ::Array[::ElasticGraph::SchemaDefinition::SchemaElements::Field & SchemaElements::FieldExtension]
+          def type: () -> ::ElasticGraph::SchemaDefinition::SchemaElements::TypeReference
+          def full_description: () -> ::String
+        end
+
+        module IndexExtension: ::ElasticGraph::SchemaDefinition::Indexing::Index
+          def require_id_in_json_schema: () -> void
+          def rollover: (::Symbol, ::String) -> void
+          def route_with: (::String) -> void
+        end
+      end
+    end
+  end
+end

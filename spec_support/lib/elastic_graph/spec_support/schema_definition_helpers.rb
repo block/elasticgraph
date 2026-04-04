@@ -17,7 +17,7 @@ require "elastic_graph/schema_definition/test_support"
     schema_elements,
     index_document_sizes: true,
     json_schema_version: 1,
-    extension_modules: [],
+    extension_modules: ElasticGraph::SchemaDefinition::ExtensionModuleSupport.default_extension_modules,
     derived_type_name_formats: {},
     type_name_overrides: {},
     enum_value_overrides_by_type: {},

@@ -552,7 +552,7 @@ module ElasticGraph
         end
 
         def define_schema(&block)
-          extension_modules = [SchemaDefinition::APIExtension]
+          extension_modules = ::ElasticGraph::SchemaDefinition::ExtensionModuleSupport.default_extension_modules + [SchemaDefinition::APIExtension]
           super(schema_element_name_form: schema_element_name_form, extension_modules: extension_modules, &block)
         end
       end

@@ -7,12 +7,12 @@
 # frozen_string_literal: true
 
 require "elastic_graph/spec_support/schema_definition_helpers"
-require "elastic_graph/schema_definition/indexing/json_schema_with_metadata"
+require "elastic_graph/json_ingestion/schema_definition/indexing/json_schema_with_metadata"
 
 module ElasticGraph
   module SchemaDefinition
     module Indexing
-      ::RSpec.describe JSONSchemaWithMetadata do
+      ::RSpec.describe JSONIngestion::SchemaDefinition::Indexing::JSONSchemaWithMetadata do
         include_context "SchemaDefinitionHelpers"
 
         it "ignores derived indexed types that do not show up in the JSON schema" do
@@ -1062,7 +1062,7 @@ module ElasticGraph
         end
 
         def missing_necessary_field_of(field_type, fully_qualified_path)
-          JSONSchemaWithMetadata::MissingNecessaryField.new(field_type, fully_qualified_path)
+          described_class::MissingNecessaryField.new(field_type, fully_qualified_path)
         end
       end
     end

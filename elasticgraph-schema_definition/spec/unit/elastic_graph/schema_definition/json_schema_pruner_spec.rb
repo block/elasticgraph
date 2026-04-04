@@ -8,11 +8,11 @@
 
 require "elastic_graph/constants"
 require "elastic_graph/spec_support/schema_definition_helpers"
-require "elastic_graph/schema_definition/json_schema_pruner"
+require "elastic_graph/json_ingestion/schema_definition/json_schema_pruner"
 
 module ElasticGraph
   module SchemaDefinition
-    RSpec.describe JSONSchemaPruner do
+    RSpec.describe JSONIngestion::SchemaDefinition::JSONSchemaPruner do
       include_context "SchemaDefinitionHelpers"
 
       describe ".prune" do

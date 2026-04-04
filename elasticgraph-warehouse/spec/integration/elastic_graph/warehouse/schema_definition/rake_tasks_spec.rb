@@ -184,8 +184,9 @@ module ElasticGraph
               index_document_sizes: false,
               path_to_schema: "schema.rb",
               schema_artifacts_directory: "config/schema/artifacts",
-              enforce_json_schema_version: enforce_json_schema_version,
-              extension_modules: [Warehouse::SchemaDefinition::APIExtension],
+              extension_artifact_options: {enforce_json_schema_version: enforce_json_schema_version},
+              # Always include the JSON ingestion default so warehouse tests get the same artifact set as production apps.
+              extension_modules: ::ElasticGraph::SchemaDefinition::ExtensionModuleSupport.default_extension_modules + [Warehouse::SchemaDefinition::APIExtension],
               output: output
             )
           end
