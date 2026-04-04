@@ -31,22 +31,29 @@ ElasticGraph.define_schema do |schema|
 
   schema.object_type "Person" do |t|
     t.implements "NamedInventor"
+    t.root_query_fields plural: "people"
+    t.field "id", "ID!"
     t.field "name", "String"
     t.field "nationality", "String"
+    t.index "people"
   end
 
   schema.object_type "Company" do |t|
     t.implements "NamedInventor"
+    t.root_query_fields plural: "companies"
+    t.field "id", "ID!"
     t.field "name", "String"
     t.field "stock_ticker", "String"
+    t.index "companies"
   end
 
   schema.union_type "Inventor" do |t|
     t.subtypes "Person", "Company"
   end
 
-  # Embedded interface type.
+  # Interface type used both as an embedded field and as a root document type.
   schema.interface_type "NamedInventor" do |t|
+    t.field "id", "ID!"
     t.field "name", "String"
   end
 
@@ -336,6 +343,7 @@ ElasticGraph.define_schema do |schema|
     t.field "id", "ID!"
     t.field "name", "String"
     t.field "created_at", "DateTime!"
+    t.field "ceo", "Person"
     t.relates_to_many "manufactured_parts", "Part", via: "manufacturer_id", dir: :in, singular: "manufactured_part"
     t.relates_to_one "address", "Address", via: "manufacturer_id", dir: :in
 

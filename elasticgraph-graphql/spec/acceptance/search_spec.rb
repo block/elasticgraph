@@ -703,7 +703,7 @@ module ElasticGraph
           build(:component, name: "c1", created_at: "2021-01-01T12:30:00Z"),
           build(:electrical_part, name: "e1"),
           build(:mechanical_part, name: "m1"),
-          build(:manufacturer, name: "m2")
+          build(:manufacturer, name: "m2", ceo: build(:person, name: "Alice", nationality: "Canadian"))
         )
 
         results = call_graphql_query(<<~EOS).dig("data", case_correctly("named_entities"), "edges").map { |e| e["node"] }
@@ -730,6 +730,13 @@ module ElasticGraph
                   ... on Component {
                     created_at
                   }
+
+                  ... on Manufacturer {
+                    ceo {
+                      name
+                      nationality
+                    }
+                  }
                 }
               }
             }
@@ -740,7 +747,7 @@ module ElasticGraph
           {"name" => "c1", case_correctly("created_at") => "2021-01-01T12:30:00.000Z"},
           {"name" => "e1"},
           {"name" => "m1"},
-          {"name" => "m2"},
+          {"name" => "m2", "ceo" => {"name" => "Alice", "nationality" => "Canadian"}},
           {"name" => "w1", case_correctly("named_inventor") => {"name" => "Bob", "nationality" => "Ukrainian"}},
           {"name" => "w2", case_correctly("named_inventor") => {"name" => "Clippy", case_correctly("stock_ticker") => "CLIP"}}
         ]

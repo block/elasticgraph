@@ -14,6 +14,13 @@ tables:
         shapes ARRAY<STRUCT<type STRING, coordinates ARRAY<FLOAT>>>,
         manufacturer_id STRING
       )
+  companies:
+    table_schema: |-
+      CREATE TABLE IF NOT EXISTS companies (
+        id STRING,
+        name STRING,
+        stock_ticker STRING
+      )
   components:
     table_schema: |-
       CREATE TABLE IF NOT EXISTS components (
@@ -45,7 +52,8 @@ tables:
       CREATE TABLE IF NOT EXISTS manufacturers (
         id STRING,
         name STRING,
-        created_at TIMESTAMP
+        created_at TIMESTAMP,
+        ceo STRUCT<id STRING, name STRING, nationality STRING>
       )
   mechanical_parts:
     table_schema: |-
@@ -55,6 +63,13 @@ tables:
         created_at TIMESTAMP,
         material STRING,
         manufacturer_id STRING
+      )
+  people:
+    table_schema: |-
+      CREATE TABLE IF NOT EXISTS people (
+        id STRING,
+        name STRING,
+        nationality STRING
       )
   sponsors:
     table_schema: |-
@@ -123,8 +138,8 @@ tables:
         component_ids ARRAY<STRING>,
         options STRUCT<size STRING, the_sighs STRING, color STRING, is_draft BOOLEAN>,
         the_opts STRUCT<size STRING, the_sighs STRING, color STRING, is_draft BOOLEAN>,
-        inventor STRUCT<name STRING, nationality STRING, stock_ticker STRING, __typename STRING>,
-        named_inventor STRUCT<name STRING, nationality STRING, stock_ticker STRING, __typename STRING>,
+        inventor STRUCT<id STRING, name STRING, nationality STRING, stock_ticker STRING, __typename STRING>,
+        named_inventor STRUCT<id STRING, name STRING, nationality STRING, stock_ticker STRING, __typename STRING>,
         weight_in_ng_str BIGINT,
         weight_in_ng BIGINT,
         tags ARRAY<STRING>,

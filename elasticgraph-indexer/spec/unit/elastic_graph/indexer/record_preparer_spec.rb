@@ -271,6 +271,50 @@ module ElasticGraph
           expect(type_b_record).to eq({"id" => "1", "size" => 3})
         end
 
+        it "`__typename` is injected or omitted depending on whether a type is at the root level or embedded" do
+          preparer = build_preparer do |s|
+            s.object_type "Person" do |t|
+              t.field "id", "ID!"
+              t.field "name", "String"
+            end
+
+            s.object_type "Company" do |t|
+              t.field "id", "ID!"
+              t.field "name", "String"
+            end
+
+            s.union_type "Inventor" do |t|
+              t.subtypes "Person", "Company"
+              t.index "inventors"
+            end
+
+            s.object_type "Manufacturer" do |t|
+              t.field "id", "ID!"
+              t.field "name", "String"
+              t.field "ceo", "Person"
+              t.index "manufacturers"
+            end
+          end
+
+          # When `Person` is prepared as a root record for the shared `inventors` index,
+          # `__typename` must be injected so the index can distinguish `Person` from `Company`.
+          person_record = preparer.prepare_for_index("Person", {"id" => "2", "name" => "Alice"})
+          expect(person_record).to include("__typename" => "Person")
+
+          # When `Person` is embedded in `Manufacturer.ceo`, `__typename` must not be injected
+          # because `Person` is a concrete type there — it is not needed (and would cause errors if left in).
+          manufacturer_record = preparer.prepare_for_index("Manufacturer", {
+            "id" => "1",
+            "name" => "ACME",
+            "ceo" => {"id" => "2", "name" => "Alice"}
+          })
+          expect(manufacturer_record).to eq({
+            "id" => "1",
+            "name" => "ACME",
+            "ceo" => {"id" => "2", "name" => "Alice"}
+          })
+        end
+
         it "handles nested abstract types, properly including `__typename` on them" do
           preparer = build_preparer do |s|
             s.object_type "Person" do |t|

@@ -95,9 +95,16 @@ module ElasticGraph
           [meta.name, meta.eg_meta_by_field_name]
         end
 
-        @types_requiring_typename = type_metas.filter_map do |meta|
+        # Types where the JSON schema has `__typename` in `required` -- meaning the field can hold
+        # multiple subtypes and `__typename` is needed to identify which one.
+        @types_with_typename_required_in_json_schema = type_metas.filter_map do |meta|
           meta.name if meta.requires_typename
-        end.to_set | types_with_typename_in_index_mapping
+        end.to_set
+
+        # Superset of the above: also includes concrete types that inherit an index from an abstract
+        # supertype (e.g. `Person` indexed in the `inventors` index). Used only at the root level
+        # in `prepare_for_index` to inject `__typename` into root documents when needed.
+        @types_requiring_typename = @types_with_typename_required_in_json_schema | types_with_typename_in_index_mapping
       end
 
       # Prepares the given payload for being indexed into the named index.
@@ -115,7 +122,12 @@ module ElasticGraph
       # Note: this method does not mutate the given `record`. Instead it returns a
       # copy with any updates applied to it.
       def prepare_for_index(type_name, record)
-        prepare_value_for_indexing(record, type_name)
+        result = prepare_value_for_indexing(record, type_name) # : ::Hash[::String, untyped]
+        # Add __typename if required but absent (e.g. for a mixed-type index).
+        if result.is_a?(::Hash) && @types_requiring_typename.include?(type_name) && !result.key?("__typename")
+          result["__typename"] = type_name
+        end
+        result
       end
 
       private
@@ -141,22 +153,15 @@ module ElasticGraph
           # what the concrete subtype is. `__typename` is required on abstract types and indicates that.
           eg_meta_by_field_name = @eg_meta_by_field_name_by_concrete_type.fetch(value["__typename"] || type_name)
 
-          prepared_fields = value.filter_map do |field_name, field_value|
+          value.filter_map do |field_name, field_value|
             if field_name == "__typename"
-              # We only want to include __typename if it we're dealing with a type that requires it.
-              # (This is the case for an abstract type, so it can differentiate between which subtype we have
-              [field_name, field_value] if @types_requiring_typename.include?(type_name)
+              # We only want to include __typename if we're dealing with a type that requires it
+              # (i.e. a type that can represent multiple subtypes, so __typename can differentiate between them).
+              [field_name, field_value] if @types_with_typename_required_in_json_schema.include?(type_name)
             elsif (eg_meta = eg_meta_by_field_name[field_name])
               [eg_meta.fetch("nameInIndex"), prepare_value_for_indexing(field_value, eg_meta.fetch("type"))]
             end
           end.to_h
-
-          # Add __typename if required but absent (e.g. for a mixed-type index).
-          if @types_requiring_typename.include?(type_name) && !value.key?("__typename")
-            prepared_fields["__typename"] = type_name
-          end
-
-          prepared_fields
         else
           # We won't have a registered preparer for enum types, since those aren't dumped in
           # runtime metadata `scalar_types_by_name`, and we can just return the value as-is in

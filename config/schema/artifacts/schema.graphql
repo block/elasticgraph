@@ -815,8 +815,277 @@ input ColorListFilterInput {
 }
 
 type Company implements NamedInventor {
+  id: ID!
   name: String
   stock_ticker: String
+}
+
+"""
+Type used to perform aggregation computations on `Company` fields.
+"""
+type CompanyAggregatedValues {
+  """
+  Computed aggregate values for the `id` field.
+  """
+  id: NonNumericAggregatedValues
+
+  """
+  Computed aggregate values for the `name` field.
+  """
+  name: NonNumericAggregatedValues
+
+  """
+  Computed aggregate values for the `stock_ticker` field.
+  """
+  stock_ticker: NonNumericAggregatedValues
+}
+
+"""
+Return type representing a bucket of `Company` documents for an aggregations query.
+"""
+type CompanyAggregation {
+  """
+  Provides computed aggregated values over all `Company` documents in an aggregation bucket.
+  """
+  aggregated_values: CompanyAggregatedValues
+
+  """
+  The count of `Company` documents in an aggregation bucket.
+  """
+  count: JsonSafeLong!
+
+  """
+  Used to specify the `Company` fields to group by. The returned values identify each aggregation bucket.
+  """
+  grouped_by: CompanyGroupedBy
+}
+
+"""
+Represents a paginated collection of `CompanyAggregation` results.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Connection-Types) for more info.
+"""
+type CompanyAggregationConnection {
+  """
+  Wraps a specific `CompanyAggregation` to pair it with its pagination cursor.
+  """
+  edges: [CompanyAggregationEdge!]!
+
+  """
+  The list of `CompanyAggregation` results.
+  """
+  nodes: [CompanyAggregation!]!
+
+  """
+  Provides pagination-related information.
+  """
+  page_info: PageInfo!
+}
+
+"""
+Represents a specific `CompanyAggregation` in the context of a `CompanyAggregationConnection`,
+providing access to both the `CompanyAggregation` and query-specific information such as the pagination `Cursor`.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for more info.
+"""
+type CompanyAggregationEdge {
+  """
+  The `Cursor` of this `CompanyAggregation`. This can be passed in the next query as
+  a `before` or `after` argument to continue paginating from this `CompanyAggregation`.
+  """
+  cursor: Cursor
+
+  """
+  The `CompanyAggregation` of this edge.
+  """
+  node: CompanyAggregation
+}
+
+"""
+Represents a paginated collection of `Company` results.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Connection-Types) for more info.
+"""
+type CompanyConnection {
+  """
+  Wraps a specific `Company` to pair it with its pagination cursor.
+  """
+  edges: [CompanyEdge!]!
+
+  """
+  The list of `Company` results.
+  """
+  nodes: [Company!]!
+
+  """
+  Provides pagination-related information.
+  """
+  page_info: PageInfo!
+
+  """
+  The total number of edges available in this connection to paginate over.
+  """
+  total_edge_count: JsonSafeLong!
+}
+
+"""
+Represents a specific `Company` in the context of a `CompanyConnection`,
+providing access to both the `Company` and query-specific information such as the pagination `Cursor`.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for more info.
+"""
+type CompanyEdge {
+  """
+  All search highlights for this `Company`, indicating where in the indexed document the query matched.
+  """
+  all_highlights: [SearchHighlight!]!
+
+  """
+  The `Cursor` of this `Company`. This can be passed in the next query as
+  a `before` or `after` argument to continue paginating from this `Company`.
+  """
+  cursor: Cursor
+
+  """
+  Specific search highlights for this `Company`, providing matching snippets for the requested fields.
+  """
+  highlights: CompanyHighlights
+
+  """
+  The `Company` of this edge.
+  """
+  node: Company
+}
+
+"""
+Input type used to specify filters on `Company` fields.
+
+Will match all documents if passed as an empty object (or as `null`).
+"""
+input CompanyFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `CompanyFilterInput` input because of collisions
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [CompanyFilterInput!]
+
+  """
+  Matches records where any of the provided sub-filters evaluate to true.
+  This works just like an OR operator in SQL.
+
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
+  """
+  any_of: [CompanyFilterInput!]
+
+  """
+  Used to filter on the `id` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  id: IDFilterInput
+
+  """
+  Used to filter on the `name` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  name: StringFilterInput
+
+  """
+  Matches records where the provided sub-filter evaluates to false.
+  This works just like a NOT operator in SQL.
+
+  When `null` or an empty object is passed, matches no documents.
+  """
+  not: CompanyFilterInput
+
+  """
+  Used to filter on the `stock_ticker` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  stock_ticker: StringFilterInput
+}
+
+"""
+Type used to specify the `Company` fields to group by for aggregations.
+"""
+type CompanyGroupedBy {
+  """
+  The `name` field value for this group.
+  """
+  name: String
+
+  """
+  The `stock_ticker` field value for this group.
+  """
+  stock_ticker: String
+}
+
+"""
+Type used to request desired `Company` search highlight fields.
+"""
+type CompanyHighlights {
+  """
+  Search highlights for the `id`, providing snippets of the matching text.
+  """
+  id: [String!]!
+
+  """
+  Search highlights for the `name`, providing snippets of the matching text.
+  """
+  name: [String!]!
+
+  """
+  Search highlights for the `stock_ticker`, providing snippets of the matching text.
+  """
+  stock_ticker: [String!]!
+}
+
+"""
+Enumerates the ways `Company`s can be sorted.
+"""
+enum CompanySortOrderInput {
+  """
+  Sorts ascending by the `id` field.
+  """
+  id_ASC
+
+  """
+  Sorts descending by the `id` field.
+  """
+  id_DESC
+
+  """
+  Sorts ascending by the `name` field.
+  """
+  name_ASC
+
+  """
+  Sorts descending by the `name` field.
+  """
+  name_DESC
+
+  """
+  Sorts ascending by the `stock_ticker` field.
+  """
+  stock_ticker_ASC
+
+  """
+  Sorts descending by the `stock_ticker` field.
+  """
+  stock_ticker_DESC
 }
 
 type Component implements NamedEntity {
@@ -3524,6 +3793,11 @@ Type used to perform aggregation computations on `Inventor` fields.
 """
 type InventorAggregatedValues {
   """
+  Computed aggregate values for the `id` field.
+  """
+  id: NonNumericAggregatedValues
+
+  """
   Computed aggregate values for the `name` field.
   """
   name: NonNumericAggregatedValues
@@ -3537,6 +3811,127 @@ type InventorAggregatedValues {
   Computed aggregate values for the `stock_ticker` field.
   """
   stock_ticker: NonNumericAggregatedValues
+}
+
+"""
+Return type representing a bucket of `Inventor` documents for an aggregations query.
+"""
+type InventorAggregation {
+  """
+  Provides computed aggregated values over all `Inventor` documents in an aggregation bucket.
+  """
+  aggregated_values: InventorAggregatedValues
+
+  """
+  The count of `Inventor` documents in an aggregation bucket.
+  """
+  count: JsonSafeLong!
+
+  """
+  Used to specify the `Inventor` fields to group by. The returned values identify each aggregation bucket.
+  """
+  grouped_by: InventorGroupedBy
+}
+
+"""
+Represents a paginated collection of `InventorAggregation` results.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Connection-Types) for more info.
+"""
+type InventorAggregationConnection {
+  """
+  Wraps a specific `InventorAggregation` to pair it with its pagination cursor.
+  """
+  edges: [InventorAggregationEdge!]!
+
+  """
+  The list of `InventorAggregation` results.
+  """
+  nodes: [InventorAggregation!]!
+
+  """
+  Provides pagination-related information.
+  """
+  page_info: PageInfo!
+}
+
+"""
+Represents a specific `InventorAggregation` in the context of a `InventorAggregationConnection`,
+providing access to both the `InventorAggregation` and query-specific information such as the pagination `Cursor`.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for more info.
+"""
+type InventorAggregationEdge {
+  """
+  The `Cursor` of this `InventorAggregation`. This can be passed in the next query as
+  a `before` or `after` argument to continue paginating from this `InventorAggregation`.
+  """
+  cursor: Cursor
+
+  """
+  The `InventorAggregation` of this edge.
+  """
+  node: InventorAggregation
+}
+
+"""
+Represents a paginated collection of `Inventor` results.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Connection-Types) for more info.
+"""
+type InventorConnection {
+  """
+  Wraps a specific `Inventor` to pair it with its pagination cursor.
+  """
+  edges: [InventorEdge!]!
+
+  """
+  The list of `Inventor` results.
+  """
+  nodes: [Inventor!]!
+
+  """
+  Provides pagination-related information.
+  """
+  page_info: PageInfo!
+
+  """
+  The total number of edges available in this connection to paginate over.
+  """
+  total_edge_count: JsonSafeLong!
+}
+
+"""
+Represents a specific `Inventor` in the context of a `InventorConnection`,
+providing access to both the `Inventor` and query-specific information such as the pagination `Cursor`.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for more info.
+"""
+type InventorEdge {
+  """
+  All search highlights for this `Inventor`, indicating where in the indexed document the query matched.
+  """
+  all_highlights: [SearchHighlight!]!
+
+  """
+  The `Cursor` of this `Inventor`. This can be passed in the next query as
+  a `before` or `after` argument to continue paginating from this `Inventor`.
+  """
+  cursor: Cursor
+
+  """
+  Specific search highlights for this `Inventor`, providing matching snippets for the requested fields.
+  """
+  highlights: InventorHighlights
+
+  """
+  The `Inventor` of this edge.
+  """
+  node: Inventor
 }
 
 """
@@ -3565,6 +3960,13 @@ input InventorFilterInput {
   When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [InventorFilterInput!]
+
+  """
+  Used to filter on the `id` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  id: IDFilterInput
 
   """
   Used to filter on the `name` field.
@@ -3621,6 +4023,11 @@ Type used to request desired `Inventor` search highlight fields.
 """
 type InventorHighlights {
   """
+  Search highlights for the `id`, providing snippets of the matching text.
+  """
+  id: [String!]!
+
+  """
   Search highlights for the `name`, providing snippets of the matching text.
   """
   name: [String!]!
@@ -3634,6 +4041,51 @@ type InventorHighlights {
   Search highlights for the `stock_ticker`, providing snippets of the matching text.
   """
   stock_ticker: [String!]!
+}
+
+"""
+Enumerates the ways `Inventor`s can be sorted.
+"""
+enum InventorSortOrderInput {
+  """
+  Sorts ascending by the `id` field.
+  """
+  id_ASC
+
+  """
+  Sorts descending by the `id` field.
+  """
+  id_DESC
+
+  """
+  Sorts ascending by the `name` field.
+  """
+  name_ASC
+
+  """
+  Sorts descending by the `name` field.
+  """
+  name_DESC
+
+  """
+  Sorts ascending by the `nationality` field.
+  """
+  nationality_ASC
+
+  """
+  Sorts descending by the `nationality` field.
+  """
+  nationality_DESC
+
+  """
+  Sorts ascending by the `stock_ticker` field.
+  """
+  stock_ticker_ASC
+
+  """
+  Sorts descending by the `stock_ticker` field.
+  """
+  stock_ticker_DESC
 }
 
 """
@@ -4266,6 +4718,7 @@ input LongStringFilterInput {
 
 type Manufacturer implements NamedEntity {
   address: Address
+  ceo: Person
   created_at: DateTime!
   id: ID!
 
@@ -4372,6 +4825,11 @@ type Manufacturer implements NamedEntity {
 Type used to perform aggregation computations on `Manufacturer` fields.
 """
 type ManufacturerAggregatedValues {
+  """
+  Computed aggregate values for the `ceo` field.
+  """
+  ceo: PersonAggregatedValues
+
   """
   Computed aggregate values for the `created_at` field.
   """
@@ -4537,6 +4995,13 @@ input ManufacturerFilterInput {
   any_of: [ManufacturerFilterInput!]
 
   """
+  Used to filter on the `ceo` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  ceo: PersonFilterInput
+
+  """
   Used to filter on the `created_at` field.
 
   When `null` or an empty object is passed, matches all documents.
@@ -4571,6 +5036,11 @@ Type used to specify the `Manufacturer` fields to group by for aggregations.
 """
 type ManufacturerGroupedBy {
   """
+  The `ceo` field value for this group.
+  """
+  ceo: PersonGroupedBy
+
+  """
   Offers the different grouping options for the `created_at` value within this group.
   """
   created_at: DateTimeGroupedBy
@@ -4586,6 +5056,11 @@ Type used to request desired `Manufacturer` search highlight fields.
 """
 type ManufacturerHighlights {
   """
+  Search highlights for the `ceo`, providing snippets of the matching text.
+  """
+  ceo: PersonHighlights
+
+  """
   Search highlights for the `id`, providing snippets of the matching text.
   """
   id: [String!]!
@@ -4600,6 +5075,36 @@ type ManufacturerHighlights {
 Enumerates the ways `Manufacturer`s can be sorted.
 """
 enum ManufacturerSortOrderInput {
+  """
+  Sorts ascending by the `ceo.id` field.
+  """
+  ceo_id_ASC
+
+  """
+  Sorts descending by the `ceo.id` field.
+  """
+  ceo_id_DESC
+
+  """
+  Sorts ascending by the `ceo.name` field.
+  """
+  ceo_name_ASC
+
+  """
+  Sorts descending by the `ceo.name` field.
+  """
+  ceo_name_DESC
+
+  """
+  Sorts ascending by the `ceo.nationality` field.
+  """
+  ceo_nationality_ASC
+
+  """
+  Sorts descending by the `ceo.nationality` field.
+  """
+  ceo_nationality_DESC
+
   """
   Sorts ascending by the `created_at` field.
   """
@@ -5400,6 +5905,11 @@ type NamedEntityAggregatedValues {
   amounts: IntAggregatedValues
 
   """
+  Computed aggregate values for the `ceo` field.
+  """
+  ceo: PersonAggregatedValues
+
+  """
   Computed aggregate values for the `cost` field.
   """
   cost: MoneyAggregatedValues
@@ -5740,6 +6250,13 @@ input NamedEntityFilterInput {
   any_of: [NamedEntityFilterInput!]
 
   """
+  Used to filter on the `ceo` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  ceo: PersonFilterInput
+
+  """
   Used to filter on the `cost` field.
 
   When `null` or an empty object is passed, matches all documents.
@@ -6015,6 +6532,11 @@ type NamedEntityGroupedBy {
   amount_cents2: Int
 
   """
+  The `ceo` field value for this group.
+  """
+  ceo: PersonGroupedBy
+
+  """
   The `cost` field value for this group.
   """
   cost: MoneyGroupedBy
@@ -6206,6 +6728,11 @@ Type used to request desired `NamedEntity` search highlight fields.
 """
 type NamedEntityHighlights {
   """
+  Search highlights for the `ceo`, providing snippets of the matching text.
+  """
+  ceo: PersonHighlights
+
+  """
   Search highlights for the `cost`, providing snippets of the matching text.
   """
   cost: MoneyHighlights
@@ -6356,6 +6883,36 @@ enum NamedEntitySortOrderInput {
   amount_cents_DESC
 
   """
+  Sorts ascending by the `ceo.id` field.
+  """
+  ceo_id_ASC
+
+  """
+  Sorts descending by the `ceo.id` field.
+  """
+  ceo_id_DESC
+
+  """
+  Sorts ascending by the `ceo.name` field.
+  """
+  ceo_name_ASC
+
+  """
+  Sorts descending by the `ceo.name` field.
+  """
+  ceo_name_DESC
+
+  """
+  Sorts ascending by the `ceo.nationality` field.
+  """
+  ceo_nationality_ASC
+
+  """
+  Sorts descending by the `ceo.nationality` field.
+  """
+  ceo_nationality_DESC
+
+  """
   Sorts ascending by the `cost.amount_cents` field.
   """
   cost_amount_cents_ASC
@@ -6476,6 +7033,16 @@ enum NamedEntitySortOrderInput {
   id_DESC
 
   """
+  Sorts ascending by the `inventor.id` field.
+  """
+  inventor_id_ASC
+
+  """
+  Sorts descending by the `inventor.id` field.
+  """
+  inventor_id_DESC
+
+  """
   Sorts ascending by the `inventor.name` field.
   """
   inventor_name_ASC
@@ -6534,6 +7101,16 @@ enum NamedEntitySortOrderInput {
   Sorts descending by the `name` field.
   """
   name_DESC
+
+  """
+  Sorts ascending by the `named_inventor.id` field.
+  """
+  named_inventor_id_ASC
+
+  """
+  Sorts descending by the `named_inventor.id` field.
+  """
+  named_inventor_id_DESC
 
   """
   Sorts ascending by the `named_inventor.name` field.
@@ -6757,6 +7334,7 @@ enum NamedEntitySortOrderInput {
 }
 
 interface NamedInventor {
+  id: ID!
   name: String
 }
 
@@ -6764,6 +7342,11 @@ interface NamedInventor {
 Type used to perform aggregation computations on `NamedInventor` fields.
 """
 type NamedInventorAggregatedValues {
+  """
+  Computed aggregate values for the `id` field.
+  """
+  id: NonNumericAggregatedValues
+
   """
   Computed aggregate values for the `name` field.
   """
@@ -6778,6 +7361,127 @@ type NamedInventorAggregatedValues {
   Computed aggregate values for the `stock_ticker` field.
   """
   stock_ticker: NonNumericAggregatedValues
+}
+
+"""
+Return type representing a bucket of `NamedInventor` documents for an aggregations query.
+"""
+type NamedInventorAggregation {
+  """
+  Provides computed aggregated values over all `NamedInventor` documents in an aggregation bucket.
+  """
+  aggregated_values: NamedInventorAggregatedValues
+
+  """
+  The count of `NamedInventor` documents in an aggregation bucket.
+  """
+  count: JsonSafeLong!
+
+  """
+  Used to specify the `NamedInventor` fields to group by. The returned values identify each aggregation bucket.
+  """
+  grouped_by: NamedInventorGroupedBy
+}
+
+"""
+Represents a paginated collection of `NamedInventorAggregation` results.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Connection-Types) for more info.
+"""
+type NamedInventorAggregationConnection {
+  """
+  Wraps a specific `NamedInventorAggregation` to pair it with its pagination cursor.
+  """
+  edges: [NamedInventorAggregationEdge!]!
+
+  """
+  The list of `NamedInventorAggregation` results.
+  """
+  nodes: [NamedInventorAggregation!]!
+
+  """
+  Provides pagination-related information.
+  """
+  page_info: PageInfo!
+}
+
+"""
+Represents a specific `NamedInventorAggregation` in the context of a `NamedInventorAggregationConnection`,
+providing access to both the `NamedInventorAggregation` and query-specific information such as the pagination `Cursor`.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for more info.
+"""
+type NamedInventorAggregationEdge {
+  """
+  The `Cursor` of this `NamedInventorAggregation`. This can be passed in the next query as
+  a `before` or `after` argument to continue paginating from this `NamedInventorAggregation`.
+  """
+  cursor: Cursor
+
+  """
+  The `NamedInventorAggregation` of this edge.
+  """
+  node: NamedInventorAggregation
+}
+
+"""
+Represents a paginated collection of `NamedInventor` results.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Connection-Types) for more info.
+"""
+type NamedInventorConnection {
+  """
+  Wraps a specific `NamedInventor` to pair it with its pagination cursor.
+  """
+  edges: [NamedInventorEdge!]!
+
+  """
+  The list of `NamedInventor` results.
+  """
+  nodes: [NamedInventor!]!
+
+  """
+  Provides pagination-related information.
+  """
+  page_info: PageInfo!
+
+  """
+  The total number of edges available in this connection to paginate over.
+  """
+  total_edge_count: JsonSafeLong!
+}
+
+"""
+Represents a specific `NamedInventor` in the context of a `NamedInventorConnection`,
+providing access to both the `NamedInventor` and query-specific information such as the pagination `Cursor`.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for more info.
+"""
+type NamedInventorEdge {
+  """
+  All search highlights for this `NamedInventor`, indicating where in the indexed document the query matched.
+  """
+  all_highlights: [SearchHighlight!]!
+
+  """
+  The `Cursor` of this `NamedInventor`. This can be passed in the next query as
+  a `before` or `after` argument to continue paginating from this `NamedInventor`.
+  """
+  cursor: Cursor
+
+  """
+  Specific search highlights for this `NamedInventor`, providing matching snippets for the requested fields.
+  """
+  highlights: NamedInventorHighlights
+
+  """
+  The `NamedInventor` of this edge.
+  """
+  node: NamedInventor
 }
 
 """
@@ -6806,6 +7510,13 @@ input NamedInventorFilterInput {
   When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [NamedInventorFilterInput!]
+
+  """
+  Used to filter on the `id` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  id: IDFilterInput
 
   """
   Used to filter on the `name` field.
@@ -6862,6 +7573,11 @@ Type used to request desired `NamedInventor` search highlight fields.
 """
 type NamedInventorHighlights {
   """
+  Search highlights for the `id`, providing snippets of the matching text.
+  """
+  id: [String!]!
+
+  """
   Search highlights for the `name`, providing snippets of the matching text.
   """
   name: [String!]!
@@ -6875,6 +7591,51 @@ type NamedInventorHighlights {
   Search highlights for the `stock_ticker`, providing snippets of the matching text.
   """
   stock_ticker: [String!]!
+}
+
+"""
+Enumerates the ways `NamedInventor`s can be sorted.
+"""
+enum NamedInventorSortOrderInput {
+  """
+  Sorts ascending by the `id` field.
+  """
+  id_ASC
+
+  """
+  Sorts descending by the `id` field.
+  """
+  id_DESC
+
+  """
+  Sorts ascending by the `name` field.
+  """
+  name_ASC
+
+  """
+  Sorts descending by the `name` field.
+  """
+  name_DESC
+
+  """
+  Sorts ascending by the `nationality` field.
+  """
+  nationality_ASC
+
+  """
+  Sorts descending by the `nationality` field.
+  """
+  nationality_DESC
+
+  """
+  Sorts ascending by the `stock_ticker` field.
+  """
+  stock_ticker_ASC
+
+  """
+  Sorts descending by the `stock_ticker` field.
+  """
+  stock_ticker_DESC
 }
 
 """
@@ -7246,8 +8007,277 @@ enum PartSortOrderInput {
 }
 
 type Person implements NamedInventor {
+  id: ID!
   name: String
   nationality: String
+}
+
+"""
+Type used to perform aggregation computations on `Person` fields.
+"""
+type PersonAggregatedValues {
+  """
+  Computed aggregate values for the `id` field.
+  """
+  id: NonNumericAggregatedValues
+
+  """
+  Computed aggregate values for the `name` field.
+  """
+  name: NonNumericAggregatedValues
+
+  """
+  Computed aggregate values for the `nationality` field.
+  """
+  nationality: NonNumericAggregatedValues
+}
+
+"""
+Return type representing a bucket of `Person` documents for an aggregations query.
+"""
+type PersonAggregation {
+  """
+  Provides computed aggregated values over all `Person` documents in an aggregation bucket.
+  """
+  aggregated_values: PersonAggregatedValues
+
+  """
+  The count of `Person` documents in an aggregation bucket.
+  """
+  count: JsonSafeLong!
+
+  """
+  Used to specify the `Person` fields to group by. The returned values identify each aggregation bucket.
+  """
+  grouped_by: PersonGroupedBy
+}
+
+"""
+Represents a paginated collection of `PersonAggregation` results.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Connection-Types) for more info.
+"""
+type PersonAggregationConnection {
+  """
+  Wraps a specific `PersonAggregation` to pair it with its pagination cursor.
+  """
+  edges: [PersonAggregationEdge!]!
+
+  """
+  The list of `PersonAggregation` results.
+  """
+  nodes: [PersonAggregation!]!
+
+  """
+  Provides pagination-related information.
+  """
+  page_info: PageInfo!
+}
+
+"""
+Represents a specific `PersonAggregation` in the context of a `PersonAggregationConnection`,
+providing access to both the `PersonAggregation` and query-specific information such as the pagination `Cursor`.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for more info.
+"""
+type PersonAggregationEdge {
+  """
+  The `Cursor` of this `PersonAggregation`. This can be passed in the next query as
+  a `before` or `after` argument to continue paginating from this `PersonAggregation`.
+  """
+  cursor: Cursor
+
+  """
+  The `PersonAggregation` of this edge.
+  """
+  node: PersonAggregation
+}
+
+"""
+Represents a paginated collection of `Person` results.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Connection-Types) for more info.
+"""
+type PersonConnection {
+  """
+  Wraps a specific `Person` to pair it with its pagination cursor.
+  """
+  edges: [PersonEdge!]!
+
+  """
+  The list of `Person` results.
+  """
+  nodes: [Person!]!
+
+  """
+  Provides pagination-related information.
+  """
+  page_info: PageInfo!
+
+  """
+  The total number of edges available in this connection to paginate over.
+  """
+  total_edge_count: JsonSafeLong!
+}
+
+"""
+Represents a specific `Person` in the context of a `PersonConnection`,
+providing access to both the `Person` and query-specific information such as the pagination `Cursor`.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for more info.
+"""
+type PersonEdge {
+  """
+  All search highlights for this `Person`, indicating where in the indexed document the query matched.
+  """
+  all_highlights: [SearchHighlight!]!
+
+  """
+  The `Cursor` of this `Person`. This can be passed in the next query as
+  a `before` or `after` argument to continue paginating from this `Person`.
+  """
+  cursor: Cursor
+
+  """
+  Specific search highlights for this `Person`, providing matching snippets for the requested fields.
+  """
+  highlights: PersonHighlights
+
+  """
+  The `Person` of this edge.
+  """
+  node: Person
+}
+
+"""
+Input type used to specify filters on `Person` fields.
+
+Will match all documents if passed as an empty object (or as `null`).
+"""
+input PersonFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `PersonFilterInput` input because of collisions
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [PersonFilterInput!]
+
+  """
+  Matches records where any of the provided sub-filters evaluate to true.
+  This works just like an OR operator in SQL.
+
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
+  """
+  any_of: [PersonFilterInput!]
+
+  """
+  Used to filter on the `id` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  id: IDFilterInput
+
+  """
+  Used to filter on the `name` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  name: StringFilterInput
+
+  """
+  Used to filter on the `nationality` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  nationality: StringFilterInput
+
+  """
+  Matches records where the provided sub-filter evaluates to false.
+  This works just like a NOT operator in SQL.
+
+  When `null` or an empty object is passed, matches no documents.
+  """
+  not: PersonFilterInput
+}
+
+"""
+Type used to specify the `Person` fields to group by for aggregations.
+"""
+type PersonGroupedBy {
+  """
+  The `name` field value for this group.
+  """
+  name: String
+
+  """
+  The `nationality` field value for this group.
+  """
+  nationality: String
+}
+
+"""
+Type used to request desired `Person` search highlight fields.
+"""
+type PersonHighlights {
+  """
+  Search highlights for the `id`, providing snippets of the matching text.
+  """
+  id: [String!]!
+
+  """
+  Search highlights for the `name`, providing snippets of the matching text.
+  """
+  name: [String!]!
+
+  """
+  Search highlights for the `nationality`, providing snippets of the matching text.
+  """
+  nationality: [String!]!
+}
+
+"""
+Enumerates the ways `Person`s can be sorted.
+"""
+enum PersonSortOrderInput {
+  """
+  Sorts ascending by the `id` field.
+  """
+  id_ASC
+
+  """
+  Sorts descending by the `id` field.
+  """
+  id_DESC
+
+  """
+  Sorts ascending by the `name` field.
+  """
+  name_ASC
+
+  """
+  Sorts descending by the `name` field.
+  """
+  name_DESC
+
+  """
+  Sorts ascending by the `nationality` field.
+  """
+  nationality_ASC
+
+  """
+  Sorts descending by the `nationality` field.
+  """
+  nationality_DESC
 }
 
 type Player {
@@ -7996,6 +9026,109 @@ type Query {
   ): AddressConnection
 
   """
+  Fetches `Company`s based on the provided arguments.
+  """
+  companies(
+    """
+    Used to forward-paginate through the `companies`. When provided, the next page after the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    after: Cursor
+
+    """
+    Used to backward-paginate through the `companies`. When provided, the previous page before the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    before: Cursor
+
+    """
+    Used to filter the returned `companies` based on the provided criteria.
+    """
+    filter: CompanyFilterInput
+
+    """
+    Used in conjunction with the `after` argument to forward-paginate through the `companies`.
+    When provided, limits the number of returned results to the first `n` after the provided
+    `after` cursor (or from the start of the `companies`, if no `after` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    first: Int
+
+    """
+    Used in conjunction with the `before` argument to backward-paginate through the `companies`.
+    When provided, limits the number of returned results to the last `n` before the provided
+    `before` cursor (or from the end of the `companies`, if no `before` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    last: Int
+
+    """
+    Used to specify how the returned `companies` should be sorted.
+    """
+    order_by: [CompanySortOrderInput!]
+  ): CompanyConnection
+
+  """
+  Aggregations over the `companies` data:
+
+  > Fetches `Company`s based on the provided arguments.
+  """
+  company_aggregations(
+    """
+    Used to forward-paginate through the `company_aggregations`. When provided, the next page after the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    after: Cursor
+
+    """
+    Used to backward-paginate through the `company_aggregations`. When provided, the previous page before the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    before: Cursor
+
+    """
+    Used to filter the `Company` documents that get aggregated over based on the provided criteria.
+    """
+    filter: CompanyFilterInput
+
+    """
+    Used in conjunction with the `after` argument to forward-paginate through the `company_aggregations`.
+    When provided, limits the number of returned results to the first `n` after the provided
+    `after` cursor (or from the start of the `company_aggregations`, if no `after` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    first: Int
+
+    """
+    Used in conjunction with the `before` argument to backward-paginate through the `company_aggregations`.
+    When provided, limits the number of returned results to the last `n` before the provided
+    `before` cursor (or from the end of the `company_aggregations`, if no `before` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    last: Int
+  ): CompanyAggregationConnection
+
+  """
   Aggregations over the `components` data:
 
   > Fetches `Component`s based on the provided arguments.
@@ -8200,6 +9333,109 @@ type Query {
     """
     order_by: [ElectricalPartSortOrderInput!]
   ): ElectricalPartConnection
+
+  """
+  Aggregations over the `inventors` data:
+
+  > Fetches `Inventor`s based on the provided arguments.
+  """
+  inventor_aggregations(
+    """
+    Used to forward-paginate through the `inventor_aggregations`. When provided, the next page after the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    after: Cursor
+
+    """
+    Used to backward-paginate through the `inventor_aggregations`. When provided, the previous page before the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    before: Cursor
+
+    """
+    Used to filter the `Inventor` documents that get aggregated over based on the provided criteria.
+    """
+    filter: InventorFilterInput
+
+    """
+    Used in conjunction with the `after` argument to forward-paginate through the `inventor_aggregations`.
+    When provided, limits the number of returned results to the first `n` after the provided
+    `after` cursor (or from the start of the `inventor_aggregations`, if no `after` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    first: Int
+
+    """
+    Used in conjunction with the `before` argument to backward-paginate through the `inventor_aggregations`.
+    When provided, limits the number of returned results to the last `n` before the provided
+    `before` cursor (or from the end of the `inventor_aggregations`, if no `before` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    last: Int
+  ): InventorAggregationConnection
+
+  """
+  Fetches `Inventor`s based on the provided arguments.
+  """
+  inventors(
+    """
+    Used to forward-paginate through the `inventors`. When provided, the next page after the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    after: Cursor
+
+    """
+    Used to backward-paginate through the `inventors`. When provided, the previous page before the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    before: Cursor
+
+    """
+    Used to filter the returned `inventors` based on the provided criteria.
+    """
+    filter: InventorFilterInput
+
+    """
+    Used in conjunction with the `after` argument to forward-paginate through the `inventors`.
+    When provided, limits the number of returned results to the first `n` after the provided
+    `after` cursor (or from the start of the `inventors`, if no `after` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    first: Int
+
+    """
+    Used in conjunction with the `before` argument to backward-paginate through the `inventors`.
+    When provided, limits the number of returned results to the last `n` before the provided
+    `before` cursor (or from the end of the `inventors`, if no `before` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    last: Int
+
+    """
+    Used to specify how the returned `inventors` should be sorted.
+    """
+    order_by: [InventorSortOrderInput!]
+  ): InventorConnection
 
   """
   Aggregations over the `manufacturers` data:
@@ -8511,6 +9747,109 @@ type Query {
   ): NamedEntityAggregationConnection
 
   """
+  Aggregations over the `named_inventors` data:
+
+  > Fetches `NamedInventor`s based on the provided arguments.
+  """
+  named_inventor_aggregations(
+    """
+    Used to forward-paginate through the `named_inventor_aggregations`. When provided, the next page after the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    after: Cursor
+
+    """
+    Used to backward-paginate through the `named_inventor_aggregations`. When provided, the previous page before the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    before: Cursor
+
+    """
+    Used to filter the `NamedInventor` documents that get aggregated over based on the provided criteria.
+    """
+    filter: NamedInventorFilterInput
+
+    """
+    Used in conjunction with the `after` argument to forward-paginate through the `named_inventor_aggregations`.
+    When provided, limits the number of returned results to the first `n` after the provided
+    `after` cursor (or from the start of the `named_inventor_aggregations`, if no `after` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    first: Int
+
+    """
+    Used in conjunction with the `before` argument to backward-paginate through the `named_inventor_aggregations`.
+    When provided, limits the number of returned results to the last `n` before the provided
+    `before` cursor (or from the end of the `named_inventor_aggregations`, if no `before` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    last: Int
+  ): NamedInventorAggregationConnection
+
+  """
+  Fetches `NamedInventor`s based on the provided arguments.
+  """
+  named_inventors(
+    """
+    Used to forward-paginate through the `named_inventors`. When provided, the next page after the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    after: Cursor
+
+    """
+    Used to backward-paginate through the `named_inventors`. When provided, the previous page before the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    before: Cursor
+
+    """
+    Used to filter the returned `named_inventors` based on the provided criteria.
+    """
+    filter: NamedInventorFilterInput
+
+    """
+    Used in conjunction with the `after` argument to forward-paginate through the `named_inventors`.
+    When provided, limits the number of returned results to the first `n` after the provided
+    `after` cursor (or from the start of the `named_inventors`, if no `after` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    first: Int
+
+    """
+    Used in conjunction with the `before` argument to backward-paginate through the `named_inventors`.
+    When provided, limits the number of returned results to the last `n` before the provided
+    `before` cursor (or from the end of the `named_inventors`, if no `before` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    last: Int
+
+    """
+    Used to specify how the returned `named_inventors` should be sorted.
+    """
+    order_by: [NamedInventorSortOrderInput!]
+  ): NamedInventorConnection
+
+  """
   Aggregations over the `parts` data:
 
   > Fetches `Part`s based on the provided arguments.
@@ -8612,6 +9951,109 @@ type Query {
     """
     order_by: [PartSortOrderInput!]
   ): PartConnection
+
+  """
+  Fetches `Person`s based on the provided arguments.
+  """
+  people(
+    """
+    Used to forward-paginate through the `people`. When provided, the next page after the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    after: Cursor
+
+    """
+    Used to backward-paginate through the `people`. When provided, the previous page before the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    before: Cursor
+
+    """
+    Used to filter the returned `people` based on the provided criteria.
+    """
+    filter: PersonFilterInput
+
+    """
+    Used in conjunction with the `after` argument to forward-paginate through the `people`.
+    When provided, limits the number of returned results to the first `n` after the provided
+    `after` cursor (or from the start of the `people`, if no `after` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    first: Int
+
+    """
+    Used in conjunction with the `before` argument to backward-paginate through the `people`.
+    When provided, limits the number of returned results to the last `n` before the provided
+    `before` cursor (or from the end of the `people`, if no `before` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    last: Int
+
+    """
+    Used to specify how the returned `people` should be sorted.
+    """
+    order_by: [PersonSortOrderInput!]
+  ): PersonConnection
+
+  """
+  Aggregations over the `people` data:
+
+  > Fetches `Person`s based on the provided arguments.
+  """
+  person_aggregations(
+    """
+    Used to forward-paginate through the `person_aggregations`. When provided, the next page after the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    after: Cursor
+
+    """
+    Used to backward-paginate through the `person_aggregations`. When provided, the previous page before the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    before: Cursor
+
+    """
+    Used to filter the `Person` documents that get aggregated over based on the provided criteria.
+    """
+    filter: PersonFilterInput
+
+    """
+    Used in conjunction with the `after` argument to forward-paginate through the `person_aggregations`.
+    When provided, limits the number of returned results to the first `n` after the provided
+    `after` cursor (or from the start of the `person_aggregations`, if no `after` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    first: Int
+
+    """
+    Used in conjunction with the `before` argument to backward-paginate through the `person_aggregations`.
+    When provided, limits the number of returned results to the last `n` before the provided
+    `before` cursor (or from the end of the `person_aggregations`, if no `before` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    last: Int
+  ): PersonAggregationConnection
 
   """
   Aggregations over the `sponsors` data:
@@ -15441,6 +16883,16 @@ enum WidgetOrAddressSortOrderInput {
   id_DESC
 
   """
+  Sorts ascending by the `inventor.id` field.
+  """
+  inventor_id_ASC
+
+  """
+  Sorts descending by the `inventor.id` field.
+  """
+  inventor_id_DESC
+
+  """
   Sorts ascending by the `inventor.name` field.
   """
   inventor_name_ASC
@@ -15489,6 +16941,16 @@ enum WidgetOrAddressSortOrderInput {
   Sorts descending by the `name` field.
   """
   name_DESC
+
+  """
+  Sorts ascending by the `named_inventor.id` field.
+  """
+  named_inventor_id_ASC
+
+  """
+  Sorts descending by the `named_inventor.id` field.
+  """
+  named_inventor_id_DESC
 
   """
   Sorts ascending by the `named_inventor.name` field.
@@ -15786,6 +17248,16 @@ enum WidgetSortOrderInput {
   id_DESC
 
   """
+  Sorts ascending by the `inventor.id` field.
+  """
+  inventor_id_ASC
+
+  """
+  Sorts descending by the `inventor.id` field.
+  """
+  inventor_id_DESC
+
+  """
   Sorts ascending by the `inventor.name` field.
   """
   inventor_name_ASC
@@ -15834,6 +17306,16 @@ enum WidgetSortOrderInput {
   Sorts descending by the `name` field.
   """
   name_DESC
+
+  """
+  Sorts ascending by the `named_inventor.id` field.
+  """
+  named_inventor_id_ASC
+
+  """
+  Sorts descending by the `named_inventor.id` field.
+  """
+  named_inventor_id_DESC
 
   """
   Sorts ascending by the `named_inventor.name` field.

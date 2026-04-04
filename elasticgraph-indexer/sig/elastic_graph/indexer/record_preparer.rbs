@@ -30,7 +30,8 @@ module ElasticGraph
 
       def initialize: (
          ::Hash[::String, SchemaArtifacts::RuntimeMetadata::extensionClass?],
-         ::Array[TypeMetadata]
+         ::Array[TypeMetadata],
+         ::Set[::String]
       ) -> void
 
       private
@@ -38,6 +39,7 @@ module ElasticGraph
       INTEGRAL_TYPE_NAMES: ::Set[::String]
       @indexing_preparer_by_scalar_type_name: ::Hash[::String, SchemaArtifacts::RuntimeMetadata::extensionClass?]
       @eg_meta_by_field_name_by_concrete_type: egMetaByFieldByTypeHash
+      @types_with_typename_required_in_json_schema: ::Set[::String]
       @types_requiring_typename: ::Set[::String]
 
       def prepare_value_for_indexing: (untyped, ::String) -> untyped

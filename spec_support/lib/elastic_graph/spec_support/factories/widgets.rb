@@ -40,11 +40,25 @@ FactoryBot.define do
 
   factory :person, parent: :hash_base do
     __typename { "Person" }
+    id { Faker::Alphanumeric.alpha(number: 20) }
+    name { Faker::Name.name }
+    nationality { Faker::Nation.nationality }
+  end
+
+  factory :indexed_person, parent: :indexed_type do
+    __typename { "Person" }
     name { Faker::Name.name }
     nationality { Faker::Nation.nationality }
   end
 
   factory :company, parent: :hash_base do
+    __typename { "Company" }
+    id { Faker::Alphanumeric.alpha(number: 20) }
+    name { Faker::Company.name }
+    stock_ticker { name[0..3].upcase }
+  end
+
+  factory :indexed_company, parent: :indexed_type do
     __typename { "Company" }
     name { Faker::Company.name }
     stock_ticker { name[0..3].upcase }
@@ -140,6 +154,7 @@ FactoryBot.define do
     __typename { "Manufacturer" }
     name { Faker::Company.name }
     created_at { Faker::Time.between(from: recent_date - 30, to: recent_date).utc.iso8601 }
+    ceo { build(:person) }
   end
 
   factory :address, parent: :indexed_type do

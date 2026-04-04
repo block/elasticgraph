@@ -18,6 +18,8 @@ datastore:
       setting_overrides_by_timestamp: {}
     components: *main_index_settings
     electrical_parts: *main_index_settings
+    companies: *main_index_settings
+    people: *main_index_settings
     manufacturers: *main_index_settings
     mechanical_parts: *main_index_settings
     teams: *main_index_settings
