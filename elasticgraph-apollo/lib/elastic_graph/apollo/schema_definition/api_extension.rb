@@ -336,52 +336,59 @@ module ElasticGraph
             end
           end
 
-          # Add @key directives to all root document types with an id field.
-          # This happens after schema definition is complete so root_document_type? sees the complete type hierarchy.
-          state.object_types_by_name.values
-            .grep(ElasticGraph::SchemaDefinition::SchemaElements::ObjectType)
-            .select { |object_type| object_type.root_document_type? && object_type.graphql_fields_by_name.key?("id") }
-            .each { |object_type| object_type.apollo_key fields: "id" }
+          # Defer @key directive addition and _Entity union creation to a follow-up callback.
+          # This ensures types created by other after_user_definition_complete callbacks
+          # (e.g. dynamically derived aggregation types) exist before we iterate over them.
+          # This works because state.user_definition_complete_callbacks is a plain Array
+          # iterated with #each in Results#after_initialize — appending a new callback here
+          # causes it to be processed after all previously registered callbacks.
+          state.after_user_definition_complete do
+            # Add @key directives to all root document types with an id field.
+            state.object_types_by_name.values
+              .grep(ElasticGraph::SchemaDefinition::SchemaElements::ObjectType)
+              .select { |object_type| object_type.root_document_type? && object_type.graphql_fields_by_name.key?("id") }
+              .each { |object_type| object_type.apollo_key fields: "id" }
 
-          entity_types = state.object_types_by_name.values.select do |object_type|
-            object_type.directives.any? do |directive|
-              directive.name == "key" && directive.arguments.fetch(:resolvable, true)
+            entity_types = state.object_types_by_name.values.select do |object_type|
+              object_type.directives.any? do |directive|
+                directive.name == "key" && directive.arguments.fetch(:resolvable, true)
+              end
             end
-          end
 
-          validate_entity_types_can_all_be_resolved(entity_types)
+            validate_entity_types_can_all_be_resolved(entity_types)
 
-          entity_type_names = entity_types
-            # As per the GraphQL spec[1], only object types can be in a union, and interface
-            # types cannot be in a union. The GraphQL gem has validation[2] for this and will raise
-            # an error if we violate it, so we must filter to only object types here.
-            #
-            # [1] https://spec.graphql.org/October2021/#sec-Unions.Type-Validation
-            # [2] https://github.com/rmosolgo/graphql-ruby/pull/3024
-            .grep(ElasticGraph::SchemaDefinition::SchemaElements::ObjectType)
-            .map(&:name)
+            entity_type_names = entity_types
+              # As per the GraphQL spec[1], only object types can be in a union, and interface
+              # types cannot be in a union. The GraphQL gem has validation[2] for this and will raise
+              # an error if we violate it, so we must filter to only object types here.
+              #
+              # [1] https://spec.graphql.org/October2021/#sec-Unions.Type-Validation
+              # [2] https://github.com/rmosolgo/graphql-ruby/pull/3024
+              .grep(ElasticGraph::SchemaDefinition::SchemaElements::ObjectType)
+              .map(&:name)
 
-          unless entity_type_names.empty?
-            apollo_union_type "_Entity" do |t|
-              t.extend EntityTypeExtension
-              t.documentation <<~EOS
-                A union type required by the [Apollo Federation subgraph
-                spec](https://www.apollographql.com/docs/federation/subgraph-spec/#union-_entity):
+            unless entity_type_names.empty?
+              apollo_union_type "_Entity" do |t|
+                t.extend EntityTypeExtension
+                t.documentation <<~EOS
+                  A union type required by the [Apollo Federation subgraph
+                  spec](https://www.apollographql.com/docs/federation/subgraph-spec/#union-_entity):
 
-                > **⚠️ This union type is generated dynamically based on the input subgraph schema!**
-                >
-                > This union's possible types must include all entities that the subgraph defines.
-                > It's the return type of the `Query._entities` field, which the graph router uses
-                > to directly access a subgraph's entity fields.
-                >
-                > For details, see [Defining the `_Entity` union](https://www.apollographql.com/docs/federation/subgraph-spec/#defining-the-_entity-union).
+                  > **⚠️ This union type is generated dynamically based on the input subgraph schema!**
+                  >
+                  > This union's possible types must include all entities that the subgraph defines.
+                  > It's the return type of the `Query._entities` field, which the graph router uses
+                  > to directly access a subgraph's entity fields.
+                  >
+                  > For details, see [Defining the `_Entity` union](https://www.apollographql.com/docs/federation/subgraph-spec/#defining-the-_entity-union).
 
-                In an ElasticGraph schema, this is a union of all indexed types.
+                  In an ElasticGraph schema, this is a union of all indexed types.
 
-                Not intended for use by clients other than Apollo.
-              EOS
+                  Not intended for use by clients other than Apollo.
+                EOS
 
-              t.subtypes(*entity_type_names)
+                t.subtypes(*entity_type_names)
+              end
             end
           end
 

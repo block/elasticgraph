@@ -202,6 +202,39 @@ module ElasticGraph
           expect(type_def_from(schema_string, "_Entity")).to eq("union _Entity = IndexedType1 | IndexedType2")
         end
 
+        it 'adds `@key(fields: "id")` to indexed types created in after_user_definition_complete callbacks' do
+          schema_string = graphql_schema_string do |schema|
+            schema.object_type "IndexedType1" do |t|
+              t.field "id", "ID!"
+              t.index "index1"
+            end
+
+            # Simulate a type created by a later callback (e.g. dynamically derived aggregation types).
+            schema.state.after_user_definition_complete do
+              schema.object_type "DeferredIndexedType" do |t|
+                t.field "id", "ID!"
+                t.field "name", "String"
+                t.index "deferred_index"
+              end
+            end
+          end
+
+          expect(type_def_from(schema_string, "IndexedType1")).to eq(<<~EOS.strip)
+            type IndexedType1 @key(fields: "id") {
+              id: ID!
+            }
+          EOS
+
+          expect(type_def_from(schema_string, "DeferredIndexedType")).to eq(<<~EOS.strip)
+            type DeferredIndexedType @key(fields: "id") {
+              id: ID!
+              name: String
+            }
+          EOS
+
+          expect(type_def_from(schema_string, "_Entity")).to eq("union _Entity = DeferredIndexedType | IndexedType1")
+        end
+
         it 'omits the `@key(fields: "id")` directive when the `id` field is indexing-only, since key fields must be GraphQL fields' do
           schema_string = graphql_schema_string { |s| define_some_types_on(s, id_is_indexing_only: ["IndexedType2"]) }
 
