@@ -58,6 +58,25 @@ module ElasticGraph
           expect(api.results).to respond_to(:available_json_schema_versions)
         end
 
+        it "exposes schema_artifact_types that includes user-defined and built-in types" do
+          api = API.new(schema_elements, true)
+
+          api.as_active_instance do
+            ElasticGraph.define_schema do |schema|
+              schema.json_schema_version 1
+              schema.object_type("Widget") do |t|
+                t.field "id", "ID"
+              end
+            end
+          end
+
+          types = api.results.schema_artifact_types
+          type_names = types.map(&:name)
+
+          expect(type_names).to include("Widget")
+          expect(type_names).to include("Int")
+        end
+
         it "allows the factory to build an object type even when no block is provided" do
           api = API.new(schema_elements, true)
 

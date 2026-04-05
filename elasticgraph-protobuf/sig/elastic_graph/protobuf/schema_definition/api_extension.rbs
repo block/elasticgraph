@@ -1,0 +1,21 @@
+module ElasticGraph
+  module Protobuf
+    module SchemaDefinition
+      module APIExtension: ::ElasticGraph::SchemaDefinition::API
+        PROTO_TYPES_BY_BUILT_IN_SCALAR_TYPE: ::Hash[::String, ::String]
+
+        def self.extended: (::ElasticGraph::SchemaDefinition::API) -> void
+        def proto_schema_artifacts: (
+          ?package_name: ::String
+        ) -> void
+        def proto_enum_mappings: (untyped) -> void
+        def configure_proto_field_number_mappings: (untyped, ?enforce: bool) -> void
+
+        def proto_schema_package_name: () -> ::String
+        def proto_enums_by_graphql_enum: () -> untyped
+        def proto_field_number_mapping_file: () -> ::String
+        def proto_field_number_mappings: () -> untyped
+      end
+    end
+  end
+end
