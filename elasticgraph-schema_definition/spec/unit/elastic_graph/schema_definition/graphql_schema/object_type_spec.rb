@@ -643,6 +643,39 @@ module ElasticGraph
           end
         end
 
+        it "excludes `fetchable: false` fields from the output type but keeps them in filter, sort, grouped_by, aggregated_values, and highlights types" do
+          result = define_schema do |api|
+            api.object_type "Widget" do |t|
+              t.field "id", "ID"
+              t.field "name", "String"
+              t.field "internal_code", "String", fetchable: false
+              t.index "widgets"
+            end
+          end
+
+          expect(type_def_from(result, "Widget")).to eq(<<~EOS.strip)
+            type Widget {
+              id: ID
+              name: String
+            }
+          EOS
+
+          # fetchable: false field should still appear in filter input
+          expect(filter_type_from(result, "Widget")).to include("internal_code: StringFilterInput")
+
+          # fetchable: false field should still appear in sort order
+          expect(sort_order_type_from(result, "Widget")).to include("internal_code_ASC")
+
+          # fetchable: false field should still appear in grouped_by
+          expect(grouped_by_type_from(result, "Widget")).to include("internal_code: String")
+
+          # fetchable: false field should still appear in aggregated_values
+          expect(aggregated_values_type_from(result, "Widget")).to include("internal_code: NonNumericAggregatedValues")
+
+          # fetchable: false field should still appear in highlights
+          expect(highlights_type_from(result, "Widget")).to include("internal_code: [String!]!")
+        end
+
         def object_type(name, *args, pre_def: nil, include_docs: true, &block)
           result = define_schema do |api|
             pre_def&.call(api)

@@ -117,6 +117,33 @@ module ElasticGraph
         })
       end
 
+      it "includes `_source.excludes` for `fetchable: false` fields" do
+        mapping = index_mapping_for "my_type" do |s|
+          s.object_type "MyType" do |t|
+            t.field "id", "ID"
+            t.field "name", "String"
+            t.field "internal_code", "String", fetchable: false
+            t.index "my_type"
+          end
+        end
+
+        expect(mapping).to include("_source" => {"excludes" => ["internal_code"]})
+        # The field should still appear in properties (it's indexed, just not in _source)
+        expect(mapping.dig("properties", "internal_code")).to eq({"type" => "keyword"})
+      end
+
+      it "does not include `_source` config when all fields are fetchable" do
+        mapping = index_mapping_for "my_type" do |s|
+          s.object_type "MyType" do |t|
+            t.field "id", "ID"
+            t.field "name", "String"
+            t.index "my_type"
+          end
+        end
+
+        expect(mapping).not_to have_key("_source")
+      end
+
       it "keeps `source_from` fields in the mapping so that indexed documents support the field even though it comes from an alternate source" do
         mapping = index_mapping_for "components" do |s|
           s.object_type "Widget" do |t|
