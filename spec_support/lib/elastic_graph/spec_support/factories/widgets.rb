@@ -38,7 +38,7 @@ FactoryBot.define do
     is_draft { false }
   end
 
-  factory :person, parent: :hash_base do
+  factory :embedded_person, parent: :hash_base do
     __typename { "Person" }
     id { Faker::Alphanumeric.alpha(number: 20) }
     name { Faker::Name.name }
@@ -51,7 +51,7 @@ FactoryBot.define do
     nationality { Faker::Nation.nationality }
   end
 
-  factory :company, parent: :hash_base do
+  factory :embedded_company, parent: :hash_base do
     __typename { "Company" }
     id { Faker::Alphanumeric.alpha(number: 20) }
     name { Faker::Company.name }
@@ -119,7 +119,7 @@ FactoryBot.define do
       components.map { |c| c.fetch(:id) }
     end
 
-    inventor { build Faker::Base.sample([:person, :company]) }
+    inventor { build Faker::Base.sample([:embedded_person, :embedded_company]) }
     named_inventor { inventor }
     weight_in_ng { Faker::Number.between(from: 2**51, to: (2**53) - 1) }
     weight_in_ng_str { Faker::Number.between(from: 2**60, to: 2**61) }
@@ -154,7 +154,7 @@ FactoryBot.define do
     __typename { "Manufacturer" }
     name { Faker::Company.name }
     created_at { Faker::Time.between(from: recent_date - 30, to: recent_date).utc.iso8601 }
-    ceo { build(:person) }
+    ceo { build(:embedded_person) }
   end
 
   factory :address, parent: :indexed_type do

@@ -698,12 +698,12 @@ module ElasticGraph
       it "supports fetching interface fields" do
         index_into(
           graphql,
-          build(:widget, name: "w1", inventor: build(:person, name: "Bob", nationality: "Ukrainian")),
-          build(:widget, name: "w2", inventor: build(:company, name: "Clippy", stock_ticker: "CLIP")),
+          build(:widget, name: "w1", inventor: build(:embedded_person, name: "Bob", nationality: "Ukrainian")),
+          build(:widget, name: "w2", inventor: build(:embedded_company, name: "Clippy", stock_ticker: "CLIP")),
           build(:component, name: "c1", created_at: "2021-01-01T12:30:00Z"),
           build(:electrical_part, name: "e1"),
           build(:mechanical_part, name: "m1"),
-          build(:manufacturer, name: "m2", ceo: build(:person, name: "Alice", nationality: "Canadian"))
+          build(:manufacturer, name: "m2", ceo: build(:embedded_person, name: "Alice", nationality: "Canadian"))
         )
 
         results = call_graphql_query(<<~EOS).dig("data", case_correctly("named_entities"), "edges").map { |e| e["node"] }
@@ -1145,8 +1145,8 @@ module ElasticGraph
       end
 
       context "with nested fields" do
-        let(:widget1) { build(:widget, options: build(:widget_options, color: "RED"), inventor: build(:person)) }
-        let(:widget2) { build(:widget, options: build(:widget_options, color: "BLUE"), inventor: build(:company)) }
+        let(:widget1) { build(:widget, options: build(:widget_options, color: "RED"), inventor: build(:embedded_person)) }
+        let(:widget2) { build(:widget, options: build(:widget_options, color: "BLUE"), inventor: build(:embedded_company)) }
 
         before do
           index_records(widget1, widget2)
