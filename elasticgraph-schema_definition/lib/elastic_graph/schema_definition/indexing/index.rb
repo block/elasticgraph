@@ -327,13 +327,11 @@ module ElasticGraph
             hash["_routing"] = {"required" => true} if uses_custom_routing?
             hash["_size"] = {"enabled" => true} if schema_def_state.index_document_sizes?
 
-            # Exclude non-fetchable fields from `_source` to save storage. These fields are still
+            # Exclude non-returnable fields from `_source` to save storage. These fields are still
             # indexed (in the inverted index and/or doc_values) for filtering, sorting, and aggregation,
             # but their values are not stored in the compressed `_source` blob.
-            if indexed_type.respond_to?(:non_fetchable_field_paths)
-              source_excludes = indexed_type.non_fetchable_field_paths
-              hash["_source"] = {"excludes" => source_excludes} if source_excludes.any?
-            end
+            source_excludes = indexed_type.source_excludes_paths
+            hash["_source"] = {"excludes" => source_excludes} if source_excludes.any?
           end
         end
 

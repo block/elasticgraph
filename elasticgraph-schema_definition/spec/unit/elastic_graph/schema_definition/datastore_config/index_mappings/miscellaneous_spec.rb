@@ -117,22 +117,90 @@ module ElasticGraph
         })
       end
 
-      it "includes `_source.excludes` for `fetchable: false` fields" do
+      it "adds `name_in_index` to `_source.excludes` for `returnable: false` fields" do
         mapping = index_mapping_for "my_type" do |s|
           s.object_type "MyType" do |t|
             t.field "id", "ID"
             t.field "name", "String"
-            t.field "internal_code", "String", fetchable: false
+            t.field "internal_code_gql", "String", name_in_index: "internal_code", returnable: false
             t.index "my_type"
           end
         end
 
-        expect(mapping).to include("_source" => {"excludes" => ["internal_code"]})
+        expect(mapping.dig("_source", "excludes")).to contain_exactly("internal_code")
         # The field should still appear in properties (it's indexed, just not in _source)
         expect(mapping.dig("properties", "internal_code")).to eq({"type" => "keyword"})
       end
 
-      it "does not include `_source` config when all fields are fetchable" do
+      it "adds `.*` to `_source.excludes` for `returnable: false` object fields" do
+        mapping = index_mapping_for "my_type" do |s|
+          s.object_type "InternalMetadata" do |t|
+            t.field "internal_code", "String"
+          end
+
+          s.object_type "MyType" do |t|
+            t.field "id", "ID"
+            t.field "internal_metadata", "InternalMetadata", returnable: false
+            t.index "my_type"
+          end
+        end
+
+        expect(mapping).to include("_source" => {"excludes" => ["internal_metadata.*"]})
+        expect(mapping.dig("properties", "internal_metadata", "properties", "internal_code")).to eq({"type" => "keyword"})
+      end
+
+      it "adds `returnable: false` indexing-only fields to `_source.excludes` but not `graphql_only` fields" do
+        mapping = index_mapping_for "my_type" do |s|
+          s.object_type "MyType" do |t|
+            t.field "id", "ID"
+            t.field "name", "String"
+            t.field "legacy_name", "String", graphql_only: true, name_in_index: "name", returnable: false
+            t.field "internal_code", "String", indexing_only: true, returnable: false
+            t.index "my_type"
+          end
+        end
+
+        expect(mapping.dig("_source", "excludes")).to contain_exactly("internal_code")
+        expect(mapping.fetch("properties")).to include(
+          "name" => {"type" => "keyword"},
+          "internal_code" => {"type" => "keyword"}
+        )
+        expect(mapping.fetch("properties")).not_to include("legacy_name")
+      end
+
+      it "adds full indexed paths to `_source.excludes` for `returnable: false` fields under nested mappings" do
+        mapping = index_mapping_for "my_type" do |s|
+          s.object_type "Parent" do |t|
+            t.field "child", "String", name_in_index: "child_in_index", returnable: false
+          end
+
+          s.object_type "Grandparent" do |t|
+            t.field "parent", "Parent!", name_in_index: "parent_in_index"
+          end
+
+          s.object_type "MyType" do |t|
+            t.field "id", "ID!"
+            t.field "grandparents", "[Grandparent!]!", name_in_index: "grandparents_in_index" do |f|
+              f.mapping type: "nested"
+            end
+            t.index "my_type"
+          end
+        end
+
+        expect(mapping.dig("_source", "excludes")).to contain_exactly("grandparents_in_index.parent_in_index.child_in_index")
+        expect(mapping.dig("properties", "grandparents_in_index")).to include(
+          "type" => "nested",
+          "properties" => {
+            "parent_in_index" => {
+              "properties" => {
+                "child_in_index" => {"type" => "keyword"}
+              }
+            }
+          }
+        )
+      end
+
+      it "does not add `_source` config when all fields are returnable" do
         mapping = index_mapping_for "my_type" do |s|
           s.object_type "MyType" do |t|
             t.field "id", "ID"
