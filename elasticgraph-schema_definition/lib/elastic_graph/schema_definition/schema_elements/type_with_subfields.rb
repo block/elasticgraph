@@ -137,7 +137,7 @@ module ElasticGraph
         #   ElasticGraph will infer field sortability based on the field's GraphQL type and mapping type.
         # @option options [Boolean] highlightable force-enables or disables the ability to request search highlights for this field. When
         #   not provided, ElasticGraph will infer field highlightable based on the field's mapping type.
-        # @option options [Boolean] fetchable when set to `false`, the field will not appear in the GraphQL output type and its data
+        # @option options [Boolean] returnable when set to `false`, the field will not appear in the GraphQL output type and its data
         #   will be excluded from `_source` in the datastore for storage savings. The field will still be available for filtering,
         #   sorting, grouping, and aggregation. Defaults to `true`.
         # @yield [Field] the field for further customization
@@ -485,27 +485,6 @@ module ElasticGraph
           )
         end
 
-        # Returns the list of field paths (in dotted notation) for fields that have `fetchable: false`.
-        # These paths are used to populate `_source.excludes` in the datastore mapping so that
-        # non-fetchable field data is not stored in `_source`, saving storage space.
-        #
-        # Uses `indexing_fields_by_name_in_index` for traversal (same as `index_field_runtime_metadata_tuples`)
-        # to avoid infinite recursion through interface/union subtype cycles.
-        #
-        # @private
-        def non_fetchable_field_paths(path_prefix: "")
-          indexing_fields_by_name_in_index.flat_map do |name, field|
-            path = path_prefix + name
-            if !field.fetchable?
-              [path]
-            elsif (object_type = field.type.fully_unwrapped.as_object_type) && object_type.respond_to?(:non_fetchable_field_paths)
-              object_type.non_fetchable_field_paths(path_prefix: "#{path}.")
-            else
-              []
-            end
-          end
-        end
-
         # @private
         def current_sources
           indexing_fields_by_name_in_index.values.flat_map do |field|
@@ -555,7 +534,7 @@ module ElasticGraph
 
         def fields_sdl(&arg_selector)
           graphql_fields_by_name.values
-            .select(&:fetchable?)
+            .select(&:returnable?)
             .map { |f| f.to_sdl(&arg_selector) }
             .flat_map { |sdl| sdl.split("\n") }
             .join("\n  ")
