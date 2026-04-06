@@ -45,7 +45,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "elasticgraph-lambda_support", ElasticGraph::VERSION
   spec.add_dependency "aws-sdk-lambda", "~> 1.176"
   spec.add_dependency "aws-sdk-sqs", "~> 1.112"
-  spec.add_dependency "aws-sdk-cloudwatch", "~> 1.132.0"
+  spec.add_dependency "aws-sdk-cloudwatch", ">= 1.132", "< 1.134"
 
   spec.add_development_dependency "elasticgraph-elasticsearch", ElasticGraph::VERSION
   spec.add_development_dependency "elasticgraph-opensearch", ElasticGraph::VERSION
