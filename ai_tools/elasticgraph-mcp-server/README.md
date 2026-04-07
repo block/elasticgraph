@@ -66,7 +66,7 @@ make help
 
 ## Using Goose to help with development
 
-You can use [Goose](https://block.github.io/goose/) to improve this MCP server. To teach goose about MCP, follow these steps:
+You can use [Goose](https://goose-docs.ai/) to improve this MCP server. To teach goose about MCP, follow these steps:
 
 ### Setting Up a Goose Session
 
