@@ -292,22 +292,33 @@ module ElasticGraph
           indexing_fields_by_name_in_index.values.reject { |f| f.source.nil? }
         end
 
-        # Returns the list of `_source.excludes` paths for non-returnable fields.
+        # Returns the list of `_source.excludes` paths for non-returnable, non-highlightable fields.
+        #
+        # Hidden highlightable fields must remain in `_source` so the datastore can still
+        # produce search highlight snippets for them.
         #
         # Uses `indexing_fields_by_name_in_index` for traversal (same as
         # `index_field_runtime_metadata_tuples`) to avoid infinite recursion
         # through interface/union subtype cycles.
         #
         # @private
-        def source_excludes_paths(path_prefix: "")
+        def source_excludes_paths(path_prefix: "", under_non_returnable_parent: false)
           indexing_fields_by_name_in_index.flat_map do |name, field|
             path = path_prefix + name
             object_type = field.type.fully_unwrapped.as_object_type
+            non_returnable = under_non_returnable_parent || !field.returnable?
 
-            if !field.returnable?
-              [object_type ? "#{path}.*" : path]
-            elsif object_type
-              object_type.source_excludes_paths(path_prefix: "#{path}.")
+            if object_type
+              if non_returnable && !field.highlightable?
+                ["#{path}.*"]
+              else
+                object_type.source_excludes_paths(
+                  path_prefix: "#{path}.",
+                  under_non_returnable_parent: non_returnable
+                )
+              end
+            elsif non_returnable && !field.highlightable?
+              [path]
             else
               []
             end

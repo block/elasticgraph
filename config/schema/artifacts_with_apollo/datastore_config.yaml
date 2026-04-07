@@ -1469,10 +1469,6 @@ index_templates:
           required: true
         _size:
           enabled: true
-        _source:
-          excludes:
-          - internal_name
-          - internal_details.*
       settings:
         index.mapping.ignore_malformed: false
         index.mapping.coerce: false
