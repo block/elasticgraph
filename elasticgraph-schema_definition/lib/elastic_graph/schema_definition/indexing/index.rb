@@ -63,7 +63,9 @@ module ElasticGraph
             # By using it here, it will cause queries to pass a `routing` parameter when
             # searching with id filtering on an index that does not use custom shard routing, giving
             # us a nice efficiency boost.
-            self.routing_field_path = public_field_path("id", explanation: "indexed types must have an `id` field")
+            id_field_path = public_field_path("id", explanation: "indexed types must have an `id` field")
+            self.routing_field_path = id_field_path
+            id_field_path.last_part.json_schema nullable: false
           end
 
           yield self if block_given?

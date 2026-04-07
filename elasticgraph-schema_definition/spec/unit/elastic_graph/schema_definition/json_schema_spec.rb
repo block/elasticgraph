@@ -1140,6 +1140,29 @@ module ElasticGraph
         })
       end
 
+      it "makes the `id` field non-nullable in JSON schema even when declared as a nullable `ID` in the GraphQL schema" do
+        json_schema = dump_schema do |s|
+          s.object_type "Widget" do |t|
+            t.field "id", "ID"
+            t.field "name", "String"
+            t.index "widgets"
+          end
+        end
+
+        expect(json_schema).to have_json_schema_like("Widget", {
+          "type" => "object",
+          "properties" => {
+            "id" => json_schema_ref("ID!"),
+            "name" => json_schema_ref("String")
+          },
+          "required" => %w[id name]
+        }).which_matches(
+          {"id" => "abc", "name" => "thing"}
+        ).and_fails_to_match(
+          {"id" => nil, "name" => "thing"}
+        )
+      end
+
       context "on an indexed type with a rollover index" do
         it "makes the JSON schema for a rollover index timestamp field on the indexed type non-nullable since a target index cannot be chosen without it" do
           json_schema = dump_schema do |s|
