@@ -43,7 +43,7 @@ The [elasticgraph-mcp-server](https://pypi.org/project/elasticgraph-mcp-server/)
 
 ### Installation
 
-Install and run the MCP server, for example as a [Goose extension](https://block.github.io/goose/docs/getting-started/using-extensions), using:
+Install and run the MCP server, for example as a [Goose extension](https://goose-docs.ai/docs/getting-started/using-extensions), using:
 
 {% include copyable_code_snippet.html language="shell" code="uvx elasticgraph-mcp-server" %}
 
