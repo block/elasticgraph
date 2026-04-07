@@ -139,6 +139,24 @@ module ElasticGraph
           expect(result.lines.grep(/ColorInput/)).to be_empty
         end
 
+        it "handles enums where the input and output names are the same" do
+          result = define_schema(derived_type_name_formats: {InputEnum: "%{base}"}) do |schema|
+            schema.enum_type "Color" do |t|
+              t.value "RED"
+              t.value "BLUE"
+            end
+
+            schema.object_type "Widget" do |type|
+              type.field "id", "ID!"
+              type.field "color", "Color!"
+              type.index "widgets"
+            end
+          end
+
+          # Only one `enum Color` should appear (no separate input enum)
+          expect(result.scan(/^enum Color\b/).size).to eq(1)
+        end
+
         it "allows the input variant to be customized using `customize_derived_types`" do
           result = define_schema do |schema|
             schema.enum_type "Color" do |t|

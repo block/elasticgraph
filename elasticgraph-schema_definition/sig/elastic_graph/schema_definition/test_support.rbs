@@ -7,24 +7,26 @@ module ElasticGraph
         ?index_document_sizes: bool,
         ?json_schema_version: ::Integer,
         ?extension_modules: ::Array[::Module],
+        ?ingestion_serializer_extension_modules: ::Array[::Module],
         ?derived_type_name_formats: ::Hash[::Symbol, ::String],
         ?type_name_overrides: ::Hash[::Symbol, ::String],
         ?enum_value_overrides_by_type: ::Hash[::Symbol, ::Hash[::Symbol, ::String]],
         ?output: io?,
         ?reload_schema_artifacts: bool,
-      ) ?{ (API) -> void } -> _SchemaArtifacts
+      ) ?{ (API) -> void } -> (Results | SchemaArtifacts::FromDisk)
 
       def define_schema_with_schema_elements: (
         SchemaArtifacts::RuntimeMetadata::SchemaElementNames,
         ?index_document_sizes: bool,
         ?json_schema_version: ::Integer,
         ?extension_modules: ::Array[::Module],
+        ?ingestion_serializer_extension_modules: ::Array[::Module],
         ?derived_type_name_formats: ::Hash[::Symbol, ::String],
         ?type_name_overrides: ::Hash[::Symbol, ::String],
         ?enum_value_overrides_by_type: ::Hash[::Symbol, ::Hash[::Symbol, ::String]],
         ?output: io?,
         ?reload_schema_artifacts: bool,
-      ) ?{ (API) -> void } -> _SchemaArtifacts
+      ) ?{ (API) -> void } -> (Results | SchemaArtifacts::FromDisk)
 
       DOC_COMMENTS: ::String
 

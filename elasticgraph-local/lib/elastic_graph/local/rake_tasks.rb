@@ -213,6 +213,23 @@ module ElasticGraph
       # @dynamic schema_definition_extension_modules, schema_definition_extension_modules=
       attr_accessor :schema_definition_extension_modules
 
+      # List of Ruby modules implementing the ingestion serializer portion of the schema definition API. Defaults to the built-in JSON
+      # Schema serializer for backward compatibility, but can be set to `[]` to disable it or replaced with a different serializer
+      # extension.
+      #
+      # @return [Array<Module>] list of ingestion serializer extension modules
+      #
+      # @example Disable the default JSON Schema serializer
+      #   ElasticGraph::Local::RakeTasks.new(
+      #     local_config_yaml: "config/settings/local.yaml",
+      #     path_to_schema: "config/schema.rb"
+      #   ) do |tasks|
+      #     tasks.schema_definition_ingestion_serializer_extension_modules = []
+      #   end
+      #
+      # @dynamic schema_definition_ingestion_serializer_extension_modules, schema_definition_ingestion_serializer_extension_modules=
+      attr_accessor :schema_definition_ingestion_serializer_extension_modules
+
       # Whether or not to enforce the requirement that the JSON schema version is incremented every time
       # dumping the JSON schemas results in a changed artifact. Defaults to `true`.
       #
@@ -362,6 +379,7 @@ module ElasticGraph
         self.type_name_overrides = {}
         self.enum_value_overrides_by_type = {}
         self.schema_definition_extension_modules = []
+        self.schema_definition_ingestion_serializer_extension_modules = SchemaDefinition::ExtensionModuleSupport.default_ingestion_serializer_extension_modules
         self.enforce_json_schema_version = true
         self.env_port_mapping = {}
         self.output = $stdout
@@ -394,6 +412,7 @@ module ElasticGraph
           type_name_overrides: type_name_overrides,
           enum_value_overrides_by_type: enum_value_overrides_by_type,
           extension_modules: schema_definition_extension_modules,
+          ingestion_serializer_extension_modules: schema_definition_ingestion_serializer_extension_modules,
           enforce_json_schema_version: enforce_json_schema_version,
           output: output
         )

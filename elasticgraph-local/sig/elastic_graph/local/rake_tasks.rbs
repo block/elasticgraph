@@ -8,6 +8,7 @@ module ElasticGraph
       attr_accessor type_name_overrides: ::Hash[::Symbol, ::String]
       attr_accessor enum_value_overrides_by_type: ::Hash[::Symbol, ::Hash[::Symbol, ::String]]
       attr_accessor schema_definition_extension_modules: ::Array[::Module]
+      attr_accessor schema_definition_ingestion_serializer_extension_modules: ::Array[::Module]
       attr_accessor enforce_json_schema_version: bool
       attr_accessor elasticsearch_versions: ::Array[::String]
       attr_accessor opensearch_versions: ::Array[::String]

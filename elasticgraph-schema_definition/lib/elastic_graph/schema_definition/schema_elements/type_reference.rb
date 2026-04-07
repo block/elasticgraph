@@ -171,20 +171,6 @@ module ElasticGraph
           schema_def_state.type_ref(type_namer.revert_override_for(name))
         end
 
-        # Returns all the JSON schema array/nullable layers of a type, from outermost to innermost.
-        # For example, [[Int]] will return [:nullable, :array, :nullable, :array, :nullable]
-        def json_schema_layers
-          @json_schema_layers ||= begin
-            layers, inner_type = peel_json_schema_layers_once
-
-            if layers.empty? || inner_type == self
-              layers
-            else
-              layers + inner_type.json_schema_layers
-            end
-          end
-        end
-
         # Most of ElasticGraph's derived GraphQL types have a static suffix (e.g. the full type name
         # is source_type + suffix). This is a map of all of these.
         STATIC_FORMAT_NAME_BY_CATEGORY = TypeNamer::REQUIRED_PLACEHOLDERS.filter_map do |format_name, placeholders|
@@ -302,16 +288,6 @@ module ElasticGraph
 
         def after_initialize
           Mixins::VerifiesGraphQLName.verify_name!(unwrapped_name)
-        end
-
-        def peel_json_schema_layers_once
-          if list?
-            return [[:array], unwrap_list] if non_null?
-            return [[:nullable, :array], unwrap_list]
-          end
-
-          return [[], unwrap_non_null] if non_null?
-          [[:nullable], self]
         end
 
         def matches_format_of?(category)

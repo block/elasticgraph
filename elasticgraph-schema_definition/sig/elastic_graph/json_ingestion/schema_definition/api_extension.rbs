@@ -1,0 +1,13 @@
+module ElasticGraph
+  module JSONIngestion
+    module SchemaDefinition
+      module APIExtension: ::ElasticGraph::SchemaDefinition::API
+        def json_schema_version: (::Integer) -> void
+        def json_schema_strictness: (?allow_omitted_fields: bool, ?allow_extra_fields: bool) -> void
+        def results: () -> (::ElasticGraph::SchemaDefinition::Results & ResultsExtension)
+
+        def self.extended: (::ElasticGraph::SchemaDefinition::API & APIExtension) -> void
+      end
+    end
+  end
+end

@@ -85,9 +85,10 @@ All gems follow the pattern: `elasticgraph-[name]/` containing:
 - `elasticgraph-elasticsearch`: Elasticsearch client wrapper
 - `elasticgraph-opensearch`: OpenSearch client wrapper
 
-**Extensions** (5 gems): Optional functionality
+**Extensions** (6 gems): Optional functionality
 - `elasticgraph-apollo`: Apollo Federation support
 - `elasticgraph-health_check`: Health checks
+- `elasticgraph-json_ingestion`: JSON Schema ingestion serializer
 - `elasticgraph-query_interceptor`: Query interception
 - `elasticgraph-query_registry`: Source-controlled query registry
 - `elasticgraph-warehouse`: Data warehouse ingestion

@@ -6,10 +6,8 @@ module ElasticGraph
 
         type optionsHash = ::Hash[::Symbol, untyped]
         attr_reader mapping_options: optionsHash
-        attr_reader json_schema_options: optionsHash
 
         def mapping: (**untyped) -> void
-        def json_schema: (**untyped) -> void
       end
     end
   end
