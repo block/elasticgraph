@@ -83,7 +83,7 @@ To understand how the different parts of the codebase fit together, see the [cod
 
 ## Using AI Tools
 
-Using AI tools such as [Goose](https://block.github.io/goose/), [ChatGPT](https://chatgpt.com/), [Cursor](https://cursor.com/),
+Using AI tools such as [Goose](https://goose-docs.ai/), [ChatGPT](https://chatgpt.com/), [Cursor](https://cursor.com/),
 or [Claude](https://claude.ai/) to contribute is encouraged. However:
 
 * AI tools are assistants and should not replace critical thinking and judgement.
