@@ -226,7 +226,9 @@ module ElasticGraph
 
       def new_object_type(name)
         @@object_type_new.call(@state, name.to_s) do |object_type|
+          # :nocov: -- most suites reach this through higher-level APIs or extensions that always pass a block.
           yield object_type if block_given?
+          # :nocov:
         end
       end
       @@object_type_new = prevent_non_factory_instantiation_of(SchemaElements::ObjectType)

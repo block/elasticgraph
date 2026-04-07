@@ -25,7 +25,7 @@ module ElasticGraph
       #   ElasticGraph.define_schema do |schema|
       #     schema.scalar_type "URL" do |t|
       #       t.mapping type: "keyword"
-      #       t.json_schema type: "string", format: "uri"
+      #       t.json_schema type: "string"
       #     end
       #   end
       #
@@ -59,8 +59,14 @@ module ElasticGraph
         include Mixins::HasDerivedGraphQLTypeCustomizations
         include Mixins::HasReadableToSAndInspect.new { |t| t.name }
 
+        # Internal default used when the JSON ingestion extension has not attached
+        # mutable per-type JSON schema configuration.
+        #
+        # @private
+        EMPTY_JSON_SCHEMA_OPTIONS = {}.freeze
+
         # `HasTypeInfo` provides the following methods:
-        # @dynamic mapping_options, json_schema_options
+        # @dynamic mapping_options
         include Mixins::HasTypeInfo
 
         # @dynamic graphql_only?
@@ -78,13 +84,8 @@ module ElasticGraph
 
           yield self
 
-          missing = [
-            ("`mapping`" if mapping_options.empty?),
-            ("`json_schema`" if json_schema_options.empty?)
-          ].compact
-
-          if missing.any?
-            raise Errors::SchemaError, "Scalar types require `mapping` and `json_schema` to be configured, but `#{name}` lacks #{missing.join(" and ")}."
+          if mapping_options.empty?
+            raise Errors::SchemaError, "Scalar types require `mapping` to be configured, but `#{name}` lacks `mapping`."
           end
 
           if (placeholder = inferred_grouping_missing_value_placeholder)
@@ -95,6 +96,15 @@ module ElasticGraph
         # @return [String] name of the scalar type
         def name
           type_ref.name
+        end
+
+        # The JSON ingestion extension overrides this to provide mutable per-type configuration.
+        #
+        # @return [Hash<Symbol, Object>]
+        def json_schema_options
+          # :nocov: -- this default hook is only for callers that have not installed the JSON ingestion extension.
+          EMPTY_JSON_SCHEMA_OPTIONS
+          # :nocov:
         end
 
         # (see Mixins::HasTypeInfo#mapping)
@@ -350,14 +360,17 @@ module ElasticGraph
             # JSON schema min/max only constrains newly indexed values, not existing data that may fall outside the range before the constraints were added.
             # This is an edge case where the long range may exceed safe float precision.
             # In this case, users can set grouping_missing_value_placeholder to nil.
-            if (json_schema_options[:minimum] || LONG_STRING_MIN) >= JSON_SAFE_LONG_MIN &&
-                (json_schema_options[:maximum] || LONG_STRING_MAX) <= JSON_SAFE_LONG_MAX
+            ingestion_min = json_schema_options[:minimum]
+            ingestion_max = json_schema_options[:maximum]
+            if (ingestion_min || LONG_STRING_MIN) >= JSON_SAFE_LONG_MIN &&
+                (ingestion_max || LONG_STRING_MAX) <= JSON_SAFE_LONG_MAX
               inferred_numeric_placeholder_for_integer_type
             end
           elsif mapping_type == "unsigned_long"
             # Similar to the checks above for long except we only need to check the max
             # (since the min is zero even if not specified)
-            if (json_schema_options[:maximum] || LONG_STRING_MAX) <= JSON_SAFE_LONG_MAX
+            ingestion_max = json_schema_options[:maximum]
+            if (ingestion_max || LONG_STRING_MAX) <= JSON_SAFE_LONG_MAX
               inferred_numeric_placeholder_for_integer_type
             end
           elsif INTEGER_TYPES.include?(mapping_type)

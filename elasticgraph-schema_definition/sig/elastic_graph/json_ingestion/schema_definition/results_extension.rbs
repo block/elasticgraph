@@ -1,0 +1,15 @@
+module ElasticGraph
+  module JSONIngestion
+    module SchemaDefinition
+      module ResultsExtension : ::ElasticGraph::SchemaDefinition::Results
+        include ::ElasticGraph::_SchemaArtifacts
+
+        def json_schema_version_setter_location: () -> ::Thread::Backtrace::Location?
+        def json_schema_field_metadata_by_type_and_field_name: () -> ::Hash[::String, ::Hash[::String, Indexing::JSONSchemaFieldMetadata]]
+        def current_public_json_schema: () -> ::Hash[::String, untyped]
+        def merge_field_metadata_into_json_schema: (::Hash[::String, untyped]) -> Indexing::JSONSchemaWithMetadata
+        def unused_deprecated_elements: () -> ::Set[::ElasticGraph::SchemaDefinition::SchemaElements::DeprecatedElement]
+      end
+    end
+  end
+end

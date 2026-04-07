@@ -5,14 +5,14 @@ module ElasticGraph
         attr_reader json_schema: ::Hash[::String, untyped]
         attr_reader missing_fields: ::Set[::String]
         attr_reader missing_types: ::Set[::String]
-        attr_reader definition_conflicts: ::Set[SchemaElements::DeprecatedElement]
+        attr_reader definition_conflicts: ::Set[::ElasticGraph::SchemaDefinition::SchemaElements::DeprecatedElement]
         attr_reader missing_necessary_fields: ::Array[JSONSchemaWithMetadata::MissingNecessaryField]
 
         def initialize: (
           json_schema: ::Hash[::String, untyped],
           missing_fields: ::Set[::String],
           missing_types: ::Set[::String],
-          definition_conflicts: ::Set[SchemaElements::DeprecatedElement],
+          definition_conflicts: ::Set[::ElasticGraph::SchemaDefinition::SchemaElements::DeprecatedElement],
           missing_necessary_fields: ::Array[JSONSchemaWithMetadata::MissingNecessaryField]
         ) -> void
 
@@ -20,7 +20,7 @@ module ElasticGraph
           ?json_schema: ::Hash[::String, untyped],
           ?missing_fields: ::Set[::String],
           ?missing_types: ::Set[::String],
-          ?definition_conflicts: ::Set[SchemaElements::DeprecatedElement],
+          ?definition_conflicts: ::Set[::ElasticGraph::SchemaDefinition::SchemaElements::DeprecatedElement],
           ?missing_necessary_fields: ::Array[JSONSchemaWithMetadata::MissingNecessaryField]
         ) -> instance
       end
@@ -30,16 +30,16 @@ module ElasticGraph
 
         class Merger
           @field_metadata_by_type_and_field_name: ::Hash[::String, ::Hash[::String, JSONSchemaFieldMetadata]]
-          @renamed_types_by_old_name: ::Hash[::String, SchemaElements::DeprecatedElement]
-          @deleted_types_by_old_name: ::Hash[::String, SchemaElements::DeprecatedElement]
-          @renamed_fields_by_type_name_and_old_field_name: ::Hash[::String, ::Hash[::String, SchemaElements::DeprecatedElement]]
-          @deleted_fields_by_type_name_and_old_field_name: ::Hash[::String, ::Hash[::String, SchemaElements::DeprecatedElement]]
-          @state: State
+          @renamed_types_by_old_name: ::Hash[::String, ::ElasticGraph::SchemaDefinition::SchemaElements::DeprecatedElement]
+          @deleted_types_by_old_name: ::Hash[::String, ::ElasticGraph::SchemaDefinition::SchemaElements::DeprecatedElement]
+          @renamed_fields_by_type_name_and_old_field_name: ::Hash[::String, ::Hash[::String, ::ElasticGraph::SchemaDefinition::SchemaElements::DeprecatedElement]]
+          @deleted_fields_by_type_name_and_old_field_name: ::Hash[::String, ::Hash[::String, ::ElasticGraph::SchemaDefinition::SchemaElements::DeprecatedElement]]
+          @state: ::ElasticGraph::SchemaDefinition::State
           @derived_indexing_type_names: ::Set[::String]
 
-          attr_reader unused_deprecated_elements: ::Set[SchemaElements::DeprecatedElement]
+          attr_reader unused_deprecated_elements: ::Set[::ElasticGraph::SchemaDefinition::SchemaElements::DeprecatedElement]
 
-          def initialize: (Results) -> void
+          def initialize: ((::ElasticGraph::SchemaDefinition::Results & ::ElasticGraph::JSONIngestion::SchemaDefinition::ResultsExtension)) -> void
           def merge_metadata_into: (::Hash[::String, untyped]) -> JSONSchemaWithMetadata
 
           private
@@ -47,14 +47,14 @@ module ElasticGraph
           def determine_current_type_name: (
             ::String,
             missing_types: ::Set[::String],
-            definition_conflicts: ::Set[SchemaElements::DeprecatedElement]
+            definition_conflicts: ::Set[::ElasticGraph::SchemaDefinition::SchemaElements::DeprecatedElement]
           ) -> ::String?
 
           def field_metadata_for: (
             ::String,
             ::String,
             missing_fields: ::Set[::String],
-            definition_conflicts: ::Set[SchemaElements::DeprecatedElement]
+            definition_conflicts: ::Set[::ElasticGraph::SchemaDefinition::SchemaElements::DeprecatedElement]
           ) -> JSONSchemaFieldMetadata?
 
           def identify_missing_necessary_fields: (
@@ -63,19 +63,18 @@ module ElasticGraph
           ) -> ::Array[MissingNecessaryField]
 
           def identify_missing_necessary_fields_for_index_def: (
-            indexableType,
-            Index,
-            JSONSchemaResolver,
-            ::Integer
+            ::ElasticGraph::SchemaDefinition::indexableType,
+            ::ElasticGraph::SchemaDefinition::Indexing::Index,
+            JSONSchemaResolver
           ) -> ::Array[MissingNecessaryField]
 
           class JSONSchemaResolver
-            @state: State
+            @state: ::ElasticGraph::SchemaDefinition::State
             @old_type_name_by_current_name: ::Hash[::String, ::String]
             @meta_by_old_type_and_name_in_index: ::Hash[::String, ::Hash[::String, ::Hash[::String, untyped]]]
 
-            def initialize: (State, ::Hash[::String, untyped], ::Hash[::String, ::String]) -> void
-            def necessary_path_missing?: (SchemaElements::FieldPath) -> bool
+            def initialize: (::ElasticGraph::SchemaDefinition::State, ::Hash[::String, untyped], ::Hash[::String, ::String]) -> void
+            def necessary_path_missing?: (::ElasticGraph::SchemaDefinition::SchemaElements::FieldPath) -> bool
 
             private
 

@@ -16,6 +16,7 @@ COPY elasticgraph-datastore_core elasticgraph-datastore_core/
 COPY elasticgraph-graphiql elasticgraph-graphiql/
 COPY elasticgraph-graphql elasticgraph-graphql/
 COPY elasticgraph-indexer elasticgraph-indexer/
+COPY elasticgraph-json_ingestion elasticgraph-json_ingestion/
 COPY elasticgraph-local elasticgraph-local/
 COPY elasticgraph-opensearch elasticgraph-opensearch/
 COPY elasticgraph-query_registry elasticgraph-query_registry/

@@ -6,29 +6,15 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/json_ingestion/schema_definition/indexing/json_schema_field_metadata"
+
 module ElasticGraph
   module SchemaDefinition
     module Indexing
-      # @!parse class JSONSchemaFieldMetadata; end
-      JSONSchemaFieldMetadata = ::Data.define(:type, :name_in_index)
-
-      # Metadata about an ElasticGraph field that needs to be stored in our versioned JSON schemas
-      # alongside the JSON schema fields.
-      #
-      # @!attribute [r] type
-      #   @return [String] name of the ElasticGraph type for this field
-      # @!attribute [r] name_in_index
-      #   @return [String] name of the field in the index
+      # Backward-compatible alias for JSON schema field metadata.
       #
       # @api private
-      class JSONSchemaFieldMetadata < ::Data
-        # @return [Hash<String, String>] hash form of the metadata that can be dumped in JSON schema
-        def to_dumpable_hash
-          {"type" => type, "nameInIndex" => name_in_index}
-        end
-
-        # @dynamic initialize, type, name_in_index
-      end
+      JSONSchemaFieldMetadata = JSONIngestion::SchemaDefinition::Indexing::JSONSchemaFieldMetadata
     end
   end
 end

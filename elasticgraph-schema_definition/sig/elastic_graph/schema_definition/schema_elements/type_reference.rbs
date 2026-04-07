@@ -30,9 +30,6 @@ module ElasticGraph
         def scalar_type_needing_grouped_by_object?: () -> bool
         def with_reverted_override: () -> TypeReference
 
-        @json_schema_layers: jsonSchemaLayersArray?
-        def json_schema_layers: () -> jsonSchemaLayersArray
-
         def to_final_form: (?as_input: bool) -> TypeReference
 
         STATIC_FORMAT_NAME_BY_CATEGORY: ::Hash[::Symbol, ::Symbol]
@@ -58,8 +55,6 @@ module ElasticGraph
         def list_element_filter_input?: () -> bool
 
         private
-
-        def peel_json_schema_layers_once: () -> [jsonSchemaLayersArray, TypeReference]
 
         def matches_format_of?: (::Symbol) -> bool
         def parent_aggregation_type: (::Array[::String]) -> ::String

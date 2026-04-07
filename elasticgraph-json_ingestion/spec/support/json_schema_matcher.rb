@@ -1,0 +1,153 @@
+# Copyright 2024 - 2026 Block, Inc.
+#
+# Use of this source code is governed by an MIT-style
+# license that can be found in the LICENSE file or at
+# https://opensource.org/licenses/MIT.
+#
+# frozen_string_literal: true
+
+# :nocov: -- this is spec support code that is only exercised by the json-ingestion matcher specs,
+# but repo-wide coverage runs track all `spec/**/*.rb` files.
+require "elastic_graph/support/json_schema/meta_schema_validator"
+require "elastic_graph/support/json_schema/validator_factory"
+require "json"
+
+RSpec::Matchers.define :have_json_schema_like do |type, expected_schema, include_typename: true, ignore_descriptions: false|
+  diffable
+
+  attr_reader :actual, :expected
+
+  chain :which_matches do |*expected_matches|
+    @expected_matches = expected_matches
+  end
+
+  chain :and_fails_to_match do |*expected_non_matches|
+    @expected_non_matches = expected_non_matches
+  end
+
+  match do |full_schema|
+    modified_expected_schema = if include_typename && expected_schema.key?("properties")
+      with_typename(type, expected_schema)
+    else
+      expected_schema
+    end
+      .then { |schema| normalize(schema) }
+
+    @expected = JSON.pretty_generate(modified_expected_schema)
+
+    @raw_actual_schema = normalize(full_schema.fetch("$defs").fetch(type))
+    actual_schema = ignore_descriptions ? strip_descriptions_from(@raw_actual_schema) : @raw_actual_schema
+    @actual = JSON.pretty_generate(actual_schema)
+
+    @validator_factory = ElasticGraph::Support::JSONSchema::ValidatorFactory.new(schema: full_schema, sanitize_pii: false)
+
+    @meta_schema_validation_errors = ElasticGraph::Support::JSONSchema.elastic_graph_internal_meta_schema_validator.validate(@raw_actual_schema)
+
+    if @meta_schema_validation_errors.empty? && actual_schema == modified_expected_schema
+      validator = @validator_factory.validator_for(type)
+
+      @match_failures = (@expected_matches || []).filter_map.with_index do |payload, index|
+        if (failure = validator.validate_with_error_message(payload))
+          match_failure_description(payload, index, failure)
+        end
+      end
+
+      @non_match_failures = (@expected_non_matches || []).filter_map.with_index do |payload, index|
+        if validator.valid?(payload)
+          non_match_failure_description(payload, index)
+        end
+      end
+
+      @match_failures.empty? && @non_match_failures.empty?
+    else
+      @match_failures = @non_match_failures = []
+      false
+    end
+  end
+
+  failure_message do |_actual_schema|
+    if @meta_schema_validation_errors.any?
+      <<~EOS
+        expected the generated JSON schema for `#{type}` to be valid according to the JSON schema meta-schema, but got validation errors:
+
+        #{@meta_schema_validation_errors.map { |e| JSON.pretty_generate(e) }.join("\n\n")}
+
+
+        Actual schema:
+        #{JSON.pretty_generate(@raw_actual_schema)}
+      EOS
+    elsif @match_failures.any?
+      <<~EOS
+        expected given JSON payloads matched the JSON schema, but one or more did not.
+
+        #{@match_failures.join("\n\n")}
+      EOS
+    elsif @non_match_failures.any?
+      <<~EOS
+        expected given JSON payloads to not match the JSON schema, but one or more did.
+
+        #{@non_match_failures.join("\n\n")}
+      EOS
+    else
+      <<~EOS
+        expected valid JSON schema[1] but got JSON schema[2].
+
+        [1] Expected schema:
+        #{expected}
+
+        [2] Actual schema:
+        #{actual}
+      EOS
+    end
+  end
+
+  def match_failure_description(payload, index, failure)
+    <<~EOS
+      Failure at index #{index} from payload:
+
+      #{JSON.pretty_generate(payload)}
+
+      #{failure}
+    EOS
+  end
+
+  def non_match_failure_description(payload, index)
+    <<~EOS
+      Failure at index #{index} from payload:
+
+      #{JSON.pretty_generate(payload)}
+    EOS
+  end
+
+  def normalize(schema)
+    ::JSON.parse(::JSON.generate(schema.sort.to_h))
+  end
+
+  def with_typename(type, schema)
+    new_schema = schema.dup
+    new_schema["properties"] = schema["properties"].merge({
+      "__typename" => {
+        "type" => "string",
+        "const" => type,
+        "default" => type
+      }
+    })
+    new_schema
+  end
+
+  def strip_descriptions_from(object)
+    case object
+    when ::Hash
+      object.filter_map do |key, value|
+        unless key == "description"
+          [key, strip_descriptions_from(value)]
+        end
+      end.to_h
+    when ::Array
+      object.map { |e| strip_descriptions_from(e) }
+    else
+      object
+    end
+  end
+end
+# :nocov:

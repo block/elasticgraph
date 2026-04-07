@@ -1,0 +1,28 @@
+module ElasticGraph
+  module JSONIngestion
+    module SchemaDefinition
+      module SchemaArtifactManagerExtension : ::ElasticGraph::SchemaDefinition::SchemaArtifactManager
+        attr_reader schema_definition_results: (::ElasticGraph::SchemaDefinition::Results & ResultsExtension)
+
+        private
+
+        @json_schemas_artifact: ::ElasticGraph::SchemaDefinition::SchemaArtifact[untyped]?
+
+        def artifacts_from_schema_def: () -> ::Array[::ElasticGraph::SchemaDefinition::SchemaArtifact[untyped]]
+        def json_schemas_artifact: () -> ::ElasticGraph::SchemaDefinition::SchemaArtifact[::Hash[::String, untyped]]
+        def check_if_needs_json_schema_version_bump: () { (::Integer) -> void } -> void
+        def build_desired_versioned_json_schemas: (::Hash[::String, untyped]) -> ::Hash[::Integer, ::Hash[::String, untyped]]
+        def report_json_schema_merge_errors: (::Array[Indexing::JSONSchemaWithMetadata]) -> void
+        def report_json_schema_merge_warnings: () -> void
+        def format_deprecated_elements: (::Enumerable[::ElasticGraph::SchemaDefinition::SchemaElements::DeprecatedElement]) -> ::String
+        def missing_field_error_for: (::String, ::Array[::Integer]) -> ::String
+        def missing_type_error_for: (::String, ::Array[::Integer]) -> ::String
+        def missing_necessary_field_error_for: (Indexing::JSONSchemaWithMetadata::MissingNecessaryField, ::Array[::Integer]) -> ::String
+        def describe_json_schema_versions: (::Array[::Integer], ::String) -> ::String
+        def old_versions: (::Array[::Integer]) -> ::String
+        def files_noun_phrase: (::Array[::Integer]) -> ::String
+        def new_versioned_json_schema_artifact: (::Hash[::String, untyped]) -> ::ElasticGraph::SchemaDefinition::SchemaArtifact[::Hash[::String, untyped]]
+      end
+    end
+  end
+end

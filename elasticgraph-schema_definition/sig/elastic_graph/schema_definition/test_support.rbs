@@ -12,7 +12,7 @@ module ElasticGraph
         ?enum_value_overrides_by_type: ::Hash[::Symbol, ::Hash[::Symbol, ::String]],
         ?output: io?,
         ?reload_schema_artifacts: bool,
-      ) ?{ (API) -> void } -> _SchemaArtifacts
+      ) ?{ (API) -> void } -> (Results | SchemaArtifacts::FromDisk)
 
       def define_schema_with_schema_elements: (
         SchemaArtifacts::RuntimeMetadata::SchemaElementNames,
@@ -24,7 +24,7 @@ module ElasticGraph
         ?enum_value_overrides_by_type: ::Hash[::Symbol, ::Hash[::Symbol, ::String]],
         ?output: io?,
         ?reload_schema_artifacts: bool,
-      ) ?{ (API) -> void } -> _SchemaArtifacts
+      ) ?{ (API) -> void } -> (Results | SchemaArtifacts::FromDisk)
 
       DOC_COMMENTS: ::String
 

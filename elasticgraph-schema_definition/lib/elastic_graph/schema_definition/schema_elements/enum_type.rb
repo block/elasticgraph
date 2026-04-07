@@ -145,7 +145,7 @@ module ElasticGraph
 
           derived_scalar_types = schema_def_state.factory.new_scalar_type(name) do |t|
             t.mapping type: "keyword"
-            t.json_schema type: "string"
+            configure_derived_scalar_type(t)
             t.graphql_only graphql_only?
           end.derived_graphql_types
 
@@ -154,6 +154,14 @@ module ElasticGraph
           else
             [input_enum] + derived_scalar_types
           end
+        end
+
+        # Hook for extensions to customize the scalar type derived from an enum type.
+        # @param scalar_type [ScalarType] the scalar type to configure
+        # @return [void]
+        # @api private
+        def configure_derived_scalar_type(scalar_type)
+          # No-op by default; extensions (e.g. JSONIngestion) override this.
         end
 
         # @return [Indexing::FieldType::Enum] indexing representation of this enum type

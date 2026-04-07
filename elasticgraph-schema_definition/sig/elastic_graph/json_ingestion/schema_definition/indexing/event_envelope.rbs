@@ -1,0 +1,11 @@
+module ElasticGraph
+  module JSONIngestion
+    module SchemaDefinition
+      module Indexing
+        module EventEnvelope
+          def self.json_schema: (::Array[::String], ::Integer) -> ::Hash[::String, untyped]
+        end
+      end
+    end
+  end
+end

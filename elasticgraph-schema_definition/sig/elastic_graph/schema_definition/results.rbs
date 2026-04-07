@@ -6,30 +6,17 @@ module ElasticGraph
     end
 
     class Results < ResultsSupertype
-      include _SchemaArtifacts
       include Support::_MemoizableDataClass
 
-      def json_schema_version_setter_location: () -> ::Thread::Backtrace::Location?
-      def json_schema_field_metadata_by_type_and_field_name: () -> ::Hash[::String, ::Hash[::String, Indexing::JSONSchemaFieldMetadata]]
-      def current_public_json_schema: () -> ::Hash[::String, untyped]
-      def merge_field_metadata_into_json_schema: (::Hash[::String, untyped]) -> Indexing::JSONSchemaWithMetadata
-      def unused_deprecated_elements: () -> ::Set[SchemaElements::DeprecatedElement]
       def derived_indexing_type_names: () -> ::Set[::String]
 
       @graphql_schema_string: ::String?
       @datastore_config: ::Hash[::String, untyped]
       @runtime_metadata: SchemaArtifacts::RuntimeMetadata::Schema?
-      @current_json_schemas: ::Hash[::String, untyped]?
       @static_script_repo: Scripting::FileSystemRepository?
-      @available_json_schema_versions: ::Set[::Integer]?
       @no_circular_dependencies: bool?
       @field_path_resolver: SchemaElements::FieldPath::Resolver?
-      @json_schema_indexing_field_types_by_name: ::Hash[::String, Indexing::_FieldType]?
       @derived_indexing_type_names: ::Set[::String]?
-      @json_schema_field_metadata_by_type_and_field_name: ::Hash[::String, ::Hash[::String, Indexing::JSONSchemaFieldMetadata]]?
-      @current_public_json_schema: ::Hash[::String, untyped]?
-      @latest_versioned_json_schema: ::Hash[::String, untyped]?
-      @json_schema_with_metadata_merger: Indexing::JSONSchemaWithMetadata::Merger?
 
       STATIC_SCRIPT_REPO: Scripting::FileSystemRepository
 
@@ -37,14 +24,11 @@ module ElasticGraph
 
       def define_root_graphql_type: () -> void
       def aggregation_efficiency_hints_for: (::Array[Indexing::DerivedIndexedType]) -> ::String?
-      def json_schema_with_metadata_merger: () -> Indexing::JSONSchemaWithMetadata::Merger
       def generate_datastore_config: () -> ::Hash[::String, untyped]
       def build_dynamic_scripts: () -> ::Array[Scripting::Script]
       def build_runtime_metadata: () -> SchemaArtifacts::RuntimeMetadata::Schema
       def identify_extra_update_targets_by_object_type_name: () -> ::Hash[::String, ::Array[SchemaArtifacts::RuntimeMetadata::UpdateTarget]]
       def generate_sdl: () -> ::String
-      def build_public_json_schema: () -> ::Hash[::String, untyped]
-      def json_schema_indexing_field_types_by_name: () -> ::Hash[::String, Indexing::_FieldType]
       def verify_runtime_metadata: (SchemaArtifacts::RuntimeMetadata::Schema) -> void
       def strip_trailing_whitespace: (::String) -> ::String
       def check_for_circular_dependencies!: () -> void

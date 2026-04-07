@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/errors"
+require "elastic_graph/schema_artifacts/from_disk"
 require "elastic_graph/schema_artifacts/runtime_metadata/schema_element_names"
 require "elastic_graph/schema_definition/api"
 require "elastic_graph/schema_definition/schema_artifact_manager"
@@ -75,8 +76,8 @@ module ElasticGraph
         yield api if block_given?
 
         # Set the json_schema_version to the provided value, if needed.
-        if !json_schema_version.nil? && api.state.json_schema_version.nil?
-          api.json_schema_version json_schema_version
+        if api.respond_to?(:json_schema_version) && !json_schema_version.nil? && api.state.ingestion_serializer_state[:json_schema_version].nil?
+          api.public_send(:json_schema_version, json_schema_version)
         end
 
         # :nocov: -- the else branch and code past this aren't used by tests in elasticgraph-schema_definition.

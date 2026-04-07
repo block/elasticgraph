@@ -27,22 +27,6 @@ module ElasticGraph
             Support::HashUtil.stringify_keys(scalar_type.mapping_options)
           end
 
-          # @return [Hash<String, ::Object>] the JSON schema for this scalar type.
-          def to_json_schema
-            Support::HashUtil.stringify_keys(scalar_type.json_schema_options)
-          end
-
-          # @return [Hash<String, ::Object>] additional ElasticGraph metadata to put in the JSON schema for this scalar type.
-          def json_schema_field_metadata_by_field_name
-            {}
-          end
-
-          # @param customizations [Hash<String, ::Object>] JSON schema customizations
-          # @return [Hash<String, ::Object>] formatted customizations.
-          def format_field_json_schema_customizations(customizations)
-            customizations
-          end
-
           # @dynamic initialize, scalar_type
         end
       end

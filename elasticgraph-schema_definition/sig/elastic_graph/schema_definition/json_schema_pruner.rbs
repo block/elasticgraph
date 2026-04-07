@@ -2,6 +2,9 @@ module ElasticGraph
   module SchemaDefinition
     class JSONSchemaPruner
       def self.prune: (::Hash[::String, untyped]) -> ::Hash[::String, untyped]
+
+      private
+
       def self.referenced_type_names: (::Array[::String], ::Hash[::String, untyped]) -> ::Set[::String]
       def self.collect_ref_names: (::Hash[::String, untyped]) -> ::Array[::String]
     end
