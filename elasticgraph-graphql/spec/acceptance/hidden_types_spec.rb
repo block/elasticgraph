@@ -45,7 +45,9 @@ module ElasticGraph
           end
 
           expect(hidden_types).to match_array(adjust_derived_type_names_as_needed(
-            all_types_related_to("Address") +
+            # `Address.full_address` is retrieved from doc values, so `Address` has no highlightable
+            # fields and no `AddressHighlights` type.
+            all_types_related_to("Address", include_highlights: false) +
             all_types_related_to("MechanicalPart") +
             # `AddressTimestamps` and `GeoShape` are only used on `Address` so when `Address` is hidden, they are, too.
             ["AddressTimestamps", "GeoShape"]
@@ -212,10 +214,10 @@ module ElasticGraph
           end
         end
 
-        def all_types_related_to(type_name, include_list_filter: false)
+        def all_types_related_to(type_name, include_list_filter: false, include_highlights: true)
           relay_types_related_to(type_name, include_list_filter: include_list_filter) +
             aggregation_types_related_to(type_name) +
-            ["#{type_name}Highlights"]
+            (include_highlights ? ["#{type_name}Highlights"] : [])
         end
 
         def relay_types_related_to(type_name, include_list_filter: false)

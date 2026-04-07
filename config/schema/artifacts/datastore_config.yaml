@@ -1520,6 +1520,7 @@ index_templates:
           enabled: true
         _source:
           excludes:
+          - workspace_id2
           - internal_name
           - internal_details.*
       settings:
@@ -1570,6 +1571,9 @@ indices:
           value: Address
       _size:
         enabled: true
+      _source:
+        excludes:
+        - full_address
     settings:
       index.mapping.ignore_malformed: false
       index.mapping.coerce: false

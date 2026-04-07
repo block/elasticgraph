@@ -114,7 +114,7 @@ module ElasticGraph
               # `id` within `_source`, given it's available as `_id`.
               ->(hit) { values.include?(hit.fetch("_id")) }
             else
-              ->(hit) { values.intersect?(Support::HashUtil.fetch_leaf_values_at_path(hit.fetch("_source"), field_path).to_set) }
+              ->(hit) { values.intersect?(hit_values_at_path(hit, field_path).to_set) }
             end
 
           hits = raw_data.fetch("hits").fetch("hits").select(&filter).first(size)
@@ -129,6 +129,28 @@ module ElasticGraph
 
         def docs_description
           (documents.size < 3) ? documents.inspect : "[#{documents.first}, ..., #{documents.last}]"
+        end
+
+        # Extracts leaf values from a hit, checking `_source` first and falling back to `fields`
+        # (populated by `docvalue_fields` in the query). When a field is excluded from `_source`
+        # (e.g. `retrieved_from: :doc_values`), the datastore still returns it under the `fields`
+        # key because the query explicitly requested it via `docvalue_fields`.
+        def hit_values_at_path(hit, field_path)
+          source = hit["_source"]
+          if source
+            Support::HashUtil.fetch_leaf_values_at_path(source, field_path) do
+              docvalue_fields_for(hit, field_path)
+            end
+          else
+            docvalue_fields_for(hit, field_path)
+          end
+        end
+
+        def docvalue_fields_for(hit, field_path)
+          fields = hit["fields"]
+          joined_path = field_path.join(".")
+          raise KeyError, "key not found: #{joined_path}" unless fields
+          fields.fetch(joined_path)
         end
 
         def total_document_count(default: nil)

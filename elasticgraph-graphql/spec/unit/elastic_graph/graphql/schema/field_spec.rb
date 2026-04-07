@@ -102,6 +102,39 @@ module ElasticGraph
             expect(field.relation_join).to be(nil).and be(field.relation_join)
             expect(RelationJoin).to have_received(:from).once
           end
+
+          it "logs and returns the blank value when a datastore document is missing the relation id field" do
+            field = define_schema do |s|
+              s.object_type "Color" do |t|
+                t.field "id", "ID!"
+                t.index "colors"
+              end
+
+              s.object_type "Photo" do |t|
+                t.field "id", "ID!"
+                t.field "photo_id", "ID"
+                t.relates_to_one "color", "Color", via: "photo_id", dir: :out
+                t.index "photos"
+              end
+            end.field_named("Photo", "color")
+
+            warnings = []
+
+            result = field.relation_join.extract_id_or_ids_from(
+              DatastoreResponse::Document.build({"_id" => "p1", "_source" => {}}),
+              lambda do |document:, problem:|
+                warnings << {document: document, problem: problem}
+              end
+            )
+
+            expect(result).to eq nil
+            expect(warnings).to contain_exactly(
+              a_hash_including(
+                document: an_object_having_attributes(id: "p1"),
+                problem: "photo_id is missing from the document"
+              )
+            )
+          end
         end
 
         describe "#sort_clauses_for" do
