@@ -168,7 +168,8 @@ module ElasticGraph
           s.object_type "MyType" do |t|
             t.field "id", "ID"
             t.field "name", "String"
-            t.field "legacy_count", "Int", graphql_only: true, name_in_index: "legacy_count_index", returnable: false
+            t.field "count", "Int"
+            t.field "legacy_count", "Int", graphql_only: true, name_in_index: "count", returnable: false
             t.field "internal_count", "Int", indexing_only: true, returnable: false
             t.index "my_type"
           end
@@ -177,10 +178,10 @@ module ElasticGraph
         expect(mapping.dig("_source", "excludes")).to contain_exactly("internal_count")
         expect(mapping.fetch("properties")).to include(
           "name" => {"type" => "keyword"},
+          "count" => {"type" => "integer"},
           "internal_count" => {"type" => "integer"}
         )
         expect(mapping.fetch("properties")).not_to include("legacy_count")
-        expect(mapping.fetch("properties")).not_to include("legacy_count_index")
       end
 
       it "uses full indexed paths in `_source.excludes` for `returnable: false` fields under nested mappings" do
@@ -215,6 +216,22 @@ module ElasticGraph
         )
       end
 
+      it "excludes all descendants for non-highlightable `returnable: false` object fields" do
+        mapping = index_mapping_for "my_type" do |s|
+          s.object_type "InternalMetrics" do |t|
+            t.field "count", "Int"
+          end
+
+          s.object_type "MyType" do |t|
+            t.field "id", "ID"
+            t.field "internal_metrics", "InternalMetrics", returnable: false
+            t.index "my_type"
+          end
+        end
+
+        expect(mapping).to include("_source" => {"excludes" => ["internal_metrics.*"]})
+        expect(mapping.dig("properties", "internal_metrics", "properties", "count")).to eq({"type" => "integer"})
+      end
       it "does not include `_source` config when all fields are returnable" do
         mapping = index_mapping_for "my_type" do |s|
           s.object_type "MyType" do |t|
