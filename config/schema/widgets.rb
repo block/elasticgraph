@@ -75,8 +75,8 @@ ElasticGraph.define_schema do |schema|
     t.field "id", "ID!"
 
     # Here we use an alternate name for this field since it's the routing field and want to verify
-    # that `name_in_index` works correctly on routing fields.
-    t.field "workspace_id", "ID", name_in_index: "workspace_id2"
+    # that `name_in_index` works correctly on routing fields, including when fetched from doc values.
+    t.field "workspace_id", "ID", name_in_index: "workspace_id2", retrieved_from: :doc_values
 
     # It's a bit funny we have both `amount_cents` and `cost` but it's nice to be able to test
     # aggregations on both a root numeric field and on a nested one, so we are keeping both here.
@@ -367,7 +367,7 @@ ElasticGraph.define_schema do |schema|
     # We use `indexing_only: true` here to verify that `id` can be an indexing-only field.
     t.field "id", "ID!", indexing_only: true
 
-    t.field "full_address", "String!"
+    t.field "full_address", "String!", retrieved_from: :doc_values
     t.field "timestamps", "AddressTimestamps"
     t.field "geo_location", "GeoLocation"
 

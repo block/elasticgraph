@@ -81,6 +81,7 @@ module ElasticGraph
 
         def generate_sdl: (name_section: ::String) ?{ (Field::argument) -> boolish } -> String
         def current_sources: () -> ::Array[::String]
+        def source_excluded_field_paths: (?path_prefix: ::String) -> ::Array[::String]
         def index_field_runtime_metadata_tuples: (
           ?path_prefix: ::String,
           ?parent_source: ::String,

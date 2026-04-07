@@ -1,6 +1,8 @@
 module ElasticGraph
   class GraphQL
     module DatastoreResponse
+      UNSET: ::Object
+
       class Document
         extend Forwardable
 
@@ -29,6 +31,12 @@ module ElasticGraph
 
         def []: (::String) -> untyped
         def fetch: (::String) -> untyped
+                 | (::String, untyped) -> untyped
+                 | (::String) { (::String) -> untyped } -> untyped
+        def fetch_value_at: (::Array[::String]) -> untyped
+                          | (::Array[::String], default_value: untyped) -> untyped
+                          | (::Array[::String]) { (::Array[::String]) -> untyped } -> untyped
+        def value_at: (::Array[::String]) -> untyped
         def index_name: () -> ::String
         def index_definition_name: () -> ::String
         def id: () -> ::String

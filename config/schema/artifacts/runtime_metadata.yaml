@@ -1446,6 +1446,7 @@ index_definitions_by_name:
       __counts.shapes|type:
         source: __self
       full_address:
+        retrieved_from: doc_values
         source: __self
       geo_location.lat:
         source: __self
@@ -2613,6 +2614,7 @@ index_definitions_by_name:
       weight_in_ng_str:
         source: __self
       workspace_id2:
+        retrieved_from: doc_values
         source: __self
       workspace_name:
         source: workspace

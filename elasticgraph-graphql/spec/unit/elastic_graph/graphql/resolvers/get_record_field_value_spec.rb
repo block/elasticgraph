@@ -58,6 +58,13 @@ module ElasticGraph
             expect(value).to eq "Napoleon"
           end
 
+          it "works with a `DatastoreResponse::Document` that has the field in `fields` instead of `_source`" do
+            doc = DatastoreResponse::Document.build({"_id" => "1", "fields" => {"name" => ["Napoleon"]}})
+            value = resolve("Person", "name", doc)
+
+            expect(value).to eq "Napoleon"
+          end
+
           it "fetches a requested list field from the document" do
             value = resolve("Person", "nicknames", {"id" => 1, "nicknames" => %w[Napo Leon]})
 
@@ -104,6 +111,13 @@ module ElasticGraph
 
           it "works with an `DatastoreResponse::Document`" do
             doc = DatastoreResponse::Document.with_payload("id" => 1, "name" => "Napoleon")
+            value = resolve("Person", "alt_name1", doc)
+
+            expect(value).to eq "Napoleon"
+          end
+
+          it "resolves a `name_in_index` field from docvalue fields" do
+            doc = DatastoreResponse::Document.build({"_id" => "1", "fields" => {"name" => ["Napoleon"]}})
             value = resolve("Person", "alt_name1", doc)
 
             expect(value).to eq "Napoleon"

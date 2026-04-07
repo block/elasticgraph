@@ -24,6 +24,8 @@ module ElasticGraph
         attr_reader sort_order_enum_value_customizations: ::Array[^(SortOrderEnumValue) -> void]
         attr_reader non_nullable_in_json_schema: bool
         attr_reader source: FieldSource?
+        attr_reader returnable: bool?
+        attr_reader retrieved_from: ::String?
         attr_accessor relationship: Relationship?
         attr_reader resolver: SchemaArtifacts::RuntimeMetadata::ConfiguredGraphQLResolver?
         attr_reader singular_name: ::String?
@@ -41,6 +43,8 @@ module ElasticGraph
           ?aggregatable: bool?,
           ?groupable: bool?,
           ?highlightable: bool?,
+          ?returnable: bool?,
+          ?retrieved_from: ::Symbol?,
           ?graphql_only: bool?,
           ?singular: ::String?,
           ?as_input: bool
@@ -62,6 +66,9 @@ module ElasticGraph
         def filterable?: () -> bool
         def groupable?: () -> bool
         def highlightable?: () -> bool
+        def returnable?: () -> bool
+        def retrieved_from_doc_values?: () -> bool
+        def source_excluded?: () -> bool
         def list_field_groupable_by_single_values?: () -> bool
         def aggregatable?: () -> bool
         def sub_aggregatable?: () -> bool

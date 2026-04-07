@@ -135,6 +135,17 @@ module ElasticGraph
         }.not_to raise_error
       end
 
+      it "dumps field retrieval metadata in `fields_by_path`" do
+        widgets = index_definition_metadata_for("widgets", on_my_type: ->(t) { t.field "internal_code", "String", retrieved_from: :doc_values })
+
+        expect(widgets.fields_by_path.fetch("internal_code")).to eq(
+          SchemaArtifacts::RuntimeMetadata::IndexField.new(
+            source: SELF_RELATIONSHIP_NAME,
+            retrieved_from: "doc_values"
+          )
+        )
+      end
+
       it "raises a clear error when a nested sort field references a type that does not exist", :dont_validate_graphql_schema do
         expect {
           index_definition_metadata_for("widgets", on_my_type: ->(t) { t.field "options", "Opts" }) do |i|

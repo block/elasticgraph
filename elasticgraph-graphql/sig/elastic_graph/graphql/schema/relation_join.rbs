@@ -55,8 +55,8 @@ module ElasticGraph
         def blank_value: () -> (nil | DatastoreResponse::SearchResponse)
 
         def extract_id_or_ids_from: (
-          ::Hash[::String, untyped],
-          ^(document: ::Hash[::String, untyped], problem: ::String) -> void
+          DatastoreResponse::Document | ::Hash[::String, untyped],
+          ^(document: DatastoreResponse::Document | ::Hash[::String, untyped], problem: ::String) -> void
         ) -> (nil | ::String | ::Enumerable[::String])
 
         def normalize_documents: (

@@ -303,7 +303,7 @@ module ElasticGraph
       def to_datastore_body
         @to_datastore_body ||= aggregations_datastore_body
           .merge(document_paginator.to_datastore_body)
-          .merge({highlight: highlight, query: filter_interpreter.build_query(all_filters), _source: source}.compact)
+          .merge({docvalue_fields: docvalue_fields, highlight: highlight, query: filter_interpreter.build_query(all_filters), _source: source}.compact)
       end
 
       def aggregations_datastore_body
@@ -323,11 +323,31 @@ module ElasticGraph
       # we only ask for the fields we need to return.
       def source
         return true if request_all_fields
-        requested_source_fields = requested_fields - ["id"]
+        requested_source_fields = requested_fields_for_source - ["id"]
         return false if requested_source_fields.empty?
         # Merging in requested_fields as _source:{includes:} based on Elasticsearch documentation:
         # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-source-field.html#include-exclude
         {includes: requested_source_fields.to_a}
+      end
+
+      def docvalue_fields
+        requested_docvalue_fields =
+          if request_all_fields
+            # When requesting all fields we send `_source: true`, but fields excluded from stored
+            # `_source` (because they use `retrieved_from: :doc_values`) still need an alternative
+            # retrieval path. We therefore request docvalue_fields for any field that ANY index
+            # definition stores in doc values, unlike the selective path below which requires
+            # unanimity across all index definitions.
+            all_docvalue_fields
+          else
+            requested_fields.select do |field_path|
+              requested_via_doc_values?(field_path)
+            end
+          end
+
+        return nil if requested_docvalue_fields.empty?
+
+        requested_docvalue_fields.to_a
       end
 
       def highlight
@@ -341,6 +361,35 @@ module ElasticGraph
         highlight_query = filter_interpreter.build_query(client_filters) unless internal_filters.empty?
 
         {fields:, highlight_query:}.compact
+      end
+
+      def requested_fields_for_source
+        @requested_fields_for_source ||= requested_fields.reject do |field_path|
+          requested_via_doc_values?(field_path)
+        end
+      end
+
+      def all_docvalue_fields
+        @all_docvalue_fields ||= search_index_definitions.flat_map do |index_def|
+          index_def.fields_by_path.filter_map do |field_path, field|
+            field_path if field.retrieved_from_doc_values?
+          end
+        end.to_set
+      end
+
+      # Returns true only when every participating index definition agrees the field should be
+      # retrieved via doc values. When they disagree we fall back to `_source` so that source-backed
+      # indices can return the field normally; the doc-values-backed index will also have the value
+      # available in `_source` in that case (a disagreement like this should not happen in practice,
+      # since `retrieved_from` is set once per field definition and propagates to all index definitions).
+      def requested_via_doc_values?(field_path)
+        return false if field_path == "id"
+
+        field_definitions = search_index_definitions.filter_map do |index_def|
+          index_def.fields_by_path[field_path]
+        end
+
+        field_definitions.any? && field_definitions.all?(&:retrieved_from_doc_values?)
       end
 
       # Encapsulates dependencies of `Query`, giving us something we can expose off of `application`

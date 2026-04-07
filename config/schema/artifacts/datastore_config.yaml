@@ -1463,6 +1463,9 @@ index_templates:
           required: true
         _size:
           enabled: true
+        _source:
+          excludes:
+          - workspace_id2
       settings:
         index.mapping.ignore_malformed: false
         index.mapping.coerce: false
@@ -1505,6 +1508,9 @@ indices:
           dynamic: 'false'
       _size:
         enabled: true
+      _source:
+        excludes:
+        - full_address
     settings:
       index.mapping.ignore_malformed: false
       index.mapping.coerce: false
