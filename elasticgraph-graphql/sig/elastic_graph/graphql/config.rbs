@@ -5,6 +5,7 @@ module ElasticGraph
 
       attr_reader default_page_size: ::Integer
       attr_reader max_page_size: ::Integer
+      attr_reader experimental_field_retrieval: ::String
       attr_reader slow_query_latency_warning_threshold_in_ms: ::Integer
       attr_reader client_resolver: Client::_Resolver
       attr_reader extension_modules: ::Array[::Module]
@@ -13,6 +14,7 @@ module ElasticGraph
       def initialize: (
         ?default_page_size: ::Integer,
         ?max_page_size: ::Integer,
+        ?experimental_field_retrieval: ::String,
         ?slow_query_latency_warning_threshold_in_ms: ::Integer,
         ?client_resolver: Client::_Resolver,
         ?extension_modules: ::Array[::Module],
@@ -22,6 +24,7 @@ module ElasticGraph
       def with: (
         ?default_page_size: ::Integer,
         ?max_page_size: ::Integer,
+        ?experimental_field_retrieval: ::String,
         ?slow_query_latency_warning_threshold_in_ms: ::Integer,
         ?client_resolver: Client::_Resolver,
         ?extension_modules: ::Array[::Module],

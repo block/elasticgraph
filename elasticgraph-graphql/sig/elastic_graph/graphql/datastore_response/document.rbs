@@ -22,7 +22,8 @@ module ElasticGraph
 
         def self.build: (
           ::Hash[::String, untyped],
-          ?decoded_cursor_factory: DecodedCursor::_Factory
+          ?decoded_cursor_factory: DecodedCursor::_Factory,
+          ?field_retrieval_plan: FieldRetrievalPlan
         ) -> Document
 
         def self.with_payload: (::Hash[::String, untyped]) -> Document

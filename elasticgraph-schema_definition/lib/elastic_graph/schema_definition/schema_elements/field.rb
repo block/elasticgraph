@@ -744,6 +744,34 @@ module ElasticGraph
           type_for_derived_types.fully_unwrapped.as_object_type&.supports?(&:highlightable?)
         end
 
+        # Whether direct scalar retrieval from doc values preserves the indexed value.
+        # @return [Boolean]
+        # @private
+        def doc_values_eligible?
+          return false unless returnable? && !type.list? && !type_for_derived_types.list? && type.fully_unwrapped.leaf?
+          return false if name_in_index.include?(".") || runtime_field_script
+
+          scalar_type = type.fully_unwrapped
+          allowed_mappings = if scalar_type.enum?
+            ["keyword"]
+          else
+            # Use the declared type: an override such as Cursor -> String is not reversible.
+            case original_type.fully_unwrapped.name
+            when "ID", "String"
+              ["keyword"]
+            when "Int", "JsonSafeLong"
+              %w[long integer short byte]
+            when "Boolean"
+              ["boolean"]
+            else
+              []
+            end
+          end
+
+          mapping = resolve_mapping || {}
+          allowed_mappings.include?(mapping["type"]) && (mapping.keys - %w[type index]).empty?
+        end
+
         # Indicates if this field is returnable in GraphQL query responses. When `false`, the field will
         # still be available for filtering, sorting, grouping, and aggregation, but will not appear in the
         # GraphQL output type and its data will be excluded from `_source` in the datastore for storage savings.

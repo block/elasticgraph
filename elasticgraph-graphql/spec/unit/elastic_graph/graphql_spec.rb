@@ -56,6 +56,27 @@ module ElasticGraph
       end
     end
 
+    describe "#field_retrieval_planner" do
+      it "allows an extension to wrap the instance's planner without changing other instances" do
+        extension = Module.new do
+          def field_retrieval_planner
+            @wrapped_planner ||= ::Data.define(:delegate) {
+              def plan(**options)
+                delegate.plan(**options).with(reason: "wrapped")
+              end
+            }.new(super)
+          end
+        end
+        extended = build_graphql(extension_modules: [extension])
+        ordinary = build_graphql
+        options = {requested_fields: ["name"], request_all_fields: false, highlighting: false, index_definitions: []}
+
+        expect(extended.field_retrieval_planner.plan(**options).reason).to eq "wrapped"
+        expect(ordinary.field_retrieval_planner.plan(**options).reason).to eq "source_default"
+        expect(ordinary.field_retrieval_planner).to be_frozen
+      end
+    end
+
     describe "#load_dependencies_eagerly" do
       it "loads dependencies eagerly" do
         graphql = build_graphql
