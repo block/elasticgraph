@@ -39,7 +39,7 @@ ElasticGraph.define_schema do |schema|
 
   schema.object_type "Team" do |t|
     t.root_query_fields plural: "teams"
-    t.field "id", "ID!"
+    t.field "id", "ID"
     t.field "league", "String"
     t.field "country_code", "ID!"
     t.field "formed_on", "Date"
