@@ -1140,7 +1140,7 @@ module ElasticGraph
         })
       end
 
-      it "makes the `id` field non-nullable in JSON schema even when declared as a nullable `ID` in the GraphQL schema" do
+      it "makes an `id: ID` field of an indexed type non-nullable in JSON schema" do
         json_schema = dump_schema do |s|
           s.object_type "Widget" do |t|
             t.field "id", "ID"
@@ -1159,6 +1159,27 @@ module ElasticGraph
         }).which_matches(
           {"id" => "abc", "name" => "thing"}
         ).and_fails_to_match(
+          {"id" => nil, "name" => "thing"}
+        )
+      end
+
+      it "leaves an `id: ID` field on a non-indexed type as nullable in the JSON schema" do
+        json_schema = dump_schema do |s|
+          s.object_type "Widget" do |t|
+            t.field "id", "ID"
+            t.field "name", "String"
+          end
+        end
+
+        expect(json_schema).to have_json_schema_like("Widget", {
+          "type" => "object",
+          "properties" => {
+            "id" => json_schema_ref("ID"),
+            "name" => json_schema_ref("String")
+          },
+          "required" => %w[id name]
+        }).which_matches(
+          {"id" => "abc", "name" => "thing"},
           {"id" => nil, "name" => "thing"}
         )
       end
