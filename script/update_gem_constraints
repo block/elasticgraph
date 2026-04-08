@@ -15,7 +15,7 @@ require "rubygems/version"
 #
 # After updating version constraints, it runs bundle install to update Gemfile.lock.
 #
-# This script was created by Goose (https://block.github.io/goose/) and can be updated using Goose.
+# This script was created by Goose (https://goose-docs.ai/) and can be updated using Goose.
 class DependencyUpdater
   def initialize
     @changes = Hash.new do |hash, key|
