@@ -10641,7 +10641,7 @@ type Team @key(fields: "id") {
   forbes_valuation_moneys_object: [Money!]!
   forbes_valuations: [JsonSafeLong!]!
   formed_on: Date
-  id: ID!
+  id: ID
   league: String
   nested_fields: TeamNestedFields
   nested_fields2: TeamNestedFields
