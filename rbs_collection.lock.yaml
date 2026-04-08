@@ -34,7 +34,7 @@ gems:
     remote: https://github.com/ruby/gem_rbs_collection.git
     repo_dir: gems
 - name: aws-sdk-cloudwatch
-  version: 1.132.0
+  version: 1.133.0
   source:
     type: rubygems
 - name: aws-sdk-core
@@ -50,7 +50,7 @@ gems:
   source:
     type: rubygems
 - name: aws-sdk-s3
-  version: 1.217.1
+  version: 1.218.0
   source:
     type: rubygems
 - name: aws-sdk-sqs
@@ -66,7 +66,7 @@ gems:
   source:
     type: stdlib
 - name: bigdecimal
-  version: 4.1.0
+  version: 4.1.1
   source:
     type: rubygems
 - name: cgi

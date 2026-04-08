@@ -132,7 +132,7 @@ Delete the `artist` schema definition:
 Then define your own schema in a Ruby file under `config/schema`.
 
 * Use the [schema definition API docs](/elasticgraph/api-docs/{{ site.data.doc_versions.latest_version }}/ElasticGraph/SchemaDefinition/API.html) as a reference.
-* Use our [AI Tools]({% link guides/ai-tools.md %}) together with an AI agent such as [Goose](https://block.github.io/goose/) to translate a schema from an existing format such as protocol buffers, JSON schema, or SQL.
+* Use our [AI Tools]({% link guides/ai-tools.md %}) together with an AI agent such as [Goose](https://goose-docs.ai/) to translate a schema from an existing format such as protocol buffers, JSON schema, or SQL.
 * Run `bundle exec rake` and deal with any errors that are reported.
 * Hint: search the project codebase for `TODO` comments to find things that need updating.
 
