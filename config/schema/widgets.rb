@@ -29,6 +29,10 @@ ElasticGraph.define_schema do |schema|
     t.field "is_draft", "Boolean"
   end
 
+  schema.object_type "WidgetInternalDetails" do |t|
+    t.field "name", "String"
+  end
+
   schema.object_type "Person" do |t|
     t.implements "NamedInventor"
     t.field "name", "String"
@@ -91,6 +95,7 @@ ElasticGraph.define_schema do |schema|
     t.field "cost_currency_primary_continent", "String"
     t.field "cost_currency_introduced_on", "Date"
     t.field "name", "String"
+    t.field "internal_name", "String", returnable: false
     t.field "name_text", "String" do |f|
       f.mapping type: "text"
     end
@@ -107,6 +112,7 @@ ElasticGraph.define_schema do |schema|
     t.field "release_dates", "[Date!]!", singular: "release_date"
     t.relates_to_many "components", "Component", via: "component_ids", dir: :out, singular: "component"
     t.field "options", "WidgetOptions"
+    t.field "internal_details", "WidgetInternalDetails", returnable: false
 
     # Demonstrate using `name_in_index` with a graphql-only embedded field.
     t.field "size", "Size", name_in_index: "options.size", graphql_only: true

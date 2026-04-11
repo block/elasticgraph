@@ -106,6 +106,7 @@ module ElasticGraph
             type_filter_and_non_indexed_aggregation_types_for("TeamSeason", include_list_filter: true, include_fields_list_filter: true) - ["TeamSeasonListElementFilterInput"] +
             type_filter_and_non_indexed_aggregation_types_for("WidgetOptions") +
             type_filter_and_non_indexed_aggregation_types_for("WidgetOptionSets") - ["WidgetOptionSetsGroupedBy"] +
+            type_filter_and_non_indexed_aggregation_types_for("WidgetInternalDetails") - ["WidgetInternalDetails"] +
             type_filter_and_non_indexed_aggregation_types_for("WidgetCurrencyNestedFields", include_highlights: false) +
             type_filter_and_non_indexed_aggregation_types_for("WorkspaceWidget") +
             type_filter_and_non_indexed_aggregation_types_for("Sponsorship", include_list_filter: true, include_fields_list_filter: true) - ["SponsorshipListElementFilterInput"] +
