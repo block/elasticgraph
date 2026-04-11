@@ -1355,6 +1355,8 @@ index_templates:
             format: strict_date
           name:
             type: keyword
+          internal_name:
+            type: keyword
           name_text:
             type: text
           description:
@@ -1386,6 +1388,10 @@ index_templates:
                 type: keyword
               is_draft:
                 type: boolean
+          internal_details:
+            properties:
+              name:
+                type: keyword
           the_opts:
             properties:
               size:
