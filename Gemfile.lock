@@ -258,7 +258,7 @@ GEM
       traces (~> 0.18)
     attr_extras (7.1.0)
     aws-eventstream (1.4.0)
-    aws-partitions (1.1235.0)
+    aws-partitions (1.1238.0)
     aws-sdk-cloudwatch (1.133.0)
       aws-sdk-core (~> 3, >= 3.244.0)
       aws-sigv4 (~> 1.5)
@@ -273,10 +273,10 @@ GEM
     aws-sdk-kms (1.123.0)
       aws-sdk-core (~> 3, >= 3.244.0)
       aws-sigv4 (~> 1.5)
-    aws-sdk-lambda (1.176.0)
+    aws-sdk-lambda (1.177.0)
       aws-sdk-core (~> 3, >= 3.244.0)
       aws-sigv4 (~> 1.5)
-    aws-sdk-s3 (1.218.0)
+    aws-sdk-s3 (1.219.0)
       aws-sdk-core (~> 3, >= 3.244.0)
       aws-sdk-kms (~> 1)
       aws-sigv4 (~> 1.5)
@@ -305,7 +305,7 @@ GEM
     diff-lcs (1.6.2)
     docile (1.4.1)
     drb (2.2.3)
-    elastic-transport (8.4.1)
+    elastic-transport (8.5.1)
       faraday (< 3)
       multi_json
     elasticsearch (9.3.1)
@@ -386,7 +386,7 @@ GEM
       zeitwerk (~> 2.5)
     http-2 (1.1.3)
     http_parser.rb (0.8.1)
-    httpx (1.7.5)
+    httpx (1.7.6)
       http-2 (>= 1.1.3)
     i18n (1.14.8)
       concurrent-ruby (~> 1.0)
@@ -451,7 +451,9 @@ GEM
       drb (~> 2.0)
       prism (~> 1.5)
     module_methods (0.1.0)
-    multi_json (1.19.1)
+    multi_json (1.20.1)
+    multi_json (1.20.1-java)
+      concurrent-ruby (~> 1.2)
     mutex_m (0.3.0)
     net-http (0.9.1)
       uri (>= 0.11.1)
@@ -648,7 +650,7 @@ GEM
     uri (1.1.1)
     vcr (6.4.0)
     webrick (1.9.2)
-    yard (0.9.37)
+    yard (0.9.40)
     yard-doctest (0.1.17)
       minitest
       yard
@@ -713,7 +715,7 @@ DEPENDENCIES
   flatware-rspec (~> 2.3, >= 2.3.4)!
   graphql-c_parser (~> 1.1, >= 1.1.3)
   html-proofer (~> 5.2, >= 5.2.1)
-  httpx (~> 1.7, >= 1.7.5)
+  httpx (~> 1.7)
   irb (~> 1.17)
   jekyll (~> 4.4, >= 4.4.1)
   memory_profiler (~> 1.1)
@@ -733,7 +735,7 @@ DEPENDENCIES
   steep (~> 1.10.0)
   super_diff (~> 0.18)
   vcr (~> 6.4)
-  yard (~> 0.9, >= 0.9.37, != 0.9.38)
+  yard (~> 0.9)
   yard-doctest (~> 0.1, >= 0.1.17)
   yard-markdown (~> 0.6)
 
@@ -748,12 +750,12 @@ CHECKSUMS
   async (2.39.0) sha256=df18730073f2bbb45788077dfa20cb365ecc1b9453969f44de6796b5191a00aa
   attr_extras (7.1.0) sha256=d96fc9a9dd5d85ba2d37762440a816f840093959ae26bb90da994c2d9f1fc827
   aws-eventstream (1.4.0) sha256=116bf85c436200d1060811e6f5d2d40c88f65448f2125bc77ffce5121e6e183b
-  aws-partitions (1.1235.0) sha256=84eb9aec5c532c7c0aa008f5ebe4cac38488fa008da20aac1ae3e49eaf3f6240
+  aws-partitions (1.1238.0) sha256=fa3d1bdea6d7e7619e8cee22ebce8a569d2119296d3ec8c5f9b9b7c81fb0602c
   aws-sdk-cloudwatch (1.133.0) sha256=c962526a8060b7864e253998e104830792e92b0cac23aea992e3e87806d303f1
   aws-sdk-core (3.244.0) sha256=3e458c078b0c5bdee95bc370c3a483374b3224cf730c1f9f0faf849a5d9a18ea
   aws-sdk-kms (1.123.0) sha256=d405f37e82f8fa32045ca8980be266c0b45b37aaf2012afe0254321a1e811f20
-  aws-sdk-lambda (1.176.0) sha256=0562c2816dcb6dbca3c0d416b180ea71f296eb8034acd87a95d2ab9e1d00e545
-  aws-sdk-s3 (1.218.0) sha256=5672a5f32107f2adfa8ca1ff33188fb534a6fd7560c52e8817458698c7c9988c
+  aws-sdk-lambda (1.177.0) sha256=fbbb672506b4df68a96ec08fa914a8ae818f3ec03e57d3d8176e0bc7f5b11b32
+  aws-sdk-s3 (1.219.0) sha256=6a755d7377978525758b3c29185ca6a10128ce2b07555ca37c4549de10c2f1c7
   aws-sdk-sqs (1.112.0) sha256=272a2d919fd3daa1c4a8ed0f9a3b765fbb84cce27aaf3b08e6d97edd171bbdae
   aws-sigv4 (1.12.1) sha256=6973ff95cb0fd0dc58ba26e90e9510a2219525d07620c8babeb70ef831826c00
   aws_lambda_ric (3.1.3) sha256=7d7551c91d2070bb1427cd05d7b0b94076d42084f743b117522659a76935dfbc
@@ -773,7 +775,7 @@ CHECKSUMS
   diff-lcs (1.6.2) sha256=9ae0d2cba7d4df3075fe8cd8602a8604993efc0dfa934cff568969efb1909962
   docile (1.4.1) sha256=96159be799bfa73cdb721b840e9802126e4e03dfc26863db73647204c727f21e
   drb (2.2.3) sha256=0b00d6fdb50995fe4a45dea13663493c841112e4068656854646f418fda13373
-  elastic-transport (8.4.1) sha256=b6300d41f26b0a9886b79e3119052ca829ef596d40a96a706d42596d23843306
+  elastic-transport (8.5.1) sha256=5eeae78f791840f2d4f35d2f3826903098e360f20f838e20b304b73a302ac04d
   elasticgraph (1.1.1.pre)
   elasticgraph-admin (1.1.1.pre)
   elasticgraph-admin_lambda (1.1.1.pre)
@@ -838,7 +840,7 @@ CHECKSUMS
   html-proofer (5.2.1) sha256=fdd958a7cbf9c3255fb96fe7cfc4e611f64e2706e469488a3326309ad007d2fd
   http-2 (1.1.3) sha256=1b2f379d35a11dbae94f8a1a52c053d8c161eb4a0c98b5d1605ff1b2bf171c9c
   http_parser.rb (0.8.1) sha256=9ae8df145b39aa5398b2f90090d651c67bd8e2ebfe4507c966579f641e11097a
-  httpx (1.7.5) sha256=f002b7728ad108b721ab9c4e02b17b5c780581d490cd13245fc3d5c5b7127b6e
+  httpx (1.7.6) sha256=82d825abc9876a132adc3492c56a0c528478ac238dd6f74d3422ab0036c6b5c8
   i18n (1.14.8) sha256=285778639134865c5e0f6269e0b818256017e8cde89993fdfcbfb64d088824a5
   io-console (0.8.2) sha256=d6e3ae7a7cc7574f4b8893b4fca2162e57a825b223a177b7afa236c5ef9814cc
   io-console (0.8.2-java) sha256=837efefe96084c13ae91114917986ae6c6d1cf063b27b8419cc564a722a38af8
@@ -866,7 +868,8 @@ CHECKSUMS
   mini_portile2 (2.8.9) sha256=0cd7c7f824e010c072e33f68bc02d85a00aeb6fce05bb4819c03dfd3c140c289
   minitest (6.0.3) sha256=88ac8a1de36c00692420e7cb3cc11a0773bbcb126aee1c249f320160a7d11411
   module_methods (0.1.0) sha256=71cabd8e5b8537316a2e4a543a778726f34fab048d6d5fe97f3766c7b4e406a1
-  multi_json (1.19.1) sha256=7aefeff8f2c854bf739931a238e4aea64592845e0c0395c8a7d2eea7fdd631b7
+  multi_json (1.20.1) sha256=2f3934e805cc45ef91b551a1f89d0e9191abd06a5e04a2ef09a6a036c452ca6d
+  multi_json (1.20.1-java) sha256=db1b1e8a461ed0d024b30bfd462bab87e7ceedc967457ba3f791043fdf263b95
   mutex_m (0.3.0) sha256=cfcb04ac16b69c4813777022fdceda24e9f798e48092a2b817eb4c0a782b0751
   net-http (0.9.1) sha256=25ba0b67c63e89df626ed8fac771d0ad24ad151a858af2cc8e6a716ca4336996
   nokogiri (1.19.2) sha256=38fdd8b59db3d5ea9e7dfb14702e882b9bf819198d5bf976f17ebce12c481756
@@ -954,7 +957,7 @@ CHECKSUMS
   uri (1.1.1) sha256=379fa58d27ffb1387eaada68c749d1426738bd0f654d812fcc07e7568f5c57c6
   vcr (6.4.0) sha256=077ac92cc16efc5904eb90492a18153b5e6ca5398046d8a249a7c96a9ea24ae6
   webrick (1.9.2) sha256=beb4a15fc474defed24a3bda4ffd88a490d517c9e4e6118c3edce59e45864131
-  yard (0.9.37) sha256=a6e910399e78e613f80ba9add9ba7c394b1a935f083cccbef82903a3d2a26992
+  yard (0.9.40) sha256=a4a205449b5d6de9292affb4fefccbd316678568b5d2df8182b7c77047a8c4a7
   yard-doctest (0.1.17) sha256=7cb35a75d99f58fc42ee72d3542a36e227237b621a40aebc391c95988b72847f
   yard-markdown (0.6.0) sha256=d01ebb21929f43b4f69e6577dda04b488cd629d623b8367a2835c53cc8b64de3
   yell (2.2.2) sha256=1d166f3cc3b6dc49a59778ea7156ed6d8de794c15106d48ffd6cbb061b9b26bc
