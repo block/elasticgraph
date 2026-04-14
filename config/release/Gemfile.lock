@@ -44,7 +44,7 @@ GEM
     simpleidn (0.2.3)
     stringio (3.2.0)
     tsort (0.2.0)
-    yard (0.9.37)
+    yard (0.9.41)
     yard-markdown (0.6.0)
       csv
       rdoc
@@ -61,7 +61,7 @@ DEPENDENCIES
   nokogiri (~> 1.19)
   rake (~> 13.3)
   redcarpet (~> 3.6, >= 3.6.1)
-  yard (~> 0.9, >= 0.9.37, != 0.9.38)
+  yard (~> 0.9, >= 0.9.41)
   yard-markdown (~> 0.6)
 
 CHECKSUMS
@@ -90,7 +90,7 @@ CHECKSUMS
   simpleidn (0.2.3) sha256=08ce96f03fa1605286be22651ba0fc9c0b2d6272c9b27a260bc88be05b0d2c29
   stringio (3.2.0) sha256=c37cb2e58b4ffbd33fe5cd948c05934af997b36e0b6ca6fdf43afa234cf222e1
   tsort (0.2.0) sha256=9650a793f6859a43b6641671278f79cfead60ac714148aabe4e3f0060480089f
-  yard (0.9.37) sha256=a6e910399e78e613f80ba9add9ba7c394b1a935f083cccbef82903a3d2a26992
+  yard (0.9.41) sha256=2fad2f362bceb63101f37aeb81d35cfc50b4ae1c11cf22f54b8d46626877a89f
   yard-markdown (0.6.0) sha256=d01ebb21929f43b4f69e6577dda04b488cd629d623b8367a2835c53cc8b64de3
 
 BUNDLED WITH
