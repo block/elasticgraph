@@ -326,6 +326,12 @@ module ElasticGraph
             # made against the wrong shard.
             hash["_routing"] = {"required" => true} if uses_custom_routing?
             hash["_size"] = {"enabled" => true} if schema_def_state.index_document_sizes?
+
+            # Exclude non-returnable fields from `_source` to save storage. These fields are still
+            # indexed (in the inverted index and/or doc_values) for filtering, sorting, and aggregation,
+            # but their values are not stored in the compressed `_source` blob.
+            source_excludes = indexed_type.source_excludes_paths
+            hash["_source"] = {"excludes" => source_excludes} if source_excludes.any?
           end
         end
 

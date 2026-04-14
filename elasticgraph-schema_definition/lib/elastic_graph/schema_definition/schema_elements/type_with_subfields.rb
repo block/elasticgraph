@@ -137,6 +137,9 @@ module ElasticGraph
         #   ElasticGraph will infer field sortability based on the field's GraphQL type and mapping type.
         # @option options [Boolean] highlightable force-enables or disables the ability to request search highlights for this field. When
         #   not provided, ElasticGraph will infer field highlightable based on the field's mapping type.
+        # @option options [Boolean] returnable when set to `false`, the field will not appear in the GraphQL output type and its data
+        #   will be excluded from `_source` in the datastore for storage savings. The field will still be available for filtering,
+        #   sorting, grouping, and aggregation. Defaults to `true`.
         # @yield [Field] the field for further customization
         # @return [void]
         #
@@ -531,6 +534,7 @@ module ElasticGraph
 
         def fields_sdl(&arg_selector)
           graphql_fields_by_name.values
+            .select(&:returnable?)
             .map { |f| f.to_sdl(&arg_selector) }
             .flat_map { |sdl| sdl.split("\n") }
             .join("\n  ")

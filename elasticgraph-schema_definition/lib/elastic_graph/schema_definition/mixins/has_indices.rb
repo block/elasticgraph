@@ -292,6 +292,28 @@ module ElasticGraph
           indexing_fields_by_name_in_index.values.reject { |f| f.source.nil? }
         end
 
+        # Returns the list of `_source.excludes` paths for non-returnable fields.
+        #
+        # Uses `indexing_fields_by_name_in_index` for traversal (same as
+        # `index_field_runtime_metadata_tuples`) to avoid infinite recursion
+        # through interface/union subtype cycles.
+        #
+        # @private
+        def source_excludes_paths(path_prefix: "")
+          indexing_fields_by_name_in_index.flat_map do |name, field|
+            path = path_prefix + name
+            object_type = field.type.fully_unwrapped.as_object_type
+
+            if !field.returnable?
+              [object_type ? "#{path}.*" : path]
+            elsif object_type
+              object_type.source_excludes_paths(path_prefix: "#{path}.")
+            else
+              []
+            end
+          end
+        end
+
         private
 
         def initialize_has_indices

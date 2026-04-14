@@ -73,6 +73,8 @@ module ElasticGraph
       #   @private
       # @!attribute [rw] highlightable
       #   @private
+      # @!attribute [rw] returnable
+      #   @private
       # @!attribute [rw] source
       #   @private
       # @!attribute [rw] runtime_field_script
@@ -91,7 +93,7 @@ module ElasticGraph
         :name, :original_type, :parent_type, :original_type_for_derived_types, :schema_def_state, :accuracy_confidence,
         :filter_customizations, :grouped_by_customizations, :highlights_customizations, :sub_aggregations_customizations,
         :aggregated_values_customizations, :sort_order_enum_value_customizations, :args,
-        :sortable, :filterable, :aggregatable, :groupable, :highlightable,
+        :sortable, :filterable, :aggregatable, :groupable, :highlightable, :returnable,
         :graphql_only, :source, :runtime_field_script, :relationship, :singular_name,
         :computation_detail, :non_nullable_in_json_schema, :as_input,
         :name_in_index, :resolver
@@ -106,7 +108,7 @@ module ElasticGraph
           name:, type:, parent_type:, schema_def_state:,
           accuracy_confidence: :high, name_in_index: name,
           type_for_derived_types: nil, graphql_only: nil, singular: nil,
-          sortable: nil, filterable: nil, aggregatable: nil, groupable: nil, highlightable: nil,
+          sortable: nil, filterable: nil, aggregatable: nil, groupable: nil, highlightable: nil, returnable: nil,
           as_input: false, resolver: nil
         )
           type_ref = schema_def_state.type_ref(type)
@@ -129,6 +131,7 @@ module ElasticGraph
             aggregatable: aggregatable,
             groupable: groupable,
             highlightable: highlightable,
+            returnable: returnable,
             graphql_only: graphql_only,
             source: nil,
             runtime_field_script: nil,
@@ -743,6 +746,16 @@ module ElasticGraph
           type_for_derived_types.fully_unwrapped.as_object_type&.supports?(&:highlightable?)
         end
 
+        # Indicates if this field is returnable in GraphQL query responses. When `false`, the field will
+        # still be available for filtering, sorting, grouping, and aggregation, but will not appear in the
+        # GraphQL output type and its data will be excluded from `_source` in the datastore for storage savings.
+        #
+        # @return [Boolean] true if this field's data can be returned (default: true)
+        def returnable?
+          return true if returnable.nil?
+          returnable
+        end
+
         # Defines an argument on the field.
         #
         # @note ElasticGraph takes care of defining arguments for all the query features it supports, so there is generally no need to use
@@ -892,7 +905,10 @@ module ElasticGraph
             parent_type: parent_type,
             name_in_index: name_in_index,
             type_for_derived_types: nil,
-            resolver: nil
+            resolver: nil,
+            # Filter fields should always appear in their parent input type's SDL regardless
+            # of the source field's returnability.
+            returnable: true
           )
 
           schema_def_state.factory.new_field(**params).tap do |f|
