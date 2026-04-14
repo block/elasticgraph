@@ -1162,6 +1162,15 @@ json_schema_version: 1
         ElasticGraph:
           type: String
           nameInIndex: name
+      internal_name:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/String"
+          - maxLength: 8191
+        - type: 'null'
+        ElasticGraph:
+          type: String
+          nameInIndex: internal_name
       name_text:
         anyOf:
         - allOf:
@@ -1229,6 +1238,13 @@ json_schema_version: 1
         ElasticGraph:
           type: WidgetOptions
           nameInIndex: options
+      internal_details:
+        anyOf:
+        - "$ref": "#/$defs/WidgetInternalDetails"
+        - type: 'null'
+        ElasticGraph:
+          type: WidgetInternalDetails
+          nameInIndex: internal_details
       the_options:
         anyOf:
         - "$ref": "#/$defs/WidgetOptions"
@@ -1307,6 +1323,7 @@ json_schema_version: 1
     - cost_currency_primary_continent
     - cost_currency_introduced_on
     - name
+    - internal_name
     - name_text
     - description
     - created_at
@@ -1316,6 +1333,7 @@ json_schema_version: 1
     - release_dates
     - component_ids
     - options
+    - internal_details
     - the_options
     - inventor
     - named_inventor
@@ -1327,6 +1345,24 @@ json_schema_version: 1
     - metadata
     description: For more performant queries on this type, please filter on `workspace_id`
       if possible.
+  WidgetInternalDetails:
+    type: object
+    properties:
+      name:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/String"
+          - maxLength: 8191
+        - type: 'null'
+        ElasticGraph:
+          type: String
+          nameInIndex: name
+      __typename:
+        type: string
+        const: WidgetInternalDetails
+        default: WidgetInternalDetails
+    required:
+    - name
   WidgetOptions:
     type: object
     properties:

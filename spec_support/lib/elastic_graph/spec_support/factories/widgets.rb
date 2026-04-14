@@ -38,6 +38,11 @@ FactoryBot.define do
     is_draft { false }
   end
 
+  factory :widget_internal_details, parent: :hash_base do
+    __typename { "WidgetInternalDetails" }
+    name { Faker::Device.model_name }
+  end
+
   factory :person, parent: :hash_base do
     __typename { "Person" }
     name { Faker::Name.name }
@@ -91,6 +96,7 @@ FactoryBot.define do
     cost_currency_introduced_on { cost&.fetch(:currency)&.then { |code| currencies_by_code.dig(code, :introduced_on) } }
     cost_currency_symbol { cost&.fetch(:currency)&.then { |code| currencies_by_code.dig(code, :symbol) } }
     name { Faker::Device.model_name }
+    internal_name { Faker::Device.model_name }
     name_text { name }
     description { "this is #{Faker::Device.model_name}" }
     created_at { Faker::Time.between(from: recent_date - 30, to: recent_date).utc.iso8601 }
@@ -100,6 +106,7 @@ FactoryBot.define do
     release_dates { release_timestamps.map { |ts| ::Time.iso8601(ts).to_date.iso8601 } }
     options { build :widget_options }
     the_options { options }
+    internal_details { build :widget_internal_details }
 
     component_ids do
       components.map { |c| c.fetch(:id) }
