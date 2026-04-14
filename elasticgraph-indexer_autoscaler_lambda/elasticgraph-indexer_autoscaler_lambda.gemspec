@@ -43,7 +43,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "elasticgraph-datastore_core", ElasticGraph::VERSION
   spec.add_dependency "elasticgraph-lambda_support", ElasticGraph::VERSION
-  spec.add_dependency "aws-sdk-lambda", "~> 1.176"
+  spec.add_dependency "aws-sdk-lambda", "~> 1.177"
   spec.add_dependency "aws-sdk-sqs", "~> 1.112"
   spec.add_dependency "aws-sdk-cloudwatch", "~> 1.133.0"
 
