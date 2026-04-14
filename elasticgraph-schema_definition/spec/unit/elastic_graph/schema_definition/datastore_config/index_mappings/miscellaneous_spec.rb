@@ -212,6 +212,19 @@ module ElasticGraph
         expect(mapping).not_to have_key("_source")
       end
 
+      it "includes `_source.excludes` for fields fetched from doc values" do
+        mapping = index_mapping_for "my_type" do |s|
+          s.object_type "MyType" do |t|
+            t.field "id", "ID"
+            t.field "internal_code", "String", retrieved_from: :doc_values
+            t.index "my_type"
+          end
+        end
+
+        expect(mapping).to include("_source" => {"excludes" => ["internal_code"]})
+        expect(mapping.dig("properties", "internal_code")).to eq({"type" => "keyword"})
+      end
+
       it "keeps `source_from` fields in the mapping so that indexed documents support the field even though it comes from an alternate source" do
         mapping = index_mapping_for "components" do |s|
           s.object_type "Widget" do |t|

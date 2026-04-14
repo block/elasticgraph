@@ -123,8 +123,8 @@ module ElasticGraph
           )
         end
 
-        def index_field_with(source: SELF_RELATIONSHIP_NAME)
-          IndexField.new(source: source)
+        def index_field_with(source: SELF_RELATIONSHIP_NAME, retrieved_from: nil)
+          IndexField.new(source: source, retrieved_from: retrieved_from)
         end
 
         def enum_type_with(values_by_name: {})

@@ -122,6 +122,23 @@ module ElasticGraph
         ])
       end
 
+      it "returns direct leaf fields configured to be fetched from doc values" do
+        index_records(
+          widget = build(:widget, workspace_id: "workspace_1"),
+          address = build(:address, full_address: "123 Main St")
+        )
+
+        widgets = list_widgets(fields: <<~EOS)
+          id
+          #{case_correctly("workspace_id")}
+        EOS
+
+        addresses = list_addresses(fields: case_correctly("full_address"))
+
+        expect(widgets).to eq([string_hash_of(widget, :id, :workspace_id)])
+        expect(addresses).to eq([string_hash_of(address, :full_address)])
+      end
+
       describe "timeout behavior" do
         it "raises `Errors::RequestExceededDeadlineError` if the specified timeout is exceeded by a datastore query" do
           expect {
@@ -160,6 +177,20 @@ module ElasticGraph
         call_graphql_query(<<~QUERY, gql: gql).dig("data", "addresses", "edges").map { |we| we.fetch("node") }
           query {
             addresses#{graphql_args(query_args)} {
+              edges {
+                node {
+                  #{fields}
+                }
+              }
+            }
+          }
+        QUERY
+      end
+
+      def list_widgets(fields:, gql: graphql, **query_args)
+        call_graphql_query(<<~QUERY, gql: gql).dig("data", "widgets", "edges").map { |we| we.fetch("node") }
+          query {
+            widgets#{graphql_args(query_args)} {
               edges {
                 node {
                   #{fields}

@@ -676,6 +676,127 @@ module ElasticGraph
           expect(highlights_type_from(result, "Widget")).to include("internal_code: [String!]!")
         end
 
+        it "keeps `retrieved_from: :doc_values` fields in the output type" do
+          result = define_schema do |api|
+            api.object_type "Widget" do |t|
+              t.field "id", "ID"
+              t.field "internal_code", "String", retrieved_from: :doc_values
+              t.index "widgets"
+            end
+          end
+
+          expect(type_def_from(result, "Widget")).to include("internal_code: String")
+        end
+
+        it "rejects unsupported `retrieved_from` values" do
+          expect {
+            define_schema do |api|
+              api.object_type "Widget" do |t|
+                t.field "id", "ID"
+                t.field "internal_code", "String", retrieved_from: :stored_fields
+                t.index "widgets"
+              end
+            end
+          }.to raise_error Errors::SchemaError, a_string_including("invalid `retrieved_from`", "The only supported value is `:doc_values`")
+        end
+
+        it "rejects `retrieved_from: :doc_values` on fields of embedded object types" do
+          expect {
+            define_schema do |api|
+              api.object_type "WidgetOptions" do |t|
+                t.field "size", "String", retrieved_from: :doc_values
+              end
+
+              api.object_type "Widget" do |t|
+                t.field "id", "ID"
+                t.field "options", "WidgetOptions"
+                t.index "widgets"
+              end
+            end
+          }.to raise_error Errors::SchemaError, a_string_including("retrieved_from: :doc_values", "direct fields of indexed root document types")
+        end
+
+        it "rejects `retrieved_from: :doc_values` on non-leaf GraphQL fields" do
+          expect {
+            define_schema do |api|
+              api.object_type "WidgetOptions" do |t|
+                t.field "size", "String"
+              end
+
+              api.object_type "Widget" do |t|
+                t.field "id", "ID"
+                t.field "options", "WidgetOptions", retrieved_from: :doc_values
+                t.index "widgets"
+              end
+            end
+          }.to raise_error Errors::SchemaError, a_string_including("retrieved_from: :doc_values", "GraphQL leaf fields")
+        end
+
+        it "rejects `retrieved_from: :doc_values` on fields with a dotted `name_in_index`" do
+          expect {
+            define_schema do |api|
+              api.object_type "WidgetOptions" do |t|
+                t.field "size", "String"
+              end
+
+              api.object_type "Widget" do |t|
+                t.field "id", "ID"
+                t.field "options", "WidgetOptions"
+                t.field "size", "String", graphql_only: true, name_in_index: "options.size", retrieved_from: :doc_values
+                t.index "widgets"
+              end
+            end
+          }.to raise_error Errors::SchemaError, a_string_including("retrieved_from: :doc_values", "without a dotted `name_in_index`")
+        end
+
+        it "rejects `retrieved_from: :doc_values` on fields under a nested path" do
+          expect {
+            define_schema do |api|
+              api.object_type "WorkspaceMembership" do |t|
+                t.field "workspace_id", "ID"
+              end
+
+              api.object_type "Widget" do |t|
+                t.field "id", "ID"
+                t.field "memberships", "[WorkspaceMembership!]!" do |f|
+                  f.mapping type: "nested"
+                end
+                t.field "workspace_id", "ID",
+                  graphql_only: true,
+                  name_in_index: "memberships.workspace_id",
+                  retrieved_from: :doc_values
+                t.index "widgets"
+              end
+            end
+          }.to raise_error Errors::SchemaError, a_string_including("retrieved_from: :doc_values", "without a dotted `name_in_index`")
+        end
+
+        it "rejects `retrieved_from: :doc_values` on text fields" do
+          expect {
+            define_schema do |api|
+              api.object_type "Widget" do |t|
+                t.field "id", "ID"
+                t.field "description", "String", retrieved_from: :doc_values do |f|
+                  f.mapping type: "text"
+                end
+                t.index "widgets"
+              end
+            end
+          }.to raise_error Errors::SchemaError, a_string_including("retrieved_from: :doc_values", "text fields do not support datastore doc values")
+        end
+
+        it "rejects `retrieved_from: :doc_values` on list fields" do
+          expect {
+            define_schema do |api|
+              api.object_type "Widget" do |t|
+                t.field "id", "ID"
+                t.field "component_ids", "[ID!]!", retrieved_from: :doc_values
+                t.index "widgets"
+              end
+            end
+          }.to raise_error Errors::SchemaError, a_string_including("retrieved_from: :doc_values", "non-list GraphQL leaf fields")
+        end
+
         def object_type(name, *args, pre_def: nil, include_docs: true, &block)
           result = define_schema do |api|
             pre_def&.call(api)

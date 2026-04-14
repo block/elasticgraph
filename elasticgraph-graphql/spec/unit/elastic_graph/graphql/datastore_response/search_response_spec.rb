@@ -369,6 +369,18 @@ module ElasticGraph
             expect(filtered.documents.map(&:payload)).to eq [bob.fetch("_source"), eileen.fetch("_source")]
           end
 
+          it "can filter on values returned in datastore `fields` when `_source` omits them" do
+            response = response_of(
+              bob = {"_id" => "B", "fields" => {"name" => ["Bob"]}},
+              {"_id" => "J", "fields" => {"name" => ["Judy"]}},
+              eileen = {"_id" => "E", "fields" => {"name" => ["Eileen"]}}
+            )
+
+            filtered = response.filter_results(["name"], ["Bob", "Eileen"].to_set, 10)
+
+            expect(filtered.documents.map(&:id)).to eq [bob.fetch("_id"), eileen.fetch("_id")]
+          end
+
           it "preserves the `decoded_cursor_factory` that was on the original documents" do
             response = response_of(
               {"_id" => "B", "_source" => {"id" => "B", "name" => "Bob", "age" => 17}},

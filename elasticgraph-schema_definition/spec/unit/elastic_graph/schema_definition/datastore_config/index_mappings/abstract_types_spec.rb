@@ -84,6 +84,29 @@ module ElasticGraph
             })
           end
 
+          it "includes `_source.excludes` for subtype fields fetched from doc values" do
+            mapping = index_mapping_for "things" do |s|
+              s.object_type "Widget" do |t|
+                t.field "id", "ID!"
+                t.field "internal_code", "String", retrieved_from: :doc_values
+                link_subtype_to_supertype(t, "Thing")
+              end
+
+              s.object_type "Component" do |t|
+                t.field "id", "ID!"
+                link_subtype_to_supertype(t, "Thing")
+              end
+
+              s.public_send type_def_method, "Thing" do |t|
+                link_supertype_to_subtypes(t, "Widget", "Component")
+                t.index "things"
+              end
+            end
+
+            expect(mapping).to include("_source" => {"excludes" => ["internal_code"]})
+            expect(mapping.dig("properties", "internal_code")).to eq({"type" => "keyword"})
+          end
+
           it "handles the subtypes having no fields" do
             mapping = index_mapping_for "things" do |s|
               s.object_type "Widget" do |t|

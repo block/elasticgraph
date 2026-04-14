@@ -120,7 +120,7 @@ module ElasticGraph
                 ],
                 current_sources: [SELF_RELATIONSHIP_NAME],
                 fields_by_path: {
-                  "foo.bar" => IndexField.new(source: "other")
+                  "foo.bar" => IndexField.new(source: "other", retrieved_from: nil)
                 },
                 has_had_multiple_sources: false
               ),
