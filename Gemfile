@@ -16,12 +16,12 @@ group :development do
   gem "benchmark-ips", "~> 2.14"
   gem "coderay", "~> 1.1", ">= 1.1.3"
   gem "factory_bot", "~> 6.5", ">= 6.5.6"
-  gem "faker", "~> 3.6", ">= 3.6.1"
+  gem "faker", "~> 3.7", ">= 3.7.1"
 
   # Pin to a GitHub SHA until Ruby 4.0 support has been released
   gem "flatware-rspec", "~> 2.3", ">= 2.3.4", github: "briandunn/flatware", ref: "0403ac1137cc7958fe06db2c0563dfbab0bd24db", platforms: :ruby
 
-  gem "httpx", "~> 1.7", ">= 1.7.5"
+  gem "httpx", "~> 1.7", ">= 1.7.6"
   gem "memory_profiler", "~> 1.1"
   gem "nokogiri", "~> 1.19", ">= 1.19.2"
   gem "method_source", "~> 1.1"
