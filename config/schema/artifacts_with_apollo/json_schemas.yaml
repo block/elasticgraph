@@ -885,6 +885,12 @@ json_schema_version: 1
           - "$ref": "#/$defs/String"
           - maxLength: 8191
         - type: 'null'
+      internal_highlightable_name:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/String"
+          - maxLength: 8191
+        - type: 'null'
       name_text:
         anyOf:
         - allOf:
@@ -926,6 +932,10 @@ json_schema_version: 1
         - "$ref": "#/$defs/WidgetOptions"
         - type: 'null'
       internal_details:
+        anyOf:
+        - "$ref": "#/$defs/WidgetInternalDetails"
+        - type: 'null'
+      internal_highlightable_details:
         anyOf:
         - "$ref": "#/$defs/WidgetInternalDetails"
         - type: 'null'
@@ -981,6 +991,7 @@ json_schema_version: 1
     - cost_currency_introduced_on
     - name
     - internal_name
+    - internal_highlightable_name
     - name_text
     - description
     - created_at
@@ -991,6 +1002,7 @@ json_schema_version: 1
     - component_ids
     - options
     - internal_details
+    - internal_highlightable_details
     - the_options
     - inventor
     - named_inventor

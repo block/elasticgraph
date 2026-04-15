@@ -741,6 +741,7 @@ module ElasticGraph
         def highlightable?
           return highlightable unless highlightable.nil?
           return false if relationship
+          return false unless returnable?
           return true if HIGHLIGHTABLE_MAPPING_TYPES.include?(mapping_type)
 
           type_for_derived_types.fully_unwrapped.as_object_type&.supports?(&:highlightable?)

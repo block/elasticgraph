@@ -5975,6 +5975,16 @@ type NamedEntityAggregatedValues {
   internal_details: WidgetInternalDetailsAggregatedValues
 
   """
+  Computed aggregate values for the `internal_highlightable_details` field.
+  """
+  internal_highlightable_details: WidgetInternalDetailsAggregatedValues
+
+  """
+  Computed aggregate values for the `internal_highlightable_name` field.
+  """
+  internal_highlightable_name: NonNumericAggregatedValues
+
+  """
   Computed aggregate values for the `internal_name` field.
   """
   internal_name: NonNumericAggregatedValues
@@ -6365,6 +6375,20 @@ input NamedEntityFilterInput {
   internal_details: WidgetInternalDetailsFilterInput
 
   """
+  Used to filter on the `internal_highlightable_details` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  internal_highlightable_details: WidgetInternalDetailsFilterInput
+
+  """
+  Used to filter on the `internal_highlightable_name` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  internal_highlightable_name: StringFilterInput
+
+  """
   Used to filter on the `internal_name` field.
 
   When `null` or an empty object is passed, matches all documents.
@@ -6628,6 +6652,16 @@ type NamedEntityGroupedBy {
   internal_details: WidgetInternalDetailsGroupedBy
 
   """
+  The `internal_highlightable_details` field value for this group.
+  """
+  internal_highlightable_details: WidgetInternalDetailsGroupedBy
+
+  """
+  The `internal_highlightable_name` field value for this group.
+  """
+  internal_highlightable_name: String
+
+  """
   The `internal_name` field value for this group.
   """
   internal_name: String
@@ -6807,14 +6841,14 @@ type NamedEntityHighlights {
   id: [String!]!
 
   """
-  Search highlights for the `internal_details`, providing snippets of the matching text.
+  Search highlights for the `internal_highlightable_details`, providing snippets of the matching text.
   """
-  internal_details: WidgetInternalDetailsHighlights
+  internal_highlightable_details: WidgetInternalDetailsHighlights
 
   """
-  Search highlights for the `internal_name`, providing snippets of the matching text.
+  Search highlights for the `internal_highlightable_name`, providing snippets of the matching text.
   """
-  internal_name: [String!]!
+  internal_highlightable_name: [String!]!
 
   """
   Search highlights for the `inventor`, providing snippets of the matching text.
@@ -7085,6 +7119,26 @@ enum NamedEntitySortOrderInput {
   Sorts descending by the `internal_details.name` field.
   """
   internal_details_name_DESC
+
+  """
+  Sorts ascending by the `internal_highlightable_details.name` field.
+  """
+  internal_highlightable_details_name_ASC
+
+  """
+  Sorts descending by the `internal_highlightable_details.name` field.
+  """
+  internal_highlightable_details_name_DESC
+
+  """
+  Sorts ascending by the `internal_highlightable_name` field.
+  """
+  internal_highlightable_name_ASC
+
+  """
+  Sorts descending by the `internal_highlightable_name` field.
+  """
+  internal_highlightable_name_DESC
 
   """
   Sorts ascending by the `internal_name` field.
@@ -14393,6 +14447,16 @@ type WidgetAggregatedValues {
   internal_details: WidgetInternalDetailsAggregatedValues
 
   """
+  Computed aggregate values for the `internal_highlightable_details` field.
+  """
+  internal_highlightable_details: WidgetInternalDetailsAggregatedValues
+
+  """
+  Computed aggregate values for the `internal_highlightable_name` field.
+  """
+  internal_highlightable_name: NonNumericAggregatedValues
+
+  """
   Computed aggregate values for the `internal_name` field.
   """
   internal_name: NonNumericAggregatedValues
@@ -15356,6 +15420,20 @@ input WidgetFilterInput {
   internal_details: WidgetInternalDetailsFilterInput
 
   """
+  Used to filter on the `internal_highlightable_details` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  internal_highlightable_details: WidgetInternalDetailsFilterInput
+
+  """
+  Used to filter on the `internal_highlightable_name` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  internal_highlightable_name: StringFilterInput
+
+  """
   Used to filter on the `internal_name` field.
 
   When `null` or an empty object is passed, matches all documents.
@@ -15558,6 +15636,16 @@ type WidgetGroupedBy {
   internal_details: WidgetInternalDetailsGroupedBy
 
   """
+  The `internal_highlightable_details` field value for this group.
+  """
+  internal_highlightable_details: WidgetInternalDetailsGroupedBy
+
+  """
+  The `internal_highlightable_name` field value for this group.
+  """
+  internal_highlightable_name: String
+
+  """
   The `internal_name` field value for this group.
   """
   internal_name: String
@@ -15697,14 +15785,14 @@ type WidgetHighlights {
   id: [String!]!
 
   """
-  Search highlights for the `internal_details`, providing snippets of the matching text.
+  Search highlights for the `internal_highlightable_details`, providing snippets of the matching text.
   """
-  internal_details: WidgetInternalDetailsHighlights
+  internal_highlightable_details: WidgetInternalDetailsHighlights
 
   """
-  Search highlights for the `internal_name`, providing snippets of the matching text.
+  Search highlights for the `internal_highlightable_name`, providing snippets of the matching text.
   """
-  internal_name: [String!]!
+  internal_highlightable_name: [String!]!
 
   """
   Search highlights for the `inventor`, providing snippets of the matching text.
@@ -16158,6 +16246,16 @@ type WidgetOrAddressAggregatedValues {
   internal_details: WidgetInternalDetailsAggregatedValues
 
   """
+  Computed aggregate values for the `internal_highlightable_details` field.
+  """
+  internal_highlightable_details: WidgetInternalDetailsAggregatedValues
+
+  """
+  Computed aggregate values for the `internal_highlightable_name` field.
+  """
+  internal_highlightable_name: NonNumericAggregatedValues
+
+  """
   Computed aggregate values for the `internal_name` field.
   """
   internal_name: NonNumericAggregatedValues
@@ -16525,6 +16623,20 @@ input WidgetOrAddressFilterInput {
   internal_details: WidgetInternalDetailsFilterInput
 
   """
+  Used to filter on the `internal_highlightable_details` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  internal_highlightable_details: WidgetInternalDetailsFilterInput
+
+  """
+  Used to filter on the `internal_highlightable_name` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  internal_highlightable_name: StringFilterInput
+
+  """
   Used to filter on the `internal_name` field.
 
   When `null` or an empty object is passed, matches all documents.
@@ -16739,6 +16851,16 @@ type WidgetOrAddressGroupedBy {
   internal_details: WidgetInternalDetailsGroupedBy
 
   """
+  The `internal_highlightable_details` field value for this group.
+  """
+  internal_highlightable_details: WidgetInternalDetailsGroupedBy
+
+  """
+  The `internal_highlightable_name` field value for this group.
+  """
+  internal_highlightable_name: String
+
+  """
   The `internal_name` field value for this group.
   """
   internal_name: String
@@ -16888,14 +17010,14 @@ type WidgetOrAddressHighlights {
   id: [String!]!
 
   """
-  Search highlights for the `internal_details`, providing snippets of the matching text.
+  Search highlights for the `internal_highlightable_details`, providing snippets of the matching text.
   """
-  internal_details: WidgetInternalDetailsHighlights
+  internal_highlightable_details: WidgetInternalDetailsHighlights
 
   """
-  Search highlights for the `internal_name`, providing snippets of the matching text.
+  Search highlights for the `internal_highlightable_name`, providing snippets of the matching text.
   """
-  internal_name: [String!]!
+  internal_highlightable_name: [String!]!
 
   """
   Search highlights for the `inventor`, providing snippets of the matching text.
@@ -17116,6 +17238,26 @@ enum WidgetOrAddressSortOrderInput {
   Sorts descending by the `internal_details.name` field.
   """
   internal_details_name_DESC
+
+  """
+  Sorts ascending by the `internal_highlightable_details.name` field.
+  """
+  internal_highlightable_details_name_ASC
+
+  """
+  Sorts descending by the `internal_highlightable_details.name` field.
+  """
+  internal_highlightable_details_name_DESC
+
+  """
+  Sorts ascending by the `internal_highlightable_name` field.
+  """
+  internal_highlightable_name_ASC
+
+  """
+  Sorts descending by the `internal_highlightable_name` field.
+  """
+  internal_highlightable_name_DESC
 
   """
   Sorts ascending by the `internal_name` field.
@@ -17501,6 +17643,26 @@ enum WidgetSortOrderInput {
   Sorts descending by the `internal_details.name` field.
   """
   internal_details_name_DESC
+
+  """
+  Sorts ascending by the `internal_highlightable_details.name` field.
+  """
+  internal_highlightable_details_name_ASC
+
+  """
+  Sorts descending by the `internal_highlightable_details.name` field.
+  """
+  internal_highlightable_details_name_DESC
+
+  """
+  Sorts ascending by the `internal_highlightable_name` field.
+  """
+  internal_highlightable_name_ASC
+
+  """
+  Sorts descending by the `internal_highlightable_name` field.
+  """
+  internal_highlightable_name_DESC
 
   """
   Sorts ascending by the `internal_name` field.

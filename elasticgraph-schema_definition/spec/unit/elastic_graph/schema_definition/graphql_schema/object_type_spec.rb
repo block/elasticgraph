@@ -643,7 +643,7 @@ module ElasticGraph
           end
         end
 
-        it "excludes `returnable: false` fields from the output type but keeps them in filter, sort, grouped_by, aggregated_values, and highlights types" do
+        it "excludes `returnable: false` fields from the output type and highlights but keeps them in filter, sort, grouped_by, and aggregated_values types" do
           result = define_schema do |api|
             api.object_type "Widget" do |t|
               t.field "id", "ID"
@@ -672,7 +672,28 @@ module ElasticGraph
           # returnable: false field should still appear in aggregated_values
           expect(aggregated_values_type_from(result, "Widget")).to include("internal_code: NonNumericAggregatedValues")
 
-          # returnable: false field should still appear in highlights
+          # returnable: false field should be excluded from highlights (non-highlightable by default for storage savings)
+          expect(highlights_type_from(result, "Widget")).not_to include("internal_code")
+        end
+
+        it "keeps `returnable: false, highlightable: true` fields in highlights while excluding them from the output type" do
+          result = define_schema do |api|
+            api.object_type "Widget" do |t|
+              t.field "id", "ID"
+              t.field "name", "String"
+              t.field "internal_code", "String", returnable: false, highlightable: true
+              t.index "widgets"
+            end
+          end
+
+          expect(type_def_from(result, "Widget")).to eq(<<~EOS.strip)
+            type Widget {
+              id: ID
+              name: String
+            }
+          EOS
+
+          # returnable: false, highlightable: true field should appear in highlights
           expect(highlights_type_from(result, "Widget")).to include("internal_code: [String!]!")
         end
 

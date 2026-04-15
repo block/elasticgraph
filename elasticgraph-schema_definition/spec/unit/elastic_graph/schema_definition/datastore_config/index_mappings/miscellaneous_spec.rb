@@ -117,7 +117,7 @@ module ElasticGraph
         })
       end
 
-      it "adds `name_in_index` to `_source.excludes` for `returnable: false` fields" do
+      it "uses `name_in_index` in `_source.excludes` for `returnable: false` fields" do
         mapping = index_mapping_for "my_type" do |s|
           s.object_type "MyType" do |t|
             t.field "id", "ID"
@@ -132,10 +132,42 @@ module ElasticGraph
         expect(mapping.dig("properties", "internal_code")).to eq({"type" => "keyword"})
       end
 
-      it "adds `.*` to `_source.excludes` for `returnable: false` object fields" do
+      it "keeps explicitly highlightable `returnable: false` fields in `_source` so they can still be highlighted" do
+        mapping = index_mapping_for "my_type" do |s|
+          s.object_type "MyType" do |t|
+            t.field "id", "ID"
+            t.field "internal_code", "String", returnable: false, highlightable: true
+            t.index "my_type"
+          end
+        end
+
+        expect(mapping).not_to have_key("_source")
+        expect(mapping.dig("properties", "internal_code")).to eq({"type" => "keyword"})
+      end
+
+      it "only excludes non-highlightable descendants for explicitly highlightable `returnable: false` object fields" do
         mapping = index_mapping_for "my_type" do |s|
           s.object_type "InternalMetadata" do |t|
             t.field "internal_code", "String"
+            t.field "internal_count", "Int"
+          end
+
+          s.object_type "MyType" do |t|
+            t.field "id", "ID"
+            t.field "internal_metadata", "InternalMetadata", returnable: false, highlightable: true
+            t.index "my_type"
+          end
+        end
+
+        expect(mapping).to include("_source" => {"excludes" => ["internal_metadata.internal_count"]})
+        expect(mapping.dig("properties", "internal_metadata", "properties", "internal_code")).to eq({"type" => "keyword"})
+        expect(mapping.dig("properties", "internal_metadata", "properties", "internal_count")).to eq({"type" => "integer"})
+      end
+
+      it "excludes all descendants for non-highlightable `returnable: false` object fields, even when subfields are individually highlightable" do
+        mapping = index_mapping_for "my_type" do |s|
+          s.object_type "InternalMetadata" do |t|
+            t.field "code", "String"
           end
 
           s.object_type "MyType" do |t|
@@ -145,33 +177,39 @@ module ElasticGraph
           end
         end
 
+        # `code` is a String (inherently highlightable), but because the parent `internal_metadata`
+        # field is non-highlightable (defaulting from `returnable: false`), the entire subtree is
+        # excluded. The parent's non-highlightable status means highlight types are not generated
+        # for this path, so keeping subfield data in `_source` for highlighting would be pointless.
         expect(mapping).to include("_source" => {"excludes" => ["internal_metadata.*"]})
-        expect(mapping.dig("properties", "internal_metadata", "properties", "internal_code")).to eq({"type" => "keyword"})
+        expect(mapping.dig("properties", "internal_metadata", "properties", "code")).to eq({"type" => "keyword"})
       end
 
-      it "adds `returnable: false` indexing-only fields to `_source.excludes` but not `graphql_only` fields" do
+      it "excludes `returnable: false` indexing-only fields but not `graphql_only` fields from `_source`" do
         mapping = index_mapping_for "my_type" do |s|
           s.object_type "MyType" do |t|
             t.field "id", "ID"
             t.field "name", "String"
-            t.field "legacy_name", "String", graphql_only: true, name_in_index: "name", returnable: false
-            t.field "internal_code", "String", indexing_only: true, returnable: false
+            t.field "count", "Int"
+            t.field "legacy_count", "Int", graphql_only: true, name_in_index: "count", returnable: false
+            t.field "internal_count", "Int", indexing_only: true, returnable: false
             t.index "my_type"
           end
         end
 
-        expect(mapping.dig("_source", "excludes")).to contain_exactly("internal_code")
+        expect(mapping.dig("_source", "excludes")).to contain_exactly("internal_count")
         expect(mapping.fetch("properties")).to include(
           "name" => {"type" => "keyword"},
-          "internal_code" => {"type" => "keyword"}
+          "count" => {"type" => "integer"},
+          "internal_count" => {"type" => "integer"}
         )
-        expect(mapping.fetch("properties")).not_to include("legacy_name")
+        expect(mapping.fetch("properties")).not_to include("legacy_count")
       end
 
-      it "adds full indexed paths to `_source.excludes` for `returnable: false` fields under nested mappings" do
+      it "uses full indexed paths in `_source.excludes` for `returnable: false` fields under nested mappings" do
         mapping = index_mapping_for "my_type" do |s|
           s.object_type "Parent" do |t|
-            t.field "child", "String", name_in_index: "child_in_index", returnable: false
+            t.field "child_count_gql", "Int", name_in_index: "child_count", returnable: false
           end
 
           s.object_type "Grandparent" do |t|
@@ -187,20 +225,20 @@ module ElasticGraph
           end
         end
 
-        expect(mapping.dig("_source", "excludes")).to contain_exactly("grandparents_in_index.parent_in_index.child_in_index")
+        expect(mapping.dig("_source", "excludes")).to contain_exactly("grandparents_in_index.parent_in_index.child_count")
         expect(mapping.dig("properties", "grandparents_in_index")).to include(
           "type" => "nested",
           "properties" => {
             "parent_in_index" => {
               "properties" => {
-                "child_in_index" => {"type" => "keyword"}
+                "child_count" => {"type" => "integer"}
               }
             }
           }
         )
       end
 
-      it "does not add `_source` config when all fields are returnable" do
+      it "does not include `_source` config when all fields are returnable" do
         mapping = index_mapping_for "my_type" do |s|
           s.object_type "MyType" do |t|
             t.field "id", "ID"
