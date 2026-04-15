@@ -94,16 +94,23 @@ RSpec.shared_context "lambda function" do |config_overrides_in_yaml: {}|
     require "aws_lambda_ric/logger_patch"
     require "aws_lambda_ric"
 
-    # Apply the Logger monkey patch directly, the same way the AWS Lambda runtime does internally:
-    # https://github.com/aws/aws-lambda-ruby-runtime-interface-client/blob/3.1.3/lib/aws_lambda_ric.rb#L164-L168
+    # The monkey patches are triggered by the act of instantiating `TelemetryLogger`, which opens
+    # a file descriptor for telemetry logging and then prepends `LoggerPatch` onto `Logger`:
+    # https://github.com/aws/aws-lambda-ruby-runtime-interface-client/blob/3.1.3/lib/aws_lambda_ric.rb#L141-L152
     #
-    # We apply it directly rather than going through `TelemetryLogger.new` because its constructor
-    # also opens a file descriptor for telemetry logging, which may not succeed in forked subprocess
-    # environments (e.g. CI runners). When `IO.new(fd, 'wb')` fails, the RIC silently rescues and
-    # skips installing the monkey patches. Applying the patch directly lets us test what we actually
-    # care about: that `LoggerPatch` is compatible with our current `logger` gem version.
-    ::Logger.class_eval { prepend ::LoggerPatch }
+    # We pass `$stdout.fileno` (the actual fd backing the current stdout) rather than a hardcoded
+    # "1", because in forked subprocess environments (e.g. CI runners with `to_stdout_from_any_process`),
+    # stdout may be redirected and fd 1 may no longer be valid. `$stdout.fileno` always returns the
+    # correct fd for the current stdout, even after redirection.
+    AwsLambdaRIC::TelemetryLogger.new($stdout.fileno.to_s)
 
+    # Here we verify that the Logger monkey patch was indeed installed. The installation of the monkey patch
+    # gets bypassed when certain errors are encountered (which are silently swallowed), so the mere act of
+    # instantiating the class above doesn't guarantee the monkey patches are active.
+    #
+    # Plus, new versions of the `aws_lambda_ric` may change how the monkey patches are installed.
+    #
+    # https://github.com/aws/aws-lambda-ruby-runtime-interface-client/blob/3.1.3/lib/aws_lambda_ric.rb#L150-L152
     expect(::Logger.ancestors).to include(::LoggerPatch)
 
     expect {
