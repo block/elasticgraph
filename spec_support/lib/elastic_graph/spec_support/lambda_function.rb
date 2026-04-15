@@ -98,11 +98,11 @@ RSpec.shared_context "lambda function" do |config_overrides_in_yaml: {}|
     # a file descriptor for telemetry logging and then prepends `LoggerPatch` onto `Logger`:
     # https://github.com/aws/aws-lambda-ruby-runtime-interface-client/blob/3.1.3/lib/aws_lambda_ric.rb#L141-L152
     #
-    # We pass `$stdout.fileno` (the actual fd backing the current stdout) rather than a hardcoded
-    # "1", because in forked subprocess environments (e.g. CI runners with `to_stdout_from_any_process`),
-    # stdout may be redirected and fd 1 may no longer be valid. `$stdout.fileno` always returns the
-    # correct fd for the current stdout, even after redirection.
-    AwsLambdaRIC::TelemetryLogger.new($stdout.fileno.to_s)
+    # We use a temporary file as the telemetry log destination rather than passing "1" (stdout),
+    # because in forked subprocess environments (e.g. CI runners), `IO.new(1, 'wb')` can fail with
+    # `Errno::EBADF`. The RIC silently rescues this and skips the LoggerPatch prepend entirely.
+    telemetry_file = ::File.open(::File.join(@tmp_dir, "telemetry_log"), "wb")
+    AwsLambdaRIC::TelemetryLogger.new(telemetry_file.fileno.to_s)
 
     # Here we verify that the Logger monkey patch was indeed installed. The installation of the monkey patch
     # gets bypassed when certain errors are encountered (which are silently swallowed), so the mere act of
@@ -113,9 +113,13 @@ RSpec.shared_context "lambda function" do |config_overrides_in_yaml: {}|
     # https://github.com/aws/aws-lambda-ruby-runtime-interface-client/blob/3.1.3/lib/aws_lambda_ric.rb#L150-L152
     expect(::Logger.ancestors).to include(::LoggerPatch)
 
-    expect {
-      # Log a message to stdout--this is what triggered a `NoMethodError` when logger 1.6.0 is used.
-      ::Logger.new($stdout).error("test log message")
-    }.to output(a_string_including("test log message")).to_stdout_from_any_process
+    # Verify that logging works after the monkey patch is applied. With `LoggerPatch` active,
+    # `Logger.new($stdout)` redirects output to the telemetry log sink (the temp file above),
+    # so we verify through the file rather than stdout. This is the behavior that triggered a
+    # `NoMethodError` with logger 1.6.0.
+    ::Logger.new($stdout).error("test log message")
+    telemetry_file.flush
+    telemetry_contents = ::File.read(::File.join(@tmp_dir, "telemetry_log"))
+    expect(telemetry_contents).to include("test log message")
   end
 end
