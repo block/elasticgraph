@@ -101,8 +101,13 @@ RSpec.shared_context "lambda function" do |config_overrides_in_yaml: {}|
     # We use a temporary file as the telemetry log destination rather than passing "1" (stdout),
     # because in forked subprocess environments (e.g. CI runners), `IO.new(1, 'wb')` can fail with
     # `Errno::EBADF`. The RIC silently rescues this and skips the LoggerPatch prepend entirely.
-    telemetry_file = ::File.open(::File.join(@tmp_dir, "telemetry_log"), "wb")
-    AwsLambdaRIC::TelemetryLogger.new(telemetry_file.fileno.to_s)
+    #
+    # We use `IO.sysopen` to get a raw fd not yet wrapped by a Ruby IO object, since
+    # `TelemetryLogger.new` calls `IO.new(fd, 'wb')` internally and some Ruby versions
+    # raise when wrapping an fd that's already owned by another Ruby IO.
+    telemetry_log_path = ::File.join(@tmp_dir, "telemetry_log")
+    telemetry_fd = ::IO.sysopen(telemetry_log_path, "wb")
+    AwsLambdaRIC::TelemetryLogger.new(telemetry_fd.to_s)
 
     # Here we verify that the Logger monkey patch was indeed installed. The installation of the monkey patch
     # gets bypassed when certain errors are encountered (which are silently swallowed), so the mere act of
@@ -118,8 +123,8 @@ RSpec.shared_context "lambda function" do |config_overrides_in_yaml: {}|
     # so we verify through the file rather than stdout. This is the behavior that triggered a
     # `NoMethodError` with logger 1.6.0.
     ::Logger.new($stdout).error("test log message")
-    telemetry_file.flush
-    telemetry_contents = ::File.read(::File.join(@tmp_dir, "telemetry_log"))
+    AwsLambdaRIC::TelemetryLogger.telemetry_log_fd_file&.flush
+    telemetry_contents = ::File.read(telemetry_log_path)
     expect(telemetry_contents).to include("test log message")
   end
 end
