@@ -95,8 +95,14 @@ RSpec.shared_context "lambda function" do |config_overrides_in_yaml: {}|
     require "aws_lambda_ric"
 
     # The monkey patches are triggered by the act of instantiating this class:
-    # https://github.com/aws/aws-lambda-ruby-runtime-interface-client/blob/3.0.0/lib/aws_lambda_ric.rb#L141-L152
-    AwsLambdaRIC::TelemetryLogger.new("1") # File descriptor is required but not used in test env
+    # https://github.com/aws/aws-lambda-ruby-runtime-interface-client/blob/3.1.3/lib/aws_lambda_ric.rb#L141-L152
+    #
+    # We provide a real writable file descriptor via `IO.pipe` rather than passing "1" (stdout),
+    # because stdout may not be reliably writable as a raw fd in forked subprocess environments
+    # (e.g. CI runners). When `IO.new(fd, 'wb')` fails with `Errno::EBADF`, the RIC silently
+    # rescues and skips installing the monkey patches entirely.
+    _telemetry_r, telemetry_w = ::IO.pipe
+    AwsLambdaRIC::TelemetryLogger.new(telemetry_w.fileno.to_s)
 
     # Here we verify that the Logger monkey patch was indeed installed. The installation of the monkey patch
     # gets bypassed when certain errors are encountered (which are silently swallowed), so the mere act of
@@ -104,7 +110,7 @@ RSpec.shared_context "lambda function" do |config_overrides_in_yaml: {}|
     #
     # Plus, new versions of the `aws_lambda_ric` may change how the monkey patches are installed.
     #
-    # https://github.com/aws/aws-lambda-ruby-runtime-interface-client/blob/3.0.0/lib/aws_lambda_ric.rb#L150-L152
+    # https://github.com/aws/aws-lambda-ruby-runtime-interface-client/blob/3.1.3/lib/aws_lambda_ric.rb#L150-L152
     expect(::Logger.ancestors).to include(::LoggerPatch)
 
     expect {
