@@ -34,7 +34,8 @@ module ElasticGraph
           event: event,
           prepared_record: idxr.record_preparer_factory.for_latest_json_schema_version.prepare_for_index(
             event.fetch("type"),
-            event.fetch("record")
+            event.fetch("record"),
+            mapping_properties: idxr.schema_artifacts.index_mappings_by_index_def_name.fetch(index_def.name).dig("properties")
           ),
           destination_index_def: index_def,
           update_target: update_targets.first,

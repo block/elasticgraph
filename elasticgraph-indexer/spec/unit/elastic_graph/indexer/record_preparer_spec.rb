@@ -190,7 +190,7 @@ module ElasticGraph
         end
 
         it "handles abstract types (like type unions) stored in separate indexes, properly omitting `__typename`" do
-          preparer = build_preparer do |s|
+          preparer, schema_artifacts = build_preparer_with_artifacts do |s|
             s.object_type "TypeA" do |t|
               t.field "id", "ID!"
               t.field "name", "String"
@@ -209,13 +209,14 @@ module ElasticGraph
             end
           end
 
-          record = preparer.prepare_for_index("TypeB", {"id" => "1", "size" => 3, "__typename" => "TypeB"})
+          type_b_mapping_properties = schema_artifacts.index_mappings_by_index_def_name.fetch("type_b").dig("properties")
+          record = preparer.prepare_for_index("TypeB", {"id" => "1", "size" => 3, "__typename" => "TypeB"}, mapping_properties: type_b_mapping_properties)
 
           expect(record).to eq({"id" => "1", "size" => 3})
         end
 
         it "handles abstract types (like type unions) stored in a single index, properly including `__typename`" do
-          preparer = build_preparer do |s|
+          preparer, schema_artifacts = build_preparer_with_artifacts do |s|
             s.object_type "TypeA" do |t|
               t.field "id", "ID!"
               t.field "name", "String"
@@ -233,13 +234,14 @@ module ElasticGraph
             end
           end
 
-          record = preparer.prepare_for_index("TypeAOrB", {"id" => "1", "size" => 3, "__typename" => "TypeB"})
+          type_a_or_b_mapping_properties = schema_artifacts.index_mappings_by_index_def_name.fetch("type_a_or_b").dig("properties")
+          record = preparer.prepare_for_index("TypeAOrB", {"id" => "1", "size" => 3, "__typename" => "TypeB"}, mapping_properties: type_a_or_b_mapping_properties)
 
           expect(record).to eq({"id" => "1", "size" => 3, "__typename" => "TypeB"})
         end
 
         it "includes __typename for types indexed only via union/interface, omits for directly indexed types" do
-          preparer = build_preparer do |s|
+          preparer, schema_artifacts = build_preparer_with_artifacts do |s|
             s.object_type "TypeA" do |t|
               t.field "id", "ID!"
               t.field "name", "String"
@@ -258,21 +260,31 @@ module ElasticGraph
             end
           end
 
+          mappings = schema_artifacts.index_mappings_by_index_def_name
+
           # Input record for TypeA without __typename
-          type_a_record = preparer.prepare_for_index("TypeA", {"id" => "1", "name" => "test"})
+          type_a_record = preparer.prepare_for_index(
+            "TypeA",
+            {"id" => "1", "name" => "test"},
+            mapping_properties: mappings.fetch("type_a_or_b").dig("properties")
+          )
 
           # __typename should be injected since the mixed supertype index requires it
           expect(type_a_record).to eq({"id" => "1", "name" => "test", "__typename" => "TypeA"})
 
           # Input record for TypeB with __typename
-          type_b_record = preparer.prepare_for_index("TypeB", {"id" => "1", "size" => 3, "__typename" => "TypeB"})
+          type_b_record = preparer.prepare_for_index(
+            "TypeB",
+            {"id" => "1", "size" => 3, "__typename" => "TypeB"},
+            mapping_properties: mappings.fetch("type_b").dig("properties")
+          )
 
           # __typename should be omitted since type_b is directly indexed
           expect(type_b_record).to eq({"id" => "1", "size" => 3})
         end
 
-        it "`__typename` is injected or omitted depending on whether a type is at the root level or embedded" do
-          preparer = build_preparer do |s|
+        it "injects or omits `__typename` depending on whether the record's context requires it" do
+          preparer, schema_artifacts = build_preparer_with_artifacts do |s|
             s.object_type "Person" do |t|
               t.field "id", "ID!"
               t.field "name", "String"
@@ -296,18 +308,28 @@ module ElasticGraph
             end
           end
 
+          mappings = schema_artifacts.index_mappings_by_index_def_name
+
           # When `Person` is prepared as a root record for the shared `inventors` index,
           # `__typename` must be injected so the index can distinguish `Person` from `Company`.
-          person_record = preparer.prepare_for_index("Person", {"id" => "2", "name" => "Alice"})
+          person_record = preparer.prepare_for_index(
+            "Person",
+            {"id" => "2", "name" => "Alice"},
+            mapping_properties: mappings.fetch("inventors").dig("properties")
+          )
           expect(person_record).to include("__typename" => "Person")
 
           # When `Person` is embedded in `Manufacturer.ceo`, `__typename` must not be injected
           # because `Person` is a concrete type there — it is not needed (and would cause errors if left in).
-          manufacturer_record = preparer.prepare_for_index("Manufacturer", {
-            "id" => "1",
-            "name" => "ACME",
-            "ceo" => {"id" => "2", "name" => "Alice"}
-          })
+          manufacturer_record = preparer.prepare_for_index(
+            "Manufacturer",
+            {
+              "id" => "1",
+              "name" => "ACME",
+              "ceo" => {"id" => "2", "name" => "Alice"}
+            },
+            mapping_properties: mappings.fetch("manufacturers").dig("properties")
+          )
           expect(manufacturer_record).to eq({
             "id" => "1",
             "name" => "ACME",
@@ -316,7 +338,7 @@ module ElasticGraph
         end
 
         it "handles nested abstract types, properly including `__typename` on them" do
-          preparer = build_preparer do |s|
+          preparer, schema_artifacts = build_preparer_with_artifacts do |s|
             s.object_type "Person" do |t|
               t.field "name", "String"
               t.field "nationality", "String"
@@ -338,14 +360,19 @@ module ElasticGraph
             end
           end
 
-          record = preparer.prepare_for_index("Invention", {
-            "id" => "1",
-            "inventor" => {
-              "name" => "Block",
-              "stock_ticker" => "SQ",
-              "__typename" => "Company"
-            }
-          })
+          inventions_mapping_properties = schema_artifacts.index_mappings_by_index_def_name.fetch("inventions").dig("properties")
+          record = preparer.prepare_for_index(
+            "Invention",
+            {
+              "id" => "1",
+              "inventor" => {
+                "name" => "Block",
+                "stock_ticker" => "SQ",
+                "__typename" => "Company"
+              }
+            },
+            mapping_properties: inventions_mapping_properties
+          )
 
           expect(record).to eq({
             "id" => "1",
@@ -467,6 +494,12 @@ module ElasticGraph
         build_indexer(schema_definition: schema_definition, **config_overrides)
           .record_preparer_factory
           .for_latest_json_schema_version
+      end
+
+      def build_preparer_with_artifacts(**config_overrides, &schema_definition)
+        indexer = build_indexer(schema_definition: schema_definition, **config_overrides)
+        preparer = indexer.record_preparer_factory.for_latest_json_schema_version
+        [preparer, indexer.schema_artifacts]
       end
     end
   end

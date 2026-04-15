@@ -27,7 +27,11 @@ module ElasticGraph
           update_target:,
           destination_index_mapping:
         )
-          prepared_record = record_preparer.prepare_for_index(event["type"], event["record"] || {"id" => event["id"]})
+          prepared_record = record_preparer.prepare_for_index(
+            event["type"],
+            event["record"] || {"id" => event["id"]},
+            mapping_properties: destination_index_mapping.dig("properties")
+          )
 
           Support::HashUtil
             .fetch_leaf_values_at_path(prepared_record, update_target.id_source.split("."))

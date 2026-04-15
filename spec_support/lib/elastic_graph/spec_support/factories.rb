@@ -17,6 +17,20 @@ require "faker"
 require "elastic_graph/indexer/test_support/converters"
 require "elastic_graph/support/hash_util"
 
+module ElasticGraph
+  module SpecSupport
+    module HashAsEmbedded
+      refine Hash do
+        # Strips indexed-type-only keys, converting an indexed factory hash
+        # to one suitable for embedding in another record.
+        def as_embedded
+          except(:__version, :__json_schema_version)
+        end
+      end
+    end
+  end
+end
+
 # A counter that we increment for the `__version` value on each new factory-generated record.
 version_counter = 0
 

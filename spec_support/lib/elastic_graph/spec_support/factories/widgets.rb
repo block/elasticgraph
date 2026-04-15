@@ -8,6 +8,8 @@
 
 require "date"
 
+using ElasticGraph::SpecSupport::HashAsEmbedded
+
 # Note: it is *essential* that all factories defined here generate records
 # deterministically, in order for the request bodies to (and responses from)
 # the datastore to not change between VCR cassettes being recorded and replayed.
@@ -43,27 +45,13 @@ FactoryBot.define do
     name { Faker::Device.model_name }
   end
 
-  factory :embedded_person, parent: :hash_base do
-    __typename { "Person" }
-    id { Faker::Alphanumeric.alpha(number: 20) }
-    name { Faker::Name.name }
-    nationality { Faker::Nation.nationality }
-  end
-
-  factory :indexed_person, parent: :indexed_type do
+  factory :person, parent: :indexed_type do
     __typename { "Person" }
     name { Faker::Name.name }
     nationality { Faker::Nation.nationality }
   end
 
-  factory :embedded_company, parent: :hash_base do
-    __typename { "Company" }
-    id { Faker::Alphanumeric.alpha(number: 20) }
-    name { Faker::Company.name }
-    stock_ticker { name[0..3].upcase }
-  end
-
-  factory :indexed_company, parent: :indexed_type do
+  factory :company, parent: :indexed_type do
     __typename { "Company" }
     name { Faker::Company.name }
     stock_ticker { name[0..3].upcase }
@@ -126,7 +114,7 @@ FactoryBot.define do
       components.map { |c| c.fetch(:id) }
     end
 
-    inventor { build Faker::Base.sample([:embedded_person, :embedded_company]) }
+    inventor { build(Faker::Base.sample([:person, :company])).as_embedded }
     named_inventor { inventor }
     weight_in_ng { Faker::Number.between(from: 2**51, to: (2**53) - 1) }
     weight_in_ng_str { Faker::Number.between(from: 2**60, to: 2**61) }
@@ -161,7 +149,7 @@ FactoryBot.define do
     __typename { "Manufacturer" }
     name { Faker::Company.name }
     created_at { Faker::Time.between(from: recent_date - 30, to: recent_date).utc.iso8601 }
-    ceo { build(:embedded_person) }
+    ceo { build(:person).as_embedded }
   end
 
   factory :address, parent: :indexed_type do

@@ -15,11 +15,7 @@ module ElasticGraph
         repo_root: CommonSpecHelpers::REPO_ROOT,
         settings_dir: "config/settings",
         use_settings_yaml: "development.yaml",
-        factory_iterations: 2,
-        # :embedded_person and :embedded_company are for use as embedded field values (e.g.
-        # `Widget.inventor`, `Manufacturer.ceo`). They lack `__version` and other fields
-        # required for indexing directly, so we exclude them from the indexed record validation.
-        ignored_factories: [:embedded_person, :embedded_company]
+        factory_iterations: 2
     end
   end
 end
