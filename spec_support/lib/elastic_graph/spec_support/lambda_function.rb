@@ -134,7 +134,7 @@ RSpec.shared_context "lambda function" do |config_overrides_in_yaml: {}|
     # so we verify through the file rather than stdout. This is the behavior that triggered a
     # `NoMethodError` with logger 1.6.0.
     ::Logger.new($stdout).error("test log message")
-    AwsLambdaRIC::TelemetryLogger.telemetry_log_fd_file&.flush
+    AwsLambdaRIC::TelemetryLogger.telemetry_log_fd_file.flush
     telemetry_contents = ::File.read(telemetry_log_path)
     expect(telemetry_contents).to include("test log message")
   end
