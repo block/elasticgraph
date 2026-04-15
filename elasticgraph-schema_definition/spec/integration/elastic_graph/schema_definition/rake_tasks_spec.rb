@@ -385,6 +385,7 @@ module ElasticGraph
             LocalTimeGroupingOffsetInput LocalTimeGroupingTruncationUnitInput LocalTimeUnitInput
             NonNumericAggregatedValues TextFilterInput
             MatchesQueryFilterInput MatchesQueryAllowedEditsPerTermInput MatchesPhraseFilterInput MatchesQueryWithPrefixFilterInput
+            WidgetInternalDetailsAggregatedValues WidgetInternalDetailsFilterInput WidgetInternalDetailsGroupedBy WidgetInternalDetailsHighlights
           ]
 
           expect(filtered_types).to match_array(allowed_list)

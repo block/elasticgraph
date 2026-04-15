@@ -134,32 +134,39 @@ module ElasticGraph
       CSS
       head.add_child(style)
 
-      # Add simple initialization script
+      # Add initialization script that works with both full page loads and YARD's SPA-style navigation.
+      # YARD 0.9.40+ uses postMessage + fetch + innerHTML replacement for sidebar clicks, which means
+      # external <script src="..."> tags aren't loaded and DOMContentLoaded doesn't re-fire.
       init_script = doc.create_element("script", <<~JS.strip)
-        document.addEventListener('DOMContentLoaded', function() {
-          mermaid.initialize({
-            startOnLoad: true,
+        (function() {
+          var mermaidConfig = {
+            startOnLoad: false,
             theme: 'default',
             securityLevel: 'loose',
-            // Better visual configuration
-            flowchart: {
-              useMaxWidth: true,
-              htmlLabels: true,
-              curve: 'basis'
-            },
-            sequence: {
-              useMaxWidth: true,
-              wrap: true
-            },
-            gantt: {
-              useMaxWidth: true
-            },
-            // Improved text handling
+            flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' },
+            sequence: { useMaxWidth: true, wrap: true },
+            gantt: { useMaxWidth: true },
             maxTextSize: 90000,
             suppressErrorRendering: false,
             logLevel: 'error'
-          });
-        });
+          };
+
+          function initMermaid() {
+            mermaid.initialize(mermaidConfig);
+            mermaid.run({ querySelector: '.mermaid' });
+          }
+
+          if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initMermaid);
+          } else if (typeof mermaid !== 'undefined') {
+            initMermaid();
+          } else {
+            var script = document.createElement('script');
+            script.src = 'assets/mermaid.min.js';
+            script.onload = initMermaid;
+            document.head.appendChild(script);
+          }
+        })();
       JS
       head.add_child(init_script)
     end
@@ -235,22 +242,38 @@ module ElasticGraph
       })
       head.add_child(script)
 
-      # Add initialization script
+      # Add initialization script that works with both full page loads and YARD's SPA-style navigation.
+      # Same 3-branch pattern as mermaid above — see comment there for details.
       init_script = doc.create_element("script", <<~JS.strip)
-        document.addEventListener('DOMContentLoaded', function() {
-          // Configure highlight.js to work with YARD's code block structure
-          document.querySelectorAll('pre.code code').forEach(function(block) {
-            // Get the language from the code element's class
-            const classes = block.className.split(' ');
-            const language = classes.find(cls => cls.match(/^[a-z]+$/) && cls !== 'code');
+        (function() {
+          function highlightCodeBlocks() {
+            document.querySelectorAll('pre.code code').forEach(function(block) {
+              var classes = block.className.split(' ');
+              var language = classes.find(function(cls) { return cls.match(/^[a-z]+$/) && cls !== 'code'; });
 
-            if (language && language !== 'mermaid') {
-              // Set the language class for highlight.js
-              block.className = 'language-' + language;
-              hljs.highlightElement(block);
-            }
-          });
-        });
+              if (language && language !== 'mermaid') {
+                block.className = 'language-' + language;
+                hljs.highlightElement(block);
+              }
+            });
+          }
+
+          if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', highlightCodeBlocks);
+          } else if (typeof hljs !== 'undefined') {
+            highlightCodeBlocks();
+          } else {
+            var cssLink = document.createElement('link');
+            cssLink.rel = 'stylesheet';
+            cssLink.href = 'assets/highlight.min.css';
+            document.head.appendChild(cssLink);
+
+            var script = document.createElement('script');
+            script.src = 'assets/highlight.min.js';
+            script.onload = highlightCodeBlocks;
+            document.head.appendChild(script);
+          }
+        })();
       JS
       head.add_child(init_script)
 

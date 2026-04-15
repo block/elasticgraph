@@ -523,6 +523,22 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: id
+      internal_details_name_ASC:
+        sort_field:
+          direction: asc
+          field_path: internal_details.name
+      internal_details_name_DESC:
+        sort_field:
+          direction: desc
+          field_path: internal_details.name
+      internal_name_ASC:
+        sort_field:
+          direction: asc
+          field_path: internal_name
+      internal_name_DESC:
+        sort_field:
+          direction: desc
+          field_path: internal_name
       inventor_id_ASC:
         sort_field:
           direction: asc
@@ -1129,6 +1145,22 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: id
+      internal_details_name_ASC:
+        sort_field:
+          direction: asc
+          field_path: internal_details.name
+      internal_details_name_DESC:
+        sort_field:
+          direction: desc
+          field_path: internal_details.name
+      internal_name_ASC:
+        sort_field:
+          direction: asc
+          field_path: internal_name
+      internal_name_DESC:
+        sort_field:
+          direction: desc
+          field_path: internal_name
       inventor_id_ASC:
         sort_field:
           direction: asc
@@ -1419,6 +1451,22 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: id
+      internal_details_name_ASC:
+        sort_field:
+          direction: asc
+          field_path: internal_details.name
+      internal_details_name_DESC:
+        sort_field:
+          direction: desc
+          field_path: internal_details.name
+      internal_name_ASC:
+        sort_field:
+          direction: asc
+          field_path: internal_name
+      internal_name_DESC:
+        sort_field:
+          direction: desc
+          field_path: internal_name
       inventor_id_ASC:
         sort_field:
           direction: asc
@@ -2811,6 +2859,10 @@ index_definitions_by_name:
       fees.currency:
         source: __self
       id:
+        source: __self
+      internal_details.name:
+        source: __self
+      internal_name:
         source: __self
       inventor.id:
         source: __self
@@ -4501,6 +4553,12 @@ object_types_by_name:
       id:
         resolver:
           name: get_record_field_value
+      internal_details:
+        resolver:
+          name: get_record_field_value
+      internal_name:
+        resolver:
+          name: get_record_field_value
       inventor:
         resolver:
           name: get_record_field_value
@@ -4678,6 +4736,12 @@ object_types_by_name:
         resolver:
           name: object_with_lookahead
       id:
+        resolver:
+          name: object_with_lookahead
+      internal_details:
+        resolver:
+          name: object_with_lookahead
+      internal_name:
         resolver:
           name: object_with_lookahead
       inventor:
@@ -4874,6 +4938,12 @@ object_types_by_name:
       fees:
         resolver:
           name: object_with_lookahead
+      internal_details:
+        resolver:
+          name: object_with_lookahead
+      internal_name:
+        resolver:
+          name: object_with_lookahead
       inventor:
         resolver:
           name: object_with_lookahead
@@ -4971,6 +5041,12 @@ object_types_by_name:
         resolver:
           name: get_record_field_value
       id:
+        resolver:
+          name: get_record_field_value
+      internal_details:
+        resolver:
+          name: get_record_field_value
+      internal_name:
         resolver:
           name: get_record_field_value
       inventor:
@@ -6873,6 +6949,12 @@ object_types_by_name:
       id:
         resolver:
           name: get_record_field_value
+      internal_details:
+        resolver:
+          name: get_record_field_value
+      internal_name:
+        resolver:
+          name: get_record_field_value
       inventor:
         resolver:
           name: get_record_field_value
@@ -6990,6 +7072,10 @@ object_types_by_name:
         description:
           cardinality: one
         fees:
+          cardinality: one
+        internal_details:
+          cardinality: one
+        internal_name:
           cardinality: one
         inventor:
           cardinality: one
@@ -7112,6 +7198,12 @@ object_types_by_name:
         resolver:
           name: object_with_lookahead
       id:
+        resolver:
+          name: object_with_lookahead
+      internal_details:
+        resolver:
+          name: object_with_lookahead
+      internal_name:
         resolver:
           name: object_with_lookahead
       inventor:
@@ -7536,6 +7628,12 @@ object_types_by_name:
       fees:
         resolver:
           name: object_with_lookahead
+      internal_details:
+        resolver:
+          name: object_with_lookahead
+      internal_name:
+        resolver:
+          name: object_with_lookahead
       inventor:
         resolver:
           name: object_with_lookahead
@@ -7610,6 +7708,12 @@ object_types_by_name:
       id:
         resolver:
           name: get_record_field_value
+      internal_details:
+        resolver:
+          name: get_record_field_value
+      internal_name:
+        resolver:
+          name: get_record_field_value
       inventor:
         resolver:
           name: get_record_field_value
@@ -7644,6 +7748,21 @@ object_types_by_name:
         resolver:
           name: get_record_field_value
       workspace_name:
+        resolver:
+          name: get_record_field_value
+  WidgetInternalDetailsAggregatedValues:
+    graphql_fields_by_name:
+      name:
+        resolver:
+          name: object_with_lookahead
+  WidgetInternalDetailsGroupedBy:
+    graphql_fields_by_name:
+      name:
+        resolver:
+          name: object_with_lookahead
+  WidgetInternalDetailsHighlights:
+    graphql_fields_by_name:
+      name:
         resolver:
           name: get_record_field_value
   WidgetOptionSets:
@@ -7801,6 +7920,12 @@ object_types_by_name:
       id:
         resolver:
           name: get_record_field_value
+      internal_details:
+        resolver:
+          name: get_record_field_value
+      internal_name:
+        resolver:
+          name: get_record_field_value
       inventor:
         resolver:
           name: get_record_field_value
@@ -7920,6 +8045,12 @@ object_types_by_name:
         resolver:
           name: object_with_lookahead
       id:
+        resolver:
+          name: object_with_lookahead
+      internal_details:
+        resolver:
+          name: object_with_lookahead
+      internal_name:
         resolver:
           name: object_with_lookahead
       inventor:
@@ -8095,6 +8226,12 @@ object_types_by_name:
       full_address:
         resolver:
           name: object_with_lookahead
+      internal_details:
+        resolver:
+          name: object_with_lookahead
+      internal_name:
+        resolver:
+          name: object_with_lookahead
       inventor:
         resolver:
           name: object_with_lookahead
@@ -8173,6 +8310,12 @@ object_types_by_name:
         resolver:
           name: get_record_field_value
       id:
+        resolver:
+          name: get_record_field_value
+      internal_details:
+        resolver:
+          name: get_record_field_value
+      internal_name:
         resolver:
           name: get_record_field_value
       inventor:

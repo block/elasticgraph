@@ -63,7 +63,9 @@ module ElasticGraph
             # By using it here, it will cause queries to pass a `routing` parameter when
             # searching with id filtering on an index that does not use custom shard routing, giving
             # us a nice efficiency boost.
-            self.routing_field_path = public_field_path("id", explanation: "indexed types must have an `id` field")
+            id_field_path = public_field_path("id", explanation: "indexed types must have an `id` field")
+            self.routing_field_path = id_field_path
+            id_field_path.last_part.json_schema nullable: false
           end
 
           yield self if block_given?
@@ -324,6 +326,12 @@ module ElasticGraph
             # made against the wrong shard.
             hash["_routing"] = {"required" => true} if uses_custom_routing?
             hash["_size"] = {"enabled" => true} if schema_def_state.index_document_sizes?
+
+            # Exclude non-returnable fields from `_source` to save storage. These fields are still
+            # indexed (in the inverted index and/or doc_values) for filtering, sorting, and aggregation,
+            # but their values are not stored in the compressed `_source` blob.
+            source_excludes = indexed_type.source_excludes_paths
+            hash["_source"] = {"excludes" => source_excludes} if source_excludes.any?
           end
         end
 

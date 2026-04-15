@@ -879,6 +879,12 @@ json_schema_version: 1
           - "$ref": "#/$defs/String"
           - maxLength: 8191
         - type: 'null'
+      internal_name:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/String"
+          - maxLength: 8191
+        - type: 'null'
       name_text:
         anyOf:
         - allOf:
@@ -918,6 +924,10 @@ json_schema_version: 1
       options:
         anyOf:
         - "$ref": "#/$defs/WidgetOptions"
+        - type: 'null'
+      internal_details:
+        anyOf:
+        - "$ref": "#/$defs/WidgetInternalDetails"
         - type: 'null'
       the_options:
         anyOf:
@@ -970,6 +980,7 @@ json_schema_version: 1
     - cost_currency_primary_continent
     - cost_currency_introduced_on
     - name
+    - internal_name
     - name_text
     - description
     - created_at
@@ -979,6 +990,7 @@ json_schema_version: 1
     - release_dates
     - component_ids
     - options
+    - internal_details
     - the_options
     - inventor
     - named_inventor
@@ -990,6 +1002,21 @@ json_schema_version: 1
     - metadata
     description: For more performant queries on this type, please filter on `workspace_id`
       if possible.
+  WidgetInternalDetails:
+    type: object
+    properties:
+      name:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/String"
+          - maxLength: 8191
+        - type: 'null'
+      __typename:
+        type: string
+        const: WidgetInternalDetails
+        default: WidgetInternalDetails
+    required:
+    - name
   WidgetOptions:
     type: object
     properties:

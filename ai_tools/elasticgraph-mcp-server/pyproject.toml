@@ -39,10 +39,10 @@ packages = ["src/elasticgraph_mcp"]
 
 [dependency-groups]
 dev = [
-    "ruff~=0.15.0",
-    "pytest~=9.0.0",
+    "ruff~=0.15.10",
+    "pytest~=9.0.3",
     "pytest-cov~=7.1.0",
-    "pre-commit~=4.5.0",
+    "pre-commit~=4.5.1",
     "pytest-asyncio~=1.3.0",
 ]
 
