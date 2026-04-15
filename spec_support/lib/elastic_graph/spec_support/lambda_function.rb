@@ -105,9 +105,20 @@ RSpec.shared_context "lambda function" do |config_overrides_in_yaml: {}|
     # We use `IO.sysopen` to get a raw fd not yet wrapped by a Ruby IO object, since
     # `TelemetryLogger.new` calls `IO.new(fd, 'wb')` internally and some Ruby versions
     # raise when wrapping an fd that's already owned by another Ruby IO.
+    # Set up the telemetry sink and apply the LoggerPatch directly, mirroring what
+    # TelemetryLogger#initialize does internally:
+    # https://github.com/aws/aws-lambda-ruby-runtime-interface-client/blob/3.1.3/lib/aws_lambda_ric.rb#L141-L168
+    #
+    # We do this ourselves rather than calling `TelemetryLogger.new` because the constructor
+    # silently rescues `Errno::EBADF`/`Errno::ENOENT` and skips the LoggerPatch prepend.
+    # In CI forked-subprocess environments, the `IO.new(fd, 'wb')` call can trigger these
+    # errors. By separating fd setup from monkey-patching, we ensure the patch is always applied.
     telemetry_log_path = ::File.join(@tmp_dir, "telemetry_log")
-    telemetry_fd = ::IO.sysopen(telemetry_log_path, "wb")
-    AwsLambdaRIC::TelemetryLogger.new(telemetry_fd.to_s)
+    telemetry_file = ::File.open(telemetry_log_path, "wb")
+    telemetry_file.sync = true
+    AwsLambdaRIC::TelemetryLogger.telemetry_log_fd_file = telemetry_file
+    AwsLambdaRIC::TelemetryLogger.telemetry_log_sink = TelemetryLogSink.new(file: telemetry_file)
+    ::Logger.prepend(::LoggerPatch)
 
     # Here we verify that the Logger monkey patch was indeed installed. The installation of the monkey patch
     # gets bypassed when certain errors are encountered (which are silently swallowed), so the mere act of
