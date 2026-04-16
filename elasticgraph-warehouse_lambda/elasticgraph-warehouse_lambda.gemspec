@@ -46,7 +46,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "elasticgraph-lambda_support", ElasticGraph::VERSION
   spec.add_dependency "aws-sdk-s3", "~> 1.219"
 
-  spec.add_development_dependency "aws_lambda_ric", "~> 3.1", ">= 3.1.3"
+  spec.add_development_dependency "aws_lambda_ric", "~> 3.2"
   spec.add_development_dependency "elasticgraph-elasticsearch", ElasticGraph::VERSION
   spec.add_development_dependency "elasticgraph-opensearch", ElasticGraph::VERSION
 end
