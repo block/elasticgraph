@@ -90,7 +90,9 @@ module ElasticGraph
             (_ = cached_client_data).with_updated_last_query(query_string, cachable_query)
           end
 
-          [query, [], registration_status]
+          prepared_query = prepare_query_for_execution(query, variables: variables, operation_name: operation_name, context: context)
+
+          [prepared_query, [], registration_status]
         end
 
         private
@@ -128,7 +130,14 @@ module ElasticGraph
             document: query.document,
             variables: variables,
             operation_name: operation_name,
-            context: context
+            context: context,
+            # Registered queries are validated at CI time (via the QueryValidator Rake task),
+            # so re-validating at runtime is redundant. Skipping it avoids the cost of running
+            # graphql-ruby's StaticValidation pipeline on every request for known-good queries.
+            # Note: `validate: false` only disables static (query-string) validation; variable
+            # validation still runs via `GraphQL::Query#variables`, so invalid variable values
+            # are still reported as errors on every request.
+            validate: false
           )
         end
       end

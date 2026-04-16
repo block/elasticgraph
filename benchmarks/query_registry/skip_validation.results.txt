@@ -1,0 +1,80 @@
+
+======================================================================
+small — 281 bytes, 46 lines
+======================================================================
+ruby 4.0.2 (2026-03-17 revision d3da9fec82) +PRISM [arm64-darwin25]
+Warming up --------------------------------------
+validate: true (before)
+                       585.000 i/100ms
+validate: false (after)
+                         7.905k i/100ms
+Calculating -------------------------------------
+validate: true (before)
+                          5.618k (± 4.1%) i/s  (177.98 μs/i) -     28.080k in   5.006680s
+validate: false (after)
+                         76.504k (± 4.7%) i/s   (13.07 μs/i) -    387.345k in   5.074292s
+
+Comparison:
+validate: false (after):    76503.8 i/s
+validate: true (before):     5618.5 i/s - 13.62x  slower
+
+
+======================================================================
+medium — 4113 bytes, 706 lines
+======================================================================
+ruby 4.0.2 (2026-03-17 revision d3da9fec82) +PRISM [arm64-darwin25]
+Warming up --------------------------------------
+validate: true (before)
+                        55.000 i/100ms
+validate: false (after)
+                         8.014k i/100ms
+Calculating -------------------------------------
+validate: true (before)
+                        545.145 (± 3.3%) i/s    (1.83 ms/i) -      2.750k in   5.049960s
+validate: false (after)
+                         74.518k (± 4.4%) i/s   (13.42 μs/i) -    376.658k in   5.064674s
+
+Comparison:
+validate: false (after):    74518.0 i/s
+validate: true (before):      545.1 i/s - 136.69x  slower
+
+
+======================================================================
+large — 61440 bytes, 10306 lines
+======================================================================
+ruby 4.0.2 (2026-03-17 revision d3da9fec82) +PRISM [arm64-darwin25]
+Warming up --------------------------------------
+validate: true (before)
+                         3.000 i/100ms
+validate: false (after)
+                         7.966k i/100ms
+Calculating -------------------------------------
+validate: true (before)
+                         38.432 (± 5.2%) i/s   (26.02 ms/i) -    192.000 in   5.011219s
+validate: false (after)
+                         71.389k (± 7.1%) i/s   (14.01 μs/i) -    358.470k in   5.049321s
+
+Comparison:
+validate: false (after):    71388.8 i/s
+validate: true (before):       38.4 i/s - 1857.56x  slower
+
+
+======================================================================
+xlarge — 416340 bytes, 63256 lines
+======================================================================
+ruby 4.0.2 (2026-03-17 revision d3da9fec82) +PRISM [arm64-darwin25]
+Warming up --------------------------------------
+validate: true (before)
+                         1.000 i/100ms
+validate: false (after)
+                         7.272k i/100ms
+Calculating -------------------------------------
+validate: true (before)
+                          6.149 (± 0.0%) i/s  (162.64 ms/i) -     31.000 in   5.047500s
+validate: false (after)
+                         73.302k (± 5.6%) i/s   (13.64 μs/i) -    370.872k in   5.075838s
+
+Comparison:
+validate: false (after):    73302.2 i/s
+validate: true (before):        6.1 i/s - 11921.96x  slower
+
