@@ -10,7 +10,7 @@ source "https://rubygems.org"
 
 # Gems needed by the test suite and other CI checks.
 group :development do
-  gem "aws_lambda_ric", "~> 3.1", ">= 3.1.3"
+  gem "aws_lambda_ric", "~> 3.2"
   # graphql-c_parser is no longer a hard dependency, but we include it here for faster CI tests
   gem "graphql-c_parser", "~> 1.1", ">= 1.1.3", platforms: :ruby
   gem "benchmark-ips", "~> 2.14"
