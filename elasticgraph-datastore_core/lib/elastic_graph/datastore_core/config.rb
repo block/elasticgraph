@@ -132,9 +132,9 @@ module ElasticGraph
                 }],
                 properties: {
                   query_cluster: {
-                    type: "string",
-                    description: "Named search cluster to be used for queries on this index. The value must match be a key in the `clusters` map.",
-                    examples: ["main", "search_cluster"]
+                    type: ["string", "null"],
+                    description: "Named search cluster to be used for queries on this index. The value must match be a key in the `clusters` map. Set to `null` to hide this index's types in the GraphQL schema returned from the GraphQL endpoint.",
+                    examples: ["main", "search_cluster", nil]
                   },
                   index_into_clusters: {
                     type: "array",

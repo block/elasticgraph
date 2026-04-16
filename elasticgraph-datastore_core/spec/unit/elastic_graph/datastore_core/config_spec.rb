@@ -97,6 +97,43 @@ module ElasticGraph
         expect(config.max_client_retries).to eq 3
       end
 
+      it "allows `query_cluster: null` to hide index types from GraphQL schema" do
+        config = config_from_yaml(<<~YAML)
+          client_faraday_adapter: {}
+          clusters:
+            main1:
+              url: http://example.com/1234
+              backend: elasticsearch
+              settings:
+                foo: 23
+          index_definitions:
+            widgets:
+              query_cluster: null
+              index_into_clusters: ["main1"]
+              ignore_routing_values: []
+              setting_overrides: {}
+              setting_overrides_by_timestamp: {}
+              custom_timestamp_ranges: []
+        YAML
+
+        widgets_config = config.index_definitions.fetch("widgets")
+
+        # Verify the config was loaded correctly from YAML
+        expect(widgets_config).to eq(Configuration::IndexDefinition.new(
+          ignore_routing_values: [],
+          query_cluster: nil,
+          index_into_clusters: ["main1"],
+          setting_overrides: {},
+          setting_overrides_by_timestamp: {},
+          custom_timestamp_ranges: []
+        ))
+
+        # Verify the key property: query_cluster is nil (not a string, not missing)
+        # This nil value will cause accessible_from_queries? to return false,
+        # which hides the index's types from the GraphQL schema.
+        expect(widgets_config.query_cluster).to be_nil
+      end
+
       it "surfaces misspellings in `backend`" do
         expect {
           config_from_yaml(<<~YAML)
