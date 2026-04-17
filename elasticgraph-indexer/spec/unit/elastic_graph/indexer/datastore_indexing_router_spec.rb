@@ -141,6 +141,176 @@ module ElasticGraph
           expect(results[widget_derived_update_op]).to eq("main" => [])
         end
 
+        context "when the narrow stage does not resolve an operation's version" do
+          it "falls back to the wildcard lookup and returns the version the wildcard stage found" do
+            narrow_call_count = 0
+            wide_call_count = 0
+
+            allow(main_datastore_client).to receive(:msearch) do |request|
+              sub_query_count = request.fetch(:body).size / 2
+
+              if narrow_call_count.zero?
+                narrow_call_count += 1
+                # Narrow stage returns no hits -- simulates an event whose rollover/routing
+                # fields point somewhere other than where the doc actually lives.
+                {"responses" => ::Array.new(sub_query_count) { {"hits" => {"hits" => []}} }}
+              else
+                wide_call_count += 1
+                requested_docs = request.fetch(:body).each_slice(2).map do |(search_header, search_body)|
+                  [search_header.fetch(:index), search_body.fetch(:query).fetch(:ids).fetch(:values).first]
+                end
+
+                responses = requested_docs.map do |(index, id)|
+                  hit = {"_index" => index, "_id" => id, "_source" => {"__versions" => {SELF_RELATIONSHIP_NAME => {id => 77}}}}
+                  {"hits" => {"hits" => [hit]}}
+                end
+
+                {"responses" => responses}
+              end
+            end
+
+            results = router.source_event_versions_in_index([widget_primary_indexing_op])
+
+            expect(narrow_call_count).to eq(1)
+            expect(wide_call_count).to eq(1)
+            expect(results).to eq(widget_primary_indexing_op => {"main" => [77]})
+          end
+
+          it "does not issue a wildcard lookup when every operation is resolved in the narrow stage" do
+            stubbed_versions_by_index_and_id[["widgets", widget_primary_indexing_op.doc_id]] = 42
+
+            results = router.source_event_versions_in_index([widget_primary_indexing_op])
+
+            expect(main_datastore_client).to have_received(:msearch).once
+            expect(results).to eq(widget_primary_indexing_op => {"main" => [42]})
+          end
+
+          it "raises when the wildcard fallback lookup returns errors from the datastore" do
+            allow(main_datastore_client).to receive(:msearch) do |request|
+              sub_query_count = request.fetch(:body).size / 2
+
+              if request.fetch(:body).first.key?(:routing) || @wide_stage_hit
+                @wide_stage_hit = true
+                {"responses" => [{"status" => 400, "error" => {"type" => "wildcard_failure", "reason" => "something broke in the fallback"}}]}
+              else
+                @wide_stage_hit = true
+                {"responses" => ::Array.new(sub_query_count) { {"hits" => {"hits" => []}} }}
+              end
+            end
+
+            expect {
+              router.source_event_versions_in_index([widget_primary_indexing_op])
+            }.to raise_error(Errors::IdentifyDocumentVersionsFailedError, a_string_including("wildcard version lookup", "wildcard_failure"))
+          end
+        end
+
+        context "when the narrow stage groups multiple operations that share a target" do
+          it "combines their doc_ids into a single sub-query and maps hits back per-operation" do
+            stubbed_versions_by_index_and_id[["widgets", "1"]] = 11
+            stubbed_versions_by_index_and_id[["widgets", "2"]] = 22
+
+            op1 = new_primary_indexing_operation({"type" => "Widget", "id" => "1", "version" => 1, "record" => {"id" => "1", "some_field" => "a"}})
+            op2 = new_primary_indexing_operation({"type" => "Widget", "id" => "2", "version" => 1, "record" => {"id" => "2", "some_field" => "b"}})
+
+            captured_bodies = []
+            allow(main_datastore_client).to receive(:msearch) do |request|
+              captured_bodies << request.fetch(:body)
+              sub_queries = request.fetch(:body).each_slice(2)
+              responses = sub_queries.map do |(header, body)|
+                index = header.fetch(:index)
+                ids = body.fetch(:query).fetch(:ids).fetch(:values)
+                hits = ids.map do |id|
+                  version = stubbed_versions_by_index_and_id[[index, id]]
+                  {"_index" => index, "_id" => id, "_source" => {"__versions" => {SELF_RELATIONSHIP_NAME => {id => version}}}}
+                end
+                {"hits" => {"hits" => hits}}
+              end
+              {"responses" => responses}
+            end
+
+            results = router.source_event_versions_in_index([op1, op2])
+
+            expect(main_datastore_client).to have_received(:msearch).once
+            expect(captured_bodies.size).to eq(1)
+            expect(captured_bodies.first.size).to eq(2) # 1 header + 1 body = 1 sub-query total
+            expect(captured_bodies.first[1].fetch(:query).fetch(:ids).fetch(:values)).to contain_exactly("1", "2")
+            expect(captured_bodies.first[1].fetch(:size)).to eq(2)
+
+            expect(results).to eq(op1 => {"main" => [11]}, op2 => {"main" => [22]})
+          end
+
+          it "logs a multi-hit warning when a single doc_id returns multiple hits" do
+            allow(main_datastore_client).to receive(:msearch) do |request|
+              sub_queries = request.fetch(:body).each_slice(2)
+              responses = sub_queries.map do |(header, body)|
+                ids = body.fetch(:query).fetch(:ids).fetch(:values)
+                hits = ids.flat_map do |id|
+                  [
+                    {"_index" => "widgets", "_id" => id, "_routing" => "r1", "_version" => 1, "_source" => {"__versions" => {SELF_RELATIONSHIP_NAME => {id => 10}}}},
+                    {"_index" => "widgets", "_id" => id, "_routing" => "r2", "_version" => 2, "_source" => {"__versions" => {SELF_RELATIONSHIP_NAME => {id => 11}}}}
+                  ]
+                end
+                {"hits" => {"hits" => hits}}
+              end
+              {"responses" => responses}
+            end
+
+            expect {
+              router.source_event_versions_in_index([widget_primary_indexing_op])
+            }.to log_warning(a_string_including("IdentifyDocumentVersionsGotMultipleResults"))
+          end
+
+          it "propagates the routing value into the msearch header when one is configured for the operation" do
+            allow(widget_primary_indexing_op.destination_index_def)
+              .to receive(:routing_value_for_prepared_record).and_return("merchant-123")
+
+            captured_body = nil
+            allow(main_datastore_client).to receive(:msearch) do |request|
+              captured_body = request.fetch(:body)
+              {"responses" => [{"hits" => {"hits" => [{"_id" => widget_primary_indexing_op.doc_id, "_source" => {"__versions" => {SELF_RELATIONSHIP_NAME => {widget_primary_indexing_op.doc_id => 99}}}}]}}]}
+            end
+
+            results = router.source_event_versions_in_index([widget_primary_indexing_op])
+
+            expect(captured_body.first).to eq(index: "widgets", routing: "merchant-123")
+            expect(results).to eq(widget_primary_indexing_op => {"main" => [99]})
+          end
+        end
+
+        context "when the wildcard fallback stage returns multiple hits for a single doc_id" do
+          it "logs a multi-hit warning from the wildcard stage" do
+            call_count = 0
+            allow(main_datastore_client).to receive(:msearch) do |request|
+              call_count += 1
+              sub_query_count = request.fetch(:body).size / 2
+
+              if call_count == 1
+                # Narrow stage -- return no hits so wide fires.
+                {"responses" => ::Array.new(sub_query_count) { {"hits" => {"hits" => []}} }}
+              else
+                # Wide stage -- return multiple hits per doc_id so the multi-hits branch fires.
+                requested_docs = request.fetch(:body).each_slice(2).map do |(header, body)|
+                  [header.fetch(:index), body.fetch(:query).fetch(:ids).fetch(:values).first]
+                end
+                responses = requested_docs.map do |(index, id)|
+                  hits = [
+                    {"_index" => index, "_id" => id, "_routing" => nil, "_version" => 1, "_source" => {"__versions" => {SELF_RELATIONSHIP_NAME => {id => 200}}}},
+                    {"_index" => index, "_id" => id, "_routing" => nil, "_version" => 2, "_source" => {"__versions" => {SELF_RELATIONSHIP_NAME => {id => 201}}}}
+                  ]
+                  {"hits" => {"hits" => hits}}
+                end
+                {"responses" => responses}
+              end
+            end
+
+            expect {
+              router.source_event_versions_in_index([widget_primary_indexing_op])
+            }.to log_warning(a_string_including("IdentifyDocumentVersionsGotMultipleResults"))
+
+            expect(call_count).to eq(2)
+          end
+        end
+
         def stub_msearch_on(client, client_name)
           allow(client).to receive(:msearch) do |request|
             requested_docs = request.dig(:body).each_slice(2).map do |(search_header, search_body)|
