@@ -140,6 +140,24 @@ module ElasticGraph
       # already been superseded by a corrected event and we can just log a message instead. This method specifically
       # supports that logic.
       #
+      # The lookup runs in two stages:
+      #
+      #  1. Narrow stage. Operations are grouped by `(target_index, routing, relationship)` reusing the
+      #     same index name and routing value computation the primary bulk write uses. One `search`
+      #     per group is issued, combining all doc_ids in that group into a single `ids` query. When
+      #     routing is set this typically targets a single shard of a single yearly index.
+      #  2. Wildcard fallback stage. Operations that the narrow stage did not resolve (no hits for
+      #     their doc_id) fall back to the original behavior: a search across the full rollover
+      #     index expression with no routing. This preserves the framework's guarantee that a
+      #     malformed event whose doc lives at a different (index, shard) than its rollover/routing
+      #     fields imply can still be identified as superseded.
+      #
+      # For well-formed failure batches this reduces the shard-level fan-out from
+      # `N_failures * shards_per_index * indices_in_expression` (which for 12 yearly rollover
+      # indices at 1024 shards each is ~8,400 shard tasks per failure) to approximately 1 shard
+      # task per group. Malformed events pay one additional wildcard round-trip, which matches
+      # today's cost.
+      #
       # If the datastore returns errors for any of the calls, this method will raise an exception.
       # Otherwise, this method returns a nested hash:
       #
@@ -162,100 +180,137 @@ module ElasticGraph
         end
 
         client_names_and_results = Support::Threading.parallel_map(ops_by_client_name) do |(client_name, all_ops)|
-          # @type block: [::String, ::Symbol, ::Array[untyped] | ::Hash[_Operation, ::Array[::Integer]]]
+          versioned_ops, unversioned_ops = all_ops.partition(&:versioned?)
 
-          ops, unversioned_ops = all_ops.partition(&:versioned?) # : [::Array[Operation::Update], ::Array[Operation::Update]]
-
-          msearch_response =
-            if (client = @datastore_clients_by_name[client_name]) && ops.any?
-              body = ops.flat_map do |op|
-                [
-                  # Note: we intentionally search the entire index expression, not just an individual index based on a rollover timestamp.
-                  # And we intentionally do NOT provide a routing value--we want to find the version, no matter what shard the document
-                  # lives on.
-                  #
-                  # Since this `source_event_versions_in_index` is for handling malformed events, its possible that the
-                  # rollover timestamp or routing value on the operation is wrong and that the correct document lives in
-                  # a different shard and index than what the operation is targeted at. We want to search across all of them
-                  # so that we will find it, regardless of where it lives.
-                  {index: op.destination_index_def.index_expression_for_search},
-                  {
-                    # Filter to the documents matching the id.
-                    query: {ids: {values: [op.doc_id]}},
-                    # We only care about the version.
-                    _source: {includes: ["__versions.#{op.update_target.relationship}"]}
-                  }
-                ]
-              end
-
-              client.msearch(body: body)
+          versions_by_op =
+            if (client = @datastore_clients_by_name[client_name]) && versioned_ops.any?
+              narrow_result = narrow_version_lookup(client, versioned_ops)
+              missing_ops = versioned_ops.reject { |op| narrow_result.fetch(op, []).any? }
+              wide_result = missing_ops.any? ? wide_version_lookup(client, missing_ops) : {}
+              narrow_result.merge(wide_result)
             else
               # The named client doesn't exist, so we don't have any versions for the docs.
-              {"responses" => ops.map { |op| {"hits" => {"hits" => _ = []}} }}
+              versioned_ops.to_h { |op| [op, []] }
             end
 
-          errors = msearch_response.fetch("responses").select { |res| res["error"] }
-
-          if errors.empty?
-            # We assume the size of the ops and the other array is the same and it cannot have `nil`.
-            zip = ops.zip(msearch_response.fetch("responses")) # : ::Array[[Operation::Update, ::Hash[::String, ::Hash[::String, untyped]]]]
-
-            versions_by_op = zip.to_h do |(op, response)|
-              hits = response.fetch("hits").fetch("hits")
-
-              if hits.size > 1
-                # Got multiple results. The document is duplicated in multiple shards or indexes. Log a warning about this.
-                @logger.warn({
-                  "message_type" => "IdentifyDocumentVersionsGotMultipleResults",
-                  "index" => hits.map { |h| h["_index"] },
-                  "routing" => hits.map { |h| h["_routing"] },
-                  "id" => hits.map { |h| h["_id"] },
-                  "version" => hits.map { |h| h["_version"] }
-                })
-              end
-
-              versions = hits.filter_map do |hit|
-                hit.dig("_source", "__versions", op.update_target.relationship, hit.fetch("_id"))
-              end
-
-              [op, versions.uniq]
-            end
-
-            unversioned_ops_hash = unversioned_ops.to_h do |op|
-              [op, []] # : [Operation::Update, ::Array[::Integer]]
-            end
-
-            [client_name, :success, versions_by_op.merge(unversioned_ops_hash)]
-          else
-            [client_name, :failure, errors]
-          end
+          unversioned_ops.each { |op| versions_by_op[op] = [] }
+          [client_name, versions_by_op]
         end
 
-        failures = client_names_and_results.flat_map do |(client_name, success_or_failure, results)|
-          if success_or_failure == :success
-            []
-          else
-            results.map do |result|
-              "From cluster #{client_name}: #{::JSON.generate(result, space: " ")}"
-            end
+        client_names_and_results.each_with_object(_ = {}) do |(client_name, versions_by_op), accum|
+          versions_by_op.each do |op, versions|
+            (accum[op] ||= {})[client_name] = versions
           end
-        end
-
-        if failures.empty?
-          # All results are success and the third element of the tuple is a hash.
-          # Assign the results to narrow down the type.
-          success_results = client_names_and_results # : ::Array[[::String, ::Symbol, ::Hash[_Operation, ::Array[::Integer]]]]
-
-          success_results.each_with_object(_ = {}) do |(client_name, _success_or_failure, results), accum|
-            results.each do |op, version|
-              (accum[op] ||= {})[client_name] = version
-            end
-          end
-        else
-          raise Errors::IdentifyDocumentVersionsFailedError, "Got #{failures.size} failure(s) while querying the datastore " \
-            "for document versions:\n\n#{failures.join("\n")}"
         end
       end
+
+      private
+
+      # Stage 1 of {#source_event_versions_in_index}: groups operations by (target_index, routing,
+      # relationship) and issues a single `msearch` where each sub-query is a group, combining all
+      # doc_ids for that group into a single `ids` query targeting the specific yearly index and
+      # shard implied by the operation's rollover/routing fields. Returns a hash of operation to
+      # versions, with an empty array for operations whose doc_id was not found.
+      def narrow_version_lookup(client, ops)
+        groups = ops.group_by { |op| narrow_lookup_key_for(op) }.to_a
+
+        body = groups.flat_map do |((target_index, routing, relationship), group_ops)|
+          header = {index: target_index}
+          header[:routing] = routing if routing && !routing.to_s.empty?
+          [
+            header,
+            {
+              query: {ids: {values: group_ops.map(&:doc_id)}},
+              _source: {includes: ["__versions.#{relationship}"]},
+              size: group_ops.size
+            }
+          ]
+        end
+
+        msearch_response = client.msearch(body: body)
+        errors = msearch_response.fetch("responses").select { |res| res["error"] }
+
+        unless errors.empty?
+          detail = errors.map { |e| ::JSON.generate(e, space: " ") }.join("\n")
+          raise Errors::IdentifyDocumentVersionsFailedError,
+            "Got #{errors.size} failure(s) during narrow version lookup:\n\n#{detail}"
+        end
+
+        group_responses = groups.zip(msearch_response.fetch("responses"))
+
+        group_responses.each_with_object({}) do |((_key, group_ops), response), accum|
+          hits_by_id = response.fetch("hits").fetch("hits").group_by { |h| h.fetch("_id") }
+
+          group_ops.each do |op|
+            hits = hits_by_id[op.doc_id] || []
+            log_multiple_hits_warning(hits) if hits.size > 1
+            accum[op] = extract_versions(hits, op)
+          end
+        end
+      end
+
+      # Stage 2 of {#source_event_versions_in_index}: wildcard lookup with no routing, used for
+      # operations that stage 1 did not resolve. Matches the framework's original supersede-check
+      # behavior so malformed events (with wrong rollover timestamp or routing) can still be
+      # identified.
+      def wide_version_lookup(client, ops)
+        body = ops.flat_map do |op|
+          [
+            {index: op.destination_index_def.index_expression_for_search},
+            {
+              query: {ids: {values: [op.doc_id]}},
+              _source: {includes: ["__versions.#{op.update_target.relationship}"]}
+            }
+          ]
+        end
+
+        msearch_response = client.msearch(body: body)
+        errors = msearch_response.fetch("responses").select { |res| res["error"] }
+
+        unless errors.empty?
+          detail = errors.map { |e| ::JSON.generate(e, space: " ") }.join("\n")
+          raise Errors::IdentifyDocumentVersionsFailedError,
+            "Got #{errors.size} failure(s) during wildcard version lookup:\n\n#{detail}"
+        end
+
+        ops.zip(msearch_response.fetch("responses")).to_h do |(op, response)|
+          hits = response.fetch("hits").fetch("hits")
+          log_multiple_hits_warning(hits) if hits.size > 1
+          [op, extract_versions(hits, op)]
+        end
+      end
+
+      def narrow_lookup_key_for(op)
+        target_index = op.destination_index_def.index_name_for_writes(
+          op.prepared_record,
+          timestamp_field_path: op.update_target.rollover_timestamp_value_source
+        )
+        routing = op.destination_index_def.routing_value_for_prepared_record(
+          op.prepared_record,
+          route_with_path: op.update_target.routing_value_source,
+          id_path: op.update_target.id_source
+        )
+        [target_index, routing, op.update_target.relationship]
+      end
+
+      def extract_versions(hits, op)
+        versions = hits.filter_map do |hit|
+          hit.dig("_source", "__versions", op.update_target.relationship, hit.fetch("_id"))
+        end
+        versions.uniq
+      end
+
+      def log_multiple_hits_warning(hits)
+        @logger.warn({
+          "message_type" => "IdentifyDocumentVersionsGotMultipleResults",
+          "index" => hits.map { |h| h["_index"] },
+          "routing" => hits.map { |h| h["_routing"] },
+          "id" => hits.map { |h| h["_id"] },
+          "version" => hits.map { |h| h["_version"] }
+        })
+      end
+
+      public
     end
   end
 end
