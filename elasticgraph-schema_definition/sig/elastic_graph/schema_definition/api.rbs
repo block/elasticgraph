@@ -17,7 +17,6 @@ module ElasticGraph
       include _NamedElement
       def type_ref: () -> SchemaElements::TypeReference
       def graphql_only?: () -> bool
-      def root_document_type?: () -> bool
       def to_sdl: () ?{ (SchemaElements::Field::argument) -> boolish } -> ::String
       def derived_graphql_types: () -> ::Array[SchemaElements::graphQLType]
       def to_indexing_field_type: () -> Indexing::_FieldType
@@ -25,6 +24,8 @@ module ElasticGraph
 
     interface _IndexableType
       include _Type
+      def root_document_type?: () -> bool
+      def directly_queryable?: () -> bool
       def abstract?: () -> bool
       def indices: () -> ::Array[Indexing::Index]
       def runtime_metadata: (::Array[SchemaArtifacts::RuntimeMetadata::UpdateTarget]) -> SchemaArtifacts::RuntimeMetadata::ObjectType
@@ -46,6 +47,8 @@ module ElasticGraph
     #
     # We could list other mixins here but will do that as there is need over time.
     type indexableType = _IndexableType & Mixins::HasDirectives & Mixins::SupportsFilteringAndAggregation & Mixins::HasIndices
+
+    type abstractType = SchemaElements::InterfaceType | SchemaElements::UnionType
 
     class API
       attr_reader state: State

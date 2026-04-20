@@ -40,7 +40,7 @@ group :development do
   gem "simplecov", "~> 0.22"
   gem "simplecov-console", "~> 0.9", ">= 0.9.5"
   gem "standard", "~> 1.54.0"
-  gem "steep", "~> 1.10.0", platforms: :ruby
+  gem "steep", "~> 2.0.0", platforms: :ruby
   gem "super_diff", "~> 0.18"
   gem "vcr", "~> 6.4"
 end

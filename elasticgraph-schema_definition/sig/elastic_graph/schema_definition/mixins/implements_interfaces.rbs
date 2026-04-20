@@ -5,7 +5,11 @@ module ElasticGraph
         def implements: (*::String) -> void
         attr_reader implemented_interfaces: ::Array[SchemaElements::TypeReference]
         def verify_graphql_correctness!: () -> void
-        def recursively_resolve_supertypes: () -> ::Set[SchemaElements::UnionType | SchemaElements::InterfaceType]
+        def recursively_resolve_supertypes: () -> ::Set[abstractType]
+
+        private
+
+        def recursively_resolve_interface_supertypes: (?ancestors: ::Set[abstractType]) -> ::Array[abstractType]
       end
     end
   end

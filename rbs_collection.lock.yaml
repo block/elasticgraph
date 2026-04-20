@@ -105,6 +105,10 @@ gems:
   version: '0'
   source:
     type: stdlib
+- name: dbm
+  version: '0'
+  source:
+    type: stdlib
 - name: diff-lcs
   version: '1.5'
   source:
@@ -147,14 +151,6 @@ gems:
     type: stdlib
 - name: google-protobuf
   version: '3.22'
-  source:
-    type: git
-    name: ruby/gem_rbs_collection
-    revision: e7a9964da22a610305173770e36871b1163faaa7
-    remote: https://github.com/ruby/gem_rbs_collection.git
-    repo_dir: gems
-- name: graphql
-  version: '1.12'
   source:
     type: git
     name: ruby/gem_rbs_collection
@@ -273,6 +269,18 @@ gems:
   version: 1.9.0
   source:
     type: rubygems
+- name: pstore
+  version: '0.2'
+  source:
+    type: git
+    name: ruby/gem_rbs_collection
+    revision: e7a9964da22a610305173770e36871b1163faaa7
+    remote: https://github.com/ruby/gem_rbs_collection.git
+    repo_dir: gems
+- name: psych
+  version: '0'
+  source:
+    type: stdlib
 - name: rack
   version: '2.2'
   source:
@@ -297,6 +305,10 @@ gems:
     revision: e7a9964da22a610305173770e36871b1163faaa7
     remote: https://github.com/ruby/gem_rbs_collection.git
     repo_dir: gems
+- name: random-formatter
+  version: '0'
+  source:
+    type: stdlib
 - name: rdoc
   version: '0'
   source:
@@ -370,6 +382,10 @@ gems:
   source:
     type: stdlib
 - name: timeout
+  version: '0'
+  source:
+    type: stdlib
+- name: tsort
   version: '0'
   source:
     type: stdlib

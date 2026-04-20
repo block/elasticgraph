@@ -168,6 +168,14 @@ Custom gems can be added via `Gemfile-custom` (see `Gemfile-custom.example`), th
 ### RBS Type Signatures
 
 - When defining RBS signatures for extension modules, prefer declaring the concrete type a module extends rather than defining custom interfaces. For example, use `module IndexExtension : ::ElasticGraph::SchemaDefinition::Indexing::Index` instead of creating a custom `_IndexExtensionInterface`.
+- Place interface methods on the narrowest correct interface. If a method only exists on indexable types, put it on `_IndexableType`, not `_Type`.
+- Define `type` aliases (e.g. `type abstractType = InterfaceType | UnionType`) for repeated union types rather than duplicating them across signatures.
+- When Steep can't infer a narrowed type from an expression, prefer an inline RBS type annotation comment (e.g. `# : SchemaElements::InterfaceType`) over a `_ =` cast. Use `_ =` only as a last resort when an annotation won't work.
+- For `Data.define` blocks where Steep can't type-check the dynamically generated `initialize`, use `# @implements ClassName` with a corresponding `class ClassName < Data` in the RBS file that declares the method signatures. Avoid `__skip__ = def`.
+- Prefer `&:method_name` over explicit blocks. If Steep complains, add the missing method to the RBS rather than rewriting as `{ |x| x.method_name }`.
+- Keep `@ivar` declarations adjacent to their accessor method in the RBS, not grouped elsewhere.
+- Be precise about collection element types in RBS — e.g. if a `Set` only ever contains `UnionType`, type it as `Set[UnionType]` not `Set[UnionType | InterfaceType]`.
+- Use `@dynamic` annotations only for methods that actually exist at runtime (provided by delegation, Struct, or included modules). Never use `@dynamic` for methods that would raise `NoMethodError`.
 
 ### Testing
 

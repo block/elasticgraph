@@ -16,7 +16,7 @@ module ElasticGraph
 
         private
 
-        def verify_no_duplicates!: (::Array[Script]) -> (void | bot)
+        def verify_no_duplicates!: (::Array[Script]) -> void
       end
     end
   end

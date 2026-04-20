@@ -45,7 +45,7 @@ module ElasticGraph
       #    end
       def self.define(*attrs, &block)
         ::Data.define(*attrs) do
-          # @implements ::Data
+          # @implements ConfigData
           alias_method :__data_initialize, :initialize
           extend ClassMethods
 

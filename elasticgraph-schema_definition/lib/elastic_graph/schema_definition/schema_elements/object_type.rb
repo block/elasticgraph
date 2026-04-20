@@ -30,7 +30,7 @@ module ElasticGraph
         include Mixins::SupportsFilteringAndAggregation
 
         # `include HasIndices` provides the following methods:
-        # @dynamic runtime_metadata, derived_indexed_types, indices, indexed?, abstract?
+        # @dynamic runtime_metadata, derived_indexed_types, indices, root_document_type?, abstract?, directly_queryable?
         include Mixins::HasIndices
 
         # `include ImplementsInterfaces` provides the following methods:
