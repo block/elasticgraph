@@ -34,7 +34,7 @@ PATH
     elasticgraph-admin_lambda (1.1.1.pre)
       elasticgraph-admin (= 1.1.1.pre)
       elasticgraph-lambda_support (= 1.1.1.pre)
-      rake (~> 13.4, >= 13.4.1)
+      rake (~> 13.4, >= 13.4.2)
 
 PATH
   remote: elasticgraph-admin
@@ -44,7 +44,7 @@ PATH
       elasticgraph-indexer (= 1.1.1.pre)
       elasticgraph-schema_artifacts (= 1.1.1.pre)
       elasticgraph-support (= 1.1.1.pre)
-      rake (~> 13.4, >= 13.4.1)
+      rake (~> 13.4, >= 13.4.2)
 
 PATH
   remote: elasticgraph-apollo
@@ -105,7 +105,7 @@ PATH
   remote: elasticgraph-indexer_autoscaler_lambda
   specs:
     elasticgraph-indexer_autoscaler_lambda (1.1.1.pre)
-      aws-sdk-cloudwatch (>= 1.133, < 1.135)
+      aws-sdk-cloudwatch (~> 1.134.0)
       aws-sdk-lambda (~> 1.177)
       aws-sdk-sqs (~> 1.112)
       elasticgraph-datastore_core (= 1.1.1.pre)
@@ -145,7 +145,7 @@ PATH
       elasticgraph-indexer (= 1.1.1.pre)
       elasticgraph-schema_definition (= 1.1.1.pre)
       rackup (~> 2.3, >= 2.3.1)
-      rake (~> 13.4, >= 13.4.1)
+      rake (~> 13.4, >= 13.4.2)
       webrick (~> 1.9, >= 1.9.2)
 
 PATH
@@ -171,7 +171,7 @@ PATH
       elasticgraph-graphql (= 1.1.1.pre)
       elasticgraph-support (= 1.1.1.pre)
       graphql (~> 2.5.23)
-      rake (~> 13.4, >= 13.4.1)
+      rake (~> 13.4, >= 13.4.2)
 
 PATH
   remote: elasticgraph-rack
@@ -195,7 +195,7 @@ PATH
       elasticgraph-schema_artifacts (= 1.1.1.pre)
       elasticgraph-support (= 1.1.1.pre)
       graphql (~> 2.5.23)
-      rake (~> 13.4, >= 13.4.1)
+      rake (~> 13.4, >= 13.4.2)
 
 PATH
   remote: elasticgraph-support
@@ -736,7 +736,7 @@ DEPENDENCIES
   steep (~> 1.10.0)
   super_diff (~> 0.18)
   vcr (~> 6.4)
-  yard (~> 0.9)
+  yard (~> 0.9, >= 0.9.43)
   yard-doctest (~> 0.1, >= 0.1.17)
   yard-markdown (~> 0.6)
 
