@@ -380,6 +380,83 @@ module ElasticGraph
               part_name_string => 1
             )
           end
+
+          describe "query validation" do
+            it "returns a query with `validate: false` for registered query forms, but `validate: true` when a registered query differs materially" do
+              registry = registry_with({"my_client" => [part_name_string]})
+
+              # Byte-for-byte registered query → cache hit → validation skipped.
+              registered_query, errors, status = registry.build_and_validate_query(part_name_string, client: client_named("my_client"))
+              expect(errors).to be_empty
+              expect(status).to eq(RegistrationStatus::MATCHED_REGISTERED_QUERY)
+              expect(registered_query.validate).to eq(false)
+
+              # Canonically equivalent alternate form → parsed once, cached, and returned with validation skipped.
+              alternate_form_query_string = "# a leading comment\n#{part_name_string}"
+              alternate_form_query, _, status = registry.build_and_validate_query(alternate_form_query_string, client: client_named("my_client"))
+              expect(status).to eq(RegistrationStatus::MATCHED_REGISTERED_QUERY)
+              expect(alternate_form_query.validate).to eq(false)
+
+              # Substantive difference (same operation name, different shape) → registry rejects it and still validates.
+              differing_query = part_name_string.sub("name\n", "the_name: name\n")
+              differing_result_query, _, status = registry.build_and_validate_query(differing_query, client: client_named("my_client"))
+              expect(status).to eq(RegistrationStatus::DIFFERING_REGISTERED_QUERY)
+              expect(differing_result_query.validate).to eq(true)
+            end
+
+            it "still performs static validation for unregistered queries" do
+              invalid_query_string = <<~EOS.strip
+                query WidgetName {
+                  __type(name: "Widget") {
+                    missingField
+                  }
+                }
+              EOS
+
+              registry = registry_with({"my_client" => [invalid_query_string]}, allow_unregistered_clients: true)
+
+              registered_query, errors, status = registry.build_and_validate_query(invalid_query_string, client: client_named("my_client"))
+              expect(errors).to be_empty
+              expect(status).to eq(RegistrationStatus::MATCHED_REGISTERED_QUERY)
+              expect(registered_query.validate).to eq(false)
+              expect(registered_query.valid?).to eq(true) # Not actually valid, but returns true since we skip validation
+
+              unregistered_query, errors, status = registry.build_and_validate_query(invalid_query_string, client: client_named("other_client"))
+              expect(errors).to be_empty
+              expect(status).to eq(RegistrationStatus::UNREGISTERED_CLIENT)
+              expect(unregistered_query.validate).to eq(true)
+              expect(unregistered_query.valid?).to eq(false)
+              expect(unregistered_query.static_errors.map(&:message).join).to include("missingField")
+            end
+
+            it "still validates variable values even when static validation is skipped" do
+              # `validate: false` disables graphql-ruby's static (query-string) validation pipeline but
+              # not variable validation (see `GraphQL::Query::Variables#initialize`, which coerces and
+              # validates each provided variable against its declared type). This test guards that
+              # contract so we don't silently start accepting malformed variable values for cache hits.
+              query_with_variable = <<~EOS.strip
+                query GetTypeName($name: String!) {
+                  __type(name: $name) {
+                    name
+                  }
+                }
+              EOS
+
+              registry = registry_with({"my_client" => [query_with_variable]})
+
+              # Byte-for-byte cache hit, but with an invalid variable value (Integer where String! is required).
+              query, errors, status = registry.build_and_validate_query(
+                query_with_variable,
+                client: client_named("my_client"),
+                variables: {"name" => 123}
+              )
+
+              expect(errors).to be_empty
+              expect(status).to eq(RegistrationStatus::MATCHED_REGISTERED_QUERY)
+              expect(query.validate).to eq(false)
+              expect(query.static_errors.map(&:message).join).to include("String")
+            end
+          end
         end
 
         it "always allows the internal ElasticGraph client to submit the eager load query that happens at boot time" do
@@ -504,11 +581,29 @@ module ElasticGraph
 
         def execute_allowed_query(registry, query_string, **options)
           get_allowed_query(registry, query_string, **options).tap do |query|
-            # Verify that the executed query is exactly what was submitted rather than what was registered.
-            # This particularly matters with the `@egLatencySlo` directive. We want the value on the query
-            # to be used when it differs from the SLO threshold on the registered query.
-            expect(query.query_string.strip).to eq(query_string.strip)
+            # Verify that the executed query preserves operation directives from the submitted query
+            # string (not the registered query). This particularly matters for `@eg_latency_slo`—
+            # the client-submitted SLO value must be used at execution time.
+            expect(operation_directives_of(query)).to eq(operation_directives_from_string(query_string, query.selected_operation_name))
           end.result
+        end
+
+        def operation_directives_of(query)
+          query.selected_operation.directives.to_h { |dir|
+            [dir.name, dir.arguments.to_h { |arg| [arg.name, arg.value] }]
+          } || {}
+        end
+
+        def operation_directives_from_string(query_string, operation_name)
+          # Use the underlying parser directly to avoid interfering with `track_parse_counts`
+          # which mocks `::GraphQL.parse`.
+          doc = ::GraphQL::Language::Parser.parse(query_string)
+          op = doc.definitions.find { |d|
+            d.is_a?(::GraphQL::Language::Nodes::OperationDefinition) && d.name == operation_name
+          }
+          (op.directives || []).to_h { |dir|
+            [dir.name, dir.arguments.to_h { |arg| [arg.name, arg.value] }]
+          }
         end
 
         def result_with_type_name(name)
