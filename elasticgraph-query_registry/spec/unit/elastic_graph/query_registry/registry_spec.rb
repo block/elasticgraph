@@ -404,7 +404,7 @@ module ElasticGraph
               expect(differing_result_query.validate).to eq(true)
             end
 
-            it "still performs static validation for queries that are built from scratch" do
+            it "still performs static validation for unregistered queries" do
               invalid_query_string = <<~EOS.strip
                 query WidgetName {
                   __type(name: "Widget") {
@@ -419,7 +419,7 @@ module ElasticGraph
               expect(errors).to be_empty
               expect(status).to eq(RegistrationStatus::MATCHED_REGISTERED_QUERY)
               expect(registered_query.validate).to eq(false)
-              expect(registered_query.valid?).to eq(true)
+              expect(registered_query.valid?).to eq(true) # Not actually valid, but returns true since we skip validation
 
               unregistered_query, errors, status = registry.build_and_validate_query(invalid_query_string, client: client_named("other_client"))
               expect(errors).to be_empty

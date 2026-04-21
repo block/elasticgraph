@@ -145,5 +145,5 @@ task will also fail and give you instructions anytime a variables file is not up
 
 You should also run `query_registry:validate_queries` as part of CI for any application that
 uses this gem. At runtime, `elasticgraph-query_registry` skips GraphQL static validation for
-registered queries so repeated requests can reuse the cached parsed document. Unregistered
+registered queries since it assumes they have already been validated on CI. Unregistered
 queries, materially different queries, and variable values still go through runtime validation.
