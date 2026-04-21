@@ -20,10 +20,12 @@ Query registration provides a few key benefits:
   allowed to, you can choose not to approve the query. Once setup and
   configured, this library will block clients from submitting queries
   that have not been registered.
-* Your GraphQL endpoint will be a bit more efficient. Parsing large
-  GraphQL queries can be a bit slow (in our testing, a 10 KB query
-  string takes about ~10ms to parse), and the registry will cache and
-  reuse the parsed form of registered queries.
+* Your GraphQL endpoint will be a bit more efficient. Parsing and
+  statically validating large GraphQL queries can be a bit slow (in our
+  testing, parsing a 10 KB query string takes about ~10ms and statically
+  validating it takes another ~25ms), and the registry will cache and
+  reuse the parsed form of registered queries while also skipping
+  redundant runtime static validation for them.
 
 Importantly, once installed, registered clients who send unregistered
 queries will get errors. Unregistered clients can similarly be blocked
@@ -141,3 +143,8 @@ bundle exec rake "query_registry:dump_variables[client_name, query_name]"
 
 Don't worry about if you forget this, though--the `query_registry:validate_queries`
 task will also fail and give you instructions anytime a variables file is not up-to-date.
+
+You should also run `query_registry:validate_queries` as part of CI for any application that
+uses this gem. At runtime, `elasticgraph-query_registry` skips GraphQL static validation for
+registered queries since it assumes they have already been validated on CI. Unregistered
+queries, materially different queries, and variable values still go through runtime validation.
