@@ -94,22 +94,41 @@ RSpec.shared_context "lambda function" do |config_overrides_in_yaml: {}|
     require "aws_lambda_ric/logger_patch"
     require "aws_lambda_ric"
 
-    # The monkey patches are triggered by the act of instantiating this class:
-    # https://github.com/aws/aws-lambda-ruby-runtime-interface-client/blob/3.0.0/lib/aws_lambda_ric.rb#L141-L152
-    AwsLambdaRIC::TelemetryLogger.new("1") # File descriptor is required but not used in test env
+    # In production, Bootstrap#start calls TelemetryLogger.from_env, which:
+    # 1. Applies LoggerPatch via mutate_std_logger (no IO involved)
+    # 2. Creates a TelemetryLogger instance if _LAMBDA_TELEMETRY_LOG_FD is set,
+    #    which sets up the telemetry sink and calls mutate_kernel_puts
+    # https://github.com/aws/aws-lambda-ruby-runtime-interface-client/blob/f11c2c7/lib/aws_lambda_ric.rb#L164-L175
+    #
+    # We don't set _LAMBDA_TELEMETRY_LOG_FD, so from_env applies LoggerPatch but returns
+    # before creating a TelemetryLogger instance (which would call IO.new(fd, 'wb') —
+    # that raises Errno::EBADF in some CI forked-subprocess environments).
+    AwsLambdaRIC::TelemetryLogger.from_env
 
-    # Here we verify that the Logger monkey patch was indeed installed. The installation of the monkey patch
-    # gets bypassed when certain errors are encountered (which are silently swallowed), so the mere act of
-    # instantiating the class above doesn't guarantee the monkey patches are active.
-    #
-    # Plus, new versions of the `aws_lambda_ric` may change how the monkey patches are installed.
-    #
-    # https://github.com/aws/aws-lambda-ruby-runtime-interface-client/blob/3.0.0/lib/aws_lambda_ric.rb#L150-L152
     expect(::Logger.ancestors).to include(::LoggerPatch)
+
+    # Set up telemetry sink wrapping $stdout, like TelemetryLogger#initialize would have
+    # done with fd 1. This ensures mutated kernel puts output still reaches stdout so that
+    # the caller's `to_stdout_from_any_process` matchers continue to work.
+    AwsLambdaRIC::TelemetryLogger.telemetry_log_fd_file = $stdout
+    AwsLambdaRIC::TelemetryLogger.telemetry_log_sink = TelemetryLogSink.new(file: $stdout)
+
+    # mutate_kernel_puts is normally called by TelemetryLogger#initialize, but we skipped
+    # the constructor (see above). Apply it via send (private) using allocate to bypass it.
+    # https://github.com/aws/aws-lambda-ruby-runtime-interface-client/blob/f11c2c7/lib/aws_lambda_ric.rb#L179-L190
+    expect(kernel_puts_monkey_patched?).to be false
+    AwsLambdaRIC::TelemetryLogger.allocate.send(:mutate_kernel_puts)
+    expect(kernel_puts_monkey_patched?).to be true
 
     expect {
       # Log a message to stdout--this is what triggered a `NoMethodError` when logger 1.6.0 is used.
       ::Logger.new($stdout).error("test log message")
     }.to output(a_string_including("test log message")).to_stdout_from_any_process
+  end
+
+  def kernel_puts_monkey_patched?
+    # The original Kernel#puts is implemented in C (source_location returns nil).
+    # After aws_lambda_ric's mutate_kernel_puts, the source file points into the gem.
+    Kernel.instance_method(:puts).source_location&.first.to_s.include?("aws_lambda_ric")
   end
 end

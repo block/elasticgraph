@@ -141,12 +141,17 @@ properties:
                   number_of_shards: 32
             properties:
               query_cluster:
-                type: string
+                type:
+                - string
+                - 'null'
                 description: Named search cluster to be used for queries on this index.
-                  The value must match be a key in the `clusters` map.
+                  The value must match be a key in the `clusters` map. Set to `null`
+                  to hide this index's types in the GraphQL schema returned from the
+                  GraphQL endpoint.
                 examples:
                 - main
                 - search_cluster
+                -
               index_into_clusters:
                 type: array
                 items:
