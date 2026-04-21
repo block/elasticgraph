@@ -22,9 +22,10 @@ Query registration provides a few key benefits:
   that have not been registered.
 * Your GraphQL endpoint will be a bit more efficient. Parsing and
   statically validating large GraphQL queries can be a bit slow (in our
-  testing, parsing a 10 KB query string takes about ~10ms), and the
-  registry will cache and reuse the parsed form of registered queries
-  while also skipping redundant runtime static validation for them.
+  testing, parsing a 10 KB query string takes about ~10ms and statically
+  validating it takes another ~25ms), and the registry will cache and
+  reuse the parsed form of registered queries while also skipping
+  redundant runtime static validation for them.
 
 Importantly, once installed, registered clients who send unregistered
 queries will get errors. Unregistered clients can similarly be blocked

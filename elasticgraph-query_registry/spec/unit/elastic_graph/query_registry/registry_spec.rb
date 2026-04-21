@@ -580,7 +580,30 @@ module ElasticGraph
         end
 
         def execute_allowed_query(registry, query_string, **options)
-          get_allowed_query(registry, query_string, **options).result
+          get_allowed_query(registry, query_string, **options).tap do |query|
+            # Verify that the executed query preserves operation directives from the submitted query
+            # string (not the registered query). This particularly matters for `@eg_latency_slo`—
+            # the client-submitted SLO value must be used at execution time.
+            expect(operation_directives_of(query)).to eq(operation_directives_from_string(query_string, query.selected_operation_name))
+          end.result
+        end
+
+        def operation_directives_of(query)
+          query.selected_operation.directives.to_h { |dir|
+            [dir.name, dir.arguments.to_h { |arg| [arg.name, arg.value] }]
+          } || {}
+        end
+
+        def operation_directives_from_string(query_string, operation_name)
+          # Use the underlying parser directly to avoid interfering with `track_parse_counts`
+          # which mocks `::GraphQL.parse`.
+          doc = ::GraphQL::Language::Parser.parse(query_string)
+          op = doc.definitions.find { |d|
+            d.is_a?(::GraphQL::Language::Nodes::OperationDefinition) && d.name == operation_name
+          }
+          (op.directives || []).to_h { |dir|
+            [dir.name, dir.arguments.to_h { |arg| [arg.name, arg.value] }]
+          }
         end
 
         def result_with_type_name(name)
