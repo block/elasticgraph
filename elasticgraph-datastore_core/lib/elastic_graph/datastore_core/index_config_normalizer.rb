@@ -19,12 +19,21 @@ module ElasticGraph
       # Note: `index.history.uuid` is a weird setting that sometimes shows up in managed AWS OpenSearch
       # clusters, but only on _some_ indices. It's not documented and we don't want to mess with it here,
       # so we want to treat it as a read only setting.
+      #
+      # Note: `index.resize.source.name`, `index.resize.source.uuid`, and
+      # `index.routing.allocation.initial_recovery._id` are set by the datastore on indices produced by
+      # a shrink/split/clone. They are exposed on read but rejected on write (attempting to write
+      # them returns `illegal_argument_exception: unknown setting`), so we must treat them as
+      # read-only to avoid the update loop trying to clear them by writing null.
       READ_ONLY_SETTINGS = %w[
         index.creation_date
         index.history.uuid
         index.provided_name
         index.replication.type
+        index.resize.source.name
+        index.resize.source.uuid
         index.routing.allocation.include._tier_preference
+        index.routing.allocation.initial_recovery._id
         index.uuid
         index.version.created
         index.version.upgraded
