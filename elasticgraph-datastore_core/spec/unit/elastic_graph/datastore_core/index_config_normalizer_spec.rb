@@ -21,12 +21,14 @@ module ElasticGraph
       it "filters out read-only settings" do
         index_config = {
           "settings" => {
+            "index.codec" => "best_compression",
             "index.creation_date" => "2020-07-20",
             "index.uuid" => "abcdefg",
             "index.history.uuid" => "98765",
             "index.resize.source.name" => "source_index_v2",
             "index.resize.source.uuid" => "0iZ0xDBcQwKxtIVDzrELdw",
             "index.routing.allocation.initial_recovery._id" => nil,
+            "index.routing_partition_size" => "1",
             "index.random.setting" => "random"
           }
         }

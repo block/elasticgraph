@@ -25,7 +25,17 @@ module ElasticGraph
       # a shrink/split/clone. They are exposed on read but rejected on write (attempting to write
       # them returns `illegal_argument_exception: unknown setting`), so we must treat them as
       # read-only to avoid the update loop trying to clear them by writing null.
+      #
+      # Note: `index.routing_partition_size` is a static, index-creation-only setting. Once the index
+      # exists it cannot be changed, so PUTs against `_settings` for it (including PUTs of null to
+      # restore the default) are rejected. Treat it as read-only so the update loop leaves it alone.
+      #
+      # Note: `index.codec` is a static (non-dynamic) setting. It is exposed on read but can only be
+      # changed on a closed index, so PUTs against `_settings` for it on an open index are rejected
+      # with `Can't update non dynamic settings`. Treat it as read-only so the update loop leaves it
+      # alone.
       READ_ONLY_SETTINGS = %w[
+        index.codec
         index.creation_date
         index.history.uuid
         index.provided_name
@@ -34,6 +44,7 @@ module ElasticGraph
         index.resize.source.uuid
         index.routing.allocation.include._tier_preference
         index.routing.allocation.initial_recovery._id
+        index.routing_partition_size
         index.uuid
         index.version.created
         index.version.upgraded
