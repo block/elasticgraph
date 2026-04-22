@@ -103,6 +103,7 @@ ElasticGraph.define_schema do |schema|
     t.field "cost_currency_introduced_on", "Date"
     t.field "name", "String"
     t.field "internal_name", "String", returnable: false
+    t.field "internal_highlightable_name", "String", returnable: false, highlightable: true
     t.field "name_text", "String" do |f|
       f.mapping type: "text"
     end
@@ -120,6 +121,7 @@ ElasticGraph.define_schema do |schema|
     t.relates_to_many "components", "Component", via: "component_ids", dir: :out, singular: "component"
     t.field "options", "WidgetOptions"
     t.field "internal_details", "WidgetInternalDetails", returnable: false
+    t.field "internal_highlightable_details", "WidgetInternalDetails", returnable: false, highlightable: true
 
     # Demonstrate using `name_in_index` with a graphql-only embedded field.
     t.field "size", "Size", name_in_index: "options.size", graphql_only: true

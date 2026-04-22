@@ -1357,6 +1357,8 @@ index_templates:
             type: keyword
           internal_name:
             type: keyword
+          internal_highlightable_name:
+            type: keyword
           name_text:
             type: text
           description:
@@ -1389,6 +1391,10 @@ index_templates:
               is_draft:
                 type: boolean
           internal_details:
+            properties:
+              name:
+                type: keyword
+          internal_highlightable_details:
             properties:
               name:
                 type: keyword

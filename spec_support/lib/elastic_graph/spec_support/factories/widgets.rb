@@ -99,6 +99,7 @@ FactoryBot.define do
     cost_currency_symbol { cost&.fetch(:currency)&.then { |code| currencies_by_code.dig(code, :symbol) } }
     name { Faker::Device.model_name }
     internal_name { Faker::Device.model_name }
+    internal_highlightable_name { Faker::Device.model_name }
     name_text { name }
     description { "this is #{Faker::Device.model_name}" }
     created_at { Faker::Time.between(from: recent_date - 30, to: recent_date).utc.iso8601 }
@@ -109,6 +110,7 @@ FactoryBot.define do
     options { build :widget_options }
     the_options { options }
     internal_details { build :widget_internal_details }
+    internal_highlightable_details { build :widget_internal_details }
 
     component_ids do
       components.map { |c| c.fetch(:id) }

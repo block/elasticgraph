@@ -1197,6 +1197,15 @@ json_schema_version: 1
         ElasticGraph:
           type: String
           nameInIndex: internal_name
+      internal_highlightable_name:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/String"
+          - maxLength: 8191
+        - type: 'null'
+        ElasticGraph:
+          type: String
+          nameInIndex: internal_highlightable_name
       name_text:
         anyOf:
         - allOf:
@@ -1271,6 +1280,13 @@ json_schema_version: 1
         ElasticGraph:
           type: WidgetInternalDetails
           nameInIndex: internal_details
+      internal_highlightable_details:
+        anyOf:
+        - "$ref": "#/$defs/WidgetInternalDetails"
+        - type: 'null'
+        ElasticGraph:
+          type: WidgetInternalDetails
+          nameInIndex: internal_highlightable_details
       the_options:
         anyOf:
         - "$ref": "#/$defs/WidgetOptions"
@@ -1350,6 +1366,7 @@ json_schema_version: 1
     - cost_currency_introduced_on
     - name
     - internal_name
+    - internal_highlightable_name
     - name_text
     - description
     - created_at
@@ -1360,6 +1377,7 @@ json_schema_version: 1
     - component_ids
     - options
     - internal_details
+    - internal_highlightable_details
     - the_options
     - inventor
     - named_inventor
