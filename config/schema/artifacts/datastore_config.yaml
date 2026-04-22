@@ -1404,6 +1404,8 @@ index_templates:
                 type: boolean
           inventor:
             properties:
+              id:
+                type: keyword
               name:
                 type: keyword
               nationality:
@@ -1414,6 +1416,8 @@ index_templates:
                 type: keyword
           named_inventor:
             properties:
+              id:
+                type: keyword
               name:
                 type: keyword
               nationality:
@@ -1508,6 +1512,30 @@ indices:
               type: integer
             shapes|coordinates:
               type: integer
+        __sources:
+          type: keyword
+        __versions:
+          type: object
+          dynamic: 'false'
+      _size:
+        enabled: true
+    settings:
+      index.mapping.ignore_malformed: false
+      index.mapping.coerce: false
+      index.number_of_replicas: 1
+      index.number_of_shards: 1
+      index.max_result_window: 10000
+  companies:
+    aliases: {}
+    mappings:
+      dynamic: strict
+      properties:
+        id:
+          type: keyword
+        name:
+          type: keyword
+        stock_ticker:
+          type: keyword
         __sources:
           type: keyword
         __versions:
@@ -1625,6 +1653,14 @@ indices:
         created_at:
           type: date
           format: strict_date_time
+        ceo:
+          properties:
+            id:
+              type: keyword
+            name:
+              type: keyword
+            nationality:
+              type: keyword
         __sources:
           type: keyword
         __versions:
@@ -1653,6 +1689,30 @@ indices:
         material:
           type: keyword
         manufacturer_id:
+          type: keyword
+        __sources:
+          type: keyword
+        __versions:
+          type: object
+          dynamic: 'false'
+      _size:
+        enabled: true
+    settings:
+      index.mapping.ignore_malformed: false
+      index.mapping.coerce: false
+      index.number_of_replicas: 1
+      index.number_of_shards: 1
+      index.max_result_window: 10000
+  people:
+    aliases: {}
+    mappings:
+      dynamic: strict
+      properties:
+        id:
+          type: keyword
+        name:
+          type: keyword
+        nationality:
           type: keyword
         __sources:
           type: keyword

@@ -21,18 +21,10 @@ module ElasticGraph
             hash[type_name] = scalar_types_by_name[type_name]&.load_indexing_preparer&.extension_class
           end # : ::Hash[::String, SchemaArtifacts::RuntimeMetadata::extensionClass?]
 
-          # Derive the set of types that have __typename in their index mappings to supplement the set of types that
-          # explicitly require __typename in the JSON schema
-          mappings = schema_artifacts.index_mappings_by_index_def_name
-          types_with_typename_in_index_mapping = schema_artifacts.runtime_metadata.object_types_by_name.filter_map do |type_name, meta|
-            type_name if meta.index_definition_names.any? { |idx| mappings.dig(idx, "properties", "__typename") }
-          end.to_set
-
           @preparers_by_json_schema_version = ::Hash.new do |hash, version|
             hash[version] = RecordPreparer.new(
               indexing_preparer_by_scalar_type_name,
-              build_type_metas_from(@schema_artifacts.json_schemas_for(version)),
-              types_with_typename_in_index_mapping
+              build_type_metas_from(@schema_artifacts.json_schemas_for(version))
             )
           end
         end
@@ -58,10 +50,6 @@ module ElasticGraph
               {} # : ::Hash[::String, untyped]
             end # : ::Hash[::String, untyped]
 
-            required_fields = type_def.fetch("required") do
-              [] # : ::Array[::String]
-            end # : ::Array[::String]
-
             eg_meta_by_field_name = properties.filter_map do |prop_name, prop|
               eg_meta = prop["ElasticGraph"]
               [prop_name, eg_meta] if eg_meta
@@ -69,7 +57,6 @@ module ElasticGraph
 
             TypeMetadata.new(
               name: type,
-              requires_typename: required_fields.include?("__typename"),
               eg_meta_by_field_name: eg_meta_by_field_name
             )
           end
@@ -84,20 +71,16 @@ module ElasticGraph
       # still build operations for it, and the operations require a `RecordPreparer`, but we do
       # not send them to the datastore.
       module Identity
-        def self.prepare_for_index(type_name, record)
+        def self.prepare_for_index(type_name, record, mapping_properties: nil)
           record
         end
       end
 
-      def initialize(indexing_preparer_by_scalar_type_name, type_metas, types_with_typename_in_index_mapping)
+      def initialize(indexing_preparer_by_scalar_type_name, type_metas)
         @indexing_preparer_by_scalar_type_name = indexing_preparer_by_scalar_type_name
         @eg_meta_by_field_name_by_concrete_type = type_metas.to_h do |meta|
           [meta.name, meta.eg_meta_by_field_name]
         end
-
-        @types_requiring_typename = type_metas.filter_map do |meta|
-          meta.name if meta.requires_typename
-        end.to_set | types_with_typename_in_index_mapping
       end
 
       # Prepares the given payload for being indexed into the named index.
@@ -114,13 +97,13 @@ module ElasticGraph
       #
       # Note: this method does not mutate the given `record`. Instead it returns a
       # copy with any updates applied to it.
-      def prepare_for_index(type_name, record)
-        prepare_value_for_indexing(record, type_name)
+      def prepare_for_index(type_name, record, mapping_properties: nil)
+        prepare_value_for_indexing(record, type_name, mapping_properties) # : ::Hash[::String, untyped]
       end
 
       private
 
-      def prepare_value_for_indexing(value, type_name)
+      def prepare_value_for_indexing(value, type_name, mapping_properties)
         type_name = type_name.delete_suffix("!")
 
         return nil if value.nil?
@@ -132,7 +115,7 @@ module ElasticGraph
         case value
         when ::Array
           element_type_name = type_name.delete_prefix("[").delete_suffix("]")
-          value.map { |v| prepare_value_for_indexing(v, element_type_name) }
+          value.map { |v| prepare_value_for_indexing(v, element_type_name, mapping_properties) }
         when ::Hash
           # `@eg_meta_by_field_name_by_concrete_type` does not have abstract types in it (e.g. type unions).
           # Instead, it'll have each concrete subtype in it.
@@ -141,18 +124,23 @@ module ElasticGraph
           # what the concrete subtype is. `__typename` is required on abstract types and indicates that.
           eg_meta_by_field_name = @eg_meta_by_field_name_by_concrete_type.fetch(value["__typename"] || type_name)
 
+          # Determine whether __typename belongs at this position by checking the index mapping.
+          typename_in_mapping = mapping_properties&.key?("__typename")
+
           prepared_fields = value.filter_map do |field_name, field_value|
             if field_name == "__typename"
-              # We only want to include __typename if it we're dealing with a type that requires it.
-              # (This is the case for an abstract type, so it can differentiate between which subtype we have
-              [field_name, field_value] if @types_requiring_typename.include?(type_name)
+              # Only include __typename if the index mapping has it at this position.
+              [field_name, field_value] if typename_in_mapping
             elsif (eg_meta = eg_meta_by_field_name[field_name])
-              [eg_meta.fetch("nameInIndex"), prepare_value_for_indexing(field_value, eg_meta.fetch("type"))]
+              name_in_index = eg_meta.fetch("nameInIndex")
+              nested_mapping_properties = mapping_properties&.dig(name_in_index, "properties")
+              [name_in_index, prepare_value_for_indexing(field_value, eg_meta.fetch("type"), nested_mapping_properties)]
             end
           end.to_h
 
-          # Add __typename if required but absent (e.g. for a mixed-type index).
-          if @types_requiring_typename.include?(type_name) && !value.key?("__typename")
+          # Inject __typename if the mapping requires it but it's absent from the record
+          # (e.g. for a concrete type indexed in a mixed-type index).
+          if typename_in_mapping && !value.key?("__typename")
             prepared_fields["__typename"] = type_name
           end
 
@@ -168,8 +156,6 @@ module ElasticGraph
       TypeMetadata = ::Data.define(
         # The name of the type this metadata object is for.
         :name,
-        # Indicates if this type requires a `__typename` field.
-        :requires_typename,
         # The per-field ElasticGraph metadata, keyed by field name.
         :eg_meta_by_field_name
       )

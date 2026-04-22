@@ -23,10 +23,12 @@ json_schema_version: 1
         type: string
         enum:
         - Address
+        - Company
         - Component
         - ElectricalPart
         - Manufacturer
         - MechanicalPart
+        - Person
         - Sponsor
         - Team
         - Widget
@@ -164,6 +166,10 @@ json_schema_version: 1
   Company:
     type: object
     properties:
+      id:
+        allOf:
+        - "$ref": "#/$defs/ID"
+        - maxLength: 8191
       name:
         anyOf:
         - allOf:
@@ -181,6 +187,7 @@ json_schema_version: 1
         const: Company
         default: Company
     required:
+    - id
     - name
     - stock_ticker
   Component:
@@ -361,6 +368,10 @@ json_schema_version: 1
         - type: 'null'
       created_at:
         "$ref": "#/$defs/DateTime"
+      ceo:
+        anyOf:
+        - "$ref": "#/$defs/Person"
+        - type: 'null'
       __typename:
         type: string
         const: Manufacturer
@@ -369,6 +380,7 @@ json_schema_version: 1
     - id
     - name
     - created_at
+    - ceo
   Material:
     type: string
     enum:
@@ -436,6 +448,10 @@ json_schema_version: 1
   Person:
     type: object
     properties:
+      id:
+        allOf:
+        - "$ref": "#/$defs/ID"
+        - maxLength: 8191
       name:
         anyOf:
         - allOf:
@@ -453,6 +469,7 @@ json_schema_version: 1
         const: Person
         default: Person
     required:
+    - id
     - name
     - nationality
   Player:

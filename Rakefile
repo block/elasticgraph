@@ -68,12 +68,13 @@ configure_local_rake_tasks = ->(tasks) do
     components = components.shuffle
 
     batch.concat(Array.new(10) { FactoryBot.build(:address, manufacturer: manufacturers.sample) })
+    batch.concat(inventors = Array.new(10) { FactoryBot.build(Faker::Base.sample([:person, :company])) })
     batch.concat(Array.new(10) do
       # Since we now use `sourced_from` to copy `Widget` fields onto `Component` documents, we need to make
       # sure that we don't have conflicting widget <-> component relationships defined. Each component can
       # have at most 1 widget, so we use `components.shift` here to ensure that a component isn't re-assigned.
       widget_components = Array.new(rand(3)) { components.shift }.compact
-      FactoryBot.build(:widget, components: widget_components)
+      FactoryBot.build(:widget, components: widget_components, inventor: Faker::Base.sample(inventors))
     end)
 
     batch.concat(sponsors = Array.new(10) { FactoryBot.build(:sponsor) })

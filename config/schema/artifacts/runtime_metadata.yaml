@@ -21,6 +21,32 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: timestamps.created_at
+  CompanySortOrderInput:
+    values_by_name:
+      id_ASC:
+        sort_field:
+          direction: asc
+          field_path: id
+      id_DESC:
+        sort_field:
+          direction: desc
+          field_path: id
+      name_ASC:
+        sort_field:
+          direction: asc
+          field_path: name
+      name_DESC:
+        sort_field:
+          direction: desc
+          field_path: name
+      stock_ticker_ASC:
+        sort_field:
+          direction: asc
+          field_path: stock_ticker
+      stock_ticker_DESC:
+        sort_field:
+          direction: desc
+          field_path: stock_ticker
   ComponentSortOrderInput:
     values_by_name:
       created_at_ASC:
@@ -209,6 +235,40 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: voltage
+  InventorSortOrderInput:
+    values_by_name:
+      id_ASC:
+        sort_field:
+          direction: asc
+          field_path: id
+      id_DESC:
+        sort_field:
+          direction: desc
+          field_path: id
+      name_ASC:
+        sort_field:
+          direction: asc
+          field_path: name
+      name_DESC:
+        sort_field:
+          direction: desc
+          field_path: name
+      nationality_ASC:
+        sort_field:
+          direction: asc
+          field_path: nationality
+      nationality_DESC:
+        sort_field:
+          direction: desc
+          field_path: nationality
+      stock_ticker_ASC:
+        sort_field:
+          direction: asc
+          field_path: stock_ticker
+      stock_ticker_DESC:
+        sort_field:
+          direction: desc
+          field_path: stock_ticker
   LocalTimeGroupingTruncationUnitInput:
     values_by_name:
       HOUR:
@@ -233,6 +293,30 @@ enum_types_by_name:
         datastore_value: 1000
   ManufacturerSortOrderInput:
     values_by_name:
+      ceo_id_ASC:
+        sort_field:
+          direction: asc
+          field_path: ceo.id
+      ceo_id_DESC:
+        sort_field:
+          direction: desc
+          field_path: ceo.id
+      ceo_name_ASC:
+        sort_field:
+          direction: asc
+          field_path: ceo.name
+      ceo_name_DESC:
+        sort_field:
+          direction: desc
+          field_path: ceo.name
+      ceo_nationality_ASC:
+        sort_field:
+          direction: asc
+          field_path: ceo.nationality
+      ceo_nationality_DESC:
+        sort_field:
+          direction: desc
+          field_path: ceo.nationality
       created_at_ASC:
         sort_field:
           direction: asc
@@ -319,6 +403,30 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: amount_cents
+      ceo_id_ASC:
+        sort_field:
+          direction: asc
+          field_path: ceo.id
+      ceo_id_DESC:
+        sort_field:
+          direction: desc
+          field_path: ceo.id
+      ceo_name_ASC:
+        sort_field:
+          direction: asc
+          field_path: ceo.name
+      ceo_name_DESC:
+        sort_field:
+          direction: desc
+          field_path: ceo.name
+      ceo_nationality_ASC:
+        sort_field:
+          direction: asc
+          field_path: ceo.nationality
+      ceo_nationality_DESC:
+        sort_field:
+          direction: desc
+          field_path: ceo.nationality
       cost_amount_cents_ASC:
         sort_field:
           direction: asc
@@ -431,6 +539,14 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: internal_name
+      inventor_id_ASC:
+        sort_field:
+          direction: asc
+          field_path: inventor.id
+      inventor_id_DESC:
+        sort_field:
+          direction: desc
+          field_path: inventor.id
       inventor_name_ASC:
         sort_field:
           direction: asc
@@ -479,6 +595,14 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: name
+      named_inventor_id_ASC:
+        sort_field:
+          direction: asc
+          field_path: named_inventor.id
+      named_inventor_id_DESC:
+        sort_field:
+          direction: desc
+          field_path: named_inventor.id
       named_inventor_name_ASC:
         sort_field:
           direction: asc
@@ -655,6 +779,40 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: workspace_name
+  NamedInventorSortOrderInput:
+    values_by_name:
+      id_ASC:
+        sort_field:
+          direction: asc
+          field_path: id
+      id_DESC:
+        sort_field:
+          direction: desc
+          field_path: id
+      name_ASC:
+        sort_field:
+          direction: asc
+          field_path: name
+      name_DESC:
+        sort_field:
+          direction: desc
+          field_path: name
+      nationality_ASC:
+        sort_field:
+          direction: asc
+          field_path: nationality
+      nationality_DESC:
+        sort_field:
+          direction: desc
+          field_path: nationality
+      stock_ticker_ASC:
+        sort_field:
+          direction: asc
+          field_path: stock_ticker
+      stock_ticker_DESC:
+        sort_field:
+          direction: desc
+          field_path: stock_ticker
   PartSortOrderInput:
     values_by_name:
       created_at_ASC:
@@ -697,6 +855,32 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: voltage
+  PersonSortOrderInput:
+    values_by_name:
+      id_ASC:
+        sort_field:
+          direction: asc
+          field_path: id
+      id_DESC:
+        sort_field:
+          direction: desc
+          field_path: id
+      name_ASC:
+        sort_field:
+          direction: asc
+          field_path: name
+      name_DESC:
+        sort_field:
+          direction: desc
+          field_path: name
+      nationality_ASC:
+        sort_field:
+          direction: asc
+          field_path: nationality
+      nationality_DESC:
+        sort_field:
+          direction: desc
+          field_path: nationality
   SponsorSortOrderInput:
     values_by_name:
       id_ASC:
@@ -977,6 +1161,14 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: internal_name
+      inventor_id_ASC:
+        sort_field:
+          direction: asc
+          field_path: inventor.id
+      inventor_id_DESC:
+        sort_field:
+          direction: desc
+          field_path: inventor.id
       inventor_name_ASC:
         sort_field:
           direction: asc
@@ -1017,6 +1209,14 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: name
+      named_inventor_id_ASC:
+        sort_field:
+          direction: asc
+          field_path: named_inventor.id
+      named_inventor_id_DESC:
+        sort_field:
+          direction: desc
+          field_path: named_inventor.id
       named_inventor_name_ASC:
         sort_field:
           direction: asc
@@ -1267,6 +1467,14 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: internal_name
+      inventor_id_ASC:
+        sort_field:
+          direction: asc
+          field_path: inventor.id
+      inventor_id_DESC:
+        sort_field:
+          direction: desc
+          field_path: inventor.id
       inventor_name_ASC:
         sort_field:
           direction: asc
@@ -1307,6 +1515,14 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: name
+      named_inventor_id_ASC:
+        sort_field:
+          direction: asc
+          field_path: named_inventor.id
+      named_inventor_id_DESC:
+        sort_field:
+          direction: desc
+          field_path: named_inventor.id
       named_inventor_name_ASC:
         sort_field:
           direction: asc
@@ -1510,6 +1726,17 @@ index_definitions_by_name:
       timestamps.created_at:
         source: __self
     route_with: id
+  companies:
+    current_sources:
+    - __self
+    fields_by_path:
+      id:
+        source: __self
+      name:
+        source: __self
+      stock_ticker:
+        source: __self
+    route_with: id
   components:
     current_sources:
     - __self
@@ -1583,6 +1810,12 @@ index_definitions_by_name:
     - direction: desc
       field_path: created_at
     fields_by_path:
+      ceo.id:
+        source: __self
+      ceo.name:
+        source: __self
+      ceo.nationality:
+        source: __self
       created_at:
         source: __self
       id:
@@ -1606,6 +1839,17 @@ index_definitions_by_name:
       material:
         source: __self
       name:
+        source: __self
+    route_with: id
+  people:
+    current_sources:
+    - __self
+    fields_by_path:
+      id:
+        source: __self
+      name:
+        source: __self
+      nationality:
         source: __self
     route_with: id
   sponsors:
@@ -2620,6 +2864,8 @@ index_definitions_by_name:
         source: __self
       internal_name:
         source: __self
+      inventor.id:
+        source: __self
       inventor.name:
         source: __self
       inventor.nationality:
@@ -2631,6 +2877,8 @@ index_definitions_by_name:
       name:
         source: __self
       name_text:
+        source: __self
+      named_inventor.id:
         source: __self
       named_inventor.name:
         source: __self
@@ -2882,6 +3130,127 @@ object_types_by_name:
         name_in_index: __counts
   Company:
     graphql_fields_by_name:
+      id:
+        resolver:
+          name: get_record_field_value
+      name:
+        resolver:
+          name: get_record_field_value
+      stock_ticker:
+        resolver:
+          name: get_record_field_value
+    index_definition_names:
+    - companies
+    update_targets:
+    - data_params:
+        name:
+          cardinality: one
+        stock_ticker:
+          cardinality: one
+      id_source: id
+      metadata_params:
+        relationship:
+          value: __self
+        sourceId:
+          cardinality: one
+          source_path: id
+        sourceType:
+          cardinality: one
+          source_path: type
+        version:
+          cardinality: one
+      relationship: __self
+      routing_value_source: id
+      script_id: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
+      type: Company
+  CompanyAggregatedValues:
+    graphql_fields_by_name:
+      id:
+        resolver:
+          name: object_with_lookahead
+      name:
+        resolver:
+          name: object_with_lookahead
+      stock_ticker:
+        resolver:
+          name: object_with_lookahead
+  CompanyAggregation:
+    elasticgraph_category: indexed_aggregation
+    graphql_fields_by_name:
+      aggregated_values:
+        resolver:
+          name: object_without_lookahead
+      count:
+        resolver:
+          name: object_without_lookahead
+      grouped_by:
+        resolver:
+          name: object_without_lookahead
+    source_type: Company
+  CompanyAggregationConnection:
+    elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver:
+          name: object_without_lookahead
+      nodes:
+        resolver:
+          name: object_without_lookahead
+      page_info:
+        resolver:
+          name: object_without_lookahead
+  CompanyAggregationEdge:
+    elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      cursor:
+        resolver:
+          name: object_without_lookahead
+      node:
+        resolver:
+          name: object_without_lookahead
+  CompanyConnection:
+    elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver:
+          name: object_without_lookahead
+      nodes:
+        resolver:
+          name: object_without_lookahead
+      page_info:
+        resolver:
+          name: object_without_lookahead
+      total_edge_count:
+        resolver:
+          name: object_without_lookahead
+  CompanyEdge:
+    elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      all_highlights:
+        resolver:
+          name: object_without_lookahead
+      cursor:
+        resolver:
+          name: object_without_lookahead
+      highlights:
+        resolver:
+          name: object_without_lookahead
+      node:
+        resolver:
+          name: object_without_lookahead
+  CompanyGroupedBy:
+    graphql_fields_by_name:
+      name:
+        resolver:
+          name: object_with_lookahead
+      stock_ticker:
+        resolver:
+          name: object_with_lookahead
+  CompanyHighlights:
+    graphql_fields_by_name:
+      id:
+        resolver:
+          name: get_record_field_value
       name:
         resolver:
           name: get_record_field_value
@@ -3517,6 +3886,9 @@ object_types_by_name:
         name_in_index: __counts
   Inventor:
     graphql_fields_by_name:
+      id:
+        resolver:
+          name: get_record_field_value
       name:
         resolver:
           name: get_record_field_value
@@ -3528,6 +3900,9 @@ object_types_by_name:
           name: get_record_field_value
   InventorAggregatedValues:
     graphql_fields_by_name:
+      id:
+        resolver:
+          name: object_with_lookahead
       name:
         resolver:
           name: object_with_lookahead
@@ -3537,6 +3912,70 @@ object_types_by_name:
       stock_ticker:
         resolver:
           name: object_with_lookahead
+  InventorAggregation:
+    elasticgraph_category: indexed_aggregation
+    graphql_fields_by_name:
+      aggregated_values:
+        resolver:
+          name: object_without_lookahead
+      count:
+        resolver:
+          name: object_without_lookahead
+      grouped_by:
+        resolver:
+          name: object_without_lookahead
+    source_type: Inventor
+  InventorAggregationConnection:
+    elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver:
+          name: object_without_lookahead
+      nodes:
+        resolver:
+          name: object_without_lookahead
+      page_info:
+        resolver:
+          name: object_without_lookahead
+  InventorAggregationEdge:
+    elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      cursor:
+        resolver:
+          name: object_without_lookahead
+      node:
+        resolver:
+          name: object_without_lookahead
+  InventorConnection:
+    elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver:
+          name: object_without_lookahead
+      nodes:
+        resolver:
+          name: object_without_lookahead
+      page_info:
+        resolver:
+          name: object_without_lookahead
+      total_edge_count:
+        resolver:
+          name: object_without_lookahead
+  InventorEdge:
+    elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      all_highlights:
+        resolver:
+          name: object_without_lookahead
+      cursor:
+        resolver:
+          name: object_without_lookahead
+      highlights:
+        resolver:
+          name: object_without_lookahead
+      node:
+        resolver:
+          name: object_without_lookahead
   InventorGroupedBy:
     graphql_fields_by_name:
       name:
@@ -3550,6 +3989,9 @@ object_types_by_name:
           name: object_with_lookahead
   InventorHighlights:
     graphql_fields_by_name:
+      id:
+        resolver:
+          name: get_record_field_value
       name:
         resolver:
           name: get_record_field_value
@@ -3680,6 +4122,9 @@ object_types_by_name:
           foreign_key: manufacturer_id
         resolver:
           name: nested_relationships
+      ceo:
+        resolver:
+          name: get_record_field_value
       created_at:
         resolver:
           name: get_record_field_value
@@ -3705,6 +4150,8 @@ object_types_by_name:
     - manufacturers
     update_targets:
     - data_params:
+        ceo:
+          cardinality: one
         created_at:
           cardinality: one
         name:
@@ -3727,6 +4174,9 @@ object_types_by_name:
       type: Manufacturer
   ManufacturerAggregatedValues:
     graphql_fields_by_name:
+      ceo:
+        resolver:
+          name: object_with_lookahead
       created_at:
         resolver:
           name: object_with_lookahead
@@ -3802,6 +4252,9 @@ object_types_by_name:
           name: object_without_lookahead
   ManufacturerGroupedBy:
     graphql_fields_by_name:
+      ceo:
+        resolver:
+          name: object_with_lookahead
       created_at:
         resolver:
           name: object_with_lookahead
@@ -3810,6 +4263,9 @@ object_types_by_name:
           name: object_with_lookahead
   ManufacturerHighlights:
     graphql_fields_by_name:
+      ceo:
+        resolver:
+          name: get_record_field_value
       id:
         resolver:
           name: get_record_field_value
@@ -4031,6 +4487,9 @@ object_types_by_name:
       amounts:
         resolver:
           name: get_record_field_value
+      ceo:
+        resolver:
+          name: get_record_field_value
       component_aggregations:
         relation:
           direction: out
@@ -4239,6 +4698,9 @@ object_types_by_name:
       amounts:
         resolver:
           name: object_with_lookahead
+      ceo:
+        resolver:
+          name: object_with_lookahead
       cost:
         resolver:
           name: object_with_lookahead
@@ -4439,6 +4901,9 @@ object_types_by_name:
         name_in_index: amount_cents
         resolver:
           name: object_with_lookahead
+      ceo:
+        resolver:
+          name: object_with_lookahead
       cost:
         resolver:
           name: object_with_lookahead
@@ -4551,6 +5016,9 @@ object_types_by_name:
           name: object_with_lookahead
   NamedEntityHighlights:
     graphql_fields_by_name:
+      ceo:
+        resolver:
+          name: get_record_field_value
       cost:
         resolver:
           name: get_record_field_value
@@ -4638,6 +5106,9 @@ object_types_by_name:
           name: get_record_field_value
   NamedInventor:
     graphql_fields_by_name:
+      id:
+        resolver:
+          name: get_record_field_value
       name:
         resolver:
           name: get_record_field_value
@@ -4649,6 +5120,9 @@ object_types_by_name:
           name: get_record_field_value
   NamedInventorAggregatedValues:
     graphql_fields_by_name:
+      id:
+        resolver:
+          name: object_with_lookahead
       name:
         resolver:
           name: object_with_lookahead
@@ -4658,6 +5132,70 @@ object_types_by_name:
       stock_ticker:
         resolver:
           name: object_with_lookahead
+  NamedInventorAggregation:
+    elasticgraph_category: indexed_aggregation
+    graphql_fields_by_name:
+      aggregated_values:
+        resolver:
+          name: object_without_lookahead
+      count:
+        resolver:
+          name: object_without_lookahead
+      grouped_by:
+        resolver:
+          name: object_without_lookahead
+    source_type: NamedInventor
+  NamedInventorAggregationConnection:
+    elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver:
+          name: object_without_lookahead
+      nodes:
+        resolver:
+          name: object_without_lookahead
+      page_info:
+        resolver:
+          name: object_without_lookahead
+  NamedInventorAggregationEdge:
+    elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      cursor:
+        resolver:
+          name: object_without_lookahead
+      node:
+        resolver:
+          name: object_without_lookahead
+  NamedInventorConnection:
+    elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver:
+          name: object_without_lookahead
+      nodes:
+        resolver:
+          name: object_without_lookahead
+      page_info:
+        resolver:
+          name: object_without_lookahead
+      total_edge_count:
+        resolver:
+          name: object_without_lookahead
+  NamedInventorEdge:
+    elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      all_highlights:
+        resolver:
+          name: object_without_lookahead
+      cursor:
+        resolver:
+          name: object_without_lookahead
+      highlights:
+        resolver:
+          name: object_without_lookahead
+      node:
+        resolver:
+          name: object_without_lookahead
   NamedInventorGroupedBy:
     graphql_fields_by_name:
       name:
@@ -4671,6 +5209,9 @@ object_types_by_name:
           name: object_with_lookahead
   NamedInventorHighlights:
     graphql_fields_by_name:
+      id:
+        resolver:
+          name: get_record_field_value
       name:
         resolver:
           name: get_record_field_value
@@ -4848,6 +5389,127 @@ object_types_by_name:
           name: get_record_field_value
   Person:
     graphql_fields_by_name:
+      id:
+        resolver:
+          name: get_record_field_value
+      name:
+        resolver:
+          name: get_record_field_value
+      nationality:
+        resolver:
+          name: get_record_field_value
+    index_definition_names:
+    - people
+    update_targets:
+    - data_params:
+        name:
+          cardinality: one
+        nationality:
+          cardinality: one
+      id_source: id
+      metadata_params:
+        relationship:
+          value: __self
+        sourceId:
+          cardinality: one
+          source_path: id
+        sourceType:
+          cardinality: one
+          source_path: type
+        version:
+          cardinality: one
+      relationship: __self
+      routing_value_source: id
+      script_id: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
+      type: Person
+  PersonAggregatedValues:
+    graphql_fields_by_name:
+      id:
+        resolver:
+          name: object_with_lookahead
+      name:
+        resolver:
+          name: object_with_lookahead
+      nationality:
+        resolver:
+          name: object_with_lookahead
+  PersonAggregation:
+    elasticgraph_category: indexed_aggregation
+    graphql_fields_by_name:
+      aggregated_values:
+        resolver:
+          name: object_without_lookahead
+      count:
+        resolver:
+          name: object_without_lookahead
+      grouped_by:
+        resolver:
+          name: object_without_lookahead
+    source_type: Person
+  PersonAggregationConnection:
+    elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver:
+          name: object_without_lookahead
+      nodes:
+        resolver:
+          name: object_without_lookahead
+      page_info:
+        resolver:
+          name: object_without_lookahead
+  PersonAggregationEdge:
+    elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      cursor:
+        resolver:
+          name: object_without_lookahead
+      node:
+        resolver:
+          name: object_without_lookahead
+  PersonConnection:
+    elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver:
+          name: object_without_lookahead
+      nodes:
+        resolver:
+          name: object_without_lookahead
+      page_info:
+        resolver:
+          name: object_without_lookahead
+      total_edge_count:
+        resolver:
+          name: object_without_lookahead
+  PersonEdge:
+    elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      all_highlights:
+        resolver:
+          name: object_without_lookahead
+      cursor:
+        resolver:
+          name: object_without_lookahead
+      highlights:
+        resolver:
+          name: object_without_lookahead
+      node:
+        resolver:
+          name: object_without_lookahead
+  PersonGroupedBy:
+    graphql_fields_by_name:
+      name:
+        resolver:
+          name: object_with_lookahead
+      nationality:
+        resolver:
+          name: object_with_lookahead
+  PersonHighlights:
+    graphql_fields_by_name:
+      id:
+        resolver:
+          name: get_record_field_value
       name:
         resolver:
           name: get_record_field_value
@@ -4996,6 +5658,12 @@ object_types_by_name:
       addresses:
         resolver:
           name: list_records
+      companies:
+        resolver:
+          name: list_records
+      company_aggregations:
+        resolver:
+          name: list_records
       component_aggregations:
         resolver:
           name: list_records
@@ -5006,6 +5674,12 @@ object_types_by_name:
         resolver:
           name: list_records
       electrical_parts:
+        resolver:
+          name: list_records
+      inventor_aggregations:
+        resolver:
+          name: list_records
+      inventors:
         resolver:
           name: list_records
       manufacturer_aggregations:
@@ -5026,10 +5700,22 @@ object_types_by_name:
       named_entity_aggregations:
         resolver:
           name: list_records
+      named_inventor_aggregations:
+        resolver:
+          name: list_records
+      named_inventors:
+        resolver:
+          name: list_records
       part_aggregations:
         resolver:
           name: list_records
       parts:
+        resolver:
+          name: list_records
+      people:
+        resolver:
+          name: list_records
+      person_aggregations:
         resolver:
           name: list_records
       sponsor_aggregations:

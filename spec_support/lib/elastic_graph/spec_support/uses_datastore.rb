@@ -328,16 +328,18 @@ RSpec.shared_context "datastore support", :capture_logs do
             "with later tests that run."
         end
 
+        destination_index_mapping = indexer.schema_artifacts.index_mappings_by_index_def_name.fetch(index_def.name)
         ElasticGraph::Indexer::Operation::Update.new(
           event: event,
           prepared_record: indexer.record_preparer_factory.for_latest_json_schema_version.prepare_for_index(
             event.fetch("type"),
-            event.fetch("record")
+            event.fetch("record"),
+            mapping_properties: destination_index_mapping.dig("properties")
           ),
           destination_index_def: index_def,
           update_target: update_target,
           doc_id: event.fetch("id"),
-          destination_index_mapping: indexer.schema_artifacts.index_mappings_by_index_def_name.fetch(index_def.name)
+          destination_index_mapping: destination_index_mapping
         )
       end
     end
