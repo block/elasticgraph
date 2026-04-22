@@ -295,13 +295,19 @@ module ElasticGraph
             .fetch(source_type)
             .update_targets.find { |ut| ut.type == destination_type }
 
+          destination_index_mapping = indexer.schema_artifacts.index_mappings_by_index_def_name.fetch(destination_index_def.name)
+
           update = Update.new(
             event: {"type" => source_type, "record" => data},
             destination_index_def: destination_index_def,
-            prepared_record: indexer.record_preparer_factory.for_latest_json_schema_version.prepare_for_index(source_type, data),
+            prepared_record: indexer.record_preparer_factory.for_latest_json_schema_version.prepare_for_index(
+              source_type,
+              data,
+              destination_index_mapping.fetch("properties")
+            ),
             update_target: update_target,
             doc_id: "the-id",
-            destination_index_mapping: indexer.schema_artifacts.index_mappings_by_index_def_name.fetch(destination_index_def.name)
+            destination_index_mapping: destination_index_mapping
           )
 
           update.to_datastore_bulk.dig(1, :script, :params)

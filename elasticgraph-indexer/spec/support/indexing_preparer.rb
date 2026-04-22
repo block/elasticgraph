@@ -54,7 +54,7 @@ RSpec.shared_context "indexing preparer support" do |scalar_type|
   private
 
   def prepare_field_value(field, value)
-    record = @record_preparer.prepare_for_index("MyType", build_record(field => value))
+    record = @record_preparer.prepare_for_index("MyType", build_record(field => value), {})
     record.fetch(field)
   end
 

@@ -334,7 +334,7 @@ RSpec.shared_context "datastore support", :capture_logs do
           prepared_record: indexer.record_preparer_factory.for_latest_json_schema_version.prepare_for_index(
             event.fetch("type"),
             event.fetch("record"),
-            mapping_properties: destination_index_mapping.dig("properties")
+            destination_index_mapping.fetch("properties")
           ),
           destination_index_def: index_def,
           update_target: update_target,

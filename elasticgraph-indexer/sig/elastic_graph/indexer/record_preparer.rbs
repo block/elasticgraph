@@ -1,7 +1,7 @@
 module ElasticGraph
   class Indexer
     interface _RecordPreparer
-      def prepare_for_index: (::String, ::Hash[::String, untyped], ?mapping_properties: ::Hash[::String, untyped]?) -> ::Hash[::String, untyped]
+      def prepare_for_index: [T] (::String, T, ::Hash[::String, untyped]) -> T
     end
 
     class RecordPreparer
@@ -33,13 +33,8 @@ module ElasticGraph
          ::Array[TypeMetadata]
       ) -> void
 
-      private
-
-      INTEGRAL_TYPE_NAMES: ::Set[::String]
       @indexing_preparer_by_scalar_type_name: ::Hash[::String, SchemaArtifacts::RuntimeMetadata::extensionClass?]
       @eg_meta_by_field_name_by_concrete_type: egMetaByFieldByTypeHash
-
-      def prepare_value_for_indexing: (untyped, ::String, ::Hash[::String, untyped]?) -> untyped
 
       class TypeMetadata
         attr_reader name: ::String
