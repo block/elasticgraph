@@ -30,7 +30,7 @@ module ElasticGraph
           prepared_record = record_preparer.prepare_for_index(
             event["type"],
             event["record"] || {"id" => event["id"]},
-            mapping_properties: destination_index_mapping.dig("properties")
+            destination_index_mapping.fetch("properties")
           )
 
           Support::HashUtil

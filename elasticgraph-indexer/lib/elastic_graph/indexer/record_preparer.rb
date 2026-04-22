@@ -71,7 +71,7 @@ module ElasticGraph
       # still build operations for it, and the operations require a `RecordPreparer`, but we do
       # not send them to the datastore.
       module Identity
-        def self.prepare_for_index(type_name, record, mapping_properties: nil)
+        def self.prepare_for_index(type_name, record, mapping_properties)
           record
         end
       end
@@ -97,8 +97,8 @@ module ElasticGraph
       #
       # Note: this method does not mutate the given `record`. Instead it returns a
       # copy with any updates applied to it.
-      def prepare_for_index(type_name, record, mapping_properties: nil)
-        prepare_value_for_indexing(record, type_name, mapping_properties) # : ::Hash[::String, untyped]
+      def prepare_for_index(type_name, record, mapping_properties)
+        prepare_value_for_indexing(record, type_name, mapping_properties)
       end
 
       private

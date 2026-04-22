@@ -580,16 +580,19 @@ module ElasticGraph
         expect(index_defs.size).to eq 1
         index_def = index_defs.first
 
+        destination_index_mapping = indexer.schema_artifacts.index_mappings_by_index_def_name.fetch(index_def.name)
+
         arguments = {
           event: event,
           prepared_record: indexer.record_preparer_factory.for_latest_json_schema_version.prepare_for_index(
             event.fetch("type"),
-            event.fetch("record")
+            event.fetch("record"),
+            destination_index_mapping.fetch("properties")
           ),
           destination_index_def: index_def,
           update_target: update_target,
           doc_id: event.fetch("id"),
-          destination_index_mapping: indexer.schema_artifacts.index_mappings_by_index_def_name.fetch(index_def.name)
+          destination_index_mapping: destination_index_mapping
         }.merge(overrides)
 
         Operation::Update.new(**arguments)
