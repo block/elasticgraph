@@ -71,8 +71,8 @@ module ElasticGraph
       # still build operations for it, and the operations require a `RecordPreparer`, but we do
       # not send them to the datastore.
       module Identity
-        def self.prepare_for_index(type_name, record, mapping_properties)
-          record
+        def self.prepare_for_index(type_name, value, mapping_properties)
+          value
         end
       end
 
@@ -95,15 +95,9 @@ module ElasticGraph
       # the set union of fields and this will take care of dropping any unsupported
       # fields before we attempt to index the record.
       #
-      # Note: this method does not mutate the given `record`. Instead it returns a
+      # Note: this method does not mutate the given `value`. Instead it returns a
       # copy with any updates applied to it.
-      def prepare_for_index(type_name, record, mapping_properties)
-        prepare_value_for_indexing(record, type_name, mapping_properties)
-      end
-
-      private
-
-      def prepare_value_for_indexing(value, type_name, mapping_properties)
+      def prepare_for_index(type_name, value, mapping_properties)
         type_name = type_name.delete_suffix("!")
 
         return nil if value.nil?
@@ -115,7 +109,7 @@ module ElasticGraph
         case value
         when ::Array
           element_type_name = type_name.delete_prefix("[").delete_suffix("]")
-          value.map { |v| prepare_value_for_indexing(v, element_type_name, mapping_properties) }
+          value.map { |v| prepare_for_index(element_type_name, v, mapping_properties) }
         when ::Hash
           # `@eg_meta_by_field_name_by_concrete_type` does not have abstract types in it (e.g. type unions).
           # Instead, it'll have each concrete subtype in it.
@@ -134,7 +128,7 @@ module ElasticGraph
             elsif (eg_meta = eg_meta_by_field_name[field_name])
               name_in_index = eg_meta.fetch("nameInIndex")
               nested_mapping_properties = mapping_properties&.dig(name_in_index, "properties")
-              [name_in_index, prepare_value_for_indexing(field_value, eg_meta.fetch("type"), nested_mapping_properties)]
+              [name_in_index, prepare_for_index(eg_meta.fetch("type"), field_value, nested_mapping_properties)]
             end
           end.to_h
 
