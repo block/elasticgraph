@@ -143,7 +143,7 @@ which can be provided to GraphQL clients.
 ### Artifact 4: `runtime_metadata.yaml`
 
 The [`runtime_metadata.yaml` artifact]({% link guides/how-it-works/schema-artifacts/runtime_metadata.yaml %}) is the
-final schema artifact. It provides metaadata used by the various parts of ElasticGraph at runtime. For example,
+final schema artifact. It provides metadata used by the various parts of ElasticGraph at runtime. For example,
 here's some of the metadata ElasticGraph records about the `Artist` type:
 
 {% include copyable_code_snippet.html language="yaml" code="---
