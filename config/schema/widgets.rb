@@ -35,20 +35,16 @@ ElasticGraph.define_schema do |schema|
 
   schema.object_type "Person" do |t|
     t.implements "NamedInventor"
-    t.root_query_fields plural: "people"
     t.field "id", "ID!"
     t.field "name", "String"
     t.field "nationality", "String"
-    t.index "people"
   end
 
   schema.object_type "Company" do |t|
     t.implements "NamedInventor"
-    t.root_query_fields plural: "companies"
     t.field "id", "ID!"
     t.field "name", "String"
     t.field "stock_ticker", "String"
-    t.index "companies"
   end
 
   schema.union_type "Inventor" do |t|
@@ -59,6 +55,7 @@ ElasticGraph.define_schema do |schema|
   schema.interface_type "NamedInventor" do |t|
     t.field "id", "ID!"
     t.field "name", "String"
+    t.index "named_inventors"
   end
 
   # Indexed interfae type.
@@ -341,6 +338,70 @@ ElasticGraph.define_schema do |schema|
 
   schema.union_type "Part" do |t|
     t.subtypes "MechanicalPart", "ElectricalPart"
+  end
+
+  schema.interface_type "DistributionChannel" do |t|
+    t.field "id", "ID!"
+    t.field "active", "Boolean"
+    t.index "distribution_channels"
+  end
+
+  # Retail branch - multi-level interface inheritance
+  schema.interface_type "Retail" do |t|
+    t.implements "DistributionChannel"
+    t.root_query_fields plural: "retailers"
+    t.field "id", "ID!"
+    t.field "active", "Boolean"
+    t.field "established_on", "Date"
+  end
+
+  schema.interface_type "Store" do |t|
+    t.implements "Retail"
+    t.field "id", "ID!"
+    t.field "active", "Boolean"
+    t.field "established_on", "Date"
+    t.field "customer_facing", "Boolean"
+  end
+
+  # ThirdPartyWholesale - concrete type in parallel to Retail branch
+  schema.object_type "ThirdPartyWholesale" do |t|
+    t.implements "DistributionChannel"
+    t.field "id", "ID!"
+    t.field "active", "Boolean"
+    t.field "partner_name", "String"
+    t.field "contract_terms", "String"
+  end
+
+  schema.object_type "OnlineStore" do |t|
+    t.implements "Store"
+    t.field "id", "ID!"
+    t.field "url", "String!"
+    t.field "platform", "String"  # e.g., "Shopify", "WooCommerce"
+    t.field "established_on", "Date"
+    t.field "active", "Boolean"
+    t.field "customer_facing", "Boolean"
+  end
+
+  schema.object_type "PhysicalStore" do |t|
+    t.implements "Store"
+    t.field "id", "ID!"
+    t.field "address", "String!"
+    t.field "square_footage", "Int"
+    t.field "established_on", "Date"
+    t.field "active", "Boolean"
+    t.field "customer_facing", "Boolean"
+
+    t.index "physical_stores"
+  end
+
+  schema.object_type "MobileStore" do |t|
+    t.implements "Store"
+    t.field "id", "ID!"
+    t.field "vehicle_type", "String!"  # e.g., "food truck", "pop-up cart"
+    t.field "current_location", "String"
+    t.field "established_on", "Date"
+    t.field "active", "Boolean"
+    t.field "customer_facing", "Boolean"
   end
 
   # Note: `Manufacturer` is used in our tests as an example of an indexed type that has no list fields, so we should

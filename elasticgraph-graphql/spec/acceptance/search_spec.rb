@@ -698,6 +698,103 @@ module ElasticGraph
         test_widget_search_highlighting(widget1, widget2, widget3)
       end
 
+      it "correctly scopes results to the queried interface level across a multi-level type hierarchy", :expect_search_routing do
+        established_on_asc = :"#{case_correctly("established_on")}_ASC"
+        id_desc = :"#{case_correctly("id")}_DESC"
+
+        # The DistributionChannel hierarchy has two branches:
+        #   DistributionChannel (index: distribution_channels)
+        #   ├── ThirdPartyWholesale   (concrete, distribution_channels index)
+        #   └── Retail               (interface, inherits distribution_channels)
+        #       └── Store            (interface, inherits distribution_channels)
+        #           ├── OnlineStore  (concrete, distribution_channels index)
+        #           ├── MobileStore  (concrete, distribution_channels index)
+        #           └── PhysicalStore (concrete, physical_stores index)
+        #
+        # The key invariant: querying at a sub-interface level (e.g. retailers, stores) must
+        # filter OUT sibling types in the shared index (e.g. ThirdPartyWholesale when querying stores).
+        index_records(
+          physical_store1 = build(:physical_store, address: "123 Main St, Anytown USA", square_footage: 5000, established_on: "2019-03-10", active: true),
+          physical_store2 = build(:physical_store, address: "456 Oak Ave, Other City", square_footage: 10000, established_on: "2022-08-05", active: true),
+          mobile_store1 = build(:mobile_store, vehicle_type: "food truck", current_location: "789 Park Ave, Big City", established_on: "2020-06-15", active: true),
+          mobile_store2 = build(:mobile_store, vehicle_type: "pop-up cart", current_location: "321 Beach Blvd, Coast Town", established_on: "2021-11-20", active: true),
+          online_store1 = build(:online_store, url: "https://shop1.example.com", platform: "Shopify", established_on: "2020-01-15", active: true),
+          online_store2 = build(:online_store, url: "https://shop2.example.com", platform: "WooCommerce", established_on: "2021-06-20", active: true),
+          build(:third_party_wholesale, partner_name: "Acme Corp", contract_terms: "Net 30", active: true),
+          wholesale2 = build(:third_party_wholesale, partner_name: "Global Dist", contract_terms: "Net 60", active: false)
+        )
+
+        store_fragments = [
+          "...on PhysicalStore { id __typename established_on }",
+          "...on MobileStore { id __typename established_on }",
+          "...on OnlineStore { id __typename established_on }"
+        ]
+        all_channel_fragments = store_fragments + ["...on ThirdPartyWholesale { id __typename active }"]
+
+        store_typenames = %w[PhysicalStore PhysicalStore MobileStore MobileStore OnlineStore OnlineStore]
+
+        # Querying at the top-level DistributionChannel interface returns all 4 concrete types,
+        # including ThirdPartyWholesale.
+        channels = list_distribution_channels_with(*all_channel_fragments)
+        expect(channels.map { |c| c["__typename"] }).to contain_exactly(
+          *store_typenames, "ThirdPartyWholesale", "ThirdPartyWholesale"
+        )
+
+        # Querying at the Retail interface excludes ThirdPartyWholesale, even though it lives in
+        # the same distribution_channels index. The __typename filter handles this.
+        retailers = list_retailers_with(*store_fragments)
+        expect(retailers.map { |r| r["__typename"] }).to contain_exactly(*store_typenames)
+
+        # Querying at the Store interface likewise excludes ThirdPartyWholesale.
+        stores = list_stores_with(*store_fragments)
+        expect(stores.map { |s| s["__typename"] }).to contain_exactly(*store_typenames)
+
+        # Filters apply within the correct scope at each level.
+        # At distribution_channels: active=false matches only wholesale2.
+        inactive = list_distribution_channels_with(*all_channel_fragments, filter: {active: {equal_to_any_of: [false]}})
+        expect(inactive.map { |c| c["__typename"] }).to contain_exactly("ThirdPartyWholesale")
+        expect(inactive.map { |c| c["id"] }).to contain_exactly(wholesale2.fetch(:id))
+
+        # At retailers: established_on filter applies, and ThirdPartyWholesale is still excluded.
+        retailers_after_2020 = list_retailers_with(*store_fragments, filter: {established_on: {gte: "2020-01-01"}})
+        expect(retailers_after_2020.map { |r| r["id"] }).to contain_exactly(
+          mobile_store1.fetch(:id), mobile_store2.fetch(:id),
+          online_store1.fetch(:id), online_store2.fetch(:id),
+          physical_store2.fetch(:id)
+        )
+
+        # Sort by established_on at the stores level spans both indices correctly.
+        stores_sorted = list_stores_with(*store_fragments, order_by: [established_on_asc])
+        expect(stores_sorted.map { |s| s["id"] }).to eq([
+          physical_store1.fetch(:id),
+          online_store1.fetch(:id),
+          mobile_store1.fetch(:id),
+          online_store2.fetch(:id),
+          mobile_store2.fetch(:id),
+          physical_store2.fetch(:id)
+        ])
+
+        # Pagination at the distribution_channels level covers all types.
+        channels_page, page_info = list_distribution_channels_and_page_info_with(
+          *all_channel_fragments,
+          first: 4,
+          order_by: [id_desc]
+        )
+        expect(channels_page.size).to eq(4)
+        expect(page_info).to include(case_correctly("has_next_page") => true)
+
+        # Filter by ID spans indices and respects the __typename scope at each query level.
+        stores_by_id = list_stores_with(
+          *store_fragments,
+          filter: {id: {equal_to_any_of: [mobile_store1.fetch(:id), physical_store1.fetch(:id), online_store1.fetch(:id)]}}
+        )
+        expect(stores_by_id.map { |s| [s["id"], s["__typename"]] }).to contain_exactly(
+          [mobile_store1.fetch(:id), "MobileStore"],
+          [physical_store1.fetch(:id), "PhysicalStore"],
+          [online_store1.fetch(:id), "OnlineStore"]
+        )
+      end
+
       it "supports fetching interface fields" do
         index_into(
           graphql,
@@ -1483,6 +1580,45 @@ module ElasticGraph
                   ...on Widget {
                     id
                   }
+                }
+              }
+            }
+          }
+        QUERY
+      end
+
+      def list_distribution_channels_with(*fragments, **query_args)
+        field = case_correctly("distribution_channels")
+        query_abstract_type_with(field, *fragments, **query_args).dig("data", field, "edges").map { |e| e.fetch("node") }
+      end
+
+      def list_distribution_channels_and_page_info_with(*fragments, **query_args)
+        field = case_correctly("distribution_channels")
+        response = query_abstract_type_with(field, *fragments, **query_args).dig("data", field)
+        [response.fetch("edges").map { |e| e.fetch("node") }, response.fetch(case_correctly("page_info"))]
+      end
+
+      def list_retailers_with(*fragments, **query_args)
+        query_abstract_type_with("retailers", *fragments, **query_args).dig("data", "retailers", "edges").map { |e| e.fetch("node") }
+      end
+
+      def list_stores_with(*fragments, **query_args)
+        query_abstract_type_with("stores", *fragments, **query_args).dig("data", "stores", "edges").map { |e| e.fetch("node") }
+      end
+
+      def query_abstract_type_with(field, *fragments, allow_errors: false, **query_args)
+        fragment_string = fragments.join("\n")
+        call_graphql_query(<<~QUERY, allow_errors: allow_errors)
+          query {
+            #{field}#{graphql_args(query_args)} {
+              #{case_correctly("page_info")} {
+                #{case_correctly("end_cursor")}
+                #{case_correctly("has_next_page")}
+                #{case_correctly("has_previous_page")}
+              }
+              edges {
+                node {
+                  #{fragment_string}
                 }
               }
             }

@@ -47,12 +47,14 @@ FactoryBot.define do
 
   factory :person, parent: :indexed_type do
     __typename { "Person" }
+    id { Faker::Alphanumeric.alpha(number: 20) }
     name { Faker::Name.name }
     nationality { Faker::Nation.nationality }
   end
 
   factory :company, parent: :indexed_type do
     __typename { "Company" }
+    id { Faker::Alphanumeric.alpha(number: 20) }
     name { Faker::Company.name }
     stock_ticker { name[0..3].upcase }
   end
@@ -209,5 +211,39 @@ FactoryBot.define do
     transient do
       parts { [] }
     end
+  end
+
+  factory :online_store, parent: :indexed_type do
+    __typename { "OnlineStore" }
+    url { "https://#{Faker::Internet.domain_name}" }
+    platform { Faker::Base.sample(["Shopify", "WooCommerce", "Magento", "Custom"]) }
+    established_on { Faker::Date.between(from: recent_date - 365, to: recent_date).iso8601 }
+    active { true }
+    customer_facing { true }
+  end
+
+  factory :physical_store, parent: :indexed_type do
+    __typename { "PhysicalStore" }
+    address { Faker::Address.full_address }
+    square_footage { Faker::Number.between(from: 500, to: 50000) }
+    established_on { Faker::Date.between(from: recent_date - 365, to: recent_date).iso8601 }
+    active { true }
+    customer_facing { true }
+  end
+
+  factory :mobile_store, parent: :indexed_type do
+    __typename { "MobileStore" }
+    vehicle_type { Faker::Base.sample(["food truck", "pop-up cart", "mobile kiosk", "trailer"]) }
+    current_location { Faker::Address.full_address }
+    established_on { Faker::Date.between(from: recent_date - 365, to: recent_date).iso8601 }
+    active { true }
+    customer_facing { true }
+  end
+
+  factory :third_party_wholesale, parent: :indexed_type do
+    __typename { "ThirdPartyWholesale" }
+    partner_name { Faker::Company.name }
+    contract_terms { Faker::Base.sample(["Net 30", "Net 60", "Net 90", "COD"]) }
+    active { true }
   end
 end

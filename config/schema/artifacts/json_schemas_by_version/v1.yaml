@@ -28,9 +28,13 @@ json_schema_version: 1
         - ElectricalPart
         - Manufacturer
         - MechanicalPart
+        - MobileStore
+        - OnlineStore
         - Person
+        - PhysicalStore
         - Sponsor
         - Team
+        - ThirdPartyWholesale
         - Widget
         - WidgetWorkspace
       id:
@@ -535,6 +539,64 @@ json_schema_version: 1
     - created_at
     - material
     - manufacturer_id
+  MobileStore:
+    type: object
+    properties:
+      id:
+        allOf:
+        - "$ref": "#/$defs/ID"
+        - maxLength: 8191
+        ElasticGraph:
+          type: ID!
+          nameInIndex: id
+      vehicle_type:
+        allOf:
+        - "$ref": "#/$defs/String"
+        - maxLength: 8191
+        ElasticGraph:
+          type: String!
+          nameInIndex: vehicle_type
+      current_location:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/String"
+          - maxLength: 8191
+        - type: 'null'
+        ElasticGraph:
+          type: String
+          nameInIndex: current_location
+      established_on:
+        anyOf:
+        - "$ref": "#/$defs/Date"
+        - type: 'null'
+        ElasticGraph:
+          type: Date
+          nameInIndex: established_on
+      active:
+        anyOf:
+        - "$ref": "#/$defs/Boolean"
+        - type: 'null'
+        ElasticGraph:
+          type: Boolean
+          nameInIndex: active
+      customer_facing:
+        anyOf:
+        - "$ref": "#/$defs/Boolean"
+        - type: 'null'
+        ElasticGraph:
+          type: Boolean
+          nameInIndex: customer_facing
+      __typename:
+        type: string
+        const: MobileStore
+        default: MobileStore
+    required:
+    - id
+    - vehicle_type
+    - current_location
+    - established_on
+    - active
+    - customer_facing
   Money:
     type: object
     properties:
@@ -565,6 +627,64 @@ json_schema_version: 1
     oneOf:
     - "$ref": "#/$defs/Person"
     - "$ref": "#/$defs/Company"
+  OnlineStore:
+    type: object
+    properties:
+      id:
+        allOf:
+        - "$ref": "#/$defs/ID"
+        - maxLength: 8191
+        ElasticGraph:
+          type: ID!
+          nameInIndex: id
+      url:
+        allOf:
+        - "$ref": "#/$defs/String"
+        - maxLength: 8191
+        ElasticGraph:
+          type: String!
+          nameInIndex: url
+      platform:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/String"
+          - maxLength: 8191
+        - type: 'null'
+        ElasticGraph:
+          type: String
+          nameInIndex: platform
+      established_on:
+        anyOf:
+        - "$ref": "#/$defs/Date"
+        - type: 'null'
+        ElasticGraph:
+          type: Date
+          nameInIndex: established_on
+      active:
+        anyOf:
+        - "$ref": "#/$defs/Boolean"
+        - type: 'null'
+        ElasticGraph:
+          type: Boolean
+          nameInIndex: active
+      customer_facing:
+        anyOf:
+        - "$ref": "#/$defs/Boolean"
+        - type: 'null'
+        ElasticGraph:
+          type: Boolean
+          nameInIndex: customer_facing
+      __typename:
+        type: string
+        const: OnlineStore
+        default: OnlineStore
+    required:
+    - id
+    - url
+    - platform
+    - established_on
+    - active
+    - customer_facing
   Person:
     type: object
     properties:
@@ -601,6 +721,62 @@ json_schema_version: 1
     - id
     - name
     - nationality
+  PhysicalStore:
+    type: object
+    properties:
+      id:
+        allOf:
+        - "$ref": "#/$defs/ID"
+        - maxLength: 8191
+        ElasticGraph:
+          type: ID!
+          nameInIndex: id
+      address:
+        allOf:
+        - "$ref": "#/$defs/String"
+        - maxLength: 8191
+        ElasticGraph:
+          type: String!
+          nameInIndex: address
+      square_footage:
+        anyOf:
+        - "$ref": "#/$defs/Int"
+        - type: 'null'
+        ElasticGraph:
+          type: Int
+          nameInIndex: square_footage
+      established_on:
+        anyOf:
+        - "$ref": "#/$defs/Date"
+        - type: 'null'
+        ElasticGraph:
+          type: Date
+          nameInIndex: established_on
+      active:
+        anyOf:
+        - "$ref": "#/$defs/Boolean"
+        - type: 'null'
+        ElasticGraph:
+          type: Boolean
+          nameInIndex: active
+      customer_facing:
+        anyOf:
+        - "$ref": "#/$defs/Boolean"
+        - type: 'null'
+        ElasticGraph:
+          type: Boolean
+          nameInIndex: customer_facing
+      __typename:
+        type: string
+        const: PhysicalStore
+        default: PhysicalStore
+    required:
+    - id
+    - address
+    - square_footage
+    - established_on
+    - active
+    - customer_facing
   Player:
     type: object
     properties:
@@ -1098,6 +1274,50 @@ json_schema_version: 1
     - was_shortened
     - players_nested
     - players_object
+  ThirdPartyWholesale:
+    type: object
+    properties:
+      id:
+        allOf:
+        - "$ref": "#/$defs/ID"
+        - maxLength: 8191
+        ElasticGraph:
+          type: ID!
+          nameInIndex: id
+      active:
+        anyOf:
+        - "$ref": "#/$defs/Boolean"
+        - type: 'null'
+        ElasticGraph:
+          type: Boolean
+          nameInIndex: active
+      partner_name:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/String"
+          - maxLength: 8191
+        - type: 'null'
+        ElasticGraph:
+          type: String
+          nameInIndex: partner_name
+      contract_terms:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/String"
+          - maxLength: 8191
+        - type: 'null'
+        ElasticGraph:
+          type: String
+          nameInIndex: contract_terms
+      __typename:
+        type: string
+        const: ThirdPartyWholesale
+        default: ThirdPartyWholesale
+    required:
+    - id
+    - active
+    - partner_name
+    - contract_terms
   Untyped:
     type:
     - array

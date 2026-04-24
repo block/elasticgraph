@@ -78,10 +78,12 @@ module ElasticGraph
             all_types_related_to("WidgetCurrency") +
             all_types_related_to("Team") +
             all_types_related_to("Sponsor") +
-            all_types_related_to("Person") +
-            all_types_related_to("Company") +
             all_types_related_to("Inventor") +
             all_types_related_to("NamedInventor") +
+            all_types_related_to("Store") +
+            all_types_related_to("DistributionChannel") +
+            all_types_related_to("Retail") +
+            all_types_related_to("PhysicalStore") +
             relay_types_related_to("String", include_list_filter: true) - ["StringSortOrderInput"] +
             type_and_filters_for("Boolean", include_list: true) +
             type_and_filters_for("Color", include_list: true, as_input_enum: true) +
@@ -96,6 +98,7 @@ module ElasticGraph
             type_and_filters_for("TeamNestedFields") + ["TeamNestedFieldsHighlights"] +
             type_and_filters_for("Affiliations") +
             type_and_filters_for("ID", include_list: true) +
+            type_filter_and_non_indexed_aggregation_types_for("Person") +
             type_filter_and_non_indexed_aggregation_types_for("TeamDetails") +
             type_filter_and_non_indexed_aggregation_types_for("AddressTimestamps", include_highlights: false) - ["AddressTimestamps"] +
             type_filter_and_non_indexed_aggregation_types_for("Affiliations", include_fields_list_filter: true) +
@@ -116,7 +119,7 @@ module ElasticGraph
             %w[
               FloatAggregatedValues IntAggregatedValues JsonSafeLongAggregatedValues LongStringAggregatedValues NonNumericAggregatedValues
               DateAggregatedValues DateTimeAggregatedValues LocalTimeAggregatedValues
-              Cursor PageInfo Query TextFilterInput GeoLocation
+              Company Cursor PageInfo Query TextFilterInput GeoLocation MobileStore OnlineStore ThirdPartyWholesale
               DateTimeGroupingOffsetInput DateTimeUnitInput DateTimeTimeOfDayFilterInput
               DateGroupedBy DateGroupingOffsetInput DateGroupingTruncationUnitInput DateUnitInput
               DateTimeGroupedBy DateTimeGroupingTruncationUnitInput TimeZone
