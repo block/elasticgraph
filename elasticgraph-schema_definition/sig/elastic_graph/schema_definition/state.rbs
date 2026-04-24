@@ -32,6 +32,7 @@ module ElasticGraph
       attr_accessor output: io
       attr_accessor allow_omitted_json_schema_fields: bool
       attr_accessor allow_extra_json_schema_fields: bool
+      attr_accessor indexed_types_by_index_name: ::Hash[::String, indexableType]
 
       def initialize: (
         api: API,
@@ -65,6 +66,7 @@ module ElasticGraph
         output: io,
         allow_omitted_json_schema_fields: bool,
         allow_extra_json_schema_fields: bool,
+        indexed_types_by_index_name: ::Hash[::String, indexableType],
       ) -> void
     end
 
@@ -82,6 +84,7 @@ module ElasticGraph
       def index_document_sizes?: () -> bool
       def type_ref: (::String) -> SchemaElements::TypeReference
 
+      def register_index: (::String, indexableType) -> void
       def register_object_interface_or_union_type: (SchemaElements::ObjectType | SchemaElements::InterfaceType | SchemaElements::UnionType) -> void
       def register_enum_type: (SchemaElements::EnumType) -> void
       def register_scalar_type: (SchemaElements::ScalarType) -> void

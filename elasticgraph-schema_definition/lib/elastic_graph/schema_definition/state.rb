@@ -55,7 +55,8 @@ module ElasticGraph
       :type_namer,
       :enum_value_namer,
       :allow_omitted_json_schema_fields,
-      :allow_extra_json_schema_fields
+      :allow_extra_json_schema_fields,
+      :indexed_types_by_index_name
     )
       include Mixins::HasReadableToSAndInspect.new
 
@@ -106,7 +107,8 @@ module ElasticGraph
           enum_value_namer: SchemaElements::EnumValueNamer.new(enum_value_overrides_by_type),
           output: output,
           allow_omitted_json_schema_fields: false,
-          allow_extra_json_schema_fields: true
+          allow_extra_json_schema_fields: true,
+          indexed_types_by_index_name: {}
         )
       end
 
@@ -133,6 +135,13 @@ module ElasticGraph
 
       def register_input_type(type)
         register_type(type)
+      end
+
+      def register_index(name, type)
+        if (existing_type = indexed_types_by_index_name[name])
+          raise Errors::SchemaError, "Duplicate index name `#{name}` defined on `#{type.name}` and `#{existing_type.name}`. Each index can only be defined once."
+        end
+        indexed_types_by_index_name[name] = type
       end
 
       def register_renamed_type(type_name, from:, defined_at:, defined_via:)

@@ -73,6 +73,7 @@ module ElasticGraph
               "Only one index per type is supported. An index named `#{@own_index_def.name}` has already been defined."
           end
 
+          schema_def_state.register_index(name, self)
           @own_index_def = schema_def_state.factory.new_index(name, settings, self, &block)
         end
 

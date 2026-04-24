@@ -193,11 +193,7 @@ module ElasticGraph
       def indexed_document_types_by_index_definition_name
         @indexed_document_types_by_index_definition_name ||= indexed_document_types.each_with_object({}) do |type, hash|
           type.index_definitions.each do |index_def|
-            if hash.key?(index_def.name)
-              raise Errors::SchemaError, "DatastoreCore::IndexDefinition #{index_def.name} is used multiple times: #{type} vs #{hash[index_def.name]}"
-            end
-
-            hash[index_def.name] = type
+            hash[index_def.name] ||= type
           end
         end.freeze
       end

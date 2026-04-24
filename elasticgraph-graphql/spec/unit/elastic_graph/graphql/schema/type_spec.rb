@@ -679,9 +679,16 @@ module ElasticGraph
 
           it "deduplicates the index definitions before returning them" do
             search_index_definitions = search_index_definitions_from do |schema, type|
-              schema.object_type "T1a" do |t|
+              # T1a and T1b both inherit the same index definition from I1, so the union
+              # gets duplicate "t1" entries from its subtypes that need deduplication.
+              schema.interface_type "I1" do |t|
                 t.field "id", "ID!"
                 t.index "t1"
+              end
+
+              schema.object_type "T1a" do |t|
+                t.implements "I1"
+                t.field "id", "ID!"
               end
 
               schema.object_type "T2" do |t|
@@ -690,8 +697,8 @@ module ElasticGraph
               end
 
               schema.object_type "T1b" do |t|
+                t.implements "I1"
                 t.field "id", "ID!"
-                t.index "t1"
               end
 
               schema.object_type "T4" do |t|
@@ -701,7 +708,6 @@ module ElasticGraph
 
               schema.union_type type do |t|
                 t.subtypes "T1a", "T2", "T1b", "T4"
-                t.index "t4"
               end
             end
 
