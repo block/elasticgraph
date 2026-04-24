@@ -318,8 +318,8 @@ GEM
     em-websocket (0.5.3)
       eventmachine (>= 0.12.9)
       http_parser.rb (~> 0)
-    erb (6.0.3)
-    erb (6.0.3-java)
+    erb (6.0.4)
+    erb (6.0.4-java)
     ethon (0.18.0)
       ffi (>= 1.15.0)
       logger
@@ -804,8 +804,8 @@ CHECKSUMS
   elasticsearch (9.3.1) sha256=ca39fb73b0f5f5434d51e74be602c9153b46bbfe5168e09d383e88349c21ea24
   elasticsearch-api (9.3.1) sha256=9c9a44ed55dcbf0c0fe0fb8ca770d0281301cedd41ef4ad1f1d9ebb3830da672
   em-websocket (0.5.3) sha256=f56a92bde4e6cb879256d58ee31f124181f68f8887bd14d53d5d9a292758c6a8
-  erb (6.0.3) sha256=e43685a8a0a0ea6a924871b2162e8953ef73147ce46b75b36d1f6774fd286e91
-  erb (6.0.3-java) sha256=91640948ba09c7d7505080a550373001ef1c863d069fa01ca0628f7aad2ef3e9
+  erb (6.0.4) sha256=38e3803694be357fe2bfe312487c74beaf9fb4e5beb3e22498952fe1645b95d9
+  erb (6.0.4-java) sha256=3014611d37917a20e14ea3ba71e06a8d581b71c073858d7796eeee45b01e8407
   ethon (0.18.0) sha256=b598afc9f30448cb068b850714b7d6948e941476095d04f90a4ac65b8d6efcb2
   eventmachine (1.2.7) sha256=994016e42aa041477ba9cff45cbe50de2047f25dd418eba003e84f0d16560972
   eventmachine (1.2.7-java) sha256=11ab7af3505f53ed7565d6a13fe73568fe0d6fac647c8816430e9c3171c8c58f
