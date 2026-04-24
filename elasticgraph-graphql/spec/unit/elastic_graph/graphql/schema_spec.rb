@@ -139,14 +139,6 @@ module ElasticGraph
           }.to raise_error(ArgumentError, a_string_including("widgets#{ROLLOVER_INDEX_INFIX_MARKER}2021-02", "name of a rollover index"))
         end
 
-        it "raises an exception if two GraphQL types are configured to use the same index" do
-          schema = schema_with_indices("Person" => "widgets", "Widget" => "widgets")
-
-          expect {
-            schema.document_type_stored_in("widgets")
-          }.to raise_error(Errors::SchemaError, a_string_including("widgets", "Person", "Widget"))
-        end
-
         def schema_with_indices(index_name_by_type)
           define_schema do |s|
             define_indexed_type(s, "Person", index_name_by_type.fetch("Person"))

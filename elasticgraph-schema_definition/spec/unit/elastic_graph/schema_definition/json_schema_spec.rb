@@ -1442,7 +1442,7 @@ module ElasticGraph
               s.object_type "Component" do |t|
                 t.field "id", "ID"
                 t.field "created_on", "Etad"
-                t.index "widgets" do |i|
+                t.index "components" do |i|
                   i.rollover :monthly, "created_on"
                 end
               end
@@ -1450,7 +1450,7 @@ module ElasticGraph
               s.object_type "Part" do |t|
                 t.field "id", "ID"
                 t.field "created_at", "String"
-                t.index "widgets" do |i|
+                t.index "parts" do |i|
                   i.rollover :monthly, "created_at"
                 end
               end
@@ -2201,13 +2201,13 @@ module ElasticGraph
                 t.field "id", "ID!"
                 t.relates_to_one "parent", "MyTypeBothDirections!", via: "children_ids", dir: :in
                 t.relates_to_many "children", "MyTypeBothDirections", via: "children_ids", dir: :out, singular: "child"
-                t.index "my_type2"
+                t.index "my_type3"
               end
 
               s.object_type "MyTypeMany" do |t|
                 t.field "id", "ID!"
                 t.relates_to_many "children", "MyTypeMany", via: "parent_id", dir: :in, singular: "child"
-                t.index "my_type3"
+                t.index "my_type4"
               end
             end
 

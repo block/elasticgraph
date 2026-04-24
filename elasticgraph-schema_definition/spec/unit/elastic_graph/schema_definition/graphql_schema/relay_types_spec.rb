@@ -419,12 +419,12 @@ module ElasticGraph
           result = define_schema do |api|
             api.object_type "HighlightableWidget" do |t|
               t.field "id", "ID!", highlightable: true
-              t.index "widgets"
+              t.index "highlightable_widgets"
             end
 
             api.object_type "UnhighlightableWidget" do |t|
               t.field "id", "ID!", highlightable: false
-              t.index "widgets"
+              t.index "unhighlightable_widgets"
             end
           end
 

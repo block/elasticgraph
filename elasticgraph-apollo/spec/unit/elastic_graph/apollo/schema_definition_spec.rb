@@ -1442,7 +1442,7 @@ module ElasticGraph
 
           # Ensure there's at least one field defined on the GraphQL type--if `id` is indexing-only, we need another field defined.
           t.field "name", "String" if id_is_indexing_only.include?("IndexedType2")
-          t.index "index1" if define_indexed_types
+          t.index "index2" if define_indexed_types
         end
 
         schema.object_type "EmbeddedObjectType1" do |t|

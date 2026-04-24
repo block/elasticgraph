@@ -143,6 +143,22 @@ module ElasticGraph
         }.to raise_error Errors::SchemaError, a_string_including("invalid index definition name", ROLLOVER_INDEX_INFIX_MARKER)
       end
 
+      it "raises an exception if two types are defined with the same index name" do
+        expect {
+          all_index_configs_for do |s|
+            s.object_type "Person" do |t|
+              t.field "id", "ID!"
+              t.index "widgets"
+            end
+
+            s.object_type "Widget" do |t|
+              t.field "id", "ID!"
+              t.index "widgets"
+            end
+          end
+        }.to raise_error(Errors::SchemaError, a_string_including("widgets", "Person", "Widget"))
+      end
+
       it "ignores interface types" do
         configs = all_index_configs_for do |s|
           s.interface_type "MyType" do |t|

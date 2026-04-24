@@ -529,7 +529,7 @@ module ElasticGraph
 
               schema.object_type "Component" do |t|
                 t.field "id", "ID!"
-                t.index "widgets"
+                t.index "components"
               end
             end
 
