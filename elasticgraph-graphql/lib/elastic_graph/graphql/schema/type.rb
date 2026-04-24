@@ -117,13 +117,22 @@ module ElasticGraph
           end
         end
 
-        # Returns the subtypes of this type, if it has any. This is like `#possible_types` provided by the
+        # Returns all concrete subtypes, at any depth. This is like `#possible_types` provided by the
         # GraphQL gem, but that includes a type itself when you ask for the possible types of a non-abstract type.
         def subtypes
           @subtypes ||= @schema
             .graphql_schema
             .possible_types(graphql_type, visibility_profile: :boot)
             .map { |t| @schema.type_from(t) } - [self]
+        end
+
+        # Returns the set of other indexed document types that share any of this type's search indexes.
+        # Used to determine whether `__typename` filtering is needed when querying an abstract type
+        # that shares an index with types that fall outside the set of this type's subtypes.
+        def other_types_in_index
+          @other_types_in_index ||= search_index_definitions.flat_map do |index_def|
+            @schema.indexed_document_types_by_index_definition_name.fetch(index_def.name, [])
+          end.reject { |t| t == self }.to_set
         end
 
         def field_named(field_name)

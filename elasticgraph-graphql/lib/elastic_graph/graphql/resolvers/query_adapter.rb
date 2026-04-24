@@ -68,50 +68,8 @@ module ElasticGraph
             monotonic_clock_deadline: monotonic_clock_deadline
           )
 
-          # When querying an abstract type (interface/union) that shares an index with sibling types,
-          # we must filter by __typename to only return documents of the queried type's subtypes.
-          # Example: Store interface and ThirdPartyWholesale both implement DistributionChannel
-          # and share the distribution_channels index. When querying `stores`, we must filter to
-          # only include PhysicalStore, OnlineStore, and MobileStore documents.
-          initial_query = add_typename_filter_if_needed(initial_query, unwrapped_type, context)
-
           @datastore_query_adapters.reduce(initial_query) do |query, adapter|
             adapter.call(query: query, field: field, args: args, lookahead: lookahead, context: context)
-          end
-        end
-
-        def add_typename_filter_if_needed(query, type, context)
-          return query unless type.abstract?
-
-          subtypes = type.subtypes
-
-          # Check if any of the indexes being searched contain documents from non-subtypes
-          # (i.e., sibling types that share the same index but shouldn't be returned).
-          # Only apply __typename filtering if needed to disambiguate.
-          return query unless query.search_index_definitions.any? do |index_def|
-            index_has_sibling_types?(context.fetch(:elastic_graph_schema), index_def, type, subtypes)
-          end
-
-          # Allow documents without __typename to pass through (they'll be resolved by index name).
-          query.merge_with(internal_filters: [{
-            query.schema_element_names.any_of => [
-              {"__typename" => {query.schema_element_names.equal_to_any_of => subtypes.map(&:name)}},
-              {"__typename" => {query.schema_element_names.equal_to_any_of => [nil]}}
-            ]
-          }])
-        end
-
-        # Checks if the given index contains documents from types that are NOT subtypes of the queried type.
-        # This indicates we need __typename filtering to exclude those sibling types.
-        def index_has_sibling_types?(schema, index_def, queried_type, queried_subtypes)
-          # Get all types that use this index
-          types_in_index = schema.indexed_document_types.select do |type|
-            type.index_definitions.any? { |idx| idx.name == index_def.name }
-          end
-
-          # Check if any of those types are NOT subtypes of the queried type
-          types_in_index.any? do |type|
-            !queried_subtypes.include?(type) && type != queried_type
           end
         end
 

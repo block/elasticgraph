@@ -192,6 +192,7 @@ module ElasticGraph
     def datastore_query_adapters
       @datastore_query_adapters ||= begin
         require "elastic_graph/graphql/aggregation/query_adapter"
+        require "elastic_graph/graphql/query_adapter/abstract_type_filter"
         require "elastic_graph/graphql/query_adapter/filters"
         require "elastic_graph/graphql/query_adapter/pagination"
         require "elastic_graph/graphql/query_adapter/sort"
@@ -200,6 +201,7 @@ module ElasticGraph
         schema_element_names = runtime_metadata.schema_element_names
 
         [
+          GraphQL::QueryAdapter::AbstractTypeFilter.new,
           GraphQL::QueryAdapter::Pagination.new(schema_element_names: schema_element_names),
           GraphQL::QueryAdapter::Filters.new(
             schema_element_names: schema_element_names,
