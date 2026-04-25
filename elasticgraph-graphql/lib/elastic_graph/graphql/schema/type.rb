@@ -126,6 +126,11 @@ module ElasticGraph
             .map { |t| @schema.type_from(t) } - [self]
         end
 
+        # For indexed aggregation types, returns the underlying source document type.
+        def aggregation_source_type
+          @schema.type_named(@object_runtime_metadata.source_type)
+        end
+
         # Returns the set of indexed document types that share any of this type's search indexes
         # but are not subtypes of this type. Used to determine whether a `__typename` filter is
         # needed when querying an abstract type.

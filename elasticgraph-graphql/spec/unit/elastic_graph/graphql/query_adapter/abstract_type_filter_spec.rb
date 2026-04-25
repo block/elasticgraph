@@ -98,6 +98,7 @@ module ElasticGraph
             QUERY
 
             typename_filter = query.internal_filters.find { |f| f.key?("__typename") }
+            expect(typename_filter).not_to be_nil
             expect(typename_filter.dig("__typename", "equal_to_any_of")).to contain_exactly(nil, "OnlineStore", "PhysicalStore")
           end
 
@@ -107,6 +108,16 @@ module ElasticGraph
             QUERY
 
             expect(query.internal_filters).not_to be_empty
+          end
+
+          it "applies a __typename filter on aggregations of the abstract type" do
+            query = datastore_query_for(:Query, :store_aggregations, <<~QUERY)
+              query { store_aggregations { nodes { count } } }
+            QUERY
+
+            typename_filter = query.internal_filters.find { |f| f.key?("__typename") }
+            expect(typename_filter).not_to be_nil
+            expect(typename_filter.dig("__typename", "equal_to_any_of")).to contain_exactly(nil, "OnlineStore", "PhysicalStore")
           end
         end
 

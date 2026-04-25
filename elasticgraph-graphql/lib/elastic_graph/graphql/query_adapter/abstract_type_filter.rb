@@ -22,11 +22,15 @@ module ElasticGraph
       class AbstractTypeFilter
         def call(field:, query:, args:, lookahead:, context:)
           type = field.type.unwrap_fully
-          return query unless type.abstract?
 
-          return query unless type.non_subtypes_in_shared_index.any?
+          # For indexed aggregation fields, resolve the underlying document type so we can
+          # apply the same __typename scoping as we do for document queries.
+          doc_type = type.indexed_aggregation? ? type.aggregation_source_type : type
 
-          subtypes = type.subtypes # Note: subtypes returns all concrete subtypes at any depth
+          return query unless doc_type.abstract?
+          return query unless doc_type.non_subtypes_in_shared_index.any?
+
+          subtypes = doc_type.subtypes # Note: subtypes returns all concrete subtypes at any depth
           query.merge_with(internal_filters: [{
             "__typename" => {query.schema_element_names.equal_to_any_of => [nil] + subtypes.map(&:name)}
           }])

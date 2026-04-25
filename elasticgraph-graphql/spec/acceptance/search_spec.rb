@@ -785,6 +785,11 @@ module ElasticGraph
           [physical_store1.fetch(:id), "PhysicalStore"],
           [online_store1.fetch(:id), "OnlineStore"]
         )
+
+        # Aggregations respect the same __typename scoping as document queries.
+        store_agg_count = call_graphql_query("query { #{case_correctly("store_aggregations")} { nodes { #{case_correctly("count")} } } }")
+          .dig("data", case_correctly("store_aggregations"), "nodes", 0, case_correctly("count"))
+        expect(store_agg_count).to eq(store_typenames.size)
       end
 
       it "supports fetching interface fields" do
