@@ -110,12 +110,16 @@ module ElasticGraph
           end
         end
 
-        context "when calling other_types_in_index on a concrete type" do
-          it "excludes the type itself from the result" do
+        context "when calling non_subtypes_in_shared_index" do
+          it "excludes the type itself and its subtypes from the result" do
             schema = build_graphql(schema_artifacts: schema_artifacts).schema
-            physical_store = schema.type_named("PhysicalStore")
+            store = schema.type_named("Store")
 
-            expect(physical_store.other_types_in_index).not_to include(physical_store)
+            result = store.non_subtypes_in_shared_index
+            expect(result).not_to include(store)
+            expect(result).not_to include(schema.type_named("OnlineStore"))
+            expect(result).not_to include(schema.type_named("PhysicalStore"))
+            expect(result).to include(schema.type_named("Wholesaler"))
           end
         end
 

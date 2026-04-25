@@ -126,13 +126,16 @@ module ElasticGraph
             .map { |t| @schema.type_from(t) } - [self]
         end
 
-        # Returns the set of other indexed document types that share any of this type's search indexes.
-        # Used to determine whether `__typename` filtering is needed when querying an abstract type
-        # that shares an index with types that fall outside the set of this type's subtypes.
-        def other_types_in_index
-          @other_types_in_index ||= search_index_definitions.flat_map do |index_def|
-            @schema.indexed_document_types_by_index_definition_name.fetch(index_def.name, [])
-          end.reject { |t| t == self }.to_set
+        # Returns the set of indexed document types that share any of this type's search indexes
+        # but are not subtypes of this type. Used to determine whether a `__typename` filter is
+        # needed when querying an abstract type.
+        def non_subtypes_in_shared_index
+          @non_subtypes_in_shared_index ||= begin
+            all_subtypes = subtypes.to_set # all concrete subtypes at any depth
+            search_index_definitions.flat_map do |index_def|
+              @schema.indexed_document_types_by_index_definition_name.fetch(index_def.name, [])
+            end.reject { |t| t == self || all_subtypes.include?(t) }.to_set
+          end
         end
 
         def field_named(field_name)

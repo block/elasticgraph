@@ -24,11 +24,9 @@ module ElasticGraph
           type = field.type.unwrap_fully
           return query unless type.abstract?
 
-          # Note: subtypes returns all concrete subtypes at any depth — intermediate abstract
-          # types in the hierarchy are not included, even though they may share the same index.
-          subtypes = type.subtypes
-          return query unless type.other_types_in_index.any? { |t| !subtypes.include?(t) }
+          return query unless type.non_subtypes_in_shared_index.any?
 
+          subtypes = type.subtypes # Note: subtypes returns all concrete subtypes at any depth
           query.merge_with(internal_filters: [{
             "__typename" => {query.schema_element_names.equal_to_any_of => [nil] + subtypes.map(&:name)}
           }])
