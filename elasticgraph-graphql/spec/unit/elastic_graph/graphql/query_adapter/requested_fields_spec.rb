@@ -43,6 +43,29 @@ module ElasticGraph
               t.field "name", "String"
             end
 
+            # Indexed interface type used solely as a root document type (not embedded anywhere).
+            # Author and Scientist inherit the `creators` index via index inheritance rather than
+            # declaring it themselves.
+            schema.interface_type "Creator" do |t|
+              t.field "id", "ID!"
+              t.field "name", "String"
+              t.index "creators"
+            end
+
+            schema.object_type "Author" do |t|
+              t.implements "Creator"
+              t.field "id", "ID!"
+              t.field "name", "String"
+              t.field "genre", "String"
+            end
+
+            schema.object_type "Scientist" do |t|
+              t.implements "Creator"
+              t.field "id", "ID!"
+              t.field "name", "String"
+              t.field "field_of_study", "String"
+            end
+
             # Indexed interface type.
             schema.interface_type "NamedEntity" do |t|
               t.root_query_fields plural: "named_entities"
@@ -370,12 +393,12 @@ module ElasticGraph
         end
 
         it "requests __typename when using `nodes` on an abstract indexed type" do
-          query = datastore_query_for(:Query, :named_entities, <<~QUERY)
+          query = datastore_query_for(:Query, :creators, <<~QUERY)
             query {
-              named_entities {
+              creators {
                 nodes {
-                  id
-                  name
+                  ... on Author { genre }
+                  ... on Scientist { field_of_study }
                 }
               }
             }

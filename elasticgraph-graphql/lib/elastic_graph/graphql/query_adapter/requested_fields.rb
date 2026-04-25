@@ -88,7 +88,7 @@ module ElasticGraph
 
           # For abstract types (unions/interfaces), we need __typename to resolve the concrete type.
           # We must fully unwrap the type to check the innermost type, since the field type could be
-          # wrapped in non-null or list wrappers (e.g., `[NamedInventor!]!`).
+          # wrapped in non-null or list wrappers (e.g., `[NamedInventor!]!` on a `nodes` relay connection field).
           fields << "#{path_prefix}__typename" if field_for(node.field)&.type&.unwrap_fully&.abstract?
           fields
         end
