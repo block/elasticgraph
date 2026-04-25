@@ -708,32 +708,28 @@ module ElasticGraph
         #   └── Retail               (interface, inherits distribution_channels)
         #       └── Store            (interface, inherits distribution_channels)
         #           ├── OnlineStore  (concrete, distribution_channels index)
-        #           ├── MobileStore  (concrete, distribution_channels index)
         #           └── PhysicalStore (concrete, physical_stores index)
         #
         # The key invariant: querying at a sub-interface level (e.g. retailers, stores) must
         # filter OUT sibling types in the shared index (e.g. ThirdPartyWholesale when querying stores).
         index_records(
-          physical_store1 = build(:physical_store, address: "123 Main St, Anytown USA", square_footage: 5000, established_on: "2019-03-10", active: true),
-          physical_store2 = build(:physical_store, address: "456 Oak Ave, Other City", square_footage: 10000, established_on: "2022-08-05", active: true),
-          mobile_store1 = build(:mobile_store, vehicle_type: "food truck", current_location: "789 Park Ave, Big City", established_on: "2020-06-15", active: true),
-          mobile_store2 = build(:mobile_store, vehicle_type: "pop-up cart", current_location: "321 Beach Blvd, Coast Town", established_on: "2021-11-20", active: true),
-          online_store1 = build(:online_store, url: "https://shop1.example.com", platform: "Shopify", established_on: "2020-01-15", active: true),
-          online_store2 = build(:online_store, url: "https://shop2.example.com", platform: "WooCommerce", established_on: "2021-06-20", active: true),
-          build(:third_party_wholesale, partner_name: "Acme Corp", contract_terms: "Net 30", active: true),
-          wholesale2 = build(:third_party_wholesale, partner_name: "Global Dist", contract_terms: "Net 60", active: false)
+          physical_store1 = build(:physical_store, established_on: "2019-03-10", active: true),
+          physical_store2 = build(:physical_store, established_on: "2022-08-05", active: true),
+          online_store1 = build(:online_store, established_on: "2020-01-15", active: true),
+          online_store2 = build(:online_store, established_on: "2021-06-20", active: true),
+          build(:third_party_wholesale, active: true),
+          wholesale2 = build(:third_party_wholesale, active: false)
         )
 
         store_fragments = [
           "...on PhysicalStore { id __typename established_on }",
-          "...on MobileStore { id __typename established_on }",
           "...on OnlineStore { id __typename established_on }"
         ]
         all_channel_fragments = store_fragments + ["...on ThirdPartyWholesale { id __typename active }"]
 
-        store_typenames = %w[PhysicalStore PhysicalStore MobileStore MobileStore OnlineStore OnlineStore]
+        store_typenames = %w[PhysicalStore PhysicalStore OnlineStore OnlineStore]
 
-        # Querying at the top-level DistributionChannel interface returns all 4 concrete types,
+        # Querying at the top-level DistributionChannel interface returns all 3 concrete types,
         # including ThirdPartyWholesale.
         channels = list_distribution_channels_with(*all_channel_fragments)
         expect(channels.map { |c| c["__typename"] }).to contain_exactly(
@@ -758,7 +754,6 @@ module ElasticGraph
         # At retailers: established_on filter applies, and ThirdPartyWholesale is still excluded.
         retailers_after_2020 = list_retailers_with(*store_fragments, filter: {established_on: {gte: "2020-01-01"}})
         expect(retailers_after_2020.map { |r| r["id"] }).to contain_exactly(
-          mobile_store1.fetch(:id), mobile_store2.fetch(:id),
           online_store1.fetch(:id), online_store2.fetch(:id),
           physical_store2.fetch(:id)
         )
@@ -768,9 +763,7 @@ module ElasticGraph
         expect(stores_sorted.map { |s| s["id"] }).to eq([
           physical_store1.fetch(:id),
           online_store1.fetch(:id),
-          mobile_store1.fetch(:id),
           online_store2.fetch(:id),
-          mobile_store2.fetch(:id),
           physical_store2.fetch(:id)
         ])
 
@@ -786,10 +779,9 @@ module ElasticGraph
         # Filter by ID spans indices and respects the __typename scope at each query level.
         stores_by_id = list_stores_with(
           *store_fragments,
-          filter: {id: {equal_to_any_of: [mobile_store1.fetch(:id), physical_store1.fetch(:id), online_store1.fetch(:id)]}}
+          filter: {id: {equal_to_any_of: [physical_store1.fetch(:id), online_store1.fetch(:id)]}}
         )
         expect(stores_by_id.map { |s| [s["id"], s["__typename"]] }).to contain_exactly(
-          [mobile_store1.fetch(:id), "MobileStore"],
           [physical_store1.fetch(:id), "PhysicalStore"],
           [online_store1.fetch(:id), "OnlineStore"]
         )

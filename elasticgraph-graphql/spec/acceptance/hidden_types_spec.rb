@@ -119,7 +119,7 @@ module ElasticGraph
             %w[
               FloatAggregatedValues IntAggregatedValues JsonSafeLongAggregatedValues LongStringAggregatedValues NonNumericAggregatedValues
               DateAggregatedValues DateTimeAggregatedValues LocalTimeAggregatedValues
-              Company Cursor PageInfo Query TextFilterInput GeoLocation MobileStore OnlineStore ThirdPartyWholesale
+              Company Cursor PageInfo Query TextFilterInput GeoLocation OnlineStore ThirdPartyWholesale
               DateTimeGroupingOffsetInput DateTimeUnitInput DateTimeTimeOfDayFilterInput
               DateGroupedBy DateGroupingOffsetInput DateGroupingTruncationUnitInput DateUnitInput
               DateTimeGroupedBy DateTimeGroupingTruncationUnitInput TimeZone

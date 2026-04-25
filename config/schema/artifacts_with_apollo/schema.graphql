@@ -2808,26 +2808,6 @@ type DistributionChannelAggregatedValues {
   active: NonNumericAggregatedValues
 
   """
-  Computed aggregate values for the `address` field.
-  """
-  address: NonNumericAggregatedValues
-
-  """
-  Computed aggregate values for the `contract_terms` field.
-  """
-  contract_terms: NonNumericAggregatedValues
-
-  """
-  Computed aggregate values for the `current_location` field.
-  """
-  current_location: NonNumericAggregatedValues
-
-  """
-  Computed aggregate values for the `customer_facing` field.
-  """
-  customer_facing: NonNumericAggregatedValues
-
-  """
   Computed aggregate values for the `established_on` field.
   """
   established_on: DateAggregatedValues
@@ -2836,31 +2816,6 @@ type DistributionChannelAggregatedValues {
   Computed aggregate values for the `id` field.
   """
   id: NonNumericAggregatedValues
-
-  """
-  Computed aggregate values for the `partner_name` field.
-  """
-  partner_name: NonNumericAggregatedValues
-
-  """
-  Computed aggregate values for the `platform` field.
-  """
-  platform: NonNumericAggregatedValues
-
-  """
-  Computed aggregate values for the `square_footage` field.
-  """
-  square_footage: IntAggregatedValues
-
-  """
-  Computed aggregate values for the `url` field.
-  """
-  url: NonNumericAggregatedValues
-
-  """
-  Computed aggregate values for the `vehicle_type` field.
-  """
-  vehicle_type: NonNumericAggregatedValues
 }
 
 """
@@ -2999,13 +2954,6 @@ input DistributionChannelFilterInput {
   active: BooleanFilterInput
 
   """
-  Used to filter on the `address` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  address: StringFilterInput
-
-  """
   Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
@@ -3025,27 +2973,6 @@ input DistributionChannelFilterInput {
   When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [DistributionChannelFilterInput!]
-
-  """
-  Used to filter on the `contract_terms` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  contract_terms: StringFilterInput
-
-  """
-  Used to filter on the `current_location` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  current_location: StringFilterInput
-
-  """
-  Used to filter on the `customer_facing` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  customer_facing: BooleanFilterInput
 
   """
   Used to filter on the `established_on` field.
@@ -3068,41 +2995,6 @@ input DistributionChannelFilterInput {
   When `null` or an empty object is passed, matches no documents.
   """
   not: DistributionChannelFilterInput
-
-  """
-  Used to filter on the `partner_name` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  partner_name: StringFilterInput
-
-  """
-  Used to filter on the `platform` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  platform: StringFilterInput
-
-  """
-  Used to filter on the `square_footage` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  square_footage: IntFilterInput
-
-  """
-  Used to filter on the `url` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  url: StringFilterInput
-
-  """
-  Used to filter on the `vehicle_type` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  vehicle_type: StringFilterInput
 }
 
 """
@@ -3115,54 +3007,9 @@ type DistributionChannelGroupedBy {
   active: Boolean
 
   """
-  The `address` field value for this group.
-  """
-  address: String
-
-  """
-  The `contract_terms` field value for this group.
-  """
-  contract_terms: String
-
-  """
-  The `current_location` field value for this group.
-  """
-  current_location: String
-
-  """
-  The `customer_facing` field value for this group.
-  """
-  customer_facing: Boolean
-
-  """
   Offers the different grouping options for the `established_on` value within this group.
   """
   established_on: DateGroupedBy
-
-  """
-  The `partner_name` field value for this group.
-  """
-  partner_name: String
-
-  """
-  The `platform` field value for this group.
-  """
-  platform: String
-
-  """
-  The `square_footage` field value for this group.
-  """
-  square_footage: Int
-
-  """
-  The `url` field value for this group.
-  """
-  url: String
-
-  """
-  The `vehicle_type` field value for this group.
-  """
-  vehicle_type: String
 }
 
 """
@@ -3170,80 +3017,15 @@ Type used to request desired `DistributionChannel` search highlight fields.
 """
 type DistributionChannelHighlights {
   """
-  Search highlights for the `address`, providing snippets of the matching text.
-  """
-  address: [String!]!
-
-  """
-  Search highlights for the `contract_terms`, providing snippets of the matching text.
-  """
-  contract_terms: [String!]!
-
-  """
-  Search highlights for the `current_location`, providing snippets of the matching text.
-  """
-  current_location: [String!]!
-
-  """
   Search highlights for the `id`, providing snippets of the matching text.
   """
   id: [String!]!
-
-  """
-  Search highlights for the `partner_name`, providing snippets of the matching text.
-  """
-  partner_name: [String!]!
-
-  """
-  Search highlights for the `platform`, providing snippets of the matching text.
-  """
-  platform: [String!]!
-
-  """
-  Search highlights for the `url`, providing snippets of the matching text.
-  """
-  url: [String!]!
-
-  """
-  Search highlights for the `vehicle_type`, providing snippets of the matching text.
-  """
-  vehicle_type: [String!]!
 }
 
 """
 Enumerates the ways `DistributionChannel`s can be sorted.
 """
 enum DistributionChannelSortOrderInput {
-  """
-  Sorts ascending by the `address` field.
-  """
-  address_ASC
-
-  """
-  Sorts descending by the `address` field.
-  """
-  address_DESC
-
-  """
-  Sorts ascending by the `contract_terms` field.
-  """
-  contract_terms_ASC
-
-  """
-  Sorts descending by the `contract_terms` field.
-  """
-  contract_terms_DESC
-
-  """
-  Sorts ascending by the `current_location` field.
-  """
-  current_location_ASC
-
-  """
-  Sorts descending by the `current_location` field.
-  """
-  current_location_DESC
-
   """
   Sorts ascending by the `established_on` field.
   """
@@ -3263,56 +3045,6 @@ enum DistributionChannelSortOrderInput {
   Sorts descending by the `id` field.
   """
   id_DESC
-
-  """
-  Sorts ascending by the `partner_name` field.
-  """
-  partner_name_ASC
-
-  """
-  Sorts descending by the `partner_name` field.
-  """
-  partner_name_DESC
-
-  """
-  Sorts ascending by the `platform` field.
-  """
-  platform_ASC
-
-  """
-  Sorts descending by the `platform` field.
-  """
-  platform_DESC
-
-  """
-  Sorts ascending by the `square_footage` field.
-  """
-  square_footage_ASC
-
-  """
-  Sorts descending by the `square_footage` field.
-  """
-  square_footage_DESC
-
-  """
-  Sorts ascending by the `url` field.
-  """
-  url_ASC
-
-  """
-  Sorts descending by the `url` field.
-  """
-  url_DESC
-
-  """
-  Sorts ascending by the `vehicle_type` field.
-  """
-  vehicle_type_ASC
-
-  """
-  Sorts descending by the `vehicle_type` field.
-  """
-  vehicle_type_DESC
 }
 
 type ElectricalPart implements NamedEntity @key(fields: "id") {
@@ -6212,15 +5944,6 @@ enum MechanicalPartSortOrderInput {
   name_DESC
 }
 
-type MobileStore implements DistributionChannel & Retail & Store @key(fields: "id") {
-  active: Boolean
-  current_location: String
-  customer_facing: Boolean
-  established_on: Date
-  id: ID!
-  vehicle_type: String!
-}
-
 type Money {
   amount_cents: Int
   currency: String!
@@ -8318,11 +8041,8 @@ type NonNumericAggregatedValues @shareable {
 
 type OnlineStore implements DistributionChannel & Retail & Store @key(fields: "id") {
   active: Boolean
-  customer_facing: Boolean
   established_on: Date
   id: ID!
-  platform: String
-  url: String!
 }
 
 """
@@ -8798,11 +8518,8 @@ type PersonHighlights {
 
 type PhysicalStore implements DistributionChannel & Retail & Store @key(fields: "id") {
   active: Boolean
-  address: String!
-  customer_facing: Boolean
   established_on: Date
   id: ID!
-  square_footage: Int
 }
 
 """
@@ -8815,16 +8532,6 @@ type PhysicalStoreAggregatedValues {
   active: NonNumericAggregatedValues
 
   """
-  Computed aggregate values for the `address` field.
-  """
-  address: NonNumericAggregatedValues
-
-  """
-  Computed aggregate values for the `customer_facing` field.
-  """
-  customer_facing: NonNumericAggregatedValues
-
-  """
   Computed aggregate values for the `established_on` field.
   """
   established_on: DateAggregatedValues
@@ -8833,11 +8540,6 @@ type PhysicalStoreAggregatedValues {
   Computed aggregate values for the `id` field.
   """
   id: NonNumericAggregatedValues
-
-  """
-  Computed aggregate values for the `square_footage` field.
-  """
-  square_footage: IntAggregatedValues
 }
 
 """
@@ -8975,13 +8677,6 @@ input PhysicalStoreFilterInput {
   active: BooleanFilterInput
 
   """
-  Used to filter on the `address` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  address: StringFilterInput
-
-  """
   Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
@@ -9001,13 +8696,6 @@ input PhysicalStoreFilterInput {
   When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [PhysicalStoreFilterInput!]
-
-  """
-  Used to filter on the `customer_facing` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  customer_facing: BooleanFilterInput
 
   """
   Used to filter on the `established_on` field.
@@ -9030,13 +8718,6 @@ input PhysicalStoreFilterInput {
   When `null` or an empty object is passed, matches no documents.
   """
   not: PhysicalStoreFilterInput
-
-  """
-  Used to filter on the `square_footage` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  square_footage: IntFilterInput
 }
 
 """
@@ -9049,35 +8730,15 @@ type PhysicalStoreGroupedBy {
   active: Boolean
 
   """
-  The `address` field value for this group.
-  """
-  address: String
-
-  """
-  The `customer_facing` field value for this group.
-  """
-  customer_facing: Boolean
-
-  """
   Offers the different grouping options for the `established_on` value within this group.
   """
   established_on: DateGroupedBy
-
-  """
-  The `square_footage` field value for this group.
-  """
-  square_footage: Int
 }
 
 """
 Type used to request desired `PhysicalStore` search highlight fields.
 """
 type PhysicalStoreHighlights {
-  """
-  Search highlights for the `address`, providing snippets of the matching text.
-  """
-  address: [String!]!
-
   """
   Search highlights for the `id`, providing snippets of the matching text.
   """
@@ -9088,16 +8749,6 @@ type PhysicalStoreHighlights {
 Enumerates the ways `PhysicalStore`s can be sorted.
 """
 enum PhysicalStoreSortOrderInput {
-  """
-  Sorts ascending by the `address` field.
-  """
-  address_ASC
-
-  """
-  Sorts descending by the `address` field.
-  """
-  address_DESC
-
   """
   Sorts ascending by the `established_on` field.
   """
@@ -9117,16 +8768,6 @@ enum PhysicalStoreSortOrderInput {
   Sorts descending by the `id` field.
   """
   id_DESC
-
-  """
-  Sorts ascending by the `square_footage` field.
-  """
-  square_footage_ASC
-
-  """
-  Sorts descending by the `square_footage` field.
-  """
-  square_footage_DESC
 }
 
 type Player {
@@ -11791,21 +11432,6 @@ type RetailAggregatedValues {
   active: NonNumericAggregatedValues
 
   """
-  Computed aggregate values for the `address` field.
-  """
-  address: NonNumericAggregatedValues
-
-  """
-  Computed aggregate values for the `current_location` field.
-  """
-  current_location: NonNumericAggregatedValues
-
-  """
-  Computed aggregate values for the `customer_facing` field.
-  """
-  customer_facing: NonNumericAggregatedValues
-
-  """
   Computed aggregate values for the `established_on` field.
   """
   established_on: DateAggregatedValues
@@ -11814,26 +11440,6 @@ type RetailAggregatedValues {
   Computed aggregate values for the `id` field.
   """
   id: NonNumericAggregatedValues
-
-  """
-  Computed aggregate values for the `platform` field.
-  """
-  platform: NonNumericAggregatedValues
-
-  """
-  Computed aggregate values for the `square_footage` field.
-  """
-  square_footage: IntAggregatedValues
-
-  """
-  Computed aggregate values for the `url` field.
-  """
-  url: NonNumericAggregatedValues
-
-  """
-  Computed aggregate values for the `vehicle_type` field.
-  """
-  vehicle_type: NonNumericAggregatedValues
 }
 
 """
@@ -11971,13 +11577,6 @@ input RetailFilterInput {
   active: BooleanFilterInput
 
   """
-  Used to filter on the `address` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  address: StringFilterInput
-
-  """
   Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
@@ -11997,20 +11596,6 @@ input RetailFilterInput {
   When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [RetailFilterInput!]
-
-  """
-  Used to filter on the `current_location` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  current_location: StringFilterInput
-
-  """
-  Used to filter on the `customer_facing` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  customer_facing: BooleanFilterInput
 
   """
   Used to filter on the `established_on` field.
@@ -12033,34 +11618,6 @@ input RetailFilterInput {
   When `null` or an empty object is passed, matches no documents.
   """
   not: RetailFilterInput
-
-  """
-  Used to filter on the `platform` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  platform: StringFilterInput
-
-  """
-  Used to filter on the `square_footage` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  square_footage: IntFilterInput
-
-  """
-  Used to filter on the `url` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  url: StringFilterInput
-
-  """
-  Used to filter on the `vehicle_type` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  vehicle_type: StringFilterInput
 }
 
 """
@@ -12073,44 +11630,9 @@ type RetailGroupedBy {
   active: Boolean
 
   """
-  The `address` field value for this group.
-  """
-  address: String
-
-  """
-  The `current_location` field value for this group.
-  """
-  current_location: String
-
-  """
-  The `customer_facing` field value for this group.
-  """
-  customer_facing: Boolean
-
-  """
   Offers the different grouping options for the `established_on` value within this group.
   """
   established_on: DateGroupedBy
-
-  """
-  The `platform` field value for this group.
-  """
-  platform: String
-
-  """
-  The `square_footage` field value for this group.
-  """
-  square_footage: Int
-
-  """
-  The `url` field value for this group.
-  """
-  url: String
-
-  """
-  The `vehicle_type` field value for this group.
-  """
-  vehicle_type: String
 }
 
 """
@@ -12118,60 +11640,15 @@ Type used to request desired `Retail` search highlight fields.
 """
 type RetailHighlights {
   """
-  Search highlights for the `address`, providing snippets of the matching text.
-  """
-  address: [String!]!
-
-  """
-  Search highlights for the `current_location`, providing snippets of the matching text.
-  """
-  current_location: [String!]!
-
-  """
   Search highlights for the `id`, providing snippets of the matching text.
   """
   id: [String!]!
-
-  """
-  Search highlights for the `platform`, providing snippets of the matching text.
-  """
-  platform: [String!]!
-
-  """
-  Search highlights for the `url`, providing snippets of the matching text.
-  """
-  url: [String!]!
-
-  """
-  Search highlights for the `vehicle_type`, providing snippets of the matching text.
-  """
-  vehicle_type: [String!]!
 }
 
 """
 Enumerates the ways `Retail`s can be sorted.
 """
 enum RetailSortOrderInput {
-  """
-  Sorts ascending by the `address` field.
-  """
-  address_ASC
-
-  """
-  Sorts descending by the `address` field.
-  """
-  address_DESC
-
-  """
-  Sorts ascending by the `current_location` field.
-  """
-  current_location_ASC
-
-  """
-  Sorts descending by the `current_location` field.
-  """
-  current_location_DESC
-
   """
   Sorts ascending by the `established_on` field.
   """
@@ -12191,46 +11668,6 @@ enum RetailSortOrderInput {
   Sorts descending by the `id` field.
   """
   id_DESC
-
-  """
-  Sorts ascending by the `platform` field.
-  """
-  platform_ASC
-
-  """
-  Sorts descending by the `platform` field.
-  """
-  platform_DESC
-
-  """
-  Sorts ascending by the `square_footage` field.
-  """
-  square_footage_ASC
-
-  """
-  Sorts descending by the `square_footage` field.
-  """
-  square_footage_DESC
-
-  """
-  Sorts ascending by the `url` field.
-  """
-  url_ASC
-
-  """
-  Sorts descending by the `url` field.
-  """
-  url_DESC
-
-  """
-  Sorts ascending by the `vehicle_type` field.
-  """
-  vehicle_type_ASC
-
-  """
-  Sorts descending by the `vehicle_type` field.
-  """
-  vehicle_type_DESC
 }
 
 """
@@ -13046,7 +12483,6 @@ input SponsorshipListFilterInput {
 
 interface Store implements DistributionChannel & Retail {
   active: Boolean
-  customer_facing: Boolean
   established_on: Date
   id: ID!
 }
@@ -13061,21 +12497,6 @@ type StoreAggregatedValues {
   active: NonNumericAggregatedValues
 
   """
-  Computed aggregate values for the `address` field.
-  """
-  address: NonNumericAggregatedValues
-
-  """
-  Computed aggregate values for the `current_location` field.
-  """
-  current_location: NonNumericAggregatedValues
-
-  """
-  Computed aggregate values for the `customer_facing` field.
-  """
-  customer_facing: NonNumericAggregatedValues
-
-  """
   Computed aggregate values for the `established_on` field.
   """
   established_on: DateAggregatedValues
@@ -13084,26 +12505,6 @@ type StoreAggregatedValues {
   Computed aggregate values for the `id` field.
   """
   id: NonNumericAggregatedValues
-
-  """
-  Computed aggregate values for the `platform` field.
-  """
-  platform: NonNumericAggregatedValues
-
-  """
-  Computed aggregate values for the `square_footage` field.
-  """
-  square_footage: IntAggregatedValues
-
-  """
-  Computed aggregate values for the `url` field.
-  """
-  url: NonNumericAggregatedValues
-
-  """
-  Computed aggregate values for the `vehicle_type` field.
-  """
-  vehicle_type: NonNumericAggregatedValues
 }
 
 """
@@ -13241,13 +12642,6 @@ input StoreFilterInput {
   active: BooleanFilterInput
 
   """
-  Used to filter on the `address` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  address: StringFilterInput
-
-  """
   Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
@@ -13267,20 +12661,6 @@ input StoreFilterInput {
   When an empty list is passed, this part of the filter matches no documents.
   """
   any_of: [StoreFilterInput!]
-
-  """
-  Used to filter on the `current_location` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  current_location: StringFilterInput
-
-  """
-  Used to filter on the `customer_facing` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  customer_facing: BooleanFilterInput
 
   """
   Used to filter on the `established_on` field.
@@ -13303,34 +12683,6 @@ input StoreFilterInput {
   When `null` or an empty object is passed, matches no documents.
   """
   not: StoreFilterInput
-
-  """
-  Used to filter on the `platform` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  platform: StringFilterInput
-
-  """
-  Used to filter on the `square_footage` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  square_footage: IntFilterInput
-
-  """
-  Used to filter on the `url` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  url: StringFilterInput
-
-  """
-  Used to filter on the `vehicle_type` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  vehicle_type: StringFilterInput
 }
 
 """
@@ -13343,44 +12695,9 @@ type StoreGroupedBy {
   active: Boolean
 
   """
-  The `address` field value for this group.
-  """
-  address: String
-
-  """
-  The `current_location` field value for this group.
-  """
-  current_location: String
-
-  """
-  The `customer_facing` field value for this group.
-  """
-  customer_facing: Boolean
-
-  """
   Offers the different grouping options for the `established_on` value within this group.
   """
   established_on: DateGroupedBy
-
-  """
-  The `platform` field value for this group.
-  """
-  platform: String
-
-  """
-  The `square_footage` field value for this group.
-  """
-  square_footage: Int
-
-  """
-  The `url` field value for this group.
-  """
-  url: String
-
-  """
-  The `vehicle_type` field value for this group.
-  """
-  vehicle_type: String
 }
 
 """
@@ -13388,60 +12705,15 @@ Type used to request desired `Store` search highlight fields.
 """
 type StoreHighlights {
   """
-  Search highlights for the `address`, providing snippets of the matching text.
-  """
-  address: [String!]!
-
-  """
-  Search highlights for the `current_location`, providing snippets of the matching text.
-  """
-  current_location: [String!]!
-
-  """
   Search highlights for the `id`, providing snippets of the matching text.
   """
   id: [String!]!
-
-  """
-  Search highlights for the `platform`, providing snippets of the matching text.
-  """
-  platform: [String!]!
-
-  """
-  Search highlights for the `url`, providing snippets of the matching text.
-  """
-  url: [String!]!
-
-  """
-  Search highlights for the `vehicle_type`, providing snippets of the matching text.
-  """
-  vehicle_type: [String!]!
 }
 
 """
 Enumerates the ways `Store`s can be sorted.
 """
 enum StoreSortOrderInput {
-  """
-  Sorts ascending by the `address` field.
-  """
-  address_ASC
-
-  """
-  Sorts descending by the `address` field.
-  """
-  address_DESC
-
-  """
-  Sorts ascending by the `current_location` field.
-  """
-  current_location_ASC
-
-  """
-  Sorts descending by the `current_location` field.
-  """
-  current_location_DESC
-
   """
   Sorts ascending by the `established_on` field.
   """
@@ -13461,46 +12733,6 @@ enum StoreSortOrderInput {
   Sorts descending by the `id` field.
   """
   id_DESC
-
-  """
-  Sorts ascending by the `platform` field.
-  """
-  platform_ASC
-
-  """
-  Sorts descending by the `platform` field.
-  """
-  platform_DESC
-
-  """
-  Sorts ascending by the `square_footage` field.
-  """
-  square_footage_ASC
-
-  """
-  Sorts descending by the `square_footage` field.
-  """
-  square_footage_DESC
-
-  """
-  Sorts ascending by the `url` field.
-  """
-  url_ASC
-
-  """
-  Sorts descending by the `url` field.
-  """
-  url_DESC
-
-  """
-  Sorts ascending by the `vehicle_type` field.
-  """
-  vehicle_type_ASC
-
-  """
-  Sorts descending by the `vehicle_type` field.
-  """
-  vehicle_type_DESC
 }
 
 """
@@ -16057,9 +15289,7 @@ input TextFilterInput {
 
 type ThirdPartyWholesale implements DistributionChannel @key(fields: "id") {
   active: Boolean
-  contract_terms: String
   id: ID!
-  partner_name: String
 }
 
 """
@@ -20203,7 +19433,7 @@ In an ElasticGraph schema, this is a union of all indexed types.
 
 Not intended for use by clients other than Apollo.
 """
-union _Entity = Company | Component | Country | ElectricalPart | Manufacturer | MechanicalPart | MobileStore | OnlineStore | Person | PhysicalStore | Sponsor | Team | ThirdPartyWholesale | Widget | WidgetCurrency | WidgetWorkspace
+union _Entity = Company | Component | Country | ElectricalPart | Manufacturer | MechanicalPart | OnlineStore | Person | PhysicalStore | Sponsor | Team | ThirdPartyWholesale | Widget | WidgetCurrency | WidgetWorkspace
 
 """
 An object type required by the [Apollo Federation subgraph

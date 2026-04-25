@@ -28,7 +28,6 @@ json_schema_version: 1
         - ElectricalPart
         - Manufacturer
         - MechanicalPart
-        - MobileStore
         - OnlineStore
         - Person
         - PhysicalStore
@@ -425,46 +424,6 @@ json_schema_version: 1
     - created_at
     - material
     - manufacturer_id
-  MobileStore:
-    type: object
-    properties:
-      id:
-        allOf:
-        - "$ref": "#/$defs/ID"
-        - maxLength: 8191
-      vehicle_type:
-        allOf:
-        - "$ref": "#/$defs/String"
-        - maxLength: 8191
-      current_location:
-        anyOf:
-        - allOf:
-          - "$ref": "#/$defs/String"
-          - maxLength: 8191
-        - type: 'null'
-      established_on:
-        anyOf:
-        - "$ref": "#/$defs/Date"
-        - type: 'null'
-      active:
-        anyOf:
-        - "$ref": "#/$defs/Boolean"
-        - type: 'null'
-      customer_facing:
-        anyOf:
-        - "$ref": "#/$defs/Boolean"
-        - type: 'null'
-      __typename:
-        type: string
-        const: MobileStore
-        default: MobileStore
-    required:
-    - id
-    - vehicle_type
-    - current_location
-    - established_on
-    - active
-    - customer_facing
   Money:
     type: object
     properties:
@@ -496,25 +455,11 @@ json_schema_version: 1
         allOf:
         - "$ref": "#/$defs/ID"
         - maxLength: 8191
-      url:
-        allOf:
-        - "$ref": "#/$defs/String"
-        - maxLength: 8191
-      platform:
-        anyOf:
-        - allOf:
-          - "$ref": "#/$defs/String"
-          - maxLength: 8191
-        - type: 'null'
       established_on:
         anyOf:
         - "$ref": "#/$defs/Date"
         - type: 'null'
       active:
-        anyOf:
-        - "$ref": "#/$defs/Boolean"
-        - type: 'null'
-      customer_facing:
         anyOf:
         - "$ref": "#/$defs/Boolean"
         - type: 'null'
@@ -524,11 +469,8 @@ json_schema_version: 1
         default: OnlineStore
     required:
     - id
-    - url
-    - platform
     - established_on
     - active
-    - customer_facing
   Person:
     type: object
     properties:
@@ -563,23 +505,11 @@ json_schema_version: 1
         allOf:
         - "$ref": "#/$defs/ID"
         - maxLength: 8191
-      address:
-        allOf:
-        - "$ref": "#/$defs/String"
-        - maxLength: 8191
-      square_footage:
-        anyOf:
-        - "$ref": "#/$defs/Int"
-        - type: 'null'
       established_on:
         anyOf:
         - "$ref": "#/$defs/Date"
         - type: 'null'
       active:
-        anyOf:
-        - "$ref": "#/$defs/Boolean"
-        - type: 'null'
-      customer_facing:
         anyOf:
         - "$ref": "#/$defs/Boolean"
         - type: 'null'
@@ -589,11 +519,8 @@ json_schema_version: 1
         default: PhysicalStore
     required:
     - id
-    - address
-    - square_footage
     - established_on
     - active
-    - customer_facing
   Player:
     type: object
     properties:
@@ -952,18 +879,6 @@ json_schema_version: 1
         anyOf:
         - "$ref": "#/$defs/Boolean"
         - type: 'null'
-      partner_name:
-        anyOf:
-        - allOf:
-          - "$ref": "#/$defs/String"
-          - maxLength: 8191
-        - type: 'null'
-      contract_terms:
-        anyOf:
-        - allOf:
-          - "$ref": "#/$defs/String"
-          - maxLength: 8191
-        - type: 'null'
       __typename:
         type: string
         const: ThirdPartyWholesale
@@ -971,8 +886,6 @@ json_schema_version: 1
     required:
     - id
     - active
-    - partner_name
-    - contract_terms
   Untyped:
     type:
     - array

@@ -35,18 +35,9 @@ tables:
     table_schema: |-
       CREATE TABLE IF NOT EXISTS distribution_channels (
         id STRING,
-        url STRING,
-        platform STRING,
         established_on DATE,
         active BOOLEAN,
-        customer_facing BOOLEAN,
-        __typename STRING,
-        address STRING,
-        square_footage INT,
-        vehicle_type STRING,
-        current_location STRING,
-        partner_name STRING,
-        contract_terms STRING
+        __typename STRING
       )
   electrical_parts:
     table_schema: |-
@@ -87,11 +78,8 @@ tables:
     table_schema: |-
       CREATE TABLE IF NOT EXISTS physical_stores (
         id STRING,
-        address STRING,
-        square_footage INT,
         established_on DATE,
-        active BOOLEAN,
-        customer_facing BOOLEAN
+        active BOOLEAN
       )
   sponsors:
     table_schema: |-

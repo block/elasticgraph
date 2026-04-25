@@ -43,7 +43,7 @@ module ElasticGraph
               t.field "name", "String"
             end
 
-            # Indexed interfae type.
+            # Indexed interface type.
             schema.interface_type "NamedEntity" do |t|
               t.root_query_fields plural: "named_entities"
               t.field "id", "ID"
@@ -367,6 +367,21 @@ module ElasticGraph
           expect(query.total_document_count_needed).to be false
           expect(query.requested_highlights).to be_empty
           expect(query.request_all_highlights).to be false
+        end
+
+        it "requests __typename when using `nodes` on an abstract indexed type" do
+          query = datastore_query_for(:Query, :named_entities, <<~QUERY)
+            query {
+              named_entities {
+                nodes {
+                  id
+                  name
+                }
+              }
+            }
+          QUERY
+
+          expect(query.requested_fields).to include("__typename")
         end
 
         it "ignores relay connection sub-fields that are not directly under `edges.node` (e.g. `page_info`)" do

@@ -177,30 +177,6 @@ enum_types_by_name:
         datastore_abbreviation: yd
   DistributionChannelSortOrderInput:
     values_by_name:
-      address_ASC:
-        sort_field:
-          direction: asc
-          field_path: address
-      address_DESC:
-        sort_field:
-          direction: desc
-          field_path: address
-      contract_terms_ASC:
-        sort_field:
-          direction: asc
-          field_path: contract_terms
-      contract_terms_DESC:
-        sort_field:
-          direction: desc
-          field_path: contract_terms
-      current_location_ASC:
-        sort_field:
-          direction: asc
-          field_path: current_location
-      current_location_DESC:
-        sort_field:
-          direction: desc
-          field_path: current_location
       established_on_ASC:
         sort_field:
           direction: asc
@@ -217,46 +193,6 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: id
-      partner_name_ASC:
-        sort_field:
-          direction: asc
-          field_path: partner_name
-      partner_name_DESC:
-        sort_field:
-          direction: desc
-          field_path: partner_name
-      platform_ASC:
-        sort_field:
-          direction: asc
-          field_path: platform
-      platform_DESC:
-        sort_field:
-          direction: desc
-          field_path: platform
-      square_footage_ASC:
-        sort_field:
-          direction: asc
-          field_path: square_footage
-      square_footage_DESC:
-        sort_field:
-          direction: desc
-          field_path: square_footage
-      url_ASC:
-        sort_field:
-          direction: asc
-          field_path: url
-      url_DESC:
-        sort_field:
-          direction: desc
-          field_path: url
-      vehicle_type_ASC:
-        sort_field:
-          direction: asc
-          field_path: vehicle_type
-      vehicle_type_DESC:
-        sort_field:
-          direction: desc
-          field_path: vehicle_type
   ElectricalPartSortOrderInput:
     values_by_name:
       created_at_ASC:
@@ -929,14 +865,6 @@ enum_types_by_name:
           field_path: voltage
   PhysicalStoreSortOrderInput:
     values_by_name:
-      address_ASC:
-        sort_field:
-          direction: asc
-          field_path: address
-      address_DESC:
-        sort_field:
-          direction: desc
-          field_path: address
       established_on_ASC:
         sort_field:
           direction: asc
@@ -953,32 +881,8 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: id
-      square_footage_ASC:
-        sort_field:
-          direction: asc
-          field_path: square_footage
-      square_footage_DESC:
-        sort_field:
-          direction: desc
-          field_path: square_footage
   RetailSortOrderInput:
     values_by_name:
-      address_ASC:
-        sort_field:
-          direction: asc
-          field_path: address
-      address_DESC:
-        sort_field:
-          direction: desc
-          field_path: address
-      current_location_ASC:
-        sort_field:
-          direction: asc
-          field_path: current_location
-      current_location_DESC:
-        sort_field:
-          direction: desc
-          field_path: current_location
       established_on_ASC:
         sort_field:
           direction: asc
@@ -995,38 +899,6 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: id
-      platform_ASC:
-        sort_field:
-          direction: asc
-          field_path: platform
-      platform_DESC:
-        sort_field:
-          direction: desc
-          field_path: platform
-      square_footage_ASC:
-        sort_field:
-          direction: asc
-          field_path: square_footage
-      square_footage_DESC:
-        sort_field:
-          direction: desc
-          field_path: square_footage
-      url_ASC:
-        sort_field:
-          direction: asc
-          field_path: url
-      url_DESC:
-        sort_field:
-          direction: desc
-          field_path: url
-      vehicle_type_ASC:
-        sort_field:
-          direction: asc
-          field_path: vehicle_type
-      vehicle_type_DESC:
-        sort_field:
-          direction: desc
-          field_path: vehicle_type
   SponsorSortOrderInput:
     values_by_name:
       id_ASC:
@@ -1047,22 +919,6 @@ enum_types_by_name:
           field_path: name
   StoreSortOrderInput:
     values_by_name:
-      address_ASC:
-        sort_field:
-          direction: asc
-          field_path: address
-      address_DESC:
-        sort_field:
-          direction: desc
-          field_path: address
-      current_location_ASC:
-        sort_field:
-          direction: asc
-          field_path: current_location
-      current_location_DESC:
-        sort_field:
-          direction: desc
-          field_path: current_location
       established_on_ASC:
         sort_field:
           direction: asc
@@ -1079,38 +935,6 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: id
-      platform_ASC:
-        sort_field:
-          direction: asc
-          field_path: platform
-      platform_DESC:
-        sort_field:
-          direction: desc
-          field_path: platform
-      square_footage_ASC:
-        sort_field:
-          direction: asc
-          field_path: square_footage
-      square_footage_DESC:
-        sort_field:
-          direction: desc
-          field_path: square_footage
-      url_ASC:
-        sort_field:
-          direction: asc
-          field_path: url
-      url_DESC:
-        sort_field:
-          direction: desc
-          field_path: url
-      vehicle_type_ASC:
-        sort_field:
-          direction: asc
-          field_path: vehicle_type
-      vehicle_type_DESC:
-        sort_field:
-          direction: desc
-          field_path: vehicle_type
   TeamSortOrderInput:
     values_by_name:
       country_code_ASC:
@@ -2053,27 +1877,9 @@ index_definitions_by_name:
     fields_by_path:
       active:
         source: __self
-      address:
-        source: __self
-      contract_terms:
-        source: __self
-      current_location:
-        source: __self
-      customer_facing:
-        source: __self
       established_on:
         source: __self
       id:
-        source: __self
-      partner_name:
-        source: __self
-      platform:
-        source: __self
-      square_footage:
-        source: __self
-      url:
-        source: __self
-      vehicle_type:
         source: __self
     route_with: id
   electrical_parts:
@@ -2151,15 +1957,9 @@ index_definitions_by_name:
     fields_by_path:
       active:
         source: __self
-      address:
-        source: __self
-      customer_facing:
-        source: __self
       established_on:
         source: __self
       id:
-        source: __self
-      square_footage:
         source: __self
     route_with: id
   sponsors:
@@ -3933,37 +3733,10 @@ object_types_by_name:
       active:
         resolver:
           name: get_record_field_value
-      address:
-        resolver:
-          name: get_record_field_value
-      contract_terms:
-        resolver:
-          name: get_record_field_value
-      current_location:
-        resolver:
-          name: get_record_field_value
-      customer_facing:
-        resolver:
-          name: get_record_field_value
       established_on:
         resolver:
           name: get_record_field_value
       id:
-        resolver:
-          name: get_record_field_value
-      partner_name:
-        resolver:
-          name: get_record_field_value
-      platform:
-        resolver:
-          name: get_record_field_value
-      square_footage:
-        resolver:
-          name: get_record_field_value
-      url:
-        resolver:
-          name: get_record_field_value
-      vehicle_type:
         resolver:
           name: get_record_field_value
     index_definition_names:
@@ -3973,37 +3746,10 @@ object_types_by_name:
       active:
         resolver:
           name: object_with_lookahead
-      address:
-        resolver:
-          name: object_with_lookahead
-      contract_terms:
-        resolver:
-          name: object_with_lookahead
-      current_location:
-        resolver:
-          name: object_with_lookahead
-      customer_facing:
-        resolver:
-          name: object_with_lookahead
       established_on:
         resolver:
           name: object_with_lookahead
       id:
-        resolver:
-          name: object_with_lookahead
-      partner_name:
-        resolver:
-          name: object_with_lookahead
-      platform:
-        resolver:
-          name: object_with_lookahead
-      square_footage:
-        resolver:
-          name: object_with_lookahead
-      url:
-        resolver:
-          name: object_with_lookahead
-      vehicle_type:
         resolver:
           name: object_with_lookahead
   DistributionChannelAggregation:
@@ -4075,60 +3821,12 @@ object_types_by_name:
       active:
         resolver:
           name: object_with_lookahead
-      address:
-        resolver:
-          name: object_with_lookahead
-      contract_terms:
-        resolver:
-          name: object_with_lookahead
-      current_location:
-        resolver:
-          name: object_with_lookahead
-      customer_facing:
-        resolver:
-          name: object_with_lookahead
       established_on:
-        resolver:
-          name: object_with_lookahead
-      partner_name:
-        resolver:
-          name: object_with_lookahead
-      platform:
-        resolver:
-          name: object_with_lookahead
-      square_footage:
-        resolver:
-          name: object_with_lookahead
-      url:
-        resolver:
-          name: object_with_lookahead
-      vehicle_type:
         resolver:
           name: object_with_lookahead
   DistributionChannelHighlights:
     graphql_fields_by_name:
-      address:
-        resolver:
-          name: get_record_field_value
-      contract_terms:
-        resolver:
-          name: get_record_field_value
-      current_location:
-        resolver:
-          name: get_record_field_value
       id:
-        resolver:
-          name: get_record_field_value
-      partner_name:
-        resolver:
-          name: get_record_field_value
-      platform:
-        resolver:
-          name: get_record_field_value
-      url:
-        resolver:
-          name: get_record_field_value
-      vehicle_type:
         resolver:
           name: get_record_field_value
   ElectricalPart:
@@ -4930,58 +4628,6 @@ object_types_by_name:
       name:
         resolver:
           name: get_record_field_value
-  MobileStore:
-    graphql_fields_by_name:
-      active:
-        resolver:
-          name: get_record_field_value
-      current_location:
-        resolver:
-          name: get_record_field_value
-      customer_facing:
-        resolver:
-          name: get_record_field_value
-      established_on:
-        resolver:
-          name: get_record_field_value
-      id:
-        resolver:
-          name: get_record_field_value
-      vehicle_type:
-        resolver:
-          name: get_record_field_value
-    index_definition_names:
-    - distribution_channels
-    update_targets:
-    - data_params:
-        __typename:
-          cardinality: one
-        active:
-          cardinality: one
-        current_location:
-          cardinality: one
-        customer_facing:
-          cardinality: one
-        established_on:
-          cardinality: one
-        vehicle_type:
-          cardinality: one
-      id_source: id
-      metadata_params:
-        relationship:
-          value: __self
-        sourceId:
-          cardinality: one
-          source_path: id
-        sourceType:
-          cardinality: one
-          source_path: type
-        version:
-          cardinality: one
-      relationship: __self
-      routing_value_source: id
-      script_id: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
-      type: MobileStore
   Money:
     graphql_fields_by_name:
       amount_cents:
@@ -5827,19 +5473,10 @@ object_types_by_name:
       active:
         resolver:
           name: get_record_field_value
-      customer_facing:
-        resolver:
-          name: get_record_field_value
       established_on:
         resolver:
           name: get_record_field_value
       id:
-        resolver:
-          name: get_record_field_value
-      platform:
-        resolver:
-          name: get_record_field_value
-      url:
         resolver:
           name: get_record_field_value
     index_definition_names:
@@ -5850,13 +5487,7 @@ object_types_by_name:
           cardinality: one
         active:
           cardinality: one
-        customer_facing:
-          cardinality: one
         established_on:
-          cardinality: one
-        platform:
-          cardinality: one
-        url:
           cardinality: one
       id_source: id
       metadata_params:
@@ -6102,19 +5733,10 @@ object_types_by_name:
       active:
         resolver:
           name: get_record_field_value
-      address:
-        resolver:
-          name: get_record_field_value
-      customer_facing:
-        resolver:
-          name: get_record_field_value
       established_on:
         resolver:
           name: get_record_field_value
       id:
-        resolver:
-          name: get_record_field_value
-      square_footage:
         resolver:
           name: get_record_field_value
     index_definition_names:
@@ -6123,13 +5745,7 @@ object_types_by_name:
     - data_params:
         active:
           cardinality: one
-        address:
-          cardinality: one
-        customer_facing:
-          cardinality: one
         established_on:
-          cardinality: one
-        square_footage:
           cardinality: one
       id_source: id
       metadata_params:
@@ -6152,19 +5768,10 @@ object_types_by_name:
       active:
         resolver:
           name: object_with_lookahead
-      address:
-        resolver:
-          name: object_with_lookahead
-      customer_facing:
-        resolver:
-          name: object_with_lookahead
       established_on:
         resolver:
           name: object_with_lookahead
       id:
-        resolver:
-          name: object_with_lookahead
-      square_footage:
         resolver:
           name: object_with_lookahead
   PhysicalStoreAggregation:
@@ -6236,23 +5843,11 @@ object_types_by_name:
       active:
         resolver:
           name: object_with_lookahead
-      address:
-        resolver:
-          name: object_with_lookahead
-      customer_facing:
-        resolver:
-          name: object_with_lookahead
       established_on:
-        resolver:
-          name: object_with_lookahead
-      square_footage:
         resolver:
           name: object_with_lookahead
   PhysicalStoreHighlights:
     graphql_fields_by_name:
-      address:
-        resolver:
-          name: get_record_field_value
       id:
         resolver:
           name: get_record_field_value
@@ -6517,31 +6112,10 @@ object_types_by_name:
       active:
         resolver:
           name: get_record_field_value
-      address:
-        resolver:
-          name: get_record_field_value
-      current_location:
-        resolver:
-          name: get_record_field_value
-      customer_facing:
-        resolver:
-          name: get_record_field_value
       established_on:
         resolver:
           name: get_record_field_value
       id:
-        resolver:
-          name: get_record_field_value
-      platform:
-        resolver:
-          name: get_record_field_value
-      square_footage:
-        resolver:
-          name: get_record_field_value
-      url:
-        resolver:
-          name: get_record_field_value
-      vehicle_type:
         resolver:
           name: get_record_field_value
     index_definition_names:
@@ -6551,31 +6125,10 @@ object_types_by_name:
       active:
         resolver:
           name: object_with_lookahead
-      address:
-        resolver:
-          name: object_with_lookahead
-      current_location:
-        resolver:
-          name: object_with_lookahead
-      customer_facing:
-        resolver:
-          name: object_with_lookahead
       established_on:
         resolver:
           name: object_with_lookahead
       id:
-        resolver:
-          name: object_with_lookahead
-      platform:
-        resolver:
-          name: object_with_lookahead
-      square_footage:
-        resolver:
-          name: object_with_lookahead
-      url:
-        resolver:
-          name: object_with_lookahead
-      vehicle_type:
         resolver:
           name: object_with_lookahead
   RetailAggregation:
@@ -6647,48 +6200,12 @@ object_types_by_name:
       active:
         resolver:
           name: object_with_lookahead
-      address:
-        resolver:
-          name: object_with_lookahead
-      current_location:
-        resolver:
-          name: object_with_lookahead
-      customer_facing:
-        resolver:
-          name: object_with_lookahead
       established_on:
-        resolver:
-          name: object_with_lookahead
-      platform:
-        resolver:
-          name: object_with_lookahead
-      square_footage:
-        resolver:
-          name: object_with_lookahead
-      url:
-        resolver:
-          name: object_with_lookahead
-      vehicle_type:
         resolver:
           name: object_with_lookahead
   RetailHighlights:
     graphql_fields_by_name:
-      address:
-        resolver:
-          name: get_record_field_value
-      current_location:
-        resolver:
-          name: get_record_field_value
       id:
-        resolver:
-          name: get_record_field_value
-      platform:
-        resolver:
-          name: get_record_field_value
-      url:
-        resolver:
-          name: get_record_field_value
-      vehicle_type:
         resolver:
           name: get_record_field_value
   SearchHighlight:
@@ -6894,31 +6411,10 @@ object_types_by_name:
       active:
         resolver:
           name: get_record_field_value
-      address:
-        resolver:
-          name: get_record_field_value
-      current_location:
-        resolver:
-          name: get_record_field_value
-      customer_facing:
-        resolver:
-          name: get_record_field_value
       established_on:
         resolver:
           name: get_record_field_value
       id:
-        resolver:
-          name: get_record_field_value
-      platform:
-        resolver:
-          name: get_record_field_value
-      square_footage:
-        resolver:
-          name: get_record_field_value
-      url:
-        resolver:
-          name: get_record_field_value
-      vehicle_type:
         resolver:
           name: get_record_field_value
     index_definition_names:
@@ -6928,31 +6424,10 @@ object_types_by_name:
       active:
         resolver:
           name: object_with_lookahead
-      address:
-        resolver:
-          name: object_with_lookahead
-      current_location:
-        resolver:
-          name: object_with_lookahead
-      customer_facing:
-        resolver:
-          name: object_with_lookahead
       established_on:
         resolver:
           name: object_with_lookahead
       id:
-        resolver:
-          name: object_with_lookahead
-      platform:
-        resolver:
-          name: object_with_lookahead
-      square_footage:
-        resolver:
-          name: object_with_lookahead
-      url:
-        resolver:
-          name: object_with_lookahead
-      vehicle_type:
         resolver:
           name: object_with_lookahead
   StoreAggregation:
@@ -7024,48 +6499,12 @@ object_types_by_name:
       active:
         resolver:
           name: object_with_lookahead
-      address:
-        resolver:
-          name: object_with_lookahead
-      current_location:
-        resolver:
-          name: object_with_lookahead
-      customer_facing:
-        resolver:
-          name: object_with_lookahead
       established_on:
-        resolver:
-          name: object_with_lookahead
-      platform:
-        resolver:
-          name: object_with_lookahead
-      square_footage:
-        resolver:
-          name: object_with_lookahead
-      url:
-        resolver:
-          name: object_with_lookahead
-      vehicle_type:
         resolver:
           name: object_with_lookahead
   StoreHighlights:
     graphql_fields_by_name:
-      address:
-        resolver:
-          name: get_record_field_value
-      current_location:
-        resolver:
-          name: get_record_field_value
       id:
-        resolver:
-          name: get_record_field_value
-      platform:
-        resolver:
-          name: get_record_field_value
-      url:
-        resolver:
-          name: get_record_field_value
-      vehicle_type:
         resolver:
           name: get_record_field_value
   StringConnection:
@@ -8006,13 +7445,7 @@ object_types_by_name:
       active:
         resolver:
           name: get_record_field_value
-      contract_terms:
-        resolver:
-          name: get_record_field_value
       id:
-        resolver:
-          name: get_record_field_value
-      partner_name:
         resolver:
           name: get_record_field_value
     index_definition_names:
@@ -8022,10 +7455,6 @@ object_types_by_name:
         __typename:
           cardinality: one
         active:
-          cardinality: one
-        contract_terms:
-          cardinality: one
-        partner_name:
           cardinality: one
       id_source: id
       metadata_params:

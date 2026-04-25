@@ -1601,29 +1601,11 @@ indices:
       properties:
         id:
           type: keyword
-        url:
-          type: keyword
-        platform:
-          type: keyword
         established_on:
           type: date
           format: strict_date
         active:
           type: boolean
-        customer_facing:
-          type: boolean
-        address:
-          type: keyword
-        square_footage:
-          type: integer
-        vehicle_type:
-          type: keyword
-        current_location:
-          type: keyword
-        partner_name:
-          type: keyword
-        contract_terms:
-          type: keyword
         __typename:
           type: keyword
         __sources:
@@ -1765,16 +1747,10 @@ indices:
       properties:
         id:
           type: keyword
-        address:
-          type: keyword
-        square_footage:
-          type: integer
         established_on:
           type: date
           format: strict_date
         active:
-          type: boolean
-        customer_facing:
           type: boolean
         __sources:
           type: keyword
