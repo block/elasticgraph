@@ -301,6 +301,16 @@ The project is a monorepo composed of many gems. Each gem typically resides in i
     -   **Dependencies**: `elasticgraph-graphql`, `elasticgraph-indexer`, `elasticgraph-schema_artifacts`, `elasticgraph-support`, `graphql`, `graphql-c_parser`, `rake`.
     -   **Provides**: The schema definition framework and artifact generation capabilities.
 
+### Index Inheritance
+
+Abstract types (interfaces and unions) can declare an index that their concrete subtypes inherit, rather than each subtype declaring its own. Multiple concrete types then share a single datastore index. A subtype may still declare its own dedicated index, which overrides the inherited one — those documents are stored in a separate index and do not have `__typename` stored in them.
+
+**`__typename` injection (indexer)**: When a record is indexed into a shared (inherited) index, the indexer automatically injects `__typename` into the document so the datastore can distinguish between concrete types at query time.
+
+**Query-time scoping**: When an abstract type shares an index with types outside its subtype hierarchy, `QueryAdapter::AbstractTypeFilter` automatically injects an internal `__typename` filter scoped to the queried type's concrete subtypes.
+
+**Key files**: `schema_definition/indexing/index.rb`, `schema_definition/mixins/has_indices.rb`, `schema_definition/schema_elements/type_with_subfields.rb`, `indexer/record_preparer.rb`, `graphql/query_adapter/abstract_type_filter.rb`, `graphql/schema/type.rb`.
+
 ## Other Key Information
 
 This section highlights other important aspects of the ElasticGraph project:
