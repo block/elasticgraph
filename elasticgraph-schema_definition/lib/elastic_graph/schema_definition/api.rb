@@ -139,6 +139,10 @@ module ElasticGraph
       # one or more fields that concrete implementations of the interface must also define. Each implementation can be an
       # {SchemaElements::ObjectType} or {SchemaElements::InterfaceType}.
       #
+      # @note An interface type can declare an index with {Mixins::HasIndices#index}. All concrete types that implement
+      #   the interface will automatically share that index unless they declare their own. This is the primary way to define a
+      #   _mixed-type index_ where multiple concrete types coexist in a single datastore index.
+      #
       # @param name [String] name of the interface
       # @yield [SchemaElements::InterfaceType] interface type object
       # @return [void]
@@ -159,6 +163,35 @@ module ElasticGraph
       #
       #     schema.object_type "BasketballPlayer" do |t|
       #       t.implements "Athlete"
+      #       t.field "name", "String"
+      #       t.field "team", "String"
+      #       t.field "pointsPerGame", "Float"
+      #     end
+      #   end
+      #
+      # @example Define an indexed interface so subtypes share a single index
+      #   ElasticGraph.define_schema do |schema|
+      #     schema.interface_type "Athlete" do |t|
+      #       t.field "id", "ID!"
+      #       t.field "name", "String"
+      #       t.field "team", "String"
+      #       t.root_query_fields plural: "athletes"
+      #       t.index "athletes"
+      #     end
+      #
+      #     # Inherits the `athletes` index automatically.
+      #     schema.object_type "BaseballPlayer" do |t|
+      #       t.implements "Athlete"
+      #       t.field "id", "ID!"
+      #       t.field "name", "String"
+      #       t.field "team", "String"
+      #       t.field "battingAvg", "Float"
+      #     end
+      #
+      #     # Also inherits the `athletes` index.
+      #     schema.object_type "BasketballPlayer" do |t|
+      #       t.implements "Athlete"
+      #       t.field "id", "ID!"
       #       t.field "name", "String"
       #       t.field "team", "String"
       #       t.field "pointsPerGame", "Float"
