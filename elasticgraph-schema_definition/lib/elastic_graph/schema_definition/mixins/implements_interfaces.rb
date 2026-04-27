@@ -125,7 +125,7 @@ module ElasticGraph
         # @return [Set<UnionType, InterfaceType>] set of supertypes
         # @private
         def recursively_resolve_supertypes
-          union_memberships = schema_def_state.union_types_by_member_ref[type_ref]
+          union_memberships = schema_def_state.union_types_by_member_ref[type_ref] # : ::Set[abstractType]
           union_memberships | recursively_resolve_interface_supertypes
         end
 
@@ -133,7 +133,7 @@ module ElasticGraph
 
         def recursively_resolve_interface_supertypes(ancestors: Set.new)
           implemented_interfaces.flat_map do |interface_ref|
-            interface = interface_ref.resolved
+            interface = interface_ref.resolved # : SchemaElements::InterfaceType
 
             if ancestors.include?(interface)
               raise Errors::SchemaError, "Your schema has self-referential types, which are not allowed, since " \

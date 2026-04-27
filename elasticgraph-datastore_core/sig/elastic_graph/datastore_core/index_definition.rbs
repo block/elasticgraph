@@ -8,7 +8,7 @@ module ElasticGraph
       def has_custom_routing?: () -> bool
       def max_result_window: () -> ::Integer
       def searches_could_hit_incomplete_docs?: () -> bool
-      def cluster_to_query: () -> ::String
+      def cluster_to_query: () -> ::String?
       def clusters_to_index_into: () -> ::Array[::String]
       def ignored_values_for_routing: () -> ::Set[::String]
       def all_accessible_cluster_names: () -> ::Array[::String]

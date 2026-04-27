@@ -3,6 +3,14 @@ module ElasticGraph
     module Config
       def self.define: [T] (*::Symbol) ?{ (ClassMethods[T]) -> void } -> T
 
+      class ConfigData < Data
+        def initialize: (**untyped) -> void
+
+        private
+
+        def convert_values: (**untyped) -> ::Hash[::Symbol, untyped]
+      end
+
       module ClassMethods[T]: ::Class
         attr_reader validator: Support::JSONSchema::Validator
         attr_reader path: ::String
@@ -13,14 +21,6 @@ module ElasticGraph
         def from_parsed_yaml!: (parsedYamlSettings) -> T
         def raise_invalid_config: (::String) -> bot
         def new_without_validation: (**untyped) -> T
-      end
-
-      module InstanceMethods: Data
-        def initialize: (**untyped) -> void
-
-        private
-
-        def convert_values: (**untyped) -> ::Hash[::Symbol, untyped]
       end
     end
   end

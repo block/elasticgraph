@@ -100,13 +100,13 @@ module ElasticGraph
       def prepare_for_index(type_name, value, mapping_properties)
         type_name = type_name.delete_suffix("!")
 
-        return nil if value.nil?
+        return (_ = nil) if value.nil? # Steep 2.0 narrows to nil here but can't see it satisfies T
 
         if (preparer = @indexing_preparer_by_scalar_type_name[type_name])
           return (_ = preparer).prepare_for_indexing(value)
         end
 
-        case value
+        _ = case value # Steep 2.0 can't narrow generic T through case/when branches
         when ::Array
           element_type_name = type_name.delete_prefix("[").delete_suffix("]")
           value.map { |v| prepare_for_index(element_type_name, v, mapping_properties) }

@@ -33,6 +33,7 @@ module ElasticGraph
       def define_docker_tasks: (::String, ::String, ::Array[::String], ::Regexp) -> void
       def define_docker_tasks_for_version: (::String, ::Symbol, ::String, port: ::Integer, version: ::String, env: ::String, ready_log_line: ::Regexp) -> void
       def define_other_tasks: () -> void
+      def run_rackup: (::String) -> void
 
       @local_datastore_url: ::String?
       def local_datastore_url: () -> ::String

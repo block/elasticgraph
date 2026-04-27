@@ -62,6 +62,7 @@ module ElasticGraph
         def filterable?: () -> bool
         def groupable?: () -> bool
         def highlightable?: () -> bool
+        def returnable?: () -> bool
         def list_field_groupable_by_single_values?: () -> bool
         def aggregatable?: () -> bool
         def sub_aggregatable?: () -> bool

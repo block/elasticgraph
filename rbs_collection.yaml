@@ -28,6 +28,10 @@ gems:
   # Ignore rbs because we are not using them as library in this project.
   - name: rbs
     ignore: true
+  # The collection's graphql signatures are for an old version and conflict with our own
+  # signatures in elasticgraph-graphql/sig/graphql_gem.rbs.
+  - name: graphql
+    ignore: true
 
   # Use `ignore: false` to tell rbs collection to pull the RBS signatures from these gems.
   - name: aws-sdk-cloudwatch

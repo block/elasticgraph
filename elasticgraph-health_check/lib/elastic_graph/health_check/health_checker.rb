@@ -225,7 +225,7 @@ module ElasticGraph
       def all_known_clusters
         @all_known_clusters ||= @indexed_document_types_by_name.flat_map do |_, index_type|
           index_type.search_index_definitions.flat_map do |index_def|
-            [index_def.cluster_to_query] + index_def.clusters_to_index_into
+            [index_def.cluster_to_query].compact + index_def.clusters_to_index_into
           end
         end + @datastore_clients_by_name.keys
       end

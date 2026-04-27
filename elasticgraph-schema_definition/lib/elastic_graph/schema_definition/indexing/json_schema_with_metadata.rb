@@ -158,7 +158,13 @@ module ElasticGraph
 
             @state.object_types_by_name.values
               .select { |type| type.has_own_index_def? && !@derived_indexing_type_names.include?(type.name) }
-              .flat_map { |object_type| identify_missing_necessary_fields_for_index_def(object_type, object_type.own_index_def, json_schema_resolver, version) }
+              .flat_map do |object_type|
+                identify_missing_necessary_fields_for_index_def(
+                  object_type,
+                  object_type.own_index_def, # : Indexing::Index
+                  json_schema_resolver, version
+                )
+              end
           end
 
           def identify_missing_necessary_fields_for_index_def(object_type, index_def, json_schema_resolver, json_schema_version)

@@ -1,7 +1,7 @@
 module ElasticGraph
   class Indexer
     interface _RecordPreparer
-      def prepare_for_index: [T] (::String, T, ::Hash[::String, untyped]) -> T
+      def prepare_for_index: [T < ::Object] (::String, T, ::Hash[::String, untyped]) -> T
     end
 
     class RecordPreparer

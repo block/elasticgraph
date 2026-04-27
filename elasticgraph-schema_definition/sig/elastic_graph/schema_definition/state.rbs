@@ -9,6 +9,7 @@ module ElasticGraph
       attr_reader scalar_types_by_name: ::Hash[::String, SchemaElements::ScalarType]
       attr_reader enum_types_by_name: ::Hash[::String, SchemaElements::EnumType]
       attr_reader implementations_by_interface_ref: ::Hash[SchemaElements::TypeReference, ::Set[SchemaElements::TypeWithSubfields]]
+      attr_reader union_types_by_member_ref: ::Hash[SchemaElements::TypeReference, ::Set[SchemaElements::UnionType]]
       attr_reader sdl_parts: ::Array[::String]
       attr_reader paginated_collection_element_types: ::Set[::String]
       attr_reader user_defined_fields: ::Set[SchemaElements::Field]
@@ -43,6 +44,7 @@ module ElasticGraph
         scalar_types_by_name: ::Hash[::String, SchemaElements::ScalarType],
         enum_types_by_name: ::Hash[::String, SchemaElements::EnumType],
         implementations_by_interface_ref: ::Hash[SchemaElements::TypeReference, ::Set[SchemaElements::TypeWithSubfields]],
+        union_types_by_member_ref: ::Hash[SchemaElements::TypeReference, ::Set[SchemaElements::UnionType]],
         sdl_parts: ::Array[::String],
         paginated_collection_element_types: ::Set[::String],
         user_defined_fields: ::Set[SchemaElements::Field],

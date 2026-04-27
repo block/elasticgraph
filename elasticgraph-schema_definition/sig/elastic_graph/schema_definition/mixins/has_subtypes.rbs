@@ -2,7 +2,7 @@ module ElasticGraph
   module SchemaDefinition
     module Mixins
       interface _AbstractType
-        include _Type
+        include _IndexableType
         def resolve_subtypes: () -> ::Array[SchemaElements::ObjectType]
         def schema_def_state: () -> State
       end
@@ -25,7 +25,7 @@ module ElasticGraph
           (SchemaElements::ObjectType) -> ::Hash[::String, SchemaElements::Field]
         } -> ::Hash[::String, SchemaElements::Field]
 
-        def subtypes_indexed?: () -> bool
+        def subtypes_are_root_document_types?: () -> bool
       end
     end
   end

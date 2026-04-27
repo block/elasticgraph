@@ -345,7 +345,7 @@ module ElasticGraph
           state.after_user_definition_complete do
             # Add @key directives to all root document types with an id field.
             state.object_types_by_name.values
-              .grep(ElasticGraph::SchemaDefinition::SchemaElements::ObjectType)
+              .grep(ElasticGraph::SchemaDefinition::SchemaElements::ObjectType) # : ::Array[::ElasticGraph::SchemaDefinition::SchemaElements::ObjectType & ObjectTypeExtension]
               .select { |object_type| object_type.root_document_type? && object_type.graphql_fields_by_name.key?("id") }
               .each { |object_type| object_type.apollo_key fields: "id" }
 
