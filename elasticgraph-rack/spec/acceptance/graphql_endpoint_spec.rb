@@ -11,6 +11,19 @@ require "elastic_graph/rack/graphql_endpoint"
 require "elastic_graph/constants"
 
 module ElasticGraph::Rack
+  # Minimal stand-in for a streaming JSON body. Real callers would write directly
+  # into a response output stream via their preferred encoder; this verifies only
+  # that the Rack adapter passes a non-String, `each`-responding body through.
+  class ChunkedJSONBody
+    def initialize(hash)
+      @hash = hash
+    end
+
+    def each
+      yield ::JSON.generate(@hash)
+    end
+  end
+
   RSpec.describe GraphQLEndpoint, :rack_app, :uses_datastore do
     let(:graphql) { build_graphql }
     let(:app_to_test) { GraphQLEndpoint.new(graphql) }
@@ -32,6 +45,30 @@ module ElasticGraph::Rack
       response = call_graphql_query(introspection_query)
 
       expect(response.dig("data", "__schema", "types").count).to be > 5
+    end
+
+    context "when configured with a custom body_serializer" do
+      let(:app_to_test) do
+        GraphQLEndpoint.new(graphql, body_serializer: lambda do |result_hash|
+          # Return a Rack-compatible streaming body (responds to `each` yielding String chunks)
+          # built without round-tripping the result through a single large `JSON.generate` String.
+          ChunkedJSONBody.new(result_hash)
+        end)
+      end
+
+      it "uses the custom body and passes its `each`-yielded chunks straight through to Rack" do
+        response = call_graphql_query(introspection_query)
+
+        expect(response.dig("data", "__schema", "types").count).to be > 5
+      end
+
+      it "still produces a String body for error responses" do
+        post_json "/", "not json"
+
+        expect(last_response.status).to eq 400
+        expect(last_response.body).to be_a(::String)
+        expect_json_error_including("invalid JSON")
+      end
     end
 
     it "supports executing queries submitted as a GET" do
