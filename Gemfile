@@ -23,7 +23,7 @@ group :development do
 
   gem "httpx", "~> 1.7", ">= 1.7.6"
   gem "memory_profiler", "~> 1.1"
-  gem "nokogiri", "~> 1.19", ">= 1.19.2"
+  gem "nokogiri", "~> 1.19"
   gem "method_source", "~> 1.1"
   gem "rack-test", "~> 2.2"
   gem "rspec", "~> 3.13", ">= 3.13.2"
@@ -64,8 +64,8 @@ group :site do
 
   gem "yard", "~> 0.9", ">= 0.9.43"
   gem "yard-doctest", "~> 0.1", ">= 0.1.17"
-  gem "yard-markdown", "~> 0.6"
-  gem "irb", "~> 1.17" # Needed for yard on Ruby 4.0
+  gem "yard-markdown", "~> 0.7"
+  gem "irb", "~> 1.18" # Needed for yard on Ruby 4.0
 end
 
 # Since this file gets symlinked both at the repo root and into each Gem directory, we have
