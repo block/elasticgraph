@@ -43,7 +43,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "elasticgraph-graphql", ElasticGraph::VERSION
   spec.add_dependency "elasticgraph-support", ElasticGraph::VERSION
-  spec.add_dependency "graphql", "~> 2.5.23"
+  spec.add_dependency "graphql", ">= 2.5.23", "< 2.7.0"
   spec.add_dependency "rake", "~> 13.4", ">= 13.4.2"
 
   spec.add_development_dependency "elasticgraph-elasticsearch", ElasticGraph::VERSION
