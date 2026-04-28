@@ -38,19 +38,19 @@ gems:
   source:
     type: rubygems
 - name: aws-sdk-core
-  version: 3.245.0
+  version: 3.246.0
   source:
     type: rubygems
 - name: aws-sdk-kms
-  version: 1.123.0
+  version: 1.124.0
   source:
     type: rubygems
 - name: aws-sdk-lambda
-  version: 1.177.0
+  version: 1.178.0
   source:
     type: rubygems
 - name: aws-sdk-s3
-  version: 1.219.0
+  version: 1.220.0
   source:
     type: rubygems
 - name: aws-sdk-sqs
@@ -394,7 +394,7 @@ gems:
     remote: https://github.com/ruby/gem_rbs_collection.git
     repo_dir: gems
 - name: yard-markdown
-  version: 0.6.0
+  version: 0.7.0
   source:
     type: rubygems
 gemfile_lock_path: Gemfile.lock
