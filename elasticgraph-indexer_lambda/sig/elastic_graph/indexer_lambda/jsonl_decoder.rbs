@@ -1,0 +1,10 @@
+module ElasticGraph
+  module IndexerLambda
+    class JSONLDecoder
+      def decode_events: (
+        sqs_record: ::Hash[::String, untyped],
+        body: ::String
+      ) -> ::Array[::Hash[::String, untyped]]
+    end
+  end
+end

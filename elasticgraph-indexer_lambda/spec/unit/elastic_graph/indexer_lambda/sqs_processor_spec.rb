@@ -75,6 +75,28 @@ module ElasticGraph
           ], refresh_indices: false)
         end
 
+        it "decodes message bodies using the configured event payload decoder" do
+          event_payload_decoder = instance_double(JSONLDecoder, decode_events: [{"field1" => {}}])
+          sqs_processor = build_sqs_processor(event_payload_decoder: event_payload_decoder)
+
+          lambda_event = {
+            "Records" => [
+              sqs_message("a", {"field1" => {}})
+            ]
+          }
+
+          sqs_processor.process(lambda_event)
+
+          expect(event_payload_decoder).to have_received(:decode_events).with(
+            sqs_record: lambda_event.fetch("Records").first,
+            body: "{\"field1\":{}}"
+          )
+
+          expect(indexer_processor).to have_received(:process_returning_failures).with([
+            {"field1" => {}, "message_id" => "a"}
+          ], refresh_indices: false)
+        end
+
         it "logs the SQS message ids received in the lambda event and the `sqs_received_at` if available" do
           sent_timestamp_millis = "796010423456"
           sent_timestamp_iso8601 = "1995-03-24T02:00:23.456Z"

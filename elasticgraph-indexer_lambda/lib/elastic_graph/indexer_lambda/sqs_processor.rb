@@ -8,6 +8,7 @@
 
 require "elastic_graph/errors"
 require "elastic_graph/indexer/indexing_failures_error"
+require "elastic_graph/indexer_lambda/jsonl_decoder"
 require "json"
 
 module ElasticGraph
@@ -19,11 +20,13 @@ module ElasticGraph
       # @dynamic ignore_sqs_latency_timestamps_from_arns
       attr_reader :ignore_sqs_latency_timestamps_from_arns
 
-      def initialize(indexer_processor, logger:, ignore_sqs_latency_timestamps_from_arns:, s3_client: nil)
+      # @param event_payload_decoder [#decode_events] decoder for resolved SQS message bodies
+      def initialize(indexer_processor, logger:, ignore_sqs_latency_timestamps_from_arns:, event_payload_decoder: JSONLDecoder.new, s3_client: nil)
         @indexer_processor = indexer_processor
         @logger = logger
         @s3_client = s3_client
         @ignore_sqs_latency_timestamps_from_arns = ignore_sqs_latency_timestamps_from_arns
+        @event_payload_decoder = event_payload_decoder
       end
 
       # Processes the ElasticGraph events in the given `lambda_event`, indexing the data in the datastore.
@@ -80,7 +83,10 @@ module ElasticGraph
             sqs_metadata = sqs_metadata.except("latency_timestamps")
           end
 
-          parse_jsonl(record.fetch("body")).map do |event|
+          @event_payload_decoder.decode_events(
+            sqs_record: record,
+            body: body_from(record.fetch("body"))
+          ).map do |event|
             ElasticGraph::Support::HashUtil.deep_merge(event, sqs_metadata)
           end
         end.tap do
@@ -93,11 +99,11 @@ module ElasticGraph
 
       S3_OFFLOADING_INDICATOR = '["software.amazon.payloadoffloading.PayloadS3Pointer"'
 
-      def parse_jsonl(jsonl_string)
-        if jsonl_string.start_with?(S3_OFFLOADING_INDICATOR)
-          jsonl_string = get_payload_from_s3(jsonl_string)
+      def body_from(body)
+        if body.start_with?(S3_OFFLOADING_INDICATOR)
+          body = get_payload_from_s3(body)
         end
-        jsonl_string.split("\n").map { |event| JSON.parse(event) }
+        body
       end
 
       def extract_sqs_metadata(record)
