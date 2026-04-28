@@ -32,6 +32,7 @@ module ElasticGraph
       def document_type_stored_in: (::String) -> Type
       def field_named: (::String, ::String) -> Field
       def indexed_document_types: () -> ::Array[Type]
+      def indexed_document_types_by_index_definition_name: () -> ::Hash[::String, ::Array[Type]]
       def log_hidden_types: (Logger) -> void
     end
   end

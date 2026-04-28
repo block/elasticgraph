@@ -16,6 +16,11 @@ module ElasticGraph
         # Declares that the current type implements the specified interface, making the current type a subtype of the interface. The
         # current type must define all of the fields of the named interface, with the exact same field types.
         #
+        # @note If the named interface has declared an index (via {Mixins::HasIndices#index}), calling `implements`
+        #   causes this type to automatically inherit that index — it will be stored in the same datastore index as all other
+        #   implementers. To override this and use a dedicated index, call {Mixins::HasIndices#index} on this type
+        #   after `implements`.
+        #
         # @param interface_names [Array<String>] names of interface types implemented by this type
         # @return [void]
         #

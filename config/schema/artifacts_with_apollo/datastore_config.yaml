@@ -1531,30 +1531,6 @@ indices:
       index.number_of_replicas: 1
       index.number_of_shards: 1
       index.max_result_window: 10000
-  companies:
-    aliases: {}
-    mappings:
-      dynamic: strict
-      properties:
-        id:
-          type: keyword
-        name:
-          type: keyword
-        stock_ticker:
-          type: keyword
-        __sources:
-          type: keyword
-        __versions:
-          type: object
-          dynamic: 'false'
-      _size:
-        enabled: true
-    settings:
-      index.mapping.ignore_malformed: false
-      index.mapping.coerce: false
-      index.number_of_replicas: 1
-      index.number_of_shards: 1
-      index.max_result_window: 10000
   components:
     aliases: {}
     mappings:
@@ -1605,6 +1581,33 @@ indices:
               type: integer
             owner_ids:
               type: integer
+        __sources:
+          type: keyword
+        __versions:
+          type: object
+          dynamic: 'false'
+      _size:
+        enabled: true
+    settings:
+      index.mapping.ignore_malformed: false
+      index.mapping.coerce: false
+      index.number_of_replicas: 1
+      index.number_of_shards: 1
+      index.max_result_window: 10000
+  distribution_channels:
+    aliases: {}
+    mappings:
+      dynamic: strict
+      properties:
+        id:
+          type: keyword
+        established_on:
+          type: date
+          format: strict_date
+        active:
+          type: boolean
+        __typename:
+          type: keyword
         __sources:
           type: keyword
         __versions:
@@ -1709,7 +1712,7 @@ indices:
       index.number_of_replicas: 1
       index.number_of_shards: 1
       index.max_result_window: 10000
-  people:
+  named_inventors:
     aliases: {}
     mappings:
       dynamic: strict
@@ -1720,6 +1723,35 @@ indices:
           type: keyword
         nationality:
           type: keyword
+        stock_ticker:
+          type: keyword
+        __typename:
+          type: keyword
+        __sources:
+          type: keyword
+        __versions:
+          type: object
+          dynamic: 'false'
+      _size:
+        enabled: true
+    settings:
+      index.mapping.ignore_malformed: false
+      index.mapping.coerce: false
+      index.number_of_replicas: 1
+      index.number_of_shards: 1
+      index.max_result_window: 10000
+  physical_stores:
+    aliases: {}
+    mappings:
+      dynamic: strict
+      properties:
+        id:
+          type: keyword
+        established_on:
+          type: date
+          format: strict_date
+        active:
+          type: boolean
         __sources:
           type: keyword
         __versions:

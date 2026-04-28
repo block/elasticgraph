@@ -47,12 +47,14 @@ FactoryBot.define do
 
   factory :person, parent: :indexed_type do
     __typename { "Person" }
+    id { Faker::Alphanumeric.alpha(number: 20) }
     name { Faker::Name.name }
     nationality { Faker::Nation.nationality }
   end
 
   factory :company, parent: :indexed_type do
     __typename { "Company" }
+    id { Faker::Alphanumeric.alpha(number: 20) }
     name { Faker::Company.name }
     stock_ticker { name[0..3].upcase }
   end
@@ -209,5 +211,22 @@ FactoryBot.define do
     transient do
       parts { [] }
     end
+  end
+
+  factory :online_store, parent: :indexed_type do
+    __typename { "OnlineStore" }
+    established_on { Faker::Date.between(from: recent_date - 365, to: recent_date).iso8601 }
+    active { true }
+  end
+
+  factory :physical_store, parent: :indexed_type do
+    __typename { "PhysicalStore" }
+    established_on { Faker::Date.between(from: recent_date - 365, to: recent_date).iso8601 }
+    active { true }
+  end
+
+  factory :third_party_wholesale, parent: :indexed_type do
+    __typename { "ThirdPartyWholesale" }
+    active { true }
   end
 end

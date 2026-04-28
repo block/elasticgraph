@@ -21,32 +21,6 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: timestamps.created_at
-  CompanySortOrderInput:
-    values_by_name:
-      id_ASC:
-        sort_field:
-          direction: asc
-          field_path: id
-      id_DESC:
-        sort_field:
-          direction: desc
-          field_path: id
-      name_ASC:
-        sort_field:
-          direction: asc
-          field_path: name
-      name_DESC:
-        sort_field:
-          direction: desc
-          field_path: name
-      stock_ticker_ASC:
-        sort_field:
-          direction: asc
-          field_path: stock_ticker
-      stock_ticker_DESC:
-        sort_field:
-          direction: desc
-          field_path: stock_ticker
   ComponentSortOrderInput:
     values_by_name:
       created_at_ASC:
@@ -201,6 +175,24 @@ enum_types_by_name:
         datastore_abbreviation: nmi
       YARD:
         datastore_abbreviation: yd
+  DistributionChannelSortOrderInput:
+    values_by_name:
+      established_on_ASC:
+        sort_field:
+          direction: asc
+          field_path: established_on
+      established_on_DESC:
+        sort_field:
+          direction: desc
+          field_path: established_on
+      id_ASC:
+        sort_field:
+          direction: asc
+          field_path: id
+      id_DESC:
+        sort_field:
+          direction: desc
+          field_path: id
   ElectricalPartSortOrderInput:
     values_by_name:
       created_at_ASC:
@@ -871,8 +863,16 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: voltage
-  PersonSortOrderInput:
+  PhysicalStoreSortOrderInput:
     values_by_name:
+      established_on_ASC:
+        sort_field:
+          direction: asc
+          field_path: established_on
+      established_on_DESC:
+        sort_field:
+          direction: desc
+          field_path: established_on
       id_ASC:
         sort_field:
           direction: asc
@@ -881,22 +881,24 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: id
-      name_ASC:
+  RetailSortOrderInput:
+    values_by_name:
+      established_on_ASC:
         sort_field:
           direction: asc
-          field_path: name
-      name_DESC:
+          field_path: established_on
+      established_on_DESC:
         sort_field:
           direction: desc
-          field_path: name
-      nationality_ASC:
+          field_path: established_on
+      id_ASC:
         sort_field:
           direction: asc
-          field_path: nationality
-      nationality_DESC:
+          field_path: id
+      id_DESC:
         sort_field:
           direction: desc
-          field_path: nationality
+          field_path: id
   SponsorSortOrderInput:
     values_by_name:
       id_ASC:
@@ -915,6 +917,24 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: name
+  StoreSortOrderInput:
+    values_by_name:
+      established_on_ASC:
+        sort_field:
+          direction: asc
+          field_path: established_on
+      established_on_DESC:
+        sort_field:
+          direction: desc
+          field_path: established_on
+      id_ASC:
+        sort_field:
+          direction: asc
+          field_path: id
+      id_DESC:
+        sort_field:
+          direction: desc
+          field_path: id
   TeamSortOrderInput:
     values_by_name:
       country_code_ASC:
@@ -1803,17 +1823,6 @@ index_definitions_by_name:
       timestamps.created_at:
         source: __self
     route_with: id
-  companies:
-    current_sources:
-    - __self
-    fields_by_path:
-      id:
-        source: __self
-      name:
-        source: __self
-      stock_ticker:
-        source: __self
-    route_with: id
   components:
     current_sources:
     - __self
@@ -1861,6 +1870,17 @@ index_definitions_by_name:
       widget_workspace_id3:
         source: widget
     has_had_multiple_sources: true
+    route_with: id
+  distribution_channels:
+    current_sources:
+    - __self
+    fields_by_path:
+      active:
+        source: __self
+      established_on:
+        source: __self
+      id:
+        source: __self
     route_with: id
   electrical_parts:
     current_sources:
@@ -1918,7 +1938,7 @@ index_definitions_by_name:
       name:
         source: __self
     route_with: id
-  people:
+  named_inventors:
     current_sources:
     - __self
     fields_by_path:
@@ -1927,6 +1947,19 @@ index_definitions_by_name:
       name:
         source: __self
       nationality:
+        source: __self
+      stock_ticker:
+        source: __self
+    route_with: id
+  physical_stores:
+    current_sources:
+    - __self
+    fields_by_path:
+      active:
+        source: __self
+      established_on:
+        source: __self
+      id:
         source: __self
     route_with: id
   sponsors:
@@ -3221,9 +3254,11 @@ object_types_by_name:
         resolver:
           name: get_record_field_value
     index_definition_names:
-    - companies
+    - named_inventors
     update_targets:
     - data_params:
+        __typename:
+          cardinality: one
         name:
           cardinality: one
         stock_ticker:
@@ -3244,100 +3279,6 @@ object_types_by_name:
       routing_value_source: id
       script_id: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
       type: Company
-  CompanyAggregatedValues:
-    graphql_fields_by_name:
-      id:
-        resolver:
-          name: object_with_lookahead
-      name:
-        resolver:
-          name: object_with_lookahead
-      stock_ticker:
-        resolver:
-          name: object_with_lookahead
-  CompanyAggregation:
-    elasticgraph_category: indexed_aggregation
-    graphql_fields_by_name:
-      aggregated_values:
-        resolver:
-          name: object_without_lookahead
-      count:
-        resolver:
-          name: object_without_lookahead
-      grouped_by:
-        resolver:
-          name: object_without_lookahead
-    source_type: Company
-  CompanyAggregationConnection:
-    elasticgraph_category: relay_connection
-    graphql_fields_by_name:
-      edges:
-        resolver:
-          name: object_without_lookahead
-      nodes:
-        resolver:
-          name: object_without_lookahead
-      page_info:
-        resolver:
-          name: object_without_lookahead
-  CompanyAggregationEdge:
-    elasticgraph_category: relay_edge
-    graphql_fields_by_name:
-      cursor:
-        resolver:
-          name: object_without_lookahead
-      node:
-        resolver:
-          name: object_without_lookahead
-  CompanyConnection:
-    elasticgraph_category: relay_connection
-    graphql_fields_by_name:
-      edges:
-        resolver:
-          name: object_without_lookahead
-      nodes:
-        resolver:
-          name: object_without_lookahead
-      page_info:
-        resolver:
-          name: object_without_lookahead
-      total_edge_count:
-        resolver:
-          name: object_without_lookahead
-  CompanyEdge:
-    elasticgraph_category: relay_edge
-    graphql_fields_by_name:
-      all_highlights:
-        resolver:
-          name: object_without_lookahead
-      cursor:
-        resolver:
-          name: object_without_lookahead
-      highlights:
-        resolver:
-          name: object_without_lookahead
-      node:
-        resolver:
-          name: object_without_lookahead
-  CompanyGroupedBy:
-    graphql_fields_by_name:
-      name:
-        resolver:
-          name: object_with_lookahead
-      stock_ticker:
-        resolver:
-          name: object_with_lookahead
-  CompanyHighlights:
-    graphql_fields_by_name:
-      id:
-        resolver:
-          name: get_record_field_value
-      name:
-        resolver:
-          name: get_record_field_value
-      stock_ticker:
-        resolver:
-          name: get_record_field_value
   Component:
     graphql_fields_by_name:
       created_at:
@@ -3787,6 +3728,107 @@ object_types_by_name:
     graphql_fields_by_name:
       count:
         name_in_index: __counts
+  DistributionChannel:
+    graphql_fields_by_name:
+      active:
+        resolver:
+          name: get_record_field_value
+      established_on:
+        resolver:
+          name: get_record_field_value
+      id:
+        resolver:
+          name: get_record_field_value
+    index_definition_names:
+    - distribution_channels
+  DistributionChannelAggregatedValues:
+    graphql_fields_by_name:
+      active:
+        resolver:
+          name: object_with_lookahead
+      established_on:
+        resolver:
+          name: object_with_lookahead
+      id:
+        resolver:
+          name: object_with_lookahead
+  DistributionChannelAggregation:
+    elasticgraph_category: indexed_aggregation
+    graphql_fields_by_name:
+      aggregated_values:
+        resolver:
+          name: object_without_lookahead
+      count:
+        resolver:
+          name: object_without_lookahead
+      grouped_by:
+        resolver:
+          name: object_without_lookahead
+    source_type: DistributionChannel
+  DistributionChannelAggregationConnection:
+    elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver:
+          name: object_without_lookahead
+      nodes:
+        resolver:
+          name: object_without_lookahead
+      page_info:
+        resolver:
+          name: object_without_lookahead
+  DistributionChannelAggregationEdge:
+    elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      cursor:
+        resolver:
+          name: object_without_lookahead
+      node:
+        resolver:
+          name: object_without_lookahead
+  DistributionChannelConnection:
+    elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver:
+          name: object_without_lookahead
+      nodes:
+        resolver:
+          name: object_without_lookahead
+      page_info:
+        resolver:
+          name: object_without_lookahead
+      total_edge_count:
+        resolver:
+          name: object_without_lookahead
+  DistributionChannelEdge:
+    elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      all_highlights:
+        resolver:
+          name: object_without_lookahead
+      cursor:
+        resolver:
+          name: object_without_lookahead
+      highlights:
+        resolver:
+          name: object_without_lookahead
+      node:
+        resolver:
+          name: object_without_lookahead
+  DistributionChannelGroupedBy:
+    graphql_fields_by_name:
+      active:
+        resolver:
+          name: object_with_lookahead
+      established_on:
+        resolver:
+          name: object_with_lookahead
+  DistributionChannelHighlights:
+    graphql_fields_by_name:
+      id:
+        resolver:
+          name: get_record_field_value
   ElectricalPart:
     graphql_fields_by_name:
       component_aggregations:
@@ -5311,6 +5353,8 @@ object_types_by_name:
       stock_ticker:
         resolver:
           name: get_record_field_value
+    index_definition_names:
+    - named_inventors
   NamedInventorAggregatedValues:
     graphql_fields_by_name:
       id:
@@ -5424,6 +5468,43 @@ object_types_by_name:
         resolver:
           name: object_with_lookahead
     graphql_only_return_type: true
+  OnlineStore:
+    graphql_fields_by_name:
+      active:
+        resolver:
+          name: get_record_field_value
+      established_on:
+        resolver:
+          name: get_record_field_value
+      id:
+        resolver:
+          name: get_record_field_value
+    index_definition_names:
+    - distribution_channels
+    update_targets:
+    - data_params:
+        __typename:
+          cardinality: one
+        active:
+          cardinality: one
+        established_on:
+          cardinality: one
+      id_source: id
+      metadata_params:
+        relationship:
+          value: __self
+        sourceId:
+          cardinality: one
+          source_path: id
+        sourceType:
+          cardinality: one
+          source_path: type
+        version:
+          cardinality: one
+      relationship: __self
+      routing_value_source: id
+      script_id: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
+      type: OnlineStore
   PageInfo:
     graphql_fields_by_name:
       end_cursor:
@@ -5592,9 +5673,11 @@ object_types_by_name:
         resolver:
           name: get_record_field_value
     index_definition_names:
-    - people
+    - named_inventors
     update_targets:
     - data_params:
+        __typename:
+          cardinality: one
         name:
           cardinality: one
         nationality:
@@ -5626,70 +5709,6 @@ object_types_by_name:
       nationality:
         resolver:
           name: object_with_lookahead
-  PersonAggregation:
-    elasticgraph_category: indexed_aggregation
-    graphql_fields_by_name:
-      aggregated_values:
-        resolver:
-          name: object_without_lookahead
-      count:
-        resolver:
-          name: object_without_lookahead
-      grouped_by:
-        resolver:
-          name: object_without_lookahead
-    source_type: Person
-  PersonAggregationConnection:
-    elasticgraph_category: relay_connection
-    graphql_fields_by_name:
-      edges:
-        resolver:
-          name: object_without_lookahead
-      nodes:
-        resolver:
-          name: object_without_lookahead
-      page_info:
-        resolver:
-          name: object_without_lookahead
-  PersonAggregationEdge:
-    elasticgraph_category: relay_edge
-    graphql_fields_by_name:
-      cursor:
-        resolver:
-          name: object_without_lookahead
-      node:
-        resolver:
-          name: object_without_lookahead
-  PersonConnection:
-    elasticgraph_category: relay_connection
-    graphql_fields_by_name:
-      edges:
-        resolver:
-          name: object_without_lookahead
-      nodes:
-        resolver:
-          name: object_without_lookahead
-      page_info:
-        resolver:
-          name: object_without_lookahead
-      total_edge_count:
-        resolver:
-          name: object_without_lookahead
-  PersonEdge:
-    elasticgraph_category: relay_edge
-    graphql_fields_by_name:
-      all_highlights:
-        resolver:
-          name: object_without_lookahead
-      cursor:
-        resolver:
-          name: object_without_lookahead
-      highlights:
-        resolver:
-          name: object_without_lookahead
-      node:
-        resolver:
-          name: object_without_lookahead
   PersonGroupedBy:
     graphql_fields_by_name:
       name:
@@ -5707,6 +5726,129 @@ object_types_by_name:
         resolver:
           name: get_record_field_value
       nationality:
+        resolver:
+          name: get_record_field_value
+  PhysicalStore:
+    graphql_fields_by_name:
+      active:
+        resolver:
+          name: get_record_field_value
+      established_on:
+        resolver:
+          name: get_record_field_value
+      id:
+        resolver:
+          name: get_record_field_value
+    index_definition_names:
+    - physical_stores
+    update_targets:
+    - data_params:
+        active:
+          cardinality: one
+        established_on:
+          cardinality: one
+      id_source: id
+      metadata_params:
+        relationship:
+          value: __self
+        sourceId:
+          cardinality: one
+          source_path: id
+        sourceType:
+          cardinality: one
+          source_path: type
+        version:
+          cardinality: one
+      relationship: __self
+      routing_value_source: id
+      script_id: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
+      type: PhysicalStore
+  PhysicalStoreAggregatedValues:
+    graphql_fields_by_name:
+      active:
+        resolver:
+          name: object_with_lookahead
+      established_on:
+        resolver:
+          name: object_with_lookahead
+      id:
+        resolver:
+          name: object_with_lookahead
+  PhysicalStoreAggregation:
+    elasticgraph_category: indexed_aggregation
+    graphql_fields_by_name:
+      aggregated_values:
+        resolver:
+          name: object_without_lookahead
+      count:
+        resolver:
+          name: object_without_lookahead
+      grouped_by:
+        resolver:
+          name: object_without_lookahead
+    source_type: PhysicalStore
+  PhysicalStoreAggregationConnection:
+    elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver:
+          name: object_without_lookahead
+      nodes:
+        resolver:
+          name: object_without_lookahead
+      page_info:
+        resolver:
+          name: object_without_lookahead
+  PhysicalStoreAggregationEdge:
+    elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      cursor:
+        resolver:
+          name: object_without_lookahead
+      node:
+        resolver:
+          name: object_without_lookahead
+  PhysicalStoreConnection:
+    elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver:
+          name: object_without_lookahead
+      nodes:
+        resolver:
+          name: object_without_lookahead
+      page_info:
+        resolver:
+          name: object_without_lookahead
+      total_edge_count:
+        resolver:
+          name: object_without_lookahead
+  PhysicalStoreEdge:
+    elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      all_highlights:
+        resolver:
+          name: object_without_lookahead
+      cursor:
+        resolver:
+          name: object_without_lookahead
+      highlights:
+        resolver:
+          name: object_without_lookahead
+      node:
+        resolver:
+          name: object_without_lookahead
+  PhysicalStoreGroupedBy:
+    graphql_fields_by_name:
+      active:
+        resolver:
+          name: object_with_lookahead
+      established_on:
+        resolver:
+          name: object_with_lookahead
+  PhysicalStoreHighlights:
+    graphql_fields_by_name:
+      id:
         resolver:
           name: get_record_field_value
   Player:
@@ -5857,16 +5999,16 @@ object_types_by_name:
       addresses:
         resolver:
           name: list_records
-      companies:
-        resolver:
-          name: list_records
-      company_aggregations:
-        resolver:
-          name: list_records
       component_aggregations:
         resolver:
           name: list_records
       components:
+        resolver:
+          name: list_records
+      distribution_channel_aggregations:
+        resolver:
+          name: list_records
+      distribution_channels:
         resolver:
           name: list_records
       electrical_part_aggregations:
@@ -5911,16 +6053,28 @@ object_types_by_name:
       parts:
         resolver:
           name: list_records
-      people:
+      physical_store_aggregations:
         resolver:
           name: list_records
-      person_aggregations:
+      physical_stores:
+        resolver:
+          name: list_records
+      retail_aggregations:
+        resolver:
+          name: list_records
+      retailers:
         resolver:
           name: list_records
       sponsor_aggregations:
         resolver:
           name: list_records
       sponsors:
+        resolver:
+          name: list_records
+      store_aggregations:
+        resolver:
+          name: list_records
+      stores:
         resolver:
           name: list_records
       team_aggregations:
@@ -5953,6 +6107,107 @@ object_types_by_name:
       widgets_or_addresses:
         resolver:
           name: list_records
+  Retail:
+    graphql_fields_by_name:
+      active:
+        resolver:
+          name: get_record_field_value
+      established_on:
+        resolver:
+          name: get_record_field_value
+      id:
+        resolver:
+          name: get_record_field_value
+    index_definition_names:
+    - distribution_channels
+  RetailAggregatedValues:
+    graphql_fields_by_name:
+      active:
+        resolver:
+          name: object_with_lookahead
+      established_on:
+        resolver:
+          name: object_with_lookahead
+      id:
+        resolver:
+          name: object_with_lookahead
+  RetailAggregation:
+    elasticgraph_category: indexed_aggregation
+    graphql_fields_by_name:
+      aggregated_values:
+        resolver:
+          name: object_without_lookahead
+      count:
+        resolver:
+          name: object_without_lookahead
+      grouped_by:
+        resolver:
+          name: object_without_lookahead
+    source_type: Retail
+  RetailAggregationConnection:
+    elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver:
+          name: object_without_lookahead
+      nodes:
+        resolver:
+          name: object_without_lookahead
+      page_info:
+        resolver:
+          name: object_without_lookahead
+  RetailAggregationEdge:
+    elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      cursor:
+        resolver:
+          name: object_without_lookahead
+      node:
+        resolver:
+          name: object_without_lookahead
+  RetailConnection:
+    elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver:
+          name: object_without_lookahead
+      nodes:
+        resolver:
+          name: object_without_lookahead
+      page_info:
+        resolver:
+          name: object_without_lookahead
+      total_edge_count:
+        resolver:
+          name: object_without_lookahead
+  RetailEdge:
+    elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      all_highlights:
+        resolver:
+          name: object_without_lookahead
+      cursor:
+        resolver:
+          name: object_without_lookahead
+      highlights:
+        resolver:
+          name: object_without_lookahead
+      node:
+        resolver:
+          name: object_without_lookahead
+  RetailGroupedBy:
+    graphql_fields_by_name:
+      active:
+        resolver:
+          name: object_with_lookahead
+      established_on:
+        resolver:
+          name: object_with_lookahead
+  RetailHighlights:
+    graphql_fields_by_name:
+      id:
+        resolver:
+          name: get_record_field_value
   SearchHighlight:
     graphql_fields_by_name:
       path:
@@ -6151,6 +6406,107 @@ object_types_by_name:
     graphql_fields_by_name:
       count:
         name_in_index: __counts
+  Store:
+    graphql_fields_by_name:
+      active:
+        resolver:
+          name: get_record_field_value
+      established_on:
+        resolver:
+          name: get_record_field_value
+      id:
+        resolver:
+          name: get_record_field_value
+    index_definition_names:
+    - distribution_channels
+  StoreAggregatedValues:
+    graphql_fields_by_name:
+      active:
+        resolver:
+          name: object_with_lookahead
+      established_on:
+        resolver:
+          name: object_with_lookahead
+      id:
+        resolver:
+          name: object_with_lookahead
+  StoreAggregation:
+    elasticgraph_category: indexed_aggregation
+    graphql_fields_by_name:
+      aggregated_values:
+        resolver:
+          name: object_without_lookahead
+      count:
+        resolver:
+          name: object_without_lookahead
+      grouped_by:
+        resolver:
+          name: object_without_lookahead
+    source_type: Store
+  StoreAggregationConnection:
+    elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver:
+          name: object_without_lookahead
+      nodes:
+        resolver:
+          name: object_without_lookahead
+      page_info:
+        resolver:
+          name: object_without_lookahead
+  StoreAggregationEdge:
+    elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      cursor:
+        resolver:
+          name: object_without_lookahead
+      node:
+        resolver:
+          name: object_without_lookahead
+  StoreConnection:
+    elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver:
+          name: object_without_lookahead
+      nodes:
+        resolver:
+          name: object_without_lookahead
+      page_info:
+        resolver:
+          name: object_without_lookahead
+      total_edge_count:
+        resolver:
+          name: object_without_lookahead
+  StoreEdge:
+    elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      all_highlights:
+        resolver:
+          name: object_without_lookahead
+      cursor:
+        resolver:
+          name: object_without_lookahead
+      highlights:
+        resolver:
+          name: object_without_lookahead
+      node:
+        resolver:
+          name: object_without_lookahead
+  StoreGroupedBy:
+    graphql_fields_by_name:
+      active:
+        resolver:
+          name: object_with_lookahead
+      established_on:
+        resolver:
+          name: object_with_lookahead
+  StoreHighlights:
+    graphql_fields_by_name:
+      id:
+        resolver:
+          name: get_record_field_value
   StringConnection:
     elasticgraph_category: relay_connection
     graphql_fields_by_name:
@@ -7084,6 +7440,38 @@ object_types_by_name:
       players_object:
         resolver:
           name: object_with_lookahead
+  ThirdPartyWholesale:
+    graphql_fields_by_name:
+      active:
+        resolver:
+          name: get_record_field_value
+      id:
+        resolver:
+          name: get_record_field_value
+    index_definition_names:
+    - distribution_channels
+    update_targets:
+    - data_params:
+        __typename:
+          cardinality: one
+        active:
+          cardinality: one
+      id_source: id
+      metadata_params:
+        relationship:
+          value: __self
+        sourceId:
+          cardinality: one
+          source_path: id
+        sourceType:
+          cardinality: one
+          source_path: type
+        version:
+          cardinality: one
+      relationship: __self
+      routing_value_source: id
+      script_id: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
+      type: ThirdPartyWholesale
   Widget:
     graphql_fields_by_name:
       amount_cents:

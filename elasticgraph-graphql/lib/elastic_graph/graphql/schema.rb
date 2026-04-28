@@ -127,7 +127,7 @@ module ElasticGraph
           else
             raise Errors::NotFoundError, "The index definition `#{index_definition_name}` does not appear to exist. Is it misspelled?"
           end
-        end
+        end.first
       end
 
       def field_named(type_name, field_name)
@@ -151,6 +151,17 @@ module ElasticGraph
         "#<#{self.class.name} 0x#{__id__.to_s(16)} indexed_document_types=[#{indexed_document_types.map(&:name).sort.join(", ")}]>"
       end
       alias_method :inspect, :to_s
+
+      # Returns a hash mapping each index definition name to all indexed document types that use that index.
+      # Multiple types may map to the same index when abstract types share an index with their concrete subtypes
+      # via index inheritance.
+      def indexed_document_types_by_index_definition_name
+        @indexed_document_types_by_index_definition_name ||= indexed_document_types.each_with_object({}) do |type, hash|
+          type.index_definitions.each do |index_def|
+            (hash[index_def.name] ||= []) << type
+          end
+        end.freeze
+      end
 
       private
 
@@ -188,14 +199,6 @@ module ElasticGraph
         graphql_schema.types(visibility_profile: :boot).transform_values do |graphql_type|
           @types_by_graphql_type[graphql_type]
         end
-      end
-
-      def indexed_document_types_by_index_definition_name
-        @indexed_document_types_by_index_definition_name ||= indexed_document_types.each_with_object({}) do |type, hash|
-          type.index_definitions.each do |index_def|
-            hash[index_def.name] ||= type
-          end
-        end.freeze
       end
 
       def log_hidden_types

@@ -43,7 +43,30 @@ module ElasticGraph
               t.field "name", "String"
             end
 
-            # Indexed interfae type.
+            # Indexed interface type used solely as a root document type (not embedded anywhere).
+            # Author and Scientist inherit the `creators` index via index inheritance rather than
+            # declaring it themselves.
+            schema.interface_type "Creator" do |t|
+              t.field "id", "ID!"
+              t.field "name", "String"
+              t.index "creators"
+            end
+
+            schema.object_type "Author" do |t|
+              t.implements "Creator"
+              t.field "id", "ID!"
+              t.field "name", "String"
+              t.field "genre", "String"
+            end
+
+            schema.object_type "Scientist" do |t|
+              t.implements "Creator"
+              t.field "id", "ID!"
+              t.field "name", "String"
+              t.field "field_of_study", "String"
+            end
+
+            # Indexed interface type.
             schema.interface_type "NamedEntity" do |t|
               t.root_query_fields plural: "named_entities"
               t.field "id", "ID"
@@ -367,6 +390,21 @@ module ElasticGraph
           expect(query.total_document_count_needed).to be false
           expect(query.requested_highlights).to be_empty
           expect(query.request_all_highlights).to be false
+        end
+
+        it "requests __typename when using `nodes` on an abstract indexed type" do
+          query = datastore_query_for(:Query, :creators, <<~QUERY)
+            query {
+              creators {
+                nodes {
+                  ... on Author { genre }
+                  ... on Scientist { field_of_study }
+                }
+              }
+            }
+          QUERY
+
+          expect(query.requested_fields).to include("__typename")
         end
 
         it "ignores relay connection sub-fields that are not directly under `edges.node` (e.g. `page_info`)" do

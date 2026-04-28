@@ -820,274 +820,6 @@ type Company implements NamedInventor {
   stock_ticker: String
 }
 
-"""
-Type used to perform aggregation computations on `Company` fields.
-"""
-type CompanyAggregatedValues {
-  """
-  Computed aggregate values for the `id` field.
-  """
-  id: NonNumericAggregatedValues
-
-  """
-  Computed aggregate values for the `name` field.
-  """
-  name: NonNumericAggregatedValues
-
-  """
-  Computed aggregate values for the `stock_ticker` field.
-  """
-  stock_ticker: NonNumericAggregatedValues
-}
-
-"""
-Return type representing a bucket of `Company` documents for an aggregations query.
-"""
-type CompanyAggregation {
-  """
-  Provides computed aggregated values over all `Company` documents in an aggregation bucket.
-  """
-  aggregated_values: CompanyAggregatedValues
-
-  """
-  The count of `Company` documents in an aggregation bucket.
-  """
-  count: JsonSafeLong!
-
-  """
-  Used to specify the `Company` fields to group by. The returned values identify each aggregation bucket.
-  """
-  grouped_by: CompanyGroupedBy
-}
-
-"""
-Represents a paginated collection of `CompanyAggregation` results.
-
-See the [Relay GraphQL Cursor Connections
-Specification](https://relay.dev/graphql/connections.htm#sec-Connection-Types) for more info.
-"""
-type CompanyAggregationConnection {
-  """
-  Wraps a specific `CompanyAggregation` to pair it with its pagination cursor.
-  """
-  edges: [CompanyAggregationEdge!]!
-
-  """
-  The list of `CompanyAggregation` results.
-  """
-  nodes: [CompanyAggregation!]!
-
-  """
-  Provides pagination-related information.
-  """
-  page_info: PageInfo!
-}
-
-"""
-Represents a specific `CompanyAggregation` in the context of a `CompanyAggregationConnection`,
-providing access to both the `CompanyAggregation` and query-specific information such as the pagination `Cursor`.
-
-See the [Relay GraphQL Cursor Connections
-Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for more info.
-"""
-type CompanyAggregationEdge {
-  """
-  The `Cursor` of this `CompanyAggregation`. This can be passed in the next query as
-  a `before` or `after` argument to continue paginating from this `CompanyAggregation`.
-  """
-  cursor: Cursor
-
-  """
-  The `CompanyAggregation` of this edge.
-  """
-  node: CompanyAggregation
-}
-
-"""
-Represents a paginated collection of `Company` results.
-
-See the [Relay GraphQL Cursor Connections
-Specification](https://relay.dev/graphql/connections.htm#sec-Connection-Types) for more info.
-"""
-type CompanyConnection {
-  """
-  Wraps a specific `Company` to pair it with its pagination cursor.
-  """
-  edges: [CompanyEdge!]!
-
-  """
-  The list of `Company` results.
-  """
-  nodes: [Company!]!
-
-  """
-  Provides pagination-related information.
-  """
-  page_info: PageInfo!
-
-  """
-  The total number of edges available in this connection to paginate over.
-  """
-  total_edge_count: JsonSafeLong!
-}
-
-"""
-Represents a specific `Company` in the context of a `CompanyConnection`,
-providing access to both the `Company` and query-specific information such as the pagination `Cursor`.
-
-See the [Relay GraphQL Cursor Connections
-Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for more info.
-"""
-type CompanyEdge {
-  """
-  All search highlights for this `Company`, indicating where in the indexed document the query matched.
-  """
-  all_highlights: [SearchHighlight!]!
-
-  """
-  The `Cursor` of this `Company`. This can be passed in the next query as
-  a `before` or `after` argument to continue paginating from this `Company`.
-  """
-  cursor: Cursor
-
-  """
-  Specific search highlights for this `Company`, providing matching snippets for the requested fields.
-  """
-  highlights: CompanyHighlights
-
-  """
-  The `Company` of this edge.
-  """
-  node: Company
-}
-
-"""
-Input type used to specify filters on `Company` fields.
-
-Will match all documents if passed as an empty object (or as `null`).
-"""
-input CompanyFilterInput {
-  """
-  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
-
-  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
-  be provided on a single `CompanyFilterInput` input because of collisions
-  between key names. For example, if you want to AND multiple
-  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
-
-  When `null` or an empty list is passed, matches all documents.
-  """
-  all_of: [CompanyFilterInput!]
-
-  """
-  Matches records where any of the provided sub-filters evaluate to true.
-  This works just like an OR operator in SQL.
-
-  When `null` is passed, matches all documents.
-  When an empty list is passed, this part of the filter matches no documents.
-  """
-  any_of: [CompanyFilterInput!]
-
-  """
-  Used to filter on the `id` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  id: IDFilterInput
-
-  """
-  Used to filter on the `name` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  name: StringFilterInput
-
-  """
-  Matches records where the provided sub-filter evaluates to false.
-  This works just like a NOT operator in SQL.
-
-  When `null` or an empty object is passed, matches no documents.
-  """
-  not: CompanyFilterInput
-
-  """
-  Used to filter on the `stock_ticker` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  stock_ticker: StringFilterInput
-}
-
-"""
-Type used to specify the `Company` fields to group by for aggregations.
-"""
-type CompanyGroupedBy {
-  """
-  The `name` field value for this group.
-  """
-  name: String
-
-  """
-  The `stock_ticker` field value for this group.
-  """
-  stock_ticker: String
-}
-
-"""
-Type used to request desired `Company` search highlight fields.
-"""
-type CompanyHighlights {
-  """
-  Search highlights for the `id`, providing snippets of the matching text.
-  """
-  id: [String!]!
-
-  """
-  Search highlights for the `name`, providing snippets of the matching text.
-  """
-  name: [String!]!
-
-  """
-  Search highlights for the `stock_ticker`, providing snippets of the matching text.
-  """
-  stock_ticker: [String!]!
-}
-
-"""
-Enumerates the ways `Company`s can be sorted.
-"""
-enum CompanySortOrderInput {
-  """
-  Sorts ascending by the `id` field.
-  """
-  id_ASC
-
-  """
-  Sorts descending by the `id` field.
-  """
-  id_DESC
-
-  """
-  Sorts ascending by the `name` field.
-  """
-  name_ASC
-
-  """
-  Sorts descending by the `name` field.
-  """
-  name_DESC
-
-  """
-  Sorts ascending by the `stock_ticker` field.
-  """
-  stock_ticker_ASC
-
-  """
-  Sorts descending by the `stock_ticker` field.
-  """
-  stock_ticker_DESC
-}
-
 type Component implements NamedEntity {
   created_at: DateTime!
   dollar_widget: Widget
@@ -2792,6 +2524,260 @@ enum DistanceUnitInput {
   A United States customary unit of 3 feet.
   """
   YARD
+}
+
+interface DistributionChannel {
+  active: Boolean
+  id: ID!
+}
+
+"""
+Type used to perform aggregation computations on `DistributionChannel` fields.
+"""
+type DistributionChannelAggregatedValues {
+  """
+  Computed aggregate values for the `active` field.
+  """
+  active: NonNumericAggregatedValues
+
+  """
+  Computed aggregate values for the `established_on` field.
+  """
+  established_on: DateAggregatedValues
+
+  """
+  Computed aggregate values for the `id` field.
+  """
+  id: NonNumericAggregatedValues
+}
+
+"""
+Return type representing a bucket of `DistributionChannel` documents for an aggregations query.
+"""
+type DistributionChannelAggregation {
+  """
+  Provides computed aggregated values over all `DistributionChannel` documents in an aggregation bucket.
+  """
+  aggregated_values: DistributionChannelAggregatedValues
+
+  """
+  The count of `DistributionChannel` documents in an aggregation bucket.
+  """
+  count: JsonSafeLong!
+
+  """
+  Used to specify the `DistributionChannel` fields to group by. The returned values identify each aggregation bucket.
+  """
+  grouped_by: DistributionChannelGroupedBy
+}
+
+"""
+Represents a paginated collection of `DistributionChannelAggregation` results.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Connection-Types) for more info.
+"""
+type DistributionChannelAggregationConnection {
+  """
+  Wraps a specific `DistributionChannelAggregation` to pair it with its pagination cursor.
+  """
+  edges: [DistributionChannelAggregationEdge!]!
+
+  """
+  The list of `DistributionChannelAggregation` results.
+  """
+  nodes: [DistributionChannelAggregation!]!
+
+  """
+  Provides pagination-related information.
+  """
+  page_info: PageInfo!
+}
+
+"""
+Represents a specific `DistributionChannelAggregation` in the context of a `DistributionChannelAggregationConnection`,
+providing access to both the `DistributionChannelAggregation` and query-specific
+information such as the pagination `Cursor`.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for more info.
+"""
+type DistributionChannelAggregationEdge {
+  """
+  The `Cursor` of this `DistributionChannelAggregation`. This can be passed in the next query as
+  a `before` or `after` argument to continue paginating from this `DistributionChannelAggregation`.
+  """
+  cursor: Cursor
+
+  """
+  The `DistributionChannelAggregation` of this edge.
+  """
+  node: DistributionChannelAggregation
+}
+
+"""
+Represents a paginated collection of `DistributionChannel` results.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Connection-Types) for more info.
+"""
+type DistributionChannelConnection {
+  """
+  Wraps a specific `DistributionChannel` to pair it with its pagination cursor.
+  """
+  edges: [DistributionChannelEdge!]!
+
+  """
+  The list of `DistributionChannel` results.
+  """
+  nodes: [DistributionChannel!]!
+
+  """
+  Provides pagination-related information.
+  """
+  page_info: PageInfo!
+
+  """
+  The total number of edges available in this connection to paginate over.
+  """
+  total_edge_count: JsonSafeLong!
+}
+
+"""
+Represents a specific `DistributionChannel` in the context of a `DistributionChannelConnection`,
+providing access to both the `DistributionChannel` and query-specific information such as the pagination `Cursor`.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for more info.
+"""
+type DistributionChannelEdge {
+  """
+  All search highlights for this `DistributionChannel`, indicating where in the indexed document the query matched.
+  """
+  all_highlights: [SearchHighlight!]!
+
+  """
+  The `Cursor` of this `DistributionChannel`. This can be passed in the next query as
+  a `before` or `after` argument to continue paginating from this `DistributionChannel`.
+  """
+  cursor: Cursor
+
+  """
+  Specific search highlights for this `DistributionChannel`, providing matching snippets for the requested fields.
+  """
+  highlights: DistributionChannelHighlights
+
+  """
+  The `DistributionChannel` of this edge.
+  """
+  node: DistributionChannel
+}
+
+"""
+Input type used to specify filters on `DistributionChannel` fields.
+
+Will match all documents if passed as an empty object (or as `null`).
+"""
+input DistributionChannelFilterInput {
+  """
+  Used to filter on the `active` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  active: BooleanFilterInput
+
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `DistributionChannelFilterInput` input because of
+  collisions between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [DistributionChannelFilterInput!]
+
+  """
+  Matches records where any of the provided sub-filters evaluate to true.
+  This works just like an OR operator in SQL.
+
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
+  """
+  any_of: [DistributionChannelFilterInput!]
+
+  """
+  Used to filter on the `established_on` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  established_on: DateFilterInput
+
+  """
+  Used to filter on the `id` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  id: IDFilterInput
+
+  """
+  Matches records where the provided sub-filter evaluates to false.
+  This works just like a NOT operator in SQL.
+
+  When `null` or an empty object is passed, matches no documents.
+  """
+  not: DistributionChannelFilterInput
+}
+
+"""
+Type used to specify the `DistributionChannel` fields to group by for aggregations.
+"""
+type DistributionChannelGroupedBy {
+  """
+  The `active` field value for this group.
+  """
+  active: Boolean
+
+  """
+  Offers the different grouping options for the `established_on` value within this group.
+  """
+  established_on: DateGroupedBy
+}
+
+"""
+Type used to request desired `DistributionChannel` search highlight fields.
+"""
+type DistributionChannelHighlights {
+  """
+  Search highlights for the `id`, providing snippets of the matching text.
+  """
+  id: [String!]!
+}
+
+"""
+Enumerates the ways `DistributionChannel`s can be sorted.
+"""
+enum DistributionChannelSortOrderInput {
+  """
+  Sorts ascending by the `established_on` field.
+  """
+  established_on_ASC
+
+  """
+  Sorts descending by the `established_on` field.
+  """
+  established_on_DESC
+
+  """
+  Sorts ascending by the `id` field.
+  """
+  id_ASC
+
+  """
+  Sorts descending by the `id` field.
+  """
+  id_DESC
 }
 
 type ElectricalPart implements NamedEntity {
@@ -7771,6 +7757,12 @@ type NonNumericAggregatedValues {
   approximate_distinct_value_count: JsonSafeLong
 }
 
+type OnlineStore implements DistributionChannel & Retail & Store {
+  active: Boolean
+  established_on: Date
+  id: ID!
+}
+
 """
 Provides information about the specific fetched page. This implements the `PageInfo`
 specification from the [Relay GraphQL Cursor Connections
@@ -8151,127 +8143,6 @@ type PersonAggregatedValues {
 }
 
 """
-Return type representing a bucket of `Person` documents for an aggregations query.
-"""
-type PersonAggregation {
-  """
-  Provides computed aggregated values over all `Person` documents in an aggregation bucket.
-  """
-  aggregated_values: PersonAggregatedValues
-
-  """
-  The count of `Person` documents in an aggregation bucket.
-  """
-  count: JsonSafeLong!
-
-  """
-  Used to specify the `Person` fields to group by. The returned values identify each aggregation bucket.
-  """
-  grouped_by: PersonGroupedBy
-}
-
-"""
-Represents a paginated collection of `PersonAggregation` results.
-
-See the [Relay GraphQL Cursor Connections
-Specification](https://relay.dev/graphql/connections.htm#sec-Connection-Types) for more info.
-"""
-type PersonAggregationConnection {
-  """
-  Wraps a specific `PersonAggregation` to pair it with its pagination cursor.
-  """
-  edges: [PersonAggregationEdge!]!
-
-  """
-  The list of `PersonAggregation` results.
-  """
-  nodes: [PersonAggregation!]!
-
-  """
-  Provides pagination-related information.
-  """
-  page_info: PageInfo!
-}
-
-"""
-Represents a specific `PersonAggregation` in the context of a `PersonAggregationConnection`,
-providing access to both the `PersonAggregation` and query-specific information such as the pagination `Cursor`.
-
-See the [Relay GraphQL Cursor Connections
-Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for more info.
-"""
-type PersonAggregationEdge {
-  """
-  The `Cursor` of this `PersonAggregation`. This can be passed in the next query as
-  a `before` or `after` argument to continue paginating from this `PersonAggregation`.
-  """
-  cursor: Cursor
-
-  """
-  The `PersonAggregation` of this edge.
-  """
-  node: PersonAggregation
-}
-
-"""
-Represents a paginated collection of `Person` results.
-
-See the [Relay GraphQL Cursor Connections
-Specification](https://relay.dev/graphql/connections.htm#sec-Connection-Types) for more info.
-"""
-type PersonConnection {
-  """
-  Wraps a specific `Person` to pair it with its pagination cursor.
-  """
-  edges: [PersonEdge!]!
-
-  """
-  The list of `Person` results.
-  """
-  nodes: [Person!]!
-
-  """
-  Provides pagination-related information.
-  """
-  page_info: PageInfo!
-
-  """
-  The total number of edges available in this connection to paginate over.
-  """
-  total_edge_count: JsonSafeLong!
-}
-
-"""
-Represents a specific `Person` in the context of a `PersonConnection`,
-providing access to both the `Person` and query-specific information such as the pagination `Cursor`.
-
-See the [Relay GraphQL Cursor Connections
-Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for more info.
-"""
-type PersonEdge {
-  """
-  All search highlights for this `Person`, indicating where in the indexed document the query matched.
-  """
-  all_highlights: [SearchHighlight!]!
-
-  """
-  The `Cursor` of this `Person`. This can be passed in the next query as
-  a `before` or `after` argument to continue paginating from this `Person`.
-  """
-  cursor: Cursor
-
-  """
-  Specific search highlights for this `Person`, providing matching snippets for the requested fields.
-  """
-  highlights: PersonHighlights
-
-  """
-  The `Person` of this edge.
-  """
-  node: Person
-}
-
-"""
 Input type used to specify filters on `Person` fields.
 
 Will match all documents if passed as an empty object (or as `null`).
@@ -8363,10 +8234,249 @@ type PersonHighlights {
   nationality: [String!]!
 }
 
+type PhysicalStore implements DistributionChannel & Retail & Store {
+  active: Boolean
+  established_on: Date
+  id: ID!
+}
+
 """
-Enumerates the ways `Person`s can be sorted.
+Type used to perform aggregation computations on `PhysicalStore` fields.
 """
-enum PersonSortOrderInput {
+type PhysicalStoreAggregatedValues {
+  """
+  Computed aggregate values for the `active` field.
+  """
+  active: NonNumericAggregatedValues
+
+  """
+  Computed aggregate values for the `established_on` field.
+  """
+  established_on: DateAggregatedValues
+
+  """
+  Computed aggregate values for the `id` field.
+  """
+  id: NonNumericAggregatedValues
+}
+
+"""
+Return type representing a bucket of `PhysicalStore` documents for an aggregations query.
+"""
+type PhysicalStoreAggregation {
+  """
+  Provides computed aggregated values over all `PhysicalStore` documents in an aggregation bucket.
+  """
+  aggregated_values: PhysicalStoreAggregatedValues
+
+  """
+  The count of `PhysicalStore` documents in an aggregation bucket.
+  """
+  count: JsonSafeLong!
+
+  """
+  Used to specify the `PhysicalStore` fields to group by. The returned values identify each aggregation bucket.
+  """
+  grouped_by: PhysicalStoreGroupedBy
+}
+
+"""
+Represents a paginated collection of `PhysicalStoreAggregation` results.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Connection-Types) for more info.
+"""
+type PhysicalStoreAggregationConnection {
+  """
+  Wraps a specific `PhysicalStoreAggregation` to pair it with its pagination cursor.
+  """
+  edges: [PhysicalStoreAggregationEdge!]!
+
+  """
+  The list of `PhysicalStoreAggregation` results.
+  """
+  nodes: [PhysicalStoreAggregation!]!
+
+  """
+  Provides pagination-related information.
+  """
+  page_info: PageInfo!
+}
+
+"""
+Represents a specific `PhysicalStoreAggregation` in the context of a `PhysicalStoreAggregationConnection`,
+providing access to both the `PhysicalStoreAggregation` and query-specific information such as the pagination `Cursor`.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for more info.
+"""
+type PhysicalStoreAggregationEdge {
+  """
+  The `Cursor` of this `PhysicalStoreAggregation`. This can be passed in the next query as
+  a `before` or `after` argument to continue paginating from this `PhysicalStoreAggregation`.
+  """
+  cursor: Cursor
+
+  """
+  The `PhysicalStoreAggregation` of this edge.
+  """
+  node: PhysicalStoreAggregation
+}
+
+"""
+Represents a paginated collection of `PhysicalStore` results.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Connection-Types) for more info.
+"""
+type PhysicalStoreConnection {
+  """
+  Wraps a specific `PhysicalStore` to pair it with its pagination cursor.
+  """
+  edges: [PhysicalStoreEdge!]!
+
+  """
+  The list of `PhysicalStore` results.
+  """
+  nodes: [PhysicalStore!]!
+
+  """
+  Provides pagination-related information.
+  """
+  page_info: PageInfo!
+
+  """
+  The total number of edges available in this connection to paginate over.
+  """
+  total_edge_count: JsonSafeLong!
+}
+
+"""
+Represents a specific `PhysicalStore` in the context of a `PhysicalStoreConnection`,
+providing access to both the `PhysicalStore` and query-specific information such as the pagination `Cursor`.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for more info.
+"""
+type PhysicalStoreEdge {
+  """
+  All search highlights for this `PhysicalStore`, indicating where in the indexed document the query matched.
+  """
+  all_highlights: [SearchHighlight!]!
+
+  """
+  The `Cursor` of this `PhysicalStore`. This can be passed in the next query as
+  a `before` or `after` argument to continue paginating from this `PhysicalStore`.
+  """
+  cursor: Cursor
+
+  """
+  Specific search highlights for this `PhysicalStore`, providing matching snippets for the requested fields.
+  """
+  highlights: PhysicalStoreHighlights
+
+  """
+  The `PhysicalStore` of this edge.
+  """
+  node: PhysicalStore
+}
+
+"""
+Input type used to specify filters on `PhysicalStore` fields.
+
+Will match all documents if passed as an empty object (or as `null`).
+"""
+input PhysicalStoreFilterInput {
+  """
+  Used to filter on the `active` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  active: BooleanFilterInput
+
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `PhysicalStoreFilterInput` input because of collisions
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [PhysicalStoreFilterInput!]
+
+  """
+  Matches records where any of the provided sub-filters evaluate to true.
+  This works just like an OR operator in SQL.
+
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
+  """
+  any_of: [PhysicalStoreFilterInput!]
+
+  """
+  Used to filter on the `established_on` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  established_on: DateFilterInput
+
+  """
+  Used to filter on the `id` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  id: IDFilterInput
+
+  """
+  Matches records where the provided sub-filter evaluates to false.
+  This works just like a NOT operator in SQL.
+
+  When `null` or an empty object is passed, matches no documents.
+  """
+  not: PhysicalStoreFilterInput
+}
+
+"""
+Type used to specify the `PhysicalStore` fields to group by for aggregations.
+"""
+type PhysicalStoreGroupedBy {
+  """
+  The `active` field value for this group.
+  """
+  active: Boolean
+
+  """
+  Offers the different grouping options for the `established_on` value within this group.
+  """
+  established_on: DateGroupedBy
+}
+
+"""
+Type used to request desired `PhysicalStore` search highlight fields.
+"""
+type PhysicalStoreHighlights {
+  """
+  Search highlights for the `id`, providing snippets of the matching text.
+  """
+  id: [String!]!
+}
+
+"""
+Enumerates the ways `PhysicalStore`s can be sorted.
+"""
+enum PhysicalStoreSortOrderInput {
+  """
+  Sorts ascending by the `established_on` field.
+  """
+  established_on_ASC
+
+  """
+  Sorts descending by the `established_on` field.
+  """
+  established_on_DESC
+
   """
   Sorts ascending by the `id` field.
   """
@@ -8376,26 +8486,6 @@ enum PersonSortOrderInput {
   Sorts descending by the `id` field.
   """
   id_DESC
-
-  """
-  Sorts ascending by the `name` field.
-  """
-  name_ASC
-
-  """
-  Sorts descending by the `name` field.
-  """
-  name_DESC
-
-  """
-  Sorts ascending by the `nationality` field.
-  """
-  nationality_ASC
-
-  """
-  Sorts descending by the `nationality` field.
-  """
-  nationality_DESC
 }
 
 type Player {
@@ -9144,109 +9234,6 @@ type Query {
   ): AddressConnection
 
   """
-  Fetches `Company`s based on the provided arguments.
-  """
-  companies(
-    """
-    Used to forward-paginate through the `companies`. When provided, the next page after the
-    provided cursor will be returned.
-
-    See the [Relay GraphQL Cursor Connections
-    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
-    """
-    after: Cursor
-
-    """
-    Used to backward-paginate through the `companies`. When provided, the previous page before the
-    provided cursor will be returned.
-
-    See the [Relay GraphQL Cursor Connections
-    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
-    """
-    before: Cursor
-
-    """
-    Used to filter the returned `companies` based on the provided criteria.
-    """
-    filter: CompanyFilterInput
-
-    """
-    Used in conjunction with the `after` argument to forward-paginate through the `companies`.
-    When provided, limits the number of returned results to the first `n` after the provided
-    `after` cursor (or from the start of the `companies`, if no `after` cursor is provided).
-
-    See the [Relay GraphQL Cursor Connections
-    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
-    """
-    first: Int
-
-    """
-    Used in conjunction with the `before` argument to backward-paginate through the `companies`.
-    When provided, limits the number of returned results to the last `n` before the provided
-    `before` cursor (or from the end of the `companies`, if no `before` cursor is provided).
-
-    See the [Relay GraphQL Cursor Connections
-    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
-    """
-    last: Int
-
-    """
-    Used to specify how the returned `companies` should be sorted.
-    """
-    order_by: [CompanySortOrderInput!]
-  ): CompanyConnection
-
-  """
-  Aggregations over the `companies` data:
-
-  > Fetches `Company`s based on the provided arguments.
-  """
-  company_aggregations(
-    """
-    Used to forward-paginate through the `company_aggregations`. When provided, the next page after the
-    provided cursor will be returned.
-
-    See the [Relay GraphQL Cursor Connections
-    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
-    """
-    after: Cursor
-
-    """
-    Used to backward-paginate through the `company_aggregations`. When provided, the previous page before the
-    provided cursor will be returned.
-
-    See the [Relay GraphQL Cursor Connections
-    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
-    """
-    before: Cursor
-
-    """
-    Used to filter the `Company` documents that get aggregated over based on the provided criteria.
-    """
-    filter: CompanyFilterInput
-
-    """
-    Used in conjunction with the `after` argument to forward-paginate through the `company_aggregations`.
-    When provided, limits the number of returned results to the first `n` after the provided
-    `after` cursor (or from the start of the `company_aggregations`, if no `after` cursor is provided).
-
-    See the [Relay GraphQL Cursor Connections
-    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
-    """
-    first: Int
-
-    """
-    Used in conjunction with the `before` argument to backward-paginate through the `company_aggregations`.
-    When provided, limits the number of returned results to the last `n` before the provided
-    `before` cursor (or from the end of the `company_aggregations`, if no `before` cursor is provided).
-
-    See the [Relay GraphQL Cursor Connections
-    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
-    """
-    last: Int
-  ): CompanyAggregationConnection
-
-  """
   Aggregations over the `components` data:
 
   > Fetches `Component`s based on the provided arguments.
@@ -9348,6 +9335,109 @@ type Query {
     """
     order_by: [ComponentSortOrderInput!]
   ): ComponentConnection
+
+  """
+  Aggregations over the `distribution_channels` data:
+
+  > Fetches `DistributionChannel`s based on the provided arguments.
+  """
+  distribution_channel_aggregations(
+    """
+    Used to forward-paginate through the `distribution_channel_aggregations`. When provided, the next page after the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    after: Cursor
+
+    """
+    Used to backward-paginate through the `distribution_channel_aggregations`. When provided, the previous page before the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    before: Cursor
+
+    """
+    Used to filter the `DistributionChannel` documents that get aggregated over based on the provided criteria.
+    """
+    filter: DistributionChannelFilterInput
+
+    """
+    Used in conjunction with the `after` argument to forward-paginate through the `distribution_channel_aggregations`.
+    When provided, limits the number of returned results to the first `n` after the provided
+    `after` cursor (or from the start of the `distribution_channel_aggregations`, if no `after` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    first: Int
+
+    """
+    Used in conjunction with the `before` argument to backward-paginate through the `distribution_channel_aggregations`.
+    When provided, limits the number of returned results to the last `n` before the provided
+    `before` cursor (or from the end of the `distribution_channel_aggregations`, if no `before` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    last: Int
+  ): DistributionChannelAggregationConnection
+
+  """
+  Fetches `DistributionChannel`s based on the provided arguments.
+  """
+  distribution_channels(
+    """
+    Used to forward-paginate through the `distribution_channels`. When provided, the next page after the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    after: Cursor
+
+    """
+    Used to backward-paginate through the `distribution_channels`. When provided, the previous page before the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    before: Cursor
+
+    """
+    Used to filter the returned `distribution_channels` based on the provided criteria.
+    """
+    filter: DistributionChannelFilterInput
+
+    """
+    Used in conjunction with the `after` argument to forward-paginate through the `distribution_channels`.
+    When provided, limits the number of returned results to the first `n` after the provided
+    `after` cursor (or from the start of the `distribution_channels`, if no `after` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    first: Int
+
+    """
+    Used in conjunction with the `before` argument to backward-paginate through the `distribution_channels`.
+    When provided, limits the number of returned results to the last `n` before the provided
+    `before` cursor (or from the end of the `distribution_channels`, if no `before` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    last: Int
+
+    """
+    Used to specify how the returned `distribution_channels` should be sorted.
+    """
+    order_by: [DistributionChannelSortOrderInput!]
+  ): DistributionChannelConnection
 
   """
   Aggregations over the `electrical_parts` data:
@@ -10071,11 +10161,13 @@ type Query {
   ): PartConnection
 
   """
-  Fetches `Person`s based on the provided arguments.
+  Aggregations over the `physical_stores` data:
+
+  > Fetches `PhysicalStore`s based on the provided arguments.
   """
-  people(
+  physical_store_aggregations(
     """
-    Used to forward-paginate through the `people`. When provided, the next page after the
+    Used to forward-paginate through the `physical_store_aggregations`. When provided, the next page after the
     provided cursor will be returned.
 
     See the [Relay GraphQL Cursor Connections
@@ -10084,7 +10176,7 @@ type Query {
     after: Cursor
 
     """
-    Used to backward-paginate through the `people`. When provided, the previous page before the
+    Used to backward-paginate through the `physical_store_aggregations`. When provided, the previous page before the
     provided cursor will be returned.
 
     See the [Relay GraphQL Cursor Connections
@@ -10093,14 +10185,14 @@ type Query {
     before: Cursor
 
     """
-    Used to filter the returned `people` based on the provided criteria.
+    Used to filter the `PhysicalStore` documents that get aggregated over based on the provided criteria.
     """
-    filter: PersonFilterInput
+    filter: PhysicalStoreFilterInput
 
     """
-    Used in conjunction with the `after` argument to forward-paginate through the `people`.
+    Used in conjunction with the `after` argument to forward-paginate through the `physical_store_aggregations`.
     When provided, limits the number of returned results to the first `n` after the provided
-    `after` cursor (or from the start of the `people`, if no `after` cursor is provided).
+    `after` cursor (or from the start of the `physical_store_aggregations`, if no `after` cursor is provided).
 
     See the [Relay GraphQL Cursor Connections
     Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
@@ -10108,29 +10200,22 @@ type Query {
     first: Int
 
     """
-    Used in conjunction with the `before` argument to backward-paginate through the `people`.
+    Used in conjunction with the `before` argument to backward-paginate through the `physical_store_aggregations`.
     When provided, limits the number of returned results to the last `n` before the provided
-    `before` cursor (or from the end of the `people`, if no `before` cursor is provided).
+    `before` cursor (or from the end of the `physical_store_aggregations`, if no `before` cursor is provided).
 
     See the [Relay GraphQL Cursor Connections
     Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
     """
     last: Int
-
-    """
-    Used to specify how the returned `people` should be sorted.
-    """
-    order_by: [PersonSortOrderInput!]
-  ): PersonConnection
+  ): PhysicalStoreAggregationConnection
 
   """
-  Aggregations over the `people` data:
-
-  > Fetches `Person`s based on the provided arguments.
+  Fetches `PhysicalStore`s based on the provided arguments.
   """
-  person_aggregations(
+  physical_stores(
     """
-    Used to forward-paginate through the `person_aggregations`. When provided, the next page after the
+    Used to forward-paginate through the `physical_stores`. When provided, the next page after the
     provided cursor will be returned.
 
     See the [Relay GraphQL Cursor Connections
@@ -10139,7 +10224,7 @@ type Query {
     after: Cursor
 
     """
-    Used to backward-paginate through the `person_aggregations`. When provided, the previous page before the
+    Used to backward-paginate through the `physical_stores`. When provided, the previous page before the
     provided cursor will be returned.
 
     See the [Relay GraphQL Cursor Connections
@@ -10148,14 +10233,14 @@ type Query {
     before: Cursor
 
     """
-    Used to filter the `Person` documents that get aggregated over based on the provided criteria.
+    Used to filter the returned `physical_stores` based on the provided criteria.
     """
-    filter: PersonFilterInput
+    filter: PhysicalStoreFilterInput
 
     """
-    Used in conjunction with the `after` argument to forward-paginate through the `person_aggregations`.
+    Used in conjunction with the `after` argument to forward-paginate through the `physical_stores`.
     When provided, limits the number of returned results to the first `n` after the provided
-    `after` cursor (or from the start of the `person_aggregations`, if no `after` cursor is provided).
+    `after` cursor (or from the start of the `physical_stores`, if no `after` cursor is provided).
 
     See the [Relay GraphQL Cursor Connections
     Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
@@ -10163,15 +10248,123 @@ type Query {
     first: Int
 
     """
-    Used in conjunction with the `before` argument to backward-paginate through the `person_aggregations`.
+    Used in conjunction with the `before` argument to backward-paginate through the `physical_stores`.
     When provided, limits the number of returned results to the last `n` before the provided
-    `before` cursor (or from the end of the `person_aggregations`, if no `before` cursor is provided).
+    `before` cursor (or from the end of the `physical_stores`, if no `before` cursor is provided).
 
     See the [Relay GraphQL Cursor Connections
     Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
     """
     last: Int
-  ): PersonAggregationConnection
+
+    """
+    Used to specify how the returned `physical_stores` should be sorted.
+    """
+    order_by: [PhysicalStoreSortOrderInput!]
+  ): PhysicalStoreConnection
+
+  """
+  Aggregations over the `retailers` data:
+
+  > Fetches `Retail`s based on the provided arguments.
+  """
+  retail_aggregations(
+    """
+    Used to forward-paginate through the `retail_aggregations`. When provided, the next page after the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    after: Cursor
+
+    """
+    Used to backward-paginate through the `retail_aggregations`. When provided, the previous page before the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    before: Cursor
+
+    """
+    Used to filter the `Retail` documents that get aggregated over based on the provided criteria.
+    """
+    filter: RetailFilterInput
+
+    """
+    Used in conjunction with the `after` argument to forward-paginate through the `retail_aggregations`.
+    When provided, limits the number of returned results to the first `n` after the provided
+    `after` cursor (or from the start of the `retail_aggregations`, if no `after` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    first: Int
+
+    """
+    Used in conjunction with the `before` argument to backward-paginate through the `retail_aggregations`.
+    When provided, limits the number of returned results to the last `n` before the provided
+    `before` cursor (or from the end of the `retail_aggregations`, if no `before` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    last: Int
+  ): RetailAggregationConnection
+
+  """
+  Fetches `Retail`s based on the provided arguments.
+  """
+  retailers(
+    """
+    Used to forward-paginate through the `retailers`. When provided, the next page after the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    after: Cursor
+
+    """
+    Used to backward-paginate through the `retailers`. When provided, the previous page before the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    before: Cursor
+
+    """
+    Used to filter the returned `retailers` based on the provided criteria.
+    """
+    filter: RetailFilterInput
+
+    """
+    Used in conjunction with the `after` argument to forward-paginate through the `retailers`.
+    When provided, limits the number of returned results to the first `n` after the provided
+    `after` cursor (or from the start of the `retailers`, if no `after` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    first: Int
+
+    """
+    Used in conjunction with the `before` argument to backward-paginate through the `retailers`.
+    When provided, limits the number of returned results to the last `n` before the provided
+    `before` cursor (or from the end of the `retailers`, if no `before` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    last: Int
+
+    """
+    Used to specify how the returned `retailers` should be sorted.
+    """
+    order_by: [RetailSortOrderInput!]
+  ): RetailConnection
 
   """
   Aggregations over the `sponsors` data:
@@ -10275,6 +10468,109 @@ type Query {
     """
     order_by: [SponsorSortOrderInput!]
   ): SponsorConnection
+
+  """
+  Aggregations over the `stores` data:
+
+  > Fetches `Store`s based on the provided arguments.
+  """
+  store_aggregations(
+    """
+    Used to forward-paginate through the `store_aggregations`. When provided, the next page after the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    after: Cursor
+
+    """
+    Used to backward-paginate through the `store_aggregations`. When provided, the previous page before the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    before: Cursor
+
+    """
+    Used to filter the `Store` documents that get aggregated over based on the provided criteria.
+    """
+    filter: StoreFilterInput
+
+    """
+    Used in conjunction with the `after` argument to forward-paginate through the `store_aggregations`.
+    When provided, limits the number of returned results to the first `n` after the provided
+    `after` cursor (or from the start of the `store_aggregations`, if no `after` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    first: Int
+
+    """
+    Used in conjunction with the `before` argument to backward-paginate through the `store_aggregations`.
+    When provided, limits the number of returned results to the last `n` before the provided
+    `before` cursor (or from the end of the `store_aggregations`, if no `before` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    last: Int
+  ): StoreAggregationConnection
+
+  """
+  Fetches `Store`s based on the provided arguments.
+  """
+  stores(
+    """
+    Used to forward-paginate through the `stores`. When provided, the next page after the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    after: Cursor
+
+    """
+    Used to backward-paginate through the `stores`. When provided, the previous page before the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    before: Cursor
+
+    """
+    Used to filter the returned `stores` based on the provided criteria.
+    """
+    filter: StoreFilterInput
+
+    """
+    Used in conjunction with the `after` argument to forward-paginate through the `stores`.
+    When provided, limits the number of returned results to the first `n` after the provided
+    `after` cursor (or from the start of the `stores`, if no `after` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    first: Int
+
+    """
+    Used in conjunction with the `before` argument to backward-paginate through the `stores`.
+    When provided, limits the number of returned results to the last `n` before the provided
+    `before` cursor (or from the end of the `stores`, if no `before` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    last: Int
+
+    """
+    Used to specify how the returned `stores` should be sorted.
+    """
+    order_by: [StoreSortOrderInput!]
+  ): StoreConnection
 
   """
   Aggregations over the `teams` data:
@@ -10795,6 +11091,260 @@ type Query {
     """
     order_by: [WidgetOrAddressSortOrderInput!]
   ): WidgetOrAddressConnection
+}
+
+interface Retail implements DistributionChannel {
+  active: Boolean
+  established_on: Date
+  id: ID!
+}
+
+"""
+Type used to perform aggregation computations on `Retail` fields.
+"""
+type RetailAggregatedValues {
+  """
+  Computed aggregate values for the `active` field.
+  """
+  active: NonNumericAggregatedValues
+
+  """
+  Computed aggregate values for the `established_on` field.
+  """
+  established_on: DateAggregatedValues
+
+  """
+  Computed aggregate values for the `id` field.
+  """
+  id: NonNumericAggregatedValues
+}
+
+"""
+Return type representing a bucket of `Retail` documents for an aggregations query.
+"""
+type RetailAggregation {
+  """
+  Provides computed aggregated values over all `Retail` documents in an aggregation bucket.
+  """
+  aggregated_values: RetailAggregatedValues
+
+  """
+  The count of `Retail` documents in an aggregation bucket.
+  """
+  count: JsonSafeLong!
+
+  """
+  Used to specify the `Retail` fields to group by. The returned values identify each aggregation bucket.
+  """
+  grouped_by: RetailGroupedBy
+}
+
+"""
+Represents a paginated collection of `RetailAggregation` results.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Connection-Types) for more info.
+"""
+type RetailAggregationConnection {
+  """
+  Wraps a specific `RetailAggregation` to pair it with its pagination cursor.
+  """
+  edges: [RetailAggregationEdge!]!
+
+  """
+  The list of `RetailAggregation` results.
+  """
+  nodes: [RetailAggregation!]!
+
+  """
+  Provides pagination-related information.
+  """
+  page_info: PageInfo!
+}
+
+"""
+Represents a specific `RetailAggregation` in the context of a `RetailAggregationConnection`,
+providing access to both the `RetailAggregation` and query-specific information such as the pagination `Cursor`.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for more info.
+"""
+type RetailAggregationEdge {
+  """
+  The `Cursor` of this `RetailAggregation`. This can be passed in the next query as
+  a `before` or `after` argument to continue paginating from this `RetailAggregation`.
+  """
+  cursor: Cursor
+
+  """
+  The `RetailAggregation` of this edge.
+  """
+  node: RetailAggregation
+}
+
+"""
+Represents a paginated collection of `Retail` results.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Connection-Types) for more info.
+"""
+type RetailConnection {
+  """
+  Wraps a specific `Retail` to pair it with its pagination cursor.
+  """
+  edges: [RetailEdge!]!
+
+  """
+  The list of `Retail` results.
+  """
+  nodes: [Retail!]!
+
+  """
+  Provides pagination-related information.
+  """
+  page_info: PageInfo!
+
+  """
+  The total number of edges available in this connection to paginate over.
+  """
+  total_edge_count: JsonSafeLong!
+}
+
+"""
+Represents a specific `Retail` in the context of a `RetailConnection`,
+providing access to both the `Retail` and query-specific information such as the pagination `Cursor`.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for more info.
+"""
+type RetailEdge {
+  """
+  All search highlights for this `Retail`, indicating where in the indexed document the query matched.
+  """
+  all_highlights: [SearchHighlight!]!
+
+  """
+  The `Cursor` of this `Retail`. This can be passed in the next query as
+  a `before` or `after` argument to continue paginating from this `Retail`.
+  """
+  cursor: Cursor
+
+  """
+  Specific search highlights for this `Retail`, providing matching snippets for the requested fields.
+  """
+  highlights: RetailHighlights
+
+  """
+  The `Retail` of this edge.
+  """
+  node: Retail
+}
+
+"""
+Input type used to specify filters on `Retail` fields.
+
+Will match all documents if passed as an empty object (or as `null`).
+"""
+input RetailFilterInput {
+  """
+  Used to filter on the `active` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  active: BooleanFilterInput
+
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `RetailFilterInput` input because of collisions
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [RetailFilterInput!]
+
+  """
+  Matches records where any of the provided sub-filters evaluate to true.
+  This works just like an OR operator in SQL.
+
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
+  """
+  any_of: [RetailFilterInput!]
+
+  """
+  Used to filter on the `established_on` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  established_on: DateFilterInput
+
+  """
+  Used to filter on the `id` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  id: IDFilterInput
+
+  """
+  Matches records where the provided sub-filter evaluates to false.
+  This works just like a NOT operator in SQL.
+
+  When `null` or an empty object is passed, matches no documents.
+  """
+  not: RetailFilterInput
+}
+
+"""
+Type used to specify the `Retail` fields to group by for aggregations.
+"""
+type RetailGroupedBy {
+  """
+  The `active` field value for this group.
+  """
+  active: Boolean
+
+  """
+  Offers the different grouping options for the `established_on` value within this group.
+  """
+  established_on: DateGroupedBy
+}
+
+"""
+Type used to request desired `Retail` search highlight fields.
+"""
+type RetailHighlights {
+  """
+  Search highlights for the `id`, providing snippets of the matching text.
+  """
+  id: [String!]!
+}
+
+"""
+Enumerates the ways `Retail`s can be sorted.
+"""
+enum RetailSortOrderInput {
+  """
+  Sorts ascending by the `established_on` field.
+  """
+  established_on_ASC
+
+  """
+  Sorts descending by the `established_on` field.
+  """
+  established_on_DESC
+
+  """
+  Sorts ascending by the `id` field.
+  """
+  id_ASC
+
+  """
+  Sorts descending by the `id` field.
+  """
+  id_DESC
 }
 
 """
@@ -11606,6 +12156,260 @@ input SponsorshipListFilterInput {
   When `null` or an empty object is passed, matches no documents.
   """
   not: SponsorshipListFilterInput
+}
+
+interface Store implements DistributionChannel & Retail {
+  active: Boolean
+  established_on: Date
+  id: ID!
+}
+
+"""
+Type used to perform aggregation computations on `Store` fields.
+"""
+type StoreAggregatedValues {
+  """
+  Computed aggregate values for the `active` field.
+  """
+  active: NonNumericAggregatedValues
+
+  """
+  Computed aggregate values for the `established_on` field.
+  """
+  established_on: DateAggregatedValues
+
+  """
+  Computed aggregate values for the `id` field.
+  """
+  id: NonNumericAggregatedValues
+}
+
+"""
+Return type representing a bucket of `Store` documents for an aggregations query.
+"""
+type StoreAggregation {
+  """
+  Provides computed aggregated values over all `Store` documents in an aggregation bucket.
+  """
+  aggregated_values: StoreAggregatedValues
+
+  """
+  The count of `Store` documents in an aggregation bucket.
+  """
+  count: JsonSafeLong!
+
+  """
+  Used to specify the `Store` fields to group by. The returned values identify each aggregation bucket.
+  """
+  grouped_by: StoreGroupedBy
+}
+
+"""
+Represents a paginated collection of `StoreAggregation` results.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Connection-Types) for more info.
+"""
+type StoreAggregationConnection {
+  """
+  Wraps a specific `StoreAggregation` to pair it with its pagination cursor.
+  """
+  edges: [StoreAggregationEdge!]!
+
+  """
+  The list of `StoreAggregation` results.
+  """
+  nodes: [StoreAggregation!]!
+
+  """
+  Provides pagination-related information.
+  """
+  page_info: PageInfo!
+}
+
+"""
+Represents a specific `StoreAggregation` in the context of a `StoreAggregationConnection`,
+providing access to both the `StoreAggregation` and query-specific information such as the pagination `Cursor`.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for more info.
+"""
+type StoreAggregationEdge {
+  """
+  The `Cursor` of this `StoreAggregation`. This can be passed in the next query as
+  a `before` or `after` argument to continue paginating from this `StoreAggregation`.
+  """
+  cursor: Cursor
+
+  """
+  The `StoreAggregation` of this edge.
+  """
+  node: StoreAggregation
+}
+
+"""
+Represents a paginated collection of `Store` results.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Connection-Types) for more info.
+"""
+type StoreConnection {
+  """
+  Wraps a specific `Store` to pair it with its pagination cursor.
+  """
+  edges: [StoreEdge!]!
+
+  """
+  The list of `Store` results.
+  """
+  nodes: [Store!]!
+
+  """
+  Provides pagination-related information.
+  """
+  page_info: PageInfo!
+
+  """
+  The total number of edges available in this connection to paginate over.
+  """
+  total_edge_count: JsonSafeLong!
+}
+
+"""
+Represents a specific `Store` in the context of a `StoreConnection`,
+providing access to both the `Store` and query-specific information such as the pagination `Cursor`.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for more info.
+"""
+type StoreEdge {
+  """
+  All search highlights for this `Store`, indicating where in the indexed document the query matched.
+  """
+  all_highlights: [SearchHighlight!]!
+
+  """
+  The `Cursor` of this `Store`. This can be passed in the next query as
+  a `before` or `after` argument to continue paginating from this `Store`.
+  """
+  cursor: Cursor
+
+  """
+  Specific search highlights for this `Store`, providing matching snippets for the requested fields.
+  """
+  highlights: StoreHighlights
+
+  """
+  The `Store` of this edge.
+  """
+  node: Store
+}
+
+"""
+Input type used to specify filters on `Store` fields.
+
+Will match all documents if passed as an empty object (or as `null`).
+"""
+input StoreFilterInput {
+  """
+  Used to filter on the `active` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  active: BooleanFilterInput
+
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `StoreFilterInput` input because of collisions between
+  key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [StoreFilterInput!]
+
+  """
+  Matches records where any of the provided sub-filters evaluate to true.
+  This works just like an OR operator in SQL.
+
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
+  """
+  any_of: [StoreFilterInput!]
+
+  """
+  Used to filter on the `established_on` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  established_on: DateFilterInput
+
+  """
+  Used to filter on the `id` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  id: IDFilterInput
+
+  """
+  Matches records where the provided sub-filter evaluates to false.
+  This works just like a NOT operator in SQL.
+
+  When `null` or an empty object is passed, matches no documents.
+  """
+  not: StoreFilterInput
+}
+
+"""
+Type used to specify the `Store` fields to group by for aggregations.
+"""
+type StoreGroupedBy {
+  """
+  The `active` field value for this group.
+  """
+  active: Boolean
+
+  """
+  Offers the different grouping options for the `established_on` value within this group.
+  """
+  established_on: DateGroupedBy
+}
+
+"""
+Type used to request desired `Store` search highlight fields.
+"""
+type StoreHighlights {
+  """
+  Search highlights for the `id`, providing snippets of the matching text.
+  """
+  id: [String!]!
+}
+
+"""
+Enumerates the ways `Store`s can be sorted.
+"""
+enum StoreSortOrderInput {
+  """
+  Sorts ascending by the `established_on` field.
+  """
+  established_on_ASC
+
+  """
+  Sorts descending by the `established_on` field.
+  """
+  established_on_DESC
+
+  """
+  Sorts ascending by the `id` field.
+  """
+  id_ASC
+
+  """
+  Sorts descending by the `id` field.
+  """
+  id_DESC
 }
 
 """
@@ -14158,6 +14962,11 @@ input TextFilterInput {
   When `null` or an empty object is passed, matches no documents.
   """
   not: TextFilterInput
+}
+
+type ThirdPartyWholesale implements DistributionChannel {
+  active: Boolean
+  id: ID!
 }
 
 """

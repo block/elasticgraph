@@ -14,13 +14,6 @@ tables:
         shapes ARRAY<STRUCT<type STRING, coordinates ARRAY<FLOAT>>>,
         manufacturer_id STRING
       )
-  companies:
-    table_schema: |-
-      CREATE TABLE IF NOT EXISTS companies (
-        id STRING,
-        name STRING,
-        stock_ticker STRING
-      )
   components:
     table_schema: |-
       CREATE TABLE IF NOT EXISTS components (
@@ -38,6 +31,14 @@ tables:
         owner_ids ARRAY<STRING>,
         owner_id STRING
       )
+  distribution_channels:
+    table_schema: |-
+      CREATE TABLE IF NOT EXISTS distribution_channels (
+        id STRING,
+        established_on DATE,
+        active BOOLEAN,
+        __typename STRING
+      )
   electrical_parts:
     table_schema: |-
       CREATE TABLE IF NOT EXISTS electrical_parts (
@@ -53,7 +54,7 @@ tables:
         id STRING,
         name STRING,
         created_at TIMESTAMP,
-        ceo STRUCT<id STRING, name STRING, nationality STRING>
+        ceo STRUCT<id STRING, name STRING, nationality STRING, __typename STRING>
       )
   mechanical_parts:
     table_schema: |-
@@ -64,12 +65,21 @@ tables:
         material STRING,
         manufacturer_id STRING
       )
-  people:
+  named_inventors:
     table_schema: |-
-      CREATE TABLE IF NOT EXISTS people (
+      CREATE TABLE IF NOT EXISTS named_inventors (
         id STRING,
         name STRING,
-        nationality STRING
+        nationality STRING,
+        __typename STRING,
+        stock_ticker STRING
+      )
+  physical_stores:
+    table_schema: |-
+      CREATE TABLE IF NOT EXISTS physical_stores (
+        id STRING,
+        established_on DATE,
+        active BOOLEAN
       )
   sponsors:
     table_schema: |-
@@ -142,8 +152,8 @@ tables:
         internal_details STRUCT<name STRING>,
         internal_highlightable_details STRUCT<name STRING>,
         the_opts STRUCT<size STRING, the_sighs STRING, color STRING, is_draft BOOLEAN>,
-        inventor STRUCT<id STRING, name STRING, nationality STRING, stock_ticker STRING, __typename STRING>,
-        named_inventor STRUCT<id STRING, name STRING, nationality STRING, stock_ticker STRING, __typename STRING>,
+        inventor STRUCT<id STRING, name STRING, nationality STRING, __typename STRING, stock_ticker STRING>,
+        named_inventor STRUCT<id STRING, name STRING, nationality STRING, __typename STRING, stock_ticker STRING>,
         weight_in_ng_str BIGINT,
         weight_in_ng BIGINT,
         tags ARRAY<STRING>,
