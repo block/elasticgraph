@@ -8,7 +8,11 @@ module ElasticGraph
         config: Config
       ) -> void
 
-      def msearch: (::Array[DatastoreQuery], ?query_tracker: QueryDetailsTracker) -> ::Hash[DatastoreQuery, DatastoreResponse::SearchResponse]
+      def msearch: (
+        ::Array[DatastoreQuery],
+        ?query_tracker: QueryDetailsTracker,
+        ?opaque_id_parts: ::Array[::String?]
+      ) -> ::Hash[DatastoreQuery, DatastoreResponse::SearchResponse]
     end
   end
 end

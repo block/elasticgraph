@@ -10,6 +10,7 @@ require "elastic_graph/constants"
 require "elastic_graph/errors"
 require "elastic_graph/indexer/event_id"
 require "elastic_graph/indexer/indexing_failures_error"
+require "elastic_graph/support/opaque_id"
 require "elastic_graph/support/threading"
 
 module ElasticGraph
@@ -188,7 +189,14 @@ module ElasticGraph
                 ]
               end
 
-              client.msearch(body: body)
+              headers = {
+                OPAQUE_ID_HEADER => Support::OpaqueID.build_header(opaque_id_parts_for_source_event_versions(ops))
+              }.compact # : ::Hash[::String, ::String]
+
+              client.msearch(
+                body: body,
+                headers: headers
+              )
             else
               # The named client doesn't exist, so we don't have any versions for the docs.
               {"responses" => ops.map { |op| {"hits" => {"hits" => _ = []}} }}
@@ -255,6 +263,22 @@ module ElasticGraph
           raise Errors::IdentifyDocumentVersionsFailedError, "Got #{failures.size} failure(s) while querying the datastore " \
             "for document versions:\n\n#{failures.join("\n")}"
         end
+      end
+
+      private
+
+      def opaque_id_parts_for_source_event_versions(operations)
+        type_counts = operations
+          .group_by { |op| op.event.fetch("type") }
+          .sort_by(&:first)
+          .map { |type_name, ops| "#{type_name}:#{ops.size}" }
+
+        [
+          "elasticgraph-indexer",
+          "purpose=source_event_versions",
+          "operation_count=#{operations.size}",
+          "type_counts=#{type_counts.join(",")}"
+        ]
       end
     end
   end

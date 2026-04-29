@@ -59,7 +59,8 @@ module ElasticGraph
           client: client,
           context: context.merge({
             monotonic_clock_deadline: timeout_in_ms&.+(start_time_in_ms),
-            elastic_graph_query_tracker: query_tracker
+            elastic_graph_query_tracker: query_tracker,
+            elastic_graph_client: client
           }.compact)
         )
 
@@ -89,7 +90,7 @@ module ElasticGraph
           @logger.info({
             "message_type" => "ElasticGraphQueryExecutorQueryDuration",
             "client" => client.name,
-            "query_fingerprint" => fingerprint_for(query),
+            "query_fingerprint" => query.fingerprint,
             "query_name" => query.selected_operation_name,
             "duration_ms" => duration,
             # How long the datastore queries took according to what the datastore itself reported.
@@ -142,7 +143,7 @@ module ElasticGraph
       def execute_query(query, client:)
         # Log the query before starting to execute it, in case there's a lambda timeout, in which case
         # we won't get any other logged messages for the query.
-        @logger.info "Starting to execute query #{fingerprint_for(query)} for client #{client.description}."
+        @logger.info "Starting to execute query #{query.fingerprint} for client #{client.description}."
 
         query.result
       rescue => ex
@@ -163,11 +164,7 @@ module ElasticGraph
       # the fingerprint to make sure that we at least have some identification information
       # about the query.
       def full_description_of(query)
-        "#{fingerprint_for(query)} #{query.sanitized_query_string}"
-      end
-
-      def fingerprint_for(query)
-        query.query_string ? query.fingerprint : "(no query string)"
+        "#{query.fingerprint} #{query.sanitized_query_string}"
       end
 
       def slo_result_for(query, duration)

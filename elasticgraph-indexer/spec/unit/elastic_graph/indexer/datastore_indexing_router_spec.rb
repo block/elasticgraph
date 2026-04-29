@@ -150,6 +150,15 @@ module ElasticGraph
               [search_header.fetch(:index), search_body.fetch(:query).fetch(:ids).fetch(:values).first]
             end
 
+            type_counts = requested_docs
+              .group_by(&:first)
+              .sort_by(&:first)
+              .map { |index_name, docs| "#{type_name_for_index(index_name)}:#{docs.size}" }
+
+            expect(request.fetch(:headers)).to include(
+              OPAQUE_ID_HEADER => "elasticgraph-indexer;purpose=source_event_versions;operation_count=#{requested_docs.size};type_counts=#{type_counts.join(",")}"
+            )
+
             requested_docs_by_client[client_name].concat(requested_docs)
 
             responses = requested_docs.map do |(index, id)|
@@ -180,6 +189,14 @@ module ElasticGraph
           op.destination_index_def.index_expression_for_search,
           op.doc_id
         ]
+      end
+
+      def type_name_for_index(index_name)
+        {
+          "components" => "Component",
+          "widget_currencies" => "WidgetCurrency",
+          "widgets" => "Widget"
+        }.fetch(index_name)
       end
 
       describe "#bulk" do
