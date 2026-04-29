@@ -15,6 +15,7 @@ module ElasticGraph
     RSpec.describe QueryExecutor do
       describe "#execute", :capture_logs do
         attr_accessor :schema_artifacts
+        attr_accessor :submitted_opaque_id_parts
 
         before(:context) do
           self.schema_artifacts = generate_schema_artifacts do |s|
@@ -223,6 +224,29 @@ module ElasticGraph
 
             expect(result.dig("errors", 0, "message")).to include(expected_error_snippet)
           }.to log a_string_including("GetColorName", "resulted in errors", expected_error_snippet)
+        end
+
+        it "passes datastore opaque id parts based on the client and query fingerprint" do
+          client = Client.new(
+            name: "client-name",
+            source_description: "client-description",
+            extra_opaque_id_parts: ["tenant=acme"]
+          )
+
+          execute_expecting_no_errors(<<~QUERY, client: client, operation_name: "GetColors")
+            query GetColors {
+              colors(args: {red: 12}) {
+                red
+              }
+            }
+          QUERY
+
+          expect(submitted_opaque_id_parts).to include(
+            "elasticgraph-graphql",
+            "client=client-name",
+            "tenant=acme",
+            a_string_starting_with("query=GetColors/")
+          )
         end
 
         it "supports named operations and variables" do
@@ -471,7 +495,9 @@ module ElasticGraph
 
         def define_graphql
           router = instance_double("ElasticGraph::GraphQL::DatastoreSearchRouter")
-          allow(router).to receive(:msearch) do |queries, query_tracker:|
+          allow(router).to receive(:msearch) do |queries, query_tracker:, opaque_id_parts: nil|
+            self.submitted_opaque_id_parts = opaque_id_parts
+
             queries.each do |query|
               allow(query).to receive(:shard_routing_values).and_return(["routing_value_1", "routing_value_2"])
             end

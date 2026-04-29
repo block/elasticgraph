@@ -20,27 +20,47 @@ module ElasticGraph
       # Note: `NestedRelationshipsSource` implements further optimizations on top of this, and should
       # be used rather than this class when applicable.
       class QuerySource < ::GraphQL::Dataloader::Source
-        def initialize(datastore_router, query_tracker)
+        def initialize(datastore_router, query_tracker, opaque_id_parts = [])
           @datastore_router = datastore_router
           @query_tracker = query_tracker
+          @opaque_id_parts = opaque_id_parts
         end
 
         def fetch(queries)
-          responses_by_query = @datastore_router.msearch(queries, query_tracker: @query_tracker)
+          responses_by_query = @datastore_router.msearch(
+            queries,
+            query_tracker: @query_tracker,
+            opaque_id_parts: @opaque_id_parts
+          )
           queries.map { |q| responses_by_query.fetch(q) }
         end
 
         def self.execute_many(queries, for_context:)
           datastore_router = for_context.fetch(:datastore_search_router)
           query_tracker = for_context.fetch(:elastic_graph_query_tracker)
+          opaque_id_parts = datastore_opaque_id_parts_for(for_context)
           dataloader = for_context.dataloader
 
-          responses = dataloader.with(self, datastore_router, query_tracker).load_all(queries)
+          responses = dataloader.with(self, datastore_router, query_tracker, opaque_id_parts).load_all(queries)
           queries.zip(responses).to_h
         end
 
         def self.execute_one(query, for_context:)
           execute_many([query], for_context: for_context).fetch(query)
+        end
+
+        # `QueryExecutor` adds `:elastic_graph_client` to the GraphQL context before
+        # resolver execution begins, so resolver-side datastore queries can reuse the
+        # same client identity in their datastore `X-Opaque-Id` headers.
+        private_class_method def self.datastore_opaque_id_parts_for(for_context)
+          client = for_context.fetch(:elastic_graph_client)
+          graphql_query = for_context.query
+          [
+            "elasticgraph-graphql",
+            "client=#{client.name}",
+            *client.extra_opaque_id_parts,
+            "query=#{graphql_query.fingerprint}"
+          ]
         end
       end
     end

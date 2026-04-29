@@ -36,6 +36,10 @@ module ElasticGraph
   # @private
   TIMEOUT_MS_HEADER = "ElasticGraph-Request-Timeout-Ms"
 
+  # HTTP header used on datastore requests to identify the caller and request shape.
+  # @private
+  OPAQUE_ID_HEADER = "X-Opaque-Id"
+
   # Min/max values for the `Int` type.
   # Based on the GraphQL spec:
   #

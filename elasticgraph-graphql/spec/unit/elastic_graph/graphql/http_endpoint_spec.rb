@@ -28,7 +28,7 @@ module ElasticGraph
       let(:default_query) { "query { addresses { total_edge_count } }" }
 
       before do
-        allow(router).to receive(:msearch) do |queries|
+        allow(router).to receive(:msearch) do |queries, **_kwargs|
           if queries.any? { |q| q.monotonic_clock_deadline&.<(expected_query_time) }
             raise Errors::RequestExceededDeadlineError, "took too long"
           end

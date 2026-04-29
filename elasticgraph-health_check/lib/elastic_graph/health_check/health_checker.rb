@@ -56,7 +56,7 @@ module ElasticGraph
         end
 
         recency_results_by_query, *cluster_healths = execute_in_parallel(
-          lambda { datastore_msearch(recency_queries_by_type_name.values) },
+          lambda { datastore_msearch(recency_queries_by_type_name) },
           *@config.clusters_to_consider.map do |cluster|
             lambda { [cluster, @datastore_clients_by_name.fetch(cluster).get_cluster_health] }
           end
@@ -70,14 +70,18 @@ module ElasticGraph
 
       private
 
-      def datastore_msearch(queries)
-        @datastore_search_router.msearch(queries)
+      def datastore_msearch(queries_by_type_name)
+        opaque_id_parts = ["elasticgraph-health_check"]
+        queried_types = queries_by_type_name.keys.sort
+        opaque_id_parts << "types=#{queried_types.join(",")}" if queried_types.any?
+
+        @datastore_search_router.msearch(queries_by_type_name.values, opaque_id_parts: opaque_id_parts)
       rescue ::GraphQL::ExecutionError => ex
         # A `GraphQL::ExecutionError` indicates the datastore is not ready to serve GraphQL queries.
         # Normally the GraphQL execution engine handles this kind of error and returns it in the `errors` of the GraphQL response.
         # Here we are outside of a GraphQL context and need to handle it ourselves.
         @logger.warn("HealthChecker getting GraphQL errors when querying the datastore: #{ex.class.name}: #{ex.message}")
-        queries.to_h { |query| [query, GraphQL::DatastoreResponse::SearchResponse::EMPTY] }
+        queries_by_type_name.values.to_h { |query| [query, GraphQL::DatastoreResponse::SearchResponse::EMPTY] }
       end
 
       def build_recency_query_for(type_name, recency_config)
