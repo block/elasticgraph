@@ -123,6 +123,31 @@ module ElasticGraph
           expect(schema.document_types_stored_in("widgets")).to contain_exactly(schema.type_named("Widget"))
         end
 
+        it "returns multiple types when an abstract type shares an index with its concrete subtypes via index inheritance" do
+          schema = define_schema do |s|
+            s.interface_type "Animal" do |t|
+              t.field "id", "ID!"
+              t.index "animals"
+            end
+
+            s.object_type "Dog" do |t|
+              t.implements "Animal"
+              t.field "id", "ID!"
+            end
+
+            s.object_type "Cat" do |t|
+              t.implements "Animal"
+              t.field "id", "ID!"
+            end
+          end
+
+          expect(schema.document_types_stored_in("animals")).to contain_exactly(
+            schema.type_named("Animal"),
+            schema.type_named("Dog"),
+            schema.type_named("Cat")
+          )
+        end
+
         it "raises an exception if given an unrecognizd index name" do
           schema = schema_with_indices("Person" => "people", "Widget" => "widgets")
 

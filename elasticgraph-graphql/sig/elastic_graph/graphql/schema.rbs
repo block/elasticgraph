@@ -30,7 +30,6 @@ module ElasticGraph
       def type_from: (::GraphQL::Schema::_Type) -> Type
       def type_named: (::String) -> Type
       def document_types_stored_in: (::String) -> ::Set[Type]
-      def indexed_document_types_by_index_definition_name: () -> ::Hash[::String, ::Set[Type]]
       def field_named: (::String, ::String) -> Field
       def indexed_document_types: () -> ::Array[Type]
       def log_hidden_types: (Logger) -> void

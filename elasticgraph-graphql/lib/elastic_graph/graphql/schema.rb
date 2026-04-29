@@ -120,6 +120,8 @@ module ElasticGraph
         raise Errors::NotFoundError, msg
       end
 
+      # Returns all indexed document types stored in the named index definition.
+      # The returned set is never empty: if no types are found, an error is raised instead.
       def document_types_stored_in(index_definition_name)
         indexed_document_types_by_index_definition_name.fetch(index_definition_name) do
           if index_definition_name.include?(ROLLOVER_INDEX_INFIX_MARKER)
@@ -152,18 +154,19 @@ module ElasticGraph
       end
       alias_method :inspect, :to_s
 
+      private
+
       # Returns a hash mapping each index definition name to all indexed document types that use that index.
       # Multiple types may map to the same index when abstract types share an index with their concrete subtypes
-      # via index inheritance.
+      # via index inheritance. Intentionally private: public callers should use `document_types_stored_in` instead.
       def indexed_document_types_by_index_definition_name
-        @indexed_document_types_by_index_definition_name ||= indexed_document_types.each_with_object({}) do |type, hash|
-          type.index_definitions.each do |index_def|
-            (hash[index_def.name] ||= Set.new) << type
-          end
-        end.freeze
+        @indexed_document_types_by_index_definition_name ||=
+          indexed_document_types.each_with_object(::Hash.new { |h, k| h[k] = ::Set.new }) do |type, hash|
+            type.index_definitions.each do |index_def|
+              hash[index_def.name] << type
+            end
+          end.freeze
       end
-
-      private
 
       def build_base_object_class
         schema = self

@@ -38,6 +38,15 @@ tables:
         owner_ids ARRAY<STRING>,
         owner_id STRING
       )
+  distribution_channels:
+    table_schema: |-
+      CREATE TABLE IF NOT EXISTS distribution_channels (
+        id STRING,
+        established_on DATE,
+        active BOOLEAN,
+        name STRING,
+        __typename STRING
+      )
   electrical_parts:
     table_schema: |-
       CREATE TABLE IF NOT EXISTS electrical_parts (
@@ -70,6 +79,13 @@ tables:
         id STRING,
         name STRING,
         nationality STRING
+      )
+  physical_stores:
+    table_schema: |-
+      CREATE TABLE IF NOT EXISTS physical_stores (
+        id STRING,
+        established_on DATE,
+        active BOOLEAN
       )
   sponsors:
     table_schema: |-

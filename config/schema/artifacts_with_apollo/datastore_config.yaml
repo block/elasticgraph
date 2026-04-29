@@ -1618,6 +1618,35 @@ indices:
       index.number_of_replicas: 1
       index.number_of_shards: 1
       index.max_result_window: 10000
+  distribution_channels:
+    aliases: {}
+    mappings:
+      dynamic: strict
+      properties:
+        id:
+          type: keyword
+        established_on:
+          type: date
+          format: strict_date
+        active:
+          type: boolean
+        name:
+          type: keyword
+        __typename:
+          type: keyword
+        __sources:
+          type: keyword
+        __versions:
+          type: object
+          dynamic: 'false'
+      _size:
+        enabled: true
+    settings:
+      index.mapping.ignore_malformed: false
+      index.mapping.coerce: false
+      index.number_of_replicas: 1
+      index.number_of_shards: 1
+      index.max_result_window: 10000
   electrical_parts:
     aliases: {}
     mappings:
@@ -1720,6 +1749,31 @@ indices:
           type: keyword
         nationality:
           type: keyword
+        __sources:
+          type: keyword
+        __versions:
+          type: object
+          dynamic: 'false'
+      _size:
+        enabled: true
+    settings:
+      index.mapping.ignore_malformed: false
+      index.mapping.coerce: false
+      index.number_of_replicas: 1
+      index.number_of_shards: 1
+      index.max_result_window: 10000
+  physical_stores:
+    aliases: {}
+    mappings:
+      dynamic: strict
+      properties:
+        id:
+          type: keyword
+        established_on:
+          type: date
+          format: strict_date
+        active:
+          type: boolean
         __sources:
           type: keyword
         __versions:
