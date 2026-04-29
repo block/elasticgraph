@@ -47,7 +47,15 @@ module ElasticGraph
 
           def all_highlights
             @all_highlights ||= begin
-              document_type = schema.document_type_stored_in(node.index_definition_name)
+              document_type =
+                if (typename = node["__typename"])
+                  # When multiple types share an index, documents carry a `__typename` field
+                  # that identifies the concrete type; use it to resolve the concrete type directly.
+                  schema.type_named(typename)
+                else
+                  # For individually-indexed types the set always contains exactly one type.
+                  schema.document_types_stored_in(node.index_definition_name).first # : Schema::Type
+                end
 
               node.highlights.filter_map do |path_string, snippets|
                 if (path = path_from(path_string, document_type))

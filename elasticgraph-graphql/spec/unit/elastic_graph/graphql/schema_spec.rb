@@ -115,19 +115,19 @@ module ElasticGraph
         end
       end
 
-      describe "#document_type_stored_in" do
-        it "returns the type stored in the named index" do
+      describe "#document_types_stored_in" do
+        it "returns the types stored in the named index" do
           schema = schema_with_indices("Person" => "people", "Widget" => "widgets")
 
-          expect(schema.document_type_stored_in("people")).to eq(schema.type_named("Person"))
-          expect(schema.document_type_stored_in("widgets")).to eq(schema.type_named("Widget"))
+          expect(schema.document_types_stored_in("people")).to contain_exactly(schema.type_named("Person"))
+          expect(schema.document_types_stored_in("widgets")).to contain_exactly(schema.type_named("Widget"))
         end
 
         it "raises an exception if given an unrecognizd index name" do
           schema = schema_with_indices("Person" => "people", "Widget" => "widgets")
 
           expect {
-            schema.document_type_stored_in("foobars")
+            schema.document_types_stored_in("foobars")
           }.to raise_error(Errors::NotFoundError, a_string_including("foobars"))
         end
 
@@ -135,7 +135,7 @@ module ElasticGraph
           schema = schema_with_indices("Person" => "people", "Widget" => "widgets")
 
           expect {
-            schema.document_type_stored_in("widgets#{ROLLOVER_INDEX_INFIX_MARKER}2021-02")
+            schema.document_types_stored_in("widgets#{ROLLOVER_INDEX_INFIX_MARKER}2021-02")
           }.to raise_error(ArgumentError, a_string_including("widgets#{ROLLOVER_INDEX_INFIX_MARKER}2021-02", "name of a rollover index"))
         end
 

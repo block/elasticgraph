@@ -121,7 +121,9 @@ module ElasticGraph
             # ...otherwise infer the type based on what index the object came from. This is the case
             # with unions/interfaces of individually indexed types.
             # (See `Part` in `config/schema/widgets.rb` for an example of this kind of type union.)
-            schema.document_type_stored_in(object.index_definition_name).graphql_type
+            # This branch is only reached for individually-indexed types (no `__typename`
+            # in the document), so the set always contains exactly one type.
+            schema.document_types_stored_in(object.index_definition_name).first.graphql_type
           end
         end
       end

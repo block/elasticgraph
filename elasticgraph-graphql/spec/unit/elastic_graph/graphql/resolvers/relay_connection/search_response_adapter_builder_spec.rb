@@ -51,6 +51,27 @@ module ElasticGraph
                   i.default_sort "amount_cents", :asc
                 end
               end
+
+              # Used to test __typename-based type resolution for shared-index types.
+              schema.interface_type "Retailer" do |t|
+                t.field "id", "ID!"
+                t.field "name", "String"
+                t.index "retailers"
+              end
+
+              schema.object_type "OnlineStore" do |t|
+                t.implements "Retailer"
+                t.field "id", "ID!"
+                t.field "name", "String"
+                t.field "url", "String"
+              end
+
+              schema.object_type "PhysicalStore" do |t|
+                t.implements "Retailer"
+                t.field "id", "ID!"
+                t.field "name", "String"
+                t.field "address", "String"
+              end
             end
           end
 
@@ -490,6 +511,33 @@ module ElasticGraph
                     ]
                   }
                 }
+              )
+            end
+
+            it "uses `__typename` from the document to resolve the concrete type when looking up highlight paths" do
+              hit = {
+                "_index" => "retailers",
+                "_id" => "r1",
+                "_source" => {"id" => "r1", "__typename" => "OnlineStore"},
+                "sort" => ["r1"],
+                "highlight" => {"url" => ["https://example.com"]}
+              }
+
+              results = execute_query(query: <<~QUERY, hits: [hit])
+                query {
+                  retailers {
+                    edges {
+                      all_highlights {
+                        path
+                        snippets
+                      }
+                    }
+                  }
+                }
+              QUERY
+
+              expect(results.dig("data", "retailers", "edges")).to contain_exactly(
+                {"all_highlights" => [{"path" => ["url"], "snippets" => ["https://example.com"]}]}
               )
             end
           end

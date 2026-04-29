@@ -120,7 +120,7 @@ module ElasticGraph
         raise Errors::NotFoundError, msg
       end
 
-      def document_type_stored_in(index_definition_name)
+      def document_types_stored_in(index_definition_name)
         indexed_document_types_by_index_definition_name.fetch(index_definition_name) do
           if index_definition_name.include?(ROLLOVER_INDEX_INFIX_MARKER)
             raise ArgumentError, "`#{index_definition_name}` is the name of a rollover index; pass the name of the parent index definition instead."
@@ -193,7 +193,7 @@ module ElasticGraph
       def indexed_document_types_by_index_definition_name
         @indexed_document_types_by_index_definition_name ||= indexed_document_types.each_with_object({}) do |type, hash|
           type.index_definitions.each do |index_def|
-            hash[index_def.name] ||= type
+            (hash[index_def.name] ||= Set.new) << type
           end
         end.freeze
       end
