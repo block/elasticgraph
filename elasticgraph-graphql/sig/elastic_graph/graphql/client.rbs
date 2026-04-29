@@ -3,12 +3,13 @@ module ElasticGraph
     class Client
       attr_reader name: ::String
       attr_reader source_description: ::String
-      def initialize: (name: ::String, source_description: ::String) -> void
-      def with: (?name: ::String, ?source_description: ::String) -> Client
+      attr_reader extra_opaque_id_parts: ::Array[::String]
+      def initialize: (source_description: ::String, name: ::String, ?extra_opaque_id_parts: ::Array[::String]) -> void
+      def with: (?source_description: ::String, ?name: ::String, ?extra_opaque_id_parts: ::Array[::String]) -> Client
 
       def self.new:
-        (name: ::String, source_description: ::String) -> instance
-      | (::String, ::String) -> instance
+        (source_description: ::String, name: ::String, ?extra_opaque_id_parts: ::Array[::String]) -> instance
+      | (::String, ::String, ?::Array[::String]) -> instance
 
       ANONYMOUS: Client
       ELASTICGRAPH_INTERNAL: Client

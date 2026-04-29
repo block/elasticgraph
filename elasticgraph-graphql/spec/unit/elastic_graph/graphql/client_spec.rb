@@ -11,6 +11,14 @@ require "elastic_graph/graphql/client"
 module ElasticGraph
   class GraphQL
     RSpec.describe Client do
+      describe "#extra_opaque_id_parts" do
+        it "defaults to an empty array" do
+          client = Client.new(name: "John", source_description: "42")
+
+          expect(client.extra_opaque_id_parts).to eq([])
+        end
+      end
+
       describe "#description" do
         it "combines the name and id in a readable way" do
           client = Client.new(name: "John", source_description: "42")

@@ -1,0 +1,7 @@
+module ElasticGraph
+  module Support
+    module OpaqueID
+      def self.build_header: (::Array[::String?]) -> ::String?
+    end
+  end
+end

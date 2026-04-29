@@ -10,6 +10,7 @@ require "elastic_graph/constants"
 require "elastic_graph/errors"
 require "elastic_graph/graphql/datastore_response/search_response"
 require "elastic_graph/graphql/query_details_tracker"
+require "elastic_graph/support/opaque_id"
 require "elastic_graph/support/threading"
 
 module ElasticGraph
@@ -32,7 +33,7 @@ module ElasticGraph
 
       # Sends the datastore a multi-search request based on the given queries.
       # Returns a hash of responses keyed by the query.
-      def msearch(queries, query_tracker: QueryDetailsTracker.empty)
+      def msearch(queries, query_tracker: QueryDetailsTracker.empty, opaque_id_parts: ["elasticgraph-graphql"])
         DatastoreQuery.perform(queries) do |header_body_tuples_by_query|
           # Here we set a client-side timeout, which causes the client to give up and close the connection.
           # According to [1]--"We have a new way to cancel search requests efficiently from the client
@@ -64,6 +65,9 @@ module ElasticGraph
           # even though Faraday (the underlying HTTP client) does. To work around this, we pass our desired
           # timeout in a specific header that the `SupportTimeouts` Faraday middleware will use.
           headers = {TIMEOUT_MS_HEADER => msearch_request_timeout_from(queries)&.to_s}.compact
+          if (opaque_id = Support::OpaqueID.build_header(opaque_id_parts))
+            headers[OPAQUE_ID_HEADER] = opaque_id
+          end
 
           queries_and_header_body_tuples_by_datastore_client = header_body_tuples_by_query.group_by do |(query, header_body_tuples)|
             @datastore_clients_by_name.fetch(query.cluster_name)

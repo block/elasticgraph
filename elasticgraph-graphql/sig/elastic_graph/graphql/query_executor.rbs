@@ -37,7 +37,6 @@ module ElasticGraph
 
       def execute_query: (::GraphQL::Query, client: Client) -> ::GraphQL::Query::Result
       def full_description_of: (::GraphQL::Query) -> ::String
-      def fingerprint_for: (::GraphQL::Query) -> ::String
       def directives_from_query_operation: (::GraphQL::Query) -> ::Hash[::String, ::Hash[::String, untyped]]
       def slo_result_for: (::GraphQL::Query, ::Integer) -> ::String?
     end

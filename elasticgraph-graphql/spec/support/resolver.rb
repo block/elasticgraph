@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/graphql/query_details_tracker"
+require "elastic_graph/graphql/client"
 require "elastic_graph/graphql/resolvers/query_adapter"
 require "elastic_graph/graphql/resolvers/query_source"
 require "graphql"
@@ -21,13 +22,14 @@ module ResolverHelperMethods
 
     ::GraphQL::Dataloader.with_dataloading do |dataloader|
       context = ::GraphQL::Query::Context.new(
-        query: nil,
+        query: instance_double(::GraphQL::Query, fingerprint: "ResolverHelperQuery/test"),
         schema: graphql.schema.graphql_schema,
         values: {
           elastic_graph_schema: graphql.schema,
           dataloader: dataloader,
           elastic_graph_query_tracker: query_details_tracker,
-          datastore_search_router: graphql.datastore_search_router
+          datastore_search_router: graphql.datastore_search_router,
+          elastic_graph_client: ElasticGraph::GraphQL::Client::ANONYMOUS
         }
       )
 

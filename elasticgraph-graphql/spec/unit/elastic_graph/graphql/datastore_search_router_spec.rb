@@ -84,7 +84,8 @@ module ElasticGraph
           router.msearch([query1.merge_with(monotonic_clock_deadline: now_when_msearch_is_called + 117)])
 
           expect(main_datastore_client).to have_received(:msearch).with(a_hash_including(headers: {
-            TIMEOUT_MS_HEADER => "117"
+            TIMEOUT_MS_HEADER => "117",
+            OPAQUE_ID_HEADER => "elasticgraph-graphql"
           }))
         end
 
@@ -93,7 +94,9 @@ module ElasticGraph
           expect(query2.monotonic_clock_deadline).to be nil
 
           router.msearch([query1, query2])
-          expect(main_datastore_client).to have_received(:msearch).with(a_hash_including(headers: {}))
+          expect(main_datastore_client).to have_received(:msearch).with(a_hash_including(headers: {
+            OPAQUE_ID_HEADER => "elasticgraph-graphql"
+          }))
         end
 
         it "picks the numerical (not lexicographical) minimum timeout when multiple queries have a deadline" do
@@ -103,7 +106,8 @@ module ElasticGraph
           ])
 
           expect(main_datastore_client).to have_received(:msearch).with(a_hash_including(headers: {
-            TIMEOUT_MS_HEADER => "9"
+            TIMEOUT_MS_HEADER => "9",
+            OPAQUE_ID_HEADER => "elasticgraph-graphql"
           }))
         end
 
@@ -115,8 +119,23 @@ module ElasticGraph
           ])
 
           expect(main_datastore_client).to have_received(:msearch).with(a_hash_including(headers: {
-            TIMEOUT_MS_HEADER => "9"
+            TIMEOUT_MS_HEADER => "9",
+            OPAQUE_ID_HEADER => "elasticgraph-graphql"
           }))
+        end
+
+        it "allows callers to provide opaque id parts for the datastore request" do
+          router.msearch([query1], opaque_id_parts: ["elasticgraph-graphql", "client=client-name", "query=GetColors/abc123"])
+
+          expect(main_datastore_client).to have_received(:msearch).with(a_hash_including(headers: {
+            OPAQUE_ID_HEADER => "elasticgraph-graphql;client=client-name;query=GetColors/abc123"
+          }))
+        end
+
+        it "omits the opaque id header when the provided parts normalize to an empty value" do
+          router.msearch([query1], opaque_id_parts: [nil, " ", ""])
+
+          expect(main_datastore_client).to have_received(:msearch).with(a_hash_including(headers: {}))
         end
 
         it "avoids sending an identical query multiple times in the same HTTP request" do

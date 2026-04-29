@@ -20,6 +20,10 @@ module ElasticGraph
       @datastore_clients_by_name: ::Hash[::String, DatastoreCore::_Client]
       @logger: ::Logger
 
+      def opaque_id_parts_for_source_event_versions: (
+        ::Array[Operation::Update]
+      ) -> ::Array[::String]
+
       class BulkResultSupertype
         attr_reader ops_and_results_by_cluster: ::Hash[::String, ::Array[[_Operation, Operation::Result]]]
         attr_reader noop_results: ::Array[Operation::Result]

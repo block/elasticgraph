@@ -2,9 +2,10 @@ module ElasticGraph
   class GraphQL
     module Resolvers
       class QuerySource < ::GraphQL::Dataloader::Source
-        def initialize: (DatastoreSearchRouter, QueryDetailsTracker) -> void
+        def initialize: (DatastoreSearchRouter, QueryDetailsTracker, ?::Array[::String]) -> void
         @datastore_router: DatastoreSearchRouter
         @query_tracker: QueryDetailsTracker
+        @opaque_id_parts: ::Array[::String]
         def fetch: (::Array[DatastoreQuery]) -> ::Array[DatastoreResponse::SearchResponse]
 
         def self.execute_many: (
@@ -16,6 +17,8 @@ module ElasticGraph
           DatastoreQuery,
           for_context: ::GraphQL::Query::Context
         ) -> DatastoreResponse::SearchResponse
+
+        def self.datastore_opaque_id_parts_for: (::GraphQL::Query::Context) -> ::Array[::String]
       end
     end
   end

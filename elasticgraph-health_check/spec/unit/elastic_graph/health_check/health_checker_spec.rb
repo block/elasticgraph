@@ -6,6 +6,7 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/constants"
 require "elastic_graph/graphql/datastore_response/search_response"
 require "elastic_graph/health_check/health_checker"
 require "elastic_graph/support/hash_util"
@@ -16,6 +17,7 @@ module ElasticGraph
       let(:cluster_names) { ["main", "other1", "other2"] }
       let(:now) { ::Time.iso8601("2022-02-14T12:30:00Z") }
       let(:datastore_query_body_by_type) { {} }
+      let(:msearch_requests_by_cluster) { Hash.new { |hash, key| hash[key] = [] } }
 
       attr_reader :example_datastore_health_response
 
@@ -138,6 +140,17 @@ module ElasticGraph
             timestamp: now - 50,
             seconds_newer_than_required: -20 # 30 - 50
           )
+        end
+
+        it "includes an opaque id on datastore msearch requests" do
+          build_health_checker(health_check: valid_config).check_health
+
+          requests = msearch_requests_by_cluster.values.flatten
+
+          expect(requests).not_to be_empty
+          expect(requests).to all(include(headers: a_hash_including(
+            OPAQUE_ID_HEADER => "elasticgraph-health_check;types=Component,Widget"
+          )))
         end
 
         it "returns `nil` for a type's latest record if there is no data in that type's index" do
@@ -467,6 +480,7 @@ module ElasticGraph
 
         stubbed_datastore_client(get_cluster_health: cluster_health).tap do |client|
           allow(client).to receive(:msearch) do |request|
+            msearch_requests_by_cluster[name] << request
             build_msearch_response(request, latest_records_by_type)
           end
         end

@@ -13,12 +13,13 @@ module ElasticGraph
     # meant to be a friendly/human readable string (such as a service name)
     # where as `source_description` is meant to be an opaque string describing
     # where `name` came from.
-    class Client < Data.define(:source_description, :name)
+    class Client < Data.define(:source_description, :name, :extra_opaque_id_parts)
       # `Data.define` provides the following methods:
-      # @dynamic initialize, name, source_description, with
+      # @dynamic name, source_description, extra_opaque_id_parts, with
 
-      ANONYMOUS = new("(anonymous)", "(anonymous)")
-      ELASTICGRAPH_INTERNAL = new("(ElasticGraphInternal)", "(ElasticGraphInternal)")
+      def initialize(source_description:, name:, extra_opaque_id_parts: [])
+        super
+      end
 
       def description
         if source_description == name
@@ -38,6 +39,9 @@ module ElasticGraph
           Client::ANONYMOUS
         end
       end
+
+      ANONYMOUS = new("(anonymous)", "(anonymous)")
+      ELASTICGRAPH_INTERNAL = new("(ElasticGraphInternal)", "(ElasticGraphInternal)")
     end
   end
 end
