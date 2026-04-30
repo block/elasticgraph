@@ -115,19 +115,44 @@ module ElasticGraph
         end
       end
 
-      describe "#document_type_stored_in" do
-        it "returns the type stored in the named index" do
+      describe "#document_types_stored_in" do
+        it "returns the types stored in the named index" do
           schema = schema_with_indices("Person" => "people", "Widget" => "widgets")
 
-          expect(schema.document_type_stored_in("people")).to eq(schema.type_named("Person"))
-          expect(schema.document_type_stored_in("widgets")).to eq(schema.type_named("Widget"))
+          expect(schema.document_types_stored_in("people")).to contain_exactly(schema.type_named("Person"))
+          expect(schema.document_types_stored_in("widgets")).to contain_exactly(schema.type_named("Widget"))
+        end
+
+        it "returns multiple types when an abstract type shares an index with its concrete subtypes via index inheritance" do
+          schema = define_schema do |s|
+            s.interface_type "Animal" do |t|
+              t.field "id", "ID!"
+              t.index "animals"
+            end
+
+            s.object_type "Dog" do |t|
+              t.implements "Animal"
+              t.field "id", "ID!"
+            end
+
+            s.object_type "Cat" do |t|
+              t.implements "Animal"
+              t.field "id", "ID!"
+            end
+          end
+
+          expect(schema.document_types_stored_in("animals")).to contain_exactly(
+            schema.type_named("Animal"),
+            schema.type_named("Dog"),
+            schema.type_named("Cat")
+          )
         end
 
         it "raises an exception if given an unrecognizd index name" do
           schema = schema_with_indices("Person" => "people", "Widget" => "widgets")
 
           expect {
-            schema.document_type_stored_in("foobars")
+            schema.document_types_stored_in("foobars")
           }.to raise_error(Errors::NotFoundError, a_string_including("foobars"))
         end
 
@@ -135,7 +160,7 @@ module ElasticGraph
           schema = schema_with_indices("Person" => "people", "Widget" => "widgets")
 
           expect {
-            schema.document_type_stored_in("widgets#{ROLLOVER_INDEX_INFIX_MARKER}2021-02")
+            schema.document_types_stored_in("widgets#{ROLLOVER_INDEX_INFIX_MARKER}2021-02")
           }.to raise_error(ArgumentError, a_string_including("widgets#{ROLLOVER_INDEX_INFIX_MARKER}2021-02", "name of a rollover index"))
         end
 

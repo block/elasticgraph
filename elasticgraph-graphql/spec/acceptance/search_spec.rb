@@ -698,6 +698,28 @@ module ElasticGraph
         test_widget_search_highlighting(widget1, widget2, widget3)
       end
 
+      it "resolves all_highlights against the concrete type for documents in a shared-index hierarchy" do
+        # OnlineStore.name is a field specific to OnlineStore — absent from DistributionChannel.
+        # Without __typename-aware type resolution in all_highlights, the highlight response from
+        # the datastore would be resolved against the wrong type (e.g. DistributionChannel), causing
+        # the name highlight to be silently dropped.
+        index_records(
+          online_store = build(:online_store, name: "Example Marketplace"),
+          build(:online_store, name: "Other Store"),
+          build(:third_party_wholesale)
+        )
+
+        highlights_by_id = query_all_highlights("retailers", filter: {
+          "name" => {"contains" => {"any_substring_of" => ["Marketplace"]}}
+        })
+
+        expect(highlights_by_id).to eq({
+          online_store.fetch(:id) => [
+            {"path" => ["name"], "snippets" => ["<em>Example Marketplace</em>"]}
+          ]
+        })
+      end
+
       it "supports fetching interface fields" do
         index_into(
           graphql,

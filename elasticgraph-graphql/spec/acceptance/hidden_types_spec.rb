@@ -82,6 +82,10 @@ module ElasticGraph
             all_types_related_to("Company") +
             all_types_related_to("Inventor") +
             all_types_related_to("NamedInventor") +
+            all_types_related_to("DistributionChannel") +
+            all_types_related_to("Retail") +
+            all_types_related_to("Store") +
+            all_types_related_to("PhysicalStore") +
             relay_types_related_to("String", include_list_filter: true) - ["StringSortOrderInput"] +
             type_and_filters_for("Boolean", include_list: true) +
             type_and_filters_for("Color", include_list: true, as_input_enum: true) +
@@ -116,6 +120,7 @@ module ElasticGraph
             %w[
               FloatAggregatedValues IntAggregatedValues JsonSafeLongAggregatedValues LongStringAggregatedValues NonNumericAggregatedValues
               DateAggregatedValues DateTimeAggregatedValues LocalTimeAggregatedValues
+              OnlineStore ThirdPartyWholesale
               Cursor PageInfo Query TextFilterInput GeoLocation
               DateTimeGroupingOffsetInput DateTimeUnitInput DateTimeTimeOfDayFilterInput
               DateGroupedBy DateGroupingOffsetInput DateGroupingTruncationUnitInput DateUnitInput

@@ -120,7 +120,12 @@ module ElasticGraph
         raise Errors::NotFoundError, msg
       end
 
-      def document_type_stored_in(index_definition_name)
+      # Returns all indexed document types stored in the named index definition.
+      # The returned set includes both abstract and concrete types. Multiple types may be returned
+      # when abstract types share an index with their concrete subtypes via index inheritance.
+      # @raise [Errors::NotFoundError] if the index definition name is not recognized
+      # @raise [ArgumentError] if given the name of a rollover index instead of the parent index definition name
+      def document_types_stored_in(index_definition_name)
         indexed_document_types_by_index_definition_name.fetch(index_definition_name) do
           if index_definition_name.include?(ROLLOVER_INDEX_INFIX_MARKER)
             raise ArgumentError, "`#{index_definition_name}` is the name of a rollover index; pass the name of the parent index definition instead."
@@ -190,12 +195,14 @@ module ElasticGraph
         end
       end
 
+      # Intentionally private: public callers should use `document_types_stored_in` instead.
       def indexed_document_types_by_index_definition_name
-        @indexed_document_types_by_index_definition_name ||= indexed_document_types.each_with_object({}) do |type, hash|
-          type.index_definitions.each do |index_def|
-            hash[index_def.name] ||= type
-          end
-        end.freeze
+        @indexed_document_types_by_index_definition_name ||=
+          indexed_document_types.each_with_object(::Hash.new { |h, k| h[k] = ::Set.new }) do |type, hash|
+            type.index_definitions.each do |index_def|
+              hash[index_def.name] << type
+            end
+          end.freeze
       end
 
       def log_hidden_types

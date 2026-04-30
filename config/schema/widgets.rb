@@ -343,6 +343,54 @@ ElasticGraph.define_schema do |schema|
     t.subtypes "MechanicalPart", "ElectricalPart"
   end
 
+  schema.interface_type "DistributionChannel" do |t|
+    t.field "id", "ID!"
+    t.field "active", "Boolean"
+    t.index "distribution_channels"
+  end
+
+  # Retail and Store form a two-level interface chain under DistributionChannel. This depth is
+  # intentional: it exercises that __typename filtering works correctly when querying at any
+  # level of a multi-level hierarchy, not just one level from the root.
+  schema.interface_type "Retail" do |t|
+    t.implements "DistributionChannel"
+    t.root_query_fields plural: "retailers"
+    t.field "id", "ID!"
+    t.field "active", "Boolean"
+    t.field "established_on", "Date"
+  end
+
+  schema.interface_type "Store" do |t|
+    t.implements "Retail"
+    t.field "id", "ID!"
+    t.field "active", "Boolean"
+    t.field "established_on", "Date"
+  end
+
+  # ThirdPartyWholesale - concrete type in parallel to Retail branch
+  schema.object_type "ThirdPartyWholesale" do |t|
+    t.implements "DistributionChannel"
+    t.field "id", "ID!"
+    t.field "active", "Boolean"
+  end
+
+  schema.object_type "OnlineStore" do |t|
+    t.implements "Store"
+    t.field "id", "ID!"
+    t.field "established_on", "Date"
+    t.field "active", "Boolean"
+    t.field "name", "String"
+  end
+
+  schema.object_type "PhysicalStore" do |t|
+    t.implements "Store"
+    t.field "id", "ID!"
+    t.field "established_on", "Date"
+    t.field "active", "Boolean"
+
+    t.index "physical_stores"
+  end
+
   # Note: `Manufacturer` is used in our tests as an example of an indexed type that has no list fields, so we should
   # not add any list fields to this type in the future.
   schema.object_type "Manufacturer" do |t|

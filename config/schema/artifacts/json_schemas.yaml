@@ -28,9 +28,12 @@ json_schema_version: 1
         - ElectricalPart
         - Manufacturer
         - MechanicalPart
+        - OnlineStore
         - Person
+        - PhysicalStore
         - Sponsor
         - Team
+        - ThirdPartyWholesale
         - Widget
         - WidgetWorkspace
       id:
@@ -445,6 +448,36 @@ json_schema_version: 1
     oneOf:
     - "$ref": "#/$defs/Person"
     - "$ref": "#/$defs/Company"
+  OnlineStore:
+    type: object
+    properties:
+      id:
+        allOf:
+        - "$ref": "#/$defs/ID"
+        - maxLength: 8191
+      established_on:
+        anyOf:
+        - "$ref": "#/$defs/Date"
+        - type: 'null'
+      active:
+        anyOf:
+        - "$ref": "#/$defs/Boolean"
+        - type: 'null'
+      name:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/String"
+          - maxLength: 8191
+        - type: 'null'
+      __typename:
+        type: string
+        const: OnlineStore
+        default: OnlineStore
+    required:
+    - id
+    - established_on
+    - active
+    - name
   Person:
     type: object
     properties:
@@ -472,6 +505,29 @@ json_schema_version: 1
     - id
     - name
     - nationality
+  PhysicalStore:
+    type: object
+    properties:
+      id:
+        allOf:
+        - "$ref": "#/$defs/ID"
+        - maxLength: 8191
+      established_on:
+        anyOf:
+        - "$ref": "#/$defs/Date"
+        - type: 'null'
+      active:
+        anyOf:
+        - "$ref": "#/$defs/Boolean"
+        - type: 'null'
+      __typename:
+        type: string
+        const: PhysicalStore
+        default: PhysicalStore
+    required:
+    - id
+    - established_on
+    - active
   Player:
     type: object
     properties:
@@ -819,6 +875,24 @@ json_schema_version: 1
     - was_shortened
     - players_nested
     - players_object
+  ThirdPartyWholesale:
+    type: object
+    properties:
+      id:
+        allOf:
+        - "$ref": "#/$defs/ID"
+        - maxLength: 8191
+      active:
+        anyOf:
+        - "$ref": "#/$defs/Boolean"
+        - type: 'null'
+      __typename:
+        type: string
+        const: ThirdPartyWholesale
+        default: ThirdPartyWholesale
+    required:
+    - id
+    - active
   Untyped:
     type:
     - array
