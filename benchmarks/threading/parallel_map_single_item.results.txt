@@ -1,0 +1,127 @@
+
+================================================================================
+single item array
+================================================================================
+ruby 3.4.7 (2025-10-08 revision 7a5688e2a2) +PRISM [arm64-darwin20]
+Warming up --------------------------------------
+before: always spawn thread
+                         2.938k i/100ms
+    after: fast path   408.510k i/100ms
+Calculating -------------------------------------
+before: always spawn thread
+                         25.825k (± 6.5%) i/s   (38.72 μs/i) -    129.272k in   5.027934s
+    after: fast path      3.993M (± 3.9%) i/s  (250.43 ns/i) -     20.017M in   5.021850s
+
+Comparison:
+    after: fast path:  3993083.5 i/s
+before: always spawn thread:    25824.7 i/s - 154.62x  slower
+
+
+================================================================================
+single entry hash, like one datastore-client msearch fanout
+================================================================================
+ruby 3.4.7 (2025-10-08 revision 7a5688e2a2) +PRISM [arm64-darwin20]
+Warming up --------------------------------------
+before: always spawn thread
+                         2.668k i/100ms
+    after: fast path   318.552k i/100ms
+Calculating -------------------------------------
+before: always spawn thread
+                         21.520k (±19.5%) i/s   (46.47 μs/i) -    104.052k in   5.098624s
+    after: fast path      3.278M (± 5.4%) i/s  (305.03 ns/i) -     16.565M in   5.069629s
+
+Comparison:
+    after: fast path:  3278402.5 i/s
+before: always spawn thread:    21519.8 i/s - 152.34x  slower
+
+
+================================================================================
+empty array
+================================================================================
+ruby 3.4.7 (2025-10-08 revision 7a5688e2a2) +PRISM [arm64-darwin20]
+Warming up --------------------------------------
+before: always spawn thread
+                       735.659k i/100ms
+    after: fast path   723.657k i/100ms
+Calculating -------------------------------------
+before: always spawn thread
+                          7.120M (± 8.2%) i/s  (140.45 ns/i) -     35.312M in   5.009859s
+    after: fast path      7.094M (± 4.8%) i/s  (140.96 ns/i) -     35.459M in   5.011149s
+
+Comparison:
+before: always spawn thread:  7119941.7 i/s
+    after: fast path:  7094392.7 i/s - same-ish: difference falls within error
+
+
+================================================================================
+empty hash
+================================================================================
+ruby 3.4.7 (2025-10-08 revision 7a5688e2a2) +PRISM [arm64-darwin20]
+Warming up --------------------------------------
+before: always spawn thread
+                       519.319k i/100ms
+    after: fast path   538.244k i/100ms
+Calculating -------------------------------------
+before: always spawn thread
+                          5.077M (±10.5%) i/s  (196.95 ns/i) -     25.447M in   5.094679s
+    after: fast path      5.290M (± 8.2%) i/s  (189.05 ns/i) -     26.374M in   5.036762s
+
+Comparison:
+    after: fast path:  5289538.9 i/s
+before: always spawn thread:  5077366.9 i/s - same-ish: difference falls within error
+
+
+================================================================================
+multi item array, expected to stay on the threaded path
+================================================================================
+ruby 3.4.7 (2025-10-08 revision 7a5688e2a2) +PRISM [arm64-darwin20]
+Warming up --------------------------------------
+before: always spawn thread
+                       734.000 i/100ms
+after: current implementation
+                       704.000 i/100ms
+Calculating -------------------------------------
+before: always spawn thread
+                          7.063k (± 8.0%) i/s  (141.58 μs/i) -     35.232k in   5.025075s
+after: current implementation
+                          6.363k (± 8.0%) i/s  (157.16 μs/i) -     31.680k in   5.010779s
+
+Comparison:
+before: always spawn thread:     7063.1 i/s
+after: current implementation:     6363.0 i/s - same-ish: difference falls within error
+
+
+================================================================================
+multi entry hash, expected to stay on the threaded path
+================================================================================
+ruby 3.4.7 (2025-10-08 revision 7a5688e2a2) +PRISM [arm64-darwin20]
+Warming up --------------------------------------
+before: always spawn thread
+                       455.000 i/100ms
+after: current implementation
+                       652.000 i/100ms
+Calculating -------------------------------------
+before: always spawn thread
+                          5.907k (±14.3%) i/s  (169.29 μs/i) -     28.665k in   5.019039s
+after: current implementation
+                          6.306k (±11.1%) i/s  (158.59 μs/i) -     31.296k in   5.042971s
+
+Comparison:
+after: current implementation:     6305.7 i/s
+before: always spawn thread:     5906.9 i/s - same-ish: difference falls within error
+
+
+Thread.new calls for 1000 map calls
+--------------------------------------------------------------------------------
+before single array          1000
+after single array           0
+before single hash           1000
+after single hash            0
+before empty array           0
+after empty array            0
+before empty hash            0
+after empty hash             0
+before multi item array      4000
+after multi item array       4000
+before multi entry hash      4000
+after multi entry hash       4000

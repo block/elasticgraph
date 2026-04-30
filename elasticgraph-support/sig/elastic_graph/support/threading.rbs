@@ -3,7 +3,7 @@ module ElasticGraph
     module Threading
       def self.parallel_map:
         [K, V, O] (::Hash[K, V]) { ([K, V]) -> O } -> ::Array[O]
-        | [I, O] (::Enumerable[I]) { (I) -> O } -> ::Array[O]
+        | [I, O] (::Array[I]) { (I) -> O } -> ::Array[O]
     end
   end
 end

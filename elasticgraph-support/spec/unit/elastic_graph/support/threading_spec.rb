@@ -17,6 +17,56 @@ module ElasticGraph
           expect(result).to eq %w[b c d]
         end
 
+        it "does not spawn a thread when there is only one item to map" do
+          calling_thread = Thread.current
+
+          result = Threading.parallel_map(["a"]) do |value|
+            expect(Thread.current).to be(calling_thread)
+            value.next
+          end
+
+          expect(result).to eq ["b"]
+        end
+
+        it "preserves hash entry destructuring when there is only one item to map" do
+          calling_thread = Thread.current
+
+          result = Threading.parallel_map({"a" => 1}) do |key, value|
+            expect(Thread.current).to be(calling_thread)
+            [key.next, value.next]
+          end
+
+          expect(result).to eq [["b", 2]]
+        end
+
+        it "preserves the backtrace on exceptions when mapping over one item" do
+          exception1 = ["a"].map { raise it } rescue $! # standard:disable Style/RescueModifier
+          exception2 = Threading.parallel_map(["a"]) { raise it } rescue $! # standard:disable Style/RescueModifier
+
+          spec_file = File.basename(__FILE__)
+
+          suffix1, suffix2 = [exception1, exception2].map do |ex|
+            ex.backtrace
+              .reject { |frame| frame.include?(spec_file) || frame.include?("threading.rb") }
+              .join("\n")
+          end
+
+          # Threading.parallel_map updates exception backtraces normally.
+          # Here we confirm it has not changed backtraces for the non-threaded fast path.
+          expect(suffix2).to eq(suffix1)
+        end
+
+        it "uses threads when mapping over multiple hash entries" do
+          calling_thread = Thread.current
+
+          result = Threading.parallel_map({"a" => 1, "b" => 2}) do |key, value|
+            expect(Thread.current).not_to be(calling_thread)
+            [key.next, value.next]
+          end
+
+          expect(result).to eq [["b", 2], ["c", 3]]
+        end
+
         it "propagates exceptions to the calling thread properly, even preserving the calling thread's stacktrace in the exception" do
           expected_trace_frames = caller
 
