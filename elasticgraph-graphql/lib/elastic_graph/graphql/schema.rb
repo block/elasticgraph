@@ -121,8 +121,10 @@ module ElasticGraph
       end
 
       # Returns all indexed document types stored in the named index definition.
-      # Multiple types may be returned when abstract types share an index with their concrete subtypes
-      # via index inheritance. The returned set is never empty: if no types are found, an error is raised instead.
+      # The returned set includes both abstract and concrete types. Multiple types may be returned
+      # when abstract types share an index with their concrete subtypes via index inheritance.
+      # @raise [Errors::NotFoundError] if the index definition name is not recognized
+      # @raise [ArgumentError] if given the name of a rollover index instead of the parent index definition name
       def document_types_stored_in(index_definition_name)
         indexed_document_types_by_index_definition_name.fetch(index_definition_name) do
           if index_definition_name.include?(ROLLOVER_INDEX_INFIX_MARKER)
