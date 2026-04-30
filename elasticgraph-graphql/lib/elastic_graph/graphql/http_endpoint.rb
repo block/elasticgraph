@@ -42,10 +42,17 @@ module ElasticGraph
       # `max_timeout_in_ms` is not a property of the HTTP request (the
       # calling application will determine it instead!) so it is a separate argument.
       #
+      # When a block is given, it is invoked with the GraphQL result hash and must return
+      # the response body to assign to the {HTTPResponse}. The body may be any value the
+      # calling adapter accepts — for example, a `String`, or any object responding to
+      # `each` per the Rack body spec. This lets a host avoid allocating a large JSON
+      # `String` by streaming the result hash directly into the response output stream.
+      # Without a block, the body is built via `JSON.generate(result.to_h)` as before.
+      #
       # Note that this method does _not_ convert exceptions to 500 responses. It's up to
       # the calling application to do that if it wants to (and to determine how much of the
       # exception to return in the HTTP response...).
-      def process(request, max_timeout_in_ms: nil, start_time_in_ms: @monotonic_clock.now_in_ms)
+      def process(request, max_timeout_in_ms: nil, start_time_in_ms: @monotonic_clock.now_in_ms, &body_serializer)
         client_or_response = @client_resolver.resolve(request)
         return client_or_response if client_or_response.is_a?(HTTPResponse)
 
@@ -60,7 +67,11 @@ module ElasticGraph
             start_time_in_ms: start_time_in_ms
           )
 
-          HTTPResponse.json(200, result.to_h)
+          if body_serializer
+            HTTPResponse.new(200, {"Content-Type" => APPLICATION_JSON}, body_serializer.call(result.to_h))
+          else
+            HTTPResponse.json(200, result.to_h)
+          end
         end
       rescue Errors::RequestExceededDeadlineError
         HTTPResponse.error(504, "Search exceeded requested timeout.")
@@ -209,7 +220,9 @@ module ElasticGraph
     #
     # - status_code: an integer like 200.
     # - headers: a hash with string keys and values containing HTTP response headers.
-    # - body: a string containing the response body.
+    # - body: the response body. The {.json} and {.error} factories produce a `String` body;
+    #   custom callers may supply any value the calling adapter accepts (for example, a Rack
+    #   body responding to `each`).
     HTTPResponse = Data.define(:status_code, :headers, :body) do
       # @implements HTTPResponse
 
