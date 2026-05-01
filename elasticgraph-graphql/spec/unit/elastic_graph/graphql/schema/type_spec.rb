@@ -758,6 +758,87 @@ module ElasticGraph
           end
         end
 
+        describe "#source_type" do
+          it "returns the underlying document type for an indexed aggregation type" do
+            schema = define_schema do |s|
+              s.object_type "Thing" do |t|
+                t.field "id", "ID!"
+                t.index "things"
+              end
+            end
+
+            aggregation_type = schema.type_named("ThingAggregation")
+            expect(aggregation_type.source_type).to be schema.type_named("Thing")
+          end
+
+          it "returns self for a non-derived type" do
+            schema = define_schema do |s|
+              s.object_type "Thing" do |t|
+                t.field "id", "ID!"
+                t.index "things"
+              end
+            end
+
+            thing_type = schema.type_named("Thing")
+            expect(thing_type.source_type).to be thing_type
+          end
+        end
+
+        describe "#non_subtypes_in_shared_index" do
+          attr_reader :schema
+
+          before(:context) do
+            @schema = define_schema(clients_by_name: {}) do |s|
+              # A root interface with an index shared by all sub-hierarchies.
+              s.interface_type "Channel" do |t|
+                t.field "id", "ID!"
+                t.index "channels"
+              end
+
+              # A sibling type — NOT under Store, but shares the Channel index.
+              s.object_type "Wholesaler" do |t|
+                t.implements "Channel"
+                t.field "id", "ID!"
+              end
+
+              # A sub-interface and its concrete subtypes.
+              s.interface_type "Store" do |t|
+                t.implements "Channel"
+                t.field "id", "ID!"
+              end
+
+              s.object_type "OnlineStore" do |t|
+                t.implements "Store"
+                t.field "id", "ID!"
+              end
+
+              # PhysicalStore overrides to use a dedicated index.
+              s.object_type "PhysicalStore" do |t|
+                t.implements "Store"
+                t.field "id", "ID!"
+                t.index "physical_stores"
+              end
+            end
+          end
+
+          it "excludes the type itself and its subtypes" do
+            store = schema.type_named("Store")
+
+            result = store.non_subtypes_in_shared_index
+            expect(result).not_to include(store)
+            expect(result).not_to include(schema.type_named("OnlineStore"))
+            expect(result).not_to include(schema.type_named("PhysicalStore"))
+          end
+
+          it "includes concrete sibling types that share the same index" do
+            expect(schema.type_named("Store").non_subtypes_in_shared_index).to include(schema.type_named("Wholesaler"))
+          end
+
+          it "returns an empty set when all types sharing its indexes are subtypes" do
+            expect(schema.type_named("Channel").non_subtypes_in_shared_index).to be_empty
+          end
+        end
+
         describe "#hidden_from_queries?" do
           it "returns `false` on a type that has no backing indexed types" do
             schema = define_schema do |s|
