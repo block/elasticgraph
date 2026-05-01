@@ -139,6 +139,10 @@ module ElasticGraph
       # one or more fields that concrete implementations of the interface must also define. Each implementation can be an
       # {SchemaElements::ObjectType} or {SchemaElements::InterfaceType}.
       #
+      # @note An interface type can declare an index with {Mixins::HasIndices#index}. This creates a _mixed-type index_ in
+      #   the datastore where concrete types that implement the interface coexist. A subtype may opt out of this shared
+      #   index inheritance and use a dedicated index by declaring its own with {Mixins::HasIndices#index}.
+      #
       # @param name [String] name of the interface
       # @yield [SchemaElements::InterfaceType] interface type object
       # @return [void]
@@ -202,6 +206,10 @@ module ElasticGraph
 
       # Defines a [GraphQL union type](https://graphql.org/learn/schema/#union-types). Use it to define an abstract supertype with one or
       # more concrete subtypes. Each subtype must be an {SchemaElements::ObjectType}, but they do not have to share any fields in common.
+      #
+      # @note A union type can declare an index with {Mixins::HasIndices#index}. This creates a _mixed-type index_ in
+      #   the datastore where the union members coexist. A subtype may opt out of this shared index inheritance and use
+      #   a dedicated index by declaring its own with {Mixins::HasIndices#index}.
       #
       # @param name [String] name of the union type
       # @yield [SchemaElements::UnionType] union type object

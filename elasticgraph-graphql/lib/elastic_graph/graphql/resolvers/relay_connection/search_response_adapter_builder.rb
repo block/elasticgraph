@@ -53,7 +53,8 @@ module ElasticGraph
                   # that identifies the concrete type; use it to resolve the concrete type directly.
                   schema.type_named(typename)
                 else
-                  # For individually-indexed types the set always contains exactly one type.
+                  # Index inheritance always injects `__typename` into any shared index mapping,
+                  # so a missing `__typename` means no sharing — the set contains exactly one type.
                   schema.document_types_stored_in(node.index_definition_name).first # : Schema::Type
                 end
 
