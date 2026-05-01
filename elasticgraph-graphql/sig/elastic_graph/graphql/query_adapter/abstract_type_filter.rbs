@@ -1,0 +1,13 @@
+module ElasticGraph
+  class GraphQL
+    class QueryAdapter
+      class AbstractTypeFilter
+        include _QueryAdapter
+
+        def initialize: (SchemaArtifacts::RuntimeMetadata::SchemaElementNames) -> void
+
+        @equal_to_any_of: ::String
+      end
+    end
+  end
+end

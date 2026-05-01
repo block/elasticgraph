@@ -110,8 +110,9 @@ module ElasticGraph
         # In order to support unions and interfaces, we must implement `resolve_type`.
         def resolve_type(supertype, object, context)
           schema = context.fetch(:elastic_graph_schema)
-          # If `__typename` is available, use that to resolve. It should be available on any embedded abstract types...
-          # (See `Inventor` in `config/schema.graphql` for an example of this kind of type union.)
+          # If `__typename` is available, use that to resolve. It will be present on embedded abstract
+          # types, and also on root documents indexed in a shared interface/union index.
+          # (See `Inventor` in `config/schema/widgets.rb` for an example of an embedded abstract type.)
           if (typename = object["__typename"])
             schema
               .graphql_schema
