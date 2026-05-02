@@ -131,18 +131,19 @@ module ElasticGraph
         # For derived types (e.g. indexed aggregations), returns the underlying source document type.
         # Returns `nil` for non-derived types.
         def source_type
-          @source_type ||= @object_runtime_metadata&.source_type&.then { |st| @schema.type_named(st) }
+          return @source_type if defined?(@source_type)
+          @source_type = @object_runtime_metadata&.source_type&.then { |st| @schema.type_named(st) }
         end
 
-        # Returns the set of concrete indexed document types that share any of this type's search
-        # indexes but are not subtypes of this type. Used to determine whether a `__typename`
-        # filter is needed when querying an abstract type.
+        # Returns the set of concrete (non-abstract) indexed document types that share any of this
+        # type's search indexes but are not subtypes of this type. Used to determine whether a
+        # `__typename` filter is needed when querying an abstract type.
         #
         # Abstract types are excluded because documents in the datastore are always associated
         # with a concrete `__typename`. When filtering by `__typename`, only concrete types are
         # relevant.
-        def non_subtypes_in_shared_index
-          @non_subtypes_in_shared_index ||=
+        def concrete_non_subtypes_in_shared_index
+          @concrete_non_subtypes_in_shared_index ||=
             search_index_definitions
               .flat_map { |index_def| @schema.document_types_stored_in(index_def.name).to_a }
               .reject { |t| t == self || subtypes.include?(t) || t.abstract? }

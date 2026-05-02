@@ -793,7 +793,7 @@ module ElasticGraph
           end
         end
 
-        describe "#non_subtypes_in_shared_index" do
+        describe "#concrete_non_subtypes_in_shared_index" do
           attr_reader :schema
 
           before(:context) do
@@ -804,8 +804,13 @@ module ElasticGraph
                 t.index "channels"
               end
 
-              # A sibling type — NOT under Store, but shares the Channel index.
+              # Sibling types — NOT under Store, but share the Channel index.
               s.object_type "Wholesaler" do |t|
+                t.implements "Channel"
+                t.field "id", "ID!"
+              end
+
+              s.object_type "Distributor" do |t|
                 t.implements "Channel"
                 t.field "id", "ID!"
               end
@@ -831,17 +836,23 @@ module ElasticGraph
           end
 
           it "excludes the type itself and its subtypes, returning only concrete sibling types in the shared index" do
-            expect(schema.type_named("Store").non_subtypes_in_shared_index).to contain_exactly(schema.type_named("Wholesaler"))
+            expect(schema.type_named("Store").concrete_non_subtypes_in_shared_index).to contain_exactly(
+              schema.type_named("Wholesaler"),
+              schema.type_named("Distributor")
+            )
           end
 
           it "excludes the type itself even when the type is a concrete type in a shared index" do
             # Wholesaler is a concrete type stored in the "channels" index, so it appears in
             # document_types_stored_in("channels"). Without the `t == self` guard it would include itself.
-            expect(schema.type_named("Wholesaler").non_subtypes_in_shared_index).to contain_exactly(schema.type_named("OnlineStore"))
+            expect(schema.type_named("Wholesaler").concrete_non_subtypes_in_shared_index).to contain_exactly(
+              schema.type_named("Distributor"),
+              schema.type_named("OnlineStore")
+            )
           end
 
           it "returns an empty set when all types sharing its indexes are subtypes" do
-            expect(schema.type_named("Channel").non_subtypes_in_shared_index).to be_empty
+            expect(schema.type_named("Channel").concrete_non_subtypes_in_shared_index).to be_empty
           end
         end
 
