@@ -604,14 +604,14 @@ module ElasticGraph
             end
           end
 
-          it "returns [] for object types" do
+          it "returns an empty set for object types" do
             type = schema.type_named("Size")
-            expect(type.subtypes).to eq []
+            expect(type.subtypes).to be_empty
           end
 
-          it "returns [] for scalar types" do
+          it "returns an empty set for scalar types" do
             type = schema.type_named("Int")
-            expect(type.subtypes).to eq []
+            expect(type.subtypes).to be_empty
           end
 
           it "returns the subtypes of a union" do
@@ -759,28 +759,37 @@ module ElasticGraph
         end
 
         describe "#source_type" do
-          it "returns the underlying document type for an indexed aggregation type" do
-            schema = define_schema do |s|
+          attr_reader :schema
+
+          before(:context) do
+            @schema = define_schema(clients_by_name: {}) do |s|
+              s.enum_type "Status" do |t|
+                t.value "ACTIVE"
+                t.value "INACTIVE"
+              end
+
               s.object_type "Thing" do |t|
                 t.field "id", "ID!"
+                t.field "status", "Status"
                 t.index "things"
               end
             end
-
-            aggregation_type = schema.type_named("ThingAggregation")
-            expect(aggregation_type.source_type).to be schema.type_named("Thing")
           end
 
-          it "returns self for a non-derived type" do
-            schema = define_schema do |s|
-              s.object_type "Thing" do |t|
-                t.field "id", "ID!"
-                t.index "things"
-              end
-            end
+          it "returns the underlying document type for an indexed aggregation type" do
+            expect(schema.type_named("ThingAggregation").source_type).to be schema.type_named("Thing")
+          end
 
-            thing_type = schema.type_named("Thing")
-            expect(thing_type.source_type).to be thing_type
+          it "returns nil for a non-derived object type" do
+            expect(schema.type_named("Thing").source_type).to be_nil
+          end
+
+          it "returns nil for a scalar type" do
+            expect(schema.type_named("Int").source_type).to be_nil
+          end
+
+          it "returns nil for an enum type" do
+            expect(schema.type_named("Status").source_type).to be_nil
           end
         end
 
@@ -821,17 +830,14 @@ module ElasticGraph
             end
           end
 
-          it "excludes the type itself and its subtypes" do
-            store = schema.type_named("Store")
-
-            result = store.non_subtypes_in_shared_index
-            expect(result).not_to include(store)
-            expect(result).not_to include(schema.type_named("OnlineStore"))
-            expect(result).not_to include(schema.type_named("PhysicalStore"))
+          it "excludes the type itself and its subtypes, returning only concrete sibling types in the shared index" do
+            expect(schema.type_named("Store").non_subtypes_in_shared_index).to contain_exactly(schema.type_named("Wholesaler"))
           end
 
-          it "includes concrete sibling types that share the same index" do
-            expect(schema.type_named("Store").non_subtypes_in_shared_index).to include(schema.type_named("Wholesaler"))
+          it "excludes the type itself even when the type is a concrete type in a shared index" do
+            # Wholesaler is a concrete type stored in the "channels" index, so it appears in
+            # document_types_stored_in("channels"). Without the `t == self` guard it would include itself.
+            expect(schema.type_named("Wholesaler").non_subtypes_in_shared_index).to contain_exactly(schema.type_named("OnlineStore"))
           end
 
           it "returns an empty set when all types sharing its indexes are subtypes" do
