@@ -698,26 +698,161 @@ module ElasticGraph
         test_widget_search_highlighting(widget1, widget2, widget3)
       end
 
-      it "resolves all_highlights against the concrete type for documents in a shared-index hierarchy" do
-        # OnlineStore.name is a field specific to OnlineStore — absent from DistributionChannel.
-        # Without __typename-aware type resolution in all_highlights, the highlight response from
-        # the datastore would be resolved against the wrong type (e.g. DistributionChannel), causing
-        # the name highlight to be silently dropped.
+      it "correctly scopes results to the queried interface level across a multi-level type hierarchy", :expect_search_routing do
+        established_on_asc = :"#{case_correctly("established_on")}_ASC"
+        id_desc = :"#{case_correctly("id")}_DESC"
+
+        # The DistributionChannel hierarchy has two branches:
+        #   DistributionChannel (index: distribution_channels)
+        #   ├── Wholesale            (interface, inherits distribution_channels)
+        #   │   ├── DirectWholesaler (concrete, distribution_channels index)
+        #   │   └── BrokerWholesaler (concrete, distribution_channels index)
+        #   └── Retail               (interface, inherits distribution_channels)
+        #       └── Store            (interface, inherits distribution_channels)
+        #           ├── OnlineStore  (concrete, distribution_channels index)
+        #           └── PhysicalStore (concrete, physical_stores index)
+        #
+        # The critical behavior under test: querying at a sub-interface level (e.g. retailers, stores)
+        # must filter OUT non-subtypes in the shared index (e.g. DirectWholesaler when querying stores).
         index_records(
-          online_store = build(:online_store, name: "Example Marketplace"),
-          build(:online_store, name: "Other Store"),
-          build(:direct_wholesaler)
+          physical_store1 = build(:physical_store, established_on: "2019-03-10", active: true),
+          physical_store2 = build(:physical_store, established_on: "2022-08-05", active: true),
+          online_store1 = build(:online_store, established_on: "2020-01-15", active: true, name: "Example Marketplace"),
+          online_store2 = build(:online_store, established_on: "2021-06-20", active: true),
+          build(:direct_wholesaler, active: true),
+          wholesaler2 = build(:broker_wholesaler, active: false)
         )
 
+        store_fragments = [
+          "...on PhysicalStore { id __typename established_on }",
+          "...on OnlineStore { id __typename established_on }"
+        ]
+        wholesale_fragment = "...on DirectWholesaler { id __typename active }"
+        all_channel_fragments = store_fragments + [wholesale_fragment, "...on BrokerWholesaler { id __typename active }"]
+
+        expected_store_typenames = %w[PhysicalStore PhysicalStore OnlineStore OnlineStore]
+
+        # Querying at the top-level DistributionChannel interface returns all concrete types,
+        # including DirectWholesaler and BrokerWholesaler.
+        channels = list_distribution_channels_with(*all_channel_fragments)
+        expect(channels.map { |c| c["__typename"] }).to contain_exactly(
+          *expected_store_typenames, "DirectWholesaler", "BrokerWholesaler"
+        )
+
+        # Querying at the Retail interface excludes wholesalers, even though they live in
+        # the same distribution_channels index.
+        retailers = list_retailers_with(*store_fragments)
+        expect(retailers.map { |r| r["__typename"] }).to contain_exactly(*expected_store_typenames)
+
+        # Querying at the Store interface likewise excludes wholesalers.
+        stores = list_stores_with(*store_fragments)
+        expect(stores.map { |s| s["__typename"] }).to contain_exactly(*expected_store_typenames)
+
+        # Using `nodes` (instead of `edges { node }`) also works. This exercises the `nodes`
+        # code path where the field type is list-wrapped (e.g. `[Store!]!`).
+        stores_via_nodes = list_stores_via_nodes_with(*store_fragments)
+        expect(stores_via_nodes.map { |s| s["__typename"] }).to contain_exactly(*expected_store_typenames)
+
+        # Filters apply within the correct scope at each level.
+        # At distribution_channels: active=false matches only wholesaler2.
+        inactive = list_distribution_channels_with(*all_channel_fragments, filter: {active: {equal_to_any_of: [false]}})
+        expect(inactive.map { |c| c["__typename"] }).to contain_exactly("BrokerWholesaler")
+        expect(inactive.map { |c| c["id"] }).to contain_exactly(wholesaler2.fetch(:id))
+
+        # At retailers: established_on filter applies, and wholesalers are still excluded.
+        retailers_after_2020 = list_retailers_with(*store_fragments, filter: {established_on: {gte: "2020-01-01"}})
+        expect(retailers_after_2020.map { |r| r["id"] }).to contain_exactly(
+          online_store1.fetch(:id), online_store2.fetch(:id),
+          physical_store2.fetch(:id)
+        )
+
+        # Sort by established_on at the stores level spans both indices correctly.
+        stores_sorted = list_stores_with(*store_fragments, order_by: [established_on_asc])
+        expect(stores_sorted.map { |s| s["id"] }).to eq([
+          physical_store1.fetch(:id),
+          online_store1.fetch(:id),
+          online_store2.fetch(:id),
+          physical_store2.fetch(:id)
+        ])
+
+        # Pagination at the distribution_channels level covers all types.
+        channels_page, page_info = list_distribution_channels_and_page_info_with(
+          *all_channel_fragments,
+          first: 4,
+          order_by: [id_desc]
+        )
+        expect(channels_page.size).to eq(4)
+        expect(page_info).to include(case_correctly("has_next_page") => true)
+
+        # Filter by ID spans indices and respects the __typename scope at each query level.
+        stores_by_id = list_stores_with(
+          *store_fragments,
+          filter: {id: {equal_to_any_of: [physical_store1.fetch(:id), online_store1.fetch(:id)]}}
+        )
+        expect(stores_by_id.map { |s| [s["id"], s["__typename"]] }).to contain_exactly(
+          [physical_store1.fetch(:id), "PhysicalStore"],
+          [online_store1.fetch(:id), "OnlineStore"]
+        )
+
+        # Aggregations respect the same __typename scoping as document queries.
+        store_agg_count = call_graphql_query("query { #{case_correctly("store_aggregations")} { nodes { #{case_correctly("count")} } } }")
+          .dig("data", case_correctly("store_aggregations"), "nodes", 0, case_correctly("count"))
+        expect(store_agg_count).to eq(expected_store_typenames.size)
+
+        # all_highlights resolves against the concrete type (OnlineStore), not the abstract root
+        # (DistributionChannel). OnlineStore.name is absent from DistributionChannel — without
+        # __typename-aware type resolution the highlight would be silently dropped.
         highlights_by_id = query_all_highlights("retailers", filter: {
           "name" => {"contains" => {"any_substring_of" => ["Marketplace"]}}
         })
-
         expect(highlights_by_id).to eq({
-          online_store.fetch(:id) => [
+          online_store1.fetch(:id) => [
             {"path" => ["name"], "snippets" => ["<em>Example Marketplace</em>"]}
           ]
         })
+      end
+
+      it "supports querying a type that is both indexed (via interface inheritance) and embedded as a field on another type" do
+        # Person is dual-role: it inherits the `named_inventors` index from NamedInventor, and
+        # is also embedded as Manufacturer.ceo. Both roles must work correctly in the same run:
+        # the indexer injects __typename when preparing Person for named_inventors, but omits it
+        # when preparing Person for the manufacturers index (where ceo has no __typename mapping).
+        person = build(:person, name: "Alice", nationality: "Canadian")
+        company = build(:company, name: "Acme", stock_ticker: "ACME")
+
+        index_records(
+          person,
+          company,
+          build(:manufacturer, name: "m1", ceo: person.as_embedded)
+        )
+
+        # Querying named_inventors returns both concrete subtypes, distinguished by __typename.
+        inventors = query_abstract_type_with(
+          case_correctly("named_inventors"),
+          "...on Person { id __typename name nationality }",
+          "...on Company { id __typename name #{case_correctly("stock_ticker")} }"
+        ).dig("data", case_correctly("named_inventors"), "edges").map { |e| e.fetch("node") }
+
+        expect(inventors).to contain_exactly(
+          {"id" => person.fetch(:id), "__typename" => "Person", "name" => "Alice", "nationality" => "Canadian"},
+          {"id" => company.fetch(:id), "__typename" => "Company", "name" => "Acme", case_correctly("stock_ticker") => "ACME"}
+        )
+
+        # Person embedded as Manufacturer.ceo is also queryable, with no __typename in the result.
+        manufacturers = call_graphql_query(<<~QUERY).dig("data", "manufacturers", "nodes")
+          query {
+            manufacturers {
+              nodes {
+                name
+                ceo { name nationality }
+              }
+            }
+          }
+        QUERY
+
+        expect(manufacturers).to contain_exactly(
+          {"name" => "m1", "ceo" => {"name" => "Alice", "nationality" => "Canadian"}}
+        )
       end
 
       it "supports fetching interface fields" do
@@ -1506,6 +1641,62 @@ module ElasticGraph
                     id
                   }
                 }
+              }
+            }
+          }
+        QUERY
+      end
+
+      def list_distribution_channels_with(*fragments, **query_args)
+        field = case_correctly("distribution_channels")
+        query_abstract_type_with(field, *fragments, **query_args).dig("data", field, "edges").map { |e| e.fetch("node") }
+      end
+
+      def list_distribution_channels_and_page_info_with(*fragments, **query_args)
+        field = case_correctly("distribution_channels")
+        response = query_abstract_type_with(field, *fragments, **query_args).dig("data", field)
+        [response.fetch("edges").map { |e| e.fetch("node") }, response.fetch(case_correctly("page_info"))]
+      end
+
+      def list_retailers_with(*fragments, **query_args)
+        query_abstract_type_with("retailers", *fragments, **query_args).dig("data", "retailers", "edges").map { |e| e.fetch("node") }
+      end
+
+      def list_stores_with(*fragments, **query_args)
+        query_abstract_type_with("stores", *fragments, **query_args).dig("data", "stores", "edges").map { |e| e.fetch("node") }
+      end
+
+      def list_stores_via_nodes_with(*fragments, **query_args)
+        query_abstract_type_via_nodes_with("stores", *fragments, **query_args).dig("data", "stores", "nodes")
+      end
+
+      def query_abstract_type_with(field, *fragments, allow_errors: false, **query_args)
+        fragment_string = fragments.join("\n")
+        call_graphql_query(<<~QUERY, allow_errors: allow_errors)
+          query {
+            #{field}#{graphql_args(query_args)} {
+              #{case_correctly("page_info")} {
+                #{case_correctly("end_cursor")}
+                #{case_correctly("has_next_page")}
+                #{case_correctly("has_previous_page")}
+              }
+              edges {
+                node {
+                  #{fragment_string}
+                }
+              }
+            }
+          }
+        QUERY
+      end
+
+      def query_abstract_type_via_nodes_with(field, *fragments, **query_args)
+        fragment_string = fragments.join("\n")
+        call_graphql_query(<<~QUERY)
+          query {
+            #{field}#{graphql_args(query_args)} {
+              nodes {
+                #{fragment_string}
               }
             }
           }

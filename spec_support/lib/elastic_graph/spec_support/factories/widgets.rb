@@ -47,12 +47,14 @@ FactoryBot.define do
 
   factory :person, parent: :indexed_type do
     __typename { "Person" }
+    id { Faker::Alphanumeric.alpha(number: 20) }
     name { Faker::Name.name }
     nationality { Faker::Nation.nationality }
   end
 
   factory :company, parent: :indexed_type do
     __typename { "Company" }
+    id { Faker::Alphanumeric.alpha(number: 20) }
     name { Faker::Company.name }
     stock_ticker { name[0..3].upcase }
   end
