@@ -139,7 +139,8 @@ module ElasticGraph
         # that are not subtypes of this type. Used to determine whether a `__typename` filter is
         # needed when querying an abstract type.
         def shares_index_with_non_subtypes?
-          @shares_index_with_non_subtypes ||=
+          return @shares_index_with_non_subtypes if defined?(@shares_index_with_non_subtypes)
+          @shares_index_with_non_subtypes =
             search_index_definitions.any? do |index_def|
               @schema.document_types_stored_in(index_def.name).any? do |t|
                 t != self && !subtypes.include?(t) && !t.abstract?

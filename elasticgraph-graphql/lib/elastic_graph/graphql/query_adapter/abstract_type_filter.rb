@@ -15,7 +15,7 @@ module ElasticGraph
       #
       # For example, given this hierarchy:
       #
-      #   DistributionChannel (index: distribution_channels)
+      #   DistributionChannel (abstract interface, index: distribution_channels)
       #   ├── Wholesale            (abstract interface, distribution_channels index)
       #   │   ├── DirectWholesaler (concrete, distribution_channels index)
       #   │   └── BrokerWholesaler (concrete, distribution_channels index)
@@ -55,7 +55,7 @@ module ElasticGraph
           # documents lack __typename (the index itself identifies the type), so nil is needed to
           # allow them through.
           if doc_type.search_index_definitions.any? { |idx| schema.document_types_stored_in(idx.name).size == 1 }
-            typename_values = [nil] + typename_values
+            typename_values += [nil]
           end
           query.merge_with(internal_filters: [{
             "__typename" => {@equal_to_any_of => typename_values}
