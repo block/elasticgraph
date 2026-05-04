@@ -135,19 +135,16 @@ module ElasticGraph
           @source_type = @object_runtime_metadata&.source_type&.then { |st| @schema.type_named(st) }
         end
 
-        # Returns the set of concrete (non-abstract) indexed document types that share any of this
-        # type's search indexes but are not subtypes of this type. Used to determine whether a
-        # `__typename` filter is needed when querying an abstract type.
-        #
-        # Abstract types are excluded because documents in the datastore are always associated
-        # with a concrete `__typename`. When filtering by `__typename`, only concrete types are
-        # relevant.
-        def concrete_non_subtypes_in_shared_index
-          @concrete_non_subtypes_in_shared_index ||=
-            search_index_definitions
-              .flat_map { |index_def| @schema.document_types_stored_in(index_def.name).to_a }
-              .reject { |t| t == self || subtypes.include?(t) || t.abstract? }
-              .to_set
+        # Returns true if any of this type's search indexes contain any concrete document types
+        # that are not subtypes of this type. Used to determine whether a `__typename` filter is
+        # needed when querying an abstract type.
+        def shares_index_with_non_subtypes?
+          @shares_index_with_non_subtypes ||=
+            search_index_definitions.any? do |index_def|
+              @schema.document_types_stored_in(index_def.name).any? do |t|
+                t != self && !subtypes.include?(t) && !t.abstract?
+              end
+            end
         end
 
         def field_named(field_name)

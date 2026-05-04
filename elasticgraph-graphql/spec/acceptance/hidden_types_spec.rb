@@ -84,6 +84,7 @@ module ElasticGraph
             all_types_related_to("NamedInventor") +
             all_types_related_to("DistributionChannel") +
             all_types_related_to("Retail") +
+            all_types_related_to("Wholesale") +
             all_types_related_to("Store") +
             all_types_related_to("PhysicalStore") +
             relay_types_related_to("String", include_list_filter: true) - ["StringSortOrderInput"] +
@@ -120,7 +121,7 @@ module ElasticGraph
             %w[
               FloatAggregatedValues IntAggregatedValues JsonSafeLongAggregatedValues LongStringAggregatedValues NonNumericAggregatedValues
               DateAggregatedValues DateTimeAggregatedValues LocalTimeAggregatedValues
-              OnlineStore ThirdPartyWholesale
+              OnlineStore DirectWholesaler BrokerWholesaler
               Cursor PageInfo Query TextFilterInput GeoLocation
               DateTimeGroupingOffsetInput DateTimeUnitInput DateTimeTimeOfDayFilterInput
               DateGroupedBy DateGroupingOffsetInput DateGroupingTruncationUnitInput DateUnitInput

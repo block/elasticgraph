@@ -224,8 +224,13 @@ FactoryBot.define do
     active { true }
   end
 
-  factory :third_party_wholesale, parent: :indexed_type do
-    __typename { "ThirdPartyWholesale" }
+  factory :direct_wholesaler, parent: :indexed_type do
+    __typename { "DirectWholesaler" }
+    active { true }
+  end
+
+  factory :broker_wholesaler, parent: :indexed_type do
+    __typename { "BrokerWholesaler" }
     active { true }
   end
 end

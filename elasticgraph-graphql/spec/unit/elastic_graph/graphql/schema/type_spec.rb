@@ -793,7 +793,7 @@ module ElasticGraph
           end
         end
 
-        describe "#concrete_non_subtypes_in_shared_index" do
+        describe "#shares_index_with_non_subtypes?" do
           attr_reader :schema
 
           before(:context) do
@@ -835,24 +835,22 @@ module ElasticGraph
             end
           end
 
-          it "excludes the type itself and its subtypes, returning only concrete sibling types in the shared index" do
-            expect(schema.type_named("Store").concrete_non_subtypes_in_shared_index).to contain_exactly(
-              schema.type_named("Wholesaler"),
-              schema.type_named("Distributor")
-            )
+          it "returns true when the type shares an index with concrete non-subtype types" do
+            expect(schema.type_named("Store").shares_index_with_non_subtypes?).to be true
           end
 
-          it "excludes the type itself even when the type is a concrete type in a shared index" do
-            # Wholesaler is a concrete type stored in the "channels" index, so it appears in
-            # document_types_stored_in("channels"). Without the `t == self` guard it would include itself.
-            expect(schema.type_named("Wholesaler").concrete_non_subtypes_in_shared_index).to contain_exactly(
-              schema.type_named("Distributor"),
-              schema.type_named("OnlineStore")
-            )
+          it "returns true for a concrete type that shares an index with other concrete types" do
+            # Wholesaler is a concrete type stored in the "channels" index alongside Distributor and
+            # OnlineStore, which are not its subtypes.
+            expect(schema.type_named("Wholesaler").shares_index_with_non_subtypes?).to be true
           end
 
-          it "returns an empty set when all types sharing its indexes are subtypes" do
-            expect(schema.type_named("Channel").concrete_non_subtypes_in_shared_index).to be_empty
+          it "returns false when all types sharing its indexes are subtypes" do
+            expect(schema.type_named("Channel").shares_index_with_non_subtypes?).to be false
+          end
+
+          it "returns false for a type with its own dedicated index" do
+            expect(schema.type_named("PhysicalStore").shares_index_with_non_subtypes?).to be false
           end
         end
 

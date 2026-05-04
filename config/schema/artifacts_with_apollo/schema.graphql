@@ -701,6 +701,11 @@ input BooleanListFilterInput {
   not: BooleanListFilterInput
 }
 
+type BrokerWholesaler implements DistributionChannel & Wholesale @key(fields: "id") {
+  active: Boolean
+  id: ID!
+}
+
 enum Color {
   BLUE
   GREEN
@@ -3009,6 +3014,11 @@ input DayOfWeekGroupingOffsetInput {
   Unit of offsetting to apply to the boundaries of the `DayOfWeek` groupings.
   """
   unit: DateTimeUnitInput!
+}
+
+type DirectWholesaler implements DistributionChannel & Wholesale @key(fields: "id") {
+  active: Boolean
+  id: ID!
 }
 
 """
@@ -11662,6 +11672,109 @@ type Query {
   ): TeamConnection
 
   """
+  Aggregations over the `wholesalers` data:
+
+  > Fetches `Wholesale`s based on the provided arguments.
+  """
+  wholesale_aggregations(
+    """
+    Used to forward-paginate through the `wholesale_aggregations`. When provided, the next page after the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    after: Cursor
+
+    """
+    Used to backward-paginate through the `wholesale_aggregations`. When provided, the previous page before the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    before: Cursor
+
+    """
+    Used to filter the `Wholesale` documents that get aggregated over based on the provided criteria.
+    """
+    filter: WholesaleFilterInput
+
+    """
+    Used in conjunction with the `after` argument to forward-paginate through the `wholesale_aggregations`.
+    When provided, limits the number of returned results to the first `n` after the provided
+    `after` cursor (or from the start of the `wholesale_aggregations`, if no `after` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    first: Int
+
+    """
+    Used in conjunction with the `before` argument to backward-paginate through the `wholesale_aggregations`.
+    When provided, limits the number of returned results to the last `n` before the provided
+    `before` cursor (or from the end of the `wholesale_aggregations`, if no `before` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    last: Int
+  ): WholesaleAggregationConnection
+
+  """
+  Fetches `Wholesale`s based on the provided arguments.
+  """
+  wholesalers(
+    """
+    Used to forward-paginate through the `wholesalers`. When provided, the next page after the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    after: Cursor
+
+    """
+    Used to backward-paginate through the `wholesalers`. When provided, the previous page before the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    before: Cursor
+
+    """
+    Used to filter the returned `wholesalers` based on the provided criteria.
+    """
+    filter: WholesaleFilterInput
+
+    """
+    Used in conjunction with the `after` argument to forward-paginate through the `wholesalers`.
+    When provided, limits the number of returned results to the first `n` after the provided
+    `after` cursor (or from the start of the `wholesalers`, if no `after` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    first: Int
+
+    """
+    Used in conjunction with the `before` argument to backward-paginate through the `wholesalers`.
+    When provided, limits the number of returned results to the last `n` before the provided
+    `before` cursor (or from the end of the `wholesalers`, if no `before` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    last: Int
+
+    """
+    Used to specify how the returned `wholesalers` should be sorted.
+    """
+    order_by: [WholesaleSortOrderInput!]
+  ): WholesaleConnection
+
+  """
   Aggregations over the `widgets` data:
 
   > Fetches `Widget`s based on the provided arguments.
@@ -16014,11 +16127,6 @@ input TextFilterInput {
   not: TextFilterInput
 }
 
-type ThirdPartyWholesale implements DistributionChannel @key(fields: "id") {
-  active: Boolean
-  id: ID!
-}
-
 """
 An [IANA time zone identifier](https://www.iana.org/time-zones), such as `America/Los_Angeles` or `UTC`.
 
@@ -16084,6 +16192,232 @@ input UntypedFilterInput {
   When `null` or an empty object is passed, matches no documents.
   """
   not: UntypedFilterInput
+}
+
+interface Wholesale implements DistributionChannel {
+  active: Boolean
+  id: ID!
+}
+
+"""
+Type used to perform aggregation computations on `Wholesale` fields.
+"""
+type WholesaleAggregatedValues {
+  """
+  Computed aggregate values for the `active` field.
+  """
+  active: NonNumericAggregatedValues
+
+  """
+  Computed aggregate values for the `id` field.
+  """
+  id: NonNumericAggregatedValues
+}
+
+"""
+Return type representing a bucket of `Wholesale` documents for an aggregations query.
+"""
+type WholesaleAggregation {
+  """
+  Provides computed aggregated values over all `Wholesale` documents in an aggregation bucket.
+  """
+  aggregated_values: WholesaleAggregatedValues
+
+  """
+  The count of `Wholesale` documents in an aggregation bucket.
+  """
+  count: JsonSafeLong!
+
+  """
+  Used to specify the `Wholesale` fields to group by. The returned values identify each aggregation bucket.
+  """
+  grouped_by: WholesaleGroupedBy
+}
+
+"""
+Represents a paginated collection of `WholesaleAggregation` results.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Connection-Types) for more info.
+"""
+type WholesaleAggregationConnection {
+  """
+  Wraps a specific `WholesaleAggregation` to pair it with its pagination cursor.
+  """
+  edges: [WholesaleAggregationEdge!]!
+
+  """
+  The list of `WholesaleAggregation` results.
+  """
+  nodes: [WholesaleAggregation!]!
+
+  """
+  Provides pagination-related information.
+  """
+  page_info: PageInfo!
+}
+
+"""
+Represents a specific `WholesaleAggregation` in the context of a `WholesaleAggregationConnection`,
+providing access to both the `WholesaleAggregation` and query-specific information such as the pagination `Cursor`.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for more info.
+"""
+type WholesaleAggregationEdge {
+  """
+  The `Cursor` of this `WholesaleAggregation`. This can be passed in the next query as
+  a `before` or `after` argument to continue paginating from this `WholesaleAggregation`.
+  """
+  cursor: Cursor
+
+  """
+  The `WholesaleAggregation` of this edge.
+  """
+  node: WholesaleAggregation
+}
+
+"""
+Represents a paginated collection of `Wholesale` results.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Connection-Types) for more info.
+"""
+type WholesaleConnection {
+  """
+  Wraps a specific `Wholesale` to pair it with its pagination cursor.
+  """
+  edges: [WholesaleEdge!]!
+
+  """
+  The list of `Wholesale` results.
+  """
+  nodes: [Wholesale!]!
+
+  """
+  Provides pagination-related information.
+  """
+  page_info: PageInfo!
+
+  """
+  The total number of edges available in this connection to paginate over.
+  """
+  total_edge_count: JsonSafeLong!
+}
+
+"""
+Represents a specific `Wholesale` in the context of a `WholesaleConnection`,
+providing access to both the `Wholesale` and query-specific information such as the pagination `Cursor`.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for more info.
+"""
+type WholesaleEdge {
+  """
+  All search highlights for this `Wholesale`, indicating where in the indexed document the query matched.
+  """
+  all_highlights: [SearchHighlight!]!
+
+  """
+  The `Cursor` of this `Wholesale`. This can be passed in the next query as
+  a `before` or `after` argument to continue paginating from this `Wholesale`.
+  """
+  cursor: Cursor
+
+  """
+  Specific search highlights for this `Wholesale`, providing matching snippets for the requested fields.
+  """
+  highlights: WholesaleHighlights
+
+  """
+  The `Wholesale` of this edge.
+  """
+  node: Wholesale
+}
+
+"""
+Input type used to specify filters on `Wholesale` fields.
+
+Will match all documents if passed as an empty object (or as `null`).
+"""
+input WholesaleFilterInput {
+  """
+  Used to filter on the `active` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  active: BooleanFilterInput
+
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `WholesaleFilterInput` input because of collisions
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [WholesaleFilterInput!]
+
+  """
+  Matches records where any of the provided sub-filters evaluate to true.
+  This works just like an OR operator in SQL.
+
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
+  """
+  any_of: [WholesaleFilterInput!]
+
+  """
+  Used to filter on the `id` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  id: IDFilterInput
+
+  """
+  Matches records where the provided sub-filter evaluates to false.
+  This works just like a NOT operator in SQL.
+
+  When `null` or an empty object is passed, matches no documents.
+  """
+  not: WholesaleFilterInput
+}
+
+"""
+Type used to specify the `Wholesale` fields to group by for aggregations.
+"""
+type WholesaleGroupedBy {
+  """
+  The `active` field value for this group.
+  """
+  active: Boolean
+}
+
+"""
+Type used to request desired `Wholesale` search highlight fields.
+"""
+type WholesaleHighlights {
+  """
+  Search highlights for the `id`, providing snippets of the matching text.
+  """
+  id: [String!]!
+}
+
+"""
+Enumerates the ways `Wholesale`s can be sorted.
+"""
+enum WholesaleSortOrderInput {
+  """
+  Sorts ascending by the `id` field.
+  """
+  id_ASC
+
+  """
+  Sorts descending by the `id` field.
+  """
+  id_DESC
 }
 
 """
@@ -20160,7 +20494,7 @@ In an ElasticGraph schema, this is a union of all indexed types.
 
 Not intended for use by clients other than Apollo.
 """
-union _Entity = Company | Component | Country | ElectricalPart | Manufacturer | MechanicalPart | OnlineStore | Person | PhysicalStore | Sponsor | Team | ThirdPartyWholesale | Widget | WidgetCurrency | WidgetWorkspace
+union _Entity = BrokerWholesaler | Company | Component | Country | DirectWholesaler | ElectricalPart | Manufacturer | MechanicalPart | OnlineStore | Person | PhysicalStore | Sponsor | Team | Widget | WidgetCurrency | WidgetWorkspace
 
 """
 An object type required by the [Apollo Federation subgraph

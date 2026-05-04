@@ -1061,6 +1061,16 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: league
+  WholesaleSortOrderInput:
+    values_by_name:
+      id_ASC:
+        sort_field:
+          direction: asc
+          field_path: id
+      id_DESC:
+        sort_field:
+          direction: desc
+          field_path: id
   WidgetCurrencySortOrderInput:
     values_by_name:
       details_symbol_ASC:
@@ -3325,6 +3335,38 @@ object_types_by_name:
     graphql_fields_by_name:
       count:
         name_in_index: __counts
+  BrokerWholesaler:
+    graphql_fields_by_name:
+      active:
+        resolver:
+          name: get_record_field_value
+      id:
+        resolver:
+          name: get_record_field_value
+    index_definition_names:
+    - distribution_channels
+    update_targets:
+    - data_params:
+        __typename:
+          cardinality: one
+        active:
+          cardinality: one
+      id_source: id
+      metadata_params:
+        relationship:
+          value: __self
+        sourceId:
+          cardinality: one
+          source_path: id
+        sourceType:
+          cardinality: one
+          source_path: type
+        version:
+          cardinality: one
+      relationship: __self
+      routing_value_source: id
+      script_id: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
+      type: BrokerWholesaler
   ColorListFilterInput:
     graphql_fields_by_name:
       count:
@@ -3907,6 +3949,38 @@ object_types_by_name:
     graphql_fields_by_name:
       count:
         name_in_index: __counts
+  DirectWholesaler:
+    graphql_fields_by_name:
+      active:
+        resolver:
+          name: get_record_field_value
+      id:
+        resolver:
+          name: get_record_field_value
+    index_definition_names:
+    - distribution_channels
+    update_targets:
+    - data_params:
+        __typename:
+          cardinality: one
+        active:
+          cardinality: one
+      id_source: id
+      metadata_params:
+        relationship:
+          value: __self
+        sourceId:
+          cardinality: one
+          source_path: id
+        sourceType:
+          cardinality: one
+          source_path: type
+        version:
+          cardinality: one
+      relationship: __self
+      routing_value_source: id
+      script_id: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
+      type: DirectWholesaler
   DistributionChannel:
     graphql_fields_by_name:
       active:
@@ -6351,6 +6425,12 @@ object_types_by_name:
       teams:
         resolver:
           name: list_records
+      wholesale_aggregations:
+        resolver:
+          name: list_records
+      wholesalers:
+        resolver:
+          name: list_records
       widget_aggregations:
         resolver:
           name: list_records
@@ -7732,7 +7812,7 @@ object_types_by_name:
       players_object:
         resolver:
           name: object_with_lookahead
-  ThirdPartyWholesale:
+  Wholesale:
     graphql_fields_by_name:
       active:
         resolver:
@@ -7742,28 +7822,88 @@ object_types_by_name:
           name: get_record_field_value
     index_definition_names:
     - distribution_channels
-    update_targets:
-    - data_params:
-        __typename:
-          cardinality: one
-        active:
-          cardinality: one
-      id_source: id
-      metadata_params:
-        relationship:
-          value: __self
-        sourceId:
-          cardinality: one
-          source_path: id
-        sourceType:
-          cardinality: one
-          source_path: type
-        version:
-          cardinality: one
-      relationship: __self
-      routing_value_source: id
-      script_id: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
-      type: ThirdPartyWholesale
+  WholesaleAggregatedValues:
+    graphql_fields_by_name:
+      active:
+        resolver:
+          name: object_with_lookahead
+      id:
+        resolver:
+          name: object_with_lookahead
+  WholesaleAggregation:
+    elasticgraph_category: indexed_aggregation
+    graphql_fields_by_name:
+      aggregated_values:
+        resolver:
+          name: object_without_lookahead
+      count:
+        resolver:
+          name: object_without_lookahead
+      grouped_by:
+        resolver:
+          name: object_without_lookahead
+    source_type: Wholesale
+  WholesaleAggregationConnection:
+    elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver:
+          name: object_without_lookahead
+      nodes:
+        resolver:
+          name: object_without_lookahead
+      page_info:
+        resolver:
+          name: object_without_lookahead
+  WholesaleAggregationEdge:
+    elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      cursor:
+        resolver:
+          name: object_without_lookahead
+      node:
+        resolver:
+          name: object_without_lookahead
+  WholesaleConnection:
+    elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver:
+          name: object_without_lookahead
+      nodes:
+        resolver:
+          name: object_without_lookahead
+      page_info:
+        resolver:
+          name: object_without_lookahead
+      total_edge_count:
+        resolver:
+          name: object_without_lookahead
+  WholesaleEdge:
+    elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      all_highlights:
+        resolver:
+          name: object_without_lookahead
+      cursor:
+        resolver:
+          name: object_without_lookahead
+      highlights:
+        resolver:
+          name: object_without_lookahead
+      node:
+        resolver:
+          name: object_without_lookahead
+  WholesaleGroupedBy:
+    graphql_fields_by_name:
+      active:
+        resolver:
+          name: object_with_lookahead
+  WholesaleHighlights:
+    graphql_fields_by_name:
+      id:
+        resolver:
+          name: get_record_field_value
   Widget:
     graphql_fields_by_name:
       amount_cents:

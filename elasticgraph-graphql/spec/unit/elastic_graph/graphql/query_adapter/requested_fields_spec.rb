@@ -405,7 +405,7 @@ module ElasticGraph
             }
           QUERY
 
-          expect(query.requested_fields).to include("__typename")
+          expect(query.requested_fields).to contain_exactly("genre", "field_of_study", "__typename")
         end
 
         it "ignores relay connection sub-fields that are not directly under `edges.node` (e.g. `page_info`)" do

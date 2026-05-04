@@ -367,9 +367,24 @@ ElasticGraph.define_schema do |schema|
     t.field "established_on", "Date"
   end
 
-  # ThirdPartyWholesale - concrete type in parallel to Retail branch
-  schema.object_type "ThirdPartyWholesale" do |t|
+  # Wholesale is a sub-interface of DistributionChannel. Unlike Retail, all its concrete subtypes
+  # share the distribution_channels index (there are no dedicated indexes in this branch of the
+  # tree), so __typename filtering for Wholesale queries omits nil.
+  schema.interface_type "Wholesale" do |t|
     t.implements "DistributionChannel"
+    t.root_query_fields plural: "wholesalers"
+    t.field "id", "ID!"
+    t.field "active", "Boolean"
+  end
+
+  schema.object_type "DirectWholesaler" do |t|
+    t.implements "Wholesale"
+    t.field "id", "ID!"
+    t.field "active", "Boolean"
+  end
+
+  schema.object_type "BrokerWholesaler" do |t|
+    t.implements "Wholesale"
     t.field "id", "ID!"
     t.field "active", "Boolean"
   end

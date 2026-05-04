@@ -16,7 +16,7 @@ module ElasticGraph
           it "does not apply a __typename filter" do
             query = datastore_query_for(:Query, :widgets, "query { widgets { edges { node { id } } } }")
 
-            expect(query.internal_filters).to be_none { |f| f.key?("__typename") }
+            expect(typename_filter_from(query)).to be_nil
           end
         end
 
@@ -24,7 +24,7 @@ module ElasticGraph
           it "does not apply a __typename filter" do
             query = datastore_query_for(:Query, :distribution_channels, "query { distribution_channels { edges { node { id } } } }")
 
-            expect(query.internal_filters).to be_none { |f| f.key?("__typename") }
+            expect(typename_filter_from(query)).to be_nil
           end
         end
 
@@ -32,17 +32,19 @@ module ElasticGraph
           it "applies a __typename filter scoped to the queried type's concrete subtypes, including nil for subtypes with dedicated indexes" do
             query = datastore_query_for(:Query, :retailers, "query { retailers { edges { node { id } } } }")
 
-            typename_filter = query.internal_filters.find { |f| f.key?("__typename") }
-            expect(typename_filter).not_to be_nil
-            expect(typename_filter.dig("__typename", "equal_to_any_of")).to contain_exactly(nil, "OnlineStore", "PhysicalStore")
+            expect(typename_filter_from(query)).to contain_exactly(nil, "OnlineStore", "PhysicalStore")
           end
 
           it "applies a __typename filter on aggregations of this kind of abstract type" do
             query = datastore_query_for(:Query, :retail_aggregations, "query { retail_aggregations { nodes { count } } }")
 
-            typename_filter = query.internal_filters.find { |f| f.key?("__typename") }
-            expect(typename_filter).not_to be_nil
-            expect(typename_filter.dig("__typename", "equal_to_any_of")).to contain_exactly(nil, "OnlineStore", "PhysicalStore")
+            expect(typename_filter_from(query)).to contain_exactly(nil, "OnlineStore", "PhysicalStore")
+          end
+
+          it "omits nil from the __typename filter when all queried indexes store multiple types" do
+            query = datastore_query_for(:Query, :wholesalers, "query { wholesalers { edges { node { id } } } }")
+
+            expect(typename_filter_from(query)).to contain_exactly("DirectWholesaler", "BrokerWholesaler")
           end
         end
 
@@ -55,6 +57,11 @@ module ElasticGraph
             type: type,
             field: field
           )
+        end
+
+        def typename_filter_from(query)
+          filter = query.internal_filters.find { |f| f.key?("__typename") }
+          filter&.dig("__typename", "equal_to_any_of")
         end
       end
     end

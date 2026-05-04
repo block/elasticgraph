@@ -11,7 +11,7 @@ module ElasticGraph
         def search_index_definitions: () -> ::Array[DatastoreCore::_IndexDefinition]
         def source_type: () -> Type?
         def subtypes: () -> ::Set[Type]
-        def concrete_non_subtypes_in_shared_index: () -> ::Set[Type]
+        def shares_index_with_non_subtypes?: () -> bool
         def unwrap_fully: () -> Type
         def field_named: (::String) -> Field
         def fields_by_name_in_index: () -> ::Hash[::String, ::Array[Field]]

@@ -23,8 +23,10 @@ json_schema_version: 1
         type: string
         enum:
         - Address
+        - BrokerWholesaler
         - Company
         - Component
+        - DirectWholesaler
         - ElectricalPart
         - Manufacturer
         - MechanicalPart
@@ -33,7 +35,6 @@ json_schema_version: 1
         - PhysicalStore
         - Sponsor
         - Team
-        - ThirdPartyWholesale
         - Widget
         - WidgetWorkspace
       id:
@@ -160,6 +161,24 @@ json_schema_version: 1
     - sponsorships_object
   Boolean:
     type: boolean
+  BrokerWholesaler:
+    type: object
+    properties:
+      id:
+        allOf:
+        - "$ref": "#/$defs/ID"
+        - maxLength: 8191
+      active:
+        anyOf:
+        - "$ref": "#/$defs/Boolean"
+        - type: 'null'
+      __typename:
+        type: string
+        const: BrokerWholesaler
+        default: BrokerWholesaler
+    required:
+    - id
+    - active
   Color:
     type: string
     enum:
@@ -253,6 +272,24 @@ json_schema_version: 1
   DateTime:
     type: string
     format: date-time
+  DirectWholesaler:
+    type: object
+    properties:
+      id:
+        allOf:
+        - "$ref": "#/$defs/ID"
+        - maxLength: 8191
+      active:
+        anyOf:
+        - "$ref": "#/$defs/Boolean"
+        - type: 'null'
+      __typename:
+        type: string
+        const: DirectWholesaler
+        default: DirectWholesaler
+    required:
+    - id
+    - active
   ElectricalPart:
     type: object
     properties:
@@ -875,24 +912,6 @@ json_schema_version: 1
     - was_shortened
     - players_nested
     - players_object
-  ThirdPartyWholesale:
-    type: object
-    properties:
-      id:
-        allOf:
-        - "$ref": "#/$defs/ID"
-        - maxLength: 8191
-      active:
-        anyOf:
-        - "$ref": "#/$defs/Boolean"
-        - type: 'null'
-      __typename:
-        type: string
-        const: ThirdPartyWholesale
-        default: ThirdPartyWholesale
-    required:
-    - id
-    - active
   Untyped:
     type:
     - array

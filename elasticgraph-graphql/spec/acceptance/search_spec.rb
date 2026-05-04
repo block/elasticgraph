@@ -706,7 +706,7 @@ module ElasticGraph
         index_records(
           online_store = build(:online_store, name: "Example Marketplace"),
           build(:online_store, name: "Other Store"),
-          build(:third_party_wholesale)
+          build(:direct_wholesaler)
         )
 
         highlights_by_id = query_all_highlights("retailers", filter: {
