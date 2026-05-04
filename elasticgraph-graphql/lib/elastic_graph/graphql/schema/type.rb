@@ -77,8 +77,14 @@ module ElasticGraph
               # is NOT a union of `PersonAggregation` and `CompanyAggregation`, so we can't do the same thing on the
               # indexed aggregation types. Delegating to the source type solves this case.
               st.search_index_definitions
+            elsif abstract?
+              # For abstract types, derive search indexes purely from concrete subtypes. This correctly
+              # handles cases where subtypes override the abstract type's declared index with a dedicated
+              # one — only indexes that actually contain documents for this type are searched.
+              # Note: subtypes returns all concrete subtypes at any depth, so no explicit recursion is needed.
+              subtypes.flat_map(&:search_index_definitions).to_set
             else
-              @index_definitions.union(subtypes.flat_map(&:search_index_definitions))
+              @index_definitions
             end
         end
 

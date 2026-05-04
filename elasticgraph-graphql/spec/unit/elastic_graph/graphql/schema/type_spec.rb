@@ -646,7 +646,7 @@ module ElasticGraph
             expect(search_index_definitions.map(&:name)).to eq ["things"]
           end
 
-          it "includes the index definitions from the subtypes when it is a type union of indexed document types" do
+          it "excludes the declared index of an abstract type when all concrete subtypes have overridden it with dedicated indexes" do
             search_index_definitions = search_index_definitions_from do |schema, type|
               schema.object_type "T1" do |t|
                 t.field "id", "ID!"
@@ -674,7 +674,7 @@ module ElasticGraph
               end
             end
 
-            expect(search_index_definitions.map(&:name)).to contain_exactly("t1", "t2", "t3", "t4", "union_index")
+            expect(search_index_definitions.map(&:name)).to contain_exactly("t1", "t2", "t3", "t4")
           end
 
           it "deduplicates the index definitions before returning them" do
