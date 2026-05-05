@@ -105,7 +105,7 @@ PATH
   remote: elasticgraph-indexer_autoscaler_lambda
   specs:
     elasticgraph-indexer_autoscaler_lambda (1.1.1.pre)
-      aws-sdk-cloudwatch (>= 1.134, < 1.136)
+      aws-sdk-cloudwatch (~> 1.135.0)
       aws-sdk-lambda (~> 1.178)
       aws-sdk-sqs (~> 1.112)
       elasticgraph-datastore_core (= 1.1.1.pre)
@@ -737,7 +737,7 @@ DEPENDENCIES
   vcr (~> 6.4)
   yard (~> 0.9, >= 0.9.43)
   yard-doctest (~> 0.1, >= 0.1.17)
-  yard-markdown (~> 0.7)
+  yard-markdown (~> 0.7, >= 0.7.1)
 
 CHECKSUMS
   Ascii85 (2.0.1) sha256=15cb5d941808543cbb9e7e6aea3c8ec3877f154c3461e8b3673e97f7ecedbe5a
