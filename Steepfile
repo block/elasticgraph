@@ -34,7 +34,7 @@ target :elasticgraph_gems do
     elasticgraph-graphql/lib/elastic_graph/graphql/datastore_response/search_response.rb
     elasticgraph-graphql/lib/elastic_graph/graphql/datastore_search_router.rb
     elasticgraph-graphql/lib/elastic_graph/graphql/resolvers/get_record_field_value.rb
-    elasticgraph-graphql/lib/elastic_graph/graphql/resolvers/list_records.rb
+    elasticgraph-graphql/lib/elastic_graph/graphql/resolvers/indexed_type_root_fields_resolver.rb
     elasticgraph-graphql/lib/elastic_graph/graphql/resolvers/nested_relationships.rb
     elasticgraph-graphql/lib/elastic_graph/graphql/schema.rb
     elasticgraph-graphql/lib/elastic_graph/graphql/schema/field.rb

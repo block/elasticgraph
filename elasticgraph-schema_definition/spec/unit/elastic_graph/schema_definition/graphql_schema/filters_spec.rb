@@ -691,7 +691,7 @@ module ElasticGraph
           define_schema do |api|
             api.object_type "Widget" do |t|
               t.field "id", "ID!" do |f|
-                f.resolve_with :list_records
+                f.resolve_with :indexed_type_root_fields
 
                 f.customize_filter_field do |ff|
                   results << ff.resolver

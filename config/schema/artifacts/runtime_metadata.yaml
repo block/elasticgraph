@@ -1829,11 +1829,11 @@ graphql_resolvers_by_name:
     resolver_ref:
       name: ElasticGraph::GraphQL::Resolvers::GetRecordFieldValue
       require_path: elastic_graph/graphql/resolvers/get_record_field_value
-  list_records:
+  indexed_type_root_fields:
     needs_lookahead: true
     resolver_ref:
-      name: ElasticGraph::GraphQL::Resolvers::ListRecords
-      require_path: elastic_graph/graphql/resolvers/list_records
+      name: ElasticGraph::GraphQL::Resolvers::IndexedTypeRootFieldsResolver
+      require_path: elastic_graph/graphql/resolvers/indexed_type_root_fields_resolver
   nested_relationships:
     needs_lookahead: true
     resolver_ref:
@@ -6196,136 +6196,136 @@ object_types_by_name:
     graphql_fields_by_name:
       address_aggregations:
         resolver:
-          name: list_records
+          name: indexed_type_root_fields
       addresses:
         resolver:
-          name: list_records
+          name: indexed_type_root_fields
       companies:
         resolver:
-          name: list_records
+          name: indexed_type_root_fields
       company_aggregations:
         resolver:
-          name: list_records
+          name: indexed_type_root_fields
       component_aggregations:
         resolver:
-          name: list_records
+          name: indexed_type_root_fields
       components:
         resolver:
-          name: list_records
+          name: indexed_type_root_fields
       distribution_channel_aggregations:
         resolver:
-          name: list_records
+          name: indexed_type_root_fields
       distribution_channels:
         resolver:
-          name: list_records
+          name: indexed_type_root_fields
       electrical_part_aggregations:
         resolver:
-          name: list_records
+          name: indexed_type_root_fields
       electrical_parts:
         resolver:
-          name: list_records
+          name: indexed_type_root_fields
       inventor_aggregations:
         resolver:
-          name: list_records
+          name: indexed_type_root_fields
       inventors:
         resolver:
-          name: list_records
+          name: indexed_type_root_fields
       manufacturer_aggregations:
         resolver:
-          name: list_records
+          name: indexed_type_root_fields
       manufacturers:
         resolver:
-          name: list_records
+          name: indexed_type_root_fields
       mechanical_part_aggregations:
         resolver:
-          name: list_records
+          name: indexed_type_root_fields
       mechanical_parts:
         resolver:
-          name: list_records
+          name: indexed_type_root_fields
       named_entities:
         resolver:
-          name: list_records
+          name: indexed_type_root_fields
       named_entity_aggregations:
         resolver:
-          name: list_records
+          name: indexed_type_root_fields
       named_inventor_aggregations:
         resolver:
-          name: list_records
+          name: indexed_type_root_fields
       named_inventors:
         resolver:
-          name: list_records
+          name: indexed_type_root_fields
       part_aggregations:
         resolver:
-          name: list_records
+          name: indexed_type_root_fields
       parts:
         resolver:
-          name: list_records
+          name: indexed_type_root_fields
       people:
         resolver:
-          name: list_records
+          name: indexed_type_root_fields
       person_aggregations:
         resolver:
-          name: list_records
+          name: indexed_type_root_fields
       physical_store_aggregations:
         resolver:
-          name: list_records
+          name: indexed_type_root_fields
       physical_stores:
         resolver:
-          name: list_records
+          name: indexed_type_root_fields
       retail_aggregations:
         resolver:
-          name: list_records
+          name: indexed_type_root_fields
       retailers:
         resolver:
-          name: list_records
+          name: indexed_type_root_fields
       sponsor_aggregations:
         resolver:
-          name: list_records
+          name: indexed_type_root_fields
       sponsors:
         resolver:
-          name: list_records
+          name: indexed_type_root_fields
       store_aggregations:
         resolver:
-          name: list_records
+          name: indexed_type_root_fields
       stores:
         resolver:
-          name: list_records
+          name: indexed_type_root_fields
       team_aggregations:
         resolver:
-          name: list_records
+          name: indexed_type_root_fields
       teams:
         resolver:
-          name: list_records
+          name: indexed_type_root_fields
       wholesale_aggregations:
         resolver:
-          name: list_records
+          name: indexed_type_root_fields
       wholesalers:
         resolver:
-          name: list_records
+          name: indexed_type_root_fields
       widget_aggregations:
         resolver:
-          name: list_records
+          name: indexed_type_root_fields
       widget_currencies:
         resolver:
-          name: list_records
+          name: indexed_type_root_fields
       widget_currency_aggregations:
         resolver:
-          name: list_records
+          name: indexed_type_root_fields
       widget_or_address_aggregations:
         resolver:
-          name: list_records
+          name: indexed_type_root_fields
       widget_workspace_aggregations:
         resolver:
-          name: list_records
+          name: indexed_type_root_fields
       widget_workspaces:
         resolver:
-          name: list_records
+          name: indexed_type_root_fields
       widgets:
         resolver:
-          name: list_records
+          name: indexed_type_root_fields
       widgets_or_addresses:
         resolver:
-          name: list_records
+          name: indexed_type_root_fields
   Retail:
     graphql_fields_by_name:
       active:

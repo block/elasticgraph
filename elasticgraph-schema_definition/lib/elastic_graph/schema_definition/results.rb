@@ -131,7 +131,7 @@ module ElasticGraph
               singular: root_doc_type.singular_root_query_field_name
             ) do |f|
               f.documentation "Fetches `#{root_doc_type.name}`s based on the provided arguments."
-              f.resolve_with :list_records
+              f.resolve_with :indexed_type_root_fields
               f.hide_relationship_runtime_metadata = true
               root_doc_type.root_query_fields_customizations&.call(f)
             end

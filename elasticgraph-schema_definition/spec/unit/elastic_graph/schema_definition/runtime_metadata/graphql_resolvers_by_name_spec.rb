@@ -20,7 +20,7 @@ module ElasticGraph
 
         expect(result.keys).to contain_exactly(
           :get_record_field_value,
-          :list_records,
+          :indexed_type_root_fields,
           :nested_relationships,
           :object_with_lookahead,
           :object_without_lookahead
@@ -119,7 +119,7 @@ module ElasticGraph
             or update the fields listed above to use one of the other registered resolvers:
 
               - :get_record_field_value
-              - :list_records
+              - :indexed_type_root_fields
               - :nested_relationships
               - :object_with_lookahead
               - :object_without_lookahead

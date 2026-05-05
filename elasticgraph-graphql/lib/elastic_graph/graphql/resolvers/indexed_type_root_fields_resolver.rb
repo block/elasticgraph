@@ -12,8 +12,8 @@ require "elastic_graph/graphql/resolvers/relay_connection"
 module ElasticGraph
   class GraphQL
     module Resolvers
-      # Responsible for fetching a a list of records of a particular type
-      class ListRecords
+      # Responsible for resolving the list and aggregation root fields generated for each indexed type.
+      class IndexedTypeRootFieldsResolver
         def initialize(elasticgraph_graphql:, config:)
           # Nothing to initialize, but needs to be defined to satisfy the resolver interface.
         end

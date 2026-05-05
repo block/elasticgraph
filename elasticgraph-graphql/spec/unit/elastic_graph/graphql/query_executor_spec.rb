@@ -46,11 +46,11 @@ module ElasticGraph
               if type.name == "Query"
                 type.field "colors", "[Color!]!" do |f|
                   f.argument "args", "ColorArgs"
-                  f.resolve_with :list_records
+                  f.resolve_with :indexed_type_root_fields
                 end
                 type.field "colors2", "[Color2!]!" do |f|
                   f.argument "args", "ColorArgs"
-                  f.resolve_with :list_records
+                  f.resolve_with :indexed_type_root_fields
                 end
               end
             end
@@ -187,7 +187,7 @@ module ElasticGraph
             schema.on_root_query_type do |t|
               t.resolve_fields_with nil
               t.field "foo", "Int" do |f|
-                f.resolve_with :list_records
+                f.resolve_with :indexed_type_root_fields
               end
             end
           end

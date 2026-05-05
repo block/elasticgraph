@@ -170,7 +170,7 @@ module ElasticGraph
               s.on_root_query_type do |f|
                 f.field "photos", "[Photo!]!" do |f|
                   f.argument "order_by", "[PhotoSort!]"
-                  f.resolve_with :list_records
+                  f.resolve_with :indexed_type_root_fields
                 end
               end
             end
@@ -295,7 +295,7 @@ module ElasticGraph
                   f.argument "camelCaseField", "Int"
                   f.argument "maybe_set_to_null", "String"
                   f.argument "nested", "Nested1FilterInput"
-                  f.resolve_with :list_records
+                  f.resolve_with :indexed_type_root_fields
                 end
               end
             end.field_named("Query", "foo")

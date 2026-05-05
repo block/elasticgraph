@@ -1,7 +1,7 @@
 module ElasticGraph
   class GraphQL
     module Resolvers
-      class ListRecords
+      class IndexedTypeRootFieldsResolver
         include _GraphQLResolverWithLookahead
       end
     end

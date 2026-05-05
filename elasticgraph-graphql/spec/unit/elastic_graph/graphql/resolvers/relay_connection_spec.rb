@@ -31,7 +31,7 @@ module ElasticGraph
               schema.on_root_query_type do |t|
                 # One test relies on `widgets_non_relay`, which isn't defined by default on `Query` so we define it here.
                 t.field "widgets_non_relay", "[Widget!]!" do |f|
-                  f.resolve_with :list_records
+                  f.resolve_with :indexed_type_root_fields
                 end
               end
             end

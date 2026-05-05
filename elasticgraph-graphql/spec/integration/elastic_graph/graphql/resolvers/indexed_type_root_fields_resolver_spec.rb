@@ -6,12 +6,12 @@
 #
 # frozen_string_literal: true
 
-require "elastic_graph/graphql/resolvers/list_records"
+require "elastic_graph/graphql/resolvers/indexed_type_root_fields_resolver"
 
 module ElasticGraph
   class GraphQL
     module Resolvers
-      RSpec.describe ListRecords, :factories, :uses_datastore, :resolver do
+      RSpec.describe IndexedTypeRootFieldsResolver, :factories, :uses_datastore, :resolver do
         context "when the field being resolved is a relay connection field" do
           let(:graphql) { build_graphql }
 

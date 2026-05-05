@@ -70,7 +70,7 @@ module QueryAdapterSpecSupport
 
     def resolved_with_resolver_that_builds_datastore_query?(schema_field, object)
       # Only 2 resolvers yield to `Resolvers::GraphQLAdapter` to get a query built.
-      [:list_records, :nested_relationships].include?(schema_field.resolver.name)
+      [:indexed_type_root_fields, :nested_relationships].include?(schema_field.resolver.name)
     end
 
     def coerce_input(type, value, ctx)

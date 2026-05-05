@@ -44,7 +44,7 @@ module ElasticGraph
 
               schema.on_root_query_type do |t|
                 t.field "person", "Person" do |f|
-                  f.resolve_with :list_records
+                  f.resolve_with :indexed_type_root_fields
                 end
               end
             end
