@@ -179,6 +179,7 @@ module ElasticGraph
           register_date_and_time_grouped_by_types
           register_standard_elastic_graph_types
           register_standard_graphql_resolvers
+          register_root_query_type
         end
 
         private
@@ -1455,6 +1456,66 @@ module ElasticGraph
             GraphQL::Resolvers::Object::WithoutLookahead,
             defined_at: require_path,
             built_in: true
+        end
+
+        def register_root_query_type
+          schema_def_api.namespace_type "Query" do |t|
+            t.documentation "The query entry point for the entire schema."
+          end
+
+          schema_def_state.after_user_definition_complete do
+            populate_root_query_fields
+          end
+        end
+
+        def populate_root_query_fields
+          query_type = schema_def_state.object_types_by_name.fetch("Query")
+
+          schema_def_state.object_types_by_name.values.select(&:directly_queryable?).sort_by(&:name).each do |type|
+            # @type var root_doc_type: Mixins::HasIndices & _Type
+            root_doc_type = _ = type
+
+            query_type.relates_to_many(
+              root_doc_type.plural_root_query_field_name,
+              root_doc_type.name,
+              via: "ignore",
+              dir: :in,
+              singular: root_doc_type.singular_root_query_field_name
+            ) do |f|
+              f.documentation "Fetches `#{root_doc_type.name}`s based on the provided arguments."
+              f.resolve_with :indexed_type_root_fields
+              f.hide_relationship_runtime_metadata = true
+              root_doc_type.root_query_fields_customizations&.call(f)
+            end
+
+            # Add additional efficiency hints to the aggregation field documentation if we have any such hints.
+            # This needs to be outside the `relates_to_many` block because `relates_to_many` adds its own "suffix" to
+            # the field documentation, and here we add another one.
+            if (agg_efficiency_hint = aggregation_efficiency_hints_for(root_doc_type.derived_indexed_types))
+              agg_name = schema_def_state.schema_elements.normalize_case("#{root_doc_type.singular_root_query_field_name}_aggregations")
+              agg_field = query_type.graphql_fields_by_name.fetch(agg_name)
+              agg_field.documentation "#{agg_field.doc_comment}\n\n#{agg_efficiency_hint}"
+            end
+          end
+        end
+
+        def aggregation_efficiency_hints_for(derived_indexed_types)
+          return nil if derived_indexed_types.empty?
+
+          hints = derived_indexed_types.map do |type|
+            derived_indexing_type = schema_def_state.types_by_name.fetch(type.destination_type_ref.name)
+            alternate_field_name = (_ = derived_indexing_type).plural_root_query_field_name
+            grouping_field = type.id_source
+
+            "  - The root `#{alternate_field_name}` field groups by `#{grouping_field}`"
+          end
+
+          <<~EOS
+            Note: aggregation queries are relatively expensive, and some fields have been pre-aggregated to allow
+            more efficient queries for some common aggregation cases:
+
+            #{hints.join("\n")}
+          EOS
         end
 
         def define_date_grouping_arguments(grouping_field, omit_timezone: false)
