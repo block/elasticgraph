@@ -15,7 +15,7 @@ group :development do
   gem "graphql-c_parser", "~> 1.1", ">= 1.1.3", platforms: :ruby
   gem "benchmark-ips", "~> 2.14"
   gem "coderay", "~> 1.1", ">= 1.1.3"
-  gem "factory_bot", "~> 6.5", ">= 6.5.6"
+  gem "factory_bot", "~> 6.6"
   gem "faker", "~> 3.8"
 
   # Pin to a GitHub SHA until Ruby 4.0 support has been released
@@ -41,7 +41,7 @@ group :development do
   gem "simplecov-console", "~> 0.9", ">= 0.9.5"
   gem "standard", "~> 1.54.0"
   gem "steep", "~> 2.0.0", platforms: :ruby
-  gem "super_diff", "~> 0.18"
+  gem "super_diff", "~> 0.19"
   gem "vcr", "~> 6.4"
 end
 
