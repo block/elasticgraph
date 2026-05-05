@@ -45,7 +45,7 @@ GEM
     stringio (3.2.0)
     tsort (0.2.0)
     yard (0.9.43)
-    yard-markdown (0.7.0)
+    yard-markdown (0.7.1)
       csv
       rdoc
       yard
@@ -91,7 +91,7 @@ CHECKSUMS
   stringio (3.2.0) sha256=c37cb2e58b4ffbd33fe5cd948c05934af997b36e0b6ca6fdf43afa234cf222e1
   tsort (0.2.0) sha256=9650a793f6859a43b6641671278f79cfead60ac714148aabe4e3f0060480089f
   yard (0.9.43) sha256=cf8733a8f0485df2a162927e9b5f182215a61f6d22de096b8f402c726a1c5821
-  yard-markdown (0.7.0) sha256=a76fa2ca9327b0383d6446c3ebf4af38bb6509a414c71aa21d722ad2223a3bda
+  yard-markdown (0.7.1) sha256=06c378632dfe7ba053be9ba469eb4701aa0470e36bcf7e5546f353eb90c1bfd1
 
 BUNDLED WITH
   4.0.3
