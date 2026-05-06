@@ -713,7 +713,7 @@ module ElasticGraph
         #           └── PhysicalStore (concrete, physical_stores index)
         #
         # The critical behavior under test: querying at a sub-interface level (e.g. retailers, stores)
-        # must filter OUT non-subtypes in the shared index (e.g. DirectWholesaler when querying stores).
+        # must filter OUT non-subtypes in the shared index (e.g. Wholesale subtypes when querying stores).
         index_records(
           physical_store1 = build(:physical_store, established_on: "2019-03-10", active: true),
           physical_store2 = build(:physical_store, established_on: "2022-08-05", active: true),
