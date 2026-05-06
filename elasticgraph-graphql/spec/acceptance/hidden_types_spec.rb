@@ -78,8 +78,6 @@ module ElasticGraph
             all_types_related_to("WidgetCurrency") +
             all_types_related_to("Team") +
             all_types_related_to("Sponsor") +
-            all_types_related_to("Person") +
-            all_types_related_to("Company") +
             all_types_related_to("Inventor") +
             all_types_related_to("NamedInventor") +
             all_types_related_to("DistributionChannel") +
@@ -106,6 +104,7 @@ module ElasticGraph
             type_filter_and_non_indexed_aggregation_types_for("Affiliations", include_fields_list_filter: true) +
             type_filter_and_non_indexed_aggregation_types_for("CurrencyDetails") +
             type_filter_and_non_indexed_aggregation_types_for("Money", include_list_filter: true, include_fields_list_filter: true) - ["MoneyListElementFilterInput"] +
+            type_filter_and_non_indexed_aggregation_types_for("Person") +
             type_filter_and_non_indexed_aggregation_types_for("Position", include_highlights: false) +
             type_filter_and_non_indexed_aggregation_types_for("Player", include_list_filter: true, include_fields_list_filter: true) - ["PlayerListElementFilterInput"] +
             type_filter_and_non_indexed_aggregation_types_for("PlayerSeason", include_list_filter: true, include_fields_list_filter: true) - ["PlayerSeasonListElementFilterInput"] +
@@ -121,7 +120,7 @@ module ElasticGraph
             %w[
               FloatAggregatedValues IntAggregatedValues JsonSafeLongAggregatedValues LongStringAggregatedValues NonNumericAggregatedValues
               DateAggregatedValues DateTimeAggregatedValues LocalTimeAggregatedValues
-              OnlineStore DirectWholesaler BrokerWholesaler
+              Company OnlineStore DirectWholesaler BrokerWholesaler
               Cursor PageInfo Query TextFilterInput GeoLocation
               DateTimeGroupingOffsetInput DateTimeUnitInput DateTimeTimeOfDayFilterInput
               DateGroupedBy DateGroupingOffsetInput DateGroupingTruncationUnitInput DateUnitInput
