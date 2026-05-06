@@ -164,7 +164,7 @@ module ElasticGraph
         # @return [Boolean] true if this type is directly queryable via a type-specific field on the root `Query` type.
         # @note A concrete subtype that inherits an index from an abstract parent is NOT directly queryable on its own —
         #   only the abstract type that declared the index is. Use {#root_document_type?} to check whether a type
-        #   participates in any index (own or inherited).
+        #   is stored at the root of any index (own or inherited).
         def directly_queryable?
           has_own_index_def?
         end
