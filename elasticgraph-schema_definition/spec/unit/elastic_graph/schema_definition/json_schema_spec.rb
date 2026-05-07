@@ -2891,6 +2891,25 @@ module ElasticGraph
         expect(envelope_type_enum_values(schemas)).to eq ["Widget"]
       end
 
+      it "does not dump a schema for a namespace type because it has no backing data to index" do
+        schemas = all_type_definitions_for do |s|
+          s.object_type "Widget" do |t|
+            t.field "id", "ID!"
+            t.index "widgets"
+          end
+
+          s.namespace_type "OlapQuery" do |t|
+            t.field "name", "String" do |f|
+              f.resolve_with :constant_value, value: "olap"
+            end
+          end
+        end
+
+        expect(schemas.keys).to include(EVENT_ENVELOPE_JSON_SCHEMA_NAME, "Widget")
+        expect(schemas.keys).to exclude("OlapQuery")
+        expect(envelope_type_enum_values(schemas)).to eq ["Widget"]
+      end
+
       it "raises a clear error if the schema defines a type with a reserved name" do
         dump_schema do |s|
           expect {

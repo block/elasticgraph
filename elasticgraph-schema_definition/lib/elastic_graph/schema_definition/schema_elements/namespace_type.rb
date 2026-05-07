@@ -29,6 +29,9 @@ module ElasticGraph
         # @private
         def initialize(schema_def_state, name)
           super(schema_def_state, name) do |type|
+            # Namespace types exist only in the GraphQL schema; they have no backing data to index,
+            # so they are marked `graphql_only` to be excluded from indexing artifacts.
+            type.graphql_only true
             # Namespace types have no backing data, so no default resolver applies. Each field either
             # sets its own or is auto-wired to `:constant_value` when its return type is another
             # namespace (handled at runtime metadata time by `HasIndices#runtime_metadata_graphql_fields_by_name`).
