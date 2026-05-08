@@ -913,6 +913,42 @@ module ElasticGraph
         ]
       end
 
+      it "returns nodes when querying only `__typename` with no other fields" do
+        index_records(
+          build(:address),
+          build(:address),
+          build(:electrical_part),
+          build(:mechanical_part)
+        )
+
+        # Concrete type: nodes { __typename }
+        address_nodes = call_graphql_query(<<~QUERY).dig("data", "addresses", "nodes")
+          query { addresses { nodes { __typename } } }
+        QUERY
+        expect(address_nodes).to contain_exactly(
+          {"__typename" => "Address"},
+          {"__typename" => "Address"}
+        )
+
+        # Concrete type: edges { node { __typename } }
+        address_edges = call_graphql_query(<<~QUERY).dig("data", "addresses", "edges")
+          query { addresses { edges { node { __typename } } } }
+        QUERY
+        expect(address_edges).to contain_exactly(
+          {"node" => {"__typename" => "Address"}},
+          {"node" => {"__typename" => "Address"}}
+        )
+
+        # Abstract type: nodes { __typename } (no type-specific fragments)
+        part_nodes = call_graphql_query(<<~QUERY).dig("data", "parts", "nodes")
+          query { parts { nodes { __typename } } }
+        QUERY
+        expect(part_nodes).to contain_exactly(
+          {"__typename" => "ElectricalPart"},
+          {"__typename" => "MechanicalPart"}
+        )
+      end
+
       describe "`list` filtering behavior" do
         it "supports filtering on scalar lists, nested object lists, and embedded object lists", :expect_index_exclusions do
           index_records(
