@@ -29,22 +29,16 @@ module ElasticGraph
         end
 
         context "when querying an abstract type that shares a search index with a non-subtype" do
-          it "applies a __typename filter scoped to the queried type's concrete subtypes, including nil for subtypes with dedicated indexes" do
+          it "applies a __typename filter scoped to the queried type's concrete subtypes" do
             query = datastore_query_for(:Query, :retailers, "query { retailers { edges { node { id } } } }")
 
-            expect(typename_filter_from(query)).to contain_exactly(nil, "OnlineStore", "PhysicalStore")
+            expect(typename_filter_from(query)).to contain_exactly("OnlineStore", "PhysicalStore")
           end
 
           it "applies a __typename filter on aggregations of this kind of abstract type" do
             query = datastore_query_for(:Query, :retail_aggregations, "query { retail_aggregations { nodes { count } } }")
 
-            expect(typename_filter_from(query)).to contain_exactly(nil, "OnlineStore", "PhysicalStore")
-          end
-
-          it "omits nil from the __typename filter when all queried indexes store multiple types" do
-            query = datastore_query_for(:Query, :wholesalers, "query { wholesalers { edges { node { id } } } }")
-
-            expect(typename_filter_from(query)).to contain_exactly("DirectWholesaler", "BrokerWholesaler")
+            expect(typename_filter_from(query)).to contain_exactly("OnlineStore", "PhysicalStore")
           end
         end
 

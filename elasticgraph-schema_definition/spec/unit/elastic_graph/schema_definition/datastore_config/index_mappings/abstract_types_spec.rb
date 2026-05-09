@@ -249,6 +249,40 @@ module ElasticGraph
         end
       end
 
+      context "for a concrete type with its own index" do
+        it "includes __typename as a constant_keyword with the type name as the value" do
+          mapping = index_mapping_for "widgets" do |s|
+            s.object_type "Widget" do |t|
+              t.field "id", "ID!"
+              t.field "name", "String"
+              t.index "widgets"
+            end
+          end
+
+          expect(mapping.dig("properties", "__typename")).to eq({"type" => "constant_keyword", "value" => "Widget"})
+        end
+
+        it "does not include __typename as constant_keyword for an abstract type's shared index" do
+          mapping = index_mapping_for "things" do |s|
+            s.object_type "Widget" do |t|
+              t.field "id", "ID!"
+              t.implements "Thing"
+            end
+
+            s.object_type "Component" do |t|
+              t.field "id", "ID!"
+              t.implements "Thing"
+            end
+
+            s.interface_type "Thing" do |t|
+              t.index "things"
+            end
+          end
+
+          expect(mapping.dig("properties", "__typename")).to eq({"type" => "keyword"})
+        end
+      end
+
       context "on a type union" do
         include_examples "a type with subtypes", :union_type do
           def link_subtype_to_supertype(object_type, supertype_name)

@@ -297,7 +297,7 @@ module ElasticGraph
             .except("type") # `type` is invalid at the mapping root because it always has to be an object.
             .then { |mapping| ListCountsMapping.merged_into(mapping, for_type: indexed_type) }
             .then do |fm|
-              Support::HashUtil.deep_merge(fm, {"properties" => {
+              internal_fields = {
                 "__sources" => {"type" => "keyword"},
                 "__versions" => {
                   "type" => "object",
@@ -317,7 +317,17 @@ module ElasticGraph
                   # a boolean.
                   "dynamic" => "false"
                 }
-              }})
+              }
+
+              # We add __typename for concrete types so they can be matched by __typename filters, which are
+              # applied when querying abstract types that span multiple indices. Since every document in a
+              # concrete type's index has the same value, we use constant_keyword here. It stores __typename
+              # once at the index level with zero per-document overhead.
+              unless indexed_type.abstract?
+                internal_fields["__typename"] = {"type" => "constant_keyword", "value" => indexed_type.name}
+              end
+
+              Support::HashUtil.deep_merge(fm, {"properties" => internal_fields})
             end
 
           {"dynamic" => "strict"}.merge(field_mappings).tap do |hash|
