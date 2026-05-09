@@ -55,7 +55,7 @@ module ElasticGraph
                 .selection(@schema.element_names.highlights)
 
               {
-                individual_docs_needed: pagination_fields_need_individual_docs?(lookahead),
+                individual_docs_needed: pagination_fields_need_individual_docs?(lookahead) || relay_connection_node_from(lookahead).selected?,
                 requested_fields: requested_fields_under(relay_connection_node_from(lookahead), index_field_paths),
                 request_all_highlights: requesting_all_highlights?(lookahead),
                 requested_highlights: requested_fields_under(highlights, index_field_paths)
