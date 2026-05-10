@@ -6,6 +6,7 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/schema_definition/extension_module_support"
 require "elastic_graph/schema_definition/rake_tasks"
 require "elastic_graph/apollo/schema_definition/api_extension"
 require "pathname"
@@ -17,6 +18,7 @@ ElasticGraph::SchemaDefinition::RakeTasks.new(
   index_document_sizes: false,
   path_to_schema: project_root / "config/products_schema.rb",
   schema_artifacts_directory: project_root / "config/schema/artifacts",
-  extension_modules: [ElasticGraph::Apollo::SchemaDefinition::APIExtension],
-  enforce_json_schema_version: false
+  # Include the JSON ingestion default alongside the Apollo extension so the apollo tests dump JSON schemas.
+  extension_modules: ElasticGraph::SchemaDefinition::ExtensionModuleSupport.default_extension_modules + [ElasticGraph::Apollo::SchemaDefinition::APIExtension],
+  extension_artifact_options: {enforce_json_schema_version: false}
 )

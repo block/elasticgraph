@@ -1,0 +1,24 @@
+module ElasticGraph
+  module JSONIngestion
+    module SchemaDefinition
+      module Indexing
+        module FieldType
+          module ObjectExtension: ::ElasticGraph::SchemaDefinition::Indexing::FieldType::Object
+            include _JSONFieldType
+
+            @json_schema_options: ::Hash[::Symbol, untyped]
+            @to_json_schema: ::Hash[::String, untyped]?
+
+            def json_schema_options: () -> ::Hash[::Symbol, untyped]
+            def with_json_schema_options: (::Hash[::Symbol, untyped]) -> (::ElasticGraph::SchemaDefinition::Indexing::FieldType::Object & ObjectExtension)
+
+            private
+
+            def json_schema_typename_field: () -> ::Hash[::String, ::Hash[::String, untyped]]
+            def validate_sourced_fields_have_no_json_schema_overrides: (::Array[::ElasticGraph::SchemaDefinition::Indexing::Field & FieldExtension]) -> void
+          end
+        end
+      end
+    end
+  end
+end

@@ -1418,7 +1418,9 @@ module ElasticGraph
         end
 
         def define_schema(with_apollo: true, &block)
-          extension_modules = with_apollo ? [SchemaDefinition::APIExtension] : []
+          # Always include the JSON ingestion default so `Results#json_schemas_for` is available in both modes.
+          extension_modules = ::ElasticGraph::SchemaDefinition::ExtensionModuleSupport.default_extension_modules
+          extension_modules += [SchemaDefinition::APIExtension] if with_apollo
           super(schema_element_name_form: schema_element_name_form, extension_modules: extension_modules, &block)
         end
       end

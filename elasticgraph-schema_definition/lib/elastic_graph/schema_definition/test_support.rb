@@ -7,8 +7,10 @@
 # frozen_string_literal: true
 
 require "elastic_graph/errors"
+require "elastic_graph/schema_artifacts/from_disk"
 require "elastic_graph/schema_artifacts/runtime_metadata/schema_element_names"
 require "elastic_graph/schema_definition/api"
+require "elastic_graph/schema_definition/extension_module_support"
 require "elastic_graph/schema_definition/schema_artifact_manager"
 
 module ElasticGraph
@@ -24,7 +26,7 @@ module ElasticGraph
         schema_element_name_overrides: {},
         index_document_sizes: true,
         json_schema_version: 1,
-        extension_modules: [],
+        extension_modules: ExtensionModuleSupport.default_extension_modules,
         derived_type_name_formats: {},
         type_name_overrides: {},
         enum_value_overrides_by_type: {},
@@ -55,7 +57,7 @@ module ElasticGraph
         schema_elements,
         index_document_sizes: true,
         json_schema_version: 1,
-        extension_modules: [],
+        extension_modules: ExtensionModuleSupport.default_extension_modules,
         derived_type_name_formats: {},
         type_name_overrides: {},
         enum_value_overrides_by_type: {},
@@ -74,9 +76,11 @@ module ElasticGraph
 
         yield api if block_given?
 
-        # Set the json_schema_version to the provided value, if needed.
+        # Set the json_schema_version to the provided value, if needed. `API#json_schema_version` and
+        # `State#json_schema_version` are no-ops when no ingestion-serializer extension is loaded, so we
+        # can call through unconditionally — the JSON-ingestion extension overrides both.
         if !json_schema_version.nil? && api.state.json_schema_version.nil?
-          api.json_schema_version json_schema_version
+          api.json_schema_version(json_schema_version)
         end
 
         # :nocov: -- the else branch and code past this aren't used by tests in elasticgraph-schema_definition.
@@ -88,7 +92,7 @@ module ElasticGraph
         artifacts_manager = api.factory.new_schema_artifact_manager(
           schema_definition_results: api.results,
           schema_artifacts_directory: tmp_dir,
-          enforce_json_schema_version: false,
+          extension_artifact_options: {enforce_json_schema_version: false},
           output: ::StringIO.new
         )
 

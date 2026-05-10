@@ -1,0 +1,16 @@
+module ElasticGraph
+  module JSONIngestion
+    module SchemaDefinition
+      module SchemaElements
+        module TypeReferenceExtension: ::ElasticGraph::SchemaDefinition::SchemaElements::TypeReference
+          @json_schema_layers: ::ElasticGraph::SchemaDefinition::jsonSchemaLayersArray?
+          def json_schema_layers: () -> ::ElasticGraph::SchemaDefinition::jsonSchemaLayersArray
+
+          private
+
+          def peel_json_schema_layers_once: () -> [::ElasticGraph::SchemaDefinition::jsonSchemaLayersArray, (::ElasticGraph::SchemaDefinition::SchemaElements::TypeReference & TypeReferenceExtension)]
+        end
+      end
+    end
+  end
+end

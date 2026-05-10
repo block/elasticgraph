@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/spec_support/schema_definition_helpers"
+require "elastic_graph/json_ingestion/schema_definition/indexing/json_schema_field_metadata"
 
 module ElasticGraph
   module SchemaDefinition
@@ -144,7 +145,7 @@ module ElasticGraph
       end
 
       def field_meta_of(type, name_in_index)
-        Indexing::JSONSchemaFieldMetadata.new(type: type, name_in_index: name_in_index)
+        JSONIngestion::SchemaDefinition::Indexing::JSONSchemaFieldMetadata.new(type: type, name_in_index: name_in_index)
       end
     end
   end

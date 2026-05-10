@@ -9,6 +9,7 @@
 require "elastic_graph/apollo/schema_definition/api_extension"
 require "elastic_graph/schema_artifacts/runtime_metadata/schema_element_names"
 require "elastic_graph/schema_definition/api"
+require "elastic_graph/schema_definition/extension_module_support"
 require "elastic_graph/schema_definition/schema_artifact_manager"
 require "elastic_graph/warehouse/schema_definition/api_extension"
 require "rspec/mocks"
@@ -60,7 +61,7 @@ module ElasticGraph
         @api = SchemaDefinition::API.new(
           SchemaArtifacts::RuntimeMetadata::SchemaElementNames.new(form: :camelCase, overrides: {}),
           true,
-          extension_modules: extension_modules
+          extension_modules: SchemaDefinition::ExtensionModuleSupport.default_extension_modules + extension_modules
         )
 
         # This is required in all schemas, but we don't want to have to put in all our examples,
@@ -82,7 +83,7 @@ module ElasticGraph
         artifacts_manager = @api.factory.new_schema_artifact_manager(
           schema_definition_results: @api.results,
           schema_artifacts_directory: "#{@tmp_dir}/schema_artifacts",
-          enforce_json_schema_version: true,
+          extension_artifact_options: {enforce_json_schema_version: true},
           output: ::StringIO.new
         )
 
@@ -95,7 +96,8 @@ module ElasticGraph
       ElasticGraph.define_schema do |schema|
         # `schema.json_schema_version` raises an error when the version is set more than once.
         # By default we set it above. Here we clear it to allow our example to set it.
-        schema.state.json_schema_version = nil
+        schema.state.ingestion_serializer_state.delete(:json_schema_version)
+        schema.state.ingestion_serializer_state.delete(:json_schema_version_setter_location)
       end
     end
 

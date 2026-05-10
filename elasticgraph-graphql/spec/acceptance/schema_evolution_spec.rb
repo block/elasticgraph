@@ -68,7 +68,7 @@ module ElasticGraph
           index_document_sizes: true,
           path_to_schema: path_to_schema,
           schema_artifacts_directory: "config/schema/artifacts",
-          enforce_json_schema_version: true,
+          extension_artifact_options: {enforce_json_schema_version: true},
           output: output
         )
       end

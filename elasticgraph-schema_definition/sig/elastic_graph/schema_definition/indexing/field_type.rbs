@@ -3,9 +3,6 @@ module ElasticGraph
     module Indexing
       interface _FieldType
         def to_mapping: () -> ::Hash[::String, untyped]
-        def to_json_schema: () -> ::Hash[::String, untyped]
-        def json_schema_field_metadata_by_field_name: () -> ::Hash[::String, JSONSchemaFieldMetadata]
-        def format_field_json_schema_customizations: (::Hash[::String, untyped]) -> ::Hash[::String, untyped]
       end
     end
   end

@@ -361,7 +361,7 @@ module ElasticGraph
         self.derived_type_name_formats = {}
         self.type_name_overrides = {}
         self.enum_value_overrides_by_type = {}
-        self.schema_definition_extension_modules = []
+        self.schema_definition_extension_modules = SchemaDefinition::ExtensionModuleSupport.default_extension_modules
         self.enforce_json_schema_version = true
         self.env_port_mapping = {}
         self.output = $stdout
@@ -394,7 +394,7 @@ module ElasticGraph
           type_name_overrides: type_name_overrides,
           enum_value_overrides_by_type: enum_value_overrides_by_type,
           extension_modules: schema_definition_extension_modules,
-          enforce_json_schema_version: enforce_json_schema_version,
+          extension_artifact_options: {enforce_json_schema_version: enforce_json_schema_version},
           output: output
         )
 
