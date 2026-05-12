@@ -109,7 +109,8 @@ module ElasticGraph
         cardinality: SchemaElements::Relationship::cardinality,
         related_type: SchemaElements::TypeReference,
         foreign_key: ::String,
-        direction: SchemaElements::foreignKeyDirection
+        direction: SchemaElements::foreignKeyDirection,
+        ?indexing_only: bool
       ) -> SchemaElements::Relationship
       @@relationship_new: ::Method
 

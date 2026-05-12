@@ -257,6 +257,107 @@ module ElasticGraph
           })
         end
       end
+
+      describe "indexing_only relationships" do
+        it "excludes an `indexing_only: true` `relates_to_one` relationship from graphql_fields_by_name in runtime metadata" do
+          metadata = object_type_metadata_for "Widget" do |s|
+            s.object_type "Widget" do |t|
+              t.field "id", "ID"
+              t.field "name", "String"
+              t.relates_to_one "source", "Widget", via: "source_id", dir: :in, indexing_only: true
+              t.index "widgets"
+            end
+          end
+
+          expect(metadata.graphql_fields_by_name.keys).to contain_exactly("id", "name")
+        end
+
+        it "excludes an `indexing_only: true` `relates_to_many` relationship from graphql_fields_by_name in runtime metadata" do
+          metadata = object_type_metadata_for "Widget" do |s|
+            s.object_type "Widget" do |t|
+              t.field "id", "ID"
+              t.field "name", "String"
+              t.relates_to_many "sources", "Widget", via: "source_id", dir: :in, indexing_only: true do |r|
+                # block is provided but does nothing — exercises the yield path
+              end
+              t.index "widgets"
+            end
+          end
+
+          expect(metadata.graphql_fields_by_name.keys).to contain_exactly("id", "name")
+        end
+
+        it "does not require `singular:` when `indexing_only: true` is passed to `relates_to_many`" do
+          expect {
+            define_schema do |s|
+              s.object_type "Widget" do |t|
+                t.field "id", "ID"
+                t.relates_to_many "sources", "Widget", via: "source_id", dir: :in, indexing_only: true
+                t.index "widgets"
+              end
+            end
+          }.not_to raise_error
+        end
+
+        it "raises an error when `singular:` is not provided and `indexing_only` is not set" do
+          expect {
+            define_schema do |s|
+              s.object_type "Widget" do |t|
+                t.field "id", "ID"
+                t.relates_to_many "sources", "Widget", via: "source_id", dir: :in
+              end
+            end
+          }.to raise_error(Errors::SchemaError, /`relates_to_many` requires a `singular:` argument \(used to name the aggregations field\)/)
+        end
+
+        it "does not infer foreign key fields for `indexing_only: true` relationships" do
+          metadata = object_type_metadata_for "Widget" do |s|
+            s.object_type "Source" do |t|
+              t.field "id", "ID!"
+              t.field "widget_id", "ID"
+              t.index "sources"
+            end
+
+            s.object_type "Widget" do |t|
+              t.field "id", "ID"
+              t.relates_to_one "source", "Source", via: "widget_id", dir: :in, indexing_only: true
+              t.index "widgets"
+            end
+          end
+
+          expect(metadata.graphql_fields_by_name.keys).to contain_exactly("id")
+        end
+
+        it "still registers non-indexing_only relationships in both graphql_fields_by_name and relationships_by_name" do
+          result = define_schema do |s|
+            s.object_type "Widget" do |t|
+              t.field "id", "ID"
+              t.relates_to_one "parent", "Widget", via: "parent_id", dir: :out
+              t.index "widgets"
+            end
+          end
+
+          widget_type = result.state.object_types_by_name["Widget"]
+          expect(widget_type.graphql_fields_by_name).to have_key("parent")
+          expect(widget_type.relationships_by_name).to have_key("parent")
+          expect(widget_type.relationships_by_name["parent"].indexing_only).to be false
+        end
+
+        it "registers indexing_only relationships in relationships_by_name but not graphql_fields_by_name" do
+          result = define_schema do |s|
+            s.object_type "Widget" do |t|
+              t.field "id", "ID"
+              t.relates_to_one "source", "Widget", via: "source_id", dir: :in, indexing_only: true
+              t.index "widgets"
+            end
+          end
+
+          widget_type = result.state.object_types_by_name["Widget"]
+          expect(widget_type.graphql_fields_by_name).not_to have_key("source")
+          expect(widget_type.relationships_by_name).to have_key("source")
+          expect(widget_type.relationships_by_name["source"].indexing_only).to be true
+        end
+      end
     end
   end
 end
