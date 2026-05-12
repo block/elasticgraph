@@ -2962,6 +2962,14 @@ Will match all documents if passed as an empty object (or as `null`).
 """
 input DistributionChannelFilterInput {
   """
+  Filters `DistributionChannel` records by concrete type. Only concrete type names are valid values —
+  filtering on an abstract type name will match nothing, since records only have concrete
+  type names for their `__typename` value.
+  Analogous to the `__typename` return field.
+  """
+  _typename: StringFilterInput
+
+  """
   Used to filter on the `active` field.
 
   When `null` or an empty object is passed, matches all documents.
@@ -4250,6 +4258,14 @@ Input type used to specify filters on `Inventor` fields.
 Will match all documents if passed as an empty object (or as `null`).
 """
 input InventorFilterInput {
+  """
+  Filters `Inventor` records by concrete type. Only concrete type names are valid values —
+  filtering on an abstract type name will match nothing, since records only have concrete
+  type names for their `__typename` value.
+  Analogous to the `__typename` return field.
+  """
+  _typename: StringFilterInput
+
   """
   Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
 
@@ -6538,6 +6554,14 @@ Will match all documents if passed as an empty object (or as `null`).
 """
 input NamedEntityFilterInput {
   """
+  Filters `NamedEntity` records by concrete type. Only concrete type names are valid values —
+  filtering on an abstract type name will match nothing, since records only have concrete
+  type names for their `__typename` value.
+  Analogous to the `__typename` return field.
+  """
+  _typename: StringFilterInput
+
+  """
   Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
@@ -7919,6 +7943,14 @@ Will match all documents if passed as an empty object (or as `null`).
 """
 input NamedInventorFilterInput {
   """
+  Filters `NamedInventor` records by concrete type. Only concrete type names are valid values —
+  filtering on an abstract type name will match nothing, since records only have concrete
+  type names for their `__typename` value.
+  Analogous to the `__typename` return field.
+  """
+  _typename: StringFilterInput
+
+  """
   Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
@@ -8276,6 +8308,14 @@ Input type used to specify filters on `Part` fields.
 Will match all documents if passed as an empty object (or as `null`).
 """
 input PartFilterInput {
+  """
+  Filters `Part` records by concrete type. Only concrete type names are valid values —
+  filtering on an abstract type name will match nothing, since records only have concrete
+  type names for their `__typename` value.
+  Analogous to the `__typename` return field.
+  """
+  _typename: StringFilterInput
+
   """
   Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
 
@@ -11721,6 +11761,14 @@ Will match all documents if passed as an empty object (or as `null`).
 """
 input RetailFilterInput {
   """
+  Filters `Retail` records by concrete type. Only concrete type names are valid values —
+  filtering on an abstract type name will match nothing, since records only have concrete
+  type names for their `__typename` value.
+  Analogous to the `__typename` return field.
+  """
+  _typename: StringFilterInput
+
+  """
   Used to filter on the `active` field.
 
   When `null` or an empty object is passed, matches all documents.
@@ -12817,6 +12865,14 @@ Input type used to specify filters on `Store` fields.
 Will match all documents if passed as an empty object (or as `null`).
 """
 input StoreFilterInput {
+  """
+  Filters `Store` records by concrete type. Only concrete type names are valid values —
+  filtering on an abstract type name will match nothing, since records only have concrete
+  type names for their `__typename` value.
+  Analogous to the `__typename` return field.
+  """
+  _typename: StringFilterInput
+
   """
   Used to filter on the `active` field.
 
@@ -15712,6 +15768,14 @@ Will match all documents if passed as an empty object (or as `null`).
 """
 input WholesaleFilterInput {
   """
+  Filters `Wholesale` records by concrete type. Only concrete type names are valid values —
+  filtering on an abstract type name will match nothing, since records only have concrete
+  type names for their `__typename` value.
+  Analogous to the `__typename` return field.
+  """
+  _typename: StringFilterInput
+
+  """
   Used to filter on the `active` field.
 
   When `null` or an empty object is passed, matches all documents.
@@ -18031,6 +18095,14 @@ Input type used to specify filters on `WidgetOrAddress` fields.
 Will match all documents if passed as an empty object (or as `null`).
 """
 input WidgetOrAddressFilterInput {
+  """
+  Filters `WidgetOrAddress` records by concrete type. Only concrete type names are valid values —
+  filtering on an abstract type name will match nothing, since records only have concrete
+  type names for their `__typename` value.
+  Analogous to the `__typename` return field.
+  """
+  _typename: StringFilterInput
+
   """
   Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
 

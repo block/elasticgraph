@@ -87,6 +87,17 @@ module ElasticGraph
           return [] if does_not_support?(&:filterable?)
 
           schema_def_state.factory.build_standard_filter_input_types_for_index_object_type(name) do |t|
+            if abstract?
+              t.field schema_def_state.schema_elements._typename, schema_def_state.type_ref("String").as_filter_input.name, name_in_index: "__typename" do |f|
+                f.documentation <<~EOS
+                  Filters `#{name}` records by concrete type. Only concrete type names are valid values —
+                  filtering on an abstract type name will match nothing, since records only have concrete
+                  type names for their `__typename` value.
+                  Analogous to the `__typename` return field.
+                EOS
+              end
+            end
+
             graphql_fields_by_name.values.each do |field|
               if field.filterable?
                 t.graphql_fields_by_name[field.name] = field.to_filter_field(parent_type: t)
