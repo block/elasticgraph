@@ -33,35 +33,37 @@ ElasticGraph.define_schema do |schema|
     t.field "name", "String"
   end
 
+  # Person serves two roles: it is indexed as a top-level queryable type (via NamedInventor's
+  # index inheritance) and embedded as Manufacturer.ceo. This dual role is intentional — it
+  # exercises that the indexer correctly injects __typename when preparing Person for the
+  # shared named_inventors index, but omits it when embedding Person in manufacturers.
   schema.object_type "Person" do |t|
     t.implements "NamedInventor"
-    t.root_query_fields plural: "people"
     t.field "id", "ID!"
     t.field "name", "String"
     t.field "nationality", "String"
-    t.index "people"
   end
 
   schema.object_type "Company" do |t|
     t.implements "NamedInventor"
-    t.root_query_fields plural: "companies"
     t.field "id", "ID!"
     t.field "name", "String"
     t.field "stock_ticker", "String"
-    t.index "companies"
   end
 
   schema.union_type "Inventor" do |t|
     t.subtypes "Person", "Company"
   end
 
-  # Interface type used both as an embedded field and as a root document type.
+  # Indexed interface type. Person and Company inherit the `named_inventors` index via
+  # index inheritance rather than declaring it themselves.
   schema.interface_type "NamedInventor" do |t|
     t.field "id", "ID!"
     t.field "name", "String"
+    t.index "named_inventors"
   end
 
-  # Indexed interfae type.
+  # Indexed interface type.
   schema.interface_type "NamedEntity" do |t|
     t.root_query_fields plural: "named_entities"
     t.field "id", "ID!"

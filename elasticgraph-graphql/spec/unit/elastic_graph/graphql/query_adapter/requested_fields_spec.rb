@@ -669,6 +669,38 @@ module ElasticGraph
             expect(query.individual_docs_needed).to be true
           end
 
+          it "sets `individual_docs_needed = true` when only `__typename` is requested under `nodes`" do
+            query = datastore_query_for(:Query, :widgets, <<~QUERY)
+              query {
+                widgets {
+                  nodes {
+                    __typename
+                  }
+                }
+              }
+            QUERY
+
+            expect(query.individual_docs_needed).to be true
+            expect(query.requested_fields).to be_empty
+          end
+
+          it "sets `individual_docs_needed = true` when only `__typename` is requested under `edges.node`" do
+            query = datastore_query_for(:Query, :widgets, <<~QUERY)
+              query {
+                widgets {
+                  edges {
+                    node {
+                      __typename
+                    }
+                  }
+                }
+              }
+            QUERY
+
+            expect(query.individual_docs_needed).to be true
+            expect(query.requested_fields).to be_empty
+          end
+
           it "sets `individual_docs_needed = true` when an edge cursor is requested" do
             query = datastore_query_for(:Query, :widgets, <<~QUERY)
               query {

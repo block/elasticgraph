@@ -35,12 +35,15 @@ module ElasticGraph
           initialize_has_indices { yield self }
         end
 
-        # Converts the current type from being an _embedded_ type (that is, a type that is embedded within another indexed type) to an
-        # _indexed_ type that resides in the named index definition. Indexed types are directly indexed into the datastore, and will be
-        # queryable from the root `Query` type.
+        # Declares a datastore index for the current type, converting it from an _embedded_ type to an _indexed_ type
+        # that is directly queryable from the root `Query` type. When called on an abstract `interface_type` or
+        # `union_type`, concrete subtypes inherit the index by default — they share the same datastore index without
+        # needing to call `t.index` themselves. A subtype can opt out of this shared index inheritance by calling
+        # `t.index` with a different name to use a dedicated index instead.
         #
         # @note Use {#root_query_fields} on indexed types to name the field that will be exposed on `Query`.
         # @note Indexed types must also define an `id` field, which ElasticGraph will use as the primary key.
+        #   When an abstract type declares the index, each concrete subtype must also define `id`.
         # @note Datastore index settings can also be defined (or overridden) in an environment-specific settings YAML file. Index settings
         #   that you want to configure differently for different environments (such as `index.number_of_shards`—-production and staging
         #   will probably need different numbers!) should be configured in the per-environment YAML configuration files rather than here.
@@ -52,7 +55,7 @@ module ElasticGraph
         # @yield [Indexing::Index] the index, so it can be customized further
         # @return [void]
         #
-        # @example Define a `campaigns` index
+        # @example Define a `campaigns` index on a concrete type
         #   ElasticGraph.define_schema do |schema|
         #     schema.object_type "Campaign" do |t|
         #       t.field "id", "ID"
@@ -66,6 +69,32 @@ module ElasticGraph
         #       ) do |i|
         #         # The index can be customized further here.
         #       end
+        #     end
+        #   end
+        #
+        # @example Declare a shared index on an interface
+        #   ElasticGraph.define_schema do |schema|
+        #     schema.interface_type "Vehicle" do |t|
+        #       t.field "id", "ID"
+        #       t.field "make", "String"
+        #       t.index "vehicles"
+        #     end
+        #
+        #     schema.object_type "Car" do |t|
+        #       t.implements "Vehicle"
+        #       t.field "id", "ID"
+        #       t.field "make", "String"
+        #       t.field "numDoors", "Int"
+        #       # Inherits the `vehicles` index — no need to call `t.index`.
+        #     end
+        #
+        #     schema.object_type "Motorcycle" do |t|
+        #       t.implements "Vehicle"
+        #       t.field "id", "ID"
+        #       t.field "make", "String"
+        #       t.field "engineCC", "Int"
+        #       # Opts out of the shared index and gets its own dedicated index instead.
+        #       t.index "motorcycles"
         #     end
         #   end
         def index(name, **settings, &block)
@@ -139,6 +168,9 @@ module ElasticGraph
         end
 
         # @return [Boolean] true if this type is directly queryable via a type-specific field on the root `Query` type.
+        # @note A concrete subtype that inherits an index from an abstract parent is NOT directly queryable on its own —
+        #   only the abstract type that declared the index is. Use {#root_document_type?} to check whether a type
+        #   is stored at the root of any index (own or inherited).
         def directly_queryable?
           has_own_index_def?
         end

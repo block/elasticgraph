@@ -249,6 +249,20 @@ module ElasticGraph
         end
       end
 
+      context "for a concrete type with its own index" do
+        it "includes __typename as a constant_keyword with the type name as the value" do
+          mapping = index_mapping_for "widgets" do |s|
+            s.object_type "Widget" do |t|
+              t.field "id", "ID!"
+              t.field "name", "String"
+              t.index "widgets"
+            end
+          end
+
+          expect(mapping.dig("properties", "__typename")).to eq({"type" => "constant_keyword", "value" => "Widget"})
+        end
+      end
+
       context "on a type union" do
         include_examples "a type with subtypes", :union_type do
           def link_subtype_to_supertype(object_type, supertype_name)

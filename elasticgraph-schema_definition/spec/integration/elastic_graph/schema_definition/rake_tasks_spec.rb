@@ -1025,7 +1025,7 @@ module ElasticGraph
             expect(error.message.lines.first(8).join).to eq(<<~EOS)
               6 schema artifact(s) are out of date. Run `bundle exec rake schema_artifacts:dump` to update the following artifact(s):
 
-              1. config/schema/artifacts/datastore_config.yaml (see [1] below for the diff)
+              1. config/schema/artifacts/datastore_config.yaml (see [1] below for the first 50 lines of the diff)
               2. config/schema/artifacts/json_schemas.yaml (see [2] below for the first 50 lines of the diff)
               3. config/schema/artifacts/json_schemas_by_version/v1.yaml (see [3] below for the diff)
               4. config/schema/artifacts/json_schemas_by_version/v2.yaml (file does not exist)
