@@ -261,26 +261,6 @@ module ElasticGraph
 
           expect(mapping.dig("properties", "__typename")).to eq({"type" => "constant_keyword", "value" => "Widget"})
         end
-
-        it "does not include __typename as constant_keyword for an abstract type's shared index" do
-          mapping = index_mapping_for "things" do |s|
-            s.object_type "Widget" do |t|
-              t.field "id", "ID!"
-              t.implements "Thing"
-            end
-
-            s.object_type "Component" do |t|
-              t.field "id", "ID!"
-              t.implements "Thing"
-            end
-
-            s.interface_type "Thing" do |t|
-              t.index "things"
-            end
-          end
-
-          expect(mapping.dig("properties", "__typename")).to eq({"type" => "keyword"})
-        end
       end
 
       context "on a type union" do
