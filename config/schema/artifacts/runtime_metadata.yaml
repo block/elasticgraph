@@ -1772,11 +1772,6 @@ enum_types_by_name:
           direction: desc
           field_path: widget.id
 graphql_resolvers_by_name:
-  constant_value:
-    needs_lookahead: false
-    resolver_ref:
-      name: ElasticGraph::GraphQL::Resolvers::ConstantValue
-      require_path: elastic_graph/graphql/resolvers/constant_value
   get_record_field_value:
     needs_lookahead: false
     resolver_ref:

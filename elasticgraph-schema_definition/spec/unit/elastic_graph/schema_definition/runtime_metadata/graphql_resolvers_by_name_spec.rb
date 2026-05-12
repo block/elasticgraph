@@ -19,7 +19,6 @@ module ElasticGraph
         result = graphql_resolvers_by_name
 
         expect(result.keys).to contain_exactly(
-          :constant_value,
           :get_record_field_value,
           :indexed_type_root_fields,
           :namespace_ref,
@@ -120,7 +119,6 @@ module ElasticGraph
             To continue, register the named resolvers with `schema.register_graphql_resolver`
             or update the fields listed above to use one of the other registered resolvers:
 
-              - :constant_value
               - :get_record_field_value
               - :indexed_type_root_fields
               - :namespace_ref

@@ -99,13 +99,13 @@ module ElasticGraph
         metadata = object_type_metadata_for "OlapQuery" do |s|
           s.namespace_type "OlapQuery" do |t|
             t.field "name", "String" do |f|
-              f.resolve_with :constant_value, value: "olap"
+              f.resolve_with :get_record_field_value
             end
           end
         end
 
         expect(metadata.graphql_fields_by_name.fetch("name").resolver).to eq(
-          configured_graphql_resolver(:constant_value, value: "olap")
+          configured_graphql_resolver(:get_record_field_value)
         )
       end
     end

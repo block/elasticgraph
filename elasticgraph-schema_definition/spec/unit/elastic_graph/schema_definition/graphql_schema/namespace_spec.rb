@@ -17,7 +17,7 @@ module ElasticGraph
         it "generates a plain GraphQL object type with the given fields" do
           result = namespace_type "OlapQuery" do |t|
             t.field "name", "String" do |f|
-              f.resolve_with :constant_value, value: "olap"
+              f.resolve_with :get_record_field_value
             end
           end
 
@@ -34,7 +34,7 @@ module ElasticGraph
 
             t.field "name", "String" do |f|
               f.documentation "The namespace's name."
-              f.resolve_with :constant_value, value: "olap"
+              f.resolve_with :get_record_field_value
             end
           end
 

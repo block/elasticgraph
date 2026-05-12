@@ -1801,11 +1801,6 @@ graphql_resolvers_by_name:
     resolver_ref:
       name: ElasticGraph::Apollo::GraphQL::ServiceFieldResolver
       require_path: elastic_graph/apollo/graphql/service_field_resolver
-  constant_value:
-    needs_lookahead: false
-    resolver_ref:
-      name: ElasticGraph::GraphQL::Resolvers::ConstantValue
-      require_path: elastic_graph/graphql/resolvers/constant_value
   get_record_field_value:
     needs_lookahead: false
     resolver_ref:

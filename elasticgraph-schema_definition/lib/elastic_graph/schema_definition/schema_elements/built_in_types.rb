@@ -1434,12 +1434,6 @@ module ElasticGraph
             defined_at: require_path,
             built_in: true
 
-          require(require_path = "elastic_graph/graphql/resolvers/constant_value")
-          schema_def_api.register_graphql_resolver :constant_value,
-            GraphQL::Resolvers::ConstantValue,
-            defined_at: require_path,
-            built_in: true
-
           require(require_path = "elastic_graph/graphql/resolvers/namespace_ref")
           schema_def_api.register_graphql_resolver :namespace_ref,
             GraphQL::Resolvers::NamespaceRef,
