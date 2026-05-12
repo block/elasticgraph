@@ -1839,6 +1839,11 @@ graphql_resolvers_by_name:
     resolver_ref:
       name: ElasticGraph::GraphQL::Resolvers::IndexedTypeRootFieldsResolver
       require_path: elastic_graph/graphql/resolvers/indexed_type_root_fields_resolver
+  namespace_ref:
+    needs_lookahead: false
+    resolver_ref:
+      name: ElasticGraph::GraphQL::Resolvers::NamespaceRef
+      require_path: elastic_graph/graphql/resolvers/namespace_ref
   nested_relationships:
     needs_lookahead: true
     resolver_ref:

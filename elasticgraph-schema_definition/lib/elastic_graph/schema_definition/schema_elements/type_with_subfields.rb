@@ -215,7 +215,10 @@ module ElasticGraph
               register_field(field.name, field, graphql_fields_by_name, "GraphQL", :indexing_only)
             end
 
-            unless graphql_only
+            # Fields pointing at a namespace type have no data to index: namespace types are pure GraphQL
+            # grouping constructs. Skipping indexing registration here keeps them out of both the index
+            # mapping and the JSON schema for the parent type.
+            unless graphql_only || field.target_type_is_namespace?
               register_field(field.name_in_index, field, indexing_fields_by_name_in_index, "indexing", :graphql_only) do |f|
                 f.to_indexing_field_reference
               end

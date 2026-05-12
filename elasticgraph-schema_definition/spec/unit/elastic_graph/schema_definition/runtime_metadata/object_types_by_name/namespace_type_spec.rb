@@ -13,7 +13,7 @@ module ElasticGraph
     RSpec.describe "RuntimeMetadata for a namespace type" do
       include_context "object type metadata support"
 
-      it "auto-wires the `:constant_value` resolver for a no-arg field on `Query` that returns a namespace type" do
+      it "auto-wires the `:namespace_ref` resolver for a no-arg field on `Query` that returns a namespace type" do
         metadata = object_type_metadata_for "Query" do |s|
           s.namespace_type "OlapQuery"
           s.on_root_query_type do |t|
@@ -21,13 +21,12 @@ module ElasticGraph
           end
         end
 
-        # `value: {}` is dropped from `config` during the dump/load roundtrip since empty hashes are pruned.
         expect(metadata.graphql_fields_by_name.fetch("olap").resolver).to eq(
-          configured_graphql_resolver(:constant_value)
+          configured_graphql_resolver(:namespace_ref)
         )
       end
 
-      it "auto-wires the `:constant_value` resolver for a no-arg field on a namespace type that returns another namespace type" do
+      it "auto-wires the `:namespace_ref` resolver for a no-arg field on a namespace type that returns another namespace type" do
         metadata = object_type_metadata_for "OlapQuery" do |s|
           s.namespace_type "OlapQuery" do |t|
             t.field "domain", "DomainQuery"
@@ -35,26 +34,23 @@ module ElasticGraph
           s.namespace_type "DomainQuery"
         end
 
-        # `value: {}` is dropped from `config` during the dump/load roundtrip since empty hashes are pruned.
         expect(metadata.graphql_fields_by_name.fetch("domain").resolver).to eq(
-          configured_graphql_resolver(:constant_value)
+          configured_graphql_resolver(:namespace_ref)
         )
       end
 
-      it "auto-wires the `:constant_value` resolver for a no-arg field on a regular object type that returns a namespace type" do
-        metadata = object_type_metadata_for "Regular" do |s|
+      it "auto-wires the `:namespace_ref` resolver for a no-arg field on a regular indexed type that returns a namespace type" do
+        metadata = object_type_metadata_for "Widget" do |s|
           s.namespace_type "DomainQuery"
-          s.object_type "Regular" do |t|
-            t.resolve_fields_with :get_record_field_value
-            t.field "id", "ID"
+          s.object_type "Widget" do |t|
+            t.field "id", "ID!"
             t.field "domain", "DomainQuery"
-            t.index "regulars"
+            t.index "widgets"
           end
         end
 
-        # `value: {}` is dropped from `config` during the dump/load roundtrip since empty hashes are pruned.
         expect(metadata.graphql_fields_by_name.fetch("domain").resolver).to eq(
-          configured_graphql_resolver(:constant_value)
+          configured_graphql_resolver(:namespace_ref)
         )
       end
 

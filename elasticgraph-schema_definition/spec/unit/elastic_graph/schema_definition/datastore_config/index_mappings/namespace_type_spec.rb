@@ -20,17 +20,30 @@ module ElasticGraph
             t.index "widgets"
           end
 
-          s.namespace_type "OlapQuery" do |t|
-            t.field "name", "String" do |f|
-              f.resolve_with :constant_value, value: "olap"
-            end
+          s.namespace_type "OlapQuery"
+        end
+
+        # Only the `widgets` index mapping is generated (no namespace type mapping).
+        widget_mapping = index_configs.first.fetch("mappings")
+        expect(widget_mapping.dig("properties")).to include("id" => {"type" => "keyword"})
+      end
+
+      it "omits fields that reference a namespace type from the index mapping of an indexed type" do
+        # This test would fail if `s.namespace_type` were replaced with `s.object_type` -- the `olap`
+        # field would then appear in the Widget mapping as an `object` type. Namespace types have no
+        # backing data, so they must be excluded from the parent's mapping.
+        widget_mapping = index_mapping_for "widgets" do |s|
+          s.namespace_type "OlapQuery"
+
+          s.object_type "Widget" do |t|
+            t.field "id", "ID!"
+            t.field "olap", "OlapQuery"
+            t.index "widgets"
           end
         end
 
-        # Only the `widgets` index is defined; no `olap_queries`-like index for the namespace type.
-        widget_mapping = index_configs.first.fetch("mappings")
         expect(widget_mapping.dig("properties")).to include("id" => {"type" => "keyword"})
-        expect(widget_mapping.dig("properties")).to exclude("name")
+        expect(widget_mapping.dig("properties")).to exclude("olap")
       end
     end
   end

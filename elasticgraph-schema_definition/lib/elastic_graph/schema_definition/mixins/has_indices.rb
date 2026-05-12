@@ -16,6 +16,11 @@ module ElasticGraph
     module Mixins
       # Provides APIs for defining datastore indices.
       module HasIndices
+        # Resolver auto-wired on any no-argument field that returns a namespace type. A namespace type
+        # carries no data of its own; this resolver just provides a non-null passthrough object for the
+        # GraphQL machinery so each child field's own resolver can run.
+        NAMESPACE_RESOLVER = SchemaArtifacts::RuntimeMetadata::ConfiguredGraphQLResolver.new(:namespace_ref, {})
+
         # @dynamic runtime_metadata_overrides
         # @private
         attr_reader :runtime_metadata_overrides
@@ -366,8 +371,13 @@ module ElasticGraph
             field_metadata = field.runtime_metadata_graphql_field
 
             if field_metadata.resolver.nil?
-              if (namespace_resolver = implicit_namespace_resolver_for(field))
-                field_metadata.with(resolver: namespace_resolver)
+              # A no-argument field whose return type is a namespace type is auto-wired to the shared
+              # {NAMESPACE_RESOLVER}. Intermediate namespace wrappers (e.g. `Query.olap` returning
+              # `OlapQuery!`) are pure groupings with no backing data, so the inert `value: {}` serves
+              # as the passthrough object that child resolvers hang off of. Fields that declare arguments
+              # are excluded since arguments signal the author wants custom resolution.
+              if field.args.empty? && field.target_type_is_namespace?
+                field_metadata.with(resolver: NAMESPACE_RESOLVER)
               elsif default_graphql_resolver
                 field_metadata.with(resolver: default_graphql_resolver)
               else
@@ -386,18 +396,6 @@ module ElasticGraph
               field_metadata
             end
           end
-        end
-
-        # If `field`'s return type is a namespace type, returns an auto-wired `:constant_value` resolver so
-        # the schema author doesn't have to spell it out. Intermediate namespace wrappers (e.g. `Query.olap`
-        # returning `OlapQuery!`) are pure groupings with no backing data, so the empty-hash constant serves
-        # as the "passthrough" object the child resolvers hang off of. Fields that declare arguments are
-        # excluded since arguments signal the author wants custom resolution.
-        def implicit_namespace_resolver_for(field)
-          return nil unless field.args.empty?
-          return_type = schema_def_state.object_types_by_name[field.type.fully_unwrapped.name]
-          return nil unless return_type&.namespace?
-          SchemaArtifacts::RuntimeMetadata::ConfiguredGraphQLResolver.new(:constant_value, {value: {}})
         end
 
         # Provides a "best effort" conversion of a type name to the plural form.

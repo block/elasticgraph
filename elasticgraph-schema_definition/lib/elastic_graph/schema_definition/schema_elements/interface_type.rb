@@ -44,11 +44,6 @@ module ElasticGraph
           end
         end
 
-        # @return [Boolean] always `false`; only {ObjectType} subtypes can be namespace types.
-        def namespace?
-          false
-        end
-
         # This contains more than just the proper interface fields; it also contains the fields from the
         # subtypes, which winds up being used to generate an input filter and aggregation type.
         #

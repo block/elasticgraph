@@ -15,7 +15,6 @@ module ElasticGraph
         attr_reader subtype_refs: ::Set[TypeReference]
 
         def initialize: (State, ::String) { (UnionType) -> void } -> void
-        def namespace?: () -> bool
         def graphql_fields_by_name: () -> ::Hash[String, Field]
         def subtype: (::String) -> void
         def subtypes: (*::String) -> void

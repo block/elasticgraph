@@ -14,8 +14,6 @@ module ElasticGraph
         include Mixins::SupportsFilteringAndAggregation
         include _IndexableType
 
-        def namespace?: () -> bool
-
         def initialize: (State, ::String) ?{ (ObjectType) -> void } -> void
       end
     end

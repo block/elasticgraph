@@ -22,6 +22,7 @@ module ElasticGraph
           :constant_value,
           :get_record_field_value,
           :indexed_type_root_fields,
+          :namespace_ref,
           :nested_relationships,
           :object_with_lookahead,
           :object_without_lookahead
@@ -122,6 +123,7 @@ module ElasticGraph
               - :constant_value
               - :get_record_field_value
               - :indexed_type_root_fields
+              - :namespace_ref
               - :nested_relationships
               - :object_with_lookahead
               - :object_without_lookahead

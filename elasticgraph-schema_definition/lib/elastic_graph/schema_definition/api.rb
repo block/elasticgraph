@@ -140,35 +140,34 @@ module ElasticGraph
       # Instead of adding an indexed type's root query fields directly to `Query` (e.g. `Query.widgets`),
       # a namespace type lets you group them under a nested path (e.g. `Query.olap.widgets`). This is
       # particularly useful when composing ElasticGraph into a federated supergraph, where grouping
-      # related fields under a namespace keeps them discoverable among fields from other subgraphs.
+      # related fields under a namespace can be useful for separating parts of the supergraph with differing conventions
+      # or semantics.
       #
       # A namespace type is a GraphQL object type with two differences from a regular object type:
       #
       # - It cannot be indexed (calling `index` on it raises an error).
       # - Any no-argument field (on any parent type, including `Query`) whose return type is a
-      #   namespace type is auto-wired to the built-in `:constant_value` resolver (with an empty
-      #   hash as the value), so you don't have to assign a resolver for intermediate namespace fields.
+      #   namespace type will be automatically resolved, so you don't have to assign a resolver for
+      #   intermediate namespace fields.
       #
       # @param name [String] name of the namespace type
       # @yield [SchemaElements::NamespaceType] namespace type object, for further customization
       # @return [void]
       #
-      # @example Define an `OlapQuery` namespace type
+      # @example Define an `OlapQuery` namespace type and hang it off `Query`
       #   ElasticGraph.define_schema do |schema|
       #     schema.namespace_type "OlapQuery" do |t|
       #       t.documentation "Namespace for OLAP query fields."
-      #       t.field "name", "String" do |f|
-      #         f.resolve_with :constant_value, value: "olap"
-      #       end
       #     end
       #
       #     schema.on_root_query_type do |t|
-      #       # `olap` has no args and returns a namespace type, so it's auto-wired to `:constant_value`.
       #       t.field "olap", "OlapQuery!"
       #     end
       #   end
       def namespace_type(name, &block)
-        @state.register_object_interface_or_union_type @factory.new_namespace_type(name.to_s, &block)
+        namespace_type = @factory.new_namespace_type(name.to_s, &block)
+        @state.namespace_types_by_name[namespace_type.name] = namespace_type
+        @state.register_object_interface_or_union_type namespace_type
         nil
       end
 

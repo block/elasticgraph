@@ -16,8 +16,7 @@ module ElasticGraph
       #
       # A namespace type is an {ObjectType} that exists purely to group fields on `Query` (or on
       # another namespace type) under a shared path. It cannot be indexed, and any no-argument field
-      # (on any parent type) whose return type is a namespace type is auto-wired to the built-in
-      # `:constant_value` resolver.
+      # (on any parent type) whose return type is a namespace type is automatically resolved
       #
       # @example Define a namespace type
       #   ElasticGraph.define_schema do |schema|
@@ -32,17 +31,12 @@ module ElasticGraph
             # Namespace types exist only in the GraphQL schema; they have no backing data to index,
             # so they are marked `graphql_only` to be excluded from indexing artifacts.
             type.graphql_only true
-            # Namespace types have no backing data, so no default resolver applies. Each field either
-            # sets its own or is auto-wired to `:constant_value` when its return type is another
-            # namespace (handled at runtime metadata time by `HasIndices#runtime_metadata_graphql_fields_by_name`).
+            # Namespace types have no backing data, so no default resolver applies. Fields that return
+            # a namespace type are auto-wired (see `HasIndices::NAMESPACE_RESOLVER`); all other fields
+            # must set their own resolver.
             type.resolve_fields_with nil
             yield type if block_given?
           end
-        end
-
-        # @return [Boolean] always `true` for a namespace type.
-        def namespace?
-          true
         end
 
         # Namespace types cannot be indexed.

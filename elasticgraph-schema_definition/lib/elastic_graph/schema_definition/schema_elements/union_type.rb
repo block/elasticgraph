@@ -71,11 +71,6 @@ module ElasticGraph
           type_ref.name
         end
 
-        # @return [Boolean] always `false`; only {ObjectType} subtypes can be namespace types.
-        def namespace?
-          false
-        end
-
         # Defines a subtype of this union type.
         #
         # @param name [String] the name of an object type which is a member of this union type

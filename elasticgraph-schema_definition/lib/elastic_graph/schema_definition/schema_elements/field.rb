@@ -757,6 +757,15 @@ module ElasticGraph
           returnable
         end
 
+        # @return [Boolean] true if this field's return type is a {API#namespace_type namespace type}.
+        # @private
+        def target_type_is_namespace?
+          # Uses `original_type.fully_unwrapped.name` rather than `type.fully_unwrapped.name` to avoid
+          # eagerly resolving the type (which can fail for fields whose type is registered later in the
+          # build pipeline). `fully_unwrapped` is pure string manipulation on the declared type name.
+          schema_def_state.namespace_types_by_name.key?(original_type.fully_unwrapped.name)
+        end
+
         # Defines an argument on the field.
         #
         # @note ElasticGraph takes care of defining arguments for all the query features it supports, so there is generally no need to use

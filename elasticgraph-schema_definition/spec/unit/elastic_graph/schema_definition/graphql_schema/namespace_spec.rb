@@ -53,11 +53,7 @@ module ElasticGraph
 
         it "does not generate a Query field for a namespace type (it is not directly queryable)" do
           result = define_schema do |schema|
-            schema.namespace_type "OlapQuery" do |t|
-              t.field "name", "String" do |f|
-                f.resolve_with :constant_value, value: "olap"
-              end
-            end
+            schema.namespace_type "OlapQuery"
 
             schema.on_root_query_type do |t|
               t.field "olap", "OlapQuery!"
@@ -71,20 +67,45 @@ module ElasticGraph
           EOS
         end
 
-        it "does not generate connection/edge/aggregation derived types for a namespace type" do
+        it "does not generate any derived types for a namespace type" do
           result = define_schema do |schema|
-            schema.namespace_type "OlapQuery" do |t|
-              t.field "name", "String" do |f|
-                f.resolve_with :constant_value, value: "olap"
-              end
+            schema.namespace_type "OlapQuery"
+          end
+
+          # Only `OlapQuery` itself appears in the schema -- no `*Connection`, `*Edge`, `*FilterInput`,
+          # `*Aggregation`, `*SortOrderInput`, etc. This is what sets namespace types apart from
+          # indexed object types, which generate a constellation of derived types.
+          expect(types_defined_in(result).grep(/OlapQuery/)).to contain_exactly("OlapQuery")
+        end
+
+        it "omits fields that reference a namespace type from derived types of an indexed type" do
+          result = define_schema do |schema|
+            schema.namespace_type "OlapQuery"
+
+            schema.object_type "Widget" do |t|
+              t.field "id", "ID!"
+              # `olap` references a namespace type. It should appear on `Widget` in the GraphQL schema,
+              # but never on any `Widget*` derived type (filter, sort, aggregation, highlights, etc.)
+              # because there's nothing in the datastore to filter/sort/group/highlight on.
+              t.field "olap", "OlapQuery"
+              t.index "widgets"
+            end
+
+            schema.on_root_query_type do |t|
+              t.field "olap", "OlapQuery!"
             end
           end
 
-          expect(connection_type_from(result, "OlapQuery")).to eq nil
-          expect(edge_type_from(result, "OlapQuery")).to eq nil
-          expect(aggregation_type_from(result, "OlapQuery")).to eq nil
-          expect(aggregation_connection_type_from(result, "OlapQuery")).to eq nil
-          expect(sort_order_type_from(result, "OlapQuery")).to eq nil
+          # `olap` is a field on `Widget`.
+          expect(type_def_from(result, "Widget")).to include("olap: OlapQuery")
+
+          # But it doesn't appear on any derived type of `Widget`.
+          widget_derived_types = types_defined_in(result).grep(/\AWidget/) - ["Widget"]
+          widget_derived_types.each do |derived_type_name|
+            derived_type_sdl = type_def_from(result, derived_type_name)
+            expect(derived_type_sdl).not_to include("olap"),
+              "Expected derived type `#{derived_type_name}` to exclude `olap`, but its SDL was:\n#{derived_type_sdl}"
+          end
         end
 
         it "raises a clear error when `index` is called on a namespace type" do

@@ -13,7 +13,6 @@ module ElasticGraph
         include Mixins::ImplementsInterfaces
 
         def initialize: (State, ::String) { (InterfaceType) -> void } -> void
-        def namespace?: () -> bool
         def interface_fields_by_name: () -> ::Hash[::String, Field]
 
         private

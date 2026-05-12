@@ -48,12 +48,6 @@ module ElasticGraph
           super.merge("__typename" => schema_def_state.factory.new_field(name: "__typename", type: "String", parent_type: self))
         end
 
-        # @return [Boolean] true if this type was declared via {API#namespace_type} and groups root query fields.
-        #   Overridden by {NamespaceType}; always `false` on a regular object type.
-        def namespace?
-          false
-        end
-
         # @private
         def initialize(schema_def_state, name)
           field_factory = schema_def_state.factory.method(:new_field)

@@ -4,7 +4,6 @@ module ElasticGraph
       class NamespaceType < ObjectType
         def initialize: (State, ::String) ?{ (NamespaceType) -> void } -> void
 
-        def namespace?: () -> bool
         def index: (::String, **untyped) ?{ (Indexing::Index) -> void } -> void
       end
     end

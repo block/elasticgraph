@@ -16,19 +16,13 @@ module ElasticGraph
 
         before(:context) do
           self.schema_artifacts = generate_schema_artifacts do |schema|
-            schema.namespace_type "Namespace" do |t|
-              t.field "name", "String" do |f|
-                f.resolve_with :constant_value, value: "ns"
-              end
-            end
-
             schema.on_root_query_type do |t|
               t.field "pi", "Float" do |f|
                 f.resolve_with :constant_value, value: 3.141592654
               end
 
-              t.field "namespace", "Namespace!" do |f|
-                f.resolve_with :constant_value, value: {}
+              t.field "sentinel", "String" do |f|
+                f.resolve_with :constant_value, value: "placeholder"
               end
             end
           end
@@ -49,7 +43,7 @@ module ElasticGraph
           subject(:resolver) { ConstantValue.new(elasticgraph_graphql: graphql, config: {value: sentinel}) }
 
           it "returns the same object reference" do
-            expect(resolve("Query", "namespace")).to be sentinel
+            expect(resolve("Query", "sentinel")).to be sentinel
           end
         end
 
