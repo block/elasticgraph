@@ -67,7 +67,7 @@ PATH
   specs:
     elasticgraph-elasticsearch (1.1.1.pre)
       elasticgraph-support (= 1.1.1.pre)
-      elasticsearch (~> 9.3, >= 9.3.1)
+      elasticsearch (~> 9.4)
       faraday (~> 2.14, >= 2.14.1)
       faraday-retry (~> 2.4)
 
@@ -309,10 +309,10 @@ GEM
     elastic-transport (8.5.1)
       faraday (< 3)
       multi_json
-    elasticsearch (9.3.1)
+    elasticsearch (9.4.0)
       elastic-transport (~> 8.3)
-      elasticsearch-api (= 9.3.1)
-    elasticsearch-api (9.3.1)
+      elasticsearch-api (= 9.4.0)
+    elasticsearch-api (9.4.0)
       base64
       multi_json
     em-websocket (0.5.3)
@@ -800,8 +800,8 @@ CHECKSUMS
   elasticgraph-support (1.1.1.pre)
   elasticgraph-warehouse (1.1.1.pre)
   elasticgraph-warehouse_lambda (1.1.1.pre)
-  elasticsearch (9.3.1) sha256=ca39fb73b0f5f5434d51e74be602c9153b46bbfe5168e09d383e88349c21ea24
-  elasticsearch-api (9.3.1) sha256=9c9a44ed55dcbf0c0fe0fb8ca770d0281301cedd41ef4ad1f1d9ebb3830da672
+  elasticsearch (9.4.0) sha256=646af8c1b5cc305bb109ada73c0ee8c39a14bdbc1bab08390fc04ccbf1b8d474
+  elasticsearch-api (9.4.0) sha256=7bb37ab10bcbc567603f20a60bb8fb0845a42187b2989eb637341bf4d260456c
   em-websocket (0.5.3) sha256=f56a92bde4e6cb879256d58ee31f124181f68f8887bd14d53d5d9a292758c6a8
   erb (6.0.4) sha256=38e3803694be357fe2bfe312487c74beaf9fb4e5beb3e22498952fe1645b95d9
   erb (6.0.4-java) sha256=3014611d37917a20e14ea3ba71e06a8d581b71c073858d7796eeee45b01e8407
