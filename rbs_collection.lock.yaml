@@ -50,7 +50,7 @@ gems:
   source:
     type: rubygems
 - name: aws-sdk-s3
-  version: 1.220.0
+  version: 1.221.0
   source:
     type: rubygems
 - name: aws-sdk-sqs

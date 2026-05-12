@@ -115,7 +115,7 @@ PATH
   remote: elasticgraph-indexer_lambda
   specs:
     elasticgraph-indexer_lambda (1.1.1.pre)
-      aws-sdk-s3 (~> 1.220)
+      aws-sdk-s3 (~> 1.221)
       elasticgraph-indexer (= 1.1.1.pre)
       elasticgraph-lambda_support (= 1.1.1.pre)
 
@@ -208,7 +208,7 @@ PATH
   remote: elasticgraph-warehouse_lambda
   specs:
     elasticgraph-warehouse_lambda (1.1.1.pre)
-      aws-sdk-s3 (~> 1.220)
+      aws-sdk-s3 (~> 1.221)
       elasticgraph-indexer_lambda (= 1.1.1.pre)
       elasticgraph-lambda_support (= 1.1.1.pre)
 
@@ -258,7 +258,7 @@ GEM
       traces (~> 0.18)
     attr_extras (7.1.0)
     aws-eventstream (1.4.0)
-    aws-partitions (1.1244.0)
+    aws-partitions (1.1246.0)
     aws-sdk-cloudwatch (1.135.0)
       aws-sdk-core (~> 3, >= 3.244.0)
       aws-sigv4 (~> 1.5)
@@ -276,7 +276,7 @@ GEM
     aws-sdk-lambda (1.178.0)
       aws-sdk-core (~> 3, >= 3.244.0)
       aws-sigv4 (~> 1.5)
-    aws-sdk-s3 (1.220.0)
+    aws-sdk-s3 (1.221.0)
       aws-sdk-core (~> 3, >= 3.244.0)
       aws-sdk-kms (~> 1)
       aws-sigv4 (~> 1.5)
@@ -387,7 +387,7 @@ GEM
       zeitwerk (~> 2.5)
     http-2 (1.1.3)
     http_parser.rb (0.8.1)
-    httpx (1.7.6)
+    httpx (1.7.7)
       http-2 (>= 1.1.3)
     i18n (1.14.8)
       concurrent-ruby (~> 1.0)
@@ -715,7 +715,7 @@ DEPENDENCIES
   flatware-rspec (~> 2.3, >= 2.3.4)!
   graphql-c_parser (~> 1.1, >= 1.1.3)
   html-proofer (~> 5.2, >= 5.2.1)
-  httpx (~> 1.7, >= 1.7.6)
+  httpx (~> 1.7, >= 1.7.7)
   irb (~> 1.18)
   jekyll (~> 4.4, >= 4.4.1)
   memory_profiler (~> 1.1)
@@ -750,12 +750,12 @@ CHECKSUMS
   async (2.39.0) sha256=df18730073f2bbb45788077dfa20cb365ecc1b9453969f44de6796b5191a00aa
   attr_extras (7.1.0) sha256=d96fc9a9dd5d85ba2d37762440a816f840093959ae26bb90da994c2d9f1fc827
   aws-eventstream (1.4.0) sha256=116bf85c436200d1060811e6f5d2d40c88f65448f2125bc77ffce5121e6e183b
-  aws-partitions (1.1244.0) sha256=e6e5ded095e3bd775db3b64f84533e1ddf7c74f070b3d0373f08dc77c8c3592b
+  aws-partitions (1.1246.0) sha256=809cd7d38b7ba4ea651c9879248ecf9fd0f8289412e76f26478d2b37064faa1d
   aws-sdk-cloudwatch (1.135.0) sha256=c6ff0d81b3eadb597249e47ef76f2578b6a884a2be5f7587f85d1093298a853a
   aws-sdk-core (3.246.0) sha256=393864ec8948560e69fcccc2e4d256b40c7028eb98930608dd295279e3c4ddcc
   aws-sdk-kms (1.124.0) sha256=40d00ab706d7e49fd620270bd0dcb546f266295abdd49b54fec2611e2a41f37c
   aws-sdk-lambda (1.178.0) sha256=6006cfb3bfb8774feca7e598f56b4db3bf97f02402a4c81326483a0ec07abc0e
-  aws-sdk-s3 (1.220.0) sha256=237fda5e6ac7ecdd9c848e27187bfdc370edad5c5a141aeec389fb450fa28c7c
+  aws-sdk-s3 (1.221.0) sha256=a05488eab2083a1e90b02e18479d8f65e401081d671b2d138992a2c5fef85491
   aws-sdk-sqs (1.112.0) sha256=272a2d919fd3daa1c4a8ed0f9a3b765fbb84cce27aaf3b08e6d97edd171bbdae
   aws-sigv4 (1.12.1) sha256=6973ff95cb0fd0dc58ba26e90e9510a2219525d07620c8babeb70ef831826c00
   aws_lambda_ric (3.2.0) sha256=fdab2c637bf0aa47b1de795d6fe7244572e9f743ac74eb47e1386e3c4c17c269
@@ -840,7 +840,7 @@ CHECKSUMS
   html-proofer (5.2.1) sha256=fdd958a7cbf9c3255fb96fe7cfc4e611f64e2706e469488a3326309ad007d2fd
   http-2 (1.1.3) sha256=1b2f379d35a11dbae94f8a1a52c053d8c161eb4a0c98b5d1605ff1b2bf171c9c
   http_parser.rb (0.8.1) sha256=9ae8df145b39aa5398b2f90090d651c67bd8e2ebfe4507c966579f641e11097a
-  httpx (1.7.6) sha256=82d825abc9876a132adc3492c56a0c528478ac238dd6f74d3422ab0036c6b5c8
+  httpx (1.7.7) sha256=5f7a5cd4b867aca8df3125aa2ed808fb62a2f236f46955571a087bb949c3770d
   i18n (1.14.8) sha256=285778639134865c5e0f6269e0b818256017e8cde89993fdfcbfb64d088824a5
   io-console (0.8.2) sha256=d6e3ae7a7cc7574f4b8893b4fca2162e57a825b223a177b7afa236c5ef9814cc
   io-console (0.8.2-java) sha256=837efefe96084c13ae91114917986ae6c6d1cf063b27b8419cc564a722a38af8
