@@ -29,11 +29,10 @@ module ElasticGraph
       # `BrokerWholesaler` documents from `distribution_channels` would appear in results.
       # So we inject:
       #
-      #   __typename: { equal_to_any_of: [nil, "OnlineStore", "PhysicalStore"] }
+      #   __typename: { equal_to_any_of: ["OnlineStore", "PhysicalStore"] }
       #
-      # `nil` is included because `PhysicalStore` has a dedicated index where documents lack
-      # `__typename` — the index itself identifies the type. We only include `nil` when at least
-      # one of the queried indexes stores only a single type (and thus lacks `__typename`).
+      # `PhysicalStore` has a dedicated index with `__typename` stored as a `constant_keyword`,
+      # so it matches the `equal_to_any_of` filter just like documents in the shared index.
       class AbstractTypeFilter
         def initialize(schema_element_names)
           @equal_to_any_of = schema_element_names.equal_to_any_of
@@ -48,15 +47,8 @@ module ElasticGraph
 
           return query unless doc_type.shares_index_with_non_subtypes?
 
-          schema = context.fetch(:elastic_graph_schema)
           subtypes = doc_type.subtypes # Note: subtypes returns all concrete subtypes at any depth
           typename_values = subtypes.map(&:name)
-          # Only include nil when at least one queried index stores only a single type — those
-          # documents lack __typename (the index itself identifies the type), so nil is needed to
-          # allow them through.
-          if doc_type.search_index_definitions.any? { |idx| schema.document_types_stored_in(idx.name).size == 1 }
-            typename_values += [nil]
-          end
           query.merge_with(internal_filters: [{
             "__typename" => {@equal_to_any_of => typename_values}
           }])

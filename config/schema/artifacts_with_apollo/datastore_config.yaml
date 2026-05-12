@@ -1241,6 +1241,9 @@ index_templates:
           __versions:
             type: object
             dynamic: 'false'
+          __typename:
+            type: constant_keyword
+            value: Team
         _routing:
           required: true
         _size:
@@ -1312,6 +1315,9 @@ index_templates:
           __versions:
             type: object
             dynamic: 'false'
+          __typename:
+            type: constant_keyword
+            value: WidgetCurrency
         _routing:
           required: true
         _size:
@@ -1475,6 +1481,9 @@ index_templates:
           __versions:
             type: object
             dynamic: 'false'
+          __typename:
+            type: constant_keyword
+            value: Widget
         _routing:
           required: true
         _size:
@@ -1523,6 +1532,9 @@ indices:
         __versions:
           type: object
           dynamic: 'false'
+        __typename:
+          type: constant_keyword
+          value: Address
       _size:
         enabled: true
     settings:
@@ -1586,6 +1598,9 @@ indices:
         __versions:
           type: object
           dynamic: 'false'
+        __typename:
+          type: constant_keyword
+          value: Component
       _size:
         enabled: true
     settings:
@@ -1644,6 +1659,9 @@ indices:
         __versions:
           type: object
           dynamic: 'false'
+        __typename:
+          type: constant_keyword
+          value: ElectricalPart
       _size:
         enabled: true
     settings:
@@ -1677,6 +1695,9 @@ indices:
         __versions:
           type: object
           dynamic: 'false'
+        __typename:
+          type: constant_keyword
+          value: Manufacturer
       _size:
         enabled: true
     settings:
@@ -1706,6 +1727,9 @@ indices:
         __versions:
           type: object
           dynamic: 'false'
+        __typename:
+          type: constant_keyword
+          value: MechanicalPart
       _size:
         enabled: true
     settings:
@@ -1759,6 +1783,9 @@ indices:
         __versions:
           type: object
           dynamic: 'false'
+        __typename:
+          type: constant_keyword
+          value: PhysicalStore
       _size:
         enabled: true
     settings:
@@ -1781,6 +1808,9 @@ indices:
         __versions:
           type: object
           dynamic: 'false'
+        __typename:
+          type: constant_keyword
+          value: Sponsor
       _size:
         enabled: true
     settings:
@@ -1810,6 +1840,9 @@ indices:
         __versions:
           type: object
           dynamic: 'false'
+        __typename:
+          type: constant_keyword
+          value: WidgetWorkspace
       _size:
         enabled: true
     settings:

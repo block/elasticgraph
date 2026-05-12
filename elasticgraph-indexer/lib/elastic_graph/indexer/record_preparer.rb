@@ -118,13 +118,16 @@ module ElasticGraph
           # what the concrete subtype is. `__typename` is required on abstract types and indicates that.
           eg_meta_by_field_name = @eg_meta_by_field_name_by_concrete_type.fetch(value["__typename"] || type_name)
 
-          # Determine whether __typename belongs at this position by checking the index mapping.
-          typename_in_mapping = mapping_properties&.key?("__typename")
+          # We only want to consider __typename if it's in the per-record mapping in order to determine
+          # whether __typename is required on records. When it's a constant_keyword it exists at the index
+          # level and therefore should be ignored for this purpose.
+          typename_type = mapping_properties&.dig("__typename", "type")
+          typename_in_record_mapping = typename_type && typename_type != "constant_keyword"
 
           prepared_fields = value.filter_map do |field_name, field_value|
             if field_name == "__typename"
               # Only include __typename if the index mapping has it at this position.
-              [field_name, field_value] if typename_in_mapping
+              [field_name, field_value] if typename_in_record_mapping
             elsif (eg_meta = eg_meta_by_field_name[field_name])
               name_in_index = eg_meta.fetch("nameInIndex")
               nested_mapping_properties = mapping_properties&.dig(name_in_index, "properties")
@@ -134,7 +137,7 @@ module ElasticGraph
 
           # Inject __typename if the mapping requires it but it's absent from the record
           # (e.g. for a concrete type indexed in a mixed-type index).
-          if typename_in_mapping && !value.key?("__typename")
+          if typename_in_record_mapping && !value.key?("__typename")
             prepared_fields["__typename"] = type_name
           end
 
