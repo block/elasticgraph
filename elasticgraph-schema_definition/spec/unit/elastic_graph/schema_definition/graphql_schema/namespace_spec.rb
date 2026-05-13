@@ -125,11 +125,9 @@ module ElasticGraph
               schema.namespace_type "OlapQuery"
 
               schema.object_type "Widget" do |t|
-                t.field "id", "ID!"
                 t.field "olap", "OlapQuery" do |f|
                   f.type_is_namespace?
                 end
-                t.index "widgets"
               end
             end
           }.to raise_error(
