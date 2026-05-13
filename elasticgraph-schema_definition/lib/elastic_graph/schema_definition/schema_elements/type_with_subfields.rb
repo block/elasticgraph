@@ -588,6 +588,10 @@ module ElasticGraph
               register_inferred_foreign_key_fields(from_type: ["id", "ID!"], to_other: [via, foreign_key_type], related_type: relationship.related_type)
             end
 
+            if relationships_by_name.key?(field_name)
+              raise Errors::SchemaError, "Duplicate relationship on Type #{name}: `#{field_name}`. " \
+                "Each relationship must have a unique name."
+            end
             relationships_by_name[field_name] = relationship
           end
         end

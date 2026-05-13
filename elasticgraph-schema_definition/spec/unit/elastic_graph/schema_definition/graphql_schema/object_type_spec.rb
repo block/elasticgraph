@@ -642,6 +642,18 @@ module ElasticGraph
               end
             }.to raise_error(Errors::SchemaError, /`relates_to_many` requires a `singular:` argument/)
           end
+
+          it "raises an error when the same relationship is defined twice" do
+            expect {
+              define_schema do |schema|
+                schema.object_type "Widget" do |t|
+                  t.field "id", "ID"
+                  t.relates_to_one "payment", "Payment", via: "payment_id", dir: :out, indexing_only: true
+                  t.relates_to_one "payment", "Payment", via: "payment_guid", dir: :out, indexing_only: true
+                end
+              end
+            }.to raise_error(Errors::SchemaError, /Duplicate relationship on Type Widget: `payment`/)
+          end
         end
 
         it "can generate a simple indexed type (with just `name`)" do
