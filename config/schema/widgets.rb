@@ -145,7 +145,7 @@ ElasticGraph.define_schema do |schema|
     t.field "metadata", "Untyped"
 
     # TODO: change `widget.` in these field paths to `widgets.` when we can support `sourced_from` with that.
-    t.relates_to_one "workspace", "WidgetWorkspace", via: "widget.id", dir: :in do |rel|
+    t.relates_to_one "workspace", "WidgetWorkspace", via: "widget.id", dir: :in, indexing_only: true do |rel|
       rel.equivalent_field "id", locally_named: "workspace_id"
       rel.equivalent_field "widget.created_at", locally_named: "created_at"
     end
