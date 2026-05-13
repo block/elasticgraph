@@ -226,7 +226,7 @@ module ElasticGraph
       @@interface_type_new = prevent_non_factory_instantiation_of(SchemaElements::InterfaceType)
 
       def new_namespace_type(name, &block)
-        @@namespace_type_new.call(@state, name.to_s, &(_ = block))
+        @@namespace_type_new.call(@state, name.to_s, &block)
       end
       @@namespace_type_new = prevent_non_factory_instantiation_of(SchemaElements::NamespaceType)
 
