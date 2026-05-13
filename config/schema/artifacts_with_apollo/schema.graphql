@@ -15920,7 +15920,6 @@ type Widget implements NamedEntity @key(fields: "id") {
   the_options: WidgetOptions
   weight_in_ng: JsonSafeLong!
   weight_in_ng_str: LongString!
-  workspace: WidgetWorkspace
   workspace_id: ID
   workspace_name: String
 }

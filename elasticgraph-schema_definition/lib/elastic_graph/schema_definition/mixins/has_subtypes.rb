@@ -34,6 +34,10 @@ module ElasticGraph
             .merge("__typename" => schema_def_state.factory.new_field(name: "__typename", type: "String", parent_type: _ = self))
         end
 
+        def relationships_by_name
+          merge_fields_by_name_from_subtypes(&:relationships_by_name)
+        end
+
         def root_document_type?
           super || subtypes_are_root_document_types?
         end

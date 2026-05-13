@@ -19,12 +19,10 @@ module ElasticGraph
         end
 
         def resolve
-          relation_field = object_type.graphql_fields_by_name[relationship_name]
+          relationship = object_type.relationships_by_name[relationship_name]
 
-          if relation_field.nil?
+          if relationship.nil?
             [nil, "#{relationship_error_prefix} is not defined. Is it misspelled?"]
-          elsif (relationship = relation_field.relationship).nil?
-            [nil, "#{relationship_error_prefix} is not a relationship. It must be defined using `relates_to_one` or `relates_to_many`."]
           elsif (related_type = schema_def_state.object_types_by_name[relationship.related_type.unwrap_non_null.name]).nil?
             issue =
               if schema_def_state.types_by_name.key?(relationship.related_type.fully_unwrapped.name)
@@ -37,13 +35,13 @@ module ElasticGraph
           elsif !related_type.root_document_type?
             [nil, "#{relationship_error_prefix} references a type which is not a root document type: `#{related_type.name}`. Only root document types can be used in relations."]
           else
-            relation_metadata = relation_field.runtime_metadata_graphql_field.relation # : SchemaArtifacts::RuntimeMetadata::Relation
+            relation_metadata = relationship.runtime_metadata
             foreign_key_parent_type = (relation_metadata.direction == :in) ? related_type : object_type
 
             if (foreign_key_error = validate_foreign_key(foreign_key_parent_type, relation_metadata))
               [nil, foreign_key_error]
             else
-              [ResolvedRelationship.new(relationship_name, relation_field, relationship, related_type, relation_metadata), nil]
+              [ResolvedRelationship.new(relationship_name, relationship, related_type, relation_metadata), nil]
             end
           end
         end
@@ -89,7 +87,7 @@ module ElasticGraph
       end
 
       # @private
-      ResolvedRelationship = ::Data.define(:relationship_name, :relationship_field, :relationship, :related_type, :relation_metadata)
+      ResolvedRelationship = ::Data.define(:relationship_name, :relationship, :related_type, :relation_metadata)
     end
   end
 end
