@@ -759,7 +759,7 @@ module ElasticGraph
 
         # @return [Boolean] true if this field's return type is a {API#namespace_type namespace type}.
         # @private
-        def target_type_is_namespace?
+        def type_is_namespace?
           # Uses `original_type.fully_unwrapped.name` rather than `type.fully_unwrapped.name` to avoid
           # eagerly resolving the type (which can fail for fields whose type is registered later in the
           # build pipeline). `fully_unwrapped` is pure string manipulation on the declared type name.
