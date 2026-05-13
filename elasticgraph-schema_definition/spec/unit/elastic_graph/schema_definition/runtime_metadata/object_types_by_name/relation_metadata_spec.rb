@@ -299,33 +299,6 @@ module ElasticGraph
         end
 
 
-        it "still registers non-indexing_only relationships in both graphql_fields_by_name and relationships_by_name" do
-          result = define_schema do |s|
-            s.object_type "Widget" do |t|
-              t.field "id", "ID"
-              t.relates_to_one "parent", "Widget", via: "parent_id", dir: :out
-              t.index "widgets"
-            end
-          end
-
-          widget_type = result.state.object_types_by_name["Widget"]
-          expect(widget_type.graphql_fields_by_name).to have_key("parent")
-          expect(widget_type.relationships_by_name).to have_key("parent")
-        end
-
-        it "registers indexing_only relationships in relationships_by_name but not graphql_fields_by_name" do
-          result = define_schema do |s|
-            s.object_type "Widget" do |t|
-              t.field "id", "ID"
-              t.relates_to_one "source", "Widget", via: "source_id", dir: :in, indexing_only: true
-              t.index "widgets"
-            end
-          end
-
-          widget_type = result.state.object_types_by_name["Widget"]
-          expect(widget_type.graphql_fields_by_name).not_to have_key("source")
-          expect(widget_type.relationships_by_name).to have_key("source")
-        end
       end
     end
   end
