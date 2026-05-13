@@ -35,7 +35,7 @@ module ElasticGraph
         end
 
         def relationships_by_name
-          merge_fields_by_name_from_subtypes(&:relationships_by_name)
+          _ = merge_fields_by_name_from_subtypes(&:relationships_by_name)
         end
 
         def root_document_type?

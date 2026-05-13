@@ -38,6 +38,7 @@ module ElasticGraph
       def derived_indexed_types: () -> ::Array[Indexing::DerivedIndexedType]
       def verify_graphql_correctness!: () -> void
       def relay_pagination_type: () -> bool
+      def relationships_by_name: () -> ::Hash[::String, SchemaElements::Relationship]
     end
 
     # Here we make a type alias that should be used in place of `_IndexableType`. All types

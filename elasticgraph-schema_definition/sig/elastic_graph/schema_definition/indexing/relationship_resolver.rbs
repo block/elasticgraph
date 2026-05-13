@@ -34,7 +34,6 @@ module ElasticGraph
 
         def initialize: (
           ::String,
-          SchemaElements::Field,
           SchemaElements::Relationship,
           indexableType,
           SchemaArtifacts::RuntimeMetadata::Relation

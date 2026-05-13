@@ -39,7 +39,7 @@ module ElasticGraph
           elsif !related_type.root_document_type?
             [nil, "#{relationship_error_prefix} references a type which is not a root document type: `#{related_type.name}`. Only root document types can be used in relations."]
           else
-            relation_metadata = relationship.runtime_metadata
+            relation_metadata = relationship.runtime_metadata # : SchemaArtifacts::RuntimeMetadata::Relation
             foreign_key_parent_type = (relation_metadata.direction == :in) ? related_type : object_type
 
             if (foreign_key_error = validate_foreign_key(foreign_key_parent_type, relation_metadata))
