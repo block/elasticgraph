@@ -589,12 +589,10 @@ module ElasticGraph
 
             yield relationship if block_given?
 
-            unless indexing_only
-              if dir == :out
-                register_inferred_foreign_key_fields(from_type: [via, foreign_key_type], to_other: ["id", "ID!"], related_type: relationship.related_type)
-              else
-                register_inferred_foreign_key_fields(from_type: ["id", "ID!"], to_other: [via, foreign_key_type], related_type: relationship.related_type)
-              end
+            if dir == :out
+              register_inferred_foreign_key_fields(from_type: [via, foreign_key_type], to_other: ["id", "ID!"], related_type: relationship.related_type)
+            else
+              register_inferred_foreign_key_fields(from_type: ["id", "ID!"], to_other: [via, foreign_key_type], related_type: relationship.related_type)
             end
 
             relationships_by_name[field_name] = relationship

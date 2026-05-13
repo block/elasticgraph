@@ -22,7 +22,11 @@ module ElasticGraph
           relationship = object_type.relationships_by_name[relationship_name]
 
           if relationship.nil?
-            [nil, "#{relationship_error_prefix} is not defined. Is it misspelled?"]
+            if object_type.graphql_fields_by_name.key?(relationship_name)
+              [nil, "#{relationship_error_prefix} is not a relationship. It must be defined using `relates_to_one` or `relates_to_many`."]
+            else
+              [nil, "#{relationship_error_prefix} is not defined. Is it misspelled?"]
+            end
           elsif (related_type = schema_def_state.object_types_by_name[relationship.related_type.unwrap_non_null.name]).nil?
             issue =
               if schema_def_state.types_by_name.key?(relationship.related_type.fully_unwrapped.name)

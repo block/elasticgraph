@@ -310,23 +310,6 @@ module ElasticGraph
           }.to raise_error(Errors::SchemaError, /`relates_to_many` requires a `singular:` argument \(used to name the aggregations field\)/)
         end
 
-        it "does not infer foreign key fields for `indexing_only: true` relationships" do
-          metadata = object_type_metadata_for "Widget" do |s|
-            s.object_type "Source" do |t|
-              t.field "id", "ID!"
-              t.field "widget_id", "ID"
-              t.index "sources"
-            end
-
-            s.object_type "Widget" do |t|
-              t.field "id", "ID"
-              t.relates_to_one "source", "Source", via: "widget_id", dir: :in, indexing_only: true
-              t.index "widgets"
-            end
-          end
-
-          expect(metadata.graphql_fields_by_name.keys).to contain_exactly("id")
-        end
 
         it "still registers non-indexing_only relationships in both graphql_fields_by_name and relationships_by_name" do
           result = define_schema do |s|
