@@ -600,6 +600,37 @@ module ElasticGraph
                   #{schema_elements.before}: Cursor): PersonConnection
             EOS
           end
+
+          it "omits `indexing_only: true` relationships from the GraphQL schema" do
+            result = define_schema do |schema|
+              schema.object_type "Widget" do |t|
+                t.field "id", "ID"
+                t.field "name", "String"
+                t.relates_to_one "workspace", "WidgetWorkspace", via: "widget_id", dir: :in, indexing_only: true
+                t.relates_to_many "components", "Component", via: "widget_id", dir: :in, indexing_only: true
+                t.index "widgets"
+              end
+
+              schema.object_type "WidgetWorkspace" do |t|
+                t.field "id", "ID"
+                t.field "widget_id", "ID"
+                t.index "widget_workspaces"
+              end
+
+              schema.object_type "Component" do |t|
+                t.field "id", "ID"
+                t.field "widget_id", "ID"
+                t.index "components"
+              end
+            end
+
+            expect(type_def_from(result, "Widget")).to eq(<<~EOS.strip)
+              type Widget {
+                id: ID
+                name: String
+              }
+            EOS
+          end
         end
 
         it "can generate a simple indexed type (with just `name`)" do
