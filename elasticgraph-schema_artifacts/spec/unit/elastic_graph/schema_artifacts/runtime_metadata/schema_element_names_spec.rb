@@ -12,12 +12,12 @@ module ElasticGraph
   module SchemaArtifacts
     module RuntimeMetadata
       ExampleElementNames = SchemaElementNamesDefinition.new(
-        :foo, :multi_word_snake, :multiWordCamel
+        :foo, :multi_word_snake, :multiWordCamel, :_leading_underscore
       )
 
       RSpec.describe SchemaElementNamesDefinition do
         it "exposes the set of element names via an `ELEMENT_NAMES` constant" do
-          expect(ExampleElementNames::ELEMENT_NAMES).to eq [:foo, :multi_word_snake, :multiWordCamel]
+          expect(ExampleElementNames::ELEMENT_NAMES).to eq [:foo, :multi_word_snake, :multiWordCamel, :_leading_underscore]
         end
 
         it "exposes camelCase element names when so configured, via snake case attributes" do
@@ -26,7 +26,8 @@ module ElasticGraph
           expect(names).to have_attributes(
             foo: "foo",
             multi_word_snake: "multiWordSnake",
-            multi_word_camel: "multiWordCamel"
+            multi_word_camel: "multiWordCamel",
+            _leading_underscore: "_leadingUnderscore"
           )
         end
 
@@ -36,7 +37,8 @@ module ElasticGraph
           expect(names).to have_attributes(
             foo: "foo",
             multi_word_snake: "multi_word_snake",
-            multi_word_camel: "multi_word_camel"
+            multi_word_camel: "multi_word_camel",
+            _leading_underscore: "_leading_underscore"
           )
         end
 
@@ -54,6 +56,7 @@ module ElasticGraph
           expect(names.normalize_case("foo_bar")).to eq "fooBar"
           expect(names.normalize_case("fooBar")).to eq "fooBar"
           expect(names.normalize_case("FooBar")).to eq "FooBar"
+          expect(names.normalize_case("_typename")).to eq "_typename"
         end
 
         it "allows overrides" do
