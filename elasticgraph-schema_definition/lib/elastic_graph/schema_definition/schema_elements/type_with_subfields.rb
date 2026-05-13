@@ -404,8 +404,7 @@ module ElasticGraph
         # @param singular [String] singular form of the `field_name`; will be used (along with an `Aggregations` suffix) for the name of
         #   the generated aggregations field. Not required when `indexing_only: true`.
         # @param indexing_only [Boolean] when true, the relationship is used only for indexing purposes (e.g. `sourced_from`) and will not
-        #   generate GraphQL connection or aggregation fields. The `singular` parameter is not required in this case. The relationship will
-        #   still be registered in {#relationships_by_name} for internal use.
+        #   generate GraphQL connection or aggregation fields. The `singular` parameter is not required in this case.
         # @yield [Relationship] the generated relationship fields, for further customization
         # @return [void]
         #
