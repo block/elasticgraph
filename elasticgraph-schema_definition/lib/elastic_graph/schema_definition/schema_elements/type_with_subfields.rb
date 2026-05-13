@@ -568,9 +568,6 @@ module ElasticGraph
         end
 
         def relates_to(field_name, type, via:, dir:, foreign_key_type:, cardinality:, related_type:, indexing_only: false)
-          # When indexing_only, we set both graphql_only and indexing_only on the field to prevent
-          # registration in either graphql_fields_by_name or indexing_fields_by_name_in_index.
-          # The field exists solely as the delegate for the Relationship object.
           field(field_name, type, sortable: false, filterable: false, groupable: false, graphql_only: true, indexing_only: indexing_only) do |field|
             relationship = schema_def_state.factory.new_relationship(
               field,
@@ -581,7 +578,7 @@ module ElasticGraph
             )
 
             field.relationship = relationship
-            field.resolve_with :nested_relationships unless indexing_only
+            field.resolve_with :nested_relationships
 
             yield relationship if block_given?
 
