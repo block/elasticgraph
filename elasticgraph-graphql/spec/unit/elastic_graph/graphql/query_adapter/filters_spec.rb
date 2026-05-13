@@ -234,6 +234,25 @@ module ElasticGraph
           expect(query.internal_filters).to be_empty
         end
 
+        it "translates `_typename` filter field on an abstract type to `__typename` in the datastore query" do
+          query = datastore_query_for(:Query, :widgets, <<~QUERY)
+            query {
+              widgets(filter: {inventor: {_typename: {equal_to_any_of: ["Company"]}}}) {
+                edges {
+                  node {
+                    id
+                  }
+                }
+              }
+            }
+          QUERY
+
+          expect(query.client_filters).to contain_exactly({
+            "inventor" => {"__typename" => {"equal_to_any_of" => ["Company"]}}
+          })
+          expect(query.internal_filters).to be_empty
+        end
+
         it "translates `count` on a list field to `#{LIST_COUNTS_FIELD}` while leaving a `count` schema field unchanged" do
           query = datastore_query_for(:Query, :widgets, <<~QUERY)
             query {

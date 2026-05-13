@@ -3825,6 +3825,10 @@ object_types_by_name:
       node:
         resolver:
           name: object_without_lookahead
+  DistributionChannelFilterInput:
+    graphql_fields_by_name:
+      _typename:
+        name_in_index: __typename
   DistributionChannelGroupedBy:
     graphql_fields_by_name:
       active:
@@ -4187,6 +4191,10 @@ object_types_by_name:
       node:
         resolver:
           name: object_without_lookahead
+  InventorFilterInput:
+    graphql_fields_by_name:
+      _typename:
+        name_in_index: __typename
   InventorGroupedBy:
     graphql_fields_by_name:
       name:
@@ -5103,6 +5111,8 @@ object_types_by_name:
           name: object_without_lookahead
   NamedEntityFilterInput:
     graphql_fields_by_name:
+      _typename:
+        name_in_index: __typename
       amount_cents2:
         name_in_index: amount_cents
       created_at2:
@@ -5427,6 +5437,10 @@ object_types_by_name:
       node:
         resolver:
           name: object_without_lookahead
+  NamedInventorFilterInput:
+    graphql_fields_by_name:
+      _typename:
+        name_in_index: __typename
   NamedInventorGroupedBy:
     graphql_fields_by_name:
       name:
@@ -5635,6 +5649,10 @@ object_types_by_name:
       node:
         resolver:
           name: object_without_lookahead
+  PartFilterInput:
+    graphql_fields_by_name:
+      _typename:
+        name_in_index: __typename
   PartGroupedBy:
     graphql_fields_by_name:
       created_at:
@@ -6200,6 +6218,10 @@ object_types_by_name:
       node:
         resolver:
           name: object_without_lookahead
+  RetailFilterInput:
+    graphql_fields_by_name:
+      _typename:
+        name_in_index: __typename
   RetailGroupedBy:
     graphql_fields_by_name:
       active:
@@ -6511,6 +6533,10 @@ object_types_by_name:
       node:
         resolver:
           name: object_without_lookahead
+  StoreFilterInput:
+    graphql_fields_by_name:
+      _typename:
+        name_in_index: __typename
   StoreGroupedBy:
     graphql_fields_by_name:
       active:
@@ -7545,6 +7571,10 @@ object_types_by_name:
       node:
         resolver:
           name: object_without_lookahead
+  WholesaleFilterInput:
+    graphql_fields_by_name:
+      _typename:
+        name_in_index: __typename
   WholesaleGroupedBy:
     graphql_fields_by_name:
       active:
@@ -8874,6 +8904,8 @@ object_types_by_name:
           name: object_without_lookahead
   WidgetOrAddressFilterInput:
     graphql_fields_by_name:
+      _typename:
+        name_in_index: __typename
       amount_cents2:
         name_in_index: amount_cents
       created_at2:
