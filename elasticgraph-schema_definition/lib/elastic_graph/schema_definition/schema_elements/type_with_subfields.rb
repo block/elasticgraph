@@ -362,7 +362,7 @@ module ElasticGraph
         #   references the `id` of this type. Use `:out` for an outbound foreign key that resides on this type  and references the `id` of
         #   the related type.
         # @param indexing_only [Boolean] when true, the relationship is used only for indexing purposes (e.g. `sourced_from`) and will not
-        #   generate a GraphQL field. The relationship will still be registered in {#relationships_by_name} for internal use.
+        #   generate a GraphQL field.
         # @yield [Relationship] the generated relationship fields, for further customization
         # @return [void]
         #
