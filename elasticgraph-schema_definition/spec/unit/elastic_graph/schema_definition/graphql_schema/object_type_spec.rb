@@ -638,13 +638,6 @@ module ElasticGraph
                 schema.object_type "Widget" do |t|
                   t.field "id", "ID"
                   t.relates_to_many "components", "Component", via: "widget_id", dir: :in
-                  t.index "widgets"
-                end
-
-                schema.object_type "Component" do |t|
-                  t.field "id", "ID"
-                  t.field "widget_id", "ID"
-                  t.index "components"
                 end
               end
             }.to raise_error(Errors::SchemaError, /`relates_to_many` requires a `singular:` argument/)
