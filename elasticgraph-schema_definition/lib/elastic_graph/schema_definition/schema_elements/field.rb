@@ -162,6 +162,18 @@ module ElasticGraph
           end
 
           schema_def_state.register_user_defined_field(self)
+
+          # A namespace-typed field has no datastore presence, so treat it as `graphql_only` and remove
+          # it from the parent's indexing map. We can't do this synchronously: the namespace type may be
+          # defined later, so `type_is_namespace?` is order-dependent at field-definition time. Deferring
+          # to `after_user_definition_complete` makes the check safe and order-independent.
+          schema_def_state.after_user_definition_complete do
+            if type_is_namespace?
+              self.graphql_only = true
+              parent_type.indexing_fields_by_name_in_index.delete(name_in_index)
+            end
+          end
+
           yield self if block_given?
         end
 
@@ -760,6 +772,13 @@ module ElasticGraph
         # @return [Boolean] true if this field's return type is a {API#namespace_type namespace type}.
         # @private
         def type_is_namespace?
+          # Order-dependent: a field referencing a namespace type defined later would return `false` if
+          # called during user schema evaluation, then `true` afterwards. ElasticGraph requires schema
+          # artifacts to be order-independent, so callers must wait until user definition is complete.
+          unless schema_def_state.user_definition_complete
+            raise Errors::SchemaError, "Cannot call `type_is_namespace?` until the schema definition is complete."
+          end
+
           # Uses `original_type.fully_unwrapped.name` rather than `type.fully_unwrapped.name` to avoid
           # eagerly resolving the type (which can fail for fields whose type is registered later in the
           # build pipeline). `fully_unwrapped` is pure string manipulation on the declared type name.

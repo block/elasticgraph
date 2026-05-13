@@ -11,7 +11,7 @@ module ElasticGraph
     module Resolvers
       # Resolves fields whose return type is a {SchemaDefinition::API#namespace_type namespace type}. A
       # namespace type is a pure GraphQL grouping construct with no backing data, so the resolver returns
-      # an empty hash as a non-null passthrough object -- each child field has its own resolver that does
+      # an empty hash as a non-null passthrough object; each child field has its own resolver that does
       # not read from the parent.
       #
       # This is auto-wired by the schema definition layer on any no-argument field whose return type is a

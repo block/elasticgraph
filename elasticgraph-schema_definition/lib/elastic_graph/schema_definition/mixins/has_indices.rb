@@ -408,7 +408,7 @@ module ElasticGraph
               # `OlapQuery!`) are pure groupings with no backing data, so the inert `value: {}` serves
               # as the passthrough object that child resolvers hang off of. Fields that declare arguments
               # are excluded since arguments signal the author wants custom resolution.
-              if field.args.empty? && field.target_type_is_namespace?
+              if field.args.empty? && field.type_is_namespace?
                 field_metadata.with(resolver: NAMESPACE_RESOLVER)
               elsif default_graphql_resolver
                 field_metadata.with(resolver: default_graphql_resolver)

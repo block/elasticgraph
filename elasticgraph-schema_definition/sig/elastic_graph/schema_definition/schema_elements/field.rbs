@@ -64,7 +64,7 @@ module ElasticGraph
         def groupable?: () -> bool
         def highlightable?: () -> bool
         def returnable?: () -> bool
-        def target_type_is_namespace?: () -> bool
+        def type_is_namespace?: () -> bool
         def list_field_groupable_by_single_values?: () -> bool
         def aggregatable?: () -> bool
         def sub_aggregatable?: () -> bool
