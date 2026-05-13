@@ -265,9 +265,7 @@ module ElasticGraph
               t.field "id", "ID"
               t.field "name", "String"
               t.relates_to_one "source", "Widget", via: "source_id", dir: :in, indexing_only: true
-              t.relates_to_many "events", "Widget", via: "widget_id", dir: :in, indexing_only: true do |r|
-                # block is provided but does nothing — exercises the yield path
-              end
+              t.relates_to_many "events", "Widget", via: "widget_id", dir: :in, indexing_only: true
               t.index "widgets"
             end
           end
