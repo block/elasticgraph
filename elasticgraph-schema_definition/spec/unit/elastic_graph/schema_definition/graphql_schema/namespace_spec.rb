@@ -119,6 +119,25 @@ module ElasticGraph
           }.to raise_error(Errors::SchemaError, a_string_including("OlapQuery", "cannot be both an indexed type and a namespace type"))
         end
 
+        it "raises a clear error if `Field#type_is_namespace?` is called before user definition is complete" do
+          expect {
+            define_schema do |schema|
+              schema.namespace_type "OlapQuery"
+
+              schema.object_type "Widget" do |t|
+                t.field "id", "ID!"
+                t.field "olap", "OlapQuery" do |f|
+                  f.type_is_namespace?
+                end
+                t.index "widgets"
+              end
+            end
+          }.to raise_error(
+            Errors::SchemaError,
+            "Cannot call `type_is_namespace?` until the schema definition is complete."
+          )
+        end
+
         def namespace_type(name, *args, include_docs: false, &block)
           result = define_schema do |api|
             api.namespace_type(name, *args, &block)
