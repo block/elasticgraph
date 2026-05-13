@@ -799,6 +799,38 @@ module ElasticGraph
           .dig("data", case_correctly("store_aggregations"), "nodes", 0, case_correctly("count"))
         expect(store_agg_count).to eq(expected_store_typenames.size)
 
+        # `_typename` filter allows querying by concrete subtype across multiple indexes and
+        # branches of the type hierarchy. `DirectWholesaler` is in the shared `distribution_channels`
+        # index; `PhysicalStore` has a dedicated index using `constant_keyword` for `__typename`.
+        typename_key = case_correctly("_typename").to_sym
+        wholesaler_or_physical = list_distribution_channels_with(
+          *all_channel_fragments,
+          filter: {typename_key => {equal_to_any_of: ["DirectWholesaler", "PhysicalStore"]}}
+        )
+        expect(wholesaler_or_physical.map { |c| c["__typename"] }).to contain_exactly("DirectWholesaler", "PhysicalStore", "PhysicalStore")
+
+        # `_typename` filter interacts correctly with automatic `__typename` scoping at a sub-interface level.
+        # Filtering `retailers` to `OnlineStore OR PhysicalStore` returns all retailers (the full set),
+        # confirming both the shared-index and dedicated-index subtypes are matched correctly.
+        all_retailers = list_retailers_with(
+          *store_fragments,
+          filter: {typename_key => {equal_to_any_of: ["OnlineStore", "PhysicalStore"]}}
+        )
+        expect(all_retailers.map { |r| r["__typename"] }).to contain_exactly(*expected_store_typenames)
+
+        # `_typename` filter also works on aggregations, including across indexes.
+        wholesaler_or_physical_agg_count = call_graphql_query(<<~QUERY)
+          query {
+            #{case_correctly("distribution_channel_aggregations")}(filter: {
+              #{typename_key}: { #{case_correctly("equal_to_any_of")}: ["DirectWholesaler", "PhysicalStore"] }
+            }) {
+              nodes { #{case_correctly("count")} }
+            }
+          }
+        QUERY
+          .dig("data", case_correctly("distribution_channel_aggregations"), "nodes", 0, case_correctly("count"))
+        expect(wholesaler_or_physical_agg_count).to eq(wholesaler_or_physical.size)
+
         # all_highlights resolves against the concrete type (OnlineStore), not the abstract root
         # (DistributionChannel). OnlineStore.name is absent from DistributionChannel — without
         # __typename-aware type resolution the highlight would be silently dropped.
@@ -1401,6 +1433,16 @@ module ElasticGraph
             filter: {inventor: {stock_ticker_key => {not: {equal_to_any_of: [widget2.fetch(:inventor).fetch(stock_ticker_key)]}}}}
           )).to contain_exactly(expected_widget1)
 
+          typename_key = case_correctly("_typename").to_sym
+          # ...or on the subfield's _typename (single underscore, since `__` prefix is reserved by the GraphQL spec)
+          expect(list_widgets_with_options_and_inventor(
+            filter: {inventor: {typename_key => {equal_to_any_of: ["Company"]}}}
+          )).to contain_exactly(expected_widget2)
+
+          expect(list_widgets_with_options_and_inventor(
+            filter: {inventor: {typename_key => {equal_to_any_of: ["Person"]}}}
+          )).to contain_exactly(expected_widget1)
+
           # On interfaces you can filter on a subfield that is present on all subtypes...
           expect(list_widgets_with_options_and_inventor(
             filter: {named_inventor: {name: {equal_to_any_of: [widget1.fetch(:inventor).fetch(:name)]}}}
@@ -1420,12 +1462,14 @@ module ElasticGraph
             filter: {named_inventor: {stock_ticker_key => {not: {equal_to_any_of: [widget2.fetch(:inventor).fetch(stock_ticker_key)]}}}}
           )).to contain_exactly(expected_widget1)
 
-          # ...or on `__typename`. Well, you could if the GraphQL spec allowed input fields
-          # named `__typename`, but it does not (see http://spec.graphql.org/June2018/#sec-Input-Objects)
-          # so we do not yet support it.
-          # expect(list_widgets_with_options_and_inventor(
-          #   filter: { inventor: { __typename: { equal_to_any_of: ["Company"] } } }
-          # )).to contain_exactly(expected_widget2)
+          # ...or on the subfield's _typename (single underscore, since `__` prefix is reserved by the GraphQL spec)
+          expect(list_widgets_with_options_and_inventor(
+            filter: {named_inventor: {typename_key => {equal_to_any_of: ["Company"]}}}
+          )).to contain_exactly(expected_widget2)
+
+          expect(list_widgets_with_options_and_inventor(
+            filter: {named_inventor: {typename_key => {equal_to_any_of: ["Person"]}}}
+          )).to contain_exactly(expected_widget1)
         end
       end
 
