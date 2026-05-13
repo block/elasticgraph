@@ -16,7 +16,7 @@ module ElasticGraph
       #
       # A namespace type is an {ObjectType} that exists purely to group fields on `Query` (or on
       # another namespace type) under a shared path. It cannot be indexed, and any no-argument field
-      # (on any parent type) whose return type is a namespace type is automatically resolved
+      # (on any parent type) whose return type is a namespace type is automatically resolved.
       #
       # @example Define a namespace type
       #   ElasticGraph.define_schema do |schema|
