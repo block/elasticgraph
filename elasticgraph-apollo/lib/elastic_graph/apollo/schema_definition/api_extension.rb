@@ -22,7 +22,7 @@ module ElasticGraph
   # * {Apollo::SchemaDefinition} is an extension used while defining an ElasticGraph schema. It includes all schema elements that are part
   #   of the Apollo spec, including `_Entity` and the various directives.
   # * {Apollo::GraphQL} is an extension used by `elasticgraph-graphql` to support queries against Apollo's subgraph schema additions (e.g.
-  #   `_service` and `_entities`). It includes [reference resolvers](https://www.apollographql.com/docs/federation/entities/#2-define-a-reference-resolver)
+  #   `_service` and `_entities`). It includes [reference resolvers](https://www.apollographql.com/docs/graphos/schema-design/federated-schemas/entities/intro#2-define-a-reference-resolver)
   #   for all indexed types in your schema.
   #
   # To use `elasticgraph-apollo`, simply use {Apollo::SchemaDefinition::APIExtension} as a schema definition extension module. The GraphQL
