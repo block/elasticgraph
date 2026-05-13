@@ -96,7 +96,7 @@ module ElasticGraph
       @@directive_new = prevent_non_factory_instantiation_of(SchemaElements::Directive)
 
       def new_enum_type(name, &block)
-        @@enum_type_new.call(@state, name, &(_ = block))
+        @@enum_type_new.call(@state, name, &block)
       end
       @@enum_type_new = prevent_non_factory_instantiation_of(SchemaElements::EnumType)
 

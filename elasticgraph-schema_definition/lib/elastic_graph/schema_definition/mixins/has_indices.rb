@@ -404,7 +404,7 @@ module ElasticGraph
 
             if field_metadata.resolver.nil?
               # A no-argument field whose return type is a namespace type is auto-wired to the shared
-              # {NAMESPACE_RESOLVER}. Intermediate namespace wrappers (e.g. `Query.olap` returning
+              # `NAMESPACE_RESOLVER`. Intermediate namespace wrappers (e.g. `Query.olap` returning
               # `OlapQuery!`) are pure groupings with no backing data, so the inert `value: {}` serves
               # as the passthrough object that child resolvers hang off of. Fields that declare arguments
               # are excluded since arguments signal the author wants custom resolution.
