@@ -272,9 +272,6 @@ module ElasticGraph
 
           expect(metadata.graphql_fields_by_name.keys).to contain_exactly("id", "name")
         end
-
-
-
       end
     end
   end
