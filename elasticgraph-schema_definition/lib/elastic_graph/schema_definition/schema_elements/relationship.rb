@@ -37,7 +37,7 @@ module ElasticGraph
       #     end
       #   end
       class Relationship < DelegateClass(Field)
-        # @dynamic related_type, hide_relationship_runtime_metadata, hide_relationship_runtime_metadata=, indexing_only
+        # @dynamic related_type, hide_relationship_runtime_metadata, hide_relationship_runtime_metadata=
 
         # @return [ObjectType, InterfaceType, UnionType] the type this relationship relates to
         attr_reader :related_type
@@ -45,19 +45,14 @@ module ElasticGraph
         # @private
         attr_accessor :hide_relationship_runtime_metadata
 
-        # @return [Boolean] true if this relationship is for indexing only (not exposed in GraphQL)
         # @private
-        attr_reader :indexing_only
-
-        # @private
-        def initialize(field, cardinality:, related_type:, foreign_key:, direction:, indexing_only: false)
+        def initialize(field, cardinality:, related_type:, foreign_key:, direction:)
           super(field)
           self.hide_relationship_runtime_metadata = false
           @cardinality = cardinality
           @related_type = related_type
           @foreign_key = foreign_key
           @direction = direction
-          @indexing_only = indexing_only
           @equivalent_field_paths_by_local_path = {}
           @additional_filter = {}
         end

@@ -9,13 +9,11 @@ module ElasticGraph
         type cardinality = :one | :many
         attr_reader related_type: TypeReference
         attr_accessor hide_relationship_runtime_metadata: bool
-        attr_reader indexing_only: bool
 
         @cardinality: cardinality
         @related_type: TypeReference
         @foreign_key: ::String
         @direction: foreignKeyDirection
-        @indexing_only: bool
         @equivalent_field_paths_by_local_path: ::Hash[::String, ::String]
         @additional_filter: ::Hash[::String, untyped]
 
@@ -24,8 +22,7 @@ module ElasticGraph
           cardinality: cardinality,
           related_type: TypeReference,
           foreign_key: ::String,
-          direction: foreignKeyDirection,
-          ?indexing_only: bool
+          direction: foreignKeyDirection
         ) -> void
 
         def additional_filter: (::Hash[::String, untyped]) -> void

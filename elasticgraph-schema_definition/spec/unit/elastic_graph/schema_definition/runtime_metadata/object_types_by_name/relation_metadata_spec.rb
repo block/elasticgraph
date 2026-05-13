@@ -340,7 +340,6 @@ module ElasticGraph
           widget_type = result.state.object_types_by_name["Widget"]
           expect(widget_type.graphql_fields_by_name).to have_key("parent")
           expect(widget_type.relationships_by_name).to have_key("parent")
-          expect(widget_type.relationships_by_name["parent"].indexing_only).to be false
         end
 
         it "registers indexing_only relationships in relationships_by_name but not graphql_fields_by_name" do
@@ -355,7 +354,6 @@ module ElasticGraph
           widget_type = result.state.object_types_by_name["Widget"]
           expect(widget_type.graphql_fields_by_name).not_to have_key("source")
           expect(widget_type.relationships_by_name).to have_key("source")
-          expect(widget_type.relationships_by_name["source"].indexing_only).to be true
         end
       end
     end
