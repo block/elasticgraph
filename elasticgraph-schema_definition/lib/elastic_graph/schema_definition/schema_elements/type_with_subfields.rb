@@ -432,31 +432,27 @@ module ElasticGraph
         def relates_to_many(field_name, type, via:, dir:, singular: nil, indexing_only: false)
           foreign_key_type = (dir == :out) ? "[ID!]!" : "ID"
 
-          if indexing_only
-            relates_to(field_name, type, via: via, dir: dir, foreign_key_type: foreign_key_type, cardinality: :many, related_type: type, indexing_only: true) do |f|
-              yield f if block_given?
-            end
-          else
-            if singular.nil?
-              raise Errors::SchemaError, "`relates_to_many` requires a `singular:` argument (used to name the aggregations field)."
-            end
+          if singular.nil? && !indexing_only
+            raise Errors::SchemaError, "`relates_to_many` requires a `singular:` argument (used to name the aggregations field)."
+          end
 
-            type_ref = schema_def_state.type_ref(type).to_final_form
+          type_ref = schema_def_state.type_ref(type).to_final_form
 
-            relates_to(field_name, type_ref.as_connection.name, via: via, dir: dir, foreign_key_type: foreign_key_type, cardinality: :many, related_type: type) do |f|
-              f.argument schema_def_state.schema_elements.filter, type_ref.as_filter_input.name do |a|
-                a.documentation "Used to filter the returned `#{field_name}` based on the provided criteria."
-              end
-
-              f.argument schema_def_state.schema_elements.order_by, "[#{type_ref.as_sort_order.name}!]" do |a|
-                a.documentation "Used to specify how the returned `#{field_name}` should be sorted."
-              end
-
-              f.define_relay_pagination_arguments!
-
-              yield f if block_given?
+          relates_to(field_name, type_ref.as_connection.name, via: via, dir: dir, foreign_key_type: foreign_key_type, cardinality: :many, related_type: type, indexing_only: indexing_only) do |f|
+            f.argument schema_def_state.schema_elements.filter, type_ref.as_filter_input.name do |a|
+              a.documentation "Used to filter the returned `#{field_name}` based on the provided criteria."
             end
 
+            f.argument schema_def_state.schema_elements.order_by, "[#{type_ref.as_sort_order.name}!]" do |a|
+              a.documentation "Used to specify how the returned `#{field_name}` should be sorted."
+            end
+
+            f.define_relay_pagination_arguments!
+
+            yield f if block_given?
+          end
+
+          unless indexing_only
             aggregations_name = schema_def_state.schema_elements.normalize_case("#{singular}_aggregations")
             relates_to(aggregations_name, type_ref.as_aggregation.as_connection.name, via: via, dir: dir, foreign_key_type: foreign_key_type, cardinality: :many, related_type: type) do |f|
               f.argument schema_def_state.schema_elements.filter, type_ref.as_filter_input.name do |a|
