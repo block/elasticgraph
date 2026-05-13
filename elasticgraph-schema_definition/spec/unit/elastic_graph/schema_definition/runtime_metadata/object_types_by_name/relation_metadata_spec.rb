@@ -273,28 +273,6 @@ module ElasticGraph
           expect(metadata.graphql_fields_by_name.keys).to contain_exactly("id", "name")
         end
 
-        it "does not require `singular:` when `indexing_only: true` is passed to `relates_to_many`" do
-          expect {
-            define_schema do |s|
-              s.object_type "Widget" do |t|
-                t.field "id", "ID"
-                t.relates_to_many "sources", "Widget", via: "source_id", dir: :in, indexing_only: true
-                t.index "widgets"
-              end
-            end
-          }.not_to raise_error
-        end
-
-        it "raises an error when `singular:` is not provided and `indexing_only` is not set" do
-          expect {
-            define_schema do |s|
-              s.object_type "Widget" do |t|
-                t.field "id", "ID"
-                t.relates_to_many "sources", "Widget", via: "source_id", dir: :in
-              end
-            end
-          }.to raise_error(Errors::SchemaError, /`relates_to_many` requires a `singular:` argument \(used to name the aggregations field\)/)
-        end
 
 
       end

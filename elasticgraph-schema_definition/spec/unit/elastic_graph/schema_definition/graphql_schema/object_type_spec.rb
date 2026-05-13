@@ -631,6 +631,24 @@ module ElasticGraph
               }
             EOS
           end
+
+          it "raises an error when `singular:` is not provided and `indexing_only` is not set on `relates_to_many`" do
+            expect {
+              define_schema do |schema|
+                schema.object_type "Widget" do |t|
+                  t.field "id", "ID"
+                  t.relates_to_many "components", "Component", via: "widget_id", dir: :in
+                  t.index "widgets"
+                end
+
+                schema.object_type "Component" do |t|
+                  t.field "id", "ID"
+                  t.field "widget_id", "ID"
+                  t.index "components"
+                end
+              end
+            }.to raise_error(Errors::SchemaError, /`relates_to_many` requires a `singular:` argument/)
+          end
         end
 
         it "can generate a simple indexed type (with just `name`)" do
