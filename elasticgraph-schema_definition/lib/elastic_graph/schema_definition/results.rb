@@ -201,10 +201,7 @@ module ElasticGraph
                 .group_by { |f| (_ = f.source).relationship_name }
             end
 
-          defined_relationships = object_type
-            .graphql_fields_by_name.values
-            .select(&:relationship)
-            .map(&:name)
+          defined_relationships = object_type.relationships_by_name.keys
 
           (defined_relationships | fields_with_sources_by_relationship_name.keys).each do |relationship_name|
             sourced_fields = fields_with_sources_by_relationship_name.fetch(relationship_name) { [] }

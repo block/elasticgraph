@@ -71,7 +71,7 @@ module ElasticGraph
             errors << "#{relationship_error_prefix} is a `relates_to_many` relationship, but `sourced_from` is only supported on a `relates_to_one` relationship."
           end
 
-          relation_metadata = resolved_relationship.relationship_field.runtime_metadata_graphql_field.relation # : SchemaArtifacts::RuntimeMetadata::Relation
+          relation_metadata = resolved_relationship.relation_metadata
           if relation_metadata.direction == :out
             errors << "#{relationship_error_prefix} has an outbound foreign key (`dir: :out`), but `sourced_from` is only supported via inbound foreign key (`dir: :in`) relationships."
           end

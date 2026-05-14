@@ -48,10 +48,12 @@ module ElasticGraph
       #   @private
       # @!attribute [rw] relay_pagination_type
       #   @private
+      # @!attribute [rw] relationships_by_name
+      #   @private
       class TypeWithSubfields < Struct.new(
         :schema_kind, :schema_def_state, :type_ref, :reserved_field_names,
         :graphql_fields_by_name, :indexing_fields_by_name_in_index, :field_factory,
-        :wrapping_type, :relay_pagination_type
+        :wrapping_type, :relay_pagination_type, :relationships_by_name
       )
         prepend Mixins::VerifiesGraphQLName
         include Mixins::CanBeGraphQLOnly
@@ -90,6 +92,8 @@ module ElasticGraph
           graphql_fields_by_name = {}
           # @type var indexing_fields_by_name_in_index: ::Hash[::String, Field]
           indexing_fields_by_name_in_index = {}
+          # @type var relationships_by_name: ::Hash[::String, Relationship]
+          relationships_by_name = {}
 
           super(
             schema_kind,
@@ -100,7 +104,8 @@ module ElasticGraph
             indexing_fields_by_name_in_index,
             field_factory,
             wrapping_type,
-            false
+            false,
+            relationships_by_name
           )
 
           yield self
@@ -356,6 +361,8 @@ module ElasticGraph
         # @param dir [:in, :out] direction of the foreign key. Use `:in` for an inbound foreign key that resides on the related type and
         #   references the `id` of this type. Use `:out` for an outbound foreign key that resides on this type  and references the `id` of
         #   the related type.
+        # @param indexing_only [Boolean] when true, the relationship is used only for indexing purposes (e.g. `sourced_from`) and will not
+        #   generate a GraphQL field.
         # @yield [Relationship] the generated relationship fields, for further customization
         # @return [void]
         #
@@ -378,9 +385,9 @@ module ElasticGraph
         #      t.index "players"
         #    end
         #  end
-        def relates_to_one(field_name, type, via:, dir:, &block)
+        def relates_to_one(field_name, type, via:, dir:, indexing_only: false, &block)
           foreign_key_type = schema_def_state.type_ref(type).non_null? ? "ID!" : "ID"
-          relates_to(field_name, type, via: via, dir: dir, foreign_key_type: foreign_key_type, cardinality: :one, related_type: type, &block)
+          relates_to(field_name, type, via: via, dir: dir, foreign_key_type: foreign_key_type, cardinality: :one, related_type: type, indexing_only: indexing_only, &block)
         end
 
         # Defines a "has many" relationship between the current indexed type and another indexed type by defining a pair of fields clients
@@ -395,7 +402,9 @@ module ElasticGraph
         #   references the `id` of this type. Use `:out` for an outbound foreign key that resides on this type  and references the `id` of
         #   the related type.
         # @param singular [String] singular form of the `field_name`; will be used (along with an `Aggregations` suffix) for the name of
-        #   the generated aggregations field
+        #   the generated aggregations field. Not required when `indexing_only: true`.
+        # @param indexing_only [Boolean] when true, the relationship is used only for indexing purposes (e.g. `sourced_from`) and will not
+        #   generate GraphQL connection or aggregation fields. The `singular` parameter is not required in this case.
         # @yield [Relationship] the generated relationship fields, for further customization
         # @return [void]
         #
@@ -420,11 +429,16 @@ module ElasticGraph
         #      t.index "players"
         #    end
         #  end
-        def relates_to_many(field_name, type, via:, dir:, singular:)
+        def relates_to_many(field_name, type, via:, dir:, singular: nil, indexing_only: false)
           foreign_key_type = (dir == :out) ? "[ID!]!" : "ID"
+
+          if singular.nil? && !indexing_only
+            raise Errors::SchemaError, "`relates_to_many` requires a `singular:` argument (used to name the aggregations field)."
+          end
+
           type_ref = schema_def_state.type_ref(type).to_final_form
 
-          relates_to(field_name, type_ref.as_connection.name, via: via, dir: dir, foreign_key_type: foreign_key_type, cardinality: :many, related_type: type) do |f|
+          relates_to(field_name, type_ref.as_connection.name, via: via, dir: dir, foreign_key_type: foreign_key_type, cardinality: :many, related_type: type, indexing_only: indexing_only) do |f|
             f.argument schema_def_state.schema_elements.filter, type_ref.as_filter_input.name do |a|
               a.documentation "Used to filter the returned `#{field_name}` based on the provided criteria."
             end
@@ -438,17 +452,19 @@ module ElasticGraph
             yield f if block_given?
           end
 
-          aggregations_name = schema_def_state.schema_elements.normalize_case("#{singular}_aggregations")
-          relates_to(aggregations_name, type_ref.as_aggregation.as_connection.name, via: via, dir: dir, foreign_key_type: foreign_key_type, cardinality: :many, related_type: type) do |f|
-            f.argument schema_def_state.schema_elements.filter, type_ref.as_filter_input.name do |a|
-              a.documentation "Used to filter the `#{type}` documents that get aggregated over based on the provided criteria."
+          unless indexing_only
+            aggregations_name = schema_def_state.schema_elements.normalize_case("#{singular}_aggregations")
+            relates_to(aggregations_name, type_ref.as_aggregation.as_connection.name, via: via, dir: dir, foreign_key_type: foreign_key_type, cardinality: :many, related_type: type) do |f|
+              f.argument schema_def_state.schema_elements.filter, type_ref.as_filter_input.name do |a|
+                a.documentation "Used to filter the `#{type}` documents that get aggregated over based on the provided criteria."
+              end
+
+              f.define_relay_pagination_arguments!
+
+              yield f if block_given?
+
+              f.documentation f.derived_documentation("Aggregations over the `#{field_name}` data")
             end
-
-            f.define_relay_pagination_arguments!
-
-            yield f if block_given?
-
-            f.documentation f.derived_documentation("Aggregations over the `#{field_name}` data")
           end
         end
 
@@ -551,8 +567,8 @@ module ElasticGraph
           registry[name] = field
         end
 
-        def relates_to(field_name, type, via:, dir:, foreign_key_type:, cardinality:, related_type:)
-          field(field_name, type, sortable: false, filterable: false, groupable: false, graphql_only: true) do |field|
+        def relates_to(field_name, type, via:, dir:, foreign_key_type:, cardinality:, related_type:, indexing_only: false)
+          field(field_name, type, sortable: false, filterable: false, groupable: false, graphql_only: true, indexing_only: indexing_only) do |field|
             relationship = schema_def_state.factory.new_relationship(
               field,
               cardinality: cardinality,
@@ -571,6 +587,12 @@ module ElasticGraph
             else
               register_inferred_foreign_key_fields(from_type: ["id", "ID!"], to_other: [via, foreign_key_type], related_type: relationship.related_type)
             end
+
+            if relationships_by_name.key?(field_name)
+              raise Errors::SchemaError, "Duplicate relationship on Type #{name}: `#{field_name}`. " \
+                "Each relationship must have a unique name."
+            end
+            relationships_by_name[field_name] = relationship
           end
         end
 

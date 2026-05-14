@@ -257,6 +257,22 @@ module ElasticGraph
           })
         end
       end
+
+      describe "indexing_only relationships" do
+        it "excludes `indexing_only: true` relationships from graphql_fields_by_name in runtime metadata" do
+          metadata = object_type_metadata_for "Widget" do |s|
+            s.object_type "Widget" do |t|
+              t.field "id", "ID"
+              t.field "name", "String"
+              t.relates_to_one "source", "Widget", via: "source_id", dir: :in, indexing_only: true
+              t.relates_to_many "events", "Widget", via: "widget_id", dir: :in, indexing_only: true
+              t.index "widgets"
+            end
+          end
+
+          expect(metadata.graphql_fields_by_name.keys).to contain_exactly("id", "name")
+        end
+      end
     end
   end
 end

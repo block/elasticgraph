@@ -11,6 +11,7 @@ module ElasticGraph
         def recursively_resolve_subtypes: () -> ::Array[SchemaElements::ObjectType]
         def graphql_fields_by_name: () -> ::Hash[::String, SchemaElements::Field]
         def indexing_fields_by_name_in_index: () -> ::Hash[::String, SchemaElements::Field]
+        def relationships_by_name: () -> ::Hash[::String, SchemaElements::Relationship]
         def abstract?: () -> true
         def current_sources: () -> ::Array[::String]
         def index_field_runtime_metadata_tuples: (

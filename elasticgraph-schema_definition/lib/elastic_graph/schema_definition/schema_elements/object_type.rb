@@ -26,7 +26,7 @@ module ElasticGraph
       #   end
       class ObjectType < DelegateClass(TypeWithSubfields)
         # DelegateClass(TypeWithSubfields) provides the following methods:
-        # @dynamic name, type_ref, to_sdl, derived_graphql_types, to_indexing_field_type, current_sources, index_field_runtime_metadata_tuples, graphql_only?, relay_pagination_type
+        # @dynamic name, type_ref, to_sdl, derived_graphql_types, to_indexing_field_type, current_sources, index_field_runtime_metadata_tuples, graphql_only?, relay_pagination_type, relationships_by_name
         include Mixins::SupportsFilteringAndAggregation
 
         # `include HasIndices` provides the following methods:
