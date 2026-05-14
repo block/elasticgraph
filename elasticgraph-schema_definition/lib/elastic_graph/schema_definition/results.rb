@@ -186,7 +186,7 @@ module ElasticGraph
         sourced_field_errors = [] # : ::Array[::String]
         relationship_errors = [] # : ::Array[::String]
 
-        state.object_types_by_name.except("Query").values.each_with_object(
+        state.object_types_by_name.reject { |name, _| state.namespace_types_by_name.key?(name) }.values.each_with_object(
           ::Hash.new { |h, k| h[k] = [] } # : ::Hash[untyped, ::Array[SchemaArtifacts::RuntimeMetadata::UpdateTarget]]
         ) do |object_type, accum|
           fields_with_sources_by_relationship_name =
