@@ -8,6 +8,7 @@
 
 require "elastic_graph/constants"
 require "elastic_graph/errors"
+require "elastic_graph/schema_artifacts/runtime_metadata/configured_graphql_resolver"
 require "elastic_graph/schema_definition/indexing/update_target_factory"
 
 module ElasticGraph
@@ -15,6 +16,11 @@ module ElasticGraph
     module Mixins
       # Provides APIs for defining datastore indices.
       module HasIndices
+        # Resolver auto-wired on any no-argument field that returns a namespace type. A namespace type
+        # carries no data of its own; this resolver just provides a non-null passthrough object for the
+        # GraphQL machinery so each child field's own resolver can run.
+        NAMESPACE_RESOLVER = SchemaArtifacts::RuntimeMetadata::ConfiguredGraphQLResolver.new(:namespace_ref, {})
+
         # @dynamic runtime_metadata_overrides
         # @private
         attr_reader :runtime_metadata_overrides
@@ -397,7 +403,14 @@ module ElasticGraph
             field_metadata = field.runtime_metadata_graphql_field
 
             if field_metadata.resolver.nil?
-              if default_graphql_resolver
+              # A no-argument field whose return type is a namespace type is auto-wired to the shared
+              # `NAMESPACE_RESOLVER`. Intermediate namespace wrappers (e.g. `Query.olap` returning
+              # `OlapQuery!`) are pure groupings with no backing data; the resolver provides an inert
+              # passthrough object that child resolvers hang off of. Fields that declare arguments are
+              # excluded since arguments signal the author wants custom resolution.
+              if field.args.empty? && field.type_is_namespace?
+                field_metadata.with(resolver: NAMESPACE_RESOLVER)
+              elsif default_graphql_resolver
                 field_metadata.with(resolver: default_graphql_resolver)
               else
                 parent_type_option =

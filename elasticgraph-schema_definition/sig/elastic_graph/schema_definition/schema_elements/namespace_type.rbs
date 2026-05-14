@@ -1,0 +1,11 @@
+module ElasticGraph
+  module SchemaDefinition
+    module SchemaElements
+      class NamespaceType < ObjectType
+        def initialize: (State, ::String) ?{ (NamespaceType) -> void } -> void
+
+        def index: (::String, **untyped) ?{ (Indexing::Index) -> void } -> void
+      end
+    end
+  end
+end

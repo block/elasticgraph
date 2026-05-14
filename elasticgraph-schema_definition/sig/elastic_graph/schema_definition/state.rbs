@@ -6,6 +6,7 @@ module ElasticGraph
       attr_reader index_document_sizes: bool
       attr_reader types_by_name: SchemaElements::typesByNameHash
       attr_reader object_types_by_name: ::Hash[::String, indexableType]
+      attr_reader namespace_types_by_name: ::Hash[::String, SchemaElements::NamespaceType]
       attr_reader scalar_types_by_name: ::Hash[::String, SchemaElements::ScalarType]
       attr_reader enum_types_by_name: ::Hash[::String, SchemaElements::EnumType]
       attr_reader implementations_by_interface_ref: ::Hash[SchemaElements::TypeReference, ::Set[SchemaElements::TypeWithSubfields]]
@@ -41,6 +42,7 @@ module ElasticGraph
         index_document_sizes: bool,
         types_by_name: SchemaElements::typesByNameHash,
         object_types_by_name: ::Hash[::String, indexableType],
+        namespace_types_by_name: ::Hash[::String, SchemaElements::NamespaceType],
         scalar_types_by_name: ::Hash[::String, SchemaElements::ScalarType],
         enum_types_by_name: ::Hash[::String, SchemaElements::EnumType],
         implementations_by_interface_ref: ::Hash[SchemaElements::TypeReference, ::Set[SchemaElements::TypeWithSubfields]],

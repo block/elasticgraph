@@ -135,6 +135,42 @@ module ElasticGraph
         nil
       end
 
+      # Defines a GraphQL object type that serves as a _namespace_ for grouping root query fields.
+      #
+      # Instead of adding an indexed type's root query fields directly to `Query` (e.g. `Query.widgets`),
+      # a namespace type lets you group them under a nested path (e.g. `Query.olap.widgets`). This is
+      # particularly useful when composing ElasticGraph into a federated supergraph, where grouping
+      # related fields under a namespace can be useful for separating parts of the supergraph with differing conventions
+      # or semantics.
+      #
+      # A namespace type is a GraphQL object type with two differences from a regular object type:
+      #
+      # - It cannot be indexed (calling `index` on it raises an error).
+      # - Any no-argument field (on any parent type, including `Query`) whose return type is a
+      #   namespace type will be automatically resolved, so you don't have to assign a resolver for
+      #   intermediate namespace fields.
+      #
+      # @param name [String] name of the namespace type
+      # @yield [SchemaElements::NamespaceType] namespace type object, for further customization
+      # @return [void]
+      #
+      # @example Define an `OlapQuery` namespace type and hang it off `Query`
+      #   ElasticGraph.define_schema do |schema|
+      #     schema.namespace_type "OlapQuery" do |t|
+      #       t.documentation "Namespace for OLAP query fields."
+      #     end
+      #
+      #     schema.on_root_query_type do |t|
+      #       t.field "olap", "OlapQuery!"
+      #     end
+      #   end
+      def namespace_type(name, &block)
+        namespace_type = @factory.new_namespace_type(name.to_s, &block)
+        @state.namespace_types_by_name[namespace_type.name] = namespace_type
+        @state.register_object_interface_or_union_type namespace_type
+        nil
+      end
+
       # Defines a [GraphQL interface](https://graphql.org/learn/schema/#interface-types). Use it to define an abstract supertype with
       # one or more fields that concrete implementations of the interface must also define. Each implementation can be an
       # {SchemaElements::ObjectType} or {SchemaElements::InterfaceType}.

@@ -81,6 +81,9 @@ module ElasticGraph
       def new_object_type: (::String) ?{ (SchemaElements::ObjectType) -> void } -> SchemaElements::ObjectType
       @@object_type_new: ::Method
 
+      def new_namespace_type: (::String) ?{ (SchemaElements::NamespaceType) -> void } -> SchemaElements::NamespaceType
+      @@namespace_type_new: ::Method
+
       def new_scalar_type: (::String) { (SchemaElements::ScalarType) -> void } -> SchemaElements::ScalarType
       @@scalar_type_new: ::Method
 

@@ -357,7 +357,7 @@ module ElasticGraph
           .values
           .reject do |t|
             derived_indexing_type_names.include?(t.name) ||
-              # Skip graphql framework types
+              # Skip graphql types (including namespace types, which are GraphQL-only).
               t.graphql_only?
           end
           .sort_by(&:name)
