@@ -28,14 +28,12 @@ module ElasticGraph
 
       class ResolvedRelationship
         attr_reader relationship_name: ::String
-        attr_reader relationship_field: SchemaElements::Field
         attr_reader relationship: SchemaElements::Relationship
         attr_reader related_type: indexableType
         attr_reader relation_metadata: SchemaArtifacts::RuntimeMetadata::Relation
 
         def initialize: (
           ::String,
-          SchemaElements::Field,
           SchemaElements::Relationship,
           indexableType,
           SchemaArtifacts::RuntimeMetadata::Relation

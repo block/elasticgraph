@@ -15,7 +15,8 @@ module ElasticGraph
           ::Hash[String, Field],
           ::Method,
           anyObjectType,
-          bool
+          bool,
+          ::Hash[::String, Relationship]
         ) ?{ (TypeWithSubfields) -> void } -> void
 
         attr_accessor schema_kind: schemaKind
@@ -27,6 +28,7 @@ module ElasticGraph
         attr_accessor field_factory: ::Method
         attr_accessor wrapping_type: anyObjectType
         attr_accessor relay_pagination_type: bool
+        attr_accessor relationships_by_name: ::Hash[::String, Relationship]
       end
 
       class TypeWithSubfields < TypeWithSubfieldsSuperType
@@ -76,8 +78,8 @@ module ElasticGraph
           ?highlightable: bool?
         ) ?{ (Field) -> void } -> Field
 
-        def relates_to_one: (::String, ::String, via: ::String, dir: foreignKeyDirection) ?{ (Relationship) -> void } -> void
-        def relates_to_many: (::String, ::String, via: ::String, dir: foreignKeyDirection, singular: ::String) ?{ (Relationship) -> void } -> void
+        def relates_to_one: (::String, ::String, via: ::String, dir: foreignKeyDirection, ?indexing_only: bool) ?{ (Relationship) -> void } -> void
+        def relates_to_many: (::String, ::String, via: ::String, dir: foreignKeyDirection, ?singular: ::String?, ?indexing_only: bool) ?{ (Relationship) -> void } -> void
 
         def generate_sdl: (name_section: ::String) ?{ (Field::argument) -> boolish } -> String
         def current_sources: () -> ::Array[::String]
@@ -106,7 +108,8 @@ module ElasticGraph
           dir: foreignKeyDirection,
           foreign_key_type: ::String,
           cardinality: Relationship::cardinality,
-          related_type: ::String) ?{ (Relationship) -> void } -> void
+          related_type: ::String,
+          ?indexing_only: bool) ?{ (Relationship) -> void } -> void
 
         def register_inferred_foreign_key_fields: (
           from_type: [::String, ::String],
