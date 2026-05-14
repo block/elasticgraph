@@ -21,6 +21,12 @@ module ElasticGraph
           {}
         end
 
+        # Same as `graphql_fields_by_name` — merging relationships from all entity subtypes could trigger
+        # field conflict errors during validation.
+        def relationships_by_name
+          {}
+        end
+
         # `_Entity` is never a root document type, and should not be treated as one (even though its subtypes are all
         # root document types, which would usually cause it to be treated as a root document type!).
         def root_document_type?

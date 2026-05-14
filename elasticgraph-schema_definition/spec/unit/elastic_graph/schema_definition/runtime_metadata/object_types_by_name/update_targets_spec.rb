@@ -52,6 +52,26 @@ module ElasticGraph
           )
         end
 
+        it "dumps an update target for an `indexing_only: true` relationship used with `sourced_from`" do
+          update_targets = update_targets_for("WidgetWorkspace") do |t|
+            t.relates_to_one "workspace", "WidgetWorkspace", via: "widget_ids", dir: :in, indexing_only: true
+
+            t.field "workspace_name", "String" do |f|
+              f.sourced_from "workspace", "name"
+            end
+          end
+
+          expect_widget_update_target_with(
+            update_targets,
+            id_source: "widget_ids",
+            routing_value_source: nil,
+            relationship: "workspace",
+            data_params: {
+              "workspace_name" => dynamic_param_with(source_path: "name", cardinality: :one)
+            }
+          )
+        end
+
         it "excludes the `sourced_from` fields from the `params` of the main type since we don't want updates of that type stomping a value indexed from an alternate source" do
           update_targets = update_targets_for("Widget")
 

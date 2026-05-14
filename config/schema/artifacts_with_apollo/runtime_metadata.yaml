@@ -5016,12 +5016,6 @@ object_types_by_name:
           foreign_key: component_ids
         resolver:
           name: nested_relationships
-      workspace:
-        relation:
-          direction: in
-          foreign_key: widget.id
-        resolver:
-          name: nested_relationships
       workspace_id:
         name_in_index: workspace_id2
         resolver:
@@ -7826,12 +7820,6 @@ object_types_by_name:
       weight_in_ng_str:
         resolver:
           name: get_record_field_value
-      workspace:
-        relation:
-          direction: in
-          foreign_key: widget.id
-        resolver:
-          name: nested_relationships
       workspace_id:
         name_in_index: workspace_id2
         resolver:
@@ -8831,12 +8819,6 @@ object_types_by_name:
       weight_in_ng_str:
         resolver:
           name: get_record_field_value
-      workspace:
-        relation:
-          direction: in
-          foreign_key: widget.id
-        resolver:
-          name: nested_relationships
       workspace_id:
         name_in_index: workspace_id2
         resolver:
