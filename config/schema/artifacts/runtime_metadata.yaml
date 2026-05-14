@@ -6118,6 +6118,7 @@ object_types_by_name:
       widgets_or_addresses:
         resolver:
           name: indexed_type_root_fields
+    graphql_only_return_type: true
   Retail:
     graphql_fields_by_name:
       active:

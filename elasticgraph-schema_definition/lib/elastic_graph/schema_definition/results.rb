@@ -111,64 +111,6 @@ module ElasticGraph
         # Record that we are now generating results so that caching can kick in.
         state.user_definition_complete = true
         state.user_definition_complete_callbacks.each(&:call)
-        define_root_graphql_type
-      end
-
-      def define_root_graphql_type
-        state.api.object_type "Query" do |query_type|
-          query_type.documentation "The query entry point for the entire schema."
-          query_type.resolve_fields_with nil
-
-          state.object_types_by_name.values.select(&:directly_queryable?).sort_by(&:name).each do |type|
-            # @type var root_doc_type: Mixins::HasIndices & _Type
-            root_doc_type = _ = type
-
-            query_type.relates_to_many(
-              root_doc_type.plural_root_query_field_name,
-              root_doc_type.name,
-              via: "ignore",
-              dir: :in,
-              singular: root_doc_type.singular_root_query_field_name
-            ) do |f|
-              f.documentation "Fetches `#{root_doc_type.name}`s based on the provided arguments."
-              f.resolve_with :indexed_type_root_fields
-              f.hide_relationship_runtime_metadata = true
-              root_doc_type.root_query_fields_customizations&.call(f)
-            end
-
-            # Add additional efficiency hints to the aggregation field documentation if we have any such hints.
-            # This needs to be outside the `relates_to_many` block because `relates_to_many` adds its own "suffix" to
-            # the field documentation, and here we add another one.
-            if (agg_efficiency_hint = aggregation_efficiency_hints_for(root_doc_type.derived_indexed_types))
-              agg_name = state.schema_elements.normalize_case("#{root_doc_type.singular_root_query_field_name}_aggregations")
-              agg_field = query_type.graphql_fields_by_name.fetch(agg_name)
-              agg_field.documentation "#{agg_field.doc_comment}\n\n#{agg_efficiency_hint}"
-            end
-          end
-
-          state.built_in_types_customization_blocks.each do |customization_block|
-            customization_block.call(query_type)
-          end
-        end
-      end
-
-      def aggregation_efficiency_hints_for(derived_indexed_types)
-        return nil if derived_indexed_types.empty?
-
-        hints = derived_indexed_types.map do |type|
-          derived_indexing_type = state.types_by_name.fetch(type.destination_type_ref.name)
-          alternate_field_name = (_ = derived_indexing_type).plural_root_query_field_name
-          grouping_field = type.id_source
-
-          "  - The root `#{alternate_field_name}` field groups by `#{grouping_field}`"
-        end
-
-        <<~EOS
-          Note: aggregation queries are relatively expensive, and some fields have been pre-aggregated to allow
-          more efficient queries for some common aggregation cases:
-
-          #{hints.join("\n")}
-        EOS
       end
 
       def json_schema_with_metadata_merger
@@ -463,13 +405,7 @@ module ElasticGraph
 
       def all_types
         @all_types ||= state.types_by_name.values.flat_map do |registered_type|
-          related_types =
-            if registered_type.name == "Query"
-              [registered_type]
-            else
-              [registered_type] + registered_type.derived_graphql_types
-            end
-
+          related_types = [registered_type] + registered_type.derived_graphql_types
           apply_customizations_to(related_types, registered_type)
           related_types
         end
