@@ -861,6 +861,68 @@ module ElasticGraph
               }.not_to raise_error
             end
 
+            it "raises an error if an inbound references field is not an `ID`, regardless of whether there are any `sourced_from` fields or not" do
+              expect {
+                update_targets_for("Widget") do |t|
+                  t.field "numeric_id", "Int"
+                  t.relates_to_one "workspace", "WidgetWorkspace", via: "widget_ids", dir: :in, references: "numeric_id"
+
+                  t.field "workspace_name", "String" do |f|
+                    f.sourced_from "workspace", "name"
+                  end
+
+                  t.field "workspace_created_at", "DateTime" do |f|
+                    f.sourced_from "workspace", "created_at"
+                  end
+                end
+              }.to raise_error_about_workspace_relationship(
+                "uses `Widget.numeric_id` as the `references` field, but that field is not an `ID` field as expected."
+              )
+
+              expect {
+                update_targets_for("Widget") do |t|
+                  t.field "numeric_id", "Int"
+                  t.relates_to_one "workspace", "WidgetWorkspace", via: "widget_ids", dir: :in, references: "numeric_id"
+                  expect(t.fields_with_sources).to be_empty
+                end
+              }.to raise_error_about_workspace_relationship(
+                "uses `Widget.numeric_id` as the `references` field, but that field is not an `ID` field as expected.",
+                sourced_fields: false
+              )
+            end
+
+            it "raises an error if an outbound references field does not exist on the related type" do
+              expect {
+                update_targets_for("Widget", on_widget_workspace_type: ->(t) {
+                  t.relates_to_one "widget", "Widget", via: "widget_id", dir: :out, references: "guid"
+                })
+              }.to raise_error Errors::SchemaError, a_string_including(
+                "`WidgetWorkspace.widget` uses `Widget.guid` as the `references` field, but that field does not exist as an indexing field."
+              )
+            end
+
+            it "raises an error if an outbound references field is not an `ID`" do
+              expect {
+                update_targets_for("Widget") do |t|
+                  t.relates_to_one "workspace", "WidgetWorkspace", via: "workspace_id", dir: :out, references: "name"
+                end
+              }.to raise_error Errors::SchemaError, a_string_including(
+                "`Widget.workspace` uses `WidgetWorkspace.name` as the `references` field, but that field is not an `ID` field as expected."
+              )
+            end
+
+            it "does not raise an error if the inbound references field is inferred instead of explicitly defined" do
+              expect {
+                update_targets_for("Widget", on_widget_workspace_type: ->(t) { t.field "widget_guid", "ID" }) do |t|
+                  t.relates_to_one "workspace", "WidgetWorkspace", via: "widget_guid", dir: :in, references: "guid"
+
+                  t.field "workspace_name", "String" do |f|
+                    f.sourced_from "workspace", "name"
+                  end
+                end
+              }.not_to raise_error
+            end
+
             it "allows a foreign key whose type is nested inside of an `object` array" do
               expect {
                 object_type_metadata_for "WidgetWorkspace" do |s|

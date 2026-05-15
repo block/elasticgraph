@@ -21,6 +21,7 @@ module ElasticGraph
           expect(relation).to eq Relation.new(
             direction: :in,
             foreign_key: nil,
+            references: "id",
             additional_filter: {},
             foreign_key_nested_paths: []
           )

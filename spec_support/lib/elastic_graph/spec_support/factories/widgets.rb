@@ -151,6 +151,7 @@ FactoryBot.define do
 
   factory :manufacturer, parent: :indexed_type do
     __typename { "Manufacturer" }
+    guid { Faker::Alphanumeric.alpha(number: 20) }
     name { Faker::Company.name }
     created_at { Faker::Time.between(from: recent_date - 30, to: recent_date).utc.iso8601 }
     ceo { build(:person).as_embedded }
@@ -190,6 +191,7 @@ FactoryBot.define do
 
     factory :mechanical_part do
       __typename { "MechanicalPart" }
+      manufacturer_guid { manufacturer&.fetch(:guid) }
       material { Faker::Base.sample(["ALLOY", "CARBON_FIBER"]) }
     end
   end

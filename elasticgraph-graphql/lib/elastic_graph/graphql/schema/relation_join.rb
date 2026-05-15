@@ -33,15 +33,15 @@ module ElasticGraph
 
           if relation.direction == :in
             # An inbound foreign key has some field (such as `foo_id`) on another document that points
-            # back to the `id` field on the document with the relation.
+            # back to the `references` field on the document with the relation.
             #
-            # The cardinality of the document id field on an inbound relation is always 1 since
-            # it is always the primary key `id` field.
-            new(field, "id", relation.foreign_key, Cardinality::One, doc_cardinality, relation.additional_filter, relation.foreign_key_nested_paths)
+            # The cardinality of the referenced field on an inbound relation is always 1 since
+            # it is expected to be a unique identifier field.
+            new(field, relation.references, relation.foreign_key, Cardinality::One, doc_cardinality, relation.additional_filter, relation.foreign_key_nested_paths)
           else
             # An outbound foreign key has some field (such as `foo_id`) on the document with the relation
-            # that point out to the `id` field of another document.
-            new(field, relation.foreign_key, "id", doc_cardinality, doc_cardinality, relation.additional_filter, relation.foreign_key_nested_paths)
+            # that points out to the `references` field of another document.
+            new(field, relation.foreign_key, relation.references, doc_cardinality, doc_cardinality, relation.additional_filter, relation.foreign_key_nested_paths)
           end
         end
 

@@ -46,13 +46,14 @@ module ElasticGraph
         attr_accessor :hide_relationship_runtime_metadata
 
         # @private
-        def initialize(field, cardinality:, related_type:, foreign_key:, direction:)
+        def initialize(field, cardinality:, related_type:, foreign_key:, direction:, references:)
           super(field)
           self.hide_relationship_runtime_metadata = false
           @cardinality = cardinality
           @related_type = related_type
           @foreign_key = foreign_key
           @direction = direction
+          @references = references
           @equivalent_field_paths_by_local_path = {}
           @additional_filter = {}
         end
@@ -205,6 +206,7 @@ module ElasticGraph
           SchemaArtifacts::RuntimeMetadata::Relation.new(
             foreign_key: @foreign_key,
             direction: @direction,
+            references: @references,
             additional_filter: @additional_filter,
             foreign_key_nested_paths: foreign_key_nested_paths
           )

@@ -4764,6 +4764,7 @@ type Manufacturer implements NamedEntity {
   address: Address
   ceo: Person
   created_at: DateTime!
+  guid: ID!
   id: ID!
 
   """
@@ -4862,6 +4863,103 @@ type Manufacturer implements NamedEntity {
     """
     order_by: [PartSortOrderInput!]
   ): PartConnection
+
+  """
+  Aggregations over the `mechanical_parts` data.
+  """
+  mechanical_part_aggregations(
+    """
+    Used to forward-paginate through the `mechanical_part_aggregations`. When provided, the next page after the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    after: Cursor
+
+    """
+    Used to backward-paginate through the `mechanical_part_aggregations`. When provided, the previous page before the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    before: Cursor
+
+    """
+    Used to filter the `MechanicalPart` documents that get aggregated over based on the provided criteria.
+    """
+    filter: MechanicalPartFilterInput
+
+    """
+    Used in conjunction with the `after` argument to forward-paginate through the `mechanical_part_aggregations`.
+    When provided, limits the number of returned results to the first `n` after the provided
+    `after` cursor (or from the start of the `mechanical_part_aggregations`, if no `after` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    first: Int
+
+    """
+    Used in conjunction with the `before` argument to backward-paginate through the `mechanical_part_aggregations`.
+    When provided, limits the number of returned results to the last `n` before the provided
+    `before` cursor (or from the end of the `mechanical_part_aggregations`, if no `before` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    last: Int
+  ): MechanicalPartAggregationConnection
+  mechanical_parts(
+    """
+    Used to forward-paginate through the `mechanical_parts`. When provided, the next page after the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    after: Cursor
+
+    """
+    Used to backward-paginate through the `mechanical_parts`. When provided, the previous page before the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    before: Cursor
+
+    """
+    Used to filter the returned `mechanical_parts` based on the provided criteria.
+    """
+    filter: MechanicalPartFilterInput
+
+    """
+    Used in conjunction with the `after` argument to forward-paginate through the `mechanical_parts`.
+    When provided, limits the number of returned results to the first `n` after the provided
+    `after` cursor (or from the start of the `mechanical_parts`, if no `after` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    first: Int
+
+    """
+    Used in conjunction with the `before` argument to backward-paginate through the `mechanical_parts`.
+    When provided, limits the number of returned results to the last `n` before the provided
+    `before` cursor (or from the end of the `mechanical_parts`, if no `before` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    last: Int
+
+    """
+    Used to specify how the returned `mechanical_parts` should be sorted.
+    """
+    order_by: [MechanicalPartSortOrderInput!]
+  ): MechanicalPartConnection
   name: String
 }
 
@@ -4878,6 +4976,11 @@ type ManufacturerAggregatedValues {
   Computed aggregate values for the `created_at` field.
   """
   created_at: DateTimeAggregatedValues
+
+  """
+  Computed aggregate values for the `guid` field.
+  """
+  guid: NonNumericAggregatedValues
 
   """
   Computed aggregate values for the `id` field.
@@ -5053,6 +5156,13 @@ input ManufacturerFilterInput {
   created_at: DateTimeFilterInput
 
   """
+  Used to filter on the `guid` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  guid: IDFilterInput
+
+  """
   Used to filter on the `id` field.
 
   When `null` or an empty object is passed, matches all documents.
@@ -5090,6 +5200,11 @@ type ManufacturerGroupedBy {
   created_at: DateTimeGroupedBy
 
   """
+  The `guid` field value for this group.
+  """
+  guid: ID
+
+  """
   The `name` field value for this group.
   """
   name: String
@@ -5103,6 +5218,11 @@ type ManufacturerHighlights {
   Search highlights for the `ceo`, providing snippets of the matching text.
   """
   ceo: PersonHighlights
+
+  """
+  Search highlights for the `guid`, providing snippets of the matching text.
+  """
+  guid: [String!]!
 
   """
   Search highlights for the `id`, providing snippets of the matching text.
@@ -5158,6 +5278,16 @@ enum ManufacturerSortOrderInput {
   Sorts descending by the `created_at` field.
   """
   created_at_DESC
+
+  """
+  Sorts ascending by the `guid` field.
+  """
+  guid_ASC
+
+  """
+  Sorts descending by the `guid` field.
+  """
+  guid_DESC
 
   """
   Sorts ascending by the `id` field.
@@ -5421,6 +5551,7 @@ type MechanicalPart implements NamedEntity {
   created_at: DateTime!
   id: ID!
   manufacturer: Manufacturer
+  manufacturer_by_guid: Manufacturer
   material: Material
   name: String
 }
@@ -6009,6 +6140,11 @@ type NamedEntityAggregatedValues {
   fees: MoneyAggregatedValues
 
   """
+  Computed aggregate values for the `guid` field.
+  """
+  guid: NonNumericAggregatedValues
+
+  """
   Computed aggregate values for the `id` field.
   """
   id: NonNumericAggregatedValues
@@ -6413,6 +6549,13 @@ input NamedEntityFilterInput {
   fees: MoneyFieldsListFilterInput
 
   """
+  Used to filter on the `guid` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  guid: IDFilterInput
+
+  """
   Used to filter on the `id` field.
 
   When `null` or an empty object is passed, matches all documents.
@@ -6699,6 +6842,11 @@ type NamedEntityGroupedBy {
   fees: MoneyGroupedBy
 
   """
+  The `guid` field value for this group.
+  """
+  guid: ID
+
+  """
   The `internal_details` field value for this group.
   """
   internal_details: WidgetInternalDetailsGroupedBy
@@ -6886,6 +7034,11 @@ type NamedEntityHighlights {
   Search highlights for the `fees`, providing snippets of the matching text.
   """
   fees: MoneyHighlights
+
+  """
+  Search highlights for the `guid`, providing snippets of the matching text.
+  """
+  guid: [String!]!
 
   """
   Search highlights for the `id`, providing snippets of the matching text.
@@ -7151,6 +7304,16 @@ enum NamedEntitySortOrderInput {
   Sorts descending by the `created_on` field.
   """
   created_on_DESC
+
+  """
+  Sorts ascending by the `guid` field.
+  """
+  guid_ASC
+
+  """
+  Sorts descending by the `guid` field.
+  """
+  guid_DESC
 
   """
   Sorts ascending by the `id` field.

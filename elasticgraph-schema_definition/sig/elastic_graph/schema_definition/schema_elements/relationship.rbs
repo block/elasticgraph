@@ -14,6 +14,7 @@ module ElasticGraph
         @related_type: TypeReference
         @foreign_key: ::String
         @direction: foreignKeyDirection
+        @references: ::String
         @equivalent_field_paths_by_local_path: ::Hash[::String, ::String]
         @additional_filter: ::Hash[::String, untyped]
 
@@ -22,7 +23,8 @@ module ElasticGraph
           cardinality: cardinality,
           related_type: TypeReference,
           foreign_key: ::String,
-          direction: foreignKeyDirection
+          direction: foreignKeyDirection,
+          references: ::String
         ) -> void
 
         def additional_filter: (::Hash[::String, untyped]) -> void

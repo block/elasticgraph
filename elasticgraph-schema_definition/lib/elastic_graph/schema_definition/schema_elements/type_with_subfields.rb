@@ -359,8 +359,10 @@ module ElasticGraph
         # @param type [String] name of the related type
         # @param via [String] name of the foreign key field
         # @param dir [:in, :out] direction of the foreign key. Use `:in` for an inbound foreign key that resides on the related type and
-        #   references the `id` of this type. Use `:out` for an outbound foreign key that resides on this type  and references the `id` of
-        #   the related type.
+        #   references the identifier of this type. Use `:out` for an outbound foreign key that resides on this type and references the
+        #   identifier of the related type.
+        # @param references [String] the field that the foreign key points to. Defaults to `"id"`. Use this when the target of the
+        #   foreign key uses a different identifier field (e.g. `"guid"`).
         # @param indexing_only [Boolean] when true, the relationship is used only for indexing purposes (e.g. `sourced_from`) and will not
         #   generate a GraphQL field.
         # @yield [Relationship] the generated relationship fields, for further customization
@@ -385,9 +387,27 @@ module ElasticGraph
         #      t.index "players"
         #    end
         #  end
-        def relates_to_one(field_name, type, via:, dir:, indexing_only: false, &block)
+        #
+        # @example Use `references` when the foreign key points to a field other than `id`
+        #  ElasticGraph.define_schema do |schema|
+        #    schema.object_type "Team" do |t|
+        #      t.field "id", "ID"
+        #      t.field "guid", "ID"
+        #      t.field "name", "String"
+        #      t.field "homeCity", "String"
+        #      t.index "teams"
+        #    end
+        #
+        #    schema.object_type "Player" do |t|
+        #      t.field "id", "ID"
+        #      t.field "name", "String"
+        #      t.relates_to_one "team", "Team", via: "teamGuid", references: "guid", dir: :out
+        #      t.index "players"
+        #    end
+        #  end
+        def relates_to_one(field_name, type, via:, dir:, references: "id", indexing_only: false, &block)
           foreign_key_type = schema_def_state.type_ref(type).non_null? ? "ID!" : "ID"
-          relates_to(field_name, type, via: via, dir: dir, foreign_key_type: foreign_key_type, cardinality: :one, related_type: type, indexing_only: indexing_only, &block)
+          relates_to(field_name, type, via: via, dir: dir, references: references, foreign_key_type: foreign_key_type, cardinality: :one, related_type: type, indexing_only: indexing_only, &block)
         end
 
         # Defines a "has many" relationship between the current indexed type and another indexed type by defining a pair of fields clients
@@ -399,8 +419,10 @@ module ElasticGraph
         # @param type [String] name of the related type
         # @param via [String] name of the foreign key field
         # @param dir [:in, :out] direction of the foreign key. Use `:in` for an inbound foreign key that resides on the related type and
-        #   references the `id` of this type. Use `:out` for an outbound foreign key that resides on this type  and references the `id` of
-        #   the related type.
+        #   references the identifier of this type. Use `:out` for an outbound foreign key that resides on this type and references the
+        #   identifier of the related type.
+        # @param references [String] the field that the foreign key points to. Defaults to `"id"`. Use this when the target of the
+        #   foreign key uses a different identifier field (e.g. `"guid"`).
         # @param singular [String] singular form of the `field_name`; will be used (along with an `Aggregations` suffix) for the name of
         #   the generated aggregations field. Not required when `indexing_only: true`.
         # @param indexing_only [Boolean] when true, the relationship is used only for indexing purposes (e.g. `sourced_from`) and will not
@@ -429,7 +451,26 @@ module ElasticGraph
         #      t.index "players"
         #    end
         #  end
-        def relates_to_many(field_name, type, via:, dir:, singular: nil, indexing_only: false)
+        #
+        # @example Use `references` when the foreign key points to a field other than `id`
+        #  ElasticGraph.define_schema do |schema|
+        #    schema.object_type "Team" do |t|
+        #      t.field "id", "ID"
+        #      t.field "guid", "ID"
+        #      t.field "name", "String"
+        #      t.field "homeCity", "String"
+        #      t.relates_to_many "players", "Player", via: "teamGuid", references: "guid", dir: :in, singular: "player"
+        #      t.index "teams"
+        #    end
+        #
+        #    schema.object_type "Player" do |t|
+        #      t.field "id", "ID"
+        #      t.field "name", "String"
+        #      t.field "teamGuid", "ID"
+        #      t.index "players"
+        #    end
+        #  end
+        def relates_to_many(field_name, type, via:, dir:, references: "id", singular: nil, indexing_only: false)
           foreign_key_type = (dir == :out) ? "[ID!]!" : "ID"
 
           if singular.nil? && !indexing_only
@@ -438,7 +479,7 @@ module ElasticGraph
 
           type_ref = schema_def_state.type_ref(type).to_final_form
 
-          relates_to(field_name, type_ref.as_connection.name, via: via, dir: dir, foreign_key_type: foreign_key_type, cardinality: :many, related_type: type, indexing_only: indexing_only) do |f|
+          relates_to(field_name, type_ref.as_connection.name, via: via, dir: dir, references: references, foreign_key_type: foreign_key_type, cardinality: :many, related_type: type, indexing_only: indexing_only) do |f|
             f.argument schema_def_state.schema_elements.filter, type_ref.as_filter_input.name do |a|
               a.documentation "Used to filter the returned `#{field_name}` based on the provided criteria."
             end
@@ -454,7 +495,7 @@ module ElasticGraph
 
           unless indexing_only
             aggregations_name = schema_def_state.schema_elements.normalize_case("#{singular}_aggregations")
-            relates_to(aggregations_name, type_ref.as_aggregation.as_connection.name, via: via, dir: dir, foreign_key_type: foreign_key_type, cardinality: :many, related_type: type) do |f|
+            relates_to(aggregations_name, type_ref.as_aggregation.as_connection.name, via: via, dir: dir, references: references, foreign_key_type: foreign_key_type, cardinality: :many, related_type: type) do |f|
               f.argument schema_def_state.schema_elements.filter, type_ref.as_filter_input.name do |a|
                 a.documentation "Used to filter the `#{type}` documents that get aggregated over based on the provided criteria."
               end
@@ -567,14 +608,15 @@ module ElasticGraph
           registry[name] = field
         end
 
-        def relates_to(field_name, type, via:, dir:, foreign_key_type:, cardinality:, related_type:, indexing_only: false)
+        def relates_to(field_name, type, via:, dir:, references:, foreign_key_type:, cardinality:, related_type:, indexing_only: false)
           field(field_name, type, sortable: false, filterable: false, groupable: false, graphql_only: true, indexing_only: indexing_only) do |field|
             relationship = schema_def_state.factory.new_relationship(
               field,
               cardinality: cardinality,
               related_type: schema_def_state.type_ref(related_type).to_final_form,
               foreign_key: via,
-              direction: dir
+              direction: dir,
+              references: references
             )
 
             field.relationship = relationship
@@ -583,9 +625,9 @@ module ElasticGraph
             yield relationship if block_given?
 
             if dir == :out
-              register_inferred_foreign_key_fields(from_type: [via, foreign_key_type], to_other: ["id", "ID!"], related_type: relationship.related_type)
+              register_inferred_foreign_key_fields(from_type: [via, foreign_key_type], to_other: [references, "ID!"], related_type: relationship.related_type)
             else
-              register_inferred_foreign_key_fields(from_type: ["id", "ID!"], to_other: [via, foreign_key_type], related_type: relationship.related_type)
+              register_inferred_foreign_key_fields(from_type: [references, "ID!"], to_other: [via, foreign_key_type], related_type: relationship.related_type)
             end
 
             if relationships_by_name.key?(field_name)

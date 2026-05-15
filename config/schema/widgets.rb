@@ -320,6 +320,7 @@ ElasticGraph.define_schema do |schema|
     t.field "material", "Material"
     t.relates_to_many "components", "Component", via: "part_ids", dir: :in, singular: "component"
     t.relates_to_one "manufacturer", "Manufacturer", via: "manufacturer_id", dir: :out
+    t.relates_to_one "manufacturer_by_guid", "Manufacturer", via: "manufacturer_guid", references: "guid", dir: :out
 
     t.index "mechanical_parts" do |i|
       i.default_sort "created_at", :desc
@@ -414,10 +415,12 @@ ElasticGraph.define_schema do |schema|
     t.root_query_fields plural: "manufacturers"
     t.implements "NamedEntity"
     t.field "id", "ID!"
+    t.field "guid", "ID!"
     t.field "name", "String"
     t.field "created_at", "DateTime!"
     t.field "ceo", "Person"
     t.relates_to_many "manufactured_parts", "Part", via: "manufacturer_id", dir: :in, singular: "manufactured_part"
+    t.relates_to_many "mechanical_parts", "MechanicalPart", via: "manufacturer_guid", references: "guid", dir: :in, singular: "mechanical_part"
     t.relates_to_one "address", "Address", via: "manufacturer_id", dir: :in
 
     t.index "manufacturers" do |i|

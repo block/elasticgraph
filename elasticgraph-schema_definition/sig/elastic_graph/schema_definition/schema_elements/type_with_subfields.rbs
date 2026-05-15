@@ -78,8 +78,8 @@ module ElasticGraph
           ?highlightable: bool?
         ) ?{ (Field) -> void } -> Field
 
-        def relates_to_one: (::String, ::String, via: ::String, dir: foreignKeyDirection, ?indexing_only: bool) ?{ (Relationship) -> void } -> void
-        def relates_to_many: (::String, ::String, via: ::String, dir: foreignKeyDirection, ?singular: ::String?, ?indexing_only: bool) ?{ (Relationship) -> void } -> void
+        def relates_to_one: (::String, ::String, via: ::String, dir: foreignKeyDirection, ?references: ::String, ?indexing_only: bool) ?{ (Relationship) -> void } -> void
+        def relates_to_many: (::String, ::String, via: ::String, dir: foreignKeyDirection, ?references: ::String, ?singular: ::String?, ?indexing_only: bool) ?{ (Relationship) -> void } -> void
 
         def generate_sdl: (name_section: ::String) ?{ (Field::argument) -> boolish } -> String
         def current_sources: () -> ::Array[::String]
@@ -106,6 +106,7 @@ module ElasticGraph
           ::String,
           via: ::String,
           dir: foreignKeyDirection,
+          references: ::String,
           foreign_key_type: ::String,
           cardinality: Relationship::cardinality,
           related_type: ::String,

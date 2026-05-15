@@ -29,6 +29,7 @@ module ElasticGraph
             relation: SchemaArtifacts::RuntimeMetadata::Relation.new(
               foreign_key: "parent_id",
               direction: :out,
+              references: "id",
               additional_filter: {},
               foreign_key_nested_paths: []
             )
@@ -50,6 +51,7 @@ module ElasticGraph
           relation: SchemaArtifacts::RuntimeMetadata::Relation.new(
             foreign_key: "parent_id",
             direction: :in,
+            references: "id",
             additional_filter: {},
             foreign_key_nested_paths: []
           )
@@ -85,6 +87,7 @@ module ElasticGraph
           relation: SchemaArtifacts::RuntimeMetadata::Relation.new(
             foreign_key: "parent_id",
             direction: :in,
+            references: "id",
             additional_filter: filter,
             foreign_key_nested_paths: []
           )
@@ -121,6 +124,7 @@ module ElasticGraph
           relation: SchemaArtifacts::RuntimeMetadata::Relation.new(
             foreign_key: "parent_id",
             direction: :in,
+            references: "id",
             additional_filter: {"is_enabled" => {"equal_to_any_of" => [true]}},
             foreign_key_nested_paths: []
           )
@@ -166,6 +170,7 @@ module ElasticGraph
           relation: SchemaArtifacts::RuntimeMetadata::Relation.new(
             foreign_key: "parent_id",
             direction: :in,
+            references: "id",
             additional_filter: {
               "is_enabled" => {"equal_to_any_of" => [true]},
               "details" => {"foo" => {"lt" => 3}, "bar" => {"gt" => 5}},
@@ -247,6 +252,7 @@ module ElasticGraph
             relation: SchemaArtifacts::RuntimeMetadata::Relation.new(
               foreign_key: "players.affiliations.sponsorships.sponsor_id",
               direction: :in,
+              references: "id",
               additional_filter: {},
               foreign_key_nested_paths: ["players", "players.affiliations.sponsorships"]
             )
@@ -254,6 +260,35 @@ module ElasticGraph
           expect(metadata.graphql_fields_by_name.slice("affiliated_teams", "affiliated_team_aggregations")).to eq({
             "affiliated_teams" => expected_relation_field.with(name_in_index: "affiliated_teams"),
             "affiliated_team_aggregations" => expected_relation_field.with(name_in_index: "affiliated_team_aggregations")
+          })
+        end
+      end
+
+      describe "references parameter" do
+        it "includes a custom references value in relation metadata" do
+          metadata = object_type_metadata_for "Widget" do |s|
+            s.object_type "Widget" do |t|
+              t.field "id", "ID"
+              t.field "guid", "ID"
+              t.relates_to_many "children", "Widget", via: "parent_guid", dir: :in, references: "guid", singular: "child"
+              t.index "widgets"
+            end
+          end
+
+          expected_relation_field = graphql_field_with(
+            resolver: configured_graphql_resolver(:nested_relationships),
+            relation: SchemaArtifacts::RuntimeMetadata::Relation.new(
+              foreign_key: "parent_guid",
+              direction: :in,
+              references: "guid",
+              additional_filter: {},
+              foreign_key_nested_paths: []
+            )
+          )
+
+          expect(metadata.graphql_fields_by_name.slice("children", "child_aggregations")).to eq({
+            "children" => expected_relation_field.with(name_in_index: "children"),
+            "child_aggregations" => expected_relation_field.with(name_in_index: "child_aggregations")
           })
         end
       end

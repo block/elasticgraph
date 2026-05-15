@@ -152,8 +152,8 @@ module ElasticGraph
           )
         end
 
-        def relation_with(foreign_key: "some_id", direction: :asc, additional_filter: {}, foreign_key_nested_paths: [])
-          Relation.new(foreign_key: foreign_key, direction: direction, additional_filter: additional_filter, foreign_key_nested_paths: foreign_key_nested_paths)
+        def relation_with(foreign_key: "some_id", direction: :asc, references: "id", additional_filter: {}, foreign_key_nested_paths: [])
+          Relation.new(foreign_key: foreign_key, direction: direction, references: references, additional_filter: additional_filter, foreign_key_nested_paths: foreign_key_nested_paths)
         end
 
         def graphql_field_with(name_in_index: "name_index", relation: nil, computation_detail: nil, resolver: nil)
