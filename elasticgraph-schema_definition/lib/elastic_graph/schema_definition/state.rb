@@ -61,6 +61,13 @@ module ElasticGraph
     )
       include Mixins::HasReadableToSAndInspect.new
 
+      # @param api [API] the public schema definition API
+      # @param schema_elements [SchemaElements::SchemaElements] configured schema element names
+      # @param index_document_sizes [Boolean] whether to index document sizes
+      # @param derived_type_name_formats [Hash{Symbol => String}] overrides for derived type name formats
+      # @param type_name_overrides [Hash{String => String}] specific type name overrides
+      # @param enum_value_overrides_by_type [Hash{String => Hash{String => String}}] enum value overrides keyed by type name
+      # @param output [IO] output stream for warnings
       def self.with(
         api:,
         schema_elements:,
@@ -117,28 +124,35 @@ module ElasticGraph
       # @dynamic index_document_sizes?
       alias_method :index_document_sizes?, :index_document_sizes
 
+      # @param name [String] the type name
       def type_ref(name)
         # Type references are immutable and can be safely cached. Here we cache them because we've observed
         # it having a noticeable impact on our test suite runtime.
         type_refs_by_name[name] ||= factory.new_type_reference(name)
       end
 
+      # @param type [Object] the type to register
       def register_object_interface_or_union_type(type)
         register_type(type, object_types_by_name)
       end
 
+      # @param type [SchemaElements::EnumType] the enum type to register
       def register_enum_type(type)
         register_type(type, enum_types_by_name)
       end
 
+      # @param type [SchemaElements::ScalarType] the scalar type to register
       def register_scalar_type(type)
         register_type(type, scalar_types_by_name)
       end
 
+      # @param type [SchemaElements::InputType] the input type to register
       def register_input_type(type)
         register_type(type)
       end
 
+      # @param name [String] name of the index
+      # @param type [Object] the type this index belongs to
       def register_index(name, type)
         if (existing_type = indexed_types_by_index_name[name])
           raise Errors::SchemaError, "Duplicate index name `#{name}` defined on `#{type.name}` and `#{existing_type.name}`. Each index can only be defined once."
@@ -146,6 +160,10 @@ module ElasticGraph
         indexed_types_by_index_name[name] = type
       end
 
+      # @param type_name [String] the current name of the type
+      # @param from [String] the old name of the type
+      # @param defined_at [Thread::Backtrace::Location] location where the rename was defined
+      # @param defined_via [String] the DSL call that defined the rename
       def register_renamed_type(type_name, from:, defined_at:, defined_via:)
         renamed_types_by_old_name[from] = factory.new_deprecated_element(
           type_name,
@@ -154,6 +172,9 @@ module ElasticGraph
         )
       end
 
+      # @param type_name [String] the name of the deleted type
+      # @param defined_at [Thread::Backtrace::Location] location where the deletion was defined
+      # @param defined_via [String] the DSL call that defined the deletion
       def register_deleted_type(type_name, defined_at:, defined_via:)
         deleted_types_by_old_name[type_name] = factory.new_deprecated_element(
           type_name,
@@ -162,6 +183,11 @@ module ElasticGraph
         )
       end
 
+      # @param type_name [String] the name of the type containing the renamed field
+      # @param from [String] the old field name
+      # @param to [String] the new field name
+      # @param defined_at [Thread::Backtrace::Location] location where the rename was defined
+      # @param defined_via [String] the DSL call that defined the rename
       def register_renamed_field(type_name, from:, to:, defined_at:, defined_via:)
         renamed_fields_by_old_field_name = renamed_fields_by_type_name_and_old_field_name[type_name] # : ::Hash[::String, SchemaElements::DeprecatedElement]
         renamed_fields_by_old_field_name[from] = factory.new_deprecated_element(
@@ -171,6 +197,10 @@ module ElasticGraph
         )
       end
 
+      # @param type_name [String] the name of the type containing the deleted field
+      # @param field_name [String] the name of the deleted field
+      # @param defined_at [Thread::Backtrace::Location] location where the deletion was defined
+      # @param defined_via [String] the DSL call that defined the deletion
       def register_deleted_field(type_name, field_name, defined_at:, defined_via:)
         deleted_fields_by_old_field_name = deleted_fields_by_type_name_and_old_field_name[type_name] # : ::Hash[::String, SchemaElements::DeprecatedElement]
         deleted_fields_by_old_field_name[field_name] = factory.new_deprecated_element(
@@ -181,6 +211,8 @@ module ElasticGraph
       end
 
       # Registers the given `field` as a user-defined field, unless the user definitions are complete.
+      #
+      # @param field [SchemaElements::Field] the field to register
       def register_user_defined_field(field)
         user_defined_fields << field
       end
@@ -203,6 +235,7 @@ module ElasticGraph
         @enums_for_directly_queryable_types ||= factory.new_enums_for_directly_queryable_types
       end
 
+      # @param type [Object] the type to find sub-aggregation paths for
       def sub_aggregation_paths_for(type)
         sub_aggregation_paths_by_type.fetch(type) do
           SchemaElements::SubAggregationPath.paths_for(type, schema_def_state: self).uniq.tap do |paths|
@@ -214,6 +247,7 @@ module ElasticGraph
         end
       end
 
+      # @param block [Proc] callback to invoke after user definition is complete
       def after_user_definition_complete(&block)
         user_definition_complete_callbacks << block
       end

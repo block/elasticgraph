@@ -13,6 +13,8 @@ module ElasticGraph
     module RuntimeMetadata
       # @private
       class SortField < ::Data.define(:field_path, :direction)
+        # @param field_path [String] dot-separated path to the field in the index
+        # @param direction [Symbol] sort direction (`:asc` or `:desc`)
         def initialize(field_path:, direction:)
           unless direction == :asc || direction == :desc
             raise Errors::SchemaError, "Sort direction `#{direction.inspect}` is invalid; it must be `:asc` or `:desc`"
@@ -24,6 +26,7 @@ module ElasticGraph
         FIELD_PATH = "field_path"
         DIRECTION = "direction"
 
+        # @param hash [Hash{String => Object}] serialized form of a SortField
         def self.from_hash(hash)
           new(
             field_path: hash[FIELD_PATH],

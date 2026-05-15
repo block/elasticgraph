@@ -302,6 +302,7 @@ module ElasticGraph
           def index_search_hits(response)
             nil
           end
+
           # :nocov:
           def identify_matching_hit(indexed_search_hits, representation, context:, index:)
             representation.representation_hash

@@ -11,6 +11,8 @@ module ElasticGraph
     module RuntimeMetadata
       # @private
       module HashDumper
+        # @param hash [Hash{String => Object}] hash to dump in sorted order
+        # @yield [value] transforms each value for dumping
         def self.dump_hash(hash)
           hash.sort_by(&:first).to_h do |key, value|
             [key, yield(value)]

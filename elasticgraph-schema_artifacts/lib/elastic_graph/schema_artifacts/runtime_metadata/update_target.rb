@@ -34,6 +34,7 @@ module ElasticGraph
         DATA_PARAMS = "data_params"
         METADATA_PARAMS = "metadata_params"
 
+        # @param hash [Hash{String => Object}] serialized form of an UpdateTarget
         def self.from_hash(hash)
           new(
             type: hash[TYPE],
@@ -65,6 +66,9 @@ module ElasticGraph
           script_id == INDEX_DATA_UPDATE_SCRIPT_ID
         end
 
+        # @param doc_id [String] document ID for the update
+        # @param event [Hash{String => Object}] source event containing metadata
+        # @param prepared_record [Hash{String => Object}] prepared record containing data fields
         def params_for(doc_id:, event:, prepared_record:)
           data = data_params.to_h do |name, param|
             [name, param.value_for(prepared_record)]

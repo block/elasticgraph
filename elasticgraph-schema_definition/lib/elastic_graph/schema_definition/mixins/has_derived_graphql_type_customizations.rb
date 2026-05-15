@@ -18,6 +18,7 @@ module ElasticGraph
         # types, allowing them to be customized.
         #
         # @param type_names [Array<String>, :all] names of the derived types to customize, or `:all` to customize all derived types
+        # @param customization_block [Proc] block receiving each matching derived type for customization
         # @return [void]
         #
         # @example Customize named derived GraphQL types
@@ -61,6 +62,7 @@ module ElasticGraph
         #
         # @param type_name [String] name of the derived type containing fields you want to customize
         # @param field_names [Array<String>] names of the fields on the derived types that you wish to customize
+        # @param customization_block [Proc] block receiving each matching field for customization
         # @return [void]
         #
         # @example Customize named fields of a derived GraphQL type
@@ -85,12 +87,14 @@ module ElasticGraph
         end
 
         # @private
+        # @param type [Object] derived type to get customizations for
         def derived_type_customizations_for_type(type)
           derived_type_customizations = derived_type_customizations_by_name[type.name] # : ::Array[^(::ElasticGraph::SchemaDefinition::_Type) -> void]
           derived_type_customizations + derived_type_customizations_for_all_types
         end
 
         # @private
+        # @param type [Object] derived type to get field customizations for
         def derived_field_customizations_by_name_for_type(type)
           derived_field_customizations_by_type_and_field_name[type.name] # : ::Hash[::String, ::Array[^(SchemaElements::Field) -> void]]
         end

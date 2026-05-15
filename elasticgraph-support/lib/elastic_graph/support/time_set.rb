@@ -24,6 +24,11 @@ module ElasticGraph
     # @private
     class TimeSet < ::Data.define(:ranges)
       # Factory method to construct a `TimeSet` using a range with the given bounds.
+      #
+      # @param gt [Time, nil] exclusive lower bound
+      # @param gte [Time, nil] inclusive lower bound
+      # @param lt [Time, nil] exclusive upper bound
+      # @param lte [Time, nil] inclusive upper bound
       def self.of_range(gt: nil, gte: nil, lt: nil, lte: nil)
         if gt && gte
           raise ArgumentError, "TimeSet got two lower bounds, but can have only one (gt: #{gt.inspect}, gte: #{gte.inspect})"
@@ -48,12 +53,16 @@ module ElasticGraph
 
       # Factory method to construct a `TimeSet` from a collection of `::Time` objects.
       # Internally we convert it to a set of `::Range` objects, one per unique time.
+      #
+      # @param times [Array<Time>] collection of times
       def self.of_times(times)
         of_range_objects(times.map { |t| ::Range.new(t, t) })
       end
 
       # Factory method to construct a `TimeSet` from a previously built collection of
       # ::Time ranges. Mostly used internally by `TimeSet` and in tests.
+      #
+      # @param range_objects [Array<Range>] collection of `::Time` ranges
       def self.of_range_objects(range_objects)
         # Use our singleton EMPTY or ALL instances if we can to save on memory.
         return EMPTY if range_objects.empty?
@@ -64,6 +73,8 @@ module ElasticGraph
       end
 
       # Returns a new `TimeSet` containing `::Time`s common to this set and `other_set`.
+      #
+      # @param other_set [TimeSet] the other set to intersect with
       def intersection(other_set)
         # Here we rely on the distributive and commutative properties of set algebra:
         #
@@ -85,16 +96,22 @@ module ElasticGraph
       end
 
       # Returns a new `TimeSet` containing `::Time`s that are in either this set or `other_set`.
+      #
+      # @param other_set [TimeSet] the other set to union with
       def union(other_set)
         TimeSet.of_range_objects(ranges.union(other_set.ranges))
       end
 
       # Returns true if the given `::Time` is a member of this `TimeSet`.
+      #
+      # @param time [Time] the time to check membership for
       def member?(time)
         ranges.any? { |r| r.cover?(time) }
       end
 
       # Returns true if this `TimeSet` and the given one have a least one time in common.
+      #
+      # @param other_set [TimeSet] the other set to check intersection with
       def intersect?(other_set)
         other_set.ranges.any? do |r1|
           ranges.any? do |r2|
@@ -109,6 +126,8 @@ module ElasticGraph
       end
 
       # Returns a new `TimeSet` containing the difference between this `TimeSet` and the given one.
+      #
+      # @param other [TimeSet] the set to subtract
       def -(other)
         new_ranges = other.ranges.to_a.reduce(ranges.to_a) do |accum, other_range|
           accum.flat_map do |self_range|
@@ -284,6 +303,9 @@ module ElasticGraph
       module RangeFactory
         # Helper method for building a range from the given bounds. Returns either
         # a built range, or, if the given bounds produce an empty range, returns nil.
+        #
+        # @param lower_bound [Time, nil] inclusive lower bound of the range
+        # @param upper_bound [Time, nil] inclusive upper bound of the range
         def self.build_non_empty(lower_bound, upper_bound)
           if lower_bound.nil? || upper_bound.nil? || lower_bound <= upper_bound
             ::Range.new(lower_bound, upper_bound)

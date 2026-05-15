@@ -44,6 +44,9 @@ module ElasticGraph
       #   callers to pass them for GraphQL enums.
       # - We've removed the `quirks_mode: true` flag passed to `JSON.generate` since it has been
       #   deprecated for a while: https://github.com/flori/json/issues/309
+      #
+      # @param value [Object] the value to serialize into GraphQL syntax
+      # @param wrap_hash_with_braces [Boolean] whether to wrap hash output with curly braces
       def self.serialize(value, wrap_hash_with_braces: true)
         case value
         when ::Hash

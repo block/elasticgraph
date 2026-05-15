@@ -17,6 +17,8 @@ module ElasticGraph
     # @private
     module Logger
       # Builds a logger instance from the given parsed YAML config.
+      #
+      # @param parsed_yaml [Hash{String => Object}] parsed YAML configuration
       def self.from_parsed_yaml(parsed_yaml)
         Factory.build(config: Config.from_parsed_yaml(parsed_yaml) || Config.new)
       end
@@ -76,6 +78,10 @@ module ElasticGraph
           @original_formatter = ::Logger::Formatter.new
         end
 
+        # @param severity [String] log severity level
+        # @param datetime [Time] timestamp of the log entry
+        # @param progname [String, nil] program name
+        # @param msg [String, Hash] log message or hash to be JSON-formatted
         def call(severity, datetime, progname, msg)
           msg = msg.is_a?(::Hash) ? ::JSON.generate(msg, space: " ") : msg
           @original_formatter.call(severity, datetime, progname, msg)
@@ -84,6 +90,8 @@ module ElasticGraph
 
       # @private
       module Factory
+        # @param config [Config] logger configuration
+        # @param device [IO, nil] optional IO device override
         def self.build(config:, device: nil)
           ::Logger.new(
             device || config.prepared_device,

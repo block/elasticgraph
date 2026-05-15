@@ -30,6 +30,7 @@ module ElasticGraph
         # @dynamic default_graphql_resolver
 
         # @private
+        # @param args [Array<Object>] positional arguments forwarded to `super`
         # @param options [Hash] forwarded to the including class's `initialize`
         # @option options [Object] :** all keyword arguments are passed through to `super`
         def initialize(*args, **options)
@@ -46,7 +47,7 @@ module ElasticGraph
         # @param name [String] name of the index. See the [Elasticsearch docs](https://www.elastic.co/guide/en/elasticsearch/reference/8.15/indices-create-index.html#indices-create-api-path-params)
         #   for restrictions.
         # @param settings [Hash{Symbol => Object}] datastore index settings (without the `index.` prefix) forwarded to the index definition. See the [Elasticsearch docs](https://www.elastic.co/guide/en/elasticsearch/reference/8.15/index-modules.html#index-modules-settings) for available settings.
-        # @yield [Indexing::Index] the index, so it can be customized further
+        # @param block [Proc] optional block yielding the index for further customization
         # @return [void]
         #
         # @example Define a `campaigns` index on a concrete type
@@ -190,7 +191,7 @@ module ElasticGraph
         # @param from_id [String] path to the source type field with `id` values for the derived type
         # @param route_with [String, nil] path to the source type field with values for shard routing on the derived type
         # @param rollover_with [String, nil] path to the source type field with values for index rollover on the derived type
-        # @yield [Indexing::DerivedIndexedType] configuration object for field derivations
+        # @param block [Proc] block yielding the derived indexed type configuration
         # @return [void]
         #
         # @example Derive a `Course` type from `StudentCourseEnrollment` events
@@ -260,6 +261,7 @@ module ElasticGraph
         end
 
         # @private
+        # @param extra_update_targets [Array<SchemaArtifacts::RuntimeMetadata::UpdateTarget>] additional update targets from relationships
         def runtime_metadata(extra_update_targets)
           SchemaArtifacts::RuntimeMetadata::ObjectType.new(
             update_targets: derived_indexed_types.map(&:runtime_metadata_for_source_type) + [self_update_target].compact + extra_update_targets,
@@ -278,7 +280,7 @@ module ElasticGraph
         # @param singular [String, nil] the singular name of the entity; used for the root `Query` field (with an `Aggregations` suffix) that
         #   queries aggregations of this indexed type. If not provided, will derive it from the type name (e.g. converting it to `camelCase`
         #   or `snake_case`, depending on configuration).
-        # @yield [SchemaElements::Field] field on the root `Query` type used to query this indexed type, to support customization
+        # @param customization_block [Proc] optional block yielding the root query field for customization
         # @return [void]
         #
         # @example Set `plural` and `singular` names
@@ -344,6 +346,8 @@ module ElasticGraph
         # through interface/union subtype cycles.
         #
         # @private
+        # @param path_prefix [String] dot-separated prefix prepended to field names
+        # @param under_non_returnable_parent [Boolean] whether an ancestor field is non-returnable
         def source_excludes_paths(path_prefix = "", under_non_returnable_parent = false)
           indexing_fields_by_name_in_index.flat_map do |name, field|
             path = path_prefix + name

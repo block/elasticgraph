@@ -22,6 +22,9 @@ module ElasticGraph
 
     # A factory method that builds a IndexerAutoscalerLambda instance from the given parsed YAML config.
     # `from_yaml_file(file_name, &block)` is also available (via `Support::FromYamlFile`).
+    #
+    # @param parsed_yaml [Hash{String => Object}] parsed YAML configuration
+    # @param datastore_client_customization_block [Proc, nil] optional block for customizing the datastore client
     def self.from_parsed_yaml(parsed_yaml, &datastore_client_customization_block)
       new(datastore_core: DatastoreCore.from_parsed_yaml(parsed_yaml, &datastore_client_customization_block))
     end
@@ -29,6 +32,10 @@ module ElasticGraph
     # @dynamic datastore_core
     attr_reader :datastore_core
 
+    # @param datastore_core [ElasticGraph::DatastoreCore] core datastore instance
+    # @param sqs_client [Aws::SQS::Client, nil] optional SQS client override
+    # @param lambda_client [Aws::Lambda::Client, nil] optional Lambda client override
+    # @param cloudwatch_client [Aws::CloudWatch::Client, nil] optional CloudWatch client override
     def initialize(
       datastore_core:,
       sqs_client: nil,

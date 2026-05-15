@@ -23,6 +23,7 @@ module ElasticGraph
           Extension.load_from_hash(extension_ref, via: GraphQLExtension.loader)
         end
 
+        # @param hash [Hash{String => Object}] serialized GraphQL extension
         def self.from_hash(hash)
           new(
             extension_ref: hash.fetch(EXTENSION_REF)

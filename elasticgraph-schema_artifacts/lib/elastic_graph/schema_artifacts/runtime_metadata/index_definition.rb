@@ -24,6 +24,12 @@ module ElasticGraph
         FIELDS_BY_PATH = "fields_by_path"
         HAS_HAD_MULTIPLE_SOURCES = "has_had_multiple_sources"
 
+        # @param route_with [String, nil] field path used for routing
+        # @param rollover [Rollover, nil] rollover configuration
+        # @param default_sort_fields [Array<SortField>] default sort fields for queries
+        # @param current_sources [Array<String>] current source event types
+        # @param fields_by_path [Hash{String => IndexField}] index field metadata keyed by path
+        # @param has_had_multiple_sources [Boolean] whether this index has ever had multiple sources
         def initialize(route_with:, rollover:, default_sort_fields:, current_sources:, fields_by_path:, has_had_multiple_sources:)
           super(
             route_with: route_with,
@@ -35,6 +41,7 @@ module ElasticGraph
           )
         end
 
+        # @param hash [Hash{String => Object}] serialized index definition
         def self.from_hash(hash)
           new(
             route_with: hash[ROUTE_WITH],
@@ -64,6 +71,7 @@ module ElasticGraph
           TIMESTAMP_FIELD_PATH = "timestamp_field_path"
 
           # @implements Rollover
+          # @param hash [Hash{String => Object}] serialized rollover configuration
           def self.from_hash(hash)
             new(
               frequency: hash.fetch(FREQUENCY).to_sym,

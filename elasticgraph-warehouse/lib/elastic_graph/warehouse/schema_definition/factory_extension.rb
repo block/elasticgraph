@@ -41,6 +41,7 @@ module ElasticGraph
         # @param name [String] the name of the index
         # @param settings [Hash] additional settings for the index
         # @param type [Object] the type this index is for
+        # @param block [Proc] optional block to customize the newly created index
         # @yield [ElasticGraph::SchemaDefinition::Indexing::Index] the newly created index (optional)
         # @return [ElasticGraph::SchemaDefinition::Indexing::Index] the created index
         def new_index(name, settings, type, &block)

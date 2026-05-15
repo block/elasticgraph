@@ -72,6 +72,12 @@ module ElasticGraph
         # @dynamic graphql_only?
 
         # @private
+        #
+        # @param schema_kind [String] the GraphQL schema kind (e.g. `"type"`, `"input"`, `"interface"`)
+        # @param schema_def_state [State] schema definition state
+        # @param name [String] name of the type
+        # @param wrapping_type [TypeWithSubfields] the type that wraps this one (for registering fields)
+        # @param field_factory [Proc] factory used to create fields
         def initialize(schema_kind, schema_def_state, name, wrapping_type:, field_factory:)
           # `any_satisfy`, `any_of`/`all_of`, and `not` are "reserved" field names. They are reserved for usage by
           # ElasticGraph itself in the `*FilterInput` types it generates. If we allow them to be used as field
@@ -283,6 +289,7 @@ module ElasticGraph
         # @param element_type [String] name of the type of element in the collection
         # @param name_in_index [String] the name of the field in the datastore index. Can be used to back a GraphQL field with a
         #   differently named field in the index.
+        # @param graphql_only [Boolean] if `true`, ElasticGraph will define the field only in the GraphQL schema, omitting it from indexing artifacts.
         # @param singular [String] indicates what the singular form of a field's name is. When provided, ElasticGraph will define a
         #   `groupedBy` field (using the singular form) allowing clients to group by individual values from the field.
         # @param aggregatable [Boolean] force-enables or disables the ability for aggregation queries to aggregate over this field.
@@ -293,6 +300,7 @@ module ElasticGraph
         #   not provided, ElasticGraph will infer field groupability based on the field's GraphQL type and mapping type.
         # @param highlightable [Boolean] force-enables or disables the ability to request search highlights for this field. When
         #   not provided, ElasticGraph will infer field highlightable based on the field's mapping type.
+        # @param block [Proc] optional block for further field customization
         # @yield [Field] the field for further customization
         # @return [void]
         #
@@ -363,6 +371,7 @@ module ElasticGraph
         #   the related type.
         # @param indexing_only [Boolean] when true, the relationship is used only for indexing purposes (e.g. `sourced_from`) and will not
         #   generate a GraphQL field.
+        # @param block [Proc] optional block for further relationship customization
         # @yield [Relationship] the generated relationship fields, for further customization
         # @return [void]
         #
@@ -471,11 +480,16 @@ module ElasticGraph
         # Converts the type to GraphQL SDL syntax.
         #
         # @private
+        #
+        # @param field_arg_selector [Proc] optional block to filter field arguments
         def to_sdl(&field_arg_selector)
           generate_sdl(name_section: name, &field_arg_selector)
         end
 
         # @private
+        #
+        # @param name_section [String] the name portion of the SDL definition
+        # @param field_arg_selector [Proc] optional block to filter field arguments
         def generate_sdl(name_section:, &field_arg_selector)
           <<~SDL
             #{formatted_documentation}#{schema_kind} #{name_section} #{directives_sdl(suffix_with: " ")}{
@@ -510,6 +524,10 @@ module ElasticGraph
         end
 
         # @private
+        #
+        # @param path_prefix [String] path from the overall document root
+        # @param parent_source [String] the source of the parent field
+        # @param list_counts_state [ListCountsState] tracks the state of the list counts field
         def index_field_runtime_metadata_tuples(
           # path from the overall document root
           path_prefix: "",

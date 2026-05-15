@@ -12,6 +12,9 @@ module ElasticGraph
     class HashUtil
       # Fetches a key from a hash (just like `Hash#fetch`) but with a more verbose error message when the key is not found.
       # The error message indicates the available keys unlike `Hash#fetch`.
+      #
+      # @param hash [Hash] the hash to fetch from
+      # @param key [Object] the key to fetch
       def self.verbose_fetch(hash, key)
         hash.fetch(key) do
           raise ::KeyError, "key not found: #{key.inspect}. Available keys: #{hash.keys.inspect}."
@@ -20,6 +23,8 @@ module ElasticGraph
 
       # Like `Hash#to_h`, but strict. When the given input has conflicting keys, `Hash#to_h` will happily let
       # the last pair when. This method instead raises an exception.
+      #
+      # @param pairs [Array<Array(Object, Object)>] key-value pairs to convert to a hash
       def self.strict_to_h(pairs)
         hash = pairs.to_h
 
@@ -33,6 +38,9 @@ module ElasticGraph
 
       # Like `Hash#merge`, but verifies that the hashes were strictly disjoint (e.g. had no keys in common).
       # An error is raised if they do have any keys in common.
+      #
+      # @param hash1 [Hash] first hash
+      # @param hash2 [Hash] second hash to merge into the first
       def self.disjoint_merge(hash1, hash2)
         conflicting_keys = [] # : ::Array[untyped]
         merged = hash1.merge(hash2) do |key, v1, _v2|
@@ -49,6 +57,8 @@ module ElasticGraph
 
       # Recursively transforms any hash keys in the given object to string keys, without
       # mutating the provided argument.
+      #
+      # @param object [Object] the object whose hash keys should be stringified
       def self.stringify_keys(object)
         transform_keys(object, :to_s)
       end
@@ -58,6 +68,7 @@ module ElasticGraph
       #
       # Important note: this should never be used on untrusted input. Symbols are not GCd in
       # Ruby in the same way as strings.
+      # @param object [Object] the object whose hash keys should be symbolized
       def self.symbolize_keys(object)
         transform_keys(object, :to_sym)
       end
@@ -65,6 +76,8 @@ module ElasticGraph
       # Recursively prunes nil values from the hash, at any level of its structure, without
       # mutating the provided argument. Key paths that are pruned are yielded to the caller
       # to allow the caller to have awareness of what was pruned.
+      # @param object [Object] the object to prune nil values from
+      # @param block [Proc] callback invoked with the key path of each pruned entry
       def self.recursively_prune_nils_from(object, &block)
         recursively_prune_if(object, block, &:nil?)
       end
@@ -72,6 +85,8 @@ module ElasticGraph
       # Recursively prunes nil values or empty hash/array values from the hash, at any level
       # of its structure, without mutating the provided argument. Key paths that are pruned
       # are yielded to the caller to allow the caller to have awareness of what was pruned.
+      # @param object [Object] the object to prune nil and empty values from
+      # @param block [Proc] callback invoked with the key path of each pruned entry
       def self.recursively_prune_nils_and_empties_from(object, &block)
         recursively_prune_if(object, block) do |value|
           if value.is_a?(::Hash) || value.is_a?(::Array)
@@ -87,6 +102,8 @@ module ElasticGraph
       #
       # flatten_and_stringify_keys({ a: { b: 3 }, c: 5 }, prefix: "foo") returns:
       # { "foo.a.b" => 3, "foo.c" => 5 }
+      # @param source_hash [Hash] the hash to flatten
+      # @param prefix [String, nil] optional prefix prepended to all keys
       def self.flatten_and_stringify_keys(source_hash, prefix: nil)
         # @type var flat_hash: ::Hash[::String, untyped]
         flat_hash = {}
@@ -98,6 +115,8 @@ module ElasticGraph
 
       # Recursively merges the values from `hash2` into `hash1`, without mutating either `hash1` or `hash2`.
       # When a key is in both `hash2` and `hash1`, takes the value from `hash2` just like `Hash#merge` does.
+      # @param hash1 [Hash] base hash
+      # @param hash2 [Hash] hash whose values take precedence on conflict
       def self.deep_merge(hash1, hash2)
         # `_ =` needed to satisfy steep--the types here are quite complicated.
         _ = hash1.merge(hash2) do |key, hash1_value, hash2_value|
@@ -116,6 +135,9 @@ module ElasticGraph
       # Raises an error if the key is not found unless a default block is provided.
       # Raises an error if any parent value is not a hash as expected.
       # Raises an error if the provided path is not a full path to a leaf in the nested structure.
+      # @param hash [Hash] the hash to fetch from
+      # @param key_path [Array<String>] ordered list of keys forming the path to the leaf
+      # @param default [Proc] optional block providing a default when a key is missing
       def self.fetch_leaf_values_at_path(hash, key_path, &default)
         do_fetch_leaf_values_at_path(hash, key_path, 0, &default)
       end
@@ -129,6 +151,8 @@ module ElasticGraph
       # Note: this is a somewhat lengthy implementation, but it was chosen based on benchmarking. This method
       # needs to be fast because it gets used repeatedly when resolving GraphQL queries at all levels of the
       # response structure.
+      # @param hash [Hash] the hash to fetch from
+      # @param path_parts [Array<String>] ordered list of keys forming the path
       def self.fetch_value_at_path(hash, path_parts)
         # We expect the most common case to be a single path part. Benchmarks have shown that special casing it
         # is quite worthwhile, as it is much faster than the general purpose implementation further below.

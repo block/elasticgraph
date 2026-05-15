@@ -20,6 +20,7 @@ module ElasticGraph
         class Type < ::Data.define(:values_by_name)
           VALUES_BY_NAME = "values_by_name"
 
+          # @param hash [Hash{String => Object}] serialized enum type
           def self.from_hash(hash)
             values_by_name = hash[VALUES_BY_NAME]&.transform_values do |value_hash|
               Value.from_hash(value_hash)
@@ -45,6 +46,7 @@ module ElasticGraph
           SORT_FIELD = "sort_field"
           ALTERNATE_ORIGINAL_NAME = "alternate_original_name"
 
+          # @param hash [Hash{String => Object}] serialized enum value
           def self.from_hash(hash)
             new(
               sort_field: hash[SORT_FIELD]&.then { |h| SortField.from_hash(h) },

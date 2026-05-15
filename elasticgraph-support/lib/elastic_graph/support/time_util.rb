@@ -29,6 +29,7 @@ module ElasticGraph
       # Note: this method assumes the given `local_time_string` is well-formed. You'll get an exception if
       # you provide a malformed value, but no effort has been put into giving a clear error message. The
       # caller is expected to have already validated that the `local_time_string` is formatted correctly.
+      # @param local_time_string [String] a local time string (e.g. `"03:45:12"` or `"12:30:43.756"`)
       def self.nano_of_day_from_local_time(local_time_string)
         hours_str, minutes_str, full_seconds_str = local_time_string.split(":")
         seconds_str, subseconds_str = (_ = full_seconds_str).split(".")
@@ -51,6 +52,8 @@ module ElasticGraph
       # - We only ever need to advance a single unit.
       #
       # This provides a simple, correct implementation for that constrained problem space.
+      # @param time [Time] the time to advance
+      # @param unit [Symbol] the unit to advance by (`:year`, `:month`, `:day`, or `:hour`)
       def self.advance_one_unit(time, unit)
         case unit
         when :year

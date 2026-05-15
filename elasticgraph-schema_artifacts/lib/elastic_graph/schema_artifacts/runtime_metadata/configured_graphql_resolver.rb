@@ -17,6 +17,7 @@ module ElasticGraph
         NAME = "name"
         CONFIG = "config"
 
+        # @param hash [Hash{String => Object}] serialized configured resolver
         def self.from_hash(hash)
           new(
             name: hash.fetch(NAME).to_sym,

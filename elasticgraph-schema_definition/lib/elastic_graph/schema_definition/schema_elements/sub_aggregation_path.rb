@@ -27,6 +27,9 @@ module ElasticGraph
         # @implements SubAggregationPath
 
         # Determines the set of sub aggregation paths for the given type.
+        #
+        # @param type [SchemaElements::TypeWithSubfields] the type to find paths for
+        # @param schema_def_state [State] schema definition state
         def self.paths_for(type, schema_def_state:)
           root_paths = type.root_document_type? ? [SubAggregationPath.new([type.name], [])] : [] # : ::Array[SubAggregationPath]
 
@@ -49,10 +52,12 @@ module ElasticGraph
           end
         end
 
+        # @param parent [String] name of the parent document type to add
         def plus_parent(parent)
           with(parent_doc_types: parent_doc_types + [parent], field_path: [])
         end
 
+        # @param field [Indexing::FieldReference] field reference to append to the path
         def plus_field(field)
           with(field_path: field_path + [field])
         end

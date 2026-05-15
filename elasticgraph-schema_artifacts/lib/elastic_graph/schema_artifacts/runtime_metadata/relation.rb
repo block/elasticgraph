@@ -16,6 +16,7 @@ module ElasticGraph
         ADDITIONAL_FILTER = "additional_filter"
         FOREIGN_KEY_NESTED_PATHS = "foreign_key_nested_paths"
 
+        # @param hash [Hash{String => Object}] serialized form of a Relation
         def self.from_hash(hash)
           new(
             foreign_key: hash[FOREIGN_KEY],

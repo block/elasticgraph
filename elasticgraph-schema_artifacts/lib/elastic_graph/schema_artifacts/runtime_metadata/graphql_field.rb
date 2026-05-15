@@ -21,6 +21,7 @@ module ElasticGraph
         AGGREGATION_DETAIL = "computation_detail"
         RESOLVER = "resolver"
 
+        # @param hash [Hash{String => Object}] serialized GraphQL field
         def self.from_hash(hash)
           new(
             name_in_index: hash[NAME_IN_INDEX],
@@ -43,6 +44,8 @@ module ElasticGraph
         # Indicates if we need this field in our dumped runtime metadata, when it has the given
         # `name_in_graphql`. Fields that have not been customized in some way do not need to be
         # included in the dumped runtime metadata.
+        #
+        # @param name_in_graphql [String] field name as it appears in the GraphQL schema
         def needed?(name_in_graphql)
           !!relation ||
             !!computation_detail ||
@@ -51,6 +54,8 @@ module ElasticGraph
             false
         end
 
+        # @param empty_bucket_value [Object, nil] default value for empty aggregation buckets
+        # @param function [Symbol] aggregation function name
         def with_computation_detail(empty_bucket_value:, function:)
           with(computation_detail: ComputationDetail.new(
             empty_bucket_value: empty_bucket_value,

@@ -19,16 +19,20 @@ module ElasticGraph
         :path_from_list_counts
       )
         # @dynamic path_to_list_counts, path_from_list_counts, with
+        #
+        # @param at [String] path from the root to the list counts field
         def self.new_list_counts_field(at:)
           new(path_to_list_counts: at, path_from_list_counts: "")
         end
 
         INITIAL = new_list_counts_field(at: LIST_COUNTS_FIELD)
 
+        # @param subpath [String] subpath to append to the current path
         def [](subpath)
           with(path_from_list_counts: "#{path_from_list_counts}#{subpath}.")
         end
 
+        # @param subpath [String] subpath to the count subfield
         def path_to_count_subfield(subpath)
           count_subfield = (path_from_list_counts + subpath).gsub(".", LIST_COUNTS_FIELD_PATH_KEY_SEPARATOR)
           "#{path_to_list_counts}.#{count_subfield}"

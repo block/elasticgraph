@@ -38,6 +38,7 @@ module ElasticGraph
     # Builds an `ElasticGraph::WarehouseLambda` instance from parsed YAML configuration.
     #
     # @param parsed_yaml [Hash] parsed YAML configuration
+    # @param datastore_client_customization_block [Proc] optional block to customize the datastore client
     # @yield [Datastore::Client] optional block to customize the datastore client
     # @return [WarehouseLambda] configured warehouse lambda instance
     def self.from_parsed_yaml(parsed_yaml, &datastore_client_customization_block)

@@ -14,14 +14,18 @@ module ElasticGraph
     module RuntimeMetadata
       # @private
       module Param
+        # @param hash_of_params [Hash{String => DynamicParam, StaticParam}] params keyed by name
         def self.dump_params_hash(hash_of_params)
           hash_of_params.sort_by(&:first).to_h { |name, param| [name, param.to_dumpable_hash(name)] }
         end
 
+        # @param hash_of_hashes [Hash{String => Hash{String => Object}}] serialized params keyed by name
         def self.load_params_hash(hash_of_hashes)
           hash_of_hashes.to_h { |name, hash| [name, from_hash(hash, name)] }
         end
 
+        # @param hash [Hash{String => Object}] serialized param data
+        # @param name [String] param name, used as default source path for dynamic params
         def self.from_hash(hash, name)
           if hash.key?(StaticParam::VALUE)
             StaticParam.from_hash(hash)
@@ -38,6 +42,8 @@ module ElasticGraph
         SOURCE_PATH = "source_path"
         CARDINALITY = "cardinality"
 
+        # @param hash [Hash{String => Object}] serialized form of a DynamicParam
+        # @param name [String] param name, used as default source path
         def self.from_hash(hash, name)
           new(
             source_path: hash[SOURCE_PATH] || name,
@@ -45,6 +51,7 @@ module ElasticGraph
           )
         end
 
+        # @param param_name [String] name of this param, used to omit redundant source path
         def to_dumpable_hash(param_name)
           {
             # Keys here are ordered alphabetically; please keep them that way.
@@ -53,6 +60,7 @@ module ElasticGraph
           }
         end
 
+        # @param event_or_prepared_record [Hash{String => Object}] event or prepared record to extract value from
         def value_for(event_or_prepared_record)
           case cardinality
           when :many then Support::HashUtil.fetch_leaf_values_at_path(event_or_prepared_record, source_path.split(".")) { [] }
@@ -65,10 +73,12 @@ module ElasticGraph
       class StaticParam < ::Data.define(:value)
         VALUE = "value"
 
+        # @param hash [Hash{String => Object}] serialized form of a StaticParam
         def self.from_hash(hash)
           new(value: hash.fetch(VALUE))
         end
 
+        # @param param_name [String] name of this param (unused for static params, present for interface consistency)
         def to_dumpable_hash(param_name)
           {
             # Keys here are ordered alphabetically; please keep them that way.
@@ -76,6 +86,7 @@ module ElasticGraph
           }
         end
 
+        # @param event_or_prepared_record [Hash{String => Object}] event or prepared record (ignored; static value is always returned)
         def value_for(event_or_prepared_record)
           value
         end

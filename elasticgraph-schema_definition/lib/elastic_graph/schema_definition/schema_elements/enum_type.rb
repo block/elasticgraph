@@ -46,6 +46,9 @@ module ElasticGraph
         include Mixins::HasReadableToSAndInspect.new { |e| e.name }
 
         # @private
+        #
+        # @param schema_def_state [State] schema definition state
+        # @param name [String] name of the enum type
         def initialize(schema_def_state, name)
           # @type var values_by_name: ::Hash[::String, EnumValue]
           values_by_name = {}
@@ -69,6 +72,7 @@ module ElasticGraph
         # Defines an enum value for the current enum type.
         #
         # @param value_name [String] name of the enum value
+        # @param block [Proc] enum value so it can be further customized
         # @yield [EnumValue] enum value so it can be further customized
         # @return [void]
         #

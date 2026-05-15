@@ -108,8 +108,7 @@ module ElasticGraph
           end
         end
 
-        # @yield [SchemaElements::Argument] an argument
-        # @yieldreturn [Boolean] whether or not to include the argument in the generated GraphQL SDL
+        # @param field_arg_selector [Proc] block that selects which arguments to include in SDL
         # @return [String] SDL string of the type
         def to_sdl(&field_arg_selector)
           name_section =

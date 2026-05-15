@@ -29,6 +29,7 @@ module ElasticGraph
     # and a [GraphiQL IDE](https://github.com/graphql/graphiql).
     #
     # @param graphql [ElasticGraph::GraphQL] ElasticGraph GraphQL instance
+    # @param output [IO] where to print status messages (defaults to stdout)
     # @return [Rack::Builder] built Rack application
     def self.new(graphql, output: $stdout)
       tarball_path = ::File.join(__dir__.to_s, "graphiql/assets.tar.gz")

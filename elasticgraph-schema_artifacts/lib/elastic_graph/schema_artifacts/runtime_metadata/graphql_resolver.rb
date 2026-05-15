@@ -29,6 +29,7 @@ module ElasticGraph
           Extension.load_from_hash(resolver_ref, via: loader)
         end
 
+        # @param hash [Hash{String => Object}] serialized GraphQL resolver
         def self.from_hash(hash)
           new(
             needs_lookahead: hash.fetch(NEEDS_LOOKAHEAD),
@@ -46,20 +47,33 @@ module ElasticGraph
 
         # @private
         class InterfaceWithLookahead
+          # @param elasticgraph_graphql [ElasticGraph::GraphQL] GraphQL instance
+          # @param config [Hash{Symbol => Object}] resolver configuration
           def initialize(elasticgraph_graphql:, config:)
             # must be defined, but nothing to do
           end
 
+          # @param field [Object] GraphQL field being resolved
+          # @param object [Object] parent object
+          # @param args [Hash{Symbol => Object}] field arguments
+          # @param context [Object] GraphQL context
+          # @param lookahead [Object] lookahead into sub-selections
           def resolve(field:, object:, args:, context:, lookahead:)
           end
         end
 
         # @private
         class InterfaceWithoutLookahead
+          # @param elasticgraph_graphql [ElasticGraph::GraphQL] GraphQL instance
+          # @param config [Hash{Symbol => Object}] resolver configuration
           def initialize(elasticgraph_graphql:, config:)
             # must be defined, but nothing to do
           end
 
+          # @param field [Object] GraphQL field being resolved
+          # @param object [Object] parent object
+          # @param args [Hash{Symbol => Object}] field arguments
+          # @param context [Object] GraphQL context
           def resolve(field:, object:, args:, context:)
           end
         end

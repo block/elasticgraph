@@ -14,6 +14,7 @@ module ElasticGraph
     #
     # @private
     class JSONSchemaPruner
+      # @param original_json_schema [Hash{String => Object}] JSON schema to prune
       def self.prune(original_json_schema)
         initial_type_names = [EVENT_ENVELOPE_JSON_SCHEMA_NAME] + original_json_schema
           .dig("$defs", EVENT_ENVELOPE_JSON_SCHEMA_NAME, "properties", "type", "enum")
@@ -30,6 +31,8 @@ module ElasticGraph
 
       # Returns a list of type names indicating all types referenced from any type in source_type_names.
       private_class_method
+      # @param source_type_names [Array<String>] type names to find references from
+      # @param original_defs [Hash{String => Object}] all type definitions from the JSON schema
       def self.referenced_type_names(source_type_names, original_defs)
         return Set.new if source_type_names.empty?
 
@@ -40,6 +43,7 @@ module ElasticGraph
       end
 
       private_class_method
+      # @param hash [Hash{String => Object}] hash to search for `$ref` entries
       def self.collect_ref_names(hash)
         hash.flat_map do |key, value|
           case value

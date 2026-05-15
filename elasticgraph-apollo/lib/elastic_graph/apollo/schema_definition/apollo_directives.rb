@@ -266,6 +266,7 @@ module ElasticGraph
           # Adds the [`@tag` directive](https://www.apollographql.com/docs/federation/federated-types/federated-directives/#tag)
           # to the schema element.
           #
+          # @param name [String] tag name to apply
           # @return [void]
           # @see APIExtension#tag_built_in_types_with
           # @see FieldExtension#tag_with

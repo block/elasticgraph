@@ -18,6 +18,10 @@ module ElasticGraph
       #
       # @private
       class UpdateTargetResolver
+        # @param object_type [Object] type that owns the sourced fields
+        # @param resolved_relationship [Object] resolved relationship metadata
+        # @param sourced_fields [Array<Object>] fields that source their data from the relationship
+        # @param field_path_resolver [Object] resolves field paths on types
         def initialize(
           object_type:,
           resolved_relationship:,
@@ -165,10 +169,15 @@ module ElasticGraph
         #
         # @private
         module RoutingSourceAdapter
+          # @param relationship [Object] relationship to get routing source from
+          # @param index [Indexing::Index] index definition
+          # @param block [Proc] block called when routing source cannot be determined
           def self.get_field_source(relationship, index, &block)
             relationship.routing_value_source_for_index(index, &block)
           end
 
+          # @param object_type [Object] type that needs routing
+          # @param relationship_name [String] name of the relationship
           def self.cannot_update_reason(object_type, relationship_name)
             "`#{object_type.name}` uses custom shard routing but we don't know what `#{relationship_name}` field to use " \
             "to route the `#{object_type.name}` update requests"
@@ -179,10 +188,15 @@ module ElasticGraph
         #
         # @private
         module RolloverTimestampSourceAdapter
+          # @param relationship [Object] relationship to get rollover timestamp source from
+          # @param index [Indexing::Index] index definition
+          # @param block [Proc] block called when rollover timestamp source cannot be determined
           def self.get_field_source(relationship, index, &block)
             relationship.rollover_timestamp_value_source_for_index(index, &block)
           end
 
+          # @param object_type [Object] type that uses rollover
+          # @param relationship_name [String] name of the relationship
           def self.cannot_update_reason(object_type, relationship_name)
             "`#{object_type.name}` uses a rollover index but we don't know what `#{relationship_name}` timestamp field to use " \
             "to select an index for the `#{object_type.name}` update requests"

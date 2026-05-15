@@ -24,6 +24,9 @@ module ElasticGraph
       # @private
       module InterfaceVerifier
         class << self
+          # @param extension [Module] module whose method signatures will be checked
+          # @param against [Module] interface definition to verify against
+          # @param constant_name [String] fully qualified name of the extension constant
           def verify!(extension, against:, constant_name:)
             problems = verify(extension, against:, constant_name:)
 
@@ -34,6 +37,9 @@ module ElasticGraph
             end
           end
 
+          # @param extension [Module] module whose method signatures will be checked
+          # @param against [Module] interface definition to verify against
+          # @param constant_name [String] fully qualified name of the extension constant
           def verify(extension, against:, constant_name:)
             problems = [] # : ::Array[::String]
             problems.concat(verify_methods("class", extension.singleton_class, against.singleton_class))

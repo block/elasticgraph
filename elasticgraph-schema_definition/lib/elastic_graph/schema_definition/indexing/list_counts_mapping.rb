@@ -20,6 +20,8 @@ module ElasticGraph
       module ListCountsMapping
         # Builds the `__counts` field mapping for the given `for_type`. Returns a new `mapping_hash` with
         # the extra `__counts` field merged into it.
+        # @param mapping_hash [Hash{String => Object}] existing mapping hash to merge into
+        # @param for_type [Object] type whose list fields determine the counts properties
         def self.merged_into(mapping_hash, for_type:)
           counts_properties = for_type.indexing_fields_by_name_in_index.values.flat_map do |field|
             field.paths_to_lists_for_count_indexing.map do |path|

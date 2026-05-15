@@ -104,6 +104,24 @@ module ElasticGraph
         include Mixins::HasReadableToSAndInspect.new(&:to_qualified_sdl)
 
         # @private
+        #
+        # @param name [String] name of the field
+        # @param type [String] GraphQL type reference
+        # @param parent_type [TypeWithSubfields] the type that owns this field
+        # @param schema_def_state [State] schema definition state
+        # @param accuracy_confidence [Symbol] how confident we are in this field's accuracy
+        # @param name_in_index [String] the name of this field in the datastore index
+        # @param type_for_derived_types [String, nil] optional type override for derived types
+        # @param graphql_only [Boolean, nil] whether this field exists only in GraphQL
+        # @param singular [String, nil] singular form of a list field name
+        # @param sortable [Boolean, nil] whether this field is sortable
+        # @param filterable [Boolean, nil] whether this field is filterable
+        # @param aggregatable [Boolean, nil] whether this field is aggregatable
+        # @param groupable [Boolean, nil] whether this field is groupable
+        # @param highlightable [Boolean, nil] whether this field supports highlighting
+        # @param returnable [Boolean, nil] whether this field is returnable in responses
+        # @param as_input [Boolean] whether this field is used as input
+        # @param resolver [Symbol, nil] name of the GraphQL resolver
         def initialize(
           name:, type:, parent_type:, schema_def_state:,
           accuracy_confidence: :high, name_in_index: name,
@@ -203,6 +221,7 @@ module ElasticGraph
         # Registers a customization callback that will be applied to the corresponding filtering field that will be generated for this
         # field.
         #
+        # @param customization_block [Proc] callback applied to the derived filtering field
         # @yield [Field] derived filtering field
         # @return [void]
         # @see #customize_aggregated_values_field
@@ -236,6 +255,7 @@ module ElasticGraph
         # Registers a customization callback that will be applied to the corresponding `aggregatedValues` field that will be generated for
         # this field.
         #
+        # @param customization_block [Proc] callback applied to the derived aggregated values field
         # @yield [Field] derived aggregated values field
         # @return [void]
         # @see #customize_filter_field
@@ -269,6 +289,7 @@ module ElasticGraph
         # Registers a customization callback that will be applied to the corresponding `groupedBy` field that will be generated for this
         # field.
         #
+        # @param customization_block [Proc] callback applied to the derived grouped by field
         # @yield [Field] derived grouped by field
         # @return [void]
         # @see #customize_aggregated_values_field
@@ -302,6 +323,7 @@ module ElasticGraph
         # Registers a customization callback that will be applied to the corresponding highlights field that will be generated for this
         # field.
         #
+        # @param customization_block [Proc] callback applied to the derived highlights field
         # @yield [Field] derived highlights field
         # @return [void]
         # @see #customize_aggregated_values_field
@@ -335,6 +357,7 @@ module ElasticGraph
         # Registers a customization callback that will be applied to the corresponding `subAggregations` field that will be generated for
         # this field.
         #
+        # @param customization_block [Proc] callback applied to the derived sub-aggregations field
         # @yield [Field] derived sub-aggregations field
         # @return [void]
         # @see #customize_aggregated_values_field
@@ -377,6 +400,7 @@ module ElasticGraph
         # Registers a customization callback that will be applied to the corresponding enum values that will be generated for this field
         # on the derived `SortOrder` enum type.
         #
+        # @param customization_block [Proc] callback applied to the derived sort order enum values
         # @yield [SortOrderEnumValue] derived sort order enum value
         # @return [void]
         # @see #customize_aggregated_values_field
@@ -427,6 +451,7 @@ module ElasticGraph
         #
         # This method registers a customization callback which is applied to every element that is generated for this field.
         #
+        # @param customization_block [Proc] callback applied to every generated schema element for this field
         # @yield [Field, EnumValue] the schema element
         # @return [void]
         # @see #customize_aggregated_values_field
@@ -468,6 +493,8 @@ module ElasticGraph
           customize_sort_order_enum_values(&customization_block)
         end
 
+        # @param nullable [Boolean, nil] when `false`, disallows `null` in JSON schema without changing GraphQL nullability
+        # @param options [Hash{Symbol => Object}] JSON schema options forwarded to {Mixins::HasTypeInfo#json_schema}
         # (see Mixins::HasTypeInfo#json_schema)
         def json_schema(nullable: nil, **options)
           if options.key?(:type)
@@ -583,6 +610,8 @@ module ElasticGraph
         end
 
         # @private
+        #
+        # @param script [Object] the runtime field script
         def runtime_script(script)
           self.runtime_field_script = script
         end
@@ -615,6 +644,10 @@ module ElasticGraph
         end
 
         # @private
+        #
+        # @param type_structure_only [Boolean] whether to emit only the type structure (no docs/directives)
+        # @param default_value_sdl [String, nil] optional default value SDL suffix
+        # @param arg_selector [Proc] optional block to filter which arguments to include
         def to_sdl(type_structure_only: false, default_value_sdl: nil, &arg_selector)
           if type_structure_only
             "#{name}#{args_sdl(joiner: ", ", &arg_selector)}: #{type.name}"
@@ -792,6 +825,7 @@ module ElasticGraph
         #
         # @param name [String] name of the argument
         # @param value_type [String] type of the argument in GraphQL SDL syntax
+        # @param block [Proc] optional block for further customization
         # @yield [Argument] for further customization
         #
         # @example Define an argument on a field
@@ -829,6 +863,8 @@ module ElasticGraph
         end
 
         # @private
+        #
+        # @param parent_type [TypeWithSubfields] the type to define the aggregated values field on
         def define_aggregated_values_field(parent_type)
           return unless aggregatable?
 
@@ -847,6 +883,8 @@ module ElasticGraph
         end
 
         # @private
+        #
+        # @param parent_type [TypeWithSubfields] the type to define the grouped by field on
         def define_grouped_by_field(parent_type)
           return unless (field_name = grouped_by_field_name)
 
@@ -858,6 +896,8 @@ module ElasticGraph
         end
 
         # @private
+        #
+        # @param parent_type [TypeWithSubfields] the type to define the highlights field on
         def define_highlights_field(parent_type)
           return unless highlightable?
 
@@ -888,6 +928,8 @@ module ElasticGraph
         end
 
         # @private
+        #
+        # @param field [Field] the grouped by field to add documentation to
         def add_grouped_by_field_documentation(field)
           text = if list_field_groupable_by_single_values?
             derived_documentation(
@@ -915,6 +957,9 @@ module ElasticGraph
         end
 
         # @private
+        #
+        # @param parent_type [TypeWithSubfields] the type to define the sub-aggregations field on
+        # @param type [String] GraphQL type name for the sub-aggregations field
         def define_sub_aggregations_field(parent_type:, type:)
           parent_type.field name, type, name_in_index: name_in_index, graphql_only: true do |f|
             f.documentation derived_documentation("Used to perform a sub-aggregation of `#{name}`")
@@ -925,6 +970,9 @@ module ElasticGraph
         end
 
         # @private
+        #
+        # @param parent_type [TypeWithSubfields] the parent type for the filter field
+        # @param for_single_value [Boolean] whether the filter is for a single value vs a list
         def to_filter_field(parent_type:, for_single_value: !type_for_derived_types.list?)
           type_prefix = text? ? "Text" : type_for_derived_types.fully_unwrapped.name
           filter_type = schema_def_state
@@ -1039,6 +1087,8 @@ module ElasticGraph
         # We do this to support the ability to filter on the size of a list.
         #
         # @private
+        #
+        # @param has_list_ancestor [Boolean] whether an ancestor field is a list type
         def paths_to_lists_for_count_indexing(has_list_ancestor: false)
           self_path = (has_list_ancestor || type.list?) ? [name_in_index] : []
 
@@ -1096,6 +1146,10 @@ module ElasticGraph
         # are exactly equal (in which case we can return either).
         #
         # @private
+        #
+        # @param field1 [Field] first candidate field
+        # @param field2 [Field] second candidate field
+        # @param to_comparable [Proc] converts a field to a comparable representation
         def self.pick_most_accurate_from(field1, field2, to_comparable: ->(value) { value })
           return field1 if to_comparable.call(field1) == to_comparable.call(field2)
           yield if field1.accuracy_confidence == field2.accuracy_confidence
@@ -1115,6 +1169,9 @@ module ElasticGraph
         # Records the `ComputationDetail` that should be on the `runtime_metadata_graphql_field`.
         #
         # @private
+        #
+        # @param empty_bucket_value [Object] value to use when an aggregation bucket is empty
+        # @param function [Symbol] the aggregation function
         def runtime_metadata_computation_detail(empty_bucket_value:, function:)
           self.computation_detail = SchemaArtifacts::RuntimeMetadata::ComputationDetail.new(
             empty_bucket_value: empty_bucket_value,

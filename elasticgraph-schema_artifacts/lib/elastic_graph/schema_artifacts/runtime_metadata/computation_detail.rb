@@ -16,6 +16,7 @@ module ElasticGraph
         FUNCTION = "function"
         EMPTY_BUCKET_VALUE = "empty_bucket_value"
 
+        # @param hash [Hash{String => Object}] serialized computation detail
         def self.from_hash(hash)
           new(
             empty_bucket_value: hash[EMPTY_BUCKET_VALUE],

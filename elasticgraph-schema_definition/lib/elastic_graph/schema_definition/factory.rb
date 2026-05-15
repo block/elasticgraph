@@ -59,6 +59,7 @@ module ElasticGraph
     class Factory
       include Mixins::HasReadableToSAndInspect.new
 
+      # @param state [State] schema definition state
       def initialize(state)
         @state = state
       end
@@ -67,17 +68,24 @@ module ElasticGraph
       # element classes to happen via this factory method provided here. To enforce that, this helper returns
       # the `new` method (as a `Method` object) after removing it from the given class. That makes it impossible
       # for `new` to be called by anyone except from the factory using the captured method object.
+      # @param klass [Class] class whose `new` method should be captured and removed
       def self.prevent_non_factory_instantiation_of(klass)
         klass.method(:new).tap do
           klass.singleton_class.undef_method :new
         end
       end
 
+      # @param name [String] name of the deprecated element
+      # @param defined_at [Thread::Backtrace::Location] source location of the definition
+      # @param defined_via [String] code snippet that defined this element
       def new_deprecated_element(name, defined_at:, defined_via:)
         @@deprecated_element_new.call(schema_def_state: @state, name: name, defined_at: defined_at, defined_via: defined_via)
       end
       @@deprecated_element_new = prevent_non_factory_instantiation_of(SchemaElements::DeprecatedElement)
 
+      # @param field [SchemaElements::Field] parent field
+      # @param name [String]
+      # @param value_type [String] GraphQL type of the argument
       def new_argument(field, name, value_type)
         @@argument_new.call(@state, field, name, value_type).tap do |argument|
           yield argument if block_given?
@@ -85,21 +93,28 @@ module ElasticGraph
       end
       @@argument_new = prevent_non_factory_instantiation_of(SchemaElements::Argument)
 
+      # @param api [API] schema definition API instance
       def new_built_in_types(api)
         @@built_in_types_new.call(api, @state)
       end
       @@built_in_types_new = prevent_non_factory_instantiation_of(SchemaElements::BuiltInTypes)
 
+      # @param name [String] directive name
+      # @param arguments [Hash{Symbol => Object}] directive arguments
       def new_directive(name, arguments)
         @@directive_new.call(name, arguments)
       end
       @@directive_new = prevent_non_factory_instantiation_of(SchemaElements::Directive)
 
+      # @param name [String] enum type name
+      # @param block [Proc] block yielding the enum type for customization
       def new_enum_type(name, &block)
         @@enum_type_new.call(@state, name, &block)
       end
       @@enum_type_new = prevent_non_factory_instantiation_of(SchemaElements::EnumType)
 
+      # @param name [String] exposed enum value name
+      # @param original_name [String] original (canonical) enum value name
       def new_enum_value(name, original_name)
         @@enum_value_new.call(@state, name, original_name) do |enum_value|
           yield enum_value if block_given?
@@ -119,6 +134,7 @@ module ElasticGraph
                  end
       @@field_new = prevent_non_factory_instantiation_of(SchemaElements::Field)
 
+      # @param all_types [Hash{String => Object}] map of all registered types
       def new_graphql_sdl_enumerator(all_types)
         @@graphql_sdl_enumerator_new.call(@state, all_types)
       end
@@ -133,6 +149,7 @@ module ElasticGraph
                  end
       @@input_field_new = prevent_non_factory_instantiation_of(SchemaElements::InputField)
 
+      # @param name [String] input type name
       def new_input_type(name)
         @@input_type_new.call(@state, name) do |input_type|
           yield input_type
@@ -140,6 +157,9 @@ module ElasticGraph
       end
       @@input_type_new = prevent_non_factory_instantiation_of(SchemaElements::InputType)
 
+      # @param source_type [String] GraphQL type name being filtered
+      # @param name_prefix [String] prefix for the derived filter input type name
+      # @param category [Symbol] category of the filter input type
       def new_filter_input_type(source_type, name_prefix: source_type, category: :filter_input)
         all_of = @state.schema_elements.all_of
         any_of = @state.schema_elements.any_of
@@ -190,6 +210,9 @@ module ElasticGraph
       # All GraphQL leaf types (enums and scalars) are indexing leaf types, but some GraphQL object types are
       # as well. For example, `GeoLocation` is an object type in GraphQL (with separate lat/long fields) but is
       # an indexing leaf type because we use the datastore `geo_point` type for it.
+      # @param source_type [String] GraphQL type name being filtered
+      # @param name_prefix [String] prefix for derived filter input type names
+      # @param define_filter_fields [Proc] block that defines filter fields on the input type
       def build_standard_filter_input_types_for_index_leaf_type(source_type, name_prefix: source_type, &define_filter_fields)
         single_value_filter = new_filter_input_type(source_type, name_prefix: name_prefix, &define_filter_fields)
         list_filter = new_list_filter_input_type(source_type, name_prefix: name_prefix, any_satisfy_type_category: :list_element_filter_input)
@@ -203,6 +226,9 @@ module ElasticGraph
       # Most GraphQL object types are indexing object types as well, but not all.
       # For example, `GeoLocation` is an object type in GraphQL (with separate lat/long fields) but is
       # an indexing leaf type because we use the datastore `geo_point` type for it.
+      # @param source_type [String] GraphQL type name being filtered
+      # @param name_prefix [String] prefix for derived filter input type names
+      # @param define_filter_fields [Proc] block that defines filter fields on the input type
       def build_standard_filter_input_types_for_index_object_type(source_type, name_prefix: source_type, &define_filter_fields)
         single_value_filter = new_filter_input_type(source_type, name_prefix: name_prefix, &define_filter_fields)
         list_filter = new_list_filter_input_type(source_type, name_prefix: name_prefix, any_satisfy_type_category: :filter_input)
@@ -211,6 +237,11 @@ module ElasticGraph
         [single_value_filter, list_filter, fields_list_filter]
       end
 
+      # @param type_name [String] GraphQL type name to build pagination types for
+      # @param include_total_edge_count [Boolean] whether to include a `totalEdgeCount` field
+      # @param derived_indexed_types [Array<Indexing::DerivedIndexedType>] derived indexed types for the connection
+      # @param support_pagination [Boolean] whether to generate full pagination support (edges, cursors)
+      # @param customize_connection [Proc] optional block for customizing the connection type
       def build_relay_pagination_types(type_name, include_total_edge_count: false, derived_indexed_types: [], support_pagination: true, &customize_connection)
         [
           (edge_type_for(type_name) if support_pagination),
@@ -218,6 +249,7 @@ module ElasticGraph
         ].compact
       end
 
+      # @param name [String] interface type name
       def new_interface_type(name)
         @@interface_type_new.call(@state, name.to_s) do |interface_type|
           yield interface_type
@@ -225,11 +257,14 @@ module ElasticGraph
       end
       @@interface_type_new = prevent_non_factory_instantiation_of(SchemaElements::InterfaceType)
 
+      # @param name [String] namespace type name
+      # @param block [Proc] block yielding the namespace type for customization
       def new_namespace_type(name, &block)
         @@namespace_type_new.call(@state, name.to_s, &block)
       end
       @@namespace_type_new = prevent_non_factory_instantiation_of(SchemaElements::NamespaceType)
 
+      # @param name [String] object type name
       def new_object_type(name)
         @@object_type_new.call(@state, name.to_s) do |object_type|
           yield object_type if block_given?
@@ -237,6 +272,7 @@ module ElasticGraph
       end
       @@object_type_new = prevent_non_factory_instantiation_of(SchemaElements::ObjectType)
 
+      # @param name [String] scalar type name
       def new_scalar_type(name)
         @@scalar_type_new.call(@state, name.to_s) do |scalar_type|
           yield scalar_type
@@ -244,16 +280,23 @@ module ElasticGraph
       end
       @@scalar_type_new = prevent_non_factory_instantiation_of(SchemaElements::ScalarType)
 
+      # @param enum_value [SchemaElements::EnumValue] enum value to wrap
+      # @param sort_order_field_path [String] dot-separated field path for sort ordering
       def new_sort_order_enum_value(enum_value, sort_order_field_path)
         @@sort_order_enum_value_new.call(enum_value, sort_order_field_path)
       end
       @@sort_order_enum_value_new = prevent_non_factory_instantiation_of(SchemaElements::SortOrderEnumValue)
 
+      # @param name [String] GraphQL type name
       def new_type_reference(name)
         @@type_reference_new.call(name, @state)
       end
       @@type_reference_new = prevent_non_factory_instantiation_of(SchemaElements::TypeReference)
 
+      # @param schema_kind [Symbol] kind of schema type (e.g. `:object`, `:input_object`)
+      # @param name [String] type name
+      # @param wrapping_type [Object] wrapping type for fields
+      # @param field_factory [Symbol] factory method name to use for creating fields
       def new_type_with_subfields(schema_kind, name, wrapping_type:, field_factory:)
         @@type_with_subfields_new.call(schema_kind, @state, name, wrapping_type: wrapping_type, field_factory: field_factory) do |type_with_subfields|
           yield type_with_subfields
@@ -261,6 +304,7 @@ module ElasticGraph
       end
       @@type_with_subfields_new = prevent_non_factory_instantiation_of(SchemaElements::TypeWithSubfields)
 
+      # @param name [String] union type name
       def new_union_type(name)
         @@union_type_new.call(@state, name.to_s) do |union_type|
           yield union_type
@@ -268,11 +312,18 @@ module ElasticGraph
       end
       @@union_type_new = prevent_non_factory_instantiation_of(SchemaElements::UnionType)
 
+      # @param relationship_name [String] name of the relationship
+      # @param field_path [String] dot-separated path to the source field
       def new_field_source(relationship_name:, field_path:)
         @@field_source_new.call(relationship_name, field_path)
       end
       @@field_source_new = prevent_non_factory_instantiation_of(SchemaElements::FieldSource)
 
+      # @param field [SchemaElements::Field] field that holds this relationship
+      # @param cardinality [Symbol] relationship cardinality (`:one` or `:many`)
+      # @param related_type [String] name of the related GraphQL type
+      # @param foreign_key [String] foreign key field name
+      # @param direction [Symbol] relationship direction (`:in` or `:out`)
       def new_relationship(field, cardinality:, related_type:, foreign_key:, direction:)
         @@relationship_new.call(
           field,
@@ -284,6 +335,10 @@ module ElasticGraph
       end
       @@relationship_new = prevent_non_factory_instantiation_of(SchemaElements::Relationship)
 
+      # @param name [String] index name
+      # @param settings [Hash{Symbol => Object}] index settings
+      # @param type [Object] type that owns this index
+      # @param block [Proc] optional block for further index customization
       def new_index(name, settings, type, &block)
         @@index_new.call(name, settings, @state, type, &block)
       end
@@ -294,6 +349,11 @@ module ElasticGraph
       end
       @@results_new = prevent_non_factory_instantiation_of(Results)
 
+      # @param schema_definition_results [Results] schema definition results
+      # @param schema_artifacts_directory [String] path to the schema artifacts output directory
+      # @param enforce_json_schema_version [Boolean] whether to enforce JSON schema version incrementing
+      # @param output [IO] output stream for messages
+      # @param max_diff_lines [Integer] maximum diff lines to display
       def new_schema_artifact_manager(
         schema_definition_results:,
         schema_artifacts_directory:,
@@ -318,6 +378,7 @@ module ElasticGraph
       # rarely (but sometimes) are. For example, the `GeoLocation` object type has two subfields
       # (`latitude` and `longitude`) but is backed by a single `geo_point` field in the index,
       # so it is an index leaf type.
+      # @param index_leaf_type [String] name of the index leaf type to aggregate
       def new_aggregated_values_type_for_index_leaf_type(index_leaf_type)
         new_object_type @state.type_ref(index_leaf_type).as_aggregated_values.name do |type|
           type.graphql_only true

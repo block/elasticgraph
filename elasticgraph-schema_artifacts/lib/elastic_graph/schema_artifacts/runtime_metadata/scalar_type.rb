@@ -37,6 +37,7 @@ module ElasticGraph
         # serialized hash form (matching what `to_dumpable_hash` returns). We expose a method
         # this way because we want to use a single loader for all `ScalarType`s that
         # need to get loaded, as it performs some caching for efficiency.
+        # @param scalar_type_hashes_by_name [Hash{String => Hash{String => Object}}] serialized scalar types keyed by type name
         def self.load_many(scalar_type_hashes_by_name)
           scalar_type_hashes_by_name.transform_values do |hash|
             new(
@@ -79,15 +80,20 @@ module ElasticGraph
 
       # @private
       class ScalarCoercionAdapterInterface
+        # @param value [Object] scalar value to coerce
+        # @param ctx [Object] GraphQL context
         def self.coerce_input(value, ctx)
         end
 
+        # @param value [Object] scalar value to coerce
+        # @param ctx [Object] GraphQL context
         def self.coerce_result(value, ctx)
         end
       end
 
       # @private
       class ScalarIndexingPreparerInterface
+        # @param value [Object] scalar value to prepare for indexing
         def self.prepare_for_indexing(value)
         end
       end

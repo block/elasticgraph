@@ -23,6 +23,8 @@ module ElasticGraph
           # Painless literal for an empty map, from [the docs](https://www.elastic.co/guide/en/elasticsearch/painless/8.15/painless-operators-reference.html#map-initialization-operator).
           EMPTY_PAINLESS_MAP = "[:]"
 
+          # @param destination_field [String] dot-separated path to the destination field
+          # @param leaf_value [Symbol, String] empty value for the leaf field (e.g. `EMPTY_PAINLESS_LIST`, `:leave_unset`)
           # @return [Array<String>] a list of painless statements that will initialize a given `destination_field` path to an empty value.
           def self.build_empty_value_initializers(destination_field, leaf_value:)
             snippets = [] # : ::Array[::String]
@@ -44,6 +46,8 @@ module ElasticGraph
             snippets
           end
 
+          # @param field_path [String] dot-separated path to the field
+          # @param empty_value [String] painless expression for the empty value
           # @return [String] a painless statement that will default a single field to an empty value.
           def self.default_source_field_to_empty(field_path, empty_value)
             <<~EOS.strip

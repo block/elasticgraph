@@ -17,6 +17,7 @@ module ElasticGraph
       # quite helpful when dealing with blocking I/O. However, the cost of threads is
       # such that this method should not be used when you have a large list of items to
       # map over (say, hundreds or thousands of items or more).
+      # @param items [Array] collection of items to map over in parallel
       def self.parallel_map(items)
         return _ = items.map { |item| yield item } if items.size < 2
 

@@ -12,6 +12,12 @@ module ElasticGraph
       # Helper class that contains common logic for instantiating `UpdateTargets`.
       # @private
       module UpdateTargetFactory
+        # @param type [String] name of the target type
+        # @param relationship [String] name of the relationship
+        # @param id_source [String] source path for the document ID
+        # @param data_params [Hash{String => SchemaArtifacts::RuntimeMetadata::DynamicParam}] data parameters for the update script
+        # @param routing_value_source [String, nil] source path for the routing value
+        # @param rollover_timestamp_value_source [String, nil] source path for the rollover timestamp
         def self.new_normal_indexing_update_target(
           type:,
           relationship:,

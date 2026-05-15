@@ -16,6 +16,7 @@ module ElasticGraph
       #
       # @private
       class SchemaElementNamesDefinition
+        # @param element_names [Array<Symbol>] canonical names of the schema elements
         def self.new(*element_names)
           ::Data.define(:form, :overrides, :exposed_name_by_canonical_name, :canonical_name_by_exposed_name) do
             const_set(:ELEMENT_NAMES, element_names)
@@ -118,6 +119,7 @@ module ElasticGraph
         module SnakeCaseConverter
           extend self
 
+          # @param name [String] name to convert to snake_case
           def normalize_case(name)
             name.gsub(/([[:upper:]])/) { "_#{$1.downcase}" }
           end
@@ -127,6 +129,7 @@ module ElasticGraph
         module CamelCaseConverter
           extend self
 
+          # @param name [String] name to convert to camelCase
           def normalize_case(name)
             name.gsub(/(?<=\w)_(\w)/) { $1.upcase }
           end

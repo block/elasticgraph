@@ -19,6 +19,7 @@ module ElasticGraph
       # Defines a configuration class with the given attributes.
       #
       # @param attrs [::Symbol] attribute names
+      # @param block [Proc] class body block (similar to `::Data.define`)
       # @yield [::Data] the body of the class (similar to `::Data.define`)
       # @return [::Class] the defined configuration class
       #
@@ -170,6 +171,8 @@ module ElasticGraph
         end
 
         # @private
+        #
+        # @param error [String] error message describing the validation failure
         def raise_invalid_config(error)
           raise Errors::ConfigError, "Invalid configuration for `#{name}` at `#{path}`: #{error}"
         end

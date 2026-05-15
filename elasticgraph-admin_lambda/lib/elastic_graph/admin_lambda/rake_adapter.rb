@@ -15,6 +15,7 @@ module ElasticGraph
     class RakeAdapter
       RAKEFILE = File.expand_path("../Rakefile", __FILE__)
 
+      # @param argv [Array<String>] command-line arguments to pass to Rake
       def self.run_rake(argv)
         capture_output do
           # We need to instantiate a new application on each invocation, because Rake is normally

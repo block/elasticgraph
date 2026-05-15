@@ -16,6 +16,7 @@ module ElasticGraph
         # @dynamic apollo_directive_definitions, apollo_directive_definitions=
         attr_accessor :apollo_directive_definitions
 
+        # @param state [ElasticGraph::SchemaDefinition::State] state instance to extend
         def self.extended(state)
           state.apollo_directive_definitions = [] # Ensure it's never `nil`.
         end

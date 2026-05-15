@@ -27,11 +27,18 @@ module ElasticGraph
       # @private
       Extension = ::Data.define(:extension_class, :require_path, :config, :name) do
         # @implements Extension
+        # @param extension_class [Class, Module] loaded extension class or module
+        # @param require_path [String] file path to require to load the extension
+        # @param config [Hash{Symbol => Object}] extension configuration
+        # @param name [String] Ruby constant name of the extension
         def initialize(extension_class:, require_path:, config:, name: extension_class.name.to_s)
           super(extension_class:, require_path:, config:, name:)
         end
 
         # Loads an extension using a serialized hash, via the provided `ExtensionLoader`.
+        #
+        # @param hash [Hash{String => Object}] serialized extension
+        # @param via [ExtensionLoader] loader to use for resolving the extension
         def self.load_from_hash(hash, via:)
           config = Support::HashUtil.symbolize_keys(hash["config"] || {}) # : ::Hash[::Symbol, untyped]
           via.load(hash.fetch("name"), from: hash.fetch("require_path"), config: config)
@@ -47,10 +54,12 @@ module ElasticGraph
           }.reject { |_, v| v.empty? }
         end
 
+        # @param interface_def [Class] interface definition to verify against
         def verify_against!(interface_def)
           InterfaceVerifier.verify!(extension_class, against: interface_def, constant_name: name)
         end
 
+        # @param interface_def [Class] interface definition to verify against
         def verify_against(interface_def)
           InterfaceVerifier.verify(extension_class, against: interface_def, constant_name: name)
         end

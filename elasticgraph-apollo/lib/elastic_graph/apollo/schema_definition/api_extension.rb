@@ -103,6 +103,7 @@ module ElasticGraph
           end
         end
 
+        # @param api [ElasticGraph::SchemaDefinition::API] schema definition API instance to extend
         def self.extended(api)
           api.factory.extend FactoryExtension
           api.state.extend StateExtension

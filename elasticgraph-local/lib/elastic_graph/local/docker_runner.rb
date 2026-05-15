@@ -31,6 +31,7 @@ module ElasticGraph
           exec(command) # we use `exec` so that our process is replaced with that one.
         end
       end
+
       # :nocov:
       def halt
         prepare_docker_compose_run "down --volumes" do |command|

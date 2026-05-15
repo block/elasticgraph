@@ -34,6 +34,12 @@ module ElasticGraph
         SOURCE_TYPE = "source_type"
         GRAPHQL_ONLY_RETURN_TYPE = "graphql_only_return_type"
 
+        # @param update_targets [Array<UpdateTarget>] targets for datastore update calls
+        # @param index_definition_names [Array<String>] names of associated index definitions
+        # @param graphql_fields_by_name [Hash{String => GraphQLField}] GraphQL field metadata keyed by field name
+        # @param elasticgraph_category [Symbol, nil] category tag for this object type
+        # @param source_type [String, nil] name of the GraphQL type from which this type was generated
+        # @param graphql_only_return_type [Boolean] whether this type exists only as a GraphQL return type
         def initialize(update_targets:, index_definition_names:, graphql_fields_by_name:, elasticgraph_category:, source_type:, graphql_only_return_type:)
           graphql_fields_by_name = graphql_fields_by_name.select { |name, field| field.needed?(name) }
 
@@ -47,6 +53,7 @@ module ElasticGraph
           )
         end
 
+        # @param hash [Hash{String => Object}] serialized form of an ObjectType
         def self.from_hash(hash)
           update_targets = hash[UPDATE_TARGETS]&.map do |update_target_hash|
             UpdateTarget.from_hash(update_target_hash)

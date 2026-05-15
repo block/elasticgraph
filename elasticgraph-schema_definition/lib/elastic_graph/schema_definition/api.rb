@@ -56,6 +56,13 @@ module ElasticGraph
       attr_reader :factory
 
       # @private
+      # @param schema_elements [SchemaArtifacts::RuntimeMetadata::SchemaElementNamesDefinition] schema element name configuration
+      # @param index_document_sizes [Boolean] whether to index document sizes
+      # @param extension_modules [Array<Module>] modules to extend onto this API instance
+      # @param derived_type_name_formats [Hash{Symbol => String}] format strings for derived type names
+      # @param type_name_overrides [Hash{String => String}] overrides for generated type names
+      # @param enum_value_overrides_by_type [Hash{String => Hash{String => String}}] overrides for generated enum values, keyed by type
+      # @param output [IO] output stream for warnings and messages
       def initialize(
         schema_elements,
         index_document_sizes,
@@ -111,7 +118,7 @@ module ElasticGraph
       # root `Query` object) or _embedded_ in other indexed types.
       #
       # @param name [String] name of the object type
-      # @yield [SchemaElements::ObjectType] object type object
+      # @param block [Proc] block yielding the object type for customization
       # @return [void]
       #
       # @example Define embedded and indexed object types
@@ -151,7 +158,7 @@ module ElasticGraph
       #   intermediate namespace fields.
       #
       # @param name [String] name of the namespace type
-      # @yield [SchemaElements::NamespaceType] namespace type object, for further customization
+      # @param block [Proc] block yielding the namespace type for customization
       # @return [void]
       #
       # @example Define an `OlapQuery` namespace type and hang it off `Query`
@@ -176,7 +183,7 @@ module ElasticGraph
       # {SchemaElements::ObjectType} or {SchemaElements::InterfaceType}.
       #
       # @param name [String] name of the interface
-      # @yield [SchemaElements::InterfaceType] interface type object
+      # @param block [Proc] block yielding the interface type for customization
       # @return [void]
       #
       # @example Define an interface and implement it
@@ -217,7 +224,7 @@ module ElasticGraph
       # enum and an output enum).
       #
       # @param name [String] name of the enum type
-      # @yield [SchemaElements::EnumType] enum type object
+      # @param block [Proc] block yielding the enum type for customization
       # @return [void]
       #
       # @example Define an enum type
@@ -244,7 +251,7 @@ module ElasticGraph
       # more concrete subtypes. Each subtype must be an {SchemaElements::ObjectType}, but they do not have to share any fields in common.
       #
       # @param name [String] name of the union type
-      # @yield [SchemaElements::UnionType] union type object
+      # @param block [Proc] block yielding the union type for customization
       # @return [void]
       #
       # @example Define a union type
@@ -279,7 +286,7 @@ module ElasticGraph
       # common scalar types (e.g. `Date` and `DateTime`), but it is also available to you to use to define your own custom scalar types.
       #
       # @param name [String] name of the scalar type
-      # @yield [SchemaElements::ScalarType] scalar type object
+      # @param block [Proc] block yielding the scalar type for customization
       # @return [void]
       #
       # @example Define a scalar type
@@ -511,7 +518,7 @@ module ElasticGraph
       # Registers a customization callback that will be applied to every built-in type automatically provided by ElasticGraph. Provides
       # an opportunity to customize the built-in types (e.g. to add directives to them or whatever).
       #
-      # @yield [SchemaElements::EnumType, SchemaElements::InputType, SchemaElements::InterfaceType, SchemaElements::ObjectType, SchemaElements::ScalarType, SchemaElements::UnionType] built in type
+      # @param customization_block [Proc] block that receives each built-in type for customization
       # @return [void]
       #
       # @example Customize documentation of built-in types
@@ -527,7 +534,7 @@ module ElasticGraph
 
       # Registers a customization callback that will be applied to the root `Query` type when it is generated.
       #
-      # @yield [SchemaElements::ObjectType] the root `Query` type
+      # @param customization_block [Proc] block that receives the root `Query` type for customization
       # @return [void]
       #
       # @example Customize documentation of built-in types

@@ -17,6 +17,7 @@ module ElasticGraph
       class IndexField < ::Data.define(:source)
         SOURCE = "source"
 
+        # @param hash [Hash{String => Object}] serialized index field
         def self.from_hash(hash)
           new(
             source: hash[SOURCE] || SELF_RELATIONSHIP_NAME

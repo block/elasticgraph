@@ -23,12 +23,16 @@ module ElasticGraph
     # @private
     module UntypedEncoder
       # Encodes the given untyped value to a String so it can be indexed in a Elasticsearch/OpenSearch `keyword` field.
+      #
+      # @param value [Object, nil] the value to encode
       def self.encode(value)
         return nil if value.nil?
         ::JSON.generate(canonicalize(value))
       end
 
       # Decodes a previously encoded Untyped value, returning its original value.
+      #
+      # @param string [String, nil] the previously encoded string to decode
       def self.decode(string)
         return nil if string.nil?
         ::JSON.parse(string)
