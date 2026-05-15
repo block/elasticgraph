@@ -175,6 +175,22 @@ module ElasticGraph
           }.not_to raise_error
         end
 
+        it "allows a namespace type wired via `Query.<field>` even when its only subfields come from indexed types using `root_query_fields on:`" do
+          expect {
+            define_schema do |schema|
+              schema.namespace_type "OlapQuery"
+
+              schema.object_type "Widget" do |t|
+                t.field "id", "ID"
+                t.root_query_fields plural: "widgets", on: "OlapQuery"
+                t.index "widgets"
+              end
+
+              schema.on_root_query_type { |t| t.field "olap", "OlapQuery!" }
+            end
+          }.not_to raise_error
+        end
+
         it "raises when namespace types form a cycle" do
           expect {
             define_schema do |schema|
