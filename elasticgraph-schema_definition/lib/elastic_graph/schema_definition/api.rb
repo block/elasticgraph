@@ -324,7 +324,7 @@ module ElasticGraph
       #
       # @param extension_module [Module] GraphQL extension module
       # @param defined_at [String] the `require` path of the extension module
-      # @param config [Hash<Symbol, Object>] configuration options for the extension module
+      # @param config [Hash<Symbol, Object>] extension-specific configuration forwarded to the extension module's `initialize` method
       # @return [void]
       #
       # @example Register `elasticgraph-query_registry` extension module
@@ -348,7 +348,7 @@ module ElasticGraph
       # @param defined_at [String] the `require` path of the resolver
       # @param built_in [Boolean] Whether this resolver is built-in to ElasticGraph or one of its extensions.
       #   Built-in resolvers that are unused in a schema will not trigger a warning.
-      # @param resolver_config [Hash{Symbol => Object}] configuration options for the resolver, to support parameterized resolvers
+      # @param resolver_config [Hash{Symbol => Object}] resolver-specific configuration forwarded to the resolver's `initialize` method within the `config` parameter
       # @return [void]
       # @see Mixins::HasIndices#resolve_fields_with
       # @see SchemaElements::Field#resolve_with

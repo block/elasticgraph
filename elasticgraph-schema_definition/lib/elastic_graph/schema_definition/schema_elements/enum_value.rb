@@ -61,6 +61,10 @@ module ElasticGraph
         # Updates the runtime metadata.
         #
         # @param updates [Hash{Symbol => Object}] to apply to the runtime metadata
+        # @option updates [Object] :sort_field sort field metadata for this enum value
+        # @option updates [Object] :datastore_value custom value stored in the datastore for this enum value
+        # @option updates [Symbol] :datastore_abbreviation abbreviated form stored in the datastore
+        # @option updates [String] :alternate_original_name alternate original name (set when the enum value was renamed)
         # @return [void]
         def update_runtime_metadata(**updates)
           self.runtime_metadata = runtime_metadata.with(**updates)

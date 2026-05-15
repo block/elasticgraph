@@ -18,6 +18,9 @@ module ElasticGraph
       # Otherwise, wraps the args list in parens. This allows the returned string to be appended
       # to a field or directive, and it'll correctly use parens (or not) based on if there are args
       # or not.
+      #
+      # @param args [Hash{Symbol => Object}] GraphQL argument names mapped to their values, serialized into GraphQL syntax
+      # @return [String] the formatted argument list (e.g. `"(foo: 1, bar: \"hi\")"`) or `""` if empty
       def self.format_args(**args)
         return "" if args.empty?
         "(#{serialize(args, wrap_hash_with_braces: false)})"

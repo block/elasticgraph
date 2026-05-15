@@ -109,7 +109,7 @@ module ElasticGraph
         #
         # @param at [::String] path from the global configuration root to where this configuration resides
         # @param optional [::Boolean] whether configuration at the provided `path` is optional
-        # @param schema [::Hash<::Symbol, ::Object>] JSON schema definition
+        # @param schema [::Hash<::Symbol, ::Object>] JSON Schema definition keywords (e.g. `properties`, `required`, `type`) forwarded to the draft-07 JSON Schema validator
         # @return [void]
         #
         # @example Define a configuration class
@@ -177,6 +177,7 @@ module ElasticGraph
         # Like `new`, but avoids applying JSON schema validation. This is needed so that we can make
         # `#with` work correctly with the validation and conversion features we offer.
         #
+        # @param data [Hash<Symbol, Object>] attribute values matching the members declared by `Data.define`
         # @private
         def new_without_validation(**data)
           instance = allocate

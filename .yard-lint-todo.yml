@@ -72,11 +72,8 @@ Documentation/UndocumentedOptions:
   Exclude:
     - "elasticgraph-schema_definition/lib/elastic_graph/schema_definition/api.rb"
     - "elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/has_indices.rb"
-    - "elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/has_type_info.rb"
-    - "elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/enum_value.rb"
     - "elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb"
     - "elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/namespace_type.rb"
-    - "elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/scalar_type.rb"
     - "elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/type_namer.rb"
     - "elasticgraph-support/lib/elastic_graph/support/config.rb"
     - "elasticgraph-support/lib/elastic_graph/support/graphql_formatter.rb"

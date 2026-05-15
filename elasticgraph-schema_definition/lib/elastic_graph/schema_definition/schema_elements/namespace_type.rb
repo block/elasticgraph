@@ -40,6 +40,8 @@ module ElasticGraph
         end
 
         # Namespace types cannot be indexed.
+        # @param name [String] index name (unused; raises before processing)
+        # @param settings [Hash{Symbol => Object}] index settings (unused; raises before processing)
         # @raise [Errors::SchemaError] always
         # @private
         def index(name, **settings, &block)
