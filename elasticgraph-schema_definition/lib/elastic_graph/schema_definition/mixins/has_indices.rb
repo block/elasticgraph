@@ -322,7 +322,7 @@ module ElasticGraph
         #       t.index "widgets"
         #     end
         #   end
-        def root_query_fields(plural:, singular: nil, on: "Query", &customization_block)
+        def root_query_fields(plural:, singular: nil, on: root_query_fields_target_namespace, &customization_block)
           @plural_root_query_field_name = plural
           @singular_root_query_field_name = singular
           @root_query_fields_target_namespace = on

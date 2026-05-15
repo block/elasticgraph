@@ -1465,7 +1465,7 @@ module ElasticGraph
 
           schema_def_state.after_user_definition_complete do
             schema_def_state.object_types_by_name.values.select(&:directly_queryable?).sort_by(&:name).each do |type|
-              (_ = type).register_root_query_fields
+              type.register_root_query_fields
             end
           end
         end
