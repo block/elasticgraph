@@ -17,7 +17,7 @@ module ElasticGraph
         # Registers a customization block for the named derived graphql types. The provided block will get run on the named derived GraphQL
         # types, allowing them to be customized.
         #
-        # @param type_names [Array<String, :all>] names of the derived types to customize, or `:all` to customize all derived types
+        # @param type_names [Array<String>, :all] names of the derived types to customize, or `:all` to customize all derived types
         # @return [void]
         #
         # @example Customize named derived GraphQL types

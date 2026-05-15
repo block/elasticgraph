@@ -122,11 +122,6 @@ Tags/CollectionType:
     - "elasticgraph-support/lib/elastic_graph/support/json_schema/validator_factory.rb"
     - "elasticgraph-warehouse/lib/elastic_graph/warehouse/schema_definition/results_extension.rb"
 
-Tags/InvalidTypes:
-  Exclude:
-    - "elasticgraph-schema_definition/lib/elastic_graph/schema_definition/api.rb"
-    - "elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/has_derived_graphql_type_customizations.rb"
-
 Tags/OptionTags:
   Exclude:
     - "elasticgraph-schema_definition/lib/elastic_graph/schema_definition/mixins/has_indices.rb"

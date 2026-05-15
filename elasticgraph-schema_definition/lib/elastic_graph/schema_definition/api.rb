@@ -346,9 +346,9 @@ module ElasticGraph
       # @param name [Symbol] unique name of the resolver
       # @param klass [Class] resolver class
       # @param defined_at [String] the `require` path of the resolver
-      # @param built_in [bool] Whether this resolver is built-in to ElasticGraph or one of its extensions.
+      # @param built_in [Boolean] Whether this resolver is built-in to ElasticGraph or one of its extensions.
       #   Built-in resolvers that are unused in a schema will not trigger a warning.
-      # @param resolver_config [Hash<Symbol, Object>] configuration options for the resolver, to support parameterized resolvers
+      # @param resolver_config [Hash{Symbol => Object}] configuration options for the resolver, to support parameterized resolvers
       # @return [void]
       # @see Mixins::HasIndices#resolve_fields_with
       # @see SchemaElements::Field#resolve_with
@@ -480,8 +480,8 @@ module ElasticGraph
       # publisher (but they can be nullable) and will ignore extra fields that are not defined in the schema. Use this method to
       # configure this behavior.
       #
-      # @param allow_omitted_fields [bool] Whether nullable fields can be omitted from indexing events.
-      # @param allow_extra_fields [bool] Whether extra fields (e.g. beyond fields defined in the schema) can be included in indexing events.
+      # @param allow_omitted_fields [Boolean] Whether nullable fields can be omitted from indexing events.
+      # @param allow_extra_fields [Boolean] Whether extra fields (e.g. beyond fields defined in the schema) can be included in indexing events.
       # @return [void]
       #
       # @note If you allow both omitted fields and extra fields, ElasticGraph's JSON schema validation will allow (and ignore) misspelled
