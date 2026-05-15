@@ -154,7 +154,7 @@ module ElasticGraph
       # @yield [SchemaElements::NamespaceType] namespace type object, for further customization
       # @return [void]
       #
-      # @example Define an `OlapQuery` namespace type and hang it off `Query`
+      # @example Group an indexed type's root query fields under an `OlapQuery` namespace
       #   ElasticGraph.define_schema do |schema|
       #     schema.namespace_type "OlapQuery" do |t|
       #       t.documentation "Namespace for OLAP query fields."
@@ -162,6 +162,14 @@ module ElasticGraph
       #
       #     schema.on_root_query_type do |t|
       #       t.field "olap", "OlapQuery!"
+      #     end
+      #
+      #     schema.object_type "Widget" do |t|
+      #       t.field "id", "ID"
+      #       # Routes `widgets` and `widgetAggregations` onto `OlapQuery` instead of `Query`,
+      #       # exposing them as `Query.olap.widgets` and `Query.olap.widgetAggregations`.
+      #       t.root_query_fields plural: "widgets", on: "OlapQuery"
+      #       t.index "widgets"
       #     end
       #   end
       def namespace_type(name, &block)
