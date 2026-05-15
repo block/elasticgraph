@@ -30,6 +30,8 @@ module ElasticGraph
         # @dynamic default_graphql_resolver
 
         # @private
+        # @param options [Hash] forwarded to the including class's `initialize`
+        # @option options [Object] :** all keyword arguments are passed through to `super`
         def initialize(*args, **options)
           super(*args, **options)
           initialize_has_indices { yield self }

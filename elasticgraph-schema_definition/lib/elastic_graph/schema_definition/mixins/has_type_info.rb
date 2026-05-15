@@ -64,6 +64,17 @@ module ElasticGraph
         # [geo_point type](https://www.elastic.co/guide/en/elasticsearch/reference/7.10/geo-point.html).
         #
         # @param options [Hash<Symbol, Object>] mapping options--must be limited to {CUSTOMIZABLE_DATASTORE_PARAMS}
+        # @option options [String] :type mapping field type (e.g. `"keyword"`, `"text"`, `"integer"`)
+        # @option options [String] :analyzer analyzer to use for `text` fields
+        # @option options [Boolean] :eager_global_ordinals whether to eagerly load global ordinals
+        # @option options [Boolean] :enabled whether the field is enabled for indexing
+        # @option options [Hash<String, Object>] :fields multi-field mappings
+        # @option options [String] :format date format string
+        # @option options [Boolean] :index whether the field value should be indexed
+        # @option options [Hash<String, Object>] :meta arbitrary metadata attached to the field mapping
+        # @option options [Boolean] :norms whether field-length normalization is enabled
+        # @option options [Object] :null_value value to substitute for `null` at index time
+        # @option options [String] :search_analyzer analyzer to use at search time (overrides `:analyzer`)
         # @return [void]
         #
         # @example Define the mapping of a custom scalar type
@@ -135,7 +146,17 @@ module ElasticGraph
         #   validations than the source system itself has. We recommend limiting your JSON schema validations to situations where
         #   violations would prevent ElasticGraph from operating correctly.
         #
-        # @param options [Hash<Symbol, Object>] JSON schema options
+        # @param options [Hash<Symbol, Object>] JSON schema options. Any
+        #   [JSON schema validation keyword](https://json-schema.org/understanding-json-schema/reference) is accepted.
+        #   In addition, `nullable: false` is supported to disallow `null` values. Common options are shown below.
+        # @option options [String] :type JSON type (e.g. `"string"`, `"integer"`, `"number"`)
+        # @option options [String] :format format hint (e.g. `"date-time"`, `"uri"`)
+        # @option options [String] :pattern regex pattern for string validation
+        # @option options [Integer] :maxLength maximum string length
+        # @option options [Integer] :minLength minimum string length
+        # @option options [Numeric] :minimum minimum numeric value
+        # @option options [Numeric] :maximum maximum numeric value
+        # @option options [Array<Object>] :enum allowed values
         # @return [void]
         #
         # @example Define the JSON schema validations of a custom scalar type

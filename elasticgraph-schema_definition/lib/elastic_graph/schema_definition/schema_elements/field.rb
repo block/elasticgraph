@@ -469,6 +469,10 @@ module ElasticGraph
         end
 
         # (see Mixins::HasTypeInfo#json_schema)
+        # @param options [Hash<Symbol, Object>] JSON schema options forwarded to {Mixins::HasTypeInfo#json_schema}
+        # @option options [Boolean] :nullable when `false`, disallows `null` values in JSON schema
+        #   without changing the GraphQL nullability of the field. `true` is not allowed--use a
+        #   nullable GraphQL type (no `!` suffix) instead.
         def json_schema(nullable: nil, **options)
           if options.key?(:type)
             raise Errors::SchemaError, "Cannot override JSON schema type of field `#{name}` with `#{options.fetch(:type)}`"
@@ -485,6 +489,7 @@ module ElasticGraph
         end
 
         # (see Mixins::HasTypeInfo#mapping)
+        # @param options [Hash<Symbol, Object>] mapping options forwarded to {Mixins::HasTypeInfo#mapping}
         def mapping(**options)
           # ElasticGraph has special handling for the nested type (e.g. we generate sub-aggregation types in the GraphQL schema for
           # nested fields), and that special handling requires that `nested` only be used on list-of-objects fields; otherwise

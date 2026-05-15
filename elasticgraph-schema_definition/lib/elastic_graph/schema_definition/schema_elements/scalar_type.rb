@@ -98,6 +98,8 @@ module ElasticGraph
         end
 
         # (see Mixins::HasTypeInfo#mapping)
+        # @param options [Hash<Symbol, Object>] mapping options forwarded to {Mixins::HasTypeInfo#mapping}.
+        #   Must include `:type` for scalar types.
         def mapping(**options)
           self.mapping_type = options.fetch(:type) do
             raise Errors::SchemaError, "Must specify a mapping `type:` on custom scalars but was missing on the `#{name}` type."
