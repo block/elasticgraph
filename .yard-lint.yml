@@ -1,0 +1,220 @@
+# YARD-Lint Configuration
+# See https://github.com/mensfeld/yard-lint for documentation
+
+inherit_from: .yard-lint-todo.yml
+
+AllValidators:
+  YardOptions:
+    - --no-private
+    - --tag dynamic
+    - --hide-tag dynamic
+    - --tag implements
+    - --hide-tag implements
+    - --markup markdown
+    - --markup-provider redcarpet
+
+  Exclude:
+    - '\.git'
+    - 'vendor/**/*'
+    - 'node_modules/**/*'
+    - 'spec/**/*'
+    - 'spec_support/**/*'
+    - 'test/**/*'
+    - 'tmp/**/*'
+    - 'bundle/**/*'
+    - 'sig/**/*'
+
+  FailOnSeverity: warning
+
+  # yard-lint's coverage metric counts all objects including private ones,
+  # which doesn't match YARD's --no-private behavior. We rely on
+  # Documentation/UndocumentedObjects (which respects --no-private via
+  # YardOptions visibility filtering) to catch undocumented public objects instead.
+  # MinCoverage: 100.0
+
+Documentation/UndocumentedObjects:
+  Enabled: true
+  Severity: warning
+  ExcludedMethods:
+    - 'initialize/0'
+    - '/^_/'
+
+Documentation/UndocumentedMethodArguments:
+  Enabled: true
+  Severity: warning
+
+Documentation/UndocumentedBooleanMethods:
+  Enabled: true
+  Severity: warning
+
+Documentation/UndocumentedOptions:
+  Enabled: true
+  Severity: warning
+
+Documentation/MissingReturn:
+  Enabled: false
+
+Documentation/MarkdownSyntax:
+  Enabled: true
+  Severity: warning
+
+Documentation/EmptyCommentLine:
+  Enabled: true
+  Severity: convention
+
+Documentation/BlankLineBeforeDefinition:
+  Enabled: true
+  Severity: convention
+  OrphanedSeverity: convention
+  EnabledPatterns:
+    SingleBlankLine: true
+    OrphanedDocs: true
+
+Tags/Order:
+  Enabled: true
+  Severity: convention
+  EnforcedOrder:
+    - param
+    - option
+    - yield
+    - yieldparam
+    - yieldreturn
+    - return
+    - raise
+    - see
+    - example
+    - note
+    - todo
+
+Tags/InvalidTypes:
+  Enabled: true
+  Severity: warning
+  ValidatedTags:
+    - param
+    - option
+    - return
+
+Tags/TypeSyntax:
+  Enabled: true
+  Severity: warning
+  ValidatedTags:
+    - param
+    - option
+    - return
+    - yieldreturn
+
+Tags/MeaninglessTag:
+  Enabled: true
+  Severity: warning
+  CheckedTags:
+    - param
+    - option
+  InvalidObjectTypes:
+    - class
+    - module
+    - constant
+
+Tags/CollectionType:
+  Enabled: true
+  Severity: convention
+  EnforcedStyle: long
+  ValidatedTags:
+    - param
+    - option
+    - return
+    - yieldreturn
+
+Tags/TagTypePosition:
+  Enabled: true
+  Severity: convention
+  CheckedTags:
+    - param
+    - option
+  EnforcedStyle: type_after_name
+
+Tags/ApiTags:
+  Enabled: false
+
+Tags/OptionTags:
+  Enabled: true
+  Severity: warning
+
+Tags/ExampleSyntax:
+  Enabled: true
+  Severity: warning
+
+Tags/ExampleStyle:
+  Enabled: false
+
+Tags/RedundantParamDescription:
+  Enabled: true
+  Severity: convention
+  CheckedTags:
+    - param
+    - option
+  Articles:
+    - The
+    - the
+    - A
+    - a
+    - An
+    - an
+  MaxRedundantWords: 6
+  GenericTerms:
+    - object
+    - instance
+    - value
+    - data
+    - item
+    - element
+  EnabledPatterns:
+    ArticleParam: true
+    PossessiveParam: true
+    TypeRestatement: true
+    ParamToVerb: true
+    IdPattern: true
+    DirectionalDate: true
+    TypeGeneric: true
+
+Tags/InformalNotation:
+  Enabled: false
+
+Tags/NonAsciiType:
+  Enabled: true
+  Severity: warning
+  ValidatedTags:
+    - param
+    - option
+    - return
+    - yieldreturn
+    - yieldparam
+
+Tags/TagGroupSeparator:
+  Enabled: false
+
+Tags/ForbiddenTags:
+  Enabled: false
+
+Warnings/UnknownTag:
+  Enabled: true
+  Severity: error
+
+Warnings/UnknownDirective:
+  Enabled: true
+  Severity: error
+
+Warnings/InvalidTagFormat:
+  Enabled: true
+  Severity: error
+
+Warnings/DuplicatedParameterName:
+  Enabled: true
+  Severity: error
+
+Warnings/UnknownParameterName:
+  Enabled: true
+  Severity: error
+
+Semantic/AbstractMethods:
+  Enabled: true
+  Severity: warning

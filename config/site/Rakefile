@@ -67,38 +67,62 @@ module ElasticGraph
           end
         end
 
-        desc "Check documentation coverage"
-        task :docs_coverage do
+        desc "Check for unexpected YARD parser warnings and errors"
+        task :yard_warnings do
           doc_output = run_yard_doc_ignoring_expected_warnings
 
-          coverage = doc_output[/([\d.]+)% documented/, 1]
           warning_count = doc_output.scan("[warn]:").count
           error_count = doc_output.scan("[error]:").count
 
-          if coverage.to_f < 100
-            # Since we do not have 100% coverage, we want to list what is undocumented.
-            #
-            # Note: we don't use this as the main command above because we've observed that
-            # `stats` does not produce as many warnings as `doc`--so we'd rather run `doc`
-            # when detecting warnings, and use `stats --list-undoc` for supplemental output.
-            undoc_output = IO.popen(yard_cmd("stats --list-undoc")).read
-
-            # Just print the output starting with `Undocumented Objects"
-            puts "\n#{undoc_output[/^Undocumented .*/m]}"
-          end
-
           issues = []
-          issues << "Missing documentation coverage (currently at #{coverage}%)." if coverage.to_f < 100
-          issues << "YARD emitted #{warning_count} documentation warning(s)." if warning_count > 0
-          issues << "YARD emitted #{error_count} documentation error(s)." if error_count > 0
+          issues << "YARD emitted #{warning_count} unexpected warning(s)." if warning_count > 0
+          issues << "YARD emitted #{error_count} error(s)." if error_count > 0
 
           unless issues.empty?
             abort <<~EOS
 
-              Documentation has #{issues.size} issues:
+              YARD parser issues found:
 
               #{issues.map { |i| " - #{i}" }.join("\n")}
             EOS
+          end
+        end
+
+        desc "Lint YARD documentation for quality issues"
+        task :yard_lint do
+          require "yard-lint"
+
+          # Register custom YARD tags so yard-lint's parser recognizes them.
+          # (YardOptions in .yard-lint.yml only affects visibility filtering,
+          # not tag registration during YARD parsing.)
+          ::YARD::Tags::Library.define_tag("Dynamic", :dynamic)
+          ::YARD::Tags::Library.define_tag("Implements", :implements)
+
+          documented_gem_paths = DOCUMENTED_GEMS.map { |gem| "#{REPO_ROOT}/#{gem}/lib" }
+          config = ::Yard::Lint::Config.load || ::Yard::Lint::Config.new
+          result = ::Yard::Lint.run(path: documented_gem_paths, config: config, progress: $stdout.tty?)
+
+          if result.clean?
+            puts "yard-lint: no offenses found"
+          else
+            stats = result.statistics
+            puts "Found #{result.count} offense(s):\n\n"
+
+            result.offenses.each do |offense|
+              severity_symbol = case offense[:severity]
+              when "error" then "E"
+              when "warning" then "W"
+              when "convention" then "C"
+              else "?"
+              end
+
+              puts "[#{severity_symbol}] #{offense[:location]}:#{offense[:location_line]}"
+              puts "    #{offense[:name]}: #{offense[:message]}"
+              puts
+            end
+
+            abort "yard-lint: #{result.count} offense(s) detected " \
+              "(#{stats[:error]} error(s), #{stats[:warning]} warning(s), #{stats[:convention]} convention(s))"
           end
         end
 
@@ -380,7 +404,7 @@ module ElasticGraph
         end
 
         desc "Perform validations of the website, including doc tests and doc coverage"
-        task validate: [:build, :validate_no_empty_code_snippets, :docs_coverage, :doctest, :validate_page_frontmatter, :validate_html_output]
+        task validate: [:build, :validate_no_empty_code_snippets, :yard_warnings, :yard_lint, :doctest, :validate_page_frontmatter, :validate_html_output]
 
         task build_css: :npm_install do
           require "rouge"
