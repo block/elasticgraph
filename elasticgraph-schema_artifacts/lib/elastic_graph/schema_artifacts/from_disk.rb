@@ -38,7 +38,6 @@ module ElasticGraph
       # @example Print the GraphQL schema string
       #   artifacts = ElasticGraph::SchemaArtifacts::FromDisk.new(schema_artifacts_dir)
       #   puts artifacts.graphql_schema_string
-      #
       def graphql_schema_string
         @graphql_schema_string ||= read_artifact(GRAPHQL_SCHEMA_FILE)
       end
