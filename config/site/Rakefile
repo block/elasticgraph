@@ -102,13 +102,19 @@ module ElasticGraph
           config = ::Yard::Lint::Config.load || ::Yard::Lint::Config.new
           result = ::Yard::Lint.run(path: documented_gem_paths, config: config, progress: $stdout.tty?)
 
-          if result.clean?
+          # yard-lint doesn't filter objects tagged with YARD's @private tag the
+          # way `yard doc --no-private` does. YARD keeps @private objects in the
+          # registry and only hides them at output time, but yard-lint checks
+          # Ruby-level visibility (public/private/protected) without also checking
+          # the @private tag. We filter those offenses out here.
+          offenses = result.offenses.reject { |offense| yard_lint_offense_private?(offense) }
+
+          if offenses.empty?
             puts "yard-lint: no offenses found"
           else
-            stats = result.statistics
-            puts "Found #{result.count} offense(s):\n\n"
+            puts "Found #{offenses.size} offense(s):\n\n"
 
-            result.offenses.each do |offense|
+            offenses.each do |offense|
               severity_symbol = case offense[:severity]
               when "error" then "E"
               when "warning" then "W"
@@ -121,8 +127,11 @@ module ElasticGraph
               puts
             end
 
-            abort "yard-lint: #{result.count} offense(s) detected " \
-              "(#{stats[:error]} error(s), #{stats[:warning]} warning(s), #{stats[:convention]} convention(s))"
+            by_severity = offenses.group_by { |o| o[:severity] }
+            abort "yard-lint: #{offenses.size} offense(s) detected " \
+              "(#{(by_severity["error"] || []).size} error(s), " \
+              "#{(by_severity["warning"] || []).size} warning(s), " \
+              "#{(by_severity["convention"] || []).size} convention(s))"
           end
         end
 
@@ -669,6 +678,30 @@ module ElasticGraph
 
       # Run YARD from the repository root so relative paths work
       "cd #{REPO_ROOT} && bundle exec yard #{subcmd} #{yard_opts}"
+    end
+
+    # Extracts a YARD registry path from a yard-lint offense and checks if it
+    # (or any ancestor) has the @private tag. Different offense types store the
+    # path in different fields.
+    def yard_lint_offense_private?(offense)
+      yard_path = offense[:element] # UndocumentedObject, BlankLineBeforeDefinition, etc.
+      yard_path ||= begin
+        path = offense[:class_name]
+        path = "#{path}##{offense[:method_name]}" if path && offense[:method_name]
+        path
+      end
+      yard_path && yard_private?(yard_path)
+    end
+
+    # Checks if the YARD object at the given path (or any ancestor) has the @private tag.
+    # Mirrors YARD's --no-private verifier logic.
+    def yard_private?(yard_path)
+      obj = ::YARD::Registry.at(yard_path)
+      while obj
+        return true if obj.has_tag?(:private)
+        obj = obj.respond_to?(:parent) ? obj.parent : nil
+      end
+      false
     end
 
     private
