@@ -64,7 +64,7 @@ module ElasticGraph
 
         # Helper method that indicates if the given schema element has a specific tag.
         #
-        # @param element [Object] element to check
+        # @param element [Object] a schema type, field, or enum value that may have Apollo directives
         # @param tag_name [String] tag to check
         # @return [Boolean]
         def self.tagged_with?(element, tag_name)

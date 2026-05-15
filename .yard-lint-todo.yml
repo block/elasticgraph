@@ -158,7 +158,3 @@ Tags/Order:
     - "elasticgraph-support/lib/elastic_graph/support/config.rb"
     - "elasticgraph-support/lib/elastic_graph/support/json_schema/validator.rb"
 
-Tags/RedundantParamDescription:
-  Exclude:
-    - "elasticgraph-apollo/lib/elastic_graph/apollo/schema_definition/field_extension.rb"
-
