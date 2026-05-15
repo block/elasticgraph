@@ -52,11 +52,10 @@ module ElasticGraph
         #
         # @param data [Object] JSON data to validate
         # @return [nil, String] a validation error message, if the data is invalid
-        #
-        # @note The returned error message may contain PII unless {#sanitize_pii} has not been set.
-        #
         # @see #valid?
         # @see #validate
+        #
+        # @note The returned error message may contain PII unless {#sanitize_pii} has not been set.
         def validate_with_error_message(data)
           errors = validate(data)
           return if errors.empty?

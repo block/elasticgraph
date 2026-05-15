@@ -19,8 +19,8 @@ module ElasticGraph
       # Defines a configuration class with the given attributes.
       #
       # @param attrs [::Symbol] attribute names
-      # @return [::Class] the defined configuration class
       # @yield [::Data] the body of the class (similar to `::Data.define`)
+      # @return [::Class] the defined configuration class
       #
       # @example Define a configuration class
       #    require "elastic_graph/support/config"

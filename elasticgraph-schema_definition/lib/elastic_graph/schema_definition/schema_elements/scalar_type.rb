@@ -98,8 +98,6 @@ module ElasticGraph
         end
 
         # (see Mixins::HasTypeInfo#mapping)
-        # @param options [Hash<Symbol, Object>] mapping options forwarded to {Mixins::HasTypeInfo#mapping}.
-        #   Must include `:type` for scalar types.
         def mapping(**options)
           self.mapping_type = options.fetch(:type) do
             raise Errors::SchemaError, "Must specify a mapping `type:` on custom scalars but was missing on the `#{name}` type."
@@ -110,10 +108,6 @@ module ElasticGraph
 
         # Specifies the scalar coercion adapter that should be used for this scalar type. The scalar coercion adapter is responsible
         # for validating and coercing scalar input values, and converting scalar return values to a form suitable for JSON serialization.
-        #
-        # @note For examples of scalar coercion adapters, see `ElasticGraph::GraphQL::ScalarCoercionAdapters`.
-        # @note If the `defined_at` require path requires any directories be put on the Ruby `$LOAD_PATH`, you are responsible for doing
-        #   that before booting {ElasticGraph::GraphQL}.
         #
         # @param adapter_name [String] fully qualified Ruby class name of the adapter
         # @param defined_at [String] the `require` path of the adapter
@@ -127,6 +121,10 @@ module ElasticGraph
         #       t.coerce_with "CoercionAdapters::PhoneNumber", defined_at: "./coercion_adapters/phone_number"
         #     end
         #   end
+        #
+        # @note For examples of scalar coercion adapters, see `ElasticGraph::GraphQL::ScalarCoercionAdapters`.
+        # @note If the `defined_at` require path requires any directories be put on the Ruby `$LOAD_PATH`, you are responsible for doing
+        #   that before booting {ElasticGraph::GraphQL}.
         def coerce_with(adapter_name, defined_at:)
           self.runtime_metadata = runtime_metadata.with(coercion_adapter_ref: {
             "name" => adapter_name,
@@ -136,10 +134,6 @@ module ElasticGraph
 
         # Specifies an indexing preparer that should be used for this scalar type. The indexing preparer is responsible for preparing
         # scalar values before indexing them, performing any desired formatting or normalization.
-        #
-        # @note For examples of scalar coercion adapters, see `ElasticGraph::Indexer::IndexingPreparers`.
-        # @note If the `defined_at` require path requires any directories be put on the Ruby `$LOAD_PATH`, you are responsible for doing
-        #   that before booting {ElasticGraph::GraphQL}.
         #
         # @param preparer_name [String] fully qualified Ruby class name of the indexing preparer
         # @param defined_at [String] the `require` path of the preparer
@@ -155,6 +149,10 @@ module ElasticGraph
         #         defined_at: "./indexing_preparers/phone_number"
         #     end
         #   end
+        #
+        # @note For examples of scalar coercion adapters, see `ElasticGraph::Indexer::IndexingPreparers`.
+        # @note If the `defined_at` require path requires any directories be put on the Ruby `$LOAD_PATH`, you are responsible for doing
+        #   that before booting {ElasticGraph::GraphQL}.
         def prepare_for_indexing_with(preparer_name, defined_at:)
           self.runtime_metadata = runtime_metadata.with(indexing_preparer_ref: {
             "name" => preparer_name,

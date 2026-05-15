@@ -139,13 +139,6 @@ module ElasticGraph
         # GraphQL schema. If you think you might want to make a field non-nullable in the GraphQL schema some day, it’s a good idea to use
         # `json_schema nullable: false` now to ensure every indexed record has a non-null value for the field.
         #
-        # @note We recommend using JSON schema validations in a limited fashion. Validations that are appropriate to apply when data is
-        #   entering the system-of-record are often not appropriate on a secondary index like ElasticGraph. Events that violate a JSON
-        #   schema validation will fail to index (typically they will be sent to the dead letter queue and page an oncall engineer). If an
-        #   ElasticGraph instance is meant to contain all the data of some source system, you probably don’t want it applying stricter
-        #   validations than the source system itself has. We recommend limiting your JSON schema validations to situations where
-        #   violations would prevent ElasticGraph from operating correctly.
-        #
         # @param options [Hash<Symbol, Object>] JSON schema options. Any
         #   [JSON schema validation keyword](https://json-schema.org/understanding-json-schema/reference) is accepted.
         #   In addition, `nullable: false` is supported to disallow `null` values. Common options are shown below.
@@ -187,6 +180,13 @@ module ElasticGraph
         #       t.index "cards"
         #     end
         #   end
+        #
+        # @note We recommend using JSON schema validations in a limited fashion. Validations that are appropriate to apply when data is
+        #   entering the system-of-record are often not appropriate on a secondary index like ElasticGraph. Events that violate a JSON
+        #   schema validation will fail to index (typically they will be sent to the dead letter queue and page an oncall engineer). If an
+        #   ElasticGraph instance is meant to contain all the data of some source system, you probably don't want it applying stricter
+        #   validations than the source system itself has. We recommend limiting your JSON schema validations to situations where
+        #   violations would prevent ElasticGraph from operating correctly.
         def json_schema(**options)
           validatable_json_schema = Support::HashUtil.stringify_keys(options)
 

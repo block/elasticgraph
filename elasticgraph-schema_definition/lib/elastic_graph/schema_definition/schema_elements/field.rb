@@ -200,9 +200,6 @@ module ElasticGraph
           original_type_for_derived_types.to_final_form(as_input: as_input)
         end
 
-        # @note For each field defined in your schema that is filterable, a corresponding filtering field will be created on the
-        #   `*FilterInput` type derived from the parent object type.
-        #
         # Registers a customization callback that will be applied to the corresponding filtering field that will be generated for this
         # field.
         #
@@ -229,13 +226,13 @@ module ElasticGraph
         #       t.index "campaigns"
         #     end
         #   end
+        #
+        # @note For each field defined in your schema that is filterable, a corresponding filtering field will be created on the
+        #   `*FilterInput` type derived from the parent object type.
         def customize_filter_field(&customization_block)
           filter_customizations << customization_block
         end
 
-        # @note For each field defined in your schema that is aggregatable, a corresponding `aggregatedValues` field will be created on the
-        #   `*AggregatedValues` type derived from the parent object type.
-        #
         # Registers a customization callback that will be applied to the corresponding `aggregatedValues` field that will be generated for
         # this field.
         #
@@ -262,13 +259,13 @@ module ElasticGraph
         #       t.index "campaigns"
         #     end
         #   end
+        #
+        # @note For each field defined in your schema that is aggregatable, a corresponding `aggregatedValues` field will be created on the
+        #   `*AggregatedValues` type derived from the parent object type.
         def customize_aggregated_values_field(&customization_block)
           aggregated_values_customizations << customization_block
         end
 
-        # @note For each field defined in your schema that is groupable, a corresponding `groupedBy` field will be created on the
-        #   `*AggregationGroupedBy` type derived from the parent object type.
-        #
         # Registers a customization callback that will be applied to the corresponding `groupedBy` field that will be generated for this
         # field.
         #
@@ -295,13 +292,13 @@ module ElasticGraph
         #       t.index "campaigns"
         #     end
         #   end
+        #
+        # @note For each field defined in your schema that is groupable, a corresponding `groupedBy` field will be created on the
+        #   `*AggregationGroupedBy` type derived from the parent object type.
         def customize_grouped_by_field(&customization_block)
           grouped_by_customizations << customization_block
         end
 
-        # @note For each field defined in your schema that is highlightable, a corresponding highlights field will be created on the
-        #   `*Highlights` type derived from the parent object type.
-        #
         # Registers a customization callback that will be applied to the corresponding highlights field that will be generated for this
         # field.
         #
@@ -328,13 +325,13 @@ module ElasticGraph
         #       t.index "campaigns"
         #     end
         #   end
+        #
+        # @note For each field defined in your schema that is highlightable, a corresponding highlights field will be created on the
+        #   `*Highlights` type derived from the parent object type.
         def customize_highlights_field(&customization_block)
           highlights_customizations << customization_block
         end
 
-        # @note For each field defined in your schema that is sub-aggregatable (e.g. list fields indexed using the `nested` mapping type),
-        # a corresponding field will be created on the `*AggregationSubAggregations` type derived from the parent object type.
-        #
         # Registers a customization callback that will be applied to the corresponding `subAggregations` field that will be generated for
         # this field.
         #
@@ -370,13 +367,13 @@ module ElasticGraph
         #       t.field "currency", "String"
         #     end
         #   end
+        #
+        # @note For each field defined in your schema that is sub-aggregatable (e.g. list fields indexed using the `nested` mapping type),
+        # a corresponding field will be created on the `*AggregationSubAggregations` type derived from the parent object type.
         def customize_sub_aggregations_field(&customization_block)
           sub_aggregations_customizations << customization_block
         end
 
-        # @note for each sortable field, enum values will be generated on the derived sort order enum type allowing you to
-        #   sort by the field `ASC` or `DESC`.
-        #
         # Registers a customization callback that will be applied to the corresponding enum values that will be generated for this field
         # on the derived `SortOrder` enum type.
         #
@@ -403,6 +400,9 @@ module ElasticGraph
         #       t.index "campaigns"
         #     end
         #   end
+        #
+        # @note for each sortable field, enum values will be generated on the derived sort order enum type allowing you to
+        #   sort by the field `ASC` or `DESC`.
         def customize_sort_order_enum_values(&customization_block)
           sort_order_enum_value_customizations << customization_block
         end
@@ -469,10 +469,6 @@ module ElasticGraph
         end
 
         # (see Mixins::HasTypeInfo#json_schema)
-        # @param options [Hash<Symbol, Object>] JSON schema options forwarded to {Mixins::HasTypeInfo#json_schema}
-        # @option options [Boolean] :nullable when `false`, disallows `null` values in JSON schema
-        #   without changing the GraphQL nullability of the field. `true` is not allowed--use a
-        #   nullable GraphQL type (no `!` suffix) instead.
         def json_schema(nullable: nil, **options)
           if options.key?(:type)
             raise Errors::SchemaError, "Cannot override JSON schema type of field `#{name}` with `#{options.fetch(:type)}`"
@@ -489,7 +485,6 @@ module ElasticGraph
         end
 
         # (see Mixins::HasTypeInfo#mapping)
-        # @param options [Hash<Symbol, Object>] mapping options forwarded to {Mixins::HasTypeInfo#mapping}
         def mapping(**options)
           # ElasticGraph has special handling for the nested type (e.g. we generate sub-aggregation types in the GraphQL schema for
           # nested fields), and that special handling requires that `nested` only be used on list-of-objects fields; otherwise
@@ -594,10 +589,6 @@ module ElasticGraph
 
         # Registers an old name that this field used to have in a prior version of the schema.
         #
-        # @note In situations where this API applies, ElasticGraph will give you an error message indicating that you need to use this API
-        #   or {TypeWithSubfields#deleted_field}. Likewise, when ElasticGraph no longer needs to know about this, it'll give you a warning
-        #   indicating the call to this method can be removed.
-        #
         # @param old_name [String] old name this field used to have in a prior version of the schema
         # @return [void]
         #
@@ -609,6 +600,10 @@ module ElasticGraph
         #       end
         #     end
         #   end
+        #
+        # @note In situations where this API applies, ElasticGraph will give you an error message indicating that you need to use this API
+        #   or {TypeWithSubfields#deleted_field}. Likewise, when ElasticGraph no longer needs to know about this, it'll give you a warning
+        #   indicating the call to this method can be removed.
         def renamed_from(old_name)
           schema_def_state.register_renamed_field(
             parent_type.name,
@@ -795,11 +790,6 @@ module ElasticGraph
 
         # Defines an argument on the field.
         #
-        # @note ElasticGraph takes care of defining arguments for all the query features it supports, so there is generally no need to use
-        #   this API, and it has no way to interpret arbitrary arguments defined on a field. However, it can be useful for extensions that
-        #   extend the {ElasticGraph::GraphQL} query engine. For example, {ElasticGraph::Apollo} uses this API to satisfy the [Apollo
-        #   federation subgraph spec](https://www.apollographql.com/docs/federation/federation-spec/).
-        #
         # @param name [String] name of the argument
         # @param value_type [String] type of the argument in GraphQL SDL syntax
         # @yield [Argument] for further customization
@@ -812,6 +802,11 @@ module ElasticGraph
         #       end
         #     end
         #   end
+        #
+        # @note ElasticGraph takes care of defining arguments for all the query features it supports, so there is generally no need to use
+        #   this API, and it has no way to interpret arbitrary arguments defined on a field. However, it can be useful for extensions that
+        #   extend the {ElasticGraph::GraphQL} query engine. For example, {ElasticGraph::Apollo} uses this API to satisfy the [Apollo
+        #   federation subgraph spec](https://www.apollographql.com/docs/federation/federation-spec/).
         def argument(name, value_type, &block)
           args[name] = schema_def_state.factory.new_argument(
             self,

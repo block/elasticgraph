@@ -16,10 +16,6 @@ module ElasticGraph
         # Declares that the current type implements the specified interface, making the current type a subtype of the interface. The
         # current type must define all of the fields of the named interface, with the exact same field types.
         #
-        # @note If the named interface has declared an index (via {Mixins::HasIndices#index}), calling `implements`
-        #   causes this type to automatically inherit that index — it will be stored in the same datastore index as all other
-        #   implementations of the named interface. To use a dedicated index instead, call {Mixins::HasIndices#index} on this type.
-        #
         # @param interface_names [Array<String>] names of interface types implemented by this type
         # @return [void]
         #
@@ -44,6 +40,10 @@ module ElasticGraph
         #      t.field "pointsPerGame", "Float"
         #    end
         #  end
+        #
+        # @note If the named interface has declared an index (via {Mixins::HasIndices#index}), calling `implements`
+        #   causes this type to automatically inherit that index — it will be stored in the same datastore index as all other
+        #   implementations of the named interface. To use a dedicated index instead, call {Mixins::HasIndices#index} on this type.
         def implements(*interface_names)
           interface_refs = interface_names.map do |interface_name|
             schema_def_state.type_ref(interface_name).to_final_form.tap do |interface_ref|

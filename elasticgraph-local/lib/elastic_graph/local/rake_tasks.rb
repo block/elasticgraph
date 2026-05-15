@@ -33,10 +33,6 @@ module ElasticGraph
       #
       # Defaults to `false` since it requires a plugin.
       #
-      # @note Enabling this requires the [mapper-size plugin](https://www.elastic.co/guide/en/elasticsearch/plugins/8.15/mapper-size.html)
-      #   to be installed on your datastore cluster. You are responsible for ensuring that is installed if you enable this feature. If you
-      #   enable this and the plugin is not installed, you will get errors!
-      #
       # @return [Boolean] whether or not the `_size` field should be indexed on each indexed type
       #
       # @example Enable indexing document sizes
@@ -46,6 +42,10 @@ module ElasticGraph
       #   ) do |tasks|
       #     tasks.index_document_sizes = true
       #   end
+      #
+      # @note Enabling this requires the [mapper-size plugin](https://www.elastic.co/guide/en/elasticsearch/plugins/8.15/mapper-size.html)
+      #   to be installed on your datastore cluster. You are responsible for ensuring that is installed if you enable this feature. If you
+      #   enable this and the plugin is not installed, you will get errors!
       #
       # @dynamic index_document_sizes, index_document_sizes=
       attr_accessor :index_document_sizes
@@ -216,15 +216,6 @@ module ElasticGraph
       # Whether or not to enforce the requirement that the JSON schema version is incremented every time
       # dumping the JSON schemas results in a changed artifact. Defaults to `true`.
       #
-      # @note Generally speaking, you will want this to be `true` for any ElasticGraph application that is in
-      #    production as the versioning of JSON schemas is what supports safe schema evolution as it allows
-      #    ElasticGraph to identify which version of the JSON schema the publishing system was operating on
-      #    when it published an event.
-      #
-      #    It can be useful to set it to `false` before your application is in production, as you do not want
-      #    to be forced to bump the version after every single schema change while you are building an initial
-      #    prototype.
-      #
       # @return [Boolean] whether to require `json_schema_version` to be incremented on changes that impact `json_schemas.yaml`
       # @see SchemaDefinition::API#json_schema_version
       #
@@ -236,6 +227,15 @@ module ElasticGraph
       #     # TODO: remove this once we're past the prototyping stage
       #     tasks.enforce_json_schema_version = false
       #   end
+      #
+      # @note Generally speaking, you will want this to be `true` for any ElasticGraph application that is in
+      #    production as the versioning of JSON schemas is what supports safe schema evolution as it allows
+      #    ElasticGraph to identify which version of the JSON schema the publishing system was operating on
+      #    when it published an event.
+      #
+      #    It can be useful to set it to `false` before your application is in production, as you do not want
+      #    to be forced to bump the version after every single schema change while you are building an initial
+      #    prototype.
       #
       # @dynamic enforce_json_schema_version, enforce_json_schema_version=
       attr_accessor :enforce_json_schema_version
@@ -285,9 +285,6 @@ module ElasticGraph
       # Hash mapping environments (e.g. `:test`, `:dev`, etc) to port numbers for use when booting Elasticsearch or OpenSearch. The hash
       # automatically includes an entry for the `:local` environment, using a port number extracted from `local_config_yaml`.
       #
-      # @note When booting Elasticsearch/OpenSearch, Kibana (or its OpenSearch equivalent, "OpenSearch Dashboards") will also get booted,
-      #   selecting the port by adding `10000` to the configured port.
-      #
       # @return [Hash<Symbol, Integer>] mapping from environment name to port number
       #
       # @example Define what port to use to boot the datastore for the `:test` environment
@@ -297,6 +294,9 @@ module ElasticGraph
       #   ) do |tasks|
       #     tasks.env_port_mapping = {test: 9999}
       #   end
+      #
+      # @note When booting Elasticsearch/OpenSearch, Kibana (or its OpenSearch equivalent, "OpenSearch Dashboards") will also get booted,
+      #   selecting the port by adding `10000` to the configured port.
       #
       # @dynamic env_port_mapping, env_port_mapping=
       attr_accessor :env_port_mapping
@@ -345,13 +345,13 @@ module ElasticGraph
         @fake_data_batch_generator_by_type[type] = block
       end
 
-      # @note This method uses keyword args for all required arguments. Optional task settings are instead specified using the block.
       # @param local_config_yaml [String, Pathname] path to the settings YAML file for the local/development environment
       # @param path_to_schema [String, Pathname] path to the Ruby schema definition file--either the only file that defines the schema
       #   (using `ElasticGraph.define_schema`) or the "main" schema definition file, which loads other files which further define parts of
       #   the schema.
       # @yield [RakeTasks] instance for further configuration
       # @yieldreturn [void]
+      # @note This method uses keyword args for all required arguments. Optional task settings are instead specified using the block.
       def initialize(local_config_yaml:, path_to_schema:)
         @local_config_yaml = local_config_yaml.to_s
 

@@ -267,6 +267,8 @@ module ElasticGraph
           # to the schema element.
           #
           # @return [void]
+          # @see APIExtension#tag_built_in_types_with
+          # @see FieldExtension#tag_with
           #
           # @example Add `@tag` to a type
           #   ElasticGraph.define_schema do |schema|
@@ -274,9 +276,6 @@ module ElasticGraph
           #       t.apollo_tag name: "public"
           #     end
           #   end
-          #
-          # @see APIExtension#tag_built_in_types_with
-          # @see FieldExtension#tag_with
           def apollo_tag(name:)
             directive "tag", name: name
           end

@@ -175,10 +175,6 @@ module ElasticGraph
       # one or more fields that concrete implementations of the interface must also define. Each implementation can be an
       # {SchemaElements::ObjectType} or {SchemaElements::InterfaceType}.
       #
-      # @note An interface type can declare an index with {Mixins::HasIndices#index}. This creates a _mixed-type index_ in
-      #   the datastore where concrete types that implement the interface coexist. A subtype may opt out of this shared
-      #   index inheritance and use a dedicated index by declaring its own with {Mixins::HasIndices#index}.
-      #
       # @param name [String] name of the interface
       # @yield [SchemaElements::InterfaceType] interface type object
       # @return [void]
@@ -204,6 +200,10 @@ module ElasticGraph
       #       t.field "pointsPerGame", "Float"
       #     end
       #   end
+      #
+      # @note An interface type can declare an index with {Mixins::HasIndices#index}. This creates a _mixed-type index_ in
+      #   the datastore where concrete types that implement the interface coexist. A subtype may opt out of this shared
+      #   index inheritance and use a dedicated index by declaring its own with {Mixins::HasIndices#index}.
       def interface_type(name, &block)
         @state.register_object_interface_or_union_type @factory.new_interface_type(name.to_s, &block)
         nil
@@ -243,10 +243,6 @@ module ElasticGraph
       # Defines a [GraphQL union type](https://graphql.org/learn/schema/#union-types). Use it to define an abstract supertype with one or
       # more concrete subtypes. Each subtype must be an {SchemaElements::ObjectType}, but they do not have to share any fields in common.
       #
-      # @note A union type can declare an index with {Mixins::HasIndices#index}. This creates a _mixed-type index_ in
-      #   the datastore where the union members coexist. A subtype may opt out of this shared index inheritance and use
-      #   a dedicated index by declaring its own with {Mixins::HasIndices#index}.
-      #
       # @param name [String] name of the union type
       # @yield [SchemaElements::UnionType] union type object
       # @return [void]
@@ -270,6 +266,10 @@ module ElasticGraph
       #       t.subtypes "BankAccount", "BitcoinWallet"
       #     end
       #   end
+      #
+      # @note A union type can declare an index with {Mixins::HasIndices#index}. This creates a _mixed-type index_ in
+      #   the datastore where the union members coexist. A subtype may opt out of this shared index inheritance and use
+      #   a dedicated index by declaring its own with {Mixins::HasIndices#index}.
       def union_type(name, &block)
         @state.register_object_interface_or_union_type @factory.new_union_type(name.to_s, &block)
         nil
@@ -296,10 +296,6 @@ module ElasticGraph
 
       # Registers the name of a type that existed in a prior version of the schema but has been deleted.
       #
-      # @note In situations where this API applies, ElasticGraph will give you an error message indicating that you need to use this API
-      #   or {SchemaElements::TypeWithSubfields#renamed_from}. Likewise, when ElasticGraph no longer needs to know about this, it'll give you a warning
-      #   indicating the call to this method can be removed.
-      #
       # @param name [String] name of type that used to exist but has been deleted
       # @return [void]
       #
@@ -307,6 +303,10 @@ module ElasticGraph
       #   ElasticGraph.define_schema do |schema|
       #     schema.deleted_type "Widget"
       #   end
+      #
+      # @note In situations where this API applies, ElasticGraph will give you an error message indicating that you need to use this API
+      #   or {SchemaElements::TypeWithSubfields#renamed_from}. Likewise, when ElasticGraph no longer needs to know about this, it'll give you a warning
+      #   indicating the call to this method can be removed.
       def deleted_type(name)
         @state.register_deleted_type(
           name,
@@ -450,10 +450,6 @@ module ElasticGraph
       # version number. The publisher will then include this version number in published events to identify the version of the schema it
       # was using. This avoids the need to deploy the publisher and ElasticGraph indexer at the same time to keep them in sync.
       #
-      # @note While this is an important part of how ElasticGraph is designed to support schema evolution, it can be annoying constantly
-      #   have to increment this while rapidly changing the schema during prototyping. You can disable the requirement to increment this
-      #   on every JSON schema change by setting `enforce_json_schema_version` to `false` in your `Rakefile`.
-      #
       # @param version [Integer] current version number of the JSON schema artifact
       # @return [void]
       # @see Local::RakeTasks#enforce_json_schema_version
@@ -462,6 +458,10 @@ module ElasticGraph
       #   ElasticGraph.define_schema do |schema|
       #     schema.json_schema_version 1
       #   end
+      #
+      # @note While this is an important part of how ElasticGraph is designed to support schema evolution, it can be annoying constantly
+      #   have to increment this while rapidly changing the schema during prototyping. You can disable the requirement to increment this
+      #   on every JSON schema change by setting `enforce_json_schema_version` to `false` in your `Rakefile`.
       def json_schema_version(version)
         if !version.is_a?(Integer) || version < 1
           raise Errors::SchemaError, "`json_schema_version` must be a positive integer. Specified version: #{version}"
@@ -484,16 +484,16 @@ module ElasticGraph
       # @param allow_extra_fields [Boolean] Whether extra fields (e.g. beyond fields defined in the schema) can be included in indexing events.
       # @return [void]
       #
+      # @example Allow omitted fields and disallow extra fields
+      #   ElasticGraph.define_schema do |schema|
+      #     schema.json_schema_strictness allow_omitted_fields: true, allow_extra_fields: false
+      #   end
+      #
       # @note If you allow both omitted fields and extra fields, ElasticGraph's JSON schema validation will allow (and ignore) misspelled
       #   field names in indexing events. For example, if the ElasticGraph schema has a nullable field named `parentId` but the publisher
       #   accidentally provides it as `parent_id`, ElasticGraph would happily ignore the `parent_id` field entirely, because `parentId`
       #   is allowed to be omitted and `parent_id` would be treated as an extra field. Therefore, we recommend that you only set one of
       #   these to `true` (or none).
-      #
-      # @example Allow omitted fields and disallow extra fields
-      #   ElasticGraph.define_schema do |schema|
-      #     schema.json_schema_strictness allow_omitted_fields: true, allow_extra_fields: false
-      #   end
       def json_schema_strictness(allow_omitted_fields: false, allow_extra_fields: true)
         unless [true, false].include?(allow_omitted_fields)
           raise Errors::SchemaError, "`allow_omitted_fields` must be true or false"

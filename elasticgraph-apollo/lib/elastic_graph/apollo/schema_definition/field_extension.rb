@@ -32,6 +32,8 @@ module ElasticGraph
         #
         # @param tag_name [String] tag to add to schema elements generated for this field
         # @return [void]
+        # @see ApolloDirectives::Tag
+        # @see APIExtension#tag_built_in_types_with
         #
         # @example Tag a field (and its derived elements) with "public"
         #   ElasticGraph.define_schema do |schema|
@@ -41,9 +43,6 @@ module ElasticGraph
         #       end
         #     end
         #   end
-        #
-        # @see ApolloDirectives::Tag
-        # @see APIExtension#tag_built_in_types_with
         def tag_with(tag_name)
           on_each_generated_schema_element do |element|
             needs_tagging =

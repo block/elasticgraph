@@ -152,19 +152,6 @@ module ElasticGraph
         # @see #relates_to_many
         # @see #relates_to_one
         #
-        # @note Be careful about defining non-nullable fields. Changing a field’s type from non-nullable (e.g. `Int!`) to nullable (e.g.
-        #   `Int`) is a breaking change for clients. Making a field non-nullable may also prevent you from applying permissioning to a field
-        #   via an AuthZ layer (as such a layer would have no way to force a field value to `null` for a client denied field access).
-        #   Therefore, we recommend limiting your use of `!` to only a few situations such as defining a type’s primary key (e.g.
-        #   `t.field "id", "ID!"`) or defining a list field (e.g. `t.field "authors", "[String!]!"`) since empty lists already provide a
-        #   "no data" representation. You can still configure the ElasticGraph indexer to require a non-null value for a field using
-        #   `f.json_schema nullable: false`.
-        #
-        # @note ElasticGraph’s understanding of datastore capabilities may override your configured
-        #   `aggregatable`/`filterable`/`groupable`/`sortable` options. For example, a field indexed as `text` for full text search will
-        #   not be sortable or groupable even if you pass `sortable: true, groupable: true` when defining the field, because [text fields
-        #   cannot be efficiently sorted by or grouped on](https://www.elastic.co/guide/en/elasticsearch/reference/8.15/text.html#text).
-        #
         # @example Define a field with documentation
         #   ElasticGraph.define_schema do |schema|
         #     schema.object_type "Campaign" do |t|
@@ -199,6 +186,19 @@ module ElasticGraph
         #       t.field "endDate", "Date", name_in_index: "endOn", graphql_only: true
         #     end
         #   end
+        #
+        # @note Be careful about defining non-nullable fields. Changing a field's type from non-nullable (e.g. `Int!`) to nullable (e.g.
+        #   `Int`) is a breaking change for clients. Making a field non-nullable may also prevent you from applying permissioning to a field
+        #   via an AuthZ layer (as such a layer would have no way to force a field value to `null` for a client denied field access).
+        #   Therefore, we recommend limiting your use of `!` to only a few situations such as defining a type's primary key (e.g.
+        #   `t.field "id", "ID!"`) or defining a list field (e.g. `t.field "authors", "[String!]!"`) since empty lists already provide a
+        #   "no data" representation. You can still configure the ElasticGraph indexer to require a non-null value for a field using
+        #   `f.json_schema nullable: false`.
+        #
+        # @note ElasticGraph's understanding of datastore capabilities may override your configured
+        #   `aggregatable`/`filterable`/`groupable`/`sortable` options. For example, a field indexed as `text` for full text search will
+        #   not be sortable or groupable even if you pass `sortable: true, groupable: true` when defining the field, because [text fields
+        #   cannot be efficiently sorted by or grouped on](https://www.elastic.co/guide/en/elasticsearch/reference/8.15/text.html#text).
         def field(name, type, graphql_only: false, indexing_only: false, **options)
           if reserved_field_names.include?(name)
             raise Errors::SchemaError, "Invalid field name: `#{self.name}.#{name}`. `#{name}` is reserved for use by " \
@@ -230,10 +230,6 @@ module ElasticGraph
 
         # Registers the name of a field that existed in a prior version of the schema but has been deleted.
         #
-        # @note In situations where this API applies, ElasticGraph will give you an error message indicating that you need to use this API
-        #   or {Field#renamed_from}. Likewise, when ElasticGraph no longer needs to know about this, it'll give you a warning indicating
-        #   the call to this method can be removed.
-        #
         # @param field_name [String] name of field that used to exist but has been deleted
         # @return [void]
         #
@@ -243,6 +239,10 @@ module ElasticGraph
         #       t.deleted_field "description"
         #     end
         #   end
+        #
+        # @note In situations where this API applies, ElasticGraph will give you an error message indicating that you need to use this API
+        #   or {Field#renamed_from}. Likewise, when ElasticGraph no longer needs to know about this, it'll give you a warning indicating
+        #   the call to this method can be removed.
         def deleted_field(field_name)
           schema_def_state.register_deleted_field(
             name,
@@ -254,10 +254,6 @@ module ElasticGraph
 
         # Registers an old name that this type used to have in a prior version of the schema.
         #
-        # @note In situations where this API applies, ElasticGraph will give you an error message indicating that you need to use this API
-        #   or {API#deleted_type}. Likewise, when ElasticGraph no longer needs to know about this, it'll give you a warning indicating
-        #   the call to this method can be removed.
-        #
         # @param old_name [String] old name this field used to have in a prior version of the schema
         # @return [void]
         #
@@ -267,6 +263,10 @@ module ElasticGraph
         #       t.renamed_from "Component"
         #     end
         #   end
+        #
+        # @note In situations where this API applies, ElasticGraph will give you an error message indicating that you need to use this API
+        #   or {API#deleted_type}. Likewise, when ElasticGraph no longer needs to know about this, it'll give you a warning indicating
+        #   the call to this method can be removed.
         def renamed_from(old_name)
           schema_def_state.register_renamed_type(
             name,
@@ -278,10 +278,6 @@ module ElasticGraph
 
         # An alternative to {#field} for when you have a list field that you want exposed as a [paginated Relay
         # connection](https://relay.dev/graphql/connections.htm) rather than as a simple list.
-        #
-        # @note Bear in mind that pagination does not have much efficiency benefit in this case: all elements of the collection will be
-        #   retrieved when fetching this field from the datastore. The pagination implementation will just trim down the collection before
-        #   returning it.
         #
         # @param name [String] name of the field
         # @param element_type [String] name of the type of element in the collection
@@ -313,6 +309,10 @@ module ElasticGraph
         #       t.index "authors"
         #     end
         #   end
+        #
+        # @note Bear in mind that pagination does not have much efficiency benefit in this case: all elements of the collection will be
+        #   retrieved when fetching this field from the datastore. The pagination implementation will just trim down the collection before
+        #   returning it.
         def paginated_collection_field(
           name,
           element_type,

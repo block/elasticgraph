@@ -13,9 +13,6 @@ module ElasticGraph
       module HasDirectives
         # Adds a GraphQL directive to the current schema element.
         #
-        # @note If you’re using a custom directive rather than a standard GraphQL directive like `@deprecated`, you’ll also need to use
-        #   {API#raw_sdl} to define the custom directive.
-        #
         # @param name [String] name of the directive
         # @param arguments [Hash<String, Object>] arguments for the directive
         # @return [void]
@@ -39,6 +36,9 @@ module ElasticGraph
         #       t.directive "sourcedFrom", system: "campaigns"
         #     end
         #   end
+        #
+        # @note If you’re using a custom directive rather than a standard GraphQL directive like `@deprecated`, you’ll also need to use
+        #   {API#raw_sdl} to define the custom directive.
         def directive(name, arguments = {})
           directives << schema_def_state.factory.new_directive(name, arguments)
         end

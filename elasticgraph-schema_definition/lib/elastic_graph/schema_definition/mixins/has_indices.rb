@@ -43,13 +43,6 @@ module ElasticGraph
         # needing to call `t.index` themselves. A subtype can opt out of this shared index inheritance by calling
         # `t.index` with a different name to use a dedicated index instead.
         #
-        # @note Use {#root_query_fields} on indexed types to name the field that will be exposed on `Query`.
-        # @note Indexed types must also define an `id` field, which ElasticGraph will use as the primary key.
-        #   When an abstract type declares the index, each concrete subtype must also define `id`.
-        # @note Datastore index settings can also be defined (or overridden) in an environment-specific settings YAML file. Index settings
-        #   that you want to configure differently for different environments (such as `index.number_of_shards`—-production and staging
-        #   will probably need different numbers!) should be configured in the per-environment YAML configuration files rather than here.
-        #
         # @param name [String] name of the index. See the [Elasticsearch docs](https://www.elastic.co/guide/en/elasticsearch/reference/8.15/indices-create-index.html#indices-create-api-path-params)
         #   for restrictions.
         # @param settings [Hash<Symbol, Object>] datastore index settings you want applied to every environment. See the [Elasticsearch docs](https://www.elastic.co/guide/en/elasticsearch/reference/8.15/index-modules.html#index-modules-settings)
@@ -99,6 +92,13 @@ module ElasticGraph
         #       t.index "motorcycles"
         #     end
         #   end
+        #
+        # @note Use {#root_query_fields} on indexed types to name the field that will be exposed on `Query`.
+        # @note Indexed types must also define an `id` field, which ElasticGraph will use as the primary key.
+        #   When an abstract type declares the index, each concrete subtype must also define `id`.
+        # @note Datastore index settings can also be defined (or overridden) in an environment-specific settings YAML file. Index settings
+        #   that you want to configure differently for different environments (such as `index.number_of_shards`—-production and staging
+        #   will probably need different numbers!) should be configured in the per-environment YAML configuration files rather than here.
         def index(name, **settings, &block)
           unless @can_configure_index
             raise Errors::SchemaError, "Cannot define an index on `#{self.name}` after initialization is complete. " \

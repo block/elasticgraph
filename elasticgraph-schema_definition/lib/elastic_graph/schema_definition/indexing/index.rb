@@ -73,9 +73,6 @@ module ElasticGraph
 
         # Specifies how documents in this index should sort by default, when no `orderBy` argument is provided to the GraphQL query.
         #
-        # @note the field name strings can be a dot-separated nested fields, but all referenced
-        #   fields must exist when this is called.
-        #
         # @param field_name_direction_pairs [Array<(String, Symbol)>] pairs of field names and `:asc` or `:desc`
         # @return [void]
         #
@@ -91,6 +88,9 @@ module ElasticGraph
         #       end
         #     end
         #   end
+        #
+        # @note the field name strings can be a dot-separated nested fields, but all referenced
+        #   fields must exist when this is called.
         def default_sort(*field_name_direction_pairs)
           self.default_sort_pairs = field_name_direction_pairs
         end
@@ -100,13 +100,6 @@ module ElasticGraph
         # allows for different index configurations, and can be necessary when a dataset is too large to fit in one dataset given
         # Elasticsearch/OpenSearch limitations on the number of shards in one index. In addition, ElasticGraph optimizes queries which
         # filter on the timestamp field to target the subset of the indices in which matching documents could reside.
-        #
-        # @note the timestamp field specified here **must be immutable**. To understand why, consider a `:yearly` rollover
-        #   index used for data based on `createdAt`; if ElasticGraph ingests record `123` with a createdAt of `2023-12-31T23:59:59Z`, it
-        #   will be indexed in the `2023` index. Later if it receives an update event for record `123` with a `createdAt` of
-        #   `2024-01-01T00:00:00Z` (a mere one second later!), ElasticGraph will store the new version of the payment in the `2024` index,
-        #   and leave the old copy of the payment in the `2023` index unchanged. It’ll have duplicates for that document.
-        # @note changing the `rollover` configuration on an existing index that already has data will result in duplicate documents
         #
         # @param frequency [:yearly, :monthly, :daily, :hourly] how often to rollover the index
         # @param timestamp_field_path_name [String] dot-separated path to the timestamp field used for rollover. Note: all referenced
@@ -125,6 +118,13 @@ module ElasticGraph
         #       end
         #     end
         #   end
+        #
+        # @note the timestamp field specified here **must be immutable**. To understand why, consider a `:yearly` rollover
+        #   index used for data based on `createdAt`; if ElasticGraph ingests record `123` with a createdAt of `2023-12-31T23:59:59Z`, it
+        #   will be indexed in the `2023` index. Later if it receives an update event for record `123` with a `createdAt` of
+        #   `2024-01-01T00:00:00Z` (a mere one second later!), ElasticGraph will store the new version of the payment in the `2024` index,
+        #   and leave the old copy of the payment in the `2023` index unchanged. It’ll have duplicates for that document.
+        # @note changing the `rollover` configuration on an existing index that already has data will result in duplicate documents
         def rollover(frequency, timestamp_field_path_name)
           schema_def_state.after_user_definition_complete do
             timestamp_field_path = public_field_path(timestamp_field_path_name, explanation: "it is referenced as an index `rollover` field")
@@ -153,13 +153,6 @@ module ElasticGraph
         # field. Using an appropriate field for shard routing is often essential for horizontal scaling, as it avoids having every query
         # hit every node, allowing additional nodes to increase query throughput.
         #
-        # @note it is essential that the shards are well-balanced. If the data’s distribution is lopsided, using this feature can make
-        #   performance worse.
-        # @note the routing field specified here **must be immutable**. If ElasticGraph receives an updated version of a document with a
-        #   different routing value, it’ll write the new version of the document to a different shard and leave the copy on the old shard
-        #   unchanged, leading to duplicates.
-        # @note changing the shard routing configuration on an existing index that already has data will result in duplicate documents
-        #
         # @param routing_field_path_name [String] dot-separated path to the field used for shard routing. Note: all referenced
         #   fields must exist when this is called.
         # @return [void]
@@ -176,6 +169,13 @@ module ElasticGraph
         #       end
         #     end
         #   end
+        #
+        # @note it is essential that the shards are well-balanced. If the data’s distribution is lopsided, using this feature can make
+        #   performance worse.
+        # @note the routing field specified here **must be immutable**. If ElasticGraph receives an updated version of a document with a
+        #   different routing value, it’ll write the new version of the document to a different shard and leave the copy on the old shard
+        #   unchanged, leading to duplicates.
+        # @note changing the shard routing configuration on an existing index that already has data will result in duplicate documents
         def route_with(routing_field_path_name)
           schema_def_state.after_user_definition_complete do
             routing_field_path = public_field_path(routing_field_path_name, explanation: "it is referenced as an index `route_with` field")
@@ -224,8 +224,8 @@ module ElasticGraph
           self.has_had_multiple_sources_flag = true
         end
 
-        # @see #route_with
         # @return [Boolean] whether or not this index uses custom shard routing
+        # @see #route_with
         def uses_custom_routing?
           routing_field_path.path_in_index != "id"
         end

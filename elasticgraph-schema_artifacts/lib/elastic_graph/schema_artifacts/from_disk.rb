@@ -48,11 +48,6 @@ module ElasticGraph
       #
       # In addition, they are used by `elasticgraph-indexer` to validate data before indexing it.
       #
-      # @note ElasticGraph supports multiple JSON schema versions in order to support safe, seamless schema evolution.
-      #   Each event will be validated using the version specified in the event itself, allowing data publishers to be
-      #   updated to the latest JSON schema at a later time after `elasticgraph-indexer` is deployed with a new JSON
-      #   schema version.
-      #
       # @param version [Integer] the desired JSON schema version
       # @return [Hash<String, Object>]
       # @raise [Errors::MissingSchemaArtifactError] when the provided version does not exist within the `artifacts_dir`.
@@ -62,6 +57,11 @@ module ElasticGraph
       # @example Get the JSON schema for a `Widget` type at version 1
       #   artifacts = ElasticGraph::SchemaArtifacts::FromDisk.new(schema_artifacts_dir)
       #   widget_v1_json_schema = artifacts.json_schemas_for(1).fetch("$defs").fetch("Widget")
+      #
+      # @note ElasticGraph supports multiple JSON schema versions in order to support safe, seamless schema evolution.
+      #   Each event will be validated using the version specified in the event itself, allowing data publishers to be
+      #   updated to the latest JSON schema at a later time after `elasticgraph-indexer` is deployed with a new JSON
+      #   schema version.
       def json_schemas_for(version)
         unless available_json_schema_versions.include?(version)
           raise Errors::MissingSchemaArtifactError, "The requested json schema version (#{version}) is not available. " \
