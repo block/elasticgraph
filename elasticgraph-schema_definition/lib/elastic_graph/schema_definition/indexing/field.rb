@@ -108,6 +108,9 @@ module ElasticGraph
           mapping_hash
         end
 
+        # Indicates if this field allows null values in the JSON schema.
+        #
+        # @return [Boolean]
         def nullable?
           json_schema_layers.include?(:nullable)
         end

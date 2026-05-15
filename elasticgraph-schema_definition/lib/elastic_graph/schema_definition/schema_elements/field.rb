@@ -750,6 +750,9 @@ module ElasticGraph
         # @private
         HIGHLIGHTABLE_MAPPING_TYPES = %w[keyword text match_only_text]
 
+        # Indicates if this field supports highlighting in search results.
+        #
+        # @return [Boolean]
         def highlightable?
           return highlightable unless highlightable.nil?
           return false if relationship

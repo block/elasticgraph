@@ -73,11 +73,6 @@ Documentation/UndocumentedMethodArguments:
     - "elasticgraph-warehouse/lib/elastic_graph/warehouse/schema_definition/factory_extension.rb"
     - "elasticgraph-warehouse_lambda/lib/elastic_graph/warehouse_lambda.rb"
 
-Documentation/UndocumentedObjects:
-  Exclude:
-    - "elasticgraph-schema_definition/lib/elastic_graph/schema_definition/indexing/field.rb"
-    - "elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb"
-
 Documentation/UndocumentedOptions:
   Exclude:
     - "elasticgraph-schema_definition/lib/elastic_graph/schema_definition/api.rb"
