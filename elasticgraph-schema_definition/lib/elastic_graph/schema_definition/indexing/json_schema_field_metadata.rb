@@ -22,7 +22,7 @@ module ElasticGraph
       #
       # @api private
       class JSONSchemaFieldMetadata < ::Data
-        # @return [Hash<String, String>] hash form of the metadata that can be dumped in JSON schema
+        # @return [Hash{String => String}] hash form of the metadata that can be dumped in JSON schema
         def to_dumpable_hash
           {"type" => type, "nameInIndex" => name_in_index}
         end

@@ -18,7 +18,7 @@ module ElasticGraph
         # @private
         attr_reader :root_schema
 
-        # @param schema [Hash<String, Object>] the JSON schema for an entire ElasticGraph schema
+        # @param schema [Hash{String => Object}] the JSON schema for an entire ElasticGraph schema
         # @param sanitize_pii [Boolean] whether to omit data that may contain PII from error messages
         def initialize(schema:, sanitize_pii:)
           @raw_schema = schema

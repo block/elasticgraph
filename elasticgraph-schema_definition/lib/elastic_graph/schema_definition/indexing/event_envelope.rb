@@ -17,7 +17,7 @@ module ElasticGraph
       module EventEnvelope
         # @param indexed_type_names [Array<String>] names of the indexed types
         # @param json_schema_version [Integer] the version of the JSON schema
-        # @return [Hash<String, Object>] the JSON schema for the ElasticGraph event envelope for the given `indexed_type_names`.
+        # @return [Hash{String => Object}] the JSON schema for the ElasticGraph event envelope for the given `indexed_type_names`.
         def self.json_schema(indexed_type_names, json_schema_version)
           {
             "type" => "object",

@@ -49,7 +49,7 @@ module ElasticGraph
       # In addition, they are used by `elasticgraph-indexer` to validate data before indexing it.
       #
       # @param version [Integer] the desired JSON schema version
-      # @return [Hash<String, Object>]
+      # @return [Hash{String => Object}]
       # @raise [Errors::MissingSchemaArtifactError] when the provided version does not exist within the `artifacts_dir`.
       # @see #available_json_schema_versions
       # @see #latest_json_schema_version
@@ -114,7 +114,7 @@ module ElasticGraph
       #
       # `elasticgraph-admin` uses this artifact to administer the datastore.
       #
-      # @return [Hash<String, Object>]
+      # @return [Hash{String => Object}]
       # @raise [Errors::MissingSchemaArtifactError] when `datastore_config.yaml` does not exist within the `artifacts_dir`.
       #
       # @example Print the current list of indices

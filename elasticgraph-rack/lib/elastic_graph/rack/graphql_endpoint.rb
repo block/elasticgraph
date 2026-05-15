@@ -30,8 +30,8 @@ module ElasticGraph
 
       # Responds to a Rack request.
       #
-      # @param env [Hash<String, Object>] Rack env
-      # @return [Array(Integer, Hash<String, String>, Array<String>)]
+      # @param env [Hash{String => Object}] Rack env
+      # @return [Array(Integer, Hash{String => String}, Array<String>)]
       def call(env)
         rack_request = ::Rack::Request.new(env)
 

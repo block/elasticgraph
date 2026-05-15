@@ -324,7 +324,7 @@ module ElasticGraph
       #
       # @param extension_module [Module] GraphQL extension module
       # @param defined_at [String] the `require` path of the extension module
-      # @param config [Hash<Symbol, Object>] extension-specific configuration forwarded to the extension module's `initialize` method
+      # @param config [Hash{Symbol => Object}] extension-specific configuration forwarded to the extension module's `initialize` method
       # @return [void]
       #
       # @example Register `elasticgraph-query_registry` extension module

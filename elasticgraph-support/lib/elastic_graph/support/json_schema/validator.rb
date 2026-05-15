@@ -15,7 +15,7 @@ module ElasticGraph
       # Responsible for validating JSON data against the ElasticGraph JSON schema for a particular type.
       #
       # @!attribute [r] schema
-      #   @return [Hash<String, Object>] a JSON schema
+      #   @return [Hash{String => Object}] a JSON schema
       # @!attribute [r] sanitize_pii
       #   @return [Boolean] whether to omit data that may contain PII from error messages
       class Validator < MemoizableData.define(:schema, :sanitize_pii)
@@ -34,7 +34,7 @@ module ElasticGraph
         # any validation errors.
         #
         # @param data [Object] JSON data to validate
-        # @return [Array<Hash<String, Object>>] validation errors; will be empty if `data` is valid
+        # @return [Array<Hash{String => Object}>] validation errors; will be empty if `data` is valid
         #
         # @see #valid?
         # @see #validate_with_error_message

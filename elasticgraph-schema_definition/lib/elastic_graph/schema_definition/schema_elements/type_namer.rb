@@ -64,7 +64,7 @@ module ElasticGraph
         # Note: this does not apply any configured `name_overrides`. It's up to the caller to apply that when desired.
         #
         # @param format_name [Symbol] key from {DEFAULT_FORMATS} identifying the format to use
-        # @param args [Hash<Symbol, String>] placeholder values required by the chosen format (e.g. `:base`, `:parent_types`, `:parent_agg_type`, `:field_path`)
+        # @param args [Hash{Symbol => String}] placeholder values required by the chosen format (e.g. `:base`, `:parent_types`, `:parent_agg_type`, `:field_path`)
         # @private
         def generate_name_for(format_name, **args)
           format = formats.fetch(format_name) do
@@ -140,7 +140,7 @@ module ElasticGraph
         # The default formats used for derived GraphQL type names. These formats can be customized by providing `derived_type_name_formats`
         # to {RakeTasks} or {Local::RakeTasks}.
         #
-        # @return [Hash<Symbol, String>]
+        # @return [Hash{Symbol => String}]
         DEFAULT_FORMATS = {
           AggregatedValues: "%{base}AggregatedValues",
           Aggregation: "%{base}Aggregation",

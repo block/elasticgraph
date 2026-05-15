@@ -17,7 +17,7 @@ module ElasticGraph
       module ResultsExtension
         # Returns the warehouse configuration generated from the schema definition.
         #
-        # @return [Hash<String, Hash>] a hash mapping table names to their configuration
+        # @return [Hash{String => Hash}] a hash mapping table names to their configuration
         def warehouse_config
           @warehouse_config ||= generate_warehouse_config
         end
@@ -26,7 +26,7 @@ module ElasticGraph
 
         # Generates warehouse configuration from indices that have warehouse table definitions.
         #
-        # @return [Hash<String, Hash>] a hash mapping table names to their configuration
+        # @return [Hash{String => Hash}] a hash mapping table names to their configuration
         def generate_warehouse_config
           tables = all_types
             .filter_map { |type| (_ = type).own_index_def if type.respond_to?(:own_index_def) }

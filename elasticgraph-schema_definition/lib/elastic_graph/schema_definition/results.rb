@@ -36,18 +36,18 @@ module ElasticGraph
         @graphql_schema_string ||= generate_sdl
       end
 
-      # @return [Hash<String, Object>] the Elasticsearch/OpenSearch configuration dumped as `datastore_config.yaml`
+      # @return [Hash{String => Object}] the Elasticsearch/OpenSearch configuration dumped as `datastore_config.yaml`
       def datastore_config
         @datastore_config ||= generate_datastore_config
       end
 
-      # @return [Hash<String, Object>] runtime metadata used by other parts of ElasticGraph and dumped as `runtime_metadata.yaml`
+      # @return [Hash{String => Object}] runtime metadata used by other parts of ElasticGraph and dumped as `runtime_metadata.yaml`
       def runtime_metadata
         @runtime_metadata ||= build_runtime_metadata
       end
 
       # @param version [Integer] desired JSON schema version
-      # @return [Hash<String, Object>] the JSON schema for the requested version, if available
+      # @return [Hash{String => Object}] the JSON schema for the requested version, if available
       # @raise [Errors::NotFoundError] if the requested JSON schema version is not available
       def json_schemas_for(version)
         unless available_json_schema_versions.include?(version)
@@ -62,7 +62,7 @@ module ElasticGraph
         @available_json_schema_versions ||= Set[latest_json_schema_version]
       end
 
-      # @return [Hash<String, Object>] the newly generated JSON schema
+      # @return [Hash{String => Object}] the newly generated JSON schema
       def latest_json_schema_version
         current_public_json_schema[JSON_SCHEMA_VERSION_KEY]
       end

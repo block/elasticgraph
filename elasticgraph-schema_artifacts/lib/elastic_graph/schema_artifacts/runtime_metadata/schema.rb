@@ -57,7 +57,7 @@ module ElasticGraph
 
         # Loads a {RuntimeMetadata::Schema} from the given hash.
         #
-        # @param hash [Hash<String, Hash<String, Object>>] runtime metadata hash loaded from YAML
+        # @param hash [Hash{String => Hash{String => Object}}] runtime metadata hash loaded from YAML
         # @return [Schema] the runtime metadata schema instance
         def self.from_hash(hash)
           elasticgraph_version = hash.fetch(ELASTICGRAPH_VERSION) do
@@ -114,7 +114,7 @@ module ElasticGraph
 
         # Converts to a hash that is suitable for dumping to disk as YAML.
         #
-        # @return [Hash<String, Hash<String, Object>>] runtime metadata hash ready to dump to YAML
+        # @return [Hash{String => Hash{String => Object}}] runtime metadata hash ready to dump to YAML
         def to_dumpable_hash
           Support::HashUtil.recursively_prune_nils_and_empties_from({
             # Keys here are ordered alphabetically; please keep them that way.

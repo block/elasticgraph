@@ -45,7 +45,7 @@ module ElasticGraph
         #
         # @param name [String] name of the index. See the [Elasticsearch docs](https://www.elastic.co/guide/en/elasticsearch/reference/8.15/indices-create-index.html#indices-create-api-path-params)
         #   for restrictions.
-        # @param settings [Hash<Symbol, Object>] datastore index settings (without the `index.` prefix) forwarded to the index definition. See the [Elasticsearch docs](https://www.elastic.co/guide/en/elasticsearch/reference/8.15/index-modules.html#index-modules-settings) for available settings.
+        # @param settings [Hash{Symbol => Object}] datastore index settings (without the `index.` prefix) forwarded to the index definition. See the [Elasticsearch docs](https://www.elastic.co/guide/en/elasticsearch/reference/8.15/index-modules.html#index-modules-settings) for available settings.
         # @yield [Indexing::Index] the index, so it can be customized further
         # @return [void]
         #
@@ -117,7 +117,7 @@ module ElasticGraph
         # can override this using {SchemaElements::Field#resolve_with}.
         #
         # @param default_resolver_name [Symbol] name of the GraphQL resolver to use as the default for fields of this type
-        # @param config [Hash<Symbol, Object>] resolver-specific configuration forwarded to the resolver's `initialize` method within the `config` parameter
+        # @param config [Hash{Symbol => Object}] resolver-specific configuration forwarded to the resolver's `initialize` method within the `config` parameter
         # @return [void]
         # @see API#register_graphql_resolver
         def resolve_fields_with(default_resolver_name, **config)
@@ -252,7 +252,7 @@ module ElasticGraph
         # `runtime_metadata.yaml` schema artifact and made available at runtime to `elasticgraph-graphql` and
         # `elasticgraph-indexer`.
         #
-        # @param overrides [Hash<Symbol, Object>] runtime metadata attributes to override, corresponding to
+        # @param overrides [Hash{Symbol => Object}] runtime metadata attributes to override, corresponding to
         #   {SchemaArtifacts::RuntimeMetadata::ObjectType} fields (e.g. `:elasticgraph_category`, `:source_type`)
         # @return [void]
         def override_runtime_metadata(**overrides)

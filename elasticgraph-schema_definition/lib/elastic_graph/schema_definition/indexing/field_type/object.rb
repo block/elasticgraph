@@ -21,15 +21,15 @@ module ElasticGraph
         # @!attribute [r] subfields
         #   @return [Array<Field>] the subfields of this object type
         # @!attribute [r] mapping_options
-        #   @return [Hash<String, ::Object>] options to be included in the mapping
+        #   @return [Hash{String => ::Object}] options to be included in the mapping
         # @!attribute [r] json_schema_options
-        #   @return [Hash<String, ::Object>] options to be included in the JSON schema
+        #   @return [Hash{String => ::Object}] options to be included in the JSON schema
         # @!attribute [r] doc_comment
         #   @return [String, nil] documentation for the type
         #
         # @api private
         class Object < Support::MemoizableData.define(:schema_def_state, :type_name, :subfields, :mapping_options, :json_schema_options, :doc_comment)
-          # @return [Hash<String, ::Object>] the datastore mapping for this object type.
+          # @return [Hash{String => ::Object}] the datastore mapping for this object type.
           def to_mapping
             @to_mapping ||= begin
               base_mapping = Field.normalized_mapping_hash_for(subfields)
@@ -41,7 +41,7 @@ module ElasticGraph
             end
           end
 
-          # @return [Hash<String, ::Object>] the JSON schema for this object type.
+          # @return [Hash{String => ::Object}] the JSON schema for this object type.
           def to_json_schema
             @to_json_schema ||=
               if json_schema_options.empty?
@@ -68,13 +68,13 @@ module ElasticGraph
               end
           end
 
-          # @return [Hash<String, ::Object>] additional ElasticGraph metadata to put in the JSON schema for this object type.
+          # @return [Hash{String => ::Object}] additional ElasticGraph metadata to put in the JSON schema for this object type.
           def json_schema_field_metadata_by_field_name
             subfields.to_h { |f| [f.name, f.json_schema_metadata] }
           end
 
-          # @param customizations [Hash<String, ::Object>] JSON schema customizations
-          # @return [Hash<String, ::Object>] formatted customizations.
+          # @param customizations [Hash{String => ::Object}] JSON schema customizations
+          # @return [Hash{String => ::Object}] formatted customizations.
           def format_field_json_schema_customizations(customizations)
             customizations
           end

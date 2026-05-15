@@ -546,7 +546,7 @@ module ElasticGraph
         # via {Mixins::HasIndices#resolve_fields_with} will be used.
         #
         # @param resolver_name [Symbol] name of the GraphQL resolver
-        # @param config [Hash<Symbol, Object>] resolver-specific configuration forwarded to the resolver's `initialize` method within the `config` parameter
+        # @param config [Hash{Symbol => Object}] resolver-specific configuration forwarded to the resolver's `initialize` method within the `config` parameter
         # @return [void]
         # @see API#register_graphql_resolver
         #

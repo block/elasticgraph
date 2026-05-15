@@ -23,23 +23,23 @@ module ElasticGraph
         #
         # @api private
         class Enum < ::Data
-          # @return [Hash<String, ::Object>] the JSON schema for this enum type.
+          # @return [Hash{String => ::Object}] the JSON schema for this enum type.
           def to_json_schema
             {"type" => "string", "enum" => enum_value_names}
           end
 
-          # @return [Hash<String, ::Object>] the datastore mapping for this enum type.
+          # @return [Hash{String => ::Object}] the datastore mapping for this enum type.
           def to_mapping
             {"type" => "keyword"}
           end
 
-          # @return [Hash<String, ::Object>] additional ElasticGraph metadata to put in the JSON schema for this enum type.
+          # @return [Hash{String => ::Object}] additional ElasticGraph metadata to put in the JSON schema for this enum type.
           def json_schema_field_metadata_by_field_name
             {}
           end
 
-          # @param customizations [Hash<String, ::Object>] JSON schema customizations
-          # @return [Hash<String, ::Object>] formatted customizations.
+          # @param customizations [Hash{String => ::Object}] JSON schema customizations
+          # @return [Hash{String => ::Object}] formatted customizations.
           def format_field_json_schema_customizations(customizations)
             # Since an enum type already restricts the values to a small set of allowed values, we do not need to keep
             # other customizations (such as the `maxLength` field customization EG automatically applies to fields

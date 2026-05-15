@@ -109,7 +109,7 @@ module ElasticGraph
         #
         # @param at [::String] path from the global configuration root to where this configuration resides
         # @param optional [::Boolean] whether configuration at the provided `path` is optional
-        # @param schema [::Hash<::Symbol, ::Object>] JSON Schema definition keywords (e.g. `properties`, `required`, `type`) forwarded to the draft-07 JSON Schema validator
+        # @param schema [::Hash{::Symbol => ::Object}] JSON Schema definition keywords (e.g. `properties`, `required`, `type`) forwarded to the draft-07 JSON Schema validator
         # @return [void]
         #
         # @example Define a configuration class
@@ -147,7 +147,7 @@ module ElasticGraph
         # Instantiates a config instance from the given parsed YAML class, returning `nil` if there is no config.
         # In addition, this (along with `Support::FromYamlFile`) makes `from_yaml_file(path_to_file)` available.
         #
-        # @param parsed_yaml [::Hash<::String, ::Object>] config hash parsed from YAML
+        # @param parsed_yaml [::Hash{::String => ::Object}] config hash parsed from YAML
         # @return [::Data, nil] the instantiated config object or `nil` if there is nothing at the specified path
         def from_parsed_yaml(parsed_yaml)
           value_at_path = Support::HashUtil.fetch_value_at_path(parsed_yaml, path.split(".")) { return nil }
@@ -162,7 +162,7 @@ module ElasticGraph
 
         # Instantiates a config instance from the given parsed YAML class, raising an error if there is no config.
         #
-        # @param parsed_yaml [::Hash<::String, ::Object>] config hash parsed from YAML
+        # @param parsed_yaml [::Hash{::String => ::Object}] config hash parsed from YAML
         # @return [::Data] the instantiated config object
         # @raise [Errors::ConfigError] if there is no config at the specified path.
         def from_parsed_yaml!(parsed_yaml)
@@ -177,7 +177,7 @@ module ElasticGraph
         # Like `new`, but avoids applying JSON schema validation. This is needed so that we can make
         # `#with` work correctly with the validation and conversion features we offer.
         #
-        # @param data [Hash<Symbol, Object>] attribute values matching the members declared by `Data.define`
+        # @param data [Hash{Symbol => Object}] attribute values matching the members declared by `Data.define`
         # @private
         def new_without_validation(**data)
           instance = allocate

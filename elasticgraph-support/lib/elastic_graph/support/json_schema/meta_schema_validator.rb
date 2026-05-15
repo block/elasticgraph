@@ -49,7 +49,7 @@ module ElasticGraph
       module MetaSchemaLoader
         # Builds a validator to validate a JSON schema definition according to the JSON schema meta schema.
         #
-        # @param overrides [Hash<String, Object>] meta schema overrides
+        # @param overrides [Hash{String => Object}] meta schema overrides
         def self.load_strict_validator(overrides = {})
           schema = ::JSONSchemer::Draft7::SCHEMA
           schema = ::ElasticGraph::Support::HashUtil.deep_merge(schema, overrides) unless overrides.empty?

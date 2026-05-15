@@ -44,7 +44,7 @@ module ElasticGraph
           "text" => {"maxLength" => DEFAULT_MAX_TEXT_LENGTH}
         }
 
-        # @return [Hash<String, Object>] the mapping for this field. The returned hash should be composed entirely
+        # @return [Hash{String => Object}] the mapping for this field. The returned hash should be composed entirely
         #   of Ruby primitives that, when converted to a JSON string, match the structure required by
         #   [Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html).
         def mapping
@@ -63,7 +63,7 @@ module ElasticGraph
           end
         end
 
-        # @return [Hash<String, Object>] the JSON schema definition for this field. The returned object should
+        # @return [Hash{String => Object}] the JSON schema definition for this field. The returned object should
         #   be composed entirely of Ruby primitives that, when converted to a JSON string, match the
         #   requirements of [the JSON schema spec](https://json-schema.org/).
         def json_schema
@@ -85,7 +85,7 @@ module ElasticGraph
         # work properly.
         #
         # @param fields [Array<Field>] fields to generate a mapping hash from
-        # @return [Hash<String, Object>] generated mapping hash
+        # @return [Hash{String => Object}] generated mapping hash
         def self.normalized_mapping_hash_for(fields)
           # When an object field has `properties`, the datastore normalizes the mapping by dropping
           # the `type => object` (it's implicit, as `properties` are only valid on an object...).

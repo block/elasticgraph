@@ -27,7 +27,7 @@ module ElasticGraph
       # @!attribute [r] default_sort_pairs
       #   @return [Array<(String, Symbol)>] (field name, direction) pairs for the default sort
       # @!attribute [r] settings
-      #   @return [Hash<(String, Object)>] datastore settings for the index
+      #   @return [Hash{String => Object}] datastore settings for the index
       # @!attribute [r] schema_def_state
       #   @return [State] schema definition state
       # @!attribute [r] indexed_type
@@ -42,7 +42,7 @@ module ElasticGraph
         include Mixins::HasReadableToSAndInspect.new { |i| i.name }
 
         # @param name [String] name of the index
-        # @param settings [Hash<(String, Object)>] datastore settings for the index
+        # @param settings [Hash{String => Object}] datastore settings for the index
         # @param schema_def_state [State] schema definition state
         # @param indexed_type [SchemaElements::ObjectType, SchemaElements::InterfaceType, SchemaElements::UnionType] type backed by this index
         # @yield [Index] the index, for further customization
@@ -230,7 +230,7 @@ module ElasticGraph
           routing_field_path.path_in_index != "id"
         end
 
-        # @return [Hash<String, Object>] datastore configuration for this index for when it does not use rollover
+        # @return [Hash{String => Object}] datastore configuration for this index for when it does not use rollover
         def to_index_config
           {
             "aliases" => {},
@@ -239,7 +239,7 @@ module ElasticGraph
           }.compact
         end
 
-        # @return [Hash<String, Object>] datastore configuration for the index template that will be defined if rollover is used
+        # @return [Hash{String => Object}] datastore configuration for the index template that will be defined if rollover is used
         def to_index_template_config
           {
             "index_patterns" => ["#{name}#{ROLLOVER_INDEX_INFIX_MARKER}*"],

@@ -59,7 +59,7 @@ module ElasticGraph
 
         # Adds additional filter conditions to a relationship beyond the foreign key.
         #
-        # @param filter [Hash<Symbol, Object>, Hash<String, Object>] additional filter conditions for this relationship
+        # @param filter [Hash{Symbol => Object}, Hash{String => Object}] additional filter conditions for this relationship
         # @return [void]
         #
         # @example Define additional filter conditions on a `relates_to_one` relationship

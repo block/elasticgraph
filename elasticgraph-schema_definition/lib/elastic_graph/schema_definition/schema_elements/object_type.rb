@@ -38,7 +38,7 @@ module ElasticGraph
         include Mixins::ImplementsInterfaces
         include Mixins::HasReadableToSAndInspect.new { |t| t.name }
 
-        # @return [Hash<String, Field>] fields that will be indexed, including __typename for mixed-type indices (types
+        # @return [Hash{String => Field}] fields that will be indexed, including __typename for mixed-type indices (types
         # that inherit an index from an abstract supertype)
         # @private
         def indexing_fields_by_name_in_index

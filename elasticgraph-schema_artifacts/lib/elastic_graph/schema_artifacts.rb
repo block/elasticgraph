@@ -20,7 +20,7 @@ module ElasticGraph
 
     # Builds a `SchemaArtifacts::FromDisk` instance using the provided YAML settings.
     #
-    # @param parsed_yaml [Hash<String, Object>] hash parsed from a settings YAML file
+    # @param parsed_yaml [Hash{String => Object}] hash parsed from a settings YAML file
     # @return [FromDisk]
     def self.from_parsed_yaml(parsed_yaml)
       config = Config.from_parsed_yaml(parsed_yaml) || Config.new

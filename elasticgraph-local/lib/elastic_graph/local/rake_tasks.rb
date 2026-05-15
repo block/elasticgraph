@@ -74,7 +74,7 @@ module ElasticGraph
       #
       # Defaults to an empty hash.
       #
-      # @return [Hash<Symbol, String>] overrides for specific field, argument, or directive names
+      # @return [Hash{Symbol => String}] overrides for specific field, argument, or directive names
       #
       # @example Spell out comparison operators instead of using shortened forms
       #   ElasticGraph::Local::RakeTasks.new(
@@ -115,7 +115,7 @@ module ElasticGraph
       #
       # Defaults to an empty hash.
       #
-      # @return [Hash<Symbol, String>] overrides for specific type names
+      # @return [Hash{Symbol => String}] overrides for specific type names
       #
       # @example Rename `JsonSafeLong` to `BigInt`
       #   ElasticGraph::Local::RakeTasks.new(
@@ -133,7 +133,7 @@ module ElasticGraph
       #
       # Defaults to an empty hash.
       #
-      # @return [Hash<Symbol, Hash<Symbol, String>>] overrides for the names of specific enum values for specific enum types
+      # @return [Hash{Symbol => Hash{Symbol => String}}] overrides for the names of specific enum values for specific enum types
       #
       # @example Shorten the names of the `DayOfWeek` enum values
       #   ElasticGraph::Local::RakeTasks.new(
@@ -285,7 +285,7 @@ module ElasticGraph
       # Hash mapping environments (e.g. `:test`, `:dev`, etc) to port numbers for use when booting Elasticsearch or OpenSearch. The hash
       # automatically includes an entry for the `:local` environment, using a port number extracted from `local_config_yaml`.
       #
-      # @return [Hash<Symbol, Integer>] mapping from environment name to port number
+      # @return [Hash{Symbol => Integer}] mapping from environment name to port number
       #
       # @example Define what port to use to boot the datastore for the `:test` environment
       #   ElasticGraph::Local::RakeTasks.new(
@@ -330,7 +330,7 @@ module ElasticGraph
       # registered callback.
       #
       # @param type [Symbol] type of data batch. Can be the name of a GraphQL type or any other name you want to give a batch of fake data
-      # @yieldreturn [Array<Hash<String, Object>>] generated data
+      # @yieldreturn [Array<Hash{String => Object}>] generated data
       #
       # @example Register a callback to generate fake `campaigns` data
       #   ElasticGraph::Local::RakeTasks.new(

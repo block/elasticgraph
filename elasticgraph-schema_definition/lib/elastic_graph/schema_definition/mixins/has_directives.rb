@@ -14,7 +14,7 @@ module ElasticGraph
         # Adds a GraphQL directive to the current schema element.
         #
         # @param name [String] name of the directive
-        # @param arguments [Hash<String, Object>] arguments for the directive
+        # @param arguments [Hash{String => Object}] arguments for the directive
         # @return [void]
         #
         # @example Add a standard GraphQL directive to a field

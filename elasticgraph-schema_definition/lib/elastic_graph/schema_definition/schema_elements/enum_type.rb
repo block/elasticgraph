@@ -35,7 +35,7 @@ module ElasticGraph
       # @!attribute [rw] for_output
       #   @return [Boolean] `true` if this enum is used for both input and output; `false` if it is for input only
       # @!attribute [r] values_by_name
-      #   @return [Hash<String, EnumValue>] map of enum values, keyed by name
+      #   @return [Hash{String => EnumValue}] map of enum values, keyed by name
       class EnumType < Struct.new(:schema_def_state, :type_ref, :for_output, :values_by_name)
         # @dynamic type_ref, graphql_only?
         prepend Mixins::VerifiesGraphQLName

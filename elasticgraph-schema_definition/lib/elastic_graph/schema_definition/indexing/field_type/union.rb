@@ -20,11 +20,11 @@ module ElasticGraph
         #   of the subtypes (and also a `__typename` keyword field).
         #
         # @!attribute [r] subtypes_by_name
-        #   @return [Hash<String, Object>] the subtypes of the union, keyed by name.
+        #   @return [Hash{String => Object}] the subtypes of the union, keyed by name.
         #
         # @api private
         class Union < ::Data.define(:subtypes_by_name)
-          # @return [Hash<String, ::Object>] the JSON schema for this union type.
+          # @return [Hash{String => ::Object}] the JSON schema for this union type.
           def to_json_schema
             subtype_json_schemas = subtypes_by_name.keys.map { |name| {"$ref" => "#/$defs/#{name}"} }
 
@@ -43,7 +43,7 @@ module ElasticGraph
             }
           end
 
-          # @return [Hash<String, ::Object>] the datastore mapping for this union type.
+          # @return [Hash{String => ::Object}] the datastore mapping for this union type.
           def to_mapping
             mapping_subfields = subtypes_by_name.values.map(&:subfields).reduce([], :union)
 
@@ -53,13 +53,13 @@ module ElasticGraph
             )
           end
 
-          # @return [Hash<String, ::Object>] additional ElasticGraph metadata to put in the JSON schema for this union type.
+          # @return [Hash{String => ::Object}] additional ElasticGraph metadata to put in the JSON schema for this union type.
           def json_schema_field_metadata_by_field_name
             {}
           end
 
-          # @param customizations [Hash<String, ::Object>] JSON schema customizations
-          # @return [Hash<String, ::Object>] formatted customizations.
+          # @param customizations [Hash{String => ::Object}] JSON schema customizations
+          # @return [Hash{String => ::Object}] formatted customizations.
           def format_field_json_schema_customizations(customizations)
             customizations
           end

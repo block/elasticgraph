@@ -17,7 +17,7 @@ module ElasticGraph
       # @!attribute [r] name
       #   @return [String] name of the directive
       # @!attribute [r] arguments
-      #   @return [Hash<Symbol, Object>] directive arguments
+      #   @return [Hash{Symbol => Object}] directive arguments
       # @!parse class Directive < ::Data; end
       class Directive < ::Data.define(:name, :arguments)
         prepend Mixins::VerifiesGraphQLName

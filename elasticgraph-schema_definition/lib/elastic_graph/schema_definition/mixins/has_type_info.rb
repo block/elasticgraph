@@ -19,12 +19,12 @@ module ElasticGraph
       # - {SchemaElements::TypeWithSubfields}: allows customization of how an object type is represented in JSON schema and the index.
       # - {SchemaElements::Field}: allows customization of a specific field over the field type's standard JSON schema and the index mapping.
       module HasTypeInfo
-        # @return [Hash<Symbol, Object>] datastore mapping options
+        # @return [Hash{Symbol => Object}] datastore mapping options
         def mapping_options
           @mapping_options ||= {}
         end
 
-        # @return [Hash<Symbol, Object>] JSON schema options
+        # @return [Hash{Symbol => Object}] JSON schema options
         def json_schema_options
           @json_schema_options ||= {}
         end
@@ -63,15 +63,15 @@ module ElasticGraph
         # modeled as an object in GraphQL. For example, we use it for the `GeoLocation` type so they get indexed in Elasticsearch using the
         # [geo_point type](https://www.elastic.co/guide/en/elasticsearch/reference/7.10/geo-point.html).
         #
-        # @param options [Hash<Symbol, Object>] mapping options--must be limited to {CUSTOMIZABLE_DATASTORE_PARAMS}
+        # @param options [Hash{Symbol => Object}] mapping options--must be limited to {CUSTOMIZABLE_DATASTORE_PARAMS}
         # @option options [String] :type mapping field type (e.g. `"keyword"`, `"text"`, `"integer"`)
         # @option options [String] :analyzer analyzer to use for `text` fields
         # @option options [Boolean] :eager_global_ordinals whether to eagerly load global ordinals
         # @option options [Boolean] :enabled whether the field is enabled for indexing
-        # @option options [Hash<String, Object>] :fields multi-field mappings
+        # @option options [Hash{String => Object}] :fields multi-field mappings
         # @option options [String] :format date format string
         # @option options [Boolean] :index whether the field value should be indexed
-        # @option options [Hash<String, Object>] :meta arbitrary metadata attached to the field mapping
+        # @option options [Hash{String => Object}] :meta arbitrary metadata attached to the field mapping
         # @option options [Boolean] :norms whether field-length normalization is enabled
         # @option options [Object] :null_value value to substitute for `null` at index time
         # @option options [String] :search_analyzer analyzer to use at search time (overrides `:analyzer`)
@@ -139,7 +139,7 @@ module ElasticGraph
         # GraphQL schema. If you think you might want to make a field non-nullable in the GraphQL schema some day, it’s a good idea to use
         # `json_schema nullable: false` now to ensure every indexed record has a non-null value for the field.
         #
-        # @param options [Hash<Symbol, Object>] JSON schema options. Any
+        # @param options [Hash{Symbol => Object}] JSON schema options. Any
         #   [JSON schema validation keyword](https://json-schema.org/understanding-json-schema/reference) is accepted.
         #   In addition, `nullable: false` is supported to disallow `null` values. Common options are shown below.
         # @option options [String] :type JSON type (e.g. `"string"`, `"integer"`, `"number"`)

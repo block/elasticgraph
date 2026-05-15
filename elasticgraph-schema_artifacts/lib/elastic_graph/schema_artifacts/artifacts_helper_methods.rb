@@ -15,7 +15,7 @@ module ElasticGraph
       # Provides accesses to the datastore scripts, typically written using the [painless scripting
       # language](https://www.elastic.co/docs/explore-analyze/scripting/modules-scripting-painless).
       #
-      # @return [Hash<String, Hash<String, Object>>]
+      # @return [Hash{String => Hash{String => Object}}]
       def datastore_scripts
         datastore_config.fetch("scripts")
       end
@@ -23,14 +23,14 @@ module ElasticGraph
       # Provides accesses to the datastore index templates, which are used for a rollover index defined using
       # {SchemaDefinition::Indexing::Index#rollover}.
       #
-      # @return [Hash<String, Hash<String, Object>>]
+      # @return [Hash{String => Hash{String => Object}}]
       def index_templates
         datastore_config.fetch("index_templates")
       end
 
       # Provides accesses to the datastore indices, used for an index that does not rollover.
       #
-      # @return [Hash<String, Hash<String, Object>>]
+      # @return [Hash{String => Hash{String => Object}}]
       def indices
         datastore_config.fetch("indices")
       end
@@ -38,7 +38,7 @@ module ElasticGraph
       # Provides access to the [mappings](https://www.elastic.co/docs/manage-data/data-store/mapping) of both the
       # {#index_templates} and {#indices}.
       #
-      # @return [Hash<String, Hash<String, Object>>]
+      # @return [Hash{String => Hash{String => Object}}]
       def index_mappings_by_index_def_name
         @index_mappings_by_index_def_name ||= index_templates
           .transform_values { |config| config.fetch("template").fetch("mappings") }
