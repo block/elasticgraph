@@ -18,10 +18,22 @@ module ElasticGraph
       # another namespace type) under a shared path. It cannot be indexed, and any no-argument field
       # (on any parent type) whose return type is a namespace type is automatically resolved.
       #
-      # @example Define a namespace type
+      # @example Group an indexed type's root query fields under an `OlapQuery` namespace
       #   ElasticGraph.define_schema do |schema|
       #     schema.namespace_type "OlapQuery" do |t|
-      #       # in the block, `t` is a NamespaceType
+      #       t.documentation "Namespace for OLAP query fields."
+      #     end
+      #
+      #     schema.on_root_query_type do |t|
+      #       t.field "olap", "OlapQuery!"
+      #     end
+      #
+      #     schema.object_type "Widget" do |t|
+      #       t.field "id", "ID"
+      #       # Routes `widgets` and `widgetAggregations` onto `OlapQuery` instead of `Query`,
+      #       # exposing them as `Query.olap.widgets` and `Query.olap.widgetAggregations`.
+      #       t.root_query_fields plural: "widgets", on: "OlapQuery"
+      #       t.index "widgets"
       #     end
       #   end
       class NamespaceType < ObjectType
