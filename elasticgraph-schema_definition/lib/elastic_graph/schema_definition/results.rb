@@ -113,6 +113,56 @@ module ElasticGraph
         state.user_definition_complete_callbacks.each(&:call)
       end
 
+      def validate_namespace_type_cycles
+        ns_types = state.namespace_types_by_name
+        visited = ::Set.new # : ::Set[::String]
+        ns_types.each_key do |type_name|
+          detect_namespace_type_cycle(type_name, ns_types, [], visited)
+        end
+      end
+
+      def detect_namespace_type_cycle(type_name, ns_types, path, visited)
+        if path.include?(type_name)
+          cycle = path.drop_while { |n| n != type_name } + [type_name]
+          raise Errors::SchemaError,
+            "Cycle detected among namespace types: #{cycle.map { |n| "`#{n}`" }.join(" -> ")}. " \
+            "Namespace types must form a tree rooted at `Query`."
+        end
+
+        return unless visited.add?(type_name)
+
+        ns_types.fetch(type_name).graphql_fields_by_name.each_value do |field|
+          return_type_name = field.type.fully_unwrapped.name
+          next unless ns_types.key?(return_type_name)
+
+          detect_namespace_type_cycle(return_type_name, ns_types, path + [type_name], visited)
+        end
+      end
+
+      def validate_namespace_type_reachability
+        ns_types = state.namespace_types_by_name
+        reachable = ::Set.new # : ::Set[::String]
+        collect_reachable_namespace_types("Query", ns_types, reachable)
+
+        orphans = ns_types.keys - reachable.to_a
+        return if orphans.empty?
+
+        raise Errors::SchemaError,
+          "Namespace type(s) declared but not reachable from `Query`: #{orphans.sort.map { |n| "`#{n}`" }.join(", ")}. " \
+          "Add a field pointing to each one (e.g., `schema.on_root_query_type { |t| t.field ... }`)."
+      end
+
+      def collect_reachable_namespace_types(type_name, ns_types, reachable)
+        return unless reachable.add?(type_name)
+
+        ns_types.fetch(type_name).graphql_fields_by_name.each_value do |field|
+          return_type_name = field.type.fully_unwrapped.name
+          next unless ns_types.key?(return_type_name)
+
+          collect_reachable_namespace_types(return_type_name, ns_types, reachable)
+        end
+      end
+
       def json_schema_with_metadata_merger
         @json_schema_with_metadata_merger ||= Indexing::JSONSchemaWithMetadata::Merger.new(self)
       end
@@ -258,8 +308,15 @@ module ElasticGraph
       # at the very end (after evaluating the "main" template). `Evaluator` calls this
       # automatically at the end.
       def generate_sdl
+        # Detect namespace cycles before `check_for_circular_dependencies!` so its generic error
+        # doesn't preempt our more specific one.
+        validate_namespace_type_cycles
         check_for_circular_dependencies!
         state.object_types_by_name.values.each(&:verify_graphql_correctness!)
+        # `all_types` applies `on_root_query_type` customizations, which must fire before we walk the
+        # namespace graph for reachability (otherwise `Query` has no fields from those callbacks yet).
+        all_types
+        validate_namespace_type_reachability
 
         type_defs = state.factory
           .new_graphql_sdl_enumerator(all_types)

@@ -21,6 +21,7 @@ module ElasticGraph
           end
 
           s.namespace_type "OlapQuery"
+          s.on_root_query_type { |t| t.field "olap", "OlapQuery" }
         end
 
         # Only the `widgets` index mapping is generated (no namespace type mapping).
@@ -40,6 +41,8 @@ module ElasticGraph
             t.field "olap", "OlapQuery"
             t.index "widgets"
           end
+
+          s.on_root_query_type { |t| t.field "olap", "OlapQuery" }
         end
 
         expect(widget_mapping.dig("properties")).to include("id" => {"type" => "keyword"})

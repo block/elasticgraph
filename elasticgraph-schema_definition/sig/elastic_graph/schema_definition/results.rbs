@@ -47,6 +47,10 @@ module ElasticGraph
       def strip_trailing_whitespace: (::String) -> ::String
       def check_for_circular_dependencies!: () -> void
       def recursively_add_referenced_types_to: (SchemaElements::TypeReference, ::Hash[::String, ::Set[::String]]) -> void
+      def validate_namespace_type_cycles: () -> void
+      def detect_namespace_type_cycle: (::String, ::Hash[::String, SchemaElements::NamespaceType], ::Array[::String], ::Set[::String]) -> void
+      def validate_namespace_type_reachability: () -> void
+      def collect_reachable_namespace_types: (::String, ::Hash[::String, SchemaElements::NamespaceType], ::Set[::String]) -> void
 
       @all_types: Array[SchemaElements::graphQLType]?
       def all_types: () -> ::Array[SchemaElements::graphQLType]

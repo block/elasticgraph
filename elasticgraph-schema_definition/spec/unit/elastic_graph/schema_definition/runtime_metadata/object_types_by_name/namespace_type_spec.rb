@@ -32,6 +32,7 @@ module ElasticGraph
             t.field "domain", "DomainQuery"
           end
           s.namespace_type "DomainQuery"
+          s.on_root_query_type { |t| t.field "olap", "OlapQuery" }
         end
 
         expect(metadata.graphql_fields_by_name.fetch("domain").resolver).to eq(
@@ -47,6 +48,7 @@ module ElasticGraph
             t.field "domain", "DomainQuery"
             t.index "widgets"
           end
+          s.on_root_query_type { |t| t.field "domain", "DomainQuery" }
         end
 
         expect(metadata.graphql_fields_by_name.fetch("domain").resolver).to eq(
@@ -63,6 +65,7 @@ module ElasticGraph
             s.namespace_type "OlapQuery" do |t|
               t.field "plain", "Plain"
             end
+            s.on_root_query_type { |t| t.field "olap", "OlapQuery" }
           end
         }.to raise_error(Errors::SchemaError, a_string_including("`OlapQuery.plain` needs a resolver"))
       end
@@ -75,6 +78,7 @@ module ElasticGraph
             end
           end
           s.namespace_type "DomainQuery"
+          s.on_root_query_type { |t| t.field "olap", "OlapQuery" }
         end
 
         expect(metadata.graphql_fields_by_name.fetch("domain").resolver).to eq(
@@ -91,6 +95,7 @@ module ElasticGraph
               end
             end
             s.namespace_type "DomainQuery"
+            s.on_root_query_type { |t| t.field "olap", "OlapQuery" }
           end
         }.to raise_error(Errors::SchemaError, a_string_including("`OlapQuery.domain` needs a resolver"))
       end
@@ -102,6 +107,7 @@ module ElasticGraph
               f.resolve_with :get_record_field_value
             end
           end
+          s.on_root_query_type { |t| t.field "olap", "OlapQuery" }
         end
 
         expect(metadata.graphql_fields_by_name.fetch("name").resolver).to eq(

@@ -70,6 +70,7 @@ module ElasticGraph
         it "does not generate any derived types for a namespace type" do
           result = define_schema do |schema|
             schema.namespace_type "OlapQuery"
+            schema.on_root_query_type { |t| t.field "olap", "OlapQuery" }
           end
 
           # Only `OlapQuery` itself appears in the schema -- no `*Connection`, `*Edge`, `*FilterInput`,
@@ -136,9 +137,77 @@ module ElasticGraph
           )
         end
 
+        it "raises when a namespace type is declared but not reachable from `Query`" do
+          expect {
+            define_schema do |schema|
+              schema.namespace_type "OlapQuery"
+            end
+          }.to raise_error(
+            Errors::SchemaError, /Namespace type\(s\) declared but not reachable from `Query`: `OlapQuery`/
+          )
+        end
+
+        it "lists all unreachable namespace types in alphabetical order" do
+          expect {
+            define_schema do |schema|
+              schema.namespace_type "WarehouseQuery"
+              schema.namespace_type "OlapQuery"
+            end
+          }.to raise_error(Errors::SchemaError, /`OlapQuery`, `WarehouseQuery`/)
+        end
+
+        it "allows namespace types reachable transitively from `Query`, including via multiple paths" do
+          expect {
+            define_schema do |schema|
+              schema.namespace_type "OlapQuery" do |t|
+                t.field "domain", "DomainQuery"
+              end
+              schema.namespace_type "WarehouseQuery" do |t|
+                t.field "domain", "DomainQuery"
+              end
+              schema.namespace_type "DomainQuery"
+
+              schema.on_root_query_type do |t|
+                t.field "olap", "OlapQuery!"
+                t.field "warehouse", "WarehouseQuery!"
+              end
+            end
+          }.not_to raise_error
+        end
+
+        it "raises when namespace types form a cycle" do
+          expect {
+            define_schema do |schema|
+              schema.namespace_type "OlapQuery" do |t|
+                t.field "domain", "DomainQuery"
+              end
+              schema.namespace_type "DomainQuery" do |t|
+                t.field "olap", "OlapQuery"
+              end
+            end
+          }.to raise_error(
+            Errors::SchemaError, /Cycle detected among namespace types: `OlapQuery` -> `DomainQuery` -> `OlapQuery`/
+          )
+        end
+
+        it "raises when a namespace type references itself" do
+          expect {
+            define_schema do |schema|
+              schema.namespace_type "OlapQuery" do |t|
+                t.field "self", "OlapQuery"
+              end
+            end
+          }.to raise_error(
+            Errors::SchemaError, /Cycle detected among namespace types: `OlapQuery` -> `OlapQuery`/
+          )
+        end
+
         def namespace_type(name, *args, include_docs: false, &block)
           result = define_schema do |api|
             api.namespace_type(name, *args, &block)
+            api.on_root_query_type do |t|
+              t.field correctly_cased(name.sub(/Query\z/, "").downcase), "#{name}!"
+            end
           end
 
           # We add a line break to match the expectations which use heredocs.

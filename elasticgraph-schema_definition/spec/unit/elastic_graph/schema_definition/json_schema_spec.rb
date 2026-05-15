@@ -2899,6 +2899,8 @@ module ElasticGraph
           end
 
           s.namespace_type "OlapQuery"
+
+          s.on_root_query_type { |t| t.field "olap", "OlapQuery" }
         end
 
         expect(schemas.keys).to include(EVENT_ENVELOPE_JSON_SCHEMA_NAME, "Widget")
@@ -2918,6 +2920,8 @@ module ElasticGraph
             t.field "olap", "OlapQuery"
             t.index "widgets"
           end
+
+          s.on_root_query_type { |t| t.field "olap", "OlapQuery" }
         end
 
         expect(schemas.keys).to exclude("OlapQuery")
