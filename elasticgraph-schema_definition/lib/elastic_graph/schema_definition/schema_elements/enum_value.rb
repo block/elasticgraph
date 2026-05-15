@@ -60,7 +60,7 @@ module ElasticGraph
 
         # Updates the runtime metadata.
         #
-        # @param [Hash<Symbol, Object>] updates to apply to the runtime metadata
+        # @param updates [Hash{Symbol => Object}] to apply to the runtime metadata
         # @return [void]
         def update_runtime_metadata(**updates)
           self.runtime_metadata = runtime_metadata.with(**updates)

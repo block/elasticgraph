@@ -116,7 +116,6 @@ Tags/CollectionType:
     - "elasticgraph-schema_definition/lib/elastic_graph/schema_definition/results.rb"
     - "elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/directive.rb"
     - "elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/enum_type.rb"
-    - "elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/enum_value.rb"
     - "elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/field.rb"
     - "elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/object_type.rb"
     - "elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/relationship.rb"
@@ -163,6 +162,3 @@ Tags/RedundantParamDescription:
   Exclude:
     - "elasticgraph-apollo/lib/elastic_graph/apollo/schema_definition/field_extension.rb"
 
-Tags/TagTypePosition:
-  Exclude:
-    - "elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/enum_value.rb"
