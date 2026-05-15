@@ -10,13 +10,8 @@
 # Documentation validators
 Documentation/BlankLineBeforeDefinition:
   Exclude:
-    - "elasticgraph-apollo/lib/elastic_graph/apollo/graphql/engine_extension.rb"
-    - "elasticgraph-apollo/lib/elastic_graph/apollo/graphql/entities_field_resolver.rb"
     - "elasticgraph-elasticsearch/lib/elastic_graph/elasticsearch/client.rb"
-    - "elasticgraph-local/lib/elastic_graph/local/docker_runner.rb"
     - "elasticgraph-opensearch/lib/elastic_graph/opensearch/client.rb"
-    - "elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/list_counts_state.rb"
-    - "elasticgraph-support/lib/elastic_graph/support/from_yaml_file.rb"
 
 Documentation/UndocumentedMethodArguments:
   Exclude:

@@ -19,7 +19,6 @@ module ElasticGraph
         :path_from_list_counts
       )
         # @dynamic path_to_list_counts, path_from_list_counts, with
-
         def self.new_list_counts_field(at:)
           new(path_to_list_counts: at, path_from_list_counts: "")
         end

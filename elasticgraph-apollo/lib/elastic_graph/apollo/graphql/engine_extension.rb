@@ -5,7 +5,6 @@
 # https://opensource.org/licenses/MIT.
 #
 # frozen_string_literal: true
-
 module ElasticGraph
   module Apollo
     # Namespace for all Apollo GraphQL engine logic.

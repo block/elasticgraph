@@ -35,7 +35,6 @@ module ElasticGraph
       # so that it happens lazily.
       class ForRakeTasks < ::Module
         # @dynamic from_yaml_file
-
         def initialize(component_class)
           define_method :from_yaml_file do |yaml_file, *args, **options|
             __skip__ = new(*args, **options) do

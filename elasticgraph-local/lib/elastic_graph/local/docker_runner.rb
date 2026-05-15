@@ -32,7 +32,6 @@ module ElasticGraph
         end
       end
       # :nocov:
-
       def halt
         prepare_docker_compose_run "down --volumes" do |command|
           system(command)
