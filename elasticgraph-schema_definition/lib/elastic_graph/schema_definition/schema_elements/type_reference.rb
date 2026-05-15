@@ -216,7 +216,7 @@ module ElasticGraph
           renamed_with_same_wrappings(inner_name)
         end
 
-        # Builds a `TypeReference` for a statically named derived type for the given `category.
+        # Builds a `TypeReference` for a statically named derived type for the given `category`.
         #
         # In addition, a dynamic method `as_[category]` is also provided (defined further below).
         def as_static_derived_type(category)

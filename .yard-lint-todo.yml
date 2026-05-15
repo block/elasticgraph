@@ -18,10 +18,6 @@ Documentation/BlankLineBeforeDefinition:
     - "elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/list_counts_state.rb"
     - "elasticgraph-support/lib/elastic_graph/support/from_yaml_file.rb"
 
-Documentation/MarkdownSyntax:
-  Exclude:
-    - "elasticgraph-schema_definition/lib/elastic_graph/schema_definition/schema_elements/type_reference.rb"
-
 Documentation/UndocumentedMethodArguments:
   Exclude:
     - "elasticgraph-admin_lambda/lib/elastic_graph/admin_lambda/rake_adapter.rb"
