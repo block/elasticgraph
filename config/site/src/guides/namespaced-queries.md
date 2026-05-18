@@ -26,7 +26,7 @@ then expose the namespace type as a field on `Query`.
   schema.namespace_type "OlapQuery"
 
   schema.on_root_query_type do |t|
-    t.field "olap", "OlapQuery!"
+    t.field "olap", "OlapQuery"
   end
 
   schema.object_type "Widget" do |t|
@@ -37,9 +37,8 @@ then expose the namespace type as a field on `Query`.
   end
 end' %}
 
-The namespace type is named `OlapQuery` (GraphQL types are PascalCase by convention) and is exposed
-as the `olap` field on `Query` (camelCase). Throughout this guide, "namespace type" refers to the
-type itself and field references like `Query.olap` refer to the field on `Query` that returns it.
+The namespace type is named `OlapQuery` and is exposed
+as the `olap` field on `Query`.
 
 This produces a GraphQL API where `Widgets` are queried through `olap`:
 
@@ -55,8 +54,7 @@ This produces a GraphQL API where `Widgets` are queried through `olap`:
 }" %}
 
 You don't need to wire up a resolver for `Query.olap`. ElasticGraph auto-resolves any no-argument
-field whose return type is a namespace type with an inert passthrough object, so each child field's
-own resolver runs against it.
+field whose return type is a namespace type.
 
 ## Nested Example
 
@@ -65,13 +63,13 @@ you don't have to configure a resolver for any intermediate field.
 
 {% include copyable_code_snippet.html language="ruby" code='ElasticGraph.define_schema do |schema|
   schema.namespace_type "OlapQuery" do |t|
-    t.field "domain", "DomainQuery!"
+    t.field "domain", "DomainQuery"
   end
 
   schema.namespace_type "DomainQuery"
 
   schema.on_root_query_type do |t|
-    t.field "olap", "OlapQuery!"
+    t.field "olap", "OlapQuery"
   end
 
   schema.object_type "Widget" do |t|
@@ -82,29 +80,3 @@ you don't have to configure a resolver for any intermediate field.
 end' %}
 
 Widgets are now queried at `Query.olap.domain.widgets`.
-
-## Tradeoffs
-
-### Single Target per Indexed Type
-
-An indexed type's root fields (`plural` and `singular`) are always placed together on one target
-type; either `Query` (the default) or a single namespace type. You cannot split them; for example,
-you cannot put `widgets` on `Query` and `widgetAggregations` on `OlapQuery`. If you need different
-groupings for the list field and the aggregation field, consider whether the namespace type is
-actually the right grouping, or model the split at the supergraph level.
-
-## Apollo Federation
-
-If you expose ElasticGraph through [elasticgraph-apollo](/elasticgraph/api-docs/{{ site.data.doc_versions.latest_version }}/ElasticGraph/Apollo.html),
-namespace types appear in the `_service` SDL like any other type. Depending on your composition
-strategy, you may need to apply federation directives:
-
-- `@shareable` — if another subgraph also defines a type with the same name and overlapping fields,
-  use `apollo_shareable` on the namespace type (and on shared fields) so Apollo composition allows
-  the overlap.
-- `@inaccessible` — use `apollo_inaccessible` on fields you don't want exposed in the final
-  supergraph schema.
-
-Namespace types you declare behave like any user-defined type — they are not tagged with
-`@shareable` automatically, even if you've called `tag_built_in_types_with`. Apply the directive
-explicitly when your supergraph composition requires it.
