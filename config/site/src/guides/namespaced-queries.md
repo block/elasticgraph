@@ -22,36 +22,14 @@ A namespace is an object type declared with [`namespace_type`](/elasticgraph/api
 You can route an indexed type's root fields to the namespace by passing `on:` to [`root_query_fields`](/elasticgraph/api-docs/main/ElasticGraph/SchemaDefinition/Mixins/HasIndices.html#root_query_fields-instance_method),
 then expose the namespace type as a field on `Query`.
 
-{% include copyable_code_snippet.html language="ruby" code='ElasticGraph.define_schema do |schema|
-  schema.namespace_type "OlapQuery"
-
-  schema.on_root_query_type do |t|
-    t.field "olap", "OlapQuery"
-  end
-
-  schema.object_type "Widget" do |t|
-    t.field "id", "ID"
-    t.field "name", "String"
-    t.index "widgets"
-    t.root_query_fields plural: "widgets", on: "OlapQuery"
-  end
-end' %}
+{% include copyable_code_snippet.html language="ruby" data="namespaced_queries.files.schema_rb" %}
 
 The namespace type is named `OlapQuery` and is exposed
 as the `olap` field on `Query`.
 
 This produces a GraphQL API where `Widgets` are queried through `olap`:
 
-{% include copyable_code_snippet.html language="graphql" code="query {
-  olap {
-    widgets(first: 10) {
-      nodes { id name }
-    }
-    widgetAggregations {
-      nodes { count }
-    }
-  }
-}" %}
+{% include copyable_code_snippet.html language="graphql" data="namespaced_queries_queries.basic.QueryWidgets" %}
 
 You don't need to wire up a resolver for `Query.olap`. ElasticGraph auto-resolves any no-argument
 field whose return type is a namespace type.
@@ -61,22 +39,6 @@ field whose return type is a namespace type.
 Namespace types can be nested inside other namespace types. The same auto-resolution applies, so
 you don't have to configure a resolver for any intermediate field.
 
-{% include copyable_code_snippet.html language="ruby" code='ElasticGraph.define_schema do |schema|
-  schema.namespace_type "OlapQuery" do |t|
-    t.field "domain", "DomainQuery"
-  end
-
-  schema.namespace_type "DomainQuery"
-
-  schema.on_root_query_type do |t|
-    t.field "olap", "OlapQuery"
-  end
-
-  schema.object_type "Widget" do |t|
-    t.field "id", "ID"
-    t.index "widgets"
-    t.root_query_fields plural: "widgets", on: "DomainQuery"
-  end
-end' %}
+{% include copyable_code_snippet.html language="ruby" data="nested_namespaced_queries.files.schema_rb" %}
 
 Widgets are now queried at `Query.olap.domain.widgets`.
