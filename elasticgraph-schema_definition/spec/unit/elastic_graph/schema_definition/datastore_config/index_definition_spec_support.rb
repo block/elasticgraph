@@ -13,22 +13,30 @@ module ElasticGraph
     ::RSpec.shared_context "IndexDefinitionSpecSupport" do
       include_context "SchemaDefinitionHelpers"
 
-      def index_configs_for(*index_names, index_document_sizes: false, schema_element_name_form: "snake_case", &schema_definition)
-        config = define_schema(
+      def build_datastore_config(index_document_sizes: false, schema_element_name_form: "snake_case", &schema_definition)
+        define_schema(
           index_document_sizes: index_document_sizes,
           schema_element_name_form: schema_element_name_form,
           &schema_definition
         ).datastore_config
+      end
+
+      def index_configs_for(*index_names, index_document_sizes: false, schema_element_name_form: "snake_case", &schema_definition)
+        config = build_datastore_config(
+          index_document_sizes: index_document_sizes,
+          schema_element_name_form: schema_element_name_form,
+          &schema_definition
+        )
 
         index_names.map { |i| config.fetch("indices").fetch(i) }
       end
 
       def index_template_configs_for(*index_names, index_document_sizes: false, schema_element_name_form: "snake_case", &schema_definition)
-        config = define_schema(
+        config = build_datastore_config(
           index_document_sizes: index_document_sizes,
           schema_element_name_form: schema_element_name_form,
           &schema_definition
-        ).datastore_config
+        )
 
         index_names.map { |i| config.fetch("index_templates").fetch(i) }
       end
