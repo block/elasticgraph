@@ -1,0 +1,15 @@
+query QueryWidgets {
+  olap {
+    widgets(first: 10) {
+      nodes {
+        id
+        name
+      }
+    }
+    widgetAggregations {
+      nodes {
+        count
+      }
+    }
+  }
+}

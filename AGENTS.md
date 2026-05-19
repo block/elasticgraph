@@ -55,6 +55,28 @@ bundle exec rake opensearch:test:boot
 - When writing links in documentation, use permalinks (links to a specific commit/version)
 - Prefer relative links to ElasticGraph documentation over external links to ruby-doc.org
 
+#### Validated Code Snippets in User Guides
+
+One of the website's guiding principles is that **all code snippets in guides must be validated** — pulled from real example projects under `config/site/examples/` rather than hand-written inline in the markdown. This ensures CI catches any future API breakage that would invalidate the docs.
+
+When you add or modify code examples in `config/site/src/guides/*.md`, do this from the start (don't write inline `code='...'` blocks first and migrate later):
+
+1. **Pick or create an example project** under `config/site/examples/<name>/`. Each project needs at minimum:
+   - `schema.rb` — schema definition file (validated by `schema_artifacts:dump`)
+   - `local_settings.yaml` — points `schema_artifacts.directory` at `config/site/examples/<name>/schema_artifacts`
+   - Optional: `queries/<category>/*.graphql` (validated against the schema by the query registry)
+   - Optional: additional `.rb` files for snippets that don't need to execute (e.g. `Rakefile`-style examples)
+2. **Mark snippet ranges** in the source files with `# :snippet-start: <name>` / `# :snippet-end:` comment fences. The fenced region becomes available as `<example>.snippets.<file>.<name>`. Whole files are also exposed as `<example>.files.<file>`, but **prefer fenced snippets** — they let you keep the standard Block copyright header at the top of the file (and any boilerplate like `schema.json_schema_version 1`) without it leaking into the rendered docs. Trim each snippet to just what's pertinent to the guide.
+3. **Reference snippets from markdown** with the data parameter:
+   ```
+   {% include copyable_code_snippet.html language="ruby" data="<example>.snippets.<file>.<name>" %}
+   ```
+   Never write inline `code='...'` blocks for guide content — those bypass validation.
+4. **Run** `bundle exec rake site:examples:<name>:extract_snippets` to regenerate `config/site/src/_data/<name>.yaml` (this file is gitignored — it gets rebuilt on the fly).
+5. **Preview** with `bundle exec rake site:serve` to confirm the snippet renders correctly before opening a PR.
+
+For an end-to-end example, see `config/site/examples/custom_resolver/` and how its snippets are pulled into `config/site/src/guides/custom-graphql-resolvers.md`.
+
 ## Architecture
 
 ### Monorepo Structure
