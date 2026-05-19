@@ -17,9 +17,11 @@ response = graphql.graphql_query_executor.execute(query)
 data = response.fetch("data")
 
 unless (3..36).cover?(data.fetch("roll6SidedDice")) && (3..60).cover?(data.fetch("roll10SidedDice"))
+  # :nocov: -- only executes on validation failure
   raise <<~EOS
     Got an unexpected response:
 
     #{::JSON.pretty_generate(response)}
   EOS
+  # :nocov:
 end

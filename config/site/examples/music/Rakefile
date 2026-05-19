@@ -6,6 +6,17 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/local/rake_tasks"
+
+ElasticGraph::Local::RakeTasks.new(
+  local_config_yaml: File.expand_path("local_settings.yaml", __dir__),
+  path_to_schema: File.expand_path("schema.rb", __dir__)
+) do |tasks|
+  tasks.opensearch_versions = []
+  tasks.enforce_json_schema_version = false
+end
+
+# :nocov: -- only used for manual live-server query validation, not during the build
 require "graphql"
 require "json"
 require "net/http"
@@ -202,3 +213,4 @@ namespace :example_queries do
     end
   end
 end
+# :nocov:
