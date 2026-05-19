@@ -361,8 +361,10 @@ module ElasticGraph
         # @param dir [:in, :out] direction of the foreign key. Use `:in` for an inbound foreign key that resides on the related type and
         #   references the identifier of this type. Use `:out` for an outbound foreign key that resides on this type and references the
         #   identifier of the related type.
-        # @param references [String] the field that the foreign key points to. Defaults to `"id"`. Use this when the target of the
-        #   foreign key uses a different identifier field (e.g. `"guid"`).
+        # @param references [String] the field that the foreign key points to. Defaults to `"id"`. For indexed types (root document types),
+        #   this must always be `"id"` because document IDs are always sourced from the `id` field. This parameter can only be customized
+        #   when the referenced type is an embedded type (a type without an index), allowing you to match on a different field within
+        #   nested objects (e.g. `"guid"`).
         # @param indexing_only [Boolean] when true, the relationship is used only for indexing purposes (e.g. `sourced_from`) and will not
         #   generate a GraphQL field.
         # @yield [Relationship] the generated relationship fields, for further customization
@@ -387,24 +389,6 @@ module ElasticGraph
         #      t.index "players"
         #    end
         #  end
-        #
-        # @example Use `references` when the foreign key points to a field other than `id`
-        #  ElasticGraph.define_schema do |schema|
-        #    schema.object_type "Team" do |t|
-        #      t.field "id", "ID"
-        #      t.field "guid", "ID"
-        #      t.field "name", "String"
-        #      t.field "homeCity", "String"
-        #      t.index "teams"
-        #    end
-        #
-        #    schema.object_type "Player" do |t|
-        #      t.field "id", "ID"
-        #      t.field "name", "String"
-        #      t.relates_to_one "team", "Team", via: "teamGuid", references: "guid", dir: :out
-        #      t.index "players"
-        #    end
-        #  end
         def relates_to_one(field_name, type, via:, dir:, references: "id", indexing_only: false, &block)
           foreign_key_type = schema_def_state.type_ref(type).non_null? ? "ID!" : "ID"
           relates_to(field_name, type, via: via, dir: dir, referenced_field_name: references, foreign_key_type: foreign_key_type, cardinality: :one, related_type: type, indexing_only: indexing_only, &block)
@@ -421,8 +405,10 @@ module ElasticGraph
         # @param dir [:in, :out] direction of the foreign key. Use `:in` for an inbound foreign key that resides on the related type and
         #   references the identifier of this type. Use `:out` for an outbound foreign key that resides on this type and references the
         #   identifier of the related type.
-        # @param references [String] the field that the foreign key points to. Defaults to `"id"`. Use this when the target of the
-        #   foreign key uses a different identifier field (e.g. `"guid"`).
+        # @param references [String] the field that the foreign key points to. Defaults to `"id"`. For indexed types (root document types),
+        #   this must always be `"id"` because document IDs are always sourced from the `id` field. This parameter can only be customized
+        #   when the referenced type is an embedded type (a type without an index), allowing you to match on a different field within
+        #   nested objects (e.g. `"guid"`).
         # @param singular [String] singular form of the `field_name`; will be used (along with an `Aggregations` suffix) for the name of
         #   the generated aggregations field. Not required when `indexing_only: true`.
         # @param indexing_only [Boolean] when true, the relationship is used only for indexing purposes (e.g. `sourced_from`) and will not
@@ -448,25 +434,6 @@ module ElasticGraph
         #      t.field "id", "ID"
         #      t.field "name", "String"
         #      t.field "teamId", "ID"
-        #      t.index "players"
-        #    end
-        #  end
-        #
-        # @example Use `references` when the foreign key points to a field other than `id`
-        #  ElasticGraph.define_schema do |schema|
-        #    schema.object_type "Team" do |t|
-        #      t.field "id", "ID"
-        #      t.field "guid", "ID"
-        #      t.field "name", "String"
-        #      t.field "homeCity", "String"
-        #      t.relates_to_many "players", "Player", via: "teamGuid", references: "guid", dir: :in, singular: "player"
-        #      t.index "teams"
-        #    end
-        #
-        #    schema.object_type "Player" do |t|
-        #      t.field "id", "ID"
-        #      t.field "name", "String"
-        #      t.field "teamGuid", "ID"
         #      t.index "players"
         #    end
         #  end

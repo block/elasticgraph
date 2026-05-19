@@ -502,13 +502,6 @@ json_schema_version: 1
         ElasticGraph:
           type: ID!
           nameInIndex: id
-      guid:
-        allOf:
-        - "$ref": "#/$defs/ID"
-        - maxLength: 8191
-        ElasticGraph:
-          type: ID!
-          nameInIndex: guid
       name:
         anyOf:
         - allOf:
@@ -536,7 +529,6 @@ json_schema_version: 1
         default: Manufacturer
     required:
     - id
-    - guid
     - name
     - created_at
     - ceo
@@ -585,15 +577,6 @@ json_schema_version: 1
         ElasticGraph:
           type: ID
           nameInIndex: manufacturer_id
-      manufacturer_guid:
-        anyOf:
-        - allOf:
-          - "$ref": "#/$defs/ID"
-          - maxLength: 8191
-        - type: 'null'
-        ElasticGraph:
-          type: ID
-          nameInIndex: manufacturer_guid
       __typename:
         type: string
         const: MechanicalPart
@@ -604,7 +587,6 @@ json_schema_version: 1
     - created_at
     - material
     - manufacturer_id
-    - manufacturer_guid
   Money:
     type: object
     properties:

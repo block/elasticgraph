@@ -325,14 +325,6 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: created_at
-      guid_ASC:
-        sort_field:
-          direction: asc
-          field_path: guid
-      guid_DESC:
-        sort_field:
-          direction: desc
-          field_path: guid
       id_ASC:
         sort_field:
           direction: asc
@@ -523,14 +515,6 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: created_on
-      guid_ASC:
-        sort_field:
-          direction: asc
-          field_path: guid
-      guid_DESC:
-        sort_field:
-          direction: desc
-          field_path: guid
       id_ASC:
         sort_field:
           direction: asc
@@ -1938,8 +1922,6 @@ index_definitions_by_name:
         source: __self
       created_at:
         source: __self
-      guid:
-        source: __self
       id:
         source: __self
       name:
@@ -1955,8 +1937,6 @@ index_definitions_by_name:
       created_at:
         source: __self
       id:
-        source: __self
-      manufacturer_guid:
         source: __self
       manufacturer_id:
         source: __self
@@ -4373,9 +4353,6 @@ object_types_by_name:
       created_at:
         resolver:
           name: get_record_field_value
-      guid:
-        resolver:
-          name: get_record_field_value
       id:
         resolver:
           name: get_record_field_value
@@ -4393,20 +4370,6 @@ object_types_by_name:
           referenced_field_name: id
         resolver:
           name: nested_relationships
-      mechanical_part_aggregations:
-        relation:
-          direction: in
-          foreign_key: manufacturer_guid
-          referenced_field_name: guid
-        resolver:
-          name: nested_relationships
-      mechanical_parts:
-        relation:
-          direction: in
-          foreign_key: manufacturer_guid
-          referenced_field_name: guid
-        resolver:
-          name: nested_relationships
       name:
         resolver:
           name: get_record_field_value
@@ -4417,8 +4380,6 @@ object_types_by_name:
         ceo:
           cardinality: one
         created_at:
-          cardinality: one
-        guid:
           cardinality: one
         name:
           cardinality: one
@@ -4444,9 +4405,6 @@ object_types_by_name:
         resolver:
           name: object_with_lookahead
       created_at:
-        resolver:
-          name: object_with_lookahead
-      guid:
         resolver:
           name: object_with_lookahead
       id:
@@ -4527,18 +4485,12 @@ object_types_by_name:
       created_at:
         resolver:
           name: object_with_lookahead
-      guid:
-        resolver:
-          name: object_with_lookahead
       name:
         resolver:
           name: object_with_lookahead
   ManufacturerHighlights:
     graphql_fields_by_name:
       ceo:
-        resolver:
-          name: get_record_field_value
-      guid:
         resolver:
           name: get_record_field_value
       id:
@@ -4576,13 +4528,6 @@ object_types_by_name:
           referenced_field_name: id
         resolver:
           name: nested_relationships
-      manufacturer_by_guid:
-        relation:
-          direction: out
-          foreign_key: manufacturer_guid
-          referenced_field_name: guid
-        resolver:
-          name: nested_relationships
       material:
         resolver:
           name: get_record_field_value
@@ -4594,8 +4539,6 @@ object_types_by_name:
     update_targets:
     - data_params:
         created_at:
-          cardinality: one
-        manufacturer_guid:
           cardinality: one
         manufacturer_id:
           cardinality: one
@@ -4841,9 +4784,6 @@ object_types_by_name:
       fees:
         resolver:
           name: get_record_field_value
-      guid:
-        resolver:
-          name: get_record_field_value
       id:
         resolver:
           name: get_record_field_value
@@ -4883,30 +4823,9 @@ object_types_by_name:
           referenced_field_name: id
         resolver:
           name: nested_relationships
-      manufacturer_by_guid:
-        relation:
-          direction: out
-          foreign_key: manufacturer_guid
-          referenced_field_name: guid
-        resolver:
-          name: nested_relationships
       material:
         resolver:
           name: get_record_field_value
-      mechanical_part_aggregations:
-        relation:
-          direction: in
-          foreign_key: manufacturer_guid
-          referenced_field_name: guid
-        resolver:
-          name: nested_relationships
-      mechanical_parts:
-        relation:
-          direction: in
-          foreign_key: manufacturer_guid
-          referenced_field_name: guid
-        resolver:
-          name: nested_relationships
       metadata:
         resolver:
           name: get_record_field_value
@@ -5056,9 +4975,6 @@ object_types_by_name:
         resolver:
           name: object_with_lookahead
       fees:
-        resolver:
-          name: object_with_lookahead
-      guid:
         resolver:
           name: object_with_lookahead
       id:
@@ -5272,9 +5188,6 @@ object_types_by_name:
       fees:
         resolver:
           name: object_with_lookahead
-      guid:
-        resolver:
-          name: object_with_lookahead
       internal_details:
         resolver:
           name: object_with_lookahead
@@ -5381,9 +5294,6 @@ object_types_by_name:
         resolver:
           name: get_record_field_value
       fees:
-        resolver:
-          name: get_record_field_value
-      guid:
         resolver:
           name: get_record_field_value
       id:
@@ -5667,13 +5577,6 @@ object_types_by_name:
           direction: out
           foreign_key: manufacturer_id
           referenced_field_name: id
-        resolver:
-          name: nested_relationships
-      manufacturer_by_guid:
-        relation:
-          direction: out
-          foreign_key: manufacturer_guid
-          referenced_field_name: guid
         resolver:
           name: nested_relationships
       material:

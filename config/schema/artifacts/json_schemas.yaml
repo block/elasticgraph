@@ -400,10 +400,6 @@ json_schema_version: 1
         allOf:
         - "$ref": "#/$defs/ID"
         - maxLength: 8191
-      guid:
-        allOf:
-        - "$ref": "#/$defs/ID"
-        - maxLength: 8191
       name:
         anyOf:
         - allOf:
@@ -422,7 +418,6 @@ json_schema_version: 1
         default: Manufacturer
     required:
     - id
-    - guid
     - name
     - created_at
     - ceo
@@ -456,12 +451,6 @@ json_schema_version: 1
           - "$ref": "#/$defs/ID"
           - maxLength: 8191
         - type: 'null'
-      manufacturer_guid:
-        anyOf:
-        - allOf:
-          - "$ref": "#/$defs/ID"
-          - maxLength: 8191
-        - type: 'null'
       __typename:
         type: string
         const: MechanicalPart
@@ -472,7 +461,6 @@ json_schema_version: 1
     - created_at
     - material
     - manufacturer_id
-    - manufacturer_guid
   Money:
     type: object
     properties:

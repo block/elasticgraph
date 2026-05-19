@@ -264,35 +264,6 @@ module ElasticGraph
         end
       end
 
-      describe "references parameter" do
-        it "includes a custom references value in relation metadata" do
-          metadata = object_type_metadata_for "Widget" do |s|
-            s.object_type "Widget" do |t|
-              t.field "id", "ID"
-              t.field "guid", "ID"
-              t.relates_to_many "children", "Widget", via: "parent_guid", dir: :in, references: "guid", singular: "child"
-              t.index "widgets"
-            end
-          end
-
-          expected_relation_field = graphql_field_with(
-            resolver: configured_graphql_resolver(:nested_relationships),
-            relation: SchemaArtifacts::RuntimeMetadata::Relation.new(
-              foreign_key: "parent_guid",
-              direction: :in,
-              referenced_field_name: "guid",
-              additional_filter: {},
-              foreign_key_nested_paths: []
-            )
-          )
-
-          expect(metadata.graphql_fields_by_name.slice("children", "child_aggregations")).to eq({
-            "children" => expected_relation_field.with(name_in_index: "children"),
-            "child_aggregations" => expected_relation_field.with(name_in_index: "child_aggregations")
-          })
-        end
-      end
-
       describe "indexing_only relationships" do
         it "excludes `indexing_only: true` relationships from graphql_fields_by_name in runtime metadata" do
           metadata = object_type_metadata_for "Widget" do |s|

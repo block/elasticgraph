@@ -1677,8 +1677,6 @@ indices:
       properties:
         id:
           type: keyword
-        guid:
-          type: keyword
         name:
           type: keyword
         created_at:
@@ -1723,8 +1721,6 @@ indices:
         material:
           type: keyword
         manufacturer_id:
-          type: keyword
-        manufacturer_guid:
           type: keyword
         __sources:
           type: keyword

@@ -53,7 +53,7 @@ module ElasticGraph
 
           expect(hidden_fields).to eq(
             "Query" => [case_correctly("address_aggregations"), "addresses", case_correctly("mechanical_part_aggregations"), case_correctly("mechanical_parts")],
-            "Manufacturer" => ["address", case_correctly("mechanical_part_aggregations"), case_correctly("mechanical_parts")]
+            "Manufacturer" => ["address"]
           )
 
           # Our mechanism for determining which types to hide on the basis of inaccessible indexes uses the type name.

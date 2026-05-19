@@ -53,7 +53,6 @@ tables:
     table_schema: |-
       CREATE TABLE IF NOT EXISTS manufacturers (
         id STRING,
-        guid STRING,
         name STRING,
         created_at TIMESTAMP,
         ceo STRUCT<id STRING, name STRING, nationality STRING, __typename STRING>
@@ -65,8 +64,7 @@ tables:
         name STRING,
         created_at TIMESTAMP,
         material STRING,
-        manufacturer_id STRING,
-        manufacturer_guid STRING
+        manufacturer_id STRING
       )
   named_inventors:
     table_schema: |-
