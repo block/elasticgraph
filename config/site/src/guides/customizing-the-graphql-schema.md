@@ -23,12 +23,7 @@ Set [`schema_element_name_form`](/elasticgraph/api-docs/{{ site.data.doc_version
 to choose between `:camelCase` (the default) and `:snake_case` for every generated field name, argument name, and
 directive name in the SDL. Generated types like `WidgetFilterInput` are unaffected; only the elements within them.
 
-{% include copyable_code_snippet.html language="ruby" code='ElasticGraph::Local::RakeTasks.new(
-  local_config_yaml: "config/settings/local.yaml",
-  path_to_schema: "config/schema.rb"
-) do |tasks|
-  tasks.schema_element_name_form = :snake_case
-end' %}
+{% include copyable_code_snippet.html language="ruby" data="schema_customization.snippets.rake_task_examples_rb.schema_element_name_form" %}
 
 For example, this will cause ElasticGraph to generate `StringFilterInput.equal_to_any_of` rather than
 `StringFilterInput.equalToAnyOf`.
@@ -43,17 +38,7 @@ field, ElasticGraph will use the name `homeCity` rather than `home_city` on the 
 Use [`schema_element_name_overrides`](/elasticgraph/api-docs/{{ site.data.doc_versions.latest_version }}/ElasticGraph/Local/RakeTasks.html#schema_element_name_overrides-instance_method)
 to rename individual generated fields, arguments, or directives. For example, to spell out filter operators that ElasticGraph abbreviates by default:
 
-{% include copyable_code_snippet.html language="ruby" code='ElasticGraph::Local::RakeTasks.new(
-  local_config_yaml: "config/settings/local.yaml",
-  path_to_schema: "config/schema.rb"
-) do |tasks|
-  tasks.schema_element_name_overrides = {
-    gt: "greaterThan",
-    gte: "greaterThanOrEqualTo",
-    lt: "lessThan",
-    lte: "lessThanOrEqualTo"
-  }
-end' %}
+{% include copyable_code_snippet.html language="ruby" data="schema_customization.snippets.rake_task_examples_rb.schema_element_name_overrides" %}
 
 To rename specific values within a generated enum (e.g. `DayOfWeek.MONDAY` to `DayOfWeek.MON`), use
 [`enum_value_overrides_by_type`](/elasticgraph/api-docs/{{ site.data.doc_versions.latest_version }}/ElasticGraph/Local/RakeTasks.html#enum_value_overrides_by_type-instance_method).
@@ -66,12 +51,7 @@ types like `WidgetFilterInput`, `WidgetAggregation`, and `WidgetSortOrder`. Thes
 
 For example, to drop the `Input` suffix from types like `WidgetFilterInput` across the entire schema:
 
-{% include copyable_code_snippet.html language="ruby" code='ElasticGraph::Local::RakeTasks.new(
-local_config_yaml: "config/settings/local.yaml",
-path_to_schema: "config/schema.rb"
-) do |tasks|
-tasks.derived_type_name_formats = {FilterInput: "%{base}Filter"}
-end' %}
+{% include copyable_code_snippet.html language="ruby" data="schema_customization.snippets.rake_task_examples_rb.derived_type_name_formats" %}
 
 The full set of naming formats is documented at
 [`SchemaElements::TypeNamer::DEFAULT_FORMATS`](/elasticgraph/api-docs/{{ site.data.doc_versions.latest_version }}/ElasticGraph/SchemaDefinition/SchemaElements/TypeNamer.html#DEFAULT_FORMATS-constant).
@@ -83,12 +63,7 @@ the default uses, or schema generation fails with a config error.
 When you need to rename a single type rather than changing a naming format used across the entire schema—for example, swapping ElasticGraph's `JsonSafeLong`
 scalar for one with a name your team prefers—use [`type_name_overrides`](/elasticgraph/api-docs/{{ site.data.doc_versions.latest_version }}/ElasticGraph/Local/RakeTasks.html#type_name_overrides-instance_method):
 
-{% include copyable_code_snippet.html language="ruby" code='ElasticGraph::Local::RakeTasks.new(
-  local_config_yaml: "config/settings/local.yaml",
-  path_to_schema: "config/schema.rb"
-) do |tasks|
-  tasks.type_name_overrides = {JsonSafeLong: "BigInt"}
-end' %}
+{% include copyable_code_snippet.html language="ruby" data="schema_customization.snippets.rake_task_examples_rb.type_name_overrides" %}
 
 {: .alert-warning}
 **Warning**{: .alert-title}
@@ -106,13 +81,7 @@ When you define a field, ElasticGraph generates corresponding fields on several 
 grouped-by, highlights, sub-aggregations) plus enum values on the sort order enum. [`on_each_generated_schema_element`](/elasticgraph/api-docs/{{ site.data.doc_versions.latest_version }}/ElasticGraph/SchemaDefinition/SchemaElements/Field.html#on_each_generated_schema_element-instance_method)
 applies the same customization to all of them at once:
 
-{% include copyable_code_snippet.html language="ruby" code='schema.object_type "Transaction" do |t|
-  t.field "currency", "String" do |f|
-    f.on_each_generated_schema_element do |element|
-      element.directive "deprecated"
-    end
-  end
-end' %}
+{% include copyable_code_snippet.html language="ruby" data="schema_customization.snippets.schema_rb.on_each_generated_schema_element" %}
 
 In this case, a `@deprecated` directive would be added to `Transaction.currency`, as well as all the schema elements
 derived from `Transaction.currency` including `TransactionFilterInput.currency`, `TransactionGroupedBy.currency`, and several others.
@@ -129,16 +98,20 @@ To target a single derived form, use the more specific hooks:
 ### Type-level Hooks
 
 To customize the derived types generated from an object or interface type as a whole, use
-[`customize_derived_types`](/elasticgraph/api-docs/{{ site.data.doc_versions.latest_version }}/ElasticGraph/SchemaDefinition/Mixins/HasDerivedGraphQLTypeCustomizations.html#customize_derived_types-instance_method)
-or [`customize_derived_type_fields`](/elasticgraph/api-docs/{{ site.data.doc_versions.latest_version }}/ElasticGraph/SchemaDefinition/Mixins/HasDerivedGraphQLTypeCustomizations.html#customize_derived_type_fields-instance_method).
-For example, to mark every derived type for `Campaign` with `@deprecated`:
+[`customize_derived_types`](/elasticgraph/api-docs/{{ site.data.doc_versions.latest_version }}/ElasticGraph/SchemaDefinition/Mixins/HasDerivedGraphQLTypeCustomizations.html#customize_derived_types-instance_method).
+Pass `:all` to customize every derived type. For example, to mark every derived type for `Campaign` with `@deprecated`:
 
-{% include copyable_code_snippet.html language="ruby" code='schema.object_type "Campaign" do |t|
-  t.customize_derived_types :all do |dt|
-    dt.directive "deprecated"
-  end
-  t.index "campaigns"
-end' %}
+{% include copyable_code_snippet.html language="ruby" data="schema_customization.snippets.schema_rb.customize_derived_types_all" %}
+
+Or pass one or more specific type names to target just those derived types:
+
+{% include copyable_code_snippet.html language="ruby" data="schema_customization.snippets.schema_rb.customize_derived_types_named" %}
+
+To customize specific fields on a derived type, use
+[`customize_derived_type_fields`](/elasticgraph/api-docs/{{ site.data.doc_versions.latest_version }}/ElasticGraph/SchemaDefinition/Mixins/HasDerivedGraphQLTypeCustomizations.html#customize_derived_type_fields-instance_method).
+For example, to deprecate `pageInfo` and `totalEdgeCount` on `ProductConnection`:
+
+{% include copyable_code_snippet.html language="ruby" data="schema_customization.snippets.schema_rb.customize_derived_type_fields" %}
 
 ### Built-in Types
 
@@ -146,9 +119,7 @@ ElasticGraph generates several built-in types you don't define directly (`Query`
 and others). [`on_built_in_types`](/elasticgraph/api-docs/{{ site.data.doc_versions.latest_version }}/ElasticGraph/SchemaDefinition/API.html#on_built_in_types-instance_method)
 runs your block on each one as it's generated:
 
-{% include copyable_code_snippet.html language="ruby" code='schema.on_built_in_types do |type|
-  type.append_to_documentation "This is a built-in ElasticGraph type."
-end' %}
+{% include copyable_code_snippet.html language="ruby" data="schema_customization.snippets.schema_rb.on_built_in_types" %}
 
 ## Customizing the Root `Query` Type
 
@@ -156,9 +127,7 @@ end' %}
 is a specialization of `on_built_in_types` that fires only for the root `Query` type. Use it to add ad hoc fields
 to `Query`, append documentation, or apply directives:
 
-{% include copyable_code_snippet.html language="ruby" code='schema.on_root_query_type do |t|
-  t.append_to_documentation "Generated by ElasticGraph."
-end' %}
+{% include copyable_code_snippet.html language="ruby" data="schema_customization.snippets.schema_rb.on_root_query_type" %}
 
 You can also use this hook to add custom `Query` fields that use a [custom GraphQL resolver]({% link guides/custom-graphql-resolvers.md %}).
 
