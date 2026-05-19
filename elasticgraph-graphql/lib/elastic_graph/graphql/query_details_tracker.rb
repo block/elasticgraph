@@ -18,7 +18,8 @@ module ElasticGraph
       :datastore_query_client_duration_ms,
       :queried_shard_count,
       :extension_data,
-      :mutex
+      :mutex,
+      keyword_init: true
     )
       def self.empty
         new(
