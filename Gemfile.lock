@@ -105,9 +105,9 @@ PATH
   remote: elasticgraph-indexer_autoscaler_lambda
   specs:
     elasticgraph-indexer_autoscaler_lambda (1.2.1.pre)
-      aws-sdk-cloudwatch (>= 1.135, < 1.137)
-      aws-sdk-lambda (~> 1.178)
-      aws-sdk-sqs (~> 1.112)
+      aws-sdk-cloudwatch (~> 1.136.0)
+      aws-sdk-lambda (~> 1.179)
+      aws-sdk-sqs (~> 1.113)
       elasticgraph-datastore_core (= 1.2.1.pre)
       elasticgraph-lambda_support (= 1.2.1.pre)
 
@@ -115,7 +115,7 @@ PATH
   remote: elasticgraph-indexer_lambda
   specs:
     elasticgraph-indexer_lambda (1.2.1.pre)
-      aws-sdk-s3 (~> 1.221)
+      aws-sdk-s3 (~> 1.222)
       elasticgraph-indexer (= 1.2.1.pre)
       elasticgraph-lambda_support (= 1.2.1.pre)
 
@@ -208,7 +208,7 @@ PATH
   remote: elasticgraph-warehouse_lambda
   specs:
     elasticgraph-warehouse_lambda (1.2.1.pre)
-      aws-sdk-s3 (~> 1.221)
+      aws-sdk-s3 (~> 1.222)
       elasticgraph-indexer_lambda (= 1.2.1.pre)
       elasticgraph-lambda_support (= 1.2.1.pre)
 
@@ -715,7 +715,7 @@ DEPENDENCIES
   flatware-rspec (~> 2.3, >= 2.3.4)!
   graphql-c_parser (~> 1.1, >= 1.1.3)
   html-proofer (~> 5.2, >= 5.2.1)
-  httpx (~> 1.7)
+  httpx (~> 1.7, >= 1.7.8)
   irb (~> 1.18)
   jekyll (~> 4.4, >= 4.4.1)
   memory_profiler (~> 1.1)
@@ -764,7 +764,6 @@ CHECKSUMS
   benchmark-ips (2.14.0) sha256=b72bc8a65d525d5906f8cd94270dccf73452ee3257a32b89fbd6684d3e8a9b1d
   bigdecimal (4.1.2) sha256=53d217666027eab4280346fba98e7d5b66baaae1b9c3c1c0ffe89d48188a3fbd
   bigdecimal (4.1.2-java) sha256=ccc836eab720a525529f70ed0de26a206fdbc9a9e8ac67b3b4ac7318b03e114d
-  bundler (4.0.11) sha256=5bcec0fb78302e48d02ee46f10ee6e6942be647ba5b44a6d1ddfda9a240ce785
   coderay (1.1.3) sha256=dc530018a4684512f8f38143cd2a096c9f02a1fc2459edcfe534787a7fc77d4b
   colorator (1.1.0) sha256=e2f85daf57af47d740db2a32191d1bdfb0f6503a0dfbc8327d0c9154d5ddfc38
   concurrent-ruby (1.3.6) sha256=6b56837e1e7e5292f9864f34b69c5a2cbc75c0cf5338f1ce9903d10fa762d5ab
