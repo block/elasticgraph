@@ -19,18 +19,6 @@ ignore:
   - "config/site/examples/music_simplified/schema.rb":
     # This file is rendered at the website, and we don't want to require the standard header on it.
     - ElasticGraph/RequireStandardCommentHeader
-  - "config/site/examples/namespaced_queries/schema.rb":
-    # This file is rendered at the website, and we don't want to require the standard header on it.
-    - ElasticGraph/RequireStandardCommentHeader
-  - "config/site/examples/nested_namespaced_queries/schema.rb":
-    # This file is rendered at the website, and we don't want to require the standard header on it.
-    - ElasticGraph/RequireStandardCommentHeader
-  - "config/site/examples/schema_customization/schema.rb":
-    # This file is rendered at the website, and we don't want to require the standard header on it.
-    - ElasticGraph/RequireStandardCommentHeader
-  - "config/site/examples/schema_customization/rake_task_examples.rb":
-    # This file is rendered at the website, and we don't want to require the standard header on it.
-    - ElasticGraph/RequireStandardCommentHeader
   - "**/*.rb":
     # This cop forces syntax that steep does not yet support. (e.g. `def foo(**); bar(**); end`)
     # Once steep supports that, we can stop ignoring this one.

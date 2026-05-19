@@ -66,15 +66,14 @@ When you add or modify code examples in `config/site/src/guides/*.md`, do this f
    - `local_settings.yaml` — points `schema_artifacts.directory` at `config/site/examples/<name>/schema_artifacts`
    - Optional: `queries/<category>/*.graphql` (validated against the schema by the query registry)
    - Optional: additional `.rb` files for snippets that don't need to execute (e.g. `Rakefile`-style examples)
-2. **Mark snippet ranges** in the source files with `# :snippet-start: <name>` / `# :snippet-end:` comment fences. The fenced region becomes available as `<example>.snippets.<file>.<name>`. Whole files are also exposed as `<example>.files.<file>`.
+2. **Mark snippet ranges** in the source files with `# :snippet-start: <name>` / `# :snippet-end:` comment fences. The fenced region becomes available as `<example>.snippets.<file>.<name>`. Whole files are also exposed as `<example>.files.<file>`, but **prefer fenced snippets** — they let you keep the standard Block copyright header at the top of the file (and any boilerplate like `schema.json_schema_version 1`) without it leaking into the rendered docs. Trim each snippet to just what's pertinent to the guide.
 3. **Reference snippets from markdown** with the data parameter:
    ```
    {% include copyable_code_snippet.html language="ruby" data="<example>.snippets.<file>.<name>" %}
    ```
    Never write inline `code='...'` blocks for guide content — those bypass validation.
-4. **Add the example to `.standard.yml`** under `RequireStandardCommentHeader` exclusions if the schema/example file shouldn't carry the standard copyright header (it gets rendered into the docs verbatim).
-5. **Run** `bundle exec rake site:examples:<name>:extract_snippets` to regenerate `config/site/src/_data/<name>.yaml`. Commit the regenerated YAML alongside the source changes.
-6. **Preview** with `bundle exec rake site:serve` to confirm the snippet renders correctly before opening a PR.
+4. **Run** `bundle exec rake site:examples:<name>:extract_snippets` to regenerate `config/site/src/_data/<name>.yaml` (this file is gitignored — it gets rebuilt on the fly).
+5. **Preview** with `bundle exec rake site:serve` to confirm the snippet renders correctly before opening a PR.
 
 For an end-to-end example, see `config/site/examples/custom_resolver/` and how its snippets are pulled into `config/site/src/guides/custom-graphql-resolvers.md`.
 

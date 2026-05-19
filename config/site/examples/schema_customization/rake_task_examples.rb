@@ -1,3 +1,11 @@
+# Copyright 2024 - 2026 Block, Inc.
+#
+# Use of this source code is governed by an MIT-style
+# license that can be found in the LICENSE file or at
+# https://opensource.org/licenses/MIT.
+#
+# frozen_string_literal: true
+
 # This file contains Rakefile-style examples that get rendered into the
 # "Customizing the GraphQL Schema" guide. The code is not executed on its own;
 # the surrounding example exercises Local::RakeTasks via the site Rakefile.

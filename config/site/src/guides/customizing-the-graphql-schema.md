@@ -145,7 +145,7 @@ A namespace is an object type declared with [`namespace_type`](/elasticgraph/api
 You can route an indexed type's root fields to the namespace by passing `on:` to [`root_query_fields`](/elasticgraph/api-docs/main/ElasticGraph/SchemaDefinition/Mixins/HasIndices.html#root_query_fields-instance_method),
 then expose the namespace type as a field on `Query`.
 
-{% include copyable_code_snippet.html language="ruby" data="namespaced_queries.files.schema_rb" %}
+{% include copyable_code_snippet.html language="ruby" data="namespaced_queries.snippets.schema_rb.namespace_type" %}
 
 The namespace type is named `OlapQuery` and is exposed as the `olap` field on `Query`. This produces a GraphQL
 API where `Widget`s are queried through `olap`:
@@ -160,6 +160,6 @@ return type is a namespace type.
 Namespace types can be nested inside other namespace types. The same auto-resolution applies, so you don't have
 to configure a resolver for any intermediate field.
 
-{% include copyable_code_snippet.html language="ruby" data="nested_namespaced_queries.files.schema_rb" %}
+{% include copyable_code_snippet.html language="ruby" data="nested_namespaced_queries.snippets.schema_rb.nested_namespace_type" %}
 
 Widgets are now queried at `Query.olap.domain.widgets`.
