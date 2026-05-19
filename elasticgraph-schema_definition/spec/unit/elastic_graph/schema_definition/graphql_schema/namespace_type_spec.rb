@@ -101,6 +101,8 @@ module ElasticGraph
 
           # But it doesn't appear on any derived type of `Widget`.
           widget_derived_types = types_defined_in(result).grep(/\AWidget/) - ["Widget"]
+          expect(widget_derived_types.size).to be >= 5
+
           widget_derived_types.each do |derived_type_name|
             derived_type_sdl = type_def_from(result, derived_type_name)
             expect(derived_type_sdl).not_to include("olap"),

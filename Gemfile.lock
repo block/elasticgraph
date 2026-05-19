@@ -68,7 +68,7 @@ PATH
     elasticgraph-elasticsearch (1.2.1.pre)
       elasticgraph-support (= 1.2.1.pre)
       elasticsearch (~> 9.4)
-      faraday (~> 2.14, >= 2.14.1)
+      faraday (~> 2.14, >= 2.14.2)
       faraday-retry (~> 2.4)
 
 PATH
@@ -153,7 +153,7 @@ PATH
   specs:
     elasticgraph-opensearch (1.2.1.pre)
       elasticgraph-support (= 1.2.1.pre)
-      faraday (~> 2.14, >= 2.14.1)
+      faraday (~> 2.14, >= 2.14.2)
       faraday-retry (~> 2.4)
       opensearch-ruby (~> 3.4)
 
@@ -329,7 +329,7 @@ GEM
       activesupport (>= 6.1.0)
     faker (3.8.0)
       i18n (>= 1.8.11, < 2)
-    faraday (2.14.1)
+    faraday (2.14.2)
       faraday-net_http (>= 2.0, < 3.5)
       json
       logger
@@ -810,7 +810,7 @@ CHECKSUMS
   eventmachine (1.2.7-java) sha256=11ab7af3505f53ed7565d6a13fe73568fe0d6fac647c8816430e9c3171c8c58f
   factory_bot (6.6.0) sha256=1fc1b3b5620ec980a6a27aec1b6ec8c250ca82962e970e8a40f93e8d388d4b89
   faker (3.8.0) sha256=c147b308df73a90f27a4fc84f18d4c22ef0ad9c2a64b2b61c86fd0ca71753efc
-  faraday (2.14.1) sha256=a43cceedc1e39d188f4d2cdd360a8aaa6a11da0c407052e426ba8d3fb42ef61c
+  faraday (2.14.2) sha256=73ccb9994a9e8648f010e32eca2ae82e41c57860aa10932cda29418b9e0223ad
   faraday-net_http (3.4.2) sha256=f147758260d3526939bf57ecf911682f94926a3666502e24c69992765875906c
   faraday-retry (2.4.0) sha256=7b79c48fb7e56526faf247b12d94a680071ff40c9fda7cf1ec1549439ad11ebe
   faraday_middleware-aws-sigv4 (1.0.1) sha256=a001ea4f687ca1c60bad8f2a627196905ce3dbf285e461dc153240e92eaabe8f

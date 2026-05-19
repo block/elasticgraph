@@ -14,7 +14,7 @@ module ElasticGraph
       include_context "IndexMappingsSpecSupport"
 
       it "does not generate an index mapping for a namespace type since it has no backing data to index" do
-        index_configs = index_configs_for "widgets" do |s|
+        datastore_config = build_datastore_config do |s|
           s.object_type "Widget" do |t|
             t.field "id", "ID!"
             t.index "widgets"
@@ -23,9 +23,8 @@ module ElasticGraph
           s.namespace_type "OlapQuery"
         end
 
-        # Only the `widgets` index mapping is generated (no namespace type mapping).
-        widget_mapping = index_configs.first.fetch("mappings")
-        expect(widget_mapping.dig("properties")).to include("id" => {"type" => "keyword"})
+        expect(datastore_config.fetch("indices").keys).to contain_exactly("widgets")
+        expect(datastore_config.fetch("index_templates").keys).to be_empty
       end
 
       it "omits fields that reference a namespace type from the index mapping of an indexed type" do
