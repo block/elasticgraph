@@ -3104,7 +3104,7 @@ object_types_by_name:
         relation:
           direction: out
           foreign_key: manufacturer_id
-          references: id
+          referenced_field_name: id
         resolver:
           name: nested_relationships
       shapes:
@@ -3382,7 +3382,7 @@ object_types_by_name:
                 - 100
           direction: in
           foreign_key: component_ids
-          references: id
+          referenced_field_name: id
         resolver:
           name: nested_relationships
       id:
@@ -3416,14 +3416,14 @@ object_types_by_name:
         relation:
           direction: out
           foreign_key: part_ids
-          references: id
+          referenced_field_name: id
         resolver:
           name: nested_relationships
       parts:
         relation:
           direction: out
           foreign_key: part_ids
-          references: id
+          referenced_field_name: id
         resolver:
           name: nested_relationships
       position:
@@ -3436,14 +3436,14 @@ object_types_by_name:
         relation:
           direction: in
           foreign_key: component_ids
-          references: id
+          referenced_field_name: id
         resolver:
           name: nested_relationships
       widget_aggregations:
         relation:
           direction: in
           foreign_key: component_ids
-          references: id
+          referenced_field_name: id
         resolver:
           name: nested_relationships
       widget_cost:
@@ -3466,7 +3466,7 @@ object_types_by_name:
         relation:
           direction: in
           foreign_key: component_ids
-          references: id
+          referenced_field_name: id
         resolver:
           name: nested_relationships
     index_definition_names:
@@ -3699,14 +3699,14 @@ object_types_by_name:
         relation:
           direction: in
           foreign_key: country_code
-          references: id
+          referenced_field_name: id
         resolver:
           name: nested_relationships
       teams:
         relation:
           direction: in
           foreign_key: country_code
-          references: id
+          referenced_field_name: id
         resolver:
           name: nested_relationships
   CurrencyDetails:
@@ -3980,14 +3980,14 @@ object_types_by_name:
         relation:
           direction: in
           foreign_key: part_ids
-          references: id
+          referenced_field_name: id
         resolver:
           name: nested_relationships
       components:
         relation:
           direction: in
           foreign_key: part_ids
-          references: id
+          referenced_field_name: id
         resolver:
           name: nested_relationships
       created_at:
@@ -4000,7 +4000,7 @@ object_types_by_name:
         relation:
           direction: out
           foreign_key: manufacturer_id
-          references: id
+          referenced_field_name: id
         resolver:
           name: nested_relationships
       name:
@@ -4468,7 +4468,7 @@ object_types_by_name:
         relation:
           direction: in
           foreign_key: manufacturer_id
-          references: id
+          referenced_field_name: id
         resolver:
           name: nested_relationships
       ceo:
@@ -4487,28 +4487,28 @@ object_types_by_name:
         relation:
           direction: in
           foreign_key: manufacturer_id
-          references: id
+          referenced_field_name: id
         resolver:
           name: nested_relationships
       manufactured_parts:
         relation:
           direction: in
           foreign_key: manufacturer_id
-          references: id
+          referenced_field_name: id
         resolver:
           name: nested_relationships
       mechanical_part_aggregations:
         relation:
           direction: in
           foreign_key: manufacturer_guid
-          references: guid
+          referenced_field_name: guid
         resolver:
           name: nested_relationships
       mechanical_parts:
         relation:
           direction: in
           foreign_key: manufacturer_guid
-          references: guid
+          referenced_field_name: guid
         resolver:
           name: nested_relationships
       name:
@@ -4657,14 +4657,14 @@ object_types_by_name:
         relation:
           direction: in
           foreign_key: part_ids
-          references: id
+          referenced_field_name: id
         resolver:
           name: nested_relationships
       components:
         relation:
           direction: in
           foreign_key: part_ids
-          references: id
+          referenced_field_name: id
         resolver:
           name: nested_relationships
       created_at:
@@ -4677,14 +4677,14 @@ object_types_by_name:
         relation:
           direction: out
           foreign_key: manufacturer_id
-          references: id
+          referenced_field_name: id
         resolver:
           name: nested_relationships
       manufacturer_by_guid:
         relation:
           direction: out
           foreign_key: manufacturer_guid
-          references: guid
+          referenced_field_name: guid
         resolver:
           name: nested_relationships
       material:
@@ -4866,7 +4866,7 @@ object_types_by_name:
         relation:
           direction: in
           foreign_key: manufacturer_id
-          references: id
+          referenced_field_name: id
         resolver:
           name: nested_relationships
       amount_cents:
@@ -4886,14 +4886,14 @@ object_types_by_name:
         relation:
           direction: out
           foreign_key: component_ids
-          references: id
+          referenced_field_name: id
         resolver:
           name: nested_relationships
       components:
         relation:
           direction: out
           foreign_key: component_ids
-          references: id
+          referenced_field_name: id
         resolver:
           name: nested_relationships
       cost:
@@ -4939,7 +4939,7 @@ object_types_by_name:
                 - 100
           direction: in
           foreign_key: component_ids
-          references: id
+          referenced_field_name: id
         resolver:
           name: nested_relationships
       fees:
@@ -4970,28 +4970,28 @@ object_types_by_name:
         relation:
           direction: in
           foreign_key: manufacturer_id
-          references: id
+          referenced_field_name: id
         resolver:
           name: nested_relationships
       manufactured_parts:
         relation:
           direction: in
           foreign_key: manufacturer_id
-          references: id
+          referenced_field_name: id
         resolver:
           name: nested_relationships
       manufacturer:
         relation:
           direction: out
           foreign_key: manufacturer_id
-          references: id
+          referenced_field_name: id
         resolver:
           name: nested_relationships
       manufacturer_by_guid:
         relation:
           direction: out
           foreign_key: manufacturer_guid
-          references: guid
+          referenced_field_name: guid
         resolver:
           name: nested_relationships
       material:
@@ -5001,14 +5001,14 @@ object_types_by_name:
         relation:
           direction: in
           foreign_key: manufacturer_guid
-          references: guid
+          referenced_field_name: guid
         resolver:
           name: nested_relationships
       mechanical_parts:
         relation:
           direction: in
           foreign_key: manufacturer_guid
-          references: guid
+          referenced_field_name: guid
         resolver:
           name: nested_relationships
       metadata:
@@ -5051,14 +5051,14 @@ object_types_by_name:
         relation:
           direction: out
           foreign_key: part_ids
-          references: id
+          referenced_field_name: id
         resolver:
           name: nested_relationships
       parts:
         relation:
           direction: out
           foreign_key: part_ids
-          references: id
+          referenced_field_name: id
         resolver:
           name: nested_relationships
       position:
@@ -5094,14 +5094,14 @@ object_types_by_name:
         relation:
           direction: in
           foreign_key: component_ids
-          references: id
+          referenced_field_name: id
         resolver:
           name: nested_relationships
       widget_aggregations:
         relation:
           direction: in
           foreign_key: component_ids
-          references: id
+          referenced_field_name: id
         resolver:
           name: nested_relationships
       widget_cost:
@@ -5124,7 +5124,7 @@ object_types_by_name:
         relation:
           direction: in
           foreign_key: component_ids
-          references: id
+          referenced_field_name: id
         resolver:
           name: nested_relationships
       workspace_id:
@@ -5771,14 +5771,14 @@ object_types_by_name:
         relation:
           direction: in
           foreign_key: part_ids
-          references: id
+          referenced_field_name: id
         resolver:
           name: nested_relationships
       components:
         relation:
           direction: in
           foreign_key: part_ids
-          references: id
+          referenced_field_name: id
         resolver:
           name: nested_relationships
       created_at:
@@ -5791,14 +5791,14 @@ object_types_by_name:
         relation:
           direction: out
           foreign_key: manufacturer_id
-          references: id
+          referenced_field_name: id
         resolver:
           name: nested_relationships
       manufacturer_by_guid:
         relation:
           direction: out
           foreign_key: manufacturer_guid
-          references: guid
+          referenced_field_name: guid
         resolver:
           name: nested_relationships
       material:
@@ -6511,14 +6511,14 @@ object_types_by_name:
           foreign_key_nested_paths:
           - current_players_nested
           - current_players_nested.affiliations.sponsorships_nested
-          references: id
+          referenced_field_name: id
         resolver:
           name: nested_relationships
       affiliated_team_from_object_aggregations:
         relation:
           direction: in
           foreign_key: current_players_object.affiliations.sponsorships_object.sponsor_id
-          references: id
+          referenced_field_name: id
         resolver:
           name: nested_relationships
       affiliated_teams_from_nested:
@@ -6528,14 +6528,14 @@ object_types_by_name:
           foreign_key_nested_paths:
           - current_players_nested
           - current_players_nested.affiliations.sponsorships_nested
-          references: id
+          referenced_field_name: id
         resolver:
           name: nested_relationships
       affiliated_teams_from_object:
         relation:
           direction: in
           foreign_key: current_players_object.affiliations.sponsorships_object.sponsor_id
-          references: id
+          referenced_field_name: id
         resolver:
           name: nested_relationships
       id:
@@ -7853,14 +7853,14 @@ object_types_by_name:
         relation:
           direction: out
           foreign_key: component_ids
-          references: id
+          referenced_field_name: id
         resolver:
           name: nested_relationships
       components:
         relation:
           direction: out
           foreign_key: component_ids
-          references: id
+          referenced_field_name: id
         resolver:
           name: nested_relationships
       cost:
@@ -8836,14 +8836,14 @@ object_types_by_name:
         relation:
           direction: out
           foreign_key: component_ids
-          references: id
+          referenced_field_name: id
         resolver:
           name: nested_relationships
       components:
         relation:
           direction: out
           foreign_key: component_ids
-          references: id
+          referenced_field_name: id
         resolver:
           name: nested_relationships
       cost:
@@ -8911,7 +8911,7 @@ object_types_by_name:
         relation:
           direction: out
           foreign_key: manufacturer_id
-          references: id
+          referenced_field_name: id
         resolver:
           name: nested_relationships
       metadata:

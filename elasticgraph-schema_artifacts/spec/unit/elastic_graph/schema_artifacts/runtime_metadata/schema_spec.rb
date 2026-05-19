@@ -69,7 +69,7 @@ module ElasticGraph
                     relation: Relation.new(
                       foreign_key: "grandparents.parents.some_id",
                       direction: :out,
-                      references: "id",
+                      referenced_field_name: "id",
                       additional_filter: {"flag_field" => {"equalToAnyOf" => [true]}},
                       foreign_key_nested_paths: ["grandparents", "grandparents.parents"]
                     ),
@@ -191,7 +191,7 @@ module ElasticGraph
                       "direction" => "out",
                       "foreign_key" => "grandparents.parents.some_id",
                       "foreign_key_nested_paths" => ["grandparents", "grandparents.parents"],
-                      "references" => "id"
+                      "referenced_field_name" => "id"
                     },
                     "resolver" => {"name" => "self"}
                   },

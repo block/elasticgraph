@@ -106,7 +106,7 @@ module ElasticGraph
           ::String,
           via: ::String,
           dir: foreignKeyDirection,
-          references: ::String,
+          referenced_field_name: ::String,
           foreign_key_type: ::String,
           cardinality: Relationship::cardinality,
           related_type: ::String,

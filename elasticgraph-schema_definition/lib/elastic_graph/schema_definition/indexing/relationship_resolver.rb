@@ -42,12 +42,12 @@ module ElasticGraph
             relation_metadata = relationship.runtime_metadata # : SchemaArtifacts::RuntimeMetadata::Relation
             foreign_key_parent_type = (relation_metadata.direction == :in) ? related_type : object_type
 
-            references_parent_type = (relation_metadata.direction == :in) ? object_type : related_type
+            referenced_parent_type = (relation_metadata.direction == :in) ? object_type : related_type
 
             if (foreign_key_error = validate_foreign_key(foreign_key_parent_type, relation_metadata))
               [nil, foreign_key_error]
-            elsif (references_error = validate_references(references_parent_type, relation_metadata))
-              [nil, references_error]
+            elsif (referenced_field_error = validate_referenced_field(referenced_parent_type, relation_metadata))
+              [nil, referenced_field_error]
             else
               [ResolvedRelationship.new(relationship_name, relationship, related_type, relation_metadata), nil]
             end
@@ -89,19 +89,19 @@ module ElasticGraph
           end
         end
 
-        def validate_references(references_parent_type, relation_metadata)
-          references_field = schema_def_state.field_path_resolver.resolve_public_path(references_parent_type, relation_metadata.references) { true }
-          # If it's an outbound relationship, verify that the references field exists on the related type.
+        def validate_referenced_field(referenced_parent_type, relation_metadata)
+          referenced_field = schema_def_state.field_path_resolver.resolve_public_path(referenced_parent_type, relation_metadata.referenced_field_name) { true }
+          # If it's an outbound relationship, verify that the referenced field exists on the related type.
           # Note: we don't verify this for inbound relationships, because when we define a relationship with an inbound
-          # foreign key, we automatically define an indexing only field for the references field (since it exists on the
-          # same type). We don't do that for outbound relationships, though (since the references field exists on another
+          # foreign key, we automatically define an indexing only field for the referenced field (since it exists on the
+          # same type). We don't do that for outbound relationships, though (since the referenced field exists on another
           # type). Allowing a relationship definition on type A to add a field to type B's schema would be weird and surprising.
-          if relation_metadata.direction == :out && references_field.nil?
-            "#{relationship_error_prefix} uses `#{references_parent_type.name}.#{relation_metadata.references}` as the `references` field, " \
-              "but that field does not exist as an indexing field. To continue, define it on `#{references_parent_type.name}`, " \
+          if relation_metadata.direction == :out && referenced_field.nil?
+            "#{relationship_error_prefix} uses `#{referenced_parent_type.name}.#{relation_metadata.referenced_field_name}` as the `references` field, " \
+              "but that field does not exist as an indexing field. To continue, define it on `#{referenced_parent_type.name}`, " \
               "use another field as the `references` target, or remove the `#{relationship_description}` definition."
-          elsif references_field && references_field.type.fully_unwrapped.name != "ID"
-            "#{relationship_error_prefix} uses `#{references_field.fully_qualified_path}` as the `references` field, " \
+          elsif referenced_field && referenced_field.type.fully_unwrapped.name != "ID"
+            "#{relationship_error_prefix} uses `#{referenced_field.fully_qualified_path}` as the `references` field, " \
               "but that field is not an `ID` field as expected. To continue, change its type, use another field " \
               "as the `references` target, or remove the `#{relationship_description}` definition."
           end

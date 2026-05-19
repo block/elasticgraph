@@ -29,7 +29,7 @@ module ElasticGraph
             relation: SchemaArtifacts::RuntimeMetadata::Relation.new(
               foreign_key: "parent_id",
               direction: :out,
-              references: "id",
+              referenced_field_name: "id",
               additional_filter: {},
               foreign_key_nested_paths: []
             )
@@ -51,7 +51,7 @@ module ElasticGraph
           relation: SchemaArtifacts::RuntimeMetadata::Relation.new(
             foreign_key: "parent_id",
             direction: :in,
-            references: "id",
+            referenced_field_name: "id",
             additional_filter: {},
             foreign_key_nested_paths: []
           )
@@ -87,7 +87,7 @@ module ElasticGraph
           relation: SchemaArtifacts::RuntimeMetadata::Relation.new(
             foreign_key: "parent_id",
             direction: :in,
-            references: "id",
+            referenced_field_name: "id",
             additional_filter: filter,
             foreign_key_nested_paths: []
           )
@@ -124,7 +124,7 @@ module ElasticGraph
           relation: SchemaArtifacts::RuntimeMetadata::Relation.new(
             foreign_key: "parent_id",
             direction: :in,
-            references: "id",
+            referenced_field_name: "id",
             additional_filter: {"is_enabled" => {"equal_to_any_of" => [true]}},
             foreign_key_nested_paths: []
           )
@@ -170,7 +170,7 @@ module ElasticGraph
           relation: SchemaArtifacts::RuntimeMetadata::Relation.new(
             foreign_key: "parent_id",
             direction: :in,
-            references: "id",
+            referenced_field_name: "id",
             additional_filter: {
               "is_enabled" => {"equal_to_any_of" => [true]},
               "details" => {"foo" => {"lt" => 3}, "bar" => {"gt" => 5}},
@@ -252,7 +252,7 @@ module ElasticGraph
             relation: SchemaArtifacts::RuntimeMetadata::Relation.new(
               foreign_key: "players.affiliations.sponsorships.sponsor_id",
               direction: :in,
-              references: "id",
+              referenced_field_name: "id",
               additional_filter: {},
               foreign_key_nested_paths: ["players", "players.affiliations.sponsorships"]
             )
@@ -280,7 +280,7 @@ module ElasticGraph
             relation: SchemaArtifacts::RuntimeMetadata::Relation.new(
               foreign_key: "parent_guid",
               direction: :in,
-              references: "guid",
+              referenced_field_name: "guid",
               additional_filter: {},
               foreign_key_nested_paths: []
             )

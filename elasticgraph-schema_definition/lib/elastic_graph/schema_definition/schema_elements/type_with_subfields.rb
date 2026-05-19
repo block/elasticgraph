@@ -407,7 +407,7 @@ module ElasticGraph
         #  end
         def relates_to_one(field_name, type, via:, dir:, references: "id", indexing_only: false, &block)
           foreign_key_type = schema_def_state.type_ref(type).non_null? ? "ID!" : "ID"
-          relates_to(field_name, type, via: via, dir: dir, references: references, foreign_key_type: foreign_key_type, cardinality: :one, related_type: type, indexing_only: indexing_only, &block)
+          relates_to(field_name, type, via: via, dir: dir, referenced_field_name: references, foreign_key_type: foreign_key_type, cardinality: :one, related_type: type, indexing_only: indexing_only, &block)
         end
 
         # Defines a "has many" relationship between the current indexed type and another indexed type by defining a pair of fields clients
@@ -479,7 +479,7 @@ module ElasticGraph
 
           type_ref = schema_def_state.type_ref(type).to_final_form
 
-          relates_to(field_name, type_ref.as_connection.name, via: via, dir: dir, references: references, foreign_key_type: foreign_key_type, cardinality: :many, related_type: type, indexing_only: indexing_only) do |f|
+          relates_to(field_name, type_ref.as_connection.name, via: via, dir: dir, referenced_field_name: references, foreign_key_type: foreign_key_type, cardinality: :many, related_type: type, indexing_only: indexing_only) do |f|
             f.argument schema_def_state.schema_elements.filter, type_ref.as_filter_input.name do |a|
               a.documentation "Used to filter the returned `#{field_name}` based on the provided criteria."
             end
@@ -495,7 +495,7 @@ module ElasticGraph
 
           unless indexing_only
             aggregations_name = schema_def_state.schema_elements.normalize_case("#{singular}_aggregations")
-            relates_to(aggregations_name, type_ref.as_aggregation.as_connection.name, via: via, dir: dir, references: references, foreign_key_type: foreign_key_type, cardinality: :many, related_type: type) do |f|
+            relates_to(aggregations_name, type_ref.as_aggregation.as_connection.name, via: via, dir: dir, referenced_field_name: references, foreign_key_type: foreign_key_type, cardinality: :many, related_type: type) do |f|
               f.argument schema_def_state.schema_elements.filter, type_ref.as_filter_input.name do |a|
                 a.documentation "Used to filter the `#{type}` documents that get aggregated over based on the provided criteria."
               end
@@ -608,7 +608,7 @@ module ElasticGraph
           registry[name] = field
         end
 
-        def relates_to(field_name, type, via:, dir:, references:, foreign_key_type:, cardinality:, related_type:, indexing_only: false)
+        def relates_to(field_name, type, via:, dir:, referenced_field_name:, foreign_key_type:, cardinality:, related_type:, indexing_only: false)
           field(field_name, type, sortable: false, filterable: false, groupable: false, graphql_only: true, indexing_only: indexing_only) do |field|
             relationship = schema_def_state.factory.new_relationship(
               field,
@@ -616,7 +616,7 @@ module ElasticGraph
               related_type: schema_def_state.type_ref(related_type).to_final_form,
               foreign_key: via,
               direction: dir,
-              references: references
+              referenced_field_name: referenced_field_name
             )
 
             field.relationship = relationship
@@ -625,9 +625,9 @@ module ElasticGraph
             yield relationship if block_given?
 
             if dir == :out
-              register_inferred_foreign_key_fields(from_type: [via, foreign_key_type], to_other: [references, "ID!"], related_type: relationship.related_type)
+              register_inferred_foreign_key_fields(from_type: [via, foreign_key_type], to_other: [referenced_field_name, "ID!"], related_type: relationship.related_type)
             else
-              register_inferred_foreign_key_fields(from_type: [references, "ID!"], to_other: [via, foreign_key_type], related_type: relationship.related_type)
+              register_inferred_foreign_key_fields(from_type: [referenced_field_name, "ID!"], to_other: [via, foreign_key_type], related_type: relationship.related_type)
             end
 
             if relationships_by_name.key?(field_name)

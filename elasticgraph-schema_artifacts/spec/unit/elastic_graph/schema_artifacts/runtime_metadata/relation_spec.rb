@@ -16,12 +16,12 @@ module ElasticGraph
         include RuntimeMetadataSupport
 
         it "builds from a minimal hash" do
-          relation = Relation.from_hash({"direction" => "in"})
+          relation = Relation.from_hash({"direction" => "in", "referenced_field_name" => "id"})
 
           expect(relation).to eq Relation.new(
             direction: :in,
             foreign_key: nil,
-            references: "id",
+            referenced_field_name: "id",
             additional_filter: {},
             foreign_key_nested_paths: []
           )

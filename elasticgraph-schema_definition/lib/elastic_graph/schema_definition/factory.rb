@@ -267,14 +267,14 @@ module ElasticGraph
       end
       @@field_source_new = prevent_non_factory_instantiation_of(SchemaElements::FieldSource)
 
-      def new_relationship(field, cardinality:, related_type:, foreign_key:, direction:, references:)
+      def new_relationship(field, cardinality:, related_type:, foreign_key:, direction:, referenced_field_name:)
         @@relationship_new.call(
           field,
           cardinality: cardinality,
           related_type: related_type,
           foreign_key: foreign_key,
           direction: direction,
-          references: references
+          referenced_field_name: referenced_field_name
         )
       end
       @@relationship_new = prevent_non_factory_instantiation_of(SchemaElements::Relationship)

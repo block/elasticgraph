@@ -4,14 +4,14 @@ module ElasticGraph
       class RelationSupertype
         attr_reader foreign_key: ::String
         attr_reader direction: Relation::direction
-        attr_reader references: ::String
+        attr_reader referenced_field_name: ::String
         attr_reader additional_filter: ::Hash[::String, untyped]
         attr_reader foreign_key_nested_paths: ::Array[::String]
 
         def initialize: (
           foreign_key: ::String,
           direction: Relation::direction,
-          references: ::String,
+          referenced_field_name: ::String,
           additional_filter: ::Hash[::String, untyped],
           foreign_key_nested_paths: ::Array[::String]
         ) -> void
@@ -22,7 +22,7 @@ module ElasticGraph
 
         FOREIGN_KEY: "foreign_key"
         DIRECTION: "direction"
-        REFERENCES: "references"
+        REFERENCED_FIELD_NAME: "referenced_field_name"
         ADDITIONAL_FILTER: "additional_filter"
         FOREIGN_KEY_NESTED_PATHS: "foreign_key_nested_paths"
         def self.from_hash: (::Hash[::String, untyped]) -> Relation

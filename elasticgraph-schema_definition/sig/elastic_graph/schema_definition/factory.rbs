@@ -110,7 +110,7 @@ module ElasticGraph
         related_type: SchemaElements::TypeReference,
         foreign_key: ::String,
         direction: SchemaElements::foreignKeyDirection,
-        references: ::String
+        referenced_field_name: ::String
       ) -> SchemaElements::Relationship
       @@relationship_new: ::Method
 
