@@ -6,8 +6,8 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/json_ingestion/schema_definition/indexing/json_schema_with_metadata"
 require "elastic_graph/spec_support/schema_definition_helpers"
-require "elastic_graph/schema_definition/indexing/json_schema_with_metadata"
 
 module ElasticGraph
   module SchemaDefinition
