@@ -216,8 +216,10 @@ module ElasticGraph
             "`schema.json_schema_version 4`"
           ).and matching(json_schema_version_setter_location_regex)
 
+          write_elastic_graph_schema_def_code(component_suffix: "3", json_schema_version: 3, component_extras: "t.renamed_from 'Component'", enforce_json_schema_version: false)
+
           expect {
-            output = run_rake("schema_artifacts:dump", enforce_json_schema_version: false)
+            output = run_rake("schema_artifacts:dump")
             expect(output.lines).to include(
               a_string_including("Dumped", JSON_SCHEMAS_FILE),
               a_string_including("Dumped", versioned_json_schema_file(3))
@@ -492,10 +494,10 @@ module ElasticGraph
             })
           )
 
-          # Here we add a different new field (`ordinal: Int!`), without bumping the version (and using `enforce_json_schema_version: false`
-          # to not have to bump the version)...
-          write_elastic_graph_schema_def_code(json_schema_version: 2, component_name_extras: "\nt.field 'ordinal', 'Int!'")
-          run_rake("schema_artifacts:dump", enforce_json_schema_version: false)
+          # Here we add a different new field (`ordinal: Int!`), without bumping the version, and disable
+          # enforcement so we do not have to bump the version.
+          write_elastic_graph_schema_def_code(json_schema_version: 2, component_name_extras: "\nt.field 'ordinal', 'Int!'", enforce_json_schema_version: false)
+          run_rake("schema_artifacts:dump")
 
           # It should not be added to the v1 schema...
           loaded_v1 = ::YAML.safe_load(read_artifact(versioned_json_schema_file(1)))
@@ -859,7 +861,6 @@ module ElasticGraph
               index_document_sizes: true,
               path_to_schema: "\#{project_root}/config/schema.rb",
               schema_artifacts_directory: "\#{project_root}/config/schema/artifacts",
-              enforce_json_schema_version: false
             )
           EOS
 
@@ -901,7 +902,7 @@ module ElasticGraph
           /line 7 at `(\S*\/?)schema\.rb`/
         end
 
-        def write_elastic_graph_schema_def_code(json_schema_version:, component_suffix: "", extra_sdl: "", component_name_extras: "", component_extras: "", omit_component_name_field: false)
+        def write_elastic_graph_schema_def_code(json_schema_version:, enforce_json_schema_version: true, component_suffix: "", extra_sdl: "", component_name_extras: "", component_extras: "", omit_component_name_field: false)
           code = <<~EOS
             Thread.current[:eg_schema_load_count] = (Thread.current[:eg_schema_load_count] || 0) + 1
             if Thread.current[:eg_schema_load_count] > 1
@@ -910,6 +911,7 @@ module ElasticGraph
 
             ElasticGraph.define_schema do |schema|
               schema.json_schema_version #{json_schema_version}
+              #{"schema.enforce_json_schema_version false" unless enforce_json_schema_version}
               schema.enum_type "Size" do |t|
                 t.values "SMALL", "MEDIUM", "LAGE"
               end
@@ -966,6 +968,7 @@ module ElasticGraph
 
             ElasticGraph.define_schema do |schema|
               schema.json_schema_version 1
+              schema.enforce_json_schema_version false
 
               schema.object_type "MyType" do |t|
                 t.field "id", "ID!"
@@ -976,7 +979,7 @@ module ElasticGraph
             end
           EOS
 
-          run_rake("schema_artifacts:dump", enforce_json_schema_version: false)
+          run_rake("schema_artifacts:dump")
           ::YAML.safe_load(read_artifact(RUNTIME_METADATA_FILE))
         end
 
@@ -1059,7 +1062,6 @@ module ElasticGraph
 
       def run_rake(
         *args,
-        enforce_json_schema_version: true,
         pretend_tty: false,
         path_to_schema: "schema.rb",
         include_extension_module: true,
@@ -1086,7 +1088,6 @@ module ElasticGraph
             index_document_sizes: true,
             path_to_schema: path_to_schema,
             schema_artifacts_directory: "config/schema/artifacts",
-            enforce_json_schema_version: enforce_json_schema_version,
             extension_modules: [extension_module].compact,
             derived_type_name_formats: derived_type_name_formats,
             type_name_overrides: type_name_overrides,
