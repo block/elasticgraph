@@ -175,6 +175,7 @@ PATH
     elasticgraph-schema_definition (1.2.1.pre)
       elasticgraph-graphql (= 1.2.1.pre)
       elasticgraph-indexer (= 1.2.1.pre)
+      elasticgraph-json_ingestion (= 1.2.1.pre)
       elasticgraph-schema_artifacts (= 1.2.1.pre)
       elasticgraph-support (= 1.2.1.pre)
       graphql (~> 2.6.2)
