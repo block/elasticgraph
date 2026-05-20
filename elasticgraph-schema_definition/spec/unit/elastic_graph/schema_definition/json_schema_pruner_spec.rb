@@ -7,8 +7,8 @@
 # frozen_string_literal: true
 
 require "elastic_graph/constants"
+require "elastic_graph/json_ingestion/schema_definition/json_schema_pruner"
 require "elastic_graph/spec_support/schema_definition_helpers"
-require "elastic_graph/schema_definition/json_schema_pruner"
 
 module ElasticGraph
   module SchemaDefinition
