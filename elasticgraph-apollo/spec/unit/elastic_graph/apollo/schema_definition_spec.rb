@@ -607,6 +607,18 @@ module ElasticGraph
           expect(result).to_not include("@tag")
         end
 
+        it "supports namespace types declared without a block" do
+          schema_string = graphql_schema_string do |schema|
+            define_some_types_on(schema)
+            schema.namespace_type "OlapQuery"
+            schema.on_root_query_type do |t|
+              t.field "olap", "OlapQuery!"
+            end
+          end
+
+          expect(type_def_from(schema_string, "OlapQuery")).to start_with("type OlapQuery")
+        end
+
         it "adds its extension methods in a way that does not leak into a schema definition that lacks the apollo extension" do
           schema_extensions = [:tag_built_in_types_with]
           field_extensions = [:tag_with]

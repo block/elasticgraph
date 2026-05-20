@@ -179,6 +179,7 @@ module ElasticGraph
           register_date_and_time_grouped_by_types
           register_standard_elastic_graph_types
           register_standard_graphql_resolvers
+          register_root_query_type
         end
 
         private
@@ -1434,6 +1435,12 @@ module ElasticGraph
             defined_at: require_path,
             built_in: true
 
+          require(require_path = "elastic_graph/graphql/resolvers/namespace_ref")
+          schema_def_api.register_graphql_resolver :namespace_ref,
+            GraphQL::Resolvers::NamespaceRef,
+            defined_at: require_path,
+            built_in: true
+
           require(require_path = "elastic_graph/graphql/resolvers/nested_relationships")
           schema_def_api.register_graphql_resolver :nested_relationships,
             GraphQL::Resolvers::NestedRelationships,
@@ -1449,6 +1456,18 @@ module ElasticGraph
             GraphQL::Resolvers::Object::WithoutLookahead,
             defined_at: require_path,
             built_in: true
+        end
+
+        def register_root_query_type
+          schema_def_api.namespace_type "Query" do |t|
+            t.documentation "The query entry point for the entire schema."
+          end
+
+          schema_def_state.after_user_definition_complete do
+            schema_def_state.object_types_by_name.values.select(&:directly_queryable?).sort_by(&:name).each do |type|
+              type.register_root_query_fields
+            end
+          end
         end
 
         def define_date_grouping_arguments(grouping_field, omit_timezone: false)

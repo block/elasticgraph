@@ -8,6 +8,7 @@
 
 require "elastic_graph/constants"
 require "elastic_graph/errors"
+require "elastic_graph/schema_artifacts/runtime_metadata/configured_graphql_resolver"
 require "elastic_graph/schema_definition/indexing/update_target_factory"
 
 module ElasticGraph
@@ -15,6 +16,11 @@ module ElasticGraph
     module Mixins
       # Provides APIs for defining datastore indices.
       module HasIndices
+        # Resolver auto-wired on any no-argument field that returns a namespace type. A namespace type
+        # carries no data of its own; this resolver just provides a non-null passthrough object for the
+        # GraphQL machinery so each child field's own resolver can run.
+        NAMESPACE_RESOLVER = SchemaArtifacts::RuntimeMetadata::ConfiguredGraphQLResolver.new(:namespace_ref, {})
+
         # @dynamic runtime_metadata_overrides
         # @private
         attr_reader :runtime_metadata_overrides
@@ -262,14 +268,17 @@ module ElasticGraph
           ).with(**runtime_metadata_overrides)
         end
 
-        # Determines what the root `Query` fields will be to query this indexed type. In addition, this method accepts a block, which you
+        # Determines what the root query fields will be to query this indexed type. In addition, this method accepts a block, which you
         # can use to customize the root query field (such as adding a GraphQL directive to it).
         #
-        # @param plural [String] the plural name of the entity; used for the root `Query` field that queries documents of this indexed type
-        # @param singular [String, nil] the singular name of the entity; used for the root `Query` field (with an `Aggregations` suffix) that
+        # @param plural [String] the plural name of the entity; used for the root query field that queries documents of this indexed type
+        # @param singular [String, nil] the singular name of the entity; used for the root query field (with an `Aggregations` suffix) that
         #   queries aggregations of this indexed type. If not provided, will derive it from the type name (e.g. converting it to `camelCase`
         #   or `snake_case`, depending on configuration).
-        # @yield [SchemaElements::Field] field on the root `Query` type used to query this indexed type, to support customization
+        # @param on [String] name of the object type on which the root fields should be defined. Defaults to `"Query"`. To route the
+        #   fields to a {API#namespace_type namespace type} instead, pass its name (e.g. `"OlapQuery"`). The target type must have been
+        #   declared via `namespace_type`; otherwise an error is raised at schema-definition time.
+        # @yield [SchemaElements::Field] field on the target type used to query this indexed type, to support customization
         # @return [void]
         #
         # @example Set `plural` and `singular` names
@@ -297,9 +306,26 @@ module ElasticGraph
         #       t.index "people"
         #     end
         #   end
-        def root_query_fields(plural:, singular: nil, &customization_block)
+        #
+        # @example Route root fields to a namespace type
+        #   ElasticGraph.define_schema do |schema|
+        #     schema.namespace_type "OlapQuery"
+        #
+        #     schema.on_root_query_type do |t|
+        #       t.field "olap", "OlapQuery"
+        #     end
+        #
+        #     schema.object_type "Widget" do |t|
+        #       # Results in `OlapQuery.widgets` and `OlapQuery.widgetAggregations`.
+        #       t.root_query_fields plural: "widgets", on: "OlapQuery"
+        #       t.field "id", "ID"
+        #       t.index "widgets"
+        #     end
+        #   end
+        def root_query_fields(plural:, singular: nil, on: root_query_fields_target_namespace, &customization_block)
           @plural_root_query_field_name = plural
           @singular_root_query_field_name = singular
+          @root_query_fields_target_namespace = on
           @root_query_fields_customizations = customization_block
         end
 
@@ -318,6 +344,42 @@ module ElasticGraph
         # @private
         def root_query_fields_customizations
           @root_query_fields_customizations
+        end
+
+        # @return [String] name of the object type on which the root fields for this indexed type should be defined.
+        #   Defaults to `"Query"`; can be overridden via the `on:` parameter of {#root_query_fields}.
+        def root_query_fields_target_namespace
+          @root_query_fields_target_namespace || "Query"
+        end
+
+        # Registers the root query fields for this indexed type on its target namespace type. Called during
+        # schema finalization, after all user type definitions have been evaluated.
+        #
+        # @private
+        def register_root_query_fields
+          target_type = resolve_root_query_fields_target
+
+          target_type.relates_to_many(
+            plural_root_query_field_name,
+            name,
+            via: "ignore",
+            dir: :in,
+            singular: singular_root_query_field_name
+          ) do |f|
+            f.documentation "Fetches `#{name}`s based on the provided arguments."
+            f.resolve_with :indexed_type_root_fields
+            f.hide_relationship_runtime_metadata = true
+            root_query_fields_customizations&.call(f)
+          end
+
+          # Add additional efficiency hints to the aggregation field documentation if we have any such hints.
+          # This needs to be outside the `relates_to_many` block because `relates_to_many` adds its own "suffix" to
+          # the field documentation, and here we add another one.
+          if (agg_efficiency_hint = aggregation_efficiency_hint)
+            agg_name = schema_def_state.schema_elements.normalize_case("#{singular_root_query_field_name}_aggregations")
+            agg_field = target_type.graphql_fields_by_name.fetch(agg_name)
+            agg_field.documentation "#{agg_field.doc_comment}\n\n#{agg_efficiency_hint}"
+          end
         end
 
         # @private
@@ -397,7 +459,14 @@ module ElasticGraph
             field_metadata = field.runtime_metadata_graphql_field
 
             if field_metadata.resolver.nil?
-              if default_graphql_resolver
+              # A no-argument field whose return type is a namespace type is auto-wired to the shared
+              # `NAMESPACE_RESOLVER`. Intermediate namespace wrappers (e.g. `Query.olap` returning
+              # `OlapQuery!`) are pure groupings with no backing data; the resolver provides an inert
+              # passthrough object that child resolvers hang off of. Fields that declare arguments are
+              # excluded since arguments signal the author wants custom resolution.
+              if field.args.empty? && field.type_is_namespace?
+                field_metadata.with(resolver: NAMESPACE_RESOLVER)
+              elsif default_graphql_resolver
                 field_metadata.with(resolver: default_graphql_resolver)
               else
                 parent_type_option =
@@ -415,6 +484,44 @@ module ElasticGraph
               field_metadata
             end
           end
+        end
+
+        def resolve_root_query_fields_target
+          target_name = root_query_fields_target_namespace
+          target_type = schema_def_state.object_types_by_name[target_name]
+
+          if target_type.nil?
+            raise Errors::SchemaError,
+              "`#{name}` uses `root_query_fields on: #{target_name.inspect}`, but no type named `#{target_name}` is defined. " \
+              "Declare it with `schema.namespace_type #{target_name.inspect}` or correct the `on:` value."
+          end
+
+          unless schema_def_state.namespace_types_by_name.key?(target_name)
+            raise Errors::SchemaError,
+              "`#{name}` uses `root_query_fields on: #{target_name.inspect}`, but `#{target_name}` is not a namespace type. " \
+              "`on:` must reference a type declared with `schema.namespace_type`."
+          end
+
+          target_type
+        end
+
+        def aggregation_efficiency_hint
+          return nil if derived_indexed_types.empty?
+
+          hints = derived_indexed_types.map do |type|
+            derived_indexing_type = schema_def_state.types_by_name.fetch(type.destination_type_ref.name)
+            alternate_field_name = (_ = derived_indexing_type).plural_root_query_field_name
+            grouping_field = type.id_source
+
+            "  - The root `#{alternate_field_name}` field groups by `#{grouping_field}`"
+          end
+
+          <<~EOS
+            Note: aggregation queries are relatively expensive, and some fields have been pre-aggregated to allow
+            more efficient queries for some common aggregation cases:
+
+            #{hints.join("\n")}
+          EOS
         end
 
         # Provides a "best effort" conversion of a type name to the plural form.

@@ -28,6 +28,7 @@ module ElasticGraph
         attr_reader resolver: SchemaArtifacts::RuntimeMetadata::ConfiguredGraphQLResolver?
         attr_reader singular_name: ::String?
         attr_reader as_input: bool
+        attr_reader args: ::Hash[::String, Argument]
 
         def initialize: (
           name: ::String,
@@ -63,6 +64,7 @@ module ElasticGraph
         def groupable?: () -> bool
         def highlightable?: () -> bool
         def returnable?: () -> bool
+        def type_is_namespace?: () -> bool
         def list_field_groupable_by_single_values?: () -> bool
         def aggregatable?: () -> bool
         def sub_aggregatable?: () -> bool

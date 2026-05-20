@@ -2891,6 +2891,41 @@ module ElasticGraph
         expect(envelope_type_enum_values(schemas)).to eq ["Widget"]
       end
 
+      it "does not dump a schema for a namespace type because it has no backing data to index" do
+        schemas = all_type_definitions_for do |s|
+          s.object_type "Widget" do |t|
+            t.field "id", "ID!"
+            t.index "widgets"
+          end
+
+          s.namespace_type "OlapQuery"
+        end
+
+        expect(schemas.keys).to include(EVENT_ENVELOPE_JSON_SCHEMA_NAME, "Widget")
+        expect(schemas.keys).to exclude("OlapQuery")
+        expect(envelope_type_enum_values(schemas)).to eq ["Widget"]
+      end
+
+      it "omits fields that reference a namespace type from the JSON schema of an indexed type" do
+        # This test would fail if `s.namespace_type` were replaced with `s.object_type` -- the `olap`
+        # property would appear under Widget's JSON schema. Namespace types have no backing data, so
+        # there is nothing to validate at ingestion time.
+        schemas = all_type_definitions_for do |s|
+          s.namespace_type "OlapQuery"
+
+          s.object_type "Widget" do |t|
+            t.field "id", "ID!"
+            t.field "olap", "OlapQuery"
+            t.index "widgets"
+          end
+        end
+
+        expect(schemas.keys).to exclude("OlapQuery")
+        widget_schema = schemas.fetch("Widget")
+        expect(widget_schema.dig("properties")).to include("id")
+        expect(widget_schema.dig("properties")).to exclude("olap")
+      end
+
       it "raises a clear error if the schema defines a type with a reserved name" do
         dump_schema do |s|
           expect {

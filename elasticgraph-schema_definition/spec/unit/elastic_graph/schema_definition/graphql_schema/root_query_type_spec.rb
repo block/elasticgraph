@@ -389,6 +389,129 @@ module ElasticGraph
           expect(type_names.grep(/\AQuery/)).to eq ["Query"]
         end
 
+        context "when `root_query_fields` uses `on:` to target a namespace type" do
+          it "places the list and aggregations fields on the named namespace type instead of `Query`" do
+            result = define_schema do |api|
+              api.namespace_type "OlapQuery"
+
+              api.on_root_query_type do |t|
+                t.field "olap", "OlapQuery!"
+              end
+
+              api.object_type "Widget" do |t|
+                t.root_query_fields plural: "widgets", singular: "widget", on: "OlapQuery"
+                t.field "id", "ID"
+                t.index "widgets"
+              end
+            end
+
+            expect(type_def_from(result, "Query")).to eq("type Query {\n  olap: OlapQuery!\n}")
+            expect(type_def_from(result, "OlapQuery")).to eq(<<~EOS.strip)
+              type OlapQuery {
+                widgets(
+                  filter: WidgetFilterInput
+                  #{correctly_cased "order_by"}: [WidgetSortOrderInput!]
+                  first: Int
+                  after: Cursor
+                  last: Int
+                  before: Cursor): WidgetConnection
+                #{correctly_cased "widget_aggregations"}(
+                  filter: WidgetFilterInput
+                  first: Int
+                  after: Cursor
+                  last: Int
+                  before: Cursor): WidgetAggregationConnection
+              }
+            EOS
+          end
+
+          it "supports nested namespace types" do
+            result = define_schema do |api|
+              api.namespace_type "OlapQuery" do |t|
+                t.field "domain", "DomainQuery!"
+              end
+              api.namespace_type "DomainQuery"
+
+              api.on_root_query_type do |t|
+                t.field "olap", "OlapQuery!"
+              end
+
+              api.object_type "Widget" do |t|
+                t.root_query_fields plural: "widgets", singular: "widget", on: "DomainQuery"
+                t.field "id", "ID"
+                t.index "widgets"
+              end
+            end
+
+            expect(type_def_from(result, "Query")).to eq("type Query {\n  olap: OlapQuery!\n}")
+            expect(type_def_from(result, "OlapQuery")).to eq("type OlapQuery {\n  domain: DomainQuery!\n}")
+            expect(type_def_from(result, "DomainQuery")).to start_with("type DomainQuery {\n  widgets(")
+          end
+
+          it "still routes other indexed types with no `on:` to `Query`" do
+            result = define_schema do |api|
+              api.namespace_type "OlapQuery"
+
+              api.on_root_query_type do |t|
+                t.field "olap", "OlapQuery!"
+              end
+
+              api.object_type "Widget" do |t|
+                t.root_query_fields plural: "widgets", singular: "widget", on: "OlapQuery"
+                t.field "id", "ID"
+                t.index "widgets"
+              end
+
+              api.object_type "Person" do |t|
+                t.root_query_fields plural: "people", singular: "person"
+                t.field "id", "ID"
+                t.index "people"
+              end
+            end
+
+            query_def = type_def_from(result, "Query")
+            expect(query_def).to include("olap: OlapQuery!")
+            expect(query_def).to include("people(")
+            expect(query_def).to include("#{correctly_cased("person_aggregations")}(")
+            expect(query_def).not_to include("widgets(")
+            expect(type_def_from(result, "OlapQuery")).to include("widgets(")
+          end
+
+          it "raises a clear error when `on:` references an undeclared type" do
+            expect {
+              define_schema do |api|
+                api.object_type "Widget" do |t|
+                  t.root_query_fields plural: "widgets", singular: "widget", on: "MissingNamespace"
+                  t.field "id", "ID"
+                  t.index "widgets"
+                end
+              end
+            }.to raise_error(Errors::SchemaError, a_string_including(
+              "`Widget` uses `root_query_fields on: \"MissingNamespace\"`",
+              "no type named `MissingNamespace` is defined"
+            ))
+          end
+
+          it "raises a clear error when `on:` references a non-namespace object type" do
+            expect {
+              define_schema do |api|
+                api.object_type "Regular" do |t|
+                  t.field "id", "ID"
+                end
+
+                api.object_type "Widget" do |t|
+                  t.root_query_fields plural: "widgets", singular: "widget", on: "Regular"
+                  t.field "id", "ID"
+                  t.index "widgets"
+                end
+              end
+            }.to raise_error(Errors::SchemaError, a_string_including(
+              "`Widget` uses `root_query_fields on: \"Regular\"`",
+              "`Regular` is not a namespace type"
+            ))
+          end
+        end
+
         it "can be customized using `on_root_query_type`" do
           available_field_names = []
 

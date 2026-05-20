@@ -1,0 +1,63 @@
+# Copyright 2024 - 2026 Block, Inc.
+#
+# Use of this source code is governed by an MIT-style
+# license that can be found in the LICENSE file or at
+# https://opensource.org/licenses/MIT.
+#
+# frozen_string_literal: true
+
+require "elastic_graph/errors"
+require "elastic_graph/schema_definition/schema_elements/object_type"
+
+module ElasticGraph
+  module SchemaDefinition
+    module SchemaElements
+      # {include:API#namespace_type}
+      #
+      # A namespace type is an {ObjectType} that exists purely to group fields on `Query` (or on
+      # another namespace type) under a shared path. It cannot be indexed, and any no-argument field
+      # (on any parent type) whose return type is a namespace type is automatically resolved.
+      #
+      # @example Group an indexed type's root query fields under an `OlapQuery` namespace
+      #   ElasticGraph.define_schema do |schema|
+      #     schema.namespace_type "OlapQuery" do |t|
+      #       t.documentation "Namespace for OLAP query fields."
+      #     end
+      #
+      #     schema.on_root_query_type do |t|
+      #       t.field "olap", "OlapQuery!"
+      #     end
+      #
+      #     schema.object_type "Widget" do |t|
+      #       t.field "id", "ID"
+      #       # Routes `widgets` and `widgetAggregations` onto `OlapQuery` instead of `Query`,
+      #       # exposing them as `Query.olap.widgets` and `Query.olap.widgetAggregations`.
+      #       t.root_query_fields plural: "widgets", on: "OlapQuery"
+      #       t.index "widgets"
+      #     end
+      #   end
+      class NamespaceType < ObjectType
+        # @private
+        def initialize(schema_def_state, name)
+          super(schema_def_state, name) do |type|
+            # Namespace types exist only in the GraphQL schema; they have no backing data to index,
+            # so they are marked `graphql_only` to be excluded from indexing artifacts.
+            type.graphql_only true
+            # Namespace types have no backing data, so no default resolver applies. Fields that return
+            # a namespace type are auto-wired (see `HasIndices::NAMESPACE_RESOLVER`); all other fields
+            # must set their own resolver.
+            type.resolve_fields_with nil
+            yield type if block_given?
+          end
+        end
+
+        # Namespace types cannot be indexed.
+        # @raise [Errors::SchemaError] always
+        # @private
+        def index(name, **settings, &block)
+          raise Errors::SchemaError, "`#{self.name}` cannot be both an indexed type and a namespace type."
+        end
+      end
+    end
+  end
+end

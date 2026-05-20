@@ -1,0 +1,9 @@
+module ElasticGraph
+  class GraphQL
+    module Resolvers
+      class NamespaceRef
+        include _GraphQLResolverWithoutLookahead
+      end
+    end
+  end
+end

@@ -75,6 +75,15 @@ module ElasticGraph
           end
         end
 
+        def new_namespace_type(name, &block)
+          super(name) do |raw_type|
+            raw_type.extend ObjectTypeExtension
+            type = raw_type # : ElasticGraph::SchemaDefinition::SchemaElements::NamespaceType & ObjectTypeExtension
+
+            yield type if block_given?
+          end
+        end
+
         def new_scalar_type(name)
           super(name) do |type|
             type.extend ScalarTypeExtension
