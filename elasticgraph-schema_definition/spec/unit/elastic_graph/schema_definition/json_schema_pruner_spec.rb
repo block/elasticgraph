@@ -12,7 +12,7 @@ require "elastic_graph/spec_support/schema_definition_helpers"
 
 module ElasticGraph
   module SchemaDefinition
-    RSpec.describe JSONSchemaPruner do
+    RSpec.describe JSONIngestion::SchemaDefinition::JSONSchemaPruner do
       include_context "SchemaDefinitionHelpers"
 
       describe ".prune" do
