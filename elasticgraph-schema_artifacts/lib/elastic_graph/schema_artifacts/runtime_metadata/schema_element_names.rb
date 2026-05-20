@@ -83,7 +83,7 @@ module ElasticGraph
               {
                 # Keys here are ordered alphabetically; please keep them that way.
                 FORM => form.to_s,
-                OVERRIDES => overrides
+                OVERRIDES => overrides.to_h { |k, v| [k.to_s, v.to_s] }
               }
             end
 
