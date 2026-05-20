@@ -8,6 +8,7 @@
 
 ElasticGraph.define_schema do |schema|
   schema.json_schema_version 1
+  schema.enforce_json_schema_version false
 end
 
 # Note: anytime you add a file to load here, you'll also have to update the list here:
