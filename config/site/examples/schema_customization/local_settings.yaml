@@ -8,7 +8,7 @@ datastore:
       backend: elasticsearch
       settings: {}
   index_definitions:
-    transactions: &main_index_settings
+    products:
       query_cluster: "main"
       index_into_clusters: ["main"]
       ignore_routing_values: []
@@ -16,9 +16,6 @@ datastore:
       setting_overrides:
         number_of_shards: 1
       setting_overrides_by_timestamp: {}
-    campaigns: *main_index_settings
-    orders: *main_index_settings
-    products: *main_index_settings
   max_client_retries: 3
 graphql:
   default_page_size: 50

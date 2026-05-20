@@ -57,7 +57,7 @@ provided as a query argument. Finally, it multiplies the dice roll by a configur
 {% include copyable_code_snippet.html language="ruby" data="custom_resolver.snippets.schema_rb.register_graphql_resolver" %}
 
 Custom resolvers must be registered with ElasticGraph in the schema definition, using the [`register_graphql_resolver`
-API](/elasticgraph/api-docs/{{ site.data.doc_versions.latest_version }}/ElasticGraph/SchemaDefinition/API.html#register_graphql_resolver-instance_method).
+API]({% api_doc_url path="ElasticGraph/SchemaDefinition/API.html" anchor="register_graphql_resolver-instance_method" %}).
 Any arguments provided after `defined_at:` get recorded as resolver config, which will later be passed to the resolver's `initialize` method.
 In this case, we've registered the resolver to roll two dice.
 
@@ -65,7 +65,7 @@ In this case, we've registered the resolver to roll two dice.
 
 {% include copyable_code_snippet.html language="ruby" data="custom_resolver.snippets.schema_rb.on_root_query_type" %}
 
-Here we've defined a field on `Query` using [`on_root_query_type`](/elasticgraph/api-docs/{{ site.data.doc_versions.latest_version }}/ElasticGraph/SchemaDefinition/API.html#on_root_query_type-instance_method),
+Here we've defined a field on `Query` using [`on_root_query_type`]({% api_doc_url path="ElasticGraph/SchemaDefinition/API.html" anchor="on_root_query_type-instance_method" %}),
 and configured it to use the `:roll_dice` resolver. Extra arguments (`multiplier: 3`, in this case) will be passed to the resolver in `config`.
 
 {: .alert-note}
