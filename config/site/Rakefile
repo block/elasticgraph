@@ -461,7 +461,6 @@ module ElasticGraph
                   # to demonstrate any `Rakefile` APIs.
                   ::ElasticGraph::Local::RakeTasks.new(local_config_yaml: settings_file, path_to_schema: schema_file) do |tasks|
                     tasks.opensearch_versions = []
-                    tasks.enforce_json_schema_version = false
                   end
                 end
 

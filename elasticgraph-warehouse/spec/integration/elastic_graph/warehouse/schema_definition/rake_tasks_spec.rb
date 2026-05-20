@@ -85,7 +85,7 @@ module ElasticGraph
             original_content = read_warehouse_artifact
             expect(original_content).not_to include("added_field")
 
-            write_warehouse_schema(table_defs: <<~EOS)
+            write_warehouse_schema(enforce_json_schema_version: false, table_defs: <<~EOS)
               s.object_type "Product" do |t|
                 t.field "id", "ID"
                 t.field "added_field", "String"
@@ -94,7 +94,7 @@ module ElasticGraph
             EOS
 
             expect {
-              run_rake_with_warehouse("schema_artifacts:dump", enforce_json_schema_version: false)
+              run_rake_with_warehouse("schema_artifacts:dump")
             }.to change { read_warehouse_artifact }
               .from(original_content)
               .to(a_string_including("added_field"))
@@ -157,10 +157,11 @@ module ElasticGraph
           end
         end
 
-        def write_warehouse_schema(table_defs:)
+        def write_warehouse_schema(table_defs:, enforce_json_schema_version: true)
           ::File.write("schema.rb", <<~EOS)
             ElasticGraph.define_schema do |s|
               s.json_schema_version 1
+              #{"s.enforce_json_schema_version false" unless enforce_json_schema_version}
 
               # Add a dummy indexed type to ensure the Query type has at least one field.
               # This prevents GraphQL-Ruby warnings about empty Query types in tests.
@@ -177,14 +178,13 @@ module ElasticGraph
           EOS
         end
 
-        def run_rake_with_warehouse(*args, enforce_json_schema_version: true)
+        def run_rake_with_warehouse(*args)
           run_rake(*args) do |output|
             ElasticGraph::SchemaDefinition::RakeTasks.new(
               schema_element_name_form: :snake_case,
               index_document_sizes: false,
               path_to_schema: "schema.rb",
               schema_artifacts_directory: "config/schema/artifacts",
-              enforce_json_schema_version: enforce_json_schema_version,
               extension_modules: [Warehouse::SchemaDefinition::APIExtension],
               output: output
             )

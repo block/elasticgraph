@@ -1,5 +1,6 @@
 ElasticGraph.define_schema do |schema|
   schema.json_schema_version 1
+  schema.enforce_json_schema_version false
 
   schema.object_type "Artist" do |t|
     t.field "id", "ID"

@@ -31,10 +31,9 @@ module ElasticGraph
       # @dynamic schema_definition_results
       attr_reader :schema_definition_results
 
-      def initialize(schema_definition_results:, schema_artifacts_directory:, enforce_json_schema_version:, output:, max_diff_lines: 50)
+      def initialize(schema_definition_results:, schema_artifacts_directory:, output:, max_diff_lines: 50)
         @schema_definition_results = schema_definition_results
         @schema_artifacts_directory = schema_artifacts_directory
-        @enforce_json_schema_version = enforce_json_schema_version
         @output = output
         @max_diff_lines = max_diff_lines
 
@@ -51,7 +50,7 @@ module ElasticGraph
       # Dumps all the schema artifacts to disk.
       def dump_artifacts
         check_if_needs_json_schema_version_bump do |recommended_json_schema_version|
-          if @enforce_json_schema_version
+          if schema_definition_results.state.enforce_json_schema_version
             # @type var setter_location: ::Thread::Backtrace::Location
             # We use `_ =` because while `json_schema_version_setter_location` can be nil,
             # it'll never be nil if we get here and we want the type to be non-nilable.
@@ -62,12 +61,12 @@ module ElasticGraph
               "increase the schema's version, and then run the `bundle exec rake schema_artifacts:dump` command again.\n\n" \
               "To update the schema version to the expected version, change line #{setter_location.lineno} at `#{setter_location_path}` to:\n" \
               "  `schema.json_schema_version #{recommended_json_schema_version}`\n\n" \
-              "Alternately, pass `enforce_json_schema_version: false` to `ElasticGraph::SchemaDefinition::RakeTasks.new` to allow the JSON schemas " \
-              "file to change without requiring a version bump, but that is only recommended for non-production applications during initial schema prototyping."
+              "Alternately, call `schema.enforce_json_schema_version false` in your schema definition to allow the JSON schemas file " \
+              "to change without requiring a version bump, but that is only recommended for non-production applications during initial schema prototyping."
           else
             @output.puts <<~EOS
               WARNING: the `json_schemas.yaml` artifact is being updated without the `json_schema_version` being correspondingly incremented.
-              This is not recommended for production applications, but is currently allowed because you have set `enforce_json_schema_version: false`.
+              This is not recommended for production applications, but is currently allowed because you have called `schema.enforce_json_schema_version false`.
             EOS
           end
         end

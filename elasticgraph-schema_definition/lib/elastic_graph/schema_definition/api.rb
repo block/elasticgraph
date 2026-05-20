@@ -460,11 +460,11 @@ module ElasticGraph
       #
       # @note While this is an important part of how ElasticGraph is designed to support schema evolution, it can be annoying constantly
       #   have to increment this while rapidly changing the schema during prototyping. You can disable the requirement to increment this
-      #   on every JSON schema change by setting `enforce_json_schema_version` to `false` in your `Rakefile`.
+      #   on every JSON schema change with {#enforce_json_schema_version}.
       #
       # @param version [Integer] current version number of the JSON schema artifact
       # @return [void]
-      # @see Local::RakeTasks#enforce_json_schema_version
+      # @see #enforce_json_schema_version
       #
       # @example Set the JSON schema version to 1
       #   ElasticGraph.define_schema do |schema|
@@ -481,6 +481,36 @@ module ElasticGraph
 
         @state.json_schema_version = version
         @state.json_schema_version_setter_location = caller_locations(1, 1).to_a.first
+        nil
+      end
+
+      # Configures whether {SchemaArtifactManager} enforces the requirement that the JSON schema version is incremented every time
+      # dumping the JSON schemas results in a changed artifact. Defaults to `true`.
+      #
+      # @note Generally speaking, you will want this to be `true` for any ElasticGraph application that is in
+      #    production as the versioning of JSON schemas is what supports safe schema evolution as it allows
+      #    ElasticGraph to identify which version of the JSON schema the publishing system was operating on
+      #    when it published an event.
+      #
+      #    It can be useful to set it to `false` before your application is in production, as you do not want
+      #    to be forced to bump the version after every single schema change while you are building an initial
+      #    prototype.
+      #
+      # @param value [Boolean] whether to require `json_schema_version` to be incremented on changes that impact `json_schemas.yaml`
+      # @return [void]
+      # @see #json_schema_version
+      #
+      # @example Disable enforcement during initial prototyping
+      #   ElasticGraph.define_schema do |schema|
+      #     # TODO: remove this once we're past the prototyping stage
+      #     schema.enforce_json_schema_version false
+      #   end
+      def enforce_json_schema_version(value)
+        unless value == true || value == false
+          raise Errors::SchemaError, "`enforce_json_schema_version` must be a boolean. Specified value: #{value.inspect}"
+        end
+
+        @state.enforce_json_schema_version = value
         nil
       end
 

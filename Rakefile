@@ -46,7 +46,6 @@ end
 
 configure_local_rake_tasks = ->(tasks) do
   tasks.schema_element_name_form = :snake_case
-  tasks.enforce_json_schema_version = false
   tasks.index_document_sizes = true
   tasks.env_port_mapping = {test: test_port}
   tasks.output = schema_def_output

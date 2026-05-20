@@ -20,6 +20,7 @@ module ElasticGraph
       attr_reader deleted_fields_by_type_name_and_old_field_name: ::Hash[::String, ::Hash[::String, SchemaElements::DeprecatedElement]]
       attr_accessor json_schema_version: ::Integer?
       attr_accessor json_schema_version_setter_location: ::Thread::Backtrace::Location?
+      attr_accessor enforce_json_schema_version: bool
       attr_reader graphql_extension_modules: ::Array[SchemaArtifacts::RuntimeMetadata::GraphQLExtension]
       attr_reader graphql_resolvers_by_name: ::Hash[::Symbol, SchemaArtifacts::RuntimeMetadata::GraphQLResolver]
       attr_reader built_in_graphql_resolvers: ::Set[::Symbol]
@@ -56,6 +57,7 @@ module ElasticGraph
         deleted_fields_by_type_name_and_old_field_name: ::Hash[::String, ::Hash[::String, SchemaElements::DeprecatedElement]],
         json_schema_version: Integer?,
         json_schema_version_setter_location: ::Thread::Backtrace::Location?,
+        enforce_json_schema_version: bool,
         graphql_extension_modules: ::Array[SchemaArtifacts::RuntimeMetadata::GraphQLExtension],
         graphql_resolvers_by_name: ::Hash[::Symbol, SchemaArtifacts::RuntimeMetadata::GraphQLResolver],
         built_in_graphql_resolvers: ::Set[::Symbol],

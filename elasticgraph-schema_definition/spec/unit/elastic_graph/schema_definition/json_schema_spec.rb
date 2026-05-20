@@ -2942,6 +2942,22 @@ module ElasticGraph
         expect(result[JSON_SCHEMA_VERSION_KEY]).to eq(1)
       end
 
+      it "allows json_schema_version enforcement to be disabled" do
+        result = define_schema(schema_element_name_form: "snake_case") do |s|
+          s.enforce_json_schema_version false
+        end
+
+        expect(result.state.enforce_json_schema_version).to eq false
+      end
+
+      it "fails if json_schema_version enforcement is set to a non-boolean value" do
+        expect {
+          define_schema(schema_element_name_form: "snake_case") do |s|
+            s.enforce_json_schema_version nil
+          end
+        }.to raise_error(Errors::SchemaError, a_string_including("must be a boolean", "nil"))
+      end
+
       it "fails if json_schema_version is set to invalid values" do
         expect {
           define_schema(schema_element_name_form: "snake_case") do |s|

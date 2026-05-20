@@ -82,7 +82,6 @@ module ElasticGraph
         artifacts_manager = @api.factory.new_schema_artifact_manager(
           schema_definition_results: @api.results,
           schema_artifacts_directory: "#{@tmp_dir}/schema_artifacts",
-          enforce_json_schema_version: true,
           output: ::StringIO.new
         )
 
