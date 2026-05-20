@@ -458,7 +458,7 @@ module ElasticGraph
       # version number. The publisher will then include this version number in published events to identify the version of the schema it
       # was using. This avoids the need to deploy the publisher and ElasticGraph indexer at the same time to keep them in sync.
       #
-      # @note While this is an important part of how ElasticGraph is designed to support schema evolution, it can be annoying constantly
+      # @note While this is an important part of how ElasticGraph is designed to support schema evolution, it can be annoying to constantly
       #   have to increment this while rapidly changing the schema during prototyping. You can disable the requirement to increment this
       #   on every JSON schema change with {#enforce_json_schema_version}.
       #

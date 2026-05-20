@@ -585,7 +585,7 @@ module ElasticGraph
             To continue, do one of the following:
 
             1. If the `Component` type has been renamed, indicate this by calling `type.renamed_from "Component"` on the renamed type.
-            2. If the `Component` field has been dropped, indicate this by calling `schema.deleted_type "Component"` on the schema.
+            2. If the `Component` type has been dropped, indicate this by calling `schema.deleted_type "Component"` on the schema.
             3. Alternately, if no publishers or in-flight events use JSON schema version 1, delete its file from `json_schemas_by_version`, and no further changes are required.
           EOS
 
@@ -600,7 +600,7 @@ module ElasticGraph
             To continue, do one of the following:
 
             1. If the `Component` type has been renamed, indicate this by calling `type.renamed_from "Component"` on the renamed type.
-            2. If the `Component` field has been dropped, indicate this by calling `schema.deleted_type "Component"` on the schema.
+            2. If the `Component` type has been dropped, indicate this by calling `schema.deleted_type "Component"` on the schema.
             3. Alternately, if no publishers or in-flight events use JSON schema versions 1 or 2, delete their files from `json_schemas_by_version`, and no further changes are required.
           EOS
 
@@ -615,7 +615,7 @@ module ElasticGraph
             To continue, do one of the following:
 
             1. If the `Component` type has been renamed, indicate this by calling `type.renamed_from "Component"` on the renamed type.
-            2. If the `Component` field has been dropped, indicate this by calling `schema.deleted_type "Component"` on the schema.
+            2. If the `Component` type has been dropped, indicate this by calling `schema.deleted_type "Component"` on the schema.
             3. Alternately, if no publishers or in-flight events use JSON schema versions 1, 2, or 3, delete their files from `json_schemas_by_version`, and no further changes are required.
           EOS
 
