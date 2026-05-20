@@ -105,6 +105,15 @@ module ElasticGraph
           }.to raise_error(Errors::SchemaError, a_string_including("bar", "foo", "multi_word_snake"))
         end
 
+        it "roundtrips through `to_dumpable_hash` and `from_hash` when overrides have symbol keys" do
+          names = new_with(form: :camelCase, overrides: {foo: :bar})
+
+          reloaded = ExampleElementNames.from_hash(names.to_dumpable_hash)
+
+          expect(reloaded.foo).to eq "bar"
+          expect(reloaded.multi_word_snake).to eq "multiWordSnake"
+        end
+
         it "inspects nicely" do
           names = new_with(form: :camelCase, overrides: {foo: :bar})
 

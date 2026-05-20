@@ -402,6 +402,19 @@ module ElasticGraph
           end
         end
 
+        it "can be roundtripped through YAML's safe_load" do
+          schema = schema_with(
+            schema_element_names: SchemaElementNames.new(form: :camelCase, overrides: {gt: "greaterThan"})
+          )
+
+          yaml_string = ::YAML.dump(schema.to_dumpable_hash)
+          loaded_hash = ::YAML.safe_load(yaml_string)
+          roundtripped_schema = Schema.from_hash(loaded_hash)
+
+          expect(roundtripped_schema.schema_element_names.gt).to eq "greaterThan"
+          expect(roundtripped_schema.schema_element_names.lt).to eq "lt"
+        end
+
         it "dumps all hashes in alphabetical order for consistency" do
           full_dumped_runtime_metadata = ::YAML.safe_load_file(::File.join(
             CommonSpecHelpers::REPO_ROOT, "config", "schema", "artifacts", RUNTIME_METADATA_FILE
