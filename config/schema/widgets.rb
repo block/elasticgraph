@@ -82,6 +82,10 @@ ElasticGraph.define_schema do |schema|
     t.field "y", "Float!"
   end
 
+  # WidgetInspection, InspectionSummary, and InspectionNote are used to test relationships from embedded types
+  # using the custom `references` parameter. WidgetInspection is an embedded type (no index) that uses `guid`
+  # as its identifier instead of `id`, demonstrating that the `references` parameter allows customizing which
+  # field on the embedded type is used for matching when resolving relationships to indexed types.
   schema.object_type "WidgetInspection" do |t|
     t.field "guid", "ID!"
 
