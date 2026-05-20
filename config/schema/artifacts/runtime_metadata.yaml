@@ -235,6 +235,74 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: voltage
+  InspectionNoteSortOrderInput:
+    values_by_name:
+      created_at_ASC:
+        sort_field:
+          direction: asc
+          field_path: created_at
+      created_at_DESC:
+        sort_field:
+          direction: desc
+          field_path: created_at
+      id_ASC:
+        sort_field:
+          direction: asc
+          field_path: id
+      id_DESC:
+        sort_field:
+          direction: desc
+          field_path: id
+      note_ASC:
+        sort_field:
+          direction: asc
+          field_path: note
+      note_DESC:
+        sort_field:
+          direction: desc
+          field_path: note
+      widget_inspection_guid_ASC:
+        sort_field:
+          direction: asc
+          field_path: widget_inspection_guid
+      widget_inspection_guid_DESC:
+        sort_field:
+          direction: desc
+          field_path: widget_inspection_guid
+  InspectionSummarySortOrderInput:
+    values_by_name:
+      created_at_ASC:
+        sort_field:
+          direction: asc
+          field_path: created_at
+      created_at_DESC:
+        sort_field:
+          direction: desc
+          field_path: created_at
+      id_ASC:
+        sort_field:
+          direction: asc
+          field_path: id
+      id_DESC:
+        sort_field:
+          direction: desc
+          field_path: id
+      summary_ASC:
+        sort_field:
+          direction: asc
+          field_path: summary
+      summary_DESC:
+        sort_field:
+          direction: desc
+          field_path: summary
+      widget_inspection_guid_ASC:
+        sort_field:
+          direction: asc
+          field_path: widget_inspection_guid
+      widget_inspection_guid_DESC:
+        sort_field:
+          direction: desc
+          field_path: widget_inspection_guid
   InventorSortOrderInput:
     values_by_name:
       id_ASC:
@@ -523,6 +591,14 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: id
+      inspection_guid_ASC:
+        sort_field:
+          direction: asc
+          field_path: inspection.guid
+      inspection_guid_DESC:
+        sort_field:
+          direction: desc
+          field_path: inspection.guid
       internal_details_name_ASC:
         sort_field:
           direction: asc
@@ -1215,6 +1291,14 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: id
+      inspection_guid_ASC:
+        sort_field:
+          direction: asc
+          field_path: inspection.guid
+      inspection_guid_DESC:
+        sort_field:
+          direction: desc
+          field_path: inspection.guid
       internal_details_name_ASC:
         sort_field:
           direction: asc
@@ -1537,6 +1621,14 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: id
+      inspection_guid_ASC:
+        sort_field:
+          direction: asc
+          field_path: inspection.guid
+      inspection_guid_DESC:
+        sort_field:
+          direction: desc
+          field_path: inspection.guid
       internal_details_name_ASC:
         sort_field:
           direction: asc
@@ -1905,6 +1997,38 @@ index_definitions_by_name:
       name:
         source: __self
       voltage:
+        source: __self
+    route_with: id
+  inspection_notes:
+    current_sources:
+    - __self
+    default_sort_fields:
+    - direction: desc
+      field_path: created_at
+    fields_by_path:
+      created_at:
+        source: __self
+      id:
+        source: __self
+      note:
+        source: __self
+      widget_inspection_guid:
+        source: __self
+    route_with: id
+  inspection_summaries:
+    current_sources:
+    - __self
+    default_sort_fields:
+    - direction: desc
+      field_path: created_at
+    fields_by_path:
+      created_at:
+        source: __self
+      id:
+        source: __self
+      summary:
+        source: __self
+      widget_inspection_guid:
         source: __self
     route_with: id
   manufacturers:
@@ -2976,6 +3100,8 @@ index_definitions_by_name:
       fees.currency:
         source: __self
       id:
+        source: __self
+      inspection.guid:
         source: __self
       internal_details.name:
         source: __self
@@ -4063,6 +4189,286 @@ object_types_by_name:
     graphql_fields_by_name:
       count:
         name_in_index: __counts
+  InspectionNote:
+    graphql_fields_by_name:
+      created_at:
+        resolver:
+          name: get_record_field_value
+      id:
+        resolver:
+          name: get_record_field_value
+      note:
+        resolver:
+          name: get_record_field_value
+      widget_inspection_guid:
+        resolver:
+          name: get_record_field_value
+    index_definition_names:
+    - inspection_notes
+    update_targets:
+    - data_params:
+        created_at:
+          cardinality: one
+        note:
+          cardinality: one
+        widget_inspection_guid:
+          cardinality: one
+      id_source: id
+      metadata_params:
+        relationship:
+          value: __self
+        sourceId:
+          cardinality: one
+          source_path: id
+        sourceType:
+          cardinality: one
+          source_path: type
+        version:
+          cardinality: one
+      relationship: __self
+      routing_value_source: id
+      script_id: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
+      type: InspectionNote
+  InspectionNoteAggregatedValues:
+    graphql_fields_by_name:
+      created_at:
+        resolver:
+          name: object_with_lookahead
+      id:
+        resolver:
+          name: object_with_lookahead
+      note:
+        resolver:
+          name: object_with_lookahead
+      widget_inspection_guid:
+        resolver:
+          name: object_with_lookahead
+  InspectionNoteAggregation:
+    elasticgraph_category: indexed_aggregation
+    graphql_fields_by_name:
+      aggregated_values:
+        resolver:
+          name: object_without_lookahead
+      count:
+        resolver:
+          name: object_without_lookahead
+      grouped_by:
+        resolver:
+          name: object_without_lookahead
+    source_type: InspectionNote
+  InspectionNoteAggregationConnection:
+    elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver:
+          name: object_without_lookahead
+      nodes:
+        resolver:
+          name: object_without_lookahead
+      page_info:
+        resolver:
+          name: object_without_lookahead
+  InspectionNoteAggregationEdge:
+    elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      cursor:
+        resolver:
+          name: object_without_lookahead
+      node:
+        resolver:
+          name: object_without_lookahead
+  InspectionNoteConnection:
+    elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver:
+          name: object_without_lookahead
+      nodes:
+        resolver:
+          name: object_without_lookahead
+      page_info:
+        resolver:
+          name: object_without_lookahead
+      total_edge_count:
+        resolver:
+          name: object_without_lookahead
+  InspectionNoteEdge:
+    elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      all_highlights:
+        resolver:
+          name: object_without_lookahead
+      cursor:
+        resolver:
+          name: object_without_lookahead
+      highlights:
+        resolver:
+          name: object_without_lookahead
+      node:
+        resolver:
+          name: object_without_lookahead
+  InspectionNoteGroupedBy:
+    graphql_fields_by_name:
+      created_at:
+        resolver:
+          name: object_with_lookahead
+      note:
+        resolver:
+          name: object_with_lookahead
+      widget_inspection_guid:
+        resolver:
+          name: object_with_lookahead
+  InspectionNoteHighlights:
+    graphql_fields_by_name:
+      id:
+        resolver:
+          name: get_record_field_value
+      note:
+        resolver:
+          name: get_record_field_value
+      widget_inspection_guid:
+        resolver:
+          name: get_record_field_value
+  InspectionSummary:
+    graphql_fields_by_name:
+      created_at:
+        resolver:
+          name: get_record_field_value
+      id:
+        resolver:
+          name: get_record_field_value
+      summary:
+        resolver:
+          name: get_record_field_value
+      widget_inspection_guid:
+        resolver:
+          name: get_record_field_value
+    index_definition_names:
+    - inspection_summaries
+    update_targets:
+    - data_params:
+        created_at:
+          cardinality: one
+        summary:
+          cardinality: one
+        widget_inspection_guid:
+          cardinality: one
+      id_source: id
+      metadata_params:
+        relationship:
+          value: __self
+        sourceId:
+          cardinality: one
+          source_path: id
+        sourceType:
+          cardinality: one
+          source_path: type
+        version:
+          cardinality: one
+      relationship: __self
+      routing_value_source: id
+      script_id: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
+      type: InspectionSummary
+  InspectionSummaryAggregatedValues:
+    graphql_fields_by_name:
+      created_at:
+        resolver:
+          name: object_with_lookahead
+      id:
+        resolver:
+          name: object_with_lookahead
+      summary:
+        resolver:
+          name: object_with_lookahead
+      widget_inspection_guid:
+        resolver:
+          name: object_with_lookahead
+  InspectionSummaryAggregation:
+    elasticgraph_category: indexed_aggregation
+    graphql_fields_by_name:
+      aggregated_values:
+        resolver:
+          name: object_without_lookahead
+      count:
+        resolver:
+          name: object_without_lookahead
+      grouped_by:
+        resolver:
+          name: object_without_lookahead
+    source_type: InspectionSummary
+  InspectionSummaryAggregationConnection:
+    elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver:
+          name: object_without_lookahead
+      nodes:
+        resolver:
+          name: object_without_lookahead
+      page_info:
+        resolver:
+          name: object_without_lookahead
+  InspectionSummaryAggregationEdge:
+    elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      cursor:
+        resolver:
+          name: object_without_lookahead
+      node:
+        resolver:
+          name: object_without_lookahead
+  InspectionSummaryConnection:
+    elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver:
+          name: object_without_lookahead
+      nodes:
+        resolver:
+          name: object_without_lookahead
+      page_info:
+        resolver:
+          name: object_without_lookahead
+      total_edge_count:
+        resolver:
+          name: object_without_lookahead
+  InspectionSummaryEdge:
+    elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      all_highlights:
+        resolver:
+          name: object_without_lookahead
+      cursor:
+        resolver:
+          name: object_without_lookahead
+      highlights:
+        resolver:
+          name: object_without_lookahead
+      node:
+        resolver:
+          name: object_without_lookahead
+  InspectionSummaryGroupedBy:
+    graphql_fields_by_name:
+      created_at:
+        resolver:
+          name: object_with_lookahead
+      summary:
+        resolver:
+          name: object_with_lookahead
+      widget_inspection_guid:
+        resolver:
+          name: object_with_lookahead
+  InspectionSummaryHighlights:
+    graphql_fields_by_name:
+      id:
+        resolver:
+          name: get_record_field_value
+      summary:
+        resolver:
+          name: get_record_field_value
+      widget_inspection_guid:
+        resolver:
+          name: get_record_field_value
   IntAggregatedValues:
     elasticgraph_category: scalar_aggregated_values
     graphql_fields_by_name:
@@ -4787,6 +5193,9 @@ object_types_by_name:
       id:
         resolver:
           name: get_record_field_value
+      inspection:
+        resolver:
+          name: get_record_field_value
       internal_details:
         resolver:
           name: get_record_field_value
@@ -4978,6 +5387,9 @@ object_types_by_name:
         resolver:
           name: object_with_lookahead
       id:
+        resolver:
+          name: object_with_lookahead
+      inspection:
         resolver:
           name: object_with_lookahead
       internal_details:
@@ -5188,6 +5600,9 @@ object_types_by_name:
       fees:
         resolver:
           name: object_with_lookahead
+      inspection:
+        resolver:
+          name: object_with_lookahead
       internal_details:
         resolver:
           name: object_with_lookahead
@@ -5297,6 +5712,9 @@ object_types_by_name:
         resolver:
           name: get_record_field_value
       id:
+        resolver:
+          name: get_record_field_value
+      inspection:
         resolver:
           name: get_record_field_value
       internal_highlightable_details:
@@ -6046,6 +6464,18 @@ object_types_by_name:
         resolver:
           name: indexed_type_root_fields
       electrical_parts:
+        resolver:
+          name: indexed_type_root_fields
+      inspection_note_aggregations:
+        resolver:
+          name: indexed_type_root_fields
+      inspection_notes:
+        resolver:
+          name: indexed_type_root_fields
+      inspection_summaries:
+        resolver:
+          name: indexed_type_root_fields
+      inspection_summary_aggregations:
         resolver:
           name: indexed_type_root_fields
       inventor_aggregations:
@@ -7675,6 +8105,9 @@ object_types_by_name:
       id:
         resolver:
           name: get_record_field_value
+      inspection:
+        resolver:
+          name: get_record_field_value
       internal_details:
         resolver:
           name: get_record_field_value
@@ -7798,6 +8231,8 @@ object_types_by_name:
         description:
           cardinality: one
         fees:
+          cardinality: one
+        inspection:
           cardinality: one
         internal_details:
           cardinality: one
@@ -7928,6 +8363,9 @@ object_types_by_name:
         resolver:
           name: object_with_lookahead
       id:
+        resolver:
+          name: object_with_lookahead
+      inspection:
         resolver:
           name: object_with_lookahead
       internal_details:
@@ -8364,6 +8802,9 @@ object_types_by_name:
       fees:
         resolver:
           name: object_with_lookahead
+      inspection:
+        resolver:
+          name: object_with_lookahead
       internal_details:
         resolver:
           name: object_with_lookahead
@@ -8450,6 +8891,9 @@ object_types_by_name:
       id:
         resolver:
           name: get_record_field_value
+      inspection:
+        resolver:
+          name: get_record_field_value
       internal_highlightable_details:
         resolver:
           name: get_record_field_value
@@ -8490,6 +8934,47 @@ object_types_by_name:
         resolver:
           name: get_record_field_value
       workspace_name:
+        resolver:
+          name: get_record_field_value
+  WidgetInspection:
+    graphql_fields_by_name:
+      guid:
+        resolver:
+          name: get_record_field_value
+      inspection_note_aggregations:
+        relation:
+          direction: in
+          foreign_key: widget_inspection_guid
+          referenced_field_name: guid
+        resolver:
+          name: nested_relationships
+      inspection_notes:
+        relation:
+          direction: in
+          foreign_key: widget_inspection_guid
+          referenced_field_name: guid
+        resolver:
+          name: nested_relationships
+      inspection_summary:
+        relation:
+          direction: in
+          foreign_key: widget_inspection_guid
+          referenced_field_name: guid
+        resolver:
+          name: nested_relationships
+  WidgetInspectionAggregatedValues:
+    graphql_fields_by_name:
+      guid:
+        resolver:
+          name: object_with_lookahead
+  WidgetInspectionGroupedBy:
+    graphql_fields_by_name:
+      guid:
+        resolver:
+          name: object_with_lookahead
+  WidgetInspectionHighlights:
+    graphql_fields_by_name:
+      guid:
         resolver:
           name: get_record_field_value
   WidgetInternalDetailsAggregatedValues:
@@ -8664,6 +9149,9 @@ object_types_by_name:
       id:
         resolver:
           name: get_record_field_value
+      inspection:
+        resolver:
+          name: get_record_field_value
       internal_details:
         resolver:
           name: get_record_field_value
@@ -8790,6 +9278,9 @@ object_types_by_name:
         resolver:
           name: object_with_lookahead
       id:
+        resolver:
+          name: object_with_lookahead
+      inspection:
         resolver:
           name: object_with_lookahead
       internal_details:
@@ -8979,6 +9470,9 @@ object_types_by_name:
       full_address:
         resolver:
           name: object_with_lookahead
+      inspection:
+        resolver:
+          name: object_with_lookahead
       internal_details:
         resolver:
           name: object_with_lookahead
@@ -9069,6 +9563,9 @@ object_types_by_name:
         resolver:
           name: get_record_field_value
       id:
+        resolver:
+          name: get_record_field_value
+      inspection:
         resolver:
           name: get_record_field_value
       internal_highlightable_details:

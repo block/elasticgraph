@@ -3574,6 +3574,610 @@ input IDListFilterInput {
   not: IDListFilterInput
 }
 
+type InspectionNote {
+  created_at: DateTime!
+  id: ID!
+  note: String
+  widget_inspection_guid: ID!
+}
+
+"""
+Type used to perform aggregation computations on `InspectionNote` fields.
+"""
+type InspectionNoteAggregatedValues {
+  """
+  Computed aggregate values for the `created_at` field.
+  """
+  created_at: DateTimeAggregatedValues
+
+  """
+  Computed aggregate values for the `id` field.
+  """
+  id: NonNumericAggregatedValues
+
+  """
+  Computed aggregate values for the `note` field.
+  """
+  note: NonNumericAggregatedValues
+
+  """
+  Computed aggregate values for the `widget_inspection_guid` field.
+  """
+  widget_inspection_guid: NonNumericAggregatedValues
+}
+
+"""
+Return type representing a bucket of `InspectionNote` documents for an aggregations query.
+"""
+type InspectionNoteAggregation {
+  """
+  Provides computed aggregated values over all `InspectionNote` documents in an aggregation bucket.
+  """
+  aggregated_values: InspectionNoteAggregatedValues
+
+  """
+  The count of `InspectionNote` documents in an aggregation bucket.
+  """
+  count: JsonSafeLong!
+
+  """
+  Used to specify the `InspectionNote` fields to group by. The returned values identify each aggregation bucket.
+  """
+  grouped_by: InspectionNoteGroupedBy
+}
+
+"""
+Represents a paginated collection of `InspectionNoteAggregation` results.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Connection-Types) for more info.
+"""
+type InspectionNoteAggregationConnection {
+  """
+  Wraps a specific `InspectionNoteAggregation` to pair it with its pagination cursor.
+  """
+  edges: [InspectionNoteAggregationEdge!]!
+
+  """
+  The list of `InspectionNoteAggregation` results.
+  """
+  nodes: [InspectionNoteAggregation!]!
+
+  """
+  Provides pagination-related information.
+  """
+  page_info: PageInfo!
+}
+
+"""
+Represents a specific `InspectionNoteAggregation` in the context of a `InspectionNoteAggregationConnection`,
+providing access to both the `InspectionNoteAggregation` and query-specific information such as the pagination `Cursor`.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for more info.
+"""
+type InspectionNoteAggregationEdge {
+  """
+  The `Cursor` of this `InspectionNoteAggregation`. This can be passed in the next query as
+  a `before` or `after` argument to continue paginating from this `InspectionNoteAggregation`.
+  """
+  cursor: Cursor
+
+  """
+  The `InspectionNoteAggregation` of this edge.
+  """
+  node: InspectionNoteAggregation
+}
+
+"""
+Represents a paginated collection of `InspectionNote` results.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Connection-Types) for more info.
+"""
+type InspectionNoteConnection {
+  """
+  Wraps a specific `InspectionNote` to pair it with its pagination cursor.
+  """
+  edges: [InspectionNoteEdge!]!
+
+  """
+  The list of `InspectionNote` results.
+  """
+  nodes: [InspectionNote!]!
+
+  """
+  Provides pagination-related information.
+  """
+  page_info: PageInfo!
+
+  """
+  The total number of edges available in this connection to paginate over.
+  """
+  total_edge_count: JsonSafeLong!
+}
+
+"""
+Represents a specific `InspectionNote` in the context of a `InspectionNoteConnection`,
+providing access to both the `InspectionNote` and query-specific information such as the pagination `Cursor`.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for more info.
+"""
+type InspectionNoteEdge {
+  """
+  All search highlights for this `InspectionNote`, indicating where in the indexed document the query matched.
+  """
+  all_highlights: [SearchHighlight!]!
+
+  """
+  The `Cursor` of this `InspectionNote`. This can be passed in the next query as
+  a `before` or `after` argument to continue paginating from this `InspectionNote`.
+  """
+  cursor: Cursor
+
+  """
+  Specific search highlights for this `InspectionNote`, providing matching snippets for the requested fields.
+  """
+  highlights: InspectionNoteHighlights
+
+  """
+  The `InspectionNote` of this edge.
+  """
+  node: InspectionNote
+}
+
+"""
+Input type used to specify filters on `InspectionNote` fields.
+
+Will match all documents if passed as an empty object (or as `null`).
+"""
+input InspectionNoteFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `InspectionNoteFilterInput` input because of
+  collisions between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [InspectionNoteFilterInput!]
+
+  """
+  Matches records where any of the provided sub-filters evaluate to true.
+  This works just like an OR operator in SQL.
+
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
+  """
+  any_of: [InspectionNoteFilterInput!]
+
+  """
+  Used to filter on the `created_at` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  created_at: DateTimeFilterInput
+
+  """
+  Used to filter on the `id` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  id: IDFilterInput
+
+  """
+  Matches records where the provided sub-filter evaluates to false.
+  This works just like a NOT operator in SQL.
+
+  When `null` or an empty object is passed, matches no documents.
+  """
+  not: InspectionNoteFilterInput
+
+  """
+  Used to filter on the `note` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  note: StringFilterInput
+
+  """
+  Used to filter on the `widget_inspection_guid` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  widget_inspection_guid: IDFilterInput
+}
+
+"""
+Type used to specify the `InspectionNote` fields to group by for aggregations.
+"""
+type InspectionNoteGroupedBy {
+  """
+  Offers the different grouping options for the `created_at` value within this group.
+  """
+  created_at: DateTimeGroupedBy
+
+  """
+  The `note` field value for this group.
+  """
+  note: String
+
+  """
+  The `widget_inspection_guid` field value for this group.
+  """
+  widget_inspection_guid: ID
+}
+
+"""
+Type used to request desired `InspectionNote` search highlight fields.
+"""
+type InspectionNoteHighlights {
+  """
+  Search highlights for the `id`, providing snippets of the matching text.
+  """
+  id: [String!]!
+
+  """
+  Search highlights for the `note`, providing snippets of the matching text.
+  """
+  note: [String!]!
+
+  """
+  Search highlights for the `widget_inspection_guid`, providing snippets of the matching text.
+  """
+  widget_inspection_guid: [String!]!
+}
+
+"""
+Enumerates the ways `InspectionNote`s can be sorted.
+"""
+enum InspectionNoteSortOrderInput {
+  """
+  Sorts ascending by the `created_at` field.
+  """
+  created_at_ASC
+
+  """
+  Sorts descending by the `created_at` field.
+  """
+  created_at_DESC
+
+  """
+  Sorts ascending by the `id` field.
+  """
+  id_ASC
+
+  """
+  Sorts descending by the `id` field.
+  """
+  id_DESC
+
+  """
+  Sorts ascending by the `note` field.
+  """
+  note_ASC
+
+  """
+  Sorts descending by the `note` field.
+  """
+  note_DESC
+
+  """
+  Sorts ascending by the `widget_inspection_guid` field.
+  """
+  widget_inspection_guid_ASC
+
+  """
+  Sorts descending by the `widget_inspection_guid` field.
+  """
+  widget_inspection_guid_DESC
+}
+
+type InspectionSummary {
+  created_at: DateTime!
+  id: ID!
+  summary: String
+  widget_inspection_guid: ID!
+}
+
+"""
+Type used to perform aggregation computations on `InspectionSummary` fields.
+"""
+type InspectionSummaryAggregatedValues {
+  """
+  Computed aggregate values for the `created_at` field.
+  """
+  created_at: DateTimeAggregatedValues
+
+  """
+  Computed aggregate values for the `id` field.
+  """
+  id: NonNumericAggregatedValues
+
+  """
+  Computed aggregate values for the `summary` field.
+  """
+  summary: NonNumericAggregatedValues
+
+  """
+  Computed aggregate values for the `widget_inspection_guid` field.
+  """
+  widget_inspection_guid: NonNumericAggregatedValues
+}
+
+"""
+Return type representing a bucket of `InspectionSummary` documents for an aggregations query.
+"""
+type InspectionSummaryAggregation {
+  """
+  Provides computed aggregated values over all `InspectionSummary` documents in an aggregation bucket.
+  """
+  aggregated_values: InspectionSummaryAggregatedValues
+
+  """
+  The count of `InspectionSummary` documents in an aggregation bucket.
+  """
+  count: JsonSafeLong!
+
+  """
+  Used to specify the `InspectionSummary` fields to group by. The returned values identify each aggregation bucket.
+  """
+  grouped_by: InspectionSummaryGroupedBy
+}
+
+"""
+Represents a paginated collection of `InspectionSummaryAggregation` results.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Connection-Types) for more info.
+"""
+type InspectionSummaryAggregationConnection {
+  """
+  Wraps a specific `InspectionSummaryAggregation` to pair it with its pagination cursor.
+  """
+  edges: [InspectionSummaryAggregationEdge!]!
+
+  """
+  The list of `InspectionSummaryAggregation` results.
+  """
+  nodes: [InspectionSummaryAggregation!]!
+
+  """
+  Provides pagination-related information.
+  """
+  page_info: PageInfo!
+}
+
+"""
+Represents a specific `InspectionSummaryAggregation` in the context of a `InspectionSummaryAggregationConnection`,
+providing access to both the `InspectionSummaryAggregation` and query-specific information such as the pagination `Cursor`.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for more info.
+"""
+type InspectionSummaryAggregationEdge {
+  """
+  The `Cursor` of this `InspectionSummaryAggregation`. This can be passed in the next query as
+  a `before` or `after` argument to continue paginating from this `InspectionSummaryAggregation`.
+  """
+  cursor: Cursor
+
+  """
+  The `InspectionSummaryAggregation` of this edge.
+  """
+  node: InspectionSummaryAggregation
+}
+
+"""
+Represents a paginated collection of `InspectionSummary` results.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Connection-Types) for more info.
+"""
+type InspectionSummaryConnection {
+  """
+  Wraps a specific `InspectionSummary` to pair it with its pagination cursor.
+  """
+  edges: [InspectionSummaryEdge!]!
+
+  """
+  The list of `InspectionSummary` results.
+  """
+  nodes: [InspectionSummary!]!
+
+  """
+  Provides pagination-related information.
+  """
+  page_info: PageInfo!
+
+  """
+  The total number of edges available in this connection to paginate over.
+  """
+  total_edge_count: JsonSafeLong!
+}
+
+"""
+Represents a specific `InspectionSummary` in the context of a `InspectionSummaryConnection`,
+providing access to both the `InspectionSummary` and query-specific information such as the pagination `Cursor`.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for more info.
+"""
+type InspectionSummaryEdge {
+  """
+  All search highlights for this `InspectionSummary`, indicating where in the indexed document the query matched.
+  """
+  all_highlights: [SearchHighlight!]!
+
+  """
+  The `Cursor` of this `InspectionSummary`. This can be passed in the next query as
+  a `before` or `after` argument to continue paginating from this `InspectionSummary`.
+  """
+  cursor: Cursor
+
+  """
+  Specific search highlights for this `InspectionSummary`, providing matching snippets for the requested fields.
+  """
+  highlights: InspectionSummaryHighlights
+
+  """
+  The `InspectionSummary` of this edge.
+  """
+  node: InspectionSummary
+}
+
+"""
+Input type used to specify filters on `InspectionSummary` fields.
+
+Will match all documents if passed as an empty object (or as `null`).
+"""
+input InspectionSummaryFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `InspectionSummaryFilterInput` input because of
+  collisions between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [InspectionSummaryFilterInput!]
+
+  """
+  Matches records where any of the provided sub-filters evaluate to true.
+  This works just like an OR operator in SQL.
+
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
+  """
+  any_of: [InspectionSummaryFilterInput!]
+
+  """
+  Used to filter on the `created_at` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  created_at: DateTimeFilterInput
+
+  """
+  Used to filter on the `id` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  id: IDFilterInput
+
+  """
+  Matches records where the provided sub-filter evaluates to false.
+  This works just like a NOT operator in SQL.
+
+  When `null` or an empty object is passed, matches no documents.
+  """
+  not: InspectionSummaryFilterInput
+
+  """
+  Used to filter on the `summary` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  summary: StringFilterInput
+
+  """
+  Used to filter on the `widget_inspection_guid` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  widget_inspection_guid: IDFilterInput
+}
+
+"""
+Type used to specify the `InspectionSummary` fields to group by for aggregations.
+"""
+type InspectionSummaryGroupedBy {
+  """
+  Offers the different grouping options for the `created_at` value within this group.
+  """
+  created_at: DateTimeGroupedBy
+
+  """
+  The `summary` field value for this group.
+  """
+  summary: String
+
+  """
+  The `widget_inspection_guid` field value for this group.
+  """
+  widget_inspection_guid: ID
+}
+
+"""
+Type used to request desired `InspectionSummary` search highlight fields.
+"""
+type InspectionSummaryHighlights {
+  """
+  Search highlights for the `id`, providing snippets of the matching text.
+  """
+  id: [String!]!
+
+  """
+  Search highlights for the `summary`, providing snippets of the matching text.
+  """
+  summary: [String!]!
+
+  """
+  Search highlights for the `widget_inspection_guid`, providing snippets of the matching text.
+  """
+  widget_inspection_guid: [String!]!
+}
+
+"""
+Enumerates the ways `InspectionSummary`s can be sorted.
+"""
+enum InspectionSummarySortOrderInput {
+  """
+  Sorts ascending by the `created_at` field.
+  """
+  created_at_ASC
+
+  """
+  Sorts descending by the `created_at` field.
+  """
+  created_at_DESC
+
+  """
+  Sorts ascending by the `id` field.
+  """
+  id_ASC
+
+  """
+  Sorts descending by the `id` field.
+  """
+  id_DESC
+
+  """
+  Sorts ascending by the `summary` field.
+  """
+  summary_ASC
+
+  """
+  Sorts descending by the `summary` field.
+  """
+  summary_DESC
+
+  """
+  Sorts ascending by the `widget_inspection_guid` field.
+  """
+  widget_inspection_guid_ASC
+
+  """
+  Sorts descending by the `widget_inspection_guid` field.
+  """
+  widget_inspection_guid_DESC
+}
+
 """
 A return type used from aggregations to provided aggregated values over `Int` fields.
 """
@@ -6014,6 +6618,11 @@ type NamedEntityAggregatedValues {
   id: NonNumericAggregatedValues
 
   """
+  Computed aggregate values for the `inspection` field.
+  """
+  inspection: WidgetInspectionAggregatedValues
+
+  """
   Computed aggregate values for the `internal_details` field.
   """
   internal_details: WidgetInternalDetailsAggregatedValues
@@ -6420,6 +7029,13 @@ input NamedEntityFilterInput {
   id: IDFilterInput
 
   """
+  Used to filter on the `inspection` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  inspection: WidgetInspectionFilterInput
+
+  """
   Used to filter on the `internal_details` field.
 
   When `null` or an empty object is passed, matches all documents.
@@ -6699,6 +7315,11 @@ type NamedEntityGroupedBy {
   fees: MoneyGroupedBy
 
   """
+  The `inspection` field value for this group.
+  """
+  inspection: WidgetInspectionGroupedBy
+
+  """
   The `internal_details` field value for this group.
   """
   internal_details: WidgetInternalDetailsGroupedBy
@@ -6891,6 +7512,11 @@ type NamedEntityHighlights {
   Search highlights for the `id`, providing snippets of the matching text.
   """
   id: [String!]!
+
+  """
+  Search highlights for the `inspection`, providing snippets of the matching text.
+  """
+  inspection: WidgetInspectionHighlights
 
   """
   Search highlights for the `internal_highlightable_details`, providing snippets of the matching text.
@@ -7161,6 +7787,16 @@ enum NamedEntitySortOrderInput {
   Sorts descending by the `id` field.
   """
   id_DESC
+
+  """
+  Sorts ascending by the `inspection.guid` field.
+  """
+  inspection_guid_ASC
+
+  """
+  Sorts descending by the `inspection.guid` field.
+  """
+  inspection_guid_DESC
 
   """
   Sorts ascending by the `internal_details.name` field.
@@ -9624,6 +10260,212 @@ type Query {
     """
     order_by: [ElectricalPartSortOrderInput!]
   ): ElectricalPartConnection
+
+  """
+  Aggregations over the `inspection_notes` data:
+
+  > Fetches `InspectionNote`s based on the provided arguments.
+  """
+  inspection_note_aggregations(
+    """
+    Used to forward-paginate through the `inspection_note_aggregations`. When provided, the next page after the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    after: Cursor
+
+    """
+    Used to backward-paginate through the `inspection_note_aggregations`. When provided, the previous page before the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    before: Cursor
+
+    """
+    Used to filter the `InspectionNote` documents that get aggregated over based on the provided criteria.
+    """
+    filter: InspectionNoteFilterInput
+
+    """
+    Used in conjunction with the `after` argument to forward-paginate through the `inspection_note_aggregations`.
+    When provided, limits the number of returned results to the first `n` after the provided
+    `after` cursor (or from the start of the `inspection_note_aggregations`, if no `after` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    first: Int
+
+    """
+    Used in conjunction with the `before` argument to backward-paginate through the `inspection_note_aggregations`.
+    When provided, limits the number of returned results to the last `n` before the provided
+    `before` cursor (or from the end of the `inspection_note_aggregations`, if no `before` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    last: Int
+  ): InspectionNoteAggregationConnection
+
+  """
+  Fetches `InspectionNote`s based on the provided arguments.
+  """
+  inspection_notes(
+    """
+    Used to forward-paginate through the `inspection_notes`. When provided, the next page after the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    after: Cursor
+
+    """
+    Used to backward-paginate through the `inspection_notes`. When provided, the previous page before the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    before: Cursor
+
+    """
+    Used to filter the returned `inspection_notes` based on the provided criteria.
+    """
+    filter: InspectionNoteFilterInput
+
+    """
+    Used in conjunction with the `after` argument to forward-paginate through the `inspection_notes`.
+    When provided, limits the number of returned results to the first `n` after the provided
+    `after` cursor (or from the start of the `inspection_notes`, if no `after` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    first: Int
+
+    """
+    Used in conjunction with the `before` argument to backward-paginate through the `inspection_notes`.
+    When provided, limits the number of returned results to the last `n` before the provided
+    `before` cursor (or from the end of the `inspection_notes`, if no `before` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    last: Int
+
+    """
+    Used to specify how the returned `inspection_notes` should be sorted.
+    """
+    order_by: [InspectionNoteSortOrderInput!]
+  ): InspectionNoteConnection
+
+  """
+  Fetches `InspectionSummary`s based on the provided arguments.
+  """
+  inspection_summaries(
+    """
+    Used to forward-paginate through the `inspection_summaries`. When provided, the next page after the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    after: Cursor
+
+    """
+    Used to backward-paginate through the `inspection_summaries`. When provided, the previous page before the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    before: Cursor
+
+    """
+    Used to filter the returned `inspection_summaries` based on the provided criteria.
+    """
+    filter: InspectionSummaryFilterInput
+
+    """
+    Used in conjunction with the `after` argument to forward-paginate through the `inspection_summaries`.
+    When provided, limits the number of returned results to the first `n` after the provided
+    `after` cursor (or from the start of the `inspection_summaries`, if no `after` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    first: Int
+
+    """
+    Used in conjunction with the `before` argument to backward-paginate through the `inspection_summaries`.
+    When provided, limits the number of returned results to the last `n` before the provided
+    `before` cursor (or from the end of the `inspection_summaries`, if no `before` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    last: Int
+
+    """
+    Used to specify how the returned `inspection_summaries` should be sorted.
+    """
+    order_by: [InspectionSummarySortOrderInput!]
+  ): InspectionSummaryConnection
+
+  """
+  Aggregations over the `inspection_summaries` data:
+
+  > Fetches `InspectionSummary`s based on the provided arguments.
+  """
+  inspection_summary_aggregations(
+    """
+    Used to forward-paginate through the `inspection_summary_aggregations`. When provided, the next page after the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    after: Cursor
+
+    """
+    Used to backward-paginate through the `inspection_summary_aggregations`. When provided, the previous page before the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    before: Cursor
+
+    """
+    Used to filter the `InspectionSummary` documents that get aggregated over based on the provided criteria.
+    """
+    filter: InspectionSummaryFilterInput
+
+    """
+    Used in conjunction with the `after` argument to forward-paginate through the `inspection_summary_aggregations`.
+    When provided, limits the number of returned results to the first `n` after the provided
+    `after` cursor (or from the start of the `inspection_summary_aggregations`, if no `after` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    first: Int
+
+    """
+    Used in conjunction with the `before` argument to backward-paginate through the `inspection_summary_aggregations`.
+    When provided, limits the number of returned results to the last `n` before the provided
+    `before` cursor (or from the end of the `inspection_summary_aggregations`, if no `before` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    last: Int
+  ): InspectionSummaryAggregationConnection
 
   """
   Aggregations over the `inventors` data:
@@ -15648,6 +16490,7 @@ type Widget implements NamedEntity {
   description: String
   fees: [Money!]!
   id: ID!
+  inspection: WidgetInspection
   inventor: Inventor
   metadata: Untyped
   name: String
@@ -15743,6 +16586,11 @@ type WidgetAggregatedValues {
   Computed aggregate values for the `id` field.
   """
   id: NonNumericAggregatedValues
+
+  """
+  Computed aggregate values for the `inspection` field.
+  """
+  inspection: WidgetInspectionAggregatedValues
 
   """
   Computed aggregate values for the `internal_details` field.
@@ -16716,6 +17564,13 @@ input WidgetFilterInput {
   id: IDFilterInput
 
   """
+  Used to filter on the `inspection` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  inspection: WidgetInspectionFilterInput
+
+  """
   Used to filter on the `internal_details` field.
 
   When `null` or an empty object is passed, matches all documents.
@@ -16934,6 +17789,11 @@ type WidgetGroupedBy {
   fees: MoneyGroupedBy
 
   """
+  The `inspection` field value for this group.
+  """
+  inspection: WidgetInspectionGroupedBy
+
+  """
   The `internal_details` field value for this group.
   """
   internal_details: WidgetInternalDetailsGroupedBy
@@ -17088,6 +17948,11 @@ type WidgetHighlights {
   id: [String!]!
 
   """
+  Search highlights for the `inspection`, providing snippets of the matching text.
+  """
+  inspection: WidgetInspectionHighlights
+
+  """
   Search highlights for the `internal_highlightable_details`, providing snippets of the matching text.
   """
   internal_highlightable_details: WidgetInternalDetailsHighlights
@@ -17151,6 +18016,181 @@ type WidgetHighlights {
   Search highlights for the `workspace_name`, providing snippets of the matching text.
   """
   workspace_name: [String!]!
+}
+
+type WidgetInspection {
+  guid: ID!
+
+  """
+  Aggregations over the `inspection_notes` data.
+  """
+  inspection_note_aggregations(
+    """
+    Used to forward-paginate through the `inspection_note_aggregations`. When provided, the next page after the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    after: Cursor
+
+    """
+    Used to backward-paginate through the `inspection_note_aggregations`. When provided, the previous page before the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    before: Cursor
+
+    """
+    Used to filter the `InspectionNote` documents that get aggregated over based on the provided criteria.
+    """
+    filter: InspectionNoteFilterInput
+
+    """
+    Used in conjunction with the `after` argument to forward-paginate through the `inspection_note_aggregations`.
+    When provided, limits the number of returned results to the first `n` after the provided
+    `after` cursor (or from the start of the `inspection_note_aggregations`, if no `after` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    first: Int
+
+    """
+    Used in conjunction with the `before` argument to backward-paginate through the `inspection_note_aggregations`.
+    When provided, limits the number of returned results to the last `n` before the provided
+    `before` cursor (or from the end of the `inspection_note_aggregations`, if no `before` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    last: Int
+  ): InspectionNoteAggregationConnection
+  inspection_notes(
+    """
+    Used to forward-paginate through the `inspection_notes`. When provided, the next page after the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    after: Cursor
+
+    """
+    Used to backward-paginate through the `inspection_notes`. When provided, the previous page before the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    before: Cursor
+
+    """
+    Used to filter the returned `inspection_notes` based on the provided criteria.
+    """
+    filter: InspectionNoteFilterInput
+
+    """
+    Used in conjunction with the `after` argument to forward-paginate through the `inspection_notes`.
+    When provided, limits the number of returned results to the first `n` after the provided
+    `after` cursor (or from the start of the `inspection_notes`, if no `after` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    first: Int
+
+    """
+    Used in conjunction with the `before` argument to backward-paginate through the `inspection_notes`.
+    When provided, limits the number of returned results to the last `n` before the provided
+    `before` cursor (or from the end of the `inspection_notes`, if no `before` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    last: Int
+
+    """
+    Used to specify how the returned `inspection_notes` should be sorted.
+    """
+    order_by: [InspectionNoteSortOrderInput!]
+  ): InspectionNoteConnection
+  inspection_summary: InspectionSummary
+}
+
+"""
+Type used to perform aggregation computations on `WidgetInspection` fields.
+"""
+type WidgetInspectionAggregatedValues {
+  """
+  Computed aggregate values for the `guid` field.
+  """
+  guid: NonNumericAggregatedValues
+}
+
+"""
+Input type used to specify filters on `WidgetInspection` fields.
+
+Will match all documents if passed as an empty object (or as `null`).
+"""
+input WidgetInspectionFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `WidgetInspectionFilterInput` input because of
+  collisions between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [WidgetInspectionFilterInput!]
+
+  """
+  Matches records where any of the provided sub-filters evaluate to true.
+  This works just like an OR operator in SQL.
+
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
+  """
+  any_of: [WidgetInspectionFilterInput!]
+
+  """
+  Used to filter on the `guid` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  guid: IDFilterInput
+
+  """
+  Matches records where the provided sub-filter evaluates to false.
+  This works just like a NOT operator in SQL.
+
+  When `null` or an empty object is passed, matches no documents.
+  """
+  not: WidgetInspectionFilterInput
+}
+
+"""
+Type used to specify the `WidgetInspection` fields to group by for aggregations.
+"""
+type WidgetInspectionGroupedBy {
+  """
+  The `guid` field value for this group.
+  """
+  guid: ID
+}
+
+"""
+Type used to request desired `WidgetInspection` search highlight fields.
+"""
+type WidgetInspectionHighlights {
+  """
+  Search highlights for the `guid`, providing snippets of the matching text.
+  """
+  guid: [String!]!
 }
 
 """
@@ -17544,6 +18584,11 @@ type WidgetOrAddressAggregatedValues {
   id: NonNumericAggregatedValues
 
   """
+  Computed aggregate values for the `inspection` field.
+  """
+  inspection: WidgetInspectionAggregatedValues
+
+  """
   Computed aggregate values for the `internal_details` field.
   """
   internal_details: WidgetInternalDetailsAggregatedValues
@@ -17927,6 +18972,13 @@ input WidgetOrAddressFilterInput {
   id: IDFilterInput
 
   """
+  Used to filter on the `inspection` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  inspection: WidgetInspectionFilterInput
+
+  """
   Used to filter on the `internal_details` field.
 
   When `null` or an empty object is passed, matches all documents.
@@ -18157,6 +19209,11 @@ type WidgetOrAddressGroupedBy {
   full_address: String
 
   """
+  The `inspection` field value for this group.
+  """
+  inspection: WidgetInspectionGroupedBy
+
+  """
   The `internal_details` field value for this group.
   """
   internal_details: WidgetInternalDetailsGroupedBy
@@ -18319,6 +19376,11 @@ type WidgetOrAddressHighlights {
   Search highlights for the `id`, providing snippets of the matching text.
   """
   id: [String!]!
+
+  """
+  Search highlights for the `inspection`, providing snippets of the matching text.
+  """
+  inspection: WidgetInspectionHighlights
 
   """
   Search highlights for the `internal_highlightable_details`, providing snippets of the matching text.
@@ -18539,6 +19601,16 @@ enum WidgetOrAddressSortOrderInput {
   Sorts descending by the `id` field.
   """
   id_DESC
+
+  """
+  Sorts ascending by the `inspection.guid` field.
+  """
+  inspection_guid_ASC
+
+  """
+  Sorts descending by the `inspection.guid` field.
+  """
+  inspection_guid_DESC
 
   """
   Sorts ascending by the `internal_details.name` field.
@@ -18944,6 +20016,16 @@ enum WidgetSortOrderInput {
   Sorts descending by the `id` field.
   """
   id_DESC
+
+  """
+  Sorts ascending by the `inspection.guid` field.
+  """
+  inspection_guid_ASC
+
+  """
+  Sorts descending by the `inspection.guid` field.
+  """
+  inspection_guid_DESC
 
   """
   Sorts ascending by the `internal_details.name` field.

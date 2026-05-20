@@ -36,6 +36,8 @@ datastore:
       setting_overrides_by_timestamp: {}
     components: *main_index_settings
     electrical_parts: *main_index_settings
+    inspection_notes: *main_index_settings
+    inspection_summaries: *main_index_settings
     named_inventors: *main_index_settings
     manufacturers: *main_index_settings
     mechanical_parts: *main_index_settings
