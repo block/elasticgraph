@@ -50,7 +50,7 @@ module ElasticGraph
         @mapping: ::Hash[::String, untyped]?
         def mapping: () -> ::Hash[::String, untyped]
         def json_schema: () -> ::Hash[::String, untyped]
-        def json_schema_metadata: () -> JSONSchemaFieldMetadata
+        def json_schema_metadata: () -> JSONIngestion::SchemaDefinition::Indexing::JSONSchemaFieldMetadata
 
         def self.normalized_mapping_hash_for: (::Array[Field]) -> ::Hash[::String, untyped]
 
