@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/errors"
+require "elastic_graph/schema_artifacts/from_disk"
 require "elastic_graph/schema_artifacts/runtime_metadata/schema_element_names"
 require "elastic_graph/schema_definition/api"
 require "elastic_graph/schema_definition/schema_artifact_manager"
@@ -76,7 +77,7 @@ module ElasticGraph
 
         # Set the json_schema_version to the provided value, if needed.
         if !json_schema_version.nil? && api.state.json_schema_version.nil?
-          api.json_schema_version json_schema_version
+          api.json_schema_version(json_schema_version)
         end
 
         # :nocov: -- the else branch and code past this aren't used by tests in elasticgraph-schema_definition.
@@ -84,11 +85,11 @@ module ElasticGraph
 
         # Reloading the schema artifacts takes extra time that we don't usually want to spend (so it's opt-in)
         # but it can be useful in some cases because there is a bit of extra pruning/validation that it applies.
+        api.enforce_json_schema_version false
         tmp_dir = ::Dir.mktmpdir
         artifacts_manager = api.factory.new_schema_artifact_manager(
           schema_definition_results: api.results,
           schema_artifacts_directory: tmp_dir,
-          enforce_json_schema_version: false,
           output: ::StringIO.new
         )
 

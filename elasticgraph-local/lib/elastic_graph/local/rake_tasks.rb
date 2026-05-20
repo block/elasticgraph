@@ -213,33 +213,6 @@ module ElasticGraph
       # @dynamic schema_definition_extension_modules, schema_definition_extension_modules=
       attr_accessor :schema_definition_extension_modules
 
-      # Whether or not to enforce the requirement that the JSON schema version is incremented every time
-      # dumping the JSON schemas results in a changed artifact. Defaults to `true`.
-      #
-      # @note Generally speaking, you will want this to be `true` for any ElasticGraph application that is in
-      #    production as the versioning of JSON schemas is what supports safe schema evolution as it allows
-      #    ElasticGraph to identify which version of the JSON schema the publishing system was operating on
-      #    when it published an event.
-      #
-      #    It can be useful to set it to `false` before your application is in production, as you do not want
-      #    to be forced to bump the version after every single schema change while you are building an initial
-      #    prototype.
-      #
-      # @return [Boolean] whether to require `json_schema_version` to be incremented on changes that impact `json_schemas.yaml`
-      # @see SchemaDefinition::API#json_schema_version
-      #
-      # @example Disable enforcement during initial prototyping
-      #   ElasticGraph::Local::RakeTasks.new(
-      #     local_config_yaml: "config/settings/local.yaml",
-      #     path_to_schema: "config/schema.rb"
-      #   ) do |tasks|
-      #     # TODO: remove this once we're past the prototyping stage
-      #     tasks.enforce_json_schema_version = false
-      #   end
-      #
-      # @dynamic enforce_json_schema_version, enforce_json_schema_version=
-      attr_accessor :enforce_json_schema_version
-
       # List of Elasticsearch versions you want to be able to boot. Rake tasks will be defined for each version to support booting and
       # halting Elasticsearch locally. If the configuration of `local_config_yaml` only configures `opensearch` as a cluster backend,
       # will default to an empty array. Otherwise, defaults to the versions of Elasticsearch that are exercised by the ElasticGraph test suite, as
@@ -362,7 +335,6 @@ module ElasticGraph
         self.type_name_overrides = {}
         self.enum_value_overrides_by_type = {}
         self.schema_definition_extension_modules = []
-        self.enforce_json_schema_version = true
         self.env_port_mapping = {}
         self.output = $stdout
         self.daemon_timeout = 300
@@ -394,7 +366,6 @@ module ElasticGraph
           type_name_overrides: type_name_overrides,
           enum_value_overrides_by_type: enum_value_overrides_by_type,
           extension_modules: schema_definition_extension_modules,
-          enforce_json_schema_version: enforce_json_schema_version,
           output: output
         )
 

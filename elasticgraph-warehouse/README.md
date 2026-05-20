@@ -53,15 +53,14 @@ index 2943335..26633c3 100644
  require "elastic_graph/local/rake_tasks"
  require "elastic_graph/query_registry/rake_tasks"
  require "rspec/core/rake_task"
-@@ -12,6 +13,8 @@ ElasticGraph::Local::RakeTasks.new(
+@@ -12,5 +13,7 @@ ElasticGraph::Local::RakeTasks.new(
    local_config_yaml: settings_file,
    path_to_schema: "#{project_root}/config/schema.rb"
  ) do |tasks|
 +  tasks.schema_definition_extension_modules = [ElasticGraph::Warehouse::SchemaDefinition::APIExtension]
 +
-   # Set this to true once you're beyond the prototyping stage.
-   tasks.enforce_json_schema_version = false
-
+   # Determines casing of field names. Can be either `:camelCase` or `:snake_case`.
+   tasks.schema_element_name_form = :camelCase
 ```
 
 After running `bundle exec rake schema_artifacts:dump`, a `data_warehouse.yaml` file will be

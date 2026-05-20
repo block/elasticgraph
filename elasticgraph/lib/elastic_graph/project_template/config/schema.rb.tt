@@ -2,6 +2,9 @@ ElasticGraph.define_schema do |schema|
   # ElasticGraph will tell you when you need to bump this.
   schema.json_schema_version 1
 
+  # Set this to true once you're beyond the prototyping stage.
+  schema.enforce_json_schema_version false
+
   # This registers the elasticgraph-query_registry extension, which can be used to reject queries that
   # clients have not registered (and to reject queries that differ from what a client has registered).
   # In addition, every registered query is validated against the schema in the CI build, giving you

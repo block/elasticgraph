@@ -448,7 +448,6 @@ module ElasticGraph
               namespace schema_name do
                 ::ElasticGraph::Local::RakeTasks.new(local_config_yaml: settings_file, path_to_schema: schema_file) do |tasks|
                   tasks.opensearch_versions = []
-                  tasks.enforce_json_schema_version = false
                 end
 
                 task validate: ["schema_artifacts:dump"] do
