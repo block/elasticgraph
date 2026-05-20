@@ -2,24 +2,24 @@
 layout: markdown
 title: Customizing the GraphQL Schema
 permalink: /guides/customizing-the-graphql-schema/
-nav_title: Customizing the Schema
-menu_order: 25
+nav_title: Schema Customization
+menu_order: 18
 ---
 
 ElasticGraph generates a complete GraphQL API from your schema definition, including filter inputs, aggregations,
 sort orders, connections, and more. This guide covers the customization options available to you to shape the generated
-schema to fit your project's conventions.
+schema to fit your project's needs and conventions.
 
 The customizations primarily fall into two groups:
 
-- **Naming options** are passed to [`Local::RakeTasks`](/elasticgraph/api-docs/{{ site.data.doc_versions.latest_version }}/ElasticGraph/Local/RakeTasks.html)
+- **Naming options** are passed to [`Local::RakeTasks`]({% api_doc_url path="ElasticGraph/Local/RakeTasks.html" %})
   in your `Rakefile`. They control the casing and spelling of generated names without changing schema structure.
 - **Schema definition hooks** let you customize generated types and fields; adding directives, documentation, or 
   grouping fields under namespace types.
 
 ## Casing of Generated Fields
 
-Set [`schema_element_name_form`](/elasticgraph/api-docs/{{ site.data.doc_versions.latest_version }}/ElasticGraph/Local/RakeTasks.html#schema_element_name_form-instance_method)
+Set [`schema_element_name_form`]({% api_doc_url path="ElasticGraph/Local/RakeTasks.html" anchor="schema_element_name_form-instance_method" %})
 to choose between `:camelCase` (the default) and `:snake_case` for every generated field name, argument name, and
 directive name in the SDL. Generated types like `WidgetFilterInput` are unaffected; only the elements within them.
 
@@ -35,33 +35,33 @@ field, ElasticGraph will use the name `homeCity` rather than `home_city` on the 
 
 ## Renaming Generated Fields, Arguments, and Directives
 
-Use [`schema_element_name_overrides`](/elasticgraph/api-docs/{{ site.data.doc_versions.latest_version }}/ElasticGraph/Local/RakeTasks.html#schema_element_name_overrides-instance_method)
+Use [`schema_element_name_overrides`]({% api_doc_url path="ElasticGraph/Local/RakeTasks.html" anchor="schema_element_name_overrides-instance_method" %})
 to rename individual generated fields, arguments, or directives. For example, to spell out filter operators that ElasticGraph abbreviates by default:
 
 {% include copyable_code_snippet.html language="ruby" data="schema_customization.snippets.rake_task_examples_rb.schema_element_name_overrides" %}
 
 To rename specific values within a generated enum (e.g. `DayOfWeek.MONDAY` to `DayOfWeek.MON`), use
-[`enum_value_overrides_by_type`](/elasticgraph/api-docs/{{ site.data.doc_versions.latest_version }}/ElasticGraph/Local/RakeTasks.html#enum_value_overrides_by_type-instance_method).
+[`enum_value_overrides_by_type`]({% api_doc_url path="ElasticGraph/Local/RakeTasks.html" anchor="enum_value_overrides_by_type-instance_method" %}).
 
 ## Naming Formats for Derived Types
 
 For each type, ElasticGraph derives a number of other types. For example, if you define a `Widget` indexed type, ElasticGraph will derive
-types like `WidgetFilterInput`, `WidgetAggregation`, and `WidgetSortOrder`. These type naming patterns are configured by
-[`derived_type_name_formats`](/elasticgraph/api-docs/{{ site.data.doc_versions.latest_version }}/ElasticGraph/Local/RakeTasks.html#derived_type_name_formats-instance_method).
+types like `WidgetFilterInput`, `WidgetAggregation`, and `WidgetSortOrder`. These type naming patterns can be configured via
+[`derived_type_name_formats`]({% api_doc_url path="ElasticGraph/Local/RakeTasks.html" anchor="derived_type_name_formats-instance_method" %}).
 
 For example, to drop the `Input` suffix from types like `WidgetFilterInput` across the entire schema:
 
 {% include copyable_code_snippet.html language="ruby" data="schema_customization.snippets.rake_task_examples_rb.derived_type_name_formats" %}
 
 The full set of naming formats is documented at
-[`SchemaElements::TypeNamer::DEFAULT_FORMATS`](/elasticgraph/api-docs/{{ site.data.doc_versions.latest_version }}/ElasticGraph/SchemaDefinition/SchemaElements/TypeNamer.html#DEFAULT_FORMATS-constant).
+[`SchemaElements::TypeNamer::DEFAULT_FORMATS`]({% api_doc_url path="ElasticGraph/SchemaDefinition/SchemaElements/TypeNamer.html" anchor="DEFAULT_FORMATS-constant" %}).
 The `%{base}` placeholder is replaced with the source type's name; format strings must preserve every placeholder
 the default uses, or schema generation fails with a config error.
 
 ## Renaming Individual Types
 
 When you need to rename a single type rather than changing a naming format used across the entire schema—for example, swapping ElasticGraph's `JsonSafeLong`
-scalar for one with a name your team prefers—use [`type_name_overrides`](/elasticgraph/api-docs/{{ site.data.doc_versions.latest_version }}/ElasticGraph/Local/RakeTasks.html#type_name_overrides-instance_method):
+scalar for one with a name your team prefers—use [`type_name_overrides`]({% api_doc_url path="ElasticGraph/Local/RakeTasks.html" anchor="type_name_overrides-instance_method" %}):
 
 {% include copyable_code_snippet.html language="ruby" data="schema_customization.snippets.rake_task_examples_rb.type_name_overrides" %}
 
@@ -78,7 +78,7 @@ to add directives like `@deprecated`. Hooks are available on individual fields, 
 ### Field-level Hooks
 
 When you define a field, ElasticGraph generates corresponding fields on several derived types (filter input, aggregations, 
-grouped-by, highlights, sub-aggregations) plus enum values on the sort order enum. [`on_each_generated_schema_element`](/elasticgraph/api-docs/{{ site.data.doc_versions.latest_version }}/ElasticGraph/SchemaDefinition/SchemaElements/Field.html#on_each_generated_schema_element-instance_method)
+grouped-by, highlights, sub-aggregations) plus enum values on the sort order enum. [`on_each_generated_schema_element`]({% api_doc_url path="ElasticGraph/SchemaDefinition/SchemaElements/Field.html" anchor="on_each_generated_schema_element-instance_method" %})
 applies the same customization to all of them at once:
 
 {% include copyable_code_snippet.html language="ruby" data="schema_customization.snippets.schema_rb.on_each_generated_schema_element" %}
@@ -88,17 +88,17 @@ derived from `Transaction.currency` including `TransactionFilterInput.currency`,
 
 To target a single derived form, use the more specific hooks:
 
-* [`customize_filter_field`](/elasticgraph/api-docs/{{ site.data.doc_versions.latest_version }}/ElasticGraph/SchemaDefinition/SchemaElements/Field.html#customize_filter_field-instance_method)
-* [`customize_aggregated_values_field`](/elasticgraph/api-docs/{{ site.data.doc_versions.latest_version }}/ElasticGraph/SchemaDefinition/SchemaElements/Field.html#customize_aggregated_values_field-instance_method)
-* [`customize_grouped_by_field`](/elasticgraph/api-docs/{{ site.data.doc_versions.latest_version }}/ElasticGraph/SchemaDefinition/SchemaElements/Field.html#customize_grouped_by_field-instance_method)
-* [`customize_highlights_field`](/elasticgraph/api-docs/{{ site.data.doc_versions.latest_version }}/ElasticGraph/SchemaDefinition/SchemaElements/Field.html#customize_highlights_field-instance_method)
-* [`customize_sub_aggregations_field`](/elasticgraph/api-docs/{{ site.data.doc_versions.latest_version }}/ElasticGraph/SchemaDefinition/SchemaElements/Field.html#customize_sub_aggregations_field-instance_method)
-* [`customize_sort_order_enum_values`](/elasticgraph/api-docs/{{ site.data.doc_versions.latest_version }}/ElasticGraph/SchemaDefinition/SchemaElements/Field.html#customize_sort_order_enum_values-instance_method)
+* [`customize_filter_field`]({% api_doc_url path="ElasticGraph/SchemaDefinition/SchemaElements/Field.html" anchor="customize_filter_field-instance_method" %})
+* [`customize_aggregated_values_field`]({% api_doc_url path="ElasticGraph/SchemaDefinition/SchemaElements/Field.html" anchor="customize_aggregated_values_field-instance_method" %})
+* [`customize_grouped_by_field`]({% api_doc_url path="ElasticGraph/SchemaDefinition/SchemaElements/Field.html" anchor="customize_grouped_by_field-instance_method" %})
+* [`customize_highlights_field`]({% api_doc_url path="ElasticGraph/SchemaDefinition/SchemaElements/Field.html" anchor="customize_highlights_field-instance_method" %})
+* [`customize_sub_aggregations_field`]({% api_doc_url path="ElasticGraph/SchemaDefinition/SchemaElements/Field.html" anchor="customize_sub_aggregations_field-instance_method" %})
+* [`customize_sort_order_enum_values`]({% api_doc_url path="ElasticGraph/SchemaDefinition/SchemaElements/Field.html" anchor="customize_sort_order_enum_values-instance_method" %})
 
 ### Type-level Hooks
 
 To customize the derived types generated from an object or interface type as a whole, use
-[`customize_derived_types`](/elasticgraph/api-docs/{{ site.data.doc_versions.latest_version }}/ElasticGraph/SchemaDefinition/Mixins/HasDerivedGraphQLTypeCustomizations.html#customize_derived_types-instance_method).
+[`customize_derived_types`]({% api_doc_url path="ElasticGraph/SchemaDefinition/Mixins/HasDerivedGraphQLTypeCustomizations.html" anchor="customize_derived_types-instance_method" %}).
 Pass `:all` to customize every derived type. For example, to mark every derived type for `Campaign` with `@deprecated`:
 
 {% include copyable_code_snippet.html language="ruby" data="schema_customization.snippets.schema_rb.customize_derived_types_all" %}
@@ -107,8 +107,11 @@ Or pass one or more specific type names to target just those derived types:
 
 {% include copyable_code_snippet.html language="ruby" data="schema_customization.snippets.schema_rb.customize_derived_types_named" %}
 
-To customize specific fields on a derived type, use
-[`customize_derived_type_fields`](/elasticgraph/api-docs/{{ site.data.doc_versions.latest_version }}/ElasticGraph/SchemaDefinition/Mixins/HasDerivedGraphQLTypeCustomizations.html#customize_derived_type_fields-instance_method).
+To customize fields that ElasticGraph defines on a derived type—fields like `pageInfo`, `nodes`, or
+`totalEdgeCount` that don't have a user-defined counterpart—use
+[`customize_derived_type_fields`]({% api_doc_url path="ElasticGraph/SchemaDefinition/Mixins/HasDerivedGraphQLTypeCustomizations.html" anchor="customize_derived_type_fields-instance_method" %}).
+For fields derived from your own field definitions, use the field-level hooks described above.
+
 For example, to deprecate `pageInfo` and `totalEdgeCount` on `ProductConnection`:
 
 {% include copyable_code_snippet.html language="ruby" data="schema_customization.snippets.schema_rb.customize_derived_type_fields" %}
@@ -116,14 +119,14 @@ For example, to deprecate `pageInfo` and `totalEdgeCount` on `ProductConnection`
 ### Built-in Types
 
 ElasticGraph generates several built-in types you don't define directly (`Query`, `PageInfo`, `AggregationCountDetail`,
-and others). [`on_built_in_types`](/elasticgraph/api-docs/{{ site.data.doc_versions.latest_version }}/ElasticGraph/SchemaDefinition/API.html#on_built_in_types-instance_method)
+and others). [`on_built_in_types`]({% api_doc_url path="ElasticGraph/SchemaDefinition/API.html" anchor="on_built_in_types-instance_method" %})
 runs your block on each one as it's generated:
 
 {% include copyable_code_snippet.html language="ruby" data="schema_customization.snippets.schema_rb.on_built_in_types" %}
 
 ## Customizing the Root `Query` Type
 
-[`on_root_query_type`](/elasticgraph/api-docs/{{ site.data.doc_versions.latest_version }}/ElasticGraph/SchemaDefinition/API.html#on_root_query_type-instance_method)
+[`on_root_query_type`]({% api_doc_url path="ElasticGraph/SchemaDefinition/API.html" anchor="on_root_query_type-instance_method" %})
 is a specialization of `on_built_in_types` that fires only for the root `Query` type. Use it to add ad hoc fields
 to `Query`, append documentation, or apply directives:
 
@@ -141,8 +144,8 @@ and fields from different subgraphs can collide. A _namespace type_ lets you gro
 under a nested path; for example, `Query.olap.widgets` instead of `Query.widgets`. This can improve discoverability
 and isolation of domain-specific types.
 
-A namespace is an object type declared with [`namespace_type`](/elasticgraph/api-docs/main/ElasticGraph/SchemaDefinition/API.html#namespace_type-instance_method).
-You can route an indexed type's root fields to the namespace by passing `on:` to [`root_query_fields`](/elasticgraph/api-docs/main/ElasticGraph/SchemaDefinition/Mixins/HasIndices.html#root_query_fields-instance_method),
+A namespace is an object type declared with [`namespace_type`]({% api_doc_url path="ElasticGraph/SchemaDefinition/API.html" anchor="namespace_type-instance_method" %}).
+You can route an indexed type's root fields to the namespace by passing `on:` to [`root_query_fields`]({% api_doc_url path="ElasticGraph/SchemaDefinition/Mixins/HasIndices.html" anchor="root_query_fields-instance_method" %}),
 then expose the namespace type as a field on `Query`.
 
 {% include copyable_code_snippet.html language="ruby" data="namespaced_queries.snippets.schema_rb.namespace_type" %}

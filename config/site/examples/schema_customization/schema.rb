@@ -17,7 +17,6 @@ ElasticGraph.define_schema do |schema|
         element.directive "deprecated"
       end
     end
-    t.index "transactions"
   end
   # :snippet-end:
 
@@ -27,17 +26,15 @@ ElasticGraph.define_schema do |schema|
     t.customize_derived_types :all do |dt|
       dt.directive "deprecated"
     end
-    t.index "campaigns"
   end
   # :snippet-end:
 
   # :snippet-start: customize_derived_types_named
   schema.object_type "Order" do |t|
     t.field "id", "ID"
-    t.customize_derived_types "OrderFilterInput", "OrderSortOrderInput" do |dt|
+    t.customize_derived_types "OrderFilterInput", "OrderGroupedBy" do |dt|
       dt.directive "deprecated"
     end
-    t.index "orders"
   end
   # :snippet-end:
 
