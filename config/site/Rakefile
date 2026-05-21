@@ -436,6 +436,13 @@ module ElasticGraph
           require "elastic_graph/local/rake_tasks"
           require "elastic_graph/query_registry/rake_tasks"
 
+          # Start coverage tracking before loading example Rakefiles so we can
+          # verify that all snippet lines are actually executed.
+          require "coverage"
+          require "simplecov"
+          ::SimpleCov.root(REPO_ROOT.to_s)
+          ::Coverage.start(lines: true)
+
           namespace :examples do
             desc "Generate and extract code snippets from example schemas"
             task extract_snippets: EXAMPLE_SCHEMA_FILES_BY_NAME.keys.map { |schema| "#{schema}:extract_snippets" }
@@ -446,19 +453,27 @@ module ElasticGraph
               queries_dir = example_dir / "queries"
 
               namespace schema_name do
-                ::ElasticGraph::Local::RakeTasks.new(local_config_yaml: settings_file, path_to_schema: schema_file) do |tasks|
-                  tasks.opensearch_versions = []
-                  tasks.enforce_json_schema_version = false
+                rakefile = example_dir / "Rakefile"
+                if rakefile.exist?
+                  load rakefile
+                else
+                  # Here we provide a "default Rakefile" for examples that don't have any specialized needs and that aren't trying
+                  # to demonstrate any `Rakefile` APIs.
+                  ::ElasticGraph::Local::RakeTasks.new(local_config_yaml: settings_file, path_to_schema: schema_file) do |tasks|
+                    tasks.opensearch_versions = []
+                    tasks.enforce_json_schema_version = false
+                  end
                 end
 
                 task validate: ["schema_artifacts:dump"] do
                   validation_file = ::File.join(example_dir, "validate.rb")
-                  if ::File.exist?(validation_file)
-                    sh "bundle exec ruby #{validation_file}"
-                  end
+                  # We load the validation file in-process so that our coverage tracking sees it.
+                  load validation_file if ::File.exist?(validation_file)
                 end
 
                 task extract_snippets: :validate do
+                  validate_snippet_coverage(example_dir)
+
                   files = extract_snippets_from_dir(example_dir) do |file|
                     ::File.read(file).strip
                   end
@@ -533,6 +548,48 @@ module ElasticGraph
       end
 
       snippets
+    end
+
+    def validate_snippet_coverage(example_dir)
+      coverage_data = ::Coverage.peek_result
+
+      ruby_files_in(example_dir).each do |file|
+        file_coverage = coverage_data[file]
+        unless file_coverage
+          relative = Pathname.new(file).relative_path_from(REPO_ROOT)
+          abort <<~EOS
+            ERROR: #{relative} was never loaded during validation (not tracked by Coverage).
+
+            Every Ruby file in an example directory must be executed during the build
+            to ensure code snippets in the docs are correct. Make sure this file is
+            loaded by schema.rb, Rakefile, or validate.rb.
+          EOS
+        end
+
+        source_file = ::SimpleCov::SourceFile.new(file, {"lines" => file_coverage[:lines]})
+        missed = source_file.missed_lines
+        next if missed.empty?
+
+        relative = Pathname.new(file).relative_path_from(REPO_ROOT)
+        abort <<~EOS
+          ERROR: #{relative} has lines that were never executed:
+
+          #{missed.map { |l| "  Line #{l.line_number}: #{l.src.rstrip}" }.join("\n")}
+
+          Every executable line in example Ruby files must be executed during
+          validation. If a line intentionally can't be covered, mark it with
+          `# :nocov:` (same syntax as SimpleCov).
+        EOS
+      end
+    end
+
+    NON_RUBY_EXTENSIONS = %w[.graphql .yaml .yml].to_set.freeze
+
+    def ruby_files_in(dir)
+      ::Dir.glob(::File.join(dir, "**", "*")).reject do |file|
+        ::File.directory?(file) ||
+          NON_RUBY_EXTENSIONS.include?(::File.extname(file))
+      end
     end
 
     def watch_files(description, *args, **kwargs)

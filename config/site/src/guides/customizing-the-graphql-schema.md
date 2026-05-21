@@ -23,7 +23,7 @@ Set [`schema_element_name_form`]({% api_doc_url path="ElasticGraph/Local/RakeTas
 to choose between `:camelCase` (the default) and `:snake_case` for every generated field name, argument name, and
 directive name in the SDL. Generated types like `WidgetFilterInput` are unaffected; only the elements within them.
 
-{% include copyable_code_snippet.html language="ruby" data="schema_customization.snippets.rake_task_examples_rb.schema_element_name_form" %}
+{% include copyable_code_snippet.html language="ruby" data="schema_customization_rake_tasks.snippets.Rakefile.schema_element_name_form" %}
 
 For example, this will cause ElasticGraph to generate `StringFilterInput.equal_to_any_of` rather than
 `StringFilterInput.equalToAnyOf`.
@@ -38,7 +38,7 @@ field, ElasticGraph will use the name `homeCity` rather than `home_city` on the 
 Use [`schema_element_name_overrides`]({% api_doc_url path="ElasticGraph/Local/RakeTasks.html" anchor="schema_element_name_overrides-instance_method" %})
 to rename individual generated fields, arguments, or directives. For example, to spell out filter operators that ElasticGraph abbreviates by default:
 
-{% include copyable_code_snippet.html language="ruby" data="schema_customization.snippets.rake_task_examples_rb.schema_element_name_overrides" %}
+{% include copyable_code_snippet.html language="ruby" data="schema_customization_rake_tasks.snippets.Rakefile.schema_element_name_overrides" %}
 
 To rename specific values within a generated enum (e.g. `DayOfWeek.MONDAY` to `DayOfWeek.MON`), use
 [`enum_value_overrides_by_type`]({% api_doc_url path="ElasticGraph/Local/RakeTasks.html" anchor="enum_value_overrides_by_type-instance_method" %}).
@@ -51,7 +51,7 @@ types like `WidgetFilterInput`, `WidgetAggregation`, and `WidgetSortOrder`. Thes
 
 For example, to drop the `Input` suffix from types like `WidgetFilterInput` across the entire schema:
 
-{% include copyable_code_snippet.html language="ruby" data="schema_customization.snippets.rake_task_examples_rb.derived_type_name_formats" %}
+{% include copyable_code_snippet.html language="ruby" data="schema_customization_rake_tasks.snippets.Rakefile.derived_type_name_formats" %}
 
 The full set of naming formats is documented at
 [`SchemaElements::TypeNamer::DEFAULT_FORMATS`]({% api_doc_url path="ElasticGraph/SchemaDefinition/SchemaElements/TypeNamer.html" anchor="DEFAULT_FORMATS-constant" %}).
@@ -63,7 +63,7 @@ the default uses, or schema generation fails with a config error.
 When you need to rename a single type rather than changing a naming format used across the entire schema—for example, swapping ElasticGraph's `JsonSafeLong`
 scalar for one with a name your team prefers—use [`type_name_overrides`]({% api_doc_url path="ElasticGraph/Local/RakeTasks.html" anchor="type_name_overrides-instance_method" %}):
 
-{% include copyable_code_snippet.html language="ruby" data="schema_customization.snippets.rake_task_examples_rb.type_name_overrides" %}
+{% include copyable_code_snippet.html language="ruby" data="schema_customization_rake_tasks.snippets.Rakefile.type_name_overrides" %}
 
 {: .alert-warning}
 **Warning**{: .alert-title}
