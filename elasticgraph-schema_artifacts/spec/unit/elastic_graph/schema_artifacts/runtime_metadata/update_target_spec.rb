@@ -84,7 +84,7 @@ module ElasticGraph
               }
             )
 
-            without_id_or_data = params.except("id", "data")
+            without_id_or_data = params.except("id", "topLevelFields")
 
             expect(without_id_or_data).to eq(
               "foo" => 43,
@@ -93,7 +93,7 @@ module ElasticGraph
             )
           end
 
-          it "extracts `event_params` from `prepared_record` and include them under `data`" do
+          it "extracts `event_params` from `prepared_record` and include them under `topLevelFields`" do
             params = params_for(
               data_params: {
                 "foo" => static_param_with(43),
@@ -108,7 +108,7 @@ module ElasticGraph
               }
             )
 
-            expect(params.fetch("data")).to eq(
+            expect(params.fetch("topLevelFields")).to eq(
               "foo" => 43,
               "bar" => "hello",
               "bazz" => [12]

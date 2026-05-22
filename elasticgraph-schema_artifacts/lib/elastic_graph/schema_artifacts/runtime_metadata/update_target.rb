@@ -74,7 +74,7 @@ module ElasticGraph
             [name, param.value_for(event)]
           end
 
-          meta.merge({"id" => doc_id, "data" => data})
+          meta.merge({"id" => doc_id, "topLevelFields" => data})
         end
       end
     end

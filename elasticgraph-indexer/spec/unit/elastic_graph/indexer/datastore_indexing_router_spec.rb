@@ -240,21 +240,21 @@ module ElasticGraph
 
           expect(submitted_body[0]).to eq({update: {_id: "1", _index: "widgets", retry_on_conflict: 5}})
           expect(submitted_body[1]).to include(
-            script: a_hash_including(id: INDEX_DATA_UPDATE_SCRIPT_ID, params: a_hash_including("data")),
+            script: a_hash_including(id: INDEX_DATA_UPDATE_SCRIPT_ID, params: a_hash_including("topLevelFields")),
             scripted_upsert: true,
             upsert: {}
           )
 
           expect(submitted_body[2]).to eq({update: {_id: "2", _index: "widgets", retry_on_conflict: 5}})
           expect(submitted_body[3]).to include(
-            script: a_hash_including(id: INDEX_DATA_UPDATE_SCRIPT_ID, params: a_hash_including("data")),
+            script: a_hash_including(id: INDEX_DATA_UPDATE_SCRIPT_ID, params: a_hash_including("topLevelFields")),
             scripted_upsert: true,
             upsert: {}
           )
 
           expect(submitted_body[4]).to eq({update: {_id: "1", _index: "components", retry_on_conflict: 5}})
           expect(submitted_body[5]).to include(
-            script: a_hash_including(id: INDEX_DATA_UPDATE_SCRIPT_ID, params: a_hash_including("data")),
+            script: a_hash_including(id: INDEX_DATA_UPDATE_SCRIPT_ID, params: a_hash_including("topLevelFields")),
             scripted_upsert: true,
             upsert: {}
           )
@@ -265,7 +265,7 @@ module ElasticGraph
             upsert: {},
             script: a_hash_including(
               id: /WidgetCurrency_from_Widget_/,
-              params: {"data" => {"name" => ["thing1"]}, "id" => "USD"}
+              params: {"topLevelFields" => {"name" => ["thing1"]}, "id" => "USD"}
             )
           )
         end

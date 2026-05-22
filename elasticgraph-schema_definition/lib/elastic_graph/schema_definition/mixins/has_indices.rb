@@ -431,7 +431,7 @@ module ElasticGraph
           return nil if abstract? || !root_document_type?
 
           # We exclude `id` from `data_params` because `Indexer::Operator::Update` automatically includes
-          # `params.id` so we don't want it duplicated at `params.data.id` alongside other data params.
+          # `params.id` so we don't want it duplicated at `params.topLevelFields.id` alongside other data params.
           #
           # In addition, we exclude fields that have an alternate `source` -- those fields will get populated
           # by a different event and we don't want to risk "stomping" their value via this update target.

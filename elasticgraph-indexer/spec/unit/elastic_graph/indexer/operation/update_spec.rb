@@ -73,7 +73,7 @@ module ElasticGraph
               {update: {_id: "17", _index: "widget_workspaces", retry_on_conflict: Update::CONFLICT_RETRIES}},
               {
                 script: {id: operations.first.update_target.script_id, params: {
-                  "data" => {"name" => ["thing1"]},
+                  "topLevelFields" => {"name" => ["thing1"]},
                   "id" => "17"
                 }},
                 scripted_upsert: true,
@@ -102,7 +102,7 @@ module ElasticGraph
               {update: {_id: "17", _index: "widget_workspaces", retry_on_conflict: Update::CONFLICT_RETRIES}},
               {
                 script: {id: INDEX_DATA_UPDATE_SCRIPT_ID, params: {
-                  "data" => {"name" => "thing1"},
+                  "topLevelFields" => {"name" => "thing1"},
                   "id" => "17",
                   "staticValue" => 47,
                   "sourceType" => "Widget",
@@ -156,7 +156,7 @@ module ElasticGraph
               {update: {_id: "17", _index: "widget_workspaces", retry_on_conflict: Update::CONFLICT_RETRIES}},
               {
                 script: {id: operations.first.update_target.script_id, params: {
-                  "data" => {"name" => []},
+                  "topLevelFields" => {"name" => []},
                   "id" => "17"
                 }},
                 scripted_upsert: true,
@@ -177,7 +177,7 @@ module ElasticGraph
               {update: {_id: "embedded_workspace_id", _index: "widget_workspaces", retry_on_conflict: Update::CONFLICT_RETRIES}},
               {
                 script: {id: operations.first.update_target.script_id, params: {
-                  "data" => {"name" => ["thing1"]},
+                  "topLevelFields" => {"name" => ["thing1"]},
                   "id" => "embedded_workspace_id"
                 }},
                 scripted_upsert: true,
@@ -202,7 +202,7 @@ module ElasticGraph
               {update: {_id: "17", _index: "widget_workspaces", retry_on_conflict: Update::CONFLICT_RETRIES}},
               {
                 script: {id: operations.first.update_target.script_id, params: {
-                  "data" => {"embedded_values.missing_field" => [], "name" => nil},
+                  "topLevelFields" => {"embedded_values.missing_field" => [], "name" => nil},
                   "id" => "17"
                 }},
                 scripted_upsert: true,
@@ -229,7 +229,7 @@ module ElasticGraph
               {update: {_id: "17", _index: "widget_workspaces", retry_on_conflict: Update::CONFLICT_RETRIES}},
               {
                 script: {id: operations.first.update_target.script_id, params: {
-                  "data" => {
+                  "topLevelFields" => {
                     "embedded_values" => ["thing1"],
                     "name" => {
                       "name" => "embedded_name",
@@ -261,7 +261,7 @@ module ElasticGraph
               {
                 script: {id: operations.first.update_target.script_id, params: {
                   # Float-typed integer values are coerced to true ints before indexing
-                  "data" => {"size" => [an_instance_of(::Integer).and(eq_to(4))]},
+                  "topLevelFields" => {"size" => [an_instance_of(::Integer).and(eq_to(4))]},
                   "id" => "17"
                 }},
                 scripted_upsert: true,
@@ -282,7 +282,7 @@ module ElasticGraph
               {update: {_id: "17", _index: "widget_workspaces", retry_on_conflict: Update::CONFLICT_RETRIES}},
               {
                 script: {id: operations.first.update_target.script_id, params: {
-                  "data" => {"name" => ["thing1"]},
+                  "topLevelFields" => {"name" => ["thing1"]},
                   "id" => "17"
                 }},
                 scripted_upsert: true,
@@ -291,7 +291,7 @@ module ElasticGraph
               {update: {_id: "18", _index: "widget_workspaces", retry_on_conflict: Update::CONFLICT_RETRIES}},
               {
                 script: {id: operations.first.update_target.script_id, params: {
-                  "data" => {"name" => ["thing1"]},
+                  "topLevelFields" => {"name" => ["thing1"]},
                   "id" => "18"
                 }},
                 scripted_upsert: true,
@@ -300,7 +300,7 @@ module ElasticGraph
               {update: {_id: "19", _index: "widget_workspaces", retry_on_conflict: Update::CONFLICT_RETRIES}},
               {
                 script: {id: operations.first.update_target.script_id, params: {
-                  "data" => {"name" => ["thing1"]},
+                  "topLevelFields" => {"name" => ["thing1"]},
                   "id" => "19"
                 }},
                 scripted_upsert: true,
