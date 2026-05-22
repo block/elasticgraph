@@ -29,9 +29,6 @@ module ElasticGraph
         def cannot_modify_mapping_field_type_error: () -> ::String
         def index_template_exists?: () -> bool
 
-        @mapping_removals: ::Array[::String]?
-        def mapping_removals: () -> ::Array[::String]
-
         @mapping_type_changes: ::Array[::String]?
         def mapping_type_changes: () -> ::Array[::String]
 
@@ -40,7 +37,8 @@ module ElasticGraph
         @settings_updates: DatastoreCore::indexSettingsHash?
         def settings_updates: () -> DatastoreCore::indexSettingsHash
 
-        def mapping_fields_from: (DatastoreCore::indexMappingHash, ?::String) -> ::Array[::String]
+        @desired_mapping_for_update: DatastoreCore::indexMappingHash?
+        def desired_mapping_for_update: () -> DatastoreCore::indexMappingHash
 
         def desired_mapping: () -> DatastoreCore::indexMappingHash
 
@@ -49,6 +47,9 @@ module ElasticGraph
 
         @desired_config_parent: ::Hash[::String, untyped]
         def desired_config_parent: () -> ::Hash[::String, untyped]
+
+        @desired_config_parent_for_update: ::Hash[::String, untyped]
+        def desired_config_parent_for_update: () -> ::Hash[::String, untyped]
 
         def current_mapping: () -> DatastoreCore::indexMappingHash
 
@@ -62,7 +63,6 @@ module ElasticGraph
         def config_diff: () -> ::String
 
         def report_action: (::String) -> void
-        def merge_properties: (::Hash[::String, untyped], ::Hash[::String, untyped]) -> ::Hash[::String, untyped]
 
         @related_index_configurators: ::Array[ForIndex]?
         def related_index_configurators: () -> ::Array[ForIndex]
