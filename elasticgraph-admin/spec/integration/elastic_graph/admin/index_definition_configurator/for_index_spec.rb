@@ -35,6 +35,25 @@ module ElasticGraph
             }.to make_no_datastore_write_calls("main")
           end
 
+          it "is a no-op when attempting to drop a mapping field because the datastore does not support it" do
+            configure_index_definition(schema_def)
+            output_io.string = +"" # use `+` so it is not a frozen string literal.
+
+            expect {
+              # Here we remove the `name` field and the `options.size` field to verify it works for both root and nested fields.
+              configure_index_definition(schema_def(
+                avoid_defining_widget_fields: %w[name],
+                avoid_defining_widget_options_fields: %w[size]
+              ))
+            }.to maintain {
+              props = get_index_definition_configuration(unique_index_name).dig("mappings", "properties")
+              [props.keys.sort, props.dig("options", "properties").keys.sort]
+            }.from([[*index_meta_fields, "created_at", "id", "name", "options"], ["color", "size"]])
+              .and make_no_datastore_write_calls("main")
+
+            expect(output_io.string).to exclude("Updated mappings", "properties.name", "properties.options.properties.size")
+          end
+
           def make_datastore_calls_to_configure_index_def(index_name, subresource = nil)
             make_datastore_write_calls("main", "PUT #{put_index_definition_url(index_name, subresource)}")
           end

@@ -1,0 +1,11 @@
+module ElasticGraph
+  class Admin
+    module IndexDefinitionConfigurator
+      module MappingUpdate
+        EMPTY_PROPERTIES: ::Hash[::String, untyped]
+
+        def self.merge_existing_fields_into: (::Hash[::String, untyped], ::Hash[::String, untyped]) -> ::Hash[::String, untyped]
+      end
+    end
+  end
+end
