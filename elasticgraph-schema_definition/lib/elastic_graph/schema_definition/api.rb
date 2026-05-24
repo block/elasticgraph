@@ -77,7 +77,7 @@ module ElasticGraph
 
         @factory = @state.factory
 
-        extension_modules.each { |mod| extend(mod) }
+        extension_modules.uniq.each { |mod| extend(mod) }
 
         # These lines must come _after_ the extension modules are applied, so that the extension modules
         # have a chance to hook into the factory in order to customize built in types if desired.
