@@ -24,6 +24,7 @@ Each iteration:
    - `git diff main...HEAD`, `git status`.
    - Read every changed file end-to-end before editing — never speculate.
    - Iteration 2+: include files you edited last iteration, since your own edits can introduce new violations.
+   - If polishing after review feedback, read all unresolved inline comments and confirm whether each is addressed in the current diff, stale, or still needs a code change.
 
 2. **Pass 1 — Code.** Walk each non-test source file against the "Code" checklist. Apply edits.
 
@@ -62,7 +63,24 @@ After exit, print the final report (see "Final report" below). Do not commit. Do
 ### Arg style
 - `&:method_name` shorthand over `{ |x| x.method_name }`.
 - One-line recursive call as the sole in-method caller? Positional args + collapse to one line. Kwargs only when there are real external callers.
-- `::ElasticGraph::` prefixes inside `module ElasticGraph` -> drop.
+- `ElasticGraph::` and `::ElasticGraph::` prefixes inside `module ElasticGraph` -> drop in Ruby and RBS unless needed to avoid ambiguity.
+
+### Moves and namespace changes
+- File moves should be reviewable as moves. First move files with content as unchanged as possible; do indentation/module-nesting polish in a later commit or PR so GitHub can detect the move.
+- Once a moved file is in its new home, use the normal nested module style:
+  ```ruby
+  module ElasticGraph
+    module SomeGem
+      # ...
+    end
+  end
+  ```
+  Then remove redundant `ElasticGraph::` prefixes made unnecessary by that nesting.
+- Preserve comments unless they are inaccurate. If a move or extraction drops a comment, verify the comment is obsolete before deleting it.
+
+### Collections and small churn
+- Keep set-like data as `Set`. Do not switch a `Set` to an `Array` unless order or duplicates are part of the semantics, and make that reason visible in the code.
+- Unused args should be removed when the caller contract allows it; do not leave compatibility-shaped parameters without a reason.
 
 ### Defaults & truthiness
 - Explicit `true`/`false` for boolean defaults in DSL call sites. `returnable: true`, not `returnable: nil`, even if `nil` evaluates correctly.
@@ -73,6 +91,12 @@ After exit, print the final report (see "Final report" below). Do not commit. Do
 ### Config & env vars
 - New ENV var reads that the AWS/SDK client already handles natively -> delete, let the SDK fall back.
 - Extension config registered in `ELASTICGRAPH_CONFIG_KEYS` or added to core YAML configs -> remove.
+- Avoid sidecar configuration APIs when the option belongs in the existing schema DSL. Special defaults should usually live in generated/bootstrap project configuration, not in core global default machinery.
+
+### Gems and dependencies
+- Do not add empty gem root files or matching root RBS files unless they are real public entry points or local tooling requires them.
+- In gemspecs, list runtime `add_dependency` entries before `add_development_dependency` entries.
+- Optional extension gems stay optional at runtime. If the test suite needs one, use `add_development_dependency` instead of making the core gem depend on it.
 
 ### Wrapper-class construction pattern
 For classes like `WarehouseLambda`, `DatastoreCore`, `Indexer`, `GraphQL`, `Admin`:
@@ -129,8 +153,13 @@ When the diff adds a schema feature, ensure specs cover:
 
 ### YARD + RBS
 - New public attrs get `@!attribute`. New kwargs get `@param`.
+- When moving a documented API, copy the useful YARD docs to the replacement API instead of leaving them on the old location or dropping them.
 - RBS type comments: `# : Type` (space after `#`). Run `ag "#:"` across the diff — zero hits expected. Same for all comments.
-- Extension-module signatures stay concrete: `module X : ::ElasticGraph::...::Y`, not custom `_Interface` shapes.
+- Extension-module signatures stay concrete when the module is mixed into a concrete class: `module X : ::ElasticGraph::...::Y`, not custom `_Interface` shapes.
+- For wrappers around frozen or `Data`-backed core objects, do not mutate or extend the core instance. Use a small delegating wrapper with an explicit delegated surface. If an extension module is intentionally mixed into that wrapper, keep any RBS interface narrow and limited to the methods the module actually calls.
+
+### Examples and generated artifacts
+- Site examples and docs fixtures should not inherit defaults that make local iteration noisier. If generated schema artifacts are ignored and should not force version bumps, set `schema.enforce_json_schema_version false` next to `schema.json_schema_version`.
 
 ### Imports and requires
 - Top-of-file `require`s alphabetical.
