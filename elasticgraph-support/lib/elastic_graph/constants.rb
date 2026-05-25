@@ -140,7 +140,7 @@ module ElasticGraph
   #
   # Note: this constant is automatically kept up-to-date by our `schema_artifacts:dump` rake task.
   # @private
-  INDEX_DATA_UPDATE_SCRIPT_ID = "update_index_data_db769e42fd258f3884d2c5b721bb3c03"
+  INDEX_DATA_UPDATE_SCRIPT_ID = "update_index_data_1b6d53ffefa2dd2d9510366867200725"
 
   # When an update script has a no-op result we often want to communicate more information about
   # why it was a no-op back to ElatsicGraph from the script. The only way to do that is to throw

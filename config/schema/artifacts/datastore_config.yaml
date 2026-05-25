@@ -2156,7 +2156,7 @@ scripts:
 
         // No timestamp values matched the params, so return `false`.
         return false;
-  update_index_data_db769e42fd258f3884d2c5b721bb3c03:
+  update_index_data_1b6d53ffefa2dd2d9510366867200725:
     context: update
     script:
       lang: painless
@@ -2182,6 +2182,11 @@ scripts:
 
         void validateSource(Map source, String id, String relationship, String sourceId, long eventVersion) {
           Map relationshipVersionsMap = source.__versions.get(relationship);
+
+          if (relationshipVersionsMap == null) {
+            throw new IllegalArgumentException("Expected source.__versions[" + relationship + "] to be initialized by setup(), but it was null");
+          }
+
           List previousSourceIdsForRelationship = relationshipVersionsMap.keySet().stream().filter(key -> key != sourceId).collect(Collectors.toList());
 
           if (previousSourceIdsForRelationship.size() > 0) {
