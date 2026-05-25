@@ -11,7 +11,7 @@ require "elastic_graph/constants"
 module ElasticGraph
   class Indexer
     module Operation
-      # Responsible for maintaining state and accumulating list counts while we traverse the `data` we are preparing
+      # Responsible for maintaining state and accumulating list counts while we traverse the `topLevelFields` we are preparing
       # to update in the index. Much of the complexity here is due to the fact that we have 3 kinds of list fields:
       # scalar lists, embedded object lists, and `nested` object lists.
       #
@@ -56,19 +56,19 @@ module ElasticGraph
         # @implements CountAccumulator
         def self.merge_list_counts_into(params, mapping:, list_counts_field_paths_for_source:)
           # Here we compute the counts of our list elements so that we can index it.
-          data = compute_list_counts_of(params.fetch("topLevelFields"), CountAccumulator.new_parent(
+          top_level_fields = compute_list_counts_of(params.fetch("topLevelFields"), CountAccumulator.new_parent(
             # We merge in `type: nested` since the `nested` type indicates a new count accumulator parent and we want that applied at the root.
             mapping.merge("type" => "nested"),
             list_counts_field_paths_for_source
           ))
 
-          # The root `__counts` field needs special handling due to our `sourced_from` feature. Anything in `data`
+          # The root `__counts` field needs special handling due to our `sourced_from` feature. Anything in `top_level_fields`
           # will overwrite what's in the specified fields when the script executes, but since there could be list
           # fields from multiple sources, we need `__counts` to get merged properly. So here we "promote" it from
-          # `data.__counts` to being a root-level parameter.
+          # `top_level_fields.__counts` to being a root-level parameter.
           params.merge(
-            "topLevelFields" => data.except(LIST_COUNTS_FIELD),
-            LIST_COUNTS_FIELD => data[LIST_COUNTS_FIELD]
+            "topLevelFields" => top_level_fields.except(LIST_COUNTS_FIELD),
+            LIST_COUNTS_FIELD => top_level_fields[LIST_COUNTS_FIELD]
           )
         end
 
