@@ -84,9 +84,9 @@ module ElasticGraph
               }
             )
 
-            without_id_or_data = params.except("id", "topLevelFields")
+            without_id_or_top_level_fields = params.except("id", "topLevelFields")
 
-            expect(without_id_or_data).to eq(
+            expect(without_id_or_top_level_fields).to eq(
               "foo" => 43,
               "bar" => "hello",
               "bazz" => [12]
