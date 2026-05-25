@@ -2156,7 +2156,7 @@ scripts:
 
         // No timestamp values matched the params, so return `false`.
         return false;
-  update_index_data_1b6d53ffefa2dd2d9510366867200725:
+  update_index_data_c506543861091e70bd493c28d29b9b70:
     context: update
     script:
       lang: painless
@@ -2184,7 +2184,7 @@ scripts:
           Map relationshipVersionsMap = source.__versions.get(relationship);
 
           if (relationshipVersionsMap == null) {
-            throw new IllegalArgumentException("Expected source.__versions[" + relationship + "] to be initialized by setup(), but it was null");
+            throw new IllegalArgumentException("Expected source.__versions[" + relationship + "] to be initialized, but it was null");
           }
 
           List previousSourceIdsForRelationship = relationshipVersionsMap.keySet().stream().filter(key -> key != sourceId).collect(Collectors.toList());
@@ -2212,7 +2212,8 @@ scripts:
           }
         }
 
-        void applyTopLevelFields(Map source, Map topLevelFields, Map counts) {
+        void applyTopLevelFields(Map source, String id, Map topLevelFields, Map counts) {
+          source.id = id;
           source.putAll(topLevelFields);
 
           if (counts != null) {
@@ -2220,8 +2221,7 @@ scripts:
           }
         }
 
-        void recordSource(Map source, String id, String relationship, String sourceId, long eventVersion) {
-          source.id = id;
+        void recordSource(Map source, String relationship, String sourceId, long eventVersion) {
           source.__versions[relationship][sourceId] = eventVersion;
 
           // Record the relationship in `__sources` if it's not already there. We maintain it as an append-only set using a sorted list.
@@ -2249,5 +2249,5 @@ scripts:
 
         setup(source, relationship, counts);
         validateSource(source, id, relationship, sourceId, eventVersion);
-        applyTopLevelFields(source, params.topLevelFields, counts);
-        recordSource(source, id, relationship, sourceId, eventVersion);
+        applyTopLevelFields(source, id, params.topLevelFields, counts);
+        recordSource(source, relationship, sourceId, eventVersion);

@@ -49,7 +49,8 @@ void validateSource(Map source, String id, String relationship, String sourceId,
   }
 }
 
-void applyTopLevelFields(Map source, Map topLevelFields, Map counts) {
+void applyTopLevelFields(Map source, String id, Map topLevelFields, Map counts) {
+  source.id = id;
   source.putAll(topLevelFields);
 
   if (counts != null) {
@@ -57,8 +58,7 @@ void applyTopLevelFields(Map source, Map topLevelFields, Map counts) {
   }
 }
 
-void recordSource(Map source, String id, String relationship, String sourceId, long eventVersion) {
-  source.id = id;
+void recordSource(Map source, String relationship, String sourceId, long eventVersion) {
   source.__versions[relationship][sourceId] = eventVersion;
 
   // Record the relationship in `__sources` if it's not already there. We maintain it as an append-only set using a sorted list.
@@ -86,5 +86,5 @@ Map counts = params.__counts;
 
 setup(source, relationship, counts);
 validateSource(source, id, relationship, sourceId, eventVersion);
-applyTopLevelFields(source, params.topLevelFields, counts);
-recordSource(source, id, relationship, sourceId, eventVersion);
+applyTopLevelFields(source, id, params.topLevelFields, counts);
+recordSource(source, relationship, sourceId, eventVersion);
