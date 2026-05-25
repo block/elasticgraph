@@ -66,7 +66,7 @@ module ElasticGraph
         end
 
         def params_for(doc_id:, event:, prepared_record:)
-          data = data_params.to_h do |name, param|
+          top_level_fields = data_params.to_h do |name, param|
             [name, param.value_for(prepared_record)]
           end
 
@@ -74,7 +74,7 @@ module ElasticGraph
             [name, param.value_for(event)]
           end
 
-          meta.merge({"id" => doc_id, "topLevelFields" => data})
+          meta.merge({"id" => doc_id, "topLevelFields" => top_level_fields})
         end
       end
     end
