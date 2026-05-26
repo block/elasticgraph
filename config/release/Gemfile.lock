@@ -44,7 +44,7 @@ GEM
     simpleidn (0.2.3)
     stringio (3.2.0)
     tsort (0.2.0)
-    yard (0.9.43)
+    yard (0.9.44)
     yard-markdown (0.7.1)
       csv
       rdoc
@@ -90,7 +90,7 @@ CHECKSUMS
   simpleidn (0.2.3) sha256=08ce96f03fa1605286be22651ba0fc9c0b2d6272c9b27a260bc88be05b0d2c29
   stringio (3.2.0) sha256=c37cb2e58b4ffbd33fe5cd948c05934af997b36e0b6ca6fdf43afa234cf222e1
   tsort (0.2.0) sha256=9650a793f6859a43b6641671278f79cfead60ac714148aabe4e3f0060480089f
-  yard (0.9.43) sha256=cf8733a8f0485df2a162927e9b5f182215a61f6d22de096b8f402c726a1c5821
+  yard (0.9.44) sha256=eb087e9b631ccd887b049f303d489963945452d5e2a7eb49a5a74a7cf6887f28
   yard-markdown (0.7.1) sha256=06c378632dfe7ba053be9ba469eb4701aa0470e36bcf7e5546f353eb90c1bfd1
 
 BUNDLED WITH
