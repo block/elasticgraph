@@ -1,59 +1,59 @@
-Map source = ctx._source;
-String sourceId = params.sourceId;
-String relationship = params.relationship;
-
-// Numbers in JSON appear to be parsed as doubles, but we want the version stored as a long, so we need to cast it here.
-long eventVersion = (long) params.version;
-
-if (source.__sources == null) {
-  source.__sources = [];
-}
-
-if (source.__versions == null) {
-  source.__versions = [:];
-}
-
-if (source.__versions[relationship] == null) {
-  source.__versions[relationship] = [:];
-}
-
-Map relationshipVersionsMap = source.__versions.get(relationship);
-List previousSourceIdsForRelationship = relationshipVersionsMap.keySet().stream().filter(id -> id != sourceId).collect(Collectors.toList());
-
-if (previousSourceIdsForRelationship.size() > 0) {
-  String previousIdDescription = previousSourceIdsForRelationship.size() == 1 ? previousSourceIdsForRelationship.get(0) : previousSourceIdsForRelationship.toString();
-  throw new IllegalArgumentException(
-    "Cannot update document " + params.id + " " +
-    "with data from related " + relationship + " " + sourceId + " " +
-    "because the related " + relationship + " has apparently changed (was: " + previousSourceIdsForRelationship + "), " +
-    "but mutations of relationships used with `sourced_from` are not supported because " +
-    "allowing it could break ElasticGraph's out-of-order processing guarantees."
- );
-}
-
-Number maybeDocVersion = source.__versions.get(params.relationship)?.get(params.sourceId);
-
-// Our JSON schema requires event versions to be non-negative, so we can safely use Long.MIN_VALUE as a stand-in when the value is null.
-long docVersion = maybeDocVersion == null ? Long.MIN_VALUE : maybeDocVersion.longValue();
-
-if (docVersion >= eventVersion) {
-  throw new IllegalArgumentException("ElasticGraph update was a no-op: [" +
-    params.id + "]: version conflict, current version [" +
-    docVersion + "] is higher or equal to the one provided [" +
-    eventVersion + "]");
-} else {
-  source.putAll(params.data);
-  Map __counts = params.__counts;
-
-  if (__counts != null) {
-    if (source.__counts == null) {
-      source.__counts = [:];
-    }
-
-    source.__counts.putAll(__counts);
+// --- Helper Functions --- //
+void setup(Map source, String relationship, Map counts) {
+  if (source.__sources == null) {
+    source.__sources = [];
   }
 
-  source.id = params.id;
+  if (source.__versions == null) {
+    source.__versions = [:];
+  }
+
+  if (source.__versions[relationship] == null) {
+    source.__versions[relationship] = [:];
+  }
+
+  if (counts != null && source.__counts == null) {
+    source.__counts = [:];
+  }
+}
+
+void validateSource(Map source, String id, String relationship, String sourceId, long eventVersion) {
+  Map relationshipVersionsMap = source.__versions.get(relationship);
+  List previousSourceIdsForRelationship = relationshipVersionsMap.keySet().stream().filter(key -> key != sourceId).collect(Collectors.toList());
+
+  if (previousSourceIdsForRelationship.size() > 0) {
+    throw new IllegalArgumentException(
+      "Cannot update document " + id + " " +
+      "with data from related " + relationship + " " + sourceId + " " +
+      "because the related " + relationship + " has apparently changed (was: " + previousSourceIdsForRelationship + "), " +
+      "but mutations of relationships used with `sourced_from` are not supported because " +
+      "allowing it could break ElasticGraph's out-of-order processing guarantees."
+   );
+  }
+
+  Number maybeDocVersion = relationshipVersionsMap.get(sourceId);
+
+  // Our JSON schema requires event versions to be non-negative, so we can safely use Long.MIN_VALUE as a stand-in when the value is null.
+  long docVersion = maybeDocVersion == null ? Long.MIN_VALUE : maybeDocVersion.longValue();
+
+  if (docVersion >= eventVersion) {
+    throw new IllegalArgumentException("ElasticGraph update was a no-op: [" +
+      id + "]: version conflict, current version [" +
+      docVersion + "] is higher or equal to the one provided [" +
+      eventVersion + "]");
+  }
+}
+
+void applyTopLevelFields(Map source, String id, Map topLevelFields, Map counts) {
+  source.id = id;
+  source.putAll(topLevelFields);
+
+  if (counts != null) {
+    source.__counts.putAll(counts);
+  }
+}
+
+void recordSource(Map source, String relationship, String sourceId, long eventVersion) {
   source.__versions[relationship][sourceId] = eventVersion;
 
   // Record the relationship in `__sources` if it's not already there. We maintain it as an append-only set using a sorted list.
@@ -70,3 +70,16 @@ if (docVersion >= eventVersion) {
     source.__sources.add(-sourceBinarySearchResult - 1, relationship);
   }
 }
+
+// --- Main script body --- //
+Map source = ctx._source;
+String id = params.id;
+String relationship = params.relationship;
+String sourceId = params.sourceId;
+long eventVersion = (long) params.version; // Cast to long since JSON parses numbers as doubles
+Map counts = params.__counts;
+
+setup(source, relationship, counts);
+validateSource(source, id, relationship, sourceId, eventVersion);
+applyTopLevelFields(source, id, params.topLevelFields, counts);
+recordSource(source, relationship, sourceId, eventVersion);

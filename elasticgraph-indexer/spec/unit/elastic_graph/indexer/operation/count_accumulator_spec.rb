@@ -148,7 +148,7 @@ module ElasticGraph
             params = script_params_for(data: data, source_type: "Manufacturer", destination_type: "Manufacturer")
 
             expect(params[LIST_COUNTS_FIELD]).to eq nil
-            expect(params["data"]).to exclude(LIST_COUNTS_FIELD)
+            expect(params["topLevelFields"]).to exclude(LIST_COUNTS_FIELD)
           end
         end
 
@@ -188,14 +188,14 @@ module ElasticGraph
               {"currency" => "USD", "amount_cents" => 725}
             ]})
 
-            expect(params.dig("data", "forbes_valuation_moneys_nested")).to eq [
+            expect(params.dig("topLevelFields", "forbes_valuation_moneys_nested")).to eq [
               {"currency" => "USD", "amount_cents" => 525},
               {"currency" => "USD", "amount_cents" => 725}
             ]
           end
 
           def current_players_counts_for_team_event(data)
-            script_params_for_team_event(data).dig("data", "current_players_nested").map do |player|
+            script_params_for_team_event(data).dig("topLevelFields", "current_players_nested").map do |player|
               player.fetch(LIST_COUNTS_FIELD)
             end
           end
@@ -259,7 +259,7 @@ module ElasticGraph
           end
 
           def seasons_for_team_event(data)
-            script_params_for_team_event(data).dig("data", "seasons_object")
+            script_params_for_team_event(data).dig("topLevelFields", "seasons_object")
           end
         end
 

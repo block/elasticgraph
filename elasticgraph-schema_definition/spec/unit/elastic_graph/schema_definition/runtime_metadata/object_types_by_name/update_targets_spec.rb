@@ -45,7 +45,7 @@ module ElasticGraph
             id_source: "widget_ids",
             routing_value_source: nil,
             relationship: "workspace",
-            data_params: {
+            top_level_fields_params: {
               "workspace_name" => dynamic_param_with(source_path: "name", cardinality: :one),
               "workspace_created_at" => dynamic_param_with(source_path: "created_at", cardinality: :one)
             }
@@ -66,7 +66,7 @@ module ElasticGraph
             id_source: "widget_ids",
             routing_value_source: nil,
             relationship: "workspace",
-            data_params: {
+            top_level_fields_params: {
               "workspace_name" => dynamic_param_with(source_path: "name", cardinality: :one)
             }
           )
@@ -80,7 +80,7 @@ module ElasticGraph
             id_source: "id",
             routing_value_source: "id",
             relationship: SELF_RELATIONSHIP_NAME,
-            data_params: {
+            top_level_fields_params: {
               # Importantly, `workspace_name` and `workspace_created_at` are NOT in this map.
               "name" => dynamic_param_with(source_path: "name", cardinality: :one)
             }
@@ -101,7 +101,7 @@ module ElasticGraph
             id_source: "widget_ids",
             routing_value_source: nil,
             relationship: "workspace",
-            data_params: {
+            top_level_fields_params: {
               "workspace_name" => dynamic_param_with(source_path: "name2", cardinality: :one)
             }
           )
@@ -121,7 +121,7 @@ module ElasticGraph
             id_source: "widget_ids",
             routing_value_source: nil,
             relationship: "workspace",
-            data_params: {
+            top_level_fields_params: {
               "workspace_name2" => dynamic_param_with(source_path: "name", cardinality: :one)
             }
           )
@@ -141,7 +141,7 @@ module ElasticGraph
             id_source: "widget_ids",
             routing_value_source: nil,
             relationship: "workspace",
-            data_params: {
+            top_level_fields_params: {
               "workspace_name" => dynamic_param_with(source_path: "nested.further_nested_in_index.name", cardinality: :one)
             }
           )
@@ -161,7 +161,7 @@ module ElasticGraph
             id_source: "widget_ids",
             routing_value_source: nil,
             relationship: "workspace",
-            data_params: {
+            top_level_fields_params: {
               "workspace_name" => dynamic_param_with(source_path: "nested.further_nested_in_index.name", cardinality: :one)
             }
           )
@@ -449,7 +449,7 @@ module ElasticGraph
         def expect_widget_update_target_with(
           update_targets,
           id_source:,
-          data_params:,
+          top_level_fields_params:,
           relationship:, routing_value_source: nil,
           rollover_timestamp_value_source: nil
         )
@@ -463,7 +463,7 @@ module ElasticGraph
           expect(widget_target.id_source).to eq id_source
           expect(widget_target.routing_value_source).to eq(routing_value_source)
           expect(widget_target.rollover_timestamp_value_source).to eq(rollover_timestamp_value_source)
-          expect(widget_target.data_params).to eq(data_params)
+          expect(widget_target.top_level_fields_params).to eq(top_level_fields_params)
           expect(widget_target.metadata_params).to eq(standard_metadata_params(relationship: relationship))
         end
 
@@ -1401,7 +1401,7 @@ module ElasticGraph
           expect(widget_workspace_target.id_source).to eq "workspace_id"
           expect(widget_workspace_target.routing_value_source).to eq(nil)
           expect(widget_workspace_target.rollover_timestamp_value_source).to eq(nil)
-          expect(widget_workspace_target.data_params).to eq({"id" => dynamic_param_with(source_path: "id", cardinality: :many)})
+          expect(widget_workspace_target.top_level_fields_params).to eq({"id" => dynamic_param_with(source_path: "id", cardinality: :many)})
           expect(widget_workspace_target.metadata_params).to eq({})
 
           widget_target = metadata.update_targets.find { |t| t.type == "Widget" }
@@ -1411,7 +1411,7 @@ module ElasticGraph
           expect(widget_target.id_source).to eq "id"
           expect(widget_target.routing_value_source).to eq("id")
           expect(widget_target.rollover_timestamp_value_source).to eq(nil)
-          expect(widget_target.data_params).to eq({
+          expect(widget_target.top_level_fields_params).to eq({
             "name" => dynamic_param_with(source_path: "name", cardinality: :one),
             "workspace_id" => dynamic_param_with(source_path: "workspace_id", cardinality: :one)
           })
@@ -1457,7 +1457,7 @@ module ElasticGraph
           expect(widget_target.id_source).to eq "id"
           expect(widget_target.routing_value_source).to eq("id")
           expect(widget_target.rollover_timestamp_value_source).to eq(nil)
-          expect(widget_target.data_params).to eq({"cost" => dynamic_param_with(source_path: "cost", cardinality: :one)})
+          expect(widget_target.top_level_fields_params).to eq({"cost" => dynamic_param_with(source_path: "cost", cardinality: :one)})
           expect(widget_target.metadata_params).to eq(standard_metadata_params(relationship: SELF_RELATIONSHIP_NAME))
         end
 
@@ -1576,7 +1576,7 @@ module ElasticGraph
           expect(metadata.update_targets.first.relationship).to eq nil
           expect(metadata.update_targets.first.script_id).to start_with "update_ThingWorkspace_from_Thing"
           expect(metadata.update_targets.first.id_source).to eq "workspace_id"
-          expect(metadata.update_targets.first.data_params).to eq({"id" => dynamic_param_with(source_path: "id", cardinality: :many)})
+          expect(metadata.update_targets.first.top_level_fields_params).to eq({"id" => dynamic_param_with(source_path: "id", cardinality: :many)})
           expect(metadata.update_targets.first.metadata_params).to eq({})
         end
 
@@ -1657,7 +1657,7 @@ module ElasticGraph
           expect(widget_target.rollover_timestamp_value_source).to be_nil # no default for rollover
         end
 
-        it "includes __typename in data_params for types that inherit an index (needed for field extraction during indexing)" do
+        it "includes __typename in top_level_fields_params for types that inherit an index (needed for field extraction during indexing)" do
           widget_metadata, component_metadata = object_type_metadata_for("Widget", "Component") do |s|
             s.object_type "Widget" do |t|
               t.field "id", "ID!"
@@ -1678,12 +1678,12 @@ module ElasticGraph
           end
 
           widget_target = widget_metadata.update_targets.find { |t| t.type == "Widget" }
-          expect(widget_target.data_params.keys).to include("__typename")
-          expect(widget_target.data_params["__typename"].source_path).to eq "__typename"
+          expect(widget_target.top_level_fields_params.keys).to include("__typename")
+          expect(widget_target.top_level_fields_params["__typename"].source_path).to eq "__typename"
 
           component_target = component_metadata.update_targets.find { |t| t.type == "Component" }
-          expect(component_target.data_params.keys).to include("__typename")
-          expect(component_target.data_params["__typename"].source_path).to eq "__typename"
+          expect(component_target.top_level_fields_params.keys).to include("__typename")
+          expect(component_target.top_level_fields_params["__typename"].source_path).to eq "__typename"
         end
       end
 

@@ -22,7 +22,7 @@ module ElasticGraph
         :id_source,
         :routing_value_source,
         :rollover_timestamp_value_source,
-        :data_params,
+        :top_level_fields_params,
         :metadata_params
       )
         TYPE = "type"
@@ -31,7 +31,7 @@ module ElasticGraph
         ID_SOURCE = "id_source"
         ROUTING_VALUE_SOURCE = "routing_value_source"
         ROLLOVER_TIMESTAMP_VALUE_SOURCE = "rollover_timestamp_value_source"
-        DATA_PARAMS = "data_params"
+        TOP_LEVEL_FIELDS_PARAMS = "top_level_fields_params"
         METADATA_PARAMS = "metadata_params"
 
         def self.from_hash(hash)
@@ -42,7 +42,7 @@ module ElasticGraph
             id_source: hash[ID_SOURCE],
             routing_value_source: hash[ROUTING_VALUE_SOURCE],
             rollover_timestamp_value_source: hash[ROLLOVER_TIMESTAMP_VALUE_SOURCE],
-            data_params: Param.load_params_hash(hash[DATA_PARAMS] || {}),
+            top_level_fields_params: Param.load_params_hash(hash[TOP_LEVEL_FIELDS_PARAMS] || {}),
             metadata_params: Param.load_params_hash(hash[METADATA_PARAMS] || {})
           )
         end
@@ -50,13 +50,13 @@ module ElasticGraph
         def to_dumpable_hash
           {
             # Keys here are ordered alphabetically; please keep them that way.
-            DATA_PARAMS => Param.dump_params_hash(data_params),
             ID_SOURCE => id_source,
             METADATA_PARAMS => Param.dump_params_hash(metadata_params),
             RELATIONSHIP => relationship,
             ROLLOVER_TIMESTAMP_VALUE_SOURCE => rollover_timestamp_value_source,
             ROUTING_VALUE_SOURCE => routing_value_source,
             SCRIPT_ID => script_id,
+            TOP_LEVEL_FIELDS_PARAMS => Param.dump_params_hash(top_level_fields_params),
             TYPE => type
           }
         end
@@ -66,7 +66,7 @@ module ElasticGraph
         end
 
         def params_for(doc_id:, event:, prepared_record:)
-          data = data_params.to_h do |name, param|
+          top_level_fields = top_level_fields_params.to_h do |name, param|
             [name, param.value_for(prepared_record)]
           end
 
@@ -74,7 +74,7 @@ module ElasticGraph
             [name, param.value_for(event)]
           end
 
-          meta.merge({"id" => doc_id, "data" => data})
+          meta.merge({"id" => doc_id, "topLevelFields" => top_level_fields})
         end
       end
     end

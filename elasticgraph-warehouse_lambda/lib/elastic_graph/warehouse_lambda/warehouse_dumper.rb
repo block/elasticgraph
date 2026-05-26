@@ -116,7 +116,7 @@ module ElasticGraph
           next nil if op.update_target.type != op.event.fetch("type")
 
           params = op.to_datastore_bulk[1].fetch(:script).fetch(:params)
-          data = params.fetch("data").merge({
+          data = params.fetch("topLevelFields").merge({
             "id" => params.fetch("id"),
             "__eg_version" => params.fetch("version")
           })

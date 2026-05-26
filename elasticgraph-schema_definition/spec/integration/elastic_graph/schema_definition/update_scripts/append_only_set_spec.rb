@@ -60,7 +60,7 @@ module ElasticGraph
           id_source: "cost.currency",
           routing_value_source: nil,
           rollover_timestamp_value_source: nil,
-          data_params: {"workspace_id" => dynamic_param_with(source_path: "workspace_id", cardinality: :many)}
+          top_level_fields_params: {"workspace_id" => dynamic_param_with(source_path: "workspace_id", cardinality: :many)}
         ))
       end
 
@@ -115,7 +115,7 @@ module ElasticGraph
           id_source: "cost.currency",
           routing_value_source: nil,
           rollover_timestamp_value_source: nil,
-          data_params: {
+          top_level_fields_params: {
             "workspace_id" => dynamic_param_with(source_path: "workspace_id", cardinality: :many),
             "options.size" => dynamic_param_with(source_path: "options.size", cardinality: :many),
             "options.color" => dynamic_param_with(source_path: "options.color", cardinality: :many)
@@ -173,7 +173,7 @@ module ElasticGraph
             id_source: "cost.currency",
             routing_value_source: nil,
             rollover_timestamp_value_source: nil,
-            data_params: {
+            top_level_fields_params: {
               "options.size" => dynamic_param_with(source_path: "options.size", cardinality: :many),
               "options.color" => dynamic_param_with(source_path: "options.color", cardinality: :many)
             }

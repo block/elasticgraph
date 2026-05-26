@@ -6,7 +6,7 @@ module ElasticGraph
           type: ::String,
           relationship: ::String,
           id_source: ::String,
-          data_params: SchemaArtifacts::RuntimeMetadata::paramsHash,
+          top_level_fields_params: SchemaArtifacts::RuntimeMetadata::paramsHash,
           routing_value_source: ::String?,
           rollover_timestamp_value_source: ::String?
         ) -> SchemaArtifacts::RuntimeMetadata::UpdateTarget

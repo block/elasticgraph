@@ -61,7 +61,7 @@ module ElasticGraph
           id_source: "source_id",
           routing_value_source: "routing_value_source",
           rollover_timestamp_value_source: "rollover_timestamp_value_source",
-          data_params: {},
+          top_level_fields_params: {},
           metadata_params: {}
         )
           UpdateTarget.new(
@@ -71,7 +71,7 @@ module ElasticGraph
             id_source: id_source,
             routing_value_source: routing_value_source,
             rollover_timestamp_value_source: rollover_timestamp_value_source,
-            data_params: data_params,
+            top_level_fields_params: top_level_fields_params,
             metadata_params: metadata_params
           )
         end
@@ -82,7 +82,7 @@ module ElasticGraph
           id_source: "source_id",
           routing_value_source: "routing_value_source",
           rollover_timestamp_value_source: "rollover_timestamp_value_source",
-          data_params: {},
+          top_level_fields_params: {},
           metadata_params: {}
         )
           UpdateTarget.new(
@@ -92,7 +92,7 @@ module ElasticGraph
             id_source: id_source,
             routing_value_source: routing_value_source,
             rollover_timestamp_value_source: rollover_timestamp_value_source,
-            data_params: data_params,
+            top_level_fields_params: top_level_fields_params,
             metadata_params: metadata_params
           )
         end

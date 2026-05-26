@@ -3071,18 +3071,7 @@ object_types_by_name:
     index_definition_names:
     - addresses
     update_targets:
-    - data_params:
-        full_address:
-          cardinality: one
-        geo_location:
-          cardinality: one
-        manufacturer_id:
-          cardinality: one
-        shapes:
-          cardinality: one
-        timestamps:
-          cardinality: one
-      id_source: id
+    - id_source: id
       metadata_params:
         relationship:
           value: __self
@@ -3096,7 +3085,18 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
+      script_id: update_index_data_b9e2b105d736d8d16ae269ab6ff81e4d
+      top_level_fields_params:
+        full_address:
+          cardinality: one
+        geo_location:
+          cardinality: one
+        manufacturer_id:
+          cardinality: one
+        shapes:
+          cardinality: one
+        timestamps:
+          cardinality: one
       type: Address
   AddressAggregatedValues:
     graphql_fields_by_name:
@@ -3261,12 +3261,7 @@ object_types_by_name:
     index_definition_names:
     - distribution_channels
     update_targets:
-    - data_params:
-        __typename:
-          cardinality: one
-        active:
-          cardinality: one
-      id_source: id
+    - id_source: id
       metadata_params:
         relationship:
           value: __self
@@ -3280,7 +3275,12 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
+      script_id: update_index_data_b9e2b105d736d8d16ae269ab6ff81e4d
+      top_level_fields_params:
+        __typename:
+          cardinality: one
+        active:
+          cardinality: one
       type: BrokerWholesaler
   ColorListFilterInput:
     graphql_fields_by_name:
@@ -3300,14 +3300,7 @@ object_types_by_name:
     index_definition_names:
     - named_inventors
     update_targets:
-    - data_params:
-        __typename:
-          cardinality: one
-        name:
-          cardinality: one
-        stock_ticker:
-          cardinality: one
-      id_source: id
+    - id_source: id
       metadata_params:
         relationship:
           value: __self
@@ -3321,7 +3314,14 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
+      script_id: update_index_data_b9e2b105d736d8d16ae269ab6ff81e4d
+      top_level_fields_params:
+        __typename:
+          cardinality: one
+        name:
+          cardinality: one
+        stock_ticker:
+          cardinality: one
       type: Company
   Component:
     graphql_fields_by_name:
@@ -3400,7 +3400,22 @@ object_types_by_name:
     index_definition_names:
     - components
     update_targets:
-    - data_params:
+    - id_source: id
+      metadata_params:
+        relationship:
+          value: __self
+        sourceId:
+          cardinality: one
+          source_path: id
+        sourceType:
+          cardinality: one
+          source_path: type
+        version:
+          cardinality: one
+      relationship: __self
+      routing_value_source: id
+      script_id: update_index_data_b9e2b105d736d8d16ae269ab6ff81e4d
+      top_level_fields_params:
         created_at:
           cardinality: one
         name:
@@ -3415,21 +3430,6 @@ object_types_by_name:
           cardinality: one
         tags:
           cardinality: one
-      id_source: id
-      metadata_params:
-        relationship:
-          value: __self
-        sourceId:
-          cardinality: one
-          source_path: id
-        sourceType:
-          cardinality: one
-          source_path: type
-        version:
-          cardinality: one
-      relationship: __self
-      routing_value_source: id
-      script_id: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
       type: Component
   ComponentAggregatedValues:
     graphql_fields_by_name:
@@ -3710,12 +3710,7 @@ object_types_by_name:
     index_definition_names:
     - distribution_channels
     update_targets:
-    - data_params:
-        __typename:
-          cardinality: one
-        active:
-          cardinality: one
-      id_source: id
+    - id_source: id
       metadata_params:
         relationship:
           value: __self
@@ -3729,7 +3724,12 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
+      script_id: update_index_data_b9e2b105d736d8d16ae269ab6ff81e4d
+      top_level_fields_params:
+        __typename:
+          cardinality: one
+        active:
+          cardinality: one
       type: DirectWholesaler
   DistributionChannel:
     graphql_fields_by_name:
@@ -3883,16 +3883,7 @@ object_types_by_name:
     index_definition_names:
     - electrical_parts
     update_targets:
-    - data_params:
-        created_at:
-          cardinality: one
-        manufacturer_id:
-          cardinality: one
-        name:
-          cardinality: one
-        voltage:
-          cardinality: one
-      id_source: id
+    - id_source: id
       metadata_params:
         relationship:
           value: __self
@@ -3906,7 +3897,16 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
+      script_id: update_index_data_b9e2b105d736d8d16ae269ab6ff81e4d
+      top_level_fields_params:
+        created_at:
+          cardinality: one
+        manufacturer_id:
+          cardinality: one
+        name:
+          cardinality: one
+        voltage:
+          cardinality: one
       type: ElectricalPart
   ElectricalPartAggregatedValues:
     graphql_fields_by_name:
@@ -4368,14 +4368,7 @@ object_types_by_name:
     index_definition_names:
     - manufacturers
     update_targets:
-    - data_params:
-        ceo:
-          cardinality: one
-        created_at:
-          cardinality: one
-        name:
-          cardinality: one
-      id_source: id
+    - id_source: id
       metadata_params:
         relationship:
           value: __self
@@ -4389,7 +4382,14 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
+      script_id: update_index_data_b9e2b105d736d8d16ae269ab6ff81e4d
+      top_level_fields_params:
+        ceo:
+          cardinality: one
+        created_at:
+          cardinality: one
+        name:
+          cardinality: one
       type: Manufacturer
   ManufacturerAggregatedValues:
     graphql_fields_by_name:
@@ -4526,16 +4526,7 @@ object_types_by_name:
     index_definition_names:
     - mechanical_parts
     update_targets:
-    - data_params:
-        created_at:
-          cardinality: one
-        manufacturer_id:
-          cardinality: one
-        material:
-          cardinality: one
-        name:
-          cardinality: one
-      id_source: id
+    - id_source: id
       metadata_params:
         relationship:
           value: __self
@@ -4549,7 +4540,16 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
+      script_id: update_index_data_b9e2b105d736d8d16ae269ab6ff81e4d
+      top_level_fields_params:
+        created_at:
+          cardinality: one
+        manufacturer_id:
+          cardinality: one
+        material:
+          cardinality: one
+        name:
+          cardinality: one
       type: MechanicalPart
   MechanicalPartAggregatedValues:
     graphql_fields_by_name:
@@ -5487,16 +5487,7 @@ object_types_by_name:
     index_definition_names:
     - distribution_channels
     update_targets:
-    - data_params:
-        __typename:
-          cardinality: one
-        active:
-          cardinality: one
-        established_on:
-          cardinality: one
-        name:
-          cardinality: one
-      id_source: id
+    - id_source: id
       metadata_params:
         relationship:
           value: __self
@@ -5510,7 +5501,16 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
+      script_id: update_index_data_b9e2b105d736d8d16ae269ab6ff81e4d
+      top_level_fields_params:
+        __typename:
+          cardinality: one
+        active:
+          cardinality: one
+        established_on:
+          cardinality: one
+        name:
+          cardinality: one
       type: OnlineStore
   PageInfo:
     graphql_fields_by_name:
@@ -5686,14 +5686,7 @@ object_types_by_name:
     index_definition_names:
     - named_inventors
     update_targets:
-    - data_params:
-        __typename:
-          cardinality: one
-        name:
-          cardinality: one
-        nationality:
-          cardinality: one
-      id_source: id
+    - id_source: id
       metadata_params:
         relationship:
           value: __self
@@ -5707,7 +5700,14 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
+      script_id: update_index_data_b9e2b105d736d8d16ae269ab6ff81e4d
+      top_level_fields_params:
+        __typename:
+          cardinality: one
+        name:
+          cardinality: one
+        nationality:
+          cardinality: one
       type: Person
   PersonAggregatedValues:
     graphql_fields_by_name:
@@ -5753,12 +5753,7 @@ object_types_by_name:
     index_definition_names:
     - physical_stores
     update_targets:
-    - data_params:
-        active:
-          cardinality: one
-        established_on:
-          cardinality: one
-      id_source: id
+    - id_source: id
       metadata_params:
         relationship:
           value: __self
@@ -5772,7 +5767,12 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
+      script_id: update_index_data_b9e2b105d736d8d16ae269ab6ff81e4d
+      top_level_fields_params:
+        active:
+          cardinality: one
+        established_on:
+          cardinality: one
       type: PhysicalStore
   PhysicalStoreAggregatedValues:
     graphql_fields_by_name:
@@ -6290,10 +6290,7 @@ object_types_by_name:
     index_definition_names:
     - sponsors
     update_targets:
-    - data_params:
-        name:
-          cardinality: one
-      id_source: id
+    - id_source: id
       metadata_params:
         relationship:
           value: __self
@@ -6307,7 +6304,10 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
+      script_id: update_index_data_b9e2b105d736d8d16ae269ab6ff81e4d
+      top_level_fields_params:
+        name:
+          cardinality: one
       type: Sponsor
   SponsorAggregatedValues:
     graphql_fields_by_name:
@@ -6639,7 +6639,23 @@ object_types_by_name:
     index_definition_names:
     - teams
     update_targets:
-    - data_params:
+    - id_source: id
+      metadata_params:
+        relationship:
+          value: __self
+        sourceId:
+          cardinality: one
+          source_path: id
+        sourceType:
+          cardinality: one
+          source_path: type
+        version:
+          cardinality: one
+      relationship: __self
+      rollover_timestamp_value_source: formed_on
+      routing_value_source: league
+      script_id: update_index_data_b9e2b105d736d8d16ae269ab6ff81e4d
+      top_level_fields_params:
         country_code:
           cardinality: one
         current_name:
@@ -6674,22 +6690,6 @@ object_types_by_name:
           cardinality: one
         won_championships_at:
           cardinality: one
-      id_source: id
-      metadata_params:
-        relationship:
-          value: __self
-        sourceId:
-          cardinality: one
-          source_path: id
-        sourceType:
-          cardinality: one
-          source_path: type
-        version:
-          cardinality: one
-      relationship: __self
-      rollover_timestamp_value_source: formed_on
-      routing_value_source: league
-      script_id: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
       type: Team
   TeamAggregatedValues:
     graphql_fields_by_name:
@@ -7707,7 +7707,11 @@ object_types_by_name:
     index_definition_names:
     - widgets
     update_targets:
-    - data_params:
+    - id_source: cost.currency
+      rollover_timestamp_value_source: cost_currency_introduced_on
+      routing_value_source: cost_currency_primary_continent
+      script_id: update_WidgetCurrency_from_Widget_e72813bd1a8767343222b77bf53be31c
+      top_level_fields_params:
         cost.amount_cents:
           cardinality: many
         cost_currency_introduced_on:
@@ -7734,12 +7738,24 @@ object_types_by_name:
           cardinality: many
         weight_in_ng:
           cardinality: many
-      id_source: cost.currency
-      rollover_timestamp_value_source: cost_currency_introduced_on
-      routing_value_source: cost_currency_primary_continent
-      script_id: update_WidgetCurrency_from_Widget_a63538953d45f84cba67edd655d129a8
       type: WidgetCurrency
-    - data_params:
+    - id_source: id
+      metadata_params:
+        relationship:
+          value: __self
+        sourceId:
+          cardinality: one
+          source_path: id
+        sourceType:
+          cardinality: one
+          source_path: type
+        version:
+          cardinality: one
+      relationship: __self
+      rollover_timestamp_value_source: created_at
+      routing_value_source: workspace_id2
+      script_id: update_index_data_b9e2b105d736d8d16ae269ab6ff81e4d
+      top_level_fields_params:
         amount_cents:
           cardinality: one
         amounts:
@@ -7802,10 +7818,11 @@ object_types_by_name:
           cardinality: one
         workspace_id2:
           cardinality: one
-      id_source: id
+      type: Widget
+    - id_source: component_ids
       metadata_params:
         relationship:
-          value: __self
+          value: widget
         sourceId:
           cardinality: one
           source_path: id
@@ -7814,12 +7831,9 @@ object_types_by_name:
           source_path: type
         version:
           cardinality: one
-      relationship: __self
-      rollover_timestamp_value_source: created_at
-      routing_value_source: workspace_id2
-      script_id: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
-      type: Widget
-    - data_params:
+      relationship: widget
+      script_id: update_index_data_b9e2b105d736d8d16ae269ab6ff81e4d
+      top_level_fields_params:
         widget_cost:
           cardinality: one
           source_path: cost
@@ -7835,20 +7849,6 @@ object_types_by_name:
         widget_workspace_id3:
           cardinality: one
           source_path: workspace_id2
-      id_source: component_ids
-      metadata_params:
-        relationship:
-          value: widget
-        sourceId:
-          cardinality: one
-          source_path: id
-        sourceType:
-          cardinality: one
-          source_path: type
-        version:
-          cardinality: one
-      relationship: widget
-      script_id: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
       type: Component
   WidgetAggregatedValues:
     graphql_fields_by_name:
@@ -8047,7 +8047,23 @@ object_types_by_name:
     index_definition_names:
     - widget_currencies
     update_targets:
-    - data_params:
+    - id_source: id
+      metadata_params:
+        relationship:
+          value: __self
+        sourceId:
+          cardinality: one
+          source_path: id
+        sourceType:
+          cardinality: one
+          source_path: type
+        version:
+          cardinality: one
+      relationship: __self
+      rollover_timestamp_value_source: introduced_on
+      routing_value_source: primary_continent
+      script_id: update_index_data_b9e2b105d736d8d16ae269ab6ff81e4d
+      top_level_fields_params:
         details:
           cardinality: one
         introduced_on:
@@ -8070,22 +8086,6 @@ object_types_by_name:
           cardinality: one
         widget_tags:
           cardinality: one
-      id_source: id
-      metadata_params:
-        relationship:
-          value: __self
-        sourceId:
-          cardinality: one
-          source_path: id
-        sourceType:
-          cardinality: one
-          source_path: type
-        version:
-          cardinality: one
-      relationship: __self
-      rollover_timestamp_value_source: introduced_on
-      routing_value_source: primary_continent
-      script_id: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
       type: WidgetCurrency
   WidgetCurrencyAggregatedValues:
     graphql_fields_by_name:
@@ -9093,12 +9093,7 @@ object_types_by_name:
     index_definition_names:
     - widget_workspaces
     update_targets:
-    - data_params:
-        name:
-          cardinality: one
-        widget:
-          cardinality: one
-      id_source: id
+    - id_source: id
       metadata_params:
         relationship:
           value: __self
@@ -9112,13 +9107,14 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
-      type: WidgetWorkspace
-    - data_params:
-        workspace_name:
+      script_id: update_index_data_b9e2b105d736d8d16ae269ab6ff81e4d
+      top_level_fields_params:
+        name:
           cardinality: one
-          source_path: name
-      id_source: widget.id
+        widget:
+          cardinality: one
+      type: WidgetWorkspace
+    - id_source: widget.id
       metadata_params:
         relationship:
           value: workspace
@@ -9133,7 +9129,11 @@ object_types_by_name:
       relationship: workspace
       rollover_timestamp_value_source: widget.created_at
       routing_value_source: id
-      script_id: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
+      script_id: update_index_data_b9e2b105d736d8d16ae269ab6ff81e4d
+      top_level_fields_params:
+        workspace_name:
+          cardinality: one
+          source_path: name
       type: Widget
   WidgetWorkspaceAggregatedValues:
     graphql_fields_by_name:
@@ -9364,4 +9364,4 @@ static_script_ids_by_scoped_name:
   field/as_day_of_week: field_as_day_of_week_f2b5c7d9e8f75bf2457b52412bfb6537
   field/as_time_of_day: field_as_time_of_day_ed82aba44fc66bff5635bec4305c1c66
   filter/by_time_of_day: filter_by_time_of_day_ea12d0561b24961789ab68ed38435612
-  update/index_data: update_index_data_1fdfaf1c9261c96019decc89b515bd9a
+  update/index_data: update_index_data_b9e2b105d736d8d16ae269ab6ff81e4d

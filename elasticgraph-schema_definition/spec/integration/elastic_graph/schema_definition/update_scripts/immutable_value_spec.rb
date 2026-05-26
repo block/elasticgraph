@@ -39,7 +39,7 @@ module ElasticGraph
           id_source: "cost.currency",
           routing_value_source: nil,
           rollover_timestamp_value_source: nil,
-          data_params: {"cost_currency_name" => dynamic_param_with(source_path: "cost_currency_name", cardinality: :many)}
+          top_level_fields_params: {"cost_currency_name" => dynamic_param_with(source_path: "cost_currency_name", cardinality: :many)}
         ))
       end
 
@@ -148,7 +148,7 @@ module ElasticGraph
             id_source: "cost.currency",
             routing_value_source: nil,
             rollover_timestamp_value_source: nil,
-            data_params: {
+            top_level_fields_params: {
               "cost_currency_unit" => dynamic_param_with(source_path: "cost_currency_unit", cardinality: :many),
               "cost_currency_symbol" => dynamic_param_with(source_path: "cost_currency_symbol", cardinality: :many)
             }
