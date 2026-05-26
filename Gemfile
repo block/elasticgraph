@@ -13,7 +13,7 @@ group :development do
   gem "aws_lambda_ric", "~> 3.2"
   # graphql-c_parser is no longer a hard dependency, but we include it here for faster CI tests
   gem "graphql-c_parser", "~> 1.1", ">= 1.1.3", platforms: :ruby
-  gem "benchmark-ips", "~> 2.15"
+  gem "benchmark-ips", "~> 2.15", ">= 2.15.1"
   gem "coderay", "~> 1.1", ">= 1.1.3"
   gem "factory_bot", "~> 6.6"
   gem "faker", "~> 3.8"
@@ -62,7 +62,7 @@ group :site do
   # TODO: switch back to a release version once that fix is merged and released.
   gem "rouge", github: "myronmarston/rouge", ref: "12c0da6aa98e0d0a0762c47103b64290c88620a1"
 
-  gem "yard", "~> 0.9"
+  gem "yard", "~> 0.9", ">= 0.9.44"
   gem "yard-doctest", "~> 0.1", ">= 0.1.17"
   gem "yard-markdown", "~> 0.7", ">= 0.7.1"
   gem "irb", "~> 1.18" # Needed for yard on Ruby 4.0
