@@ -1349,6 +1349,19 @@ module ElasticGraph
           expect(type_def_from(result, "DateTime")).to eq "scalar DateTime @deprecated"
         end
 
+        it "only applies each extension module once" do
+          applied_count = 0
+          api_extension = Module.new do
+            define_singleton_method :extended do |_api|
+              applied_count += 1
+            end
+          end
+
+          define_schema(extension_modules: [api_extension, api_extension]) {}
+
+          expect(applied_count).to eq 1
+        end
+
         describe "#on_built_in_types" do
           it "can tag built in types" do
             result = define_schema do |api|
