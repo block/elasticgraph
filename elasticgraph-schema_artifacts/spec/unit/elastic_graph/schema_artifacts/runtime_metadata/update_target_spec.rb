@@ -25,21 +25,21 @@ module ElasticGraph
             id_source: nil,
             routing_value_source: nil,
             rollover_timestamp_value_source: nil,
-            data_params: {},
+            top_level_fields_params: {},
             metadata_params: {}
           )
         end
 
-        it "allows `data_params` to contain both dynamic params and static params" do
+        it "allows `top_level_fields_params` to contain both dynamic params and static params" do
           update_target = normal_indexing_update_target_with(
-            data_params: {
+            top_level_fields_params: {
               "name" => dynamic_param_with(source_path: "some_name", cardinality: :one),
               "relationshipName" => static_param_with("__self")
             }
           )
 
           dumped = update_target.to_dumpable_hash
-          expect(dumped.fetch("data_params")).to eq({
+          expect(dumped.fetch("top_level_fields_params")).to eq({
             "name" => {"cardinality" => "one", "source_path" => "some_name"},
             "relationshipName" => {"value" => "__self"}
           })
@@ -95,7 +95,7 @@ module ElasticGraph
 
           it "extracts `event_params` from `prepared_record` and include them under `topLevelFields`" do
             params = params_for(
-              data_params: {
+              top_level_fields_params: {
                 "foo" => static_param_with(43),
                 "bar" => dynamic_param_with(source_path: "some.nested.field", cardinality: :one),
                 "bazz" => dynamic_param_with(source_path: "some.other.field", cardinality: :many)
@@ -115,9 +115,9 @@ module ElasticGraph
             )
           end
 
-          def params_for(doc_id: "doc_id", event: {}, prepared_record: {}, data_params: {}, metadata_params: {})
+          def params_for(doc_id: "doc_id", event: {}, prepared_record: {}, top_level_fields_params: {}, metadata_params: {})
             update_target = normal_indexing_update_target_with(
-              data_params: data_params,
+              top_level_fields_params: top_level_fields_params,
               metadata_params: metadata_params
             )
 

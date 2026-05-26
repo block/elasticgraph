@@ -57,7 +57,7 @@ module ElasticGraph
             id_source: "cost.currency",
             routing_value_source: nil,
             rollover_timestamp_value_source: nil,
-            data_params: {"created_at" => dynamic_param_with(source_path: "created_at", cardinality: :many)}
+            top_level_fields_params: {"created_at" => dynamic_param_with(source_path: "created_at", cardinality: :many)}
           ))
         end
       end
@@ -105,7 +105,7 @@ module ElasticGraph
             id_source: "cost.currency",
             routing_value_source: nil,
             rollover_timestamp_value_source: nil,
-            data_params: {"created_at" => dynamic_param_with(source_path: "created_at", cardinality: :many)}
+            top_level_fields_params: {"created_at" => dynamic_param_with(source_path: "created_at", cardinality: :many)}
           ))
         end
       end
@@ -156,7 +156,7 @@ module ElasticGraph
             id_source: "cost.currency",
             routing_value_source: nil,
             rollover_timestamp_value_source: nil,
-            data_params: {"created_at" => dynamic_param_with(source_path: "created_at", cardinality: :many)}
+            top_level_fields_params: {"created_at" => dynamic_param_with(source_path: "created_at", cardinality: :many)}
           ))
         end
 
@@ -204,7 +204,7 @@ module ElasticGraph
               id_source: "cost.currency",
               routing_value_source: nil,
               rollover_timestamp_value_source: nil,
-              data_params: {"created_at" => dynamic_param_with(source_path: "created_at", cardinality: :many)}
+              top_level_fields_params: {"created_at" => dynamic_param_with(source_path: "created_at", cardinality: :many)}
             ))
           end
         end

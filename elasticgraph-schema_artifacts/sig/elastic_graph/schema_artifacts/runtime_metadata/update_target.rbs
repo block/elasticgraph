@@ -8,7 +8,7 @@ module ElasticGraph
         attr_reader id_source: ::String
         attr_reader routing_value_source: ::String?
         attr_reader rollover_timestamp_value_source: ::String?
-        attr_reader data_params: paramsHash
+        attr_reader top_level_fields_params: paramsHash
         attr_reader metadata_params: paramsHash
 
         def initialize: (
@@ -18,7 +18,7 @@ module ElasticGraph
           id_source: ::String,
           routing_value_source: ::String?,
           rollover_timestamp_value_source: ::String?,
-          data_params: paramsHash,
+          top_level_fields_params: paramsHash,
           metadata_params: paramsHash
         ) -> void
 
@@ -29,7 +29,7 @@ module ElasticGraph
           ?id_source: ::String,
           ?routing_value_source: ::String?,
           ?rollover_timestamp_value_source: ::String?,
-          ?data_params: paramsHash,
+          ?top_level_fields_params: paramsHash,
           ?metadata_params: paramsHash
         ) -> UpdateTarget
 
@@ -45,7 +45,7 @@ module ElasticGraph
         ID_SOURCE: "id_source"
         ROUTING_VALUE_SOURCE: "routing_value_source"
         ROLLOVER_TIMESTAMP_VALUE_SOURCE: "rollover_timestamp_value_source"
-        DATA_PARAMS: "data_params"
+        TOP_LEVEL_FIELDS_PARAMS: "top_level_fields_params"
         METADATA_PARAMS: "metadata_params"
 
         def self.from_hash: (::Hash[::String, untyped]) -> UpdateTarget

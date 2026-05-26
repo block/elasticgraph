@@ -42,7 +42,7 @@ module ElasticGraph
                     id_source: "cost.currency",
                     routing_value_source: "cost.currency_name",
                     rollover_timestamp_value_source: "currency_introduced_on",
-                    data_params: {"workspace_id" => DynamicParam.new(source_path: "wid", cardinality: :one)},
+                    top_level_fields_params: {"workspace_id" => DynamicParam.new(source_path: "wid", cardinality: :one)},
                     metadata_params: {"relationshipName" => StaticParam.new(value: "currency")}
                   ),
                   UpdateTarget.new(
@@ -52,7 +52,7 @@ module ElasticGraph
                     id_source: "id",
                     routing_value_source: nil,
                     rollover_timestamp_value_source: nil,
-                    data_params: {},
+                    top_level_fields_params: {},
                     metadata_params: {}
                   )
                 ],
@@ -172,7 +172,7 @@ module ElasticGraph
                     "id_source" => "cost.currency",
                     "routing_value_source" => "cost.currency_name",
                     "rollover_timestamp_value_source" => "currency_introduced_on",
-                    "data_params" => {"workspace_id" => {"source_path" => "wid", "cardinality" => "one"}},
+                    "top_level_fields_params" => {"workspace_id" => {"source_path" => "wid", "cardinality" => "one"}},
                     "metadata_params" => {"relationshipName" => {"value" => "currency"}}
                   },
                   {
@@ -310,7 +310,7 @@ module ElasticGraph
               id_source: "cost.currency",
               routing_value_source: nil,
               rollover_timestamp_value_source: nil,
-              data_params: {"workspace_id" => dynamic_param_with(cardinality: :many)},
+              top_level_fields_params: {"workspace_id" => dynamic_param_with(cardinality: :many)},
               metadata_params: {}
             )]),
             "IndexDefinitionNamesOnly" => object_type_with(index_definition_names: ["foo", "bar"]),

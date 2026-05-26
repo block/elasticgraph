@@ -270,7 +270,7 @@ module ElasticGraph
             routing_value_source: routing_value_source,
             rollover_timestamp_value_source: rollover_timestamp_value_source,
             metadata_params: {},
-            data_params: fields.map(&:source_field).to_h do |f|
+            top_level_fields_params: fields.map(&:source_field).to_h do |f|
               [f, SchemaArtifacts::RuntimeMetadata::DynamicParam.new(source_path: f, cardinality: :many)]
             end
           )

@@ -430,12 +430,12 @@ module ElasticGraph
         def self_update_target
           return nil if abstract? || !root_document_type?
 
-          # We exclude `id` from `data_params` because `Indexer::Operator::Update` automatically includes
-          # `params.id` so we don't want it duplicated at `params.topLevelFields.id` alongside other data params.
+          # We exclude `id` from `top_level_fields_params` because `Indexer::Operator::Update` automatically includes
+          # `params.id` so we don't want it duplicated at `params.topLevelFields.id` alongside other top-level fields params.
           #
           # In addition, we exclude fields that have an alternate `source` -- those fields will get populated
           # by a different event and we don't want to risk "stomping" their value via this update target.
-          data_params = indexing_fields_by_name_in_index.select { |name, field| name != "id" && field.source.nil? }.to_h do |field|
+          top_level_fields_params = indexing_fields_by_name_in_index.select { |name, field| name != "id" && field.source.nil? }.to_h do |field|
             [field, SchemaArtifacts::RuntimeMetadata::DynamicParam.new(source_path: field, cardinality: :one)]
           end
 
@@ -445,7 +445,7 @@ module ElasticGraph
             type: name,
             relationship: SELF_RELATIONSHIP_NAME,
             id_source: "id",
-            data_params: data_params,
+            top_level_fields_params: top_level_fields_params,
             # Some day we may want to consider supporting multiple indices. If/when we add support for that,
             # we'll need to change the runtime metadata here to have a map of these values, keyed by index
             # name.

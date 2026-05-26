@@ -16,7 +16,7 @@ module ElasticGraph
           type:,
           relationship:,
           id_source:,
-          data_params:,
+          top_level_fields_params:,
           routing_value_source:,
           rollover_timestamp_value_source:
         )
@@ -28,7 +28,7 @@ module ElasticGraph
             metadata_params: standard_metadata_params.merge({
               "relationship" => SchemaArtifacts::RuntimeMetadata::StaticParam.new(value: relationship)
             }),
-            data_params: data_params,
+            top_level_fields_params: top_level_fields_params,
             routing_value_source: routing_value_source,
             rollover_timestamp_value_source: rollover_timestamp_value_source
           )

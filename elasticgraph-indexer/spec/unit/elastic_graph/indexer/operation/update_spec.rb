@@ -91,7 +91,7 @@ module ElasticGraph
             expect(operations.size).to eq(1)
             operation = operations.first.with(update_target: normal_indexing_update_target_with(
               type: "Widget",
-              data_params: {"name" => dynamic_param_with(source_path: "name", cardinality: :one)},
+              top_level_fields_params: {"name" => dynamic_param_with(source_path: "name", cardinality: :one)},
               metadata_params: {
                 "staticValue" => static_param_with(47),
                 "sourceType" => dynamic_param_with(source_path: "type", cardinality: :one)
@@ -194,7 +194,7 @@ module ElasticGraph
             operations = operations_for_indexer(indexer)
 
             expect(operations.size).to eq(1)
-            operation = operations.first.with(update_target: operations.first.update_target.with(data_params: {
+            operation = operations.first.with(update_target: operations.first.update_target.with(top_level_fields_params: {
               "embedded_values.missing_field" => dynamic_param_with(source_path: "embedded_values.missing_field", cardinality: :many),
               "name" => dynamic_param_with(source_path: "some_field_that_is_not_in_record", cardinality: :one)
             }))
@@ -219,7 +219,7 @@ module ElasticGraph
             operations = operations_for_indexer(indexer)
             expect(operations.size).to eq(1)
 
-            operation = operations.first.with(update_target: operations.first.update_target.with(data_params: {
+            operation = operations.first.with(update_target: operations.first.update_target.with(top_level_fields_params: {
               # Here we've swapped the source_paths with the param names.
               "embedded_values" => dynamic_param_with(source_path: "name", cardinality: :many),
               "name" => dynamic_param_with(source_path: "embedded_values", cardinality: :one)

@@ -21,7 +21,7 @@ module ElasticGraph
         def validate_relationship: () -> ::Array[::String]
         def relationship_error_prefix: () -> ::String
 
-        def resolve_data_params: () -> [
+        def resolve_top_level_fields_params: () -> [
           ::Hash[::String, SchemaArtifacts::RuntimeMetadata::DynamicParam],
           ::Array[::String]
         ]

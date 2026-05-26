@@ -36,19 +36,19 @@ module ElasticGraph
         # Returns a tuple of the `update_target` (if valid), and a list of errors.
         def resolve
           relationship_errors = validate_relationship
-          data_params, data_params_errors = resolve_data_params
+          top_level_fields_params, top_level_fields_params_errors = resolve_top_level_fields_params
           routing_value_source, routing_error = resolve_field_source(RoutingSourceAdapter)
           rollover_timestamp_value_source, rollover_timestamp_error = resolve_field_source(RolloverTimestampSourceAdapter)
           equivalent_field_errors = resolved_relationship.relationship.validate_equivalent_fields(field_path_resolver)
 
-          all_errors = relationship_errors + data_params_errors + equivalent_field_errors + [routing_error, rollover_timestamp_error].compact
+          all_errors = relationship_errors + top_level_fields_params_errors + equivalent_field_errors + [routing_error, rollover_timestamp_error].compact
 
           if all_errors.empty?
             update_target = UpdateTargetFactory.new_normal_indexing_update_target(
               type: object_type.name,
               relationship: resolved_relationship.relationship_name,
               id_source: resolved_relationship.relation_metadata.foreign_key,
-              data_params: data_params,
+              top_level_fields_params: top_level_fields_params,
               routing_value_source: routing_value_source,
               rollover_timestamp_value_source: rollover_timestamp_value_source
             )
@@ -89,14 +89,14 @@ module ElasticGraph
           "`#{object_type.name}.#{resolved_relationship.relationship_name}` #{sourced_fields_description}"
         end
 
-        # Resolves the `sourced_fields` into a data params map, validating them along the way.
+        # Resolves the `sourced_fields` into a top-level fields params map, validating them along the way.
         #
-        # Returns a tuple of the data params and a list of any errors that occurred during resolution.
-        def resolve_data_params
+        # Returns a tuple of the top-level fields params and a list of any errors that occurred during resolution.
+        def resolve_top_level_fields_params
           related_type = resolved_relationship.related_type
           errors = [] # : ::Array[::String]
 
-          data_params = sourced_fields.filter_map do |field|
+          top_level_fields_params = sourced_fields.filter_map do |field|
             field_source = field.source # : SchemaElements::FieldSource
 
             referenced_field_path = field_path_resolver.resolve_public_path(related_type, field_source.field_path) do |parent_field|
@@ -129,7 +129,7 @@ module ElasticGraph
             end
           end.to_h
 
-          [data_params, errors]
+          [top_level_fields_params, errors]
         end
 
         # Helper method that assists with resolving `routing_value_source` and `rollover_timestamp_value_source`.

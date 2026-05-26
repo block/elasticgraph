@@ -98,7 +98,7 @@ module ElasticGraph
             id_source: "cost.currency",
             routing_value_source: "cost_currency_name",
             rollover_timestamp_value_source: "currency_introduced_on",
-            data_params: {
+            top_level_fields_params: {
               "workspace_id" => dynamic_param_with(source_path: "workspace_id", cardinality: :many),
               "cost_currency_name" => dynamic_param_with(source_path: "cost_currency_name", cardinality: :many),
               "created_at" => dynamic_param_with(source_path: "created_at", cardinality: :many)
