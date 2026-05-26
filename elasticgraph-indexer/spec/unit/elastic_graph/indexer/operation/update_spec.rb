@@ -73,7 +73,7 @@ module ElasticGraph
               {update: {_id: "17", _index: "widget_workspaces", retry_on_conflict: Update::CONFLICT_RETRIES}},
               {
                 script: {id: operations.first.update_target.script_id, params: {
-                  "topLevelFields" => {"name" => ["thing1"]},
+                  "nestedSourcedFields" => {}, "nestedSourcedPathIdentifiers" => {}, "nestedSourcedPaths" => {}, "topLevelFields" => {"name" => ["thing1"]},
                   "id" => "17"
                 }},
                 scripted_upsert: true,
@@ -102,7 +102,7 @@ module ElasticGraph
               {update: {_id: "17", _index: "widget_workspaces", retry_on_conflict: Update::CONFLICT_RETRIES}},
               {
                 script: {id: INDEX_DATA_UPDATE_SCRIPT_ID, params: {
-                  "topLevelFields" => {"name" => "thing1"},
+                  "nestedSourcedFields" => {}, "nestedSourcedPathIdentifiers" => {}, "nestedSourcedPaths" => {}, "topLevelFields" => {"name" => "thing1"},
                   "id" => "17",
                   "staticValue" => 47,
                   "sourceType" => "Widget",
@@ -156,7 +156,7 @@ module ElasticGraph
               {update: {_id: "17", _index: "widget_workspaces", retry_on_conflict: Update::CONFLICT_RETRIES}},
               {
                 script: {id: operations.first.update_target.script_id, params: {
-                  "topLevelFields" => {"name" => []},
+                  "nestedSourcedFields" => {}, "nestedSourcedPathIdentifiers" => {}, "nestedSourcedPaths" => {}, "topLevelFields" => {"name" => []},
                   "id" => "17"
                 }},
                 scripted_upsert: true,
@@ -177,7 +177,7 @@ module ElasticGraph
               {update: {_id: "embedded_workspace_id", _index: "widget_workspaces", retry_on_conflict: Update::CONFLICT_RETRIES}},
               {
                 script: {id: operations.first.update_target.script_id, params: {
-                  "topLevelFields" => {"name" => ["thing1"]},
+                  "nestedSourcedFields" => {}, "nestedSourcedPathIdentifiers" => {}, "nestedSourcedPaths" => {}, "topLevelFields" => {"name" => ["thing1"]},
                   "id" => "embedded_workspace_id"
                 }},
                 scripted_upsert: true,
@@ -202,7 +202,7 @@ module ElasticGraph
               {update: {_id: "17", _index: "widget_workspaces", retry_on_conflict: Update::CONFLICT_RETRIES}},
               {
                 script: {id: operations.first.update_target.script_id, params: {
-                  "topLevelFields" => {"embedded_values.missing_field" => [], "name" => nil},
+                  "nestedSourcedFields" => {}, "nestedSourcedPathIdentifiers" => {}, "nestedSourcedPaths" => {}, "topLevelFields" => {"embedded_values.missing_field" => [], "name" => nil},
                   "id" => "17"
                 }},
                 scripted_upsert: true,
@@ -229,13 +229,13 @@ module ElasticGraph
               {update: {_id: "17", _index: "widget_workspaces", retry_on_conflict: Update::CONFLICT_RETRIES}},
               {
                 script: {id: operations.first.update_target.script_id, params: {
-                  "topLevelFields" => {
-                    "embedded_values" => ["thing1"],
-                    "name" => {
-                      "name" => "embedded_name",
-                      "workspace_id" => "embedded_workspace_id"
-                    }
-                  },
+                  "nestedSourcedFields" => {}, "nestedSourcedPathIdentifiers" => {}, "nestedSourcedPaths" => {}, "topLevelFields" => {
+                                                                                                                   "embedded_values" => ["thing1"],
+                                                                                                                   "name" => {
+                                                                                                                     "name" => "embedded_name",
+                                                                                                                     "workspace_id" => "embedded_workspace_id"
+                                                                                                                   }
+                                                                                                                 },
                   "id" => "17"
                 }},
                 scripted_upsert: true,
@@ -261,7 +261,7 @@ module ElasticGraph
               {
                 script: {id: operations.first.update_target.script_id, params: {
                   # Float-typed integer values are coerced to true ints before indexing
-                  "topLevelFields" => {"size" => [an_instance_of(::Integer).and(eq_to(4))]},
+                  "nestedSourcedFields" => {}, "nestedSourcedPathIdentifiers" => {}, "nestedSourcedPaths" => {}, "topLevelFields" => {"size" => [an_instance_of(::Integer).and(eq_to(4))]},
                   "id" => "17"
                 }},
                 scripted_upsert: true,
@@ -282,7 +282,7 @@ module ElasticGraph
               {update: {_id: "17", _index: "widget_workspaces", retry_on_conflict: Update::CONFLICT_RETRIES}},
               {
                 script: {id: operations.first.update_target.script_id, params: {
-                  "topLevelFields" => {"name" => ["thing1"]},
+                  "nestedSourcedFields" => {}, "nestedSourcedPathIdentifiers" => {}, "nestedSourcedPaths" => {}, "topLevelFields" => {"name" => ["thing1"]},
                   "id" => "17"
                 }},
                 scripted_upsert: true,
@@ -291,7 +291,7 @@ module ElasticGraph
               {update: {_id: "18", _index: "widget_workspaces", retry_on_conflict: Update::CONFLICT_RETRIES}},
               {
                 script: {id: operations.first.update_target.script_id, params: {
-                  "topLevelFields" => {"name" => ["thing1"]},
+                  "nestedSourcedFields" => {}, "nestedSourcedPathIdentifiers" => {}, "nestedSourcedPaths" => {}, "topLevelFields" => {"name" => ["thing1"]},
                   "id" => "18"
                 }},
                 scripted_upsert: true,
@@ -300,7 +300,7 @@ module ElasticGraph
               {update: {_id: "19", _index: "widget_workspaces", retry_on_conflict: Update::CONFLICT_RETRIES}},
               {
                 script: {id: operations.first.update_target.script_id, params: {
-                  "topLevelFields" => {"name" => ["thing1"]},
+                  "nestedSourcedFields" => {}, "nestedSourcedPathIdentifiers" => {}, "nestedSourcedPaths" => {}, "topLevelFields" => {"name" => ["thing1"]},
                   "id" => "19"
                 }},
                 scripted_upsert: true,

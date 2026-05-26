@@ -298,6 +298,13 @@ module ElasticGraph
             .then { |mapping| ListCountsMapping.merged_into(mapping, for_type: indexed_type) }
             .then do |fm|
               internal_fields = {
+                "__nested_sourced_data" => {
+                  "type" => "object",
+                  # __nested_sourced_data stores sourced data for nested sourced_from fields. Its keys are not
+                  # statically known (they're relationship names and composite element keys), so we
+                  # set dynamic to "false" to allow arbitrary keys in _source without indexing them.
+                  "dynamic" => "false"
+                },
                 "__sources" => {"type" => "keyword"},
                 "__versions" => {
                   "type" => "object",

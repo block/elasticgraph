@@ -12,6 +12,8 @@ require "elastic_graph/schema_artifacts/runtime_metadata/schema"
 require "elastic_graph/schema_artifacts/artifacts_helper_methods"
 require "elastic_graph/schema_definition/indexing/event_envelope"
 require "elastic_graph/schema_definition/indexing/json_schema_with_metadata"
+require "elastic_graph/schema_definition/indexing/nested_relationship_chain_resolver"
+require "elastic_graph/schema_definition/indexing/nested_update_target_resolver"
 require "elastic_graph/schema_definition/indexing/relationship_resolver"
 require "elastic_graph/schema_definition/indexing/update_target_resolver"
 require "elastic_graph/schema_definition/mixins/has_readable_to_s_and_inspect"
@@ -143,11 +145,20 @@ module ElasticGraph
       end
 
       def build_runtime_metadata
-        extra_update_targets_by_object_type_name = identify_extra_update_targets_by_object_type_name
+        extra_update_targets_by_object_type_name, nested_sourced_paths_by_type_name = identify_extra_update_targets_by_object_type_name
 
         object_types_by_name = all_types
           .select { |t| t.respond_to?(:graphql_fields_by_name) }
-          .to_h { |type| [type.name, (_ = type).runtime_metadata(extra_update_targets_by_object_type_name.fetch(type.name) { [] })] }
+          .to_h do |type|
+            extra_targets = extra_update_targets_by_object_type_name.fetch(type.name) { [] } # : ::Array[SchemaArtifacts::RuntimeMetadata::UpdateTarget]
+            metadata = if type.respond_to?(:own_index_def)
+              nested_config = nested_sourced_paths_by_type_name.fetch(type.name) { {} } # : ::Hash[::String, ::Array[::Hash[::String, untyped]]]
+              (_ = type).runtime_metadata(extra_targets, nested_sourced_paths: nested_config)
+            else
+              (_ = type).runtime_metadata(extra_targets)
+            end
+            [type.name, metadata]
+          end
 
         scalar_types_by_name = state.scalar_types_by_name.transform_values(&:runtime_metadata)
 
@@ -182,13 +193,15 @@ module ElasticGraph
 
       # Builds a map, keyed by object type name, of extra `update_targets` that have been generated
       # from any fields that use `sourced_from` on other types.
+      #
+      # Returns a tuple of [update_targets_by_type_name, nested_sourced_paths_by_type_name].
       def identify_extra_update_targets_by_object_type_name
         sourced_field_errors = [] # : ::Array[::String]
         relationship_errors = [] # : ::Array[::String]
+        extra_update_targets_by_type_name = ::Hash.new { |h, k| h[k] = [] } # : ::Hash[untyped, ::Array[SchemaArtifacts::RuntimeMetadata::UpdateTarget]]
+        nested_sourced_paths_by_type = {} # : ::Hash[::String, ::Hash[::String, ::Array[::Hash[::String, untyped]]]]
 
-        state.object_types_by_name.except(*state.namespace_types_by_name.keys).values.each_with_object(
-          ::Hash.new { |h, k| h[k] = [] } # : ::Hash[untyped, ::Array[SchemaArtifacts::RuntimeMetadata::UpdateTarget]]
-        ) do |object_type, accum|
+        state.object_types_by_name.except(*state.namespace_types_by_name.keys).values.each do |object_type|
           fields_with_sources_by_relationship_name =
             if object_type.own_index_def.nil?
               # only indexed types can have `sourced_from` fields, and resolving `fields_with_sources` on an unindexed union type
@@ -224,7 +237,7 @@ module ElasticGraph
               )
 
               update_target, errors = update_target_resolver.resolve
-              accum[resolved_relationship.related_type.name] << update_target if update_target
+              extra_update_targets_by_type_name[resolved_relationship.related_type.name] << update_target if update_target
               sourced_field_errors.concat(errors)
 
               # Validate that has_had_multiple_sources! has been called when sourced_from is used
@@ -237,20 +250,84 @@ module ElasticGraph
               end
             end
           end
-        end.tap do
-          full_errors = [] # : ::Array[::String]
 
-          if sourced_field_errors.any?
-            full_errors << "Schema had #{sourced_field_errors.size} error(s) related to `sourced_from` fields:\n\n#{sourced_field_errors.map.with_index(1) { |e, i| "#{i}. #{e}" }.join("\n\n")}"
+          # Process nested sourced_from fields on non-indexed types.
+          if object_type.own_index_def.nil?
+            identify_nested_sourced_update_targets(object_type, extra_update_targets_by_type_name, nested_sourced_paths_by_type, sourced_field_errors)
+          end
+        end
+
+        full_errors = [] # : ::Array[::String]
+
+        if sourced_field_errors.any?
+          full_errors << "Schema had #{sourced_field_errors.size} error(s) related to `sourced_from` fields:\n\n#{sourced_field_errors.map.with_index(1) { |e, i| "#{i}. #{e}" }.join("\n\n")}"
+        end
+
+        if relationship_errors.any?
+          full_errors << "Schema had #{relationship_errors.size} error(s) related to relationship fields:\n\n#{relationship_errors.map.with_index(1) { |e, i| "#{i}. #{e}" }.join("\n\n")}"
+        end
+
+        unless full_errors.empty?
+          raise Errors::SchemaError, full_errors.join("\n\n")
+        end
+
+        [extra_update_targets_by_type_name, nested_sourced_paths_by_type]
+      end
+
+      # Identifies update targets for sourced_from fields on non-indexed embedded types
+      # that use parent_relationship chains.
+      def identify_nested_sourced_update_targets(object_type, extra_update_targets_by_type_name, nested_sourced_paths_by_type, errors)
+        # Find relationships on this type that have parent_relationship configured
+        nested_relationships = object_type.relationships_by_name
+          .select { |_, rel| rel.parent_relationship_config }
+
+        return if nested_relationships.empty?
+
+        # Find sourced_from fields on this type, grouped by relationship name
+        fields_with_sources_by_relationship_name = object_type
+          .indexing_fields_by_name_in_index.values
+          .reject { |f| f.source.nil? }
+          .group_by { |f| (_ = f.source).relationship_name }
+
+        nested_relationships.each do |rel_name, relationship|
+          empty_fields = [] # : ::Array[SchemaElements::Field]
+          sourced_fields = fields_with_sources_by_relationship_name.fetch(rel_name) { empty_fields }
+
+          next if sourced_fields.empty?
+
+          # Resolve the chain from this type up to the root indexed type
+          chain_resolver = Indexing::NestedRelationshipChainResolver.new(schema_def_state: state)
+          resolved_chain, chain_errors = chain_resolver.resolve(relationship, object_type)
+
+          if chain_errors.any?
+            errors.concat(chain_errors)
+            next
           end
 
-          if relationship_errors.any?
-            full_errors << "Schema had #{relationship_errors.size} error(s) related to relationship fields:\n\n#{relationship_errors.map.with_index(1) { |e, i| "#{i}. #{e}" }.join("\n\n")}"
-          end
+          # Resolve the update target
+          resolved_chain = _ = resolved_chain # : Indexing::ResolvedNestedChain
+          resolver = Indexing::NestedUpdateTargetResolver.new(
+            object_type: object_type,
+            relationship: relationship,
+            sourced_fields: sourced_fields,
+            resolved_chain: resolved_chain,
+            field_path_resolver: state.field_path_resolver,
+            schema_def_state: state
+          )
 
-          unless full_errors.empty?
-            raise Errors::SchemaError, full_errors.join("\n\n")
-          end
+          update_target, resolve_errors = resolver.resolve
+          errors.concat(resolve_errors)
+
+          next unless update_target
+
+          # Store on the source type
+          related_type_name = relationship.related_type.unwrap_non_null.name
+          extra_update_targets_by_type_name[related_type_name] << update_target
+
+          # Record the path config for the root indexed type's self-update target.
+          root_type_name = resolved_chain.root_indexed_type.name
+          nested_sourced_paths_by_type[root_type_name] ||= {}
+          nested_sourced_paths_by_type[root_type_name].merge!(update_target.nested_sourced_paths)
         end
       end
 

@@ -257,9 +257,9 @@ module ElasticGraph
         end
 
         # @private
-        def runtime_metadata(extra_update_targets)
+        def runtime_metadata(extra_update_targets, nested_sourced_paths: {})
           SchemaArtifacts::RuntimeMetadata::ObjectType.new(
-            update_targets: derived_indexed_types.map(&:runtime_metadata_for_source_type) + [self_update_target].compact + extra_update_targets,
+            update_targets: derived_indexed_types.map(&:runtime_metadata_for_source_type) + [self_update_target(nested_sourced_paths: nested_sourced_paths)].compact + extra_update_targets,
             index_definition_names: [index_def&.name].compact,
             graphql_fields_by_name: runtime_metadata_graphql_fields_by_name,
             elasticgraph_category: nil,
@@ -427,7 +427,7 @@ module ElasticGraph
           @can_configure_index = false
         end
 
-        def self_update_target
+        def self_update_target(nested_sourced_paths: {})
           return nil if abstract? || !root_document_type?
 
           # We exclude `id` from `top_level_fields_params` because `Indexer::Operator::Update` automatically includes
@@ -450,7 +450,8 @@ module ElasticGraph
             # we'll need to change the runtime metadata here to have a map of these values, keyed by index
             # name.
             routing_value_source: index_runtime_metadata.route_with,
-            rollover_timestamp_value_source: index_runtime_metadata.rollover&.timestamp_field_path
+            rollover_timestamp_value_source: index_runtime_metadata.rollover&.timestamp_field_path,
+            nested_sourced_paths: nested_sourced_paths
           )
         end
 

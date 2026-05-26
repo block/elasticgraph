@@ -1,0 +1,34 @@
+module ElasticGraph
+  module SchemaDefinition
+    module Indexing
+      class NestedRelationshipChainResolver
+        @schema_def_state: State
+
+        def initialize: (schema_def_state: State) -> void
+        def resolve: (SchemaElements::Relationship, untyped) -> [ResolvedNestedChain?, ::Array[::String]]
+
+        private
+
+        def find_embedding_field: (untyped, untyped, ::Array[::String]) -> SchemaElements::Field?
+        def rel_description: (untyped, SchemaElements::Relationship) -> ::String
+      end
+
+      class ResolvedNestedChain
+        attr_reader root_indexed_type: untyped
+        attr_reader path_segments: ::Array[PathSegment]
+        attr_reader root_relationship: SchemaElements::Relationship
+
+        def initialize: (root_indexed_type: untyped, path_segments: ::Array[PathSegment], root_relationship: SchemaElements::Relationship) -> void
+      end
+
+      class PathSegment
+        attr_reader parent_type: untyped
+        attr_reader embedding_field: SchemaElements::Field
+        attr_reader match_field: ::String
+        attr_reader source_field: ::String
+
+        def initialize: (parent_type: untyped, embedding_field: SchemaElements::Field, match_field: ::String, source_field: ::String) -> void
+      end
+    end
+  end
+end

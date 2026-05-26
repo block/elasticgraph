@@ -574,7 +574,8 @@ module ElasticGraph
               cardinality: cardinality,
               related_type: schema_def_state.type_ref(related_type).to_final_form,
               foreign_key: via,
-              direction: dir
+              direction: dir,
+              indexing_only: indexing_only
             )
 
             field.relationship = relationship
