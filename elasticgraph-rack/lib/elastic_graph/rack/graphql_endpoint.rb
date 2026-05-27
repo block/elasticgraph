@@ -23,15 +23,22 @@ module ElasticGraph
     #   run ElasticGraph::Rack::GraphQLEndpoint.new(graphql)
     class GraphQLEndpoint
       # @param graphql [ElasticGraph::GraphQL] ElasticGraph GraphQL instance
-      def initialize(graphql)
+      # @param body_serializer [#call, nil] optional callable invoked with the GraphQL result
+      #   hash; its return value is used as the response body. The body may be a `String` or
+      #   any object responding to `each` per the Rack body spec. Use this to bypass the
+      #   default `JSON.generate(result.to_h)` allocation — for example, by streaming the
+      #   result hash directly into the response output stream via a JSON encoder of your
+      #   choice. Errors and non-200 responses still produce a `String` body.
+      def initialize(graphql, body_serializer: nil)
         @logger = graphql.logger
         @graphql_http_endpoint = graphql.graphql_http_endpoint
+        @body_serializer = body_serializer
       end
 
       # Responds to a Rack request.
       #
       # @param env [Hash<String, Object>] Rack env
-      # @return [Array(Integer, Hash<String, String>, Array<String>)]
+      # @return [Array(Integer, Hash<String, String>, #each)]
       def call(env)
         rack_request = ::Rack::Request.new(env)
 
@@ -50,9 +57,17 @@ module ElasticGraph
           body: rack_request.body&.read
         )
 
-        response = @graphql_http_endpoint.process(request)
+        response =
+          if (body_serializer = @body_serializer)
+            @graphql_http_endpoint.process(request, &body_serializer)
+          else
+            @graphql_http_endpoint.process(request)
+          end
 
-        [response.status_code, response.headers.transform_keys(&:downcase), [response.body]]
+        body = response.body
+        rack_body = body.is_a?(::String) ? [body] : body
+
+        [response.status_code, response.headers.transform_keys(&:downcase), rack_body]
       rescue => e
         raise if ENV["RACK_ENV"] == "test"
 
