@@ -29,9 +29,7 @@ module ElasticGraph
       #     local_config_yaml: "config/settings/local.yaml",
       #     path_to_schema: "config/schema.rb"
       #   ) do |tasks|
-      #     tasks.schema_definition_extension_modules = [
-      #       ElasticGraph::Warehouse::SchemaDefinition::APIExtension
-      #     ]
+      #     tasks.schema_definition_extension_modules << ElasticGraph::Warehouse::SchemaDefinition::APIExtension
       #   end
       module APIExtension
         # Maps built-in ElasticGraph scalar types to their warehouse column types.
