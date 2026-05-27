@@ -35,7 +35,7 @@ module ElasticGraph
   #     local_config_yaml: "config/settings/local.yaml",
   #     path_to_schema: "config/schema.rb"
   #   ) do |tasks|
-  #     tasks.schema_definition_extension_modules = [ElasticGraph::Apollo::SchemaDefinition::APIExtension]
+  #     tasks.schema_definition_extension_modules << ElasticGraph::Apollo::SchemaDefinition::APIExtension
   #   end
   module Apollo
     # Namespace for all Apollo schema definition support.
@@ -55,7 +55,7 @@ module ElasticGraph
       #     local_config_yaml: "config/settings/local.yaml",
       #     path_to_schema: "config/schema.rb"
       #   ) do |tasks|
-      #     tasks.schema_definition_extension_modules = [ElasticGraph::Apollo::SchemaDefinition::APIExtension]
+      #     tasks.schema_definition_extension_modules << ElasticGraph::Apollo::SchemaDefinition::APIExtension
       #   end
       module APIExtension
         # Applies an apollo tag to built-in types so that they are included in the Apollo contract schema.

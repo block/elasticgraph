@@ -168,7 +168,7 @@ module ElasticGraph
       #     local_config_yaml: "config/settings/local.yaml",
       #     path_to_schema: "config/schema.rb"
       #   ) do |tasks|
-      #     tasks.schema_definition_extension_modules = [ElasticGraph::Apollo::SchemaDefinition::APIExtension]
+      #     tasks.schema_definition_extension_modules << ElasticGraph::Apollo::SchemaDefinition::APIExtension
       #   end
       #
       # @example Extension that defines a `@since` directive and offers a `since` API on fields
@@ -207,7 +207,7 @@ module ElasticGraph
       #     local_config_yaml: "config/settings/local.yaml",
       #     path_to_schema: "config/schema.rb"
       #   ) do |tasks|
-      #     tasks.schema_definition_extension_modules = [SinceExtension]
+      #     tasks.schema_definition_extension_modules << SinceExtension
       #   end
       #
       # @dynamic schema_definition_extension_modules, schema_definition_extension_modules=

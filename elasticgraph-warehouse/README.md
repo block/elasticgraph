@@ -57,7 +57,7 @@ index 2943335..26633c3 100644
    local_config_yaml: settings_file,
    path_to_schema: "#{project_root}/config/schema.rb"
  ) do |tasks|
-+  tasks.schema_definition_extension_modules = [ElasticGraph::Warehouse::SchemaDefinition::APIExtension]
++  tasks.schema_definition_extension_modules << ElasticGraph::Warehouse::SchemaDefinition::APIExtension
 +
    # Set this to true once you're beyond the prototyping stage.
    tasks.enforce_json_schema_version = false
