@@ -1,0 +1,13 @@
+module ElasticGraph
+  module JSONIngestion
+    module SchemaDefinition
+      module JSONSchemaLayers
+        def self.for: (::ElasticGraph::SchemaDefinition::SchemaElements::TypeReference) -> ::ElasticGraph::SchemaDefinition::jsonSchemaLayersArray
+
+        private
+
+        def self.peel_once: (::ElasticGraph::SchemaDefinition::SchemaElements::TypeReference) -> [::ElasticGraph::SchemaDefinition::jsonSchemaLayersArray, ::ElasticGraph::SchemaDefinition::SchemaElements::TypeReference]
+      end
+    end
+  end
+end
