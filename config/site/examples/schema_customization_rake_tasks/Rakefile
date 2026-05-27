@@ -13,7 +13,6 @@ ElasticGraph::Local::RakeTasks.new(
   path_to_schema: File.expand_path("schema.rb", __dir__)
 ) do |tasks|
   tasks.opensearch_versions = []
-  tasks.enforce_json_schema_version = false
 
   # :snippet-start: schema_element_name_form
   # Within `ElasticGraph::Local::RakeTasks.new { ... }` in your `Rakefile`:
