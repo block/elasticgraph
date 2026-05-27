@@ -14,7 +14,7 @@ module ElasticGraph
   module SchemaDefinition
     module Indexing
       module FieldType
-        # Responsible for the JSON schema and mapping of a {SchemaElements::ObjectType}.
+        # Responsible for the mapping of a {SchemaElements::ObjectType}.
         #
         # @!attribute [r] type_name
         #   @return [String] name of the object type
@@ -22,13 +22,11 @@ module ElasticGraph
         #   @return [Array<Field>] the subfields of this object type
         # @!attribute [r] mapping_options
         #   @return [Hash<String, ::Object>] options to be included in the mapping
-        # @!attribute [r] json_schema_options
-        #   @return [Hash<String, ::Object>] options to be included in the JSON schema
         # @!attribute [r] doc_comment
         #   @return [String, nil] documentation for the type
         #
         # @api private
-        class Object < Support::MemoizableData.define(:schema_def_state, :type_name, :subfields, :mapping_options, :json_schema_options, :doc_comment)
+        class Object < Support::MemoizableData.define(:schema_def_state, :type_name, :subfields, :mapping_options, :doc_comment)
           # @return [Hash<String, ::Object>] the datastore mapping for this object type.
           def to_mapping
             @to_mapping ||= begin
@@ -41,76 +39,9 @@ module ElasticGraph
             end
           end
 
-          # @return [Hash<String, ::Object>] the JSON schema for this object type.
-          def to_json_schema
-            @to_json_schema ||=
-              if json_schema_options.empty?
-                # Fields that are `sourced_from` an alternate type must not be included in this types JSON schema,
-                # since events of this type won't include them.
-                other_source_subfields, json_schema_candidate_subfields = subfields.partition(&:source)
-                validate_sourced_fields_have_no_json_schema_overrides(other_source_subfields)
-                json_schema_subfields = json_schema_candidate_subfields.reject(&:runtime_field_script)
-                required_fields = json_schema_subfields
-                required_fields = required_fields.reject(&:nullable?) if schema_def_state.allow_omitted_json_schema_fields
-
-                {
-                  "type" => "object",
-                  "properties" => json_schema_subfields.to_h { |f| [f.name, f.json_schema] }.merge(json_schema_typename_field),
-                  # Note: `__typename` is intentionally not included in the `required` list. If `__typename` is present
-                  # we want it validated (as we do by merging in `json_schema_typename_field`) but we only want
-                  # to require it in the context of a union type. The union's json schema requires the field.
-                  "required" => required_fields.map(&:name).freeze,
-                  "additionalProperties" => (false unless schema_def_state.allow_extra_json_schema_fields),
-                  "description" => doc_comment
-                }.compact.freeze
-              else
-                Support::HashUtil.stringify_keys(json_schema_options)
-              end
-          end
-
-          # @return [Hash<String, ::Object>] additional ElasticGraph metadata to put in the JSON schema for this object type.
-          def json_schema_field_metadata_by_field_name
-            subfields.to_h { |f| [f.name, f.json_schema_metadata] }
-          end
-
-          # @param customizations [Hash<String, ::Object>] JSON schema customizations
-          # @return [Hash<String, ::Object>] formatted customizations.
-          def format_field_json_schema_customizations(customizations)
-            customizations
-          end
-
-          private
-
+          # @private
           def after_initialize
             subfields.freeze
-          end
-
-          # Returns a __typename property which we use for union types.
-          #
-          # This must always be set to the name of the type (thus the const value).
-          #
-          # We also add a "default" value. This does not impact validation, but rather
-          # aids tools like our kotlin codegen to save publishers from having to set the
-          # property explicitly when creating events.
-          def json_schema_typename_field
-            {
-              "__typename" => {
-                "type" => "string",
-                "const" => type_name,
-                "default" => type_name
-              }
-            }
-          end
-
-          def validate_sourced_fields_have_no_json_schema_overrides(other_source_subfields)
-            problem_fields = other_source_subfields.reject { |f| f.json_schema_customizations.empty? }
-            return if problem_fields.empty?
-
-            field_descriptions = problem_fields.map(&:name).sort.map { |f| "`#{f}`" }.join(", ")
-            raise Errors::SchemaError,
-              "`#{type_name}` has #{problem_fields.size} field(s) (#{field_descriptions}) that are `sourced_from` " \
-              "another type and also have JSON schema customizations. Instead, put the JSON schema " \
-              "customizations on the source type's field definitions."
           end
         end
       end

@@ -161,7 +161,7 @@ module ElasticGraph
         # @return [void]
         # @api private
         def configure_derived_scalar_type(scalar_type)
-          scalar_type.json_schema type: "string"
+          # No-op by default; extensions (e.g. JSONIngestion) override this.
         end
 
         # @return [Indexing::FieldType::Enum] indexing representation of this enum type

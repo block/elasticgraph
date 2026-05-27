@@ -4,6 +4,8 @@ module ElasticGraph
       module FieldType
         class Enum
           include _FieldType
+          include Support::_MemoizableDataClass
+
           attr_reader enum_value_names: ::Array[::String]
           def initialize: (::Array[::String]) -> void
         end

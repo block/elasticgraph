@@ -9,13 +9,14 @@
 require "elastic_graph/errors"
 require "elastic_graph/schema_artifacts/runtime_metadata/extension"
 require "elastic_graph/schema_artifacts/runtime_metadata/graphql_resolver"
-require "elastic_graph/schema_definition/mixins/has_readable_to_s_and_inspect"
-require "elastic_graph/schema_definition/results"
-require "elastic_graph/schema_definition/state"
 
 # :nocov: -- only loaded on JRuby
 require "elastic_graph/schema_definition/jruby_patches" if RUBY_ENGINE == "jruby"
 # :nocov:
+
+require "elastic_graph/schema_definition/mixins/has_readable_to_s_and_inspect"
+require "elastic_graph/schema_definition/results"
+require "elastic_graph/schema_definition/state"
 
 module ElasticGraph
   # The main entry point for schema definition from ElasticGraph applications.
@@ -294,7 +295,7 @@ module ElasticGraph
       #   ElasticGraph.define_schema do |schema|
       #     schema.scalar_type "URL" do |t|
       #       t.mapping type: "keyword"
-      #       t.json_schema type: "string", format: "uri"
+      #       t.json_schema type: "string"
       #     end
       #   end
       def scalar_type(name, &block)
@@ -453,97 +454,32 @@ module ElasticGraph
         @results ||= @factory.new_results
       end
 
-      # Defines the version number of the current JSON schema. Importantly, every time a change is made that impacts the JSON schema
-      # artifact, the version number must be incremented to ensure that each different version of the JSON schema is identified by a unique
-      # version number. The publisher will then include this version number in published events to identify the version of the schema it
-      # was using. This avoids the need to deploy the publisher and ElasticGraph indexer at the same time to keep them in sync.
+      # Records the JSON schema version of this schema definition.
       #
-      # @note While this is an important part of how ElasticGraph is designed to support schema evolution, it can be annoying constantly
-      #   have to increment this while rapidly changing the schema during prototyping. You can disable the requirement to increment this
-      #   on every JSON schema change with {#enforce_json_schema_version}.
+      # The default implementation is a no-op so that callers (and the test helpers) can invoke this
+      # uniformly regardless of whether an ingestion-serializer extension is loaded. When
+      # `elasticgraph-json_ingestion` is loaded, its `APIExtension` overrides this with real behavior.
       #
-      # @param version [Integer] current version number of the JSON schema artifact
+      # @param version [Integer] the JSON schema version
       # @return [void]
-      # @see #enforce_json_schema_version
-      #
-      # @example Set the JSON schema version to 1
-      #   ElasticGraph.define_schema do |schema|
-      #     schema.json_schema_version 1
-      #   end
       def json_schema_version(version)
-        if !version.is_a?(Integer) || version < 1
-          raise Errors::SchemaError, "`json_schema_version` must be a positive integer. Specified version: #{version}"
-        end
-
-        if @state.json_schema_version
-          raise Errors::SchemaError, "`json_schema_version` can only be set once on a schema. Previously-set version: #{@state.json_schema_version}"
-        end
-
-        @state.json_schema_version = version
-        @state.json_schema_version_setter_location = caller_locations(1, 1).to_a.first
-        nil
       end
 
-      # Configures whether {SchemaArtifactManager} enforces the requirement that the JSON schema version is incremented every time
-      # dumping the JSON schemas results in a changed artifact. Defaults to `true`.
+      # Records JSON schema version enforcement configuration.
       #
-      # @note Generally speaking, you will want this to be `true` for any ElasticGraph application that is in
-      #    production as the versioning of JSON schemas is what supports safe schema evolution as it allows
-      #    ElasticGraph to identify which version of the JSON schema the publishing system was operating on
-      #    when it published an event.
+      # The default implementation is a no-op; overridden by the JSON ingestion extension.
       #
-      #    It can be useful to set it to `false` before your application is in production, as you do not want
-      #    to be forced to bump the version after every single schema change while you are building an initial
-      #    prototype.
-      #
-      # @param value [Boolean] whether to require `json_schema_version` to be incremented on changes that impact `json_schemas.yaml`
+      # @param value [Boolean] whether JSON schema version bumps should be enforced
       # @return [void]
-      # @see #json_schema_version
-      #
-      # @example Disable enforcement during initial prototyping
-      #   ElasticGraph.define_schema do |schema|
-      #     # TODO: remove this once we're past the prototyping stage
-      #     schema.enforce_json_schema_version false
-      #   end
       def enforce_json_schema_version(value)
-        unless value == true || value == false
-          raise Errors::SchemaError, "`enforce_json_schema_version` must be a boolean. Specified value: #{value.inspect}"
-        end
-
-        @state.enforce_json_schema_version = value
-        nil
       end
 
-      # Defines strictness of the JSON schema validation. By default, the JSON schema will require all fields to be provided by the
-      # publisher (but they can be nullable) and will ignore extra fields that are not defined in the schema. Use this method to
-      # configure this behavior.
+      # Records JSON schema strictness configuration.
       #
-      # @param allow_omitted_fields [bool] Whether nullable fields can be omitted from indexing events.
-      # @param allow_extra_fields [bool] Whether extra fields (e.g. beyond fields defined in the schema) can be included in indexing events.
+      # The default implementation is a no-op; overridden by the JSON ingestion extension.
+      #
       # @return [void]
-      #
-      # @note If you allow both omitted fields and extra fields, ElasticGraph's JSON schema validation will allow (and ignore) misspelled
-      #   field names in indexing events. For example, if the ElasticGraph schema has a nullable field named `parentId` but the publisher
-      #   accidentally provides it as `parent_id`, ElasticGraph would happily ignore the `parent_id` field entirely, because `parentId`
-      #   is allowed to be omitted and `parent_id` would be treated as an extra field. Therefore, we recommend that you only set one of
-      #   these to `true` (or none).
-      #
-      # @example Allow omitted fields and disallow extra fields
-      #   ElasticGraph.define_schema do |schema|
-      #     schema.json_schema_strictness allow_omitted_fields: true, allow_extra_fields: false
-      #   end
       def json_schema_strictness(allow_omitted_fields: false, allow_extra_fields: true)
-        unless [true, false].include?(allow_omitted_fields)
-          raise Errors::SchemaError, "`allow_omitted_fields` must be true or false"
-        end
-
-        unless [true, false].include?(allow_extra_fields)
-          raise Errors::SchemaError, "`allow_extra_fields` must be true or false"
-        end
-
-        @state.allow_omitted_json_schema_fields = allow_omitted_fields
-        @state.allow_extra_json_schema_fields = allow_extra_fields
-        nil
       end
 
       # Registers a customization callback that will be applied to every built-in type automatically provided by ElasticGraph. Provides

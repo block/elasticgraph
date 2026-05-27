@@ -433,6 +433,7 @@ module ElasticGraph
 
         # When we are releasing gems, these dependencies aren't available.
         unless ENV["BUNDLE_GEMFILE"].to_s.end_with?("config/release/Gemfile")
+          require "elastic_graph/json_ingestion/schema_definition/api_extension"
           require "elastic_graph/local/rake_tasks"
           require "elastic_graph/query_registry/rake_tasks"
 
@@ -460,6 +461,7 @@ module ElasticGraph
                   # Here we provide a "default Rakefile" for examples that don't have any specialized needs and that aren't trying
                   # to demonstrate any `Rakefile` APIs.
                   ::ElasticGraph::Local::RakeTasks.new(local_config_yaml: settings_file, path_to_schema: schema_file) do |tasks|
+                    tasks.schema_definition_extension_modules << ElasticGraph::JSONIngestion::SchemaDefinition::APIExtension
                     tasks.opensearch_versions = []
                   end
                 end
