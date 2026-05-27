@@ -3159,7 +3159,7 @@ module ElasticGraph
         {
           "allOf" => [
             {"$ref" => "#/$defs/ID"},
-            {"maxLength" => DEFAULT_MAX_KEYWORD_LENGTH, "pattern" => Indexing::Index::HAS_NON_WHITE_SPACE_REGEX}
+            {"maxLength" => DEFAULT_MAX_KEYWORD_LENGTH, "pattern" => HAS_NON_WHITE_SPACE_REGEX}
           ]
         }
       end

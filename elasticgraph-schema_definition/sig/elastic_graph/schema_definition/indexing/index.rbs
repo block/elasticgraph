@@ -8,7 +8,10 @@ module ElasticGraph
         attr_reader rollover_config: RolloverConfig?
         attr_reader has_had_multiple_sources_flag: bool
         attr_reader indexed_type: indexableType
+        attr_reader schema_def_state: State
 
+        def rollover: (::Symbol, ::String) -> void
+        def route_with: (::String) -> void
         def uses_custom_routing?: () -> bool
         def to_index_config: () -> ::Hash[::String, untyped]
         def to_index_template_config: () -> ::Hash[::String, untyped]
@@ -16,6 +19,7 @@ module ElasticGraph
 
         private
 
+        def public_field_path: (::String, explanation: ::String) -> SchemaElements::FieldPath
         def date_and_datetime_types: () -> ::Array[::String]
       end
     end

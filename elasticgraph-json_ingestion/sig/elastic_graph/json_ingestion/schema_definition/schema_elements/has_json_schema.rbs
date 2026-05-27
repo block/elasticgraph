@@ -1,0 +1,14 @@
+module ElasticGraph
+  module JSONIngestion
+    module SchemaDefinition
+      module SchemaElements
+        module HasJSONSchema
+          @json_schema_options: ::Hash[::Symbol, untyped]
+
+          def json_schema_options: () -> ::Hash[::Symbol, untyped]
+          def json_schema: (**untyped) -> void
+        end
+      end
+    end
+  end
+end
