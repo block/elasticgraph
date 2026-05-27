@@ -6,6 +6,7 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/errors"
 require "elastic_graph/json_ingestion/schema_definition/json_schema_option_validator"
 
 module ElasticGraph

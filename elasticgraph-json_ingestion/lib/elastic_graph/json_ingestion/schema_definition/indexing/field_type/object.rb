@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "delegate"
+require "elastic_graph/errors"
 require "elastic_graph/schema_definition/indexing/field_type/object"
 require "elastic_graph/support/hash_util"
 

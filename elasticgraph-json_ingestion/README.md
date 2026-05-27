@@ -2,8 +2,8 @@
 
 JSON Schema ingestion support for ElasticGraph.
 
-This gem contains the JSON Schema helper code used by schema definition to generate indexing
-event schemas and merge ElasticGraph metadata into versioned schema artifacts.
+This gem provides the schema-definition extension that generates JSON Schema artifacts for indexing
+events and validates JSON-ingestion-specific schema options.
 
 ## Dependency Diagram
 
@@ -17,7 +17,4 @@ graph LR;
     elasticgraph-support["elasticgraph-support"];
     elasticgraph-json_ingestion --> elasticgraph-support;
     class elasticgraph-support otherEgGemStyle;
-    elasticgraph-schema_definition["elasticgraph-schema_definition"];
-    elasticgraph-schema_definition --> elasticgraph-json_ingestion;
-    class elasticgraph-schema_definition otherEgGemStyle;
 ```

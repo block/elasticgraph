@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/constants"
+require "elastic_graph/errors"
 require "elastic_graph/graphql/scalar_coercion_adapters/valid_time_zones"
 require "elastic_graph/json_ingestion/schema_definition/factory_extension"
 require "elastic_graph/json_ingestion/schema_definition/state_extension"
@@ -18,7 +19,7 @@ module ElasticGraph
     # {SchemaDefinition::APIExtension} is the primary entry point and should be used as a schema definition extension module.
     module SchemaDefinition
       # Module designed to be extended onto an {ElasticGraph::SchemaDefinition::API} instance
-      # to add JSON Schema ingestion serializer capabilities.
+      # to add JSON Schema artifact generation capabilities.
       module APIExtension
         # Default JSON schema options applied to ElasticGraph's built-in scalar types when this extension
         # is loaded. Keyed by the un-overridden type name; the lookup at runtime maps each key through
@@ -45,7 +46,8 @@ module ElasticGraph
         # @return [void]
         # @api private
         def self.extended(api)
-          api.state.extend(StateExtension)
+          state = api.state.extend(StateExtension) # : ElasticGraph::SchemaDefinition::State & StateExtension
+          state.reserved_type_names << EVENT_ENVELOPE_JSON_SCHEMA_NAME
           api.factory.extend FactoryExtension
 
           # Build a lookup from final (post-`type_name_overrides`) names to JSON schema options. We can't
@@ -80,7 +82,7 @@ module ElasticGraph
         # version number. The publisher will then include this version number in published events to identify the version of the schema it
         # was using. This avoids the need to deploy the publisher and ElasticGraph indexer at the same time to keep them in sync.
         #
-        # @note While this is an important part of how ElasticGraph is designed to support schema evolution, it can be annoying constantly
+        # @note While this is an important part of how ElasticGraph is designed to support schema evolution, it can be annoying to constantly
         #   have to increment this while rapidly changing the schema during prototyping. You can disable the requirement to increment this
         #   on every JSON schema change with {#enforce_json_schema_version}.
         #

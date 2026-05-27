@@ -80,7 +80,6 @@ module ElasticGraph
               type_name: type_name,
               subfields: subfields,
               mapping_options: mapping_options,
-              json_schema_options: json_schema_options,
               doc_comment: doc_comment
             ),
             json_schema_options: json_schema_options

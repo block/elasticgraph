@@ -4,6 +4,8 @@ module ElasticGraph
       module SchemaArtifactManagerExtension : ::ElasticGraph::SchemaDefinition::SchemaArtifactManager
         private
 
+        @json_schemas_artifact: ::ElasticGraph::SchemaDefinition::SchemaArtifact[untyped]?
+
         def json_ingestion_schema_definition_results: () -> (::ElasticGraph::SchemaDefinition::Results & ResultsExtension)
         def json_ingestion_state: () -> (::ElasticGraph::SchemaDefinition::State & StateExtension)
         def artifacts_from_schema_def: () -> ::Array[::ElasticGraph::SchemaDefinition::SchemaArtifact[untyped]]

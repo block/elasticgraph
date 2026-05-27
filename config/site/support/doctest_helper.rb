@@ -52,6 +52,7 @@ module ElasticGraph
     descriptions_needing_schema_def_api_and_extension_modules = {
       "ElasticGraph.define_schema" => [],
       "ElasticGraph::Apollo::SchemaDefinition" => [ElasticGraph::Apollo::SchemaDefinition::APIExtension],
+      "ElasticGraph::JSONIngestion::SchemaDefinition" => [],
       "ElasticGraph::SchemaDefinition" => [],
       "ElasticGraph::Warehouse::SchemaDefinition" => [ElasticGraph::Warehouse::SchemaDefinition::APIExtension]
     }
@@ -61,7 +62,7 @@ module ElasticGraph
         @api = SchemaDefinition::API.new(
           SchemaArtifacts::RuntimeMetadata::SchemaElementNames.new(form: :camelCase, overrides: {}),
           true,
-          extension_modules: extension_modules
+          extension_modules: [JSONIngestion::SchemaDefinition::APIExtension] + extension_modules
         )
 
         # This is required in all schemas, but we don't want to have to put in all our examples,
@@ -111,6 +112,7 @@ module ElasticGraph
         # `schema.json_schema_version` raises an error when the version is set more than once.
         # By default we set it above. Here we clear it to allow our example to set it.
         schema.state.json_schema_version = nil
+        schema.state.json_schema_version_setter_location = nil
       end
     end
 

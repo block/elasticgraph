@@ -85,8 +85,6 @@ module ElasticGraph
       #   @private
       # @!attribute [rw] computation_detail
       #   @private
-      # @!attribute [rw] non_nullable_in_json_schema
-      #   @private
       # @!attribute [rw] as_input
       #   @private
       class Field < Struct.new(
@@ -95,7 +93,7 @@ module ElasticGraph
         :aggregated_values_customizations, :sort_order_enum_value_customizations, :args,
         :sortable, :filterable, :aggregatable, :groupable, :highlightable, :returnable,
         :graphql_only, :source, :runtime_field_script, :relationship, :singular_name,
-        :computation_detail, :non_nullable_in_json_schema, :as_input,
+        :computation_detail, :as_input,
         :name_in_index, :resolver
       )
         include Mixins::HasDocumentation
@@ -140,7 +138,6 @@ module ElasticGraph
             # the `_name` suffix on the attribute for clarity.
             singular_name: singular,
             name_in_index: name_in_index,
-            non_nullable_in_json_schema: false,
             as_input: as_input,
             resolver: resolver
           )
@@ -466,22 +463,6 @@ module ElasticGraph
           customize_highlights_field(&customization_block)
           customize_sub_aggregations_field(&customization_block)
           customize_sort_order_enum_values(&customization_block)
-        end
-
-        # (see Mixins::HasTypeInfo#json_schema)
-        def json_schema(nullable: nil, **options)
-          if options.key?(:type)
-            raise Errors::SchemaError, "Cannot override JSON schema type of field `#{name}` with `#{options.fetch(:type)}`"
-          end
-
-          case nullable
-          when true
-            raise Errors::SchemaError, "`nullable: true` is not allowed on a field--just declare the GraphQL field as being nullable (no `!` suffix) instead."
-          when false
-            self.non_nullable_in_json_schema = true
-          end
-
-          super(**options)
         end
 
         # (see Mixins::HasTypeInfo#mapping)
@@ -1010,9 +991,8 @@ module ElasticGraph
           Indexing::FieldReference.new(
             name: name,
             name_in_index: name_in_index,
-            type: non_nullable_in_json_schema ? type.wrap_non_null : type,
+            type: type,
             mapping_options: mapping_options,
-            json_schema_options: json_schema_options,
             accuracy_confidence: accuracy_confidence,
             source: source,
             runtime_field_script: runtime_field_script,
@@ -1077,11 +1057,11 @@ module ElasticGraph
 
           # :medium is assigned to `Field`s that are inferred from the id fields required by a relation.
           # We make logical guesses about the `indexing_field_type` but if the field is also manually defined,
-          # it could be slightly different (e.g. additional json schema validations), so we have medium
+          # it could be slightly different, so we have medium
           # confidence of these.
           medium: 2,
 
-          # :low is assigned to the ElastcField inferred for the foreign key of an inbound relation. The
+          # :low is assigned to the field inferred for the foreign key of an inbound relation. The
           # nullability/cardinality of the foreign key field cannot be known from the relation metadata,
           # so we just guess what seems safest (`[:nullable]`). If the field is defined another way
           # we should prefer it, so we give these fields :low confidence.

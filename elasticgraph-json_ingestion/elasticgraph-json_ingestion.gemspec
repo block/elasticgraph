@@ -36,8 +36,8 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "elasticgraph-support", ElasticGraph::VERSION
 
-  # This gem's schema-definition extension code references `elasticgraph-schema_definition`, but
-  # applications load it through schema-definition tasks after `elasticgraph-schema_definition` is already
-  # available. Keeping this as a development dependency avoids a runtime dependency cycle.
+  # This gem's extension code references `elasticgraph-schema_definition`, but applications load it
+  # through schema-definition tasks after `elasticgraph-schema_definition` is already available.
+  # Keeping it as a development dependency avoids pulling schema definition into runtime bundles.
   spec.add_development_dependency "elasticgraph-schema_definition", ElasticGraph::VERSION
 end

@@ -6,6 +6,7 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/errors"
 require "elastic_graph/support/hash_util"
 require "elastic_graph/support/json_schema/meta_schema_validator"
 
