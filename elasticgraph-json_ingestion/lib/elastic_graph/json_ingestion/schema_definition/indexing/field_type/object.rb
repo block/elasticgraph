@@ -19,20 +19,20 @@ module ElasticGraph
           #
           # @private
           class Object < DelegateClass(ElasticGraph::SchemaDefinition::Indexing::FieldType::Object)
-            # @dynamic __getobj__, json_schema_options
+            # @dynamic __getobj__, json_schema_options, json_schema_options=
             # @return [Hash<Symbol, Object>] JSON schema options for this object type
-            attr_reader :json_schema_options
+            attr_accessor :json_schema_options
 
             # @param field_type [ElasticGraph::SchemaDefinition::Indexing::FieldType::Object] the object field type to wrap
-            # @param json_schema_options [Hash<Symbol, Object>] JSON schema options for this object type
-            def initialize(field_type, json_schema_options:)
+            def initialize(field_type)
               super(field_type)
-              @json_schema_options = json_schema_options
+              @json_schema_options = {}
             end
 
             # @return [Hash<String, JSONSchemaFieldMetadata>] field metadata keyed by field name
             def json_schema_field_metadata_by_field_name
-              subfields.to_h { |field| [field.name, field.json_schema_metadata] }
+              json_schema_subfields = subfields # : ::Array[Indexing::Field]
+              json_schema_subfields.to_h { |field| [field.name, field.json_schema_metadata] }
             end
 
             # @param customizations [Hash<String, Object>] the customizations to format
@@ -47,15 +47,13 @@ module ElasticGraph
                 if json_schema_options.empty?
                   # Fields that are `sourced_from` an alternate type must not be included in this type's JSON schema,
                   # since events of this type won't include them.
-                  core_other_source_subfields, core_json_schema_candidate_subfields = subfields.partition(&:source)
-                  # @type var other_source_subfields: ::Array[Indexing::Field]
-                  other_source_subfields = _ = core_other_source_subfields
+                  json_schema_candidate_fields = subfields # : ::Array[Indexing::Field]
+                  other_source_subfields, json_schema_candidate_subfields = json_schema_candidate_fields.partition(&:source)
                   validate_sourced_fields_have_no_json_schema_overrides(other_source_subfields)
-                  # @type var json_schema_candidate_subfields: ::Array[Indexing::Field]
-                  json_schema_candidate_subfields = _ = core_json_schema_candidate_subfields
                   json_schema_subfields = json_schema_candidate_subfields.reject(&:runtime_field_script)
                   required_fields = json_schema_subfields
-                  required_fields = required_fields.reject(&:nullable?) if schema_def_state.allow_omitted_json_schema_fields
+                  state = schema_def_state # : ::ElasticGraph::SchemaDefinition::State & ::ElasticGraph::JSONIngestion::SchemaDefinition::StateExtension
+                  required_fields = required_fields.reject(&:nullable?) if state.allow_omitted_json_schema_fields
 
                   {
                     "type" => "object",
@@ -64,7 +62,7 @@ module ElasticGraph
                     # we want it validated (as we do by merging in `json_schema_typename_field`) but we only want
                     # to require it in the context of a union type. The union's JSON schema requires the field.
                     "required" => required_fields.map(&:name).freeze,
-                    "additionalProperties" => (false unless schema_def_state.allow_extra_json_schema_fields),
+                    "additionalProperties" => (false unless state.allow_extra_json_schema_fields),
                     "description" => doc_comment
                   }.compact.freeze
                 else

@@ -270,17 +270,6 @@ module ElasticGraph
 
         private
 
-        # A regex that requires at least one non-whitespace character.
-        # Note: this does not use the `/S` character class because it's recommended to use a small subset
-        # of Regex syntax:
-        #
-        # > The regular expression syntax used is from JavaScript (ECMA 262, specifically). However, that
-        # > complete syntax is not widely supported, therefore it is recommended that you stick to the subset
-        # > of that syntax described below.
-        #
-        # (From https://json-schema.org/understanding-json-schema/reference/regular_expressions.html)
-        HAS_NON_WHITE_SPACE_REGEX = "[^ \t\n]+"
-
         DEFAULT_SETTINGS = {
           "index.mapping.ignore_malformed" => false,
           "index.mapping.coerce" => false,
