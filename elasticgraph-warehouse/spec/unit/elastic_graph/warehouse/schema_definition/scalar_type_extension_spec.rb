@@ -35,7 +35,6 @@ module ElasticGraph
           results = define_warehouse_schema do |s|
             s.scalar_type "CustomTimestamp" do |t|
               t.mapping type: "date"
-              t.json_schema type: "string", format: "date-time"
               t.warehouse_column type: "TIMESTAMP"
             end
 
@@ -53,7 +52,6 @@ module ElasticGraph
           results = define_warehouse_schema do |s|
             s.scalar_type "UnconfiguredScalar" do |t|
               t.mapping type: "keyword"
-              t.json_schema type: "string"
               # Intentionally NOT calling t.warehouse_column
             end
 

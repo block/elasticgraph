@@ -21,12 +21,15 @@ module ElasticGraph
         #
         # @api private
         class Field < DelegateClass(ElasticGraph::SchemaDefinition::Indexing::Field)
-          # @dynamic __getobj__, json_schema_layers, json_schema_customizations
+          # @dynamic __getobj__, json_schema_layers, json_schema_customizations, doc_comment
           # @return [Array<Symbol>] JSON schema wrapper layers from the field type reference
           attr_reader :json_schema_layers
 
           # @return [Hash<Symbol, Object>] user-defined JSON schema customizations
           attr_reader :json_schema_customizations
+
+          # @return [String, nil] documentation for the field
+          attr_reader :doc_comment
 
           # JSON schema overrides that automatically apply to specific mapping types so that the JSON schema
           # validation will reject values which cannot be indexed into fields of a specific mapping type.
@@ -44,10 +47,12 @@ module ElasticGraph
           # @param field [ElasticGraph::SchemaDefinition::Indexing::Field] the indexing field to wrap
           # @param json_schema_layers [Array<Symbol>] JSON schema wrapper layers from the field type reference
           # @param json_schema_customizations [Hash<Symbol, Object>] user-defined JSON schema customizations
-          def initialize(field, json_schema_layers:, json_schema_customizations:)
+          # @param doc_comment [String, nil] documentation for the field
+          def initialize(field, json_schema_layers:, json_schema_customizations:, doc_comment:)
             super(field)
             @json_schema_layers = json_schema_layers
             @json_schema_customizations = json_schema_customizations
+            @doc_comment = doc_comment
           end
 
           # Returns the JSON schema definition for this field.
@@ -81,7 +86,8 @@ module ElasticGraph
             when Field
               __getobj__ == other.__getobj__ &&
                 json_schema_layers == other.json_schema_layers &&
-                json_schema_customizations == other.json_schema_customizations
+                json_schema_customizations == other.json_schema_customizations &&
+                doc_comment == other.doc_comment
             else
               super
             end
@@ -95,7 +101,7 @@ module ElasticGraph
           #
           # @return [Integer] the hash code
           def hash
-            [__getobj__, json_schema_layers, json_schema_customizations].hash
+            [__getobj__, json_schema_layers, json_schema_customizations, doc_comment].hash
           end
 
           private

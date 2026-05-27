@@ -34,6 +34,7 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = [">= 3.4", "< 4.1"]
 
-  spec.add_development_dependency "elasticgraph-schema_definition", ElasticGraph::VERSION
   spec.add_dependency "elasticgraph-support", ElasticGraph::VERSION
+
+  spec.add_development_dependency "elasticgraph-schema_definition", ElasticGraph::VERSION
 end

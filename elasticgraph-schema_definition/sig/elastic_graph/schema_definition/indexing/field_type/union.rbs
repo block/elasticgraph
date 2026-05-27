@@ -2,13 +2,11 @@ module ElasticGraph
   module SchemaDefinition
     module Indexing
       module FieldType
-        class UnionSuperType
-          attr_reader subtypes_by_name: ::Hash[::String, Object]
-          def self.new: (::Hash[::String, Object]) -> instance
-        end
-
-        class Union < UnionSuperType
+        class Union
           include _FieldType
+
+          attr_reader subtypes_by_name: ::Hash[::String, Object]
+          def initialize: (::Hash[::String, Object]) -> void
         end
       end
     end

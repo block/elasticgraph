@@ -43,7 +43,6 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "elasticgraph-graphql", ElasticGraph::VERSION # needed since we validate that scalar `coerce_with` options are valid (which loads scalar coercion adapters)
   spec.add_dependency "elasticgraph-indexer", ElasticGraph::VERSION # needed since we validate that scalar `prepare_for_indexing_with` options are valid (which loads indexing preparer adapters)
-  spec.add_dependency "elasticgraph-json_ingestion", ElasticGraph::VERSION
   spec.add_dependency "elasticgraph-schema_artifacts", ElasticGraph::VERSION
   spec.add_dependency "elasticgraph-support", ElasticGraph::VERSION
   spec.add_dependency "graphql", "~> 2.6.2"
@@ -52,5 +51,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "elasticgraph-admin", ElasticGraph::VERSION
   spec.add_development_dependency "elasticgraph-datastore_core", ElasticGraph::VERSION
   spec.add_development_dependency "elasticgraph-elasticsearch", ElasticGraph::VERSION
+  # The test suite exercises the default JSON ingestion extension, but the gem remains optional at runtime.
+  spec.add_development_dependency "elasticgraph-json_ingestion", ElasticGraph::VERSION
   spec.add_development_dependency "elasticgraph-opensearch", ElasticGraph::VERSION
 end

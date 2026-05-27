@@ -52,7 +52,7 @@ module ElasticGraph
     descriptions_needing_schema_def_api_and_extension_modules = {
       "ElasticGraph.define_schema" => [],
       "ElasticGraph::Apollo::SchemaDefinition" => [ElasticGraph::Apollo::SchemaDefinition::APIExtension],
-      "ElasticGraph::JSONIngestion::SchemaDefinition" => [ElasticGraph::JSONIngestion::SchemaDefinition::APIExtension],
+      "ElasticGraph::JSONIngestion::SchemaDefinition" => [JSONIngestion::SchemaDefinition::APIExtension],
       "ElasticGraph::SchemaDefinition" => [],
       "ElasticGraph::Warehouse::SchemaDefinition" => [ElasticGraph::Warehouse::SchemaDefinition::APIExtension]
     }
@@ -92,16 +92,11 @@ module ElasticGraph
       end
     end
 
-    [
-      "ElasticGraph::JSONIngestion::SchemaDefinition::APIExtension#json_schema_version",
-      "ElasticGraph::SchemaDefinition::API#json_schema_version"
-    ].each do |description|
-      doctest.before description do
-        ElasticGraph.define_schema do |schema|
-          # `schema.json_schema_version` raises an error when the version is set more than once.
-          # By default we set it above. Here we clear it to allow our example to set it.
-          schema.state.json_schema_version = nil
-        end
+    doctest.before "ElasticGraph::JSONIngestion::SchemaDefinition::APIExtension#json_schema_version" do
+      ElasticGraph.define_schema do |schema|
+        # `schema.json_schema_version` raises an error when the version is set more than once.
+        # By default we set it above. Here we clear it to allow our example to set it.
+        schema.state.json_schema_version = nil
       end
     end
 
