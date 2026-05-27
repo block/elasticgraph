@@ -5,6 +5,7 @@ module ElasticGraph
         module FieldType
           class Union
             include _UnionFieldType
+            include UnionExtension
 
             @field_type: ::ElasticGraph::SchemaDefinition::Indexing::FieldType::Union
 

@@ -6,6 +6,7 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/json_ingestion/schema_definition/indexing/field_type/scalar_extension"
 require "elastic_graph/schema_definition/indexing/field_type/scalar"
 
 module ElasticGraph
@@ -17,6 +18,8 @@ module ElasticGraph
           #
           # @private
           class Scalar
+            include ScalarExtension
+
             def self.wrap(field_type)
               new(field_type)
             end

@@ -5,6 +5,7 @@ module ElasticGraph
         module FieldType
           class Object
             include _ObjectFieldType
+            include ObjectExtension
 
             @field_type: ::ElasticGraph::SchemaDefinition::Indexing::FieldType::Object
 

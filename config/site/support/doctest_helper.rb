@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/apollo/schema_definition/api_extension"
+require "elastic_graph/json_ingestion/schema_definition/api_extension"
 require "elastic_graph/schema_artifacts/runtime_metadata/schema_element_names"
 require "elastic_graph/schema_definition/api"
 require "elastic_graph/schema_definition/schema_artifact_manager"
@@ -88,6 +89,21 @@ module ElasticGraph
         # Dump the artifacts to surface any issues with the schema definition.
         artifacts_manager.dump_artifacts
       end
+    end
+
+    doctest.before "ElasticGraph::JSONIngestion::SchemaDefinition" do
+      @api = SchemaDefinition::API.new(
+        SchemaArtifacts::RuntimeMetadata::SchemaElementNames.new(form: :camelCase, overrides: {}),
+        true,
+        extension_modules: [JSONIngestion::SchemaDefinition::APIExtension]
+      )
+
+      @api.json_schema_version 1
+      ::Thread.current[:ElasticGraph_SchemaDefinition_API_instance] = @api
+    end
+
+    doctest.after "ElasticGraph::JSONIngestion::SchemaDefinition" do
+      ::Thread.current[:ElasticGraph_SchemaDefinition_API_instance] = nil
     end
 
     doctest.before "ElasticGraph::SchemaDefinition::API#json_schema_version" do

@@ -5,6 +5,7 @@ module ElasticGraph
         module FieldType
           class Enum
             include _EnumFieldType
+            include EnumExtension
 
             @field_type: ::ElasticGraph::SchemaDefinition::Indexing::FieldType::Enum
 

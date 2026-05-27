@@ -6,6 +6,7 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/json_ingestion/schema_definition/indexing/field_type/enum_extension"
 require "elastic_graph/schema_definition/indexing/field_type/enum"
 
 module ElasticGraph
@@ -18,6 +19,8 @@ module ElasticGraph
           #
           # @private
           class Enum
+            include EnumExtension
+
             def self.wrap(field_type)
               new(field_type)
             end

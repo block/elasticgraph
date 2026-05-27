@@ -6,6 +6,8 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/json_ingestion/schema_definition/indexing/field"
+
 module ElasticGraph
   module JSONIngestion
     module SchemaDefinition
@@ -21,11 +23,17 @@ module ElasticGraph
         #
         # @api private
         class FieldReference < ::Data
-          # Resolves this field reference, or `nil` if unresolvable.
+          # Resolves this field reference into a JSON-schema-aware field, or `nil` if unresolvable.
           #
           # @return [ElasticGraph::SchemaDefinition::Indexing::Field, nil]
           def resolve
-            field_reference.resolve
+            return nil unless (resolved_field = field_reference.resolve)
+
+            json_schema_field = resolved_field.extend(Indexing::FieldExtension) # : ElasticGraph::SchemaDefinition::Indexing::Field & FieldExtension
+            json_schema_field.with_json_schema(
+              json_schema_layers: json_schema_layers,
+              json_schema_customizations: json_schema_customizations
+            )
           end
 
           # @dynamic initialize, with, field_reference, json_schema_layers, json_schema_customizations

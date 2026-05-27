@@ -1,0 +1,9 @@
+module ElasticGraph
+  module JSONIngestion
+    module SchemaDefinition
+      module JSONSchemaOptionValidator
+        def self.validate!: (untyped, ::Hash[::Symbol, untyped]) -> void
+      end
+    end
+  end
+end

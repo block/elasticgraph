@@ -19,7 +19,7 @@ module ElasticGraph
             ?json_schema_customizations: ::Hash[::Symbol, untyped]
           ) -> FieldReference
 
-          def resolve: () -> ::ElasticGraph::SchemaDefinition::Indexing::Field?
+          def resolve: () -> (::ElasticGraph::SchemaDefinition::Indexing::Field & FieldExtension)?
         end
       end
     end

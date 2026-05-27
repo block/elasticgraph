@@ -6,6 +6,7 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/json_ingestion/schema_definition/indexing/field_type/object_extension"
 require "elastic_graph/schema_definition/indexing/field_type/object"
 
 module ElasticGraph
@@ -17,8 +18,10 @@ module ElasticGraph
           #
           # @private
           class Object
+            include ObjectExtension
+
             def self.wrap(field_type, json_schema_options:)
-              new(field_type)
+              new(field_type).with_json_schema_options(json_schema_options)
             end
 
             def initialize(field_type)

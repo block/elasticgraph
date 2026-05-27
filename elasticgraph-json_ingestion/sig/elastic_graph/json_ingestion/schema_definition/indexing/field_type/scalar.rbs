@@ -5,6 +5,7 @@ module ElasticGraph
         module FieldType
           class Scalar
             include _ScalarFieldType
+            include ScalarExtension
 
             @field_type: ::ElasticGraph::SchemaDefinition::Indexing::FieldType::Scalar
 

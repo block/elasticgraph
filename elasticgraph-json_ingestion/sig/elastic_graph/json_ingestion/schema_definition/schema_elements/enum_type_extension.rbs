@@ -1,0 +1,15 @@
+module ElasticGraph
+  module JSONIngestion
+    module SchemaDefinition
+      module SchemaElements
+        module EnumTypeExtension: ::ElasticGraph::SchemaDefinition::SchemaElements::EnumType
+          def to_indexing_field_type: () -> Indexing::FieldType::Enum
+
+          private
+
+          def configure_derived_scalar_type: (::ElasticGraph::SchemaDefinition::SchemaElements::ScalarType & ScalarTypeExtension) -> void
+        end
+      end
+    end
+  end
+end
