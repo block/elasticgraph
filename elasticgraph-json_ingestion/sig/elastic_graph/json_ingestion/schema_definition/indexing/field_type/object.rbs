@@ -1,0 +1,23 @@
+module ElasticGraph
+  module JSONIngestion
+    module SchemaDefinition
+      module Indexing
+        module FieldType
+          class Object
+            include _ObjectFieldType
+
+            @field_type: ::ElasticGraph::SchemaDefinition::Indexing::FieldType::Object
+
+            def self.wrap: (
+              ::ElasticGraph::SchemaDefinition::Indexing::FieldType::Object,
+              json_schema_options: ::Hash[::Symbol, untyped]
+            ) -> Object
+
+            def initialize: (::ElasticGraph::SchemaDefinition::Indexing::FieldType::Object) -> void
+            def to_mapping: () -> ::Hash[::String, untyped]
+          end
+        end
+      end
+    end
+  end
+end

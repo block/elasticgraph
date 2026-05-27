@@ -1,0 +1,27 @@
+module ElasticGraph
+  module JSONIngestion
+    module SchemaDefinition
+      module Indexing
+        interface _EnumFieldType
+          def enum_value_names: () -> ::Array[::String]
+        end
+
+        interface _ObjectFieldType
+          def schema_def_state: () -> ::ElasticGraph::SchemaDefinition::State
+          def type_name: () -> ::String
+          def subfields: () -> ::Array[::ElasticGraph::SchemaDefinition::Indexing::Field]
+          def mapping_options: () -> ::ElasticGraph::SchemaDefinition::Mixins::HasTypeInfo::optionsHash
+          def doc_comment: () -> ::String?
+        end
+
+        interface _ScalarFieldType
+          def scalar_type: () -> ::ElasticGraph::SchemaDefinition::SchemaElements::ScalarType
+        end
+
+        interface _UnionFieldType
+          def subtypes_by_name: () -> ::Hash[::String, ::Object]
+        end
+      end
+    end
+  end
+end

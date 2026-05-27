@@ -1,0 +1,19 @@
+module ElasticGraph
+  module JSONIngestion
+    module SchemaDefinition
+      module Indexing
+        module FieldType
+          class Scalar
+            include _ScalarFieldType
+
+            @field_type: ::ElasticGraph::SchemaDefinition::Indexing::FieldType::Scalar
+
+            def self.wrap: (::ElasticGraph::SchemaDefinition::Indexing::FieldType::Scalar) -> Scalar
+            def initialize: (::ElasticGraph::SchemaDefinition::Indexing::FieldType::Scalar) -> void
+            def to_mapping: () -> ::Hash[::String, untyped]
+          end
+        end
+      end
+    end
+  end
+end

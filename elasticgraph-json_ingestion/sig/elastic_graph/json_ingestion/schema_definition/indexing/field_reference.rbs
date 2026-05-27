@@ -1,0 +1,27 @@
+module ElasticGraph
+  module JSONIngestion
+    module SchemaDefinition
+      module Indexing
+        class FieldReference
+          attr_reader field_reference: ::ElasticGraph::SchemaDefinition::Indexing::FieldReference
+          attr_reader json_schema_layers: ::ElasticGraph::SchemaDefinition::jsonSchemaLayersArray
+          attr_reader json_schema_customizations: ::Hash[::Symbol, untyped]
+
+          def initialize: (
+            field_reference: ::ElasticGraph::SchemaDefinition::Indexing::FieldReference,
+            json_schema_layers: ::ElasticGraph::SchemaDefinition::jsonSchemaLayersArray,
+            json_schema_customizations: ::Hash[::Symbol, untyped]
+          ) -> void
+
+          def with: (
+            ?field_reference: ::ElasticGraph::SchemaDefinition::Indexing::FieldReference,
+            ?json_schema_layers: ::ElasticGraph::SchemaDefinition::jsonSchemaLayersArray,
+            ?json_schema_customizations: ::Hash[::Symbol, untyped]
+          ) -> FieldReference
+
+          def resolve: () -> ::ElasticGraph::SchemaDefinition::Indexing::Field?
+        end
+      end
+    end
+  end
+end

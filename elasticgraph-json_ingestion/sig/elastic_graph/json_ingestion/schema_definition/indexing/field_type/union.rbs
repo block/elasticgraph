@@ -1,0 +1,19 @@
+module ElasticGraph
+  module JSONIngestion
+    module SchemaDefinition
+      module Indexing
+        module FieldType
+          class Union
+            include _UnionFieldType
+
+            @field_type: ::ElasticGraph::SchemaDefinition::Indexing::FieldType::Union
+
+            def self.wrap: (::ElasticGraph::SchemaDefinition::Indexing::FieldType::Union) -> Union
+            def initialize: (::ElasticGraph::SchemaDefinition::Indexing::FieldType::Union) -> void
+            def to_mapping: () -> ::Hash[::String, untyped]
+          end
+        end
+      end
+    end
+  end
+end
