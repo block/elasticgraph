@@ -32,7 +32,8 @@ module ElasticGraph
 
             # @return [Hash<String, Object>] the JSON schema definition for this scalar type
             def to_json_schema
-              Support::HashUtil.stringify_keys(scalar_type.json_schema_options)
+              json_scalar_type = scalar_type # : ElasticGraph::SchemaDefinition::SchemaElements::ScalarType & SchemaElements::ScalarTypeExtension
+              Support::HashUtil.stringify_keys(json_scalar_type.json_schema_options)
             end
           end
         end

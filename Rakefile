@@ -8,9 +8,10 @@
 
 require "delegate"
 require "elastic_graph/apollo/schema_definition/api_extension"
-require "elastic_graph/warehouse/schema_definition/api_extension"
+require "elastic_graph/json_ingestion/schema_definition/api_extension"
 require "elastic_graph/local/rake_tasks"
 require "elastic_graph/schema_definition/rake_tasks"
+require "elastic_graph/warehouse/schema_definition/api_extension"
 require "yaml"
 
 project_root = File.expand_path(__dir__)
@@ -91,6 +92,7 @@ configure_local_rake_tasks = ->(tasks) do
   tasks.opensearch_versions = tested_datastore_versions.fetch("opensearch")
 
   ENV["DEMONSTRATE_WAREHOUSE_APIS"] = "true"
+  tasks.schema_definition_extension_modules << ElasticGraph::JSONIngestion::SchemaDefinition::APIExtension
   tasks.schema_definition_extension_modules << ElasticGraph::Warehouse::SchemaDefinition::APIExtension
 end
 

@@ -19,14 +19,18 @@ module ElasticGraph
           #
           # @private
           class Object < DelegateClass(ElasticGraph::SchemaDefinition::Indexing::FieldType::Object)
-            # @dynamic __getobj__, json_schema_options, json_schema_options=
+            # @dynamic __getobj__, json_schema_options, json_schema_options=, doc_comment, doc_comment=
             # @return [Hash<Symbol, Object>] JSON schema options for this object type
             attr_accessor :json_schema_options
+
+            # @return [String, nil] documentation for the object type
+            attr_accessor :doc_comment
 
             # @param field_type [ElasticGraph::SchemaDefinition::Indexing::FieldType::Object] the object field type to wrap
             def initialize(field_type)
               super(field_type)
               @json_schema_options = {}
+              @doc_comment = nil
             end
 
             # @return [Hash<String, JSONSchemaFieldMetadata>] field metadata keyed by field name
@@ -74,7 +78,8 @@ module ElasticGraph
               case other
               when Object
                 __getobj__ == other.__getobj__ &&
-                  json_schema_options == other.json_schema_options
+                  json_schema_options == other.json_schema_options &&
+                  doc_comment == other.doc_comment
               else
                 super
               end
@@ -85,7 +90,7 @@ module ElasticGraph
             end
 
             def hash
-              [__getobj__, json_schema_options].hash
+              [__getobj__, json_schema_options, doc_comment].hash
             end
 
             private

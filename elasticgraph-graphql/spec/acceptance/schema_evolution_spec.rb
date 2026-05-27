@@ -8,6 +8,7 @@
 
 require "elastic_graph/graphql"
 require "elastic_graph/indexer"
+require "elastic_graph/json_ingestion/schema_definition/api_extension"
 require "elastic_graph/schema_definition/rake_tasks"
 require "support/graphql"
 
@@ -65,6 +66,7 @@ module ElasticGraph
       run_rake "schema_artifacts:dump" do |output|
         SchemaDefinition::RakeTasks.new(
           schema_element_name_form: :snake_case,
+          extension_modules: [JSONIngestion::SchemaDefinition::APIExtension],
           index_document_sizes: true,
           path_to_schema: path_to_schema,
           schema_artifacts_directory: "config/schema/artifacts",

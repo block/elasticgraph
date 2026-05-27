@@ -453,6 +453,7 @@ module ElasticGraph
 
           # Ensure `Query` doesn't have a typical ElasticGraph query field that it includes for all indexed types (including union indexed types)
           expect(type_def_from(schema_string, "Query")).to exclude("__entitys", "_EntityConnection")
+          expect(schema_state.object_types_by_name.fetch("_Entity")).not_to be_root_document_type
         end
 
         it "has minimal impact on schema artifacts that are not used by the ElasticGraph GraphQL engine" do
@@ -460,7 +461,6 @@ module ElasticGraph
           without_apollo_results = define_schema(with_apollo: false) { |s| define_some_types_on(s) }
 
           expect(with_apollo_results.datastore_scripts).to eq(without_apollo_results.datastore_scripts)
-          expect(with_apollo_results.json_schemas_for(1)).to eq(without_apollo_results.json_schemas_for(1))
           expect(with_apollo_results.indices).to eq(without_apollo_results.indices)
           expect(with_apollo_results.index_templates).to eq(without_apollo_results.index_templates)
 

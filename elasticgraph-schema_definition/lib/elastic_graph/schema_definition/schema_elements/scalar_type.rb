@@ -25,7 +25,6 @@ module ElasticGraph
       #   ElasticGraph.define_schema do |schema|
       #     schema.scalar_type "URL" do |t|
       #       t.mapping type: "keyword"
-      #       t.json_schema type: "string", format: "uri"
       #     end
       #   end
       #
@@ -60,7 +59,7 @@ module ElasticGraph
         include Mixins::HasReadableToSAndInspect.new { |t| t.name }
 
         # `HasTypeInfo` provides the following methods:
-        # @dynamic mapping_options, json_schema_options
+        # @dynamic mapping_options
         include Mixins::HasTypeInfo
 
         # @dynamic graphql_only?
@@ -78,13 +77,8 @@ module ElasticGraph
 
           yield self
 
-          missing = [
-            ("`mapping`" if mapping_options.empty?),
-            ("`json_schema`" if json_schema_options.empty?)
-          ].compact
-
-          if missing.any?
-            raise Errors::SchemaError, "Scalar types require `mapping` and `json_schema` to be configured, but `#{name}` lacks #{missing.join(" and ")}."
+          if mapping_options.empty?
+            raise Errors::SchemaError, "Scalar types require `mapping` to be configured, but `#{name}` lacks `mapping`."
           end
 
           if (placeholder = inferred_grouping_missing_value_placeholder)
@@ -121,7 +115,6 @@ module ElasticGraph
         #   ElasticGraph.define_schema do |schema|
         #     schema.scalar_type "PhoneNumber" do |t|
         #       t.mapping type: "keyword"
-        #       t.json_schema type: "string", pattern: "^\\+[1-9][0-9]{1,14}$"
         #       t.coerce_with "CoercionAdapters::PhoneNumber", defined_at: "./coercion_adapters/phone_number"
         #     end
         #   end
@@ -147,7 +140,6 @@ module ElasticGraph
         #   ElasticGraph.define_schema do |schema|
         #     schema.scalar_type "PhoneNumber" do |t|
         #       t.mapping type: "keyword"
-        #       t.json_schema type: "string", pattern: "^\\+[1-9][0-9]{1,14}$"
         #
         #       t.prepare_for_indexing_with "IndexingPreparers::PhoneNumber",
         #         defined_at: "./indexing_preparers/phone_number"
@@ -172,7 +164,6 @@ module ElasticGraph
         #   ElasticGraph.define_schema do |schema|
         #     schema.scalar_type "BigInt" do |t|
         #       t.mapping type: "long"
-        #       t.json_schema type: "integer", minimum: -(2**53) + 1, maximum: (2**53) - 1
         #       t.grouping_missing_value_placeholder "NaN"
         #     end
         #   end
@@ -343,23 +334,8 @@ module ElasticGraph
             MISSING_STRING_PLACEHOLDER
           elsif FLOAT_TYPES.include?(mapping_type)
             MISSING_NUMERIC_PLACEHOLDER
-          elsif mapping_type == "long"
-            # It is only safe to use NaN for a long when the long's range is safe to coerce to a float
-            # without loss of precision. This is because using NaN as the missing value will cause
-            # the datastore to coerce the other bucket keys to float.
-            # JSON schema min/max only constrains newly indexed values, not existing data that may fall outside the range before the constraints were added.
-            # This is an edge case where the long range may exceed safe float precision.
-            # In this case, users can set grouping_missing_value_placeholder to nil.
-            if (json_schema_options[:minimum] || LONG_STRING_MIN) >= JSON_SAFE_LONG_MIN &&
-                (json_schema_options[:maximum] || LONG_STRING_MAX) <= JSON_SAFE_LONG_MAX
-              inferred_numeric_placeholder_for_integer_type
-            end
-          elsif mapping_type == "unsigned_long"
-            # Similar to the checks above for long except we only need to check the max
-            # (since the min is zero even if not specified)
-            if (json_schema_options[:maximum] || LONG_STRING_MAX) <= JSON_SAFE_LONG_MAX
-              inferred_numeric_placeholder_for_integer_type
-            end
+          elsif mapping_type == "long" || mapping_type == "unsigned_long"
+            nil
           elsif INTEGER_TYPES.include?(mapping_type)
             # All other integer types can safely be coerced to float without loss of precision
             inferred_numeric_placeholder_for_integer_type

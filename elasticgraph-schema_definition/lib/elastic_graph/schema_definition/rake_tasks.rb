@@ -6,8 +6,8 @@
 #
 # frozen_string_literal: true
 
-require "rake/tasklib"
 require "elastic_graph/schema_artifacts/runtime_metadata/schema_element_names"
+require "rake/tasklib"
 
 module ElasticGraph
   module SchemaDefinition
@@ -40,7 +40,7 @@ module ElasticGraph
       # @param enum_value_overrides_by_type [Hash<Symbol, Hash<Symbol, String>>] overrides for the names of specific enum values for
       #   specific enum types. For example, to rename the `DayOfWeek.MONDAY` enum to `DayOfWeek.MON`, pass `{DayOfWeek: {MONDAY: "MON"}}`.
       # @param extension_modules [Array<Module>] List of Ruby modules to extend onto the `SchemaDefinition::API` instance. Designed to
-      #   support ElasticGraph extension gems (such as `elasticgraph-apollo`).
+      #   support ElasticGraph extension gems (such as `elasticgraph-apollo` and `elasticgraph-json_ingestion`).
       # @param output [IO] used for printing task output
       #
       # @example Minimal setup with defaults
