@@ -1,0 +1,21 @@
+module ElasticGraph
+  module JSONIngestion
+    module SchemaDefinition
+      module SchemaElements
+        module FieldExtension: ::ElasticGraph::SchemaDefinition::SchemaElements::Field
+          @json_schema_options: ::Hash[::Symbol, untyped]
+          @non_nullable_in_json_schema: bool
+
+          def json_schema_options: () -> ::Hash[::Symbol, untyped]
+          def non_nullable_in_json_schema?: () -> bool
+          def json_schema: (?nullable: bool?, **untyped) -> void
+          def to_indexing_field_reference: () -> Indexing::FieldReference?
+
+          private
+
+          def type_for_json_schema: () -> (::ElasticGraph::SchemaDefinition::SchemaElements::TypeReference & TypeReferenceExtension)
+        end
+      end
+    end
+  end
+end
