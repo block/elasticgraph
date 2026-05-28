@@ -2195,7 +2195,7 @@ scripts:
 
         // No timestamp values matched the params, so return `false`.
         return false;
-  update_index_data_cd5bc011d0885b2dfd793c9f119f068d:
+  update_index_data_59be3b4ab537ea412a3ead0408fb4137:
     context: update
     script:
       lang: painless
@@ -2277,7 +2277,7 @@ scripts:
         // ============================================================
 
         // Initializes internal bookkeeping structures (__sources, __versions, __counts, __nested_sourced_data).
-        void setup(Map source, String relationship, String nestedElementKey, Map counts) {
+        void setup(Map source, String relationship, String nestedElementKey, Map nestedSourcedPaths, Map counts) {
           if (source.__sources == null) {
             source.__sources = [];
           }
@@ -2299,7 +2299,7 @@ scripts:
               source.__nested_sourced_data = [:];
             }
             if (source.__nested_sourced_data[relationship] == null) {
-              source.__nested_sourced_data[relationship] = [:];
+              source.__nested_sourced_data[relationship] = ["path_segments": nestedSourcedPaths.get(relationship), "data": [:]];
             }
           }
 
@@ -2365,27 +2365,28 @@ scripts:
             return;
           }
 
-          source.__nested_sourced_data[relationship][nestedElementKey] = nestedSourcedFields;
+          ((Map) source.__nested_sourced_data[relationship]).get("data").put(nestedElementKey, nestedSourcedFields);
         }
 
         // Applies nested sourced data from the __nested_sourced_data buffer to matched nested elements.
+        // Reads path config from the document itself — no external params needed.
         // Called after every event so that after a self-event's putAll overwrites nested arrays,
         // the buffered data gets re-applied.
-        void applyNestedSourcedData(Map source, Map nestedSourcedPaths) {
-          if (source.__nested_sourced_data == null || nestedSourcedPaths.isEmpty()) {
+        void applyNestedSourcedData(Map source) {
+          if (source.__nested_sourced_data == null) {
             return;
           }
 
           for (sourcedEntry in source.__nested_sourced_data.entrySet()) {
-            String sourcedRelationship = sourcedEntry.getKey();
-            Map elementDataByKey = (Map) sourcedEntry.getValue();
+            Map relationshipData = (Map) sourcedEntry.getValue();
+            List pathSegments = (List) relationshipData.get("path_segments");
+            Map dataByKey = (Map) relationshipData.get("data");
 
-            List pathSegments = (List) nestedSourcedPaths.get(sourcedRelationship);
-            if (pathSegments == null) {
+            if (pathSegments == null || dataByKey == null) {
               continue;
             }
 
-            for (elementEntry in elementDataByKey.entrySet()) {
+            for (elementEntry in dataByKey.entrySet()) {
               List keyParts = splitNestedElementKey((String) elementEntry.getKey());
               if (keyParts.size() != pathSegments.size()) {
                 continue;
@@ -2438,9 +2439,9 @@ scripts:
 
         String nestedElementKey = buildNestedElementKeyForRelationship(relationship, nestedSourcedPaths, nestedSourcedPathIdentifiers);
 
-        setup(source, relationship, nestedElementKey, counts);
+        setup(source, relationship, nestedElementKey, nestedSourcedPaths, counts);
         validateSource(source, id, relationship, sourceId, eventVersion, nestedElementKey);
         applyTopLevelFields(source, id, params.topLevelFields, counts);
         storeNestedSourcedData(source, relationship, nestedSourcedFields, nestedElementKey);
-        applyNestedSourcedData(source, nestedSourcedPaths);
+        applyNestedSourcedData(source);
         recordSource(source, relationship, sourceId, eventVersion, nestedElementKey);

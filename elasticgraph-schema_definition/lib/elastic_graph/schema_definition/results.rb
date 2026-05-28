@@ -145,20 +145,11 @@ module ElasticGraph
       end
 
       def build_runtime_metadata
-        extra_update_targets_by_object_type_name, nested_sourced_paths_by_type_name = identify_extra_update_targets_by_object_type_name
+        extra_update_targets_by_object_type_name = identify_extra_update_targets_by_object_type_name
 
         object_types_by_name = all_types
           .select { |t| t.respond_to?(:graphql_fields_by_name) }
-          .to_h do |type|
-            extra_targets = extra_update_targets_by_object_type_name.fetch(type.name) { [] } # : ::Array[SchemaArtifacts::RuntimeMetadata::UpdateTarget]
-            metadata = if type.respond_to?(:own_index_def)
-              nested_config = nested_sourced_paths_by_type_name.fetch(type.name) { {} } # : ::Hash[::String, ::Array[::Hash[::String, untyped]]]
-              (_ = type).runtime_metadata(extra_targets, nested_sourced_paths: nested_config)
-            else
-              (_ = type).runtime_metadata(extra_targets)
-            end
-            [type.name, metadata]
-          end
+          .to_h { |type| [type.name, (_ = type).runtime_metadata(extra_update_targets_by_object_type_name.fetch(type.name) { [] })] }
 
         scalar_types_by_name = state.scalar_types_by_name.transform_values(&:runtime_metadata)
 
@@ -193,13 +184,10 @@ module ElasticGraph
 
       # Builds a map, keyed by object type name, of extra `update_targets` that have been generated
       # from any fields that use `sourced_from` on other types.
-      #
-      # Returns a tuple of [update_targets_by_type_name, nested_sourced_paths_by_type_name].
       def identify_extra_update_targets_by_object_type_name
         sourced_field_errors = [] # : ::Array[::String]
         relationship_errors = [] # : ::Array[::String]
         extra_update_targets_by_type_name = ::Hash.new { |h, k| h[k] = [] } # : ::Hash[untyped, ::Array[SchemaArtifacts::RuntimeMetadata::UpdateTarget]]
-        nested_sourced_paths_by_type = {} # : ::Hash[::String, ::Hash[::String, ::Array[::Hash[::String, untyped]]]]
 
         state.object_types_by_name.except(*state.namespace_types_by_name.keys).values.each do |object_type|
           fields_with_sources_by_relationship_name =
@@ -253,7 +241,7 @@ module ElasticGraph
 
           # Process nested sourced_from fields on non-indexed types.
           if object_type.own_index_def.nil?
-            identify_nested_sourced_update_targets(object_type, extra_update_targets_by_type_name, nested_sourced_paths_by_type, sourced_field_errors)
+            identify_nested_sourced_update_targets(object_type, extra_update_targets_by_type_name, sourced_field_errors)
           end
         end
 
@@ -271,12 +259,12 @@ module ElasticGraph
           raise Errors::SchemaError, full_errors.join("\n\n")
         end
 
-        [extra_update_targets_by_type_name, nested_sourced_paths_by_type]
+        extra_update_targets_by_type_name
       end
 
       # Identifies update targets for sourced_from fields on non-indexed embedded types
       # that use parent_relationship chains.
-      def identify_nested_sourced_update_targets(object_type, extra_update_targets_by_type_name, nested_sourced_paths_by_type, errors)
+      def identify_nested_sourced_update_targets(object_type, extra_update_targets_by_type_name, errors)
         # Find relationships on this type that have parent_relationship configured
         nested_relationships = object_type.relationships_by_name
           .select { |_, rel| rel.parent_relationship_config }
@@ -323,11 +311,6 @@ module ElasticGraph
           # Store on the source type
           related_type_name = relationship.related_type.unwrap_non_null.name
           extra_update_targets_by_type_name[related_type_name] << update_target
-
-          # Record the path config for the root indexed type's self-update target.
-          root_type_name = resolved_chain.root_indexed_type.name
-          nested_sourced_paths_by_type[root_type_name] ||= {}
-          nested_sourced_paths_by_type[root_type_name].merge!(update_target.nested_sourced_paths)
         end
       end
 

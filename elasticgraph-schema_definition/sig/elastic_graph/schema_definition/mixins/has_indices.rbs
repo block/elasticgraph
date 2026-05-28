@@ -13,7 +13,7 @@ module ElasticGraph
         def index: (::String, ::Hash[::Symbol, ::String | ::Integer]) ?{ (Indexing::Index) -> void } -> Indexing::Index
         def resolve_fields_with: (::Symbol?) -> void
         def override_runtime_metadata: (**untyped) -> void
-        def runtime_metadata: (::Array[SchemaArtifacts::RuntimeMetadata::UpdateTarget], ?nested_sourced_paths: ::Hash[::String, ::Array[::Hash[::String, untyped]]]) -> SchemaArtifacts::RuntimeMetadata::ObjectType
+        def runtime_metadata: (::Array[SchemaArtifacts::RuntimeMetadata::UpdateTarget]) -> SchemaArtifacts::RuntimeMetadata::ObjectType
         def derived_indexed_types: () -> ::Array[Indexing::DerivedIndexedType]
         def derive_indexed_type_fields: (
           ::String,
