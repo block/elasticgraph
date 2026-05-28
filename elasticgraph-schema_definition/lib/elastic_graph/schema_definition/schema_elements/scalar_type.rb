@@ -215,7 +215,7 @@ module ElasticGraph
 
         # @private
         def to_indexing_field_type
-          Indexing::FieldType::Scalar.new(scalar_type: self)
+          schema_def_state.factory.new_scalar_indexing_field_type(scalar_type: self)
         end
 
         # @private

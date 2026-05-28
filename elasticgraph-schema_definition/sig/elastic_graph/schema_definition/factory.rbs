@@ -47,6 +47,9 @@ module ElasticGraph
       ) ?{ (SchemaElements::Field) -> void } -> SchemaElements::Field
       @@field_new: ::Method
 
+      def new_enum_indexing_field_type: (::Array[::String]) -> Indexing::FieldType::Enum
+      @@enum_indexing_field_type_new: ::Method
+
       def new_graphql_sdl_enumerator: (::Array[SchemaElements::graphQLType]) -> SchemaElements::GraphQLSDLEnumerator
       @@graphql_sdl_enumerator_new: ::Method
 
@@ -81,11 +84,23 @@ module ElasticGraph
       def new_object_type: (::String) ?{ (SchemaElements::ObjectType) -> void } -> SchemaElements::ObjectType
       @@object_type_new: ::Method
 
+      def new_object_indexing_field_type: (
+        type_name: ::String,
+        subfields: ::Array[Indexing::Field],
+        mapping_options: Mixins::HasTypeInfo::optionsHash,
+        json_schema_options: Mixins::HasTypeInfo::optionsHash,
+        doc_comment: ::String?
+      ) -> Indexing::FieldType::Object
+      @@object_indexing_field_type_new: ::Method
+
       def new_namespace_type: (::String) ?{ (SchemaElements::NamespaceType) -> void } -> SchemaElements::NamespaceType
       @@namespace_type_new: ::Method
 
       def new_scalar_type: (::String) { (SchemaElements::ScalarType) -> void } -> SchemaElements::ScalarType
       @@scalar_type_new: ::Method
+
+      def new_scalar_indexing_field_type: (scalar_type: SchemaElements::ScalarType) -> Indexing::FieldType::Scalar
+      @@scalar_indexing_field_type_new: ::Method
 
       def new_sort_order_enum_value: (SchemaElements::EnumValue, ::Array[SchemaElements::Field]) -> SchemaElements::SortOrderEnumValue
       @@sort_order_enum_value_new: ::Method
@@ -103,6 +118,9 @@ module ElasticGraph
 
       def new_union_type: (::String) { (SchemaElements::UnionType) -> void } -> SchemaElements::UnionType
       @@union_type_new: ::Method
+
+      def new_union_indexing_field_type: (::Hash[::String, Indexing::FieldType::Object]) -> Indexing::FieldType::Union
+      @@union_indexing_field_type_new: ::Method
 
       def new_field_source: (relationship_name: ::String, field_path: ::String) -> SchemaElements::FieldSource
       @@field_source_new: ::Method
