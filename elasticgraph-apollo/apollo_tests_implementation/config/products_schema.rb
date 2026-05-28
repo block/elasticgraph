@@ -18,6 +18,7 @@ module ApolloTestImpl
   # https://github.com/apollographql/apollo-federation-subgraph-compatibility/blob/2.0.0/COMPATIBILITY.md#products-schema-to-be-implemented-by-library-maintainers
   ElasticGraph.define_schema do |schema|
     schema.json_schema_version 1
+    schema.enforce_json_schema_version false
     schema.target_apollo_federation_version(federation_version) if federation_version
 
     unless federation_version == "2.0"

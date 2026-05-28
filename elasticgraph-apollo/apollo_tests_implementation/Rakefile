@@ -17,6 +17,5 @@ ElasticGraph::SchemaDefinition::RakeTasks.new(
   index_document_sizes: false,
   path_to_schema: project_root / "config/products_schema.rb",
   schema_artifacts_directory: project_root / "config/schema/artifacts",
-  extension_modules: [ElasticGraph::Apollo::SchemaDefinition::APIExtension],
-  enforce_json_schema_version: false
+  extension_modules: [ElasticGraph::Apollo::SchemaDefinition::APIExtension]
 )

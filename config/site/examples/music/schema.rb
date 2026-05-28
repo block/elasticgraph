@@ -10,6 +10,7 @@ require "pathname"
 
 ElasticGraph.define_schema do |schema|
   schema.json_schema_version 1
+  schema.enforce_json_schema_version false
 end
 
 Dir["#{__dir__}/schema/**/*.rb"].each do |schema_def_file|
