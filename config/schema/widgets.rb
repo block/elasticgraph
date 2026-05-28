@@ -82,6 +82,41 @@ ElasticGraph.define_schema do |schema|
     t.field "y", "Float!"
   end
 
+  # WidgetInspection, InspectionSummary, and InspectionNote are used to test relationships from embedded types
+  # using the custom `references` parameter. WidgetInspection is an embedded type (no index) that uses `guid`
+  # as its identifier instead of `id`, demonstrating that the `references` parameter allows customizing which
+  # field on the embedded type is used for matching when resolving relationships to indexed types.
+  schema.object_type "WidgetInspection" do |t|
+    t.field "guid", "ID!"
+
+    t.relates_to_one "inspection_summary", "InspectionSummary", via: "widget_inspection_guid", references: "guid", dir: :in
+    t.relates_to_many "inspection_notes", "InspectionNote", via: "widget_inspection_guid", references: "guid", dir: :in, singular: "inspection_note"
+  end
+
+  schema.object_type "InspectionSummary" do |t|
+    t.root_query_fields plural: "inspection_summaries"
+    t.field "id", "ID!"
+    t.field "widget_inspection_guid", "ID!"
+    t.field "summary", "String"
+    t.field "created_at", "DateTime!"
+
+    t.index "inspection_summaries" do |i|
+      i.default_sort "created_at", :desc
+    end
+  end
+
+  schema.object_type "InspectionNote" do |t|
+    t.root_query_fields plural: "inspection_notes"
+    t.field "id", "ID!"
+    t.field "widget_inspection_guid", "ID!"
+    t.field "note", "String"
+    t.field "created_at", "DateTime!"
+
+    t.index "inspection_notes" do |i|
+      i.default_sort "created_at", :desc
+    end
+  end
+
   schema.object_type "Widget" do |t|
     t.root_query_fields plural: "widgets"
     t.implements "NamedEntity"
@@ -153,6 +188,8 @@ ElasticGraph.define_schema do |schema|
     t.field "workspace_name", "String" do |f|
       f.sourced_from "workspace", "name"
     end
+
+    t.field "inspection", "WidgetInspection"
 
     # Customize the index so we can demonstrate that index customization works.
     # Also, to demonstrate that custom shard routing works correctly, we need multiple shards.

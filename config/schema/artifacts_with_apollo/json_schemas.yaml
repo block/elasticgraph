@@ -28,6 +28,8 @@ json_schema_version: 1
         - Component
         - DirectWholesaler
         - ElectricalPart
+        - InspectionNote
+        - InspectionSummary
         - Manufacturer
         - MechanicalPart
         - OnlineStore
@@ -372,6 +374,62 @@ json_schema_version: 1
     - coordinates
   ID:
     type: string
+  InspectionNote:
+    type: object
+    properties:
+      id:
+        allOf:
+        - "$ref": "#/$defs/ID"
+        - maxLength: 8191
+      widget_inspection_guid:
+        allOf:
+        - "$ref": "#/$defs/ID"
+        - maxLength: 8191
+      note:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/String"
+          - maxLength: 8191
+        - type: 'null'
+      created_at:
+        "$ref": "#/$defs/DateTime"
+      __typename:
+        type: string
+        const: InspectionNote
+        default: InspectionNote
+    required:
+    - id
+    - widget_inspection_guid
+    - note
+    - created_at
+  InspectionSummary:
+    type: object
+    properties:
+      id:
+        allOf:
+        - "$ref": "#/$defs/ID"
+        - maxLength: 8191
+      widget_inspection_guid:
+        allOf:
+        - "$ref": "#/$defs/ID"
+        - maxLength: 8191
+      summary:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/String"
+          - maxLength: 8191
+        - type: 'null'
+      created_at:
+        "$ref": "#/$defs/DateTime"
+      __typename:
+        type: string
+        const: InspectionSummary
+        default: InspectionSummary
+    required:
+    - id
+    - widget_inspection_guid
+    - summary
+    - created_at
   Int:
     type: integer
     minimum: -2147483648
@@ -1068,6 +1126,10 @@ json_schema_version: 1
           - "$ref": "#/$defs/Untyped"
           - maxLength: 8191
         - type: 'null'
+      inspection:
+        anyOf:
+        - "$ref": "#/$defs/WidgetInspection"
+        - type: 'null'
       __typename:
         type: string
         const: Widget
@@ -1105,8 +1167,22 @@ json_schema_version: 1
     - amounts
     - fees
     - metadata
+    - inspection
     description: For more performant queries on this type, please filter on `workspace_id`
       if possible.
+  WidgetInspection:
+    type: object
+    properties:
+      guid:
+        allOf:
+        - "$ref": "#/$defs/ID"
+        - maxLength: 8191
+      __typename:
+        type: string
+        const: WidgetInspection
+        default: WidgetInspection
+    required:
+    - guid
   WidgetInternalDetails:
     type: object
     properties:

@@ -23,6 +23,10 @@ module ElasticGraph
           indexableType,
           SchemaArtifacts::RuntimeMetadata::Relation
         ) -> ::String?
+        def validate_referenced_field: (
+          indexableType,
+          SchemaArtifacts::RuntimeMetadata::Relation
+        ) -> ::String?
         def relationship_description: () -> ::String
       end
 

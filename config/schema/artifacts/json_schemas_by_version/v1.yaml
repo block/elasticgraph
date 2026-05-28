@@ -28,6 +28,8 @@ json_schema_version: 1
         - Component
         - DirectWholesaler
         - ElectricalPart
+        - InspectionNote
+        - InspectionSummary
         - Manufacturer
         - MechanicalPart
         - OnlineStore
@@ -471,6 +473,86 @@ json_schema_version: 1
     - coordinates
   ID:
     type: string
+  InspectionNote:
+    type: object
+    properties:
+      id:
+        allOf:
+        - "$ref": "#/$defs/ID"
+        - maxLength: 8191
+        ElasticGraph:
+          type: ID!
+          nameInIndex: id
+      widget_inspection_guid:
+        allOf:
+        - "$ref": "#/$defs/ID"
+        - maxLength: 8191
+        ElasticGraph:
+          type: ID!
+          nameInIndex: widget_inspection_guid
+      note:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/String"
+          - maxLength: 8191
+        - type: 'null'
+        ElasticGraph:
+          type: String
+          nameInIndex: note
+      created_at:
+        "$ref": "#/$defs/DateTime"
+        ElasticGraph:
+          type: DateTime!
+          nameInIndex: created_at
+      __typename:
+        type: string
+        const: InspectionNote
+        default: InspectionNote
+    required:
+    - id
+    - widget_inspection_guid
+    - note
+    - created_at
+  InspectionSummary:
+    type: object
+    properties:
+      id:
+        allOf:
+        - "$ref": "#/$defs/ID"
+        - maxLength: 8191
+        ElasticGraph:
+          type: ID!
+          nameInIndex: id
+      widget_inspection_guid:
+        allOf:
+        - "$ref": "#/$defs/ID"
+        - maxLength: 8191
+        ElasticGraph:
+          type: ID!
+          nameInIndex: widget_inspection_guid
+      summary:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/String"
+          - maxLength: 8191
+        - type: 'null'
+        ElasticGraph:
+          type: String
+          nameInIndex: summary
+      created_at:
+        "$ref": "#/$defs/DateTime"
+        ElasticGraph:
+          type: DateTime!
+          nameInIndex: created_at
+      __typename:
+        type: string
+        const: InspectionSummary
+        default: InspectionSummary
+    required:
+    - id
+    - widget_inspection_guid
+    - summary
+    - created_at
   Int:
     type: integer
     minimum: -2147483648
@@ -1476,6 +1558,13 @@ json_schema_version: 1
         ElasticGraph:
           type: Untyped
           nameInIndex: metadata
+      inspection:
+        anyOf:
+        - "$ref": "#/$defs/WidgetInspection"
+        - type: 'null'
+        ElasticGraph:
+          type: WidgetInspection
+          nameInIndex: inspection
       __typename:
         type: string
         const: Widget
@@ -1513,8 +1602,25 @@ json_schema_version: 1
     - amounts
     - fees
     - metadata
+    - inspection
     description: For more performant queries on this type, please filter on `workspace_id`
       if possible.
+  WidgetInspection:
+    type: object
+    properties:
+      guid:
+        allOf:
+        - "$ref": "#/$defs/ID"
+        - maxLength: 8191
+        ElasticGraph:
+          type: ID!
+          nameInIndex: guid
+      __typename:
+        type: string
+        const: WidgetInspection
+        default: WidgetInspection
+    required:
+    - guid
   WidgetInternalDetails:
     type: object
     properties:

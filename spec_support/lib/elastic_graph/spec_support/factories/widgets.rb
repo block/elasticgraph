@@ -89,6 +89,33 @@ FactoryBot.define do
     created_at { Faker::Time.between(from: recent_date - 30, to: recent_date).utc.iso8601 }
   end
 
+  factory :widget_inspection, parent: :hash_base do
+    __typename { "WidgetInspection" }
+    guid { Faker::Alphanumeric.alpha(number: 20) }
+  end
+
+  factory :inspection_summary, parent: :indexed_type do
+    __typename { "InspectionSummary" }
+    widget_inspection_guid { widget_inspection&.fetch(:guid) }
+    summary { Faker::Lorem.sentence }
+    created_at { Faker::Time.between(from: recent_date - 30, to: recent_date).utc.iso8601 }
+
+    transient do
+      widget_inspection { nil }
+    end
+  end
+
+  factory :inspection_note, parent: :indexed_type do
+    __typename { "InspectionNote" }
+    widget_inspection_guid { widget_inspection&.fetch(:guid) }
+    note { Faker::Lorem.sentence }
+    created_at { Faker::Time.between(from: recent_date - 30, to: recent_date).utc.iso8601 }
+
+    transient do
+      widget_inspection { nil }
+    end
+  end
+
   factory :widget, parent: :indexed_type do
     __typename { "Widget" }
     workspace_id { Faker::Alphanumeric.alpha(number: 6) }
@@ -113,6 +140,7 @@ FactoryBot.define do
     the_options { options }
     internal_details { build :widget_internal_details }
     internal_highlightable_details { build :widget_internal_details }
+    inspection { build :widget_inspection }
 
     component_ids do
       components.map { |c| c.fetch(:id) }
