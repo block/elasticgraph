@@ -10,9 +10,9 @@ module ElasticGraph
       include Support::_MemoizableDataClass
 
       def json_schema_version_setter_location: () -> ::Thread::Backtrace::Location?
-      def json_schema_field_metadata_by_type_and_field_name: () -> ::Hash[::String, ::Hash[::String, Indexing::JSONSchemaFieldMetadata]]
+      def json_schema_field_metadata_by_type_and_field_name: () -> ::Hash[::String, ::Hash[::String, JSONIngestion::SchemaDefinition::Indexing::JSONSchemaFieldMetadata]]
       def current_public_json_schema: () -> ::Hash[::String, untyped]
-      def merge_field_metadata_into_json_schema: (::Hash[::String, untyped]) -> Indexing::JSONSchemaWithMetadata
+      def merge_field_metadata_into_json_schema: (::Hash[::String, untyped]) -> JSONIngestion::SchemaDefinition::Indexing::JSONSchemaWithMetadata
       def unused_deprecated_elements: () -> ::Set[SchemaElements::DeprecatedElement]
       def derived_indexing_type_names: () -> ::Set[::String]
 
@@ -26,16 +26,16 @@ module ElasticGraph
       @field_path_resolver: SchemaElements::FieldPath::Resolver?
       @json_schema_indexing_field_types_by_name: ::Hash[::String, Indexing::_FieldType]?
       @derived_indexing_type_names: ::Set[::String]?
-      @json_schema_field_metadata_by_type_and_field_name: ::Hash[::String, ::Hash[::String, Indexing::JSONSchemaFieldMetadata]]?
+      @json_schema_field_metadata_by_type_and_field_name: ::Hash[::String, ::Hash[::String, JSONIngestion::SchemaDefinition::Indexing::JSONSchemaFieldMetadata]]?
       @current_public_json_schema: ::Hash[::String, untyped]?
       @latest_versioned_json_schema: ::Hash[::String, untyped]?
-      @json_schema_with_metadata_merger: Indexing::JSONSchemaWithMetadata::Merger?
+      @json_schema_with_metadata_merger: JSONIngestion::SchemaDefinition::Indexing::JSONSchemaWithMetadata::Merger?
 
       STATIC_SCRIPT_REPO: Scripting::FileSystemRepository
 
       private
 
-      def json_schema_with_metadata_merger: () -> Indexing::JSONSchemaWithMetadata::Merger
+      def json_schema_with_metadata_merger: () -> JSONIngestion::SchemaDefinition::Indexing::JSONSchemaWithMetadata::Merger
       def generate_datastore_config: () -> ::Hash[::String, untyped]
       def build_dynamic_scripts: () -> ::Array[Scripting::Script]
       def build_runtime_metadata: () -> SchemaArtifacts::RuntimeMetadata::Schema
