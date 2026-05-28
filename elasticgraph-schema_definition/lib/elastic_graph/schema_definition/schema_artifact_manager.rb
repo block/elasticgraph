@@ -8,7 +8,7 @@
 
 require "did_you_mean"
 require "elastic_graph/constants"
-require "elastic_graph/schema_definition/json_schema_pruner"
+require "elastic_graph/json_ingestion/schema_definition/json_schema_pruner"
 require "elastic_graph/support/graphql_gem_loader"
 require "elastic_graph/support/memoizable_data"
 require "fileutils"
