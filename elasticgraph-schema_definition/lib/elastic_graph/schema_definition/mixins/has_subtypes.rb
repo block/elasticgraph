@@ -22,7 +22,7 @@ module ElasticGraph
             [type.name, _ = type.to_indexing_field_type]
           end
 
-          Indexing::FieldType::Union.new(subtypes_by_name)
+          schema_def_state.factory.new_union_indexing_field_type(subtypes_by_name)
         end
 
         def graphql_fields_by_name

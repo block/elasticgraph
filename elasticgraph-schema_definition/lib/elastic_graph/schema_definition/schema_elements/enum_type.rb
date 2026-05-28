@@ -158,7 +158,7 @@ module ElasticGraph
 
         # @return [Indexing::FieldType::Enum] indexing representation of this enum type
         def to_indexing_field_type
-          Indexing::FieldType::Enum.new(values_by_name.keys)
+          schema_def_state.factory.new_enum_indexing_field_type(values_by_name.keys)
         end
 
         # @return [EnumType] converts the enum type to its input form for when different naming is used for input vs output enums.

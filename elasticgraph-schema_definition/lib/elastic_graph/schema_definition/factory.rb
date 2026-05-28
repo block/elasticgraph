@@ -7,6 +7,10 @@
 # frozen_string_literal: true
 
 require "elastic_graph/constants"
+require "elastic_graph/schema_definition/indexing/field_type/enum"
+require "elastic_graph/schema_definition/indexing/field_type/object"
+require "elastic_graph/schema_definition/indexing/field_type/scalar"
+require "elastic_graph/schema_definition/indexing/field_type/union"
 require "elastic_graph/schema_definition/mixins/has_readable_to_s_and_inspect"
 require "elastic_graph/schema_definition/results"
 require "elastic_graph/schema_definition/indexing/index"
@@ -118,6 +122,11 @@ module ElasticGraph
                    @@field_new.call(schema_def_state: @state, **kwargs, &block)
                  end
       @@field_new = prevent_non_factory_instantiation_of(SchemaElements::Field)
+
+      def new_enum_indexing_field_type(enum_value_names)
+        @@enum_indexing_field_type_new.call(enum_value_names)
+      end
+      @@enum_indexing_field_type_new = prevent_non_factory_instantiation_of(Indexing::FieldType::Enum)
 
       def new_graphql_sdl_enumerator(all_types)
         @@graphql_sdl_enumerator_new.call(@state, all_types)
@@ -237,12 +246,29 @@ module ElasticGraph
       end
       @@object_type_new = prevent_non_factory_instantiation_of(SchemaElements::ObjectType)
 
+      def new_object_indexing_field_type(type_name:, subfields:, mapping_options:, json_schema_options:, doc_comment:)
+        @@object_indexing_field_type_new.call(
+          schema_def_state: @state,
+          type_name: type_name,
+          subfields: subfields,
+          mapping_options: mapping_options,
+          json_schema_options: json_schema_options,
+          doc_comment: doc_comment
+        )
+      end
+      @@object_indexing_field_type_new = prevent_non_factory_instantiation_of(Indexing::FieldType::Object)
+
       def new_scalar_type(name)
         @@scalar_type_new.call(@state, name.to_s) do |scalar_type|
           yield scalar_type
         end
       end
       @@scalar_type_new = prevent_non_factory_instantiation_of(SchemaElements::ScalarType)
+
+      def new_scalar_indexing_field_type(scalar_type:)
+        @@scalar_indexing_field_type_new.call(scalar_type: scalar_type)
+      end
+      @@scalar_indexing_field_type_new = prevent_non_factory_instantiation_of(Indexing::FieldType::Scalar)
 
       def new_sort_order_enum_value(enum_value, sort_order_field_path)
         @@sort_order_enum_value_new.call(enum_value, sort_order_field_path)
@@ -267,6 +293,11 @@ module ElasticGraph
         end
       end
       @@union_type_new = prevent_non_factory_instantiation_of(SchemaElements::UnionType)
+
+      def new_union_indexing_field_type(subtypes_by_name)
+        @@union_indexing_field_type_new.call(subtypes_by_name)
+      end
+      @@union_indexing_field_type_new = prevent_non_factory_instantiation_of(Indexing::FieldType::Union)
 
       def new_field_source(relationship_name:, field_path:)
         @@field_source_new.call(relationship_name, field_path)
