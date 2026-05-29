@@ -72,9 +72,7 @@ module ElasticGraph
             routing_value_source: routing_value_source,
             rollover_timestamp_value_source: rollover_timestamp_value_source,
             top_level_fields_params: top_level_fields_params,
-            nested_sourced_fields_params: {},
-            nested_sourced_path_identifiers_params: {},
-            nested_sourced_paths: {},
+            nested_sourced_data_params: NestedSourcedDataParams::EMPTY,
             metadata_params: metadata_params
           )
         end
@@ -96,9 +94,7 @@ module ElasticGraph
             routing_value_source: routing_value_source,
             rollover_timestamp_value_source: rollover_timestamp_value_source,
             top_level_fields_params: top_level_fields_params,
-            nested_sourced_fields_params: {},
-            nested_sourced_path_identifiers_params: {},
-            nested_sourced_paths: {},
+            nested_sourced_data_params: NestedSourcedDataParams::EMPTY,
             metadata_params: metadata_params
           )
         end

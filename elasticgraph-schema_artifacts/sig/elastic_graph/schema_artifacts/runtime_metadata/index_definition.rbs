@@ -8,6 +8,7 @@ module ElasticGraph
         attr_reader current_sources: ::Set[::String]
         attr_reader fields_by_path: ::Hash[::String, IndexField]
         attr_reader has_had_multiple_sources: bool
+        attr_reader nested_sourced_paths: ::Hash[::String, ::Array[nestedSourcedPathSegment]]
 
         def initialize: (
           route_with: ::String,
@@ -15,7 +16,8 @@ module ElasticGraph
           default_sort_fields: ::Array[SortField],
           current_sources: ::Set[::String],
           fields_by_path: ::Hash[::String, IndexField],
-          has_had_multiple_sources: bool
+          has_had_multiple_sources: bool,
+          ?nested_sourced_paths: ::Hash[::String, ::Array[nestedSourcedPathSegment]]
         ) -> void
 
         def with: (
@@ -24,7 +26,8 @@ module ElasticGraph
           ?default_sort_fields: ::Array[SortField],
           ?current_sources: ::Enumerable[::String],
           ?fields_by_path: ::Hash[::String, IndexField],
-          ?has_had_multiple_sources: bool
+          ?has_had_multiple_sources: bool,
+          ?nested_sourced_paths: ::Hash[::String, ::Array[nestedSourcedPathSegment]]
         ) -> IndexDefinition
       end
 
@@ -35,6 +38,7 @@ module ElasticGraph
         CURRENT_SOURCES: "current_sources"
         FIELDS_BY_PATH: "fields_by_path"
         HAS_HAD_MULTIPLE_SOURCES: "has_had_multiple_sources"
+        NESTED_SOURCED_PATHS: "nested_sourced_paths"
 
         def initialize: (
           route_with: ::String,
@@ -42,7 +46,8 @@ module ElasticGraph
           default_sort_fields: ::Array[SortField],
           current_sources: ::Enumerable[::String],
           fields_by_path: ::Hash[::String, IndexField],
-          has_had_multiple_sources: bool
+          has_had_multiple_sources: bool,
+          ?nested_sourced_paths: ::Hash[::String, ::Array[nestedSourcedPathSegment]]
         ) -> void
 
         def self.from_hash: (::Hash[::String, untyped]) -> IndexDefinition

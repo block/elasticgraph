@@ -43,9 +43,7 @@ module ElasticGraph
                     routing_value_source: "cost.currency_name",
                     rollover_timestamp_value_source: "currency_introduced_on",
                     top_level_fields_params: {"workspace_id" => DynamicParam.new(source_path: "wid", cardinality: :one)},
-                    nested_sourced_fields_params: {},
-                    nested_sourced_path_identifiers_params: {},
-                    nested_sourced_paths: {},
+                    nested_sourced_data_params: NestedSourcedDataParams::EMPTY,
                     metadata_params: {"relationshipName" => StaticParam.new(value: "currency")}
                   ),
                   UpdateTarget.new(
@@ -56,9 +54,7 @@ module ElasticGraph
                     routing_value_source: nil,
                     rollover_timestamp_value_source: nil,
                     top_level_fields_params: {},
-                    nested_sourced_fields_params: {},
-                    nested_sourced_path_identifiers_params: {},
-                    nested_sourced_paths: {},
+                    nested_sourced_data_params: NestedSourcedDataParams::EMPTY,
                     metadata_params: {}
                   )
                 ],
@@ -317,9 +313,7 @@ module ElasticGraph
               routing_value_source: nil,
               rollover_timestamp_value_source: nil,
               top_level_fields_params: {"workspace_id" => dynamic_param_with(cardinality: :many)},
-              nested_sourced_fields_params: {},
-              nested_sourced_path_identifiers_params: {},
-              nested_sourced_paths: {},
+              nested_sourced_data_params: NestedSourcedDataParams::EMPTY,
               metadata_params: {}
             )]),
             "IndexDefinitionNamesOnly" => object_type_with(index_definition_names: ["foo", "bar"]),

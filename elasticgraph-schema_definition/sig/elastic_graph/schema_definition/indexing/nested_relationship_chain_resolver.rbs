@@ -9,6 +9,9 @@ module ElasticGraph
 
         private
 
+        def resolve_chain: (SchemaElements::Relationship, untyped, ::Array[PathSegment], ::Array[::String], ::Set[::String]) -> [SchemaElements::Relationship, untyped]
+        def validate_link: (SchemaElements::Relationship, untyped, SchemaElements::Relationship::ParentRef, ::Array[::String], ::Set[::String]) -> [untyped, untyped]
+        def build_path_segment: (SchemaElements::Relationship, untyped, untyped, ::Array[PathSegment], ::Array[::String]) -> void
         def find_embedding_field: (untyped, untyped, ::Array[::String]) -> SchemaElements::Field?
         def rel_description: (untyped, SchemaElements::Relationship) -> ::String
       end

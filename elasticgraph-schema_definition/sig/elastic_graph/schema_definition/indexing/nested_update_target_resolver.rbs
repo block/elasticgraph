@@ -31,9 +31,9 @@ module ElasticGraph
         attr_reader schema_def_state: State
 
         def related_type: () -> untyped
-        def resolve_nested_sourced_fields_params: (::Array[::String]) -> SchemaArtifacts::RuntimeMetadata::paramsHash
+        def resolve_nested_sourced_data_params: (::Array[::String]) -> SchemaArtifacts::RuntimeMetadata::paramsHash
         def build_path_identifier_params: () -> SchemaArtifacts::RuntimeMetadata::paramsHash
-        def build_nested_sourced_paths: () -> ::Array[::Hash[::String, untyped]]
+        def build_nested_sourced_paths: () -> ::Array[SchemaArtifacts::RuntimeMetadata::nestedSourcedPathSegment]
         def resolve_routing: (::Array[::String]) -> untyped
         def resolve_rollover: (::Array[::String]) -> untyped
         def validate_has_had_multiple_sources: (::Array[::String]) -> void

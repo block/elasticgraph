@@ -6,6 +6,7 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/schema_artifacts/runtime_metadata/nested_sourced_path_segment"
 require "elastic_graph/schema_artifacts/runtime_metadata/params"
 require "elastic_graph/schema_definition/indexing/update_target_factory"
 
@@ -44,10 +45,10 @@ module ElasticGraph
             return [nil, errors]
           end
 
-          nested_sourced_fields_params = resolve_nested_sourced_fields_params(errors)
-          return [nil, errors] if nested_sourced_fields_params.empty? && errors.any?
+          field_params = resolve_nested_sourced_data_params(errors)
+          return [nil, errors] if field_params.empty? && errors.any?
 
-          nested_sourced_path_identifiers_params = build_path_identifier_params
+          path_identifier_params = build_path_identifier_params
           nested_sourced_paths = build_nested_sourced_paths
           routing_value_source = resolve_routing(errors)
           rollover_timestamp_value_source = resolve_rollover(errors)
@@ -56,20 +57,22 @@ module ElasticGraph
           if errors.any?
             [nil, errors]
           else
-            # Wrap in map keyed by relationship name — the script uses this to look up
-            # the path config for the specific relationship being processed.
-            nested_sourced_paths_map = {relationship.name => nested_sourced_paths}
+            # Register the path config on the destination index so it's available at runtime.
+            resolved_chain.root_indexed_type.index_def.register_nested_sourced_paths(relationship.name, nested_sourced_paths)
+
+            nested_sourced_data_params = SchemaArtifacts::RuntimeMetadata::NestedSourcedDataParams.new(
+              field_params: field_params,
+              path_identifier_params: path_identifier_params
+            )
 
             update_target = UpdateTargetFactory.new_normal_indexing_update_target(
               type: resolved_chain.root_indexed_type.name,
               relationship: relationship.name,
               id_source: resolved_chain.root_relationship.foreign_key,
               top_level_fields_params: {},
-              nested_sourced_fields_params: nested_sourced_fields_params,
-              nested_sourced_path_identifiers_params: nested_sourced_path_identifiers_params,
+              nested_sourced_data_params: nested_sourced_data_params,
               routing_value_source: routing_value_source,
-              rollover_timestamp_value_source: rollover_timestamp_value_source,
-              nested_sourced_paths: nested_sourced_paths_map
+              rollover_timestamp_value_source: rollover_timestamp_value_source
             )
 
             [update_target, errors]
@@ -85,7 +88,7 @@ module ElasticGraph
           @related_type ||= schema_def_state.object_types_by_name[relationship.related_type.unwrap_non_null.name]
         end
 
-        def resolve_nested_sourced_fields_params(errors)
+        def resolve_nested_sourced_data_params(errors)
           sourced_fields.filter_map do |field|
             field_source = field.source # : SchemaElements::FieldSource
             referenced_field_path = field_path_resolver.resolve_public_path(related_type, field_source.field_path) do |parent_field|
@@ -122,13 +125,15 @@ module ElasticGraph
         def build_nested_sourced_paths
           resolved_chain.path_segments.map do |segment|
             if segment.embedding_field.type.list?
-              {
-                "list" => segment.embedding_field.name_in_index,
-                "match_field" => segment.match_field,
-                "source_field" => segment.source_field
-              }
+              SchemaArtifacts::RuntimeMetadata::ListPathSegment.new(
+                field: segment.embedding_field.name_in_index,
+                match_field: segment.match_field,
+                source_field: segment.source_field
+              )
             else
-              {"object" => segment.embedding_field.name_in_index}
+              SchemaArtifacts::RuntimeMetadata::ObjectPathSegment.new(
+                field: segment.embedding_field.name_in_index
+              )
             end
           end
         end

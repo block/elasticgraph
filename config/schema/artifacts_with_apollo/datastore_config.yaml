@@ -2195,7 +2195,7 @@ scripts:
 
         // No timestamp values matched the params, so return `false`.
         return false;
-  update_index_data_59be3b4ab537ea412a3ead0408fb4137:
+  update_index_data_079bafcf4d739acd8659a631377fa9c8:
     context: update
     script:
       lang: painless
@@ -2204,33 +2204,61 @@ scripts:
         // Helper Functions
         // ============================================================
 
-        // Builds a composite nested element key from path segments.
+        // Encodes a list of strings into a length-prefixed string.
+        // Each part is encoded as "length:value" and parts are concatenated directly.
+        // This encoding is unambiguous regardless of what characters the values contain.
+        String encodeKey(List parts) {
+          StringBuilder sb = new StringBuilder();
+          for (String part : parts) {
+            sb.append(part.length());
+            sb.append(':');
+            sb.append(part);
+          }
+          return sb.toString();
+        }
+
+        // Decodes a length-prefixed string back into a list of strings.
+        List decodeKey(String key) {
+          List parts = new ArrayList();
+          int i = 0;
+          while (i < key.length()) {
+            int colonPos = key.indexOf(":", i);
+            int length = Integer.parseInt(key.substring(i, colonPos));
+            int valueStart = colonPos + 1;
+            parts.add(key.substring(valueStart, valueStart + length));
+            i = valueStart + length;
+          }
+          return parts;
+        }
+
+        // Builds a nested element key (as an encoded string) from path segments.
         // List segments contribute their matched identifier value; object segments contribute their field name.
-        String buildNestedElementKey(List pathSegments, Map pathIdentifiers) {
+        // Returns "" if no path segments are configured (i.e., this is not a nested sourced event).
+        String buildNestedElementKey(String relationship, Map nestedSourcedPaths, Map pathIdentifiers) {
+          List pathSegments = (List) nestedSourcedPaths.get(relationship);
+          if (pathSegments == null) {
+            return "";
+          }
           List parts = new ArrayList();
           for (Map segment : pathSegments) {
-            if (segment.containsKey("list")) {
-              parts.add(pathIdentifiers[segment.source_field]);
+            if ("list".equals(segment.get("type"))) {
+              parts.add(pathIdentifiers[segment.sourceField]);
             } else {
-              parts.add(segment.get("object"));
+              parts.add(segment.get("field"));
             }
           }
-          return String.join(":", parts);
+          return encodeKey(parts);
         }
 
-        // Looks up path segments for the given relationship and builds the nested element key.
-        // Returns "" if no path segments are configured (i.e., this is not a nested sourced event).
-        String buildNestedElementKeyForRelationship(String relationship, Map nestedSourcedPaths, Map pathIdentifiers) {
-            List pathSegments = (List) nestedSourcedPaths.get(relationship);
-            if (pathSegments == null) {
-              return "";
-            }
-            return buildNestedElementKey(pathSegments, pathIdentifiers);
-        }
-
-        // Splits a composite nested element key into a list of parts.
-        List splitNestedElementKey(String nestedElementKey) {
-          return Arrays.asList(nestedElementKey.splitOnToken(":"));
+        // Builds the versions key by combining the relationship name with the element key parts.
+        // For top-level events (empty element key), returns just the relationship name.
+        String buildVersionsKey(String relationship, String nestedElementKey) {
+          if (nestedElementKey.isEmpty()) {
+            return relationship;
+          }
+          List parts = decodeKey(nestedElementKey);
+          parts.add(0, relationship);
+          return encodeKey(parts);
         }
 
         // Finds an element in a list where element[matchField] equals matchValue. Returns null if not found.
@@ -2250,15 +2278,14 @@ scripts:
 
           for (int i = 0; i < pathSegments.size(); i++) {
             Map segment = (Map) pathSegments.get(i);
-            boolean isList = segment.containsKey("list");
-            String field = isList ? (String) segment.get("list") : (String) segment.get("object");
+            String field = (String) segment.get("field");
 
             if (!current.containsKey(field)) {
               return null;
             }
 
-            if (isList) {
-              current = (Map) findInList((List) current.get(field), (String) segment.get("match_field"), (String) keyParts.get(i));
+            if ("list".equals(segment.get("type"))) {
+              current = (Map) findInList((List) current.get(field), (String) segment.get("matchField"), (String) keyParts.get(i));
             } else {
               current = (Map) current.get(field);
             }
@@ -2277,7 +2304,7 @@ scripts:
         // ============================================================
 
         // Initializes internal bookkeeping structures (__sources, __versions, __counts, __nested_sourced_data).
-        void setup(Map source, String relationship, String nestedElementKey, Map nestedSourcedPaths, Map counts) {
+        void setup(Map source, String versionsKey, String relationship, String nestedElementKey, Map counts) {
           if (source.__sources == null) {
             source.__sources = [];
           }
@@ -2286,12 +2313,8 @@ scripts:
             source.__versions = [:];
           }
 
-          if (source.__versions[relationship] == null) {
-            source.__versions[relationship] = [:];
-          }
-
-          if (!nestedElementKey.isEmpty() && source.__versions[relationship][nestedElementKey] == null) {
-            source.__versions[relationship][nestedElementKey] = [:];
+          if (source.__versions[versionsKey] == null) {
+            source.__versions[versionsKey] = [:];
           }
 
           if (!nestedElementKey.isEmpty()) {
@@ -2299,7 +2322,7 @@ scripts:
               source.__nested_sourced_data = [:];
             }
             if (source.__nested_sourced_data[relationship] == null) {
-              source.__nested_sourced_data[relationship] = ["path_segments": nestedSourcedPaths.get(relationship), "data": [:]];
+              source.__nested_sourced_data[relationship] = [:];
             }
           }
 
@@ -2309,31 +2332,19 @@ scripts:
         }
 
         // Validates that this event is allowed: no relationship mutation and no stale version.
-        void validateSource(Map source, String id, String relationship, String sourceId, long eventVersion, String nestedElementKey) {
-          // For nested events, validate per-element. For top-level events, validate per-relationship.
-          Map versionsMap = nestedElementKey.isEmpty()
-            ? source.__versions[relationship]
-            : source.__versions[relationship][nestedElementKey];
+        void validateSource(Map source, String id, String relationship, String sourceId, long eventVersion, String versionsKey) {
+          Map versionsMap = source.__versions[versionsKey];
 
           // Check that no other source ID has previously written to this target.
           List previousSourceIds = versionsMap.keySet().stream().filter(key -> key != sourceId).collect(Collectors.toList());
           if (previousSourceIds.size() > 0) {
-            if (nestedElementKey.isEmpty()) {
-              throw new IllegalArgumentException(
-                "Cannot update document " + id + " " +
-                "with data from related " + relationship + " " + sourceId + " " +
-                "because the related " + relationship + " has apparently changed (was: " + previousSourceIds + "), " +
-                "but mutations of relationships used with `sourced_from` are not supported because " +
-                "allowing it could break ElasticGraph's out-of-order processing guarantees."
-              );
-            } else {
-              throw new IllegalArgumentException(
-                "Cannot update nested element [" + nestedElementKey + "] on document " + id + " " +
-                "with data from " + relationship + " " + sourceId + " " +
-                "because this element was previously sourced from a different event (" + previousSourceIds + "). " +
-                "Each nested element can only be sourced from one source document."
-              );
-            }
+            throw new IllegalArgumentException(
+              "Cannot update document " + id + " " +
+              "with data from related " + relationship + " " + sourceId + " " +
+              "because the related " + relationship + " has apparently changed (was: " + previousSourceIds + "), " +
+              "but mutations of relationships used with `sourced_from` are not supported because " +
+              "allowing it could break ElasticGraph's out-of-order processing guarantees."
+            );
           }
 
           // Check that the event version is newer than what we've already seen.
@@ -2341,9 +2352,8 @@ scripts:
           long docVersion = maybeDocVersion == null ? Long.MIN_VALUE : maybeDocVersion.longValue();
 
           if (docVersion >= eventVersion) {
-            String target = nestedElementKey.isEmpty() ? id : id + "/" + nestedElementKey;
             throw new IllegalArgumentException("ElasticGraph update was a no-op: [" +
-              target + "]: version conflict, current version [" +
+              id + "]: version conflict, current version [" +
               docVersion + "] is higher or equal to the one provided [" +
               eventVersion + "]");
           }
@@ -2365,29 +2375,29 @@ scripts:
             return;
           }
 
-          ((Map) source.__nested_sourced_data[relationship]).get("data").put(nestedElementKey, nestedSourcedFields);
+          ((Map) source.__nested_sourced_data[relationship]).put(nestedElementKey, nestedSourcedFields);
         }
 
         // Applies nested sourced data from the __nested_sourced_data buffer to matched nested elements.
-        // Reads path config from the document itself — no external params needed.
+        // Reads path config from the nestedSourcedPaths param.
         // Called after every event so that after a self-event's putAll overwrites nested arrays,
         // the buffered data gets re-applied.
-        void applyNestedSourcedData(Map source) {
+        void applyNestedSourcedData(Map source, Map nestedSourcedPaths) {
           if (source.__nested_sourced_data == null) {
             return;
           }
 
           for (sourcedEntry in source.__nested_sourced_data.entrySet()) {
-            Map relationshipData = (Map) sourcedEntry.getValue();
-            List pathSegments = (List) relationshipData.get("path_segments");
-            Map dataByKey = (Map) relationshipData.get("data");
+            String relationship = (String) sourcedEntry.getKey();
+            Map dataByKey = (Map) sourcedEntry.getValue();
+            List pathSegments = (List) nestedSourcedPaths.get(relationship);
 
             if (pathSegments == null || dataByKey == null) {
               continue;
             }
 
             for (elementEntry in dataByKey.entrySet()) {
-              List keyParts = splitNestedElementKey((String) elementEntry.getKey());
+              List keyParts = decodeKey((String) elementEntry.getKey());
               if (keyParts.size() != pathSegments.size()) {
                 continue;
               }
@@ -2401,12 +2411,8 @@ scripts:
         }
 
         // Records the event version in __versions and adds the relationship to __sources.
-        void recordSource(Map source, String relationship, String sourceId, long eventVersion, String nestedElementKey) {
-          if (nestedElementKey.isEmpty()) {
-            source.__versions[relationship][sourceId] = eventVersion;
-          } else {
-            source.__versions[relationship][nestedElementKey][sourceId] = eventVersion;
-          }
+        void recordSource(Map source, String versionsKey, String relationship, String sourceId, long eventVersion) {
+          source.__versions[versionsKey][sourceId] = eventVersion;
 
           // Record the relationship in `__sources` if it's not already there. We maintain it as an append-only set using a sorted list.
           // This ensures deterministic ordering of its elements regardless of event ingestion order, and lets us check membership in O(log N) time.
@@ -2437,11 +2443,12 @@ scripts:
         Map nestedSourcedPathIdentifiers = params.nestedSourcedPathIdentifiers;
         Map nestedSourcedPaths = params.nestedSourcedPaths;
 
-        String nestedElementKey = buildNestedElementKeyForRelationship(relationship, nestedSourcedPaths, nestedSourcedPathIdentifiers);
+        String nestedElementKey = buildNestedElementKey(relationship, nestedSourcedPaths, nestedSourcedPathIdentifiers);
+        String versionsKey = buildVersionsKey(relationship, nestedElementKey);
 
-        setup(source, relationship, nestedElementKey, nestedSourcedPaths, counts);
-        validateSource(source, id, relationship, sourceId, eventVersion, nestedElementKey);
+        setup(source, versionsKey, relationship, nestedElementKey, counts);
+        validateSource(source, id, relationship, sourceId, eventVersion, versionsKey);
         applyTopLevelFields(source, id, params.topLevelFields, counts);
         storeNestedSourcedData(source, relationship, nestedSourcedFields, nestedElementKey);
-        applyNestedSourcedData(source);
-        recordSource(source, relationship, sourceId, eventVersion, nestedElementKey);
+        applyNestedSourcedData(source, nestedSourcedPaths);
+        recordSource(source, versionsKey, relationship, sourceId, eventVersion);
