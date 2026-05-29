@@ -26,6 +26,7 @@ module ElasticGraph
             routing_value_source: nil,
             rollover_timestamp_value_source: nil,
             top_level_fields_params: {},
+            nested_sourced_data_params: NestedSourcedDataParams::EMPTY,
             metadata_params: {}
           )
         end
@@ -84,9 +85,9 @@ module ElasticGraph
               }
             )
 
-            without_id_or_top_level_fields = params.except("id", "topLevelFields")
+            without_omitted_fields = params.except("id", "topLevelFields", "nestedSourcedFields", "nestedSourcedPathIdentifiers")
 
-            expect(without_id_or_top_level_fields).to eq(
+            expect(without_omitted_fields).to eq(
               "foo" => 43,
               "bar" => "hello",
               "bazz" => [12]

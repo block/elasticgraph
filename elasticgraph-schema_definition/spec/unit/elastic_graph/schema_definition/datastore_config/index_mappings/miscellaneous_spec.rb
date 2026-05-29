@@ -347,7 +347,7 @@ module ElasticGraph
         mapping = generate_mapping.call(graphql_only: true)
 
         # Verify that it does not have a property for `size` or `options.size`
-        expect(mapping.fetch("properties").keys).to contain_exactly("id", "options", "__sources", "__versions", "__typename")
+        expect(mapping.fetch("properties").keys).to contain_exactly("id", "options", "__nested_sourced_data", "__sources", "__versions", "__typename")
         expect(mapping.fetch("properties")).to include({
           "id" => {"type" => "keyword"},
           "options" => {

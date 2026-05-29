@@ -38,7 +38,7 @@ module ElasticGraph
       #   @return [RolloverConfig, nil] rollover configuration for the index
       # @!attribute [r] has_had_multiple_sources_flag
       #   @return [Boolean] whether this index has ever had multiple sources
-      class Index < Struct.new(:name, :default_sort_pairs, :settings, :schema_def_state, :indexed_type, :routing_field_path, :rollover_config, :has_had_multiple_sources_flag)
+      class Index < Struct.new(:name, :default_sort_pairs, :settings, :schema_def_state, :indexed_type, :routing_field_path, :rollover_config, :has_had_multiple_sources_flag, :nested_sourced_paths)
         include Mixins::HasReadableToSAndInspect.new { |i| i.name }
 
         # @param name [String] name of the index
@@ -55,7 +55,7 @@ module ElasticGraph
 
           settings = DEFAULT_SETTINGS.merge(Support::HashUtil.flatten_and_stringify_keys(settings, prefix: "index"))
 
-          super(name, [], settings, schema_def_state, indexed_type, nil, nil, false)
+          super(name, [], settings, schema_def_state, indexed_type, nil, nil, false, {})
 
           schema_def_state.after_user_definition_complete do
             # `id` is the field Elasticsearch/OpenSearch use for routing by default:
@@ -251,6 +251,13 @@ module ElasticGraph
           }
         end
 
+        # Registers the nested sourced path segments for a relationship on this index.
+        # Called by `NestedUpdateTargetResolver` during schema resolution.
+        # @api private
+        def register_nested_sourced_paths(relationship_name, path_segments)
+          nested_sourced_paths[relationship_name] = path_segments
+        end
+
         # @return [SchemaArtifacts::RuntimeMetadata::IndexDefinition] runtime metadata for this index
         def runtime_metadata
           SchemaArtifacts::RuntimeMetadata::IndexDefinition.new(
@@ -264,7 +271,8 @@ module ElasticGraph
                 direction: direction
               )
             end,
-            has_had_multiple_sources: has_had_multiple_sources_flag
+            has_had_multiple_sources: has_had_multiple_sources_flag,
+            nested_sourced_paths: nested_sourced_paths
           )
         end
 
@@ -298,6 +306,13 @@ module ElasticGraph
             .then { |mapping| ListCountsMapping.merged_into(mapping, for_type: indexed_type) }
             .then do |fm|
               internal_fields = {
+                "__nested_sourced_data" => {
+                  "type" => "object",
+                  # __nested_sourced_data stores sourced data for nested sourced_from fields. Its keys are not
+                  # statically known (they're relationship names and composite element keys), so we
+                  # set dynamic to "false" to allow arbitrary keys in _source without indexing them.
+                  "dynamic" => "false"
+                },
                 "__sources" => {"type" => "keyword"},
                 "__versions" => {
                   "type" => "object",

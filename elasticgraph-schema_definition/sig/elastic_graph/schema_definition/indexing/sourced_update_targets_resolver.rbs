@@ -1,0 +1,22 @@
+module ElasticGraph
+  module SchemaDefinition
+    module Indexing
+      class SourcedUpdateTargetsResolver
+        @schema_def_state: State
+        @sourced_field_errors: ::Array[::String]
+        @relationship_errors: ::Array[::String]
+        @sourced_update_targets_by_type_name: ::Hash[::String, ::Array[SchemaArtifacts::RuntimeMetadata::UpdateTarget]]
+
+        def initialize: (schema_def_state: State) -> void
+        def resolve: () -> ::Hash[::String, ::Array[SchemaArtifacts::RuntimeMetadata::UpdateTarget]]
+
+        private
+
+        def resolve_for_type: (untyped) -> void
+        def resolve_top_level_update_target: (untyped, untyped, ::Array[SchemaElements::Field]) -> void
+        def resolve_nested_update_targets: (untyped) -> void
+        def raise_if_errors: () -> void
+      end
+    end
+  end
+end

@@ -1,0 +1,43 @@
+module ElasticGraph
+  module SchemaDefinition
+    module Indexing
+      class NestedUpdateTargetResolver
+        @object_type: untyped
+        @relationship: SchemaElements::Relationship
+        @sourced_fields: ::Array[SchemaElements::Field]
+        @resolved_chain: ResolvedNestedChain
+        @field_path_resolver: SchemaElements::FieldPath::Resolver
+        @schema_def_state: State
+        @related_type: untyped
+
+        def initialize: (
+          object_type: untyped,
+          relationship: SchemaElements::Relationship,
+          sourced_fields: ::Array[SchemaElements::Field],
+          resolved_chain: ResolvedNestedChain,
+          field_path_resolver: SchemaElements::FieldPath::Resolver,
+          schema_def_state: State
+        ) -> void
+
+        def resolve: () -> [SchemaArtifacts::RuntimeMetadata::UpdateTarget?, ::Array[::String]]
+
+        private
+
+        attr_reader object_type: untyped
+        attr_reader relationship: SchemaElements::Relationship
+        attr_reader sourced_fields: ::Array[SchemaElements::Field]
+        attr_reader resolved_chain: ResolvedNestedChain
+        attr_reader field_path_resolver: SchemaElements::FieldPath::Resolver
+        attr_reader schema_def_state: State
+
+        def related_type: () -> untyped
+        def resolve_nested_sourced_data_params: (::Array[::String]) -> SchemaArtifacts::RuntimeMetadata::paramsHash
+        def build_path_identifier_params: () -> SchemaArtifacts::RuntimeMetadata::paramsHash
+        def build_nested_sourced_paths: () -> ::Array[SchemaArtifacts::RuntimeMetadata::nestedSourcedPathSegment]
+        def resolve_routing: (::Array[::String]) -> untyped
+        def resolve_rollover: (::Array[::String]) -> untyped
+        def validate_has_had_multiple_sources: (::Array[::String]) -> void
+      end
+    end
+  end
+end

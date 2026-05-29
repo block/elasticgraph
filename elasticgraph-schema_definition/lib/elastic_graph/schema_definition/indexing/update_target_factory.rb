@@ -18,19 +18,21 @@ module ElasticGraph
           id_source:,
           top_level_fields_params:,
           routing_value_source:,
-          rollover_timestamp_value_source:
+          rollover_timestamp_value_source:,
+          nested_sourced_data_params: SchemaArtifacts::RuntimeMetadata::NestedSourcedDataParams::EMPTY
         )
           SchemaArtifacts::RuntimeMetadata::UpdateTarget.new(
             type: type,
             relationship: relationship,
             script_id: INDEX_DATA_UPDATE_SCRIPT_ID,
             id_source: id_source,
+            routing_value_source: routing_value_source,
+            rollover_timestamp_value_source: rollover_timestamp_value_source,
+            top_level_fields_params: top_level_fields_params,
+            nested_sourced_data_params: nested_sourced_data_params,
             metadata_params: standard_metadata_params.merge({
               "relationship" => SchemaArtifacts::RuntimeMetadata::StaticParam.new(value: relationship)
-            }),
-            top_level_fields_params: top_level_fields_params,
-            routing_value_source: routing_value_source,
-            rollover_timestamp_value_source: rollover_timestamp_value_source
+            })
           )
         end
 
