@@ -1,0 +1,20 @@
+module ElasticGraph
+  class Indexer
+    type indexingEventDecoder = IndexingEventDecoder::Interface
+
+    module IndexingEventDecoder
+      class Interface
+        def initialize: (
+          config: ::Hash[::Symbol | ::String, untyped],
+          schema_artifacts: schemaArtifacts?,
+          logger: ::Logger
+        ) -> void
+
+        def decode: (::String) -> ::Array[event]
+      end
+
+      class JSONLines < Interface
+      end
+    end
+  end
+end
