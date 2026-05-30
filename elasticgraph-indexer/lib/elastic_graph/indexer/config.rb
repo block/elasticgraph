@@ -8,10 +8,17 @@
 
 require "elastic_graph/support/config"
 require "elastic_graph/errors"
+require "elastic_graph/indexer/indexing_event_decoder"
+require "elastic_graph/schema_artifacts/runtime_metadata/extension_loader"
 
 module ElasticGraph
   class Indexer
-    class Config < Support::Config.define(:latency_slo_thresholds_by_timestamp_in_ms, :skip_derived_indexing_type_updates)
+    class Config < Support::Config.define(:latency_slo_thresholds_by_timestamp_in_ms, :skip_derived_indexing_type_updates, :indexing_event_decoder)
+      DEFAULT_INDEXING_EVENT_DECODER = {
+        "name" => "ElasticGraph::Indexer::IndexingEventDecoder::JSONLines",
+        "require_path" => "elastic_graph/indexer/indexing_event_decoder"
+      }
+
       json_schema at: "indexer",
         optional: false,
         description: "Configuration for indexing operations and metrics used by `elasticgraph-indexer`.",
@@ -42,16 +49,63 @@ module ElasticGraph
               {}, # : untyped
               {"WidgetWorkspace" => ["ABC12345678"]}
             ]
+          },
+          indexing_event_decoder: {
+            description: "Extension object used to decode raw indexing payloads into ElasticGraph indexing event hashes. The default decoder expects JSON Lines.",
+            type: "object",
+            properties: {
+              name: {
+                description: "The name of the indexing event decoder extension class.",
+                type: "string",
+                minLength: 1,
+                examples: ["MyCompany::ElasticGraph::CSVIndexingEventDecoder"]
+              },
+              require_path: {
+                description: "The path to require to load the indexing event decoder extension.",
+                type: "string",
+                minLength: 1,
+                examples: ["./lib/my_company/elastic_graph/csv_indexing_event_decoder"]
+              },
+              config: {
+                description: "Configuration for the indexing event decoder. Will be passed into the decoder's `#initialize` method.",
+                type: "object",
+                default: {}, # : untyped
+                examples: [
+                  {}, # : untyped
+                  {"delimiter" => ","}
+                ]
+              }
+            },
+            required: ["name", "require_path"],
+            default: DEFAULT_INDEXING_EVENT_DECODER,
+            examples: [
+              DEFAULT_INDEXING_EVENT_DECODER,
+              {
+                "name" => "MyCompany::ElasticGraph::CSVIndexingEventDecoder",
+                "require_path" => "./lib/my_company/elastic_graph/csv_indexing_event_decoder",
+                "config" => {"delimiter" => ","}
+              }
+            ]
           }
         }
 
       private
 
-      def convert_values(skip_derived_indexing_type_updates:, latency_slo_thresholds_by_timestamp_in_ms:)
+      def convert_values(skip_derived_indexing_type_updates:, latency_slo_thresholds_by_timestamp_in_ms:, indexing_event_decoder:)
         {
           skip_derived_indexing_type_updates: skip_derived_indexing_type_updates.transform_values(&:to_set),
-          latency_slo_thresholds_by_timestamp_in_ms: latency_slo_thresholds_by_timestamp_in_ms
+          latency_slo_thresholds_by_timestamp_in_ms: latency_slo_thresholds_by_timestamp_in_ms,
+          indexing_event_decoder: load_indexing_event_decoder(indexing_event_decoder)
         }
+      end
+
+      def load_indexing_event_decoder(config)
+        loader = SchemaArtifacts::RuntimeMetadata::ExtensionLoader.new(IndexingEventDecoder::Interface)
+        loader.load(
+          config.fetch("name"),
+          from: config.fetch("require_path"),
+          config: config["config"] || {}
+        )
       end
     end
   end
