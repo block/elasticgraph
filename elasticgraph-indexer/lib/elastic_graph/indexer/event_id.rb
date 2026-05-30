@@ -12,7 +12,7 @@ module ElasticGraph
   class Indexer
     # A unique identifier for an event ingested by the indexer. As a string, takes the form of
     # "[type]:[id]@v[version]", such as "Widget:123abc@v7". This format was designed to make it
-    # easy to put these ids in a comma-seperated list.
+    # easy to put these ids in a comma-separated list.
     EventID = ::Data.define(:type, :id, :version) do
       # @implements EventID
       def self.from_event(event)
@@ -26,7 +26,7 @@ module ElasticGraph
 
     # Steep weirdly expects them here...
     # @dynamic initialize, config, datastore_core, schema_artifacts, datastore_router, monotonic_clock
-    # @dynamic record_preparer_factory, processor, operation_factory, logger
+    # @dynamic record_preparer_factory, processor, operation_factory, indexing_event_decoder, logger
     # @dynamic self.from_parsed_yaml
   end
 end
