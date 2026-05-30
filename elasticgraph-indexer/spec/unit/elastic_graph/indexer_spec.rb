@@ -28,6 +28,28 @@ module ElasticGraph
 
         expect(indexer).to be_a(Indexer)
       end
+
+      it "builds a configured indexing event decoder" do
+        config = Indexer::Config.from_parsed_yaml("indexer" => {
+          "indexing_event_decoder" => {
+            "name" => "ExampleIndexingEventDecoder",
+            "require_path" => "support/example_extensions/indexing_event_decoder",
+            "config" => {"delimiter" => "|"}
+          }
+        })
+        indexer = Indexer.new(config: config, datastore_core: build_datastore_core)
+
+        decoder = indexer.indexing_event_decoder
+
+        expect(decoder).to be_a(ExampleIndexingEventDecoder)
+        expect(decoder.config).to eq({"delimiter" => "|"})
+        expect(decoder.schema_artifacts).to be(indexer.schema_artifacts)
+        expect(decoder.logger).to be(indexer.logger)
+        expect(decoder.decode("one|two")).to eq([
+          {"value" => "one"},
+          {"value" => "two"}
+        ])
+      end
     end
   end
 end
