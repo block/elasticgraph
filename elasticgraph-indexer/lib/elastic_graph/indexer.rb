@@ -86,6 +86,17 @@ module ElasticGraph
       end
     end
 
+    def indexing_event_decoder
+      @indexing_event_decoder ||= begin
+        extension = config.indexing_event_decoder
+        (_ = extension.extension_class).new(
+          config: extension.config,
+          schema_artifacts: schema_artifacts,
+          logger: logger
+        )
+      end
+    end
+
     def monotonic_clock
       @monotonic_clock ||= begin
         require "elastic_graph/support/monotonic_clock"
