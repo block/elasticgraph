@@ -82,6 +82,31 @@ module ElasticGraph
           )
         end
 
+        it "rejects type names reserved by schema definition extensions" do
+          expect {
+            define_schema do |schema|
+              schema.object_type EVENT_ENVELOPE_JSON_SCHEMA_NAME
+            end
+          }.to raise_error Errors::SchemaError, a_string_including(
+            "`#{EVENT_ENVELOPE_JSON_SCHEMA_NAME}` cannot be used as a schema type",
+            "reserved name"
+          )
+        end
+
+        it "allows test schemas to skip JSON schema version setup" do
+          result = define_schema(json_schema_version: nil) do |schema|
+            schema.object_type("Widget") do |t|
+              t.field "id", "ID"
+            end
+          end
+
+          expect(type_def_from(result, "Widget")).to eq(<<~EOS.strip)
+            type Widget {
+              id: ID
+            }
+          EOS
+        end
+
         it "produces the same GraphQL output, regardless of the order the types are defined in" do
           object_type_definitions = {
             "Component" => lambda do |t|
