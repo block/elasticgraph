@@ -41,6 +41,28 @@ module ElasticGraph
         end
       end
 
+      it "rejects `route_with` fields that resolve to a non-leaf type" do
+        expect {
+          index_definition_metadata_for("widgets") do |i|
+            i.route_with "nested_fields_gql"
+          end
+        }.to raise_error Errors::SchemaError, a_string_including(
+          "shard routing field `MyType.nested_fields_gql",
+          "is not a leaf field"
+        )
+      end
+
+      it "includes nested field-path guidance for unresolved nested `route_with` fields" do
+        expect {
+          index_definition_metadata_for("widgets") do |i|
+            i.route_with "nested_fields_gql.missing"
+          end
+        }.to raise_error Errors::SchemaError, a_string_including(
+          "Field `MyType.nested_fields_gql.missing` cannot be resolved",
+          "Verify that all fields and types referenced by `nested_fields_gql.missing` are defined."
+        )
+      end
+
       it "defaults `route_with` to `id` because that's the default routing the datastore uses" do
         components = index_definition_metadata_for("components")
         expect(components.route_with).to eq "id"
@@ -57,6 +79,28 @@ module ElasticGraph
 
         components = index_definition_metadata_for("components")
         expect(components.rollover).to eq nil
+      end
+
+      it "rejects rollover fields that are not date or datetime fields" do
+        expect {
+          index_definition_metadata_for("widgets") do |i|
+            i.rollover :monthly, "group_id"
+          end
+        }.to raise_error Errors::SchemaError, a_string_including(
+          "rollover field `MyType.group_id",
+          "is not a `Date` or `DateTime` field"
+        )
+      end
+
+      it "rejects rollover fields that are lists" do
+        expect {
+          index_definition_metadata_for("widgets", on_my_type: ->(t) { t.field "timestamps", "[DateTime!]!" }) do |i|
+            i.rollover :monthly, "timestamps"
+          end
+        }.to raise_error Errors::SchemaError, a_string_including(
+          "rollover field `MyType.timestamps",
+          "is a list field"
+        )
       end
 
       it "dumps the `rollover` timestamp field's `name_in_index`" do
