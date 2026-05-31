@@ -103,9 +103,6 @@ SimpleCov.start do
   # status if we're not running it's test suite.
   add_filter "/elasticgraph-local/" unless spec_files_to_run.any? { |f| f.include?("/elasticgraph-local/") }
 
-  # The JSON ingestion gem is being introduced by extracting implementation first and moving its tests later.
-  add_filter "/elasticgraph-json_ingestion/"
-
   # This version file is loaded from our gemspecs, which can get loaded by bundler before we get here.
   # SimpleCov is only able to track coverage of files loaded after it starts, so we need to filter them out if
   # their constant is already defined. They don't contain any branching statements or anything so it's ok to
