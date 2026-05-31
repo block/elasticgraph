@@ -1,0 +1,13 @@
+module ElasticGraph
+  module JSONIngestion
+    module SchemaDefinition
+      module SchemaElements
+        module TypeWithSubfieldsExtension: ::ElasticGraph::SchemaDefinition::SchemaElements::TypeWithSubfields
+          include HasJSONSchema
+
+          def to_indexing_field_type: () -> Indexing::FieldType::Object
+        end
+      end
+    end
+  end
+end
