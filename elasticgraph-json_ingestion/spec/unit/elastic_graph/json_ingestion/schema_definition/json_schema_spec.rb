@@ -13,7 +13,7 @@ require "elastic_graph/spec_support/schema_definition_helpers"
 require "support/json_schema_matcher"
 
 module ElasticGraph
-  module SchemaDefinition
+  module JSONIngestion::SchemaDefinition
     ::RSpec.describe "JSON schema generation" do
       include_context "SchemaDefinitionHelpers"
       json_schema_id = {"allOf" => [{"$ref" => "#/$defs/ID"}, {"maxLength" => DEFAULT_MAX_KEYWORD_LENGTH}]}
