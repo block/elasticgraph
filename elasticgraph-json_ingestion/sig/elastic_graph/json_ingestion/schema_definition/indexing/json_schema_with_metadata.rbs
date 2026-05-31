@@ -40,7 +40,7 @@ module ElasticGraph
 
             attr_reader unused_deprecated_elements: ::Set[ElasticGraph::SchemaDefinition::SchemaElements::DeprecatedElement]
 
-            def initialize: (ElasticGraph::SchemaDefinition::Results) -> void
+            def initialize: ((ElasticGraph::SchemaDefinition::Results & ResultsExtension)) -> void
             def merge_metadata_into: (::Hash[::String, untyped]) -> JSONSchemaWithMetadata
 
             private

@@ -16,7 +16,12 @@ module ElasticGraph
       include SchemaArtifacts::RuntimeMetadata::RuntimeMetadataSupport
 
       def define_schema(**options, &block)
-        super(schema_element_name_form: "snake_case", **options)
+        super(
+          schema_element_name_form: "snake_case",
+          extension_modules: [JSONIngestion::SchemaDefinition::APIExtension],
+          **options,
+          &block
+        )
       end
     end
   end

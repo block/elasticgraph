@@ -6,14 +6,13 @@
 #
 # frozen_string_literal: true
 
-require "elastic_graph/constants"
 require "elastic_graph/errors"
 require "elastic_graph/schema_definition/factory"
 require "elastic_graph/schema_definition/mixins/has_readable_to_s_and_inspect"
 require "elastic_graph/schema_definition/schema_elements/enum_value_namer"
 require "elastic_graph/schema_definition/schema_elements/field_path"
-require "elastic_graph/schema_definition/schema_elements/type_namer"
 require "elastic_graph/schema_definition/schema_elements/sub_aggregation_path"
+require "elastic_graph/schema_definition/schema_elements/type_namer"
 
 module ElasticGraph
   module SchemaDefinition
@@ -41,9 +40,7 @@ module ElasticGraph
       :deleted_types_by_old_name,
       :renamed_fields_by_type_name_and_old_field_name,
       :deleted_fields_by_type_name_and_old_field_name,
-      :json_schema_version,
-      :json_schema_version_setter_location,
-      :enforce_json_schema_version,
+      :reserved_type_names,
       :graphql_extension_modules,
       :graphql_resolvers_by_name,
       :built_in_graphql_resolvers,
@@ -56,8 +53,6 @@ module ElasticGraph
       :output,
       :type_namer,
       :enum_value_namer,
-      :allow_omitted_json_schema_fields,
-      :allow_extra_json_schema_fields,
       :indexed_types_by_index_name
     )
       include Mixins::HasReadableToSAndInspect.new
@@ -92,9 +87,7 @@ module ElasticGraph
           deleted_types_by_old_name: {},
           renamed_fields_by_type_name_and_old_field_name: ::Hash.new { |h, k| h[k] = {} },
           deleted_fields_by_type_name_and_old_field_name: ::Hash.new { |h, k| h[k] = {} },
-          json_schema_version_setter_location: nil,
-          json_schema_version: nil,
-          enforce_json_schema_version: true,
+          reserved_type_names: ::Set.new,
           graphql_extension_modules: [],
           graphql_resolvers_by_name: {},
           built_in_graphql_resolvers: ::Set.new,
@@ -110,14 +103,21 @@ module ElasticGraph
           ),
           enum_value_namer: SchemaElements::EnumValueNamer.new(enum_value_overrides_by_type),
           output: output,
-          allow_omitted_json_schema_fields: false,
-          allow_extra_json_schema_fields: true,
           indexed_types_by_index_name: {}
         )
       end
 
       # @dynamic index_document_sizes?
       alias_method :index_document_sizes?, :index_document_sizes
+
+      # Returns the JSON schema version recorded on this state, or `nil` if none has been set.
+      #
+      # The default implementation returns `nil` so callers can query it uniformly regardless of whether
+      # an ingestion-serializer extension is active. When `elasticgraph-json_ingestion` is loaded its
+      # `StateExtension` overrides this with a real `attr_accessor` backed by the extension's instance state.
+      def json_schema_version
+        nil
+      end
 
       def type_ref(name)
         # Type references are immutable and can be safely cached. Here we cache them because we've observed
@@ -226,12 +226,10 @@ module ElasticGraph
 
       private
 
-      RESERVED_TYPE_NAMES = [EVENT_ENVELOPE_JSON_SCHEMA_NAME].to_set
-
       def register_type(type, additional_type_index = nil)
         name = (_ = type).name
 
-        if RESERVED_TYPE_NAMES.include?(name)
+        if reserved_type_names.include?(name)
           raise Errors::SchemaError, "`#{name}` cannot be used as a schema type because it is a reserved name."
         end
 

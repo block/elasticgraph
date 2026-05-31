@@ -18,6 +18,7 @@ module ElasticGraph
         @json_schema_field_metadata_by_type_and_field_name: ::Hash[::String, ::Hash[::String, Indexing::JSONSchemaFieldMetadata]]?
         @current_public_json_schema: ::Hash[::String, untyped]?
         @json_schema_with_metadata_merger: Indexing::JSONSchemaWithMetadata::Merger?
+        @json_schema_indexing_field_types_by_name: ::Hash[::String, Indexing::_JSONFieldType]?
 
         def json_ingestion_state: () -> (::ElasticGraph::SchemaDefinition::State & StateExtension)
         def json_schema_with_metadata_merger: () -> Indexing::JSONSchemaWithMetadata::Merger

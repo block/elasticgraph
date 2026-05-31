@@ -45,7 +45,8 @@ module ElasticGraph
         # @return [void]
         # @api private
         def self.extended(api)
-          api.state.extend(StateExtension)
+          state = api.state.extend(StateExtension) # : ElasticGraph::SchemaDefinition::State & StateExtension
+          state.reserved_type_names << EVENT_ENVELOPE_JSON_SCHEMA_NAME
           api.factory.extend(FactoryExtension)
 
           # Build a lookup from final (post-`type_name_overrides`) names to JSON schema options. We can't

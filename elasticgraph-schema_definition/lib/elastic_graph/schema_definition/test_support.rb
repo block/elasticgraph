@@ -75,7 +75,9 @@ module ElasticGraph
 
         yield api if block_given?
 
-        # Set the json_schema_version to the provided value, if needed.
+        # Set the json_schema_version to the provided value, if needed. `API#json_schema_version` and
+        # `State#json_schema_version` are no-ops when no ingestion-serializer extension is loaded, so we
+        # can call through unconditionally — the JSON-ingestion extension overrides both.
         if !json_schema_version.nil? && api.state.json_schema_version.nil?
           api.json_schema_version(json_schema_version)
         end

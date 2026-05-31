@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/apollo/schema_definition/api_extension"
+require "elastic_graph/json_ingestion/schema_definition/api_extension"
 require "elastic_graph/spec_support/runtime_metadata_support"
 require "elastic_graph/spec_support/schema_definition_helpers"
 require "graphql"
@@ -1431,7 +1432,8 @@ module ElasticGraph
         end
 
         def define_schema(with_apollo: true, &block)
-          extension_modules = with_apollo ? [SchemaDefinition::APIExtension] : []
+          extension_modules = [::ElasticGraph::JSONIngestion::SchemaDefinition::APIExtension]
+          extension_modules += [SchemaDefinition::APIExtension] if with_apollo
           super(schema_element_name_form: schema_element_name_form, extension_modules: extension_modules, &block)
         end
       end
