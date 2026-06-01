@@ -1,0 +1,23 @@
+module ElasticGraph
+  module SchemaArtifacts
+    module RuntimeMetadata
+      class NestedSourcedDataParamsSuperType
+        attr_reader field_params: paramsHash
+        attr_reader path_identifier_params: paramsHash
+
+        def initialize: (field_params: paramsHash, path_identifier_params: paramsHash) -> void
+      end
+
+      class NestedSourcedDataParams < NestedSourcedDataParamsSuperType
+        FIELD_PARAMS: "field_params"
+        PATH_IDENTIFIER_PARAMS: "path_identifier_params"
+        EMPTY: NestedSourcedDataParams
+
+        def self.from_hash: (::Hash[::String, untyped]) -> NestedSourcedDataParams
+        def to_dumpable_hash: () -> ::Hash[::String, untyped]
+        def empty?: () -> bool
+        def script_params_for: (::Hash[::String, untyped]) -> ::Hash[::String, ::Hash[::String, untyped]]
+      end
+    end
+  end
+end

@@ -37,24 +37,42 @@ module ElasticGraph
       #     end
       #   end
       class Relationship < DelegateClass(Field)
-        # @dynamic related_type, hide_relationship_runtime_metadata, hide_relationship_runtime_metadata=
+        # @dynamic related_type, foreign_key, hide_relationship_runtime_metadata, hide_relationship_runtime_metadata=, parent_ref, indexing_only
+
+        # References a parent relationship in a nested sourced_from chain.
+        # @private
+        ParentRef = ::Data.define(:type_ref, :relationship_name)
 
         # @return [ObjectType, InterfaceType, UnionType] the type this relationship relates to
         attr_reader :related_type
 
+        # @return [String] the foreign key field name (the `via` parameter)
+        # @private
+        attr_reader :foreign_key
+
         # @private
         attr_accessor :hide_relationship_runtime_metadata
 
+        # @return [ParentRef, nil] reference to the parent relationship in a nested sourced_from chain
         # @private
-        def initialize(field, cardinality:, related_type:, foreign_key:, direction:)
+        attr_reader :parent_ref
+
+        # @return [Boolean] true if this relationship is for indexing only (not exposed in GraphQL)
+        # @private
+        attr_reader :indexing_only
+
+        # @private
+        def initialize(field, cardinality:, related_type:, foreign_key:, direction:, indexing_only: false)
           super(field)
           self.hide_relationship_runtime_metadata = false
           @cardinality = cardinality
           @related_type = related_type
           @foreign_key = foreign_key
           @direction = direction
+          @indexing_only = indexing_only
           @equivalent_field_paths_by_local_path = {}
           @additional_filter = {}
+          @parent_ref = nil
         end
 
         # Adds additional filter conditions to a relationship beyond the foreign key.
@@ -134,6 +152,59 @@ module ElasticGraph
           else
             @equivalent_field_paths_by_local_path[locally_named] = path
           end
+        end
+
+        # Indicates that this relationship chains through a parent relationship to reach the root indexed type.
+        #
+        # Use this API when defining relationships on embedded (non-indexed) types that need to use `sourced_from`
+        # on their fields. By chaining relationships through parent types, ElasticGraph can resolve the path from
+        # the nested type up to the root indexed type and properly update nested fields when source events arrive.
+        #
+        # @param parent_type_name [String] name of the parent type in the nesting hierarchy
+        # @param parent_relationship_name [String] name of the relationship on the parent type
+        # @return [void]
+        #
+        # @example Define a nested sourced_from relationship chain
+        #   ElasticGraph.define_schema do |schema|
+        #     schema.object_type "Team" do |t|
+        #       t.field "id", "ID!"
+        #       t.field "name", "String"
+        #       t.field "players", "[Player!]"
+        #       t.relates_to_many "statLines", "StatLine", via: "teamId", dir: :in, indexing_only: true
+        #       t.index "teams" do |i|
+        #         i.has_had_multiple_sources!
+        #       end
+        #     end
+        #
+        #     schema.object_type "Player" do |t|
+        #       t.field "id", "ID!"
+        #       t.field "name", "String"
+        #       t.field "goalsScored", "Int" do |f|
+        #         f.sourced_from "statLine", "goals"
+        #       end
+        #       t.relates_to_one "statLine", "StatLine", via: "playerId", dir: :in, indexing_only: true do |r|
+        #         r.parent_relationship "Team", "statLines"
+        #       end
+        #     end
+        #
+        #     schema.object_type "StatLine" do |t|
+        #       t.field "id", "ID!"
+        #       t.field "teamId", "ID"
+        #       t.field "playerId", "ID"
+        #       t.field "goals", "Int"
+        #       t.index "stat_lines"
+        #     end
+        #   end
+        def parent_relationship(parent_type_name, parent_relationship_name)
+          if @parent_ref
+            raise Errors::SchemaError, "`parent_relationship` has been called multiple times on `#{parent_type.name}.#{name}`, " \
+              "but each relationship can have only one `parent_relationship`."
+          end
+
+          @parent_ref = ParentRef.new(
+            type_ref: schema_def_state.type_ref(parent_type_name),
+            relationship_name: parent_relationship_name
+          )
         end
 
         # Gets the `routing_value_source` from this relationship for the given `index`, based on the configured
