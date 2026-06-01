@@ -42,7 +42,7 @@ jobs:
             datastore: "elasticsearch:9.0.0"
           - build_part: "run_datastore_specs"
             ruby: "4.0"
-            datastore: "opensearch:3.4.0"
+            datastore: "opensearch:3.6.0"
           - build_part: "run_datastore_specs"
             ruby: "4.0"
             datastore: "opensearch:2.19.0"
@@ -114,7 +114,7 @@ jobs:
       contents: read
       packages: write
     env:
-      OPENSEARCH_VERSION: "3.4.0"
+      OPENSEARCH_VERSION: "3.6.0"
 
     steps:
       - name: Harden Runner
