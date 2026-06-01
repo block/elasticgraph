@@ -38,6 +38,10 @@ module ElasticGraph
       #   @return [RolloverConfig, nil] rollover configuration for the index
       # @!attribute [r] has_had_multiple_sources_flag
       #   @return [Boolean] whether this index has ever had multiple sources
+      # @!attribute [r] nested_sourced_paths
+      #   @return [Hash<String, Array<SchemaArtifacts::RuntimeMetadata::ListPathSegment, SchemaArtifacts::RuntimeMetadata::ObjectPathSegment>>]
+      #     map from relationship name to the path segments that the painless script uses to
+      #     navigate to nested elements whose fields are sourced from another type via `sourced_from`.
       class Index < Struct.new(:name, :default_sort_pairs, :settings, :schema_def_state, :indexed_type, :routing_field_path, :rollover_config, :has_had_multiple_sources_flag, :nested_sourced_paths)
         include Mixins::HasReadableToSAndInspect.new { |i| i.name }
 
@@ -252,7 +256,7 @@ module ElasticGraph
         end
 
         # Registers the nested sourced path segments for a relationship on this index.
-        # Called by `NestedUpdateTargetResolver` during schema resolution.
+        # Called by `SourcedUpdateTargetsResolver` during schema resolution.
         # @api private
         def register_nested_sourced_paths(relationship_name, path_segments)
           nested_sourced_paths[relationship_name] = path_segments

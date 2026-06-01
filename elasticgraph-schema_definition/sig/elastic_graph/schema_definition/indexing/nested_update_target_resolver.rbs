@@ -19,7 +19,7 @@ module ElasticGraph
           schema_def_state: State
         ) -> void
 
-        def resolve: () -> [SchemaArtifacts::RuntimeMetadata::UpdateTarget?, ::Array[::String]]
+        def resolve: () { (untyped, SchemaElements::Relationship, ::Array[SchemaArtifacts::RuntimeMetadata::nestedSourcedPathSegment]) -> void } -> [SchemaArtifacts::RuntimeMetadata::UpdateTarget?, ::Array[::String]]
 
         private
 

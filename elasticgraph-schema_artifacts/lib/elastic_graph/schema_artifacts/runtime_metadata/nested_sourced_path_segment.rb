@@ -14,6 +14,7 @@ module ElasticGraph
       #
       # @private
       class ListPathSegment < ::Data.define(:field, :match_field, :source_field)
+        # @dynamic to_painless_param
         TYPE = "list"
         FIELD = "field"
         MATCH_FIELD = "matchField"
@@ -22,6 +23,8 @@ module ElasticGraph
         def to_dumpable_hash
           {"type" => TYPE, FIELD => field, MATCH_FIELD => match_field, SOURCE_FIELD => source_field}
         end
+
+        alias_method :to_painless_param, :to_dumpable_hash
 
         def self.from_hash(hash)
           new(field: hash[FIELD], match_field: hash[MATCH_FIELD], source_field: hash[SOURCE_FIELD])
@@ -32,12 +35,15 @@ module ElasticGraph
       #
       # @private
       class ObjectPathSegment < ::Data.define(:field)
+        # @dynamic to_painless_param
         TYPE = "object"
         FIELD = "field"
 
         def to_dumpable_hash
           {"type" => TYPE, FIELD => field}
         end
+
+        alias_method :to_painless_param, :to_dumpable_hash
 
         def self.from_hash(hash)
           new(field: hash[FIELD])

@@ -57,8 +57,7 @@ module ElasticGraph
           if errors.any?
             [nil, errors]
           else
-            # Register the path config on the destination index so it's available at runtime.
-            resolved_chain.root_indexed_type.index_def.register_nested_sourced_paths(relationship.name, nested_sourced_paths)
+            yield resolved_chain.root_indexed_type, relationship, nested_sourced_paths
 
             nested_sourced_data_params = SchemaArtifacts::RuntimeMetadata::NestedSourcedDataParams.new(
               field_params: field_params,

@@ -134,7 +134,9 @@ module ElasticGraph
               schema_def_state: @schema_def_state
             )
 
-            update_target, resolve_errors = resolver.resolve
+            update_target, resolve_errors = resolver.resolve do |indexed_type, rel, nested_sourced_paths|
+              indexed_type.index_def.register_nested_sourced_paths(rel.name, nested_sourced_paths)
+            end
             @sourced_field_errors.concat(resolve_errors)
 
             next unless update_target

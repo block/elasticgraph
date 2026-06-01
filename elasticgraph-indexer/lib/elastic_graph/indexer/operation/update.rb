@@ -151,7 +151,7 @@ module ElasticGraph
           # so it's important we avoid it.
           return initial_params unless update_target.for_normal_indexing?
 
-          initial_params["nestedSourcedPaths"] = destination_index_def.nested_sourced_paths.transform_values { |segments| segments.map(&:to_dumpable_hash) }
+          initial_params["nestedSourcedPaths"] = destination_index_def.nested_sourced_paths
 
           CountAccumulator.merge_list_counts_into(
             initial_params,
