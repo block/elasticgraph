@@ -20,9 +20,9 @@ module ElasticGraph
 
             expect {
               configure_index_definition(schema_def(number_of_shards: 47))
-            }.to raise_error(Errors::BadDatastoreRequest, a_string_including("Can't update non dynamic settings", "index.number_of_shards"))
+            }.to raise_error(Errors::BadDatastoreRequest, a_string_including("Can't update non dynamic setting", "index.number_of_shards"))
               .and make_datastore_write_calls("main", "PUT /#{unique_index_name}/_settings")
-              .and log_warning(/Can't update non dynamic settings/)
+              .and log_warning(/Can't update non dynamic setting/)
           end
 
           it "handles empty indexed types" do
