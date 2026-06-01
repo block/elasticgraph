@@ -264,7 +264,8 @@ module ElasticGraph
                 direction: direction
               )
             end,
-            has_had_multiple_sources: has_had_multiple_sources_flag
+            has_had_multiple_sources: has_had_multiple_sources_flag,
+            nested_sourced_paths: {} # TODO: Populate with real data once paths are registered on the index
           )
         end
 

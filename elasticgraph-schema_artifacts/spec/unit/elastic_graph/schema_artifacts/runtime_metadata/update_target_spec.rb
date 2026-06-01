@@ -26,6 +26,7 @@ module ElasticGraph
             routing_value_source: nil,
             rollover_timestamp_value_source: nil,
             top_level_fields_params: {},
+            nested_sourced_data_params: NestedSourcedDataParams::EMPTY,
             metadata_params: {}
           )
         end
@@ -84,9 +85,9 @@ module ElasticGraph
               }
             )
 
-            without_id_or_top_level_fields = params.except("id", "topLevelFields")
+            metadata_params_only = params.except("id", "topLevelFields", "nestedSourcedFields", "nestedSourcedPathIdentifiers")
 
-            expect(without_id_or_top_level_fields).to eq(
+            expect(metadata_params_only).to eq(
               "foo" => 43,
               "bar" => "hello",
               "bazz" => [12]
@@ -115,9 +116,23 @@ module ElasticGraph
             )
           end
 
-          def params_for(doc_id: "doc_id", event: {}, prepared_record: {}, top_level_fields_params: {}, metadata_params: {})
+          it "includes nested_sourced_data_params resolved from the prepared_record" do
+            params = params_for(
+              nested_sourced_data_params: NestedSourcedDataParams.new(
+                field_params: {"foo" => dynamic_param_with(source_path: "some.field", cardinality: :one)},
+                path_identifier_params: {"bar" => dynamic_param_with(source_path: "some.other", cardinality: :one)}
+              ),
+              prepared_record: {"some" => {"field" => "hello", "other" => "abc"}}
+            )
+
+            expect(params["nestedSourcedFields"]).to eq({"foo" => "hello"})
+            expect(params["nestedSourcedPathIdentifiers"]).to eq({"bar" => "abc"})
+          end
+
+          def params_for(doc_id: "doc_id", event: {}, prepared_record: {}, top_level_fields_params: {}, nested_sourced_data_params: NestedSourcedDataParams::EMPTY, metadata_params: {})
             update_target = normal_indexing_update_target_with(
               top_level_fields_params: top_level_fields_params,
+              nested_sourced_data_params: nested_sourced_data_params,
               metadata_params: metadata_params
             )
 

@@ -88,7 +88,8 @@ module ElasticGraph
             default_sort_fields: [],
             current_sources: [SELF_RELATIONSHIP_NAME],
             fields_by_path: {},
-            has_had_multiple_sources: false
+            has_had_multiple_sources: false,
+            nested_sourced_paths: {}
           )
 
           DatastoreCore::IndexDefinition.with(

@@ -72,6 +72,7 @@ module ElasticGraph
             routing_value_source: routing_value_source,
             rollover_timestamp_value_source: rollover_timestamp_value_source,
             top_level_fields_params: top_level_fields_params,
+            nested_sourced_data_params: NestedSourcedDataParams::EMPTY,
             metadata_params: metadata_params
           )
         end
@@ -83,6 +84,7 @@ module ElasticGraph
           routing_value_source: "routing_value_source",
           rollover_timestamp_value_source: "rollover_timestamp_value_source",
           top_level_fields_params: {},
+          nested_sourced_data_params: NestedSourcedDataParams::EMPTY,
           metadata_params: {}
         )
           UpdateTarget.new(
@@ -93,6 +95,7 @@ module ElasticGraph
             routing_value_source: routing_value_source,
             rollover_timestamp_value_source: rollover_timestamp_value_source,
             top_level_fields_params: top_level_fields_params,
+            nested_sourced_data_params: nested_sourced_data_params,
             metadata_params: metadata_params
           )
         end
@@ -112,14 +115,15 @@ module ElasticGraph
           StaticParam.new(value: value)
         end
 
-        def index_definition_with(route_with: nil, rollover: nil, default_sort_fields: [], current_sources: [SELF_RELATIONSHIP_NAME], fields_by_path: {}, has_had_multiple_sources: false)
+        def index_definition_with(route_with: nil, rollover: nil, default_sort_fields: [], current_sources: [SELF_RELATIONSHIP_NAME], fields_by_path: {}, has_had_multiple_sources: false, nested_sourced_paths: {})
           IndexDefinition.new(
             route_with: route_with,
             rollover: rollover,
             default_sort_fields: default_sort_fields,
             current_sources: current_sources,
             fields_by_path: fields_by_path,
-            has_had_multiple_sources: has_had_multiple_sources
+            has_had_multiple_sources: has_had_multiple_sources,
+            nested_sourced_paths: nested_sourced_paths
           )
         end
 

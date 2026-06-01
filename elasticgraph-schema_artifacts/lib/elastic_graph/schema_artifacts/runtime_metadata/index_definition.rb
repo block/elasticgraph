@@ -8,6 +8,7 @@
 
 require "elastic_graph/schema_artifacts/runtime_metadata/hash_dumper"
 require "elastic_graph/schema_artifacts/runtime_metadata/index_field"
+require "elastic_graph/schema_artifacts/runtime_metadata/nested_sourced_path_segment"
 require "elastic_graph/schema_artifacts/runtime_metadata/sort_field"
 
 module ElasticGraph
@@ -16,22 +17,24 @@ module ElasticGraph
       # Runtime metadata related to a datastore index definition.
       #
       # @private
-      class IndexDefinition < ::Data.define(:route_with, :rollover, :default_sort_fields, :current_sources, :fields_by_path, :has_had_multiple_sources)
+      class IndexDefinition < ::Data.define(:route_with, :rollover, :default_sort_fields, :current_sources, :fields_by_path, :has_had_multiple_sources, :nested_sourced_paths)
         ROUTE_WITH = "route_with"
         ROLLOVER = "rollover"
         DEFAULT_SORT_FIELDS = "default_sort_fields"
         CURRENT_SOURCES = "current_sources"
         FIELDS_BY_PATH = "fields_by_path"
         HAS_HAD_MULTIPLE_SOURCES = "has_had_multiple_sources"
+        NESTED_SOURCED_PATHS = "nested_sourced_paths"
 
-        def initialize(route_with:, rollover:, default_sort_fields:, current_sources:, fields_by_path:, has_had_multiple_sources:)
+        def initialize(route_with:, rollover:, default_sort_fields:, current_sources:, fields_by_path:, has_had_multiple_sources:, nested_sourced_paths:)
           super(
             route_with: route_with,
             rollover: rollover,
             default_sort_fields: default_sort_fields,
             current_sources: current_sources.to_set,
             fields_by_path: fields_by_path,
-            has_had_multiple_sources: has_had_multiple_sources
+            has_had_multiple_sources: has_had_multiple_sources,
+            nested_sourced_paths: nested_sourced_paths
           )
         end
 
@@ -42,7 +45,8 @@ module ElasticGraph
             default_sort_fields: hash[DEFAULT_SORT_FIELDS]&.map { |h| SortField.from_hash(h) } || [],
             current_sources: hash[CURRENT_SOURCES] || [],
             fields_by_path: (hash[FIELDS_BY_PATH] || {}).transform_values { |h| IndexField.from_hash(h) },
-            has_had_multiple_sources: hash[HAS_HAD_MULTIPLE_SOURCES] || false
+            has_had_multiple_sources: hash[HAS_HAD_MULTIPLE_SOURCES] || false,
+            nested_sourced_paths: (hash[NESTED_SOURCED_PATHS] || {}).transform_values { |segments| segments.map { |h| NestedSourcedPathSegment.from_hash(h) } }
           )
         end
 
@@ -53,6 +57,7 @@ module ElasticGraph
             DEFAULT_SORT_FIELDS => default_sort_fields.map(&:to_dumpable_hash),
             FIELDS_BY_PATH => HashDumper.dump_hash(fields_by_path, &:to_dumpable_hash),
             HAS_HAD_MULTIPLE_SOURCES => (true if has_had_multiple_sources),
+            NESTED_SOURCED_PATHS => nested_sourced_paths.transform_values { |segments| segments.map(&:to_dumpable_hash) },
             ROLLOVER => rollover&.to_dumpable_hash,
             ROUTE_WITH => route_with
           }

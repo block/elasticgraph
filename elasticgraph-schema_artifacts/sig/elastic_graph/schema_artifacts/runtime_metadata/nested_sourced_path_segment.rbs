@@ -1,0 +1,45 @@
+module ElasticGraph
+  module SchemaArtifacts
+    module RuntimeMetadata
+      class ListPathSegmentSuperType
+        attr_reader field: ::String
+        attr_reader match_field: ::String
+        attr_reader source_field: ::String
+
+        def initialize: (field: ::String, match_field: ::String, source_field: ::String) -> void
+      end
+
+      class ListPathSegment < ListPathSegmentSuperType
+        TYPE: "list"
+        FIELD: "field"
+        MATCH_FIELD: "matchField"
+        SOURCE_FIELD: "sourceField"
+
+        def self.from_hash: (::Hash[::String, untyped]) -> ListPathSegment
+        def to_dumpable_hash: () -> ::Hash[::String, ::String]
+        alias to_painless_param to_dumpable_hash
+      end
+
+      class ObjectPathSegmentSuperType
+        attr_reader field: ::String
+
+        def initialize: (field: ::String) -> void
+      end
+
+      class ObjectPathSegment < ObjectPathSegmentSuperType
+        TYPE: "object"
+        FIELD: "field"
+
+        def self.from_hash: (::Hash[::String, untyped]) -> ObjectPathSegment
+        def to_dumpable_hash: () -> ::Hash[::String, ::String]
+        alias to_painless_param to_dumpable_hash
+      end
+
+      type nestedSourcedPathSegment = ListPathSegment | ObjectPathSegment
+
+      module NestedSourcedPathSegment
+        def self.from_hash: (::Hash[::String, untyped]) -> nestedSourcedPathSegment
+      end
+    end
+  end
+end

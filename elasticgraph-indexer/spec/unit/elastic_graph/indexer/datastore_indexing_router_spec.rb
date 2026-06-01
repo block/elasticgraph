@@ -265,7 +265,7 @@ module ElasticGraph
             upsert: {},
             script: a_hash_including(
               id: /WidgetCurrency_from_Widget_/,
-              params: {"topLevelFields" => {"name" => ["thing1"]}, "id" => "USD"}
+              params: {"topLevelFields" => {"name" => ["thing1"]}, "id" => "USD", "nestedSourcedFields" => {}, "nestedSourcedPathIdentifiers" => {}}
             )
           )
         end
