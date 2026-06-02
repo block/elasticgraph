@@ -12,8 +12,7 @@ require "elastic_graph/schema_artifacts/runtime_metadata/schema"
 require "elastic_graph/schema_artifacts/artifacts_helper_methods"
 require "elastic_graph/schema_definition/indexing/event_envelope"
 require "elastic_graph/schema_definition/indexing/json_schema_with_metadata"
-require "elastic_graph/schema_definition/indexing/relationship_resolver"
-require "elastic_graph/schema_definition/indexing/update_target_resolver"
+require "elastic_graph/schema_definition/indexing/sourced_from_update_targets_resolver"
 require "elastic_graph/schema_definition/mixins/has_readable_to_s_and_inspect"
 require "elastic_graph/schema_definition/schema_elements/field_path"
 require "elastic_graph/schema_definition/scripting/file_system_repository"
@@ -143,11 +142,14 @@ module ElasticGraph
       end
 
       def build_runtime_metadata
-        extra_update_targets_by_object_type_name = identify_extra_update_targets_by_object_type_name
+        sourced_update_targets_by_source_type_name = Indexing::SourcedFromUpdateTargetsResolver.new(schema_def_state: state).resolve
 
         object_types_by_name = all_types
           .select { |t| t.respond_to?(:graphql_fields_by_name) }
-          .to_h { |type| [type.name, (_ = type).runtime_metadata(extra_update_targets_by_object_type_name.fetch(type.name) { [] })] }
+          .to_h do |type|
+            empty = [] # : ::Array[SchemaArtifacts::RuntimeMetadata::UpdateTarget]
+            [type.name, (_ = type).runtime_metadata(sourced_update_targets_by_source_type_name.fetch(type.name) { empty })]
+          end
 
         scalar_types_by_name = state.scalar_types_by_name.transform_values(&:runtime_metadata)
 
@@ -178,80 +180,6 @@ module ElasticGraph
           graphql_resolvers_by_name: state.graphql_resolvers_by_name,
           static_script_ids_by_scoped_name: STATIC_SCRIPT_REPO.script_ids_by_scoped_name
         ).tap { |rm| verify_runtime_metadata(rm) }
-      end
-
-      # Builds a map, keyed by object type name, of extra `update_targets` that have been generated
-      # from any fields that use `sourced_from` on other types.
-      def identify_extra_update_targets_by_object_type_name
-        sourced_field_errors = [] # : ::Array[::String]
-        relationship_errors = [] # : ::Array[::String]
-
-        state.object_types_by_name.except(*state.namespace_types_by_name.keys).values.each_with_object(
-          ::Hash.new { |h, k| h[k] = [] } # : ::Hash[untyped, ::Array[SchemaArtifacts::RuntimeMetadata::UpdateTarget]]
-        ) do |object_type, accum|
-          fields_with_sources_by_relationship_name =
-            if object_type.own_index_def.nil?
-              # only indexed types can have `sourced_from` fields, and resolving `fields_with_sources` on an unindexed union type
-              # such as `_Entity` when we are using apollo can lead to exceptions when multiple entity types have the same field name
-              # that use different mapping types.
-              {} # : ::Hash[::String, ::Array[SchemaElements::Field]]
-            else
-              object_type
-                .fields_with_sources
-                .group_by { |f| (_ = f.source).relationship_name }
-            end
-
-          defined_relationships = object_type.relationships_by_name.keys
-
-          (defined_relationships | fields_with_sources_by_relationship_name.keys).each do |relationship_name|
-            sourced_fields = fields_with_sources_by_relationship_name.fetch(relationship_name) { [] }
-            relationship_resolver = Indexing::RelationshipResolver.new(
-              schema_def_state: state,
-              object_type: object_type,
-              relationship_name: relationship_name,
-              sourced_fields: sourced_fields
-            )
-
-            resolved_relationship, relationship_error = relationship_resolver.resolve
-            relationship_errors << relationship_error if relationship_error
-
-            if object_type.own_index_def && resolved_relationship && sourced_fields.any?
-              update_target_resolver = Indexing::UpdateTargetResolver.new(
-                object_type: object_type,
-                resolved_relationship: resolved_relationship,
-                sourced_fields: sourced_fields,
-                field_path_resolver: state.field_path_resolver
-              )
-
-              update_target, errors = update_target_resolver.resolve
-              accum[resolved_relationship.related_type.name] << update_target if update_target
-              sourced_field_errors.concat(errors)
-
-              # Validate that has_had_multiple_sources! has been called when sourced_from is used
-              if (index_def = object_type.own_index_def) && !index_def.has_had_multiple_sources_flag
-                sourced_field_errors << "Type `#{object_type.name}` uses `sourced_from` fields but its index `#{index_def.name}` " \
-                  "has not been configured with `has_had_multiple_sources!`. To resolve this, add `i.has_had_multiple_sources!` within the " \
-                  "`t.index \"#{index_def.name}\"` block. This flag is required because indices with multiple sources can contain " \
-                  "incomplete documents, and ElasticGraph needs to know this to apply proper filtering. Once set, this flag should remain even " \
-                  "if you later remove all `sourced_from` fields, as the index may still contain historical incomplete documents."
-              end
-            end
-          end
-        end.tap do
-          full_errors = [] # : ::Array[::String]
-
-          if sourced_field_errors.any?
-            full_errors << "Schema had #{sourced_field_errors.size} error(s) related to `sourced_from` fields:\n\n#{sourced_field_errors.map.with_index(1) { |e, i| "#{i}. #{e}" }.join("\n\n")}"
-          end
-
-          if relationship_errors.any?
-            full_errors << "Schema had #{relationship_errors.size} error(s) related to relationship fields:\n\n#{relationship_errors.map.with_index(1) { |e, i| "#{i}. #{e}" }.join("\n\n")}"
-          end
-
-          unless full_errors.empty?
-            raise Errors::SchemaError, full_errors.join("\n\n")
-          end
-        end
       end
 
       # Generates the SDL defined by your schema. Intended to be called only once

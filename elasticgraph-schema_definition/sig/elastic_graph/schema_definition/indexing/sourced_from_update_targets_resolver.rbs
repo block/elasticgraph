@@ -1,0 +1,22 @@
+module ElasticGraph
+  module SchemaDefinition
+    module Indexing
+      class SourcedFromUpdateTargetsResolver
+        @schema_def_state: State
+        @sourced_field_errors: ::Array[::String]
+        @relationship_errors: ::Array[::String]
+        @update_targets_by_source_type_name: ::Hash[::String, ::Array[SchemaArtifacts::RuntimeMetadata::UpdateTarget]]
+
+        def initialize: (schema_def_state: State) -> void
+        def resolve: () -> ::Hash[::String, ::Array[SchemaArtifacts::RuntimeMetadata::UpdateTarget]]
+
+        private
+
+        def resolve_for_type: (indexableType) -> void
+        def resolve_update_target: (indexableType, ResolvedRelationship, ::Array[SchemaElements::Field]) -> void
+        def sourced_fields_by_relationship_name: (indexableType) -> ::Hash[::String, ::Array[SchemaElements::Field]]
+        def raise_if_errors: () -> void
+      end
+    end
+  end
+end
