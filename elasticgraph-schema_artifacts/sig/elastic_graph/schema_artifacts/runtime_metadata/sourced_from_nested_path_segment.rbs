@@ -10,14 +10,12 @@ module ElasticGraph
       end
 
       class ListPathSegment < ListPathSegmentSuperType
-        TYPE: "list"
         FIELD: "field"
-        MATCH_FIELD: "matchField"
-        SOURCE_FIELD: "sourceField"
+        MATCH_FIELD: "match_field"
+        SOURCE_FIELD: "source_field"
 
         def self.from_hash: (::Hash[::String, untyped]) -> ListPathSegment
         def to_dumpable_hash: () -> ::Hash[::String, ::String]
-        alias to_painless_param to_dumpable_hash
       end
 
       class ObjectPathSegmentSuperType
@@ -27,18 +25,16 @@ module ElasticGraph
       end
 
       class ObjectPathSegment < ObjectPathSegmentSuperType
-        TYPE: "object"
         FIELD: "field"
 
         def self.from_hash: (::Hash[::String, untyped]) -> ObjectPathSegment
         def to_dumpable_hash: () -> ::Hash[::String, ::String]
-        alias to_painless_param to_dumpable_hash
       end
 
-      type nestedSourcedPathSegment = ListPathSegment | ObjectPathSegment
+      type sourcedFromNestedPathSegment = ListPathSegment | ObjectPathSegment
 
-      module NestedSourcedPathSegment
-        def self.from_hash: (::Hash[::String, untyped]) -> nestedSourcedPathSegment
+      module SourcedFromNestedPathSegment
+        def self.from_hash: (::Hash[::String, untyped]) -> sourcedFromNestedPathSegment
       end
     end
   end

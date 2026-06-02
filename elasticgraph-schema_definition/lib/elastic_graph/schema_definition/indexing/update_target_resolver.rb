@@ -49,7 +49,7 @@ module ElasticGraph
               relationship: resolved_relationship.relationship_name,
               id_source: resolved_relationship.relation_metadata.foreign_key,
               top_level_fields_params: top_level_fields_params,
-              nested_sourced_data_params: SchemaArtifacts::RuntimeMetadata::NestedSourcedDataParams::EMPTY,
+              sourced_from_nested_params: SchemaArtifacts::RuntimeMetadata::SourcedFromNestedParams::EMPTY,
               routing_value_source: routing_value_source,
               rollover_timestamp_value_source: rollover_timestamp_value_source
             )

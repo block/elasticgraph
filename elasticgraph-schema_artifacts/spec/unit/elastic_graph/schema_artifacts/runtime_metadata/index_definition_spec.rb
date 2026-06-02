@@ -25,7 +25,7 @@ module ElasticGraph
             current_sources: Set.new,
             fields_by_path: {},
             has_had_multiple_sources: false,
-            nested_sourced_paths: {}
+            sourced_from_nested_paths_by_relationship: {}
           )
         end
 
@@ -50,26 +50,6 @@ module ElasticGraph
 
           index_def_with_flag = index_definition_with(has_had_multiple_sources: true)
           expect(index_def_with_flag.to_dumpable_hash["has_had_multiple_sources"]).to eq true
-        end
-
-        it "roundtrips nested_sourced_paths through to_dumpable_hash and from_hash" do
-          index_def = index_definition_with(
-            nested_sourced_paths: {
-              "foo" => [
-                ListPathSegment.new(field: "bar", match_field: "id", source_field: "bazId"),
-                ObjectPathSegment.new(field: "qux")
-              ]
-            }
-          )
-
-          roundtripped = IndexDefinition.from_hash(index_def.to_dumpable_hash)
-
-          expect(roundtripped.nested_sourced_paths).to eq({
-            "foo" => [
-              ListPathSegment.new(field: "bar", match_field: "id", source_field: "bazId"),
-              ObjectPathSegment.new(field: "qux")
-            ]
-          })
         end
 
         describe IndexDefinition::Rollover do

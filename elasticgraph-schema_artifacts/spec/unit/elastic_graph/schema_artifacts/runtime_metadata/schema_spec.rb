@@ -43,7 +43,10 @@ module ElasticGraph
                     routing_value_source: "cost.currency_name",
                     rollover_timestamp_value_source: "currency_introduced_on",
                     top_level_fields_params: {"workspace_id" => DynamicParam.new(source_path: "wid", cardinality: :one)},
-                    nested_sourced_data_params: NestedSourcedDataParams::EMPTY,
+                    sourced_from_nested_params: SourcedFromNestedParams.new(
+                      field_params: {"amount" => DynamicParam.new(source_path: "cost.amount", cardinality: :one)},
+                      path_identifier_params: {"currency_id" => DynamicParam.new(source_path: "cost.currency", cardinality: :one)}
+                    ),
                     metadata_params: {"relationshipName" => StaticParam.new(value: "currency")}
                   ),
                   UpdateTarget.new(
@@ -54,7 +57,7 @@ module ElasticGraph
                     routing_value_source: nil,
                     rollover_timestamp_value_source: nil,
                     top_level_fields_params: {},
-                    nested_sourced_data_params: NestedSourcedDataParams::EMPTY,
+                    sourced_from_nested_params: SourcedFromNestedParams::EMPTY,
                     metadata_params: {}
                   )
                 ],
@@ -125,7 +128,12 @@ module ElasticGraph
                   "foo.bar" => IndexField.new(source: "other")
                 },
                 has_had_multiple_sources: false,
-                nested_sourced_paths: {}
+                sourced_from_nested_paths_by_relationship: {
+                  "currency" => [
+                    ListPathSegment.new(field: "costs", match_field: "id", source_field: "cost_id"),
+                    ObjectPathSegment.new(field: "details")
+                  ]
+                }
               ),
               "addresses" => IndexDefinition.new(
                 route_with: nil,
@@ -134,7 +142,7 @@ module ElasticGraph
                 current_sources: [SELF_RELATIONSHIP_NAME],
                 fields_by_path: {},
                 has_had_multiple_sources: false,
-                nested_sourced_paths: {}
+                sourced_from_nested_paths_by_relationship: {}
               ),
               "components" => IndexDefinition.new(
                 route_with: "group_id",
@@ -143,7 +151,7 @@ module ElasticGraph
                 current_sources: [SELF_RELATIONSHIP_NAME],
                 fields_by_path: {},
                 has_had_multiple_sources: true,
-                nested_sourced_paths: {}
+                sourced_from_nested_paths_by_relationship: {}
               )
             },
             schema_element_names: SchemaElementNames.new(
@@ -171,14 +179,18 @@ module ElasticGraph
                 "index_definition_names" => ["widgets"],
                 "update_targets" => [
                   {
-                    "type" => "WidgetCurrency",
-                    "relationship" => "currency",
-                    "script_id" => "some_script_id",
                     "id_source" => "cost.currency",
-                    "routing_value_source" => "cost.currency_name",
+                    "metadata_params" => {"relationshipName" => {"value" => "currency"}},
+                    "relationship" => "currency",
                     "rollover_timestamp_value_source" => "currency_introduced_on",
+                    "routing_value_source" => "cost.currency_name",
+                    "script_id" => "some_script_id",
+                    "sourced_from_nested_params" => {
+                      "field_params" => {"amount" => {"source_path" => "cost.amount", "cardinality" => "one"}},
+                      "path_identifier_params" => {"currency_id" => {"source_path" => "cost.currency", "cardinality" => "one"}}
+                    },
                     "top_level_fields_params" => {"workspace_id" => {"source_path" => "wid", "cardinality" => "one"}},
-                    "metadata_params" => {"relationshipName" => {"value" => "currency"}}
+                    "type" => "WidgetCurrency"
                   },
                   {
                     "id_source" => "id"
@@ -266,6 +278,12 @@ module ElasticGraph
                   "foo.bar" => {
                     "source" => "other"
                   }
+                },
+                "sourced_from_nested_paths_by_relationship" => {
+                  "currency" => [
+                    {"field" => "costs", "match_field" => "id", "source_field" => "cost_id"},
+                    {"field" => "details"}
+                  ]
                 }
               },
               "addresses" => {
@@ -316,7 +334,7 @@ module ElasticGraph
               routing_value_source: nil,
               rollover_timestamp_value_source: nil,
               top_level_fields_params: {"workspace_id" => dynamic_param_with(cardinality: :many)},
-              nested_sourced_data_params: NestedSourcedDataParams::EMPTY,
+              sourced_from_nested_params: SourcedFromNestedParams::EMPTY,
               metadata_params: {}
             )]),
             "IndexDefinitionNamesOnly" => object_type_with(index_definition_names: ["foo", "bar"]),

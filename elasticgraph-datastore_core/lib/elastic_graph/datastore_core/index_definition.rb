@@ -33,10 +33,7 @@ module ElasticGraph
           env_index_config: env_index_config,
           defined_clusters: config.clusters.keys.to_set,
           datastore_clients_by_name: datastore_clients_by_name,
-          has_had_multiple_sources: runtime_metadata.has_had_multiple_sources,
-          # :nocov: -- the block is only exercised with non-empty nested_sourced_paths, which will come in a future PR
-          nested_sourced_paths: runtime_metadata.nested_sourced_paths.transform_values { |segments| segments.map(&:to_painless_param) }
-          # :nocov:
+          has_had_multiple_sources: runtime_metadata.has_had_multiple_sources
         }
 
         if (rollover = runtime_metadata.rollover)

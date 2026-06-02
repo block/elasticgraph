@@ -265,7 +265,7 @@ module ElasticGraph
               )
             end,
             has_had_multiple_sources: has_had_multiple_sources_flag,
-            nested_sourced_paths: {} # TODO: Populate with real data once paths are registered on the index
+            sourced_from_nested_paths_by_relationship: {} # TODO: Populate with real data once paths are registered on the index
           )
         end
 

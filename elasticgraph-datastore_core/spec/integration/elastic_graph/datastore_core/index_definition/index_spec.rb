@@ -89,7 +89,7 @@ module ElasticGraph
             current_sources: [SELF_RELATIONSHIP_NAME],
             fields_by_path: {},
             has_had_multiple_sources: false,
-            nested_sourced_paths: {}
+            sourced_from_nested_paths_by_relationship: {}
           )
 
           DatastoreCore::IndexDefinition.with(

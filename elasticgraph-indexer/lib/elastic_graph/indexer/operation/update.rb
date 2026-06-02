@@ -145,15 +145,10 @@ module ElasticGraph
             prepared_record: prepared_record
           )
 
-          # The normal indexing script uses `__counts` and `nestedSourcedPaths`. Other indexing scripts
-          # (e.g. the ones generated for derived indexing) do not use these so there's no point in
-          # spending effort on computing them. Plus, the logic below raises an exception in that case,
-          # so it's important we avoid it.
+          # The normal indexing script uses `__counts`. Other indexing scripts (e.g. the ones generated
+          # for derived indexing) do not use `__counts` so there's no point in spending effort on computing
+          # it. Plus, the logic below raises an exception in that case, so it's important we avoid it.
           return initial_params unless update_target.for_normal_indexing?
-
-          # `nestedSourcedPaths` is static per-index configuration (describing how to navigate to nested
-          # elements), unlike the per-event params resolved by `update_target.params_for` above.
-          initial_params["nestedSourcedPaths"] = destination_index_def.nested_sourced_paths
 
           CountAccumulator.merge_list_counts_into(
             initial_params,

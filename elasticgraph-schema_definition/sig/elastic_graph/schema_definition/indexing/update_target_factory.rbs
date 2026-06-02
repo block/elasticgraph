@@ -9,7 +9,7 @@ module ElasticGraph
           top_level_fields_params: SchemaArtifacts::RuntimeMetadata::paramsHash,
           routing_value_source: ::String?,
           rollover_timestamp_value_source: ::String?,
-          nested_sourced_data_params: SchemaArtifacts::RuntimeMetadata::NestedSourcedDataParams
+          sourced_from_nested_params: SchemaArtifacts::RuntimeMetadata::SourcedFromNestedParams
         ) -> SchemaArtifacts::RuntimeMetadata::UpdateTarget
 
         private

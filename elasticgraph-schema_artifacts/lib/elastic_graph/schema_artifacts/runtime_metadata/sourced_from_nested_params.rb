@@ -17,7 +17,7 @@ module ElasticGraph
       # extract from the event to identify which nested element to target.
       #
       # @private
-      class NestedSourcedDataParams < ::Data.define(:field_params, :path_identifier_params)
+      class SourcedFromNestedParams < ::Data.define(:field_params, :path_identifier_params)
         FIELD_PARAMS = "field_params"
         PATH_IDENTIFIER_PARAMS = "path_identifier_params"
 
@@ -40,8 +40,8 @@ module ElasticGraph
         # Resolves params into script-ready values from the given prepared record.
         def script_params_for(prepared_record)
           {
-            "nestedSourcedFields" => field_params.transform_values { |param| param.value_for(prepared_record) },
-            "nestedSourcedPathIdentifiers" => path_identifier_params.transform_values { |param| param.value_for(prepared_record) }
+            "sourcedFromNestedFields" => field_params.transform_values { |param| param.value_for(prepared_record) },
+            "sourcedFromNestedPathIdentifiers" => path_identifier_params.transform_values { |param| param.value_for(prepared_record) }
           }
         end
       end
