@@ -30,7 +30,7 @@ module ElasticGraph
           type_names_and_update_targets =
             @schema_def_state.object_types_by_name.except(*@schema_def_state.namespace_types_by_name.keys).each_value.flat_map do |object_type|
               resolve_for_type(object_type) do |error_type, error|
-                errors = error_type == :relationship ? relationship_errors : sourced_field_errors
+                errors = (error_type == :relationship) ? relationship_errors : sourced_field_errors
                 errors << error
               end
             end
