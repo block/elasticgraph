@@ -12,7 +12,7 @@ module ElasticGraph
       # @private
       module SourcedFromNestedPathSegment
         def self.from_hash(hash)
-          if hash.key?("match_field")
+          if hash.key?(ListPathSegment::MATCH_FIELD)
             ListPathSegment.from_hash(hash)
           else
             ObjectPathSegment.from_hash(hash)
