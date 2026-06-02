@@ -39,7 +39,6 @@ module ElasticGraph
       def generate_datastore_config: () -> ::Hash[::String, untyped]
       def build_dynamic_scripts: () -> ::Array[Scripting::Script]
       def build_runtime_metadata: () -> SchemaArtifacts::RuntimeMetadata::Schema
-      def identify_extra_update_targets_by_object_type_name: () -> ::Hash[::String, ::Array[SchemaArtifacts::RuntimeMetadata::UpdateTarget]]
       def generate_sdl: () -> ::String
       def build_public_json_schema: () -> ::Hash[::String, untyped]
       def json_schema_indexing_field_types_by_name: () -> ::Hash[::String, Indexing::_FieldType]
