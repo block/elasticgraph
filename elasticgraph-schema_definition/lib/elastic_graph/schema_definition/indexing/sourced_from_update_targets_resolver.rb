@@ -18,30 +18,37 @@ module ElasticGraph
       #
       # @private
       class SourcedFromUpdateTargetsResolver
-        def initialize(schema_def_state:)
+        def initialize(schema_def_state)
           @schema_def_state = schema_def_state
-          @sourced_field_errors = [] # : ::Array[::String]
-          @relationship_errors = [] # : ::Array[::String]
-          @update_targets_by_source_type_name = ::Hash.new { |h, k| h[k] = [] } # : ::Hash[::String, ::Array[SchemaArtifacts::RuntimeMetadata::UpdateTarget]]
         end
 
         # Returns a map of source type name → update targets that should be triggered by that type's events.
         def resolve
-          @schema_def_state.object_types_by_name.except(*@schema_def_state.namespace_types_by_name.keys).each_value do |object_type|
-            resolve_for_type(object_type)
-          end
+          sourced_field_errors = [] # : ::Array[::String]
+          relationship_errors = [] # : ::Array[::String]
 
-          raise_if_errors
-          @update_targets_by_source_type_name
+          type_names_and_update_targets =
+            @schema_def_state.object_types_by_name.except(*@schema_def_state.namespace_types_by_name.keys).each_value.flat_map do |object_type|
+              resolve_for_type(object_type) do |error_type, error|
+                errors = error_type == :relationship ? relationship_errors : sourced_field_errors
+                errors << error
+              end
+            end
+
+          raise_if_errors(sourced_field_errors, relationship_errors)
+
+          type_names_and_update_targets
+            .group_by(&:first)
+            .transform_values { |pairs| pairs.map(&:last) }
         end
 
         private
 
-        def resolve_for_type(object_type)
+        def resolve_for_type(object_type, &error_reporter)
           fields_with_sources_by_relationship_name = sourced_fields_by_relationship_name(object_type)
           defined_relationships = object_type.relationships_by_name.keys
 
-          (defined_relationships | fields_with_sources_by_relationship_name.keys).each do |relationship_name|
+          (defined_relationships | fields_with_sources_by_relationship_name.keys).filter_map do |relationship_name|
             empty_fields = [] # : ::Array[SchemaElements::Field]
             sourced_fields = fields_with_sources_by_relationship_name.fetch(relationship_name) { empty_fields }
             relationship_resolver = RelationshipResolver.new(
@@ -52,10 +59,10 @@ module ElasticGraph
             )
 
             resolved_relationship, relationship_error = relationship_resolver.resolve
-            @relationship_errors << relationship_error if relationship_error
+            yield :relationship, relationship_error if relationship_error
 
             if object_type.own_index_def && resolved_relationship && sourced_fields.any?
-              resolve_update_target(object_type, resolved_relationship, sourced_fields)
+              resolve_update_target(object_type, resolved_relationship, sourced_fields, &error_reporter)
             end
           end
         end
@@ -69,17 +76,19 @@ module ElasticGraph
           )
 
           update_target, errors = update_target_resolver.resolve
-          @update_targets_by_source_type_name[resolved_relationship.related_type.name] << update_target if update_target
-          @sourced_field_errors.concat(errors)
+          errors.each { |error| yield :sourced_field, error }
 
           # Validate that has_had_multiple_sources! has been called when sourced_from is used
-          if (index_def = object_type.own_index_def) && !index_def.has_had_multiple_sources_flag
-            @sourced_field_errors << "Type `#{object_type.name}` uses `sourced_from` fields but its index `#{index_def.name}` " \
+          index_def = object_type.own_index_def # : Index
+          unless index_def.has_had_multiple_sources_flag
+            yield :sourced_field, "Type `#{object_type.name}` uses `sourced_from` fields but its index `#{index_def.name}` " \
               "has not been configured with `has_had_multiple_sources!`. To resolve this, add `i.has_had_multiple_sources!` within the " \
               "`t.index \"#{index_def.name}\"` block. This flag is required because indices with multiple sources can contain " \
               "incomplete documents, and ElasticGraph needs to know this to apply proper filtering. Once set, this flag should remain even " \
               "if you later remove all `sourced_from` fields, as the index may still contain historical incomplete documents."
           end
+
+          [resolved_relationship.related_type.name, update_target] if update_target
         end
 
         def sourced_fields_by_relationship_name(object_type)
@@ -95,15 +104,15 @@ module ElasticGraph
           end
         end
 
-        def raise_if_errors
+        def raise_if_errors(sourced_field_errors, relationship_errors)
           full_errors = [] # : ::Array[::String]
 
-          if @sourced_field_errors.any?
-            full_errors << "Schema had #{@sourced_field_errors.size} error(s) related to `sourced_from` fields:\n\n#{@sourced_field_errors.map.with_index(1) { |e, i| "#{i}. #{e}" }.join("\n\n")}"
+          if sourced_field_errors.any?
+            full_errors << "Schema had #{sourced_field_errors.size} error(s) related to `sourced_from` fields:\n\n#{sourced_field_errors.map.with_index(1) { |e, i| "#{i}. #{e}" }.join("\n\n")}"
           end
 
-          if @relationship_errors.any?
-            full_errors << "Schema had #{@relationship_errors.size} error(s) related to relationship fields:\n\n#{@relationship_errors.map.with_index(1) { |e, i| "#{i}. #{e}" }.join("\n\n")}"
+          if relationship_errors.any?
+            full_errors << "Schema had #{relationship_errors.size} error(s) related to relationship fields:\n\n#{relationship_errors.map.with_index(1) { |e, i| "#{i}. #{e}" }.join("\n\n")}"
           end
 
           unless full_errors.empty?

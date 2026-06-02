@@ -142,7 +142,7 @@ module ElasticGraph
       end
 
       def build_runtime_metadata
-        sourced_update_targets_by_source_type_name = Indexing::SourcedFromUpdateTargetsResolver.new(schema_def_state: state).resolve
+        sourced_update_targets_by_source_type_name = Indexing::SourcedFromUpdateTargetsResolver.new(state).resolve
 
         object_types_by_name = all_types
           .select { |t| t.respond_to?(:graphql_fields_by_name) }
