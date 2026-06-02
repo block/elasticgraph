@@ -272,7 +272,8 @@ module ElasticGraph
             metadata_params: {},
             top_level_fields_params: fields.map(&:source_field).to_h do |f|
               [f, SchemaArtifacts::RuntimeMetadata::DynamicParam.new(source_path: f, cardinality: :many)]
-            end
+            end,
+            sourced_from_nested_params: SchemaArtifacts::RuntimeMetadata::SourcedFromNestedParams::EMPTY
           )
         end
 

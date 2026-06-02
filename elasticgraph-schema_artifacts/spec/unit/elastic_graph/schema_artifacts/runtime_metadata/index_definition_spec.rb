@@ -24,7 +24,8 @@ module ElasticGraph
             default_sort_fields: [],
             current_sources: Set.new,
             fields_by_path: {},
-            has_had_multiple_sources: false
+            has_had_multiple_sources: false,
+            sourced_from_nested_paths_by_relationship: {}
           )
         end
 

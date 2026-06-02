@@ -18,7 +18,8 @@ module ElasticGraph
           id_source:,
           top_level_fields_params:,
           routing_value_source:,
-          rollover_timestamp_value_source:
+          rollover_timestamp_value_source:,
+          sourced_from_nested_params:
         )
           SchemaArtifacts::RuntimeMetadata::UpdateTarget.new(
             type: type,
@@ -29,6 +30,7 @@ module ElasticGraph
               "relationship" => SchemaArtifacts::RuntimeMetadata::StaticParam.new(value: relationship)
             }),
             top_level_fields_params: top_level_fields_params,
+            sourced_from_nested_params: sourced_from_nested_params,
             routing_value_source: routing_value_source,
             rollover_timestamp_value_source: rollover_timestamp_value_source
           )

@@ -74,7 +74,9 @@ module ElasticGraph
               {
                 script: {id: operations.first.update_target.script_id, params: {
                   "topLevelFields" => {"name" => ["thing1"]},
-                  "id" => "17"
+                  "id" => "17",
+                  "sourcedFromNestedFields" => {},
+                  "sourcedFromNestedPathIdentifiers" => {}
                 }},
                 scripted_upsert: true,
                 upsert: {}
@@ -104,6 +106,8 @@ module ElasticGraph
                 script: {id: INDEX_DATA_UPDATE_SCRIPT_ID, params: {
                   "topLevelFields" => {"name" => "thing1"},
                   "id" => "17",
+                  "sourcedFromNestedFields" => {},
+                  "sourcedFromNestedPathIdentifiers" => {},
                   "staticValue" => 47,
                   "sourceType" => "Widget",
                   LIST_COUNTS_FIELD => {"sizes" => 0, "widget_names" => 0}
@@ -157,7 +161,9 @@ module ElasticGraph
               {
                 script: {id: operations.first.update_target.script_id, params: {
                   "topLevelFields" => {"name" => []},
-                  "id" => "17"
+                  "id" => "17",
+                  "sourcedFromNestedFields" => {},
+                  "sourcedFromNestedPathIdentifiers" => {}
                 }},
                 scripted_upsert: true,
                 upsert: {}
@@ -178,7 +184,9 @@ module ElasticGraph
               {
                 script: {id: operations.first.update_target.script_id, params: {
                   "topLevelFields" => {"name" => ["thing1"]},
-                  "id" => "embedded_workspace_id"
+                  "id" => "embedded_workspace_id",
+                  "sourcedFromNestedFields" => {},
+                  "sourcedFromNestedPathIdentifiers" => {}
                 }},
                 scripted_upsert: true,
                 upsert: {}
@@ -203,7 +211,9 @@ module ElasticGraph
               {
                 script: {id: operations.first.update_target.script_id, params: {
                   "topLevelFields" => {"embedded_values.missing_field" => [], "name" => nil},
-                  "id" => "17"
+                  "id" => "17",
+                  "sourcedFromNestedFields" => {},
+                  "sourcedFromNestedPathIdentifiers" => {}
                 }},
                 scripted_upsert: true,
                 upsert: {}
@@ -236,7 +246,9 @@ module ElasticGraph
                       "workspace_id" => "embedded_workspace_id"
                     }
                   },
-                  "id" => "17"
+                  "id" => "17",
+                  "sourcedFromNestedFields" => {},
+                  "sourcedFromNestedPathIdentifiers" => {}
                 }},
                 scripted_upsert: true,
                 upsert: {}
@@ -262,7 +274,9 @@ module ElasticGraph
                 script: {id: operations.first.update_target.script_id, params: {
                   # Float-typed integer values are coerced to true ints before indexing
                   "topLevelFields" => {"size" => [an_instance_of(::Integer).and(eq_to(4))]},
-                  "id" => "17"
+                  "id" => "17",
+                  "sourcedFromNestedFields" => {},
+                  "sourcedFromNestedPathIdentifiers" => {}
                 }},
                 scripted_upsert: true,
                 upsert: {}
@@ -283,7 +297,9 @@ module ElasticGraph
               {
                 script: {id: operations.first.update_target.script_id, params: {
                   "topLevelFields" => {"name" => ["thing1"]},
-                  "id" => "17"
+                  "id" => "17",
+                  "sourcedFromNestedFields" => {},
+                  "sourcedFromNestedPathIdentifiers" => {}
                 }},
                 scripted_upsert: true,
                 upsert: {}
@@ -292,7 +308,9 @@ module ElasticGraph
               {
                 script: {id: operations.first.update_target.script_id, params: {
                   "topLevelFields" => {"name" => ["thing1"]},
-                  "id" => "18"
+                  "id" => "18",
+                  "sourcedFromNestedFields" => {},
+                  "sourcedFromNestedPathIdentifiers" => {}
                 }},
                 scripted_upsert: true,
                 upsert: {}
@@ -301,7 +319,9 @@ module ElasticGraph
               {
                 script: {id: operations.first.update_target.script_id, params: {
                   "topLevelFields" => {"name" => ["thing1"]},
-                  "id" => "19"
+                  "id" => "19",
+                  "sourcedFromNestedFields" => {},
+                  "sourcedFromNestedPathIdentifiers" => {}
                 }},
                 scripted_upsert: true,
                 upsert: {}

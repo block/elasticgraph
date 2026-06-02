@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/constants"
+require "elastic_graph/schema_artifacts/runtime_metadata/sourced_from_nested_params"
 require "elastic_graph/schema_artifacts/runtime_metadata/params"
 
 module ElasticGraph
@@ -23,6 +24,7 @@ module ElasticGraph
         :routing_value_source,
         :rollover_timestamp_value_source,
         :top_level_fields_params,
+        :sourced_from_nested_params,
         :metadata_params
       )
         TYPE = "type"
@@ -32,6 +34,7 @@ module ElasticGraph
         ROUTING_VALUE_SOURCE = "routing_value_source"
         ROLLOVER_TIMESTAMP_VALUE_SOURCE = "rollover_timestamp_value_source"
         TOP_LEVEL_FIELDS_PARAMS = "top_level_fields_params"
+        SOURCED_FROM_NESTED_PARAMS = "sourced_from_nested_params"
         METADATA_PARAMS = "metadata_params"
 
         def self.from_hash(hash)
@@ -43,6 +46,7 @@ module ElasticGraph
             routing_value_source: hash[ROUTING_VALUE_SOURCE],
             rollover_timestamp_value_source: hash[ROLLOVER_TIMESTAMP_VALUE_SOURCE],
             top_level_fields_params: Param.load_params_hash(hash[TOP_LEVEL_FIELDS_PARAMS] || {}),
+            sourced_from_nested_params: SourcedFromNestedParams.from_hash(hash[SOURCED_FROM_NESTED_PARAMS] || {}),
             metadata_params: Param.load_params_hash(hash[METADATA_PARAMS] || {})
           )
         end
@@ -56,6 +60,7 @@ module ElasticGraph
             ROLLOVER_TIMESTAMP_VALUE_SOURCE => rollover_timestamp_value_source,
             ROUTING_VALUE_SOURCE => routing_value_source,
             SCRIPT_ID => script_id,
+            SOURCED_FROM_NESTED_PARAMS => sourced_from_nested_params.to_dumpable_hash,
             TOP_LEVEL_FIELDS_PARAMS => Param.dump_params_hash(top_level_fields_params),
             TYPE => type
           }
@@ -74,7 +79,10 @@ module ElasticGraph
             [name, param.value_for(event)]
           end
 
-          meta.merge({"id" => doc_id, "topLevelFields" => top_level_fields})
+          meta.merge(
+            {"id" => doc_id, "topLevelFields" => top_level_fields},
+            sourced_from_nested_params.script_params_for(prepared_record)
+          )
         end
       end
     end

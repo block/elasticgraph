@@ -446,6 +446,7 @@ module ElasticGraph
             relationship: SELF_RELATIONSHIP_NAME,
             id_source: "id",
             top_level_fields_params: top_level_fields_params,
+            sourced_from_nested_params: SchemaArtifacts::RuntimeMetadata::SourcedFromNestedParams::EMPTY,
             # Some day we may want to consider supporting multiple indices. If/when we add support for that,
             # we'll need to change the runtime metadata here to have a map of these values, keyed by index
             # name.
