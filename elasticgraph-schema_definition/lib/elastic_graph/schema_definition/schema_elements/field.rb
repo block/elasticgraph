@@ -963,7 +963,7 @@ module ElasticGraph
             EOS
           end
 
-          argument schema_def_state.schema_elements.after.to_sym, "Cursor" do |a|
+          argument schema_def_state.schema_elements.after.to_sym, schema_def_state.type_namer.cursor_type_name do |a|
             a.documentation <<~EOS
               Used to forward-paginate through the `#{name}`. When provided, the next page after the
               provided cursor will be returned.
@@ -984,7 +984,7 @@ module ElasticGraph
             EOS
           end
 
-          argument schema_def_state.schema_elements.before.to_sym, "Cursor" do |a|
+          argument schema_def_state.schema_elements.before.to_sym, schema_def_state.type_namer.cursor_type_name do |a|
             a.documentation <<~EOS
               Used to backward-paginate through the `#{name}`. When provided, the previous page before the
               provided cursor will be returned.

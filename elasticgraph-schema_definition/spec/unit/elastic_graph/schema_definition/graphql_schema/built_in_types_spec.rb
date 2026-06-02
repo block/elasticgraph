@@ -75,6 +75,89 @@ module ElasticGraph
           EOS
         end
 
+        it "allows overriding `Cursor` to `String` for federation compatibility" do
+          result = define_schema(type_name_overrides: {Cursor: "String"}) do |api|
+            api.object_type "Widget" do |t|
+              t.field "id", "ID!"
+              t.index "widgets"
+            end
+          end
+
+          # The Cursor scalar should not be registered when overridden to a built-in type
+          expect(type_def_from(result, "Cursor")).to be_nil
+
+          # PageInfo fields should use String instead of Cursor
+          expect(type_def_from(result, "PageInfo")).to eq(<<~EOS.strip)
+            type PageInfo {
+              #{schema_elements.has_next_page}: Boolean!
+              #{schema_elements.has_previous_page}: Boolean!
+              #{schema_elements.start_cursor}: String
+              #{schema_elements.end_cursor}: String
+            }
+          EOS
+
+          # Edge.cursor field should use String
+          expect(type_def_from(result, "WidgetEdge")).to include("#{schema_elements.cursor}: String")
+
+          # Pagination arguments should use String
+          query_type = type_def_from(result, "Query")
+          expect(query_type).to include("after: String")
+          expect(query_type).to include("before: String")
+        end
+
+        it "keeps the `Cursor` scalar when not overridden" do
+          result = define_schema(type_name_overrides: {})
+
+          # The Cursor scalar should be registered
+          expect(type_def_from(result, "Cursor")).to include("scalar Cursor")
+
+          # PageInfo fields should use Cursor
+          expect(type_def_from(result, "PageInfo")).to include("#{schema_elements.start_cursor}: Cursor")
+          expect(type_def_from(result, "PageInfo")).to include("#{schema_elements.end_cursor}: Cursor")
+        end
+
+        it "allows overriding `Cursor` to `ID` (another string-like type)" do
+          result = define_schema(type_name_overrides: {Cursor: "ID"}) do |api|
+            api.object_type "Widget" do |t|
+              t.field "id", "ID!"
+              t.index "widgets"
+            end
+          end
+
+          # The Cursor scalar should not be registered
+          expect(type_def_from(result, "Cursor")).to be_nil
+
+          # PageInfo fields should use ID
+          expect(type_def_from(result, "PageInfo")).to include("#{schema_elements.start_cursor}: ID")
+          expect(type_def_from(result, "PageInfo")).to include("#{schema_elements.end_cursor}: ID")
+        end
+
+        it "rejects overriding `Cursor` to a non-string-compatible type like Int" do
+          expect {
+            define_schema(type_name_overrides: {Cursor: "Int"})
+          }.to raise_error(
+            Errors::SchemaError,
+            a_string_including(
+              "Invalid cursor type override",
+              "Cursor` was overridden to `Int`",
+              "cursor types must be string-compatible",
+              "String, ID (String recommended for federation compatibility)"
+            )
+          )
+        end
+
+        it "rejects overriding `Cursor` to a non-string-compatible type like Boolean" do
+          expect {
+            define_schema(type_name_overrides: {Cursor: "Boolean"})
+          }.to raise_error(Errors::SchemaError, a_string_including("cursor types must be string-compatible"))
+        end
+
+        it "rejects overriding `Cursor` to a non-string-compatible type like Float" do
+          expect {
+            define_schema(type_name_overrides: {Cursor: "Float"})
+          }.to raise_error(Errors::SchemaError, a_string_including("cursor types must be string-compatible"))
+        end
+
         it "defines a `GeoLocation` object type and related filter types" do
           expect(type_named("GeoLocation", include_docs: true)).to eq(<<~EOS.strip)
             """

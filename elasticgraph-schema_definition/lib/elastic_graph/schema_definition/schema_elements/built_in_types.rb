@@ -161,6 +161,14 @@ module ElasticGraph
       # @!attribute [rw] names
       #   @private
       class BuiltInTypes
+        # Built-in GraphQL scalar types that are part of the GraphQL specification.
+        # Used to detect when type_name_overrides maps to a built-in type that should
+        # not be registered.
+        BUILT_IN_SCALARS = %w[String Int Float Boolean ID].freeze
+
+        # Valid types that can be used for cursor fields (string-compatible scalars).
+        VALID_CURSOR_TYPES = %w[String ID].freeze
+
         attr_reader :schema_def_api, :schema_def_state, :names
 
         # @private
@@ -183,6 +191,19 @@ module ElasticGraph
         end
 
         private
+
+        def validate_cursor_type_override!
+          override_name = @schema_def_state.type_namer.cursor_type_name
+          return if override_name == "Cursor"
+          return if VALID_CURSOR_TYPES.include?(override_name)
+
+          raise Errors::SchemaError, <<~ERROR
+            Invalid cursor type override: `Cursor` was overridden to `#{override_name}`, but cursor types must be string-compatible.
+            Valid cursor type overrides are: #{VALID_CURSOR_TYPES.join(", ")} (String recommended for federation compatibility).
+
+            To fix: tasks.type_name_overrides = {Cursor: "String"}
+          ERROR
+        end
 
         def register_directives
           # Note: The `eg` prefix is being used based on a GraphQL Spec recommendation:
@@ -500,14 +521,14 @@ module ElasticGraph
               f.documentation "Indicates if there is another page of results available before the current one."
             end
 
-            t.field names.start_cursor, "Cursor", graphql_only: true do |f|
+            t.field names.start_cursor, @schema_def_state.type_namer.cursor_type_name, graphql_only: true do |f|
               f.documentation <<~EOS
                 The `Cursor` of the first edge of the current page. This can be passed in the next query as
                 a `before` argument to paginate backwards.
               EOS
             end
 
-            t.field names.end_cursor, "Cursor", graphql_only: true do |f|
+            t.field names.end_cursor, @schema_def_state.type_namer.cursor_type_name, graphql_only: true do |f|
               f.documentation <<~EOS
                 The `Cursor` of the last edge of the current page. This can be passed in the next query as
                 a `after` argument to paginate forwards.
@@ -753,21 +774,29 @@ module ElasticGraph
         end
 
         def register_custom_elastic_graph_scalars
-          schema_def_api.scalar_type "Cursor" do |t|
-            # Technically, we don't use the mapping or json_schema on this type since it's a return-only
-            # type and isn't indexed. However, `scalar_type` requires them to be set (since custom scalars
-            # defined by users will need those set) so we set them here to what they would be if we actually
-            # used them.
-            t.mapping type: "keyword"
-            t.json_schema type: "string"
-            t.coerce_with "ElasticGraph::GraphQL::ScalarCoercionAdapters::Cursor",
-              defined_at: "elastic_graph/graphql/scalar_coercion_adapters/cursor"
+          # Validate that Cursor type override is compatible (must be string-like)
+          validate_cursor_type_override!
 
-            t.documentation <<~EOS
-              An opaque string value representing a specific location in a paginated connection type.
-              Returned cursors can be passed back in the next query via the `before` or `after`
-              arguments to continue paginating from that point.
-            EOS
+          # Only register the Cursor scalar if it's not overridden to a built-in type.
+          # When overridden to a built-in type like String, we use that type directly
+          # and skip scalar registration to avoid duplicate type definition errors.
+          unless BUILT_IN_SCALARS.include?(@schema_def_state.type_namer.cursor_type_name)
+            schema_def_api.scalar_type "Cursor" do |t|
+              # Technically, we don't use the mapping or json_schema on this type since it's a return-only
+              # type and isn't indexed. However, `scalar_type` requires them to be set (since custom scalars
+              # defined by users will need those set) so we set them here to what they would be if we actually
+              # used them.
+              t.mapping type: "keyword"
+              t.json_schema type: "string"
+              t.coerce_with "ElasticGraph::GraphQL::ScalarCoercionAdapters::Cursor",
+                defined_at: "elastic_graph/graphql/scalar_coercion_adapters/cursor"
+
+              t.documentation <<~EOS
+                An opaque string value representing a specific location in a paginated connection type.
+                Returned cursors can be passed back in the next query via the `before` or `after`
+                arguments to continue paginating from that point.
+              EOS
+            end
           end
 
           schema_def_api.scalar_type "Date" do |t|

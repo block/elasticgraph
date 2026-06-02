@@ -25,6 +25,7 @@ module ElasticGraph
 
         def name_for: (::Symbol | ::String) -> ::String
         def revert_override_for: (::String) -> ::String
+        def cursor_type_name: () -> ::String
         def generate_name_for: (::Symbol, **::String) -> ::String
         def extract_base_from: (::String, format: ::Symbol) -> ::String?
         def matches_format?: (::String, ::Symbol) -> bool

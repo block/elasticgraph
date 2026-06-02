@@ -58,6 +58,12 @@ module ElasticGraph
           reverse_overrides.fetch(potentially_overriden_name, potentially_overriden_name)
         end
 
+        # Returns the type name to use for cursor fields, respecting any type_name_overrides.
+        # @return [String] the cursor type name (e.g., "Cursor" or "String")
+        def cursor_type_name
+          name_for("Cursor")
+        end
+
         # Generates a derived type name based on the provided format name and arguments. The given arguments must match
         # the placeholders in the format. If the format name is unknown or the arguments are invalid, a `Errors::ConfigError` is raised.
         #

@@ -39,4 +39,11 @@ ElasticGraph::Local::RakeTasks.new(
   # Within `ElasticGraph::Local::RakeTasks.new { ... }` in your `Rakefile`:
   tasks.type_name_overrides = {JsonSafeLong: "BigInt"}
   # :snippet-end:
+
+  # :snippet-start: cursor_type_override
+  # Within `ElasticGraph::Local::RakeTasks.new { ... }` in your `Rakefile`:
+  # Override Cursor to String for federation compatibility with subgraphs
+  # that use String for cursor fields per the Relay spec.
+  tasks.type_name_overrides = {Cursor: "String"}
+  # :snippet-end:
 end

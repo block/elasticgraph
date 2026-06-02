@@ -15,19 +15,15 @@ module ElasticGraph
         def self.coerce_input(value, ctx)
           case value
           when DecodedCursor
-            value
+            value.encode
           when ::String
-            DecodedCursor.try_decode(value)
+            value
           end
         end
 
         def self.coerce_result(value, ctx)
-          case value
-          when DecodedCursor
-            value.encode
-          when ::String
-            value if DecodedCursor.try_decode(value)
-          end
+          # Pass-through: resolvers already encode cursors to strings
+          value
         end
       end
     end
