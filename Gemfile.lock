@@ -105,9 +105,9 @@ PATH
   remote: elasticgraph-indexer_autoscaler_lambda
   specs:
     elasticgraph-indexer_autoscaler_lambda (1.2.1.pre)
-      aws-sdk-cloudwatch (>= 1.138, < 1.140)
-      aws-sdk-lambda (~> 1.181)
-      aws-sdk-sqs (~> 1.115)
+      aws-sdk-cloudwatch (~> 1.139.0)
+      aws-sdk-lambda (~> 1.183)
+      aws-sdk-sqs (~> 1.116)
       elasticgraph-datastore_core (= 1.2.1.pre)
       elasticgraph-lambda_support (= 1.2.1.pre)
 
@@ -115,7 +115,7 @@ PATH
   remote: elasticgraph-indexer_lambda
   specs:
     elasticgraph-indexer_lambda (1.2.1.pre)
-      aws-sdk-s3 (~> 1.224)
+      aws-sdk-s3 (~> 1.225)
       elasticgraph-indexer (= 1.2.1.pre)
       elasticgraph-lambda_support (= 1.2.1.pre)
 
@@ -208,7 +208,7 @@ PATH
   remote: elasticgraph-warehouse_lambda
   specs:
     elasticgraph-warehouse_lambda (1.2.1.pre)
-      aws-sdk-s3 (~> 1.224)
+      aws-sdk-s3 (~> 1.225)
       elasticgraph-indexer_lambda (= 1.2.1.pre)
       elasticgraph-lambda_support (= 1.2.1.pre)
 
