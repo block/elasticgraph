@@ -17,10 +17,7 @@ group :development do
   gem "coderay", "~> 1.1", ">= 1.1.3"
   gem "factory_bot", "~> 6.6"
   gem "faker", "~> 3.8"
-
-  # Pin to a GitHub SHA until Ruby 4.0 support has been released
-  gem "flatware-rspec", "~> 2.3", ">= 2.3.4", github: "briandunn/flatware", ref: "0403ac1137cc7958fe06db2c0563dfbab0bd24db", platforms: :ruby
-
+  gem "flatware-rspec", "~> 2.4", platforms: :ruby
   gem "httpx", "~> 1.7", ">= 1.7.8"
   gem "memory_profiler", "~> 1.1"
   gem "nokogiri", "~> 1.19", ">= 1.19.3"
@@ -47,8 +44,7 @@ end
 
 # Documentation/website gems
 group :site do
-  # Pin to a GitHub SHA until Ruby 4.0 support has been released: https://github.com/filewatcher/filewatcher/issues/286
-  gem "filewatcher", "~> 2.1", github: "filewatcher/filewatcher", ref: "596fad65f3b442fee6cf30a3d8daf2767d63f8c9"
+  gem "filewatcher", "~> 3.0", ">= 3.0.1"
 
   platforms :ruby do
     gem "html-proofer", "~> 5.2", ">= 5.2.1"
