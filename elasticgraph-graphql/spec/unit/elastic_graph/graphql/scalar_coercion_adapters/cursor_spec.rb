@@ -18,22 +18,22 @@ module ElasticGraph
           it "accepts a properly encoded string cursor" do
             cursor = DecodedCursor.new({"a" => 1, "b" => "foo"})
             encoded = cursor.encode
-            expect_input_value_to_be_accepted(encoded)
+            expect_input_value_to_be_accepted(encoded, only_test_variable: true)
           end
 
           it "accepts the special singleton cursor string value" do
             encoded = DecodedCursor::SINGLETON.encode
-            expect_input_value_to_be_accepted(encoded)
+            expect_input_value_to_be_accepted(encoded, only_test_variable: true)
           end
 
           it "accepts a `nil` value" do
-            expect_input_value_to_be_accepted(nil)
+            expect_input_value_to_be_accepted(nil, only_test_variable: true)
           end
 
           it "accepts broken string cursors" do
             cursor = DecodedCursor.new({"a" => 1, "b" => "foo"}).encode
             broken_cursor = cursor + "-broken"
-            expect_input_value_to_be_accepted(broken_cursor)
+            expect_input_value_to_be_accepted(broken_cursor, only_test_variable: true)
           end
         end
 
