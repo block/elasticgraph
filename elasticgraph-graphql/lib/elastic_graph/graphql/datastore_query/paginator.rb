@@ -8,6 +8,7 @@
 
 require "elastic_graph/errors"
 require "elastic_graph/support/memoizable_data"
+require "graphql"
 
 module ElasticGraph
   class GraphQL
