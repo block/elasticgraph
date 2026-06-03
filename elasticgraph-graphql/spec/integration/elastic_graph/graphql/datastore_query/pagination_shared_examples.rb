@@ -245,7 +245,7 @@ module ElasticGraph
         broken_cursor = DecodedCursor.new({"not" => "valid"})
 
         expect {
-          paginated_search(first: 1, after: broken_cursor.encode)
+          paginated_search(first: 1, after: broken_cursor)
         }.to raise_error ::GraphQL::ExecutionError, a_string_including("`#{broken_cursor.encode}` is not a valid cursor")
       end
 

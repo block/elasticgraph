@@ -10,18 +10,18 @@ module ElasticGraph
         attr_reader default_page_size: ::Integer
         attr_reader max_page_size: ::Integer
         attr_reader first: ::Integer?
-        attr_reader after: (::String | nil)
+        attr_reader after: (::String | DecodedCursor | nil)
         attr_reader last: ::Integer?
-        attr_reader before: (::String | nil)
+        attr_reader before: (::String | DecodedCursor | nil)
         attr_reader schema_element_names: SchemaArtifacts::RuntimeMetadata::SchemaElementNames
 
         def initialize: (
           default_page_size: ::Integer,
           max_page_size: ::Integer,
           first: ::Integer?,
-          after: (::String | nil),
+          after: (::String | DecodedCursor | nil),
           last: ::Integer?,
-          before: (::String | nil),
+          before: (::String | DecodedCursor | nil),
           schema_element_names: SchemaArtifacts::RuntimeMetadata::SchemaElementNames) -> void
 
         @decoded_after: DecodedCursor?
@@ -42,7 +42,7 @@ module ElasticGraph
 
         private
 
-        def decode_cursor: (::String?) -> DecodedCursor?
+        def decode_cursor: (::String | DecodedCursor | nil) -> DecodedCursor?
 
         @first_n: ::Integer?
         def first_n: () -> ::Integer?

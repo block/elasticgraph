@@ -151,10 +151,11 @@ module ElasticGraph
         private
 
         # Decodes a cursor string to a DecodedCursor object.
-        # @param cursor [String, nil] the cursor string to decode
+        # @param cursor [String, DecodedCursor, nil] the cursor to decode (accepts DecodedCursor for backward compatibility)
         # @return [DecodedCursor, nil] the decoded cursor
         def decode_cursor(cursor)
           return nil if cursor.nil?
+          return cursor if cursor.is_a?(DecodedCursor)
           DecodedCursor.decode!(cursor)
         end
 

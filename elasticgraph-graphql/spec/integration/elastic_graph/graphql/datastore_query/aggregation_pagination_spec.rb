@@ -49,15 +49,15 @@ module ElasticGraph
           expect(items.map(&:count)).to eq [6]
           expect(page_info).to have_attributes(has_next_page: false, has_previous_page: false)
 
-          items, page_info = paginated_search.call(first: 2, after: DecodedCursor::SINGLETON.encode)
+          items, page_info = paginated_search.call(first: 2, after: DecodedCursor::SINGLETON)
           expect(items).to be_empty
           expect(page_info).to have_attributes(has_next_page: false, has_previous_page: true)
 
-          items, page_info = paginated_search.call(last: 2, before: DecodedCursor::SINGLETON.encode)
+          items, page_info = paginated_search.call(last: 2, before: DecodedCursor::SINGLETON)
           expect(items).to be_empty
           expect(page_info).to have_attributes(has_next_page: true, has_previous_page: false)
 
-          items, page_info = paginated_search.call(after: DecodedCursor::SINGLETON.encode, before: DecodedCursor::SINGLETON.encode)
+          items, page_info = paginated_search.call(after: DecodedCursor::SINGLETON, before: DecodedCursor::SINGLETON)
           expect(items).to be_empty
           expect(page_info).to have_attributes(has_next_page: false, has_previous_page: false)
         end
@@ -69,15 +69,15 @@ module ElasticGraph
           expect(items.map { |i| fetch_aggregated_values(i, "amount_cents", "sum") }).to eq [210]
           expect(page_info).to have_attributes(has_next_page: false, has_previous_page: false)
 
-          items, page_info = paginated_search.call(first: 2, after: DecodedCursor::SINGLETON.encode)
+          items, page_info = paginated_search.call(first: 2, after: DecodedCursor::SINGLETON)
           expect(items).to be_empty
           expect(page_info).to have_attributes(has_next_page: false, has_previous_page: true)
 
-          items, page_info = paginated_search.call(last: 2, before: DecodedCursor::SINGLETON.encode)
+          items, page_info = paginated_search.call(last: 2, before: DecodedCursor::SINGLETON)
           expect(items).to be_empty
           expect(page_info).to have_attributes(has_next_page: true, has_previous_page: false)
 
-          items, page_info = paginated_search.call(after: DecodedCursor::SINGLETON.encode, before: DecodedCursor::SINGLETON.encode)
+          items, page_info = paginated_search.call(after: DecodedCursor::SINGLETON, before: DecodedCursor::SINGLETON)
           expect(items).to be_empty
           expect(page_info).to have_attributes(has_next_page: false, has_previous_page: false)
         end
