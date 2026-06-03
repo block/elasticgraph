@@ -13,16 +13,11 @@ module ElasticGraph
     module ScalarCoercionAdapters
       class Cursor
         def self.coerce_input(value, ctx)
-          case value
-          when DecodedCursor
-            value.encode
-          when ::String
-            value
-          end
+          return value if value.nil? || value.is_a?(::String)
+          raise ::GraphQL::CoercionError, "Cursor must be a String, got #{value.class}"
         end
 
         def self.coerce_result(value, ctx)
-          # Pass-through: resolvers already encode cursors to strings
           value
         end
       end

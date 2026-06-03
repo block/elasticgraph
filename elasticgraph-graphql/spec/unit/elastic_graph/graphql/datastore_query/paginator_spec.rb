@@ -67,13 +67,13 @@ module ElasticGraph
             expect(first_call).to be(second_call)
           end
 
-          it "raises InvalidCursorError when decoding an invalid cursor string" do
+          it "raises GraphQL::ExecutionError when decoding an invalid cursor string" do
             invalid_cursor = "invalid_base64_!@#%"
             paginator = build_paginator(after: invalid_cursor)
 
             expect {
               paginator.decoded_after
-            }.to raise_error(Errors::InvalidCursorError, a_string_including(invalid_cursor))
+            }.to raise_error(::GraphQL::ExecutionError, a_string_including(invalid_cursor))
           end
         end
 

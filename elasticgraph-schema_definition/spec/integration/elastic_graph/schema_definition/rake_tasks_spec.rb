@@ -314,6 +314,8 @@ module ElasticGraph
           exclusions = SchemaElements::TypeNamer::TYPES_THAT_CANNOT_BE_OVERRIDDEN
           expect(original_types).to include(*exclusions.to_a)
           overrides = (original_types - exclusions.to_a).to_h { |name| [name, "Pre#{name}"] }
+          # Cursor can only be overridden to String or ID
+          overrides["Cursor"] = "String" if overrides.key?("Cursor")
 
           output = run_rake(
             "schema_artifacts:dump",
@@ -366,6 +368,8 @@ module ElasticGraph
           EOS
 
           overrides = original_core_types.to_h { |name| [name, "Pre#{name}"] }
+          # Cursor can only be overridden to String or ID
+          overrides["Cursor"] = "String" if overrides.key?("Cursor")
 
           output = run_rake("schema_artifacts:dump", type_name_overrides: overrides)
           expect(output).to exclude(does_not_match_warning_snippet)
