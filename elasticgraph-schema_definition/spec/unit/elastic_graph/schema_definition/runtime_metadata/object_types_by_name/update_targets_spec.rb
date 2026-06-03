@@ -1298,6 +1298,213 @@ module ElasticGraph
           end
         end
 
+        describe "`parent_relationship` validations" do
+          it "does not raise an error for a valid `parent_relationship` configuration" do
+            expect { nested_sourced_from_schema }.not_to raise_error
+          end
+
+          it "works with a scalar (non-list) embedding field" do
+            expect {
+              nested_sourced_from_schema(players_field: "Player!")
+            }.not_to raise_error
+          end
+
+          it "accepts an explicit `parent_field_name:` to identify the embedding field" do
+            expect {
+              nested_sourced_from_schema(
+                on_player_relationship: ->(r) { r.parent_relationship "Team", "statLines", parent_field_name: "players" }
+              )
+            }.not_to raise_error
+          end
+
+          it "raises an error when `parent_relationship` is called twice on the same relationship" do
+            expect {
+              nested_sourced_from_schema(
+                on_player_relationship: ->(r) {
+                  r.parent_relationship "Team", "statLines"
+                  r.parent_relationship "Team", "statLines"
+                }
+              )
+            }.to raise_error Errors::SchemaError, a_string_including(
+              "`parent_relationship` has been called multiple times on `Player.statLine`"
+            )
+          end
+
+          it "raises an error when `parent_relationship` is used without `indexing_only: true`" do
+            expect {
+              nested_sourced_from_schema(player_indexing_only: false)
+            }.to raise_error Errors::SchemaError, a_string_including(
+              "`Player.statLine` uses `parent_relationship` but is not declared with `indexing_only: true`"
+            )
+          end
+
+          it "raises an error when a circular parent chain is detected" do
+            expect {
+              object_type_metadata_for "Team" do |s|
+                s.object_type "Team" do |t|
+                  t.field "id", "ID!"
+                  t.field "players", "[Player!]!" do |f|
+                    f.mapping type: "object"
+                  end
+                  t.relates_to_many "statLines", "StatLine", via: "teamId", dir: :in, indexing_only: true do |r|
+                    r.parent_relationship "Player", "statLine"
+                  end
+                end
+
+                s.object_type "Player" do |t|
+                  t.field "id", "ID!"
+                  t.field "teams", "[Team!]!" do |f|
+                    f.mapping type: "object"
+                  end
+                  t.field "goals", "Int" do |f|
+                    f.sourced_from "statLine", "goals"
+                  end
+                  t.relates_to_one "statLine", "StatLine", via: "playerId", dir: :in, indexing_only: true do |r|
+                    r.parent_relationship "Team", "statLines"
+                  end
+                end
+
+                s.object_type "StatLine" do |t|
+                  t.field "id", "ID!"
+                  t.field "teamId", "ID"
+                  t.field "playerId", "ID"
+                  t.field "goals", "Int"
+                  t.index "stat_lines"
+                end
+              end
+            }.to raise_error Errors::SchemaError, a_string_including(
+              "creates a circular `parent_relationship` chain"
+            )
+          end
+
+          it "raises an error when the parent type does not exist" do
+            expect {
+              nested_sourced_from_schema(
+                on_player_relationship: ->(r) { r.parent_relationship "NonExistentType", "statLines" }
+              )
+            }.to raise_error Errors::SchemaError, a_string_including(
+              "`Player.statLine` references parent type `NonExistentType` via `parent_relationship`, but that type does not exist."
+            )
+          end
+
+          it "raises an error when the parent relationship does not exist on the parent type" do
+            expect {
+              nested_sourced_from_schema(
+                on_player_relationship: ->(r) { r.parent_relationship "Team", "nonExistentRelationship" }
+              )
+            }.to raise_error Errors::SchemaError, a_string_including(
+              "`Player.statLine` references parent relationship `Team.nonExistentRelationship` via `parent_relationship`, but that relationship does not exist."
+            )
+          end
+
+          it "raises an error when source types disagree across the chain" do
+            expect {
+              nested_sourced_from_schema(
+                on_team: ->(t) {
+                  t.relates_to_many "otherEvents", "OtherEvent", via: "teamId", dir: :in, indexing_only: true
+                },
+                on_player_relationship: ->(r) { r.parent_relationship "Team", "otherEvents" }
+              ) do |s|
+                s.object_type "OtherEvent" do |t|
+                  t.field "id", "ID!"
+                  t.field "teamId", "ID"
+                  t.index "other_events"
+                end
+              end
+            }.to raise_error Errors::SchemaError, a_string_including(
+              "`Player.statLine` relates to `StatLine`",
+              "but its parent relationship `Team.otherEvents` relates to `OtherEvent`",
+              "All relationships in a `parent_relationship` chain must relate to the same source type"
+            )
+          end
+
+          it "raises an error when the chain terminates at a non-indexed type" do
+            expect {
+              nested_sourced_from_schema(index_teams: false)
+            }.to raise_error Errors::SchemaError, a_string_including(
+              "The `parent_relationship` chain from `Player.statLine` terminates at `Team`",
+              "`Team` is not an indexed type",
+              "The chain must terminate at an indexed type"
+            )
+          end
+
+          it "raises an error when no embedding field is found on the parent type" do
+            expect {
+              nested_sourced_from_schema(players_field: nil)
+            }.to raise_error Errors::SchemaError, a_string_including(
+              "`Player.statLine` declares `Team` as its parent type via `parent_relationship`, but `Team` has no field of type `Player`"
+            )
+          end
+
+          it "raises an error when multiple embedding fields exist (ambiguous)" do
+            expect {
+              nested_sourced_from_schema(on_team: ->(t) {
+                t.field "bench_players", "[Player!]!" do |f|
+                  f.mapping type: "object"
+                end
+              })
+            }.to raise_error Errors::SchemaError, a_string_including(
+              "`Team` has multiple fields of type `Player`",
+              "has an ambiguous `parent_relationship`",
+              "parent_field_name:"
+            )
+          end
+
+          it "raises an error when an explicit `parent_field_name:` references a non-existent field" do
+            expect {
+              nested_sourced_from_schema(
+                on_player_relationship: ->(r) { r.parent_relationship "Team", "statLines", parent_field_name: "nonExistentField" }
+              )
+            }.to raise_error Errors::SchemaError, a_string_including(
+              "`Player.statLine` references field `Team.nonExistentField` via `parent_relationship`, but that field does not exist."
+            )
+          end
+
+          def nested_sourced_from_schema(
+            on_team: nil,
+            on_player_relationship: ->(r) { r.parent_relationship "Team", "statLines" },
+            player_indexing_only: true,
+            players_field: "[Player!]!",
+            index_teams: true
+          )
+            object_type_metadata_for "Team" do |s|
+              s.object_type "Team" do |t|
+                t.field "id", "ID!"
+                if players_field
+                  t.field "players", players_field do |f|
+                    f.mapping type: "object" if players_field.start_with?("[")
+                  end
+                end
+                t.relates_to_many "statLines", "StatLine", via: "teamId", dir: :in, indexing_only: true
+                on_team&.call(t)
+                if index_teams
+                  t.index("teams") { |i| i.has_had_multiple_sources! }
+                end
+              end
+
+              s.object_type "Player" do |t|
+                t.field "id", "ID!"
+                t.field "goals", "Int" do |f|
+                  f.sourced_from "statLine", "goals"
+                end
+                t.relates_to_one "statLine", "StatLine", via: "playerId", dir: :in, indexing_only: player_indexing_only do |r|
+                  on_player_relationship.call(r)
+                end
+              end
+
+              s.object_type "StatLine" do |t|
+                t.field "id", "ID!"
+                t.field "teamId", "ID"
+                t.field "playerId", "ID"
+                t.field "goals", "Int"
+                t.index "stat_lines"
+              end
+
+              yield s if block_given?
+            end
+          end
+        end
+
         def update_targets_for(
           type,
           widget_name: "String",

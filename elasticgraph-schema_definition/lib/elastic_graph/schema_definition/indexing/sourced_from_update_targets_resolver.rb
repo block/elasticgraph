@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/errors"
+require "elastic_graph/schema_definition/indexing/relationship_chain_resolver"
 require "elastic_graph/schema_definition/indexing/relationship_resolver"
 require "elastic_graph/schema_definition/indexing/update_target_resolver"
 
@@ -48,7 +49,7 @@ module ElasticGraph
           fields_with_sources_by_relationship_name = sourced_fields_by_relationship_name(object_type)
           defined_relationships = object_type.relationships_by_name.keys
 
-          (defined_relationships | fields_with_sources_by_relationship_name.keys).filter_map do |relationship_name|
+          results = (defined_relationships | fields_with_sources_by_relationship_name.keys).filter_map do |relationship_name|
             empty_fields = [] # : ::Array[SchemaElements::Field]
             sourced_fields = fields_with_sources_by_relationship_name.fetch(relationship_name) { empty_fields }
             relationship_resolver = RelationshipResolver.new(
@@ -65,6 +66,14 @@ module ElasticGraph
               resolve_update_target(object_type, resolved_relationship, sourced_fields, &error_reporter)
             end
           end
+
+          # Non-indexed types may have `parent_relationship` chains that need validation.
+          # Indexed types use the top-level sourced_from path above instead.
+          if object_type.own_index_def.nil?
+            resolve_nested_relationships(object_type, &error_reporter)
+          end
+
+          results
         end
 
         def resolve_update_target(object_type, resolved_relationship, sourced_fields)
@@ -89,6 +98,22 @@ module ElasticGraph
           end
 
           [resolved_relationship.related_type.name, update_target] if update_target
+        end
+
+        def resolve_nested_relationships(object_type)
+          relationships_with_parent_ref = object_type.relationships_by_name.each_value.select(&:parent_ref)
+          return if relationships_with_parent_ref.empty?
+
+          sourced_relationship_names = object_type.fields_with_sources.map { |f| (_ = f.source).relationship_name }
+          chain_resolver = RelationshipChainResolver.new(schema_def_state: @schema_def_state)
+
+          relationships_with_parent_ref.each do |relationship|
+            next unless sourced_relationship_names.include?(relationship.name)
+
+            # TODO: use resolved_chain to build nested update targets once that logic is implemented.
+            _resolved_chain, chain_errors = chain_resolver.resolve(relationship, object_type)
+            chain_errors.each { |error| yield :sourced_field, error }
+          end
         end
 
         def sourced_fields_by_relationship_name(object_type)
