@@ -90,7 +90,7 @@ This configuration causes ElasticGraph to:
 - Use `String` for pagination arguments (`before`, `after`)
 
 Internally, ElasticGraph will lazily decode cursor strings when pagination logic requires access to the decoded cursor
-structure. This decoding is transparent—pagination continues to work exactly as before, including forward and backward
+structure. This decoding is transparent: pagination continues to work exactly as before, including forward and backward
 pagination, cursor validation, and aggregation pagination.
 
 {: .alert-note}
