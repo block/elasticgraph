@@ -198,7 +198,7 @@ module ElasticGraph
           [field, value]
         end
 
-        DecodedCursor.new(values)
+        DecodedCursor.new(values).encode
       end
     end
   end
