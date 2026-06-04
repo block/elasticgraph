@@ -67,11 +67,9 @@ module ElasticGraph
             end
           end
 
-          # Non-indexed types may have `parent_relationship` chains that need validation.
-          # Indexed types use the top-level sourced_from path above instead.
-          if object_type.own_index_def.nil?
-            resolve_nested_relationships(object_type, &error_reporter)
-          end
+          # Resolve any `parent_relationship` chains on this type. For now this only surfaces
+          # configuration errors; later PRs will use the resolved chains to build nested update targets.
+          resolve_relationship_chains(object_type, &error_reporter)
 
           results
         end
@@ -100,18 +98,22 @@ module ElasticGraph
           [resolved_relationship.related_type.name, update_target] if update_target
         end
 
-        def resolve_nested_relationships(object_type)
+        def resolve_relationship_chains(object_type)
           relationships_with_parent_ref = object_type.relationships_by_name.each_value.select(&:parent_ref)
           return if relationships_with_parent_ref.empty?
 
-          sourced_relationship_names = object_type.fields_with_sources.map { |f| (_ = f.source).relationship_name }
+          sourced_relationship_names = object_type.fields_with_sources.map do |f|
+            source = f.source # : SchemaElements::FieldSource
+            source.relationship_name
+          end.to_set
+
           chain_resolver = RelationshipChainResolver.new(schema_def_state: @schema_def_state)
 
           relationships_with_parent_ref.each do |relationship|
             next unless sourced_relationship_names.include?(relationship.name)
 
             # TODO: use resolved_chain to build nested update targets once that logic is implemented.
-            _resolved_chain, chain_errors = chain_resolver.resolve(relationship, object_type)
+            _resolved_chain, chain_errors = chain_resolver.resolve(relationship)
             chain_errors.each { |error| yield :sourced_field, error }
           end
         end

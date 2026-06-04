@@ -1,50 +1,11 @@
 module ElasticGraph
   module SchemaDefinition
     module Indexing
-      class RelationshipChainResolver
-        @schema_def_state: State
-
-        def initialize: (schema_def_state: State) -> void
-        def resolve: (SchemaElements::Relationship, indexableType) -> [ResolvedRelationshipChain?, ::Array[::String]]
-
-        private
-
-        def resolve_chain: (
-          SchemaElements::Relationship,
-          indexableType,
-          ::Array[PathSegment],
-          ::Array[::String],
-          ::Set[::String]
-        ) -> [SchemaElements::Relationship, indexableType]
-
-        def resolve_parent_ref: (
-          SchemaElements::Relationship,
-          indexableType,
-          SchemaElements::Relationship::ParentRef,
-          ::Array[::String],
-          ::Set[::String]
-        ) -> [indexableType?, SchemaElements::Relationship?]
-
-        def build_path_segment: (
-          SchemaElements::Relationship,
-          indexableType,
-          indexableType,
-          ::Array[PathSegment],
-          ::Array[::String]
-        ) -> void
-
-        def resolve_field: (SchemaElements::Relationship::ParentRef, indexableType, SchemaElements::Relationship, indexableType, ::Array[::String]) -> SchemaElements::Field?
-        def find_field_by_type: (indexableType, indexableType, SchemaElements::Relationship, ::Array[::String]) -> SchemaElements::Field?
-        def rel_description: (indexableType, SchemaElements::Relationship) -> ::String
-      end
-
       class ResolvedRelationshipChain
-        attr_reader root_indexed_type: indexableType
         attr_reader root_relationship: SchemaElements::Relationship
         attr_reader path_segments: ::Array[PathSegment]
 
         def initialize: (
-          root_indexed_type: indexableType,
           root_relationship: SchemaElements::Relationship,
           path_segments: ::Array[PathSegment]
         ) -> void
@@ -60,6 +21,40 @@ module ElasticGraph
           match_field_name: ::String?,
           source_field_name: ::String?
         ) -> void
+      end
+
+      class RelationshipChainResolver
+        @schema_def_state: State
+
+        def initialize: (schema_def_state: State) -> void
+        def resolve: (SchemaElements::Relationship) -> [ResolvedRelationshipChain?, ::Array[::String]]
+
+        private
+
+        def resolve_chain: (
+          SchemaElements::Relationship,
+          ::Array[PathSegment],
+          ::Array[::String],
+          ::Set[SchemaElements::Relationship]
+        ) -> SchemaElements::Relationship?
+
+        def resolve_parent_ref: (
+          SchemaElements::Relationship,
+          SchemaElements::Relationship::ParentRef,
+          ::Array[::String],
+          ::Set[SchemaElements::Relationship]
+        ) -> SchemaElements::Relationship?
+
+        def build_path_segment: (
+          SchemaElements::Relationship,
+          indexableType,
+          ::Array[PathSegment],
+          ::Array[::String]
+        ) -> void
+
+        def resolve_field: (SchemaElements::Relationship::ParentRef, indexableType, SchemaElements::Relationship, ::Array[::String]) -> SchemaElements::Field?
+        def find_field_by_type: (indexableType, SchemaElements::Relationship, ::Array[::String]) -> SchemaElements::Field?
+        def rel_description: (SchemaElements::Relationship) -> ::String
       end
     end
   end

@@ -1338,7 +1338,7 @@ module ElasticGraph
             )
           end
 
-          it "raises an error when a circular parent chain is detected" do
+          it "raises an error when a circular parent chain is detected", :dont_validate_graphql_schema do
             expect {
               object_type_metadata_for "Team" do |s|
                 s.object_type "Team" do |t|
@@ -1388,8 +1388,12 @@ module ElasticGraph
           end
 
           it "raises an error when the parent relationship does not exist on the parent type" do
+            # `Player` is indexed here in addition to being embedded on `Team`. This confirms that
+            # `parent_relationship` chains are validated even for types that are both indexed and
+            # embedded (not just non-indexed embedded types).
             expect {
               nested_sourced_from_schema(
+                index_players: true,
                 on_player_relationship: ->(r) { r.parent_relationship "Team", "nonExistentRelationship" }
               )
             }.to raise_error Errors::SchemaError, a_string_including(
@@ -1465,7 +1469,8 @@ module ElasticGraph
             on_player_relationship: ->(r) { r.parent_relationship "Team", "statLines" },
             player_indexing_only: true,
             players_field: "[Player!]!",
-            index_teams: true
+            index_teams: true,
+            index_players: false
           )
             object_type_metadata_for "Team" do |s|
               s.object_type "Team" do |t|
@@ -1489,6 +1494,9 @@ module ElasticGraph
                 end
                 t.relates_to_one "statLine", "StatLine", via: "playerId", dir: :in, indexing_only: player_indexing_only do |r|
                   on_player_relationship.call(r)
+                end
+                if index_players
+                  t.index("players") { |i| i.has_had_multiple_sources! }
                 end
               end
 
