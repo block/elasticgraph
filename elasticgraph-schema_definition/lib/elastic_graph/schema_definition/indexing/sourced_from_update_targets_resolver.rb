@@ -102,16 +102,9 @@ module ElasticGraph
           relationships_with_parent_ref = object_type.relationships_by_name.each_value.select(&:parent_ref)
           return if relationships_with_parent_ref.empty?
 
-          sourced_relationship_names = object_type.fields_with_sources.map do |f|
-            source = f.source # : SchemaElements::FieldSource
-            source.relationship_name
-          end.to_set
-
           chain_resolver = RelationshipChainResolver.new(schema_def_state: @schema_def_state)
 
           relationships_with_parent_ref.each do |relationship|
-            next unless sourced_relationship_names.include?(relationship.name)
-
             # TODO: use resolved_chain to build nested update targets once that logic is implemented.
             _resolved_chain, chain_errors = chain_resolver.resolve(relationship)
             chain_errors.each { |error| yield :sourced_field, error }
