@@ -1,0 +1,29 @@
+module ElasticGraph
+  module JSONIngestion
+    module SchemaDefinition
+      module ResultsExtension : ::ElasticGraph::SchemaDefinition::Results
+        def json_schemas_for: (::Integer) -> ::Hash[::String, untyped]
+        def available_json_schema_versions: () -> ::Set[::Integer]
+        def latest_json_schema_version: () -> ::Integer
+        def json_schema_version_setter_location: () -> ::Thread::Backtrace::Location?
+        def json_schema_field_metadata_by_type_and_field_name: () -> ::Hash[::String, ::Hash[::String, Indexing::JSONSchemaFieldMetadata]]
+        def current_public_json_schema: () -> ::Hash[::String, untyped]
+        def merge_field_metadata_into_json_schema: (::Hash[::String, untyped]) -> Indexing::JSONSchemaWithMetadata
+        def unused_deprecated_elements: () -> ::Set[::ElasticGraph::SchemaDefinition::SchemaElements::DeprecatedElement]
+
+        private
+
+        @latest_versioned_json_schema: ::Hash[::String, untyped]?
+        @available_json_schema_versions: ::Set[::Integer]?
+        @json_schema_field_metadata_by_type_and_field_name: ::Hash[::String, ::Hash[::String, Indexing::JSONSchemaFieldMetadata]]?
+        @current_public_json_schema: ::Hash[::String, untyped]?
+        @json_ingestion_json_schema_builder: JSONSchemaBuilder?
+        @json_ingestion_json_schema_with_metadata_merger: Indexing::JSONSchemaWithMetadata::Merger?
+
+        def json_ingestion_state: () -> (::ElasticGraph::SchemaDefinition::State & StateExtension)
+        def json_ingestion_json_schema_builder: () -> JSONSchemaBuilder
+        def json_ingestion_json_schema_with_metadata_merger: () -> Indexing::JSONSchemaWithMetadata::Merger
+      end
+    end
+  end
+end

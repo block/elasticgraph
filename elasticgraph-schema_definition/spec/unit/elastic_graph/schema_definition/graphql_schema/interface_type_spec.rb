@@ -15,6 +15,12 @@ module ElasticGraph
       include_context "GraphQL schema spec support"
 
       with_both_casing_forms do
+        it "can create an interface type without a customization block" do
+          interface_type = API.new(schema_elements, true).factory.new_interface_type("Named")
+
+          expect(interface_type.name).to eq("Named")
+        end
+
         it "acts like `object_type` but defines a GraphQL `interface` instead of a GraphQL `type`" do
           result = define_schema do |schema|
             schema.interface_type "Named" do |t|

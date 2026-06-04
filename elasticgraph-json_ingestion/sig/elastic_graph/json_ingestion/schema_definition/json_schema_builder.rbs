@@ -1,0 +1,27 @@
+module ElasticGraph
+  module JSONIngestion
+    module SchemaDefinition
+      class JSONSchemaBuilder
+        def initialize: (
+          state: ::ElasticGraph::SchemaDefinition::State,
+          all_types: ::Array[::ElasticGraph::SchemaDefinition::SchemaElements::graphQLType],
+          derived_indexing_type_names: ::Set[::String]
+        ) -> void
+
+        def public_json_schema: () -> ::Hash[::String, untyped]
+        def field_metadata_by_type_and_field_name: () -> ::Hash[::String, ::Hash[::String, Indexing::JSONSchemaFieldMetadata]]
+
+        private
+
+        @state: ::ElasticGraph::SchemaDefinition::State
+        @all_types: ::Array[::ElasticGraph::SchemaDefinition::SchemaElements::graphQLType]
+        @derived_indexing_type_names: ::Set[::String]
+        @indexing_field_types_by_name: ::Hash[::String, Indexing::_JSONFieldType]?
+
+        def root_document_type_names: () -> ::Array[::String]
+        def definitions_by_name: () -> ::Hash[::String, untyped]
+        def indexing_field_types_by_name: () -> ::Hash[::String, Indexing::_JSONFieldType]
+      end
+    end
+  end
+end

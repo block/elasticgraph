@@ -8,14 +8,11 @@ module ElasticGraph
           end
 
           class Object < ObjectSupertype
-            attr_reader json_schema_options: ::Hash[::Symbol, untyped]
+            attr_accessor json_schema_options: ::Hash[::Symbol, untyped]
 
             @to_json_schema: ::Hash[::String, untyped]?
 
-            def initialize: (
-              ::ElasticGraph::SchemaDefinition::Indexing::FieldType::Object field_type,
-              json_schema_options: ::Hash[::Symbol, untyped]
-            ) -> void
+            def initialize: (::ElasticGraph::SchemaDefinition::Indexing::FieldType::Object field_type) -> void
 
             def json_schema_field_metadata_by_field_name: () -> ::Hash[::String, JSONSchemaFieldMetadata]
             def format_field_json_schema_customizations: (::Hash[::String, untyped]) -> ::Hash[::String, untyped]

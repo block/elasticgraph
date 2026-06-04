@@ -85,7 +85,7 @@ module ElasticGraph
         expect(json_schema_field_metadata).to all eq({})
       end
 
-      it "generates no field metadata for user-defined union or interface types since the JSON schema" do
+      it "generates no field metadata for user-defined union or interface types since they have no direct JSON fields" do
         metadata_by_type_and_field_name = dump_metadata do |schema|
           schema.interface_type "Named" do |t|
             t.field "name", "String"
