@@ -14,7 +14,7 @@ module ElasticGraph
 
         private
 
-        @filter_value_set_extractor: Filtering::FilterValueSetExtractor[EqualityValueSet]
+        @filter_value_set_extractor: Filtering::FilterValueSetExtractor[Filtering::EqualityValueSet]
       end
 
       type routingValue = untyped

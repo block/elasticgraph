@@ -7,7 +7,7 @@ module ElasticGraph
         def self.for_equality: (
           FilterNodeInterpreter,
           SchemaArtifacts::RuntimeMetadata::SchemaElementNames
-        ) -> FilterValueSetExtractor[DatastoreQuery::EqualityValueSet]
+        ) -> FilterValueSetExtractor[EqualityValueSet]
 
         def initialize: (
           FilterNodeInterpreter,

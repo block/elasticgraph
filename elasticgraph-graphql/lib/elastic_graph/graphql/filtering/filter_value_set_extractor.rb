@@ -6,7 +6,7 @@
 #
 # frozen_string_literal: true
 
-require "elastic_graph/graphql/datastore_query/equality_value_set"
+require "elastic_graph/graphql/filtering/equality_value_set"
 
 module ElasticGraph
   class GraphQL
@@ -17,10 +17,10 @@ module ElasticGraph
         # Factory method for building a `FilterValueSetExtractor` that uses `EqualityValueSet` to
         # extract the set of values matched by `equal_to_any_of` filters on the target fields.
         def self.for_equality(filter_node_interpreter, schema_names)
-          new(filter_node_interpreter, schema_names, DatastoreQuery::EqualityValueSet::ALL, DatastoreQuery::EqualityValueSet::EMPTY) do |operator, filter_value|
+          new(filter_node_interpreter, schema_names, EqualityValueSet::ALL, EqualityValueSet::EMPTY) do |operator, filter_value|
             if operator == :equal_to_any_of
               # This calls `.compact` to remove `nil` filter_value values
-              DatastoreQuery::EqualityValueSet.of(filter_value.compact)
+              EqualityValueSet.of(filter_value.compact)
             end
           end
         end

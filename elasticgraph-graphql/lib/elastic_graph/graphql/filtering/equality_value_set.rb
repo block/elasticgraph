@@ -8,12 +8,15 @@
 
 module ElasticGraph
   class GraphQL
-    class DatastoreQuery
+    module Filtering
       # A set that can represent either a specific list of values or all values except a specific
-      # list, with support for common set operations (union, intersection, negation).
+      # list, with support for common set operations (union, intersection, negation). In contrast
+      # to other set implementations that work with `FilterValueSetExtractor`, only only works with
+      # `equal_to_any_of` filtering (hence the `EqualityValueSet` name).
       class EqualityValueSet < Data.define(:type, :values)
         # `Data.define` provides the following methods:
         # @dynamic initialize, type, values, with
+
         def self.of(values)
           new(:inclusive, values.to_set)
         end
@@ -24,10 +27,6 @@ module ElasticGraph
 
         ALL = of_all_except([])
         EMPTY = of([])
-
-        def include?(value)
-          inclusive? ? values.include?(value) : !values.include?(value)
-        end
 
         def intersection(other)
           if inclusive? && other.inclusive?
@@ -54,8 +53,8 @@ module ElasticGraph
             #   s3 = s1.intersection(s2)
             #
             # Here s3 would be just `1, 2`.
-            included, excluded = inclusive? ? [values, other.values] : [other.values, values]
-            EqualityValueSet.of(included - excluded)
+            included_values, excluded_values = get_included_and_excluded_values(other)
+            EqualityValueSet.of(included_values - excluded_values)
           end
         end
 
@@ -74,7 +73,7 @@ module ElasticGraph
             #
             # Here s3 would be all 1, 2, > 3 (the same as `EqualityValueSet.of_all_except([3])`)
             EqualityValueSet.of_all_except(values.intersection(other.values))
-          elsif inclusive?
+          else
             # Since one set is inclusive and one set is exclusive, we need to return an exclusive set of
             # `excluded_values - included_values`. For example, when dealing with positive integers:
             #
@@ -84,10 +83,8 @@ module ElasticGraph
             #   s3 = s1.union(s2)
             #
             # Here s3 would be 1, 2, 3, > 5 (the same as `EqualityValueSet.of_all_except([4, 5])`)
-            EqualityValueSet.of_all_except(other.values - values)
-          else
-            # s1 is exclusive, s2 is inclusive: symmetric to the above.
-            EqualityValueSet.of_all_except(values - other.values)
+            included_values, excluded_values = get_included_and_excluded_values(other)
+            EqualityValueSet.of_all_except(excluded_values - included_values)
           end
         end
 
@@ -104,10 +101,13 @@ module ElasticGraph
         def exclusive?
           type == :exclusive
         end
-      end
 
-      # Steep is complaining that it can't find some `DatastoreQuery` methods but they are not in this file...
-      # @dynamic shard_routing_values, effective_size, merge_with, search_index_expression, with, to_datastore_msearch_header_and_body
+        private
+
+        def get_included_and_excluded_values(other)
+          inclusive? ? [values, other.values] : [other.values, values]
+        end
+      end
     end
   end
 end

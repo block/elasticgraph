@@ -1,6 +1,6 @@
 module ElasticGraph
   class GraphQL
-    class DatastoreQuery
+    module Filtering
       type equalityValueSetType = :inclusive | :exclusive
 
       class EqualityValueSet
@@ -27,9 +27,12 @@ module ElasticGraph
         EMPTY: EqualityValueSet
         INVERTED_TYPES: ::Hash[equalityValueSetType, equalityValueSetType]
 
-        def include?: (untyped) -> bool
         def inclusive?: () -> bool
         def exclusive?: () -> bool
+
+        private
+
+        def get_included_and_excluded_values: (EqualityValueSet) -> [::Set[untyped], ::Set[untyped]]
       end
     end
   end
