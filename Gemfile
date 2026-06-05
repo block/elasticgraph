@@ -6,7 +6,7 @@
 #
 # frozen_string_literal: true
 
-source "https://rubygems.org"
+source "https://rubygems.org", cooldown: 7
 
 # Gems needed by the test suite and other CI checks.
 group :development do
