@@ -14,49 +14,10 @@ module ElasticGraph
 
         private
 
-        @filter_value_set_extractor: Filtering::FilterValueSetExtractor[RoutingValueSet]
+        @filter_value_set_extractor: Filtering::FilterValueSetExtractor[EqualityValueSet]
       end
 
       type routingValue = untyped
-
-      type routingValueSetType = :inclusive | :exclusive
-
-      class RoutingValueSetSupertype
-        attr_reader type: routingValueSetType
-        attr_reader routing_values: ::Set[routingValue]
-
-        def initialize: (routingValueSetType, ::Set[routingValue]) -> void
-        def self.with: (
-          type: routingValueSetType,
-          routing_values: ::Set[routingValue]
-        ) -> RoutingValueSet
-
-        def with: (
-          ?type: routingValueSetType,
-          ?routing_values: ::Set[routingValue]
-        ) -> RoutingValueSet
-      end
-
-      class RoutingValueSet < RoutingValueSetSupertype
-        include Support::_NegatableSet[RoutingValueSet]
-        def self.of: (::Enumerable[routingValue]) -> RoutingValueSet
-        def self.of_all_except: (::Enumerable[routingValue]) -> RoutingValueSet
-
-        ALL: RoutingValueSet
-        EMPTY: RoutingValueSet
-        INVERTED_TYPES: ::Hash[routingValueSetType, routingValueSetType]
-
-        def to_return_value: () -> ::Array[routingValue]?
-
-        def inclusive?: () -> bool
-        def exclusive?: () -> bool
-
-        private
-
-        def get_included_and_excluded_values: (
-          RoutingValueSet
-        ) -> [::Set[routingValue], ::Set[routingValue]]
-      end
     end
   end
 end

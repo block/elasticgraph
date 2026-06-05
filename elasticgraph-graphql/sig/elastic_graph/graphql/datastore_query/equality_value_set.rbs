@@ -1,0 +1,36 @@
+module ElasticGraph
+  class GraphQL
+    class DatastoreQuery
+      type equalityValueSetType = :inclusive | :exclusive
+
+      class EqualityValueSet
+        include Support::_NegatableSet[EqualityValueSet]
+
+        attr_reader type: equalityValueSetType
+        attr_reader values: ::Set[untyped]
+
+        def initialize: (equalityValueSetType, ::Set[untyped]) -> void
+
+        def self.new:
+          (equalityValueSetType, ::Set[untyped]) -> instance
+          | (type: equalityValueSetType, values: ::Set[untyped]) -> instance
+
+        def with: (
+          ?type: equalityValueSetType,
+          ?values: ::Set[untyped]
+        ) -> EqualityValueSet
+
+        def self.of: (::Enumerable[untyped]) -> EqualityValueSet
+        def self.of_all_except: (::Enumerable[untyped]) -> EqualityValueSet
+
+        ALL: EqualityValueSet
+        EMPTY: EqualityValueSet
+        INVERTED_TYPES: ::Hash[equalityValueSetType, equalityValueSetType]
+
+        def include?: (untyped) -> bool
+        def inclusive?: () -> bool
+        def exclusive?: () -> bool
+      end
+    end
+  end
+end
