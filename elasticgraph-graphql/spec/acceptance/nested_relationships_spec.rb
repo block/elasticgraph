@@ -29,11 +29,25 @@ module ElasticGraph
         let(:component3) { build(:component, parts: [part2, part3], name: "comp3", created_at: "2019-06-02T00:00:00Z") }
         let(:component4) { build(:component, parts: [part2], name: "comp4", created_at: "2019-06-01T00:00:00Z") }
 
-        let(:widget1) { build(:widget, name: "widget1", amount_cents: 100, components: [component1, component2, component4], created_at: "2019-06-02T00:00:00Z") }
-        let(:widget2) { build(:widget, name: "widget2", amount_cents: 200, components: [component3], created_at: "2019-06-01T00:00:00Z") }
+        let(:inspection1) { build(:widget_inspection) }
+        let(:inspection2) { build(:widget_inspection) }
+
+        let(:summary1) { build(:inspection_summary, widget_inspection: inspection1, summary: "summary1") }
+        let(:summary2) { build(:inspection_summary, widget_inspection: inspection2, summary: "summary2") }
+
+        let(:note1_1) { build(:inspection_note, widget_inspection: inspection1, note: "note1_1") }
+        let(:note1_2) { build(:inspection_note, widget_inspection: inspection1, note: "note1_2") }
+        let(:note2_1) { build(:inspection_note, widget_inspection: inspection2, note: "note2_1") }
+
+        let(:widget1) { build(:widget, name: "widget1", amount_cents: 100, components: [component1, component2, component4], inspection: inspection1, created_at: "2019-06-02T00:00:00Z") }
+        let(:widget2) { build(:widget, name: "widget2", amount_cents: 200, components: [component3], inspection: inspection2, created_at: "2019-06-01T00:00:00Z") }
 
         before do
-          index_records(manufacturer1, manufacturer2, address1, address2, part1, part2, part3, component1, component2, component3, component4, widget1, widget2)
+          index_records(
+            manufacturer1, manufacturer2, address1, address2, part1, part2, part3,
+            component1, component2, component3, component4, widget1, widget2,
+            summary1, summary2, note1_1, note1_2, note2_1
+          )
         end
 
         it "supports filtering relationships with additional filter conditions" do
@@ -372,6 +386,61 @@ module ElasticGraph
               case_correctly("end_cursor") => /\w+/
             }
           )
+        end
+
+        it "supports relationships from embedded types using custom `references` parameter" do
+          results = call_graphql_query(<<~QUERY).dig("data", "widgets", "nodes")
+            query {
+              widgets(filter: {name: {equal_to_any_of: ["widget1", "widget2"]}}, order_by: [name_ASC]) {
+                nodes {
+                  name
+                  inspection {
+                    guid
+                    inspection_summary {
+                      summary
+                    }
+                    inspection_notes(order_by: [note_ASC]) {
+                      nodes {
+                        note
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          QUERY
+
+          expect(results).to match([
+            {
+              case_correctly("name") => "widget1",
+              case_correctly("inspection") => {
+                case_correctly("guid") => inspection1.fetch(:guid),
+                case_correctly("inspection_summary") => {
+                  case_correctly("summary") => "summary1"
+                },
+                case_correctly("inspection_notes") => {
+                  case_correctly("nodes") => [
+                    {case_correctly("note") => "note1_1"},
+                    {case_correctly("note") => "note1_2"}
+                  ]
+                }
+              }
+            },
+            {
+              case_correctly("name") => "widget2",
+              case_correctly("inspection") => {
+                case_correctly("guid") => inspection2.fetch(:guid),
+                case_correctly("inspection_summary") => {
+                  case_correctly("summary") => "summary2"
+                },
+                case_correctly("inspection_notes") => {
+                  case_correctly("nodes") => [
+                    {case_correctly("note") => "note2_1"}
+                  ]
+                }
+              }
+            }
+          ])
         end
 
         def case_correctly(string_or_sym)

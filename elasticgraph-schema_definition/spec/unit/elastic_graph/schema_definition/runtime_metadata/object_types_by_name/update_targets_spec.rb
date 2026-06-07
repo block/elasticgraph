@@ -861,6 +861,32 @@ module ElasticGraph
               }.not_to raise_error
             end
 
+            it "raises an error if an outbound references field does not exist on the related type" do
+              expect {
+                update_targets_for("Widget", on_widget_workspace_type: ->(t) {
+                  t.relates_to_one "widget", "Widget", via: "widget_id", dir: :out, references: "guid"
+                })
+              }.to raise_error Errors::SchemaError, a_string_including(
+                "`WidgetWorkspace.widget` uses `Widget.guid` as the `references` field, but that field does not exist as an indexing field."
+              )
+            end
+
+            it "raises an error if a custom references field (not 'id') is used on an indexed type, since references can only be customized for embedded types" do
+              expect {
+                update_targets_for("Widget", on_widget_workspace_type: ->(t) {
+                  t.field "guid", "ID"
+                }) do |t|
+                  t.relates_to_one "workspace", "WidgetWorkspace", via: "workspace_id", dir: :out, references: "guid"
+
+                  t.field "workspace_name", "String" do |f|
+                    f.sourced_from "workspace", "name"
+                  end
+                end
+              }.to raise_error Errors::SchemaError, a_string_including(
+                "uses `references: \"guid\"` on indexed type `WidgetWorkspace`, but the `references` parameter can only be customized for relationships to embedded types"
+              )
+            end
+
             it "allows a foreign key whose type is nested inside of an `object` array" do
               expect {
                 object_type_metadata_for "WidgetWorkspace" do |s|

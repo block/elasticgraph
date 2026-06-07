@@ -1458,6 +1458,10 @@ index_templates:
             type: keyword
           workspace_name:
             type: keyword
+          inspection:
+            properties:
+              guid:
+                type: keyword
           __counts:
             properties:
               release_timestamps:
@@ -1662,6 +1666,66 @@ indices:
         __typename:
           type: constant_keyword
           value: ElectricalPart
+      _size:
+        enabled: true
+    settings:
+      index.mapping.ignore_malformed: false
+      index.mapping.coerce: false
+      index.number_of_replicas: 1
+      index.number_of_shards: 1
+      index.max_result_window: 10000
+  inspection_notes:
+    aliases: {}
+    mappings:
+      dynamic: strict
+      properties:
+        id:
+          type: keyword
+        widget_inspection_guid:
+          type: keyword
+        note:
+          type: keyword
+        created_at:
+          type: date
+          format: strict_date_time
+        __sources:
+          type: keyword
+        __versions:
+          type: object
+          dynamic: 'false'
+        __typename:
+          type: constant_keyword
+          value: InspectionNote
+      _size:
+        enabled: true
+    settings:
+      index.mapping.ignore_malformed: false
+      index.mapping.coerce: false
+      index.number_of_replicas: 1
+      index.number_of_shards: 1
+      index.max_result_window: 10000
+  inspection_summaries:
+    aliases: {}
+    mappings:
+      dynamic: strict
+      properties:
+        id:
+          type: keyword
+        widget_inspection_guid:
+          type: keyword
+        summary:
+          type: keyword
+        created_at:
+          type: date
+          format: strict_date_time
+        __sources:
+          type: keyword
+        __versions:
+          type: object
+          dynamic: 'false'
+        __typename:
+          type: constant_keyword
+          value: InspectionSummary
       _size:
         enabled: true
     settings:

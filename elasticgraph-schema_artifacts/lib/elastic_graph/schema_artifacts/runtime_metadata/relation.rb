@@ -10,9 +10,10 @@ module ElasticGraph
   module SchemaArtifacts
     module RuntimeMetadata
       # @private
-      class Relation < ::Data.define(:foreign_key, :direction, :additional_filter, :foreign_key_nested_paths)
+      class Relation < ::Data.define(:foreign_key, :direction, :referenced_field_name, :additional_filter, :foreign_key_nested_paths)
         FOREIGN_KEY = "foreign_key"
         DIRECTION = "direction"
+        REFERENCED_FIELD_NAME = "referenced_field_name"
         ADDITIONAL_FILTER = "additional_filter"
         FOREIGN_KEY_NESTED_PATHS = "foreign_key_nested_paths"
 
@@ -20,6 +21,7 @@ module ElasticGraph
           new(
             foreign_key: hash[FOREIGN_KEY],
             direction: hash.fetch(DIRECTION).to_sym,
+            referenced_field_name: hash[REFERENCED_FIELD_NAME],
             additional_filter: hash[ADDITIONAL_FILTER] || {},
             foreign_key_nested_paths: hash[FOREIGN_KEY_NESTED_PATHS] || []
           )
@@ -31,7 +33,8 @@ module ElasticGraph
             ADDITIONAL_FILTER => additional_filter,
             DIRECTION => direction.to_s,
             FOREIGN_KEY => foreign_key,
-            FOREIGN_KEY_NESTED_PATHS => foreign_key_nested_paths
+            FOREIGN_KEY_NESTED_PATHS => foreign_key_nested_paths,
+            REFERENCED_FIELD_NAME => referenced_field_name
           }
         end
       end

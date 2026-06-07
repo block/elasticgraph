@@ -49,6 +49,22 @@ tables:
         voltage INT,
         manufacturer_id STRING
       )
+  inspection_notes:
+    table_schema: |-
+      CREATE TABLE IF NOT EXISTS inspection_notes (
+        id STRING,
+        widget_inspection_guid STRING,
+        note STRING,
+        created_at TIMESTAMP
+      )
+  inspection_summaries:
+    table_schema: |-
+      CREATE TABLE IF NOT EXISTS inspection_summaries (
+        id STRING,
+        widget_inspection_guid STRING,
+        summary STRING,
+        created_at TIMESTAMP
+      )
   manufacturers:
     table_schema: |-
       CREATE TABLE IF NOT EXISTS manufacturers (
@@ -161,5 +177,6 @@ tables:
         amounts ARRAY<INT>,
         fees ARRAY<STRUCT<currency STRING, amount_cents INT>>,
         metadata STRING,
-        workspace_name STRING
+        workspace_name STRING,
+        inspection STRUCT<guid STRING>
       )
