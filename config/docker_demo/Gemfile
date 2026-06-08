@@ -6,7 +6,7 @@
 #
 # frozen_string_literal: true
 
-source "https://rubygems.org"
+source "https://rubygems.org", cooldown: 7
 
 # This minimal Gemfile is used by the docker image and intentionally only contains
 # what is needed to be able to run `bundle exec elasticgraph new`. The resulting

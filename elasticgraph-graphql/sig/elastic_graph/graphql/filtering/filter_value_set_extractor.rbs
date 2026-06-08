@@ -4,6 +4,11 @@ module ElasticGraph
       class FilterValueSetExtractor[S < Support::_NegatableSet[S]]
         type setType[out S] = S | singleton(UnboundedSetWithExclusions)
 
+        def self.for_equality: (
+          FilterNodeInterpreter,
+          SchemaArtifacts::RuntimeMetadata::SchemaElementNames
+        ) -> FilterValueSetExtractor[EqualityValueSet]
+
         def initialize: (
           FilterNodeInterpreter,
           SchemaArtifacts::RuntimeMetadata::SchemaElementNames,

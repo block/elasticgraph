@@ -6,7 +6,7 @@
 #
 # frozen_string_literal: true
 
-source "https://rubygems.org"
+source "https://rubygems.org", cooldown: 7
 
 gem "gem-release", "~> 2.2"
 gem "irb", "~> 1.18" # Needed for yard on Ruby 4.0

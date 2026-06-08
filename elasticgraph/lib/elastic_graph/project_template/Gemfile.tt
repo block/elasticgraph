@@ -1,4 +1,4 @@
-source "https://rubygems.org"
+source "https://rubygems.org", cooldown: 7
 
 # Recommended for better GraphQL parsing performance.
 gem "graphql-c_parser", "~> 1.1", platforms: :ruby

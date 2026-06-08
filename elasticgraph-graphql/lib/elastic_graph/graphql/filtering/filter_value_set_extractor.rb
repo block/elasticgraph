@@ -6,12 +6,25 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/graphql/filtering/equality_value_set"
+
 module ElasticGraph
   class GraphQL
     module Filtering
       # Responsible for extracting a set of values from query filters, based on a using a custom
       # set type that is able to efficiently model the "all values" case.
       class FilterValueSetExtractor
+        # Factory method for building a `FilterValueSetExtractor` that uses `EqualityValueSet` to
+        # extract the set of values matched by `equal_to_any_of` filters on the target fields.
+        def self.for_equality(filter_node_interpreter, schema_names)
+          new(filter_node_interpreter, schema_names, EqualityValueSet::ALL, EqualityValueSet::EMPTY) do |operator, filter_value|
+            if operator == :equal_to_any_of
+              # This calls `.compact` to remove `nil` filter_value values
+              EqualityValueSet.of(filter_value.compact)
+            end
+          end
+        end
+
         def initialize(filter_node_interpreter, schema_names, all_values_set, empty_set, &build_set_for_filter)
           @filter_node_interpreter = filter_node_interpreter
           @schema_names = schema_names
