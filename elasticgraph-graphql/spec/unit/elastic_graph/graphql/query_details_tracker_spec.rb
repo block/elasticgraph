@@ -11,6 +11,21 @@ require "elastic_graph/graphql/query_details_tracker"
 module ElasticGraph
   class GraphQL
     RSpec.describe QueryDetailsTracker do
+      describe ".empty" do
+        it "initializes all tracker fields" do
+          tracker = QueryDetailsTracker.empty
+
+          expect(tracker.shard_routing_values).to eq ::Set.new
+          expect(tracker.search_index_expressions).to eq ::Set.new
+          expect(tracker.query_counts_per_datastore_request).to eq []
+          expect(tracker.datastore_query_server_duration_ms).to eq 0
+          expect(tracker.datastore_query_client_duration_ms).to eq 0
+          expect(tracker.queried_shard_count).to eq 0
+          expect(tracker.extension_data).to eq({})
+          expect(tracker.mutex).to be_a ::Thread::Mutex
+        end
+      end
+
       describe "#[]=" do
         let(:tracker) { QueryDetailsTracker.empty }
 
