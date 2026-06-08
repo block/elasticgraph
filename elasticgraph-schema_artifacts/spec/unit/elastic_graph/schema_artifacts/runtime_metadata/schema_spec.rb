@@ -130,7 +130,7 @@ module ElasticGraph
                 has_had_multiple_sources: false,
                 sourced_from_nested_paths_by_relationship: {
                   "currency" => [
-                    ListPathSegment.new(field: "costs", match_field: "id", source_field: "cost_id"),
+                    ListPathSegment.new(field: "costs", source_field: "cost_id"),
                     ObjectPathSegment.new(field: "details")
                   ]
                 }
@@ -281,7 +281,7 @@ module ElasticGraph
                 },
                 "sourced_from_nested_paths_by_relationship" => {
                   "currency" => [
-                    {"field" => "costs", "match_field" => "id", "source_field" => "cost_id"},
+                    {"field" => "costs", "source_field" => "cost_id"},
                     {"field" => "details"}
                   ]
                 }
