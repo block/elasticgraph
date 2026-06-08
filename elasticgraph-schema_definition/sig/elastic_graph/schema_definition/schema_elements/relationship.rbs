@@ -7,26 +7,42 @@ module ElasticGraph
 
       class Relationship < RelationshipSupertype
         type cardinality = :one | :many
+
+        class ParentRef
+          attr_reader type_ref: TypeReference
+          attr_reader relationship_name: ::String
+          attr_reader field_name: ::String?
+
+          def initialize: (type_ref: TypeReference, relationship_name: ::String, field_name: ::String?) -> void
+        end
+
         attr_reader related_type: TypeReference
+        attr_reader foreign_key: ::String
         attr_accessor hide_relationship_runtime_metadata: bool
+        attr_reader parent_ref: ParentRef?
+        attr_reader indexing_only: bool
 
         @cardinality: cardinality
         @related_type: TypeReference
         @foreign_key: ::String
         @direction: foreignKeyDirection
+        @indexing_only: bool
         @equivalent_field_paths_by_local_path: ::Hash[::String, ::String]
         @additional_filter: ::Hash[::String, untyped]
+        @parent_ref: ParentRef?
 
         def initialize: (
           Field,
           cardinality: cardinality,
           related_type: TypeReference,
           foreign_key: ::String,
-          direction: foreignKeyDirection
+          direction: foreignKeyDirection,
+          ?indexing_only: bool
         ) -> void
 
         def additional_filter: (::Hash[::String, untyped]) -> void
         def equivalent_field: (::String, ?locally_named: ::String) -> void
+        def parent_relationship: (::String, ::String, ?parent_field_name: ::String?) -> void
         def routing_value_source_for_index: [T] (Indexing::Index) { (::String) -> bot } -> ::String?
         def rollover_timestamp_value_source_for_index: [T] (Indexing::Index) { (::String) -> bot } -> ::String?
         def validate_equivalent_fields: (SchemaElements::FieldPath::Resolver) -> ::Array[::String]

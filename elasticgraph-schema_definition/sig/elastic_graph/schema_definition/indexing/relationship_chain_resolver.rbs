@@ -1,0 +1,60 @@
+module ElasticGraph
+  module SchemaDefinition
+    module Indexing
+      class ResolvedRelationshipChain
+        attr_reader root_relationship: SchemaElements::Relationship
+        attr_reader path_segments: ::Array[PathSegment]
+
+        def initialize: (
+          root_relationship: SchemaElements::Relationship,
+          path_segments: ::Array[PathSegment]
+        ) -> void
+      end
+
+      class PathSegment
+        attr_reader field: SchemaElements::Field
+        attr_reader source_field_name: ::String?
+
+        def initialize: (
+          field: SchemaElements::Field,
+          source_field_name: ::String?
+        ) -> void
+      end
+
+      class RelationshipChainResolver
+        @schema_def_state: State
+        @indexing_fields_by_field_type_name_by_parent_type: ::Hash[indexableType, ::Hash[::String, ::Array[SchemaElements::Field]]]
+
+        def initialize: (schema_def_state: State) -> void
+        def resolve: (SchemaElements::Relationship) -> [ResolvedRelationshipChain?, ::Array[::String]]
+
+        private
+
+        def resolve_chain: (
+          SchemaElements::Relationship,
+          ::Array[PathSegment],
+          ::Array[::String],
+          ::Set[SchemaElements::Relationship]
+        ) -> SchemaElements::Relationship?
+
+        def resolve_parent_ref: (
+          SchemaElements::Relationship,
+          SchemaElements::Relationship::ParentRef,
+          ::Array[::String],
+          ::Set[SchemaElements::Relationship]
+        ) -> SchemaElements::Relationship?
+
+        def build_path_segment: (
+          SchemaElements::Relationship,
+          indexableType,
+          ::Array[PathSegment],
+          ::Array[::String]
+        ) -> void
+
+        def resolve_field: (SchemaElements::Relationship::ParentRef, indexableType, SchemaElements::Relationship, ::Array[::String]) -> SchemaElements::Field?
+        def find_field_by_type: (indexableType, SchemaElements::Relationship, ::Array[::String]) -> SchemaElements::Field?
+        def rel_description: (SchemaElements::Relationship) -> ::String
+      end
+    end
+  end
+end
