@@ -1401,7 +1401,7 @@ module ElasticGraph
                   t.field "teams", "[Team!]!" do |f|
                     f.mapping type: "object"
                   end
-                  t.relates_to_many "statLines", "StatLine", via: "leagueId", dir: :in, indexing_only: true
+                  t.relates_to_many "leagueStatLines", "StatLine", via: "leagueId", dir: :in, indexing_only: true
                   t.index "leagues"
                 end
 
@@ -1410,8 +1410,8 @@ module ElasticGraph
                   t.field "players", "[Player!]!" do |f|
                     f.mapping type: "object"
                   end
-                  t.relates_to_many "statLines", "StatLine", via: "teamId", dir: :in, indexing_only: true do |r|
-                    r.parent_relationship "League", "statLines"
+                  t.relates_to_many "teamStatLines", "StatLine", via: "teamId", dir: :in, indexing_only: true do |r|
+                    r.parent_relationship "League", "leagueStatLines"
                   end
                 end
 
@@ -1420,18 +1420,18 @@ module ElasticGraph
                   t.field "gameAppearances", "[GameAppearance!]!" do |f|
                     f.mapping type: "object"
                   end
-                  t.relates_to_many "statLines", "StatLine", via: "playerId", dir: :in, indexing_only: true do |r|
-                    r.parent_relationship "Team", "statLines"
+                  t.relates_to_many "playerStatLines", "StatLine", via: "playerId", dir: :in, indexing_only: true do |r|
+                    r.parent_relationship "Team", "teamStatLines"
                   end
                 end
 
                 s.object_type "GameAppearance" do |t|
                   t.field "id", "ID!"
                   t.field "goals", "Int" do |f|
-                    f.sourced_from "statLine", "goals"
+                    f.sourced_from "gameAppearanceStatLine", "goals"
                   end
-                  t.relates_to_one "statLine", "StatLine", via: "gameAppearanceId", dir: :in, indexing_only: true do |r|
-                    r.parent_relationship "Player", "statLines"
+                  t.relates_to_one "gameAppearanceStatLine", "StatLine", via: "gameAppearanceId", dir: :in, indexing_only: true do |r|
+                    r.parent_relationship "Player", "playerStatLines"
                   end
                 end
 

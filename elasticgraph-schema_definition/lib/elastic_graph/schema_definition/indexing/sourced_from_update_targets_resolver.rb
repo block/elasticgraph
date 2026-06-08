@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/errors"
+require "elastic_graph/schema_artifacts/runtime_metadata/sourced_from_nested_path_segment"
 require "elastic_graph/schema_definition/indexing/relationship_chain_resolver"
 require "elastic_graph/schema_definition/indexing/relationship_resolver"
 require "elastic_graph/schema_definition/indexing/update_target_resolver"
@@ -67,8 +68,8 @@ module ElasticGraph
             end
           end
 
-          # Resolve any `parent_relationship` chains on this type. For now this only surfaces
-          # configuration errors; later PRs will use the resolved chains to build nested update targets.
+          # Resolve any `parent_relationship` chains on this type, surfacing configuration errors and
+          # registering the resolved path segments on the root index.
           resolve_relationship_chains(object_type, &error_reporter)
 
           results
@@ -102,12 +103,46 @@ module ElasticGraph
           relationships_with_parent_ref = object_type.relationships_by_name.each_value.select(&:parent_ref)
           return if relationships_with_parent_ref.empty?
 
+          # The set of relationship names this type's `sourced_from` fields draw their data through. We use
+          # `fields_with_sources` (rather than `sourced_fields_by_relationship_name`) because it works for
+          # non-indexed (embedded) types — which is exactly where nested `sourced_from` fields live.
+          relationship_names_with_sourced_fields = object_type.fields_with_sources.map { |f| (_ = f.source).relationship_name }.to_set
+
           chain_resolver = RelationshipChainResolver.new(schema_def_state: @schema_def_state)
 
           relationships_with_parent_ref.each do |relationship|
-            # TODO: use resolved_chain to build nested update targets once that logic is implemented.
-            _resolved_chain, chain_errors = chain_resolver.resolve(relationship)
+            # Every `parent_relationship` chain is resolved so its configuration errors are surfaced, even for
+            # relationships that don't themselves back any `sourced_from` field.
+            resolved_chain, chain_errors = chain_resolver.resolve(relationship)
             chain_errors.each { |error| yield :sourced_field, error }
+            next unless resolved_chain
+
+            # Only register paths for relationships that back `sourced_from` fields. A pure link in a longer
+            # chain has no nested data of its own; its navigation lives in the leaf relationship's chain.
+            next unless relationship_names_with_sourced_fields.include?(relationship.name)
+
+            # Register the path segments on the root index, keyed by the leaf relationship name. This is a
+            # resolved chain's only effect today; the rest of the nested `sourced_from` machinery comes later.
+            root_index = resolved_chain.root_relationship.parent_type.index_def # : Index
+            root_index.register_sourced_from_nested_paths(relationship.name, build_sourced_from_nested_paths(resolved_chain))
+          end
+        end
+
+        # Converts a resolved chain's path segments into the runtime-metadata segment types the index dumps.
+        # A segment with a `source_field_name` navigates into a list (and needs it to match an element);
+        # one without navigates into an object.
+        def build_sourced_from_nested_paths(resolved_chain)
+          resolved_chain.path_segments.map do |segment|
+            if (source_field = segment.source_field_name)
+              SchemaArtifacts::RuntimeMetadata::ListPathSegment.new(
+                field: segment.field.name_in_index,
+                source_field: source_field
+              )
+            else
+              SchemaArtifacts::RuntimeMetadata::ObjectPathSegment.new(
+                field: segment.field.name_in_index
+              )
+            end
           end
         end
 
