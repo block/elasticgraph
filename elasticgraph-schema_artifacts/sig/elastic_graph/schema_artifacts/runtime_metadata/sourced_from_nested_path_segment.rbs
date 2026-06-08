@@ -3,15 +3,13 @@ module ElasticGraph
     module RuntimeMetadata
       class ListPathSegmentSuperType
         attr_reader field: ::String
-        attr_reader match_field: ::String
         attr_reader source_field: ::String
 
-        def initialize: (field: ::String, match_field: ::String, source_field: ::String) -> void
+        def initialize: (field: ::String, source_field: ::String) -> void
       end
 
       class ListPathSegment < ListPathSegmentSuperType
         FIELD: "field"
-        MATCH_FIELD: "match_field"
         SOURCE_FIELD: "source_field"
 
         def self.from_hash: (::Hash[::String, untyped]) -> ListPathSegment
