@@ -1303,7 +1303,7 @@ module ElasticGraph
             expect { nested_sourced_from_schema }.not_to raise_error
           end
 
-          it "works with a scalar (non-list) embedding field" do
+          it "works with a non-list (object) embedding field" do
             expect {
               nested_sourced_from_schema(players_field: "Player!")
             }.not_to raise_error
@@ -1314,6 +1314,18 @@ module ElasticGraph
               nested_sourced_from_schema(
                 on_player_relationship: ->(r) { r.parent_relationship "Team", "statLines", parent_field_name: "players" }
               )
+            }.not_to raise_error
+          end
+
+          it "discovers an embedding field declared with `indexing_only: true`" do
+            # An `indexing_only: true` field is absent from `graphql_fields_by_name` but present in
+            # `indexing_fields_by_name_in_index`, so this only resolves when the latter is used.
+            expect {
+              nested_sourced_from_schema(players_field: nil, on_team: ->(t) {
+                t.field "players", "[Player!]!", indexing_only: true do |f|
+                  f.mapping type: "object"
+                end
+              })
             }.not_to raise_error
           end
 
@@ -1375,6 +1387,65 @@ module ElasticGraph
             }.to raise_error Errors::SchemaError, a_string_including(
               "creates a circular `parent_relationship` chain"
             )
+          end
+
+          it "resolves a chain spanning several levels", :dont_validate_graphql_schema do
+            # League -> Team -> Player -> GameAppearance is a 4-level `parent_relationship` chain (leaf
+            # to root: GameAppearance's relationship walks up through Player and Team to the indexed
+            # League). All four relationships relate to the same `StatLine` source type, so the chain is
+            # valid. This can only pass if `resolve_chain` actually recurses through every level.
+            expect {
+              object_type_metadata_for "League" do |s|
+                s.object_type "League" do |t|
+                  t.field "id", "ID!"
+                  t.field "teams", "[Team!]!" do |f|
+                    f.mapping type: "object"
+                  end
+                  t.relates_to_many "statLines", "StatLine", via: "leagueId", dir: :in, indexing_only: true
+                  t.index "leagues"
+                end
+
+                s.object_type "Team" do |t|
+                  t.field "id", "ID!"
+                  t.field "players", "[Player!]!" do |f|
+                    f.mapping type: "object"
+                  end
+                  t.relates_to_many "statLines", "StatLine", via: "teamId", dir: :in, indexing_only: true do |r|
+                    r.parent_relationship "League", "statLines"
+                  end
+                end
+
+                s.object_type "Player" do |t|
+                  t.field "id", "ID!"
+                  t.field "gameAppearances", "[GameAppearance!]!" do |f|
+                    f.mapping type: "object"
+                  end
+                  t.relates_to_many "statLines", "StatLine", via: "playerId", dir: :in, indexing_only: true do |r|
+                    r.parent_relationship "Team", "statLines"
+                  end
+                end
+
+                s.object_type "GameAppearance" do |t|
+                  t.field "id", "ID!"
+                  t.field "goals", "Int" do |f|
+                    f.sourced_from "statLine", "goals"
+                  end
+                  t.relates_to_one "statLine", "StatLine", via: "gameAppearanceId", dir: :in, indexing_only: true do |r|
+                    r.parent_relationship "Player", "statLines"
+                  end
+                end
+
+                s.object_type "StatLine" do |t|
+                  t.field "id", "ID!"
+                  t.field "leagueId", "ID"
+                  t.field "teamId", "ID"
+                  t.field "playerId", "ID"
+                  t.field "gameAppearanceId", "ID"
+                  t.field "goals", "Int"
+                  t.index "stat_lines"
+                end
+              end
+            }.not_to raise_error
           end
 
           it "raises an error when the parent type does not exist" do
@@ -1454,6 +1525,19 @@ module ElasticGraph
             )
           end
 
+          it "uses `parent_field_name:` to disambiguate when multiple embedding fields exist" do
+            expect {
+              nested_sourced_from_schema(
+                on_team: ->(t) {
+                  t.field "bench_players", "[Player!]!" do |f|
+                    f.mapping type: "object"
+                  end
+                },
+                on_player_relationship: ->(r) { r.parent_relationship "Team", "statLines", parent_field_name: "bench_players" }
+              )
+            }.not_to raise_error
+          end
+
           it "raises an error when an explicit `parent_field_name:` references a non-existent field" do
             expect {
               nested_sourced_from_schema(
@@ -1475,13 +1559,16 @@ module ElasticGraph
             object_type_metadata_for "Team" do |s|
               s.object_type "Team" do |t|
                 t.field "id", "ID!"
+
                 if players_field
                   t.field "players", players_field do |f|
                     f.mapping type: "object" if players_field.start_with?("[")
                   end
                 end
+
                 t.relates_to_many "statLines", "StatLine", via: "teamId", dir: :in, indexing_only: true
                 on_team&.call(t)
+
                 if index_teams
                   t.index("teams") { |i| i.has_had_multiple_sources! }
                 end
@@ -1489,12 +1576,15 @@ module ElasticGraph
 
               s.object_type "Player" do |t|
                 t.field "id", "ID!"
+
                 t.field "goals", "Int" do |f|
                   f.sourced_from "statLine", "goals"
                 end
+
                 t.relates_to_one "statLine", "StatLine", via: "playerId", dir: :in, indexing_only: player_indexing_only do |r|
                   on_player_relationship.call(r)
                 end
+
                 if index_players
                   t.index("players") { |i| i.has_had_multiple_sources! }
                 end

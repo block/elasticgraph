@@ -20,14 +20,15 @@ module ElasticGraph
       )
 
       # Describes how to navigate from a parent type into a nested child element.
-      # For list fields, `match_field_name` and `source_field_name` identify which element
-      # to update: the element where `element[match_field_name] == event[source_field_name]`.
-      # For non-list (object) fields, these are nil since there's no ambiguity.
+      # For list fields, `source_field_name` identifies which element to update: the element
+      # whose `id` matches `event[source_field_name]`. We implicitly match on the `id` field
+      # because ElasticGraph relationships always join on `id` via foreign keys; this could be
+      # made configurable in the future to support non-`id` primary keys.
+      # For non-list (object) fields, `source_field_name` is nil since there's no ambiguity.
       #
       # @private
       PathSegment = ::Data.define(
         :field,             # Field - the field to navigate into at this level
-        :match_field_name,  # String? - field name on the nested element to match against (nil for object fields)
         :source_field_name  # String? - field name on the source event providing the match value (nil for object fields)
       )
 
@@ -39,6 +40,14 @@ module ElasticGraph
       class RelationshipChainResolver
         def initialize(schema_def_state:)
           @schema_def_state = schema_def_state
+
+          # Lazily groups each parent type's indexing fields by their fully-unwrapped field type name,
+          # so `find_field_by_type` can look up candidate embedding fields without re-scanning per chain.
+          @indexing_fields_by_field_type_name_by_parent_type = ::Hash.new do |hash, parent_type|
+            hash[parent_type] = parent_type.indexing_fields_by_name_in_index.values.group_by do |field|
+              field.type.fully_unwrapped.name
+            end
+          end
         end
 
         # Resolves the chain starting from `starting_relationship` (which must have a `parent_ref`).
@@ -139,19 +148,18 @@ module ElasticGraph
           field = resolve_field(parent_ref, parent_type, current_rel, errors)
           return unless field
 
-          # For list fields, `match_field_name` and `source_field_name` identify which element
-          # to update. `match_field_name` is always "id" because ElasticGraph relationships join
-          # on `id` via foreign keys. For non-list fields, these are nil since there's no ambiguity.
+          # For list fields, `source_field_name` identifies which element to update: the one whose
+          # `id` matches `event[source_field_name]`. We implicitly match on `id` because ElasticGraph
+          # relationships always join on `id` via foreign keys. For non-list fields, it's nil since
+          # there's no ambiguity.
           path_segments << if field.type.list?
             PathSegment.new(
               field: field,
-              match_field_name: "id",
               source_field_name: current_rel.foreign_key
             )
           else
             PathSegment.new(
               field: field,
-              match_field_name: nil,
               source_field_name: nil
             )
           end
@@ -159,7 +167,7 @@ module ElasticGraph
 
         def resolve_field(parent_ref, parent_type, current_rel, errors)
           if parent_ref.field_name
-            field = parent_type.graphql_fields_by_name[parent_ref.field_name]
+            field = parent_type.indexing_fields_by_name_in_index[parent_ref.field_name]
             unless field
               errors << "#{rel_description(current_rel)} references field `#{parent_type.name}.#{parent_ref.field_name}` " \
                 "via `parent_relationship`, but that field does not exist."
@@ -172,9 +180,7 @@ module ElasticGraph
 
         def find_field_by_type(parent_type, current_rel, errors)
           child_type = current_rel.parent_type
-          matches = parent_type.graphql_fields_by_name.values.select do |field|
-            field.type.fully_unwrapped.name == child_type.name
-          end
+          matches = @indexing_fields_by_field_type_name_by_parent_type.dig(parent_type, child_type.name) || []
 
           if matches.size > 1
             field_names = matches.map(&:name).join(", ")

@@ -13,18 +13,17 @@ module ElasticGraph
 
       class PathSegment
         attr_reader field: SchemaElements::Field
-        attr_reader match_field_name: ::String?
         attr_reader source_field_name: ::String?
 
         def initialize: (
           field: SchemaElements::Field,
-          match_field_name: ::String?,
           source_field_name: ::String?
         ) -> void
       end
 
       class RelationshipChainResolver
         @schema_def_state: State
+        @indexing_fields_by_field_type_name_by_parent_type: ::Hash[indexableType, ::Hash[::String, ::Array[SchemaElements::Field]]]
 
         def initialize: (schema_def_state: State) -> void
         def resolve: (SchemaElements::Relationship) -> [ResolvedRelationshipChain?, ::Array[::String]]
