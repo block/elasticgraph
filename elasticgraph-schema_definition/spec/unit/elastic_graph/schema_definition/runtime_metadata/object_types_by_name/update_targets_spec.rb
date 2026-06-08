@@ -1389,7 +1389,7 @@ module ElasticGraph
             )
           end
 
-          it "resolves a chain spanning several levels", :dont_validate_graphql_schema do
+          it "resolves a chain spanning several levels" do
             # League -> Team -> Player -> GameAppearance is a 4-level `parent_relationship` chain (leaf
             # to root: GameAppearance's relationship walks up through Player and Team to the indexed
             # League). All four relationships relate to the same `StatLine` source type, so the chain is
