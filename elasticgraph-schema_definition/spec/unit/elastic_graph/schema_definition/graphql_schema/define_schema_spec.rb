@@ -21,7 +21,6 @@ module ElasticGraph
 
           api.as_active_instance do
             ElasticGraph.define_schema do |schema|
-              schema.json_schema_version 1
               schema.object_type("Person") do |t|
                 t.field "id", "ID"
               end
@@ -53,6 +52,24 @@ module ElasticGraph
           expect {
             ElasticGraph.define_schema { |schema| }
           }.to raise_error Errors::SchemaError, a_string_including("Let ElasticGraph load")
+        end
+
+        it "raises a clear error when JSON schema definition APIs are used without an extension that implements them" do
+          api = API.new(schema_elements, true)
+
+          expect(api.supports_json_schema_versioning?).to be false
+
+          expect {
+            api.json_schema_version 1
+          }.to raise_error Errors::SchemaError, a_string_including("`json_schema_version` is not supported", "elasticgraph-json_ingestion")
+
+          expect {
+            api.enforce_json_schema_version false
+          }.to raise_error Errors::SchemaError, a_string_including("`enforce_json_schema_version` is not supported", "elasticgraph-json_ingestion")
+
+          expect {
+            api.json_schema_strictness allow_omitted_fields: true
+          }.to raise_error Errors::SchemaError, a_string_including("`json_schema_strictness` is not supported", "elasticgraph-json_ingestion")
         end
 
         it "does not leak the active API instance, even when an error occurs" do

@@ -110,15 +110,6 @@ module ElasticGraph
       # @dynamic index_document_sizes?
       alias_method :index_document_sizes?, :index_document_sizes
 
-      # Returns the JSON schema version recorded on this state, or `nil` if none has been set.
-      #
-      # The default implementation returns `nil` so callers can query it uniformly regardless of whether
-      # an ingestion-serializer extension is active. When `elasticgraph-json_ingestion` is loaded its
-      # `StateExtension` overrides this with a real `attr_accessor` backed by the extension's instance state.
-      def json_schema_version
-        nil
-      end
-
       def type_ref(name)
         # Type references are immutable and can be safely cached. Here we cache them because we've observed
         # it having a noticeable impact on our test suite runtime.

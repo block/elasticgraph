@@ -43,10 +43,7 @@ module ElasticGraphProfiler
   end
 
   def self.report_results
-    computed_results = results.filter_map do |id, results_for_id|
-      results_for_id = results_for_id.compact
-      next if results_for_id.empty?
-
+    computed_results = results.map do |id, results_for_id|
       durations = results_for_id.map { |h| h.fetch(:duration) }
       total = durations.sum
       count = durations.count

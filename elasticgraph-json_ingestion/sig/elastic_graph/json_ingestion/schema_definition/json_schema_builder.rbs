@@ -3,7 +3,7 @@ module ElasticGraph
     module SchemaDefinition
       class JSONSchemaBuilder
         def initialize: (
-          state: ::ElasticGraph::SchemaDefinition::State,
+          state: ::ElasticGraph::SchemaDefinition::State & StateExtension,
           all_types: ::Array[::ElasticGraph::SchemaDefinition::SchemaElements::graphQLType],
           derived_indexing_type_names: ::Set[::String]
         ) -> void
@@ -13,7 +13,7 @@ module ElasticGraph
 
         private
 
-        @state: ::ElasticGraph::SchemaDefinition::State
+        @state: ::ElasticGraph::SchemaDefinition::State & StateExtension
         @all_types: ::Array[::ElasticGraph::SchemaDefinition::SchemaElements::graphQLType]
         @derived_indexing_type_names: ::Set[::String]
         @indexing_field_types_by_name: ::Hash[::String, Indexing::_JSONFieldType]?

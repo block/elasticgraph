@@ -75,11 +75,12 @@ module ElasticGraph
 
         yield api if block_given?
 
-        # Set the json_schema_version to the provided value, if needed. `API#json_schema_version` and
-        # `State#json_schema_version` are no-ops when no ingestion-serializer extension is loaded, so we
-        # can call through unconditionally — the JSON-ingestion extension overrides both.
-        if !json_schema_version.nil? && api.state.json_schema_version.nil?
-          api.json_schema_version(json_schema_version)
+        # Set the json_schema_version to the provided value, if needed. JSON schema versioning is only
+        # available when an extension that implements JSON schema generation (such as
+        # `elasticgraph-json_ingestion`) is loaded; without one there is no JSON schema version to set.
+        if !json_schema_version.nil? && api.supports_json_schema_versioning?
+          state = api.state # : untyped
+          api.json_schema_version(json_schema_version) if state.json_schema_version.nil?
         end
 
         # :nocov: -- the else branch and code past this aren't used by tests in elasticgraph-schema_definition.
@@ -87,7 +88,7 @@ module ElasticGraph
 
         # Reloading the schema artifacts takes extra time that we don't usually want to spend (so it's opt-in)
         # but it can be useful in some cases because there is a bit of extra pruning/validation that it applies.
-        api.enforce_json_schema_version false
+        api.enforce_json_schema_version false if api.supports_json_schema_versioning?
         tmp_dir = ::Dir.mktmpdir
         artifacts_manager = api.factory.new_schema_artifact_manager(
           schema_definition_results: api.results,

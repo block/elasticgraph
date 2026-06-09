@@ -80,9 +80,14 @@ module ElasticGraph
       def register_graphql_resolver: (::Symbol, ::Class, defined_at: ::String, ?built_in: bool, **untyped) -> void
       def on_built_in_types: () { (SchemaElements::graphQLType) -> void } -> void
       def on_root_query_type: () { (SchemaElements::ObjectType) -> void } -> void
+      def supports_json_schema_versioning?: () -> bool
       def json_schema_version: (::Integer) -> void
       def enforce_json_schema_version: (bool) -> void
       def json_schema_strictness: (?allow_omitted_fields: bool, ?allow_extra_fields: bool) -> void
+
+      private
+
+      def raise_json_schema_definition_not_supported_error: (::Symbol) -> bot
     end
   end
 end

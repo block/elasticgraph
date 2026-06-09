@@ -81,7 +81,6 @@ module ElasticGraph
 
       def index_document_sizes?: () -> bool
       def type_ref: (::String) -> SchemaElements::TypeReference
-      def json_schema_version: () -> ::Integer?
 
       def register_index: (::String, indexableType) -> void
       def register_object_interface_or_union_type: (SchemaElements::ObjectType | SchemaElements::InterfaceType | SchemaElements::UnionType) -> void
