@@ -15,6 +15,7 @@ module ElasticGraph
 
       class ResolvedRelationshipChain < ResolvedRelationshipChainSuperType
         def qualified_relationship: () -> ::String
+        def sourced_from_nested_paths: () -> ::Array[SchemaArtifacts::RuntimeMetadata::sourcedFromNestedPathSegment]
       end
 
       class PathSegment

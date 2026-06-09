@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/errors"
+require "elastic_graph/schema_artifacts/runtime_metadata/sourced_from_nested_path_segment"
 
 module ElasticGraph
   module SchemaDefinition
@@ -21,7 +22,25 @@ module ElasticGraph
       )
         # The leaf relationship name qualified by its embedding-field path (hence unique per resolved chain)
         def qualified_relationship
-          (path_segments.map { |segment| segment.field.name_in_index } + [leaf_relationship.name]).join(".")
+          (path_segments.map { |segment| segment.field.name_in_index } + [leaf_relationship.name_in_index]).join(".")
+        end
+
+        # The runtime-metadata segments the painless script uses to navigate this chain: a `ListPathSegment` for
+        # each list embedding field (carrying the source field that matches the element) and an `ObjectPathSegment`
+        # for each object embedding field.
+        def sourced_from_nested_paths
+          path_segments.map do |segment|
+            if (source_field = segment.source_field_name)
+              SchemaArtifacts::RuntimeMetadata::ListPathSegment.new(
+                field: segment.field.name_in_index,
+                source_field: source_field
+              )
+            else
+              SchemaArtifacts::RuntimeMetadata::ObjectPathSegment.new(
+                field: segment.field.name_in_index
+              )
+            end
+          end
         end
       end
 

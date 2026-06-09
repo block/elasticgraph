@@ -933,6 +933,45 @@ module ElasticGraph
           )
         end
 
+        it "uses the embedding field's `name_in_index` (not its GraphQL name) in the key and segments" do
+          # The `players` embedding field has a distinct `name_in_index`, so the qualified relationship key and
+          # the segment `field` must both use the index name (`players_in_index`), not the GraphQL name.
+          paths = sourced_from_nested_paths_for_index("teams") do |s|
+            s.object_type "Team" do |t|
+              t.field "id", "ID!"
+              t.field "players", "[Player!]!", name_in_index: "players_in_index" do |f|
+                f.mapping type: "object"
+              end
+              t.relates_to_many "statLines", "StatLine", via: "teamId", dir: :in, indexing_only: true
+              t.index("teams") { |i| i.has_had_multiple_sources! }
+            end
+
+            s.object_type "Player" do |t|
+              t.field "id", "ID!"
+              t.field "goals", "Int" do |f|
+                f.sourced_from "statLine", "goals"
+              end
+              t.relates_to_one "statLine", "StatLine", via: "playerId", dir: :in, indexing_only: true do |r|
+                r.parent_relationship "Team", "statLines"
+              end
+            end
+
+            s.object_type "StatLine" do |t|
+              t.field "id", "ID!"
+              t.field "teamId", "ID"
+              t.field "playerId", "ID"
+              t.field "goals", "Int"
+              t.index "stat_lines"
+            end
+          end
+
+          expect(paths).to eq(
+            "players_in_index.statLine" => [
+              SchemaArtifacts::RuntimeMetadata::ListPathSegment.new(field: "players_in_index", source_field: "playerId")
+            ]
+          )
+        end
+
         it "registers interleaved list and object segments for a chain spanning several levels" do
           # League -> Team -> Roster -> Player, where `Team` embeds `roster` as an object (not a list).
           # The resulting path interleaves `ListPathSegment` and `ObjectPathSegment` across its levels.

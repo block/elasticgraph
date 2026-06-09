@@ -7,7 +7,6 @@
 # frozen_string_literal: true
 
 require "elastic_graph/errors"
-require "elastic_graph/schema_artifacts/runtime_metadata/sourced_from_nested_path_segment"
 require "elastic_graph/schema_definition/indexing/relationship_chain_resolver"
 require "elastic_graph/schema_definition/indexing/relationship_resolver"
 require "elastic_graph/schema_definition/indexing/update_target_resolver"
@@ -121,27 +120,10 @@ module ElasticGraph
             # chain has no nested data of its own; its navigation lives in the leaf relationship's chain.
             next unless relationship_names_with_sourced_fields.include?(relationship.name)
 
-            # Register the path segments on the root index, keyed by the chain's qualified relationship.
+            # Register the resolved chain on its root index, which records the path segments keyed by the
+            # chain's qualified relationship.
             root_index = resolved_chain.root_relationship.parent_type.index_def # : Index
-            root_index.register_sourced_from_nested_paths(resolved_chain.qualified_relationship, build_sourced_from_nested_paths(resolved_chain))
-          end
-        end
-
-        # Converts a resolved chain's path segments into the runtime-metadata segment types the index dumps.
-        # A segment with a `source_field_name` navigates into a list (and needs it to match an element);
-        # one without navigates into an object.
-        def build_sourced_from_nested_paths(resolved_chain)
-          resolved_chain.path_segments.map do |segment|
-            if (source_field = segment.source_field_name)
-              SchemaArtifacts::RuntimeMetadata::ListPathSegment.new(
-                field: segment.field.name_in_index,
-                source_field: source_field
-              )
-            else
-              SchemaArtifacts::RuntimeMetadata::ObjectPathSegment.new(
-                field: segment.field.name_in_index
-              )
-            end
+            root_index.register_resolved_relationship_chain(resolved_chain)
           end
         end
 

@@ -40,7 +40,7 @@ module ElasticGraph
       #   @return [Boolean] whether this index has ever had multiple sources
       # @!attribute [r] sourced_from_nested_paths_by_qualified_relationship
       #   @return [Hash<String, Array<SchemaArtifacts::RuntimeMetadata::ListPathSegment, SchemaArtifacts::RuntimeMetadata::ObjectPathSegment>>]
-      #     map from a (leaf) relationship name to the path segments the painless script uses to navigate from this
+      #     map from a qualified (leaf) relationship to the path segments the painless script uses to navigate from this
       #     root index's documents down to the nested elements that receive `sourced_from` data
       class Index < Struct.new(
         :name,
@@ -283,10 +283,10 @@ module ElasticGraph
           )
         end
 
-        # Registers a nested `sourced_from` chain's path segments under its qualified relationship.
+        # Registers a resolved `parent_relationship` chain on this index.
         # @api private
-        def register_sourced_from_nested_paths(qualified_relationship, path_segments)
-          sourced_from_nested_paths_by_qualified_relationship[qualified_relationship] = path_segments
+        def register_resolved_relationship_chain(resolved_chain)
+          sourced_from_nested_paths_by_qualified_relationship[resolved_chain.qualified_relationship] = resolved_chain.sourced_from_nested_paths
         end
 
         private

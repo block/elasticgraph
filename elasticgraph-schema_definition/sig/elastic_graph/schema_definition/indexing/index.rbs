@@ -14,7 +14,7 @@ module ElasticGraph
         def to_index_config: () -> ::Hash[::String, untyped]
         def to_index_template_config: () -> ::Hash[::String, untyped]
         def runtime_metadata: () -> SchemaArtifacts::RuntimeMetadata::IndexDefinition
-        def register_sourced_from_nested_paths: (::String, ::Array[SchemaArtifacts::RuntimeMetadata::sourcedFromNestedPathSegment]) -> void
+        def register_resolved_relationship_chain: (ResolvedRelationshipChain) -> void
 
         private
 

@@ -12,7 +12,6 @@ module ElasticGraph
         def resolve_for_type: (indexableType) { (::Symbol, ::String) -> void } -> ::Array[[::String, SchemaArtifacts::RuntimeMetadata::UpdateTarget]]
         def resolve_update_target: (indexableType, ResolvedRelationship, ::Array[SchemaElements::Field]) { (::Symbol, ::String) -> void } -> [::String, SchemaArtifacts::RuntimeMetadata::UpdateTarget]?
         def resolve_relationship_chains: (indexableType) { (::Symbol, ::String) -> void } -> void
-        def build_sourced_from_nested_paths: (ResolvedRelationshipChain) -> ::Array[SchemaArtifacts::RuntimeMetadata::sourcedFromNestedPathSegment]
         def sourced_fields_by_relationship_name: (indexableType) -> ::Hash[::String, ::Array[SchemaElements::Field]]
         def raise_if_errors: (::Array[::String], ::Array[::String]) -> void
       end
