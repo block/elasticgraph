@@ -89,7 +89,8 @@ module ElasticGraph
     def indexing_event_decoder
       @indexing_event_decoder ||= begin
         extension = config.indexing_event_decoder
-        (_ = extension.extension_class).new(
+        decoder_class = extension.extension_class # : untyped
+        decoder_class.new(
           config: extension.config,
           schema_artifacts: schema_artifacts,
           logger: logger

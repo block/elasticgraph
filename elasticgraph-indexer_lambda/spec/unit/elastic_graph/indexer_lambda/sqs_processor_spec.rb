@@ -394,12 +394,16 @@ module ElasticGraph
       end
 
       def build_sqs_processor(**options)
-        event_decoder = options.delete(:indexing_event_decoder) { nil }
+        json_lines_decoder = Indexer::IndexingEventDecoder::JSONLines.new(
+          config: {},
+          schema_artifacts: nil, # not used by `JSONLines`
+          logger: logger
+        )
 
         SqsProcessor.new(
           indexer_processor,
           logger: logger,
-          indexing_event_decoder: event_decoder,
+          indexing_event_decoder: json_lines_decoder,
           ignore_sqs_latency_timestamps_from_arns: ignore_sqs_latency_timestamps_from_arns,
           **options
         )

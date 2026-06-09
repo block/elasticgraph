@@ -10,9 +10,9 @@ require "elastic_graph/indexer/indexing_event_decoder"
 
 module ElasticGraph
   class Indexer
-    RSpec.describe IndexingEventDecoder::JSONLines do
+    RSpec.describe IndexingEventDecoder::JSONLines, :capture_logs do
       it "decodes newline-delimited JSON objects" do
-        decoder = described_class.new(config: {}, schema_artifacts: nil, logger: nil)
+        decoder = described_class.new(config: {}, schema_artifacts: nil, logger: logger)
         payload = <<~JSONL
           {"op":"upsert","id":"1"}
           {"op":"upsert","id":"2"}

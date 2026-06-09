@@ -19,10 +19,10 @@ module ElasticGraph
       # @dynamic ignore_sqs_latency_timestamps_from_arns
       attr_reader :ignore_sqs_latency_timestamps_from_arns
 
-      def initialize(indexer_processor, logger:, ignore_sqs_latency_timestamps_from_arns:, indexing_event_decoder: nil, s3_client: nil)
+      def initialize(indexer_processor, logger:, ignore_sqs_latency_timestamps_from_arns:, indexing_event_decoder:, s3_client: nil)
         @indexer_processor = indexer_processor
         @logger = logger
-        @indexing_event_decoder = indexing_event_decoder || default_indexing_event_decoder
+        @indexing_event_decoder = indexing_event_decoder
         @s3_client = s3_client
         @ignore_sqs_latency_timestamps_from_arns = ignore_sqs_latency_timestamps_from_arns
       end
@@ -92,16 +92,6 @@ module ElasticGraph
         end
 
         @indexing_event_decoder.decode(payload)
-      end
-
-      def default_indexing_event_decoder
-        require "elastic_graph/indexer/indexing_event_decoder"
-
-        Indexer::IndexingEventDecoder::JSONLines.new(
-          config: {},
-          schema_artifacts: nil,
-          logger: @logger
-        )
       end
 
       def extract_sqs_metadata(record)
