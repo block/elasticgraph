@@ -6,7 +6,7 @@ module ElasticGraph
       class Interface
         def initialize: (
           config: ::Hash[::Symbol | ::String, untyped],
-          schema_artifacts: schemaArtifacts?,
+          schema_artifacts: schemaArtifacts,
           logger: ::Logger
         ) -> void
 

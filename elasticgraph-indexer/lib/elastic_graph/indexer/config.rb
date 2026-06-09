@@ -6,10 +6,10 @@
 #
 # frozen_string_literal: true
 
-require "elastic_graph/support/config"
 require "elastic_graph/errors"
 require "elastic_graph/indexer/indexing_event_decoder"
 require "elastic_graph/schema_artifacts/runtime_metadata/extension_loader"
+require "elastic_graph/support/config"
 
 module ElasticGraph
   class Indexer
@@ -57,7 +57,7 @@ module ElasticGraph
               name: {
                 description: "The name of the indexing event decoder extension class.",
                 type: "string",
-                minLength: 1,
+                pattern: /^[A-Z]\w+(::[A-Z]\w+)*$/.source, # https://rubular.com/r/UuqAz4fR3kdMip
                 examples: ["MyCompany::ElasticGraph::CSVIndexingEventDecoder"]
               },
               require_path: {
