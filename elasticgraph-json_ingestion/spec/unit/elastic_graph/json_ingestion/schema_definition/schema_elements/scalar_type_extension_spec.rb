@@ -98,7 +98,7 @@ module ElasticGraph
           end
 
           def build_api
-            schema_elements = ::ElasticGraph::SchemaArtifacts::RuntimeMetadata::SchemaElementNames.new(form: "snake_case")
+            schema_elements = SchemaArtifacts::RuntimeMetadata::SchemaElementNames.new(form: "snake_case")
             ::ElasticGraph::SchemaDefinition::API.new(
               schema_elements,
               true,
