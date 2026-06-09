@@ -106,6 +106,23 @@ module ElasticGraph
           EOS
         end
 
+        it "allows test schemas to set the JSON schema version themselves" do
+          # If the test support logic re-set the version it would fail with a "can only be set once" error.
+          result = define_schema do |schema|
+            schema.json_schema_version 7
+
+            schema.object_type("Widget") do |t|
+              t.field "id", "ID"
+            end
+          end
+
+          expect(type_def_from(result, "Widget")).to eq(<<~EOS.strip)
+            type Widget {
+              id: ID
+            }
+          EOS
+        end
+
         it "produces the same GraphQL output, regardless of the order the types are defined in" do
           object_type_definitions = {
             "Component" => lambda do |t|

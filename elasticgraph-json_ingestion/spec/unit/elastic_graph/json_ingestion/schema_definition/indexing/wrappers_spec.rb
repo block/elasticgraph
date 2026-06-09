@@ -32,11 +32,18 @@ module ElasticGraph
               json_schema_customizations: {maxLength: 10},
               doc_comment: reference.doc_comment
             )
+            different_doc_reference = FieldReference.new(
+              reference.__getobj__,
+              json_schema_layers: reference.json_schema_layers,
+              json_schema_customizations: reference.json_schema_customizations,
+              doc_comment: "alternate docs"
+            )
 
             expect(reference).to eq(matching_reference)
             expect(reference.eql?(matching_reference)).to eq(true)
             expect(reference.hash).to eq(matching_reference.hash)
             expect(reference).not_to eq(different_reference)
+            expect(reference).not_to eq(different_doc_reference)
             expect(reference == reference.__getobj__).to eq(true)
           end
 
@@ -73,11 +80,18 @@ module ElasticGraph
               json_schema_customizations: {maxLength: 10},
               doc_comment: field.doc_comment
             )
+            different_doc_field = Field.new(
+              field.__getobj__,
+              json_schema_layers: field.json_schema_layers,
+              json_schema_customizations: field.json_schema_customizations,
+              doc_comment: "alternate docs"
+            )
 
             expect(field).to eq(matching_field)
             expect(field.eql?(matching_field)).to eq(true)
             expect(field.hash).to eq(matching_field.hash)
             expect(field).not_to eq(different_field)
+            expect(field).not_to eq(different_doc_field)
             expect(field == field.__getobj__).to eq(true)
           end
 
@@ -89,11 +103,16 @@ module ElasticGraph
             different_object_field_type = FieldType::Object.new(object_field_type.__getobj__).tap do |field_type|
               field_type.json_schema_options = {type: "object"}
             end
+            different_doc_object_field_type = FieldType::Object.new(object_field_type.__getobj__).tap do |field_type|
+              field_type.json_schema_options = object_field_type.json_schema_options
+              field_type.doc_comment = "alternate docs"
+            end
 
             expect(object_field_type).to eq(matching_object_field_type)
             expect(object_field_type.eql?(matching_object_field_type)).to eq(true)
             expect(object_field_type.hash).to eq(matching_object_field_type.hash)
             expect(object_field_type).not_to eq(different_object_field_type)
+            expect(object_field_type).not_to eq(different_doc_object_field_type)
             expect(object_field_type == object_field_type.__getobj__).to eq(true)
           end
 
@@ -120,6 +139,9 @@ module ElasticGraph
             end.state.object_types_by_name.fetch("Widget")
           end
 
+          # A minimal stand-in for a `SchemaElements::TypeReference` that never resolves. References to
+          # not-yet-defined types resolve to `nil` mid-definition; a stand-in lets us exercise that path
+          # directly instead of relying on the timing of a partially-defined schema.
           def unresolved_type_ref
             Class.new do
               def fully_unwrapped

@@ -39,9 +39,20 @@ module ElasticGraph
               field_factory: api.factory.method(:new_field)
             )
 
-            expect(api.state.enum_types_by_name.fetch("EmptyEnum").singleton_class.ancestors).to include(EnumTypeExtension)
-            expect(api.state.object_types_by_name.fetch("EmptyInterface").__getobj__.singleton_class.ancestors).to include(TypeWithSubfieldsExtension)
-            expect(direct_type_with_subfields.singleton_class.ancestors).to include(TypeWithSubfieldsExtension)
+            # An enum's derived GraphQL types are built from a derived scalar twin, which can only be
+            # built if `EnumTypeExtension` configured the twin's `json_schema`; otherwise building it
+            # raises a "lacks `json_schema`" error.
+            expect {
+              api.state.enum_types_by_name.fetch("EmptyEnum").derived_graphql_types
+            }.not_to raise_error
+
+            # `json_schema` is only available on types extended with `TypeWithSubfieldsExtension`.
+            interface_type = api.state.object_types_by_name.fetch("EmptyInterface")
+            interface_type.json_schema minProperties: 1
+            expect(interface_type.json_schema_options).to eq({minProperties: 1})
+
+            direct_type_with_subfields.json_schema minProperties: 2
+            expect(direct_type_with_subfields.json_schema_options).to eq({minProperties: 2})
 
             expect {
               build_api.scalar_type "BigInt"
