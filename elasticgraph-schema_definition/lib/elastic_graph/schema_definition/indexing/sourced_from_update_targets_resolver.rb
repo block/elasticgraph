@@ -121,10 +121,9 @@ module ElasticGraph
             # chain has no nested data of its own; its navigation lives in the leaf relationship's chain.
             next unless relationship_names_with_sourced_fields.include?(relationship.name)
 
-            # Register the path segments on the root index, keyed by the leaf relationship name. This is a
-            # resolved chain's only effect today; the rest of the nested `sourced_from` machinery comes later.
+            # Register the path segments on the root index, keyed by the chain's qualified relationship.
             root_index = resolved_chain.root_relationship.parent_type.index_def # : Index
-            root_index.register_sourced_from_nested_paths(relationship.name, build_sourced_from_nested_paths(resolved_chain))
+            root_index.register_sourced_from_nested_paths(resolved_chain.qualified_relationship, build_sourced_from_nested_paths(resolved_chain))
           end
         end
 

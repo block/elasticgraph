@@ -14,10 +14,16 @@ module ElasticGraph
       # The result of resolving a relationship chain.
       #
       # @private
-      ResolvedRelationshipChain = ::Data.define(
-        :root_relationship,  # Relationship - the root relationship (no parent_relationship)
-        :path_segments       # Array<PathSegment> - ordered root-to-leaf
+      class ResolvedRelationshipChain < ::Data.define(
+        :root_relationship,  # Relationship the chain terminated at on the root indexed type
+        :leaf_relationship,  # Relationship the chain was resolved from — backs `sourced_from` field(s)
+        :path_segments       # Array<PathSegment> - the embedding fields to descend, ordered root-to-leaf
       )
+        # The leaf relationship name qualified by its embedding-field path (hence unique per resolved chain)
+        def qualified_relationship
+          (path_segments.map { |segment| segment.field.name_in_index } + [leaf_relationship.name]).join(".")
+        end
+      end
 
       # Describes how to navigate from a parent type into a nested child element.
       # For list fields, `source_field_name` identifies which element to update: the element
@@ -75,6 +81,7 @@ module ElasticGraph
 
           resolved_chain = ResolvedRelationshipChain.new(
             root_relationship: root_relationship,
+            leaf_relationship: starting_relationship,
             path_segments: path_segments.reverse # reverse so root-to-leaf order
           )
 

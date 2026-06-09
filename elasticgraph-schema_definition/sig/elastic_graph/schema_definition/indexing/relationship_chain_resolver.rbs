@@ -1,14 +1,20 @@
 module ElasticGraph
   module SchemaDefinition
     module Indexing
-      class ResolvedRelationshipChain
+      class ResolvedRelationshipChainSuperType
         attr_reader root_relationship: SchemaElements::Relationship
+        attr_reader leaf_relationship: SchemaElements::Relationship
         attr_reader path_segments: ::Array[PathSegment]
 
         def initialize: (
           root_relationship: SchemaElements::Relationship,
+          leaf_relationship: SchemaElements::Relationship,
           path_segments: ::Array[PathSegment]
         ) -> void
+      end
+
+      class ResolvedRelationshipChain < ResolvedRelationshipChainSuperType
+        def qualified_relationship: () -> ::String
       end
 
       class PathSegment
