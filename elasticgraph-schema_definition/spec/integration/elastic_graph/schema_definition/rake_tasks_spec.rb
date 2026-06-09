@@ -1101,7 +1101,7 @@ module ElasticGraph
             index_document_sizes: true,
             path_to_schema: path_to_schema,
             schema_artifacts_directory: "config/schema/artifacts",
-            extension_modules: [::ElasticGraph::JSONIngestion::SchemaDefinition::APIExtension, extension_module].compact,
+            extension_modules: [JSONIngestion::SchemaDefinition::APIExtension, extension_module].compact,
             derived_type_name_formats: derived_type_name_formats,
             type_name_overrides: type_name_overrides,
             enum_value_overrides_by_type: enum_value_overrides_by_type,

@@ -2,6 +2,7 @@ module ElasticGraph
   module JSONIngestion
     module SchemaDefinition
       module APIExtension: ::ElasticGraph::SchemaDefinition::API
+        def supports_json_schema_versioning?: () -> bool
         def json_schema_version: (::Integer) -> void
         def enforce_json_schema_version: (bool) -> void
         def json_schema_strictness: (?allow_omitted_fields: bool, ?allow_extra_fields: bool) -> void

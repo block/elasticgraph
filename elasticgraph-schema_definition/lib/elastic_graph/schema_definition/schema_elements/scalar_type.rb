@@ -335,6 +335,12 @@ module ElasticGraph
           elsif FLOAT_TYPES.include?(mapping_type)
             MISSING_NUMERIC_PLACEHOLDER
           elsif mapping_type == "long" || mapping_type == "unsigned_long"
+            # It is only safe to use NaN as the missing value placeholder when every value can be coerced to a
+            # float without loss of precision (using NaN causes the datastore to coerce the other bucket keys to
+            # float). Core ElasticGraph has no knowledge of the range of values of a `long` or `unsigned_long`
+            # field, so we cannot safely infer a placeholder here. Ingestion extensions that know the allowed
+            # range (e.g. from the JSON schema `minimum`/`maximum` in `elasticgraph-json_ingestion`) override
+            # this method to infer a placeholder when it is safe.
             nil
           elsif INTEGER_TYPES.include?(mapping_type)
             # All other integer types can safely be coerced to float without loss of precision

@@ -13,15 +13,29 @@ module ElasticGraph
   module SchemaDefinition
     RSpec.describe Factory do
       it "can create an object type without a customization block" do
-        api = API.new(
+        object_type = build_api.factory.new_object_type("Widget")
+
+        expect(object_type.name).to eq("Widget")
+      end
+
+      it "can create an index without a customization block" do
+        api = build_api
+
+        api.object_type "Widget" do |t|
+          t.field "id", "ID!"
+          t.index "widgets"
+        end
+
+        index = api.state.object_types_by_name.fetch("Widget").own_index_def
+        expect(index.name).to eq("widgets")
+      end
+
+      def build_api
+        API.new(
           SchemaArtifacts::RuntimeMetadata::SchemaElementNames.new(form: :snake_case, overrides: {}),
           true,
           extension_modules: []
         )
-
-        object_type = api.factory.new_object_type("Widget")
-
-        expect(object_type.name).to eq("Widget")
       end
     end
   end

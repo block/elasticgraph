@@ -364,16 +364,8 @@ module ElasticGraph
       reload_schema_artifacts: false
     )
       require "elastic_graph/schema_definition/test_support"
+      require "elastic_graph/spec_support/schema_definition_helpers"
       require "stringio"
-
-      extension_modules = begin
-        require "elastic_graph/json_ingestion/schema_definition/api_extension"
-        [::ElasticGraph::JSONIngestion::SchemaDefinition::APIExtension]
-      rescue LoadError => e
-        raise unless e.path == "elastic_graph/json_ingestion/schema_definition/api_extension"
-
-        []
-      end
 
       output = ::StringIO.new # to silence warnings.
       ::ElasticGraph::SchemaDefinition::TestSupport.define_schema(
@@ -381,7 +373,7 @@ module ElasticGraph
         schema_element_name_overrides: schema_element_name_overrides,
         derived_type_name_formats: derived_type_name_formats,
         enum_value_overrides_by_type: enum_value_overrides_by_type,
-        extension_modules: extension_modules,
+        extension_modules: ::ElasticGraph::SpecSupport::DEFAULT_SCHEMA_DEFINITION_EXTENSION_MODULES.dup,
         reload_schema_artifacts: reload_schema_artifacts,
         output: output
       ) do |schema|

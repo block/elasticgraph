@@ -67,10 +67,7 @@ module ElasticGraph
             self.routing_field_path = id_field_path
           end
 
-          # :nocov: -- `Factory#new_index` (and its JSON-ingestion wrapper) always pass a block; the
-          # else branch is here for hand-instantiation paths that the test suite doesn't exercise.
           yield self if block_given?
-          # :nocov:
         end
 
         # Specifies how documents in this index should sort by default, when no `orderBy` argument is provided to the GraphQL query.

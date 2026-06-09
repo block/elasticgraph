@@ -6,7 +6,6 @@ module ElasticGraph
           include HasJSONSchema
 
           def finalize_json_schema_configuration!: () -> void
-          def validate_json_schema_configuration!: () -> void
 
           private
 
