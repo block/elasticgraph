@@ -10,28 +10,36 @@ require "json"
 
 module ElasticGraph
   class Indexer
+    # Namespace for indexing event decoders, which turn raw payload strings from a transport into
+    # ElasticGraph indexing event hashes. The decoder to use is configured via the
+    # `indexer.indexing_event_decoder` setting.
     module IndexingEventDecoder
-      # Defines the extension interface implemented by indexing event decoders.
-      #
-      # @api private
+      # Defines the indexing event decoder interface, which our extension loader will validate against.
       class Interface
-        # :nocov:
+        # @param config [Hash<String, Object>] configuration from the `indexing_event_decoder.config` setting
+        # @param schema_artifacts [SchemaArtifacts::FromDisk] the schema artifacts
+        # @param logger [Logger] the ElasticGraph logger
         def initialize(config:, schema_artifacts:, logger:)
+          # must be defined, but nothing to do
         end
 
+        # @param payload [String] a raw payload from the transport
+        # @return [Array<Hash<String, Object>>] the decoded ElasticGraph indexing events
         def decode(payload)
+          # :nocov: -- must return an array to satisfy Steep type checking but never called
           []
+          # :nocov:
         end
-        # :nocov:
       end
 
       # The default indexing event decoder, which expects newline-delimited JSON objects.
-      #
-      # @api private
-      class JSONLines
+      class JSONLines < Interface
+        # (see Interface#initialize)
         def initialize(config:, schema_artifacts:, logger:)
+          # must be defined for extension interface verification, but nothing to do
         end
 
+        # (see Interface#decode)
         def decode(payload)
           payload.split("\n").map { |event| JSON.parse(event) }
         end
