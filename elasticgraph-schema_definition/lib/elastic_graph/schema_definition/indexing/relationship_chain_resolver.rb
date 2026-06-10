@@ -20,6 +20,19 @@ module ElasticGraph
         :leaf_relationship,  # Relationship the chain was resolved from — backs `sourced_from` field(s)
         :path_segments       # Array<PathSegment> - the embedding fields to descend, ordered root-to-leaf
       )
+        # The index the chain terminates at — where the root indexed type's documents (and their nested
+        # elements) live, and where the chain's navigation path is registered. The chain always terminates at
+        # an indexed type (enforced when it is resolved), so this is never `nil`.
+        def root_index
+          root_relationship.parent_type.index_def # : Index
+        end
+
+        # Records this chain's navigation path on its root index, so the painless script can locate the
+        # nested element to update at index time.
+        def register_on_root_index
+          root_index.register_sourced_from_nested_paths(qualified_relationship, sourced_from_nested_paths)
+        end
+
         # The leaf relationship name qualified by its embedding-field path (hence unique per resolved chain)
         def qualified_relationship
           (path_segments.map { |segment| segment.field.name_in_index } + [leaf_relationship.name_in_index]).join(".")

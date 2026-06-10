@@ -982,7 +982,7 @@ module ElasticGraph
                 f.mapping type: "object"
               end
               t.relates_to_many "statLines", "StatLine", via: "leagueId", dir: :in, indexing_only: true
-              t.index "leagues"
+              t.index("leagues") { |i| i.has_had_multiple_sources! }
             end
 
             s.object_type "Team" do |t|

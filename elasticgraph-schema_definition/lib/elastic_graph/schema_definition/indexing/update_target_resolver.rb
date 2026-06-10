@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/schema_artifacts/runtime_metadata/params"
+require "elastic_graph/schema_definition/indexing/sourced_field_params_resolver"
 require "elastic_graph/schema_definition/indexing/update_target_factory"
 
 module ElasticGraph
@@ -18,6 +19,8 @@ module ElasticGraph
       #
       # @private
       class UpdateTargetResolver
+        include SourcedFieldParamsResolver
+
         def initialize(
           object_type:,
           resolved_relationship:,
@@ -36,7 +39,7 @@ module ElasticGraph
         # Returns a tuple of the `update_target` (if valid), and a list of errors.
         def resolve
           relationship_errors = validate_relationship
-          top_level_fields_params, top_level_fields_params_errors = resolve_top_level_fields_params
+          top_level_fields_params, top_level_fields_params_errors = resolve_sourced_field_params
           routing_value_source, routing_error = resolve_field_source(RoutingSourceAdapter)
           rollover_timestamp_value_source, rollover_timestamp_error = resolve_field_source(RolloverTimestampSourceAdapter)
           equivalent_field_errors = resolved_relationship.relationship.validate_equivalent_fields(field_path_resolver)
@@ -90,47 +93,9 @@ module ElasticGraph
           "`#{object_type.name}.#{resolved_relationship.relationship_name}` #{sourced_fields_description}"
         end
 
-        # Resolves the `sourced_fields` into a top-level fields params map, validating them along the way.
-        #
-        # Returns a tuple of the top-level fields params and a list of any errors that occurred during resolution.
-        def resolve_top_level_fields_params
-          related_type = resolved_relationship.related_type
-          errors = [] # : ::Array[::String]
-
-          top_level_fields_params = sourced_fields.filter_map do |field|
-            field_source = field.source # : SchemaElements::FieldSource
-
-            referenced_field_path = field_path_resolver.resolve_public_path(related_type, field_source.field_path) do |parent_field|
-              !parent_field.type.list?
-            end
-
-            if referenced_field_path.nil?
-              explanation =
-                if field_source.field_path.include?(".")
-                  "could not be resolved: some parts do not exist on their respective types as non-list fields"
-                else
-                  "does not exist as an indexing field"
-                end
-
-              errors << "`#{object_type.name}.#{field.name}` has an invalid `sourced_from` argument: `#{related_type.name}.#{field_source.field_path}` #{explanation}."
-              nil
-            elsif referenced_field_path.type.unwrap_non_null != field.type.unwrap_non_null
-              errors << "The type of `#{object_type.name}.#{field.name}` is `#{field.type}`, but the type of it's source (`#{related_type.name}.#{field_source.field_path}`) is `#{referenced_field_path.type}`. These must agree to use `sourced_from`."
-              nil
-            elsif field.type.non_null?
-              errors << "The type of `#{object_type.name}.#{field.name}` (`#{field.type}`) is not nullable, but this is not allowed for `sourced_from` fields since the value will be `null` before the related type's event is ingested."
-              nil
-            else
-              param = SchemaArtifacts::RuntimeMetadata::DynamicParam.new(
-                source_path: referenced_field_path.path_in_index,
-                cardinality: :one
-              )
-
-              [field.name_in_index, param]
-            end
-          end.to_h
-
-          [top_level_fields_params, errors]
+        # The related type whose source events feed this update target — where `sourced_from` fields are resolved.
+        def related_type
+          resolved_relationship.related_type
         end
 
         # Helper method that assists with resolving `routing_value_source` and `rollover_timestamp_value_source`.
