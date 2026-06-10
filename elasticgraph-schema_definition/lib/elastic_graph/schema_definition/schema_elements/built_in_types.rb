@@ -517,14 +517,14 @@ module ElasticGraph
               f.documentation "Indicates if there is another page of results available before the current one."
             end
 
-            t.field names.start_cursor, @schema_def_state.type_namer.cursor_type_name, graphql_only: true do |f|
+            t.field names.start_cursor, "Cursor", graphql_only: true do |f|
               f.documentation <<~EOS
                 The `Cursor` of the first edge of the current page. This can be passed in the next query as
                 a `before` argument to paginate backwards.
               EOS
             end
 
-            t.field names.end_cursor, @schema_def_state.type_namer.cursor_type_name, graphql_only: true do |f|
+            t.field names.end_cursor, "Cursor", graphql_only: true do |f|
               f.documentation <<~EOS
                 The `Cursor` of the last edge of the current page. This can be passed in the next query as
                 a `after` argument to paginate forwards.
