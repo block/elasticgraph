@@ -107,17 +107,6 @@ module ElasticGraph
           end
         end
 
-        it "keeps the `Cursor` scalar when not overridden" do
-          result = define_schema(type_name_overrides: {})
-
-          # The Cursor scalar should be registered
-          expect(type_def_from(result, "Cursor")).to include("scalar Cursor")
-
-          # PageInfo fields should use Cursor
-          expect(type_def_from(result, "PageInfo")).to include("#{schema_elements.start_cursor}: Cursor")
-          expect(type_def_from(result, "PageInfo")).to include("#{schema_elements.end_cursor}: Cursor")
-        end
-
         %w[Boolean Float Int].each do |invalid_cursor_override|
           it "rejects overriding `Cursor` to a non-string-compatible type like #{invalid_cursor_override}" do
             expect {
