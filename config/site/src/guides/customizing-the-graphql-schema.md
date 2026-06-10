@@ -89,10 +89,6 @@ This configuration causes ElasticGraph to:
 - Use `String` for all cursor-related fields (`PageInfo.startCursor`, `PageInfo.endCursor`, `Edge.cursor`)
 - Use `String` for pagination arguments (`before`, `after`)
 
-Internally, ElasticGraph will lazily decode cursor strings when pagination logic requires access to the decoded cursor
-structure. This decoding is transparent: pagination continues to work exactly as before, including forward and backward
-pagination, cursor validation, and aggregation pagination.
-
 {: .alert-note}
 **Note**{: .alert-title}
 The `Cursor` scalar and `String` are semantically identical on the wire—both are opaque base64-encoded strings. The
