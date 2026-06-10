@@ -128,7 +128,7 @@ module ElasticGraph
                   "foo.bar" => IndexField.new(source: "other")
                 },
                 has_had_multiple_sources: false,
-                sourced_from_nested_paths_by_relationship: {
+                sourced_from_nested_paths_by_qualified_relationship: {
                   "currency" => [
                     ListPathSegment.new(field: "costs", source_field: "cost_id"),
                     ObjectPathSegment.new(field: "details")
@@ -142,7 +142,7 @@ module ElasticGraph
                 current_sources: [SELF_RELATIONSHIP_NAME],
                 fields_by_path: {},
                 has_had_multiple_sources: false,
-                sourced_from_nested_paths_by_relationship: {}
+                sourced_from_nested_paths_by_qualified_relationship: {}
               ),
               "components" => IndexDefinition.new(
                 route_with: "group_id",
@@ -151,7 +151,7 @@ module ElasticGraph
                 current_sources: [SELF_RELATIONSHIP_NAME],
                 fields_by_path: {},
                 has_had_multiple_sources: true,
-                sourced_from_nested_paths_by_relationship: {}
+                sourced_from_nested_paths_by_qualified_relationship: {}
               )
             },
             schema_element_names: SchemaElementNames.new(
@@ -279,7 +279,7 @@ module ElasticGraph
                     "source" => "other"
                   }
                 },
-                "sourced_from_nested_paths_by_relationship" => {
+                "sourced_from_nested_paths_by_qualified_relationship" => {
                   "currency" => [
                     {"field" => "costs", "source_field" => "cost_id"},
                     {"field" => "details"}

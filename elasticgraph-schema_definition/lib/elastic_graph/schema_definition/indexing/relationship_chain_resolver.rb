@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/errors"
+require "elastic_graph/schema_artifacts/runtime_metadata/sourced_from_nested_path_segment"
 
 module ElasticGraph
   module SchemaDefinition
@@ -14,10 +15,34 @@ module ElasticGraph
       # The result of resolving a relationship chain.
       #
       # @private
-      ResolvedRelationshipChain = ::Data.define(
-        :root_relationship,  # Relationship - the root relationship (no parent_relationship)
-        :path_segments       # Array<PathSegment> - ordered root-to-leaf
+      class ResolvedRelationshipChain < ::Data.define(
+        :root_relationship,  # Relationship the chain terminated at on the root indexed type
+        :leaf_relationship,  # Relationship the chain was resolved from — backs `sourced_from` field(s)
+        :path_segments       # Array<PathSegment> - the embedding fields to descend, ordered root-to-leaf
       )
+        # The leaf relationship name qualified by its embedding-field path (hence unique per resolved chain)
+        def qualified_relationship
+          (path_segments.map { |segment| segment.field.name_in_index } + [leaf_relationship.name_in_index]).join(".")
+        end
+
+        # The runtime-metadata segments the painless script uses to navigate this chain: a `ListPathSegment` for
+        # each list embedding field (carrying the source field that matches the element) and an `ObjectPathSegment`
+        # for each object embedding field.
+        def sourced_from_nested_paths
+          path_segments.map do |segment|
+            if (source_field = segment.source_field_name)
+              SchemaArtifacts::RuntimeMetadata::ListPathSegment.new(
+                field: segment.field.name_in_index,
+                source_field: source_field
+              )
+            else
+              SchemaArtifacts::RuntimeMetadata::ObjectPathSegment.new(
+                field: segment.field.name_in_index
+              )
+            end
+          end
+        end
+      end
 
       # Describes how to navigate from a parent type into a nested child element.
       # For list fields, `source_field_name` identifies which element to update: the element
@@ -75,6 +100,7 @@ module ElasticGraph
 
           resolved_chain = ResolvedRelationshipChain.new(
             root_relationship: root_relationship,
+            leaf_relationship: starting_relationship,
             path_segments: path_segments.reverse # reverse so root-to-leaf order
           )
 

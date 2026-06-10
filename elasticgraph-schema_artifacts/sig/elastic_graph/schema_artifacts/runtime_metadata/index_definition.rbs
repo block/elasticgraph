@@ -8,7 +8,7 @@ module ElasticGraph
         attr_reader current_sources: ::Set[::String]
         attr_reader fields_by_path: ::Hash[::String, IndexField]
         attr_reader has_had_multiple_sources: bool
-        attr_reader sourced_from_nested_paths_by_relationship: ::Hash[::String, ::Array[sourcedFromNestedPathSegment]]
+        attr_reader sourced_from_nested_paths_by_qualified_relationship: ::Hash[::String, ::Array[sourcedFromNestedPathSegment]]
 
         def initialize: (
           route_with: ::String,
@@ -17,7 +17,7 @@ module ElasticGraph
           current_sources: ::Set[::String],
           fields_by_path: ::Hash[::String, IndexField],
           has_had_multiple_sources: bool,
-          sourced_from_nested_paths_by_relationship: ::Hash[::String, ::Array[sourcedFromNestedPathSegment]]
+          sourced_from_nested_paths_by_qualified_relationship: ::Hash[::String, ::Array[sourcedFromNestedPathSegment]]
         ) -> void
 
         def with: (
@@ -27,7 +27,7 @@ module ElasticGraph
           ?current_sources: ::Enumerable[::String],
           ?fields_by_path: ::Hash[::String, IndexField],
           ?has_had_multiple_sources: bool,
-          ?sourced_from_nested_paths_by_relationship: ::Hash[::String, ::Array[sourcedFromNestedPathSegment]]
+          ?sourced_from_nested_paths_by_qualified_relationship: ::Hash[::String, ::Array[sourcedFromNestedPathSegment]]
         ) -> IndexDefinition
       end
 
@@ -38,7 +38,7 @@ module ElasticGraph
         CURRENT_SOURCES: "current_sources"
         FIELDS_BY_PATH: "fields_by_path"
         HAS_HAD_MULTIPLE_SOURCES: "has_had_multiple_sources"
-        SOURCED_FROM_NESTED_PATHS_BY_RELATIONSHIP: "sourced_from_nested_paths_by_relationship"
+        SOURCED_FROM_NESTED_PATHS_BY_QUALIFIED_RELATIONSHIP: "sourced_from_nested_paths_by_qualified_relationship"
 
         def initialize: (
           route_with: ::String,
@@ -47,7 +47,7 @@ module ElasticGraph
           current_sources: ::Enumerable[::String],
           fields_by_path: ::Hash[::String, IndexField],
           has_had_multiple_sources: bool,
-          sourced_from_nested_paths_by_relationship: ::Hash[::String, ::Array[sourcedFromNestedPathSegment]]
+          sourced_from_nested_paths_by_qualified_relationship: ::Hash[::String, ::Array[sourcedFromNestedPathSegment]]
         ) -> void
 
         def self.from_hash: (::Hash[::String, untyped]) -> IndexDefinition

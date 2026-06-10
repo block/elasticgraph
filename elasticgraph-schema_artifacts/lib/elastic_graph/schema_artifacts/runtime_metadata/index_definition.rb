@@ -17,16 +17,16 @@ module ElasticGraph
       # Runtime metadata related to a datastore index definition.
       #
       # @private
-      class IndexDefinition < ::Data.define(:route_with, :rollover, :default_sort_fields, :current_sources, :fields_by_path, :has_had_multiple_sources, :sourced_from_nested_paths_by_relationship)
+      class IndexDefinition < ::Data.define(:route_with, :rollover, :default_sort_fields, :current_sources, :fields_by_path, :has_had_multiple_sources, :sourced_from_nested_paths_by_qualified_relationship)
         ROUTE_WITH = "route_with"
         ROLLOVER = "rollover"
         DEFAULT_SORT_FIELDS = "default_sort_fields"
         CURRENT_SOURCES = "current_sources"
         FIELDS_BY_PATH = "fields_by_path"
         HAS_HAD_MULTIPLE_SOURCES = "has_had_multiple_sources"
-        SOURCED_FROM_NESTED_PATHS_BY_RELATIONSHIP = "sourced_from_nested_paths_by_relationship"
+        SOURCED_FROM_NESTED_PATHS_BY_QUALIFIED_RELATIONSHIP = "sourced_from_nested_paths_by_qualified_relationship"
 
-        def initialize(route_with:, rollover:, default_sort_fields:, current_sources:, fields_by_path:, has_had_multiple_sources:, sourced_from_nested_paths_by_relationship:)
+        def initialize(route_with:, rollover:, default_sort_fields:, current_sources:, fields_by_path:, has_had_multiple_sources:, sourced_from_nested_paths_by_qualified_relationship:)
           super(
             route_with: route_with,
             rollover: rollover,
@@ -34,7 +34,7 @@ module ElasticGraph
             current_sources: current_sources.to_set,
             fields_by_path: fields_by_path,
             has_had_multiple_sources: has_had_multiple_sources,
-            sourced_from_nested_paths_by_relationship: sourced_from_nested_paths_by_relationship
+            sourced_from_nested_paths_by_qualified_relationship: sourced_from_nested_paths_by_qualified_relationship
           )
         end
 
@@ -46,7 +46,7 @@ module ElasticGraph
             current_sources: hash[CURRENT_SOURCES] || [],
             fields_by_path: (hash[FIELDS_BY_PATH] || {}).transform_values { |h| IndexField.from_hash(h) },
             has_had_multiple_sources: hash[HAS_HAD_MULTIPLE_SOURCES] || false,
-            sourced_from_nested_paths_by_relationship: (hash[SOURCED_FROM_NESTED_PATHS_BY_RELATIONSHIP] || {}).transform_values { |segments| segments.map { |h| SourcedFromNestedPathSegment.from_hash(h) } }
+            sourced_from_nested_paths_by_qualified_relationship: (hash[SOURCED_FROM_NESTED_PATHS_BY_QUALIFIED_RELATIONSHIP] || {}).transform_values { |segments| segments.map { |h| SourcedFromNestedPathSegment.from_hash(h) } }
           )
         end
 
@@ -59,7 +59,7 @@ module ElasticGraph
             HAS_HAD_MULTIPLE_SOURCES => (true if has_had_multiple_sources),
             ROLLOVER => rollover&.to_dumpable_hash,
             ROUTE_WITH => route_with,
-            SOURCED_FROM_NESTED_PATHS_BY_RELATIONSHIP => sourced_from_nested_paths_by_relationship.transform_values { |segments| segments.map(&:to_dumpable_hash) }
+            SOURCED_FROM_NESTED_PATHS_BY_QUALIFIED_RELATIONSHIP => sourced_from_nested_paths_by_qualified_relationship.transform_values { |segments| segments.map(&:to_dumpable_hash) }
           }
         end
 

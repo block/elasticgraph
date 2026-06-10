@@ -912,6 +912,243 @@ module ElasticGraph
         end
       end
 
+      describe "#sourced_from_nested_paths_by_qualified_relationship" do
+        it "registers a `ListPathSegment` for a list embedding field, keyed by the qualified relationship" do
+          paths = sourced_from_nested_paths
+
+          expect(paths).to eq(
+            "players.statLine" => [
+              SchemaArtifacts::RuntimeMetadata::ListPathSegment.new(field: "players", source_field: "playerId")
+            ]
+          )
+        end
+
+        it "registers an `ObjectPathSegment` for a non-list embedding field" do
+          paths = sourced_from_nested_paths(players_field: "Player!")
+
+          expect(paths).to eq(
+            "players.statLine" => [
+              SchemaArtifacts::RuntimeMetadata::ObjectPathSegment.new(field: "players")
+            ]
+          )
+        end
+
+        it "uses the embedding field's `name_in_index` (not its GraphQL name) in the key and segments" do
+          # The `players` embedding field has a distinct `name_in_index`, so the qualified relationship key and
+          # the segment `field` must both use the index name (`players_in_index`), not the GraphQL name.
+          paths = sourced_from_nested_paths_for_index("teams") do |s|
+            s.object_type "Team" do |t|
+              t.field "id", "ID!"
+              t.field "players", "[Player!]!", name_in_index: "players_in_index" do |f|
+                f.mapping type: "object"
+              end
+              t.relates_to_many "statLines", "StatLine", via: "teamId", dir: :in, indexing_only: true
+              t.index("teams") { |i| i.has_had_multiple_sources! }
+            end
+
+            s.object_type "Player" do |t|
+              t.field "id", "ID!"
+              t.field "goals", "Int" do |f|
+                f.sourced_from "statLine", "goals"
+              end
+              t.relates_to_one "statLine", "StatLine", via: "playerId", dir: :in, indexing_only: true do |r|
+                r.parent_relationship "Team", "statLines"
+              end
+            end
+
+            s.object_type "StatLine" do |t|
+              t.field "id", "ID!"
+              t.field "teamId", "ID"
+              t.field "playerId", "ID"
+              t.field "goals", "Int"
+              t.index "stat_lines"
+            end
+          end
+
+          expect(paths).to eq(
+            "players_in_index.statLine" => [
+              SchemaArtifacts::RuntimeMetadata::ListPathSegment.new(field: "players_in_index", source_field: "playerId")
+            ]
+          )
+        end
+
+        it "registers interleaved list and object segments for a chain spanning several levels" do
+          # League -> Team -> Roster -> Player, where `Team` embeds `roster` as an object (not a list).
+          # The resulting path interleaves `ListPathSegment` and `ObjectPathSegment` across its levels.
+          paths = sourced_from_nested_paths_for_index("leagues") do |s|
+            s.object_type "League" do |t|
+              t.field "id", "ID!"
+              t.field "teams", "[Team!]!" do |f|
+                f.mapping type: "object"
+              end
+              t.relates_to_many "statLines", "StatLine", via: "leagueId", dir: :in, indexing_only: true
+              t.index "leagues"
+            end
+
+            s.object_type "Team" do |t|
+              t.field "id", "ID!"
+              t.field "roster", "Roster!" do |f|
+                f.mapping type: "object"
+              end
+              t.relates_to_many "statLines", "StatLine", via: "teamId", dir: :in, indexing_only: true do |r|
+                r.parent_relationship "League", "statLines"
+              end
+            end
+
+            s.object_type "Roster" do |t|
+              t.field "id", "ID!"
+              t.field "players", "[Player!]!" do |f|
+                f.mapping type: "object"
+              end
+              t.relates_to_many "statLines", "StatLine", via: "rosterId", dir: :in, indexing_only: true do |r|
+                r.parent_relationship "Team", "statLines"
+              end
+            end
+
+            s.object_type "Player" do |t|
+              t.field "id", "ID!"
+              t.field "goals", "Int" do |f|
+                f.sourced_from "statLine", "goals"
+              end
+              t.relates_to_one "statLine", "StatLine", via: "playerId", dir: :in, indexing_only: true do |r|
+                r.parent_relationship "Roster", "statLines"
+              end
+            end
+
+            s.object_type "StatLine" do |t|
+              t.field "id", "ID!"
+              t.field "leagueId", "ID"
+              t.field "teamId", "ID"
+              t.field "rosterId", "ID"
+              t.field "playerId", "ID"
+              t.field "goals", "Int"
+              t.index "stat_lines"
+            end
+          end
+
+          # Only `Player.statLine` backs a `sourced_from` field; the intermediate relationships are just links.
+          # Its path spans all three embedding fields: a list (`teams`), an object (`roster`), then a list (`players`).
+          expect(paths).to eq(
+            "teams.roster.players.statLine" => [
+              SchemaArtifacts::RuntimeMetadata::ListPathSegment.new(field: "teams", source_field: "teamId"),
+              SchemaArtifacts::RuntimeMetadata::ObjectPathSegment.new(field: "roster"),
+              SchemaArtifacts::RuntimeMetadata::ListPathSegment.new(field: "players", source_field: "playerId")
+            ]
+          )
+        end
+
+        it "is empty for an index with no `parent_relationship` chains" do
+          paths = sourced_from_nested_paths_for_index("widgets") do |s|
+            s.object_type "Widget" do |t|
+              t.field "id", "ID!"
+              t.field "name", "String"
+              t.index "widgets"
+            end
+          end
+
+          expect(paths).to eq({})
+        end
+
+        it "distinguishes same-named leaf relationships by their embedding path" do
+          # `Player` and `Coach` are both embedded in `Team` and each declares a `statLine` relationship that
+          # chains up to the `teams` index. The two leaves share the relationship name `statLine`, but they're
+          # embedded via different fields (`players` vs `coaches`), so the embedding path keeps their keys distinct.
+          paths = sourced_from_nested_paths_for_index("teams") do |s|
+            s.object_type "Team" do |t|
+              t.field "id", "ID!"
+              t.field "players", "[Player!]!" do |f|
+                f.mapping type: "object"
+              end
+              t.field "coaches", "[Coach!]!" do |f|
+                f.mapping type: "object"
+              end
+              t.relates_to_many "statLines", "StatLine", via: "teamId", dir: :in, indexing_only: true
+              t.index("teams") { |i| i.has_had_multiple_sources! }
+            end
+
+            s.object_type "Player" do |t|
+              t.field "id", "ID!"
+              t.field "goals", "Int" do |f|
+                f.sourced_from "statLine", "goals"
+              end
+              t.relates_to_one "statLine", "StatLine", via: "playerId", dir: :in, indexing_only: true do |r|
+                r.parent_relationship "Team", "statLines"
+              end
+            end
+
+            s.object_type "Coach" do |t|
+              t.field "id", "ID!"
+              t.field "wins", "Int" do |f|
+                f.sourced_from "statLine", "wins"
+              end
+              t.relates_to_one "statLine", "StatLine", via: "coachId", dir: :in, indexing_only: true do |r|
+                r.parent_relationship "Team", "statLines"
+              end
+            end
+
+            s.object_type "StatLine" do |t|
+              t.field "id", "ID!"
+              t.field "teamId", "ID"
+              t.field "playerId", "ID"
+              t.field "coachId", "ID"
+              t.field "goals", "Int"
+              t.field "wins", "Int"
+              t.index "stat_lines"
+            end
+          end
+
+          expect(paths).to eq(
+            "players.statLine" => [
+              SchemaArtifacts::RuntimeMetadata::ListPathSegment.new(field: "players", source_field: "playerId")
+            ],
+            "coaches.statLine" => [
+              SchemaArtifacts::RuntimeMetadata::ListPathSegment.new(field: "coaches", source_field: "coachId")
+            ]
+          )
+        end
+
+        # Builds the standard `Team`/`Player`/`StatLine` nested `sourced_from` chain (`Player.statLine` declares a
+        # `parent_relationship` to `Team.statLines`, with `Player` embedded in `Team.players`) and returns the
+        # `sourced_from_nested_paths_by_qualified_relationship` registered on the `teams` index.
+        def sourced_from_nested_paths(players_field: "[Player!]!")
+          sourced_from_nested_paths_for_index("teams") do |s|
+            s.object_type "Team" do |t|
+              t.field "id", "ID!"
+              t.field "players", players_field do |f|
+                f.mapping type: "object" if f.type.list?
+              end
+              t.relates_to_many "statLines", "StatLine", via: "teamId", dir: :in, indexing_only: true
+              t.index("teams") { |i| i.has_had_multiple_sources! }
+            end
+
+            s.object_type "Player" do |t|
+              t.field "id", "ID!"
+              t.field "goals", "Int" do |f|
+                f.sourced_from "statLine", "goals"
+              end
+              t.relates_to_one "statLine", "StatLine", via: "playerId", dir: :in, indexing_only: true do |r|
+                r.parent_relationship "Team", "statLines"
+              end
+            end
+
+            s.object_type "StatLine" do |t|
+              t.field "id", "ID!"
+              t.field "teamId", "ID"
+              t.field "playerId", "ID"
+              t.field "goals", "Int"
+              t.index "stat_lines"
+            end
+          end
+        end
+
+        # Defines a schema and returns the `sourced_from_nested_paths_by_qualified_relationship` registered on the named index.
+        def sourced_from_nested_paths_for_index(index_name, &schema)
+          define_schema(&schema)
+            .runtime_metadata.index_definitions_by_name
+            .fetch(index_name).sourced_from_nested_paths_by_qualified_relationship
+        end
+      end
+
       def index_definition_metadata_for(name, type_definition_order: ["NestedFields", "MyType"], on_my_type: nil, **options, &block)
         type_defs = {
           "NestedFields" => ->(t) do

@@ -38,7 +38,21 @@ module ElasticGraph
       #   @return [RolloverConfig, nil] rollover configuration for the index
       # @!attribute [r] has_had_multiple_sources_flag
       #   @return [Boolean] whether this index has ever had multiple sources
-      class Index < Struct.new(:name, :default_sort_pairs, :settings, :schema_def_state, :indexed_type, :routing_field_path, :rollover_config, :has_had_multiple_sources_flag)
+      # @!attribute [r] sourced_from_nested_paths_by_qualified_relationship
+      #   @return [Hash<String, Array<SchemaArtifacts::RuntimeMetadata::ListPathSegment, SchemaArtifacts::RuntimeMetadata::ObjectPathSegment>>]
+      #     map from a qualified (leaf) relationship to the path segments the painless script uses to navigate from this
+      #     root index's documents down to the nested elements that receive `sourced_from` data
+      class Index < Struct.new(
+        :name,
+        :default_sort_pairs,
+        :settings,
+        :schema_def_state,
+        :indexed_type,
+        :routing_field_path,
+        :rollover_config,
+        :has_had_multiple_sources_flag,
+        :sourced_from_nested_paths_by_qualified_relationship
+      )
         include Mixins::HasReadableToSAndInspect.new { |i| i.name }
 
         # @param name [String] name of the index
@@ -55,7 +69,7 @@ module ElasticGraph
 
           settings = DEFAULT_SETTINGS.merge(Support::HashUtil.flatten_and_stringify_keys(settings, prefix: "index"))
 
-          super(name, [], settings, schema_def_state, indexed_type, nil, nil, false)
+          super(name, [], settings, schema_def_state, indexed_type, nil, nil, false, {})
 
           schema_def_state.after_user_definition_complete do
             # `id` is the field Elasticsearch/OpenSearch use for routing by default:
@@ -265,8 +279,14 @@ module ElasticGraph
               )
             end,
             has_had_multiple_sources: has_had_multiple_sources_flag,
-            sourced_from_nested_paths_by_relationship: {} # TODO: Populate with real data once paths are registered on the index
+            sourced_from_nested_paths_by_qualified_relationship: sourced_from_nested_paths_by_qualified_relationship
           )
+        end
+
+        # Registers a resolved `parent_relationship` chain on this index.
+        # @api private
+        def register_resolved_relationship_chain(resolved_chain)
+          sourced_from_nested_paths_by_qualified_relationship[resolved_chain.qualified_relationship] = resolved_chain.sourced_from_nested_paths
         end
 
         private
