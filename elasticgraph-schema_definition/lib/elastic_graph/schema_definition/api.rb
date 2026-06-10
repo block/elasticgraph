@@ -452,55 +452,6 @@ module ElasticGraph
         @results ||= @factory.new_results
       end
 
-      # Indicates whether a schema definition extension that implements JSON schema versioning (such as
-      # `elasticgraph-json_ingestion`) has been loaded onto this API instance.
-      #
-      # @return [Boolean] `false` unless an extension overrides this
-      # @api private
-      def supports_json_schema_versioning?
-        false
-      end
-
-      # Defines the version number of the current JSON schema.
-      #
-      # JSON schema generation is provided by an ingestion extension rather than by ElasticGraph core, so this
-      # raises an error directing you to `ElasticGraph::JSONIngestion::SchemaDefinition::APIExtension` (from the
-      # `elasticgraph-json_ingestion` gem), which overrides this with real behavior.
-      #
-      # @param version [Integer] current version number of the JSON schema artifact
-      # @return [void]
-      # @raise [Errors::SchemaError] unless an extension that implements JSON schema generation is loaded
-      def json_schema_version(version)
-        raise_json_schema_definition_not_supported_error(:json_schema_version)
-      end
-
-      # Configures whether the JSON schema version is required to be incremented when the JSON schemas artifact changes.
-      #
-      # JSON schema generation is provided by an ingestion extension rather than by ElasticGraph core, so this
-      # raises an error directing you to `ElasticGraph::JSONIngestion::SchemaDefinition::APIExtension` (from the
-      # `elasticgraph-json_ingestion` gem), which overrides this with real behavior.
-      #
-      # @param value [Boolean] whether JSON schema version bumps should be enforced
-      # @return [void]
-      # @raise [Errors::SchemaError] unless an extension that implements JSON schema generation is loaded
-      def enforce_json_schema_version(value)
-        raise_json_schema_definition_not_supported_error(:enforce_json_schema_version)
-      end
-
-      # Defines the strictness of the generated JSON schema validation.
-      #
-      # JSON schema generation is provided by an ingestion extension rather than by ElasticGraph core, so this
-      # raises an error directing you to `ElasticGraph::JSONIngestion::SchemaDefinition::APIExtension` (from the
-      # `elasticgraph-json_ingestion` gem), which overrides this with real behavior.
-      #
-      # @param allow_omitted_fields [Boolean] whether nullable fields can be omitted from indexing events
-      # @param allow_extra_fields [Boolean] whether extra fields can be included in indexing events
-      # @return [void]
-      # @raise [Errors::SchemaError] unless an extension that implements JSON schema generation is loaded
-      def json_schema_strictness(allow_omitted_fields: false, allow_extra_fields: true)
-        raise_json_schema_definition_not_supported_error(:json_schema_strictness)
-      end
-
       # Registers a customization callback that will be applied to every built-in type automatically provided by ElasticGraph. Provides
       # an opportunity to customize the built-in types (e.g. to add directives to them or whatever).
       #
@@ -546,15 +497,6 @@ module ElasticGraph
         yield
       ensure
         ::Thread.current[:ElasticGraph_SchemaDefinition_API_instance] = old_value
-      end
-
-      private
-
-      def raise_json_schema_definition_not_supported_error(method_name)
-        raise Errors::SchemaError,
-          "`#{method_name}` is not supported because no loaded schema definition extension implements JSON schema generation. " \
-          "To use it, add `elasticgraph-json_ingestion` to your bundle and include " \
-          "`ElasticGraph::JSONIngestion::SchemaDefinition::APIExtension` in your configured `extension_modules`."
       end
     end
   end
