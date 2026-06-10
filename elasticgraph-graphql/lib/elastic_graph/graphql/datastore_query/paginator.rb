@@ -68,12 +68,14 @@ module ElasticGraph
 
         # @return [DecodedCursor, nil] the decoded after cursor
         def decoded_after
-          @decoded_after ||= decode_cursor(after)
+          return @decoded_after if defined?(@decoded_after)
+          @decoded_after = decode_cursor(after)
         end
 
         # @return [DecodedCursor, nil] the decoded before cursor
         def decoded_before
-          @decoded_before ||= decode_cursor(before)
+          return @decoded_before if defined?(@decoded_before)
+          @decoded_before = decode_cursor(before)
         end
 
         def requested_page_size
