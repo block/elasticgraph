@@ -162,12 +162,9 @@ module ElasticGraph
       #   @private
       class BuiltInTypes
         # Built-in GraphQL scalar types that are part of the GraphQL specification.
-        # Used to detect when type_name_overrides maps to a built-in type that should
-        # not be registered.
-        BUILT_IN_SCALARS = %w[String Int Float Boolean ID].freeze
-
-        # Valid types that can be used for cursor fields (string-compatible scalars).
-        VALID_CURSOR_TYPES = %w[String ID].freeze
+        # Non-string standard GraphQL scalars that cannot be used for cursor overrides.
+        # String and ID are valid, as are any custom scalar names (e.g., PaginationCursor).
+        INVALID_CURSOR_TYPE_OVERRIDES = (STOCK_GRAPHQL_SCALARS - %w[ID String]).freeze
 
         attr_reader :schema_def_api, :schema_def_state, :names
 
@@ -195,14 +192,13 @@ module ElasticGraph
         def validate_cursor_type_override!
           override_name = @schema_def_state.type_namer.cursor_type_name
           return if override_name == "Cursor"
-          return if VALID_CURSOR_TYPES.include?(override_name)
 
-          raise Errors::SchemaError, <<~ERROR
-            Invalid cursor type override: `Cursor` was overridden to `#{override_name}`, but cursor types must be string-compatible.
-            Valid cursor type overrides are: #{VALID_CURSOR_TYPES.join(", ")} (String recommended for federation compatibility).
-
-            To fix: tasks.type_name_overrides = {Cursor: "String"}
-          ERROR
+          if INVALID_CURSOR_TYPE_OVERRIDES.include?(override_name)
+            raise Errors::SchemaError, <<~ERROR
+              Invalid cursor type override: `Cursor` was overridden to `#{override_name}`, but cursor types must be string-compatible.
+              Valid options include: String, ID, or any custom scalar name (e.g., PaginationCursor).
+            ERROR
+          end
         end
 
         def register_directives
@@ -780,7 +776,7 @@ module ElasticGraph
           # Only register the Cursor scalar if it's not overridden to a built-in type.
           # When overridden to a built-in type like String, we use that type directly
           # and skip scalar registration to avoid duplicate type definition errors.
-          unless BUILT_IN_SCALARS.include?(@schema_def_state.type_namer.cursor_type_name)
+          unless STOCK_GRAPHQL_SCALARS.include?(@schema_def_state.type_namer.cursor_type_name)
             schema_def_api.scalar_type "Cursor" do |t|
               # Technically, we don't use the mapping or json_schema on this type since it's a return-only
               # type and isn't indexed. However, `scalar_type` requires them to be set (since custom scalars
@@ -788,8 +784,6 @@ module ElasticGraph
               # used them.
               t.mapping type: "keyword"
               t.json_schema type: "string"
-              t.coerce_with "ElasticGraph::GraphQL::ScalarCoercionAdapters::Cursor",
-                defined_at: "elastic_graph/graphql/scalar_coercion_adapters/cursor"
 
               t.documentation <<~EOS
                 An opaque string value representing a specific location in a paginated connection type.

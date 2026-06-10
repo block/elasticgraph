@@ -121,7 +121,7 @@ module ElasticGraph
               FloatAggregatedValues IntAggregatedValues JsonSafeLongAggregatedValues LongStringAggregatedValues NonNumericAggregatedValues
               DateAggregatedValues DateTimeAggregatedValues LocalTimeAggregatedValues
               Company OnlineStore DirectWholesaler BrokerWholesaler
-              Cursor PageInfo Query TextFilterInput GeoLocation
+              PageInfo Query TextFilterInput GeoLocation
               DateTimeGroupingOffsetInput DateTimeUnitInput DateTimeTimeOfDayFilterInput
               DateGroupedBy DateGroupingOffsetInput DateGroupingTruncationUnitInput DateUnitInput
               DateTimeGroupedBy DateTimeGroupingTruncationUnitInput TimeZone
@@ -130,7 +130,10 @@ module ElasticGraph
               LocalTimeGroupingOffsetInput LocalTimeGroupingTruncationUnitInput LocalTimeUnitInput MatchesQueryFilterInput
               MatchesPhraseFilterInput MatchesQueryWithPrefixFilterInput MatchesQueryAllowedEditsPerTermInput StringContainsFilterInput StringStartsWithFilterInput
               SearchHighlight
-            ]
+            ] +
+            # Cursor is conditionally included because when it's overridden to a built-in type like String
+            # (as in the camelCase test context), the Cursor scalar is not registered in the schema.
+            (all_fields_by_type_name.key?("Cursor") ? ["Cursor"] : [])
 
           # The sub-aggregation types are quite complicated and we just add them all here.
           expected_types_present_on_both_schemas += %w[

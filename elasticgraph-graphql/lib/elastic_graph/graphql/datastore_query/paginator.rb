@@ -155,7 +155,6 @@ module ElasticGraph
 
         def decode_cursor(cursor)
           return nil if cursor.nil?
-          return cursor if cursor.is_a?(DecodedCursor)
           DecodedCursor.decode!(cursor)
         rescue Errors::InvalidCursorError => e
           raise ::GraphQL::ExecutionError, e.message

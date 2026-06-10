@@ -1404,18 +1404,25 @@ module ElasticGraph
           {"count" => 2, grouped_by => {case_correctly("workspace_id") => "w2"}}
         ]
 
-        array_error = "Cursor must be a String, got Array"
+        # When Cursor is overridden to String (camelCase context), GraphQL validates the type and rejects arrays
+        # at the schema validation level. When Cursor is a custom scalar (snake_case context), GraphQL doesn't
+        # validate input types for custom scalars, so the array reaches our decode logic which validates the type.
+        array_error = if is_a?(CamelCaseGraphQLAcceptanceAdapter)
+          "Argument 'after' on Field '#{case_correctly("widget_aggregations")}' has an invalid value ([1, 2, 3]). Expected type 'String'."
+        else
+          "Cursor must be a String, got Array"
+        end
+
         expect {
           response = list_widget_workspace_id_groupings(first: 2, after: [1, 2, 3], expect_errors: true)
           expect(response["errors"]).to contain_exactly(a_hash_including("message" => array_error))
         }.to log_warning a_string_including(array_error)
 
         broken_cursor = page_info.fetch(case_correctly("end_cursor")) + "-broken"
-        invalid_cursor_error = "`#{broken_cursor}` is an invalid cursor."
         expect {
           response = list_widget_workspace_id_groupings(first: 2, after: broken_cursor, expect_errors: true)
-          expect(response["errors"]).to contain_exactly(a_hash_including("message" => invalid_cursor_error))
-        }.to log_warning a_string_including(invalid_cursor_error)
+          expect(response["errors"]).to contain_exactly(a_hash_including("message" => "`#{broken_cursor}` is an invalid cursor."))
+        }.to log_warning a_string_including("`#{broken_cursor}` is an invalid cursor.")
 
         page_info, workspace_nodes = list_widget_workspace_id_groupings(first: 2, after: page_info.fetch(case_correctly("end_cursor")))
 

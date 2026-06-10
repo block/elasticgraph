@@ -1,9 +1,0 @@
-module ElasticGraph
-  class GraphQL
-    module ScalarCoercionAdapters
-      class Cursor
-        extend SchemaArtifacts::_ScalarCoercionAdapter[::String, ::String]
-      end
-    end
-  end
-end

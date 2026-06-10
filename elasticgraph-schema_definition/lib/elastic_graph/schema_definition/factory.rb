@@ -519,7 +519,7 @@ module ElasticGraph
             f.documentation "The `#{type_name}` of this edge."
           end
 
-          t.field @state.schema_elements.cursor, @state.type_namer.cursor_type_name do |f|
+          t.field @state.schema_elements.cursor, "Cursor" do |f|
             f.documentation <<~EOS
               The `Cursor` of this `#{type_name}`. This can be passed in the next query as
               a `before` or `after` argument to continue paginating from this `#{type_name}`.

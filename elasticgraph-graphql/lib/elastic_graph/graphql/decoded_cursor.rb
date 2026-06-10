@@ -45,6 +45,10 @@ module ElasticGraph
 
       # Tries to decode the given string cursor, raising an `Errors::InvalidCursorError` if it's invalid.
       def self.decode!(string)
+        unless string.is_a?(::String)
+          raise Errors::InvalidCursorError, "Cursor must be a String, got #{string.class}"
+        end
+
         return SINGLETON if string == SINGLETON_CURSOR
         json = ::Base64.urlsafe_decode64(string)
         new(::JSON.parse(json))

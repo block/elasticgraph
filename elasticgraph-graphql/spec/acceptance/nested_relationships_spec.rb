@@ -307,7 +307,15 @@ module ElasticGraph
           }.to log_warning a_string_including("`first` cannot be negative, but is -2.")
 
           # Demonstrate how broken cursors behave.
-          array_error = "Cursor must be a String, got Array"
+          # When Cursor is overridden to String (camelCase context), GraphQL validates the type and rejects arrays
+          # at the schema validation level. When Cursor is a custom scalar (snake_case context), GraphQL doesn't
+          # validate input types for custom scalars, so the array reaches our decode logic which validates the type.
+          array_error = if is_a?(CamelCaseGraphQLAcceptanceAdapter)
+            "Argument 'after' on Field 'components' has an invalid value ([1, 2, 3]). Expected type 'String'."
+          else
+            "Cursor must be a String, got Array"
+          end
+
           expect {
             response = query_widgets_and_components_including_page_info(
               widget_args: {first: 1, order_by: [:amount_cents_ASC]},
@@ -318,15 +326,14 @@ module ElasticGraph
           }.to log_warning a_string_including(array_error)
 
           broken_cursor = results["edges"][0]["node"]["components"][case_correctly "page_info"][case_correctly "end_cursor"] + "-broken"
-          invalid_cursor_error = "`#{broken_cursor}` is an invalid cursor."
           expect {
             response = query_widgets_and_components_including_page_info(
               widget_args: {first: 1, order_by: [:amount_cents_ASC]},
               component_args: {first: 1, after: broken_cursor, order_by: [:name_ASC]},
               expect_errors: true
             )
-            expect(response["errors"]).to contain_exactly(a_hash_including("message" => invalid_cursor_error))
-          }.to log_warning a_string_including(invalid_cursor_error)
+            expect(response["errors"]).to contain_exactly(a_hash_including("message" => "`#{broken_cursor}` is an invalid cursor."))
+          }.to log_warning a_string_including("`#{broken_cursor}` is an invalid cursor.")
 
           # get next page of components (but still on the first page of widgets)
           results = query_widgets_and_components_including_page_info(

@@ -107,6 +107,10 @@ module ElasticGraph
         end
 
         def paginated_search(first: nil, after: nil, last: nil, before: nil, groupings: [field_term_grouping_of("name")], computations: [], filter_to: nil)
+          # Encode cursors (all cursors in aggregation tests are DecodedCursor objects)
+          after = after&.encode
+          before = before&.encode
+
           aggregation_query = aggregation_query_of(
             groupings: groupings, computations: computations,
             first: first, after: after, last: last, before: before,

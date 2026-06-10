@@ -60,7 +60,7 @@ module ElasticGraph
         module_exec(&block)
       end
 
-      context "with a camelCase schema, alternate derived type naming, and enum value overrides" do
+      context "with a camelCase schema, `String` cursors, alternate derived type naming, and enum value overrides" do
         include CamelCaseGraphQLAcceptanceAdapter
 
         # Need to use a local variable instead of an instance variable for the context state,
@@ -90,6 +90,7 @@ module ElasticGraph
             datastore_backend: datastore_backend,
             schema_element_name_form: :camelCase,
             derived_type_name_formats: derived_type_name_formats,
+            type_name_overrides: {Cursor: "String"},
             enum_value_overrides_by_type: enum_value_overrides_by_type,
             schema_definition: ->(schema) do
               # standard:disable Security/Eval -- it's ok here in a test.
