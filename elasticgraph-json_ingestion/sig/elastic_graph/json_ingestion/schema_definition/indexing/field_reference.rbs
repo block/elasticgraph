@@ -9,11 +9,13 @@ module ElasticGraph
         class FieldReference < FieldReferenceSupertype
           attr_reader json_schema_layers: ::ElasticGraph::SchemaDefinition::jsonSchemaLayersArray
           attr_reader json_schema_customizations: ::Hash[::Symbol, untyped]
+          attr_reader doc_comment: ::String?
 
           def initialize: (
             ::ElasticGraph::SchemaDefinition::Indexing::FieldReference field_reference,
             json_schema_layers: ::ElasticGraph::SchemaDefinition::jsonSchemaLayersArray,
-            json_schema_customizations: ::Hash[::Symbol, untyped]
+            json_schema_customizations: ::Hash[::Symbol, untyped],
+            doc_comment: ::String?
           ) -> void
 
           def resolve: () -> Field?

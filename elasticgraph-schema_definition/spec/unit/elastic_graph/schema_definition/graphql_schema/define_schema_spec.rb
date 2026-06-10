@@ -21,7 +21,6 @@ module ElasticGraph
 
           api.as_active_instance do
             ElasticGraph.define_schema do |schema|
-              schema.json_schema_version 1
               schema.object_type("Person") do |t|
                 t.field "id", "ID"
               end

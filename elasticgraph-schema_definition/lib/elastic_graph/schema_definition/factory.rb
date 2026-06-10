@@ -250,14 +250,12 @@ module ElasticGraph
       end
       @@object_type_new = prevent_non_factory_instantiation_of(SchemaElements::ObjectType)
 
-      def new_object_indexing_field_type(type_name:, subfields:, mapping_options:, json_schema_options:, doc_comment:)
+      def new_object_indexing_field_type(type_name:, subfields:, mapping_options:)
         @@object_indexing_field_type_new.call(
           schema_def_state: @state,
           type_name: type_name,
           subfields: subfields,
-          mapping_options: mapping_options,
-          json_schema_options: json_schema_options,
-          doc_comment: doc_comment
+          mapping_options: mapping_options
         )
       end
       @@object_indexing_field_type_new = prevent_non_factory_instantiation_of(Indexing::FieldType::Object)

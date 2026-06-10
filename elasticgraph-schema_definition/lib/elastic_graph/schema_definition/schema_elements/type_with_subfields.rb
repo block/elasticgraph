@@ -157,8 +157,7 @@ module ElasticGraph
         #   via an AuthZ layer (as such a layer would have no way to force a field value to `null` for a client denied field access).
         #   Therefore, we recommend limiting your use of `!` to only a few situations such as defining a type’s primary key (e.g.
         #   `t.field "id", "ID!"`) or defining a list field (e.g. `t.field "authors", "[String!]!"`) since empty lists already provide a
-        #   "no data" representation. You can still configure the ElasticGraph indexer to require a non-null value for a field using
-        #   `f.json_schema nullable: false`.
+        #   "no data" representation. You can still configure an ingestion validation extension to require a non-null indexed value.
         #
         # @note ElasticGraph’s understanding of datastore capabilities may override your configured
         #   `aggregatable`/`filterable`/`groupable`/`sortable` options. For example, a field indexed as `text` for full text search will
@@ -494,9 +493,7 @@ module ElasticGraph
           schema_def_state.factory.new_object_indexing_field_type(
             type_name: name,
             subfields: indexing_fields_by_name_in_index.values.map(&:to_indexing_field).compact,
-            mapping_options: mapping_options,
-            json_schema_options: json_schema_options,
-            doc_comment: doc_comment
+            mapping_options: mapping_options
           )
         end
 

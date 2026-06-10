@@ -100,7 +100,8 @@ module ElasticGraph
             Indexing::FieldReference.new(
               reference.with(type: type_for_json_schema),
               json_schema_layers: JSONSchemaLayers.for(type_for_json_schema),
-              json_schema_customizations: json_schema_options
+              json_schema_customizations: json_schema_options,
+              doc_comment: doc_comment
             )
           end
         end

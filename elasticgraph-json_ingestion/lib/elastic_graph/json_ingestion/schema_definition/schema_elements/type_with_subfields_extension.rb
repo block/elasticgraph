@@ -20,6 +20,7 @@ module ElasticGraph
           def to_indexing_field_type
             field_type = super # : Indexing::FieldType::Object
             field_type.json_schema_options = json_schema_options
+            field_type.doc_comment = doc_comment
             field_type
           end
         end

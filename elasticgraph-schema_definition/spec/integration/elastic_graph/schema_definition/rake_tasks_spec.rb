@@ -8,6 +8,7 @@
 
 require "bundler"
 require "elastic_graph/constants"
+require "elastic_graph/json_ingestion/schema_definition/api_extension"
 require "elastic_graph/schema_definition/rake_tasks"
 require "elastic_graph/schema_definition/schema_elements/type_namer"
 require "graphql"
@@ -216,7 +217,12 @@ module ElasticGraph
             "`schema.json_schema_version 4`"
           ).and matching(json_schema_version_setter_location_regex)
 
-          write_elastic_graph_schema_def_code(component_suffix: "3", json_schema_version: 3, component_extras: "t.renamed_from 'Component'", enforce_json_schema_version: false)
+          write_elastic_graph_schema_def_code(
+            component_suffix: "3",
+            json_schema_version: 3,
+            component_extras: "t.renamed_from 'Component'",
+            enforce_json_schema_version: false
+          )
 
           expect {
             output = run_rake("schema_artifacts:dump")
@@ -494,9 +500,13 @@ module ElasticGraph
             })
           )
 
-          # Here we add a different new field (`ordinal: Int!`), without bumping the version, and disable
-          # enforcement so we do not have to bump the version.
-          write_elastic_graph_schema_def_code(json_schema_version: 2, component_name_extras: "\nt.field 'ordinal', 'Int!'", enforce_json_schema_version: false)
+          # Here we add a different new field (`ordinal: Int!`), without bumping the version (and using `enforce_json_schema_version: false`
+          # to not have to bump the version)...
+          write_elastic_graph_schema_def_code(
+            json_schema_version: 2,
+            component_name_extras: "\nt.field 'ordinal', 'Int!'",
+            enforce_json_schema_version: false
+          )
           run_rake("schema_artifacts:dump")
 
           # It should not be added to the v1 schema...
@@ -585,7 +595,7 @@ module ElasticGraph
             To continue, do one of the following:
 
             1. If the `Component` type has been renamed, indicate this by calling `type.renamed_from "Component"` on the renamed type.
-            2. If the `Component` field has been dropped, indicate this by calling `schema.deleted_type "Component"` on the schema.
+            2. If the `Component` type has been dropped, indicate this by calling `schema.deleted_type "Component"` on the schema.
             3. Alternately, if no publishers or in-flight events use JSON schema version 1, delete its file from `json_schemas_by_version`, and no further changes are required.
           EOS
 
@@ -600,7 +610,7 @@ module ElasticGraph
             To continue, do one of the following:
 
             1. If the `Component` type has been renamed, indicate this by calling `type.renamed_from "Component"` on the renamed type.
-            2. If the `Component` field has been dropped, indicate this by calling `schema.deleted_type "Component"` on the schema.
+            2. If the `Component` type has been dropped, indicate this by calling `schema.deleted_type "Component"` on the schema.
             3. Alternately, if no publishers or in-flight events use JSON schema versions 1 or 2, delete their files from `json_schemas_by_version`, and no further changes are required.
           EOS
 
@@ -615,7 +625,7 @@ module ElasticGraph
             To continue, do one of the following:
 
             1. If the `Component` type has been renamed, indicate this by calling `type.renamed_from "Component"` on the renamed type.
-            2. If the `Component` field has been dropped, indicate this by calling `schema.deleted_type "Component"` on the schema.
+            2. If the `Component` type has been dropped, indicate this by calling `schema.deleted_type "Component"` on the schema.
             3. Alternately, if no publishers or in-flight events use JSON schema versions 1, 2, or 3, delete their files from `json_schemas_by_version`, and no further changes are required.
           EOS
 
@@ -822,7 +832,7 @@ module ElasticGraph
           expect(runtime_meta["object_types_by_name"].keys).to exclude("DateTimeListFilterInput")
         end
 
-        it "successfully checks schema artifacts when the rake task is run within a bundle that only includes the `elasticgraph-schema_definition` gem" do
+        it "successfully checks schema artifacts when the rake task is run within a minimal schema definition bundle" do
           # We want to ensure that `elasticgraph-schema_definition` gem declares (in its gemspec) all the
           # dependencies necessary for the schema definition rake tasks. Unfortunately, it's test suite
           # alone can't detect this, even when run via `script/run_gem_specs`, due to transitive dependencies
@@ -837,6 +847,7 @@ module ElasticGraph
             source "https://rubygems.org"
 
             gem "elasticgraph-schema_definition", path: "#{CommonSpecHelpers::REPO_ROOT}/elasticgraph-schema_definition"
+            gem "elasticgraph-json_ingestion", path: "#{CommonSpecHelpers::REPO_ROOT}/elasticgraph-json_ingestion"
 
             register_gemspec_gems_with_path = lambda do |eg_gem_name|
               gemspec_contents = ::File.read("#{CommonSpecHelpers::REPO_ROOT}/\#{eg_gem_name}/\#{eg_gem_name}.gemspec")
@@ -854,6 +865,7 @@ module ElasticGraph
           ::File.write("Rakefile", <<~EOS)
             project_root = "#{CommonSpecHelpers::REPO_ROOT}"
 
+            require "elastic_graph/json_ingestion/schema_definition/api_extension"
             require "elastic_graph/schema_definition/rake_tasks"
 
             ElasticGraph::SchemaDefinition::RakeTasks.new(
@@ -861,6 +873,7 @@ module ElasticGraph
               index_document_sizes: true,
               path_to_schema: "\#{project_root}/config/schema.rb",
               schema_artifacts_directory: "\#{project_root}/config/schema/artifacts",
+              extension_modules: [ElasticGraph::JSONIngestion::SchemaDefinition::APIExtension]
             )
           EOS
 
@@ -902,7 +915,7 @@ module ElasticGraph
           /line 7 at `(\S*\/?)schema\.rb`/
         end
 
-        def write_elastic_graph_schema_def_code(json_schema_version:, enforce_json_schema_version: true, component_suffix: "", extra_sdl: "", component_name_extras: "", component_extras: "", omit_component_name_field: false)
+        def write_elastic_graph_schema_def_code(json_schema_version:, component_suffix: "", extra_sdl: "", component_name_extras: "", component_extras: "", omit_component_name_field: false, enforce_json_schema_version: true)
           code = <<~EOS
             Thread.current[:eg_schema_load_count] = (Thread.current[:eg_schema_load_count] || 0) + 1
             if Thread.current[:eg_schema_load_count] > 1
@@ -1088,7 +1101,7 @@ module ElasticGraph
             index_document_sizes: true,
             path_to_schema: path_to_schema,
             schema_artifacts_directory: "config/schema/artifacts",
-            extension_modules: [extension_module].compact,
+            extension_modules: [JSONIngestion::SchemaDefinition::APIExtension, extension_module].compact,
             derived_type_name_formats: derived_type_name_formats,
             type_name_overrides: type_name_overrides,
             enum_value_overrides_by_type: enum_value_overrides_by_type,

@@ -51,10 +51,10 @@ module ElasticGraph
     # API instance being active.
     descriptions_needing_schema_def_api_and_extension_modules = {
       "ElasticGraph.define_schema" => [],
-      "ElasticGraph::Apollo::SchemaDefinition" => [ElasticGraph::Apollo::SchemaDefinition::APIExtension],
-      "ElasticGraph::JSONIngestion::SchemaDefinition" => [ElasticGraph::JSONIngestion::SchemaDefinition::APIExtension],
+      "ElasticGraph::Apollo::SchemaDefinition" => [Apollo::SchemaDefinition::APIExtension],
+      "ElasticGraph::JSONIngestion::SchemaDefinition" => [JSONIngestion::SchemaDefinition::APIExtension],
       "ElasticGraph::SchemaDefinition" => [],
-      "ElasticGraph::Warehouse::SchemaDefinition" => [ElasticGraph::Warehouse::SchemaDefinition::APIExtension]
+      "ElasticGraph::Warehouse::SchemaDefinition" => [Warehouse::SchemaDefinition::APIExtension]
     }
 
     descriptions_needing_schema_def_api_and_extension_modules.each do |description, extension_modules|
@@ -65,9 +65,10 @@ module ElasticGraph
           extension_modules: extension_modules
         )
 
-        # This is required in all schemas, but we don't want to have to put in all our examples,
-        # so we set it here.
-        @api.json_schema_version 1
+        # This is required in all JSON ingestion schemas, but we don't want to have to put it in all
+        # our examples, so we set it here. (Without a JSON ingestion extension, the
+        # `json_schema_version` API does not exist and there is no version to set.)
+        @api.json_schema_version 1 if @api.respond_to?(:json_schema_version)
 
         @api.object_type "SomeIndexedTypeToEnsureQueryTypeHasFields" do |t|
           t.field "id", "ID"
@@ -92,16 +93,11 @@ module ElasticGraph
       end
     end
 
-    [
-      "ElasticGraph::JSONIngestion::SchemaDefinition::APIExtension#json_schema_version",
-      "ElasticGraph::SchemaDefinition::API#json_schema_version"
-    ].each do |description|
-      doctest.before description do
-        ElasticGraph.define_schema do |schema|
-          # `schema.json_schema_version` raises an error when the version is set more than once.
-          # By default we set it above. Here we clear it to allow our example to set it.
-          schema.state.json_schema_version = nil
-        end
+    doctest.before "ElasticGraph::JSONIngestion::SchemaDefinition::APIExtension#json_schema_version" do
+      ElasticGraph.define_schema do |schema|
+        # `schema.json_schema_version` raises an error when the version is set more than once.
+        # By default we set it above. Here we clear it to allow our example to set it.
+        schema.state.json_schema_version = nil
       end
     end
 
