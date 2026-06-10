@@ -66,9 +66,9 @@ module ElasticGraph
         )
 
         # This is required in all JSON ingestion schemas, but we don't want to have to put it in all
-        # our examples, so we set it here. (Without a JSON ingestion extension, JSON schema versioning
-        # is not supported and there is no version to set.)
-        @api.json_schema_version 1 if @api.supports_json_schema_versioning?
+        # our examples, so we set it here. (Without a JSON ingestion extension, the
+        # `json_schema_version` API does not exist and there is no version to set.)
+        @api.json_schema_version 1 if @api.respond_to?(:json_schema_version)
 
         @api.object_type "SomeIndexedTypeToEnsureQueryTypeHasFields" do |t|
           t.field "id", "ID"

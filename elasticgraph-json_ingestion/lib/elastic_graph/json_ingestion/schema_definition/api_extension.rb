@@ -45,14 +45,6 @@ module ElasticGraph
           end
         end
 
-        # Indicates that this extension implements JSON schema versioning.
-        #
-        # @return [Boolean] true
-        # @api private
-        def supports_json_schema_versioning?
-          true
-        end
-
         # Defines the version number of the current JSON schema. Importantly, every time a change is made that impacts the JSON schema
         # artifact, the version number must be incremented to ensure that each different version of the JSON schema is identified by a unique
         # version number. The publisher will then include this version number in published events to identify the version of the schema it
