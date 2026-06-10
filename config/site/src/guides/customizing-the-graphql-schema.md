@@ -73,7 +73,7 @@ this way.
 ### Federation Compatibility: Overriding `Cursor` to `String`
 
 When composing an ElasticGraph subgraph into a federated supergraph alongside other subgraphs that use `String` for
-cursor fields (following the [Relay GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm)),
+cursor fields (as the [Relay GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm) permits),
 federation composition may fail with a type incompatibility error. ElasticGraph uses a dedicated `Cursor` scalar type
 for cursor fields by default, which provides better type safety and documentation but can cause conflicts.
 
