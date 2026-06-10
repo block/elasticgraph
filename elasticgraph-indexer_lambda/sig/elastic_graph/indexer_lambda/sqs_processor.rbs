@@ -1,10 +1,18 @@
 module ElasticGraph
   module IndexerLambda
     class SqsProcessor
+      interface _EventPayloadDecoder
+        def decode_events: (
+          sqs_record: ::Hash[::String, untyped],
+          body: ::String
+        ) -> ::Array[::Hash[::String, untyped]]
+      end
+
       def initialize: (
         Indexer::Processor,
         logger: ::Logger,
         ignore_sqs_latency_timestamps_from_arns: ::Set[::String],
+        ?event_payload_decoder: _EventPayloadDecoder,
         ?s3_client: Aws::S3::Client?,
       ) -> void
 
@@ -14,6 +22,7 @@ module ElasticGraph
 
       @indexer_processor: Indexer::Processor
       @logger: ::Logger
+      @event_payload_decoder: _EventPayloadDecoder
       @s3_client: Aws::S3::Client?
 
       attr_reader ignore_sqs_latency_timestamps_from_arns: ::Set[::String]
@@ -22,7 +31,6 @@ module ElasticGraph
       S3_OFFLOADING_INDICATOR: String
       def extract_sqs_metadata: (::Hash[String, untyped]) -> ::Hash[::String, untyped]
       def millis_to_iso8601: (::String) -> ::String?
-      def parse_jsonl: (::String) -> ::Array[::Hash[::String, untyped]]
       def get_payload_from_s3: (::String) -> ::String
       def s3_client: () -> Aws::S3::Client
       def format_response: (
