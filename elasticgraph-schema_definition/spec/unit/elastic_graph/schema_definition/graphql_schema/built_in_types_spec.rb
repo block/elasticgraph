@@ -117,13 +117,8 @@ module ElasticGraph
 
         it "allows overriding `Cursor` to a custom scalar like `PaginationCursor`" do
           result = define_schema(type_name_overrides: {Cursor: "PaginationCursor"}) do |api|
-            # User must define their custom cursor scalar
-            api.scalar_type "PaginationCursor" do |t|
-              t.mapping type: "keyword"
-              t.json_schema type: "string"
-              t.coerce_with "ElasticGraph::GraphQL::ScalarCoercionAdapters::Cursor",
-                defined_at: "elastic_graph/graphql/scalar_coercion_adapters/cursor"
-            end
+            # Custom cursor scalars are automatically registered by built_in_types.rb
+            # when type_name_overrides is used, so no manual definition is needed.
 
             api.object_type "Widget" do |t|
               t.field "id", "ID!"
@@ -131,8 +126,11 @@ module ElasticGraph
             end
           end
 
-          # The Cursor scalar should not be registered when overridden to a custom scalar
+          # The standard Cursor scalar should not be registered when overridden
           expect(type_def_from(result, "Cursor")).to be_nil
+
+          # PaginationCursor should be auto-registered
+          expect(type_def_from(result, "PaginationCursor")).to eq("scalar PaginationCursor")
 
           # PageInfo fields should use the custom scalar
           expect(type_def_from(result, "PageInfo")).to eq(<<~EOS.strip)

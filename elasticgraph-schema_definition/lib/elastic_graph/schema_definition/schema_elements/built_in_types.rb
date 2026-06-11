@@ -787,7 +787,9 @@ module ElasticGraph
               t.json_schema type: "string"
               t.coerce_with "ElasticGraph::GraphQL::ScalarCoercionAdapters::Cursor",
                 defined_at: "elastic_graph/graphql/scalar_coercion_adapters/cursor"
-              t.warehouse_column type: "STRING"
+
+              # Configure warehouse column type if the warehouse extension is loaded.
+              t.warehouse_column type: "STRING" if t.respond_to?(:warehouse_column)
 
               t.documentation <<~EOS
                 An opaque string value representing a specific location in a paginated connection type.
