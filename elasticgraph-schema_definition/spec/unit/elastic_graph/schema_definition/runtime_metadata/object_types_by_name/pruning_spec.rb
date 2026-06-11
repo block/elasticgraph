@@ -113,7 +113,6 @@ module ElasticGraph
 
           s.scalar_type "CustomFrameworkScalar" do |t|
             t.mapping type: "keyword"
-            t.json_schema type: "string"
             t.graphql_only true
           end
 

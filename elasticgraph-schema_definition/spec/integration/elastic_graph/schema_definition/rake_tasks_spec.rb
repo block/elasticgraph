@@ -33,7 +33,7 @@ module ElasticGraph
 
       describe "schema_artifacts:dump", :in_temp_dir do
         it "idempotently dumps all schema artifacts, and is able to check if they are current with `:check`" do
-          write_elastic_graph_schema_def_code(json_schema_version: 1)
+          write_elastic_graph_schema_def_code
           expect_all_artifacts_out_of_date_because_they_havent_been_dumped
 
           expect {
@@ -41,8 +41,6 @@ module ElasticGraph
             expect(output.lines).to include(
               a_string_including("Dumped", DATASTORE_CONFIG_FILE),
               a_string_including("Dumped", RUNTIME_METADATA_FILE),
-              a_string_including("Dumped", JSON_SCHEMAS_FILE),
-              a_string_including("Dumped", versioned_json_schema_file(1)),
               a_string_including("Dumped", GRAPHQL_SCHEMA_FILE)
             )
           }.to change { read_artifact(DATASTORE_CONFIG_FILE) }
@@ -54,17 +52,11 @@ module ElasticGraph
             .and change { read_artifact(RUNTIME_METADATA_FILE) }
             .from(a_falsy_value)
             .to(a_string_including("script_id: update_ComponentDesigner_from_Component_").and(excluding("ruby/object")))
-            .and change { read_artifact(JSON_SCHEMAS_FILE) }
-            .from(a_falsy_value)
-            .to(a_string_including("\n  Component:", "\njson_schema_version: 1"))
             .and change { read_artifact(GRAPHQL_SCHEMA_FILE) }
             .from(a_falsy_value)
             .to(a_string_including("type Component {", "directive @fromExtensionModule"))
 
-          # Verify the data is dumped in Alphabetical order for consistency, and is pruned
-          # (Except for `EVENT_ENVELOPE_JSON_SCHEMA_NAME` -- it goes first).
-          definition_names = YAML.safe_load(read_artifact(JSON_SCHEMAS_FILE)).fetch("$defs").keys
-          expect(definition_names).to eq(%w[ElasticGraphEventEnvelope Component ElectricalPart ID MechanicalPart Size String])
+          # Verify the data is dumped in Alphabetical order for consistency.
           expect(YAML.safe_load(read_artifact(DATASTORE_CONFIG_FILE)).fetch("indices").keys).to eq %w[
             component_designers components electrical_parts mechanical_parts
           ]
@@ -77,10 +69,9 @@ module ElasticGraph
             expect(output.lines).to include(a_string_including("already up to date"))
           }.to maintain { read_artifact(DATASTORE_CONFIG_FILE) }
             .and maintain { read_artifact(RUNTIME_METADATA_FILE) }
-            .and maintain { read_artifact(JSON_SCHEMAS_FILE) }
             .and maintain { read_artifact(GRAPHQL_SCHEMA_FILE) }
 
-          write_elastic_graph_schema_def_code(component_suffix: "2", component_extras: "schema.deleted_type 'Component'", json_schema_version: 2)
+          write_elastic_graph_schema_def_code(component_suffix: "2")
 
           expect_out_of_date_artifacts_with_details(<<~EOS.strip)
             -  component_designers:
@@ -97,9 +88,6 @@ module ElasticGraph
             expect(output.lines).to include(
               a_string_including("Dumped", DATASTORE_CONFIG_FILE),
               a_string_including("Dumped", RUNTIME_METADATA_FILE),
-              a_string_including("Dumped", JSON_SCHEMAS_FILE),
-              a_string_including("Dumped", versioned_json_schema_file(1)),
-              a_string_including("Dumped", versioned_json_schema_file(2)),
               a_string_including("Dumped", GRAPHQL_SCHEMA_FILE)
             )
           }.to change { read_artifact(DATASTORE_CONFIG_FILE) }
@@ -111,17 +99,26 @@ module ElasticGraph
             .and change { read_artifact(RUNTIME_METADATA_FILE) }
             .from(a_string_including("script_id: update_ComponentDesigner_from_Component_"))
             .to(a_string_including("script_id: update_ComponentDesigner2_from_Component2_"))
-            .and change { read_artifact(JSON_SCHEMAS_FILE) }
-            .from(a_string_including("\n  Component:", "\njson_schema_version: 1"))
-            .to(a_string_including("\n  Component2:", "\njson_schema_version: 2").and(excluding("\n  Component:")))
             .and change { read_artifact(GRAPHQL_SCHEMA_FILE) }
             .from(a_string_including("type Component {"))
             .to(a_string_including("type Component2 {").and(excluding("Component ")))
 
           expect_up_to_date_artifacts
+        end
 
-          delete_artifact versioned_json_schema_file(2)
-          expect_missing_versioned_json_schema_artifact "v2.yaml"
+        it "shows the full diff for an out-of-date artifact when the diff is short" do
+          write_elastic_graph_schema_def_code
+          run_rake("schema_artifacts:dump")
+
+          write_elastic_graph_schema_def_code(number_of_shards: 7)
+
+          expect {
+            run_rake("schema_artifacts:check")
+          }.to abort_with { |error|
+            expect(error.message)
+              .to include("1. config/schema/artifacts/datastore_config.yaml (see [1] below for the diff)", "number_of_shards")
+              .and exclude("lines of the diff")
+          }
         end
 
         it "allows the derived GraphQL type name formats to be customized" do
@@ -133,7 +130,7 @@ module ElasticGraph
             block.call(line)
           end
 
-          write_elastic_graph_schema_def_code(json_schema_version: 1)
+          write_elastic_graph_schema_def_code
           run_rake("schema_artifacts:dump")
 
           # We strip the comment preamble so we can compare it with an SDL string that lacks it below.
@@ -175,7 +172,7 @@ module ElasticGraph
         end
 
         it "generates separate input vs output enums by default, but allows them to be the same if desired" do
-          write_elastic_graph_schema_def_code(json_schema_version: 1)
+          write_elastic_graph_schema_def_code
 
           run_rake("schema_artifacts:dump")
           expect(enum_types_in_dumped_graphql_schema).to contain_exactly(
@@ -215,6 +212,7 @@ module ElasticGraph
 
           output = run_rake(
             "schema_artifacts:dump",
+            extension_modules: [JSONIngestion::SchemaDefinition::APIExtension],
             type_name_overrides: overrides.merge({"Widgets" => "Unused"}),
             enum_value_overrides_by_type: {
               "PreColor" => {"GREAN" => "GREENISH", "MAGENTA" => "RED"},
@@ -265,7 +263,7 @@ module ElasticGraph
 
           overrides = original_core_types.to_h { |name| [name, "Pre#{name}"] }
 
-          output = run_rake("schema_artifacts:dump", type_name_overrides: overrides)
+          output = run_rake("schema_artifacts:dump", extension_modules: [JSONIngestion::SchemaDefinition::APIExtension], type_name_overrides: overrides)
           expect(output).to exclude(does_not_match_warning_snippet)
 
           overriden_types = graphql_types_defined_in(read_artifact(GRAPHQL_SCHEMA_FILE))
@@ -291,7 +289,12 @@ module ElasticGraph
 
         it "does not change the formatting of the dumped artifacts in unexpected ways" do
           config_dir = File.join(CommonSpecHelpers::REPO_ROOT, "config")
-          run_rake("schema_artifacts:dump", path_to_schema: File.join(config_dir, "schema.rb"), include_extension_module: false)
+          run_rake(
+            "schema_artifacts:dump",
+            path_to_schema: File.join(config_dir, "schema.rb"),
+            include_extension_module: false,
+            extension_modules: [JSONIngestion::SchemaDefinition::APIExtension]
+          )
 
           # :nocov: -- some branches below depend on pass vs fail or local vs CI.
           # Exclude `data_warehouse.yaml` from the diff since it's generated by the warehouse extension,
@@ -315,13 +318,13 @@ module ElasticGraph
         end
 
         it "retains `extend schema` in the dumped SDL if ElasticGraph includes it in the generated SDL string" do
-          write_elastic_graph_schema_def_code(json_schema_version: 1, extra_sdl: "")
+          write_elastic_graph_schema_def_code(extra_sdl: "")
           run_rake("schema_artifacts:dump")
 
           # `extend` should not be added by default...
           expect(read_artifact(GRAPHQL_SCHEMA_FILE)).not_to include("extend")
 
-          write_elastic_graph_schema_def_code(json_schema_version: 1, extra_sdl: <<~EOS)
+          write_elastic_graph_schema_def_code(extra_sdl: <<~EOS)
             extend schema
               @customDirective
 
@@ -419,7 +422,7 @@ module ElasticGraph
           }.to output(/Your Gemfile lists/).to_stderr_from_any_process
         end
 
-        def write_elastic_graph_schema_def_code(json_schema_version:, component_suffix: "", extra_sdl: "", component_extras: "")
+        def write_elastic_graph_schema_def_code(component_suffix: "", extra_sdl: "", component_extras: "", number_of_shards: 5)
           code = <<~EOS
             Thread.current[:eg_schema_load_count] = (Thread.current[:eg_schema_load_count] || 0) + 1
             if Thread.current[:eg_schema_load_count] > 1
@@ -427,7 +430,6 @@ module ElasticGraph
             end
 
             ElasticGraph.define_schema do |schema|
-              schema.json_schema_version #{json_schema_version}
               schema.enum_type "Size" do |t|
                 t.values "SMALL", "MEDIUM", "LAGE"
               end
@@ -460,7 +462,7 @@ module ElasticGraph
                 t.field "id", "ID!"
                 t.field "name", "String!"
                 t.field "designer_id", "ID"
-                t.index "components#{component_suffix}", number_of_shards: 5
+                t.index "components#{component_suffix}", number_of_shards: #{number_of_shards}
 
                 t.derive_indexed_type_fields "ComponentDesigner#{component_suffix}", from_id: "designer_id" do |derive|
                   derive.append_only_set "designed_component_names", from: "name"
@@ -483,9 +485,6 @@ module ElasticGraph
             end
 
             ElasticGraph.define_schema do |schema|
-              schema.json_schema_version 1
-              schema.enforce_json_schema_version false
-
               schema.object_type "MyType" do |t|
                 t.field "id", "ID!"
                 #{'t.field "timestamp", "DateTime"' if include_date_time_fields}
@@ -506,7 +505,7 @@ module ElasticGraph
             output = run_rake("schema_artifacts:check")
           }.not_to raise_error
 
-          expect(output).to include(DATASTORE_CONFIG_FILE, JSON_SCHEMAS_FILE, "up to date")
+          expect(output).to include(DATASTORE_CONFIG_FILE, RUNTIME_METADATA_FILE, "up to date")
         end
 
         def expect_all_artifacts_out_of_date_because_they_havent_been_dumped
@@ -514,25 +513,11 @@ module ElasticGraph
             run_rake("schema_artifacts:check")
           }.to abort_with { |error|
             expect(error.message).to eq(<<~EOS.strip)
-              5 schema artifact(s) are out of date. Run `bundle exec rake schema_artifacts:dump` to update the following artifact(s):
+              3 schema artifact(s) are out of date. Run `bundle exec rake schema_artifacts:dump` to update the following artifact(s):
 
               1. config/schema/artifacts/datastore_config.yaml (file does not exist)
-              2. config/schema/artifacts/json_schemas.yaml (file does not exist)
-              3. config/schema/artifacts/json_schemas_by_version/v1.yaml (file does not exist)
-              4. config/schema/artifacts/runtime_metadata.yaml (file does not exist)
-              5. config/schema/artifacts/schema.graphql (file does not exist)
-            EOS
-          }
-        end
-
-        def expect_missing_versioned_json_schema_artifact(version_file)
-          expect {
-            run_rake("schema_artifacts:check")
-          }.to abort_with { |error|
-            expect(error.message).to eq(<<~EOS.strip)
-              1 schema artifact(s) are out of date. Run `bundle exec rake schema_artifacts:dump` to update the following artifact(s):
-
-              1. config/schema/artifacts/json_schemas_by_version/#{version_file} (file does not exist)
+              2. config/schema/artifacts/runtime_metadata.yaml (file does not exist)
+              3. config/schema/artifacts/schema.graphql (file does not exist)
             EOS
           }
         end
@@ -541,15 +526,12 @@ module ElasticGraph
           expect {
             run_rake("schema_artifacts:check", pretend_tty: test_color)
           }.to abort_with { |error|
-            expect(error.message.lines.first(8).join).to eq(<<~EOS)
-              6 schema artifact(s) are out of date. Run `bundle exec rake schema_artifacts:dump` to update the following artifact(s):
+            expect(error.message.lines.first(5).join).to eq(<<~EOS)
+              3 schema artifact(s) are out of date. Run `bundle exec rake schema_artifacts:dump` to update the following artifact(s):
 
               1. config/schema/artifacts/datastore_config.yaml (see [1] below for the first 50 lines of the diff)
-              2. config/schema/artifacts/json_schemas.yaml (see [2] below for the first 50 lines of the diff)
-              3. config/schema/artifacts/json_schemas_by_version/v1.yaml (see [3] below for the diff)
-              4. config/schema/artifacts/json_schemas_by_version/v2.yaml (file does not exist)
-              5. config/schema/artifacts/runtime_metadata.yaml (see [4] below for the first 50 lines of the diff)
-              6. config/schema/artifacts/schema.graphql (see [5] below for the first 50 lines of the diff)
+              2. config/schema/artifacts/runtime_metadata.yaml (see [2] below for the first 50 lines of the diff)
+              3. config/schema/artifacts/schema.graphql (see [3] below for the first 50 lines of the diff)
             EOS
 
             expect(error.message).to include(example_diff)
@@ -560,14 +542,6 @@ module ElasticGraph
           path = File.join("config", "schema", "artifacts", name)
           File.exist?(path) && File.read(path)
         end
-
-        def delete_artifact(*name_parts)
-          ::File.delete(::File.join("config", "schema", "artifacts", *name_parts))
-        end
-
-        def versioned_json_schema_file(version)
-          ::File.join(JSON_SCHEMAS_BY_VERSION_DIRECTORY, "v#{version}.yaml")
-        end
       end
 
       def run_rake(
@@ -575,6 +549,7 @@ module ElasticGraph
         pretend_tty: false,
         path_to_schema: "schema.rb",
         include_extension_module: true,
+        extension_modules: [],
         derived_type_name_formats: {},
         type_name_overrides: {},
         enum_value_overrides_by_type: {}
@@ -598,7 +573,7 @@ module ElasticGraph
             index_document_sizes: true,
             path_to_schema: path_to_schema,
             schema_artifacts_directory: "config/schema/artifacts",
-            extension_modules: [JSONIngestion::SchemaDefinition::APIExtension, extension_module].compact,
+            extension_modules: extension_modules + [extension_module].compact,
             derived_type_name_formats: derived_type_name_formats,
             type_name_overrides: type_name_overrides,
             enum_value_overrides_by_type: enum_value_overrides_by_type,

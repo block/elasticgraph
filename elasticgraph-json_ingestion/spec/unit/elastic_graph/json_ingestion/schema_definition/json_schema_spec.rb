@@ -3151,6 +3151,27 @@ module ElasticGraph
         expect(widget_schema.dig("properties", "undocumented_field")).not_to have_key("description")
       end
 
+      it "does not care if the interface and object fields have different JSON schema" do
+        json_schema = dump_schema do |schema|
+          schema.object_type "Thing" do |t|
+            t.implements "HasID"
+            t.field "id", "ID!" do |f|
+              f.json_schema maxLength: 40
+            end
+            t.field "name", "String"
+            t.index "things"
+          end
+
+          schema.interface_type "HasID" do |t|
+            t.field "id", "ID!" do |f|
+              f.json_schema maxLength: 30
+            end
+          end
+        end
+
+        expect(json_schema.dig("$defs", "Thing", "properties", "id", "allOf")).to include({"maxLength" => 40})
+      end
+
       def all_type_definitions_for(&schema_definition)
         dump_schema(&schema_definition).fetch("$defs")
       end

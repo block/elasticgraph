@@ -35,7 +35,7 @@ module ElasticGraph
       end
 
       def define_schema(**options, &block)
-        define_schema_with_schema_elements(schema_elements, **options, &block).graphql_schema_string
+        define_schema_with_schema_elements(schema_elements, extension_modules: [], **options, &block).graphql_schema_string
       end
 
       def correctly_cased(name)
