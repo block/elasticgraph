@@ -773,11 +773,12 @@ module ElasticGraph
           # Validate that Cursor type override is compatible (must be string-like)
           validate_cursor_type_override!
 
-          # Only register the Cursor scalar if it's not overridden to a built-in type.
-          # When overridden to a built-in type like String, we use that type directly
-          # and skip scalar registration to avoid duplicate type definition errors.
-          unless STOCK_GRAPHQL_SCALARS.include?(@schema_def_state.type_namer.cursor_type_name)
-            schema_def_api.scalar_type "Cursor" do |t|
+          # Register the cursor scalar unless it's overridden to a built-in type.
+          # When overridden to a built-in type like String or ID, we use that type directly.
+          # When overridden to a custom scalar (e.g., PaginationCursor), we register it automatically.
+          cursor_type_name = @schema_def_state.type_namer.cursor_type_name
+          unless STOCK_GRAPHQL_SCALARS.include?(cursor_type_name)
+            schema_def_api.scalar_type cursor_type_name do |t|
               # Technically, we don't use the mapping or json_schema on this type since it's a return-only
               # type and isn't indexed. However, `scalar_type` requires them to be set (since custom scalars
               # defined by users will need those set) so we set them here to what they would be if we actually
@@ -786,6 +787,7 @@ module ElasticGraph
               t.json_schema type: "string"
               t.coerce_with "ElasticGraph::GraphQL::ScalarCoercionAdapters::Cursor",
                 defined_at: "elastic_graph/graphql/scalar_coercion_adapters/cursor"
+              t.warehouse_column type: "STRING"
 
               t.documentation <<~EOS
                 An opaque string value representing a specific location in a paginated connection type.

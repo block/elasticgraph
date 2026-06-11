@@ -71,6 +71,22 @@ module ElasticGraph
             "call `warehouse_column type:"
           ))
         end
+
+        it "respects warehouse_column configuration from custom cursor scalar overrides (e.g., PaginationCursor)" do
+          results = define_warehouse_schema(type_name_overrides: {Cursor: "PaginationCursor"}) do |s|
+            # Define a custom type that includes a PaginationCursor field so we can verify
+            # the warehouse column type is configured correctly.
+            s.object_type "CursorTest" do |t|
+              t.field "id", "ID"
+              t.field "cursor_value", "PaginationCursor"
+              t.index "cursor_tests"
+            end
+          end
+
+          # The PaginationCursor scalar is automatically registered in built_in_types.rb with
+          # warehouse_column type: "STRING", and the warehouse callback respects that configuration.
+          expect(warehouse_column_def_from(results, "cursor_tests", "cursor_value")).to eq "cursor_value STRING"
+        end
       end
     end
   end

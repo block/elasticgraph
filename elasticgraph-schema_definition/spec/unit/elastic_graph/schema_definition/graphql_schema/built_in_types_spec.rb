@@ -115,6 +115,44 @@ module ElasticGraph
           end
         end
 
+        it "allows overriding `Cursor` to a custom scalar like `PaginationCursor`" do
+          result = define_schema(type_name_overrides: {Cursor: "PaginationCursor"}) do |api|
+            # User must define their custom cursor scalar
+            api.scalar_type "PaginationCursor" do |t|
+              t.mapping type: "keyword"
+              t.json_schema type: "string"
+              t.coerce_with "ElasticGraph::GraphQL::ScalarCoercionAdapters::Cursor",
+                defined_at: "elastic_graph/graphql/scalar_coercion_adapters/cursor"
+            end
+
+            api.object_type "Widget" do |t|
+              t.field "id", "ID!"
+              t.index "widgets"
+            end
+          end
+
+          # The Cursor scalar should not be registered when overridden to a custom scalar
+          expect(type_def_from(result, "Cursor")).to be_nil
+
+          # PageInfo fields should use the custom scalar
+          expect(type_def_from(result, "PageInfo")).to eq(<<~EOS.strip)
+            type PageInfo {
+              #{schema_elements.has_next_page}: Boolean!
+              #{schema_elements.has_previous_page}: Boolean!
+              #{schema_elements.start_cursor}: PaginationCursor
+              #{schema_elements.end_cursor}: PaginationCursor
+            }
+          EOS
+
+          # Edge.cursor field should use the custom scalar
+          expect(type_def_from(result, "WidgetEdge")).to include("#{schema_elements.cursor}: PaginationCursor")
+
+          # Pagination arguments should use the custom scalar
+          query_type = type_def_from(result, "Query")
+          expect(query_type).to include("after: PaginationCursor")
+          expect(query_type).to include("before: PaginationCursor")
+        end
+
         it "defines a `GeoLocation` object type and related filter types" do
           expect(type_named("GeoLocation", include_docs: true)).to eq(<<~EOS.strip)
             """

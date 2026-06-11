@@ -60,7 +60,12 @@ module ElasticGraph
           api.on_built_in_types do |type|
             case type
             when ScalarTypeExtension
-              type.warehouse_column type: COLUMN_TYPES_BY_BUILT_IN_SCALAR_TYPE.fetch(type.name)
+              # Only configure warehouse_column if not already set (e.g., by the scalar definition itself).
+              # This allows custom cursor scalars to configure themselves while providing defaults for
+              # standard built-in types.
+              unless type.warehouse_column_type
+                type.warehouse_column type: COLUMN_TYPES_BY_BUILT_IN_SCALAR_TYPE.fetch(type.name)
+              end
             end
           end
         end
