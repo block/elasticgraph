@@ -9405,8 +9405,8 @@ scalar_types_by_name:
       require_path: elastic_graph/indexer/indexing_preparers/no_op
   Cursor:
     coercion_adapter:
-      name: ElasticGraph::GraphQL::ScalarCoercionAdapters::NoOp
-      require_path: elastic_graph/graphql/scalar_coercion_adapters/no_op
+      name: ElasticGraph::GraphQL::ScalarCoercionAdapters::Cursor
+      require_path: elastic_graph/graphql/scalar_coercion_adapters/cursor
     grouping_missing_value_placeholder: "$SECURE_RANDOM_VALUE"
     indexing_preparer:
       name: ElasticGraph::Indexer::IndexingPreparers::NoOp

@@ -784,6 +784,8 @@ module ElasticGraph
               # used them.
               t.mapping type: "keyword"
               t.json_schema type: "string"
+              t.coerce_with "ElasticGraph::GraphQL::ScalarCoercionAdapters::Cursor",
+                defined_at: "elastic_graph/graphql/scalar_coercion_adapters/cursor"
 
               t.documentation <<~EOS
                 An opaque string value representing a specific location in a paginated connection type.

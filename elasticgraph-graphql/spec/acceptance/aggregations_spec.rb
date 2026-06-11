@@ -1404,14 +1404,11 @@ module ElasticGraph
           {"count" => 2, grouped_by => {case_correctly("workspace_id") => "w2"}}
         ]
 
-        # When Cursor is overridden to String (camelCase context), GraphQL validates the type and rejects arrays
-        # at the schema validation level. When Cursor is a custom scalar (snake_case context), GraphQL doesn't
-        # validate input types for custom scalars, so the array reaches our decode logic which validates the type.
-        array_error = if is_a?(CamelCaseGraphQLAcceptanceAdapter)
-          "Argument 'after' on Field '#{case_correctly("widget_aggregations")}' has an invalid value ([1, 2, 3]). Expected type 'String'."
-        else
-          "Cursor must be a String, got Array"
-        end
+        # Both contexts (Cursor scalar and String override) now produce consistent error messages
+        # because the coercion adapter returns nil for invalid values, causing GraphQL to generate
+        # validation errors with full field context.
+        cursor_type = is_a?(CamelCaseGraphQLAcceptanceAdapter) ? "String" : "Cursor"
+        array_error = "Argument 'after' on Field '#{case_correctly("widget_aggregations")}' has an invalid value ([1, 2, 3]). Expected type '#{cursor_type}'."
 
         expect {
           response = list_widget_workspace_id_groupings(first: 2, after: [1, 2, 3], expect_errors: true)

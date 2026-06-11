@@ -1,0 +1,11 @@
+module ElasticGraph
+  class GraphQL
+    module ScalarCoercionAdapters
+      class Cursor
+        def self.coerce_input: (untyped, untyped) -> ::String?
+
+        def self.coerce_result: (untyped, untyped) -> untyped
+      end
+    end
+  end
+end

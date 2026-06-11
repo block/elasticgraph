@@ -307,14 +307,11 @@ module ElasticGraph
           }.to log_warning a_string_including("`first` cannot be negative, but is -2.")
 
           # Demonstrate how broken cursors behave.
-          # When Cursor is overridden to String (camelCase context), GraphQL validates the type and rejects arrays
-          # at the schema validation level. When Cursor is a custom scalar (snake_case context), GraphQL doesn't
-          # validate input types for custom scalars, so the array reaches our decode logic which validates the type.
-          array_error = if is_a?(CamelCaseGraphQLAcceptanceAdapter)
-            "Argument 'after' on Field 'components' has an invalid value ([1, 2, 3]). Expected type 'String'."
-          else
-            "Cursor must be a String, got Array"
-          end
+          # Both contexts (Cursor scalar and String override) now produce consistent error messages
+          # because the coercion adapter returns nil for invalid values, causing GraphQL to generate
+          # validation errors with full field context.
+          cursor_type = is_a?(CamelCaseGraphQLAcceptanceAdapter) ? "String" : "Cursor"
+          array_error = "Argument 'after' on Field 'components' has an invalid value ([1, 2, 3]). Expected type '#{cursor_type}'."
 
           expect {
             response = query_widgets_and_components_including_page_info(
