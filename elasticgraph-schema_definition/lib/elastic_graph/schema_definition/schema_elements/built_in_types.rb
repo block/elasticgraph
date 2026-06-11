@@ -789,7 +789,10 @@ module ElasticGraph
                 defined_at: "elastic_graph/graphql/scalar_coercion_adapters/cursor"
 
               # Configure warehouse column type if the warehouse extension is loaded.
+              # :nocov: Not all test configurations load the warehouse extension, so this branch isn't always hit.
+              # It is covered by elasticgraph-warehouse tests where the extension is loaded.
               t.warehouse_column type: "STRING" if t.respond_to?(:warehouse_column)
+              # :nocov:
 
               t.documentation <<~EOS
                 An opaque string value representing a specific location in a paginated connection type.
