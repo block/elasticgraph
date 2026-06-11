@@ -94,7 +94,10 @@ module ElasticGraph
           end
 
           def scalar_coercion_adapter_path
-            ::File.join(CommonSpecHelpers::REPO_ROOT, "elasticgraph-schema_definition/spec/support/example_extensions/scalar_coercion_adapter")
+            # Must match the `defined_at` path used by other specs (e.g. in `elasticgraph-schema_definition`)
+            # that load this adapter: the extension loader raises if the same extension is loaded from two
+            # different paths within one process, as can happen when one worker runs both suites.
+            "support/example_extensions/scalar_coercion_adapter"
           end
 
           def build_api
