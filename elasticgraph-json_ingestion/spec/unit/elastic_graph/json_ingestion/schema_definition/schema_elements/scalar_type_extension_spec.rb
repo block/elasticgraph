@@ -8,6 +8,7 @@
 
 require "elastic_graph/constants"
 require "elastic_graph/errors"
+require "elastic_graph/json_ingestion/schema_definition/api_extension"
 require "elastic_graph/json_ingestion/schema_definition/schema_elements/scalar_type_extension"
 require "elastic_graph/spec_support/schema_definition_helpers"
 
