@@ -21,13 +21,13 @@ module ElasticGraph
         metadata = scalar_type_metadata_for "BigInt" do |s|
           s.scalar_type "BigInt" do |t|
             t.mapping type: "long"
-            t.coerce_with "ExampleScalarCoercionAdapter", defined_at: "support/example_extensions/scalar_coercion_adapter"
+            t.coerce_with "ExampleScalarCoercionAdapter", defined_at: "elastic_graph/spec_support/example_extensions/scalar_coercion_adapter"
           end
         end
 
         expect(metadata).to eq scalar_type_with(coercion_adapter_ref: {
           "name" => "ExampleScalarCoercionAdapter",
-          "require_path" => "support/example_extensions/scalar_coercion_adapter"
+          "require_path" => "elastic_graph/spec_support/example_extensions/scalar_coercion_adapter"
         })
       end
 
@@ -51,7 +51,7 @@ module ElasticGraph
             t.mapping type: "long"
 
             expect {
-              t.coerce_with "NotAValidConstant", defined_at: "support/example_extensions/scalar_coercion_adapter"
+              t.coerce_with "NotAValidConstant", defined_at: "elastic_graph/spec_support/example_extensions/scalar_coercion_adapter"
             }.to raise_error NameError, a_string_including("NotAValidConstant")
           end
         end
@@ -79,14 +79,14 @@ module ElasticGraph
         metadata = scalar_type_metadata_for "Int" do |s|
           s.on_built_in_types do |t|
             if t.is_a?(SchemaElements::ScalarType)
-              t.coerce_with "ExampleScalarCoercionAdapter", defined_at: "support/example_extensions/scalar_coercion_adapter"
+              t.coerce_with "ExampleScalarCoercionAdapter", defined_at: "elastic_graph/spec_support/example_extensions/scalar_coercion_adapter"
             end
           end
         end
 
         expect(metadata.coercion_adapter_ref).to eq({
           "name" => "ExampleScalarCoercionAdapter",
-          "require_path" => "support/example_extensions/scalar_coercion_adapter"
+          "require_path" => "elastic_graph/spec_support/example_extensions/scalar_coercion_adapter"
         })
       end
 
@@ -191,7 +191,7 @@ module ElasticGraph
 
           it "infers 'NaN' for safe integer type #{int_type} with custom coercion adapter" do
             grouping_missing_value_placeholder = grouping_missing_value_placeholder_for(int_type) do |t|
-              t.coerce_with "ExampleScalarCoercionAdapter", defined_at: "support/example_extensions/scalar_coercion_adapter"
+              t.coerce_with "ExampleScalarCoercionAdapter", defined_at: "elastic_graph/spec_support/example_extensions/scalar_coercion_adapter"
             end
 
             expect(grouping_missing_value_placeholder).to eq(MISSING_NUMERIC_PLACEHOLDER)
@@ -200,7 +200,7 @@ module ElasticGraph
 
         it "does not infer a placeholder for `long` types since core ElasticGraph cannot know their range is float-safe" do
           grouping_missing_value_placeholder = grouping_missing_value_placeholder_for("long") do |t|
-            t.coerce_with "ExampleScalarCoercionAdapter", defined_at: "support/example_extensions/scalar_coercion_adapter"
+            t.coerce_with "ExampleScalarCoercionAdapter", defined_at: "elastic_graph/spec_support/example_extensions/scalar_coercion_adapter"
           end
 
           expect(grouping_missing_value_placeholder).to be_nil
@@ -208,7 +208,7 @@ module ElasticGraph
 
         it "does not infer a placeholder for `unsigned_long` types since core ElasticGraph cannot know their range is float-safe" do
           grouping_missing_value_placeholder = grouping_missing_value_placeholder_for("unsigned_long") do |t|
-            t.coerce_with "ExampleScalarCoercionAdapter", defined_at: "support/example_extensions/scalar_coercion_adapter"
+            t.coerce_with "ExampleScalarCoercionAdapter", defined_at: "elastic_graph/spec_support/example_extensions/scalar_coercion_adapter"
           end
 
           expect(grouping_missing_value_placeholder).to be_nil
