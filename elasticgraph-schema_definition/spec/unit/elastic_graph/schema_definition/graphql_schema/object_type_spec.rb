@@ -674,9 +674,7 @@ module ElasticGraph
             result = object_type "Widget", include_docs: true do |t|
               t.documentation "A widget."
               t.field "id", "ID"
-              t.field "user_id", "ID" do |f|
-                f.json_schema nullable: false
-              end
+              t.field "user_id", "ID"
 
               t.index "widgets" do |i|
                 i.route_with "user_id"

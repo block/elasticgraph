@@ -6,7 +6,6 @@
 #
 # frozen_string_literal: true
 
-require "elastic_graph/json_ingestion/schema_definition/api_extension"
 require "elastic_graph/spec_support/schema_definition_helpers"
 require "elastic_graph/spec_support/runtime_metadata_support"
 
@@ -19,7 +18,7 @@ module ElasticGraph
       def define_schema(**options, &block)
         super(
           schema_element_name_form: "snake_case",
-          extension_modules: [JSONIngestion::SchemaDefinition::APIExtension],
+          extension_modules: [],
           **options,
           &block
         )

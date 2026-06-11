@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/errors"
+require "elastic_graph/json_ingestion/schema_definition/api_extension"
 require "elastic_graph/spec_support/have_readable_to_s_and_inspect_output"
 require_relative "graphql_schema_spec_support"
 
@@ -81,13 +82,14 @@ module ElasticGraph
           )
         end
 
-        it "rejects type names reserved by schema definition extensions" do
+        it "rejects type names that have been registered as reserved (as schema definition extensions do)" do
           expect {
             define_schema do |schema|
-              schema.object_type EVENT_ENVELOPE_JSON_SCHEMA_NAME
+              schema.state.reserved_type_names << "SomeReservedName"
+              schema.object_type "SomeReservedName"
             end
           }.to raise_error Errors::SchemaError, a_string_including(
-            "`#{EVENT_ENVELOPE_JSON_SCHEMA_NAME}` cannot be used as a schema type",
+            "`SomeReservedName` cannot be used as a schema type",
             "reserved name"
           )
         end
@@ -108,7 +110,7 @@ module ElasticGraph
 
         it "allows test schemas to set the JSON schema version themselves" do
           # If the test support logic re-set the version it would fail with a "can only be set once" error.
-          result = define_schema do |schema|
+          result = define_schema(extension_modules: [JSONIngestion::SchemaDefinition::APIExtension]) do |schema|
             schema.json_schema_version 7
 
             schema.object_type("Widget") do |t|
@@ -184,7 +186,6 @@ module ElasticGraph
             schema.scalar_type "MyScalar" do |t|
               expect(t).to have_readable_to_s_and_inspect_output.including("MyScalar")
               t.mapping type: "keyword"
-              t.json_schema type: "string"
             end
 
             schema.enum_type "Color" do |t|

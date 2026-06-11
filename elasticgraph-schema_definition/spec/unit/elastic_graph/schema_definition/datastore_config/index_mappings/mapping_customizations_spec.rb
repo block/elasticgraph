@@ -16,7 +16,6 @@ module ElasticGraph
       it "respects `mapping` customizations set on a field definition, allowing them to augment or replace the mapping of the base type" do
         mapping = index_mapping_for "my_type" do |s|
           s.scalar_type "MyText" do |t|
-            t.json_schema type: "string"
             t.mapping type: "text"
           end
 
@@ -221,7 +220,6 @@ module ElasticGraph
             end
 
             s.scalar_type "MyText" do |t|
-              t.json_schema type: "string"
               t.mapping type: "text"
             end
           end
