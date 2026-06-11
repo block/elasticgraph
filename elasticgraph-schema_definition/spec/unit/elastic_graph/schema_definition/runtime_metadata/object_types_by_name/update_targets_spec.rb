@@ -1701,6 +1701,21 @@ module ElasticGraph
             )
           end
 
+          it "raises an error when a non-leaf (root) relationship in the chain uses an `additional_filter`" do
+            # Routability (inbound FK, no `additional_filter`) must hold for *every* relationship in the chain,
+            # not just the leaf that backs the `sourced_from` field: each link routes the source event up to the
+            # root document, so a filtered/outbound link anywhere would silently mismatch. Here we break the
+            # *root* relationship (`Team.statLines`) — the leaf (`Player.statLine`) remains valid — to prove the
+            # chain-wide validation covers non-leaf relationships and isn't narrowed to the leaf.
+            expect {
+              nested_sourced_from_schema(
+                on_statlines_relationship: ->(r) { r.additional_filter status: "active" }
+              )
+            }.to raise_error Errors::SchemaError, a_string_including(
+              "`Team.statLines` (referenced from `sourced_from` on field(s): `goals`) uses an `additional_filter`, but `sourced_from` is not supported on relationships with `additional_filter`."
+            )
+          end
+
           it "raises an error when the chain terminates at a non-indexed type" do
             expect {
               nested_sourced_from_schema(index_teams: false)

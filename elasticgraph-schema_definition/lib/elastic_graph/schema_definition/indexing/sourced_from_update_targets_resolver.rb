@@ -10,6 +10,7 @@ require "elastic_graph/errors"
 require "elastic_graph/schema_definition/indexing/nested_update_target_resolver"
 require "elastic_graph/schema_definition/indexing/relationship_chain_resolver"
 require "elastic_graph/schema_definition/indexing/relationship_resolver"
+require "elastic_graph/schema_definition/indexing/resolved_relationship_chain"
 require "elastic_graph/schema_definition/indexing/top_level_update_target_resolver"
 
 module ElasticGraph

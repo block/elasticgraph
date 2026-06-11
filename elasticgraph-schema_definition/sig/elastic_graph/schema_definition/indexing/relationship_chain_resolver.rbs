@@ -1,29 +1,6 @@
 module ElasticGraph
   module SchemaDefinition
     module Indexing
-      class ResolvedRelationshipChainSuperType
-        attr_reader relationships: ::Array[SchemaElements::Relationship]
-        attr_reader path_segments: ::Array[PathSegment]
-
-        def initialize: (
-          relationships: ::Array[SchemaElements::Relationship],
-          path_segments: ::Array[PathSegment]
-        ) -> void
-      end
-
-      class ResolvedRelationshipChain < ResolvedRelationshipChainSuperType
-        def root_relationship: () -> SchemaElements::Relationship
-        def leaf_relationship: () -> SchemaElements::Relationship
-        def root_index: () -> Index
-        def register_on_root_index: () -> void
-        @qualified_relationship: ::String
-        def qualified_relationship: () -> ::String
-        @sourced_from_nested_paths: ::Array[SchemaArtifacts::RuntimeMetadata::sourcedFromNestedPathSegment]
-        def sourced_from_nested_paths: () -> ::Array[SchemaArtifacts::RuntimeMetadata::sourcedFromNestedPathSegment]
-        @path_identifier_params: ::Hash[::String, SchemaArtifacts::RuntimeMetadata::DynamicParam]
-        def path_identifier_params: () -> ::Hash[::String, SchemaArtifacts::RuntimeMetadata::DynamicParam]
-      end
-
       class PathSegment
         attr_reader field: SchemaElements::Field
         attr_reader source_field_name: ::String?
