@@ -356,14 +356,23 @@ module ElasticGraph
     end
     # :nocov:
 
+    # The require is performed lazily (only when a spec relies on the default) so that this can be used
+    # from spec bundles that do not include the optional `elasticgraph-json_ingestion` gem. Suites in
+    # such bundles must pass `extension_modules:` explicitly; if one relies on the default it will get a
+    # clear `LoadError` here rather than silently building schema artifacts without JSON schemas.
+    def default_schema_definition_extension_modules
+      require "elastic_graph/json_ingestion/schema_definition/api_extension"
+      [::ElasticGraph::JSONIngestion::SchemaDefinition::APIExtension]
+    end
+
     def generate_schema_artifacts(
       schema_element_name_form: :snake_case,
       schema_element_name_overrides: {},
       derived_type_name_formats: {},
       enum_value_overrides_by_type: {},
+      extension_modules: default_schema_definition_extension_modules,
       reload_schema_artifacts: false
     )
-      require "elastic_graph/json_ingestion/schema_definition/api_extension"
       require "elastic_graph/schema_definition/test_support"
       require "stringio"
 
@@ -373,7 +382,7 @@ module ElasticGraph
         schema_element_name_overrides: schema_element_name_overrides,
         derived_type_name_formats: derived_type_name_formats,
         enum_value_overrides_by_type: enum_value_overrides_by_type,
-        extension_modules: [::ElasticGraph::JSONIngestion::SchemaDefinition::APIExtension],
+        extension_modules: extension_modules,
         reload_schema_artifacts: reload_schema_artifacts,
         output: output
       ) do |schema|

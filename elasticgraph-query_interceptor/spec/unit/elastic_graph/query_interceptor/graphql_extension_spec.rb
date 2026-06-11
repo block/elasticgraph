@@ -170,7 +170,7 @@ module ElasticGraph
       end
 
       def generate_schema_artifacts
-        super do |schema|
+        super(extension_modules: []) do |schema|
           yield schema
 
           # Ensure there's at least one indexed type defined to avoid GraphQL validation errors.

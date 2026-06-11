@@ -35,12 +35,7 @@ require "elastic_graph/schema_definition/test_support"
     )
   end
 
-  # The require is performed lazily (only when a spec relies on the default) so that this file can be
-  # loaded in spec bundles that do not include the optional `elasticgraph-json_ingestion` gem. Suites in
-  # such bundles must pass `extension_modules:` explicitly; if one relies on the default it will get a
-  # clear `LoadError` here rather than silently building schema artifacts without JSON schemas.
-  def default_schema_definition_extension_modules
-    require "elastic_graph/json_ingestion/schema_definition/api_extension"
-    [::ElasticGraph::JSONIngestion::SchemaDefinition::APIExtension]
-  end
+  # `default_schema_definition_extension_modules` is provided by `CommonSpecHelpers`, which performs
+  # the `elasticgraph-json_ingestion` require lazily so this file can be loaded in spec bundles that
+  # do not include that optional gem.
 end
