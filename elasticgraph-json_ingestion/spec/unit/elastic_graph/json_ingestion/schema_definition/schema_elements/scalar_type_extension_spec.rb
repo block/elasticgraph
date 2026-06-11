@@ -83,12 +83,127 @@ module ElasticGraph
             expect(grouping_missing_value_placeholder).to eq(nil)
           end
 
+          it "does not infer a placeholder for JSON-safe unsigned_long scalars with the default coercion adapter (which would not coerce floats back to integers)" do
+            grouping_missing_value_placeholder = grouping_missing_value_placeholder_for(
+              "unsigned_long",
+              type: "integer",
+              maximum: JSON_SAFE_LONG_MAX
+            )
+
+            expect(grouping_missing_value_placeholder).to eq(nil)
+          end
+
+          it "does not infer a placeholder for unsigned_long scalars when no maximum is specified" do
+            grouping_missing_value_placeholder = grouping_missing_value_placeholder_for("unsigned_long", type: "integer") do |type|
+              type.coerce_with "ExampleScalarCoercionAdapter", defined_at: scalar_coercion_adapter_path
+            end
+
+            expect(grouping_missing_value_placeholder).to eq(nil)
+          end
+
+          it "infers a numeric missing-value placeholder for long scalars exactly at the JSON-safe boundaries with custom coercion" do
+            grouping_missing_value_placeholder = grouping_missing_value_placeholder_for(
+              "long",
+              type: "integer",
+              minimum: JSON_SAFE_LONG_MIN,
+              maximum: JSON_SAFE_LONG_MAX
+            ) do |type|
+              type.coerce_with "ExampleScalarCoercionAdapter", defined_at: scalar_coercion_adapter_path
+            end
+
+            expect(grouping_missing_value_placeholder).to eq(MISSING_NUMERIC_PLACEHOLDER)
+          end
+
+          it "does not infer a placeholder for JSON-safe long scalars with the default coercion adapter" do
+            grouping_missing_value_placeholder = grouping_missing_value_placeholder_for(
+              "long",
+              type: "integer",
+              minimum: JSON_SAFE_LONG_MIN,
+              maximum: JSON_SAFE_LONG_MAX
+            )
+
+            expect(grouping_missing_value_placeholder).to eq(nil)
+          end
+
+          it "does not infer a placeholder for long scalars when the minimum is one below the JSON-safe range" do
+            grouping_missing_value_placeholder = grouping_missing_value_placeholder_for(
+              "long",
+              type: "integer",
+              minimum: JSON_SAFE_LONG_MIN - 1,
+              maximum: JSON_SAFE_LONG_MAX
+            ) do |type|
+              type.coerce_with "ExampleScalarCoercionAdapter", defined_at: scalar_coercion_adapter_path
+            end
+
+            expect(grouping_missing_value_placeholder).to eq(nil)
+          end
+
+          it "does not infer a placeholder for long scalars when the maximum is one above the JSON-safe range" do
+            grouping_missing_value_placeholder = grouping_missing_value_placeholder_for(
+              "long",
+              type: "integer",
+              minimum: JSON_SAFE_LONG_MIN,
+              maximum: JSON_SAFE_LONG_MAX + 1
+            ) do |type|
+              type.coerce_with "ExampleScalarCoercionAdapter", defined_at: scalar_coercion_adapter_path
+            end
+
+            expect(grouping_missing_value_placeholder).to eq(nil)
+          end
+
+          it "does not infer a placeholder for long scalars when only one bound is specified (the other defaults to the LongString range)" do
+            only_min = grouping_missing_value_placeholder_for("long", type: "integer", minimum: 0) do |type|
+              type.coerce_with "ExampleScalarCoercionAdapter", defined_at: scalar_coercion_adapter_path
+            end
+
+            only_max = grouping_missing_value_placeholder_for("long", type: "integer", maximum: 1000) do |type|
+              type.coerce_with "ExampleScalarCoercionAdapter", defined_at: scalar_coercion_adapter_path
+            end
+
+            expect(only_min).to eq(nil)
+            expect(only_max).to eq(nil)
+          end
+
+          it "does not infer a placeholder for long scalars when no bounds are specified" do
+            grouping_missing_value_placeholder = grouping_missing_value_placeholder_for("long", type: "integer") do |type|
+              type.coerce_with "ExampleScalarCoercionAdapter", defined_at: scalar_coercion_adapter_path
+            end
+
+            expect(grouping_missing_value_placeholder).to eq(nil)
+          end
+
+          it "has the expected placeholder for each built-in scalar type, including the JSON-safe-range-aware `JsonSafeLong` inference" do
+            results = define_schema(schema_element_name_form: "snake_case") { |schema| }
+            built_in_scalars = results.state.scalar_types_by_name.keys
+            scalar_types_by_name = results.runtime_metadata.scalar_types_by_name
+
+            placeholders_by_scalar_type = built_in_scalars.to_h do |scalar_type|
+              [scalar_type, scalar_types_by_name.fetch(scalar_type).grouping_missing_value_placeholder]
+            end
+
+            expect(placeholders_by_scalar_type).to eq({
+              "Boolean" => nil,
+              "Cursor" => MISSING_STRING_PLACEHOLDER,
+              "Date" => nil,
+              "DateTime" => nil,
+              "Float" => MISSING_NUMERIC_PLACEHOLDER,
+              "ID" => MISSING_STRING_PLACEHOLDER,
+              "Int" => MISSING_NUMERIC_PLACEHOLDER, # GraphQL automatically coerces Int values
+              "JsonSafeLong" => MISSING_NUMERIC_PLACEHOLDER, # custom coercion adapter coerces floats back to integers
+              "LocalTime" => nil,
+              "LongString" => nil, # outside of the JSON safe range.
+              "String" => MISSING_STRING_PLACEHOLDER,
+              "TimeZone" => MISSING_STRING_PLACEHOLDER,
+              "Untyped" => MISSING_STRING_PLACEHOLDER
+            })
+          end
+
           def grouping_missing_value_placeholder_for(mapping_type, **json_schema_options)
             define_schema(schema_element_name_form: "snake_case") do |schema|
               schema.scalar_type "CustomScalar" do |type|
                 type.mapping type: mapping_type
                 type.json_schema(**json_schema_options)
-                yield type
+                yield type if block_given?
               end
             end.runtime_metadata.scalar_types_by_name.fetch("CustomScalar").grouping_missing_value_placeholder
           end

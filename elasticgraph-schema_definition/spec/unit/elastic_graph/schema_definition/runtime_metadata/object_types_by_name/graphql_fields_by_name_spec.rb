@@ -243,7 +243,6 @@ module ElasticGraph
 
           schema.scalar_type "Duration" do |t|
             t.mapping type: "keyword"
-            t.json_schema type: "string"
           end
 
           schema.object_type "Options" do |t|
