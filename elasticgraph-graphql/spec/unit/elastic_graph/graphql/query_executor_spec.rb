@@ -447,7 +447,6 @@ module ElasticGraph
 
               schema.scalar_type "Operands" do |t|
                 t.mapping type: nil
-                t.json_schema type: "null"
               end
 
               schema.object_type "Widget" do |t|

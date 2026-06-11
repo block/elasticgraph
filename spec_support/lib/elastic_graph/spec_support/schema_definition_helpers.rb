@@ -13,29 +13,17 @@ require "elastic_graph/schema_definition/test_support"
 ::RSpec.shared_context "SchemaDefinitionHelpers", :capture_logs do
   include ::ElasticGraph::SchemaDefinition::TestSupport
 
-  # Defaults `extension_modules` and `output` for tests; all other options are forwarded to
-  # `TestSupport` unchanged. `output` must be handled with `||` (rather than a keyword default)
-  # because `TestSupport#define_schema` passes `output: nil` explicitly when no output is given.
-  def define_schema(extension_modules: default_schema_definition_extension_modules, output: nil, **options, &block)
-    super(
-      extension_modules: extension_modules,
-      output: output || log_device,
-      **options,
-      &block
-    )
+  # Defaults `output` for tests; all other options are forwarded to `TestSupport` unchanged.
+  # `output` must be handled with `||` (rather than a keyword default) because
+  # `TestSupport#define_schema` passes `output: nil` explicitly when no output is given.
+  #
+  # Note: schema definition extension modules (such as the one from `elasticgraph-json_ingestion`)
+  # are intentionally not defaulted; specs that need an extension must opt in explicitly.
+  def define_schema(output: nil, **options, &block)
+    super(output: output || log_device, **options, &block)
   end
 
-  def define_schema_with_schema_elements(schema_elements, extension_modules: default_schema_definition_extension_modules, output: nil, **options, &block)
-    super(
-      schema_elements,
-      extension_modules: extension_modules,
-      output: output || log_device,
-      **options,
-      &block
-    )
+  def define_schema_with_schema_elements(schema_elements, output: nil, **options, &block)
+    super(schema_elements, output: output || log_device, **options, &block)
   end
-
-  # `default_schema_definition_extension_modules` is provided by `CommonSpecHelpers`, which performs
-  # the `elasticgraph-json_ingestion` require lazily so this file can be loaded in spec bundles that
-  # do not include that optional gem.
 end

@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/graphql/resolvers/nested_relationships"
+require "elastic_graph/json_ingestion/schema_definition/api_extension"
 
 module ElasticGraph
   class GraphQL
@@ -16,7 +17,7 @@ module ElasticGraph
         # is implemented via a filter on `id` (the search routing field)
         context "when the field being resolved is a relay connection field", :expect_search_routing do
           let(:graphql) do
-            build_graphql(schema_definition: lambda do |schema|
+            build_graphql(schema_definition_extension_modules: [JSONIngestion::SchemaDefinition::APIExtension], schema_definition: lambda do |schema|
               schema.object_type "Component" do |t|
                 t.field "id", "ID!"
                 t.field "name", "String!"
@@ -62,7 +63,7 @@ module ElasticGraph
 
         describe "a relates_to_many/relates_to_one bidirectional relationship with an array foreign key from the one to the many" do
           let(:graphql) do
-            build_graphql(schema_definition: lambda do |schema|
+            build_graphql(schema_definition_extension_modules: [JSONIngestion::SchemaDefinition::APIExtension], schema_definition: lambda do |schema|
               schema.object_type "Money" do |t|
                 t.field "currency", "String!"
                 t.field "amount_cents", "Int"
@@ -241,7 +242,7 @@ module ElasticGraph
 
         describe "a relates_to_many/relates_to_one bidirectional relationship with a scalar foreign key from the many to the one" do
           let(:graphql) do
-            build_graphql(schema_definition: lambda do |schema|
+            build_graphql(schema_definition_extension_modules: [JSONIngestion::SchemaDefinition::APIExtension], schema_definition: lambda do |schema|
               schema.object_type "ElectricalPart" do |t|
                 t.field "id", "ID!"
                 t.field "name", "String!"
@@ -381,7 +382,7 @@ module ElasticGraph
 
         describe "a relates_to_many/relates_to_many bidirectional relationship with an array foreign key from a many to a many" do
           let(:graphql) do
-            build_graphql(schema_definition: lambda do |schema|
+            build_graphql(schema_definition_extension_modules: [JSONIngestion::SchemaDefinition::APIExtension], schema_definition: lambda do |schema|
               schema.object_type "Component" do |t|
                 t.field "id", "ID!"
                 t.field "name", "String!"
@@ -573,7 +574,7 @@ module ElasticGraph
 
         describe "a relates_to_one/relates_to_one bidirectional relationship with a scalar foreign key from a one to a one" do
           let(:graphql) do
-            build_graphql(schema_definition: lambda do |schema|
+            build_graphql(schema_definition_extension_modules: [JSONIngestion::SchemaDefinition::APIExtension], schema_definition: lambda do |schema|
               schema.object_type "Manufacturer" do |t|
                 t.field "id", "ID!"
                 t.field "name", "String"

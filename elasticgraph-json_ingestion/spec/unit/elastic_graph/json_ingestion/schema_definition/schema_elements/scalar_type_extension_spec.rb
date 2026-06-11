@@ -21,7 +21,7 @@ module ElasticGraph
 
           it "requires custom scalar types to declare their JSON schema representation" do
             expect {
-              define_schema(schema_element_name_form: "snake_case") do |schema|
+              define_schema(schema_element_name_form: "snake_case", extension_modules: [APIExtension]) do |schema|
                 schema.scalar_type "BigInt" do |type|
                   type.mapping type: "long"
                 end
@@ -174,7 +174,7 @@ module ElasticGraph
           end
 
           it "has the expected placeholder for each built-in scalar type, including the JSON-safe-range-aware `JsonSafeLong` inference" do
-            results = define_schema(schema_element_name_form: "snake_case") { |schema| }
+            results = define_schema(schema_element_name_form: "snake_case", extension_modules: [APIExtension]) { |schema| }
             built_in_scalars = results.state.scalar_types_by_name.keys
             scalar_types_by_name = results.runtime_metadata.scalar_types_by_name
 
@@ -200,7 +200,7 @@ module ElasticGraph
           end
 
           def grouping_missing_value_placeholder_for(mapping_type, **json_schema_options)
-            define_schema(schema_element_name_form: "snake_case") do |schema|
+            define_schema(schema_element_name_form: "snake_case", extension_modules: [APIExtension]) do |schema|
               schema.scalar_type "CustomScalar" do |type|
                 type.mapping type: mapping_type
                 type.json_schema(**json_schema_options)

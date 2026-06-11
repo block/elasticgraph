@@ -2972,7 +2972,7 @@ module ElasticGraph
       end
 
       it "sets json_schema_version to the specified (valid) value" do
-        result = define_schema(schema_element_name_form: "snake_case") do |s|
+        result = define_schema(schema_element_name_form: "snake_case", extension_modules: [APIExtension]) do |s|
           s.json_schema_version 1
         end.json_schemas_for(1)
 
@@ -2980,7 +2980,7 @@ module ElasticGraph
       end
 
       it "allows json_schema_version enforcement to be disabled" do
-        result = define_schema(schema_element_name_form: "snake_case") do |s|
+        result = define_schema(schema_element_name_form: "snake_case", extension_modules: [APIExtension]) do |s|
           s.enforce_json_schema_version false
         end
 
@@ -2989,7 +2989,7 @@ module ElasticGraph
 
       it "fails if json_schema_version enforcement is set to a non-boolean value" do
         expect {
-          define_schema(schema_element_name_form: "snake_case") do |s|
+          define_schema(schema_element_name_form: "snake_case", extension_modules: [APIExtension]) do |s|
             s.enforce_json_schema_version nil
           end
         }.to raise_error(Errors::SchemaError, a_string_including("must be a boolean", "nil"))
@@ -2997,25 +2997,25 @@ module ElasticGraph
 
       it "fails if json_schema_version is set to invalid values" do
         expect {
-          define_schema(schema_element_name_form: "snake_case") do |s|
+          define_schema(schema_element_name_form: "snake_case", extension_modules: [APIExtension]) do |s|
             s.json_schema_version 0.5
           end
         }.to raise_error(Errors::SchemaError, a_string_including("must be a positive integer. Specified version: 0.5"))
 
         expect {
-          define_schema(schema_element_name_form: "snake_case") do |s|
+          define_schema(schema_element_name_form: "snake_case", extension_modules: [APIExtension]) do |s|
             s.json_schema_version "asd"
           end
         }.to raise_error(Errors::SchemaError, a_string_including("must be a positive integer. Specified version: asd"))
 
         expect {
-          define_schema(schema_element_name_form: "snake_case") do |s|
+          define_schema(schema_element_name_form: "snake_case", extension_modules: [APIExtension]) do |s|
             s.json_schema_version 0
           end
         }.to raise_error(Errors::SchemaError, a_string_including("must be a positive integer. Specified version: 0"))
 
         expect {
-          define_schema(schema_element_name_form: "snake_case") do |s|
+          define_schema(schema_element_name_form: "snake_case", extension_modules: [APIExtension]) do |s|
             s.json_schema_version(-1)
           end
         }.to raise_error(Errors::SchemaError, a_string_including("must be a positive integer. Specified version: -1"))
@@ -3023,13 +3023,13 @@ module ElasticGraph
 
       it "fails if json_schema_version is left unset" do
         expect {
-          define_schema(schema_element_name_form: "snake_case", json_schema_version: nil) {}.available_json_schema_versions
+          define_schema(schema_element_name_form: "snake_case", json_schema_version: nil, extension_modules: [APIExtension]) {}.available_json_schema_versions
         }.to raise_error(Errors::SchemaError, a_string_including("must be specified in the schema"))
       end
 
       it "fails if json_schema_version is set multiple times" do
         expect {
-          define_schema(schema_element_name_form: "snake_case") do |s|
+          define_schema(schema_element_name_form: "snake_case", extension_modules: [APIExtension]) do |s|
             s.json_schema_version 1
             s.json_schema_version 2
           end
@@ -3038,7 +3038,7 @@ module ElasticGraph
 
       it "is unable to return a non-existent schema version" do
         expect {
-          define_schema(schema_element_name_form: "snake_case") do |s|
+          define_schema(schema_element_name_form: "snake_case", extension_modules: [APIExtension]) do |s|
             s.json_schema_version 1
           end.json_schemas_for(2)
         }.to raise_error(Errors::NotFoundError, a_string_including("The requested json schema version (2) is not available", "Available versions: 1"))
@@ -3179,6 +3179,7 @@ module ElasticGraph
       def dump_schema(type_name_overrides: {}, enum_value_overrides_by_type: {}, &schema_definition)
         define_schema(
           schema_element_name_form: "snake_case",
+          extension_modules: [APIExtension],
           type_name_overrides: type_name_overrides,
           enum_value_overrides_by_type: enum_value_overrides_by_type,
           &schema_definition

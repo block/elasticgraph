@@ -8,6 +8,7 @@
 
 require "elastic_graph/constants"
 require "elastic_graph/errors"
+require "elastic_graph/json_ingestion/schema_definition/api_extension"
 require "elastic_graph/json_ingestion/schema_definition/indexing/field"
 require "elastic_graph/json_ingestion/schema_definition/indexing/field_reference"
 require "elastic_graph/json_ingestion/schema_definition/indexing/field_type/object"
@@ -160,7 +161,7 @@ module ElasticGraph
         end
 
         def object_types_by_name
-          @object_types_by_name ||= define_schema(schema_element_name_form: "snake_case") do |s|
+          @object_types_by_name ||= define_schema(schema_element_name_form: "snake_case", extension_modules: [APIExtension]) do |s|
             s.enum_type "Color" do |t|
               t.values "RED", "BLUE"
             end
@@ -195,7 +196,7 @@ module ElasticGraph
       end
 
       def dump_schema(&schema_definition)
-        define_schema(schema_element_name_form: "snake_case", &schema_definition).current_public_json_schema
+        define_schema(schema_element_name_form: "snake_case", extension_modules: [APIExtension], &schema_definition).current_public_json_schema
       end
 
       def json_schema_ref(type, is_keyword_type: %w[ID! ID String! String].include?(type))

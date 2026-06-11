@@ -356,25 +356,25 @@ module ElasticGraph
     end
     # :nocov:
 
-    # The require is performed lazily (only when a spec relies on the default) so that this can be used
-    # from spec bundles that do not include the optional `elasticgraph-json_ingestion` gem. Suites in
-    # such bundles must pass `extension_modules:` explicitly; if one relies on the default it will get a
-    # clear `LoadError` here rather than silently building schema artifacts without JSON schemas.
-    def default_schema_definition_extension_modules
-      require "elastic_graph/json_ingestion/schema_definition/api_extension"
-      [::ElasticGraph::JSONIngestion::SchemaDefinition::APIExtension]
-    end
-
+    # `extension_modules` intentionally defaults to none: specs must opt in explicitly to schema
+    # definition extensions (such as the one from `elasticgraph-json_ingestion`).
     def generate_schema_artifacts(
+      extension_modules: [],
       schema_element_name_form: :snake_case,
       schema_element_name_overrides: {},
       derived_type_name_formats: {},
       enum_value_overrides_by_type: {},
-      extension_modules: default_schema_definition_extension_modules,
       reload_schema_artifacts: false
     )
       require "elastic_graph/schema_definition/test_support"
       require "stringio"
+
+      unless block_given?
+        # When no block is given we load the repository's main test schema (`config/schema.rb`),
+        # which uses the JSON ingestion schema definition DSL, so it requires this extension.
+        require "elastic_graph/json_ingestion/schema_definition/api_extension"
+        extension_modules += [JSONIngestion::SchemaDefinition::APIExtension]
+      end
 
       output = ::StringIO.new # to silence warnings.
       ::ElasticGraph::SchemaDefinition::TestSupport.define_schema(
