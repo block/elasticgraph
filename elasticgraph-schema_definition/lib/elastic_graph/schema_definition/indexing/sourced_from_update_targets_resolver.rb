@@ -10,7 +10,7 @@ require "elastic_graph/errors"
 require "elastic_graph/schema_definition/indexing/nested_update_target_resolver"
 require "elastic_graph/schema_definition/indexing/relationship_chain_resolver"
 require "elastic_graph/schema_definition/indexing/relationship_resolver"
-require "elastic_graph/schema_definition/indexing/update_target_resolver"
+require "elastic_graph/schema_definition/indexing/top_level_update_target_resolver"
 
 module ElasticGraph
   module SchemaDefinition
@@ -91,25 +91,15 @@ module ElasticGraph
         end
 
         def resolve_top_level_update_target(object_type, resolved_relationship, sourced_fields)
-          update_target_resolver = UpdateTargetResolver.new(
+          top_level_update_target_resolver = TopLevelUpdateTargetResolver.new(
             object_type: object_type,
             resolved_relationship: resolved_relationship,
             sourced_fields: sourced_fields,
             field_path_resolver: @schema_def_state.field_path_resolver
           )
 
-          update_target, errors = update_target_resolver.resolve
+          update_target, errors = top_level_update_target_resolver.resolve
           errors.each { |error| yield :sourced_field, error }
-
-          # Validate that has_had_multiple_sources! has been called when sourced_from is used
-          index_def = object_type.own_index_def # : Index
-          unless index_def.has_had_multiple_sources_flag
-            yield :sourced_field, "Type `#{object_type.name}` uses `sourced_from` fields but its index `#{index_def.name}` " \
-              "has not been configured with `has_had_multiple_sources!`. To resolve this, add `i.has_had_multiple_sources!` within the " \
-              "`t.index \"#{index_def.name}\"` block. This flag is required because indices with multiple sources can contain " \
-              "incomplete documents, and ElasticGraph needs to know this to apply proper filtering. Once set, this flag should remain even " \
-              "if you later remove all `sourced_from` fields, as the index may still contain historical incomplete documents."
-          end
 
           [resolved_relationship.related_type.name, update_target] if update_target
         end

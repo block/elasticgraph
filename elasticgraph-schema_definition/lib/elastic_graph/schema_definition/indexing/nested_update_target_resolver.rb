@@ -8,21 +8,21 @@
 
 require "elastic_graph/schema_artifacts/runtime_metadata/params"
 require "elastic_graph/schema_artifacts/runtime_metadata/sourced_from_nested_params"
-require "elastic_graph/schema_definition/indexing/sourced_field_params_resolver"
 require "elastic_graph/schema_definition/indexing/update_target_factory"
+require "elastic_graph/schema_definition/indexing/update_target_resolver_support"
 
 module ElasticGraph
   module SchemaDefinition
     module Indexing
-      # Responsible for resolving a nested `parent_relationship` chain and a set of `sourced_from`
-      # fields into an `UpdateTarget` that instructs the indexer to update a nested element within
-      # the root indexed type when a source event arrives. This is the nested analog of
-      # `UpdateTargetResolver`, which handles the top-level (non-nested) `sourced_from` case.
+      # Resolves a relationship and a set of `sourced_from` fields into an `UpdateTarget` that instructs the
+      # indexer how to update a type from the related type's source events. This handles the *nested* case,
+      # where the `sourced_from` fields live on a type embedded within an indexed type (reached via a
+      # `parent_relationship` chain) and the target updates the root indexed type the embedded type nests
+      # within. (The *top-level* case—`sourced_from` fields directly on an indexed type—is handled by
+      # `TopLevelUpdateTargetResolver`.)
       #
       # @private
       class NestedUpdateTargetResolver
-        include SourcedFieldParamsResolver
-
         def initialize(
           object_type:,
           sourced_fields:,
@@ -42,13 +42,21 @@ module ElasticGraph
         #
         # Returns a tuple of the `update_target` (if valid) and a list of errors.
         def resolve
-          relationship_errors = validate_relationship
-          field_params, field_params_errors = resolve_sourced_field_params
-          routing_value_source, routing_error = resolve_field_source(RoutingSourceAdapter)
-          rollover_timestamp_value_source, rollover_timestamp_error = resolve_field_source(RolloverTimestampSourceAdapter)
-          has_had_multiple_sources_errors = validate_has_had_multiple_sources
+          relationship_errors = validate_relationships
+          field_params, field_params_errors = UpdateTargetResolverSupport.resolve_sourced_field_params(
+            object_type: object_type,
+            related_type: related_type,
+            sourced_fields: sourced_fields,
+            field_path_resolver: field_path_resolver
+          )
+          routing_value_source, routing_error = resolve_field_source(UpdateTargetResolverSupport::RoutingSourceAdapter)
+          rollover_timestamp_value_source, rollover_timestamp_error = resolve_field_source(UpdateTargetResolverSupport::RolloverTimestampSourceAdapter)
+          # Routing/rollover values resolve from `equivalent_field`s on the root relationship, so they are
+          # validated there (matching how `TopLevelUpdateTargetResolver` validates its own relationship).
+          equivalent_field_errors = root_relationship.validate_equivalent_fields(field_path_resolver)
+          has_had_multiple_sources_errors = UpdateTargetResolverSupport.validate_has_had_multiple_sources(root_index, root_type, relationship)
 
-          all_errors = relationship_errors + field_params_errors + has_had_multiple_sources_errors +
+          all_errors = relationship_errors + field_params_errors + equivalent_field_errors + has_had_multiple_sources_errors +
             [routing_error, rollover_timestamp_error].compact
 
           if all_errors.empty?
@@ -56,10 +64,9 @@ module ElasticGraph
               type: root_type.name,
               relationship: resolved_chain.qualified_relationship,
               id_source: root_relationship.foreign_key,
-              top_level_fields_params: {},
               sourced_from_nested_params: SchemaArtifacts::RuntimeMetadata::SourcedFromNestedParams.new(
                 field_params: field_params,
-                path_identifier_params: build_path_identifier_params
+                path_identifier_params: resolved_chain.path_identifier_params
               ),
               routing_value_source: routing_value_source,
               rollover_timestamp_value_source: rollover_timestamp_value_source
@@ -95,101 +102,31 @@ module ElasticGraph
           @related_type ||= schema_def_state.object_types_by_name.fetch(relationship.related_type.unwrap_non_null.name)
         end
 
-        # Applies validations specific to relationships backing nested `sourced_from` fields.
-        def validate_relationship
-          errors = [] # : ::Array[::String]
+        # Applies validations on the relationships backing nested `sourced_from` fields. Only the leaf must be
+        # `relates_to_one` (it's where a value is sourced through), but every relationship in the chain joins on
+        # a foreign key that routes the source event, so each must be routable (inbound foreign key, no filter).
+        def validate_relationships
+          leaf_prefix = UpdateTargetResolverSupport.relationship_error_prefix(relationship, sourced_fields)
 
-          if relationship.many?
-            errors << "`#{object_type.name}.#{relationship.name}` is a `relates_to_many` relationship, but nested " \
-              "`sourced_from` is only supported on a `relates_to_one` relationship."
-          end
-
-          errors
-        end
-
-        # Builds the params identifying which nested element to update: one entry per list segment in the
-        # chain, pulling the matching value from the segment's foreign key on the source event. Object
-        # segments have no ambiguity, so they contribute no identifier.
-        def build_path_identifier_params
-          resolved_chain.path_segments.filter_map do |segment|
-            source_field = segment.source_field_name
-            next unless source_field
-
-            param = SchemaArtifacts::RuntimeMetadata::DynamicParam.new(
-              source_path: source_field,
-              cardinality: :one
-            )
-
-            [source_field, param]
-          end.to_h
-        end
-
-        # Resolves `routing_value_source` and `rollover_timestamp_value_source` against the root
-        # relationship and root index, using an `adapter` for the differences between the two cases.
-        #
-        # Returns a tuple of the resolved source (if successful) and an error (if invalid).
-        def resolve_field_source(adapter)
-          field_source_graphql_path_string = adapter.get_field_source(root_relationship, root_index) do |local_need|
-            # The update is triggered by the leaf relationship's source events (`relationship`), but routing and
-            # rollover are resolved through — and `equivalent_field` is configured on — the root relationship.
-            error = "Cannot update `#{root_type.name}` documents with nested data from related `#{relationship.name}` " \
-              "events, because #{adapter.cannot_update_reason(root_type, root_relationship.name)}. To fix it, add a call " \
-              "like this to the `#{root_type.name}.#{root_relationship.name}` relationship definition: `rel.equivalent_field " \
-              "\"[#{related_type.name} field]\", locally_named: \"#{local_need}\"`."
-
-            return [nil, error]
-          end
-
-          if field_source_graphql_path_string
-            field_path = field_path_resolver.resolve_public_path(related_type, field_source_graphql_path_string) do |parent_field|
-              !parent_field.type.list?
+          UpdateTargetResolverSupport.validate_relationship_cardinality(relationship, error_prefix: leaf_prefix) +
+            resolved_chain.relationships.flat_map do |chain_relationship|
+              error_prefix = UpdateTargetResolverSupport.relationship_error_prefix(chain_relationship, sourced_fields)
+              UpdateTargetResolverSupport.validate_relationship_routability(chain_relationship, error_prefix: error_prefix)
             end
-
-            [field_path&.path_in_index, nil]
-          else
-            [nil, nil]
-          end
         end
 
-        # Validates that `has_had_multiple_sources!` has been configured on the root index, since nested
-        # `sourced_from` makes the root index multi-sourced.
-        def validate_has_had_multiple_sources
-          return [] if root_index.has_had_multiple_sources_flag
-
-          ["Type `#{root_type.name}` has nested `sourced_from` fields (via `#{object_type.name}.#{relationship.name}`) but " \
-            "its index `#{root_index.name}` has not been configured with `has_had_multiple_sources!`. To resolve this, add " \
-            "`i.has_had_multiple_sources!` within the `t.index \"#{root_index.name}\"` block. This flag is required because " \
-            "indices with multiple sources can contain incomplete documents, and ElasticGraph needs to know this to apply " \
-            "proper filtering. Once set, this flag should remain even if you later remove all `sourced_from` fields, as the " \
-            "index may still contain historical incomplete documents."]
-        end
-
-        # Adapter for the `routing_value_source` case for use by `resolve_field_source`.
-        #
-        # @private
-        module RoutingSourceAdapter
-          def self.get_field_source(relationship, index, &block)
-            relationship.routing_value_source_for_index(index, &block)
-          end
-
-          def self.cannot_update_reason(root_type, relationship_name)
-            "`#{root_type.name}` uses custom shard routing but we don't know what `#{relationship_name}` field to use " \
-            "to route the `#{root_type.name}` update requests"
-          end
-        end
-
-        # Adapter for the `rollover_timestamp_value_source` case for use by `resolve_field_source`.
-        #
-        # @private
-        module RolloverTimestampSourceAdapter
-          def self.get_field_source(relationship, index, &block)
-            relationship.rollover_timestamp_value_source_for_index(index, &block)
-          end
-
-          def self.cannot_update_reason(root_type, relationship_name)
-            "`#{root_type.name}` uses a rollover index but we don't know what `#{relationship_name}` timestamp field to use " \
-            "to select an index for the `#{root_type.name}` update requests"
-          end
+        # Resolves a routing/rollover field source via the shared helper, supplying the root type, index, and
+        # relationship — the update target updates the root indexed type via the root relationship, so routing
+        # and rollover (and the `equivalent_field` config) are resolved there.
+        def resolve_field_source(adapter)
+          UpdateTargetResolverSupport.resolve_field_source(
+            adapter,
+            relationship: root_relationship,
+            index_def: root_index,
+            related_type: related_type,
+            field_path_resolver: field_path_resolver,
+            updated_type: root_type
+          )
         end
       end
     end

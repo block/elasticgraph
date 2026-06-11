@@ -451,7 +451,8 @@ module ElasticGraph
           id_source:,
           top_level_fields_params:,
           relationship:, routing_value_source: nil,
-          rollover_timestamp_value_source: nil
+          rollover_timestamp_value_source: nil,
+          sourced_from_nested_params: SchemaArtifacts::RuntimeMetadata::SourcedFromNestedParams::EMPTY
         )
           expect(update_targets.count { |t| t.type == "Widget" }).to eq(1)
           widget_target = update_targets.find { |t| t.type == "Widget" }
@@ -464,6 +465,7 @@ module ElasticGraph
           expect(widget_target.routing_value_source).to eq(routing_value_source)
           expect(widget_target.rollover_timestamp_value_source).to eq(rollover_timestamp_value_source)
           expect(widget_target.top_level_fields_params).to eq(top_level_fields_params)
+          expect(widget_target.sourced_from_nested_params).to eq(sourced_from_nested_params)
           expect(widget_target.metadata_params).to eq(standard_metadata_params(relationship: relationship))
         end
 
@@ -491,7 +493,7 @@ module ElasticGraph
                   end
                 end
               }.to raise_error Errors::SchemaError, a_string_including(
-                "Type `Widget` uses `sourced_from` fields but its index `widgets` has not been configured with `has_had_multiple_sources!`",
+                "Type `Widget` has `sourced_from` fields (via `Widget.workspace`) but its index `widgets` has not been configured with `has_had_multiple_sources!`",
                 "To resolve this, add `i.has_had_multiple_sources!` within the `t.index \"widgets\"` block",
                 "This flag is required because indices with multiple sources can contain incomplete documents",
                 "Once set, this flag should remain even if you later remove all `sourced_from` fields"
@@ -537,7 +539,7 @@ module ElasticGraph
                     f.sourced_from "workspace", "created_at"
                   end
                 end
-              }.to raise_error_about_workspace_relationship("is a `relationship` using an `additional_filter` but `sourced_from` is not supported on relationships with `additional_filter`.")
+              }.to raise_error_about_workspace_relationship("uses an `additional_filter`, but `sourced_from` is not supported on relationships with `additional_filter`.")
             end
 
             it "raises an error if the referenced relationship is not defined" do
@@ -1300,36 +1302,32 @@ module ElasticGraph
 
         describe "nested `sourced_from` update targets" do
           it "dumps a nested update target on the source type, keyed by the qualified relationship" do
-            targets = nested_update_targets_by_relationship(nested_sourced_from_schema(fetch: "StatLine"))
-
-            expect(targets.keys).to contain_exactly("players.statLine")
-            target = targets.fetch("players.statLine")
-            expect(target.type).to eq "Team"
-            expect(target.relationship).to eq "players.statLine"
-            expect(target.script_id).to eq(INDEX_DATA_UPDATE_SCRIPT_ID)
-            expect(target.id_source).to eq "teamId"
-            expect(target.routing_value_source).to eq(nil)
-            expect(target.rollover_timestamp_value_source).to eq(nil)
-            expect(target.top_level_fields_params).to eq({})
-            expect(target.sourced_from_nested_params.field_params).to eq(
-              "goals" => dynamic_param_with(source_path: "goals", cardinality: :one)
-            )
-            expect(target.sourced_from_nested_params.path_identifier_params).to eq(
-              "playerId" => dynamic_param_with(source_path: "playerId", cardinality: :one)
-            )
+            expect_statline_update_target_with(nested_sourced_from_schema)
           end
 
           it "omits `path_identifier_params` for a non-list (object) embedding field, since there is no element to match" do
-            metadata = nested_sourced_from_schema(fetch: "StatLine", players_field: "Player!")
-            target = nested_update_targets_by_relationship(metadata).fetch("players.statLine")
+            expect_statline_update_target_with(nested_sourced_from_schema(players_field: "Player!"), path_identifier_params: {})
+          end
 
-            expect(target.sourced_from_nested_params.path_identifier_params).to eq({})
+          it "bundles every `sourced_from` field on the nested type into `field_params`" do
+            metadata = nested_sourced_from_schema(
+              on_player: ->(t) {
+                t.field "assists", "Int" do |f|
+                  f.sourced_from "statLine", "assists"
+                end
+              },
+              on_statline: ->(t) { t.field "assists", "Int" }
+            )
+
+            expect_statline_update_target_with(metadata, field_params: {
+              "goals" => dynamic_param_with(source_path: "goals", cardinality: :one),
+              "assists" => dynamic_param_with(source_path: "assists", cardinality: :one)
+            })
           end
 
           context "on a root type that uses custom routing" do
             it "determines the `routing_value_source` from an `equivalent_field` configured on the root relationship" do
               metadata = nested_sourced_from_schema(
-                fetch: "StatLine",
                 on_team: ->(t) { t.field "team_owner_id", "ID!" },
                 on_teams_index: ->(i) { i.route_with "team_owner_id" },
                 on_statlines_relationship: ->(r) {
@@ -1343,21 +1341,20 @@ module ElasticGraph
                 end
               end
 
-              target = nested_update_targets_by_relationship(metadata).fetch("players.statLine")
-              expect(target.routing_value_source).to eq "stats.owner_id"
+              expect_statline_update_target_with(metadata, routing_value_source: "stats.owner_id")
             end
 
-            it "leaves `routing_value_source` nil when the equivalent field is a `graphql_only` field with no indexing path" do
-              metadata = nested_sourced_from_schema(
-                fetch: "StatLine",
-                on_team: ->(t) { t.field "team_owner_id", "ID!" },
-                on_teams_index: ->(i) { i.route_with "team_owner_id" },
-                on_statlines_relationship: ->(r) { r.equivalent_field "owner_id", locally_named: "team_owner_id" },
-                on_statline: ->(t) { t.field "owner_id", "ID", graphql_only: true }
+            it "raises a clear error when the equivalent field is a `graphql_only` field with no indexing path" do
+              expect {
+                nested_sourced_from_schema(
+                  on_team: ->(t) { t.field "team_owner_id", "ID!" },
+                  on_teams_index: ->(i) { i.route_with "team_owner_id" },
+                  on_statlines_relationship: ->(r) { r.equivalent_field "owner_id", locally_named: "team_owner_id" },
+                  on_statline: ->(t) { t.field "owner_id", "ID", graphql_only: true }
+                )
+              }.to raise_error Errors::SchemaError, a_string_including(
+                "`StatLine.owner_id` (referenced from an `equivalent_field` defined on `Team.statLines`) does not exist"
               )
-
-              target = nested_update_targets_by_relationship(metadata).fetch("players.statLine")
-              expect(target.routing_value_source).to eq(nil)
             end
 
             it "raises a clear error when no `equivalent_field` is configured for the custom routing field" do
@@ -1367,7 +1364,7 @@ module ElasticGraph
                   on_teams_index: ->(i) { i.route_with "team_owner_id" }
                 )
               }.to raise_error Errors::SchemaError, a_string_including(
-                "Cannot update `Team` documents with nested data from related `statLine` events",
+                "Cannot update `Team` documents with data from related `statLines` events",
                 "`Team` uses custom shard routing but we don't know what `statLines` field to use to route the `Team` update requests",
                 "add a call like this to the `Team.statLines` relationship definition",
                 '`rel.equivalent_field "[StatLine field]", locally_named: "team_owner_id"`'
@@ -1378,15 +1375,13 @@ module ElasticGraph
           context "on a root type that uses a rollover index" do
             it "determines the `rollover_timestamp_value_source` from an `equivalent_field` configured on the root relationship" do
               metadata = nested_sourced_from_schema(
-                fetch: "StatLine",
                 on_team: ->(t) { t.field "team_created_at", "DateTime" },
                 on_teams_index: ->(i) { i.rollover :yearly, "team_created_at" },
                 on_statlines_relationship: ->(r) { r.equivalent_field "created_at", locally_named: "team_created_at" },
                 on_statline: ->(t) { t.field "created_at", "DateTime" }
               )
 
-              target = nested_update_targets_by_relationship(metadata).fetch("players.statLine")
-              expect(target.rollover_timestamp_value_source).to eq "created_at"
+              expect_statline_update_target_with(metadata, rollover_timestamp_value_source: "created_at")
             end
 
             it "raises a clear error when no `equivalent_field` is configured for the rollover timestamp field" do
@@ -1396,7 +1391,7 @@ module ElasticGraph
                   on_teams_index: ->(i) { i.rollover :yearly, "team_created_at" }
                 )
               }.to raise_error Errors::SchemaError, a_string_including(
-                "Cannot update `Team` documents with nested data from related `statLine` events",
+                "Cannot update `Team` documents with data from related `statLines` events",
                 "`Team` uses a rollover index but we don't know what `statLines` timestamp field to use to select an index for the `Team` update requests",
                 "add a call like this to the `Team.statLines` relationship definition",
                 '`rel.equivalent_field "[StatLine field]", locally_named: "team_created_at"`'
@@ -1405,15 +1400,31 @@ module ElasticGraph
           end
 
           describe "validations" do
+            it "raises an error when the nested `sourced_from` field does not exist on the sourced type" do
+              expect {
+                nested_sourced_from_schema(player_goals_source: "nonexistent")
+              }.to raise_error Errors::SchemaError, a_string_including(
+                "`Player.goals` has an invalid `sourced_from` argument: `StatLine.nonexistent` does not exist as an indexing field."
+              )
+            end
+
+            it "raises an error when the nested `sourced_from` field's type does not match its source's type" do
+              expect {
+                nested_sourced_from_schema(player_goals_type: "String")
+              }.to raise_error Errors::SchemaError, a_string_including(
+                "The type of `Player.goals` is `String`, but the type of its source (`StatLine.goals`) is `Int`. These must agree to use `sourced_from`."
+              )
+            end
+
             it "raises an error when the root index has not been configured with `has_had_multiple_sources!`" do
               expect {
                 nested_sourced_from_schema(multiple_sources: false)
               }.to raise_error Errors::SchemaError, a_string_including(
-                "Type `Team` has nested `sourced_from` fields (via `Player.statLine`) but its index `teams` has not been configured with `has_had_multiple_sources!`"
+                "Type `Team` has `sourced_from` fields (via `Player.statLine`) but its index `teams` has not been configured with `has_had_multiple_sources!`"
               )
             end
 
-            it "raises an error when the leaf relationship is `relates_to_many`", :dont_validate_graphql_schema do
+            it "raises an error when the leaf relationship is `relates_to_many`" do
               expect {
                 object_type_metadata_for "Team" do |s|
                   s.object_type "Team" do |t|
@@ -1444,7 +1455,7 @@ module ElasticGraph
                   end
                 end
               }.to raise_error Errors::SchemaError, a_string_including(
-                "`Player.statLines` is a `relates_to_many` relationship, but nested `sourced_from` is only supported on a `relates_to_one` relationship."
+                "`Player.statLines` (referenced from `sourced_from` on field(s): `goals`) is a `relates_to_many` relationship, but `sourced_from` is only supported on a `relates_to_one` relationship."
               )
             end
           end
@@ -1453,23 +1464,22 @@ module ElasticGraph
         describe "`parent_relationship` validations" do
           it "accepts an explicit `parent_field_name:` to identify the embedding field" do
             metadata = nested_sourced_from_schema(
-              fetch: "StatLine",
               on_player_relationship: ->(r) { r.parent_relationship "Team", "statLines", parent_field_name: "players" }
             )
 
-            expect(nested_update_targets_by_relationship(metadata).keys).to contain_exactly("players.statLine")
+            expect_statline_update_target_with(metadata)
           end
 
           it "discovers an embedding field declared with `indexing_only: true`" do
             # An `indexing_only: true` field is absent from `graphql_fields_by_name` but present in
             # `indexing_fields_by_name_in_index`, so this only resolves when the latter is used.
-            metadata = nested_sourced_from_schema(fetch: "StatLine", players_field: nil, on_team: ->(t) {
+            metadata = nested_sourced_from_schema(players_field: nil, on_team: ->(t) {
               t.field "players", "[Player!]!", indexing_only: true do |f|
                 f.mapping type: "object"
               end
             })
 
-            expect(nested_update_targets_by_relationship(metadata).keys).to contain_exactly("players.statLine")
+            expect_statline_update_target_with(metadata)
           end
 
           it "raises an error when `parent_relationship` is called twice on the same relationship" do
@@ -1639,6 +1649,27 @@ module ElasticGraph
             )
           end
 
+          it "raises an error when a relationship in the chain uses an outbound foreign key" do
+            expect {
+              nested_sourced_from_schema(player_statline_dir: :out, player_statline_via: "statLineId")
+            }.to raise_error Errors::SchemaError, a_string_including(
+              "`Player.statLine` (referenced from `sourced_from` on field(s): `goals`) has an outbound foreign key (`dir: :out`), but `sourced_from` is only supported via inbound foreign key (`dir: :in`) relationships."
+            )
+          end
+
+          it "raises an error when a relationship in the chain uses an `additional_filter`" do
+            expect {
+              nested_sourced_from_schema(
+                on_player_relationship: ->(r) {
+                  r.parent_relationship "Team", "statLines"
+                  r.additional_filter status: "active"
+                }
+              )
+            }.to raise_error Errors::SchemaError, a_string_including(
+              "`Player.statLine` (referenced from `sourced_from` on field(s): `goals`) uses an `additional_filter`, but `sourced_from` is not supported on relationships with `additional_filter`."
+            )
+          end
+
           it "raises an error when the chain terminates at a non-indexed type" do
             expect {
               nested_sourced_from_schema(index_teams: false)
@@ -1673,7 +1704,6 @@ module ElasticGraph
 
           it "uses `parent_field_name:` to disambiguate when multiple embedding fields exist" do
             metadata = nested_sourced_from_schema(
-              fetch: "StatLine",
               on_team: ->(t) {
                 t.field "bench_players", "[Player!]!" do |f|
                   f.mapping type: "object"
@@ -1684,7 +1714,7 @@ module ElasticGraph
 
             # The qualified relationship reflects `bench_players`, confirming disambiguation chose that field
             # rather than the also-eligible `players`.
-            expect(nested_update_targets_by_relationship(metadata).keys).to contain_exactly("bench_players.statLine")
+            expect_statline_update_target_with(metadata, relationship: "bench_players.statLine")
           end
 
           it "raises an error when an explicit `parent_field_name:` references a non-existent field" do
@@ -1703,13 +1733,39 @@ module ElasticGraph
         def nested_update_targets_by_relationship(metadata)
           metadata
             .update_targets
-            .reject { |t| t.relationship == SELF_RELATIONSHIP_NAME }
             .to_h { |t| [t.relationship, t] }
+            .except(SELF_RELATIONSHIP_NAME)
+        end
+
+        # Asserts the full nested `UpdateTarget` `StatLine` events produce for `Team`, with defaults for the
+        # common `nested_sourced_from_schema` case so each test overrides only the attributes it exercises.
+        def expect_statline_update_target_with(
+          metadata,
+          relationship: "players.statLine",
+          routing_value_source: nil,
+          rollover_timestamp_value_source: nil,
+          field_params: {"goals" => dynamic_param_with(source_path: "goals", cardinality: :one)},
+          path_identifier_params: {"playerId" => dynamic_param_with(source_path: "playerId", cardinality: :one)}
+        )
+          targets = nested_update_targets_by_relationship(metadata)
+          expect(targets.keys).to contain_exactly(relationship)
+
+          target = targets.fetch(relationship)
+          expect(target.type).to eq "Team"
+          expect(target.relationship).to eq relationship
+          expect(target.script_id).to eq(INDEX_DATA_UPDATE_SCRIPT_ID)
+          expect(target.id_source).to eq "teamId"
+          expect(target.routing_value_source).to eq(routing_value_source)
+          expect(target.rollover_timestamp_value_source).to eq(rollover_timestamp_value_source)
+          expect(target.top_level_fields_params).to eq({})
+          expect(target.sourced_from_nested_params.field_params).to eq(field_params)
+          expect(target.sourced_from_nested_params.path_identifier_params).to eq(path_identifier_params)
+          expect(target.metadata_params).to eq(standard_metadata_params(relationship: relationship))
         end
 
         def nested_sourced_from_schema(
-          fetch: "Team",
           on_team: nil,
+          on_player: nil,
           on_statlines_relationship: nil,
           on_player_relationship: ->(r) { r.parent_relationship "Team", "statLines" },
           player_indexing_only: true,
@@ -1718,9 +1774,14 @@ module ElasticGraph
           index_players: false,
           multiple_sources: true,
           on_teams_index: nil,
-          on_statline: nil
+          on_statline: nil,
+          player_goals_type: "Int",
+          player_goals_source: "goals",
+          player_statline_dir: :in,
+          player_statline_via: "playerId"
         )
-          object_type_metadata_for fetch do |s|
+          # `StatLine` is the source type, so its metadata carries the nested update targets we assert on.
+          object_type_metadata_for "StatLine" do |s|
             s.object_type "Team" do |t|
               t.field "id", "ID!"
 
@@ -1730,9 +1791,7 @@ module ElasticGraph
                 end
               end
 
-              t.relates_to_many "statLines", "StatLine", via: "teamId", dir: :in, indexing_only: true do |r|
-                on_statlines_relationship&.call(r)
-              end
+              t.relates_to_many "statLines", "StatLine", via: "teamId", dir: :in, indexing_only: true, &on_statlines_relationship
               on_team&.call(t)
 
               if index_teams
@@ -1746,13 +1805,15 @@ module ElasticGraph
             s.object_type "Player" do |t|
               t.field "id", "ID!"
 
-              t.field "goals", "Int" do |f|
-                f.sourced_from "statLine", "goals"
+              t.field "goals", player_goals_type do |f|
+                f.sourced_from "statLine", player_goals_source
               end
 
-              t.relates_to_one "statLine", "StatLine", via: "playerId", dir: :in, indexing_only: player_indexing_only do |r|
+              t.relates_to_one "statLine", "StatLine", via: player_statline_via, dir: player_statline_dir, indexing_only: player_indexing_only do |r|
                 on_player_relationship.call(r)
               end
+
+              on_player&.call(t)
 
               if index_players
                 t.index("players") { |i| i.has_had_multiple_sources! }
