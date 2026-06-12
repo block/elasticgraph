@@ -8,17 +8,16 @@
 
 require "elastic_graph/constants"
 require "elastic_graph/errors"
-require "elastic_graph/json_ingestion/schema_definition/api_extension"
 require "elastic_graph/json_ingestion/schema_definition/indexing/field"
 require "elastic_graph/json_ingestion/schema_definition/indexing/field_reference"
 require "elastic_graph/json_ingestion/schema_definition/indexing/field_type/object"
-require "elastic_graph/spec_support/schema_definition_helpers"
+require "support/json_ingestion_schema_definition_helpers"
 require "support/json_schema_matcher"
 
 module ElasticGraph
   module JSONIngestion::SchemaDefinition
     ::RSpec.describe "JSON schema indexing wrappers" do
-      include_context "SchemaDefinitionHelpers"
+      include_context "JSONIngestionSchemaDefinitionHelpers"
 
       # `FieldReference#resolve` is a lazy reference: the referenced type need not exist when a field is
       # defined, only when artifacts are dumped. These two specs drive both outcomes (resolves / never
@@ -161,7 +160,7 @@ module ElasticGraph
         end
 
         def object_types_by_name
-          @object_types_by_name ||= define_schema(schema_element_name_form: "snake_case", extension_modules: [APIExtension]) do |s|
+          @object_types_by_name ||= define_schema(schema_element_name_form: "snake_case") do |s|
             s.enum_type "Color" do |t|
               t.values "RED", "BLUE"
             end
@@ -196,7 +195,7 @@ module ElasticGraph
       end
 
       def dump_schema(&schema_definition)
-        define_schema(schema_element_name_form: "snake_case", extension_modules: [APIExtension], &schema_definition).current_public_json_schema
+        define_schema(schema_element_name_form: "snake_case", &schema_definition).current_public_json_schema
       end
 
       def json_schema_ref(type, is_keyword_type: %w[ID! ID String! String].include?(type))

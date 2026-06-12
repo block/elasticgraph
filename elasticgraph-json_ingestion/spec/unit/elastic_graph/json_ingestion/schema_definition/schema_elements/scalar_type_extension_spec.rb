@@ -10,18 +10,18 @@ require "elastic_graph/constants"
 require "elastic_graph/errors"
 require "elastic_graph/json_ingestion/schema_definition/api_extension"
 require "elastic_graph/json_ingestion/schema_definition/schema_elements/scalar_type_extension"
-require "elastic_graph/spec_support/schema_definition_helpers"
+require "support/json_ingestion_schema_definition_helpers"
 
 module ElasticGraph
   module JSONIngestion
     module SchemaDefinition
       module SchemaElements
         RSpec.describe ScalarTypeExtension do
-          include_context "SchemaDefinitionHelpers"
+          include_context "JSONIngestionSchemaDefinitionHelpers"
 
           it "requires custom scalar types to declare their JSON schema representation" do
             expect {
-              define_schema(schema_element_name_form: "snake_case", extension_modules: [APIExtension]) do |schema|
+              define_schema(schema_element_name_form: "snake_case") do |schema|
                 schema.scalar_type "BigInt" do |type|
                   type.mapping type: "long"
                 end
@@ -174,7 +174,7 @@ module ElasticGraph
           end
 
           it "has the expected placeholder for each built-in scalar type, including the JSON-safe-range-aware `JsonSafeLong` inference" do
-            results = define_schema(schema_element_name_form: "snake_case", extension_modules: [APIExtension]) { |schema| }
+            results = define_schema(schema_element_name_form: "snake_case") { |schema| }
             built_in_scalars = results.state.scalar_types_by_name.keys
             scalar_types_by_name = results.runtime_metadata.scalar_types_by_name
 
@@ -200,7 +200,7 @@ module ElasticGraph
           end
 
           def grouping_missing_value_placeholder_for(mapping_type, **json_schema_options)
-            define_schema(schema_element_name_form: "snake_case", extension_modules: [APIExtension]) do |schema|
+            define_schema(schema_element_name_form: "snake_case") do |schema|
               schema.scalar_type "CustomScalar" do |type|
                 type.mapping type: mapping_type
                 type.json_schema(**json_schema_options)

@@ -7,14 +7,13 @@
 # frozen_string_literal: true
 
 require "elastic_graph/constants"
-require "elastic_graph/json_ingestion/schema_definition/api_extension"
 require "elastic_graph/json_ingestion/schema_definition/json_schema_pruner"
-require "elastic_graph/spec_support/schema_definition_helpers"
+require "support/json_ingestion_schema_definition_helpers"
 
 module ElasticGraph
   module JSONIngestion::SchemaDefinition
     RSpec.describe JSONSchemaPruner do
-      include_context "SchemaDefinitionHelpers"
+      include_context "JSONIngestionSchemaDefinitionHelpers"
 
       describe ".prune" do
         subject { described_class.prune(schema) }
@@ -121,7 +120,7 @@ module ElasticGraph
       end
 
       def dump_schema(&schema_definition)
-        schema_definition_results = define_schema(schema_element_name_form: "snake_case", extension_modules: [APIExtension], &schema_definition)
+        schema_definition_results = define_schema(schema_element_name_form: "snake_case", &schema_definition)
         latest_json_schema_version = schema_definition_results.latest_json_schema_version
 
         schema_definition_results.json_schemas_for(latest_json_schema_version)
