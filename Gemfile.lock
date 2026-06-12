@@ -44,7 +44,7 @@ PATH
   specs:
     elasticgraph-elasticsearch (1.2.1.pre)
       elasticgraph-support (= 1.2.1.pre)
-      elasticsearch (~> 9.4)
+      elasticsearch (~> 9.4, >= 9.4.1)
       faraday (~> 2.14, >= 2.14.2)
       faraday-retry (~> 2.4)
 
@@ -82,9 +82,9 @@ PATH
   remote: elasticgraph-indexer_autoscaler_lambda
   specs:
     elasticgraph-indexer_autoscaler_lambda (1.2.1.pre)
-      aws-sdk-cloudwatch (~> 1.138.0)
-      aws-sdk-lambda (~> 1.181)
-      aws-sdk-sqs (~> 1.115)
+      aws-sdk-cloudwatch (~> 1.139.0)
+      aws-sdk-lambda (~> 1.183)
+      aws-sdk-sqs (~> 1.116)
       elasticgraph-datastore_core (= 1.2.1.pre)
       elasticgraph-lambda_support (= 1.2.1.pre)
 
@@ -92,7 +92,7 @@ PATH
   remote: elasticgraph-indexer_lambda
   specs:
     elasticgraph-indexer_lambda (1.2.1.pre)
-      aws-sdk-s3 (~> 1.224)
+      aws-sdk-s3 (~> 1.225)
       elasticgraph-indexer (= 1.2.1.pre)
       elasticgraph-lambda_support (= 1.2.1.pre)
 
@@ -185,7 +185,7 @@ PATH
   remote: elasticgraph-warehouse_lambda
   specs:
     elasticgraph-warehouse_lambda (1.2.1.pre)
-      aws-sdk-s3 (~> 1.224)
+      aws-sdk-s3 (~> 1.225)
       elasticgraph-indexer_lambda (= 1.2.1.pre)
       elasticgraph-lambda_support (= 1.2.1.pre)
 
@@ -235,11 +235,11 @@ GEM
       traces (~> 0.18)
     attr_extras (7.1.0)
     aws-eventstream (1.4.0)
-    aws-partitions (1.1253.0)
-    aws-sdk-cloudwatch (1.138.0)
+    aws-partitions (1.1258.0)
+    aws-sdk-cloudwatch (1.139.0)
       aws-sdk-core (~> 3, >= 3.248.0)
       aws-sigv4 (~> 1.5)
-    aws-sdk-core (3.249.0)
+    aws-sdk-core (3.251.0)
       aws-eventstream (~> 1, >= 1.3.0)
       aws-partitions (~> 1, >= 1.992.0)
       aws-sigv4 (~> 1.9)
@@ -247,17 +247,17 @@ GEM
       bigdecimal
       jmespath (~> 1, >= 1.6.1)
       logger
-    aws-sdk-kms (1.128.0)
+    aws-sdk-kms (1.129.0)
       aws-sdk-core (~> 3, >= 3.248.0)
       aws-sigv4 (~> 1.5)
-    aws-sdk-lambda (1.181.0)
+    aws-sdk-lambda (1.183.0)
       aws-sdk-core (~> 3, >= 3.248.0)
       aws-sigv4 (~> 1.5)
-    aws-sdk-s3 (1.224.0)
+    aws-sdk-s3 (1.225.0)
       aws-sdk-core (~> 3, >= 3.248.0)
       aws-sdk-kms (~> 1)
       aws-sigv4 (~> 1.5)
-    aws-sdk-sqs (1.115.0)
+    aws-sdk-sqs (1.116.0)
       aws-sdk-core (~> 3, >= 3.248.0)
       aws-sigv4 (~> 1.5)
     aws-sigv4 (1.12.1)
@@ -273,7 +273,7 @@ GEM
     colorator (1.1.0)
     concurrent-ruby (1.3.6)
     connection_pool (3.0.2)
-    console (1.35.1)
+    console (1.36.0)
       fiber-annotation
       fiber-local (~> 1.1)
       json
@@ -283,13 +283,13 @@ GEM
     diff-lcs (1.6.2)
     docile (1.4.1)
     drb (2.2.3)
-    elastic-transport (8.5.1)
+    elastic-transport (8.5.2)
       faraday (< 3)
       multi_json
-    elasticsearch (9.4.0)
+    elasticsearch (9.4.1)
       elastic-transport (~> 8.3)
-      elasticsearch-api (= 9.4.0)
-    elasticsearch-api (9.4.0)
+      elasticsearch-api (= 9.4.1)
+    elasticsearch-api (9.4.1)
       base64
       multi_json
     em-websocket (0.5.3)
@@ -310,7 +310,7 @@ GEM
       faraday-net_http (>= 2.0, < 3.5)
       json
       logger
-    faraday-net_http (3.4.3)
+    faraday-net_http (3.4.4)
       net-http (~> 0.5)
     faraday-retry (2.4.0)
       faraday (~> 2.0)
@@ -412,8 +412,8 @@ GEM
     jekyll-watch (2.2.1)
       listen (~> 3.0)
     jmespath (1.6.2)
-    json (2.19.5)
-    json (2.19.5-java)
+    json (2.19.8)
+    json (2.19.8-java)
     json_schemer (2.5.0)
       bigdecimal
       hana (~> 1.3)
@@ -478,10 +478,10 @@ GEM
       prettyprint
     prettyprint (0.2.0)
     prism (1.9.0)
-    psych (5.3.1)
+    psych (5.4.0)
       date
       stringio
-    psych (5.3.1-java)
+    psych (5.4.0-java)
       date
       jar-dependencies (>= 0.1.7)
     public_suffix (7.0.5)
@@ -738,13 +738,13 @@ CHECKSUMS
   async (2.39.0) sha256=df18730073f2bbb45788077dfa20cb365ecc1b9453969f44de6796b5191a00aa
   attr_extras (7.1.0) sha256=d96fc9a9dd5d85ba2d37762440a816f840093959ae26bb90da994c2d9f1fc827
   aws-eventstream (1.4.0) sha256=116bf85c436200d1060811e6f5d2d40c88f65448f2125bc77ffce5121e6e183b
-  aws-partitions (1.1253.0) sha256=d6924abcd0db15995faa0016d141b0391ba2c5a05415e1d6e0bdd1cad37d811f
-  aws-sdk-cloudwatch (1.138.0) sha256=43dd1f1be1ad217da395265cd497a6df02544129756a684a0bd80aaf3ad185ad
-  aws-sdk-core (3.249.0) sha256=320c37f002b8e6a701f5a63d1d0639affd44eefbe4d1de0596a65a0c4efe73fe
-  aws-sdk-kms (1.128.0) sha256=20ce3957f80c7b40b3115a7e902af52b15a6eef42fe6b2e19db72f8e8c9e5658
-  aws-sdk-lambda (1.181.0) sha256=6c9c39b2055cde61e094e8df08babd1af111639f48839e254308c57f7a3ff7ed
-  aws-sdk-s3 (1.224.0) sha256=7d443c4ae9eda795b60e081d41f49b498e2483f1fc204f3239176ec922ed7879
-  aws-sdk-sqs (1.115.0) sha256=cadda0e090612d32e625267e1edfd8741839e53600c984591a93d0a15301b5a8
+  aws-partitions (1.1258.0) sha256=3fee017570594ecf5e7f4c845b115fef8000530e57bdaf2b927357e5bf08967f
+  aws-sdk-cloudwatch (1.139.0) sha256=07725a68bb3f3e9d5e4282eb990d0526a7037c2f6a0fbbc61772e483275f27c6
+  aws-sdk-core (3.251.0) sha256=ef8186cb5509147e590310da58fab4c5b0901eba0e85a72955abdf772e425c87
+  aws-sdk-kms (1.129.0) sha256=363f548df321f4a4fcfd05523384e591060b400f8e65133ed7ef0793155a3343
+  aws-sdk-lambda (1.183.0) sha256=3dbf19f07e2d484108ec9e7f45c6482ee2f5f3023ee5df1434caa8a4d84f3ae4
+  aws-sdk-s3 (1.225.0) sha256=734752cc77e369c645ff5285b70ff5af207b0dcd3388346de2f727cd4e943924
+  aws-sdk-sqs (1.116.0) sha256=6378f95b0bd4acc8296aa4089983e7da0e50b4a306afd13f9d44f691c9dcbbe3
   aws-sigv4 (1.12.1) sha256=6973ff95cb0fd0dc58ba26e90e9510a2219525d07620c8babeb70ef831826c00
   aws_lambda_ric (3.2.0) sha256=fdab2c637bf0aa47b1de795d6fe7244572e9f743ac74eb47e1386e3c4c17c269
   base64 (0.3.0) sha256=27337aeabad6ffae05c265c450490628ef3ebd4b67be58257393227588f5a97b
@@ -752,18 +752,19 @@ CHECKSUMS
   benchmark-ips (2.15.1) sha256=07a1a9f3c6105ecaf68c174fc3fbcddd71a0e9ada6236ae03093a0dcfd812d59
   bigdecimal (4.1.2) sha256=53d217666027eab4280346fba98e7d5b66baaae1b9c3c1c0ffe89d48188a3fbd
   bigdecimal (4.1.2-java) sha256=ccc836eab720a525529f70ed0de26a206fdbc9a9e8ac67b3b4ac7318b03e114d
+  bundler (4.0.13) sha256=19f08be7f27022cf0b89f27da0b044ae075e8270a9ef44ad248a932614e1ca3b
   coderay (1.1.3) sha256=dc530018a4684512f8f38143cd2a096c9f02a1fc2459edcfe534787a7fc77d4b
   colorator (1.1.0) sha256=e2f85daf57af47d740db2a32191d1bdfb0f6503a0dfbc8327d0c9154d5ddfc38
   concurrent-ruby (1.3.6) sha256=6b56837e1e7e5292f9864f34b69c5a2cbc75c0cf5338f1ce9903d10fa762d5ab
   connection_pool (3.0.2) sha256=33fff5ba71a12d2aa26cb72b1db8bba2a1a01823559fb01d29eb74c286e62e0a
-  console (1.35.1) sha256=6d2bfdd0bc7e57830540a6c0ce3bc83fff471844db44be89a38aef9f95df296a
+  console (1.36.0) sha256=45599ea906cf80a73d8941f03abf873fe66a6a954e0bac5bc1c01e2cdc406f07
   csv (3.3.5) sha256=6e5134ac3383ef728b7f02725d9872934f523cb40b961479f69cf3afa6c8e73f
   date (3.5.1) sha256=750d06384d7b9c15d562c76291407d89e368dda4d4fff957eb94962d325a0dc0
   date (3.5.1-java) sha256=12e09477dc932afe45bf768cd362bf73026804e0db1e6c314186d6cd0bee3344
   diff-lcs (1.6.2) sha256=9ae0d2cba7d4df3075fe8cd8602a8604993efc0dfa934cff568969efb1909962
   docile (1.4.1) sha256=96159be799bfa73cdb721b840e9802126e4e03dfc26863db73647204c727f21e
   drb (2.2.3) sha256=0b00d6fdb50995fe4a45dea13663493c841112e4068656854646f418fda13373
-  elastic-transport (8.5.1) sha256=5eeae78f791840f2d4f35d2f3826903098e360f20f838e20b304b73a302ac04d
+  elastic-transport (8.5.2) sha256=5ab56d54aae0584471374368170e04b2c1b5214cad8c9e5d627cb6d07e204fc3
   elasticgraph (1.2.1.pre)
   elasticgraph-admin (1.2.1.pre)
   elasticgraph-admin_lambda (1.2.1.pre)
@@ -788,8 +789,8 @@ CHECKSUMS
   elasticgraph-support (1.2.1.pre)
   elasticgraph-warehouse (1.2.1.pre)
   elasticgraph-warehouse_lambda (1.2.1.pre)
-  elasticsearch (9.4.0) sha256=646af8c1b5cc305bb109ada73c0ee8c39a14bdbc1bab08390fc04ccbf1b8d474
-  elasticsearch-api (9.4.0) sha256=7bb37ab10bcbc567603f20a60bb8fb0845a42187b2989eb637341bf4d260456c
+  elasticsearch (9.4.1) sha256=5785407cd3e06a723fe36987c5c3a83940612035c423376399c49d2940024475
+  elasticsearch-api (9.4.1) sha256=8104cf332ac90f0a4626b8ecbf3c19f4cac05208690e8aff0d4af30443085a4d
   em-websocket (0.5.3) sha256=f56a92bde4e6cb879256d58ee31f124181f68f8887bd14d53d5d9a292758c6a8
   erb (6.0.4) sha256=38e3803694be357fe2bfe312487c74beaf9fb4e5beb3e22498952fe1645b95d9
   erb (6.0.4-java) sha256=3014611d37917a20e14ea3ba71e06a8d581b71c073858d7796eeee45b01e8407
@@ -799,7 +800,7 @@ CHECKSUMS
   factory_bot (6.6.0) sha256=1fc1b3b5620ec980a6a27aec1b6ec8c250ca82962e970e8a40f93e8d388d4b89
   faker (3.8.0) sha256=c147b308df73a90f27a4fc84f18d4c22ef0ad9c2a64b2b61c86fd0ca71753efc
   faraday (2.14.2) sha256=73ccb9994a9e8648f010e32eca2ae82e41c57860aa10932cda29418b9e0223ad
-  faraday-net_http (3.4.3) sha256=9db13becec9312f345a769eeeecf9049c9287d54c0ae053d7235228993a4eec1
+  faraday-net_http (3.4.4) sha256=0e78af151747ed1b00f33e25973b4bc220d7f16c00c39676817c8b12331eb588
   faraday-retry (2.4.0) sha256=7b79c48fb7e56526faf247b12d94a680071ff40c9fda7cf1ec1549439ad11ebe
   faraday_middleware-aws-sigv4 (1.0.1) sha256=a001ea4f687ca1c60bad8f2a627196905ce3dbf285e461dc153240e92eaabe8f
   ffi (1.17.4) sha256=bcd1642e06f0d16fc9e09ac6d49c3a7298b9789bcb58127302f934e437d60acf
@@ -839,8 +840,8 @@ CHECKSUMS
   jekyll-sass-converter (3.1.0) sha256=83925d84f1d134410c11d0c6643b0093e82e3a3cf127e90757a85294a3862443
   jekyll-watch (2.2.1) sha256=bc44ed43f5e0a552836245a54dbff3ea7421ecc2856707e8a1ee203a8387a7e1
   jmespath (1.6.2) sha256=238d774a58723d6c090494c8879b5e9918c19485f7e840f2c1c7532cf84ebcb1
-  json (2.19.5) sha256=218a18553e4801d579ca7e0f5bc72bafd776d7397238a1fb4e74db5b0a812c59
-  json (2.19.5-java) sha256=c3b74d6cee27c06713dbe8a8eb4ae0d3e6d0d090214f5068e55c01e7011c0976
+  json (2.19.8) sha256=6354310fd76ef69b87d5bd1f38b40d730613baf90b6803d2d0a48f618d32dfaa
+  json (2.19.8-java) sha256=cffef98cdee2e2b6830662ea91e9212c4dd2cbd3059ebc44e90ede45132a20bf
   json_schemer (2.5.0) sha256=2f01fb4cce721a4e08dd068fc2030cffd0702a7f333f1ea2be6e8991f00ae396
   kramdown (2.5.2) sha256=1ba542204c66b6f9111ff00dcc26075b95b220b07f2905d8261740c82f7f02fa
   kramdown-parser-gfm (1.1.0) sha256=fb39745516427d2988543bf01fc4cf0ab1149476382393e0e9c48592f6581729
@@ -874,8 +875,8 @@ CHECKSUMS
   pp (0.6.3) sha256=2951d514450b93ccfeb1df7d021cae0da16e0a7f95ee1e2273719669d0ab9df6
   prettyprint (0.2.0) sha256=2bc9e15581a94742064a3cc8b0fb9d45aae3d03a1baa6ef80922627a0766f193
   prism (1.9.0) sha256=7b530c6a9f92c24300014919c9dcbc055bf4cdf51ec30aed099b06cd6674ef85
-  psych (5.3.1) sha256=eb7a57cef10c9d70173ff74e739d843ac3b2c019a003de48447b2963d81b1974
-  psych (5.3.1-java) sha256=20a4a81ad01479ef060f604ed75ba42fe673169e67d923b1bae5aa4e13cc5820
+  psych (5.4.0) sha256=14f72d69a611af663d7d70e4a7b67d9eb1f3ae9f8d916b478961d5a0075ba5b7
+  psych (5.4.0-java) sha256=5f948b27c94be491e6ae3e19484700fe87b7bea75f91a5ab8cdf18bb215b1a3b
   public_suffix (7.0.5) sha256=1a8bb08f1bbea19228d3bed6e5ed908d1cb4f7c2726d18bd9cadf60bc676f623
   racc (1.8.1) sha256=4a7f6929691dbec8b5209a0b373bc2614882b55fc5d2e447a21aaa691303d62f
   racc (1.8.1-java) sha256=54f2e6d1e1b91c154013277d986f52a90e5ececbe91465d29172e49342732b98
