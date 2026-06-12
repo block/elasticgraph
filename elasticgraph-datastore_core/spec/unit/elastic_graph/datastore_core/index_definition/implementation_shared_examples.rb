@@ -544,15 +544,61 @@ module ElasticGraph
               index.list_counts_field_paths_for_source(SELF_RELATIONSHIP_NAME)
             )
           end
+        end
 
-          def update_type_for_index(schema)
-            yield schema.state.object_types_by_name.fetch("MyType")
+        describe "#sourced_from_nested_paths_as_painless_param" do
+          it "returns an empty hash for an index with no nested `sourced_from` fields" do
+            index = define_index
+
+            expect(index.sourced_from_nested_paths_as_painless_param).to eq({})
+          end
+
+          it "converts the registered nested paths into the painless hash form, keyed by qualified relationship" do
+            index = define_index(schema_def: lambda do |schema|
+              schema.object_type "NestedThing" do |t|
+                t.field "id", "ID!"
+                t.field "name", "String" do |f|
+                  f.sourced_from "related_thing", "name"
+                end
+                t.relates_to_one "related_thing", "RelatedThing", via: "nested_thing_id", dir: :in, indexing_only: true do |r|
+                  r.parent_relationship "MyType", "related_things"
+                end
+              end
+
+              schema.object_type "RelatedThing" do |t|
+                t.field "id", "ID!"
+                t.field "my_type_id", "ID"
+                t.field "nested_thing_id", "ID"
+                t.field "name", "String"
+                t.field "created_at", "DateTime!"
+                t.index "related_things"
+              end
+
+              update_type_for_index(schema) do |t|
+                t.field "nested_things", "[NestedThing!]!" do |f|
+                  f.mapping type: "object"
+                end
+                # `equivalent_field` is required because `MyType` may be a rollover index, so the indexer
+                # needs to know which `RelatedThing` timestamp selects the `MyType` index to update.
+                t.relates_to_many "related_things", "RelatedThing", via: "my_type_id", dir: :in, indexing_only: true, singular: "related_thing" do |r|
+                  r.equivalent_field "created_at"
+                end
+              end
+            end) { |i| i.has_had_multiple_sources! }
+
+            expect(index.sourced_from_nested_paths_as_painless_param).to eq(
+              "nested_things.related_thing" => [{"field" => "nested_things", "sourceField" => "nested_thing_id"}]
+            )
           end
         end
 
         def define_index(name = "my_type", **options, &block)
           define_datastore_core_with_index(name, **options, &block)
             .index_definitions_by_name.fetch(name)
+        end
+
+        def update_type_for_index(schema)
+          yield schema.state.object_types_by_name.fetch("MyType")
         end
       end
     end

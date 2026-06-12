@@ -25,9 +25,6 @@ module ElasticGraph
       # always on `id` (relationships join on `id` via foreign keys), so it's implicit rather
       # than stored here.
       #
-      # A future PR will add `to_painless_param` to convert these segments into the
-      # camelCase hash format expected by the painless script (with a "type" discriminator).
-      #
       # @private
       class ListPathSegment < ::Data.define(:field, :source_field)
         FIELD = "field"
@@ -41,10 +38,14 @@ module ElasticGraph
         def self.from_hash(hash)
           new(field: hash[FIELD], source_field: hash[SOURCE_FIELD])
         end
+
+        # The painless script expects camelCase and discriminates list segments by the presence of `sourceField`.
+        def to_painless_hash
+          {"field" => field, "sourceField" => source_field}
+        end
       end
 
       # Represents a segment in a nested sourced path that navigates into an object field.
-      # See `ListPathSegment` for notes on `to_painless_param`.
       #
       # @private
       class ObjectPathSegment < ::Data.define(:field)
@@ -57,6 +58,11 @@ module ElasticGraph
 
         def self.from_hash(hash)
           new(field: hash[FIELD])
+        end
+
+        # No `sourceField`, which is how the painless script tells object segments from list segments.
+        def to_painless_hash
+          {"field" => field}
         end
       end
     end

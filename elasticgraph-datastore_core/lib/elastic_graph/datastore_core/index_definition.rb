@@ -33,7 +33,8 @@ module ElasticGraph
           env_index_config: env_index_config,
           defined_clusters: config.clusters.keys.to_set,
           datastore_clients_by_name: datastore_clients_by_name,
-          has_had_multiple_sources: runtime_metadata.has_had_multiple_sources
+          has_had_multiple_sources: runtime_metadata.has_had_multiple_sources,
+          sourced_from_nested_paths_by_qualified_relationship: runtime_metadata.sourced_from_nested_paths_by_qualified_relationship
         }
 
         if (rollover = runtime_metadata.rollover)
