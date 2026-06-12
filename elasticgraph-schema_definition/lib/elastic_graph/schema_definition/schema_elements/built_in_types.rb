@@ -777,7 +777,7 @@ module ElasticGraph
           # When overridden to a custom scalar (e.g., PaginationCursor), we register it automatically.
           cursor_type_name = @schema_def_state.type_namer.cursor_type_name
           unless STOCK_GRAPHQL_SCALARS.include?(cursor_type_name)
-            schema_def_api.scalar_type cursor_type_name do |t|
+            schema_def_api.scalar_type "Cursor" do |t|
               # Technically, we don't use the mapping or json_schema on this type since it's a return-only
               # type and isn't indexed. However, `scalar_type` requires them to be set (since custom scalars
               # defined by users will need those set) so we set them here to what they would be if we actually
@@ -786,12 +786,6 @@ module ElasticGraph
               t.json_schema type: "string"
               t.coerce_with "ElasticGraph::GraphQL::ScalarCoercionAdapters::Cursor",
                 defined_at: "elastic_graph/graphql/scalar_coercion_adapters/cursor"
-
-              # Configure warehouse column type if the warehouse extension is loaded.
-              # :nocov: Not all test configurations load the warehouse extension, so this branch isn't always hit.
-              # It is covered by elasticgraph-warehouse tests where the extension is loaded.
-              t.warehouse_column type: "STRING" if t.respond_to?(:warehouse_column)
-              # :nocov:
 
               t.documentation <<~EOS
                 An opaque string value representing a specific location in a paginated connection type.
