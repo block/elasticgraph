@@ -623,7 +623,7 @@ module ElasticGraph
 
           search_index_definitions = search_index_definitions_for(route_with_field_paths, ignored_routing_values)
 
-          query = new_query(search_index_definitions: search_index_definitions, aggregations: aggregations, **options)
+          query = new_query(initial_search_index_definitions: search_index_definitions, aggregations: aggregations, **options)
 
           datastore_msearch_header_of(query)[:routing]&.split(",").tap do |used_routing_values|
             expect(used_routing_values).to eq(query.shard_routing_values)

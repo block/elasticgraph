@@ -27,12 +27,12 @@ module ElasticGraph
           components_def = graphql.datastore_core.index_definitions_by_name.fetch("components")
 
           widget_query = graphql.datastore_query_builder.new_query(
-            search_index_definitions: [widgets_def],
+            initial_search_index_definitions: [widgets_def],
             requested_fields: ["id"]
           )
 
           component_query = graphql.datastore_query_builder.new_query(
-            search_index_definitions: [components_def],
+            initial_search_index_definitions: [components_def],
             requested_fields: ["id"]
           )
 

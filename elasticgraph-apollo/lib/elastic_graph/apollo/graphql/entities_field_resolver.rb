@@ -70,7 +70,7 @@ module ElasticGraph
           return nil unless adapter.root_document_type?
 
           type = adapter.type
-          query = @datastore_query_builder.new_query(search_index_definitions: type.search_index_definitions, **query_attributes)
+          query = @datastore_query_builder.new_query(initial_search_index_definitions: type.search_index_definitions, **query_attributes)
           adapter.customize_query(query, representations)
         end
 

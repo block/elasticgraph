@@ -23,14 +23,14 @@ module ElasticGraph
         expect(manufacturers_def.route_with).to eq "id"
       end
 
-      it "returns a list of `route_with` values from the `search_index_definitions`" do
-        query = new_query(search_index_definitions: [widgets_def, addresses_def])
+      it "returns a list of `route_with` values from the `initial_search_index_definitions`" do
+        query = new_query(initial_search_index_definitions: [widgets_def, addresses_def])
 
         expect(query.route_with_field_paths).to contain_exactly("workspace_id2", "id")
       end
 
       it "deduplicates values when multiple search index definitions have the same `route_with` value" do
-        query = new_query(search_index_definitions: [manufacturers_def, addresses_def])
+        query = new_query(initial_search_index_definitions: [manufacturers_def, addresses_def])
 
         expect(query.route_with_field_paths).to contain_exactly("id")
       end

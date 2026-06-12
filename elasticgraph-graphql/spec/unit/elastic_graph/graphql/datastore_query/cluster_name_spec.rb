@@ -34,15 +34,15 @@ module ElasticGraph
       end
 
       it "returns the name of the datastore cluster from the search index definitions" do
-        main_query = new_query(search_index_definitions: [widgets_def, addresses_def])
+        main_query = new_query(initial_search_index_definitions: [widgets_def, addresses_def])
         expect(main_query.cluster_name).to eq "main"
 
-        other_query = new_query(search_index_definitions: [components_def])
+        other_query = new_query(initial_search_index_definitions: [components_def])
         expect(other_query.cluster_name).to eq "other1"
       end
 
       it "raises an error if the index definitions do not agree about the cluster" do
-        query = new_query(search_index_definitions: [widgets_def, components_def])
+        query = new_query(initial_search_index_definitions: [widgets_def, components_def])
 
         expect {
           query.cluster_name

@@ -28,7 +28,7 @@ module ElasticGraph
     # with minimal effort.
     class DatastoreQuery < Support::MemoizableData.define(
       :total_document_count_needed, :aggregations, :logger, :filter_interpreter, :routing_picker,
-      :index_expression_builder, :default_page_size, :search_index_definitions, :max_page_size,
+      :index_expression_builder, :default_page_size, :initial_search_index_definitions, :max_page_size,
       :client_filters, :internal_filters, :sort, :document_pagination,
       :requested_fields, :request_all_fields, :requested_highlights, :request_all_highlights,
       :individual_docs_needed, :size_multiplier, :monotonic_clock_deadline, :schema_element_names
@@ -138,13 +138,16 @@ module ElasticGraph
         @to_datastore_msearch_header_and_body ||= [to_datastore_msearch_header, to_datastore_body]
       end
 
+      # @!attribute [r] initial_search_index_definitions
+      #   The index definitions as provided at construction, before any subsequent adjustments.
+
       # Returns an index_definition expression string to use for searches. This string can specify
       # multiple indices, use wildcards, etc. For info about what is supported, see:
       # https://www.elastic.co/guide/en/elasticsearch/reference/current/multi-index.html
       def search_index_expression
         @search_index_expression ||= index_expression_builder.determine_search_index_expression(
           all_filters,
-          search_index_definitions,
+          initial_search_index_definitions,
           # When we have aggregations, we must require indices to search. When we search no indices, the datastore does not return
           # the standard aggregations response structure, which causes problems.
           require_indices: !aggregations_datastore_body.empty?
@@ -158,10 +161,10 @@ module ElasticGraph
       # Returns the name of the datastore cluster as a String where this query should be setn.
       # Unless exactly 1 cluster name is found, this method raises a Errors::ConfigError.
       def cluster_name
-        cluster_name = search_index_definitions.map(&:cluster_to_query).uniq
+        cluster_name = initial_search_index_definitions.map(&:cluster_to_query).uniq
         return cluster_name.first if cluster_name.size == 1
         raise Errors::ConfigError, "Found different datastore clusters (#{cluster_name}) to query " \
-          "for query targeting indices: #{search_index_definitions}"
+          "for query targeting indices: #{initial_search_index_definitions}"
       end
 
       # Returns a list of unique field paths that should be used for shard routing during searches.
@@ -173,7 +176,7 @@ module ElasticGraph
       # can be composed of subtypes that have use different shard routing; this will return
       # the set union of them all.
       def route_with_field_paths
-        search_index_definitions.map(&:route_with).uniq
+        initial_search_index_definitions.map(&:route_with).uniq
       end
 
       # The shard routing values used for this search. Can be `nil` if the query will hit all shards.
@@ -236,7 +239,7 @@ module ElasticGraph
           decoded_cursor_factory: decoded_cursor_factory,
           schema_element_names: schema_element_names,
           size_multiplier: size_multiplier,
-          max_effective_size: search_index_definitions.map { |i| i.max_result_window }.min,
+          max_effective_size: initial_search_index_definitions.map { |i| i.max_result_window }.min,
           paginator: Paginator.new(
             default_page_size: default_page_size,
             max_page_size: max_page_size,
@@ -297,7 +300,7 @@ module ElasticGraph
       end
 
       def ignored_values_for_routing
-        @ignored_values_for_routing ||= search_index_definitions.flat_map { |i| i.ignored_values_for_routing.to_a }.to_set
+        @ignored_values_for_routing ||= initial_search_index_definitions.flat_map { |i| i.ignored_values_for_routing.to_a }.to_set
       end
 
       def to_datastore_body
@@ -361,7 +364,7 @@ module ElasticGraph
         end
 
         def new_query(
-          search_index_definitions:,
+          initial_search_index_definitions:,
           client_filters: [],
           internal_filters: [],
           sort: [],
@@ -376,8 +379,8 @@ module ElasticGraph
           total_document_count_needed: false,
           monotonic_clock_deadline: nil
         )
-          if search_index_definitions.empty?
-            raise Errors::SearchFailedError, "Query is invalid, since it contains no `search_index_definitions`."
+          if initial_search_index_definitions.empty?
+            raise Errors::SearchFailedError, "Query is invalid, since it contains no `initial_search_index_definitions`."
           end
 
           individual_docs_needed ||= !requested_fields.empty? || request_all_fields ||
@@ -390,7 +393,7 @@ module ElasticGraph
             index_expression_builder: index_expression_builder,
             logger: logger,
             schema_element_names: runtime_metadata.schema_element_names,
-            search_index_definitions: search_index_definitions,
+            initial_search_index_definitions: initial_search_index_definitions,
             client_filters: client_filters.to_set,
             internal_filters: internal_filters.to_set,
             sort: sort,

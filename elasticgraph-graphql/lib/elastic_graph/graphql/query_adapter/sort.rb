@@ -21,7 +21,7 @@ module ElasticGraph
             # really cared, they would have provided an `order_by` argument...) but we want our
             # logic to be consistent and deterministic, so we just use the alphabetically first
             # index here.
-            sort_clauses = (_ = query.search_index_definitions.min_by(&:name)).default_sort_clauses
+            sort_clauses = (_ = query.initial_search_index_definitions.min_by(&:name)).default_sort_clauses
           end
 
           query.merge_with(sort: sort_clauses)

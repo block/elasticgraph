@@ -128,7 +128,7 @@ module ElasticGraph
             alt_individual_docs_needed = base_query.with(individual_docs_needed: !base_query.individual_docs_needed),
             alt_sort = base_query.with(sort: [{"age" => {"order" => "desc"}}]),
             alt_requested_fields = base_query.with(requested_fields: ["name"]),
-            alt_index = base_query.with(search_index_definitions: [components_def])
+            alt_index = base_query.with(initial_search_index_definitions: [components_def])
           )
 
           expect(executed_queries).to contain_exactly(
@@ -193,7 +193,7 @@ module ElasticGraph
         end
 
         def new_query(**options)
-          graphql.datastore_query_builder.new_query(search_index_definitions: [widgets_def], **options)
+          graphql.datastore_query_builder.new_query(initial_search_index_definitions: [widgets_def], **options)
         end
 
         def build_response_for(query)

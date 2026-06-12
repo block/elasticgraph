@@ -88,7 +88,7 @@ module ElasticGraph
         type = @indexed_document_types_by_name.fetch(type_name)
 
         @datastore_query_builder.new_query(
-          search_index_definitions: type.search_index_definitions,
+          initial_search_index_definitions: type.search_index_definitions,
           internal_filters: [build_index_optimization_filter_for(recency_config)],
           requested_fields: ["id", recency_config.timestamp_field],
           document_pagination: {first: 1},

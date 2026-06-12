@@ -28,7 +28,7 @@ module ElasticGraph
         index_def = graphql.datastore_core.index_definitions_by_name.fetch(index_def_name)
 
         query = graphql.datastore_query_builder.new_query(
-          search_index_definitions: [index_def],
+          initial_search_index_definitions: [index_def],
           requested_fields: ["id"],
           sort: index_def.default_sort_clauses,
           aggregations: aggregations.to_h { |agg| [agg.name, agg] },

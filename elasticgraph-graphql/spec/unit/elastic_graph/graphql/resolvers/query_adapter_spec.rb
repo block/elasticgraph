@@ -65,9 +65,9 @@ module ElasticGraph
             expect(datastore_query).to be_a(DatastoreQuery)
           end
 
-          it "sets the `search_index_definitions` based on the field type" do
+          it "sets the `initial_search_index_definitions` based on the field type" do
             datastore_query = build_query_from({})
-            expect(datastore_query.search_index_definitions).to eq(graphql.schema.type_named("Widget").search_index_definitions)
+            expect(datastore_query.initial_search_index_definitions).to eq(graphql.schema.type_named("Widget").search_index_definitions)
           end
 
           describe "sort" do

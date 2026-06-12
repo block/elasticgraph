@@ -27,7 +27,7 @@ module ElasticGraph
           expect(widgets_def.index_expression_for_search).to eq "widgets_rollover__*"
           expect(components_def.index_expression_for_search).to eq "components"
 
-          query = new_query(search_index_definitions: [components_def, widgets_def])
+          query = new_query(initial_search_index_definitions: [components_def, widgets_def])
 
           expect(query.search_index_expression).to eq "components,widgets_rollover__*"
         end
@@ -548,7 +548,7 @@ module ElasticGraph
             end
 
             index_def = graphql.datastore_core.index_definitions_by_name.fetch("widgets")
-            builder.new_query(search_index_definitions: [index_def], aggregations: aggregations, **options).search_index_expression.split(",")
+            builder.new_query(initial_search_index_definitions: [index_def], aggregations: aggregations, **options).search_index_expression.split(",")
           end
 
           # The search index expression parts should be the same regardless of whether a client or internal filter is used.

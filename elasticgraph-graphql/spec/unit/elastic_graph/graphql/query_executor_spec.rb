@@ -200,11 +200,11 @@ module ElasticGraph
 
           expect {
             execute_expecting_no_errors(query_string)
-          }.to raise_error(a_string_including("Query is invalid, since it contains no `search_index_definitions`."))
+          }.to raise_error(a_string_including("Query is invalid, since it contains no `initial_search_index_definitions`."))
             .and log a_string_including(
               "Query Foo[1] for client (anonymous) failed with an exception[2]",
               query_string.to_s,
-              "ElasticGraph::Errors::SearchFailedError: Query is invalid, since it contains no `search_index_definitions`."
+              "ElasticGraph::Errors::SearchFailedError: Query is invalid, since it contains no `initial_search_index_definitions`."
             )
         end
 
