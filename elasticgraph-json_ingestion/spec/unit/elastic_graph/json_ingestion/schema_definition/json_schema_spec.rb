@@ -8,14 +8,13 @@
 
 require "elastic_graph/constants"
 require "elastic_graph/errors"
-require "elastic_graph/json_ingestion/schema_definition/api_extension"
-require "elastic_graph/spec_support/schema_definition_helpers"
+require "support/json_ingestion_schema_definition_helpers"
 require "support/json_schema_matcher"
 
 module ElasticGraph
   module JSONIngestion::SchemaDefinition
     ::RSpec.describe "JSON schema generation" do
-      include_context "SchemaDefinitionHelpers"
+      include_context "JSONIngestionSchemaDefinitionHelpers"
       json_schema_id = {"allOf" => [{"$ref" => "#/$defs/ID"}, {"maxLength" => DEFAULT_MAX_KEYWORD_LENGTH}]}
       json_schema_float = {"$ref" => "#/$defs/Float"}
       json_schema_integer = {"$ref" => "#/$defs/Int"}
@@ -113,10 +112,7 @@ module ElasticGraph
         it "configures built-in scalar JSON schema before user schema blocks are evaluated" do
           json_schema_options_in_schema_block = nil
 
-          define_schema(
-            schema_element_name_form: "snake_case",
-            extension_modules: [JSONIngestion::SchemaDefinition::APIExtension]
-          ) do |s|
+          define_schema(schema_element_name_form: "snake_case") do |s|
             json_schema_options_in_schema_block = s.state.scalar_types_by_name.fetch("String").json_schema_options.dup
 
             s.object_type "Widget" do |t|
