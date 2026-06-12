@@ -70,6 +70,28 @@ scalar for one with a name your team prefers—use [`type_name_overrides`]({% ap
 The standard GraphQL scalars (`Boolean`, `Float`, `ID`, `Int`, `String`) and the root `Query` type cannot be renamed
 this way.
 
+### Federation Compatibility: Overriding `Cursor` to `String`
+
+When composing an ElasticGraph subgraph into a federated supergraph alongside other subgraphs that use `String` for
+cursor fields (as the [Relay GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm) permits),
+federation composition may fail with a type incompatibility error. ElasticGraph uses a dedicated `Cursor` scalar type
+for cursor fields by default, which provides better type safety and documentation but can cause conflicts.
+
+To resolve this, override the `Cursor` type to `String`:
+
+{% include copyable_code_snippet.html language="ruby" data="schema_customization_rake_tasks.snippets.Rakefile.cursor_type_override" %}
+
+This configuration causes ElasticGraph to:
+- Skip registration of the `Cursor` scalar (avoiding duplicate type definitions)
+- Use `String` for all cursor-related fields (`PageInfo.startCursor`, `PageInfo.endCursor`, `Edge.cursor`)
+- Use `String` for pagination arguments (`before`, `after`)
+
+{: .alert-note}
+**Note**{: .alert-title}
+The `Cursor` scalar and `String` are semantically identical on the wire—both are opaque base64-encoded strings. The
+only difference is that `Cursor` provides more expressive type information in the GraphQL schema. Using `String` for
+cursor fields is fully compatible with the Relay specification and is the common convention in most GraphQL implementations.
+
 ## Customization Hooks
 
 The schema definition API exposes hooks that let you customize generated types and fields. These hooks are commonly used

@@ -71,6 +71,32 @@ module ElasticGraph
             "call `warehouse_column type:"
           ))
         end
+
+        it "respects type name overrides for all built in types (except stock GraphQL scalars that can't be renamed)" do
+          overrides = APIExtension::COLUMN_TYPES_BY_BUILT_IN_SCALAR_TYPE.except(*STOCK_GRAPHQL_SCALARS).keys.to_h do |original_type_name|
+            [original_type_name.to_sym, "Overridden#{original_type_name}"]
+          end
+
+          results = define_warehouse_schema(type_name_overrides: overrides) do |s|
+            # Define a custom type that includes a PaginationCursor field so we can verify
+            # the warehouse column type is configured correctly.
+            s.object_type "CursorTest" do |t|
+              t.field "id", "ID"
+
+              overrides.each do |original_type, overridden_type|
+                t.field "overridden_#{original_type}", overridden_type
+              end
+
+              t.index "override_tests"
+            end
+          end
+
+          overrides.each do |original_type, overridden_type|
+            field_name = "overridden_#{original_type}"
+            expected_column_type = APIExtension::COLUMN_TYPES_BY_BUILT_IN_SCALAR_TYPE.fetch(original_type.to_s)
+            expect(warehouse_column_def_from(results, "override_tests", field_name)).to eq "#{field_name} #{expected_column_type}"
+          end
+        end
       end
     end
   end

@@ -360,6 +360,7 @@ module ElasticGraph
       schema_element_name_form: :snake_case,
       schema_element_name_overrides: {},
       derived_type_name_formats: {},
+      type_name_overrides: {},
       enum_value_overrides_by_type: {},
       reload_schema_artifacts: false
     )
@@ -371,6 +372,7 @@ module ElasticGraph
         schema_element_name_form: schema_element_name_form,
         schema_element_name_overrides: schema_element_name_overrides,
         derived_type_name_formats: derived_type_name_formats,
+        type_name_overrides: type_name_overrides,
         enum_value_overrides_by_type: enum_value_overrides_by_type,
         reload_schema_artifacts: reload_schema_artifacts,
         output: output

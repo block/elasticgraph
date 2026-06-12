@@ -1404,16 +1404,21 @@ module ElasticGraph
           {"count" => 2, grouped_by => {case_correctly("workspace_id") => "w2"}}
         ]
 
+        # Both contexts (Cursor scalar and String override) now produce consistent error messages
+        # because the coercion adapter returns nil for invalid values, causing GraphQL to generate
+        # validation errors with full field context.
+        array_error = "Argument 'after' on Field '#{case_correctly("widget_aggregations")}' has an invalid value ([1, 2, 3]). Expected type '#{cursor_type}'."
+
         expect {
           response = list_widget_workspace_id_groupings(first: 2, after: [1, 2, 3], expect_errors: true)
-          expect(response["errors"]).to contain_exactly(a_hash_including("message" => "Argument 'after' on Field '#{case_correctly("widget_aggregations")}' has an invalid value ([1, 2, 3]). Expected type 'Cursor'."))
-        }.to log_warning a_string_including("Argument 'after' on Field '#{case_correctly("widget_aggregations")}' has an invalid value", "[1, 2, 3]")
+          expect(response["errors"]).to contain_exactly(a_hash_including("message" => array_error))
+        }.to log_warning a_string_including(array_error)
 
         broken_cursor = page_info.fetch(case_correctly("end_cursor")) + "-broken"
         expect {
           response = list_widget_workspace_id_groupings(first: 2, after: broken_cursor, expect_errors: true)
-          expect(response["errors"]).to contain_exactly(a_hash_including("message" => "Argument 'after' on Field '#{case_correctly("widget_aggregations")}' has an invalid value (#{broken_cursor.inspect}). Expected type 'Cursor'."))
-        }.to log_warning a_string_including("Argument 'after' on Field '#{case_correctly("widget_aggregations")}' has an invalid value", broken_cursor)
+          expect(response["errors"]).to contain_exactly(a_hash_including("message" => "`#{broken_cursor}` is an invalid cursor."))
+        }.to log_warning a_string_including("`#{broken_cursor}` is an invalid cursor.")
 
         page_info, workspace_nodes = list_widget_workspace_id_groupings(first: 2, after: page_info.fetch(case_correctly("end_cursor")))
 

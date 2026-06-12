@@ -60,7 +60,7 @@ module ElasticGraph
         module_exec(&block)
       end
 
-      context "with a camelCase schema, alternate derived type naming, and enum value overrides" do
+      context "with a camelCase schema, `String` cursors, alternate derived type naming, and enum value overrides" do
         include CamelCaseGraphQLAcceptanceAdapter
 
         # Need to use a local variable instead of an instance variable for the context state,
@@ -90,6 +90,7 @@ module ElasticGraph
             datastore_backend: datastore_backend,
             schema_element_name_form: :camelCase,
             derived_type_name_formats: derived_type_name_formats,
+            type_name_overrides: {Cursor: "String"},
             enum_value_overrides_by_type: enum_value_overrides_by_type,
             schema_definition: ->(schema) do
               # standard:disable Security/Eval -- it's ok here in a test.
@@ -164,6 +165,12 @@ module ElasticGraph
       type_name
     end
 
+    # Returns the cursor type name used in this schema configuration.
+    # In snake_case schemas, we use the default Cursor scalar.
+    def cursor_type
+      "Cursor"
+    end
+
     # For parity with our `camelCase` context, also roundtrip factory-built records through JSON.
     # Otherwise we can have subtle, surprising differences between the two casing contexts. For
     # example, if the factory puts a `Date` object in a record, the JSON roundtripping will convert
@@ -182,6 +189,12 @@ module ElasticGraph
       else
         "#{value}2"
       end
+    end
+
+    # Returns the cursor type name used in this schema configuration.
+    # In camelCase schemas, we override Cursor to String for testing.
+    def cursor_type
+      "String"
     end
 
     def configure_for_camel_case(config)

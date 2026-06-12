@@ -173,6 +173,10 @@ module ElasticGraph
       end
 
       def paginated_search(first: nil, after: nil, last: nil, before: nil, document_pagination: nil, sort: sort_list, filter_to: nil)
+        # Encode cursors (all cursors in document pagination tests are DecodedCursor objects)
+        after = after&.encode
+        before = before&.encode
+
         document_pagination ||= {first: first, after: after, last: last, before: before}.compact
         query = nil
         response = search_datastore(

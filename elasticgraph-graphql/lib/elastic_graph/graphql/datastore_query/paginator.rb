@@ -8,6 +8,7 @@
 
 require "elastic_graph/errors"
 require "elastic_graph/support/memoizable_data"
+require "graphql"
 
 module ElasticGraph
   class GraphQL
@@ -65,6 +66,18 @@ module ElasticGraph
         # These methods are provided by `Data.define`:
         # @dynamic default_page_size, max_page_size, first, after, last, before, schema_element_names, initialize
 
+        # @return [DecodedCursor, nil] the decoded after cursor
+        def decoded_after
+          return @decoded_after if defined?(@decoded_after)
+          @decoded_after = decode_cursor(after)
+        end
+
+        # @return [DecodedCursor, nil] the decoded before cursor
+        def decoded_before
+          return @decoded_before if defined?(@decoded_before)
+          @decoded_before = decode_cursor(before)
+        end
+
         def requested_page_size
           # `+ 1` so we can tell if there are more docs for `has_next_page`/`has_previous_page`
           # ...but only if we need to get anything at all.
@@ -86,8 +99,9 @@ module ElasticGraph
         end
 
         # The cursor values to search after (if we need to search after one at all).
+        # Returns the decoded cursor when available, since callers need access to the decoded structure.
         def search_after
-          search_in_reverse? ? before : after
+          search_in_reverse? ? decoded_before : decoded_after
         end
 
         # In some cases, we're forced to search in reverse; in those caes, this is used to restore
@@ -109,13 +123,13 @@ module ElasticGraph
           # We can't always use `before` and `after` in the datastore query (such as when both are provided!),
           # so here we drop items from the start that come on or before `after`, and items from the
           # end that come on or after `before`.
-          if (after_cursor = after)
+          if (after_cursor = decoded_after)
             items = items.drop_while do |doc|
               item_sort_values_satisfy?(yield(doc, after_cursor), :<=)
             end
           end
 
-          if (before_cursor = before)
+          if (before_cursor = decoded_before)
             items = items.take_while do |doc|
               item_sort_values_satisfy?(yield(doc, before_cursor), :<)
             end
@@ -128,7 +142,7 @@ module ElasticGraph
         end
 
         def paginated_from_singleton_cursor?
-          before == DecodedCursor::SINGLETON || after == DecodedCursor::SINGLETON
+          decoded_before == DecodedCursor::SINGLETON || decoded_after == DecodedCursor::SINGLETON
         end
 
         def desired_page_size
@@ -138,6 +152,13 @@ module ElasticGraph
         end
 
         private
+
+        def decode_cursor(cursor)
+          return nil if cursor.nil?
+          DecodedCursor.decode!(cursor)
+        rescue Errors::InvalidCursorError => e
+          raise ::GraphQL::ExecutionError, e.message
+        end
 
         def first_n
           @first_n ||= size_arg_value(:first, first)

@@ -75,6 +75,82 @@ module ElasticGraph
           EOS
         end
 
+        %w[ID String].each do |cursor_override|
+          it "allows overriding `Cursor` to `#{cursor_override}` for federation compatibility" do
+            result = define_schema(type_name_overrides: {Cursor: cursor_override}) do |api|
+              api.object_type "Widget" do |t|
+                t.field "id", "ID!"
+                t.index "widgets"
+              end
+            end
+
+            # The Cursor scalar should not be registered when overridden to a built-in type
+            expect(type_def_from(result, "Cursor")).to be_nil
+
+            # PageInfo fields should use the override instead of Cursor
+            expect(type_def_from(result, "PageInfo")).to eq(<<~EOS.strip)
+              type PageInfo {
+                #{schema_elements.has_next_page}: Boolean!
+                #{schema_elements.has_previous_page}: Boolean!
+                #{schema_elements.start_cursor}: #{cursor_override}
+                #{schema_elements.end_cursor}: #{cursor_override}
+              }
+            EOS
+
+            # Edge.cursor field should use the override
+            expect(type_def_from(result, "WidgetEdge")).to include("#{schema_elements.cursor}: #{cursor_override}")
+
+            # Pagination arguments should use the override
+            query_type = type_def_from(result, "Query")
+            expect(query_type).to include("after: #{cursor_override}")
+            expect(query_type).to include("before: #{cursor_override}")
+          end
+        end
+
+        %w[Boolean Float Int].each do |invalid_cursor_override|
+          it "rejects overriding `Cursor` to a non-string-compatible type like #{invalid_cursor_override}" do
+            expect {
+              define_schema(type_name_overrides: {Cursor: invalid_cursor_override})
+            }.to raise_error(Errors::SchemaError, a_string_including("cursor types must be string-compatible"))
+          end
+        end
+
+        it "allows overriding `Cursor` to a custom scalar like `PaginationCursor`" do
+          result = define_schema(type_name_overrides: {Cursor: "PaginationCursor"}) do |api|
+            # Custom cursor scalars are automatically registered by built_in_types.rb
+            # when type_name_overrides is used, so no manual definition is needed.
+
+            api.object_type "Widget" do |t|
+              t.field "id", "ID!"
+              t.index "widgets"
+            end
+          end
+
+          # The standard Cursor scalar should not be registered when overridden
+          expect(type_def_from(result, "Cursor")).to be_nil
+
+          # PaginationCursor should be auto-registered
+          expect(type_def_from(result, "PaginationCursor")).to eq("scalar PaginationCursor")
+
+          # PageInfo fields should use the custom scalar
+          expect(type_def_from(result, "PageInfo")).to eq(<<~EOS.strip)
+            type PageInfo {
+              #{schema_elements.has_next_page}: Boolean!
+              #{schema_elements.has_previous_page}: Boolean!
+              #{schema_elements.start_cursor}: PaginationCursor
+              #{schema_elements.end_cursor}: PaginationCursor
+            }
+          EOS
+
+          # Edge.cursor field should use the custom scalar
+          expect(type_def_from(result, "WidgetEdge")).to include("#{schema_elements.cursor}: PaginationCursor")
+
+          # Pagination arguments should use the custom scalar
+          query_type = type_def_from(result, "Query")
+          expect(query_type).to include("after: PaginationCursor")
+          expect(query_type).to include("before: PaginationCursor")
+        end
+
         it "defines a `GeoLocation` object type and related filter types" do
           expect(type_named("GeoLocation", include_docs: true)).to eq(<<~EOS.strip)
             """

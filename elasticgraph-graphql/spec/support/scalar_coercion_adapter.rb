@@ -66,20 +66,18 @@ RSpec.shared_context "scalar coercion adapter support" do |scalar_type_name, sch
     @graphql.graphql_query_executor.execute(@query).to_h
   end
 
-  def expect_input_value_to_be_accepted(value, as: value, only_test_variable: false)
+  def expect_input_value_to_be_accepted(value, as: value)
     response = execute_query_with_variable_value(value)
 
     expect(response).not_to include("errors")
     expect(response).to eq({"data" => {"echo" => nil}})
     expect(@test_resolver.last_arg_value).to eq(as)
 
-    unless only_test_variable
-      response = execute_query_with_inline_query_value(value)
+    response = execute_query_with_inline_query_value(value)
 
-      expect(response).not_to include("errors")
-      expect(response).to eq({"data" => {"echo" => nil}})
-      expect(@test_resolver.last_arg_value).to eq(as)
-    end
+    expect(response).not_to include("errors")
+    expect(response).to eq({"data" => {"echo" => nil}})
+    expect(@test_resolver.last_arg_value).to eq(as)
   end
 
   # Use `define_method` instead of `def` to have access to `scalar_type_name`

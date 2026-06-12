@@ -6,28 +6,20 @@
 #
 # frozen_string_literal: true
 
-require "elastic_graph/graphql/decoded_cursor"
-
 module ElasticGraph
   class GraphQL
     module ScalarCoercionAdapters
+      # Coercion adapter for the Cursor scalar type.
+      # Validates that cursor values are strings. When given a non-string value, returns nil
+      # to trigger GraphQL-Ruby's validation error with full field context.
       class Cursor
         def self.coerce_input(value, ctx)
-          case value
-          when DecodedCursor
-            value
-          when ::String
-            DecodedCursor.try_decode(value)
-          end
+          return value if value.nil? || value.is_a?(::String)
+          nil # Returning nil causes GraphQL-Ruby to generate a validation error
         end
 
         def self.coerce_result(value, ctx)
-          case value
-          when DecodedCursor
-            value.encode
-          when ::String
-            value if DecodedCursor.try_decode(value)
-          end
+          value
         end
       end
     end

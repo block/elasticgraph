@@ -307,14 +307,19 @@ module ElasticGraph
           }.to log_warning a_string_including("`first` cannot be negative, but is -2.")
 
           # Demonstrate how broken cursors behave.
+          # Both contexts (Cursor scalar and String override) now produce consistent error messages
+          # because the coercion adapter returns nil for invalid values, causing GraphQL to generate
+          # validation errors with full field context.
+          array_error = "Argument 'after' on Field 'components' has an invalid value ([1, 2, 3]). Expected type '#{cursor_type}'."
+
           expect {
             response = query_widgets_and_components_including_page_info(
               widget_args: {first: 1, order_by: [:amount_cents_ASC]},
               component_args: {first: 1, after: [1, 2, 3], order_by: [:name_ASC]},
               expect_errors: true
             )
-            expect(response["errors"]).to contain_exactly(a_hash_including("message" => "Argument 'after' on Field 'components' has an invalid value ([1, 2, 3]). Expected type 'Cursor'."))
-          }.to log_warning a_string_including("Argument 'after' on Field 'components' has an invalid value", "[1, 2, 3]")
+            expect(response["errors"]).to contain_exactly(a_hash_including("message" => array_error))
+          }.to log_warning a_string_including(array_error)
 
           broken_cursor = results["edges"][0]["node"]["components"][case_correctly "page_info"][case_correctly "end_cursor"] + "-broken"
           expect {
@@ -323,8 +328,8 @@ module ElasticGraph
               component_args: {first: 1, after: broken_cursor, order_by: [:name_ASC]},
               expect_errors: true
             )
-            expect(response["errors"]).to contain_exactly(a_hash_including("message" => "Argument 'after' on Field 'components' has an invalid value (#{broken_cursor.inspect}). Expected type 'Cursor'."))
-          }.to log_warning a_string_including("Argument 'after' on Field 'components' has an invalid value", broken_cursor)
+            expect(response["errors"]).to contain_exactly(a_hash_including("message" => "`#{broken_cursor}` is an invalid cursor."))
+          }.to log_warning a_string_including("`#{broken_cursor}` is an invalid cursor.")
 
           # get next page of components (but still on the first page of widgets)
           results = query_widgets_and_components_including_page_info(

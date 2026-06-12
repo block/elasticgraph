@@ -161,6 +161,10 @@ module ElasticGraph
       # @!attribute [rw] names
       #   @private
       class BuiltInTypes
+        # Non-string standard GraphQL scalars that cannot be used for cursor overrides.
+        # String and ID are valid, as are any custom scalar names (e.g., PaginationCursor).
+        INVALID_CURSOR_TYPE_OVERRIDES = (STOCK_GRAPHQL_SCALARS - %w[ID String]).freeze
+
         attr_reader :schema_def_api, :schema_def_state, :names
 
         # @private
@@ -183,6 +187,18 @@ module ElasticGraph
         end
 
         private
+
+        def validate_cursor_type_override!
+          override_name = @schema_def_state.type_namer.cursor_type_name
+          return if override_name == "Cursor"
+
+          if INVALID_CURSOR_TYPE_OVERRIDES.include?(override_name)
+            raise Errors::SchemaError, <<~ERROR
+              Invalid cursor type override: `Cursor` was overridden to `#{override_name}`, but cursor types must be string-compatible.
+              Valid options include: String, ID, or any custom scalar name (e.g., PaginationCursor).
+            ERROR
+          end
+        end
 
         def register_directives
           # Note: The `eg` prefix is being used based on a GraphQL Spec recommendation:
@@ -753,21 +769,30 @@ module ElasticGraph
         end
 
         def register_custom_elastic_graph_scalars
-          schema_def_api.scalar_type "Cursor" do |t|
-            # Technically, we don't use the mapping or json_schema on this type since it's a return-only
-            # type and isn't indexed. However, `scalar_type` requires them to be set (since custom scalars
-            # defined by users will need those set) so we set them here to what they would be if we actually
-            # used them.
-            t.mapping type: "keyword"
-            t.json_schema type: "string"
-            t.coerce_with "ElasticGraph::GraphQL::ScalarCoercionAdapters::Cursor",
-              defined_at: "elastic_graph/graphql/scalar_coercion_adapters/cursor"
+          # Validate that Cursor type override is compatible (must be string-like)
+          validate_cursor_type_override!
 
-            t.documentation <<~EOS
-              An opaque string value representing a specific location in a paginated connection type.
-              Returned cursors can be passed back in the next query via the `before` or `after`
-              arguments to continue paginating from that point.
-            EOS
+          # Register the cursor scalar unless it's overridden to a built-in type.
+          # When overridden to a built-in type like String or ID, we use that type directly.
+          # When overridden to a custom scalar (e.g., PaginationCursor), we register it automatically.
+          cursor_type_name = @schema_def_state.type_namer.cursor_type_name
+          unless STOCK_GRAPHQL_SCALARS.include?(cursor_type_name)
+            schema_def_api.scalar_type "Cursor" do |t|
+              # Technically, we don't use the mapping or json_schema on this type since it's a return-only
+              # type and isn't indexed. However, `scalar_type` requires them to be set (since custom scalars
+              # defined by users will need those set) so we set them here to what they would be if we actually
+              # used them.
+              t.mapping type: "keyword"
+              t.json_schema type: "string"
+              t.coerce_with "ElasticGraph::GraphQL::ScalarCoercionAdapters::Cursor",
+                defined_at: "elastic_graph/graphql/scalar_coercion_adapters/cursor"
+
+              t.documentation <<~EOS
+                An opaque string value representing a specific location in a paginated connection type.
+                Returned cursors can be passed back in the next query via the `before` or `after`
+                arguments to continue paginating from that point.
+              EOS
+            end
           end
 
           schema_def_api.scalar_type "Date" do |t|

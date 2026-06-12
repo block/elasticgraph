@@ -60,7 +60,7 @@ module ElasticGraph
           api.on_built_in_types do |type|
             case type
             when ScalarTypeExtension
-              type.warehouse_column type: COLUMN_TYPES_BY_BUILT_IN_SCALAR_TYPE.fetch(type.name)
+              type.warehouse_column type: COLUMN_TYPES_BY_BUILT_IN_SCALAR_TYPE.fetch(type.type_ref.with_reverted_override.name)
             end
           end
         end
