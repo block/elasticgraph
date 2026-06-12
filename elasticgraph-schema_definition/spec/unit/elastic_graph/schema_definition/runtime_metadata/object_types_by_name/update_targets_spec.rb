@@ -1493,9 +1493,9 @@ module ElasticGraph
         end
 
         describe "`parent_relationship` validations" do
-          it "accepts an explicit `parent_field_name:` to identify the embedding field" do
+          it "accepts an explicit `embedded_at:` to identify the embedding field" do
             metadata = nested_sourced_from_schema(
-              on_player_relationship: ->(r) { r.parent_relationship "Team", "statLines", parent_field_name: "players" }
+              on_player_relationship: ->(r) { r.parent_relationship "Team", "statLines", embedded_at: "players" }
             )
 
             expect_statline_update_target_with(metadata)
@@ -1513,7 +1513,7 @@ module ElasticGraph
             expect_statline_update_target_with(metadata)
           end
 
-          it "resolves a `parent_field_name` by public field name even when the embedding field has a distinct `name_in_index`" do
+          it "resolves an `embedded_at` by public field name even when the embedding field has a distinct `name_in_index`" do
             metadata = nested_sourced_from_schema(
               on_team: ->(t) {
                 t.field "players", "[Player!]!", name_in_index: "the_players" do |f|
@@ -1521,17 +1521,17 @@ module ElasticGraph
                 end
               },
               players_field: nil,
-              on_player_relationship: ->(r) { r.parent_relationship "Team", "statLines", parent_field_name: "players" }
+              on_player_relationship: ->(r) { r.parent_relationship "Team", "statLines", embedded_at: "players" }
             )
 
             expect_statline_update_target_with(metadata, relationship: "the_players.statLine")
           end
 
-          context "when the embedding field is reached via a dotted `parent_field_name` path" do
+          context "when the embedding field is reached via a dotted `embedded_at` path" do
             it "descends an object segment to a leaf list segment, keying the target by the full qualified relationship" do
               metadata = nested_sourced_from_schema(
                 embed_players_under: "TeamNestedFields",
-                on_player_relationship: ->(r) { r.parent_relationship "Team", "statLines", parent_field_name: "nested.players" }
+                on_player_relationship: ->(r) { r.parent_relationship "Team", "statLines", embedded_at: "nested.players" }
               )
 
               expect_statline_update_target_with(metadata, relationship: "nested.players.statLine")
@@ -1541,7 +1541,7 @@ module ElasticGraph
               metadata = nested_sourced_from_schema(
                 embed_players_under: "TeamNestedFields",
                 players_field: "Player!",
-                on_player_relationship: ->(r) { r.parent_relationship "Team", "statLines", parent_field_name: "nested.players" }
+                on_player_relationship: ->(r) { r.parent_relationship "Team", "statLines", embedded_at: "nested.players" }
               )
 
               expect_statline_update_target_with(metadata, relationship: "nested.players.statLine", path_identifier_params: {})
@@ -1551,7 +1551,7 @@ module ElasticGraph
               expect {
                 nested_sourced_from_schema(
                   embed_players_under: "[TeamNestedFields!]!",
-                  on_player_relationship: ->(r) { r.parent_relationship "Team", "statLines", parent_field_name: "nested.players" }
+                  on_player_relationship: ->(r) { r.parent_relationship "Team", "statLines", embedded_at: "nested.players" }
                 )
               }.to raise_error Errors::SchemaError, a_string_including(
                 "`Player.statLine` embeds through list field `Team.nested` via `parent_relationship`, but only the final embedding field may be a list.",
@@ -1563,7 +1563,7 @@ module ElasticGraph
               expect {
                 nested_sourced_from_schema(
                   embed_players_under: "TeamNestedFields",
-                  on_player_relationship: ->(r) { r.parent_relationship "Team", "statLines", parent_field_name: "nested.nonexistent" }
+                  on_player_relationship: ->(r) { r.parent_relationship "Team", "statLines", embedded_at: "nested.nonexistent" }
                 )
               }.to raise_error Errors::SchemaError, a_string_including(
                 "`Player.statLine` references field `Team.nested.nonexistent` via `parent_relationship`, but that field does not exist."
@@ -1695,7 +1695,7 @@ module ElasticGraph
 
           it "resolves a deeply nested chain mixing object dotted-path hops, multiple list links, and `name_in_index` renames" do
             # Embedding path (root -> leaf), * = list level. Each list level is its own `parent_relationship` link;
-            # the object hops are folded into the links' dotted `parent_field_name`s:
+            # the object hops are folded into the links' dotted `embedded_at`s:
             #   Team .roster(the_roster) .squads* .lineup .players(the_players)* -> Player.goals (sourced)
             metadata =
               object_type_metadata_for "StatLine" do |s|
@@ -1716,7 +1716,7 @@ module ElasticGraph
                   t.field "id", "ID!"
                   t.field "lineup", "Lineup"
                   t.relates_to_many "statLines", "StatLine", via: "squadId", dir: :in, indexing_only: true do |r|
-                    r.parent_relationship "Team", "statLines", parent_field_name: "roster.squads"
+                    r.parent_relationship "Team", "statLines", embedded_at: "roster.squads"
                   end
                 end
 
@@ -1732,7 +1732,7 @@ module ElasticGraph
                     f.sourced_from "statLine", "stats.goals"
                   end
                   t.relates_to_one "statLine", "StatLine", via: "playerId", dir: :in, indexing_only: true do |r|
-                    r.parent_relationship "Squad", "statLines", parent_field_name: "lineup.players"
+                    r.parent_relationship "Squad", "statLines", embedded_at: "lineup.players"
                   end
                 end
 
@@ -1873,18 +1873,18 @@ module ElasticGraph
             }.to raise_error Errors::SchemaError, a_string_including(
               "`Team` has multiple fields of type `Player`",
               "has an ambiguous `parent_relationship`",
-              "parent_field_name:"
+              "embedded_at:"
             )
           end
 
-          it "uses `parent_field_name:` to disambiguate when multiple embedding fields exist" do
+          it "uses `embedded_at:` to disambiguate when multiple embedding fields exist" do
             metadata = nested_sourced_from_schema(
               on_team: ->(t) {
                 t.field "bench_players", "[Player!]!" do |f|
                   f.mapping type: "object"
                 end
               },
-              on_player_relationship: ->(r) { r.parent_relationship "Team", "statLines", parent_field_name: "bench_players" }
+              on_player_relationship: ->(r) { r.parent_relationship "Team", "statLines", embedded_at: "bench_players" }
             )
 
             # The qualified relationship reflects `bench_players`, confirming disambiguation chose that field
@@ -1892,10 +1892,10 @@ module ElasticGraph
             expect_statline_update_target_with(metadata, relationship: "bench_players.statLine")
           end
 
-          it "raises an error when an explicit `parent_field_name:` references a non-existent field" do
+          it "raises an error when an explicit `embedded_at:` references a non-existent field" do
             expect {
               nested_sourced_from_schema(
-                on_player_relationship: ->(r) { r.parent_relationship "Team", "statLines", parent_field_name: "nonExistentField" }
+                on_player_relationship: ->(r) { r.parent_relationship "Team", "statLines", embedded_at: "nonExistentField" }
               )
             }.to raise_error Errors::SchemaError, a_string_including(
               "`Player.statLine` references field `Team.nonExistentField` via `parent_relationship`, but that field does not exist."

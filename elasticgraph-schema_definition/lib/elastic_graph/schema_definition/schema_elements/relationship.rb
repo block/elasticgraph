@@ -160,7 +160,7 @@ module ElasticGraph
         #
         # @param parent_type_name [String] name of the parent type in the nesting hierarchy
         # @param parent_relationship_name [String] name of the relationship on the parent type
-        # @param parent_field_name [String, nil] name of the field on the parent type that embeds this type.
+        # @param embedded_at [String, nil] name of the field on the parent type that embeds this type.
         #   When omitted, auto-discovered by finding the field on the parent type whose type matches this type.
         #   Required when the parent type has multiple fields of this type.
         # @return [void]
@@ -198,7 +198,7 @@ module ElasticGraph
         #       t.index "stat_lines"
         #     end
         #   end
-        def parent_relationship(parent_type_name, parent_relationship_name, parent_field_name: nil)
+        def parent_relationship(parent_type_name, parent_relationship_name, embedded_at: nil)
           if @parent_ref
             raise Errors::SchemaError, "`parent_relationship` has been called multiple times on `#{parent_type.name}.#{name}`, " \
               "but each relationship can have only one `parent_relationship`."
@@ -207,7 +207,7 @@ module ElasticGraph
           @parent_ref = ParentRef.new(
             type_ref: schema_def_state.type_ref(parent_type_name),
             relationship_name: parent_relationship_name,
-            field_name: parent_field_name
+            field_name: embedded_at
           )
         end
 
