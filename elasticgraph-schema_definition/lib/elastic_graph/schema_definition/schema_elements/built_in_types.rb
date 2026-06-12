@@ -161,7 +161,6 @@ module ElasticGraph
       # @!attribute [rw] names
       #   @private
       class BuiltInTypes
-        # Built-in GraphQL scalar types that are part of the GraphQL specification.
         # Non-string standard GraphQL scalars that cannot be used for cursor overrides.
         # String and ID are valid, as are any custom scalar names (e.g., PaginationCursor).
         INVALID_CURSOR_TYPE_OVERRIDES = (STOCK_GRAPHQL_SCALARS - %w[ID String]).freeze
