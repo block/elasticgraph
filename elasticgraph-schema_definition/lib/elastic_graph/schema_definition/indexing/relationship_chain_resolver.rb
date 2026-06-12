@@ -153,7 +153,7 @@ module ElasticGraph
         end
 
         # Resolves this link's embedding field(s) on `parent_type`, one per dotted-path component. An explicit
-        # `parent_field_name` is resolved by public name (consistent with `sourced_from` and `equivalent_field`);
+        # `embedded_at` is resolved by public name (consistent with `sourced_from` and `equivalent_field`);
         # the resolved `name_in_index` is what flows into the qualified relationship and the painless script.
         #
         # Only the final path component may be a list: it carries the relationship's foreign key, matched against
@@ -195,8 +195,8 @@ module ElasticGraph
             parent_ref = current_rel.parent_ref # : SchemaElements::Relationship::ParentRef
             errors << "#{rel_description(current_rel)} has an ambiguous `parent_relationship` — " \
               "`#{parent_type.name}` has multiple fields of type `#{child_type.name}` (#{field_names}). " \
-              "Specify which field using the `parent_field_name:` option: " \
-              "`r.parent_relationship \"#{parent_type.name}\", \"#{parent_ref.relationship_name}\", parent_field_name: \"<field_name>\"`"
+              "Specify which field using the `embedded_at:` option: " \
+              "`r.parent_relationship \"#{parent_type.name}\", \"#{parent_ref.relationship_name}\", embedded_at: \"<field_name>\"`"
             nil
           elsif matches.empty?
             errors << "#{rel_description(current_rel)} declares `#{parent_type.name}` as its parent type " \
