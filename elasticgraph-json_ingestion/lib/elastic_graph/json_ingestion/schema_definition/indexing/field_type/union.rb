@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "delegate"
+require "elastic_graph/json_ingestion/schema_definition/indexing/field_type/value_semantics"
 require "elastic_graph/schema_definition/indexing/field_type/union"
 
 module ElasticGraph
@@ -18,6 +19,10 @@ module ElasticGraph
           #
           # @private
           class Union < DelegateClass(ElasticGraph::SchemaDefinition::Indexing::FieldType::Union)
+            prepend ValueSemantics
+
+            # @dynamic __getobj__
+
             # @return [Hash] empty hash, as union types have no subfields
             def json_schema_field_metadata_by_field_name
               {}

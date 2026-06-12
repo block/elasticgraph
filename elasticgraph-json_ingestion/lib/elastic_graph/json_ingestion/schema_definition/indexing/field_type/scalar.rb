@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "delegate"
+require "elastic_graph/json_ingestion/schema_definition/indexing/field_type/value_semantics"
 require "elastic_graph/schema_definition/indexing/field_type/scalar"
 require "elastic_graph/support/hash_util"
 
@@ -19,6 +20,10 @@ module ElasticGraph
           #
           # @private
           class Scalar < DelegateClass(ElasticGraph::SchemaDefinition::Indexing::FieldType::Scalar)
+            prepend ValueSemantics
+
+            # @dynamic __getobj__
+
             # @return [Hash] empty hash, as scalar types have no subfields
             def json_schema_field_metadata_by_field_name
               {}

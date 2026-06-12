@@ -112,7 +112,7 @@ module ElasticGraph
         ::String,
         wrapping_type: SchemaElements::anyObjectType,
         field_factory: ::Method
-      ) ?{ (SchemaElements::TypeWithSubfields) -> void } -> SchemaElements::TypeWithSubfields
+      ) { (SchemaElements::TypeWithSubfields) -> void } -> SchemaElements::TypeWithSubfields
       @@type_with_subfields_new: ::Method
 
       def new_union_type: (::String) { (SchemaElements::UnionType) -> void } -> SchemaElements::UnionType

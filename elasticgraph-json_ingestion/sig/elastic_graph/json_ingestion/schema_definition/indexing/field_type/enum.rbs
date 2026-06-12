@@ -8,9 +8,12 @@ module ElasticGraph
           end
 
           class Enum < EnumSupertype
+            include ValueSemantics
+
             def json_schema_field_metadata_by_field_name: () -> ::Hash[::String, JSONSchemaFieldMetadata]
             def format_field_json_schema_customizations: (::Hash[::String, untyped]) -> ::Hash[::String, untyped]
             def to_json_schema: () -> ::Hash[::String, untyped]
+            def __getobj__: () -> ::ElasticGraph::SchemaDefinition::Indexing::FieldType::Enum
           end
         end
       end

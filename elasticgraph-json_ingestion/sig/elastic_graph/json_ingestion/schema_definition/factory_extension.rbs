@@ -13,14 +13,14 @@ module ElasticGraph
           subfields: ::Array[Indexing::Field],
           mapping_options: ::ElasticGraph::SchemaDefinition::Mixins::HasTypeInfo::optionsHash
         ) -> Indexing::FieldType::Object
-        def new_scalar_type: (::String) ?{ (::ElasticGraph::SchemaDefinition::SchemaElements::ScalarType & SchemaElements::ScalarTypeExtension) -> void } -> (::ElasticGraph::SchemaDefinition::SchemaElements::ScalarType & SchemaElements::ScalarTypeExtension)
+        def new_scalar_type: (::String) { (::ElasticGraph::SchemaDefinition::SchemaElements::ScalarType & SchemaElements::ScalarTypeExtension) -> void } -> (::ElasticGraph::SchemaDefinition::SchemaElements::ScalarType & SchemaElements::ScalarTypeExtension)
         def new_scalar_indexing_field_type: (scalar_type: ::ElasticGraph::SchemaDefinition::SchemaElements::ScalarType) -> Indexing::FieldType::Scalar
         def new_type_with_subfields: (
           ::ElasticGraph::SchemaDefinition::SchemaElements::schemaKind,
           ::String,
           wrapping_type: ::ElasticGraph::SchemaDefinition::SchemaElements::anyObjectType,
           field_factory: ::Method
-        ) ?{ (::ElasticGraph::SchemaDefinition::SchemaElements::TypeWithSubfields & SchemaElements::TypeWithSubfieldsExtension) -> void } -> (::ElasticGraph::SchemaDefinition::SchemaElements::TypeWithSubfields & SchemaElements::TypeWithSubfieldsExtension)
+        ) { (::ElasticGraph::SchemaDefinition::SchemaElements::TypeWithSubfields & SchemaElements::TypeWithSubfieldsExtension) -> void } -> (::ElasticGraph::SchemaDefinition::SchemaElements::TypeWithSubfields & SchemaElements::TypeWithSubfieldsExtension)
         def new_union_indexing_field_type: (::Hash[::String, Indexing::FieldType::Object]) -> Indexing::FieldType::Union
         def new_results: () -> ::ElasticGraph::SchemaDefinition::Results
         def new_schema_artifact_manager: (**untyped) -> ::ElasticGraph::SchemaDefinition::SchemaArtifactManager
