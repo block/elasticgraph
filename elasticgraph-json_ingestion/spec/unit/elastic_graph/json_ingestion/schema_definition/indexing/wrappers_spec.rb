@@ -6,153 +6,219 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/constants"
+require "elastic_graph/errors"
 require "elastic_graph/json_ingestion/schema_definition/indexing/field"
 require "elastic_graph/json_ingestion/schema_definition/indexing/field_reference"
 require "elastic_graph/json_ingestion/schema_definition/indexing/field_type/object"
 require "elastic_graph/spec_support/schema_definition_helpers"
+require "support/json_schema_matcher"
 
 module ElasticGraph
-  module JSONIngestion
-    module SchemaDefinition
-      module Indexing
-        RSpec.describe "JSON schema indexing wrappers" do
-          include_context "SchemaDefinitionHelpers"
+  module JSONIngestion::SchemaDefinition
+    ::RSpec.describe "JSON schema indexing wrappers" do
+      include_context "SchemaDefinitionHelpers"
 
-          it "compares field references using both the wrapped reference and JSON schema options" do
-            reference = widget_schema_field("name").to_indexing_field_reference
-            matching_reference = FieldReference.new(
-              reference.__getobj__,
-              json_schema_layers: reference.json_schema_layers,
-              json_schema_customizations: reference.json_schema_customizations,
-              doc_comment: reference.doc_comment
-            )
-            different_reference = FieldReference.new(
-              reference.__getobj__,
-              json_schema_layers: reference.json_schema_layers,
-              json_schema_customizations: {maxLength: 10},
-              doc_comment: reference.doc_comment
-            )
-            different_doc_reference = FieldReference.new(
-              reference.__getobj__,
-              json_schema_layers: reference.json_schema_layers,
-              json_schema_customizations: reference.json_schema_customizations,
-              doc_comment: "alternate docs"
-            )
-
-            expect(reference).to eq(matching_reference)
-            expect(reference.eql?(matching_reference)).to eq(true)
-            expect(reference.hash).to eq(matching_reference.hash)
-            expect(reference).not_to eq(different_reference)
-            expect(reference).not_to eq(different_doc_reference)
-            expect(reference == reference.__getobj__).to eq(true)
-          end
-
-          it "returns nil when resolving a field reference whose type is unresolved" do
-            reference = FieldReference.new(
-              ::ElasticGraph::SchemaDefinition::Indexing::FieldReference.new(
-                name: "missing_type",
-                name_in_index: "missing_type",
-                type: unresolved_type_ref,
-                mapping_options: {},
-                accuracy_confidence: nil,
-                source: nil,
-                runtime_field_script: nil
-              ),
-              json_schema_layers: [],
-              json_schema_customizations: {},
-              doc_comment: nil
-            )
-
-            expect(reference.resolve).to eq(nil)
-          end
-
-          it "compares fields using both the wrapped field and JSON schema options" do
-            field = widget_indexing_field("name")
-            matching_field = Field.new(
-              field.__getobj__,
-              json_schema_layers: field.json_schema_layers,
-              json_schema_customizations: field.json_schema_customizations,
-              doc_comment: field.doc_comment
-            )
-            different_field = Field.new(
-              field.__getobj__,
-              json_schema_layers: field.json_schema_layers,
-              json_schema_customizations: {maxLength: 10},
-              doc_comment: field.doc_comment
-            )
-            different_doc_field = Field.new(
-              field.__getobj__,
-              json_schema_layers: field.json_schema_layers,
-              json_schema_customizations: field.json_schema_customizations,
-              doc_comment: "alternate docs"
-            )
-
-            expect(field).to eq(matching_field)
-            expect(field.eql?(matching_field)).to eq(true)
-            expect(field.hash).to eq(matching_field.hash)
-            expect(field).not_to eq(different_field)
-            expect(field).not_to eq(different_doc_field)
-            expect(field == field.__getobj__).to eq(true)
-          end
-
-          it "compares object field types using both the wrapped field type and JSON schema options" do
-            object_field_type = widget_field_type
-            matching_object_field_type = FieldType::Object.new(object_field_type.__getobj__).tap do |field_type|
-              field_type.json_schema_options = object_field_type.json_schema_options
-            end
-            different_object_field_type = FieldType::Object.new(object_field_type.__getobj__).tap do |field_type|
-              field_type.json_schema_options = {type: "object"}
-            end
-            different_doc_object_field_type = FieldType::Object.new(object_field_type.__getobj__).tap do |field_type|
-              field_type.json_schema_options = object_field_type.json_schema_options
-              field_type.doc_comment = "alternate docs"
+      # `FieldReference#resolve` is a lazy reference: the referenced type need not exist when a field is
+      # defined, only when artifacts are dumped. These two specs drive both outcomes (resolves / never
+      # resolves) through the public schema-definition API.
+      describe "lazy field resolution" do
+        it "resolves a field whose type is defined after the referencing type" do
+          json_schema = dump_schema do |s|
+            s.object_type "MyType" do |t|
+              t.field "id", "ID!"
+              t.field "other", "OtherType"
             end
 
-            expect(object_field_type).to eq(matching_object_field_type)
-            expect(object_field_type.eql?(matching_object_field_type)).to eq(true)
-            expect(object_field_type.hash).to eq(matching_object_field_type.hash)
-            expect(object_field_type).not_to eq(different_object_field_type)
-            expect(object_field_type).not_to eq(different_doc_object_field_type)
-            expect(object_field_type == object_field_type.__getobj__).to eq(true)
+            s.object_type "OtherType" do |t|
+              t.field "name", "String"
+            end
           end
 
-          def widget_schema_field(name)
-            widget_type.indexing_fields_by_name_in_index.fetch(name)
-          end
+          expect(json_schema).to have_json_schema_like("MyType", {
+            "type" => "object",
+            "properties" => {
+              "id" => json_schema_ref("ID!"),
+              "other" => json_schema_ref("OtherType")
+            },
+            "required" => %w[id other]
+          })
+        end
 
-          def widget_indexing_field(name)
-            widget_field_type.subfields.find { |field| field.name == name }
-          end
-
-          def widget_field_type
-            widget_type.to_indexing_field_type
-          end
-
-          def widget_type
-            define_schema(schema_element_name_form: "snake_case") do |schema|
-              schema.object_type "Widget" do |type|
-                type.field "id", "ID!"
-                type.field "name", "String" do |field|
-                  field.json_schema minLength: 1
-                end
+        it "raises a clear error (rather than blowing up internally) for a field whose type never resolves" do
+          # When a field references a type that is never defined, the wrapped `FieldReference#resolve`
+          # returns `nil`. The schema definition machinery relies on that `nil` to detect the unresolvable
+          # type and surface a helpful error instead of crashing.
+          expect {
+            dump_schema do |s|
+              s.object_type "MyType" do |t|
+                t.field "id", "ID!"
+                t.field "mystery", "DoesNotExist"
               end
-            end.state.object_types_by_name.fetch("Widget")
-          end
+            end
+          }.to raise_error(Errors::SchemaError, a_string_including("Type `DoesNotExist` cannot be resolved", "misspelled"))
+        end
+      end
 
-          # A minimal stand-in for a `SchemaElements::TypeReference` that never resolves. References to
-          # not-yet-defined types resolve to `nil` mid-definition; a stand-in lets us exercise that path
-          # directly instead of relying on the timing of a partially-defined schema.
-          def unresolved_type_ref
-            Class.new do
-              def fully_unwrapped
-                self
-              end
+      # Each wrapper is a value object that augments a wrapped schema-definition object with JSON schema
+      # state. Their `==`/`eql?`/`hash` implementations exist so the schema-definition machinery can treat
+      # two wrappers of equal state as interchangeable (e.g. for `Set`/`Hash`/`uniq` de-duplication) and
+      # treat a wrapper as equal to the object it wraps. No public-API path depends on the *outcome* of
+      # these comparisons today, so we exercise them directly — but on wrappers obtained from a schema
+      # defined via the public API (converting the same schema element twice to obtain equal-but-distinct
+      # wrappers), so they're used in context rather than fabricated with internal collaborators.
+      describe "value semantics" do
+        it "treats `FieldReference`s derived from the same field as interchangeable, and distinguishes other fields" do
+          schema_field = widget_indexing_field("name")
+          reference = schema_field.to_indexing_field_reference
+          equivalent_reference = schema_field.to_indexing_field_reference
+          other_reference = widget_indexing_field("id").to_indexing_field_reference
 
-              def resolved
-                nil
-              end
-            end.new
+          expect_equivalent(reference, equivalent_reference)
+          expect_distinct(reference, other_reference)
+          expect_equal_to_wrapped(reference)
+        end
+
+        it "treats `Field`s derived from the same field as interchangeable, and distinguishes other fields" do
+          field = widget_indexing_object_field_type.subfields.fetch(0)
+          equivalent_field = widget_indexing_object_field_type.subfields.fetch(0)
+          other_field = widget_indexing_object_field_type.subfields.fetch(1)
+
+          expect_equivalent(field, equivalent_field)
+          expect_distinct(field, other_field)
+          expect_equal_to_wrapped(field)
+        end
+
+        it "treats `FieldType::Object`s derived from the same type as interchangeable, and distinguishes other types" do
+          object_field_type = indexing_object_field_type_for("Widget")
+          equivalent_object_field_type = indexing_object_field_type_for("Widget")
+          other_object_field_type = indexing_object_field_type_for("Gadget")
+
+          expect_equivalent(object_field_type, equivalent_object_field_type)
+          expect_distinct(object_field_type, other_object_field_type)
+          expect_equal_to_wrapped(object_field_type)
+        end
+
+        # The stateless leaf field-type wrappers (`Scalar`, `Enum`, `Union`) share their value semantics
+        # via `FieldType::ValueSemantics`. They carry no JSON schema state of their own, so equality is
+        # purely a function of the wrapped field type: two wrappers around equal field types are equal and
+        # a wrapper equals the field type it wraps. We cover all three kinds since each must `prepend`
+        # the shared module and nothing else (compiler or type checker) catches an omission.
+        {"scalar" => "enum", "enum" => "union", "union" => "scalar"}.each do |leaf_kind, other_leaf_kind|
+          it "treats `#{leaf_kind}` field-type wrappers as interchangeable when they wrap equal field types" do
+            field_type = indexing_leaf_field_type(leaf_kind)
+            equivalent_field_type = indexing_leaf_field_type(leaf_kind)
+            other_field_type = indexing_leaf_field_type(other_leaf_kind)
+
+            expect_equivalent(field_type, equivalent_field_type)
+            expect_distinct(field_type, other_field_type)
+            expect_equal_to_wrapped(field_type)
           end
+        end
+
+        # The assertions below compare the boolean result of `==`/`eql?` rather than passing the wrappers
+        # to the `eq`/`eql` matchers directly. These wrappers delegate to the deep, cross-referential
+        # schema-definition object graph, and on failure RSpec's differ would `pretty_print` both sides --
+        # which balloons to tens of megabytes and takes seconds. Asserting on booleans keeps a failure
+        # cheap to render (`expected true, got false`) regardless of how the comparison turns out.
+
+        # Asserts the full value-object contract: equal-by-`==`, equal-by-`eql?`, equal `hash`, and -- the
+        # behavior the contract exists for -- interchangeable as `Set`/`Hash` members.
+        def expect_equivalent(wrapper, equivalent_wrapper)
+          expect(wrapper == equivalent_wrapper).to be(true)
+          expect(wrapper.eql?(equivalent_wrapper)).to be(true)
+          expect(wrapper.hash).to eq(equivalent_wrapper.hash)
+          expect(::Set.new([wrapper, equivalent_wrapper]).size).to eq(1)
+        end
+
+        def expect_distinct(wrapper, other_wrapper)
+          expect(wrapper == other_wrapper).to be(false)
+        end
+
+        def expect_equal_to_wrapped(wrapper)
+          expect(wrapper == wrapper.__getobj__).to be(true)
+        end
+
+        def widget_indexing_field(name)
+          object_types_by_name.fetch("Widget").indexing_fields_by_name_in_index.fetch(name)
+        end
+
+        def widget_indexing_object_field_type
+          indexing_object_field_type_for("Widget")
+        end
+
+        def indexing_object_field_type_for(type_name)
+          object_types_by_name.fetch(type_name).to_indexing_field_type
+        end
+
+        # The `Widget` field whose indexing field type is the requested leaf kind. A different kind's field
+        # gives an "other" leaf wrapper for inequality assertions.
+        def indexing_leaf_field_type(leaf_kind)
+          field_name = {"scalar" => "name", "enum" => "color", "union" => "thing"}.fetch(leaf_kind)
+          subfield = widget_indexing_object_field_type.subfields.find { |f| f.name == field_name }
+          subfield.indexing_field_type
+        end
+
+        def object_types_by_name
+          @object_types_by_name ||= define_schema(schema_element_name_form: "snake_case") do |s|
+            s.enum_type "Color" do |t|
+              t.values "RED", "BLUE"
+            end
+
+            s.object_type "Square" do |t|
+              t.field "side", "Int!"
+            end
+
+            s.object_type "Circle" do |t|
+              t.field "radius", "Int!"
+            end
+
+            s.union_type "Shape" do |t|
+              t.subtypes "Square", "Circle"
+            end
+
+            s.object_type "Widget" do |t|
+              t.field "id", "ID!"
+              t.field "name", "String" do |f|
+                f.json_schema minLength: 1
+              end
+              t.field "color", "Color"
+              t.field "thing", "Shape"
+            end
+
+            s.object_type "Gadget" do |t|
+              t.field "id", "ID!"
+              t.field "size", "Int"
+            end
+          end.state.object_types_by_name
+        end
+      end
+
+      def dump_schema(&schema_definition)
+        define_schema(schema_element_name_form: "snake_case", &schema_definition).current_public_json_schema
+      end
+
+      def json_schema_ref(type, is_keyword_type: %w[ID! ID String! String].include?(type))
+        if type.end_with?("!")
+          basic_json_schema_ref = {"$ref" => "#/$defs/#{type.delete_suffix("!")}"}
+
+          if is_keyword_type
+            {
+              "allOf" => [
+                basic_json_schema_ref,
+                {"maxLength" => DEFAULT_MAX_KEYWORD_LENGTH}
+              ]
+            }
+          else
+            basic_json_schema_ref
+          end
+        else
+          {
+            "anyOf" => [
+              json_schema_ref("#{type}!", is_keyword_type: is_keyword_type),
+              {"type" => "null"}
+            ]
+          }
         end
       end
     end
