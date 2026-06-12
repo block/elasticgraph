@@ -508,6 +508,45 @@ properties:
         - {}
         - WidgetWorkspace:
           - ABC12345678
+      indexing_event_decoder:
+        description: Extension object used to decode raw indexing payloads into ElasticGraph
+          indexing event hashes. The default decoder expects JSON Lines.
+        type: object
+        properties:
+          name:
+            description: The name of the indexing event decoder extension class.
+            type: string
+            pattern: "^[A-Z]\\w+(::[A-Z]\\w+)*$"
+            examples:
+            - MyCompany::ElasticGraph::CSVIndexingEventDecoder
+          require_path:
+            description: The path to require to load the indexing event decoder extension.
+            type: string
+            minLength: 1
+            examples:
+            - "./lib/my_company/elastic_graph/csv_indexing_event_decoder"
+          config:
+            description: Configuration for the indexing event decoder. Will be passed
+              into the decoder's `#initialize` method.
+            type: object
+            default: {}
+            examples:
+            - {}
+            - delimiter: ","
+        required:
+        - name
+        - require_path
+        default:
+          name: ElasticGraph::Indexer::IndexingEventDecoder::JSONLines
+          require_path: elastic_graph/indexer/indexing_event_decoder
+        examples:
+        - name: ElasticGraph::Indexer::IndexingEventDecoder::JSONLines
+          require_path: elastic_graph/indexer/indexing_event_decoder
+        - name: MyCompany::ElasticGraph::CSVIndexingEventDecoder
+          require_path: "./lib/my_company/elastic_graph/csv_indexing_event_decoder"
+          config:
+            delimiter: ","
+        additionalProperties: false
     additionalProperties: false
   logger:
     description: Configuration for logging used by all parts of ElasticGraph.
