@@ -29,6 +29,7 @@ module ElasticGraph
     class DatastoreQuery < Support::MemoizableData.define(
       :total_document_count_needed, :aggregations, :logger, :filter_interpreter, :routing_picker,
       :index_expression_builder, :default_page_size, :initial_search_index_definitions, :max_page_size,
+      :typename_filter, :index_definitions_by_type_name,
       :client_filters, :internal_filters, :sort, :document_pagination,
       :requested_fields, :request_all_fields, :requested_highlights, :request_all_highlights,
       :individual_docs_needed, :size_multiplier, :monotonic_clock_deadline, :schema_element_names
@@ -39,6 +40,7 @@ module ElasticGraph
       require "elastic_graph/graphql/datastore_query/index_expression_builder"
       require "elastic_graph/graphql/datastore_query/paginator"
       require "elastic_graph/graphql/datastore_query/routing_picker"
+      require "elastic_graph/graphql/filtering/typename_filter"
 
       # Performs a list of queries by building a hash of datastore msearch header/body tuples (keyed
       # by query), yielding them to the caller, and then post-processing the results. The caller is
@@ -141,13 +143,29 @@ module ElasticGraph
       # @!attribute [r] initial_search_index_definitions
       #   The index definitions as provided at construction, before any subsequent adjustments.
 
+      # Returns the narrowed set of index definitions to search, based on any `__typename` filter
+      # in the client filters. Falls back to `initial_search_index_definitions` when there is no
+      # `__typename` filter or no type name mapping is available.
+      def narrowed_search_index_definitions
+        @narrowed_search_index_definitions ||= begin
+          filtered_type_names = typename_filter.filtered_type_names(client_filters.to_a)
+
+          if filtered_type_names
+            possible_index_defs = index_definitions_by_type_name.slice(*filtered_type_names).values.flatten
+            initial_search_index_definitions & possible_index_defs
+          else
+            initial_search_index_definitions
+          end
+        end
+      end
+
       # Returns an index_definition expression string to use for searches. This string can specify
       # multiple indices, use wildcards, etc. For info about what is supported, see:
       # https://www.elastic.co/guide/en/elasticsearch/reference/current/multi-index.html
       def search_index_expression
         @search_index_expression ||= index_expression_builder.determine_search_index_expression(
           all_filters,
-          initial_search_index_definitions,
+          narrowed_search_index_definitions,
           # When we have aggregations, we must require indices to search. When we search no indices, the datastore does not return
           # the standard aggregations response structure, which causes problems.
           require_indices: !aggregations_datastore_body.empty?
@@ -348,11 +366,19 @@ module ElasticGraph
 
       # Encapsulates dependencies of `Query`, giving us something we can expose off of `application`
       # to build queries when desired.
-      class Builder < Support::MemoizableData.define(:runtime_metadata, :logger, :filter_interpreter, :filter_node_interpreter, :default_page_size, :max_page_size)
+      class Builder < Support::MemoizableData.define(:runtime_metadata, :logger, :filter_interpreter, :filter_node_interpreter, :default_page_size, :max_page_size, :index_definitions_by_type_name)
         def routing_picker
           @routing_picker ||= RoutingPicker.new(
             filter_node_interpreter: filter_node_interpreter,
             schema_names: runtime_metadata.schema_element_names
+          )
+        end
+
+        def typename_filter
+          @typename_filter ||= Filtering::TypenameFilter.new(
+            filter_node_interpreter: filter_node_interpreter,
+            schema_names: runtime_metadata.schema_element_names,
+            known_type_names: index_definitions_by_type_name.keys
           )
         end
 
@@ -390,10 +416,12 @@ module ElasticGraph
 
           DatastoreQuery.new(
             routing_picker: routing_picker,
+            typename_filter: typename_filter,
             index_expression_builder: index_expression_builder,
             logger: logger,
             schema_element_names: runtime_metadata.schema_element_names,
             initial_search_index_definitions: initial_search_index_definitions,
+            index_definitions_by_type_name: index_definitions_by_type_name,
             client_filters: client_filters.to_set,
             internal_filters: internal_filters.to_set,
             sort: sort,

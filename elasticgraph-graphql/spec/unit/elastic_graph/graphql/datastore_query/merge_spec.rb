@@ -18,25 +18,26 @@ module ElasticGraph
       include_context "DatastoreQueryUnitSupport"
 
       before(:context) do
-        # These are derived from app state and don't vary in two different queries for the same app,
-        # so we don't have to deal with merging them.
-        app_level_attributes = %i[
-          logger filter_interpreter routing_picker index_expression_builder
-          default_page_size max_page_size schema_element_names
-        ]
-
-        @attributes_needing_merge_test_coverage = (DatastoreQuery.members - app_level_attributes).to_set
+        @attributes_needing_merge_test_coverage = DatastoreQuery::Builder.instance_method(:new_query).parameters.map(&:last).to_set
+        @attributes_covered = ::Set.new
       end
 
       before(:example) do |ex|
         Array(ex.metadata[:covers]).each do |attribute|
-          @attributes_needing_merge_test_coverage.delete(attribute)
+          if @attributes_needing_merge_test_coverage.include?(attribute)
+            @attributes_covered << attribute
+          else
+            # :nocov: -- only executed when a test has a typo in its `covers:` metadata
+            raise "Attribute `#{attribute}` (from `covers: :#{attribute}`) does not appear to need coverage. Did you misspell it?"
+            # :nocov:
+          end
         end
       end
 
       after(:context) do
-        expect(@attributes_needing_merge_test_coverage).to be_empty, "`#merge` tests are expected to cover all attributes, " \
-          "but the following do not appear to have coverage: #{@attributes_needing_merge_test_coverage}"
+        untested_attribute = @attributes_needing_merge_test_coverage - @attributes_covered
+        expect(untested_attribute).to be_empty, "`#merge` tests are expected to cover all attributes, " \
+          "but the following do not appear to have coverage: #{untested_attribute}"
       end
 
       it "does not allow `initial_search_index_definitions` to be overridden", covers: :initial_search_index_definitions do

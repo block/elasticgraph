@@ -2,6 +2,7 @@ module ElasticGraph
   class GraphQL
     class DatastoreQuerySupertype
       attr_reader initial_search_index_definitions: ::Array[DatastoreCore::_IndexDefinition]
+      attr_reader index_definitions_by_type_name: ::Hash[::String, ::Array[DatastoreCore::_IndexDefinition]]
       attr_reader aggregations: ::Hash[::String, Aggregation::Query]
       attr_reader document_paginator: DatastoreQuery::DocumentPaginator
       attr_reader total_document_count_needed: bool
@@ -9,6 +10,7 @@ module ElasticGraph
 
     # Note: this is a partial signature definition
     class DatastoreQuery < DatastoreQuerySupertype
+      def narrowed_search_index_definitions: () -> ::Array[DatastoreCore::_IndexDefinition]
       def shard_routing_values: () -> ::Array[::String]?
       def merge_with: (**untyped) -> DatastoreQuery
       def search_index_expression: () -> ::String
@@ -21,6 +23,7 @@ module ElasticGraph
         def self.new: (
           runtime_metadata: SchemaArtifacts::RuntimeMetadata::Schema,
           logger: ::Logger,
+          index_definitions_by_type_name: ::Hash[::String, ::Array[DatastoreCore::_IndexDefinition]],
           **untyped
         ) -> Builder
 

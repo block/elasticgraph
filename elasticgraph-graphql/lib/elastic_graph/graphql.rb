@@ -124,6 +124,7 @@ module ElasticGraph
           filter_node_interpreter:,
           runtime_metadata:,
           logger:,
+          index_definitions_by_type_name: @datastore_core.index_definitions_by_graphql_type,
           default_page_size: @config.default_page_size,
           max_page_size: @config.max_page_size
         )
