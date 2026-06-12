@@ -6,10 +6,5 @@
 #
 # frozen_string_literal: true
 
-class ExampleScalarCoercionAdapter
-  def self.coerce_input(value, ctx)
-  end
-
-  def self.coerce_result(value, ctx)
-  end
-end
+# This file contains RSpec configuration for `elasticgraph-json_ingestion`.
+# It is loaded by the shared spec helper at `spec_support/spec_helper.rb`.

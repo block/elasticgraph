@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "delegate"
+require "elastic_graph/json_ingestion/schema_definition/indexing/field_type/value_semantics"
 require "elastic_graph/schema_definition/indexing/field_type/enum"
 
 module ElasticGraph
@@ -19,6 +20,10 @@ module ElasticGraph
           #
           # @private
           class Enum < DelegateClass(ElasticGraph::SchemaDefinition::Indexing::FieldType::Enum)
+            prepend ValueSemantics
+
+            # @dynamic __getobj__
+
             # @return [Hash<String, ::Object>] additional ElasticGraph metadata to put in the JSON schema for this enum type.
             def json_schema_field_metadata_by_field_name
               {}

@@ -17,7 +17,6 @@ module ElasticGraph
         it "generates the SDL for a custom scalar type" do
           result = scalar_type "BigInt" do |t|
             t.mapping type: "long"
-            t.json_schema type: "integer"
           end
 
           expect(type_def_from(result, "BigInt")).to eq(<<~EOS.strip)
@@ -28,23 +27,14 @@ module ElasticGraph
         it "requires the `mapping` to be specified so we know how to index it in the datastore" do
           expect {
             scalar_type "BigInt" do |t|
-              t.json_schema type: "integer"
+              # Intentionally not calling `t.mapping`.
             end
           }.to raise_error Errors::SchemaError, a_string_including("BigInt", "lacks `mapping`")
-        end
-
-        it "requires the `json_schema` to be specified so we know how it should be encoded in an ingested event" do
-          expect {
-            scalar_type "BigInt" do |t|
-              t.mapping type: "long"
-            end
-          }.to raise_error Errors::SchemaError, a_string_including("BigInt", "lacks `json_schema`")
         end
 
         it "requires a `type` be specified on the `mapping` since we can't guess what the mapping type should be" do
           expect {
             scalar_type "BigInt" do |t|
-              t.json_schema type: "integer"
               t.mapping null_value: 0
             end
           }.to raise_error Errors::SchemaError, a_string_including("BigInt", "mapping", "type:")
@@ -58,7 +48,6 @@ module ElasticGraph
 
             schema.scalar_type "BigInt" do |t|
               t.mapping type: "long"
-              t.json_schema type: "integer"
             end
           end
 
@@ -79,7 +68,6 @@ module ElasticGraph
 
             schema.scalar_type "BigInt" do |t|
               t.mapping type: "long"
-              t.json_schema type: "integer"
               t.directive "meta", since_date: "2021-08-01"
               t.directive "meta", author: "John"
             end
@@ -93,7 +81,6 @@ module ElasticGraph
         it "allows documentation to be defined on the scalar" do
           result = scalar_type "BigInt" do |t|
             t.mapping type: "long"
-            t.json_schema type: "integer"
             t.documentation "A number that exceeds the normal `Int` max."
           end
 
@@ -108,7 +95,6 @@ module ElasticGraph
         it "defines a filter type with `any_of` and `equal_to_any_of` for a mapping type that can't efficiently support range queries" do
           result = scalar_type "FullText" do |t|
             t.mapping type: "text"
-            t.json_schema type: "string"
           end
 
           expect(filter_type_from(result, "FullText")).to eq(<<~EOS.strip)
@@ -124,7 +110,6 @@ module ElasticGraph
         it "defines a filter type with `any_of`, `equal_to_any_of`, and comparison operators for a numeric mapping type that can efficiently support range queries" do
           result = scalar_type "Short" do |t|
             t.mapping type: "short"
-            t.json_schema type: "integer"
           end
 
           expect(filter_type_from(result, "Short")).to eq(<<~EOS.strip)
@@ -144,7 +129,6 @@ module ElasticGraph
         it "defines a filter type with `any_of`, `equal_to_any_of`, and comparison operators for a date mapping type that can efficiently support range queries" do
           result = scalar_type "CalendarDate" do |t|
             t.mapping type: "date"
-            t.json_schema type: "string"
           end
 
           expect(filter_type_from(result, "CalendarDate")).to eq(<<~EOS.strip)
@@ -164,7 +148,6 @@ module ElasticGraph
         it "defines a `*ListFilterInput` type so that lists of the custom scalar type can be filtered on" do
           result = scalar_type "Short" do |t|
             t.mapping type: "short"
-            t.json_schema type: "integer"
           end
 
           expect(list_filter_type_from(result, "Short", include_docs: true)).to eq(<<~EOS.strip)
@@ -218,7 +201,6 @@ module ElasticGraph
         it "documents each filter field" do
           result = scalar_type "Byte" do |t|
             t.mapping type: "byte"
-            t.json_schema type: "integer"
           end
 
           expect(filter_type_from(result, "Byte", include_docs: true)).to eq(<<~EOS.strip)

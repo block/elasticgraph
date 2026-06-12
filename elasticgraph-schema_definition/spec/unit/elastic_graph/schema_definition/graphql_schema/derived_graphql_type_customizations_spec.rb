@@ -170,7 +170,6 @@ module ElasticGraph
             api.raw_sdl "directive @external on OBJECT"
 
             api.scalar_type "Url" do |t|
-              t.json_schema type: "string"
               t.mapping type: "keyword"
 
               t.customize_derived_types "UrlEdge", "UrlConnection" do |dt|

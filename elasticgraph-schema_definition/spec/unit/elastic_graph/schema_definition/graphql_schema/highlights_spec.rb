@@ -59,12 +59,10 @@ module ElasticGraph
             end
 
             api.scalar_type "CustomNumber" do |t|
-              t.json_schema type: "number"
               t.mapping type: "integer"
             end
 
             api.scalar_type "CustomKeyword" do |t|
-              t.json_schema type: "string"
               t.mapping type: "keyword"
             end
 

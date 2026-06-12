@@ -258,31 +258,6 @@ module ElasticGraph
         EOS
       end
 
-      it "does not care if the interface and object fields have different JSON schema" do
-        result = define_schema do |schema|
-          schema.public_send ruby_definition_method, "Thing" do |t|
-            t.implements "HasID"
-            t.field "id", "ID!" do |f|
-              f.json_schema maxLength: 40
-            end
-            t.field "name", "String"
-          end
-
-          schema.interface_type "HasID" do |t|
-            t.field "id", "ID!" do |f|
-              f.json_schema maxLength: 30
-            end
-          end
-        end
-
-        expect(type_def_from(result, "Thing")).to eq(<<~EOS.strip)
-          #{graphql_definition_keyword} Thing implements HasID {
-            id: ID!
-            name: String
-          }
-        EOS
-      end
-
       it "does not care if the interface and object fields have different index mappings" do
         result = define_schema do |schema|
           schema.public_send ruby_definition_method, "Thing" do |t|
