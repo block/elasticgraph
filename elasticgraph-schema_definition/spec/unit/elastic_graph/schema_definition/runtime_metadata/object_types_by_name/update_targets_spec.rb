@@ -1513,6 +1513,64 @@ module ElasticGraph
             expect_statline_update_target_with(metadata)
           end
 
+          it "resolves a `parent_field_name` by public field name even when the embedding field has a distinct `name_in_index`" do
+            metadata = nested_sourced_from_schema(
+              on_team: ->(t) {
+                t.field "players", "[Player!]!", name_in_index: "the_players" do |f|
+                  f.mapping type: "object"
+                end
+              },
+              players_field: nil,
+              on_player_relationship: ->(r) { r.parent_relationship "Team", "statLines", parent_field_name: "players" }
+            )
+
+            expect_statline_update_target_with(metadata, relationship: "the_players.statLine")
+          end
+
+          context "when the embedding field is reached via a dotted `parent_field_name` path" do
+            it "descends an object segment to a leaf list segment, keying the target by the full qualified relationship" do
+              metadata = nested_sourced_from_schema(
+                embed_players_under: "TeamNestedFields",
+                on_player_relationship: ->(r) { r.parent_relationship "Team", "statLines", parent_field_name: "nested.players" }
+              )
+
+              expect_statline_update_target_with(metadata, relationship: "nested.players.statLine")
+            end
+
+            it "omits `path_identifier_params` when the leaf of the dotted path is an object (not a list)" do
+              metadata = nested_sourced_from_schema(
+                embed_players_under: "TeamNestedFields",
+                players_field: "Player!",
+                on_player_relationship: ->(r) { r.parent_relationship "Team", "statLines", parent_field_name: "nested.players" }
+              )
+
+              expect_statline_update_target_with(metadata, relationship: "nested.players.statLine", path_identifier_params: {})
+            end
+
+            it "raises a clear error pointing at the multi-link solution when an intermediate segment is a list" do
+              expect {
+                nested_sourced_from_schema(
+                  embed_players_under: "[TeamNestedFields!]!",
+                  on_player_relationship: ->(r) { r.parent_relationship "Team", "statLines", parent_field_name: "nested.players" }
+                )
+              }.to raise_error Errors::SchemaError, a_string_including(
+                "`Player.statLine` embeds through list field `Team.nested` via `parent_relationship`, but only the final embedding field may be a list.",
+                "give its embedded type its own `relates_to_one`/`relates_to_many` to the source type with a `parent_relationship`"
+              )
+            end
+
+            it "raises a clear error when the dotted path does not resolve to a field" do
+              expect {
+                nested_sourced_from_schema(
+                  embed_players_under: "TeamNestedFields",
+                  on_player_relationship: ->(r) { r.parent_relationship "Team", "statLines", parent_field_name: "nested.nonexistent" }
+                )
+              }.to raise_error Errors::SchemaError, a_string_including(
+                "`Player.statLine` references field `Team.nested.nonexistent` via `parent_relationship`, but that field does not exist."
+              )
+            end
+          end
+
           it "raises an error when `parent_relationship` is called twice on the same relationship" do
             expect {
               nested_sourced_from_schema(
@@ -1633,6 +1691,77 @@ module ElasticGraph
             # The qualified relationship spans every embedding field from the root index down to the leaf,
             # proving the chain recursed through all four levels.
             expect(nested_update_targets_by_relationship(metadata).keys).to contain_exactly("teams.players.gameAppearances.statLine")
+          end
+
+          it "resolves a deeply nested chain mixing object dotted-path hops, multiple list links, and `name_in_index` renames" do
+            # Embedding path (root -> leaf), * = list level. Each list level is its own `parent_relationship` link;
+            # the object hops are folded into the links' dotted `parent_field_name`s:
+            #   Team .roster(the_roster) .squads* .lineup .players(the_players)* -> Player.goals (sourced)
+            metadata =
+              object_type_metadata_for "StatLine" do |s|
+                s.object_type "Team" do |t|
+                  t.field "id", "ID!"
+                  t.field "roster", "Roster", name_in_index: "the_roster"
+                  t.relates_to_many "statLines", "StatLine", via: "teamId", dir: :in, indexing_only: true
+                  t.index("teams") { |i| i.has_had_multiple_sources! }
+                end
+
+                s.object_type "Roster" do |t|
+                  t.field "squads", "[Squad!]!" do |f|
+                    f.mapping type: "object"
+                  end
+                end
+
+                s.object_type "Squad" do |t|
+                  t.field "id", "ID!"
+                  t.field "lineup", "Lineup"
+                  t.relates_to_many "statLines", "StatLine", via: "squadId", dir: :in, indexing_only: true do |r|
+                    r.parent_relationship "Team", "statLines", parent_field_name: "roster.squads"
+                  end
+                end
+
+                s.object_type "Lineup" do |t|
+                  t.field "players", "[Player!]!", name_in_index: "the_players" do |f|
+                    f.mapping type: "object"
+                  end
+                end
+
+                s.object_type "Player" do |t|
+                  t.field "id", "ID!"
+                  t.field "goals", "Int" do |f|
+                    f.sourced_from "statLine", "stats.goals"
+                  end
+                  t.relates_to_one "statLine", "StatLine", via: "playerId", dir: :in, indexing_only: true do |r|
+                    r.parent_relationship "Squad", "statLines", parent_field_name: "lineup.players"
+                  end
+                end
+
+                s.object_type "StatLineStats" do |t|
+                  t.field "goals", "Int"
+                end
+
+                s.object_type "StatLine" do |t|
+                  t.field "id", "ID!"
+                  t.field "teamId", "ID"
+                  t.field "squadId", "ID"
+                  t.field "playerId", "ID"
+                  t.field "stats", "StatLineStats"
+                  t.index "stat_lines"
+                end
+              end
+
+            target = nested_update_targets_by_relationship(metadata).fetch("the_roster.squads.lineup.the_players.statLine")
+
+            expect(target.type).to eq "Team"
+            expect(target.id_source).to eq "teamId"
+            expect(target.sourced_from_nested_params.field_params).to eq(
+              "goals" => dynamic_param_with(source_path: "stats.goals", cardinality: :one)
+            )
+            # One identifier per list level; the object hops contribute none.
+            expect(target.sourced_from_nested_params.path_identifier_params).to eq(
+              "squadId" => dynamic_param_with(source_path: "squadId", cardinality: :one),
+              "playerId" => dynamic_param_with(source_path: "playerId", cardinality: :one)
+            )
           end
 
           it "raises an error when the parent type does not exist" do
@@ -1816,6 +1945,7 @@ module ElasticGraph
           on_player_relationship: ->(r) { r.parent_relationship "Team", "statLines" },
           player_indexing_only: true,
           players_field: "[Player!]!",
+          embed_players_under: nil,
           index_teams: true,
           index_players: false,
           multiple_sources: true,
@@ -1828,10 +1958,22 @@ module ElasticGraph
         )
           # `StatLine` is the source type, so its metadata carries the nested update targets we assert on.
           object_type_metadata_for "StatLine" do |s|
+            if embed_players_under
+              s.object_type "TeamNestedFields" do |t|
+                t.field "players", players_field do |f|
+                  f.mapping type: "object" if players_field.start_with?("[")
+                end
+              end
+            end
+
             s.object_type "Team" do |t|
               t.field "id", "ID!"
 
-              if players_field
+              if embed_players_under
+                t.field "nested", embed_players_under do |f|
+                  f.mapping type: "object" if embed_players_under.start_with?("[")
+                end
+              elsif players_field
                 t.field "players", players_field do |f|
                   f.mapping type: "object" if players_field.start_with?("[")
                 end

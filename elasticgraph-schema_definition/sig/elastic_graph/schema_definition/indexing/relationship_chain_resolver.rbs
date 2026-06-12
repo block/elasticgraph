@@ -34,14 +34,14 @@ module ElasticGraph
           ::Array[::String]
         ) -> SchemaElements::Relationship?
 
-        def build_path_segment: (
+        def append_path_segments: (
           SchemaElements::Relationship,
           indexableType,
           ::Array[PathSegment],
           ::Array[::String]
         ) -> void
 
-        def resolve_field: (SchemaElements::Relationship::ParentRef, indexableType, SchemaElements::Relationship, ::Array[::String]) -> SchemaElements::Field?
+        def resolve_embedding_fields: (SchemaElements::Relationship, indexableType, ::Array[::String]) -> ::Array[SchemaElements::Field]
         def find_field_by_type: (indexableType, SchemaElements::Relationship, ::Array[::String]) -> SchemaElements::Field?
         def rel_description: (SchemaElements::Relationship) -> ::String
       end
