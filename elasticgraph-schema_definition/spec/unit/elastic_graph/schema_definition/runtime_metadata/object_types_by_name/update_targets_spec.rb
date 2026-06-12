@@ -1959,9 +1959,9 @@ module ElasticGraph
           # `StatLine` is the source type, so its metadata carries the nested update targets we assert on.
           object_type_metadata_for "StatLine" do |s|
             if embed_players_under
-              s.object_type "TeamNestedFields" do |t|
+              s.object_type s.state.type_ref(embed_players_under).fully_unwrapped.name do |t|
                 t.field "players", players_field do |f|
-                  f.mapping type: "object" if players_field.start_with?("[")
+                  f.mapping type: "object" if f.type.list?
                 end
               end
             end
@@ -1971,11 +1971,11 @@ module ElasticGraph
 
               if embed_players_under
                 t.field "nested", embed_players_under do |f|
-                  f.mapping type: "object" if embed_players_under.start_with?("[")
+                  f.mapping type: "object" if f.type.list?
                 end
               elsif players_field
                 t.field "players", players_field do |f|
-                  f.mapping type: "object" if players_field.start_with?("[")
+                  f.mapping type: "object" if f.type.list?
                 end
               end
 
