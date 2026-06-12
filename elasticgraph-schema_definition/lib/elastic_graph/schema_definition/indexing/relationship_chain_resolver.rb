@@ -88,7 +88,7 @@ module ElasticGraph
           parent_rel = resolve_parent_ref(current_rel, parent_ref, relationships, errors)
           return nil unless parent_rel
 
-          append_path_segments(current_rel, parent_rel.parent_type, path_segments, errors)
+          path_segments.concat(build_path_segments(current_rel, parent_rel.parent_type, errors))
           return nil if errors.any?
 
           resolve_chain(parent_rel, path_segments, relationships, errors)
@@ -136,48 +136,53 @@ module ElasticGraph
           parent_rel
         end
 
-        # Builds this link's PathSegment(s) and appends them to path_segments. The embedding field may be a dotted
-        # path through intermediate object fields, so each path component becomes a segment.
-        # Only the final field, when a list, identifies which element to update: it carries the relationship's
-        # foreign key, matched against the element's `id`. A list before the final field would need its own match
-        # value that a single link can't supply, so it's rejected.
-        def append_path_segments(current_rel, parent_type, path_segments, errors)
-          *leading_fields, leaf_field = resolve_embedding_fields(current_rel, parent_type, errors)
-          return unless leaf_field
+        # Builds this link's PathSegment(s). The embedding field may be a dotted path through intermediate object
+        # fields, so each path component becomes a segment. Only the final field, when a list, identifies which
+        # element to update: it carries the relationship's foreign key, matched against the element's `id`.
+        def build_path_segments(current_rel, parent_type, errors)
+          parts = resolve_embedding_fields(current_rel, parent_type, errors)
 
-          if (intermediate_list = leading_fields.find { |field| field.type.list? })
-            errors << "#{rel_description(current_rel)} embeds through list field `#{parent_type.name}.#{intermediate_list.name}` " \
-              "via `parent_relationship`, but only the final embedding field may be a list. To source through an " \
-              "intermediate list, give its embedded type its own `relates_to_one`/`relates_to_many` to the source " \
-              "type with a `parent_relationship`, so that list level is matched by its own foreign key."
-            return
+          link_segments = parts.map.with_index(1) do |field, index|
+            source_field_name = current_rel.foreign_key if index == parts.size && field.type.list?
+            PathSegment.new(field: field, source_field_name: source_field_name)
           end
 
-          leaf_foreign_key = current_rel.foreign_key if leaf_field.type.list?
-          link_segments =
-            leading_fields.map { |field| PathSegment.new(field: field, source_field_name: nil) } +
-            [PathSegment.new(field: leaf_field, source_field_name: leaf_foreign_key)]
-
-          # `resolve_chain` walks leaf-to-root and reverses the whole list once at the end, so append this link's
-          # segments reversed for that final reverse to restore root-to-leaf order within the link.
-          path_segments.concat(link_segments.reverse)
+          # `resolve_chain` walks leaf-to-root and reverses the whole list once at the end, so reverse
+          # the link segments to restore root-to-leaf order within the link.
+          link_segments.reverse
         end
 
         # Resolves this link's embedding field(s) on `parent_type`, one per dotted-path component. An explicit
         # `parent_field_name` is resolved by public name (consistent with `sourced_from` and `equivalent_field`);
         # the resolved `name_in_index` is what flows into the qualified relationship and the painless script.
+        #
+        # Only the final path component may be a list: it carries the relationship's foreign key, matched against
+        # the element's `id`. An intermediate list would need its own match value that a single link can't supply,
+        # so we refuse to descend through it (which halts `resolve_public_path`) and report the dedicated error.
         # Returns `[]` (and records an error) when it doesn't resolve.
         def resolve_embedding_fields(current_rel, parent_type, errors)
           parent_ref = current_rel.parent_ref # : SchemaElements::Relationship::ParentRef
           field_name = parent_ref.field_name
           return [find_field_by_type(parent_type, current_rel, errors)].compact unless field_name
 
-          field_path = @schema_def_state.field_path_resolver.resolve_public_path(parent_type, field_name) { true }
+          field_path = @schema_def_state.field_path_resolver.resolve_public_path(parent_type, field_name) do |parent_field|
+            if parent_field.type.list?
+              errors << "#{rel_description(current_rel)} embeds through list field `#{parent_field.parent_type.name}.#{parent_field.name}` " \
+                "via `parent_relationship`, but only the final embedding field may be a list. To source through an " \
+                "intermediate list, give its embedded type its own `relates_to_one`/`relates_to_many` to the source " \
+                "type with a `parent_relationship`, so that list level is matched by its own foreign key."
+              return [] # : ::Array[SchemaElements::Field]
+            end
+
+            true
+          end
+
           unless field_path
             errors << "#{rel_description(current_rel)} references field `#{parent_type.name}.#{field_name}` " \
               "via `parent_relationship`, but that field does not exist."
             return [] # : ::Array[SchemaElements::Field]
           end
+
           field_path.path_parts
         end
 

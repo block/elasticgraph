@@ -34,12 +34,11 @@ module ElasticGraph
           ::Array[::String]
         ) -> SchemaElements::Relationship?
 
-        def append_path_segments: (
+        def build_path_segments: (
           SchemaElements::Relationship,
           indexableType,
-          ::Array[PathSegment],
           ::Array[::String]
-        ) -> void
+        ) -> ::Array[PathSegment]
 
         def resolve_embedding_fields: (SchemaElements::Relationship, indexableType, ::Array[::String]) -> ::Array[SchemaElements::Field]
         def find_field_by_type: (indexableType, SchemaElements::Relationship, ::Array[::String]) -> SchemaElements::Field?
