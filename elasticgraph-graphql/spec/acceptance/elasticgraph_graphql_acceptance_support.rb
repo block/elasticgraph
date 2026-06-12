@@ -165,6 +165,12 @@ module ElasticGraph
       type_name
     end
 
+    # Returns the cursor type name used in this schema configuration.
+    # In snake_case schemas, we use the default Cursor scalar.
+    def cursor_type
+      "Cursor"
+    end
+
     # For parity with our `camelCase` context, also roundtrip factory-built records through JSON.
     # Otherwise we can have subtle, surprising differences between the two casing contexts. For
     # example, if the factory puts a `Date` object in a record, the JSON roundtripping will convert
@@ -183,6 +189,12 @@ module ElasticGraph
       else
         "#{value}2"
       end
+    end
+
+    # Returns the cursor type name used in this schema configuration.
+    # In camelCase schemas, we override Cursor to String for testing.
+    def cursor_type
+      "String"
     end
 
     def configure_for_camel_case(config)

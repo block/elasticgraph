@@ -310,7 +310,6 @@ module ElasticGraph
           # Both contexts (Cursor scalar and String override) now produce consistent error messages
           # because the coercion adapter returns nil for invalid values, causing GraphQL to generate
           # validation errors with full field context.
-          cursor_type = is_a?(CamelCaseGraphQLAcceptanceAdapter) ? "String" : "Cursor"
           array_error = "Argument 'after' on Field 'components' has an invalid value ([1, 2, 3]). Expected type '#{cursor_type}'."
 
           expect {
