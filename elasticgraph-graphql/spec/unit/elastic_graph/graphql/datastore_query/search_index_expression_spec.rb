@@ -548,7 +548,7 @@ module ElasticGraph
             end
 
             index_def = graphql.datastore_core.index_definitions_by_name.fetch("widgets")
-            builder.new_query(initial_search_index_definitions: [index_def], aggregations: aggregations, **options).search_index_expression.split(",")
+            graphql.datastore_query_builder.new_query(initial_search_index_definitions: [index_def], aggregations: aggregations, **options).search_index_expression.split(",")
           end
 
           # The search index expression parts should be the same regardless of whether a client or internal filter is used.

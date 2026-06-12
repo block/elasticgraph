@@ -1,0 +1,22 @@
+module ElasticGraph
+  class GraphQL
+    module Filtering
+      class TypenameFilter
+        def initialize: (
+          filter_node_interpreter: FilterNodeInterpreter,
+          schema_names: SchemaArtifacts::RuntimeMetadata::SchemaElementNames,
+          known_type_names: ::Array[::String]
+        ) -> void
+
+        def filtered_type_names: (
+          ::Array[::Hash[::String, untyped]]
+        ) -> ::Array[::String]?
+
+        private
+
+        @extractor: FilterValueSetExtractor[EqualityValueSet]
+        @known_type_names: ::Array[::String]
+      end
+    end
+  end
+end

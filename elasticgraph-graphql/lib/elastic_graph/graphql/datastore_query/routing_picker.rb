@@ -53,8 +53,8 @@ module ElasticGraph
       # `Query::RoutingPicker` exists only for use by `Query` and is effectively private.
       private_constant :RoutingPicker
 
-      # Steep is complaining that it can't find some `Query` but they are not in this file...
-      # @dynamic shard_routing_values, effective_size, merge_with, search_index_expression, with, to_datastore_msearch_header_and_body
+      # Steep can't find implementations of these `DatastoreQuery` methods because they're defined in `datastore_query.rb`, not in this file.
+      # @dynamic shard_routing_values, effective_size, merge_with, search_index_expression, narrowed_search_index_definitions, with, to_datastore_msearch_header_and_body
     end
   end
 end

@@ -701,6 +701,9 @@ module ElasticGraph
       it "correctly scopes results to the queried interface level across a multi-level type hierarchy", :expect_search_routing do
         established_on_asc = :"#{case_correctly("established_on")}_ASC"
         id_desc = :"#{case_correctly("id")}_DESC"
+        dc_index = index_definition_name_for("distribution_channels")
+        ps_index = index_definition_name_for("physical_stores")
+        both_indices = "#{dc_index},#{ps_index}"
 
         # The DistributionChannel hierarchy has two branches:
         #   DistributionChannel (index: distribution_channels)
@@ -738,26 +741,31 @@ module ElasticGraph
         expect(channels.map { |c| c["__typename"] }).to contain_exactly(
           *expected_store_typenames, "DirectWholesaler", "BrokerWholesaler"
         )
+        expect(index_search_expressions_from_queries("main").last(1)).to eq [both_indices]
 
         # Querying at the Retail interface excludes wholesalers, even though they live in
         # the same distribution_channels index.
         retailers = list_retailers_with(*store_fragments)
         expect(retailers.map { |r| r["__typename"] }).to contain_exactly(*expected_store_typenames)
+        expect(index_search_expressions_from_queries("main").last(1)).to eq [both_indices]
 
         # Querying at the Store interface likewise excludes wholesalers.
         stores = list_stores_with(*store_fragments)
         expect(stores.map { |s| s["__typename"] }).to contain_exactly(*expected_store_typenames)
+        expect(index_search_expressions_from_queries("main").last(1)).to eq [both_indices]
 
         # Using `nodes` (instead of `edges { node }`) also works. This exercises the `nodes`
         # code path where the field type is list-wrapped (e.g. `[Store!]!`).
         stores_via_nodes = list_stores_via_nodes_with(*store_fragments)
         expect(stores_via_nodes.map { |s| s["__typename"] }).to contain_exactly(*expected_store_typenames)
+        expect(index_search_expressions_from_queries("main").last(1)).to eq [both_indices]
 
         # Filters apply within the correct scope at each level.
         # At distribution_channels: active=false matches only wholesaler2.
         inactive = list_distribution_channels_with(*all_channel_fragments, filter: {active: {equal_to_any_of: [false]}})
         expect(inactive.map { |c| c["__typename"] }).to contain_exactly("BrokerWholesaler")
         expect(inactive.map { |c| c["id"] }).to contain_exactly(wholesaler2.fetch(:id))
+        expect(index_search_expressions_from_queries("main").last(1)).to eq [both_indices]
 
         # At retailers: established_on filter applies, and wholesalers are still excluded.
         retailers_after_2020 = list_retailers_with(*store_fragments, filter: {established_on: {gte: "2020-01-01"}})
@@ -765,6 +773,7 @@ module ElasticGraph
           online_store1.fetch(:id), online_store2.fetch(:id),
           physical_store2.fetch(:id)
         )
+        expect(index_search_expressions_from_queries("main").last(1)).to eq [both_indices]
 
         # Sort by established_on at the stores level spans both indices correctly.
         stores_sorted = list_stores_with(*store_fragments, order_by: [established_on_asc])
@@ -774,6 +783,7 @@ module ElasticGraph
           online_store2.fetch(:id),
           physical_store2.fetch(:id)
         ])
+        expect(index_search_expressions_from_queries("main").last(1)).to eq [both_indices]
 
         # Pagination at the distribution_channels level covers all types.
         channels_page, page_info = list_distribution_channels_and_page_info_with(
@@ -783,6 +793,7 @@ module ElasticGraph
         )
         expect(channels_page.size).to eq(4)
         expect(page_info).to include(case_correctly("has_next_page") => true)
+        expect(index_search_expressions_from_queries("main").last(1)).to eq [both_indices]
 
         # Filter by ID spans indices and respects the __typename scope at each query level.
         stores_by_id = list_stores_with(
@@ -793,11 +804,13 @@ module ElasticGraph
           [physical_store1.fetch(:id), "PhysicalStore"],
           [online_store1.fetch(:id), "OnlineStore"]
         )
+        expect(index_search_expressions_from_queries("main").last(1)).to eq [both_indices]
 
         # Aggregations respect the same __typename scoping as document queries.
         store_agg_count = call_graphql_query("query { #{case_correctly("store_aggregations")} { nodes { #{case_correctly("count")} } } }")
           .dig("data", case_correctly("store_aggregations"), "nodes", 0, case_correctly("count"))
         expect(store_agg_count).to eq(expected_store_typenames.size)
+        expect(index_search_expressions_from_queries("main").last(1)).to eq [both_indices]
 
         # `_typename` filter allows querying by concrete subtype across multiple indexes and
         # branches of the type hierarchy. `DirectWholesaler` is in the shared `distribution_channels`
@@ -808,6 +821,23 @@ module ElasticGraph
           filter: {typename_key => {equal_to_any_of: ["DirectWholesaler", "PhysicalStore"]}}
         )
         expect(wholesaler_or_physical.map { |c| c["__typename"] }).to contain_exactly("DirectWholesaler", "PhysicalStore", "PhysicalStore")
+        expect(index_search_expressions_from_queries("main").last(1)).to eq [both_indices]
+
+        # A __typename filter targeting only PhysicalStore narrows to just the physical_stores index.
+        physical_stores_only = list_distribution_channels_with(
+          *all_channel_fragments,
+          filter: {typename_key => {equal_to_any_of: ["PhysicalStore"]}}
+        )
+        expect(physical_stores_only.map { |c| c["__typename"] }).to contain_exactly("PhysicalStore", "PhysicalStore")
+        expect(index_search_expressions_from_queries("main").last(1)).to eq [ps_index]
+
+        # A __typename filter targeting both wholesaler types narrows to just the distribution_channels index.
+        wholesalers_only = list_distribution_channels_with(
+          *all_channel_fragments,
+          filter: {typename_key => {equal_to_any_of: ["DirectWholesaler", "BrokerWholesaler"]}}
+        )
+        expect(wholesalers_only.map { |c| c["__typename"] }).to contain_exactly("DirectWholesaler", "BrokerWholesaler")
+        expect(index_search_expressions_from_queries("main").last(1)).to eq [dc_index]
 
         # `_typename` filter interacts correctly with automatic `__typename` scoping at a sub-interface level.
         # Filtering `retailers` to `OnlineStore OR PhysicalStore` returns all retailers (the full set),
@@ -817,6 +847,7 @@ module ElasticGraph
           filter: {typename_key => {equal_to_any_of: ["OnlineStore", "PhysicalStore"]}}
         )
         expect(all_retailers.map { |r| r["__typename"] }).to contain_exactly(*expected_store_typenames)
+        expect(index_search_expressions_from_queries("main").last(1)).to eq [both_indices]
 
         # `_typename` filter also works on aggregations, including across indexes.
         wholesaler_or_physical_agg_count = call_graphql_query(<<~QUERY)
@@ -830,6 +861,7 @@ module ElasticGraph
         QUERY
           .dig("data", case_correctly("distribution_channel_aggregations"), "nodes", 0, case_correctly("count"))
         expect(wholesaler_or_physical_agg_count).to eq(wholesaler_or_physical.size)
+        expect(index_search_expressions_from_queries("main").last(1)).to eq [both_indices]
 
         # all_highlights resolves against the concrete type (OnlineStore), not the abstract root
         # (DistributionChannel). OnlineStore.name is absent from DistributionChannel — without
@@ -842,6 +874,7 @@ module ElasticGraph
             {"path" => ["name"], "snippets" => ["<em>Example Marketplace</em>"]}
           ]
         })
+        expect(index_search_expressions_from_queries("main").last(1)).to eq [both_indices]
       end
 
       it "supports querying a type that is both indexed (via interface inheritance) and embedded as a field on another type" do
