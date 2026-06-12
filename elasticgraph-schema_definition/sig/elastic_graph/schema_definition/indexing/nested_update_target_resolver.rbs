@@ -1,0 +1,36 @@
+module ElasticGraph
+  module SchemaDefinition
+    module Indexing
+      class NestedUpdateTargetResolver
+        def initialize: (
+          object_type: indexableType,
+          sourced_fields: ::Array[SchemaElements::Field],
+          resolved_chain: ResolvedRelationshipChain,
+          field_path_resolver: SchemaElements::FieldPath::Resolver,
+          schema_def_state: State,
+        ) -> void
+
+        def resolve: () -> [SchemaArtifacts::RuntimeMetadata::UpdateTarget?, ::Array[::String]]
+
+        private
+
+        attr_reader object_type: indexableType
+        attr_reader sourced_fields: ::Array[SchemaElements::Field]
+        attr_reader field_path_resolver: SchemaElements::FieldPath::Resolver
+        attr_reader resolved_chain: ResolvedRelationshipChain
+        attr_reader schema_def_state: State
+
+        @related_type: indexableType
+        def related_type: () -> indexableType
+
+        def relationship: () -> SchemaElements::Relationship
+        def root_relationship: () -> SchemaElements::Relationship
+        def root_type: () -> indexableType
+        def root_index: () -> Index
+
+        def validate_relationships: () -> ::Array[::String]
+        def resolve_field_source: (UpdateTargetResolverSupport::_FieldSourceAdapter) -> [::String?, ::String?]
+      end
+    end
+  end
+end

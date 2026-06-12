@@ -7,43 +7,11 @@
 # frozen_string_literal: true
 
 require "elastic_graph/errors"
-require "elastic_graph/schema_artifacts/runtime_metadata/sourced_from_nested_path_segment"
+require "elastic_graph/schema_definition/indexing/resolved_relationship_chain"
 
 module ElasticGraph
   module SchemaDefinition
     module Indexing
-      # The result of resolving a relationship chain.
-      #
-      # @private
-      class ResolvedRelationshipChain < ::Data.define(
-        :root_relationship,  # Relationship the chain terminated at on the root indexed type
-        :leaf_relationship,  # Relationship the chain was resolved from — backs `sourced_from` field(s)
-        :path_segments       # Array<PathSegment> - the embedding fields to descend, ordered root-to-leaf
-      )
-        # The leaf relationship name qualified by its embedding-field path (hence unique per resolved chain)
-        def qualified_relationship
-          (path_segments.map { |segment| segment.field.name_in_index } + [leaf_relationship.name_in_index]).join(".")
-        end
-
-        # The runtime-metadata segments the painless script uses to navigate this chain: a `ListPathSegment` for
-        # each list embedding field (carrying the source field that matches the element) and an `ObjectPathSegment`
-        # for each object embedding field.
-        def sourced_from_nested_paths
-          path_segments.map do |segment|
-            if (source_field = segment.source_field_name)
-              SchemaArtifacts::RuntimeMetadata::ListPathSegment.new(
-                field: segment.field.name_in_index,
-                source_field: source_field
-              )
-            else
-              SchemaArtifacts::RuntimeMetadata::ObjectPathSegment.new(
-                field: segment.field.name_in_index
-              )
-            end
-          end
-        end
-      end
-
       # Describes how to navigate from a parent type into a nested child element.
       # For list fields, `source_field_name` identifies which element to update: the element
       # whose `id` matches `event[source_field_name]`. We implicitly match on the `id` field
@@ -82,11 +50,11 @@ module ElasticGraph
         def resolve(starting_relationship)
           errors = [] # : ::Array[::String]
           path_segments = [] # : ::Array[PathSegment]
-          visited_relationships = Set[starting_relationship]
+          relationships = [] # : ::Array[SchemaElements::Relationship]
 
           # resolve_chain returns the chain's root relationship (the one with no parent_ref), or nil
           # if it hit an error walking the chain (in which case the error is already recorded).
-          root_relationship = resolve_chain(starting_relationship, path_segments, errors, visited_relationships)
+          root_relationship = resolve_chain(starting_relationship, path_segments, relationships, errors)
           return [nil, errors] unless root_relationship
 
           # A valid chain must terminate at a relationship defined on an indexed type.
@@ -99,8 +67,7 @@ module ElasticGraph
           end
 
           resolved_chain = ResolvedRelationshipChain.new(
-            root_relationship: root_relationship,
-            leaf_relationship: starting_relationship,
+            relationships: relationships.reverse, # reverse so root-to-leaf order
             path_segments: path_segments.reverse # reverse so root-to-leaf order
           )
 
@@ -109,25 +76,27 @@ module ElasticGraph
 
         private
 
-        # Recursively walks from leaf to root, building path segments in reverse. Returns the root
-        # relationship (the one with no parent_ref) on success, or nil if an error was encountered.
-        def resolve_chain(current_rel, path_segments, errors, visited_relationships)
+        # Recursively walks from leaf to root, collecting relationships and building path segments in reverse.
+        # Returns the root relationship (the one with no parent_ref) on success, or nil if an error was
+        # encountered.
+        def resolve_chain(current_rel, path_segments, relationships, errors)
+          relationships << current_rel
+
           parent_ref = current_rel.parent_ref
           return current_rel unless parent_ref
 
-          parent_rel = resolve_parent_ref(current_rel, parent_ref, errors, visited_relationships)
+          parent_rel = resolve_parent_ref(current_rel, parent_ref, relationships, errors)
           return nil unless parent_rel
 
           build_path_segment(current_rel, parent_rel.parent_type, path_segments, errors)
           return nil if errors.any?
 
-          visited_relationships.add(parent_rel)
-          resolve_chain(parent_rel, path_segments, errors, visited_relationships)
+          resolve_chain(parent_rel, path_segments, relationships, errors)
         end
 
         # Resolves a parent_ref into the concrete parent relationship.
         # Returns the parent relationship on success, or appends to errors and returns nil.
-        def resolve_parent_ref(current_rel, ref, errors, visited_relationships)
+        def resolve_parent_ref(current_rel, ref, relationships, errors)
           unless current_rel.indexing_only
             errors << "#{rel_description(current_rel)} uses `parent_relationship` but is not declared with " \
               "`indexing_only: true`. Relationships with `parent_relationship` must be indexing-only."
@@ -149,7 +118,7 @@ module ElasticGraph
             return nil
           end
 
-          if visited_relationships.include?(parent_rel)
+          if relationships.include?(parent_rel)
             errors << "#{rel_description(current_rel)} creates a circular `parent_relationship` chain " \
               "— `#{parent_type.name}.#{ref.relationship_name}` was already visited. The chain must terminate at a root indexed type."
             return nil

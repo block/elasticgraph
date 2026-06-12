@@ -1,23 +1,6 @@
 module ElasticGraph
   module SchemaDefinition
     module Indexing
-      class ResolvedRelationshipChainSuperType
-        attr_reader root_relationship: SchemaElements::Relationship
-        attr_reader leaf_relationship: SchemaElements::Relationship
-        attr_reader path_segments: ::Array[PathSegment]
-
-        def initialize: (
-          root_relationship: SchemaElements::Relationship,
-          leaf_relationship: SchemaElements::Relationship,
-          path_segments: ::Array[PathSegment]
-        ) -> void
-      end
-
-      class ResolvedRelationshipChain < ResolvedRelationshipChainSuperType
-        def qualified_relationship: () -> ::String
-        def sourced_from_nested_paths: () -> ::Array[SchemaArtifacts::RuntimeMetadata::sourcedFromNestedPathSegment]
-      end
-
       class PathSegment
         attr_reader field: SchemaElements::Field
         attr_reader source_field_name: ::String?
@@ -40,15 +23,15 @@ module ElasticGraph
         def resolve_chain: (
           SchemaElements::Relationship,
           ::Array[PathSegment],
-          ::Array[::String],
-          ::Set[SchemaElements::Relationship]
+          ::Array[SchemaElements::Relationship],
+          ::Array[::String]
         ) -> SchemaElements::Relationship?
 
         def resolve_parent_ref: (
           SchemaElements::Relationship,
           SchemaElements::Relationship::ParentRef,
-          ::Array[::String],
-          ::Set[SchemaElements::Relationship]
+          ::Array[SchemaElements::Relationship],
+          ::Array[::String]
         ) -> SchemaElements::Relationship?
 
         def build_path_segment: (

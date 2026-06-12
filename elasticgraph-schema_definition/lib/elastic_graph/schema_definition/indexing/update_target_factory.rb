@@ -6,6 +6,8 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/schema_artifacts/runtime_metadata/sourced_from_nested_params"
+
 module ElasticGraph
   module SchemaDefinition
     module Indexing
@@ -16,10 +18,10 @@ module ElasticGraph
           type:,
           relationship:,
           id_source:,
-          top_level_fields_params:,
           routing_value_source:,
           rollover_timestamp_value_source:,
-          sourced_from_nested_params:
+          top_level_fields_params: {},
+          sourced_from_nested_params: SchemaArtifacts::RuntimeMetadata::SourcedFromNestedParams::EMPTY
         )
           SchemaArtifacts::RuntimeMetadata::UpdateTarget.new(
             type: type,

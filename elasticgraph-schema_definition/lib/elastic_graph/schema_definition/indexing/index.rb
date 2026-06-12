@@ -283,10 +283,11 @@ module ElasticGraph
           )
         end
 
-        # Registers a resolved `parent_relationship` chain on this index.
+        # Records the path segments that navigate from this index's documents down to a nested element that
+        # receives `sourced_from` data, keyed by the qualified relationship backing those fields.
         # @api private
-        def register_resolved_relationship_chain(resolved_chain)
-          sourced_from_nested_paths_by_qualified_relationship[resolved_chain.qualified_relationship] = resolved_chain.sourced_from_nested_paths
+        def register_sourced_from_nested_paths(qualified_relationship, nested_paths)
+          sourced_from_nested_paths_by_qualified_relationship[qualified_relationship] = nested_paths
         end
 
         private

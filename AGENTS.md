@@ -209,6 +209,7 @@ Custom gems can be added via `Gemfile-custom` (see `Gemfile-custom.example`), th
 - Use `expect_to_return_non_nil_values_from_all_attributes` to test wrapper classes (like `WarehouseLambda`, `GraphQL`, `Indexer`, etc.). This automatically exercises every zero-argument method and verifies all dependencies are built successfully.
 - Use the `:capture_logs` RSpec tag instead of logger test doubles for verifying log output. Access logs with `logged_jsons_of_type(message_type)`.
 - Use `build_*` helper methods from `spec/support/builds_*.rb` to construct test objects. These helpers provide sensible defaults while allowing selective overrides for testing specific scenarios.
+- Only tag a spec with `:dont_validate_graphql_schema` when it's actually required for the test to pass under `VALIDATE_GRAPHQL_SCHEMAS=1` (the tag skips that validation). First try to fix the test's schema so it produces a valid GraphQL schema while still exercising what the test is meant to exercise; reach for the tag only when that isn't possible. Verify by running the spec with `VALIDATE_GRAPHQL_SCHEMAS=1`.
 
 ## Important Patterns
 

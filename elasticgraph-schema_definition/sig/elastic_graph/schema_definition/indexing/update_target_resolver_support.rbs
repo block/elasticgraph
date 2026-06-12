@@ -1,0 +1,47 @@
+module ElasticGraph
+  module SchemaDefinition
+    module Indexing
+      module UpdateTargetResolverSupport
+        def self.resolve_sourced_field_params: (
+          object_type: indexableType,
+          related_type: indexableType,
+          sourced_fields: ::Array[SchemaElements::Field],
+          field_path_resolver: SchemaElements::FieldPath::Resolver
+        ) -> [
+          ::Hash[::String, SchemaArtifacts::RuntimeMetadata::DynamicParam],
+          ::Array[::String]
+        ]
+
+        def self.resolve_field_source: (
+          _FieldSourceAdapter,
+          relationship: SchemaElements::Relationship,
+          index_def: Index,
+          related_type: indexableType,
+          field_path_resolver: SchemaElements::FieldPath::Resolver,
+          updated_type: indexableType
+        ) -> [::String?, ::String?]
+
+        def self.validate_relationship_cardinality: (SchemaElements::Relationship, error_prefix: ::String) -> ::Array[::String]
+        def self.validate_relationship_routability: (SchemaElements::Relationship, error_prefix: ::String) -> ::Array[::String]
+        def self.relationship_error_prefix: (SchemaElements::Relationship, ::Array[SchemaElements::Field]) -> ::String
+        def self.validate_has_had_multiple_sources: (Index, indexableType, SchemaElements::Relationship) -> ::Array[::String]
+
+        interface _FieldSourceAdapter
+          def get_field_source: (SchemaElements::Relationship, Index) {
+            (::String) -> bot
+          } -> ::String?
+
+          def cannot_update_reason: (indexableType, ::String) -> ::String
+        end
+
+        module RoutingSourceAdapter
+          extend _FieldSourceAdapter
+        end
+
+        module RolloverTimestampSourceAdapter
+          extend _FieldSourceAdapter
+        end
+      end
+    end
+  end
+end
