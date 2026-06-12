@@ -6,35 +6,39 @@
 #
 # frozen_string_literal: true
 
-require "elastic_graph/graphql/scalar_coercion_adapters/cursor"
+require "support/scalar_coercion_adapter"
 
 module ElasticGraph
   class GraphQL
     module ScalarCoercionAdapters
-      RSpec.describe Cursor do
-        describe ".coerce_input" do
+      RSpec.describe "Cursor" do
+        include_context "scalar coercion adapter support", "Cursor"
+
+        context "input coercion" do
           it "accepts string values" do
-            result = Cursor.coerce_input("abc123", nil)
-            expect(result).to eq("abc123")
+            expect_input_value_to_be_accepted("abc123")
           end
 
           it "accepts nil" do
-            result = Cursor.coerce_input(nil, nil)
-            expect(result).to be_nil
+            expect_input_value_to_be_accepted(nil)
           end
 
-          it "rejects non-string values by returning nil" do
-            expect(Cursor.coerce_input(123, nil)).to be_nil
-            expect(Cursor.coerce_input([1, 2, 3], nil)).to be_nil
-            expect(Cursor.coerce_input({key: "value"}, nil)).to be_nil
-            expect(Cursor.coerce_input(true, nil)).to be_nil
+          it "rejects non-string values" do
+            expect_input_value_to_be_rejected(123)
+            expect_input_value_to_be_rejected([1, 2, 3])
+            expect_input_value_to_be_rejected({"key" => "value"})
+            expect_input_value_to_be_rejected(true)
+            expect_input_value_to_be_rejected(false)
           end
         end
 
-        describe ".coerce_result" do
-          it "returns the value as-is" do
-            expect(Cursor.coerce_result("abc123", nil)).to eq("abc123")
-            expect(Cursor.coerce_result(nil, nil)).to be_nil
+        context "result coercion" do
+          it "returns string values as-is" do
+            expect_result_to_be_returned("abc123", as: "abc123")
+          end
+
+          it "returns nil as-is" do
+            expect_result_to_be_returned(nil)
           end
         end
       end
