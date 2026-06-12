@@ -320,6 +320,10 @@ module ElasticGraph
             .then { |mapping| ListCountsMapping.merged_into(mapping, for_type: indexed_type) }
             .then do |fm|
               internal_fields = {
+                # The update script buffers nested `sourced_from` data here keyed by relationship and composite
+                # element key. Like `__versions`, these keys aren't statically known, so we keep it in `_source`
+                # (the script reads it across events) but unsearchable via `dynamic: false`.
+                "__nested_sourced_data" => {"type" => "object", "dynamic" => "false"},
                 "__sources" => {"type" => "keyword"},
                 "__versions" => {
                   "type" => "object",

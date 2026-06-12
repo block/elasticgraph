@@ -42,7 +42,7 @@ module ElasticGraph
         let(:output_io) { StringIO.new }
         let(:clock) { class_double(::Time, now: ::Time.utc(2024, 3, 20, 12, 0, 0)) }
         let(:mapping_removal_note_snippet) { "extra fields listed here will not actually get removed" }
-        let(:index_meta_fields) { ["__sources", "__typename", "__versions"] }
+        let(:index_meta_fields) { ["__nested_sourced_data", "__sources", "__typename", "__versions"] }
 
         it "idempotently creates an index or index template, avoiding unneeded datastore write calls" do
           expect {
