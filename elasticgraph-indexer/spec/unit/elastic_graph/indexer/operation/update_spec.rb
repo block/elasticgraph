@@ -108,6 +108,7 @@ module ElasticGraph
                   "id" => "17",
                   "sourcedFromNestedFields" => {},
                   "sourcedFromNestedPathIdentifiers" => {},
+                  "sourcedFromNestedPaths" => {},
                   "staticValue" => 47,
                   "sourceType" => "Widget",
                   LIST_COUNTS_FIELD => {"sizes" => 0, "widget_names" => 0}
