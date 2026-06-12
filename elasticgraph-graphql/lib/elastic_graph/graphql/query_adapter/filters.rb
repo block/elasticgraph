@@ -28,7 +28,7 @@ module ElasticGraph
           # If an incomplete document could be hit by a search with our filters against any of the
           # index definitions, we must add a filter that will exclude incomplete documents.
           exclude_incomplete_docs_filter if query
-            .search_index_definitions
+            .initial_search_index_definitions
             .any? { |index_def| search_could_hit_incomplete_docs?(index_def, client_filter || {}) }
         end
 

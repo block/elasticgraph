@@ -30,7 +30,7 @@ module ElasticGraph
 
         builder.new_query(
           aggregations: aggregations,
-          search_index_definitions: types.flat_map { |t| graphql.datastore_core.index_definitions_by_graphql_type.fetch(t) },
+          initial_search_index_definitions: types.flat_map { |t| graphql.datastore_core.index_definitions_by_graphql_type.fetch(t) },
           **options
         )
       end

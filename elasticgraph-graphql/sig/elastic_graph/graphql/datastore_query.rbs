@@ -1,7 +1,7 @@
 module ElasticGraph
   class GraphQL
     class DatastoreQuerySupertype
-      attr_reader search_index_definitions: ::Array[DatastoreCore::_IndexDefinition]
+      attr_reader initial_search_index_definitions: ::Array[DatastoreCore::_IndexDefinition]
       attr_reader aggregations: ::Hash[::String, Aggregation::Query]
       attr_reader document_paginator: DatastoreQuery::DocumentPaginator
       attr_reader total_document_count_needed: bool

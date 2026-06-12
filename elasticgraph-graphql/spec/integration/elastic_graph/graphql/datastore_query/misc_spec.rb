@@ -135,7 +135,7 @@ module ElasticGraph
           widgets_def = graphql.datastore_core.index_definitions_by_name.fetch(unique_index_name)
 
           query = graphql.datastore_query_builder.new_query(
-            search_index_definitions: [widgets_def],
+            initial_search_index_definitions: [widgets_def],
             requested_fields: ["id"]
           )
 

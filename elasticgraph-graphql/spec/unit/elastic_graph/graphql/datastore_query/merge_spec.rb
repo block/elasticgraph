@@ -39,15 +39,15 @@ module ElasticGraph
           "but the following do not appear to have coverage: #{@attributes_needing_merge_test_coverage}"
       end
 
-      it "does not allow `search_index_definitions` to be overridden", covers: :search_index_definitions do
+      it "does not allow `initial_search_index_definitions` to be overridden", covers: :initial_search_index_definitions do
         widgets_def = graphql.datastore_core.index_definitions_by_name.fetch("widgets")
         components_def = graphql.datastore_core.index_definitions_by_name.fetch("components")
 
-        query = new_query(search_index_definitions: [widgets_def])
+        query = new_query(initial_search_index_definitions: [widgets_def])
 
         expect {
-          query.merge_with(search_index_definitions: [components_def])
-        }.to raise_error ArgumentError, a_string_including("search_index_definitions")
+          query.merge_with(initial_search_index_definitions: [components_def])
+        }.to raise_error ArgumentError, a_string_including("initial_search_index_definitions")
       end
 
       %i[client_filters internal_filters].each do |filter_attr|

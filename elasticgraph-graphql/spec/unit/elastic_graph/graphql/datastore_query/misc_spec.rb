@@ -15,10 +15,10 @@ module ElasticGraph
       let(:default_page_size) { 73 }
       let(:graphql) { build_graphql(default_page_size: default_page_size) }
 
-      it "raises an error if instantiated with an empty collection of `search_index_definitions`" do
+      it "raises an error if instantiated with an empty collection of `initial_search_index_definitions`" do
         expect {
-          new_query(search_index_definitions: [])
-        }.to raise_error Errors::SearchFailedError, a_string_including("search_index_definitions")
+          new_query(initial_search_index_definitions: [])
+        }.to raise_error Errors::SearchFailedError, a_string_including("initial_search_index_definitions")
       end
 
       it "inspects nicely, but redacts filters since they could contain PII" do

@@ -210,7 +210,7 @@ module ElasticGraph
           join = graphql_field.relation_join
           monotonic_clock = graphql.monotonic_clock
           query = graphql.datastore_query_builder.new_query(
-            search_index_definitions: graphql_field.type.unwrap_fully.search_index_definitions,
+            initial_search_index_definitions: graphql_field.type.unwrap_fully.search_index_definitions,
             # We need to request at least one field, or individual documents won't be requested.
             requested_fields: ["name"],
             **query_args

@@ -64,7 +64,7 @@ module ElasticGraph
           unwrapped_type = field.type.unwrap_fully
 
           initial_query = @datastore_query_builder.new_query(
-            search_index_definitions: unwrapped_type.search_index_definitions,
+            initial_search_index_definitions: unwrapped_type.search_index_definitions,
             monotonic_clock_deadline: monotonic_clock_deadline
           )
 
