@@ -14,6 +14,7 @@ module ElasticGraph
 
         def self.from_hash: (::Hash[::String, untyped]) -> ListPathSegment
         def to_dumpable_hash: () -> ::Hash[::String, ::String]
+        def to_painless_hash: () -> ::Hash[::String, ::String]
       end
 
       class ObjectPathSegmentSuperType
@@ -27,6 +28,7 @@ module ElasticGraph
 
         def self.from_hash: (::Hash[::String, untyped]) -> ObjectPathSegment
         def to_dumpable_hash: () -> ::Hash[::String, ::String]
+        def to_painless_hash: () -> ::Hash[::String, ::String]
       end
 
       type sourcedFromNestedPathSegment = ListPathSegment | ObjectPathSegment
