@@ -79,10 +79,7 @@ for cursor fields by default, which provides better type safety and documentatio
 
 To resolve this, override the `Cursor` type to `String`:
 
-```ruby
-# Within `ElasticGraph::Local::RakeTasks.new { ... }` in your `Rakefile`:
-tasks.type_name_overrides = {Cursor: "String"}
-```
+{% include copyable_code_snippet.html language="ruby" data="schema_customization_rake_tasks.snippets.Rakefile.cursor_type_override" %}
 
 This configuration causes ElasticGraph to:
 - Skip registration of the `Cursor` scalar (avoiding duplicate type definitions)
