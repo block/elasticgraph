@@ -1,0 +1,18 @@
+module ElasticGraph
+  module Protobuf
+    module SchemaDefinition
+      module ScalarTypeExtension: ::ElasticGraph::SchemaDefinition::SchemaElements::ScalarType
+        PROTO_FIELD_TYPE_BY_JSON_SCHEMA_TYPE: ::Hash[::String, ::String]
+
+        attr_reader proto_field_type: ::String?
+
+        def proto_field: (type: ::String) -> void
+        def to_proto_field_type: () -> ::String
+
+        private
+
+        def infer_proto_field_type_from_json_schema: () -> ::String?
+      end
+    end
+  end
+end
