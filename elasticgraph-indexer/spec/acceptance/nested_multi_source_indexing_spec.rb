@@ -17,7 +17,7 @@ module ElasticGraph
 
     # A multi-byte character in a coach id, to verify the length-prefixed element-key encoding (which counts
     # UTF-16 code units) round-trips correctly when locating the embedded element.
-    let(:multibyte_coach_id) { "coach-café-✦" }
+    let(:multibyte_coach_id) { "coach-bjørn" }
 
     it "fills in nested sourced fields on embedded list elements and singleton objects, regardless of ingestion order" do
       league = "NBA"
@@ -90,6 +90,24 @@ module ElasticGraph
       # The team document records each source it has seen. The relationship keys are the *qualified* nested
       # relationships, and the `__versions` map keys them together with the element identifiers.
       expect(source.fetch("__sources")).to contain_exactly("__self", "coaches.record", "general_manager.record")
+
+      # The core invariant of nested `sourced_from`: each nested element gets its *own* `__versions` bucket so
+      # that sibling elements sharing a relationship (the two coaches, both via `coaches.record`) don't collide
+      # into one version bucket and trip the "relationship has changed" conflict check. Top-level events
+      # (`__self`) stay keyed by the bare relationship; nested events extend the key with the element
+      # identifiers and encode it (length-prefixed `len:value|` parts; the list segment contributes the matched
+      # `coachId`, the object segment its field name).
+      expect(source.fetch("__versions")).to eq(
+        "__self" => {"t1" => version_of(team)},
+        "14:coaches.record|2:c1|" => {"rec-c1" => version_of(record_c1)},
+        "14:coaches.record|11:coach-bjørn|" => {"rec-#{multibyte_coach_id}" => version_of(record_c2)},
+        "22:general_manager.record|15:general_manager|" => {"rec-gm1" => version_of(record_gm)}
+      )
+    end
+
+    # The version an upsert event will record in the document's `__versions` map.
+    def version_of(event)
+      event.fetch("version")
     end
 
     def indexed_team_source(id)
