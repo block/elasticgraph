@@ -119,6 +119,53 @@ module ElasticGraph
             ]
           end
 
+          it "passes the nested `sourced_from` params through to the script, sourcing field values and path identifiers from the prepared record and the index's registered nested paths" do
+            indexer = indexer_with_widget_workspace_index_definition do |index|
+              # no customization
+            end
+
+            operations = operations_for_indexer(indexer)
+            expect(operations.size).to eq(1)
+            operation = operations.first.with(update_target: normal_indexing_update_target_with(
+              type: "Widget",
+              top_level_fields_params: {"name" => dynamic_param_with(source_path: "name", cardinality: :one)},
+              sourced_from_nested_params: SchemaArtifacts::RuntimeMetadata::SourcedFromNestedParams.new(
+                field_params: {"stat" => dynamic_param_with(source_path: "name", cardinality: :one)},
+                path_identifier_params: {"playerId" => dynamic_param_with(source_path: "embedded_values.workspace_id", cardinality: :one)}
+              )
+            ))
+
+            # The nested paths come from the destination index def (static per-index config), so we stub them
+            # here rather than building a full nested `sourced_from` schema for this unit test.
+            allow(operation.destination_index_def).to receive(:sourced_from_nested_paths_as_painless_param).and_return({
+              "players.statLine" => [
+                SchemaArtifacts::RuntimeMetadata::ListPathSegment.new(field: "players", source_field: "playerId").to_painless_hash,
+                SchemaArtifacts::RuntimeMetadata::ObjectPathSegment.new(field: "statLine").to_painless_hash
+              ]
+            })
+
+            expect(operation.to_datastore_bulk).to eq [
+              {update: {_id: "17", _index: "widget_workspaces", retry_on_conflict: Update::CONFLICT_RETRIES}},
+              {
+                script: {id: INDEX_DATA_UPDATE_SCRIPT_ID, params: {
+                  "topLevelFields" => {"name" => "thing1"},
+                  "id" => "17",
+                  "sourcedFromNestedFields" => {"stat" => "thing1"},
+                  "sourcedFromNestedPathIdentifiers" => {"playerId" => "embedded_workspace_id"},
+                  "sourcedFromNestedPaths" => {
+                    "players.statLine" => [
+                      {"field" => "players", "sourceField" => "playerId"},
+                      {"field" => "statLine"}
+                    ]
+                  },
+                  LIST_COUNTS_FIELD => {"sizes" => 0, "widget_names" => 0}
+                }},
+                scripted_upsert: true,
+                upsert: {}
+              }
+            ]
+          end
+
           it "returns no datastore bulk actions if the source document lacks the id field of the update target" do
             indexer = indexer_with_widget_workspace_index_definition do |index|
               # no customization
