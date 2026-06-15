@@ -78,6 +78,11 @@ FactoryBot.define do
 
     nested_fields2 { nested_fields }
 
+    # Staff exercises nested `sourced_from`. Default to an empty coaching list / no GM so the many specs that
+    # build a `:team` aren't burdened with staff data; the nested-sourcing acceptance spec sets these explicitly.
+    coaches { [] }
+    general_manager { nil }
+
     transient do
       sponsors { [] }
       current_players do
@@ -88,6 +93,29 @@ FactoryBot.define do
         Array.new(Faker::Number.between(from: 2, to: 5)) { build :team_season }.uniq { |h| h.fetch(:year) }
       end
     end
+  end
+
+  factory :coach, parent: :hash_base do
+    __typename { "Coach" }
+    name { Faker::Name.name }
+    # `career_wins` is intentionally omitted: it is a nested `sourced_from` field, filled in from a
+    # `:coach_record` event rather than provided on the embedded element.
+  end
+
+  factory :general_manager, parent: :hash_base do
+    __typename { "GeneralManager" }
+    name { Faker::Name.name }
+    # `career_wins` is sourced from a `:general_manager_record`; see the note on `:coach`.
+  end
+
+  factory :coach_record, parent: :indexed_type do
+    __typename { "CoachRecord" }
+    wins { Faker::Number.between(from: 0, to: 500) }
+  end
+
+  factory :general_manager_record, parent: :indexed_type do
+    __typename { "GeneralManagerRecord" }
+    wins { Faker::Number.between(from: 0, to: 500) }
   end
 
   factory :team_details, parent: :hash_base do

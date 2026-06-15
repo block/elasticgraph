@@ -1125,7 +1125,7 @@ index_templates:
               career_wins:
                 type: integer
             type: object
-          head_coach:
+          general_manager:
             properties:
               id:
                 type: keyword
@@ -1754,6 +1754,41 @@ indices:
       index.number_of_replicas: 1
       index.number_of_shards: 1
       index.max_result_window: 10000
+  general_manager_records:
+    aliases: {}
+    mappings:
+      dynamic: strict
+      properties:
+        id:
+          type: keyword
+        teamId:
+          type: keyword
+        wins:
+          type: integer
+        team_league:
+          type: keyword
+        team_formed_on:
+          type: date
+          format: strict_date
+        __nested_sourced_data:
+          type: object
+          dynamic: 'false'
+        __sources:
+          type: keyword
+        __versions:
+          type: object
+          dynamic: 'false'
+        __typename:
+          type: constant_keyword
+          value: GeneralManagerRecord
+      _size:
+        enabled: true
+    settings:
+      index.mapping.ignore_malformed: false
+      index.mapping.coerce: false
+      index.number_of_replicas: 1
+      index.number_of_shards: 1
+      index.max_result_window: 10000
   manufacturers:
     aliases: {}
     mappings:
@@ -2258,7 +2293,7 @@ scripts:
 
         // No timestamp values matched the params, so return `false`.
         return false;
-  update_index_data_4ffccc5ee7c813abd4bdfbaca9907adb:
+  update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d:
     context: update
     script:
       lang: painless
@@ -2489,13 +2524,23 @@ scripts:
         List nestedElementKeyParts = buildNestedElementKeyParts(relationship, sourcedFromNestedPaths, sourcedFromNestedPathIdentifiers);
         boolean isNested = !nestedElementKeyParts.isEmpty();
 
-        // The combined key identifies the source within the document: just the relationship for a top-level event,
-        // or the relationship plus the nested element's identifiers for a nested event. It keys both `__versions`
-        // (so each distinct source tracks its own version) and `__nested_sourced_data` (the re-apply buffer).
-        List combinedKeyParts = new ArrayList();
-        combinedKeyParts.add(relationship);
-        combinedKeyParts.addAll(nestedElementKeyParts);
-        String combinedKey = encodeKey(combinedKeyParts);
+        // The combined key identifies the source within the document, keying both `__versions` (so each distinct
+        // source tracks its own version) and `__nested_sourced_data` (the re-apply buffer).
+        //
+        // For a top-level event it is the bare relationship name. This is deliberate: it keeps existing documents
+        // byte-identical (no `__versions` migration) and keeps the indexer's version-recovery read -- which looks up
+        // `__versions[relationship]` by the bare name (see `DatastoreIndexingRouter#source_event_versions_in_index`)
+        // -- correct without changes. Only a nested event extends the key, appending the element identifiers and
+        // encoding the result, since a nested element needs its own version bucket distinct from its siblings'.
+        String combinedKey;
+        if (isNested) {
+          List combinedKeyParts = new ArrayList();
+          combinedKeyParts.add(relationship);
+          combinedKeyParts.addAll(nestedElementKeyParts);
+          combinedKey = encodeKey(combinedKeyParts);
+        } else {
+          combinedKey = relationship;
+        }
 
         setup(source, combinedKey, isNested, counts);
         validateSource(source, id, relationship, sourceId, eventVersion, combinedKey);

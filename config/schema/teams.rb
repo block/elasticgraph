@@ -80,14 +80,15 @@ ElasticGraph.define_schema do |schema|
     # Here we duplicate `nested_fields` as `nested_fields2` to achieve that.
     t.field "nested_fields2", "TeamNestedFields"
 
-    # Coaching staff embeds source-bearing `Coach`/`HeadCoach` elements (see the `CoachRecord` types below).
-    # `coaches` is a list (its `career_wins` is sourced onto the element matched by `coachId`); `head_coach`
-    # is a singleton object (sourced onto the element reached by field name -- the all-object path).
+    # Staff embeds source-bearing elements whose stats are filled in from separate feeds (see the `*Record`
+    # types below). `coaches` is a list (each coach's `career_wins` is sourced onto the element matched by
+    # `coachId`); `general_manager` is a team's single GM, embedded as an object (sourced onto the element
+    # reached by field name -- the all-object path).
     t.field "coaches", "[Coach!]!" do |f|
       f.mapping type: "object"
     end
 
-    t.field "head_coach", "HeadCoach" do |f|
+    t.field "general_manager", "GeneralManager" do |f|
       f.mapping type: "object"
     end
 
@@ -95,7 +96,7 @@ ElasticGraph.define_schema do |schema|
       r.equivalent_field "team_league", locally_named: "league"
       r.equivalent_field "team_formed_on", locally_named: "formed_on"
     end
-    t.relates_to_many "head_coach_records", "CoachRecord", via: "teamId", dir: :in, indexing_only: true, singular: "head_coach_record" do |r|
+    t.relates_to_many "general_manager_records", "GeneralManagerRecord", via: "teamId", dir: :in, indexing_only: true, singular: "general_manager_record" do |r|
       r.equivalent_field "team_league", locally_named: "league"
       r.equivalent_field "team_formed_on", locally_named: "formed_on"
     end
@@ -203,32 +204,44 @@ ElasticGraph.define_schema do |schema|
     end
   end
 
-  # These types exercise *nested* `sourced_from`: a field sourced not onto the root indexed document but
-  # onto an element embedded within it. A `Team` embeds its coaching staff, and each coach's `career_wins`
-  # is filled in from a separate `CoachRecord` feed (keyed by coach). A coach is a real entity with its own
-  # `id` -- unlike the embedded `Player` value object above -- which is exactly what nested `sourced_from`
-  # needs to match the right embedded element.
+  # These types exercise *nested* `sourced_from`: a field sourced not onto the root indexed document but onto
+  # an element embedded within it. A `Team` embeds its staff, and each staff member's win stat is filled in
+  # from a separate records feed. A coach or GM is a real entity with its own `id` -- unlike the embedded
+  # `Player` value object above -- which is exactly what nested `sourced_from` needs to match the right
+  # embedded element.
   #
-  # We embed coaches two ways to cover both path shapes the painless script must handle:
-  # - `coaches` (a *list*): the path has a list segment, so the target element is matched by id.
-  # - `head_coach` (a singleton *object*): the path is all-object, so the target element is reached by field
-  #   name (the case that originally produced an empty element key and collided with top-level events).
+  # We embed staff two ways to cover both path shapes the painless script must handle:
+  # - `coaches` (a *list*): the path has a list segment, so the target element is matched by id (`coachId`).
+  # - `general_manager` (a single GM, embedded as an *object*): the path is all-object, so the target element
+  #   is reached by field name (the case that originally produced an empty element key and collided with
+  #   top-level events).
   #
-  # Each embedding owns its own source relationship, since a single `parent_relationship` resolves to exactly
-  # one embedding path.
+  # `CoachRecord` and `GeneralManagerRecord` are *distinct source types* -- and naturally so, since a coach
+  # and a GM are different roles with different feeds. This also matters mechanically: both relate to `Team`
+  # via `teamId`, so a single shared type would match both relationships and an event meant for one would also
+  # (incorrectly) flow into the other. Distinct types keep the feeds separable.
+  #
+  # Both feeds carry `team_league`/`team_formed_on` equivalents because the `teams` index uses custom shard
+  # routing (`league`) and is a rollover index (`formed_on`): the indexer needs them to route/select the
+  # `Team` index it updates. Mirrors how the top-level `sourced_from` example in `widgets.rb` uses
+  # `equivalent_field`.
   schema.object_type "CoachRecord" do |t|
     t.field "id", "ID!"
     t.field "teamId", "ID"
     t.field "coachId", "ID"
     t.field "wins", "Int"
-
-    # The `teams` index uses custom shard routing (`league`) and is a rollover index (`formed_on`), so a
-    # `CoachRecord` event must carry equivalents the indexer can use to route/select the `Team` index it
-    # updates. Mirrors how the top-level `sourced_from` example in `widgets.rb` uses `equivalent_field`.
     t.field "team_league", "String"
     t.field "team_formed_on", "Date"
-
     t.index "coach_records"
+  end
+
+  schema.object_type "GeneralManagerRecord" do |t|
+    t.field "id", "ID!"
+    t.field "teamId", "ID"
+    t.field "wins", "Int"
+    t.field "team_league", "String"
+    t.field "team_formed_on", "Date"
+    t.index "general_manager_records"
   end
 
   schema.object_type "Coach" do |t|
@@ -244,7 +257,9 @@ ElasticGraph.define_schema do |schema|
     end
   end
 
-  schema.object_type "HeadCoach" do |t|
+  # A team has exactly one general manager, so a `GeneralManagerRecord` joins on `teamId` (one record per
+  # team) rather than on a per-element id like `Coach` does.
+  schema.object_type "GeneralManager" do |t|
     t.field "id", "ID!"
     t.field "name", "String"
 
@@ -252,8 +267,8 @@ ElasticGraph.define_schema do |schema|
       f.sourced_from "record", "wins"
     end
 
-    t.relates_to_one "record", "CoachRecord", via: "teamId", dir: :in, indexing_only: true do |r|
-      r.parent_relationship "Team", "head_coach_records"
+    t.relates_to_one "record", "GeneralManagerRecord", via: "teamId", dir: :in, indexing_only: true do |r|
+      r.parent_relationship "Team", "general_manager_records"
     end
   end
 end

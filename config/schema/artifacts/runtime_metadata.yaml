@@ -285,6 +285,48 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: voltage
+  GeneralManagerRecordSortOrderInput:
+    values_by_name:
+      id_ASC:
+        sort_field:
+          direction: asc
+          field_path: id
+      id_DESC:
+        sort_field:
+          direction: desc
+          field_path: id
+      teamId_ASC:
+        sort_field:
+          direction: asc
+          field_path: teamId
+      teamId_DESC:
+        sort_field:
+          direction: desc
+          field_path: teamId
+      team_formed_on_ASC:
+        sort_field:
+          direction: asc
+          field_path: team_formed_on
+      team_formed_on_DESC:
+        sort_field:
+          direction: desc
+          field_path: team_formed_on
+      team_league_ASC:
+        sort_field:
+          direction: asc
+          field_path: team_league
+      team_league_DESC:
+        sort_field:
+          direction: desc
+          field_path: team_league
+      wins_ASC:
+        sort_field:
+          direction: asc
+          field_path: wins
+      wins_DESC:
+        sort_field:
+          direction: desc
+          field_path: wins
   InventorSortOrderInput:
     values_by_name:
       id_ASC:
@@ -1043,30 +1085,30 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: formed_on
-      head_coach_career_wins_ASC:
+      general_manager_career_wins_ASC:
         sort_field:
           direction: asc
-          field_path: head_coach.career_wins
-      head_coach_career_wins_DESC:
+          field_path: general_manager.career_wins
+      general_manager_career_wins_DESC:
         sort_field:
           direction: desc
-          field_path: head_coach.career_wins
-      head_coach_id_ASC:
+          field_path: general_manager.career_wins
+      general_manager_id_ASC:
         sort_field:
           direction: asc
-          field_path: head_coach.id
-      head_coach_id_DESC:
+          field_path: general_manager.id
+      general_manager_id_DESC:
         sort_field:
           direction: desc
-          field_path: head_coach.id
-      head_coach_name_ASC:
+          field_path: general_manager.id
+      general_manager_name_ASC:
         sort_field:
           direction: asc
-          field_path: head_coach.name
-      head_coach_name_DESC:
+          field_path: general_manager.name
+      general_manager_name_DESC:
         sort_field:
           direction: desc
-          field_path: head_coach.name
+          field_path: general_manager.name
       id_ASC:
         sort_field:
           direction: asc
@@ -2003,6 +2045,21 @@ index_definitions_by_name:
       voltage:
         source: __self
     route_with: id
+  general_manager_records:
+    current_sources:
+    - __self
+    fields_by_path:
+      id:
+        source: __self
+      teamId:
+        source: __self
+      team_formed_on:
+        source: __self
+      team_league:
+        source: __self
+      wins:
+        source: __self
+    route_with: id
   manufacturers:
     current_sources:
     - __self
@@ -2315,11 +2372,11 @@ index_definitions_by_name:
         source: __self
       formed_on:
         source: __self
-      head_coach.career_wins:
+      general_manager.career_wins:
         source: record
-      head_coach.id:
+      general_manager.id:
         source: __self
-      head_coach.name:
+      general_manager.name:
         source: __self
       id:
         source: __self
@@ -2982,8 +3039,8 @@ index_definitions_by_name:
       coaches.record:
       - field: coaches
         source_field: coachId
-      head_coach.record:
-      - field: head_coach
+      general_manager.record:
+      - field: general_manager
   widget_currencies:
     current_sources:
     - __self
@@ -3204,7 +3261,7 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_4ffccc5ee7c813abd4bdfbaca9907adb
+      script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
       top_level_fields_params:
         full_address:
           cardinality: one
@@ -3394,7 +3451,7 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_4ffccc5ee7c813abd4bdfbaca9907adb
+      script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
       top_level_fields_params:
         __typename:
           cardinality: one
@@ -3483,7 +3540,7 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_4ffccc5ee7c813abd4bdfbaca9907adb
+      script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
       top_level_fields_params:
         coachId:
           cardinality: one
@@ -3511,7 +3568,7 @@ object_types_by_name:
       relationship: coaches.record
       rollover_timestamp_value_source: team_formed_on
       routing_value_source: team_league
-      script_id: update_index_data_4ffccc5ee7c813abd4bdfbaca9907adb
+      script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
       sourced_from_nested_params:
         field_params:
           career_wins:
@@ -3520,28 +3577,6 @@ object_types_by_name:
         path_identifier_params:
           coachId:
             cardinality: one
-      type: Team
-    - id_source: teamId
-      metadata_params:
-        relationship:
-          value: head_coach.record
-        sourceId:
-          cardinality: one
-          source_path: id
-        sourceType:
-          cardinality: one
-          source_path: type
-        version:
-          cardinality: one
-      relationship: head_coach.record
-      rollover_timestamp_value_source: team_formed_on
-      routing_value_source: team_league
-      script_id: update_index_data_4ffccc5ee7c813abd4bdfbaca9907adb
-      sourced_from_nested_params:
-        field_params:
-          career_wins:
-            cardinality: one
-            source_path: wins
       type: Team
   CoachRecordAggregatedValues:
     graphql_fields_by_name:
@@ -3690,7 +3725,7 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_4ffccc5ee7c813abd4bdfbaca9907adb
+      script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
       top_level_fields_params:
         __typename:
           cardinality: one
@@ -3790,7 +3825,7 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_4ffccc5ee7c813abd4bdfbaca9907adb
+      script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
       top_level_fields_params:
         created_at:
           cardinality: one
@@ -4100,7 +4135,7 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_4ffccc5ee7c813abd4bdfbaca9907adb
+      script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
       top_level_fields_params:
         __typename:
           cardinality: one
@@ -4273,7 +4308,7 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_4ffccc5ee7c813abd4bdfbaca9907adb
+      script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
       top_level_fields_params:
         created_at:
           cardinality: one
@@ -4412,6 +4447,220 @@ object_types_by_name:
         resolver:
           name: object_with_lookahead
     graphql_only_return_type: true
+  GeneralManager:
+    graphql_fields_by_name:
+      career_wins:
+        resolver:
+          name: get_record_field_value
+      id:
+        resolver:
+          name: get_record_field_value
+      name:
+        resolver:
+          name: get_record_field_value
+  GeneralManagerAggregatedValues:
+    graphql_fields_by_name:
+      career_wins:
+        resolver:
+          name: object_with_lookahead
+      id:
+        resolver:
+          name: object_with_lookahead
+      name:
+        resolver:
+          name: object_with_lookahead
+  GeneralManagerGroupedBy:
+    graphql_fields_by_name:
+      career_wins:
+        resolver:
+          name: object_with_lookahead
+      id:
+        resolver:
+          name: object_with_lookahead
+      name:
+        resolver:
+          name: object_with_lookahead
+  GeneralManagerHighlights:
+    graphql_fields_by_name:
+      id:
+        resolver:
+          name: get_record_field_value
+      name:
+        resolver:
+          name: get_record_field_value
+  GeneralManagerRecord:
+    graphql_fields_by_name:
+      id:
+        resolver:
+          name: get_record_field_value
+      teamId:
+        resolver:
+          name: get_record_field_value
+      team_formed_on:
+        resolver:
+          name: get_record_field_value
+      team_league:
+        resolver:
+          name: get_record_field_value
+      wins:
+        resolver:
+          name: get_record_field_value
+    index_definition_names:
+    - general_manager_records
+    update_targets:
+    - id_source: id
+      metadata_params:
+        relationship:
+          value: __self
+        sourceId:
+          cardinality: one
+          source_path: id
+        sourceType:
+          cardinality: one
+          source_path: type
+        version:
+          cardinality: one
+      relationship: __self
+      routing_value_source: id
+      script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
+      top_level_fields_params:
+        teamId:
+          cardinality: one
+        team_formed_on:
+          cardinality: one
+        team_league:
+          cardinality: one
+        wins:
+          cardinality: one
+      type: GeneralManagerRecord
+    - id_source: teamId
+      metadata_params:
+        relationship:
+          value: general_manager.record
+        sourceId:
+          cardinality: one
+          source_path: id
+        sourceType:
+          cardinality: one
+          source_path: type
+        version:
+          cardinality: one
+      relationship: general_manager.record
+      rollover_timestamp_value_source: team_formed_on
+      routing_value_source: team_league
+      script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
+      sourced_from_nested_params:
+        field_params:
+          career_wins:
+            cardinality: one
+            source_path: wins
+      type: Team
+  GeneralManagerRecordAggregatedValues:
+    graphql_fields_by_name:
+      id:
+        resolver:
+          name: object_with_lookahead
+      teamId:
+        resolver:
+          name: object_with_lookahead
+      team_formed_on:
+        resolver:
+          name: object_with_lookahead
+      team_league:
+        resolver:
+          name: object_with_lookahead
+      wins:
+        resolver:
+          name: object_with_lookahead
+  GeneralManagerRecordAggregation:
+    elasticgraph_category: indexed_aggregation
+    graphql_fields_by_name:
+      aggregated_values:
+        resolver:
+          name: object_without_lookahead
+      count:
+        resolver:
+          name: object_without_lookahead
+      grouped_by:
+        resolver:
+          name: object_without_lookahead
+    source_type: GeneralManagerRecord
+  GeneralManagerRecordAggregationConnection:
+    elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver:
+          name: object_without_lookahead
+      nodes:
+        resolver:
+          name: object_without_lookahead
+      page_info:
+        resolver:
+          name: object_without_lookahead
+  GeneralManagerRecordAggregationEdge:
+    elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      cursor:
+        resolver:
+          name: object_without_lookahead
+      node:
+        resolver:
+          name: object_without_lookahead
+  GeneralManagerRecordConnection:
+    elasticgraph_category: relay_connection
+    graphql_fields_by_name:
+      edges:
+        resolver:
+          name: object_without_lookahead
+      nodes:
+        resolver:
+          name: object_without_lookahead
+      page_info:
+        resolver:
+          name: object_without_lookahead
+      total_edge_count:
+        resolver:
+          name: object_without_lookahead
+  GeneralManagerRecordEdge:
+    elasticgraph_category: relay_edge
+    graphql_fields_by_name:
+      all_highlights:
+        resolver:
+          name: object_without_lookahead
+      cursor:
+        resolver:
+          name: object_without_lookahead
+      highlights:
+        resolver:
+          name: object_without_lookahead
+      node:
+        resolver:
+          name: object_without_lookahead
+  GeneralManagerRecordGroupedBy:
+    graphql_fields_by_name:
+      teamId:
+        resolver:
+          name: object_with_lookahead
+      team_formed_on:
+        resolver:
+          name: object_with_lookahead
+      team_league:
+        resolver:
+          name: object_with_lookahead
+      wins:
+        resolver:
+          name: object_with_lookahead
+  GeneralManagerRecordHighlights:
+    graphql_fields_by_name:
+      id:
+        resolver:
+          name: get_record_field_value
+      teamId:
+        resolver:
+          name: get_record_field_value
+      team_league:
+        resolver:
+          name: get_record_field_value
   GeoLocation:
     graphql_fields_by_name:
       latitude:
@@ -4428,47 +4677,6 @@ object_types_by_name:
         resolver:
           name: get_record_field_value
       type:
-        resolver:
-          name: get_record_field_value
-  HeadCoach:
-    graphql_fields_by_name:
-      career_wins:
-        resolver:
-          name: get_record_field_value
-      id:
-        resolver:
-          name: get_record_field_value
-      name:
-        resolver:
-          name: get_record_field_value
-  HeadCoachAggregatedValues:
-    graphql_fields_by_name:
-      career_wins:
-        resolver:
-          name: object_with_lookahead
-      id:
-        resolver:
-          name: object_with_lookahead
-      name:
-        resolver:
-          name: object_with_lookahead
-  HeadCoachGroupedBy:
-    graphql_fields_by_name:
-      career_wins:
-        resolver:
-          name: object_with_lookahead
-      id:
-        resolver:
-          name: object_with_lookahead
-      name:
-        resolver:
-          name: object_with_lookahead
-  HeadCoachHighlights:
-    graphql_fields_by_name:
-      id:
-        resolver:
-          name: get_record_field_value
-      name:
         resolver:
           name: get_record_field_value
   IDListFilterInput:
@@ -4799,7 +5007,7 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_4ffccc5ee7c813abd4bdfbaca9907adb
+      script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
       top_level_fields_params:
         ceo:
           cardinality: one
@@ -4957,7 +5165,7 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_4ffccc5ee7c813abd4bdfbaca9907adb
+      script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
       top_level_fields_params:
         created_at:
           cardinality: one
@@ -5918,7 +6126,7 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_4ffccc5ee7c813abd4bdfbaca9907adb
+      script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
       top_level_fields_params:
         __typename:
           cardinality: one
@@ -6117,7 +6325,7 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_4ffccc5ee7c813abd4bdfbaca9907adb
+      script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
       top_level_fields_params:
         __typename:
           cardinality: one
@@ -6184,7 +6392,7 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_4ffccc5ee7c813abd4bdfbaca9907adb
+      script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
       top_level_fields_params:
         active:
           cardinality: one
@@ -6443,6 +6651,12 @@ object_types_by_name:
         resolver:
           name: indexed_type_root_fields
       electrical_parts:
+        resolver:
+          name: indexed_type_root_fields
+      general_manager_record_aggregations:
+        resolver:
+          name: indexed_type_root_fields
+      general_manager_records:
         resolver:
           name: indexed_type_root_fields
       inventor_aggregations:
@@ -6727,7 +6941,7 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_4ffccc5ee7c813abd4bdfbaca9907adb
+      script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
       top_level_fields_params:
         name:
           cardinality: one
@@ -7034,7 +7248,7 @@ object_types_by_name:
       formed_on:
         resolver:
           name: get_record_field_value
-      head_coach:
+      general_manager:
         resolver:
           name: get_record_field_value
       id:
@@ -7083,7 +7297,7 @@ object_types_by_name:
       relationship: __self
       rollover_timestamp_value_source: formed_on
       routing_value_source: league
-      script_id: update_index_data_4ffccc5ee7c813abd4bdfbaca9907adb
+      script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
       top_level_fields_params:
         coaches:
           cardinality: one
@@ -7105,7 +7319,7 @@ object_types_by_name:
           cardinality: one
         formed_on:
           cardinality: one
-        head_coach:
+        general_manager:
           cardinality: one
         league:
           cardinality: one
@@ -7150,7 +7364,7 @@ object_types_by_name:
       formed_on:
         resolver:
           name: object_with_lookahead
-      head_coach:
+      general_manager:
         resolver:
           name: object_with_lookahead
       id:
@@ -7373,7 +7587,7 @@ object_types_by_name:
       formed_on:
         resolver:
           name: object_with_lookahead
-      head_coach:
+      general_manager:
         resolver:
           name: object_with_lookahead
       league:
@@ -7408,7 +7622,7 @@ object_types_by_name:
       forbes_valuation_moneys_object:
         resolver:
           name: get_record_field_value
-      head_coach:
+      general_manager:
         resolver:
           name: get_record_field_value
       id:
@@ -8205,7 +8419,7 @@ object_types_by_name:
       relationship: __self
       rollover_timestamp_value_source: created_at
       routing_value_source: workspace_id2
-      script_id: update_index_data_4ffccc5ee7c813abd4bdfbaca9907adb
+      script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
       top_level_fields_params:
         amount_cents:
           cardinality: one
@@ -8283,7 +8497,7 @@ object_types_by_name:
         version:
           cardinality: one
       relationship: widget
-      script_id: update_index_data_4ffccc5ee7c813abd4bdfbaca9907adb
+      script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
       top_level_fields_params:
         widget_cost:
           cardinality: one
@@ -8513,7 +8727,7 @@ object_types_by_name:
       relationship: __self
       rollover_timestamp_value_source: introduced_on
       routing_value_source: primary_continent
-      script_id: update_index_data_4ffccc5ee7c813abd4bdfbaca9907adb
+      script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
       top_level_fields_params:
         details:
           cardinality: one
@@ -9558,7 +9772,7 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_4ffccc5ee7c813abd4bdfbaca9907adb
+      script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
       top_level_fields_params:
         name:
           cardinality: one
@@ -9580,7 +9794,7 @@ object_types_by_name:
       relationship: workspace
       rollover_timestamp_value_source: widget.created_at
       routing_value_source: id
-      script_id: update_index_data_4ffccc5ee7c813abd4bdfbaca9907adb
+      script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
       top_level_fields_params:
         workspace_name:
           cardinality: one
@@ -9815,4 +10029,4 @@ static_script_ids_by_scoped_name:
   field/as_day_of_week: field_as_day_of_week_f2b5c7d9e8f75bf2457b52412bfb6537
   field/as_time_of_day: field_as_time_of_day_ed82aba44fc66bff5635bec4305c1c66
   filter/by_time_of_day: filter_by_time_of_day_ea12d0561b24961789ab68ed38435612
-  update/index_data: update_index_data_4ffccc5ee7c813abd4bdfbaca9907adb
+  update/index_data: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d

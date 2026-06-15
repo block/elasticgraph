@@ -29,6 +29,7 @@ json_schema_version: 1
         - Component
         - DirectWholesaler
         - ElectricalPart
+        - GeneralManagerRecord
         - Manufacturer
         - MechanicalPart
         - OnlineStore
@@ -390,6 +391,63 @@ json_schema_version: 1
     - manufacturer_id
   Float:
     type: number
+  GeneralManager:
+    type: object
+    properties:
+      id:
+        allOf:
+        - "$ref": "#/$defs/ID"
+        - maxLength: 8191
+      name:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/String"
+          - maxLength: 8191
+        - type: 'null'
+      __typename:
+        type: string
+        const: GeneralManager
+        default: GeneralManager
+    required:
+    - id
+    - name
+  GeneralManagerRecord:
+    type: object
+    properties:
+      id:
+        allOf:
+        - "$ref": "#/$defs/ID"
+        - maxLength: 8191
+      teamId:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/ID"
+          - maxLength: 8191
+        - type: 'null'
+      wins:
+        anyOf:
+        - "$ref": "#/$defs/Int"
+        - type: 'null'
+      team_league:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/String"
+          - maxLength: 8191
+        - type: 'null'
+      team_formed_on:
+        anyOf:
+        - "$ref": "#/$defs/Date"
+        - type: 'null'
+      __typename:
+        type: string
+        const: GeneralManagerRecord
+        default: GeneralManagerRecord
+    required:
+    - id
+    - teamId
+    - wins
+    - team_league
+    - team_formed_on
   GeoLocation:
     type: object
     properties:
@@ -435,26 +493,6 @@ json_schema_version: 1
     required:
     - type
     - coordinates
-  HeadCoach:
-    type: object
-    properties:
-      id:
-        allOf:
-        - "$ref": "#/$defs/ID"
-        - maxLength: 8191
-      name:
-        anyOf:
-        - allOf:
-          - "$ref": "#/$defs/String"
-          - maxLength: 8191
-        - type: 'null'
-      __typename:
-        type: string
-        const: HeadCoach
-        default: HeadCoach
-    required:
-    - id
-    - name
   ID:
     type: string
   Int:
@@ -850,9 +888,9 @@ json_schema_version: 1
         type: array
         items:
           "$ref": "#/$defs/Coach"
-      head_coach:
+      general_manager:
         anyOf:
-        - "$ref": "#/$defs/HeadCoach"
+        - "$ref": "#/$defs/GeneralManager"
         - type: 'null'
       __typename:
         type: string
@@ -878,7 +916,7 @@ json_schema_version: 1
     - nested_fields
     - nested_fields2
     - coaches
-    - head_coach
+    - general_manager
     description: For more performant queries on this type, please filter on `league`
       if possible.
   TeamDetails:

@@ -4122,6 +4122,455 @@ input FloatFilterInput {
   not: FloatFilterInput
 }
 
+type GeneralManager {
+  career_wins: Int
+  id: ID!
+  name: String
+}
+
+"""
+Type used to perform aggregation computations on `GeneralManager` fields.
+"""
+type GeneralManagerAggregatedValues {
+  """
+  Computed aggregate values for the `career_wins` field.
+  """
+  career_wins: IntAggregatedValues
+
+  """
+  Computed aggregate values for the `id` field.
+  """
+  id: NonNumericAggregatedValues
+
+  """
+  Computed aggregate values for the `name` field.
+  """
+  name: NonNumericAggregatedValues
+}
+
+"""
+Input type used to specify filters on `GeneralManager` fields.
+
+Will match all documents if passed as an empty object (or as `null`).
+"""
+input GeneralManagerFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `GeneralManagerFilterInput` input because of
+  collisions between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [GeneralManagerFilterInput!]
+
+  """
+  Matches records where any of the provided sub-filters evaluate to true.
+  This works just like an OR operator in SQL.
+
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
+  """
+  any_of: [GeneralManagerFilterInput!]
+
+  """
+  Used to filter on the `career_wins` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  career_wins: IntFilterInput
+
+  """
+  Used to filter on the `id` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  id: IDFilterInput
+
+  """
+  Used to filter on the `name` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  name: StringFilterInput
+
+  """
+  Matches records where the provided sub-filter evaluates to false.
+  This works just like a NOT operator in SQL.
+
+  When `null` or an empty object is passed, matches no documents.
+  """
+  not: GeneralManagerFilterInput
+}
+
+"""
+Type used to specify the `GeneralManager` fields to group by for aggregations.
+"""
+type GeneralManagerGroupedBy {
+  """
+  The `career_wins` field value for this group.
+  """
+  career_wins: Int
+
+  """
+  The `id` field value for this group.
+  """
+  id: ID
+
+  """
+  The `name` field value for this group.
+  """
+  name: String
+}
+
+"""
+Type used to request desired `GeneralManager` search highlight fields.
+"""
+type GeneralManagerHighlights {
+  """
+  Search highlights for the `id`, providing snippets of the matching text.
+  """
+  id: [String!]!
+
+  """
+  Search highlights for the `name`, providing snippets of the matching text.
+  """
+  name: [String!]!
+}
+
+type GeneralManagerRecord @key(fields: "id") {
+  id: ID!
+  teamId: ID
+  team_formed_on: Date
+  team_league: String
+  wins: Int
+}
+
+"""
+Type used to perform aggregation computations on `GeneralManagerRecord` fields.
+"""
+type GeneralManagerRecordAggregatedValues {
+  """
+  Computed aggregate values for the `id` field.
+  """
+  id: NonNumericAggregatedValues
+
+  """
+  Computed aggregate values for the `teamId` field.
+  """
+  teamId: NonNumericAggregatedValues
+
+  """
+  Computed aggregate values for the `team_formed_on` field.
+  """
+  team_formed_on: DateAggregatedValues
+
+  """
+  Computed aggregate values for the `team_league` field.
+  """
+  team_league: NonNumericAggregatedValues
+
+  """
+  Computed aggregate values for the `wins` field.
+  """
+  wins: IntAggregatedValues
+}
+
+"""
+Return type representing a bucket of `GeneralManagerRecord` documents for an aggregations query.
+"""
+type GeneralManagerRecordAggregation {
+  """
+  Provides computed aggregated values over all `GeneralManagerRecord` documents in an aggregation bucket.
+  """
+  aggregated_values: GeneralManagerRecordAggregatedValues
+
+  """
+  The count of `GeneralManagerRecord` documents in an aggregation bucket.
+  """
+  count: JsonSafeLong!
+
+  """
+  Used to specify the `GeneralManagerRecord` fields to group by. The returned values identify each aggregation bucket.
+  """
+  grouped_by: GeneralManagerRecordGroupedBy
+}
+
+"""
+Represents a paginated collection of `GeneralManagerRecordAggregation` results.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Connection-Types) for more info.
+"""
+type GeneralManagerRecordAggregationConnection {
+  """
+  Wraps a specific `GeneralManagerRecordAggregation` to pair it with its pagination cursor.
+  """
+  edges: [GeneralManagerRecordAggregationEdge!]!
+
+  """
+  The list of `GeneralManagerRecordAggregation` results.
+  """
+  nodes: [GeneralManagerRecordAggregation!]!
+
+  """
+  Provides pagination-related information.
+  """
+  page_info: PageInfo!
+}
+
+"""
+Represents a specific `GeneralManagerRecordAggregation` in the context of a `GeneralManagerRecordAggregationConnection`,
+providing access to both the `GeneralManagerRecordAggregation` and
+query-specific information such as the pagination `Cursor`.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for more info.
+"""
+type GeneralManagerRecordAggregationEdge {
+  """
+  The `Cursor` of this `GeneralManagerRecordAggregation`. This can be passed in the next query as
+  a `before` or `after` argument to continue paginating from this `GeneralManagerRecordAggregation`.
+  """
+  cursor: Cursor
+
+  """
+  The `GeneralManagerRecordAggregation` of this edge.
+  """
+  node: GeneralManagerRecordAggregation
+}
+
+"""
+Represents a paginated collection of `GeneralManagerRecord` results.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Connection-Types) for more info.
+"""
+type GeneralManagerRecordConnection {
+  """
+  Wraps a specific `GeneralManagerRecord` to pair it with its pagination cursor.
+  """
+  edges: [GeneralManagerRecordEdge!]!
+
+  """
+  The list of `GeneralManagerRecord` results.
+  """
+  nodes: [GeneralManagerRecord!]!
+
+  """
+  Provides pagination-related information.
+  """
+  page_info: PageInfo!
+
+  """
+  The total number of edges available in this connection to paginate over.
+  """
+  total_edge_count: JsonSafeLong!
+}
+
+"""
+Represents a specific `GeneralManagerRecord` in the context of a `GeneralManagerRecordConnection`,
+providing access to both the `GeneralManagerRecord` and query-specific information such as the pagination `Cursor`.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for more info.
+"""
+type GeneralManagerRecordEdge {
+  """
+  All search highlights for this `GeneralManagerRecord`, indicating where in the indexed document the query matched.
+  """
+  all_highlights: [SearchHighlight!]!
+
+  """
+  The `Cursor` of this `GeneralManagerRecord`. This can be passed in the next query as
+  a `before` or `after` argument to continue paginating from this `GeneralManagerRecord`.
+  """
+  cursor: Cursor
+
+  """
+  Specific search highlights for this `GeneralManagerRecord`, providing matching snippets for the requested fields.
+  """
+  highlights: GeneralManagerRecordHighlights
+
+  """
+  The `GeneralManagerRecord` of this edge.
+  """
+  node: GeneralManagerRecord
+}
+
+"""
+Input type used to specify filters on `GeneralManagerRecord` fields.
+
+Will match all documents if passed as an empty object (or as `null`).
+"""
+input GeneralManagerRecordFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `GeneralManagerRecordFilterInput` input because of
+  collisions between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [GeneralManagerRecordFilterInput!]
+
+  """
+  Matches records where any of the provided sub-filters evaluate to true.
+  This works just like an OR operator in SQL.
+
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
+  """
+  any_of: [GeneralManagerRecordFilterInput!]
+
+  """
+  Used to filter on the `id` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  id: IDFilterInput
+
+  """
+  Matches records where the provided sub-filter evaluates to false.
+  This works just like a NOT operator in SQL.
+
+  When `null` or an empty object is passed, matches no documents.
+  """
+  not: GeneralManagerRecordFilterInput
+
+  """
+  Used to filter on the `teamId` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  teamId: IDFilterInput
+
+  """
+  Used to filter on the `team_formed_on` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  team_formed_on: DateFilterInput
+
+  """
+  Used to filter on the `team_league` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  team_league: StringFilterInput
+
+  """
+  Used to filter on the `wins` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  wins: IntFilterInput
+}
+
+"""
+Type used to specify the `GeneralManagerRecord` fields to group by for aggregations.
+"""
+type GeneralManagerRecordGroupedBy {
+  """
+  The `teamId` field value for this group.
+  """
+  teamId: ID
+
+  """
+  Offers the different grouping options for the `team_formed_on` value within this group.
+  """
+  team_formed_on: DateGroupedBy
+
+  """
+  The `team_league` field value for this group.
+  """
+  team_league: String
+
+  """
+  The `wins` field value for this group.
+  """
+  wins: Int
+}
+
+"""
+Type used to request desired `GeneralManagerRecord` search highlight fields.
+"""
+type GeneralManagerRecordHighlights {
+  """
+  Search highlights for the `id`, providing snippets of the matching text.
+  """
+  id: [String!]!
+
+  """
+  Search highlights for the `teamId`, providing snippets of the matching text.
+  """
+  teamId: [String!]!
+
+  """
+  Search highlights for the `team_league`, providing snippets of the matching text.
+  """
+  team_league: [String!]!
+}
+
+"""
+Enumerates the ways `GeneralManagerRecord`s can be sorted.
+"""
+enum GeneralManagerRecordSortOrderInput {
+  """
+  Sorts ascending by the `id` field.
+  """
+  id_ASC
+
+  """
+  Sorts descending by the `id` field.
+  """
+  id_DESC
+
+  """
+  Sorts ascending by the `teamId` field.
+  """
+  teamId_ASC
+
+  """
+  Sorts descending by the `teamId` field.
+  """
+  teamId_DESC
+
+  """
+  Sorts ascending by the `team_formed_on` field.
+  """
+  team_formed_on_ASC
+
+  """
+  Sorts descending by the `team_formed_on` field.
+  """
+  team_formed_on_DESC
+
+  """
+  Sorts ascending by the `team_league` field.
+  """
+  team_league_ASC
+
+  """
+  Sorts descending by the `team_league` field.
+  """
+  team_league_DESC
+
+  """
+  Sorts ascending by the `wins` field.
+  """
+  wins_ASC
+
+  """
+  Sorts descending by the `wins` field.
+  """
+  wins_DESC
+}
+
 """
 Geographic coordinates representing a location on the Earth's surface.
 """
@@ -4210,124 +4659,6 @@ input GeoLocationFilterInput {
 type GeoShape {
   coordinates: [Float!]!
   type: String
-}
-
-type HeadCoach {
-  career_wins: Int
-  id: ID!
-  name: String
-}
-
-"""
-Type used to perform aggregation computations on `HeadCoach` fields.
-"""
-type HeadCoachAggregatedValues {
-  """
-  Computed aggregate values for the `career_wins` field.
-  """
-  career_wins: IntAggregatedValues
-
-  """
-  Computed aggregate values for the `id` field.
-  """
-  id: NonNumericAggregatedValues
-
-  """
-  Computed aggregate values for the `name` field.
-  """
-  name: NonNumericAggregatedValues
-}
-
-"""
-Input type used to specify filters on `HeadCoach` fields.
-
-Will match all documents if passed as an empty object (or as `null`).
-"""
-input HeadCoachFilterInput {
-  """
-  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
-
-  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
-  be provided on a single `HeadCoachFilterInput` input because of collisions
-  between key names. For example, if you want to AND multiple
-  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
-
-  When `null` or an empty list is passed, matches all documents.
-  """
-  all_of: [HeadCoachFilterInput!]
-
-  """
-  Matches records where any of the provided sub-filters evaluate to true.
-  This works just like an OR operator in SQL.
-
-  When `null` is passed, matches all documents.
-  When an empty list is passed, this part of the filter matches no documents.
-  """
-  any_of: [HeadCoachFilterInput!]
-
-  """
-  Used to filter on the `career_wins` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  career_wins: IntFilterInput
-
-  """
-  Used to filter on the `id` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  id: IDFilterInput
-
-  """
-  Used to filter on the `name` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  name: StringFilterInput
-
-  """
-  Matches records where the provided sub-filter evaluates to false.
-  This works just like a NOT operator in SQL.
-
-  When `null` or an empty object is passed, matches no documents.
-  """
-  not: HeadCoachFilterInput
-}
-
-"""
-Type used to specify the `HeadCoach` fields to group by for aggregations.
-"""
-type HeadCoachGroupedBy {
-  """
-  The `career_wins` field value for this group.
-  """
-  career_wins: Int
-
-  """
-  The `id` field value for this group.
-  """
-  id: ID
-
-  """
-  The `name` field value for this group.
-  """
-  name: String
-}
-
-"""
-Type used to request desired `HeadCoach` search highlight fields.
-"""
-type HeadCoachHighlights {
-  """
-  Search highlights for the `id`, providing snippets of the matching text.
-  """
-  id: [String!]!
-
-  """
-  Search highlights for the `name`, providing snippets of the matching text.
-  """
-  name: [String!]!
 }
 
 """
@@ -10660,6 +10991,109 @@ type Query {
   ): ElectricalPartConnection
 
   """
+  Aggregations over the `general_manager_records` data:
+
+  > Fetches `GeneralManagerRecord`s based on the provided arguments.
+  """
+  general_manager_record_aggregations(
+    """
+    Used to forward-paginate through the `general_manager_record_aggregations`. When provided, the next page after the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    after: Cursor
+
+    """
+    Used to backward-paginate through the `general_manager_record_aggregations`. When provided, the previous page before the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    before: Cursor
+
+    """
+    Used to filter the `GeneralManagerRecord` documents that get aggregated over based on the provided criteria.
+    """
+    filter: GeneralManagerRecordFilterInput
+
+    """
+    Used in conjunction with the `after` argument to forward-paginate through the `general_manager_record_aggregations`.
+    When provided, limits the number of returned results to the first `n` after the provided
+    `after` cursor (or from the start of the `general_manager_record_aggregations`, if no `after` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    first: Int
+
+    """
+    Used in conjunction with the `before` argument to backward-paginate through the `general_manager_record_aggregations`.
+    When provided, limits the number of returned results to the last `n` before the provided
+    `before` cursor (or from the end of the `general_manager_record_aggregations`, if no `before` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    last: Int
+  ): GeneralManagerRecordAggregationConnection
+
+  """
+  Fetches `GeneralManagerRecord`s based on the provided arguments.
+  """
+  general_manager_records(
+    """
+    Used to forward-paginate through the `general_manager_records`. When provided, the next page after the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    after: Cursor
+
+    """
+    Used to backward-paginate through the `general_manager_records`. When provided, the previous page before the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    before: Cursor
+
+    """
+    Used to filter the returned `general_manager_records` based on the provided criteria.
+    """
+    filter: GeneralManagerRecordFilterInput
+
+    """
+    Used in conjunction with the `after` argument to forward-paginate through the `general_manager_records`.
+    When provided, limits the number of returned results to the first `n` after the provided
+    `after` cursor (or from the start of the `general_manager_records`, if no `after` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    first: Int
+
+    """
+    Used in conjunction with the `before` argument to backward-paginate through the `general_manager_records`.
+    When provided, limits the number of returned results to the last `n` before the provided
+    `before` cursor (or from the end of the `general_manager_records`, if no `before` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    last: Int
+
+    """
+    Used to specify how the returned `general_manager_records` should be sorted.
+    """
+    order_by: [GeneralManagerRecordSortOrderInput!]
+  ): GeneralManagerRecordConnection
+
+  """
   Aggregations over the `inventors` data:
 
   > Fetches `Inventor`s based on the provided arguments.
@@ -13983,7 +14417,7 @@ type Team @key(fields: "id") {
   forbes_valuation_moneys_object: [Money!]!
   forbes_valuations: [JsonSafeLong!]!
   formed_on: Date
-  head_coach: HeadCoach
+  general_manager: GeneralManager
   id: ID
   league: String
   nested_fields: TeamNestedFields
@@ -14040,9 +14474,9 @@ type TeamAggregatedValues {
   formed_on: DateAggregatedValues
 
   """
-  Computed aggregate values for the `head_coach` field.
+  Computed aggregate values for the `general_manager` field.
   """
-  head_coach: HeadCoachAggregatedValues
+  general_manager: GeneralManagerAggregatedValues
 
   """
   Computed aggregate values for the `id` field.
@@ -14674,11 +15108,11 @@ input TeamFilterInput {
   formed_on: DateFilterInput
 
   """
-  Used to filter on the `head_coach` field.
+  Used to filter on the `general_manager` field.
 
   When `null` or an empty object is passed, matches all documents.
   """
-  head_coach: HeadCoachFilterInput
+  general_manager: GeneralManagerFilterInput
 
   """
   Used to filter on the `id` field.
@@ -14817,9 +15251,9 @@ type TeamGroupedBy {
   formed_on: DateGroupedBy
 
   """
-  The `head_coach` field value for this group.
+  The `general_manager` field value for this group.
   """
-  head_coach: HeadCoachGroupedBy
+  general_manager: GeneralManagerGroupedBy
 
   """
   The `league` field value for this group.
@@ -14884,9 +15318,9 @@ type TeamHighlights {
   forbes_valuation_moneys_object: MoneyHighlights
 
   """
-  Search highlights for the `head_coach`, providing snippets of the matching text.
+  Search highlights for the `general_manager`, providing snippets of the matching text.
   """
-  head_coach: HeadCoachHighlights
+  general_manager: GeneralManagerHighlights
 
   """
   Search highlights for the `id`, providing snippets of the matching text.
@@ -15862,34 +16296,34 @@ enum TeamSortOrderInput {
   formed_on_DESC
 
   """
-  Sorts ascending by the `head_coach.career_wins` field.
+  Sorts ascending by the `general_manager.career_wins` field.
   """
-  head_coach_career_wins_ASC
+  general_manager_career_wins_ASC
 
   """
-  Sorts descending by the `head_coach.career_wins` field.
+  Sorts descending by the `general_manager.career_wins` field.
   """
-  head_coach_career_wins_DESC
+  general_manager_career_wins_DESC
 
   """
-  Sorts ascending by the `head_coach.id` field.
+  Sorts ascending by the `general_manager.id` field.
   """
-  head_coach_id_ASC
+  general_manager_id_ASC
 
   """
-  Sorts descending by the `head_coach.id` field.
+  Sorts descending by the `general_manager.id` field.
   """
-  head_coach_id_DESC
+  general_manager_id_DESC
 
   """
-  Sorts ascending by the `head_coach.name` field.
+  Sorts ascending by the `general_manager.name` field.
   """
-  head_coach_name_ASC
+  general_manager_name_ASC
 
   """
-  Sorts descending by the `head_coach.name` field.
+  Sorts descending by the `general_manager.name` field.
   """
-  head_coach_name_DESC
+  general_manager_name_DESC
 
   """
   Sorts ascending by the `id` field.
@@ -20729,7 +21163,7 @@ In an ElasticGraph schema, this is a union of all indexed types.
 
 Not intended for use by clients other than Apollo.
 """
-union _Entity = BrokerWholesaler | CoachRecord | Company | Component | Country | DirectWholesaler | ElectricalPart | Manufacturer | MechanicalPart | OnlineStore | Person | PhysicalStore | Sponsor | Team | Widget | WidgetCurrency | WidgetWorkspace
+union _Entity = BrokerWholesaler | CoachRecord | Company | Component | Country | DirectWholesaler | ElectricalPart | GeneralManagerRecord | Manufacturer | MechanicalPart | OnlineStore | Person | PhysicalStore | Sponsor | Team | Widget | WidgetCurrency | WidgetWorkspace
 
 """
 An object type required by the [Apollo Federation subgraph
