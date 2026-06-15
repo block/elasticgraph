@@ -24,6 +24,7 @@ json_schema_version: 1
         enum:
         - Address
         - BrokerWholesaler
+        - CoachRecord
         - Company
         - Component
         - DirectWholesaler
@@ -212,6 +213,94 @@ json_schema_version: 1
     required:
     - id
     - active
+  Coach:
+    type: object
+    properties:
+      id:
+        allOf:
+        - "$ref": "#/$defs/ID"
+        - maxLength: 8191
+        ElasticGraph:
+          type: ID!
+          nameInIndex: id
+      name:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/String"
+          - maxLength: 8191
+        - type: 'null'
+        ElasticGraph:
+          type: String
+          nameInIndex: name
+      __typename:
+        type: string
+        const: Coach
+        default: Coach
+    required:
+    - id
+    - name
+  CoachRecord:
+    type: object
+    properties:
+      id:
+        allOf:
+        - "$ref": "#/$defs/ID"
+        - maxLength: 8191
+        ElasticGraph:
+          type: ID!
+          nameInIndex: id
+      teamId:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/ID"
+          - maxLength: 8191
+        - type: 'null'
+        ElasticGraph:
+          type: ID
+          nameInIndex: teamId
+      coachId:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/ID"
+          - maxLength: 8191
+        - type: 'null'
+        ElasticGraph:
+          type: ID
+          nameInIndex: coachId
+      wins:
+        anyOf:
+        - "$ref": "#/$defs/Int"
+        - type: 'null'
+        ElasticGraph:
+          type: Int
+          nameInIndex: wins
+      team_league:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/String"
+          - maxLength: 8191
+        - type: 'null'
+        ElasticGraph:
+          type: String
+          nameInIndex: team_league
+      team_formed_on:
+        anyOf:
+        - "$ref": "#/$defs/Date"
+        - type: 'null'
+        ElasticGraph:
+          type: Date
+          nameInIndex: team_formed_on
+      __typename:
+        type: string
+        const: CoachRecord
+        default: CoachRecord
+    required:
+    - id
+    - teamId
+    - coachId
+    - wins
+    - team_league
+    - team_formed_on
   Color:
     type: string
     enum:
@@ -469,6 +558,32 @@ json_schema_version: 1
     required:
     - type
     - coordinates
+  HeadCoach:
+    type: object
+    properties:
+      id:
+        allOf:
+        - "$ref": "#/$defs/ID"
+        - maxLength: 8191
+        ElasticGraph:
+          type: ID!
+          nameInIndex: id
+      name:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/String"
+          - maxLength: 8191
+        - type: 'null'
+        ElasticGraph:
+          type: String
+          nameInIndex: name
+      __typename:
+        type: string
+        const: HeadCoach
+        default: HeadCoach
+    required:
+    - id
+    - name
   ID:
     type: string
   Int:
@@ -1019,6 +1134,20 @@ json_schema_version: 1
         ElasticGraph:
           type: TeamNestedFields
           nameInIndex: nested_fields2
+      coaches:
+        type: array
+        items:
+          "$ref": "#/$defs/Coach"
+        ElasticGraph:
+          type: "[Coach!]!"
+          nameInIndex: coaches
+      head_coach:
+        anyOf:
+        - "$ref": "#/$defs/HeadCoach"
+        - type: 'null'
+        ElasticGraph:
+          type: HeadCoach
+          nameInIndex: head_coach
       __typename:
         type: string
         const: Team
@@ -1042,6 +1171,8 @@ json_schema_version: 1
     - seasons_object
     - nested_fields
     - nested_fields2
+    - coaches
+    - head_coach
     description: For more performant queries on this type, please filter on `league`
       if possible.
   TeamDetails:

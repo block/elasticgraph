@@ -80,9 +80,30 @@ ElasticGraph.define_schema do |schema|
     # Here we duplicate `nested_fields` as `nested_fields2` to achieve that.
     t.field "nested_fields2", "TeamNestedFields"
 
+    # Coaching staff embeds source-bearing `Coach`/`HeadCoach` elements (see the `CoachRecord` types below).
+    # `coaches` is a list (its `career_wins` is sourced onto the element matched by `coachId`); `head_coach`
+    # is a singleton object (sourced onto the element reached by field name -- the all-object path).
+    t.field "coaches", "[Coach!]!" do |f|
+      f.mapping type: "object"
+    end
+
+    t.field "head_coach", "HeadCoach" do |f|
+      f.mapping type: "object"
+    end
+
+    t.relates_to_many "coach_records", "CoachRecord", via: "teamId", dir: :in, indexing_only: true, singular: "coach_record" do |r|
+      r.equivalent_field "team_league", locally_named: "league"
+      r.equivalent_field "team_formed_on", locally_named: "formed_on"
+    end
+    t.relates_to_many "head_coach_records", "CoachRecord", via: "teamId", dir: :in, indexing_only: true, singular: "head_coach_record" do |r|
+      r.equivalent_field "team_league", locally_named: "league"
+      r.equivalent_field "team_formed_on", locally_named: "formed_on"
+    end
+
     t.index "teams" do |i|
       i.route_with "league"
       i.rollover :yearly, "formed_on"
+      i.has_had_multiple_sources!
     end
   end
 
@@ -179,6 +200,60 @@ ElasticGraph.define_schema do |schema|
       # :nocov: -- only one side of these conditionals is executed in our test suite (but both both are covered by rake tasks)
       f.apollo_external if f.respond_to?(:apollo_external)
       # :nocov:
+    end
+  end
+
+  # These types exercise *nested* `sourced_from`: a field sourced not onto the root indexed document but
+  # onto an element embedded within it. A `Team` embeds its coaching staff, and each coach's `career_wins`
+  # is filled in from a separate `CoachRecord` feed (keyed by coach). A coach is a real entity with its own
+  # `id` -- unlike the embedded `Player` value object above -- which is exactly what nested `sourced_from`
+  # needs to match the right embedded element.
+  #
+  # We embed coaches two ways to cover both path shapes the painless script must handle:
+  # - `coaches` (a *list*): the path has a list segment, so the target element is matched by id.
+  # - `head_coach` (a singleton *object*): the path is all-object, so the target element is reached by field
+  #   name (the case that originally produced an empty element key and collided with top-level events).
+  #
+  # Each embedding owns its own source relationship, since a single `parent_relationship` resolves to exactly
+  # one embedding path.
+  schema.object_type "CoachRecord" do |t|
+    t.field "id", "ID!"
+    t.field "teamId", "ID"
+    t.field "coachId", "ID"
+    t.field "wins", "Int"
+
+    # The `teams` index uses custom shard routing (`league`) and is a rollover index (`formed_on`), so a
+    # `CoachRecord` event must carry equivalents the indexer can use to route/select the `Team` index it
+    # updates. Mirrors how the top-level `sourced_from` example in `widgets.rb` uses `equivalent_field`.
+    t.field "team_league", "String"
+    t.field "team_formed_on", "Date"
+
+    t.index "coach_records"
+  end
+
+  schema.object_type "Coach" do |t|
+    t.field "id", "ID!"
+    t.field "name", "String"
+
+    t.field "career_wins", "Int" do |f|
+      f.sourced_from "record", "wins"
+    end
+
+    t.relates_to_one "record", "CoachRecord", via: "coachId", dir: :in, indexing_only: true do |r|
+      r.parent_relationship "Team", "coach_records"
+    end
+  end
+
+  schema.object_type "HeadCoach" do |t|
+    t.field "id", "ID!"
+    t.field "name", "String"
+
+    t.field "career_wins", "Int" do |f|
+      f.sourced_from "record", "wins"
+    end
+
+    t.relates_to_one "record", "CoachRecord", via: "teamId", dir: :in, indexing_only: true do |r|
+      r.parent_relationship "Team", "head_coach_records"
     end
   end
 end

@@ -706,6 +706,496 @@ type BrokerWholesaler implements DistributionChannel & Wholesale @key(fields: "i
   id: ID!
 }
 
+type Coach {
+  career_wins: Int
+  id: ID!
+  name: String
+}
+
+"""
+Type used to perform aggregation computations on `Coach` fields.
+"""
+type CoachAggregatedValues {
+  """
+  Computed aggregate values for the `career_wins` field.
+  """
+  career_wins: IntAggregatedValues
+
+  """
+  Computed aggregate values for the `id` field.
+  """
+  id: NonNumericAggregatedValues
+
+  """
+  Computed aggregate values for the `name` field.
+  """
+  name: NonNumericAggregatedValues
+}
+
+"""
+Input type used to specify filters on a `Coach` object referenced directly
+or transitively from a list field that has been configured to index each leaf field as
+its own flattened list of values.
+
+Will match all documents if passed as an empty object (or as `null`).
+"""
+input CoachFieldsListFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `CoachFieldsListFilterInput` input because of
+  collisions between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [CoachFieldsListFilterInput!]
+
+  """
+  Matches records where any of the provided sub-filters evaluate to true.
+  This works just like an OR operator in SQL.
+
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
+  """
+  any_of: [CoachFieldsListFilterInput!]
+
+  """
+  Used to filter on the `career_wins` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  career_wins: IntListFilterInput
+
+  """
+  Used to filter on the number of non-null elements in this list field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  count: IntFilterInput
+
+  """
+  Used to filter on the `id` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  id: IDListFilterInput
+
+  """
+  Used to filter on the `name` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  name: StringListFilterInput
+
+  """
+  Matches records where the provided sub-filter evaluates to false.
+  This works just like a NOT operator in SQL.
+
+  When `null` or an empty object is passed, matches no documents.
+  """
+  not: CoachFieldsListFilterInput
+}
+
+"""
+Type used to specify the `Coach` fields to group by for aggregations.
+"""
+type CoachGroupedBy {
+  """
+  The `career_wins` field value for this group.
+  """
+  career_wins: Int
+
+  """
+  The `id` field value for this group.
+  """
+  id: ID
+
+  """
+  The `name` field value for this group.
+  """
+  name: String
+}
+
+"""
+Type used to request desired `Coach` search highlight fields.
+"""
+type CoachHighlights {
+  """
+  Search highlights for the `id`, providing snippets of the matching text.
+  """
+  id: [String!]!
+
+  """
+  Search highlights for the `name`, providing snippets of the matching text.
+  """
+  name: [String!]!
+}
+
+type CoachRecord @key(fields: "id") {
+  coachId: ID
+  id: ID!
+  teamId: ID
+  team_formed_on: Date
+  team_league: String
+  wins: Int
+}
+
+"""
+Type used to perform aggregation computations on `CoachRecord` fields.
+"""
+type CoachRecordAggregatedValues {
+  """
+  Computed aggregate values for the `coachId` field.
+  """
+  coachId: NonNumericAggregatedValues
+
+  """
+  Computed aggregate values for the `id` field.
+  """
+  id: NonNumericAggregatedValues
+
+  """
+  Computed aggregate values for the `teamId` field.
+  """
+  teamId: NonNumericAggregatedValues
+
+  """
+  Computed aggregate values for the `team_formed_on` field.
+  """
+  team_formed_on: DateAggregatedValues
+
+  """
+  Computed aggregate values for the `team_league` field.
+  """
+  team_league: NonNumericAggregatedValues
+
+  """
+  Computed aggregate values for the `wins` field.
+  """
+  wins: IntAggregatedValues
+}
+
+"""
+Return type representing a bucket of `CoachRecord` documents for an aggregations query.
+"""
+type CoachRecordAggregation {
+  """
+  Provides computed aggregated values over all `CoachRecord` documents in an aggregation bucket.
+  """
+  aggregated_values: CoachRecordAggregatedValues
+
+  """
+  The count of `CoachRecord` documents in an aggregation bucket.
+  """
+  count: JsonSafeLong!
+
+  """
+  Used to specify the `CoachRecord` fields to group by. The returned values identify each aggregation bucket.
+  """
+  grouped_by: CoachRecordGroupedBy
+}
+
+"""
+Represents a paginated collection of `CoachRecordAggregation` results.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Connection-Types) for more info.
+"""
+type CoachRecordAggregationConnection {
+  """
+  Wraps a specific `CoachRecordAggregation` to pair it with its pagination cursor.
+  """
+  edges: [CoachRecordAggregationEdge!]!
+
+  """
+  The list of `CoachRecordAggregation` results.
+  """
+  nodes: [CoachRecordAggregation!]!
+
+  """
+  Provides pagination-related information.
+  """
+  page_info: PageInfo!
+}
+
+"""
+Represents a specific `CoachRecordAggregation` in the context of a `CoachRecordAggregationConnection`,
+providing access to both the `CoachRecordAggregation` and query-specific information such as the pagination `Cursor`.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for more info.
+"""
+type CoachRecordAggregationEdge {
+  """
+  The `Cursor` of this `CoachRecordAggregation`. This can be passed in the next query as
+  a `before` or `after` argument to continue paginating from this `CoachRecordAggregation`.
+  """
+  cursor: Cursor
+
+  """
+  The `CoachRecordAggregation` of this edge.
+  """
+  node: CoachRecordAggregation
+}
+
+"""
+Represents a paginated collection of `CoachRecord` results.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Connection-Types) for more info.
+"""
+type CoachRecordConnection {
+  """
+  Wraps a specific `CoachRecord` to pair it with its pagination cursor.
+  """
+  edges: [CoachRecordEdge!]!
+
+  """
+  The list of `CoachRecord` results.
+  """
+  nodes: [CoachRecord!]!
+
+  """
+  Provides pagination-related information.
+  """
+  page_info: PageInfo!
+
+  """
+  The total number of edges available in this connection to paginate over.
+  """
+  total_edge_count: JsonSafeLong!
+}
+
+"""
+Represents a specific `CoachRecord` in the context of a `CoachRecordConnection`,
+providing access to both the `CoachRecord` and query-specific information such as the pagination `Cursor`.
+
+See the [Relay GraphQL Cursor Connections
+Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for more info.
+"""
+type CoachRecordEdge {
+  """
+  All search highlights for this `CoachRecord`, indicating where in the indexed document the query matched.
+  """
+  all_highlights: [SearchHighlight!]!
+
+  """
+  The `Cursor` of this `CoachRecord`. This can be passed in the next query as
+  a `before` or `after` argument to continue paginating from this `CoachRecord`.
+  """
+  cursor: Cursor
+
+  """
+  Specific search highlights for this `CoachRecord`, providing matching snippets for the requested fields.
+  """
+  highlights: CoachRecordHighlights
+
+  """
+  The `CoachRecord` of this edge.
+  """
+  node: CoachRecord
+}
+
+"""
+Input type used to specify filters on `CoachRecord` fields.
+
+Will match all documents if passed as an empty object (or as `null`).
+"""
+input CoachRecordFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `CoachRecordFilterInput` input because of collisions
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [CoachRecordFilterInput!]
+
+  """
+  Matches records where any of the provided sub-filters evaluate to true.
+  This works just like an OR operator in SQL.
+
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
+  """
+  any_of: [CoachRecordFilterInput!]
+
+  """
+  Used to filter on the `coachId` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  coachId: IDFilterInput
+
+  """
+  Used to filter on the `id` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  id: IDFilterInput
+
+  """
+  Matches records where the provided sub-filter evaluates to false.
+  This works just like a NOT operator in SQL.
+
+  When `null` or an empty object is passed, matches no documents.
+  """
+  not: CoachRecordFilterInput
+
+  """
+  Used to filter on the `teamId` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  teamId: IDFilterInput
+
+  """
+  Used to filter on the `team_formed_on` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  team_formed_on: DateFilterInput
+
+  """
+  Used to filter on the `team_league` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  team_league: StringFilterInput
+
+  """
+  Used to filter on the `wins` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  wins: IntFilterInput
+}
+
+"""
+Type used to specify the `CoachRecord` fields to group by for aggregations.
+"""
+type CoachRecordGroupedBy {
+  """
+  The `coachId` field value for this group.
+  """
+  coachId: ID
+
+  """
+  The `teamId` field value for this group.
+  """
+  teamId: ID
+
+  """
+  Offers the different grouping options for the `team_formed_on` value within this group.
+  """
+  team_formed_on: DateGroupedBy
+
+  """
+  The `team_league` field value for this group.
+  """
+  team_league: String
+
+  """
+  The `wins` field value for this group.
+  """
+  wins: Int
+}
+
+"""
+Type used to request desired `CoachRecord` search highlight fields.
+"""
+type CoachRecordHighlights {
+  """
+  Search highlights for the `coachId`, providing snippets of the matching text.
+  """
+  coachId: [String!]!
+
+  """
+  Search highlights for the `id`, providing snippets of the matching text.
+  """
+  id: [String!]!
+
+  """
+  Search highlights for the `teamId`, providing snippets of the matching text.
+  """
+  teamId: [String!]!
+
+  """
+  Search highlights for the `team_league`, providing snippets of the matching text.
+  """
+  team_league: [String!]!
+}
+
+"""
+Enumerates the ways `CoachRecord`s can be sorted.
+"""
+enum CoachRecordSortOrderInput {
+  """
+  Sorts ascending by the `coachId` field.
+  """
+  coachId_ASC
+
+  """
+  Sorts descending by the `coachId` field.
+  """
+  coachId_DESC
+
+  """
+  Sorts ascending by the `id` field.
+  """
+  id_ASC
+
+  """
+  Sorts descending by the `id` field.
+  """
+  id_DESC
+
+  """
+  Sorts ascending by the `teamId` field.
+  """
+  teamId_ASC
+
+  """
+  Sorts descending by the `teamId` field.
+  """
+  teamId_DESC
+
+  """
+  Sorts ascending by the `team_formed_on` field.
+  """
+  team_formed_on_ASC
+
+  """
+  Sorts descending by the `team_formed_on` field.
+  """
+  team_formed_on_DESC
+
+  """
+  Sorts ascending by the `team_league` field.
+  """
+  team_league_ASC
+
+  """
+  Sorts descending by the `team_league` field.
+  """
+  team_league_DESC
+
+  """
+  Sorts ascending by the `wins` field.
+  """
+  wins_ASC
+
+  """
+  Sorts descending by the `wins` field.
+  """
+  wins_DESC
+}
+
 enum Color {
   BLUE
   GREEN
@@ -3720,6 +4210,124 @@ input GeoLocationFilterInput {
 type GeoShape {
   coordinates: [Float!]!
   type: String
+}
+
+type HeadCoach {
+  career_wins: Int
+  id: ID!
+  name: String
+}
+
+"""
+Type used to perform aggregation computations on `HeadCoach` fields.
+"""
+type HeadCoachAggregatedValues {
+  """
+  Computed aggregate values for the `career_wins` field.
+  """
+  career_wins: IntAggregatedValues
+
+  """
+  Computed aggregate values for the `id` field.
+  """
+  id: NonNumericAggregatedValues
+
+  """
+  Computed aggregate values for the `name` field.
+  """
+  name: NonNumericAggregatedValues
+}
+
+"""
+Input type used to specify filters on `HeadCoach` fields.
+
+Will match all documents if passed as an empty object (or as `null`).
+"""
+input HeadCoachFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `HeadCoachFilterInput` input because of collisions
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [HeadCoachFilterInput!]
+
+  """
+  Matches records where any of the provided sub-filters evaluate to true.
+  This works just like an OR operator in SQL.
+
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
+  """
+  any_of: [HeadCoachFilterInput!]
+
+  """
+  Used to filter on the `career_wins` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  career_wins: IntFilterInput
+
+  """
+  Used to filter on the `id` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  id: IDFilterInput
+
+  """
+  Used to filter on the `name` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  name: StringFilterInput
+
+  """
+  Matches records where the provided sub-filter evaluates to false.
+  This works just like a NOT operator in SQL.
+
+  When `null` or an empty object is passed, matches no documents.
+  """
+  not: HeadCoachFilterInput
+}
+
+"""
+Type used to specify the `HeadCoach` fields to group by for aggregations.
+"""
+type HeadCoachGroupedBy {
+  """
+  The `career_wins` field value for this group.
+  """
+  career_wins: Int
+
+  """
+  The `id` field value for this group.
+  """
+  id: ID
+
+  """
+  The `name` field value for this group.
+  """
+  name: String
+}
+
+"""
+Type used to request desired `HeadCoach` search highlight fields.
+"""
+type HeadCoachHighlights {
+  """
+  Search highlights for the `id`, providing snippets of the matching text.
+  """
+  id: [String!]!
+
+  """
+  Search highlights for the `name`, providing snippets of the matching text.
+  """
+  name: [String!]!
 }
 
 """
@@ -9640,6 +10248,109 @@ type Query {
   ): AddressConnection
 
   """
+  Aggregations over the `coach_records` data:
+
+  > Fetches `CoachRecord`s based on the provided arguments.
+  """
+  coach_record_aggregations(
+    """
+    Used to forward-paginate through the `coach_record_aggregations`. When provided, the next page after the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    after: Cursor
+
+    """
+    Used to backward-paginate through the `coach_record_aggregations`. When provided, the previous page before the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    before: Cursor
+
+    """
+    Used to filter the `CoachRecord` documents that get aggregated over based on the provided criteria.
+    """
+    filter: CoachRecordFilterInput
+
+    """
+    Used in conjunction with the `after` argument to forward-paginate through the `coach_record_aggregations`.
+    When provided, limits the number of returned results to the first `n` after the provided
+    `after` cursor (or from the start of the `coach_record_aggregations`, if no `after` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    first: Int
+
+    """
+    Used in conjunction with the `before` argument to backward-paginate through the `coach_record_aggregations`.
+    When provided, limits the number of returned results to the last `n` before the provided
+    `before` cursor (or from the end of the `coach_record_aggregations`, if no `before` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    last: Int
+  ): CoachRecordAggregationConnection
+
+  """
+  Fetches `CoachRecord`s based on the provided arguments.
+  """
+  coach_records(
+    """
+    Used to forward-paginate through the `coach_records`. When provided, the next page after the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    after: Cursor
+
+    """
+    Used to backward-paginate through the `coach_records`. When provided, the previous page before the
+    provided cursor will be returned.
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    before: Cursor
+
+    """
+    Used to filter the returned `coach_records` based on the provided criteria.
+    """
+    filter: CoachRecordFilterInput
+
+    """
+    Used in conjunction with the `after` argument to forward-paginate through the `coach_records`.
+    When provided, limits the number of returned results to the first `n` after the provided
+    `after` cursor (or from the start of the `coach_records`, if no `after` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    first: Int
+
+    """
+    Used in conjunction with the `before` argument to backward-paginate through the `coach_records`.
+    When provided, limits the number of returned results to the last `n` before the provided
+    `before` cursor (or from the end of the `coach_records`, if no `before` cursor is provided).
+
+    See the [Relay GraphQL Cursor Connections
+    Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
+    """
+    last: Int
+
+    """
+    Used to specify how the returned `coach_records` should be sorted.
+    """
+    order_by: [CoachRecordSortOrderInput!]
+  ): CoachRecordConnection
+
+  """
   Aggregations over the `components` data:
 
   > Fetches `Component`s based on the provided arguments.
@@ -13262,6 +13973,7 @@ input StringStartsWithFilterInput {
 For more performant queries on this type, please filter on `league` if possible.
 """
 type Team @key(fields: "id") {
+  coaches: [Coach!]!
   country_code: ID!
   current_name: String
   current_players_nested: [Player!]!
@@ -13271,6 +13983,7 @@ type Team @key(fields: "id") {
   forbes_valuation_moneys_object: [Money!]!
   forbes_valuations: [JsonSafeLong!]!
   formed_on: Date
+  head_coach: HeadCoach
   id: ID
   league: String
   nested_fields: TeamNestedFields
@@ -13286,6 +13999,11 @@ type Team @key(fields: "id") {
 Type used to perform aggregation computations on `Team` fields.
 """
 type TeamAggregatedValues {
+  """
+  Computed aggregate values for the `coaches` field.
+  """
+  coaches: CoachAggregatedValues
+
   """
   Computed aggregate values for the `country_code` field.
   """
@@ -13320,6 +14038,11 @@ type TeamAggregatedValues {
   Computed aggregate values for the `formed_on` field.
   """
   formed_on: DateAggregatedValues
+
+  """
+  Computed aggregate values for the `head_coach` field.
+  """
+  head_coach: HeadCoachAggregatedValues
 
   """
   Computed aggregate values for the `id` field.
@@ -13881,6 +14604,13 @@ input TeamFilterInput {
   any_of: [TeamFilterInput!]
 
   """
+  Used to filter on the `coaches` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  coaches: CoachFieldsListFilterInput
+
+  """
   Used to filter on the `country_code` field.
 
   When `null` or an empty object is passed, matches all documents.
@@ -13942,6 +14672,13 @@ input TeamFilterInput {
   When `null` or an empty object is passed, matches all documents.
   """
   formed_on: DateFilterInput
+
+  """
+  Used to filter on the `head_coach` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  head_coach: HeadCoachFilterInput
 
   """
   Used to filter on the `id` field.
@@ -14020,6 +14757,18 @@ Type used to specify the `Team` fields to group by for aggregations.
 """
 type TeamGroupedBy {
   """
+  The `coaches` field value for this group.
+
+  Note: `coaches` is a collection field, but selecting this field will group on
+  individual values of the selected subfields of `coaches`.
+  That means that a document may be grouped into multiple aggregation groupings (i.e. when its `coaches`
+  field has multiple values) leading to some data duplication in the response. However, if a value shows
+  up in `coaches` multiple times for a single document, that document will only be included in the group
+  once.
+  """
+  coaches: CoachGroupedBy
+
+  """
   The `country_code` field value for this group.
   """
   country_code: ID
@@ -14068,6 +14817,11 @@ type TeamGroupedBy {
   formed_on: DateGroupedBy
 
   """
+  The `head_coach` field value for this group.
+  """
+  head_coach: HeadCoachGroupedBy
+
+  """
   The `league` field value for this group.
   """
   league: String
@@ -14089,6 +14843,11 @@ type TeamGroupedBy {
 Type used to request desired `Team` search highlight fields.
 """
 type TeamHighlights {
+  """
+  Search highlights for the `coaches`, providing snippets of the matching text.
+  """
+  coaches: CoachHighlights
+
   """
   Search highlights for the `country_code`, providing snippets of the matching text.
   """
@@ -14123,6 +14882,11 @@ type TeamHighlights {
   Search highlights for the `forbes_valuation_moneys_object`, providing snippets of the matching text.
   """
   forbes_valuation_moneys_object: MoneyHighlights
+
+  """
+  Search highlights for the `head_coach`, providing snippets of the matching text.
+  """
+  head_coach: HeadCoachHighlights
 
   """
   Search highlights for the `id`, providing snippets of the matching text.
@@ -15096,6 +15860,36 @@ enum TeamSortOrderInput {
   Sorts descending by the `formed_on` field.
   """
   formed_on_DESC
+
+  """
+  Sorts ascending by the `head_coach.career_wins` field.
+  """
+  head_coach_career_wins_ASC
+
+  """
+  Sorts descending by the `head_coach.career_wins` field.
+  """
+  head_coach_career_wins_DESC
+
+  """
+  Sorts ascending by the `head_coach.id` field.
+  """
+  head_coach_id_ASC
+
+  """
+  Sorts descending by the `head_coach.id` field.
+  """
+  head_coach_id_DESC
+
+  """
+  Sorts ascending by the `head_coach.name` field.
+  """
+  head_coach_name_ASC
+
+  """
+  Sorts descending by the `head_coach.name` field.
+  """
+  head_coach_name_DESC
 
   """
   Sorts ascending by the `id` field.
@@ -19935,7 +20729,7 @@ In an ElasticGraph schema, this is a union of all indexed types.
 
 Not intended for use by clients other than Apollo.
 """
-union _Entity = BrokerWholesaler | Company | Component | Country | DirectWholesaler | ElectricalPart | Manufacturer | MechanicalPart | OnlineStore | Person | PhysicalStore | Sponsor | Team | Widget | WidgetCurrency | WidgetWorkspace
+union _Entity = BrokerWholesaler | CoachRecord | Company | Component | Country | DirectWholesaler | ElectricalPart | Manufacturer | MechanicalPart | OnlineStore | Person | PhysicalStore | Sponsor | Team | Widget | WidgetCurrency | WidgetWorkspace
 
 """
 An object type required by the [Apollo Federation subgraph

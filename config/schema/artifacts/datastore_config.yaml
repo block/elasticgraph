@@ -1116,6 +1116,24 @@ index_templates:
                       players_object|seasons_object|awards:
                         type: integer
                 type: nested
+          coaches:
+            properties:
+              id:
+                type: keyword
+              name:
+                type: keyword
+              career_wins:
+                type: integer
+            type: object
+          head_coach:
+            properties:
+              id:
+                type: keyword
+              name:
+                type: keyword
+              career_wins:
+                type: integer
+            type: object
           __counts:
             properties:
               past_names:
@@ -1235,6 +1253,14 @@ index_templates:
               nested_fields2|current_players:
                 type: integer
               nested_fields2|the_seasons:
+                type: integer
+              coaches:
+                type: integer
+              coaches|id:
+                type: integer
+              coaches|name:
+                type: integer
+              coaches|career_wins:
                 type: integer
           __nested_sourced_data:
             type: object
@@ -1547,6 +1573,43 @@ indices:
         __typename:
           type: constant_keyword
           value: Address
+      _size:
+        enabled: true
+    settings:
+      index.mapping.ignore_malformed: false
+      index.mapping.coerce: false
+      index.number_of_replicas: 1
+      index.number_of_shards: 1
+      index.max_result_window: 10000
+  coach_records:
+    aliases: {}
+    mappings:
+      dynamic: strict
+      properties:
+        id:
+          type: keyword
+        teamId:
+          type: keyword
+        coachId:
+          type: keyword
+        wins:
+          type: integer
+        team_league:
+          type: keyword
+        team_formed_on:
+          type: date
+          format: strict_date
+        __nested_sourced_data:
+          type: object
+          dynamic: 'false'
+        __sources:
+          type: keyword
+        __versions:
+          type: object
+          dynamic: 'false'
+        __typename:
+          type: constant_keyword
+          value: CoachRecord
       _size:
         enabled: true
     settings:

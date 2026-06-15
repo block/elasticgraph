@@ -24,6 +24,7 @@ json_schema_version: 1
         enum:
         - Address
         - BrokerWholesaler
+        - CoachRecord
         - Company
         - Component
         - DirectWholesaler
@@ -179,6 +180,70 @@ json_schema_version: 1
     required:
     - id
     - active
+  Coach:
+    type: object
+    properties:
+      id:
+        allOf:
+        - "$ref": "#/$defs/ID"
+        - maxLength: 8191
+      name:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/String"
+          - maxLength: 8191
+        - type: 'null'
+      __typename:
+        type: string
+        const: Coach
+        default: Coach
+    required:
+    - id
+    - name
+  CoachRecord:
+    type: object
+    properties:
+      id:
+        allOf:
+        - "$ref": "#/$defs/ID"
+        - maxLength: 8191
+      teamId:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/ID"
+          - maxLength: 8191
+        - type: 'null'
+      coachId:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/ID"
+          - maxLength: 8191
+        - type: 'null'
+      wins:
+        anyOf:
+        - "$ref": "#/$defs/Int"
+        - type: 'null'
+      team_league:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/String"
+          - maxLength: 8191
+        - type: 'null'
+      team_formed_on:
+        anyOf:
+        - "$ref": "#/$defs/Date"
+        - type: 'null'
+      __typename:
+        type: string
+        const: CoachRecord
+        default: CoachRecord
+    required:
+    - id
+    - teamId
+    - coachId
+    - wins
+    - team_league
+    - team_formed_on
   Color:
     type: string
     enum:
@@ -370,6 +435,26 @@ json_schema_version: 1
     required:
     - type
     - coordinates
+  HeadCoach:
+    type: object
+    properties:
+      id:
+        allOf:
+        - "$ref": "#/$defs/ID"
+        - maxLength: 8191
+      name:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/String"
+          - maxLength: 8191
+        - type: 'null'
+      __typename:
+        type: string
+        const: HeadCoach
+        default: HeadCoach
+    required:
+    - id
+    - name
   ID:
     type: string
   Int:
@@ -761,6 +846,14 @@ json_schema_version: 1
         anyOf:
         - "$ref": "#/$defs/TeamNestedFields"
         - type: 'null'
+      coaches:
+        type: array
+        items:
+          "$ref": "#/$defs/Coach"
+      head_coach:
+        anyOf:
+        - "$ref": "#/$defs/HeadCoach"
+        - type: 'null'
       __typename:
         type: string
         const: Team
@@ -784,6 +877,8 @@ json_schema_version: 1
     - seasons_object
     - nested_fields
     - nested_fields2
+    - coaches
+    - head_coach
     description: For more performant queries on this type, please filter on `league`
       if possible.
   TeamDetails:
