@@ -167,7 +167,6 @@ module ElasticGraph
               factory.new_schema_artifact_manager(
                 schema_definition_results: schema_def_results,
                 schema_artifacts_directory: Dir.pwd,
-                enforce_json_schema_version: true,
                 output: output_io
               ).dump_artifacts
 

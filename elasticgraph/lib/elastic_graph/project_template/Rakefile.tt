@@ -12,9 +12,6 @@ ElasticGraph::Local::RakeTasks.new(
   local_config_yaml: settings_file,
   path_to_schema: "#{project_root}/config/schema.rb"
 ) do |tasks|
-  # Set this to true once you're beyond the prototyping stage.
-  tasks.enforce_json_schema_version = false
-
   # Determines casing of field names. Can be either `:camelCase` or `:snake_case`.
   tasks.schema_element_name_form = :camelCase
 
