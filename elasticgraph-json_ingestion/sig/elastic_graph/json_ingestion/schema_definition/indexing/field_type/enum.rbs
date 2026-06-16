@@ -1,0 +1,19 @@
+module ElasticGraph
+  module JSONIngestion
+    module SchemaDefinition
+      module Indexing
+        module FieldType
+          class EnumSupertype < ::ElasticGraph::SchemaDefinition::Indexing::FieldType::Enum
+            def initialize: (::ElasticGraph::SchemaDefinition::Indexing::FieldType::Enum) -> void
+          end
+
+          class Enum < EnumSupertype
+            def json_schema_field_metadata_by_field_name: () -> ::Hash[::String, JSONSchemaFieldMetadata]
+            def format_field_json_schema_customizations: (::Hash[::String, untyped]) -> ::Hash[::String, untyped]
+            def to_json_schema: () -> ::Hash[::String, untyped]
+          end
+        end
+      end
+    end
+  end
+end
