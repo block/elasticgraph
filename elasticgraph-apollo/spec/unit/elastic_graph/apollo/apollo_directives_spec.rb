@@ -56,7 +56,6 @@ module ElasticGraph
             schema.scalar_type "Url" do |f|
               f.apollo_authenticated
               f.mapping type: "keyword"
-              f.json_schema type: "string"
             end
           end
 
@@ -166,7 +165,6 @@ module ElasticGraph
             schema.scalar_type "Url" do |f|
               f.apollo_inaccessible
               f.mapping type: "keyword"
-              f.json_schema type: "string"
 
               f.customize_derived_types "UrlFilterInput" do |dt|
                 dt.apollo_inaccessible
@@ -319,7 +317,6 @@ module ElasticGraph
             schema.scalar_type "Url" do |f|
               f.apollo_policy(policies: [["Policy1", "Policy2"], ["Policy3"]])
               f.mapping type: "keyword"
-              f.json_schema type: "string"
             end
           end
 
@@ -407,7 +404,6 @@ module ElasticGraph
             schema.scalar_type "Url" do |f|
               f.apollo_requires_scopes(scopes: [["Scope1", "Scope2"], ["Scope3"]])
               f.mapping type: "keyword"
-              f.json_schema type: "string"
             end
           end
 
@@ -493,7 +489,6 @@ module ElasticGraph
             schema.scalar_type "Url" do |f|
               f.apollo_tag name: "test"
               f.mapping type: "keyword"
-              f.json_schema type: "string"
 
               f.customize_derived_types "UrlFilterInput" do |dt|
                 dt.apollo_tag name: "test"

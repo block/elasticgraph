@@ -18,25 +18,20 @@ module ElasticGraph
 
           # Validates that json_schema has been configured on this scalar type, and applies
           # post-yield runtime metadata derived from the final JSON schema configuration.
+          # GraphQL-only scalar types are skipped because they are not part of ingestion.
           #
-          # @raise [Errors::SchemaError] if json_schema has not been configured
+          # @raise [Errors::SchemaError] if json_schema has not been configured on an ingested scalar type
           # @return [void]
           def finalize_json_schema_configuration!
-            validate_json_schema_configuration!
+            return if graphql_only?
+
+            if json_schema_options.empty?
+              raise Errors::SchemaError, "Scalar types require `json_schema` to be configured, but `#{name}` lacks `json_schema`."
+            end
 
             if !grouping_missing_value_placeholder_overridden && (placeholder = inferred_grouping_missing_value_placeholder)
               self.runtime_metadata = runtime_metadata.with(grouping_missing_value_placeholder: placeholder)
             end
-          end
-
-          # Validates that json_schema has been configured on this scalar type.
-          #
-          # @raise [Errors::SchemaError] if json_schema has not been configured
-          # @return [void]
-          def validate_json_schema_configuration!
-            return unless json_schema_options.empty?
-
-            raise Errors::SchemaError, "Scalar types require `json_schema` to be configured, but `#{name}` lacks `json_schema`."
           end
 
           private

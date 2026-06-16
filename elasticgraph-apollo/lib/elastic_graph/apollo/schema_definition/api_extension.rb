@@ -224,23 +224,20 @@ module ElasticGraph
 
           apollo_scalar_type "link__Import" do |t|
             t.documentation "Scalar type used by the `@link` directive required for Apollo Federation V2."
-            # `scalar_type` requires we set these but this scalar type is only in GraphQL.
+            # `scalar_type` requires a mapping but this scalar type is only in GraphQL.
             t.mapping type: nil
-            t.json_schema type: "null"
           end
 
           apollo_scalar_type "federation__Scope" do |t|
             t.documentation "Scalar type used by the `@requiresScopes` directive required for Apollo Federation V2.5+."
-            # `scalar_type` requires we set these but this scalar type is only in GraphQL.
+            # `scalar_type` requires a mapping but this scalar type is only in GraphQL.
             t.mapping type: nil
-            t.json_schema type: "null"
           end
 
           apollo_scalar_type "federation__Policy" do |t|
             t.documentation "Scalar type used by the `@policy` directive required for Apollo Federation V2.6+."
-            # `scalar_type` requires we set these but this scalar type is only in GraphQL.
+            # `scalar_type` requires a mapping but this scalar type is only in GraphQL.
             t.mapping type: nil
-            t.json_schema type: "null"
           end
 
           # Copied from https://github.com/apollographql/federation/blob/b3a3cb84d8d67d1d6e817dc85b9ae0ecdd9908d1/docs/source/subgraph-spec.mdx#subgraph-schema-additions
@@ -271,9 +268,8 @@ module ElasticGraph
               Not intended for use by clients other than Apollo.
             EOS
 
-            # `scalar_type` requires we set these but this scalar type is only in GraphQL.
+            # `scalar_type` requires a mapping but this scalar type is only in GraphQL.
             t.mapping type: nil
-            t.json_schema type: "null"
           end
 
           apollo_scalar_type "_Any" do |t|
@@ -297,9 +293,8 @@ module ElasticGraph
               Not intended for use by clients other than Apollo.
             EOS
 
-            # `scalar_type` requires we set these but this scalar type is only in GraphQL.
+            # `scalar_type` requires a mapping but this scalar type is only in GraphQL.
             t.mapping type: nil
-            t.json_schema type: "null"
           end
 
           apollo_object_type "_Service" do |t|

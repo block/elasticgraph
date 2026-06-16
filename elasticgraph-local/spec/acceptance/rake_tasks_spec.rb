@@ -6,6 +6,7 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/json_ingestion/schema_definition/api_extension"
 require "elastic_graph/local/rake_tasks"
 require "elastic_graph/schema_definition/rake_tasks"
 require "json"
@@ -134,6 +135,7 @@ module ElasticGraph
             ) do |t|
               t.index_document_sizes = true
               t.schema_element_name_form = :snake_case
+              t.schema_definition_extension_modules << JSONIngestion::SchemaDefinition::APIExtension
               t.env_port_mapping = {"example" => 9615}
               t.elasticsearch_versions = ["8.18.0", "9.0.0"]
               t.opensearch_versions = ["2.19.0"]

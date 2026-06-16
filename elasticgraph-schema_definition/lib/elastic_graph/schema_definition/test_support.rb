@@ -75,9 +75,12 @@ module ElasticGraph
 
         yield api if block_given?
 
-        # Set the json_schema_version to the provided value, if needed.
-        if !json_schema_version.nil? && api.state.json_schema_version.nil?
-          api.json_schema_version(json_schema_version)
+        # Set the json_schema_version to the provided value, if needed. The `json_schema_version` API only
+        # exists when an extension that implements JSON schema generation (such as
+        # `elasticgraph-json_ingestion`) is loaded; without one there is no JSON schema version to set.
+        if !json_schema_version.nil? && api.respond_to?(:json_schema_version)
+          versioned_api = api # : untyped
+          versioned_api.json_schema_version(json_schema_version) if versioned_api.state.json_schema_version.nil?
         end
 
         # :nocov: -- the else branch and code past this aren't used by tests in elasticgraph-schema_definition.
@@ -85,7 +88,10 @@ module ElasticGraph
 
         # Reloading the schema artifacts takes extra time that we don't usually want to spend (so it's opt-in)
         # but it can be useful in some cases because there is a bit of extra pruning/validation that it applies.
-        api.enforce_json_schema_version false
+        if api.respond_to?(:enforce_json_schema_version)
+          versioned_api = api # : untyped
+          versioned_api.enforce_json_schema_version false
+        end
         tmp_dir = ::Dir.mktmpdir
         artifacts_manager = api.factory.new_schema_artifact_manager(
           schema_definition_results: api.results,

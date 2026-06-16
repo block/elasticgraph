@@ -4,6 +4,7 @@ module ElasticGraph
       module FieldType
         class Scalar
           include _FieldType
+
           attr_reader scalar_type: SchemaElements::ScalarType
 
           def initialize: (scalar_type: SchemaElements::ScalarType) -> Scalar

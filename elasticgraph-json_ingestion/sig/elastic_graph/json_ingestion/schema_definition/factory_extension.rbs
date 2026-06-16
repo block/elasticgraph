@@ -11,9 +11,7 @@ module ElasticGraph
         def new_object_indexing_field_type: (
           type_name: ::String,
           subfields: ::Array[Indexing::Field],
-          mapping_options: ::ElasticGraph::SchemaDefinition::Mixins::HasTypeInfo::optionsHash,
-          doc_comment: ::String?,
-          json_schema_options: ::Hash[::Symbol, untyped]
+          mapping_options: ::ElasticGraph::SchemaDefinition::Mixins::HasTypeInfo::optionsHash
         ) -> Indexing::FieldType::Object
         def new_scalar_type: (::String) ?{ (::ElasticGraph::SchemaDefinition::SchemaElements::ScalarType & SchemaElements::ScalarTypeExtension) -> void } -> (::ElasticGraph::SchemaDefinition::SchemaElements::ScalarType & SchemaElements::ScalarTypeExtension)
         def new_scalar_indexing_field_type: (scalar_type: ::ElasticGraph::SchemaDefinition::SchemaElements::ScalarType) -> Indexing::FieldType::Scalar

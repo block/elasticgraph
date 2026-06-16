@@ -2925,6 +2925,24 @@ module ElasticGraph
         expect(envelope_type_enum_values(schemas)).to eq ["Widget"]
       end
 
+      it "does not require or dump a schema for a GraphQL-only scalar type because it has no backing data to index" do
+        schemas = all_type_definitions_for do |s|
+          s.object_type "Widget" do |t|
+            t.field "id", "ID!"
+            t.index "widgets"
+          end
+
+          s.scalar_type "GraphQLOnly" do |t|
+            t.graphql_only true
+            t.mapping type: nil
+          end
+        end
+
+        expect(schemas.keys).to include(EVENT_ENVELOPE_JSON_SCHEMA_NAME, "Widget")
+        expect(schemas.keys).to exclude("GraphQLOnly")
+        expect(envelope_type_enum_values(schemas)).to eq ["Widget"]
+      end
+
       it "omits fields that reference a namespace type from the JSON schema of an indexed type" do
         # This test would fail if `s.namespace_type` were replaced with `s.object_type` -- the `olap`
         # property would appear under Widget's JSON schema. Namespace types have no backing data, so

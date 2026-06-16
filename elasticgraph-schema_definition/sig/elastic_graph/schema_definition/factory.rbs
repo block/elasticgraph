@@ -88,9 +88,7 @@ module ElasticGraph
       def new_object_indexing_field_type: (
         type_name: ::String,
         subfields: ::Array[Indexing::Field],
-        mapping_options: Mixins::HasTypeInfo::optionsHash,
-        json_schema_options: Mixins::HasTypeInfo::optionsHash,
-        doc_comment: ::String?
+        mapping_options: Mixins::HasTypeInfo::optionsHash
       ) -> Indexing::FieldType::Object
       @@object_indexing_field_type_new: ::Method
 
