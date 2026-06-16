@@ -106,6 +106,12 @@ PATH
       hashdiff (~> 1.2, >= 1.2.1)
 
 PATH
+  remote: elasticgraph-json_ingestion
+  specs:
+    elasticgraph-json_ingestion (1.2.1.pre)
+      elasticgraph-support (= 1.2.1.pre)
+
+PATH
   remote: elasticgraph-lambda_support
   specs:
     elasticgraph-lambda_support (1.2.1.pre)
@@ -686,6 +692,7 @@ DEPENDENCIES
   elasticgraph-indexer (= 1.2.1.pre)!
   elasticgraph-indexer_autoscaler_lambda (= 1.2.1.pre)!
   elasticgraph-indexer_lambda (= 1.2.1.pre)!
+  elasticgraph-json_ingestion (= 1.2.1.pre)!
   elasticgraph-lambda_support (= 1.2.1.pre)!
   elasticgraph-local (= 1.2.1.pre)!
   elasticgraph-opensearch (= 1.2.1.pre)!
@@ -777,6 +784,7 @@ CHECKSUMS
   elasticgraph-indexer (1.2.1.pre)
   elasticgraph-indexer_autoscaler_lambda (1.2.1.pre)
   elasticgraph-indexer_lambda (1.2.1.pre)
+  elasticgraph-json_ingestion (1.2.1.pre)
   elasticgraph-lambda_support (1.2.1.pre)
   elasticgraph-local (1.2.1.pre)
   elasticgraph-opensearch (1.2.1.pre)
