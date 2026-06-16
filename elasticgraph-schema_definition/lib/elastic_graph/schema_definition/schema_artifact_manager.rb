@@ -39,7 +39,7 @@ module ElasticGraph
 
         @json_schemas_artifact = new_yaml_artifact(
           JSON_SCHEMAS_FILE,
-          JSONSchemaPruner.prune(schema_definition_results.current_public_json_schema),
+          JSONIngestion::SchemaDefinition::JSONSchemaPruner.prune(schema_definition_results.current_public_json_schema),
           extra_comment_lines: [
             "This is the \"public\" JSON schema file and is intended to be provided to publishers so that",
             "they can perform code generation and event validation."
@@ -191,7 +191,7 @@ module ElasticGraph
       def report_json_schema_merge_errors(merged_results)
         json_schema_versions_by_missing_field = ::Hash.new { |h, k| h[k] = [] } # : ::Hash[::String, ::Array[::Integer]]
         json_schema_versions_by_missing_type = ::Hash.new { |h, k| h[k] = [] } # : ::Hash[::String, ::Array[::Integer]]
-        json_schema_versions_by_missing_necessary_field = ::Hash.new { |h, k| h[k] = [] } # : ::Hash[Indexing::JSONSchemaWithMetadata::MissingNecessaryField, ::Array[::Integer]]
+        json_schema_versions_by_missing_necessary_field = ::Hash.new { |h, k| h[k] = [] } # : ::Hash[JSONIngestion::SchemaDefinition::Indexing::JSONSchemaWithMetadata::MissingNecessaryField, ::Array[::Integer]]
 
         merged_results.each do |result|
           result.missing_fields.each do |field|

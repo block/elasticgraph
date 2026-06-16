@@ -113,7 +113,7 @@ module ElasticGraph
       end
 
       def json_schema_with_metadata_merger
-        @json_schema_with_metadata_merger ||= Indexing::JSONSchemaWithMetadata::Merger.new(self)
+        @json_schema_with_metadata_merger ||= JSONIngestion::SchemaDefinition::Indexing::JSONSchemaWithMetadata::Merger.new(self)
       end
 
       def generate_datastore_config
@@ -211,11 +211,13 @@ module ElasticGraph
           .transform_values(&:to_json_schema)
           .compact
 
+        event_envelope = JSONIngestion::SchemaDefinition::Indexing::EventEnvelope
+
         {
           "$schema" => JSON_META_SCHEMA,
           JSON_SCHEMA_VERSION_KEY => json_schema_version,
           "$defs" => {
-            "ElasticGraphEventEnvelope" => Indexing::EventEnvelope.json_schema(root_document_type_names, json_schema_version)
+            "ElasticGraphEventEnvelope" => event_envelope.json_schema(root_document_type_names, json_schema_version)
           }.merge(definitions_by_name)
         }
       end

@@ -77,7 +77,7 @@ module ElasticGraph
 
         # @return [JSONSchemaFieldMetadata] additional ElasticGraph metadata to be stored in the JSON schema for this field.
         def json_schema_metadata
-          JSONSchemaFieldMetadata.new(type: type.name, name_in_index: name_in_index)
+          JSONIngestion::SchemaDefinition::Indexing::JSONSchemaFieldMetadata.new(type: type.name, name_in_index: name_in_index)
         end
 
         # Builds a hash containing the mapping for the provided fields, normalizing it in the same way that the
