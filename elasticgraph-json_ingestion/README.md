@@ -17,4 +17,7 @@ graph LR;
     elasticgraph-support["elasticgraph-support"];
     elasticgraph-json_ingestion --> elasticgraph-support;
     class elasticgraph-support otherEgGemStyle;
+    elasticgraph-schema_definition["elasticgraph-schema_definition"];
+    elasticgraph-schema_definition --> elasticgraph-json_ingestion;
+    class elasticgraph-schema_definition otherEgGemStyle;
 ```

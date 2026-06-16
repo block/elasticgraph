@@ -7,7 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/constants"
-require "elastic_graph/schema_definition/indexing/json_schema_field_metadata"
+require "elastic_graph/json_ingestion/schema_definition/indexing/json_schema_field_metadata"
 require "elastic_graph/schema_definition/indexing/list_counts_mapping"
 require "elastic_graph/support/hash_util"
 require "elastic_graph/support/memoizable_data"

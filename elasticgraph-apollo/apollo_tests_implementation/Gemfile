@@ -16,6 +16,7 @@ source "https://rubygems.org", cooldown: 7
   graphiql
   graphql
   indexer
+  json_ingestion
   rack
   schema_artifacts
   schema_definition

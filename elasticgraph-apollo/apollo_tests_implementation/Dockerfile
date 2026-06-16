@@ -14,6 +14,7 @@ COPY elasticgraph-elasticsearch /web/elasticgraph-elasticsearch
 COPY elasticgraph-graphiql /web/elasticgraph-graphiql
 COPY elasticgraph-graphql /web/elasticgraph-graphql
 COPY elasticgraph-indexer /web/elasticgraph-indexer
+COPY elasticgraph-json_ingestion /web/elasticgraph-json_ingestion
 COPY elasticgraph-rack /web/elasticgraph-rack
 COPY elasticgraph-schema_artifacts /web/elasticgraph-schema_artifacts
 COPY elasticgraph-schema_definition /web/elasticgraph-schema_definition

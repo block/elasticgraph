@@ -8,10 +8,10 @@
 
 require "elastic_graph/constants"
 require "elastic_graph/errors"
-require "elastic_graph/schema_artifacts/runtime_metadata/schema"
+require "elastic_graph/json_ingestion/schema_definition/indexing/event_envelope"
+require "elastic_graph/json_ingestion/schema_definition/indexing/json_schema_with_metadata"
 require "elastic_graph/schema_artifacts/artifacts_helper_methods"
-require "elastic_graph/schema_definition/indexing/event_envelope"
-require "elastic_graph/schema_definition/indexing/json_schema_with_metadata"
+require "elastic_graph/schema_artifacts/runtime_metadata/schema"
 require "elastic_graph/schema_definition/indexing/sourced_from_update_targets_resolver"
 require "elastic_graph/schema_definition/mixins/has_readable_to_s_and_inspect"
 require "elastic_graph/schema_definition/schema_elements/field_path"
