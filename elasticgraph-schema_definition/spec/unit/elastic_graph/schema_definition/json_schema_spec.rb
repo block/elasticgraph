@@ -8,6 +8,7 @@
 
 require "elastic_graph/constants"
 require "elastic_graph/errors"
+require "elastic_graph/json_ingestion/schema_definition/api_extension"
 require "elastic_graph/spec_support/schema_definition_helpers"
 require "support/json_schema_matcher"
 
@@ -107,6 +108,24 @@ module ElasticGraph
             "type" => "number"
           }).which_matches(0, 1, -1, 0.1, -99.0)
             .and_fails_to_match("a", true, nil)
+        end
+
+        it "configures built-in scalar JSON schema before user schema blocks are evaluated" do
+          json_schema_options_in_schema_block = nil
+
+          define_schema(
+            schema_element_name_form: "snake_case",
+            extension_modules: [JSONIngestion::SchemaDefinition::APIExtension]
+          ) do |s|
+            json_schema_options_in_schema_block = s.state.scalar_types_by_name.fetch("String").json_schema_options.dup
+
+            s.object_type "Widget" do |t|
+              t.field "id", "ID!"
+              t.index "widgets"
+            end
+          end.current_public_json_schema
+
+          expect(json_schema_options_in_schema_block).to eq({type: "string"})
         end
 
         example "for `TimeZone`" do
@@ -3159,7 +3178,7 @@ module ElasticGraph
         {
           "allOf" => [
             {"$ref" => "#/$defs/ID"},
-            {"maxLength" => DEFAULT_MAX_KEYWORD_LENGTH, "pattern" => Indexing::Index::HAS_NON_WHITE_SPACE_REGEX}
+            {"maxLength" => DEFAULT_MAX_KEYWORD_LENGTH, "pattern" => HAS_NON_WHITE_SPACE_REGEX}
           ]
         }
       end
