@@ -55,7 +55,6 @@ module ElasticGraph
         def customize_sub_aggregations_field: () { (Field) -> void } -> void
         def customize_aggregated_values_field: () { (Field) -> void } -> void
         def on_each_generated_schema_element: () { (Field | SortOrderEnumValue) -> void } -> void
-        def renamed_from: (::String) -> void
         def argument: (::String, ::String) ?{ (Argument) -> void } -> void
         def define_relay_pagination_arguments!: () -> void
         def filterable?: () -> bool

@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/constants"
+require "elastic_graph/json_ingestion/schema_definition/deprecated_element"
 require "elastic_graph/json_ingestion/schema_definition/factory_extension"
 require "elastic_graph/json_ingestion/schema_definition/state_extension"
 
@@ -139,6 +140,28 @@ module ElasticGraph
 
           state.allow_omitted_json_schema_fields = allow_omitted_fields
           state.allow_extra_json_schema_fields = allow_extra_fields
+          nil
+        end
+
+        # Registers the name of a type that existed in a prior JSON schema version but has been deleted.
+        #
+        # @note In situations where this API applies, ElasticGraph will give you an error message indicating that you need to use this API
+        #   or {SchemaElements::TypeWithSubfieldsExtension#renamed_from}. Likewise, when ElasticGraph no longer needs to know about this,
+        #   it'll give you a warning indicating the call to this method can be removed.
+        #
+        # @param name [String] name of type that used to exist but has been deleted
+        # @return [void]
+        #
+        # @example Indicate that `Widget` has been deleted
+        #   ElasticGraph.define_schema do |schema|
+        #     schema.deleted_type "Widget"
+        #   end
+        def deleted_type(name)
+          json_ingestion_state.register_deleted_type(
+            name,
+            defined_at: caller_locations(1, 1).to_a.first, # : ::Thread::Backtrace::Location
+            defined_via: %(schema.deleted_type "#{name}")
+          )
           nil
         end
 

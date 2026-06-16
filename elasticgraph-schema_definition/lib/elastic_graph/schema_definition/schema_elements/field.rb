@@ -568,33 +568,6 @@ module ElasticGraph
           self.runtime_field_script = script
         end
 
-        # Registers an old name that this field used to have in a prior version of the schema.
-        #
-        # @note In situations where this API applies, ElasticGraph will give you an error message indicating that you need to use this API
-        #   or {TypeWithSubfields#deleted_field}. Likewise, when ElasticGraph no longer needs to know about this, it'll give you a warning
-        #   indicating the call to this method can be removed.
-        #
-        # @param old_name [String] old name this field used to have in a prior version of the schema
-        # @return [void]
-        #
-        # @example Indicate that `Widget.description` used to be called `Widget.notes`.
-        #   ElasticGraph.define_schema do |schema|
-        #     schema.object_type "Widget" do |t|
-        #       t.field "description", "String" do |f|
-        #         f.renamed_from "notes"
-        #       end
-        #     end
-        #   end
-        def renamed_from(old_name)
-          schema_def_state.register_renamed_field(
-            parent_type.name,
-            from: old_name,
-            to: name,
-            defined_at: caller_locations(1, 1).to_a.first, # : ::Thread::Backtrace::Location
-            defined_via: %(field.renamed_from "#{old_name}")
-          )
-        end
-
         # @private
         def to_sdl(type_structure_only: false, default_value_sdl: nil, &arg_selector)
           if type_structure_only

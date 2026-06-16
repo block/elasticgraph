@@ -62,9 +62,6 @@ module ElasticGraph
         ) ?{ (Field) -> void } -> Field
 
         def aggregated_values_type: () -> TypeReference
-        def deleted_field: (::String) -> void
-        def renamed_from: (::String) -> void
-
         def paginated_collection_field: (
           ::String,
           ::String,

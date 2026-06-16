@@ -5,6 +5,7 @@ module ElasticGraph
         def json_schema_version: (::Integer) -> void
         def enforce_json_schema_version: (bool) -> void
         def json_schema_strictness: (?allow_omitted_fields: bool, ?allow_extra_fields: bool) -> void
+        def deleted_type: (::String) -> void
 
         def self.extended: (::ElasticGraph::SchemaDefinition::API & APIExtension) -> void
 

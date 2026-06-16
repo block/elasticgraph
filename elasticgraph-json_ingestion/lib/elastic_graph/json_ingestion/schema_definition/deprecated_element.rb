@@ -7,8 +7,10 @@
 # frozen_string_literal: true
 
 module ElasticGraph
-  module SchemaDefinition
-    module SchemaElements
+  module JSONIngestion
+    module SchemaDefinition
+      # Records a schema element that existed in a prior JSON schema version.
+      #
       # @private
       DeprecatedElement = ::Data.define(:schema_def_state, :name, :defined_at, :defined_via) do
         # @implements DeprecatedElement
