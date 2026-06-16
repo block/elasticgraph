@@ -9,7 +9,6 @@ module ElasticGraph
 
         type argument = untyped
         type mapping = untyped
-        type jsonSchema = untyped
         type accuracyConfidence = :high | :medium | :low
 
         attr_reader name: ::String

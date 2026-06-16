@@ -55,7 +55,6 @@ module ElasticGraph
           **untyped
           # ?name_in_index: ::String,
           # ?mapping: SchemaElements::Field::mapping,
-          # ?json_schema: SchemaElements::Field::jsonSchema,
           # ?sortable: bool?,
           # ?filterable: bool?,
           # ?aggregatable: bool?,

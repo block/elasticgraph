@@ -1,0 +1,22 @@
+module ElasticGraph
+  module JSONIngestion
+    module SchemaDefinition
+      module Indexing
+        module FieldType
+          module ValueSemantics : _Delegator
+            def ==: (untyped other) -> bool
+            def eql?: (untyped other) -> bool
+            def hash: () -> ::Integer
+          end
+
+          interface _Delegator
+            def __getobj__: () -> untyped
+
+            # Provided by `DelegateClass`; `ValueSemantics#==` calls `super` to fall back to it.
+            def ==: (untyped other) -> bool
+          end
+        end
+      end
+    end
+  end
+end

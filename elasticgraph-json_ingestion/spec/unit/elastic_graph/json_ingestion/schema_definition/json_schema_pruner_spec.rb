@@ -11,8 +11,8 @@ require "elastic_graph/json_ingestion/schema_definition/json_schema_pruner"
 require "elastic_graph/spec_support/schema_definition_helpers"
 
 module ElasticGraph
-  module SchemaDefinition
-    RSpec.describe JSONIngestion::SchemaDefinition::JSONSchemaPruner do
+  module JSONIngestion::SchemaDefinition
+    RSpec.describe JSONSchemaPruner, :capture_logs do
       include_context "SchemaDefinitionHelpers"
 
       describe ".prune" do

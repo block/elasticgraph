@@ -8,11 +8,14 @@ module ElasticGraph
           end
 
           class Union < UnionSupertype
+            include ValueSemantics
+
             def self.new: (::ElasticGraph::SchemaDefinition::Indexing::FieldType::Union) -> instance
 
             def json_schema_field_metadata_by_field_name: () -> ::Hash[::String, JSONSchemaFieldMetadata]
             def format_field_json_schema_customizations: (::Hash[::String, untyped]) -> ::Hash[::String, untyped]
             def to_json_schema: () -> ::Hash[::String, untyped]
+            def __getobj__: () -> ::ElasticGraph::SchemaDefinition::Indexing::FieldType::Union
           end
         end
       end

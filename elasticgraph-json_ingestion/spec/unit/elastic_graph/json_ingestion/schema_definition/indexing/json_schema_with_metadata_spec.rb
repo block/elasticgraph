@@ -10,9 +10,9 @@ require "elastic_graph/json_ingestion/schema_definition/indexing/json_schema_wit
 require "elastic_graph/spec_support/schema_definition_helpers"
 
 module ElasticGraph
-  module SchemaDefinition
+  module JSONIngestion::SchemaDefinition
     module Indexing
-      ::RSpec.describe JSONIngestion::SchemaDefinition::Indexing::JSONSchemaWithMetadata do
+      ::RSpec.describe JSONSchemaWithMetadata do
         include_context "SchemaDefinitionHelpers"
 
         it "ignores derived indexed types that do not show up in the JSON schema" do
@@ -1056,7 +1056,7 @@ module ElasticGraph
         def define_schema(&schema_definition)
           super(
             schema_element_name_form: "snake_case",
-            extension_modules: [JSONIngestion::SchemaDefinition::APIExtension],
+            extension_modules: [APIExtension],
             &schema_definition
           )
         end

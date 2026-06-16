@@ -10,7 +10,7 @@ require "elastic_graph/json_ingestion/schema_definition/indexing/json_schema_fie
 require "elastic_graph/spec_support/schema_definition_helpers"
 
 module ElasticGraph
-  module SchemaDefinition
+  module JSONIngestion::SchemaDefinition
     ::RSpec.describe "JSON schema field metadata generation" do
       include_context "SchemaDefinitionHelpers"
 
@@ -143,13 +143,13 @@ module ElasticGraph
       def define_schema(&schema_definition)
         super(
           schema_element_name_form: "snake_case",
-          extension_modules: [JSONIngestion::SchemaDefinition::APIExtension],
+          extension_modules: [APIExtension],
           &schema_definition
         )
       end
 
       def field_meta_of(type, name_in_index)
-        JSONIngestion::SchemaDefinition::Indexing::JSONSchemaFieldMetadata.new(type: type, name_in_index: name_in_index)
+        Indexing::JSONSchemaFieldMetadata.new(type: type, name_in_index: name_in_index)
       end
     end
   end
