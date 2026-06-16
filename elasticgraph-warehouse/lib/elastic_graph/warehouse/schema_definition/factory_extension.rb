@@ -28,9 +28,7 @@ module ElasticGraph
         def new_enum_type(name)
           super(name) do |type|
             type.extend EnumTypeExtension
-            # simplecov:disable -- currently all invocations have a block
             yield type if block_given?
-            # simplecov:enable
           end
         end
 
@@ -59,9 +57,7 @@ module ElasticGraph
         def new_interface_type(name)
           super(name) do |type|
             type.extend ObjectInterfaceAndUnionExtension
-            # simplecov:disable -- currently all invocations have a block
             yield type if block_given?
-            # simplecov:enable
           end
         end
 
@@ -73,9 +69,7 @@ module ElasticGraph
         def new_object_type(name)
           super(name) do |type|
             type.extend ObjectInterfaceAndUnionExtension
-            # simplecov:disable -- currently all invocations have a block
             yield type if block_given?
-            # simplecov:enable
           end
         end
 
@@ -87,9 +81,7 @@ module ElasticGraph
         def new_scalar_type(name)
           super(name) do |type|
             type.extend ScalarTypeExtension
-            # simplecov:disable -- currently all invocations have a block
             yield type if block_given?
-            # simplecov:enable
           end
         end
 
@@ -101,9 +93,7 @@ module ElasticGraph
         def new_union_type(name)
           super(name) do |type|
             type.extend ObjectInterfaceAndUnionExtension
-            # simplecov:disable -- currently all invocations have a block
             yield type if block_given?
-            # simplecov:enable
           end
         end
 
