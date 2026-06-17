@@ -115,8 +115,6 @@ module ElasticGraph
         "seasons_object|was_shortened" => 2,
         "seasons_object|won_games_at" => 0,
         "seasons_object|year" => 2,
-        # `coaches` is `nested`-mapped, so its per-field counts live in each element's own `__counts` doc
-        # rather than rolling up here; only the top-level `staff|coaches` element count appears at the root.
         "staff|coaches" => 2,
         "the_nested_fields|current_players" => 2,
         "the_nested_fields|forbes_valuation_moneys" => 1,
