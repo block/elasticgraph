@@ -24,10 +24,12 @@ json_schema_version: 1
         enum:
         - Address
         - BrokerWholesaler
+        - CoachRecord
         - Company
         - Component
         - DirectWholesaler
         - ElectricalPart
+        - GeneralManagerRecord
         - Manufacturer
         - MechanicalPart
         - OnlineStore
@@ -179,6 +181,70 @@ json_schema_version: 1
     required:
     - id
     - active
+  Coach:
+    type: object
+    properties:
+      id:
+        allOf:
+        - "$ref": "#/$defs/ID"
+        - maxLength: 8191
+      name:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/String"
+          - maxLength: 8191
+        - type: 'null'
+      __typename:
+        type: string
+        const: Coach
+        default: Coach
+    required:
+    - id
+    - name
+  CoachRecord:
+    type: object
+    properties:
+      id:
+        allOf:
+        - "$ref": "#/$defs/ID"
+        - maxLength: 8191
+      team_id:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/ID"
+          - maxLength: 8191
+        - type: 'null'
+      coach_id:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/ID"
+          - maxLength: 8191
+        - type: 'null'
+      wins:
+        anyOf:
+        - "$ref": "#/$defs/Int"
+        - type: 'null'
+      team_league:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/String"
+          - maxLength: 8191
+        - type: 'null'
+      team_formed_on:
+        anyOf:
+        - "$ref": "#/$defs/Date"
+        - type: 'null'
+      __typename:
+        type: string
+        const: CoachRecord
+        default: CoachRecord
+    required:
+    - id
+    - team_id
+    - coach_id
+    - wins
+    - team_league
+    - team_formed_on
   Color:
     type: string
     enum:
@@ -325,6 +391,63 @@ json_schema_version: 1
     - manufacturer_id
   Float:
     type: number
+  GeneralManager:
+    type: object
+    properties:
+      id:
+        allOf:
+        - "$ref": "#/$defs/ID"
+        - maxLength: 8191
+      name:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/String"
+          - maxLength: 8191
+        - type: 'null'
+      __typename:
+        type: string
+        const: GeneralManager
+        default: GeneralManager
+    required:
+    - id
+    - name
+  GeneralManagerRecord:
+    type: object
+    properties:
+      id:
+        allOf:
+        - "$ref": "#/$defs/ID"
+        - maxLength: 8191
+      team_id:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/ID"
+          - maxLength: 8191
+        - type: 'null'
+      wins:
+        anyOf:
+        - "$ref": "#/$defs/Int"
+        - type: 'null'
+      team_league:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/String"
+          - maxLength: 8191
+        - type: 'null'
+      team_formed_on:
+        anyOf:
+        - "$ref": "#/$defs/Date"
+        - type: 'null'
+      __typename:
+        type: string
+        const: GeneralManagerRecord
+        default: GeneralManagerRecord
+    required:
+    - id
+    - team_id
+    - wins
+    - team_league
+    - team_formed_on
   GeoLocation:
     type: object
     properties:
@@ -681,6 +804,24 @@ json_schema_version: 1
     required:
     - sponsor_id
     - annual_total
+  Staff:
+    type: object
+    properties:
+      coaches:
+        type: array
+        items:
+          "$ref": "#/$defs/Coach"
+      general_manager:
+        anyOf:
+        - "$ref": "#/$defs/GeneralManager"
+        - type: 'null'
+      __typename:
+        type: string
+        const: Staff
+        default: Staff
+    required:
+    - coaches
+    - general_manager
   String:
     type: string
   Team:
@@ -761,6 +902,10 @@ json_schema_version: 1
         anyOf:
         - "$ref": "#/$defs/TeamNestedFields"
         - type: 'null'
+      staff:
+        anyOf:
+        - "$ref": "#/$defs/Staff"
+        - type: 'null'
       __typename:
         type: string
         const: Team
@@ -784,6 +929,7 @@ json_schema_version: 1
     - seasons_object
     - nested_fields
     - nested_fields2
+    - staff
     description: For more performant queries on this type, please filter on `league`
       if possible.
   TeamDetails:

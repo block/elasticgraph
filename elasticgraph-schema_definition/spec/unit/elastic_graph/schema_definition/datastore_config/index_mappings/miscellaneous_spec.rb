@@ -102,7 +102,7 @@ module ElasticGraph
         }.not_to raise_error
       end
 
-      it "includes a `__versions` property (so update scripts can maintain the versions) and a `__sources` property (so that we can filter on present sources)" do
+      it "includes a `__versions` property (so update scripts can maintain the versions), a `__sources` property (so that we can filter on present sources), and a `__nested_sourced_data` property (so update scripts can buffer nested sourced fields)" do
         mapping = index_mapping_for "my_type" do |s|
           s.object_type "MyType" do |t|
             t.field "id", "ID"
@@ -113,7 +113,8 @@ module ElasticGraph
         expect(mapping.dig("properties")).to include({
           "id" => {"type" => "keyword"},
           "__versions" => {"dynamic" => "false", "type" => "object"},
-          "__sources" => {"type" => "keyword"}
+          "__sources" => {"type" => "keyword"},
+          "__nested_sourced_data" => {"dynamic" => "false", "type" => "object"}
         })
       end
 

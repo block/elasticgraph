@@ -1,12 +1,23 @@
 // --- Helper Functions --- //
 
-// Encodes a list of strings into an unambiguous, length-prefixed string ("len:value" parts concatenated).
+// Appends a single length-prefixed part to `sb` in the form `len:value|`. The trailing `|` is purely a
+// readability separator so that adjacent parts don't visually run together; `decodeKey` relies on the
+// length prefix (not the `|`) to find part boundaries, so a `|` inside a value is handled correctly.
+//
+// `length` is a count of Java `char`s (UTF-16 code units), and `decodeKey` slices by the same unit, so
+// multi-byte characters round-trip correctly as long as both sides agree (they do, since both use String).
+void appendKeyPart(StringBuilder sb, String part) {
+  sb.append(part.length());
+  sb.append(':');
+  sb.append(part);
+  sb.append('|');
+}
+
+// Encodes a list of strings into an unambiguous, length-prefixed string (`len:value|` parts concatenated).
 String encodeKey(List parts) {
   StringBuilder sb = new StringBuilder();
   for (String part : parts) {
-    sb.append(part.length());
-    sb.append(':');
-    sb.append(part);
+    appendKeyPart(sb, part);
   }
   return sb.toString();
 }
@@ -20,20 +31,20 @@ List decodeKey(String key) {
     int length = Integer.parseInt(key.substring(i, colonPos));
     int valueStart = colonPos + 1;
     parts.add(key.substring(valueStart, valueStart + length));
-    i = valueStart + length;
+    i = valueStart + length + 1; // +1 skips the '|' terminator
   }
   return parts;
 }
 
-// The encoded path to the nested element this event targets, or "" for a top-level event (no path).
-// List segments contribute their matched id (the value at `sourceField`); object segments contribute their
-// field name. Every segment contributes one part, so a path with any segments yields a non-empty key.
-String buildNestedElementKey(String relationship, Map sourcedFromNestedPaths, Map sourcedFromNestedPathIdentifiers) {
+// The element-identifier parts for the nested element this event targets, or an empty list for a top-level
+// event (no path). List segments contribute their matched id (the value at `sourceField`); object segments
+// contribute their field name. Every segment contributes one part.
+List buildNestedElementKeyParts(String relationship, Map sourcedFromNestedPaths, Map sourcedFromNestedPathIdentifiers) {
   List pathSegments = (List) sourcedFromNestedPaths.get(relationship);
-  if (pathSegments == null) {
-    return "";
-  }
   List parts = new ArrayList();
+  if (pathSegments == null) {
+    return parts;
+  }
   for (Map segment : pathSegments) {
     if (segment.containsKey("sourceField")) {
       parts.add(sourcedFromNestedPathIdentifiers[segment.sourceField]);
@@ -41,46 +52,38 @@ String buildNestedElementKey(String relationship, Map sourcedFromNestedPaths, Ma
       parts.add(segment.get("field"));
     }
   }
-  return encodeKey(parts);
-}
-
-// The `__versions` key: the relationship for top-level events, or relationship + element identifiers for nested ones.
-String buildVersionsKey(String relationship, String nestedElementKey) {
-  if (nestedElementKey.isEmpty()) {
-    return relationship;
-  }
-  List parts = decodeKey(nestedElementKey);
-  parts.add(0, relationship);
-  return encodeKey(parts);
+  return parts;
 }
 
 // Finds the element of `elements` whose `id` equals `matchValue`, or null.
 def findInList(List elements, String matchValue) {
   for (Map element : elements) {
-    if (matchValue.equals(element.id)) {
+    if (matchValue == element.id) {
       return element;
     }
   }
   return null;
 }
 
-// Navigates `source` through `pathSegments` to the target nested element, or null if any hop is missing.
+// Extracts the target nested element by walking `source` through `pathSegments`, or null if any hop is missing.
 // `keyParts` has one entry per segment (aligned by index): a list element's matched id, or an object field name.
-def navigateToNestedElement(Map source, List pathSegments, List keyParts) {
+// Whether a hop descends into a list or an object is determined from the data itself (the actual value's type),
+// not from the segment shape, so navigation can't silently break if the key/segment representations diverge.
+def extractNestedElement(Map source, List pathSegments, List keyParts) {
   Map current = source;
 
   for (int i = 0; i < pathSegments.size(); i++) {
     Map segment = (Map) pathSegments.get(i);
     String field = (String) segment.get("field");
 
-    if (!current.containsKey(field)) {
-      return null;
-    }
+    def subField = current.get(field);
 
-    if (segment.containsKey("sourceField")) {
-      current = (Map) findInList((List) current.get(field), (String) keyParts.get(i));
+    if (subField instanceof List) {
+      current = (Map) findInList((List) subField, (String) keyParts.get(i));
+    } else if (subField instanceof Map) {
+      current = (Map) subField;
     } else {
-      current = (Map) current.get(field);
+      current = null;
     }
 
     if (current == null) {
@@ -93,7 +96,7 @@ def navigateToNestedElement(Map source, List pathSegments, List keyParts) {
 
 // --- Main Functions --- //
 
-void setup(Map source, String versionsKey, String relationship, String nestedElementKey, Map counts) {
+void setup(Map source, String combinedKey, boolean isNested, Map counts) {
   if (source.__sources == null) {
     source.__sources = [];
   }
@@ -102,17 +105,12 @@ void setup(Map source, String versionsKey, String relationship, String nestedEle
     source.__versions = [:];
   }
 
-  if (source.__versions[versionsKey] == null) {
-    source.__versions[versionsKey] = [:];
+  if (source.__versions[combinedKey] == null) {
+    source.__versions[combinedKey] = [:];
   }
 
-  if (!nestedElementKey.isEmpty()) {
-    if (source.__nested_sourced_data == null) {
-      source.__nested_sourced_data = [:];
-    }
-    if (source.__nested_sourced_data[relationship] == null) {
-      source.__nested_sourced_data[relationship] = [:];
-    }
+  if (isNested && source.__nested_sourced_data == null) {
+    source.__nested_sourced_data = [:];
   }
 
   if (counts != null && source.__counts == null) {
@@ -120,8 +118,8 @@ void setup(Map source, String versionsKey, String relationship, String nestedEle
   }
 }
 
-void validateSource(Map source, String id, String relationship, String sourceId, long eventVersion, String versionsKey) {
-  Map versionsMap = source.__versions[versionsKey];
+void validateSource(Map source, String id, String relationship, String sourceId, long eventVersion, String combinedKey) {
+  Map versionsMap = source.__versions[combinedKey];
   List previousSourceIdsForRelationship = versionsMap.keySet().stream().filter(key -> key != sourceId).collect(Collectors.toList());
 
   if (previousSourceIdsForRelationship.size() > 0) {
@@ -156,43 +154,46 @@ void applyTopLevelFields(Map source, String id, Map topLevelFields, Map counts) 
   }
 }
 
-// Buffers nested sourced fields keyed by the target element, so they can be re-applied after any later self-event.
-void storeNestedSourcedData(Map source, String relationship, Map sourcedFromNestedFields, String nestedElementKey) {
-  if (sourcedFromNestedFields.isEmpty()) {
-    return;
-  }
-
-  ((Map) source.__nested_sourced_data[relationship]).put(nestedElementKey, sourcedFromNestedFields);
+// Buffers nested sourced fields keyed by the target element's combined key, so they can be re-applied after
+// any later event that overwrites the nested arrays.
+void storeNestedSourcedData(Map source, String combinedKey, Map sourcedFromNestedFields) {
+  source.__nested_sourced_data.put(combinedKey, sourcedFromNestedFields);
 }
 
-// Re-applies all buffered nested sourced data to its target elements. Runs on every event so that a
-// self-event's `putAll` (which overwrites nested arrays with fresh data) doesn't drop previously sourced fields.
+// Re-applies all buffered nested sourced data to its target elements. Runs on every event so that an event
+// providing top-level data (which overwrites nested arrays with fresh data via `putAll`) doesn't drop
+// previously sourced fields. The self-event is the common case, but any related event providing top-level
+// data could overwrite here too.
 void applyNestedSourcedData(Map source, Map sourcedFromNestedPaths) {
   if (source.__nested_sourced_data == null) {
     return;
   }
 
-  for (sourcedEntry in source.__nested_sourced_data.entrySet()) {
-    String relationship = (String) sourcedEntry.getKey();
-    Map dataByKey = (Map) sourcedEntry.getValue();
+  for (entry in source.__nested_sourced_data.entrySet()) {
+    List keyParts = decodeKey((String) entry.getKey());
+    String relationship = (String) keyParts.remove(0);
     List pathSegments = (List) sourcedFromNestedPaths.get(relationship);
 
+    // The relationship is absent from `sourcedFromNestedPaths` when its nested `sourced_from` configuration
+    // has been dropped from the schema while previously-sourced data remains buffered in the document. The
+    // fields are no longer exposed and no new data arrives for them, so it's correct to leave the stale
+    // buffer untouched and skip re-applying it.
     if (pathSegments == null) {
       continue;
     }
 
-    for (elementEntry in dataByKey.entrySet()) {
-      List keyParts = decodeKey((String) elementEntry.getKey());
-      Map target = (Map) navigateToNestedElement(source, pathSegments, keyParts);
-      if (target != null) {
-        target.putAll((Map) elementEntry.getValue());
-      }
+    // NOTE: orphaned buffer entries (e.g. a nested element removed from its parent collection) are never
+    // pruned, so `__nested_sourced_data` can grow unbounded for documents whose nested collections churn.
+    // This is a known limitation tracked for a follow-up; see the PR discussion.
+    Map target = (Map) extractNestedElement(source, pathSegments, keyParts);
+    if (target != null) {
+      target.putAll((Map) entry.getValue());
     }
   }
 }
 
-void recordSource(Map source, String versionsKey, String relationship, String sourceId, long eventVersion) {
-  source.__versions[versionsKey][sourceId] = eventVersion;
+void recordSource(Map source, String combinedKey, String relationship, String sourceId, long eventVersion) {
+  source.__versions[combinedKey][sourceId] = eventVersion;
 
   // Record the relationship in `__sources` if it's not already there. We maintain it as an append-only set using a sorted list.
   // This ensures deterministic ordering of its elements regardless of event ingestion order, and lets us check membership in O(log N) time.
@@ -220,12 +221,32 @@ Map sourcedFromNestedFields = params.sourcedFromNestedFields;
 Map sourcedFromNestedPathIdentifiers = params.sourcedFromNestedPathIdentifiers;
 Map sourcedFromNestedPaths = params.sourcedFromNestedPaths;
 
-String nestedElementKey = buildNestedElementKey(relationship, sourcedFromNestedPaths, sourcedFromNestedPathIdentifiers);
-String versionsKey = buildVersionsKey(relationship, nestedElementKey);
+List nestedElementKeyParts = buildNestedElementKeyParts(relationship, sourcedFromNestedPaths, sourcedFromNestedPathIdentifiers);
+boolean isNested = !nestedElementKeyParts.isEmpty();
 
-setup(source, versionsKey, relationship, nestedElementKey, counts);
-validateSource(source, id, relationship, sourceId, eventVersion, versionsKey);
+// The combined key identifies the source within the document, keying both `__versions` (so each distinct
+// source tracks its own version) and `__nested_sourced_data` (the re-apply buffer).
+//
+// For a top-level event it is the bare relationship name. This is deliberate: it keeps existing documents
+// byte-identical (no `__versions` migration) and keeps the indexer's version-recovery read -- which looks up
+// `__versions[relationship]` by the bare name (see `DatastoreIndexingRouter#source_event_versions_in_index`)
+// -- correct without changes. Only a nested event extends the key, appending the element identifiers and
+// encoding the result, since a nested element needs its own version bucket distinct from its siblings'.
+String combinedKey;
+if (isNested) {
+  List combinedKeyParts = new ArrayList();
+  combinedKeyParts.add(relationship);
+  combinedKeyParts.addAll(nestedElementKeyParts);
+  combinedKey = encodeKey(combinedKeyParts);
+} else {
+  combinedKey = relationship;
+}
+
+setup(source, combinedKey, isNested, counts);
+validateSource(source, id, relationship, sourceId, eventVersion, combinedKey);
 applyTopLevelFields(source, id, params.topLevelFields, counts);
-storeNestedSourcedData(source, relationship, sourcedFromNestedFields, nestedElementKey);
+if (isNested) {
+  storeNestedSourcedData(source, combinedKey, sourcedFromNestedFields);
+}
 applyNestedSourcedData(source, sourcedFromNestedPaths);
-recordSource(source, versionsKey, relationship, sourceId, eventVersion);
+recordSource(source, combinedKey, relationship, sourceId, eventVersion);

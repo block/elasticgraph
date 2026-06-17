@@ -7,7 +7,7 @@
 # frozen_string_literal: true
 
 module ElasticGraph
-  RSpec.describe "Multi-source indexing", :uses_datastore, :factories, :capture_logs do
+  RSpec.describe "Top-level multi-source indexing", :uses_datastore, :factories, :capture_logs do
     let(:indexer) { build_indexer }
 
     it "ingests data from multiple source types into a single document, regardless of the ingestion order" do

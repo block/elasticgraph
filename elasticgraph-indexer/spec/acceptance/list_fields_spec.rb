@@ -41,6 +41,10 @@ module ElasticGraph
           # This next team_season has `started_at: nil` so we can verify that the count of those values has one less as a result.
           build(:team_season, notes: %w[D], players: [], won_games_at: [], started_at: nil)
         ],
+        staff: build(:staff, coaches: [
+          build(:coach, id: "c1", name: "Alice"),
+          build(:coach, id: "c2", name: "Bob")
+        ]),
         sponsors: [build(:sponsor)]
       )
 
@@ -111,6 +115,7 @@ module ElasticGraph
         "seasons_object|was_shortened" => 2,
         "seasons_object|won_games_at" => 0,
         "seasons_object|year" => 2,
+        "staff|coaches" => 2,
         "the_nested_fields|current_players" => 2,
         "the_nested_fields|forbes_valuation_moneys" => 1,
         "the_nested_fields|the_seasons" => 2,
