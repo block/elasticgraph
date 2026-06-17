@@ -7,9 +7,6 @@
 # frozen_string_literal: true
 
 module ElasticGraph
-  # Exercises nested `sourced_from`: `career_wins` sourced onto elements embedded within a `Team` rather than
-  # onto the root, covering both path shapes the painless script navigates: `staff.coaches` (matched by id) and
-  # `staff.general_manager` (the all-object path, reached by field name).
   RSpec.describe "Nested multi-source indexing", :uses_datastore, :factories, :capture_logs do
     let(:indexer) { build_indexer }
     let(:league) { "NBA" }
@@ -19,9 +16,7 @@ module ElasticGraph
     let(:multibyte_coach_id) { "coach-bjørn" }
 
     it "fills in nested sourced fields on embedded list elements and singleton objects, regardless of ingestion order" do
-      # Pin distinct explicit versions per record so the `__versions` assertion below is both deterministic
-      # (the factory otherwise auto-increments based on how many records were built first) and unambiguous --
-      # each bucket's value pins it to a specific source event, catching any cross-element mixup.
+      # Distinct versions so each `__versions` bucket below pins to a specific event (catches cross-element mixups).
       team = team_event(version: 10)
       record_c1 = coach_record_for("c1", 100, version: 11)
       record_c2 = coach_record_for(multibyte_coach_id, 200, version: 12)
@@ -39,13 +34,12 @@ module ElasticGraph
       coaches_by_id = coaches_by_id_from(source)
       expect(coaches_by_id.keys).to contain_exactly("c1", multibyte_coach_id)
 
-      expect(coaches_by_id.fetch("c1")).to include("name" => "Alice", "career_wins" => 100)
-      expect(coaches_by_id.fetch(multibyte_coach_id)).to include("name" => "Bjørn", "career_wins" => 200)
-      expect(source.fetch("staff").fetch("general_manager")).to include("name" => "Casey", "career_wins" => 300)
+      expect(coaches_by_id.fetch("c1")).to eq("id" => "c1", "name" => "Alice", "career_wins" => 100)
+      expect(coaches_by_id.fetch(multibyte_coach_id)).to eq("id" => multibyte_coach_id, "name" => "Bjørn", "career_wins" => 200)
+      expect(source.fetch("staff").fetch("general_manager")).to eq("id" => "gm1", "name" => "Casey", "career_wins" => 300)
 
-      # `__sources`/`__versions` are keyed by the qualified nested relationship. Each nested element gets its own
-      # `__versions` bucket so sibling coaches don't collide; nested keys encode one `len:value|` part per path
-      # segment (object segment → field name, list segment → matched `coach_id`).
+      # Each nested element gets its own `__versions` bucket (encoded `len:value|` parts per path segment) so
+      # sibling coaches don't collide, while `__sources` keeps the bare qualified relationship.
       expect(source.fetch("__sources")).to contain_exactly("__self", "staff.coaches.record", "staff.general_manager.record")
 
       expect(source.fetch("__versions")).to eq(
@@ -57,35 +51,34 @@ module ElasticGraph
     end
 
     it "preserves already-sourced nested fields when the root document is re-indexed" do
-      # Source `career_wins` onto `c1`, then re-index the team. The new team event re-sends the `staff.coaches`
-      # array WITHOUT `career_wins` (a publisher doesn't know about sourced fields), overwriting the nested array;
-      # the script must re-apply the buffered sourced data so it survives the root update.
       indexer.processor.process([coach_record_for("c1", 100)], refresh_indices: true)
       indexer.processor.process([team_event(version: 1)], refresh_indices: true)
 
       expect(coaches_by_id_from(indexed_team_source("t1")).fetch("c1")).to include("career_wins" => 100)
 
+      # The re-indexed team re-sends `staff.coaches` without `career_wins` (publishers don't know about sourced
+      # fields), overwriting the nested array; the buffered sourced data must be re-applied so it survives.
       indexer.processor.process([team_event(version: 2)], refresh_indices: true)
 
-      expect(coaches_by_id_from(indexed_team_source("t1")).fetch("c1")).to include("name" => "Alice", "career_wins" => 100)
+      expect(coaches_by_id_from(indexed_team_source("t1")).fetch("c1")).to eq("id" => "c1", "name" => "Alice", "career_wins" => 100)
     end
 
     it "ignores a stale (lower-version) source event for an already-sourced nested element" do
       indexer.processor.process([team_event], refresh_indices: true)
       indexer.processor.process([coach_record_for("c1", 200, version: 5)], refresh_indices: true)
-
-      # An older version of the same coach's record must not overwrite the newer sourced value.
       indexer.processor.process([coach_record_for("c1", 100, version: 2)], refresh_indices: true)
 
-      expect(coaches_by_id_from(indexed_team_source("t1")).fetch("c1")).to include("career_wins" => 200)
+      source = indexed_team_source("t1")
+      expect(coaches_by_id_from(source).fetch("c1")).to eq("id" => "c1", "name" => "Alice", "career_wins" => 200)
+      # The recorded version stays at the newer event's, not the stale one's.
+      expect(source.fetch("__versions").fetch("20:staff.coaches.record|5:staff|2:c1|")).to eq("rec-c1" => 5)
     end
 
     it "rejects a mutation of the relationship used by a nested `sourced_from` field" do
       indexer.processor.process([team_event], refresh_indices: true)
       indexer.processor.process([coach_record_for("c1", 100, id: "rec-a")], refresh_indices: true)
 
-      # A second record (different source id) targeting the same coach is treated as a relationship mutation,
-      # which would break out-of-order processing guarantees, so it is rejected.
+      # A different source id for the same coach is a relationship mutation, which breaks out-of-order guarantees.
       expect {
         indexer.processor.process([coach_record_for("c1", 200, id: "rec-b")], refresh_indices: true)
       }.to raise_error Indexer::IndexingFailuresError, a_string_including(
