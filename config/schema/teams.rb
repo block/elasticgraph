@@ -91,7 +91,8 @@ ElasticGraph.define_schema do |schema|
       r.equivalent_field "team_league", locally_named: "league"
       r.equivalent_field "team_formed_on", locally_named: "formed_on"
     end
-    t.relates_to_many "general_manager_records", "GeneralManagerRecord", via: "teamId", dir: :in, indexing_only: true, singular: "general_manager_record" do |r|
+
+    t.relates_to_one "general_manager_record", "GeneralManagerRecord", via: "teamId", dir: :in, indexing_only: true do |r|
       r.equivalent_field "team_league", locally_named: "league"
       r.equivalent_field "team_formed_on", locally_named: "formed_on"
     end
@@ -261,7 +262,7 @@ ElasticGraph.define_schema do |schema|
     end
 
     t.relates_to_one "record", "GeneralManagerRecord", via: "teamId", dir: :in, indexing_only: true do |r|
-      r.parent_relationship "Team", "general_manager_records", embedded_at: "staff.general_manager"
+      r.parent_relationship "Team", "general_manager_record", embedded_at: "staff.general_manager"
     end
   end
 end
