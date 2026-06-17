@@ -210,12 +210,10 @@ ElasticGraph.define_schema do |schema|
   # and select the rollover index (`formed_on`) for the `Team` they update.
   schema.object_type "Staff" do |t|
     t.field "coaches", "[Coach!]!" do |f|
-      f.mapping type: "object"
+      f.mapping type: "nested"
     end
 
-    t.field "general_manager", "GeneralManager" do |f|
-      f.mapping type: "object"
-    end
+    t.field "general_manager", "GeneralManager"
   end
 
   schema.object_type "CoachRecord" do |t|

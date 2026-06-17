@@ -2248,12 +2248,6 @@ index_definitions_by_name:
         source: __self
       __counts.staff|coaches:
         source: __self
-      __counts.staff|coaches|career_wins:
-        source: __self
-      __counts.staff|coaches|id:
-        source: __self
-      __counts.staff|coaches|name:
-        source: __self
       __counts.the_nested_fields|current_players:
         source: __self
       __counts.the_nested_fields|forbes_valuation_moneys:
@@ -3482,10 +3476,6 @@ object_types_by_name:
       name:
         resolver:
           name: object_with_lookahead
-  CoachFieldsListFilterInput:
-    graphql_fields_by_name:
-      count:
-        name_in_index: __counts
   CoachGroupedBy:
     graphql_fields_by_name:
       career_wins:
@@ -3505,6 +3495,10 @@ object_types_by_name:
       name:
         resolver:
           name: get_record_field_value
+  CoachListFilterInput:
+    graphql_fields_by_name:
+      count:
+        name_in_index: __counts
   CoachRecord:
     graphql_fields_by_name:
       coach_id:
@@ -7083,17 +7077,11 @@ object_types_by_name:
           name: get_record_field_value
   StaffAggregatedValues:
     graphql_fields_by_name:
-      coaches:
-        resolver:
-          name: object_with_lookahead
       general_manager:
         resolver:
           name: object_with_lookahead
   StaffGroupedBy:
     graphql_fields_by_name:
-      coaches:
-        resolver:
-          name: object_with_lookahead
       general_manager:
         resolver:
           name: object_with_lookahead
@@ -7506,6 +7494,11 @@ object_types_by_name:
       players_object:
         resolver:
           name: object_with_lookahead
+  TeamAggregationStaffSubAggregations:
+    graphql_fields_by_name:
+      coaches:
+        resolver:
+          name: object_with_lookahead
   TeamAggregationSubAggregations:
     graphql_fields_by_name:
       current_players_nested:
@@ -7530,6 +7523,29 @@ object_types_by_name:
       seasons_object:
         resolver:
           name: object_with_lookahead
+      staff:
+        resolver:
+          name: object_with_lookahead
+  TeamCoachSubAggregation:
+    graphql_fields_by_name:
+      aggregated_values:
+        resolver:
+          name: object_without_lookahead
+      count_detail:
+        resolver:
+          name: object_without_lookahead
+      grouped_by:
+        resolver:
+          name: object_without_lookahead
+  TeamCoachSubAggregationConnection:
+    elasticgraph_category: nested_sub_aggregation_connection
+    graphql_fields_by_name:
+      nodes:
+        resolver:
+          name: object_without_lookahead
+      page_info:
+        resolver:
+          name: object_without_lookahead
   TeamConnection:
     elasticgraph_category: relay_connection
     graphql_fields_by_name:

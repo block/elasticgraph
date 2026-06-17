@@ -700,24 +700,22 @@ type CoachAggregatedValues {
 }
 
 """
-Input type used to specify filters on a `Coach` object referenced directly
-or transitively from a list field that has been configured to index each leaf field as
-its own flattened list of values.
+Input type used to specify filters on `Coach` fields.
 
 Will match all documents if passed as an empty object (or as `null`).
 """
-input CoachFieldsListFilterInput {
+input CoachFilterInput {
   """
   Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
-  be provided on a single `CoachFieldsListFilterInput` input because of
-  collisions between key names. For example, if you want to AND multiple
+  be provided on a single `CoachFilterInput` input because of collisions between
+  key names. For example, if you want to AND multiple
   OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
-  all_of: [CoachFieldsListFilterInput!]
+  all_of: [CoachFilterInput!]
 
   """
   Matches records where any of the provided sub-filters evaluate to true.
@@ -726,35 +724,28 @@ input CoachFieldsListFilterInput {
   When `null` is passed, matches all documents.
   When an empty list is passed, this part of the filter matches no documents.
   """
-  any_of: [CoachFieldsListFilterInput!]
+  any_of: [CoachFilterInput!]
 
   """
   Used to filter on the `career_wins` field.
 
   When `null` or an empty object is passed, matches all documents.
   """
-  career_wins: IntListFilterInput
-
-  """
-  Used to filter on the number of non-null elements in this list field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  count: IntFilterInput
+  career_wins: IntFilterInput
 
   """
   Used to filter on the `id` field.
 
   When `null` or an empty object is passed, matches all documents.
   """
-  id: IDListFilterInput
+  id: IDFilterInput
 
   """
   Used to filter on the `name` field.
 
   When `null` or an empty object is passed, matches all documents.
   """
-  name: StringListFilterInput
+  name: StringFilterInput
 
   """
   Matches records where the provided sub-filter evaluates to false.
@@ -762,7 +753,7 @@ input CoachFieldsListFilterInput {
 
   When `null` or an empty object is passed, matches no documents.
   """
-  not: CoachFieldsListFilterInput
+  not: CoachFilterInput
 }
 
 """
@@ -798,6 +789,56 @@ type CoachHighlights {
   Search highlights for the `name`, providing snippets of the matching text.
   """
   name: [String!]!
+}
+
+"""
+Input type used to specify filters on `[Coach]` fields.
+
+Will match all documents if passed as an empty object (or as `null`).
+"""
+input CoachListFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `CoachListFilterInput` input because of collisions
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [CoachListFilterInput!]
+
+  """
+  Matches records where any of the provided sub-filters evaluate to true.
+  This works just like an OR operator in SQL.
+
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
+  """
+  any_of: [CoachListFilterInput!]
+
+  """
+  Matches records where any of the list elements match the provided sub-filter.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  any_satisfy: CoachFilterInput
+
+  """
+  Used to filter on the number of non-null elements in this list field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  count: IntFilterInput
+
+  """
+  Matches records where the provided sub-filter evaluates to false.
+  This works just like a NOT operator in SQL.
+
+  When `null` or an empty object is passed, matches no documents.
+  """
+  not: CoachListFilterInput
 }
 
 type CoachRecord {
@@ -13539,11 +13580,6 @@ Type used to perform aggregation computations on `Staff` fields.
 """
 type StaffAggregatedValues {
   """
-  Computed aggregate values for the `coaches` field.
-  """
-  coaches: CoachAggregatedValues
-
-  """
   Computed aggregate values for the `general_manager` field.
   """
   general_manager: GeneralManagerAggregatedValues
@@ -13581,7 +13617,7 @@ input StaffFilterInput {
 
   When `null` or an empty object is passed, matches all documents.
   """
-  coaches: CoachFieldsListFilterInput
+  coaches: CoachListFilterInput
 
   """
   Used to filter on the `general_manager` field.
@@ -13603,18 +13639,6 @@ input StaffFilterInput {
 Type used to specify the `Staff` fields to group by for aggregations.
 """
 type StaffGroupedBy {
-  """
-  The `coaches` field value for this group.
-
-  Note: `coaches` is a collection field, but selecting this field will group on
-  individual values of the selected subfields of `coaches`.
-  That means that a document may be grouped into multiple aggregation groupings (i.e. when its `coaches`
-  field has multiple values) leading to some data duplication in the response. However, if a value shows
-  up in `coaches` multiple times for a single document, that document will only be included in the group
-  once.
-  """
-  coaches: CoachGroupedBy
-
   """
   The `general_manager` field value for this group.
   """
@@ -14571,6 +14595,26 @@ type TeamAggregationSeasonsObjectSubAggregations {
 }
 
 """
+Provides access to the `sub_aggregations` under `staff` within each `TeamAggregation`.
+"""
+type TeamAggregationStaffSubAggregations {
+  """
+  Used to perform a sub-aggregation of `coaches`.
+  """
+  coaches(
+    """
+    Used to filter the `Coach` documents included in this sub-aggregation based on the provided criteria.
+    """
+    filter: CoachFilterInput
+
+    """
+    Determines how many sub-aggregation buckets should be returned.
+    """
+    first: Int
+  ): TeamCoachSubAggregationConnection
+}
+
+"""
 Provides access to the `sub_aggregations` within each `TeamAggregation`.
 """
 type TeamAggregationSubAggregations {
@@ -14638,6 +14682,46 @@ type TeamAggregationSubAggregations {
   Used to perform a sub-aggregation of `seasons_object`.
   """
   seasons_object: TeamAggregationSeasonsObjectSubAggregations
+
+  """
+  Used to perform a sub-aggregation of `staff`.
+  """
+  staff: TeamAggregationStaffSubAggregations
+}
+
+"""
+Return type representing a bucket of `Coach` objects for a sub-aggregation within each `TeamAggregation`.
+"""
+type TeamCoachSubAggregation {
+  """
+  Provides computed aggregated values over all `Coach` documents in a sub-aggregation bucket.
+  """
+  aggregated_values: CoachAggregatedValues
+
+  """
+  Details of the count of `Coach` documents in a sub-aggregation bucket.
+  """
+  count_detail: AggregationCountDetail
+
+  """
+  Used to specify the `Coach` fields to group by. The returned values identify each sub-aggregation bucket.
+  """
+  grouped_by: CoachGroupedBy
+}
+
+"""
+Represents a collection of `TeamCoachSubAggregation` results.
+"""
+type TeamCoachSubAggregationConnection {
+  """
+  The list of `TeamCoachSubAggregation` results.
+  """
+  nodes: [TeamCoachSubAggregation!]!
+
+  """
+  Provides pagination-related information.
+  """
+  page_info: PageInfo!
 }
 
 """

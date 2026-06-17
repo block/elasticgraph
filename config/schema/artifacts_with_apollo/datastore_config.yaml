@@ -1126,7 +1126,7 @@ index_templates:
                     type: keyword
                   career_wins:
                     type: integer
-                type: object
+                type: nested
               general_manager:
                 properties:
                   id:
@@ -1135,7 +1135,6 @@ index_templates:
                     type: keyword
                   career_wins:
                     type: integer
-                type: object
             type: object
           __counts:
             properties:
@@ -1258,12 +1257,6 @@ index_templates:
               nested_fields2|the_seasons:
                 type: integer
               staff|coaches:
-                type: integer
-              staff|coaches|id:
-                type: integer
-              staff|coaches|name:
-                type: integer
-              staff|coaches|career_wins:
                 type: integer
           __nested_sourced_data:
             type: object

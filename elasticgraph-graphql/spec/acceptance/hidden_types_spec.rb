@@ -107,7 +107,7 @@ module ElasticGraph
             type_filter_and_non_indexed_aggregation_types_for("CurrencyDetails") +
             type_filter_and_non_indexed_aggregation_types_for("Staff") +
             type_filter_and_non_indexed_aggregation_types_for("GeneralManager") +
-            type_filter_and_non_indexed_aggregation_types_for("Coach", include_fields_list_filter: true) - ["CoachFilterInput"] +
+            type_filter_and_non_indexed_aggregation_types_for("Coach", include_list_filter: true) - ["CoachListElementFilterInput"] +
             type_filter_and_non_indexed_aggregation_types_for("Money", include_list_filter: true, include_fields_list_filter: true) - ["MoneyListElementFilterInput"] +
             type_filter_and_non_indexed_aggregation_types_for("Person") +
             type_filter_and_non_indexed_aggregation_types_for("Position", include_highlights: false) +
@@ -143,6 +143,8 @@ module ElasticGraph
           # The sub-aggregation types are quite complicated and we just add them all here.
           expected_types_present_on_both_schemas += %w[
             TeamAggregationSubAggregations
+            TeamAggregationStaffSubAggregations
+            TeamCoachSubAggregation TeamCoachSubAggregationConnection
             TeamMoneySubAggregation TeamMoneySubAggregationConnection
             TeamPlayerSubAggregation TeamPlayerSubAggregationConnection
             TeamTeamSeasonSubAggregation TeamTeamSeasonSubAggregationConnection
