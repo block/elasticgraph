@@ -78,9 +78,16 @@ FactoryBot.define do
 
     nested_fields2 { nested_fields }
 
-    # `staff` exercises nested `sourced_from`. Default to no staff so the many specs that build a `:team`
-    # aren't burdened with staff data; the nested-sourcing acceptance spec sets it explicitly.
-    staff { nil }
+    # `staff` exercises nested `sourced_from`. Coaches/GM use fixed ids and names to keep the factory
+    # deterministic (required for VCR stability). `career_wins` is intentionally absent on each member --
+    # it's a nested `sourced_from` field filled in from a separate records feed, not provided on the element.
+    staff do
+      build(
+        :staff,
+        coaches: [build(:coach, id: "coach1", name: "Coach One"), build(:coach, id: "coach2", name: "Coach Two")],
+        general_manager: build(:general_manager, id: "gm1", name: "GM One")
+      )
+    end
 
     transient do
       sponsors { [] }
