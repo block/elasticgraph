@@ -206,9 +206,8 @@ ElasticGraph.define_schema do |schema|
   # - `staff.coaches` (object then list): final segment is a list, so the element is matched by `coachId`.
   # - `staff.general_manager` (all object): every segment is an object, so the element is reached by field name.
   #
-  # `CoachRecord`/`GeneralManagerRecord` must be distinct source types: both relate to `Team` via `teamId`, so
-  # a shared type would fan one feed's events into both relationships. Their `team_league`/`team_formed_on`
-  # equivalents let the indexer route (`league`) and select the rollover index (`formed_on`) for the `Team`.
+  # The `*Record` feeds carry `team_league`/`team_formed_on` equivalents so the indexer can route (`league`)
+  # and select the rollover index (`formed_on`) for the `Team` they update.
   schema.object_type "Staff" do |t|
     t.field "coaches", "[Coach!]!" do |f|
       f.mapping type: "object"
