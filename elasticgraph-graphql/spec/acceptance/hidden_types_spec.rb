@@ -105,9 +105,6 @@ module ElasticGraph
             type_filter_and_non_indexed_aggregation_types_for("AddressTimestamps", include_highlights: false) - ["AddressTimestamps"] +
             type_filter_and_non_indexed_aggregation_types_for("Affiliations", include_fields_list_filter: true) +
             type_filter_and_non_indexed_aggregation_types_for("CurrencyDetails") +
-            # `Staff` and `GeneralManager` are embedded via `object` (not `nested`) singleton fields, and
-            # `Coach` via an `object` list field, so none get the plain `FilterInput`/`ListFilterInput` that
-            # `nested` embeddings (e.g. `Player`) produce; `Coach` only gets the `FieldsListFilterInput`.
             type_filter_and_non_indexed_aggregation_types_for("Staff") +
             type_filter_and_non_indexed_aggregation_types_for("GeneralManager") +
             type_filter_and_non_indexed_aggregation_types_for("Coach", include_fields_list_filter: true) - ["CoachFilterInput"] +
