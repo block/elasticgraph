@@ -78,10 +78,9 @@ FactoryBot.define do
 
     nested_fields2 { nested_fields }
 
-    # Staff exercises nested `sourced_from`. Default to an empty coaching list / no GM so the many specs that
-    # build a `:team` aren't burdened with staff data; the nested-sourcing acceptance spec sets these explicitly.
-    coaches { [] }
-    general_manager { nil }
+    # `staff` exercises nested `sourced_from`. Default to no staff so the many specs that build a `:team`
+    # aren't burdened with staff data; the nested-sourcing acceptance spec sets it explicitly.
+    staff { nil }
 
     transient do
       sponsors { [] }
@@ -93,6 +92,12 @@ FactoryBot.define do
         Array.new(Faker::Number.between(from: 2, to: 5)) { build :team_season }.uniq { |h| h.fetch(:year) }
       end
     end
+  end
+
+  factory :staff, parent: :hash_base do
+    __typename { "Staff" }
+    coaches { [] }
+    general_manager { nil }
   end
 
   factory :coach, parent: :hash_base do

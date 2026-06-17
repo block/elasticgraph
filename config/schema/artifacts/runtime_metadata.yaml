@@ -1085,30 +1085,6 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: formed_on
-      general_manager_career_wins_ASC:
-        sort_field:
-          direction: asc
-          field_path: general_manager.career_wins
-      general_manager_career_wins_DESC:
-        sort_field:
-          direction: desc
-          field_path: general_manager.career_wins
-      general_manager_id_ASC:
-        sort_field:
-          direction: asc
-          field_path: general_manager.id
-      general_manager_id_DESC:
-        sort_field:
-          direction: desc
-          field_path: general_manager.id
-      general_manager_name_ASC:
-        sort_field:
-          direction: asc
-          field_path: general_manager.name
-      general_manager_name_DESC:
-        sort_field:
-          direction: desc
-          field_path: general_manager.name
       id_ASC:
         sort_field:
           direction: asc
@@ -1125,6 +1101,30 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: league
+      staff_general_manager_career_wins_ASC:
+        sort_field:
+          direction: asc
+          field_path: staff.general_manager.career_wins
+      staff_general_manager_career_wins_DESC:
+        sort_field:
+          direction: desc
+          field_path: staff.general_manager.career_wins
+      staff_general_manager_id_ASC:
+        sort_field:
+          direction: asc
+          field_path: staff.general_manager.id
+      staff_general_manager_id_DESC:
+        sort_field:
+          direction: desc
+          field_path: staff.general_manager.id
+      staff_general_manager_name_ASC:
+        sort_field:
+          direction: asc
+          field_path: staff.general_manager.name
+      staff_general_manager_name_DESC:
+        sort_field:
+          direction: desc
+          field_path: staff.general_manager.name
   WholesaleSortOrderInput:
     values_by_name:
       id_ASC:
@@ -2136,14 +2136,6 @@ index_definitions_by_name:
     - __self
     - record
     fields_by_path:
-      __counts.coaches:
-        source: __self
-      __counts.coaches|career_wins:
-        source: __self
-      __counts.coaches|id:
-        source: __self
-      __counts.coaches|name:
-        source: __self
       __counts.current_players_nested:
         source: __self
       __counts.current_players_object:
@@ -2254,6 +2246,14 @@ index_definitions_by_name:
         source: __self
       __counts.seasons_object|year:
         source: __self
+      __counts.staff|coaches:
+        source: __self
+      __counts.staff|coaches|career_wins:
+        source: __self
+      __counts.staff|coaches|id:
+        source: __self
+      __counts.staff|coaches|name:
+        source: __self
       __counts.the_nested_fields|current_players:
         source: __self
       __counts.the_nested_fields|forbes_valuation_moneys:
@@ -2261,12 +2261,6 @@ index_definitions_by_name:
       __counts.the_nested_fields|the_seasons:
         source: __self
       __counts.won_championships_at:
-        source: __self
-      coaches.career_wins:
-        source: record
-      coaches.id:
-        source: __self
-      coaches.name:
         source: __self
       country_code:
         source: __self
@@ -2371,12 +2365,6 @@ index_definitions_by_name:
       forbes_valuations:
         source: __self
       formed_on:
-        source: __self
-      general_manager.career_wins:
-        source: record
-      general_manager.id:
-        source: __self
-      general_manager.name:
         source: __self
       id:
         source: __self
@@ -2830,6 +2818,18 @@ index_definitions_by_name:
         source: __self
       stadium_location.lon:
         source: __self
+      staff.coaches.career_wins:
+        source: record
+      staff.coaches.id:
+        source: __self
+      staff.coaches.name:
+        source: __self
+      staff.general_manager.career_wins:
+        source: record
+      staff.general_manager.id:
+        source: __self
+      staff.general_manager.name:
+        source: __self
       the_nested_fields.current_players.__counts.affiliations|sponsorships_nested:
         source: __self
       the_nested_fields.current_players.__counts.affiliations|sponsorships_object:
@@ -3036,10 +3036,12 @@ index_definitions_by_name:
       timestamp_field_path: formed_on
     route_with: league
     sourced_from_nested_paths_by_qualified_relationship:
-      coaches.record:
+      staff.coaches.record:
+      - field: staff
       - field: coaches
         source_field: coachId
-      general_manager.record:
+      staff.general_manager.record:
+      - field: staff
       - field: general_manager
   widget_currencies:
     current_sources:
@@ -3556,7 +3558,7 @@ object_types_by_name:
     - id_source: teamId
       metadata_params:
         relationship:
-          value: coaches.record
+          value: staff.coaches.record
         sourceId:
           cardinality: one
           source_path: id
@@ -3565,7 +3567,7 @@ object_types_by_name:
           source_path: type
         version:
           cardinality: one
-      relationship: coaches.record
+      relationship: staff.coaches.record
       rollover_timestamp_value_source: team_formed_on
       routing_value_source: team_league
       script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
@@ -4536,7 +4538,7 @@ object_types_by_name:
     - id_source: teamId
       metadata_params:
         relationship:
-          value: general_manager.record
+          value: staff.general_manager.record
         sourceId:
           cardinality: one
           source_path: id
@@ -4545,7 +4547,7 @@ object_types_by_name:
           source_path: type
         version:
           cardinality: one
-      relationship: general_manager.record
+      relationship: staff.general_manager.record
       rollover_timestamp_value_source: team_formed_on
       routing_value_source: team_league
       script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
@@ -7071,6 +7073,38 @@ object_types_by_name:
     graphql_fields_by_name:
       count:
         name_in_index: __counts
+  Staff:
+    graphql_fields_by_name:
+      coaches:
+        resolver:
+          name: get_record_field_value
+      general_manager:
+        resolver:
+          name: get_record_field_value
+  StaffAggregatedValues:
+    graphql_fields_by_name:
+      coaches:
+        resolver:
+          name: object_with_lookahead
+      general_manager:
+        resolver:
+          name: object_with_lookahead
+  StaffGroupedBy:
+    graphql_fields_by_name:
+      coaches:
+        resolver:
+          name: object_with_lookahead
+      general_manager:
+        resolver:
+          name: object_with_lookahead
+  StaffHighlights:
+    graphql_fields_by_name:
+      coaches:
+        resolver:
+          name: get_record_field_value
+      general_manager:
+        resolver:
+          name: get_record_field_value
   Store:
     graphql_fields_by_name:
       active:
@@ -7218,9 +7252,6 @@ object_types_by_name:
         name_in_index: __counts
   Team:
     graphql_fields_by_name:
-      coaches:
-        resolver:
-          name: get_record_field_value
       country_code:
         resolver:
           name: get_record_field_value
@@ -7248,9 +7279,6 @@ object_types_by_name:
       formed_on:
         resolver:
           name: get_record_field_value
-      general_manager:
-        resolver:
-          name: get_record_field_value
       id:
         resolver:
           name: get_record_field_value
@@ -7276,6 +7304,9 @@ object_types_by_name:
       stadium_location:
         resolver:
           name: get_record_field_value
+      staff:
+        resolver:
+          name: get_record_field_value
       won_championships_at:
         resolver:
           name: get_record_field_value
@@ -7299,8 +7330,6 @@ object_types_by_name:
       routing_value_source: league
       script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
       top_level_fields_params:
-        coaches:
-          cardinality: one
         country_code:
           cardinality: one
         current_name:
@@ -7319,8 +7348,6 @@ object_types_by_name:
           cardinality: one
         formed_on:
           cardinality: one
-        general_manager:
-          cardinality: one
         league:
           cardinality: one
         nested_fields2:
@@ -7333,6 +7360,8 @@ object_types_by_name:
           cardinality: one
         stadium_location:
           cardinality: one
+        staff:
+          cardinality: one
         the_nested_fields:
           cardinality: one
         won_championships_at:
@@ -7340,9 +7369,6 @@ object_types_by_name:
       type: Team
   TeamAggregatedValues:
     graphql_fields_by_name:
-      coaches:
-        resolver:
-          name: object_with_lookahead
       country_code:
         resolver:
           name: object_with_lookahead
@@ -7364,9 +7390,6 @@ object_types_by_name:
       formed_on:
         resolver:
           name: object_with_lookahead
-      general_manager:
-        resolver:
-          name: object_with_lookahead
       id:
         resolver:
           name: object_with_lookahead
@@ -7380,6 +7403,9 @@ object_types_by_name:
         resolver:
           name: object_with_lookahead
       stadium_location:
+        resolver:
+          name: object_with_lookahead
+      staff:
         resolver:
           name: object_with_lookahead
       won_championships_at:
@@ -7566,9 +7592,6 @@ object_types_by_name:
         name_in_index: the_nested_fields
   TeamGroupedBy:
     graphql_fields_by_name:
-      coaches:
-        resolver:
-          name: object_with_lookahead
       country_code:
         resolver:
           name: object_with_lookahead
@@ -7587,20 +7610,17 @@ object_types_by_name:
       formed_on:
         resolver:
           name: object_with_lookahead
-      general_manager:
-        resolver:
-          name: object_with_lookahead
       league:
         resolver:
           name: object_with_lookahead
       seasons_object:
         resolver:
           name: object_with_lookahead
+      staff:
+        resolver:
+          name: object_with_lookahead
   TeamHighlights:
     graphql_fields_by_name:
-      coaches:
-        resolver:
-          name: get_record_field_value
       country_code:
         resolver:
           name: get_record_field_value
@@ -7620,9 +7640,6 @@ object_types_by_name:
         resolver:
           name: get_record_field_value
       forbes_valuation_moneys_object:
-        resolver:
-          name: get_record_field_value
-      general_manager:
         resolver:
           name: get_record_field_value
       id:
@@ -7645,6 +7662,9 @@ object_types_by_name:
         resolver:
           name: get_record_field_value
       seasons_object:
+        resolver:
+          name: get_record_field_value
+      staff:
         resolver:
           name: get_record_field_value
   TeamMoneySubAggregation:

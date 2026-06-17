@@ -8,10 +8,10 @@
 
 module ElasticGraph
   # Exercises *nested* `sourced_from`: fields sourced onto elements embedded within a `Team` document rather
-  # than onto the root. A `Team` embeds its staff; each member's `career_wins` is sourced from a separate
-  # records feed. We cover both path shapes the painless script must handle:
-  # - `coaches` (a list): the target element is matched by id (`coachId`).
-  # - `general_manager` (a singleton object): the target element is reached by field name (the all-object path).
+  # than onto the root. A `Team` embeds a `Staff` object; each member's `career_wins` is sourced from a
+  # separate records feed. The dotted embedding paths cover both shapes the painless script must navigate:
+  # - `staff.coaches` (object then list): the target element is matched by id (`coachId`).
+  # - `staff.general_manager` (all object): the target element is reached by field name (the all-object path).
   RSpec.describe "Nested multi-source indexing", :uses_datastore, :factories, :capture_logs do
     let(:indexer) { build_indexer }
 
@@ -28,11 +28,14 @@ module ElasticGraph
         id: "t1",
         league: league,
         formed_on: formed_on,
-        coaches: [
-          build(:coach, id: "c1", name: "Alice"),
-          build(:coach, id: multibyte_coach_id, name: "Bjørn")
-        ],
-        general_manager: build(:general_manager, id: "gm1", name: "Casey")
+        staff: build(
+          :staff,
+          coaches: [
+            build(:coach, id: "c1", name: "Alice"),
+            build(:coach, id: multibyte_coach_id, name: "Bjørn")
+          ],
+          general_manager: build(:general_manager, id: "gm1", name: "Casey")
+        )
       )
 
       # Each `CoachRecord` carries the equivalents the indexer needs to route (`team_league`) and select the
@@ -76,7 +79,8 @@ module ElasticGraph
 
       expect(source["id"]).to eq("t1")
 
-      coaches_by_id = source.fetch("coaches").to_h { |c| [c.fetch("id"), c] }
+      staff = source.fetch("staff")
+      coaches_by_id = staff.fetch("coaches").to_h { |c| [c.fetch("id"), c] }
       expect(coaches_by_id.keys).to contain_exactly("c1", multibyte_coach_id)
 
       # `c1`'s record arrived before the team doc; its sourced `career_wins` was buffered and applied on team creation.
@@ -85,23 +89,24 @@ module ElasticGraph
       expect(coaches_by_id.fetch(multibyte_coach_id)).to include("name" => "Bjørn", "career_wins" => 200)
 
       # The all-object path: the singleton general manager element is reached by field name and filled in.
-      expect(source.fetch("general_manager")).to include("name" => "Casey", "career_wins" => 300)
+      expect(staff.fetch("general_manager")).to include("name" => "Casey", "career_wins" => 300)
 
       # The team document records each source it has seen. The relationship keys are the *qualified* nested
-      # relationships, and the `__versions` map keys them together with the element identifiers.
-      expect(source.fetch("__sources")).to contain_exactly("__self", "coaches.record", "general_manager.record")
+      # relationships (the dotted embedding path plus the leaf relationship name).
+      expect(source.fetch("__sources")).to contain_exactly("__self", "staff.coaches.record", "staff.general_manager.record")
 
       # The core invariant of nested `sourced_from`: each nested element gets its *own* `__versions` bucket so
-      # that sibling elements sharing a relationship (the two coaches, both via `coaches.record`) don't collide
-      # into one version bucket and trip the "relationship has changed" conflict check. Top-level events
-      # (`__self`) stay keyed by the bare relationship; nested events extend the key with the element
-      # identifiers and encode it (length-prefixed `len:value|` parts; the list segment contributes the matched
-      # `coachId`, the object segment its field name).
+      # that sibling elements sharing a relationship (the two coaches, both via `staff.coaches.record`) don't
+      # collide into one version bucket and trip the "relationship has changed" conflict check. Top-level events
+      # (`__self`) stay keyed by the bare relationship; nested events extend the key with one identifier per
+      # path segment and encode it (length-prefixed `len:value|` parts: each object segment contributes its
+      # field name, each list segment the matched `coachId`). So the coach keys carry both the `staff` object
+      # segment and the `coachId`, and the GM key carries both object segments (`staff`, `general_manager`).
       expect(source.fetch("__versions")).to eq(
         "__self" => {"t1" => version_of(team)},
-        "14:coaches.record|2:c1|" => {"rec-c1" => version_of(record_c1)},
-        "14:coaches.record|11:coach-bjørn|" => {"rec-#{multibyte_coach_id}" => version_of(record_c2)},
-        "22:general_manager.record|15:general_manager|" => {"rec-gm1" => version_of(record_gm)}
+        "20:staff.coaches.record|5:staff|2:c1|" => {"rec-c1" => version_of(record_c1)},
+        "20:staff.coaches.record|5:staff|11:coach-bjørn|" => {"rec-#{multibyte_coach_id}" => version_of(record_c2)},
+        "28:staff.general_manager.record|5:staff|15:general_manager|" => {"rec-gm1" => version_of(record_gm)}
       )
     end
 

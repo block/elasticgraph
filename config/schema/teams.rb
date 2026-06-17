@@ -80,18 +80,17 @@ ElasticGraph.define_schema do |schema|
     # Here we duplicate `nested_fields` as `nested_fields2` to achieve that.
     t.field "nested_fields2", "TeamNestedFields"
 
-    # Staff embeds source-bearing elements whose stats are filled in from separate feeds (see the `*Record`
-    # types below). `coaches` is a list (each coach's `career_wins` is sourced onto the element matched by
-    # `coachId`); `general_manager` is a team's single GM, embedded as an object (sourced onto the element
-    # reached by field name -- the all-object path).
-    t.field "coaches", "[Coach!]!" do |f|
+    # A team's coaching staff, embedded as a `Staff` object. Its members' win stats are filled in from
+    # separate feeds (see the `*Record` types below) via nested `sourced_from`. The `staff` layer means each
+    # member is reached through a dotted embedding path (`staff.coaches` / `staff.general_manager`), which
+    # exercises the painless script's multi-segment path navigation.
+    t.field "staff", "Staff" do |f|
       f.mapping type: "object"
     end
 
-    t.field "general_manager", "GeneralManager" do |f|
-      f.mapping type: "object"
-    end
-
+    # The record feeds join on `teamId` and live on `Team` (the indexed root), even though the elements they
+    # source onto are nested under `staff`. The `parent_relationship` declarations on `Coach`/`GeneralManager`
+    # name these relationships and reach the embedded elements via their `embedded_at:` dotted paths.
     t.relates_to_many "coach_records", "CoachRecord", via: "teamId", dir: :in, indexing_only: true, singular: "coach_record" do |r|
       r.equivalent_field "team_league", locally_named: "league"
       r.equivalent_field "team_formed_on", locally_named: "formed_on"
@@ -205,16 +204,17 @@ ElasticGraph.define_schema do |schema|
   end
 
   # These types exercise *nested* `sourced_from`: a field sourced not onto the root indexed document but onto
-  # an element embedded within it. A `Team` embeds its staff, and each staff member's win stat is filled in
-  # from a separate records feed. A coach or GM is a real entity with its own `id` -- unlike the embedded
-  # `Player` value object above -- which is exactly what nested `sourced_from` needs to match the right
-  # embedded element.
+  # an element embedded within it. A `Team` embeds a `Staff` object, and each staff member's win stat is
+  # filled in from a separate records feed. A coach or GM is a real entity with its own `id` -- unlike the
+  # embedded `Player` value object above -- which is exactly what nested `sourced_from` needs to match the
+  # right embedded element.
   #
-  # We embed staff two ways to cover both path shapes the painless script must handle:
-  # - `coaches` (a *list*): the path has a list segment, so the target element is matched by id (`coachId`).
-  # - `general_manager` (a single GM, embedded as an *object*): the path is all-object, so the target element
-  #   is reached by field name (the case that originally produced an empty element key and collided with
-  #   top-level events).
+  # `Staff` holds its members two ways, so the dotted embedding paths cover both shapes the painless script
+  # must navigate:
+  # - `staff.coaches` (object then *list*): the final segment is a list, so the target element is matched by
+  #   id (`coachId`).
+  # - `staff.general_manager` (all *object*): every segment is an object, so the target element is reached by
+  #   field name (the case that originally produced an empty element key and collided with top-level events).
   #
   # `CoachRecord` and `GeneralManagerRecord` are *distinct source types* -- and naturally so, since a coach
   # and a GM are different roles with different feeds. This also matters mechanically: both relate to `Team`
@@ -225,6 +225,16 @@ ElasticGraph.define_schema do |schema|
   # routing (`league`) and is a rollover index (`formed_on`): the indexer needs them to route/select the
   # `Team` index it updates. Mirrors how the top-level `sourced_from` example in `widgets.rb` uses
   # `equivalent_field`.
+  schema.object_type "Staff" do |t|
+    t.field "coaches", "[Coach!]!" do |f|
+      f.mapping type: "object"
+    end
+
+    t.field "general_manager", "GeneralManager" do |f|
+      f.mapping type: "object"
+    end
+  end
+
   schema.object_type "CoachRecord" do |t|
     t.field "id", "ID!"
     t.field "teamId", "ID"
@@ -253,7 +263,7 @@ ElasticGraph.define_schema do |schema|
     end
 
     t.relates_to_one "record", "CoachRecord", via: "coachId", dir: :in, indexing_only: true do |r|
-      r.parent_relationship "Team", "coach_records"
+      r.parent_relationship "Team", "coach_records", embedded_at: "staff.coaches"
     end
   end
 
@@ -268,7 +278,7 @@ ElasticGraph.define_schema do |schema|
     end
 
     t.relates_to_one "record", "GeneralManagerRecord", via: "teamId", dir: :in, indexing_only: true do |r|
-      r.parent_relationship "Team", "general_manager_records"
+      r.parent_relationship "Team", "general_manager_records", embedded_at: "staff.general_manager"
     end
   end
 end

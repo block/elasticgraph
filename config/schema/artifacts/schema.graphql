@@ -13529,6 +13529,113 @@ input SponsorshipListFilterInput {
   not: SponsorshipListFilterInput
 }
 
+type Staff {
+  coaches: [Coach!]!
+  general_manager: GeneralManager
+}
+
+"""
+Type used to perform aggregation computations on `Staff` fields.
+"""
+type StaffAggregatedValues {
+  """
+  Computed aggregate values for the `coaches` field.
+  """
+  coaches: CoachAggregatedValues
+
+  """
+  Computed aggregate values for the `general_manager` field.
+  """
+  general_manager: GeneralManagerAggregatedValues
+}
+
+"""
+Input type used to specify filters on `Staff` fields.
+
+Will match all documents if passed as an empty object (or as `null`).
+"""
+input StaffFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `StaffFilterInput` input because of collisions between
+  key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [StaffFilterInput!]
+
+  """
+  Matches records where any of the provided sub-filters evaluate to true.
+  This works just like an OR operator in SQL.
+
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
+  """
+  any_of: [StaffFilterInput!]
+
+  """
+  Used to filter on the `coaches` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  coaches: CoachFieldsListFilterInput
+
+  """
+  Used to filter on the `general_manager` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  general_manager: GeneralManagerFilterInput
+
+  """
+  Matches records where the provided sub-filter evaluates to false.
+  This works just like a NOT operator in SQL.
+
+  When `null` or an empty object is passed, matches no documents.
+  """
+  not: StaffFilterInput
+}
+
+"""
+Type used to specify the `Staff` fields to group by for aggregations.
+"""
+type StaffGroupedBy {
+  """
+  The `coaches` field value for this group.
+
+  Note: `coaches` is a collection field, but selecting this field will group on
+  individual values of the selected subfields of `coaches`.
+  That means that a document may be grouped into multiple aggregation groupings (i.e. when its `coaches`
+  field has multiple values) leading to some data duplication in the response. However, if a value shows
+  up in `coaches` multiple times for a single document, that document will only be included in the group
+  once.
+  """
+  coaches: CoachGroupedBy
+
+  """
+  The `general_manager` field value for this group.
+  """
+  general_manager: GeneralManagerGroupedBy
+}
+
+"""
+Type used to request desired `Staff` search highlight fields.
+"""
+type StaffHighlights {
+  """
+  Search highlights for the `coaches`, providing snippets of the matching text.
+  """
+  coaches: CoachHighlights
+
+  """
+  Search highlights for the `general_manager`, providing snippets of the matching text.
+  """
+  general_manager: GeneralManagerHighlights
+}
+
 interface Store implements DistributionChannel & Retail {
   active: Boolean
   established_on: Date
@@ -14084,7 +14191,6 @@ input StringStartsWithFilterInput {
 For more performant queries on this type, please filter on `league` if possible.
 """
 type Team {
-  coaches: [Coach!]!
   country_code: ID!
   current_name: String
   current_players_nested: [Player!]!
@@ -14094,7 +14200,6 @@ type Team {
   forbes_valuation_moneys_object: [Money!]!
   forbes_valuations: [JsonSafeLong!]!
   formed_on: Date
-  general_manager: GeneralManager
   id: ID
   league: String
   nested_fields: TeamNestedFields
@@ -14103,6 +14208,7 @@ type Team {
   seasons_nested: [TeamSeason!]!
   seasons_object: [TeamSeason!]!
   stadium_location: GeoLocation
+  staff: Staff
   won_championships_at: [DateTime!]!
 }
 
@@ -14110,11 +14216,6 @@ type Team {
 Type used to perform aggregation computations on `Team` fields.
 """
 type TeamAggregatedValues {
-  """
-  Computed aggregate values for the `coaches` field.
-  """
-  coaches: CoachAggregatedValues
-
   """
   Computed aggregate values for the `country_code` field.
   """
@@ -14151,11 +14252,6 @@ type TeamAggregatedValues {
   formed_on: DateAggregatedValues
 
   """
-  Computed aggregate values for the `general_manager` field.
-  """
-  general_manager: GeneralManagerAggregatedValues
-
-  """
   Computed aggregate values for the `id` field.
   """
   id: NonNumericAggregatedValues
@@ -14179,6 +14275,11 @@ type TeamAggregatedValues {
   Computed aggregate values for the `stadium_location` field.
   """
   stadium_location: NonNumericAggregatedValues
+
+  """
+  Computed aggregate values for the `staff` field.
+  """
+  staff: StaffAggregatedValues
 
   """
   Computed aggregate values for the `won_championships_at` field.
@@ -14715,13 +14816,6 @@ input TeamFilterInput {
   any_of: [TeamFilterInput!]
 
   """
-  Used to filter on the `coaches` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  coaches: CoachFieldsListFilterInput
-
-  """
   Used to filter on the `country_code` field.
 
   When `null` or an empty object is passed, matches all documents.
@@ -14783,13 +14877,6 @@ input TeamFilterInput {
   When `null` or an empty object is passed, matches all documents.
   """
   formed_on: DateFilterInput
-
-  """
-  Used to filter on the `general_manager` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  general_manager: GeneralManagerFilterInput
 
   """
   Used to filter on the `id` field.
@@ -14856,6 +14943,13 @@ input TeamFilterInput {
   stadium_location: GeoLocationFilterInput
 
   """
+  Used to filter on the `staff` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  staff: StaffFilterInput
+
+  """
   Used to filter on the `won_championships_at` field.
 
   When `null` or an empty object is passed, matches all documents.
@@ -14867,18 +14961,6 @@ input TeamFilterInput {
 Type used to specify the `Team` fields to group by for aggregations.
 """
 type TeamGroupedBy {
-  """
-  The `coaches` field value for this group.
-
-  Note: `coaches` is a collection field, but selecting this field will group on
-  individual values of the selected subfields of `coaches`.
-  That means that a document may be grouped into multiple aggregation groupings (i.e. when its `coaches`
-  field has multiple values) leading to some data duplication in the response. However, if a value shows
-  up in `coaches` multiple times for a single document, that document will only be included in the group
-  once.
-  """
-  coaches: CoachGroupedBy
-
   """
   The `country_code` field value for this group.
   """
@@ -14928,11 +15010,6 @@ type TeamGroupedBy {
   formed_on: DateGroupedBy
 
   """
-  The `general_manager` field value for this group.
-  """
-  general_manager: GeneralManagerGroupedBy
-
-  """
   The `league` field value for this group.
   """
   league: String
@@ -14948,17 +15025,17 @@ type TeamGroupedBy {
   once.
   """
   seasons_object: TeamSeasonGroupedBy
+
+  """
+  The `staff` field value for this group.
+  """
+  staff: StaffGroupedBy
 }
 
 """
 Type used to request desired `Team` search highlight fields.
 """
 type TeamHighlights {
-  """
-  Search highlights for the `coaches`, providing snippets of the matching text.
-  """
-  coaches: CoachHighlights
-
   """
   Search highlights for the `country_code`, providing snippets of the matching text.
   """
@@ -14995,11 +15072,6 @@ type TeamHighlights {
   forbes_valuation_moneys_object: MoneyHighlights
 
   """
-  Search highlights for the `general_manager`, providing snippets of the matching text.
-  """
-  general_manager: GeneralManagerHighlights
-
-  """
   Search highlights for the `id`, providing snippets of the matching text.
   """
   id: [String!]!
@@ -15033,6 +15105,11 @@ type TeamHighlights {
   Search highlights for the `seasons_object`, providing snippets of the matching text.
   """
   seasons_object: TeamSeasonHighlights
+
+  """
+  Search highlights for the `staff`, providing snippets of the matching text.
+  """
+  staff: StaffHighlights
 }
 
 """
@@ -15973,36 +16050,6 @@ enum TeamSortOrderInput {
   formed_on_DESC
 
   """
-  Sorts ascending by the `general_manager.career_wins` field.
-  """
-  general_manager_career_wins_ASC
-
-  """
-  Sorts descending by the `general_manager.career_wins` field.
-  """
-  general_manager_career_wins_DESC
-
-  """
-  Sorts ascending by the `general_manager.id` field.
-  """
-  general_manager_id_ASC
-
-  """
-  Sorts descending by the `general_manager.id` field.
-  """
-  general_manager_id_DESC
-
-  """
-  Sorts ascending by the `general_manager.name` field.
-  """
-  general_manager_name_ASC
-
-  """
-  Sorts descending by the `general_manager.name` field.
-  """
-  general_manager_name_DESC
-
-  """
   Sorts ascending by the `id` field.
   """
   id_ASC
@@ -16021,6 +16068,36 @@ enum TeamSortOrderInput {
   Sorts descending by the `league` field.
   """
   league_DESC
+
+  """
+  Sorts ascending by the `staff.general_manager.career_wins` field.
+  """
+  staff_general_manager_career_wins_ASC
+
+  """
+  Sorts descending by the `staff.general_manager.career_wins` field.
+  """
+  staff_general_manager_career_wins_DESC
+
+  """
+  Sorts ascending by the `staff.general_manager.id` field.
+  """
+  staff_general_manager_id_ASC
+
+  """
+  Sorts descending by the `staff.general_manager.id` field.
+  """
+  staff_general_manager_id_DESC
+
+  """
+  Sorts ascending by the `staff.general_manager.name` field.
+  """
+  staff_general_manager_name_ASC
+
+  """
+  Sorts descending by the `staff.general_manager.name` field.
+  """
+  staff_general_manager_name_DESC
 }
 
 """

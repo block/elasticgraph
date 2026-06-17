@@ -1116,23 +1116,26 @@ index_templates:
                       players_object|seasons_object|awards:
                         type: integer
                 type: nested
-          coaches:
+          staff:
             properties:
-              id:
-                type: keyword
-              name:
-                type: keyword
-              career_wins:
-                type: integer
-            type: object
-          general_manager:
-            properties:
-              id:
-                type: keyword
-              name:
-                type: keyword
-              career_wins:
-                type: integer
+              coaches:
+                properties:
+                  id:
+                    type: keyword
+                  name:
+                    type: keyword
+                  career_wins:
+                    type: integer
+                type: object
+              general_manager:
+                properties:
+                  id:
+                    type: keyword
+                  name:
+                    type: keyword
+                  career_wins:
+                    type: integer
+                type: object
             type: object
           __counts:
             properties:
@@ -1254,13 +1257,13 @@ index_templates:
                 type: integer
               nested_fields2|the_seasons:
                 type: integer
-              coaches:
+              staff|coaches:
                 type: integer
-              coaches|id:
+              staff|coaches|id:
                 type: integer
-              coaches|name:
+              staff|coaches|name:
                 type: integer
-              coaches|career_wins:
+              staff|coaches|career_wins:
                 type: integer
           __nested_sourced_data:
             type: object

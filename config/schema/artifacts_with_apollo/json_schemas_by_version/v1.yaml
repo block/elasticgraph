@@ -1053,6 +1053,30 @@ json_schema_version: 1
     required:
     - sponsor_id
     - annual_total
+  Staff:
+    type: object
+    properties:
+      coaches:
+        type: array
+        items:
+          "$ref": "#/$defs/Coach"
+        ElasticGraph:
+          type: "[Coach!]!"
+          nameInIndex: coaches
+      general_manager:
+        anyOf:
+        - "$ref": "#/$defs/GeneralManager"
+        - type: 'null'
+        ElasticGraph:
+          type: GeneralManager
+          nameInIndex: general_manager
+      __typename:
+        type: string
+        const: Staff
+        default: Staff
+    required:
+    - coaches
+    - general_manager
   String:
     type: string
   Team:
@@ -1187,20 +1211,13 @@ json_schema_version: 1
         ElasticGraph:
           type: TeamNestedFields
           nameInIndex: nested_fields2
-      coaches:
-        type: array
-        items:
-          "$ref": "#/$defs/Coach"
-        ElasticGraph:
-          type: "[Coach!]!"
-          nameInIndex: coaches
-      general_manager:
+      staff:
         anyOf:
-        - "$ref": "#/$defs/GeneralManager"
+        - "$ref": "#/$defs/Staff"
         - type: 'null'
         ElasticGraph:
-          type: GeneralManager
-          nameInIndex: general_manager
+          type: Staff
+          nameInIndex: staff
       __typename:
         type: string
         const: Team
@@ -1224,8 +1241,7 @@ json_schema_version: 1
     - seasons_object
     - nested_fields
     - nested_fields2
-    - coaches
-    - general_manager
+    - staff
     description: For more performant queries on this type, please filter on `league`
       if possible.
   TeamDetails:
