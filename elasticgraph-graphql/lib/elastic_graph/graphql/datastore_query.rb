@@ -283,9 +283,11 @@ module ElasticGraph
 
       def remove_duplicate_sort_clauses(sort_clauses)
         seen_fields = Set.new
-        sort_clauses.select do |clause|
-          clause.keys.all? { |key| seen_fields.add?(key) }
-        end
+        # Each sort clause is a single-key hash (enforced upstream by
+        # `DecodedCursor::Factory.from_sort_list`), so we keep a clause only when its field
+        # hasn't already been used by an earlier clause. `Set#add?` returns `nil` (falsey)
+        # when the field was already present, which drops the duplicate clause.
+        sort_clauses.select { |clause| seen_fields.add?(clause.keys.first) }
       end
 
       def decoded_cursor_factory
