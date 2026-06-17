@@ -153,7 +153,7 @@ module ElasticGraph
           # or other sensitive values that we don't want logged.
           <<~ERROR
             #{index + 1}) Header: #{::JSON.generate(query.to_datastore_msearch_header)}
-            #{response.fetch("error").inspect}"
+            #{response.fetch("error").inspect}
             On cluster: #{query.cluster_name}
           ERROR
         end.join("\n\n")
