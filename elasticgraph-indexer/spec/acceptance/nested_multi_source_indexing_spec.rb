@@ -16,7 +16,6 @@ module ElasticGraph
     let(:multibyte_coach_id) { "coach-bjørn" }
 
     it "fills in nested sourced fields on embedded list elements and singleton objects, regardless of ingestion order" do
-      # Distinct versions so each `__versions` bucket below pins to a specific event (catches cross-element mixups).
       team = team_event(version: 10)
       record_c1 = coach_record_for("c1", 100, version: 11)
       record_c2 = coach_record_for(multibyte_coach_id, 200, version: 12)
