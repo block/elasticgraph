@@ -1591,9 +1591,9 @@ indices:
       properties:
         id:
           type: keyword
-        teamId:
+        team_id:
           type: keyword
-        coachId:
+        coach_id:
           type: keyword
         wins:
           type: integer
@@ -1764,7 +1764,7 @@ indices:
       properties:
         id:
           type: keyword
-        teamId:
+        team_id:
           type: keyword
         wins:
           type: integer

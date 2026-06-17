@@ -834,10 +834,10 @@ type CoachHighlights {
 }
 
 type CoachRecord @key(fields: "id") {
-  coachId: ID
+  coach_id: ID
   id: ID!
-  teamId: ID
   team_formed_on: Date
+  team_id: ID
   team_league: String
   wins: Int
 }
@@ -847,9 +847,9 @@ Type used to perform aggregation computations on `CoachRecord` fields.
 """
 type CoachRecordAggregatedValues {
   """
-  Computed aggregate values for the `coachId` field.
+  Computed aggregate values for the `coach_id` field.
   """
-  coachId: NonNumericAggregatedValues
+  coach_id: NonNumericAggregatedValues
 
   """
   Computed aggregate values for the `id` field.
@@ -857,14 +857,14 @@ type CoachRecordAggregatedValues {
   id: NonNumericAggregatedValues
 
   """
-  Computed aggregate values for the `teamId` field.
-  """
-  teamId: NonNumericAggregatedValues
-
-  """
   Computed aggregate values for the `team_formed_on` field.
   """
   team_formed_on: DateAggregatedValues
+
+  """
+  Computed aggregate values for the `team_id` field.
+  """
+  team_id: NonNumericAggregatedValues
 
   """
   Computed aggregate values for the `team_league` field.
@@ -1026,11 +1026,11 @@ input CoachRecordFilterInput {
   any_of: [CoachRecordFilterInput!]
 
   """
-  Used to filter on the `coachId` field.
+  Used to filter on the `coach_id` field.
 
   When `null` or an empty object is passed, matches all documents.
   """
-  coachId: IDFilterInput
+  coach_id: IDFilterInput
 
   """
   Used to filter on the `id` field.
@@ -1048,18 +1048,18 @@ input CoachRecordFilterInput {
   not: CoachRecordFilterInput
 
   """
-  Used to filter on the `teamId` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  teamId: IDFilterInput
-
-  """
   Used to filter on the `team_formed_on` field.
 
   When `null` or an empty object is passed, matches all documents.
   """
   team_formed_on: DateFilterInput
+
+  """
+  Used to filter on the `team_id` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  team_id: IDFilterInput
 
   """
   Used to filter on the `team_league` field.
@@ -1081,19 +1081,19 @@ Type used to specify the `CoachRecord` fields to group by for aggregations.
 """
 type CoachRecordGroupedBy {
   """
-  The `coachId` field value for this group.
+  The `coach_id` field value for this group.
   """
-  coachId: ID
-
-  """
-  The `teamId` field value for this group.
-  """
-  teamId: ID
+  coach_id: ID
 
   """
   Offers the different grouping options for the `team_formed_on` value within this group.
   """
   team_formed_on: DateGroupedBy
+
+  """
+  The `team_id` field value for this group.
+  """
+  team_id: ID
 
   """
   The `team_league` field value for this group.
@@ -1111,9 +1111,9 @@ Type used to request desired `CoachRecord` search highlight fields.
 """
 type CoachRecordHighlights {
   """
-  Search highlights for the `coachId`, providing snippets of the matching text.
+  Search highlights for the `coach_id`, providing snippets of the matching text.
   """
-  coachId: [String!]!
+  coach_id: [String!]!
 
   """
   Search highlights for the `id`, providing snippets of the matching text.
@@ -1121,9 +1121,9 @@ type CoachRecordHighlights {
   id: [String!]!
 
   """
-  Search highlights for the `teamId`, providing snippets of the matching text.
+  Search highlights for the `team_id`, providing snippets of the matching text.
   """
-  teamId: [String!]!
+  team_id: [String!]!
 
   """
   Search highlights for the `team_league`, providing snippets of the matching text.
@@ -1136,14 +1136,14 @@ Enumerates the ways `CoachRecord`s can be sorted.
 """
 enum CoachRecordSortOrderInput {
   """
-  Sorts ascending by the `coachId` field.
+  Sorts ascending by the `coach_id` field.
   """
-  coachId_ASC
+  coach_id_ASC
 
   """
-  Sorts descending by the `coachId` field.
+  Sorts descending by the `coach_id` field.
   """
-  coachId_DESC
+  coach_id_DESC
 
   """
   Sorts ascending by the `id` field.
@@ -1156,16 +1156,6 @@ enum CoachRecordSortOrderInput {
   id_DESC
 
   """
-  Sorts ascending by the `teamId` field.
-  """
-  teamId_ASC
-
-  """
-  Sorts descending by the `teamId` field.
-  """
-  teamId_DESC
-
-  """
   Sorts ascending by the `team_formed_on` field.
   """
   team_formed_on_ASC
@@ -1174,6 +1164,16 @@ enum CoachRecordSortOrderInput {
   Sorts descending by the `team_formed_on` field.
   """
   team_formed_on_DESC
+
+  """
+  Sorts ascending by the `team_id` field.
+  """
+  team_id_ASC
+
+  """
+  Sorts descending by the `team_id` field.
+  """
+  team_id_DESC
 
   """
   Sorts ascending by the `team_league` field.
@@ -4242,8 +4242,8 @@ type GeneralManagerHighlights {
 
 type GeneralManagerRecord @key(fields: "id") {
   id: ID!
-  teamId: ID
   team_formed_on: Date
+  team_id: ID
   team_league: String
   wins: Int
 }
@@ -4258,14 +4258,14 @@ type GeneralManagerRecordAggregatedValues {
   id: NonNumericAggregatedValues
 
   """
-  Computed aggregate values for the `teamId` field.
-  """
-  teamId: NonNumericAggregatedValues
-
-  """
   Computed aggregate values for the `team_formed_on` field.
   """
   team_formed_on: DateAggregatedValues
+
+  """
+  Computed aggregate values for the `team_id` field.
+  """
+  team_id: NonNumericAggregatedValues
 
   """
   Computed aggregate values for the `team_league` field.
@@ -4443,18 +4443,18 @@ input GeneralManagerRecordFilterInput {
   not: GeneralManagerRecordFilterInput
 
   """
-  Used to filter on the `teamId` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  teamId: IDFilterInput
-
-  """
   Used to filter on the `team_formed_on` field.
 
   When `null` or an empty object is passed, matches all documents.
   """
   team_formed_on: DateFilterInput
+
+  """
+  Used to filter on the `team_id` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  team_id: IDFilterInput
 
   """
   Used to filter on the `team_league` field.
@@ -4476,14 +4476,14 @@ Type used to specify the `GeneralManagerRecord` fields to group by for aggregati
 """
 type GeneralManagerRecordGroupedBy {
   """
-  The `teamId` field value for this group.
-  """
-  teamId: ID
-
-  """
   Offers the different grouping options for the `team_formed_on` value within this group.
   """
   team_formed_on: DateGroupedBy
+
+  """
+  The `team_id` field value for this group.
+  """
+  team_id: ID
 
   """
   The `team_league` field value for this group.
@@ -4506,9 +4506,9 @@ type GeneralManagerRecordHighlights {
   id: [String!]!
 
   """
-  Search highlights for the `teamId`, providing snippets of the matching text.
+  Search highlights for the `team_id`, providing snippets of the matching text.
   """
-  teamId: [String!]!
+  team_id: [String!]!
 
   """
   Search highlights for the `team_league`, providing snippets of the matching text.
@@ -4531,16 +4531,6 @@ enum GeneralManagerRecordSortOrderInput {
   id_DESC
 
   """
-  Sorts ascending by the `teamId` field.
-  """
-  teamId_ASC
-
-  """
-  Sorts descending by the `teamId` field.
-  """
-  teamId_DESC
-
-  """
   Sorts ascending by the `team_formed_on` field.
   """
   team_formed_on_ASC
@@ -4549,6 +4539,16 @@ enum GeneralManagerRecordSortOrderInput {
   Sorts descending by the `team_formed_on` field.
   """
   team_formed_on_DESC
+
+  """
+  Sorts ascending by the `team_id` field.
+  """
+  team_id_ASC
+
+  """
+  Sorts descending by the `team_id` field.
+  """
+  team_id_DESC
 
   """
   Sorts ascending by the `team_league` field.

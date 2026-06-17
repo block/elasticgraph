@@ -39,8 +39,8 @@ module ElasticGraph
         build_upsert_event(
           :coach_record,
           id: "rec-#{coach_id}",
-          teamId: "t1",
-          coachId: coach_id,
+          team_id: "t1",
+          coach_id: coach_id,
           wins: wins,
           team_league: league,
           team_formed_on: formed_on
@@ -49,11 +49,11 @@ module ElasticGraph
 
       record_c1 = record_for.call("c1", 100)
       record_c2 = record_for.call(multibyte_coach_id, 200)
-      # The GM feed is a distinct source type, matched purely by `teamId`.
+      # The GM feed is a distinct source type, matched purely by `team_id`.
       record_gm = build_upsert_event(
         :general_manager_record,
         id: "rec-gm1",
-        teamId: "t1",
+        team_id: "t1",
         wins: 300,
         team_league: league,
         team_formed_on: formed_on
@@ -78,7 +78,7 @@ module ElasticGraph
 
       # `__sources`/`__versions` are keyed by the qualified nested relationship. Each nested element gets its own
       # `__versions` bucket so sibling coaches don't collide; nested keys encode one `len:value|` part per path
-      # segment (object segment → field name, list segment → matched `coachId`).
+      # segment (object segment → field name, list segment → matched `coach_id`).
       expect(source.fetch("__sources")).to contain_exactly("__self", "staff.coaches.record", "staff.general_manager.record")
 
       expect(source.fetch("__versions")).to eq(

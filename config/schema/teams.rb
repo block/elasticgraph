@@ -87,12 +87,12 @@ ElasticGraph.define_schema do |schema|
 
     # The record feeds live on `Team` (the indexed root) though they source onto elements nested under `staff`;
     # the `parent_relationship` declarations reach those elements via `embedded_at:` dotted paths.
-    t.relates_to_many "coach_records", "CoachRecord", via: "teamId", dir: :in, indexing_only: true, singular: "coach_record" do |r|
+    t.relates_to_many "coach_records", "CoachRecord", via: "team_id", dir: :in, indexing_only: true, singular: "coach_record" do |r|
       r.equivalent_field "team_league", locally_named: "league"
       r.equivalent_field "team_formed_on", locally_named: "formed_on"
     end
 
-    t.relates_to_one "general_manager_record", "GeneralManagerRecord", via: "teamId", dir: :in, indexing_only: true do |r|
+    t.relates_to_one "general_manager_record", "GeneralManagerRecord", via: "team_id", dir: :in, indexing_only: true do |r|
       r.equivalent_field "team_league", locally_named: "league"
       r.equivalent_field "team_formed_on", locally_named: "formed_on"
     end
@@ -203,7 +203,7 @@ ElasticGraph.define_schema do |schema|
   # These types exercise nested `sourced_from`: each staff member's win stat is sourced onto an element
   # embedded within `Team` rather than onto the root. `Staff` holds its members two ways so the dotted paths
   # cover both shapes the painless script navigates:
-  # - `staff.coaches` (object then list): final segment is a list, so the element is matched by `coachId`.
+  # - `staff.coaches` (object then list): final segment is a list, so the element is matched by `coach_id`.
   # - `staff.general_manager` (all object): every segment is an object, so the element is reached by field name.
   #
   # The `*Record` feeds carry `team_league`/`team_formed_on` equivalents so the indexer can route (`league`)
@@ -220,8 +220,8 @@ ElasticGraph.define_schema do |schema|
 
   schema.object_type "CoachRecord" do |t|
     t.field "id", "ID!"
-    t.field "teamId", "ID"
-    t.field "coachId", "ID"
+    t.field "team_id", "ID"
+    t.field "coach_id", "ID"
     t.field "wins", "Int"
     t.field "team_league", "String"
     t.field "team_formed_on", "Date"
@@ -230,7 +230,7 @@ ElasticGraph.define_schema do |schema|
 
   schema.object_type "GeneralManagerRecord" do |t|
     t.field "id", "ID!"
-    t.field "teamId", "ID"
+    t.field "team_id", "ID"
     t.field "wins", "Int"
     t.field "team_league", "String"
     t.field "team_formed_on", "Date"
@@ -245,12 +245,12 @@ ElasticGraph.define_schema do |schema|
       f.sourced_from "record", "wins"
     end
 
-    t.relates_to_one "record", "CoachRecord", via: "coachId", dir: :in, indexing_only: true do |r|
+    t.relates_to_one "record", "CoachRecord", via: "coach_id", dir: :in, indexing_only: true do |r|
       r.parent_relationship "Team", "coach_records", embedded_at: "staff.coaches"
     end
   end
 
-  # A team has exactly one general manager, so a `GeneralManagerRecord` joins on `teamId` (one record per
+  # A team has exactly one general manager, so a `GeneralManagerRecord` joins on `team_id` (one record per
   # team) rather than on a per-element id like `Coach` does.
   schema.object_type "GeneralManager" do |t|
     t.field "id", "ID!"
@@ -260,7 +260,7 @@ ElasticGraph.define_schema do |schema|
       f.sourced_from "record", "wins"
     end
 
-    t.relates_to_one "record", "GeneralManagerRecord", via: "teamId", dir: :in, indexing_only: true do |r|
+    t.relates_to_one "record", "GeneralManagerRecord", via: "team_id", dir: :in, indexing_only: true do |r|
       r.parent_relationship "Team", "general_manager_record", embedded_at: "staff.general_manager"
     end
   end

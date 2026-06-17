@@ -250,7 +250,7 @@ json_schema_version: 1
         ElasticGraph:
           type: ID!
           nameInIndex: id
-      teamId:
+      team_id:
         anyOf:
         - allOf:
           - "$ref": "#/$defs/ID"
@@ -258,8 +258,8 @@ json_schema_version: 1
         - type: 'null'
         ElasticGraph:
           type: ID
-          nameInIndex: teamId
-      coachId:
+          nameInIndex: team_id
+      coach_id:
         anyOf:
         - allOf:
           - "$ref": "#/$defs/ID"
@@ -267,7 +267,7 @@ json_schema_version: 1
         - type: 'null'
         ElasticGraph:
           type: ID
-          nameInIndex: coachId
+          nameInIndex: coach_id
       wins:
         anyOf:
         - "$ref": "#/$defs/Int"
@@ -297,8 +297,8 @@ json_schema_version: 1
         default: CoachRecord
     required:
     - id
-    - teamId
-    - coachId
+    - team_id
+    - coach_id
     - wins
     - team_league
     - team_formed_on
@@ -538,7 +538,7 @@ json_schema_version: 1
         ElasticGraph:
           type: ID!
           nameInIndex: id
-      teamId:
+      team_id:
         anyOf:
         - allOf:
           - "$ref": "#/$defs/ID"
@@ -546,7 +546,7 @@ json_schema_version: 1
         - type: 'null'
         ElasticGraph:
           type: ID
-          nameInIndex: teamId
+          nameInIndex: team_id
       wins:
         anyOf:
         - "$ref": "#/$defs/Int"
@@ -576,7 +576,7 @@ json_schema_version: 1
         default: GeneralManagerRecord
     required:
     - id
-    - teamId
+    - team_id
     - wins
     - team_league
     - team_formed_on

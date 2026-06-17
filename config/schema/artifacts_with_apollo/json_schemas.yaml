@@ -208,13 +208,13 @@ json_schema_version: 1
         allOf:
         - "$ref": "#/$defs/ID"
         - maxLength: 8191
-      teamId:
+      team_id:
         anyOf:
         - allOf:
           - "$ref": "#/$defs/ID"
           - maxLength: 8191
         - type: 'null'
-      coachId:
+      coach_id:
         anyOf:
         - allOf:
           - "$ref": "#/$defs/ID"
@@ -240,8 +240,8 @@ json_schema_version: 1
         default: CoachRecord
     required:
     - id
-    - teamId
-    - coachId
+    - team_id
+    - coach_id
     - wins
     - team_league
     - team_formed_on
@@ -418,7 +418,7 @@ json_schema_version: 1
         allOf:
         - "$ref": "#/$defs/ID"
         - maxLength: 8191
-      teamId:
+      team_id:
         anyOf:
         - allOf:
           - "$ref": "#/$defs/ID"
@@ -444,7 +444,7 @@ json_schema_version: 1
         default: GeneralManagerRecord
     required:
     - id
-    - teamId
+    - team_id
     - wins
     - team_league
     - team_formed_on

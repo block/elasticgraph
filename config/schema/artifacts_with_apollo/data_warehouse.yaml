@@ -18,8 +18,8 @@ tables:
     table_schema: |-
       CREATE TABLE IF NOT EXISTS coach_records (
         id STRING,
-        teamId STRING,
-        coachId STRING,
+        team_id STRING,
+        coach_id STRING,
         wins INT,
         team_league STRING,
         team_formed_on DATE
@@ -63,7 +63,7 @@ tables:
     table_schema: |-
       CREATE TABLE IF NOT EXISTS general_manager_records (
         id STRING,
-        teamId STRING,
+        team_id STRING,
         wins INT,
         team_league STRING,
         team_formed_on DATE

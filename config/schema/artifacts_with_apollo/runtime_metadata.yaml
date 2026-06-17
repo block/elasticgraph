@@ -23,14 +23,14 @@ enum_types_by_name:
           field_path: timestamps.created_at
   CoachRecordSortOrderInput:
     values_by_name:
-      coachId_ASC:
+      coach_id_ASC:
         sort_field:
           direction: asc
-          field_path: coachId
-      coachId_DESC:
+          field_path: coach_id
+      coach_id_DESC:
         sort_field:
           direction: desc
-          field_path: coachId
+          field_path: coach_id
       id_ASC:
         sort_field:
           direction: asc
@@ -39,14 +39,6 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: id
-      teamId_ASC:
-        sort_field:
-          direction: asc
-          field_path: teamId
-      teamId_DESC:
-        sort_field:
-          direction: desc
-          field_path: teamId
       team_formed_on_ASC:
         sort_field:
           direction: asc
@@ -55,6 +47,14 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: team_formed_on
+      team_id_ASC:
+        sort_field:
+          direction: asc
+          field_path: team_id
+      team_id_DESC:
+        sort_field:
+          direction: desc
+          field_path: team_id
       team_league_ASC:
         sort_field:
           direction: asc
@@ -295,14 +295,6 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: id
-      teamId_ASC:
-        sort_field:
-          direction: asc
-          field_path: teamId
-      teamId_DESC:
-        sort_field:
-          direction: desc
-          field_path: teamId
       team_formed_on_ASC:
         sort_field:
           direction: asc
@@ -311,6 +303,14 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: team_formed_on
+      team_id_ASC:
+        sort_field:
+          direction: asc
+          field_path: team_id
+      team_id_DESC:
+        sort_field:
+          direction: desc
+          field_path: team_id
       team_league_ASC:
         sort_field:
           direction: asc
@@ -1982,13 +1982,13 @@ index_definitions_by_name:
     current_sources:
     - __self
     fields_by_path:
-      coachId:
+      coach_id:
         source: __self
       id:
         source: __self
-      teamId:
-        source: __self
       team_formed_on:
+        source: __self
+      team_id:
         source: __self
       team_league:
         source: __self
@@ -2080,9 +2080,9 @@ index_definitions_by_name:
     fields_by_path:
       id:
         source: __self
-      teamId:
-        source: __self
       team_formed_on:
+        source: __self
+      team_id:
         source: __self
       team_league:
         source: __self
@@ -3068,7 +3068,7 @@ index_definitions_by_name:
       staff.coaches.record:
       - field: staff
       - field: coaches
-        source_field: coachId
+        source_field: coach_id
       staff.general_manager.record:
       - field: staff
       - field: general_manager
@@ -3536,16 +3536,16 @@ object_types_by_name:
           name: get_record_field_value
   CoachRecord:
     graphql_fields_by_name:
-      coachId:
+      coach_id:
         resolver:
           name: get_record_field_value
       id:
         resolver:
           name: get_record_field_value
-      teamId:
+      team_formed_on:
         resolver:
           name: get_record_field_value
-      team_formed_on:
+      team_id:
         resolver:
           name: get_record_field_value
       team_league:
@@ -3573,18 +3573,18 @@ object_types_by_name:
       routing_value_source: id
       script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
       top_level_fields_params:
-        coachId:
-          cardinality: one
-        teamId:
+        coach_id:
           cardinality: one
         team_formed_on:
+          cardinality: one
+        team_id:
           cardinality: one
         team_league:
           cardinality: one
         wins:
           cardinality: one
       type: CoachRecord
-    - id_source: teamId
+    - id_source: team_id
       metadata_params:
         relationship:
           value: staff.coaches.record
@@ -3606,21 +3606,21 @@ object_types_by_name:
             cardinality: one
             source_path: wins
         path_identifier_params:
-          coachId:
+          coach_id:
             cardinality: one
       type: Team
   CoachRecordAggregatedValues:
     graphql_fields_by_name:
-      coachId:
+      coach_id:
         resolver:
           name: object_with_lookahead
       id:
         resolver:
           name: object_with_lookahead
-      teamId:
+      team_formed_on:
         resolver:
           name: object_with_lookahead
-      team_formed_on:
+      team_id:
         resolver:
           name: object_with_lookahead
       team_league:
@@ -3695,13 +3695,13 @@ object_types_by_name:
           name: object_without_lookahead
   CoachRecordGroupedBy:
     graphql_fields_by_name:
-      coachId:
-        resolver:
-          name: object_with_lookahead
-      teamId:
+      coach_id:
         resolver:
           name: object_with_lookahead
       team_formed_on:
+        resolver:
+          name: object_with_lookahead
+      team_id:
         resolver:
           name: object_with_lookahead
       team_league:
@@ -3712,13 +3712,13 @@ object_types_by_name:
           name: object_with_lookahead
   CoachRecordHighlights:
     graphql_fields_by_name:
-      coachId:
+      coach_id:
         resolver:
           name: get_record_field_value
       id:
         resolver:
           name: get_record_field_value
-      teamId:
+      team_id:
         resolver:
           name: get_record_field_value
       team_league:
@@ -4597,10 +4597,10 @@ object_types_by_name:
       id:
         resolver:
           name: get_record_field_value
-      teamId:
+      team_formed_on:
         resolver:
           name: get_record_field_value
-      team_formed_on:
+      team_id:
         resolver:
           name: get_record_field_value
       team_league:
@@ -4628,16 +4628,16 @@ object_types_by_name:
       routing_value_source: id
       script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
       top_level_fields_params:
-        teamId:
-          cardinality: one
         team_formed_on:
+          cardinality: one
+        team_id:
           cardinality: one
         team_league:
           cardinality: one
         wins:
           cardinality: one
       type: GeneralManagerRecord
-    - id_source: teamId
+    - id_source: team_id
       metadata_params:
         relationship:
           value: staff.general_manager.record
@@ -4664,10 +4664,10 @@ object_types_by_name:
       id:
         resolver:
           name: object_with_lookahead
-      teamId:
+      team_formed_on:
         resolver:
           name: object_with_lookahead
-      team_formed_on:
+      team_id:
         resolver:
           name: object_with_lookahead
       team_league:
@@ -4742,10 +4742,10 @@ object_types_by_name:
           name: object_without_lookahead
   GeneralManagerRecordGroupedBy:
     graphql_fields_by_name:
-      teamId:
+      team_formed_on:
         resolver:
           name: object_with_lookahead
-      team_formed_on:
+      team_id:
         resolver:
           name: object_with_lookahead
       team_league:
@@ -4759,7 +4759,7 @@ object_types_by_name:
       id:
         resolver:
           name: get_record_field_value
-      teamId:
+      team_id:
         resolver:
           name: get_record_field_value
       team_league:
