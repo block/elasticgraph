@@ -85,8 +85,9 @@ ElasticGraph.define_schema do |schema|
       f.mapping type: "object"
     end
 
-    # The record feeds live on `Team` (the indexed root) though they source onto elements nested under `staff`;
-    # the `parent_relationship` declarations reach those elements via `embedded_at:` dotted paths.
+    # These relationships are declared on `Team` (the indexed root) even though the `sourced_from` fields they
+    # back live on elements nested under `staff`; the embedded types' `parent_relationship` declarations chain
+    # back up to them and reach the nested elements via `embedded_at:` dotted paths.
     t.relates_to_many "coach_records", "CoachRecord", via: "team_id", dir: :in, indexing_only: true, singular: "coach_record" do |r|
       r.equivalent_field "team_league", locally_named: "league"
       r.equivalent_field "team_formed_on", locally_named: "formed_on"
