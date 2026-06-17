@@ -119,46 +119,36 @@ module ElasticGraph
             ]
           end
 
-          it "passes the nested `sourced_from` params through to the script, sourcing field values and path identifiers from the prepared record and the index's registered nested paths" do
-            indexer = indexer_with_widget_workspace_index_definition do |index|
-              # no customization
-            end
+          it "passes the nested `sourced_from` params through to the script, sourcing field values from the source event and the nested paths from the index's registered configuration" do
+            indexer = indexer_with_nested_sourced_from_schema
+            stat_line_event = {
+              "op" => "upsert",
+              "id" => "stat_line1",
+              "type" => "StatLine",
+              "version" => 1,
+              "record" => {"id" => "stat_line1", "team_id" => "team1", "player_id" => "player1", "goals" => 50}
+            }
+            operations = operations_for_indexer(indexer, event: stat_line_event, source_type: "StatLine", destination_type: "Team", destination_index: "teams")
 
-            operations = operations_for_indexer(indexer)
             expect(operations.size).to eq(1)
-            operation = operations.first.with(update_target: normal_indexing_update_target_with(
-              type: "Widget",
-              top_level_fields_params: {"name" => dynamic_param_with(source_path: "name", cardinality: :one)},
-              sourced_from_nested_params: SchemaArtifacts::RuntimeMetadata::SourcedFromNestedParams.new(
-                field_params: {"stat" => dynamic_param_with(source_path: "name", cardinality: :one)},
-                path_identifier_params: {"playerId" => dynamic_param_with(source_path: "embedded_values.workspace_id", cardinality: :one)}
-              )
-            ))
-
-            # The nested paths come from the destination index def (static per-index config), so we stub them
-            # here rather than building a full nested `sourced_from` schema for this unit test.
-            allow(operation.destination_index_def).to receive(:sourced_from_nested_paths_as_painless_param).and_return({
-              "players.statLine" => [
-                SchemaArtifacts::RuntimeMetadata::ListPathSegment.new(field: "players", source_field: "playerId").to_painless_hash,
-                SchemaArtifacts::RuntimeMetadata::ObjectPathSegment.new(field: "statLine").to_painless_hash
-              ]
-            })
-
-            expect(operation.to_datastore_bulk).to eq [
-              {update: {_id: "17", _index: "widget_workspaces", retry_on_conflict: Update::CONFLICT_RETRIES}},
+            expect(operations.first.to_datastore_bulk).to eq [
+              {update: {_id: "team1", _index: "teams", retry_on_conflict: Update::CONFLICT_RETRIES}},
               {
                 script: {id: INDEX_DATA_UPDATE_SCRIPT_ID, params: {
-                  "topLevelFields" => {"name" => "thing1"},
-                  "id" => "17",
-                  "sourcedFromNestedFields" => {"stat" => "thing1"},
-                  "sourcedFromNestedPathIdentifiers" => {"playerId" => "embedded_workspace_id"},
+                  "topLevelFields" => {},
+                  "id" => "team1",
+                  "relationship" => "players.stat_line",
+                  "sourceId" => "stat_line1",
+                  "sourceType" => "StatLine",
+                  "version" => 1,
+                  "sourcedFromNestedFields" => {"goals" => 50},
+                  "sourcedFromNestedPathIdentifiers" => {"player_id" => "player1"},
                   "sourcedFromNestedPaths" => {
-                    "players.statLine" => [
-                      {"field" => "players", "sourceField" => "playerId"},
-                      {"field" => "statLine"}
+                    "players.stat_line" => [
+                      {"field" => "players", "sourceField" => "player_id"}
                     ]
                   },
-                  LIST_COUNTS_FIELD => {"sizes" => 0, "widget_names" => 0}
+                  LIST_COUNTS_FIELD => {}
                 }},
                 scripted_upsert: true,
                 upsert: {}
@@ -462,17 +452,51 @@ module ElasticGraph
             end
           end
 
-          def operations_for_indexer(indexer, event: self.event)
-            update_target = indexer.schema_artifacts.runtime_metadata.object_types_by_name.fetch("Widget").update_targets.first
+          def operations_for_indexer(indexer, event: self.event, source_type: "Widget", destination_type: "WidgetWorkspace", destination_index: "widget_workspaces")
+            update_target = indexer.schema_artifacts.runtime_metadata.object_types_by_name
+              .fetch(source_type).update_targets.find { |ut| ut.type == destination_type }
             index_defs_by_name = indexer.datastore_core.index_definitions_by_name
 
             Update.operations_for(
               event: event,
-              destination_index_def: index_defs_by_name.fetch("widget_workspaces"),
+              destination_index_def: index_defs_by_name.fetch(destination_index),
               record_preparer: indexer.record_preparer_factory.for_latest_json_schema_version,
               update_target: update_target,
-              destination_index_mapping: indexer.schema_artifacts.index_mappings_by_index_def_name.fetch("widget_workspaces")
+              destination_index_mapping: indexer.schema_artifacts.index_mappings_by_index_def_name.fetch(destination_index)
             )
+          end
+
+          def indexer_with_nested_sourced_from_schema
+            indexer_with_schema do |schema|
+              schema.object_type "Team" do |t|
+                t.field "id", "ID!"
+                t.field "players", "[Player!]!" do |f|
+                  f.mapping type: "object"
+                end
+                t.relates_to_many "stat_lines", "StatLine", via: "team_id", dir: :in, indexing_only: true
+                t.index "teams" do |i|
+                  i.has_had_multiple_sources!
+                end
+              end
+
+              schema.object_type "Player" do |t|
+                t.field "id", "ID!"
+                t.field "goals", "Int" do |f|
+                  f.sourced_from "stat_line", "goals"
+                end
+                t.relates_to_one "stat_line", "StatLine", via: "player_id", dir: :in, indexing_only: true do |r|
+                  r.parent_relationship "Team", "stat_lines", embedded_at: "players"
+                end
+              end
+
+              schema.object_type "StatLine" do |t|
+                t.field "id", "ID!"
+                t.field "team_id", "ID"
+                t.field "player_id", "ID"
+                t.field "goals", "Int"
+                t.index "stat_lines"
+              end
+            end
           end
 
           def indexer_with_widget_workspace_index_definition(
