@@ -94,12 +94,24 @@ module ElasticGraph
           }.to raise_invalid_graphql_name_error_for("Invalid.Name")
         end
 
-        it "raises a clear error when the type name is not formatted correctly" do
+        it "raises a clear error when a field name is not formatted correctly" do
           expect {
             object_type "WidgetOptions" do |t|
               t.field "invalid.name", "String!"
             end
           }.to raise_invalid_graphql_name_error_for("invalid.name")
+        end
+
+        # A relationship name must not contain `:` because the `update_index_data.painless` script length-prefix
+        # encodes nested `sourced_from` keys as `len:value|` and distinguishes a bare (top-level) relationship key
+        # from an encoded one by the absence of a `:`. GraphQL-name validation already guarantees this, but we pin
+        # it here so the painless codec's assumption can't be silently broken by a future change to the name rules.
+        it "raises a clear error when a relationship name contains a `:`" do
+          expect {
+            object_type "WidgetOptions" do |t|
+              t.relates_to_one "in:valid", "WidgetOptions", via: "widget_id", dir: :out
+            end
+          }.to raise_invalid_graphql_name_error_for("in:valid")
         end
 
         it "fails with a clear error when a field is defined with unrecognized options" do

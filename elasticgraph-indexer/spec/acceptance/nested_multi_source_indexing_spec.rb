@@ -117,10 +117,10 @@ module ElasticGraph
     end
 
     # The GM feed is a distinct source type, matched purely by `team_id`.
-    def gm_record(wins, version: nil)
+    def gm_record(wins, version:)
       build_upsert_event(
         :general_manager_record,
-        **(version ? {__version: version} : {}),
+        __version: version,
         id: "rec-gm1",
         team_id: "t1",
         wins: wins,

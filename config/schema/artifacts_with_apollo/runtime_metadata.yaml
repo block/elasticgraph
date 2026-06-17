@@ -3286,7 +3286,7 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
+      script_id: update_index_data_a6cfcbfa63bca002c1d25c877ebb39a0
       top_level_fields_params:
         full_address:
           cardinality: one
@@ -3476,7 +3476,7 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
+      script_id: update_index_data_a6cfcbfa63bca002c1d25c877ebb39a0
       top_level_fields_params:
         __typename:
           cardinality: one
@@ -3565,7 +3565,7 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
+      script_id: update_index_data_a6cfcbfa63bca002c1d25c877ebb39a0
       top_level_fields_params:
         coach_id:
           cardinality: one
@@ -3593,7 +3593,7 @@ object_types_by_name:
       relationship: staff.coaches.record
       rollover_timestamp_value_source: team_formed_on
       routing_value_source: team_league
-      script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
+      script_id: update_index_data_a6cfcbfa63bca002c1d25c877ebb39a0
       sourced_from_nested_params:
         field_params:
           career_wins:
@@ -3750,7 +3750,7 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
+      script_id: update_index_data_a6cfcbfa63bca002c1d25c877ebb39a0
       top_level_fields_params:
         __typename:
           cardinality: one
@@ -3871,7 +3871,7 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
+      script_id: update_index_data_a6cfcbfa63bca002c1d25c877ebb39a0
       top_level_fields_params:
         created_at:
           cardinality: one
@@ -4233,7 +4233,7 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
+      script_id: update_index_data_a6cfcbfa63bca002c1d25c877ebb39a0
       top_level_fields_params:
         __typename:
           cardinality: one
@@ -4406,7 +4406,7 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
+      script_id: update_index_data_a6cfcbfa63bca002c1d25c877ebb39a0
       top_level_fields_params:
         created_at:
           cardinality: one
@@ -4620,7 +4620,7 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
+      script_id: update_index_data_a6cfcbfa63bca002c1d25c877ebb39a0
       top_level_fields_params:
         team_formed_on:
           cardinality: one
@@ -4646,7 +4646,7 @@ object_types_by_name:
       relationship: staff.general_manager.record
       rollover_timestamp_value_source: team_formed_on
       routing_value_source: team_league
-      script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
+      script_id: update_index_data_a6cfcbfa63bca002c1d25c877ebb39a0
       sourced_from_nested_params:
         field_params:
           career_wins:
@@ -5105,7 +5105,7 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
+      script_id: update_index_data_a6cfcbfa63bca002c1d25c877ebb39a0
       top_level_fields_params:
         ceo:
           cardinality: one
@@ -5263,7 +5263,7 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
+      script_id: update_index_data_a6cfcbfa63bca002c1d25c877ebb39a0
       top_level_fields_params:
         created_at:
           cardinality: one
@@ -6245,7 +6245,7 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
+      script_id: update_index_data_a6cfcbfa63bca002c1d25c877ebb39a0
       top_level_fields_params:
         __typename:
           cardinality: one
@@ -6444,7 +6444,7 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
+      script_id: update_index_data_a6cfcbfa63bca002c1d25c877ebb39a0
       top_level_fields_params:
         __typename:
           cardinality: one
@@ -6511,7 +6511,7 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
+      script_id: update_index_data_a6cfcbfa63bca002c1d25c877ebb39a0
       top_level_fields_params:
         active:
           cardinality: one
@@ -7066,7 +7066,7 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
+      script_id: update_index_data_a6cfcbfa63bca002c1d25c877ebb39a0
       top_level_fields_params:
         name:
           cardinality: one
@@ -7445,7 +7445,7 @@ object_types_by_name:
       relationship: __self
       rollover_timestamp_value_source: formed_on
       routing_value_source: league
-      script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
+      script_id: update_index_data_a6cfcbfa63bca002c1d25c877ebb39a0
       top_level_fields_params:
         country_code:
           cardinality: one
@@ -8584,7 +8584,7 @@ object_types_by_name:
       relationship: __self
       rollover_timestamp_value_source: created_at
       routing_value_source: workspace_id2
-      script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
+      script_id: update_index_data_a6cfcbfa63bca002c1d25c877ebb39a0
       top_level_fields_params:
         amount_cents:
           cardinality: one
@@ -8662,7 +8662,7 @@ object_types_by_name:
         version:
           cardinality: one
       relationship: widget
-      script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
+      script_id: update_index_data_a6cfcbfa63bca002c1d25c877ebb39a0
       top_level_fields_params:
         widget_cost:
           cardinality: one
@@ -8892,7 +8892,7 @@ object_types_by_name:
       relationship: __self
       rollover_timestamp_value_source: introduced_on
       routing_value_source: primary_continent
-      script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
+      script_id: update_index_data_a6cfcbfa63bca002c1d25c877ebb39a0
       top_level_fields_params:
         details:
           cardinality: one
@@ -9937,7 +9937,7 @@ object_types_by_name:
           cardinality: one
       relationship: __self
       routing_value_source: id
-      script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
+      script_id: update_index_data_a6cfcbfa63bca002c1d25c877ebb39a0
       top_level_fields_params:
         name:
           cardinality: one
@@ -9959,7 +9959,7 @@ object_types_by_name:
       relationship: workspace
       rollover_timestamp_value_source: widget.created_at
       routing_value_source: id
-      script_id: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
+      script_id: update_index_data_a6cfcbfa63bca002c1d25c877ebb39a0
       top_level_fields_params:
         workspace_name:
           cardinality: one
@@ -10237,4 +10237,4 @@ static_script_ids_by_scoped_name:
   field/as_day_of_week: field_as_day_of_week_f2b5c7d9e8f75bf2457b52412bfb6537
   field/as_time_of_day: field_as_time_of_day_ed82aba44fc66bff5635bec4305c1c66
   filter/by_time_of_day: filter_by_time_of_day_ea12d0561b24961789ab68ed38435612
-  update/index_data: update_index_data_5c49b3ff1e64fc1d273bdccfa28a064d
+  update/index_data: update_index_data_a6cfcbfa63bca002c1d25c877ebb39a0
