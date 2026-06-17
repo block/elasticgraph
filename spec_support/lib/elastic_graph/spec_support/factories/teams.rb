@@ -78,16 +78,7 @@ FactoryBot.define do
 
     nested_fields2 { nested_fields }
 
-    # `staff` exercises nested `sourced_from`. Coaches/GM use fixed ids and names to keep the factory
-    # deterministic (required for VCR stability). `career_wins` is intentionally absent on each member --
-    # it's a nested `sourced_from` field filled in from a separate records feed, not provided on the element.
-    staff do
-      build(
-        :staff,
-        coaches: [build(:coach, id: "coach1", name: "Coach One"), build(:coach, id: "coach2", name: "Coach Two")],
-        general_manager: build(:general_manager, id: "gm1", name: "GM One")
-      )
-    end
+    staff { build :staff }
 
     transient do
       sponsors { [] }
@@ -103,12 +94,13 @@ FactoryBot.define do
 
   factory :staff, parent: :hash_base do
     __typename { "Staff" }
-    coaches { [] }
-    general_manager { nil }
+    coaches { Array.new(Faker::Number.between(from: 2, to: 5)) { build :coach } }
+    general_manager { build :general_manager }
   end
 
   factory :coach, parent: :hash_base do
     __typename { "Coach" }
+    id { Faker::Alphanumeric.alpha(number: 20) }
     name { Faker::Name.name }
     # `career_wins` is intentionally omitted: it is a nested `sourced_from` field, filled in from a
     # `:coach_record` event rather than provided on the embedded element.
@@ -116,6 +108,7 @@ FactoryBot.define do
 
   factory :general_manager, parent: :hash_base do
     __typename { "GeneralManager" }
+    id { Faker::Alphanumeric.alpha(number: 20) }
     name { Faker::Name.name }
     # `career_wins` is sourced from a `:general_manager_record`; see the note on `:coach`.
   end
