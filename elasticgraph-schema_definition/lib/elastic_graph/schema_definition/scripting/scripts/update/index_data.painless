@@ -17,8 +17,8 @@ String encodeKey(List parts) {
 }
 
 // Inverse of `encodeKey`. A bare key has no leading `len:` prefix and decodes to a single part. Relationship
-// names are GraphQL names (regex enforced at schema-definition time), so they never contain `:`
-// The `indexOf` test thus unambiguously distinguishes a bare key from a length-prefixed one.
+// names are validated as GraphQL names at schema-definition time (even when `indexing_only`), so they never
+// contain `:` -- the `indexOf` test thus unambiguously distinguishes a bare key from a length-prefixed one.
 List decodeKey(String key) {
   List parts = new ArrayList();
   if (key.indexOf(":") == -1) {
