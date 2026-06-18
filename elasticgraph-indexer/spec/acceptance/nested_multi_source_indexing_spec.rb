@@ -73,6 +73,19 @@ module ElasticGraph
       expect(source.fetch("__versions").fetch("20:staff.coaches.record|5:staff|2:c1|")).to eq("rec-c1" => 5)
     end
 
+    it "clears an already-sourced nested field when a newer source event drops the value upstream" do
+      indexer.processor.process([team_event], refresh_indices: true)
+      indexer.processor.process([coach_record_for("c1", 100, version: 1)], refresh_indices: true)
+
+      expect(coaches_by_id_from(indexed_team_source("t1")).fetch("c1")).to include("career_wins" => 100)
+
+      # A newer record for the same coach omits `wins` (e.g. it was deleted upstream). It arrives as a non-empty
+      # map with a null value, so re-applying it overwrites `career_wins` with null rather than leaving the v1 value.
+      indexer.processor.process([coach_record_for("c1", nil, version: 2)], refresh_indices: true)
+
+      expect(coaches_by_id_from(indexed_team_source("t1")).fetch("c1")).to eq("id" => "c1", "name" => "Alice", "career_wins" => nil)
+    end
+
     it "rejects a mutation of the relationship used by a nested `sourced_from` field" do
       indexer.processor.process([team_event], refresh_indices: true)
       indexer.processor.process([coach_record_for("c1", 100, id: "rec-a")], refresh_indices: true)
