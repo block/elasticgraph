@@ -115,12 +115,28 @@ FactoryBot.define do
 
   factory :coach_record, parent: :indexed_type do
     __typename { "CoachRecord" }
+    team_id { team&.fetch(:id) }
+    coach_id { coach&.fetch(:id) }
     wins { Faker::Number.between(from: 0, to: 500) }
+    team_league { team&.fetch(:league) }
+    team_formed_on { team&.fetch(:formed_on) }
+
+    transient do
+      team { nil }
+      coach { nil }
+    end
   end
 
   factory :general_manager_record, parent: :indexed_type do
     __typename { "GeneralManagerRecord" }
+    team_id { team&.fetch(:id) }
     wins { Faker::Number.between(from: 0, to: 500) }
+    team_league { team&.fetch(:league) }
+    team_formed_on { team&.fetch(:formed_on) }
+
+    transient do
+      team { nil }
+    end
   end
 
   factory :team_details, parent: :hash_base do
