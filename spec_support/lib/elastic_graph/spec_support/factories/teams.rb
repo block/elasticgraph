@@ -115,28 +115,19 @@ FactoryBot.define do
 
   factory :coach_record, parent: :indexed_type do
     __typename { "CoachRecord" }
-    team_id { team&.fetch(:id) }
-    coach_id { coach&.fetch(:id) }
+    team_id { Faker::Alphanumeric.alpha(number: 20) }
+    coach_id { Faker::Alphanumeric.alpha(number: 20) }
     wins { Faker::Number.between(from: 0, to: 500) }
-    team_league { team&.fetch(:league) }
-    team_formed_on { team&.fetch(:formed_on) }
-
-    transient do
-      team { nil }
-      coach { nil }
-    end
+    team_league { Faker::Base.sample(leagues) }
+    team_formed_on { Faker::Date.between(from: recent_date - (5 * 365), to: recent_date - 365).iso8601 }
   end
 
   factory :general_manager_record, parent: :indexed_type do
     __typename { "GeneralManagerRecord" }
-    team_id { team&.fetch(:id) }
+    team_id { Faker::Alphanumeric.alpha(number: 20) }
     wins { Faker::Number.between(from: 0, to: 500) }
-    team_league { team&.fetch(:league) }
-    team_formed_on { team&.fetch(:formed_on) }
-
-    transient do
-      team { nil }
-    end
+    team_league { Faker::Base.sample(leagues) }
+    team_formed_on { Faker::Date.between(from: recent_date - (5 * 365), to: recent_date - 365).iso8601 }
   end
 
   factory :team_details, parent: :hash_base do
