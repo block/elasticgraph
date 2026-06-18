@@ -10,6 +10,7 @@ $LOAD_PATH << ::File.join(__dir__, "lib")
 
 ElasticGraph.define_schema do |schema|
   schema.json_schema_version 1
+  schema.enforce_json_schema_version false
 
   # :snippet-start: register_graphql_resolver
   require(require_path = "roll_dice_resolver")

@@ -94,7 +94,7 @@ module ElasticGraph
             EOS
 
             expect {
-              run_rake_with_warehouse("schema_artifacts:dump", enforce_json_schema_version: false)
+              run_rake_with_warehouse("schema_artifacts:dump")
             }.to change { read_warehouse_artifact }
               .from(original_content)
               .to(a_string_including("added_field"))
@@ -160,8 +160,6 @@ module ElasticGraph
         def write_warehouse_schema(table_defs:)
           ::File.write("schema.rb", <<~EOS)
             ElasticGraph.define_schema do |s|
-              s.json_schema_version 1
-
               # Add a dummy indexed type to ensure the Query type has at least one field.
               # This prevents GraphQL-Ruby warnings about empty Query types in tests.
               # We exclude it from the warehouse so it doesn't interfere with test expectations.
@@ -177,14 +175,13 @@ module ElasticGraph
           EOS
         end
 
-        def run_rake_with_warehouse(*args, enforce_json_schema_version: true)
+        def run_rake_with_warehouse(*args)
           run_rake(*args) do |output|
             ElasticGraph::SchemaDefinition::RakeTasks.new(
               schema_element_name_form: :snake_case,
               index_document_sizes: false,
               path_to_schema: "schema.rb",
               schema_artifacts_directory: "config/schema/artifacts",
-              enforce_json_schema_version: enforce_json_schema_version,
               extension_modules: [Warehouse::SchemaDefinition::APIExtension],
               output: output
             )

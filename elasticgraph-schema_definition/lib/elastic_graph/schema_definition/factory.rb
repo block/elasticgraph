@@ -63,6 +63,10 @@ module ElasticGraph
     class Factory
       include Mixins::HasReadableToSAndInspect.new
 
+      # @dynamic state
+      # @return [State] schema definition state shared with the factory's API
+      attr_reader :state
+
       def initialize(state)
         @state = state
       end
@@ -229,7 +233,7 @@ module ElasticGraph
 
       def new_interface_type(name)
         @@interface_type_new.call(@state, name.to_s) do |interface_type|
-          yield interface_type
+          yield interface_type if block_given?
         end
       end
       @@interface_type_new = prevent_non_factory_instantiation_of(SchemaElements::InterfaceType)
@@ -246,14 +250,12 @@ module ElasticGraph
       end
       @@object_type_new = prevent_non_factory_instantiation_of(SchemaElements::ObjectType)
 
-      def new_object_indexing_field_type(type_name:, subfields:, mapping_options:, json_schema_options:, doc_comment:)
+      def new_object_indexing_field_type(type_name:, subfields:, mapping_options:)
         @@object_indexing_field_type_new.call(
           schema_def_state: @state,
           type_name: type_name,
           subfields: subfields,
-          mapping_options: mapping_options,
-          json_schema_options: json_schema_options,
-          doc_comment: doc_comment
+          mapping_options: mapping_options
         )
       end
       @@object_indexing_field_type_new = prevent_non_factory_instantiation_of(Indexing::FieldType::Object)
@@ -329,14 +331,12 @@ module ElasticGraph
       def new_schema_artifact_manager(
         schema_definition_results:,
         schema_artifacts_directory:,
-        enforce_json_schema_version:,
         output:,
         max_diff_lines: 50
       )
         @@schema_artifact_manager_new.call(
           schema_definition_results:,
           schema_artifacts_directory:,
-          enforce_json_schema_version:,
           output:,
           max_diff_lines:
         )

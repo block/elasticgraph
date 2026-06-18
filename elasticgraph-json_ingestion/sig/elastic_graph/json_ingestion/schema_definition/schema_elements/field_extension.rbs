@@ -1,0 +1,17 @@
+module ElasticGraph
+  module JSONIngestion
+    module SchemaDefinition
+      module SchemaElements
+        module FieldExtension: ::ElasticGraph::SchemaDefinition::SchemaElements::Field
+          include HasJSONSchema
+
+          @non_nullable_in_json_schema: bool
+
+          def non_nullable_in_json_schema?: () -> bool
+          def json_schema: (?nullable: bool?, **untyped) -> void
+          def to_indexing_field_reference: () -> Indexing::FieldReference?
+        end
+      end
+    end
+  end
+end

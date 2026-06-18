@@ -8,6 +8,7 @@
 
 ElasticGraph.define_schema do |schema|
   schema.json_schema_version 1
+  schema.enforce_json_schema_version false
 
   # :snippet-start: on_each_generated_schema_element
   # Within `ElasticGraph.define_schema { ... }` in your schema definition:

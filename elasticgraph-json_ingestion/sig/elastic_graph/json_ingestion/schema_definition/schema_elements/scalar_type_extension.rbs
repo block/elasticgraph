@@ -1,0 +1,17 @@
+module ElasticGraph
+  module JSONIngestion
+    module SchemaDefinition
+      module SchemaElements
+        module ScalarTypeExtension: ::ElasticGraph::SchemaDefinition::SchemaElements::ScalarType
+          include HasJSONSchema
+
+          def finalize_json_schema_configuration!: () -> void
+
+          private
+
+          def inferred_grouping_missing_value_placeholder: () -> ::String?
+        end
+      end
+    end
+  end
+end

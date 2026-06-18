@@ -26,6 +26,10 @@ module ElasticGraph
         def values: (*::String) -> void
         def runtime_metadata: () -> SchemaArtifacts::RuntimeMetadata::Enum::Type
         def as_input: () -> EnumType
+
+        private
+
+        def configure_derived_scalar_type: (ScalarType) -> void
       end
     end
   end

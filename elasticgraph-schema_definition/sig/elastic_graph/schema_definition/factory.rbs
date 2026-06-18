@@ -2,6 +2,7 @@ module ElasticGraph
   module SchemaDefinition
     class Factory
       @state: State
+      attr_reader state: State
       def initialize: (State) -> void
 
       def self.prevent_non_factory_instantiation_of: (::Class) -> ::Method
@@ -87,9 +88,7 @@ module ElasticGraph
       def new_object_indexing_field_type: (
         type_name: ::String,
         subfields: ::Array[Indexing::Field],
-        mapping_options: Mixins::HasTypeInfo::optionsHash,
-        json_schema_options: Mixins::HasTypeInfo::optionsHash,
-        doc_comment: ::String?
+        mapping_options: Mixins::HasTypeInfo::optionsHash
       ) -> Indexing::FieldType::Object
       @@object_indexing_field_type_new: ::Method
 
@@ -113,7 +112,7 @@ module ElasticGraph
         ::String,
         wrapping_type: SchemaElements::anyObjectType,
         field_factory: ::Method
-      ) ?{ (SchemaElements::TypeWithSubfields) -> void } -> SchemaElements::TypeWithSubfields
+      ) { (SchemaElements::TypeWithSubfields) -> void } -> SchemaElements::TypeWithSubfields
       @@type_with_subfields_new: ::Method
 
       def new_union_type: (::String) { (SchemaElements::UnionType) -> void } -> SchemaElements::UnionType
@@ -148,7 +147,6 @@ module ElasticGraph
       def new_schema_artifact_manager: (
         schema_definition_results: Results,
         schema_artifacts_directory: ::String,
-        enforce_json_schema_version: bool,
         output: io,
         ?max_diff_lines: ::Integer
       ) -> SchemaArtifactManager

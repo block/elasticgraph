@@ -1,0 +1,66 @@
+# Copyright 2024 - 2026 Block, Inc.
+#
+# Use of this source code is governed by an MIT-style
+# license that can be found in the LICENSE file or at
+# https://opensource.org/licenses/MIT.
+#
+# frozen_string_literal: true
+
+require "elastic_graph/json_ingestion/schema_definition/schema_elements/has_json_schema"
+
+module ElasticGraph
+  module JSONIngestion
+    module SchemaDefinition
+      module SchemaElements
+        # Extends scalar types with JSON schema validation and serialization behavior.
+        module ScalarTypeExtension
+          include HasJSONSchema
+
+          # Validates that json_schema has been configured on this scalar type, and applies
+          # post-yield runtime metadata derived from the final JSON schema configuration.
+          # GraphQL-only scalar types are skipped because they are not part of ingestion.
+          #
+          # @raise [Errors::SchemaError] if json_schema has not been configured on an ingested scalar type
+          # @return [void]
+          def finalize_json_schema_configuration!
+            return if graphql_only?
+
+            if json_schema_options.empty?
+              raise Errors::SchemaError, "Scalar types require `json_schema` to be configured, but `#{name}` lacks `json_schema`."
+            end
+
+            if !grouping_missing_value_placeholder_overridden && (placeholder = inferred_grouping_missing_value_placeholder)
+              self.runtime_metadata = runtime_metadata.with(grouping_missing_value_placeholder: placeholder)
+            end
+          end
+
+          private
+
+          def inferred_grouping_missing_value_placeholder
+            case mapping_type
+            when "long"
+              # It is only safe to use NaN for a long when the long's range is safe to coerce to a float
+              # without loss of precision. This is because using NaN as the missing value will cause
+              # the datastore to coerce the other bucket keys to float.
+              # JSON schema min/max only constrains newly indexed values, not existing data that may fall
+              # outside the range before the constraints were added. In that edge case, users can set
+              # `grouping_missing_value_placeholder` to `nil`.
+              if (json_schema_options[:minimum] || LONG_STRING_MIN) >= JSON_SAFE_LONG_MIN &&
+                  (json_schema_options[:maximum] || LONG_STRING_MAX) <= JSON_SAFE_LONG_MAX
+                inferred_numeric_placeholder_for_integer_type
+              end
+            when "unsigned_long"
+              # Similar to the checks above for long except we only need to check the max
+              # (since the min is zero even if not specified).
+              if (json_schema_options[:maximum] || LONG_STRING_MAX) <= JSON_SAFE_LONG_MAX
+                inferred_numeric_placeholder_for_integer_type
+              end
+            else
+              super
+            end
+          end
+        end
+      end
+    end
+  end
+end

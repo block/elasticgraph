@@ -1,0 +1,43 @@
+module ElasticGraph
+  module JSONIngestion
+    module SchemaDefinition
+      module Indexing
+        class FieldSupertype < ::ElasticGraph::SchemaDefinition::Indexing::Field
+          def initialize: (::ElasticGraph::SchemaDefinition::Indexing::Field) -> void
+        end
+
+        class Field < FieldSupertype
+          attr_reader json_schema_layers: ::ElasticGraph::SchemaDefinition::jsonSchemaLayersArray
+          attr_reader json_schema_customizations: ::Hash[::Symbol, untyped]
+          attr_reader doc_comment: ::String?
+
+          @json_schema: ::Hash[::String, untyped]?
+
+          JSON_SCHEMA_OVERRIDES_BY_MAPPING_TYPE: ::Hash[::String, ::Hash[::String, untyped]]
+
+          def initialize: (
+            ::ElasticGraph::SchemaDefinition::Indexing::Field field,
+            json_schema_layers: ::ElasticGraph::SchemaDefinition::jsonSchemaLayersArray,
+            json_schema_customizations: ::Hash[::Symbol, untyped],
+            doc_comment: ::String?
+          ) -> void
+
+          def json_schema: () -> ::Hash[::String, untyped]
+          def json_schema_metadata: () -> JSONSchemaFieldMetadata
+          def nullable?: () -> bool
+          def ==: (untyped other) -> bool
+          def eql?: (untyped other) -> bool
+          def hash: () -> ::Integer
+          def __getobj__: () -> ::ElasticGraph::SchemaDefinition::Indexing::Field
+
+          private
+
+          def inner_json_schema: () -> ::Hash[::String, untyped]
+          def outer_json_schema_customizations: () -> ::Hash[::String, untyped]
+          def user_specified_json_schema_customizations_go_on_outside?: () -> bool
+          def process_layer: (::Symbol layer, ::Hash[::String, untyped] schema) -> ::Hash[::String, untyped]
+        end
+      end
+    end
+  end
+end

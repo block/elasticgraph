@@ -1,0 +1,13 @@
+module ElasticGraph
+  module JSONIngestion
+    module SchemaDefinition
+      module Indexing
+        module IndexExtension: ::ElasticGraph::SchemaDefinition::Indexing::Index
+          def self.extended: (::ElasticGraph::SchemaDefinition::Indexing::Index) -> void
+          def rollover: (::Symbol, ::String) -> void
+          def route_with: (::String) -> void
+        end
+      end
+    end
+  end
+end

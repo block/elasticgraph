@@ -17,6 +17,7 @@ module ElasticGraph
         define_schema(
           index_document_sizes: index_document_sizes,
           schema_element_name_form: schema_element_name_form,
+          extension_modules: [],
           &schema_definition
         ).datastore_config
       end

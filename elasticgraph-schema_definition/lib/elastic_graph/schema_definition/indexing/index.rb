@@ -79,7 +79,6 @@ module ElasticGraph
             # us a nice efficiency boost.
             id_field_path = public_field_path("id", explanation: "indexed types must have an `id` field")
             self.routing_field_path = id_field_path
-            id_field_path.last_part.json_schema nullable: false
           end
 
           yield self if block_given?
@@ -152,8 +151,6 @@ module ElasticGraph
               raise Errors::SchemaError, "rollover field `#{timestamp_field_path.full_description}` cannot be used for rollover since it is a list field."
             end
 
-            timestamp_field_path.path_parts.each { |f| f.json_schema nullable: false }
-
             self.rollover_config = RolloverConfig.new(
               frequency: frequency,
               timestamp_field_path: timestamp_field_path
@@ -200,8 +197,6 @@ module ElasticGraph
 
             self.routing_field_path = routing_field_path
 
-            routing_field_path.path_parts[0..-2].each { |f| f.json_schema nullable: false }
-            routing_field_path.last_part.json_schema nullable: false, pattern: HAS_NON_WHITE_SPACE_REGEX
             indexed_type.append_to_documentation "For more performant queries on this type, please filter on `#{routing_field_path_name}` if possible."
           end
         end
@@ -291,17 +286,6 @@ module ElasticGraph
         end
 
         private
-
-        # A regex that requires at least one non-whitespace character.
-        # Note: this does not use the `/S` character class because it's recommended to use a small subset
-        # of Regex syntax:
-        #
-        # > The regular expression syntax used is from JavaScript (ECMA 262, specifically). However, that
-        # > complete syntax is not widely supported, therefore it is recommended that you stick to the subset
-        # > of that syntax described below.
-        #
-        # (From https://json-schema.org/understanding-json-schema/reference/regular_expressions.html)
-        HAS_NON_WHITE_SPACE_REGEX = "[^ \t\n]+"
 
         DEFAULT_SETTINGS = {
           "index.mapping.ignore_malformed" => false,
