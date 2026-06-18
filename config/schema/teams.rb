@@ -80,20 +80,18 @@ ElasticGraph.define_schema do |schema|
     # Here we duplicate `nested_fields` as `nested_fields2` to achieve that.
     t.field "nested_fields2", "TeamNestedFields"
 
-    # Exercises nested `sourced_from` (see the `Staff`/`*Record` types below).
-    t.field "staff", "Staff" do |f|
-      f.mapping type: "object"
-    end
+    # Exercises nested `sourced_from` (see the `Staff`/`*Profile` types below).
+    t.field "staff", "Staff"
 
     # These relationships are declared on `Team` (the indexed root) even though the `sourced_from` fields they
     # back live on elements nested under `staff`; the embedded types' `parent_relationship` declarations chain
-    # back up to them and reach the nested elements via `embedded_at:` dotted paths.
-    t.relates_to_many "coach_records", "CoachRecord", via: "team_id", dir: :in, indexing_only: true, singular: "coach_record" do |r|
+    # back up to them.
+    t.relates_to_many "coach_profiles", "CoachProfile", via: "team_id", dir: :in, indexing_only: true do |r|
       r.equivalent_field "team_league", locally_named: "league"
       r.equivalent_field "team_formed_on", locally_named: "formed_on"
     end
 
-    t.relates_to_one "general_manager_record", "GeneralManagerRecord", via: "team_id", dir: :in, indexing_only: true do |r|
+    t.relates_to_one "general_manager_profile", "GeneralManagerProfile", via: "team_id", dir: :in, indexing_only: true do |r|
       r.equivalent_field "team_league", locally_named: "league"
       r.equivalent_field "team_formed_on", locally_named: "formed_on"
     end
@@ -201,13 +199,13 @@ ElasticGraph.define_schema do |schema|
     end
   end
 
-  # These types exercise nested `sourced_from`: each staff member's win stat is sourced onto an element
+  # These types exercise nested `sourced_from`: each staff member's salary is sourced onto an element
   # embedded within `Team` rather than onto the root. `Staff` holds its members two ways so the dotted paths
   # cover both shapes the painless script navigates:
   # - `staff.coaches` (object then list): final segment is a list, so the element is matched by `coach_id`.
   # - `staff.general_manager` (all object): every segment is an object, so the element is reached by field name.
   #
-  # The `*Record` feeds carry `team_league`/`team_formed_on` equivalents so the indexer can route (`league`)
+  # The `*Profile` events carry `team_league`/`team_formed_on` equivalents so the indexer can route (`league`)
   # and select the rollover index (`formed_on`) for the `Team` they update.
   schema.object_type "Staff" do |t|
     t.field "coaches", "[Coach!]!" do |f|
@@ -217,50 +215,50 @@ ElasticGraph.define_schema do |schema|
     t.field "general_manager", "GeneralManager"
   end
 
-  schema.object_type "CoachRecord" do |t|
+  schema.object_type "CoachProfile" do |t|
     t.field "id", "ID!"
     t.field "team_id", "ID"
     t.field "coach_id", "ID"
-    t.field "wins", "Int"
+    t.field "annual_salary", "Int"
     t.field "team_league", "String"
     t.field "team_formed_on", "Date"
-    t.index "coach_records"
+    t.index "coach_profiles"
   end
 
-  schema.object_type "GeneralManagerRecord" do |t|
+  schema.object_type "GeneralManagerProfile" do |t|
     t.field "id", "ID!"
     t.field "team_id", "ID"
-    t.field "wins", "Int"
+    t.field "annual_salary", "Int"
     t.field "team_league", "String"
     t.field "team_formed_on", "Date"
-    t.index "general_manager_records"
+    t.index "general_manager_profiles"
   end
 
   schema.object_type "Coach" do |t|
     t.field "id", "ID!"
     t.field "name", "String"
 
-    t.field "career_wins", "Int" do |f|
-      f.sourced_from "record", "wins"
+    t.field "salary", "Int" do |f|
+      f.sourced_from "profile", "annual_salary"
     end
 
-    t.relates_to_one "record", "CoachRecord", via: "coach_id", dir: :in, indexing_only: true do |r|
-      r.parent_relationship "Team", "coach_records", embedded_at: "staff.coaches"
+    t.relates_to_one "profile", "CoachProfile", via: "coach_id", dir: :in, indexing_only: true do |r|
+      r.parent_relationship "Team", "coach_profiles", embedded_at: "staff.coaches"
     end
   end
 
-  # A team has exactly one general manager, so a `GeneralManagerRecord` joins on `team_id` (one record per
+  # A team has exactly one general manager, so a `GeneralManagerProfile` joins on `team_id` (one profile per
   # team) rather than on a per-element id like `Coach` does.
   schema.object_type "GeneralManager" do |t|
     t.field "id", "ID!"
     t.field "name", "String"
 
-    t.field "career_wins", "Int" do |f|
-      f.sourced_from "record", "wins"
+    t.field "salary", "Int" do |f|
+      f.sourced_from "profile", "annual_salary"
     end
 
-    t.relates_to_one "record", "GeneralManagerRecord", via: "team_id", dir: :in, indexing_only: true do |r|
-      r.parent_relationship "Team", "general_manager_record", embedded_at: "staff.general_manager"
+    t.relates_to_one "profile", "GeneralManagerProfile", via: "team_id", dir: :in, indexing_only: true do |r|
+      r.parent_relationship "Team", "general_manager_profile", embedded_at: "staff.general_manager"
     end
   end
 end

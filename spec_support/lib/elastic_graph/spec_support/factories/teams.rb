@@ -102,30 +102,30 @@ FactoryBot.define do
     __typename { "Coach" }
     id { Faker::Alphanumeric.alpha(number: 20) }
     name { Faker::Name.name }
-    # `career_wins` is intentionally omitted: it is a nested `sourced_from` field, filled in from a
-    # `:coach_record` event rather than provided on the embedded element.
+    # `salary` is intentionally omitted: it is a nested `sourced_from` field, filled in from a
+    # `:coach_profile` event rather than provided on the embedded element.
   end
 
   factory :general_manager, parent: :hash_base do
     __typename { "GeneralManager" }
     id { Faker::Alphanumeric.alpha(number: 20) }
     name { Faker::Name.name }
-    # `career_wins` is sourced from a `:general_manager_record`; see the note on `:coach`.
+    # `salary` is sourced from a `:general_manager_profile`; see the note on `:coach`.
   end
 
-  factory :coach_record, parent: :indexed_type do
-    __typename { "CoachRecord" }
+  factory :coach_profile, parent: :indexed_type do
+    __typename { "CoachProfile" }
     team_id { Faker::Alphanumeric.alpha(number: 20) }
     coach_id { Faker::Alphanumeric.alpha(number: 20) }
-    wins { Faker::Number.between(from: 0, to: 500) }
+    annual_salary { Faker::Number.between(from: 50000, to: 100000) }
     team_league { Faker::Base.sample(leagues) }
     team_formed_on { Faker::Date.between(from: recent_date - (5 * 365), to: recent_date - 365).iso8601 }
   end
 
-  factory :general_manager_record, parent: :indexed_type do
-    __typename { "GeneralManagerRecord" }
+  factory :general_manager_profile, parent: :indexed_type do
+    __typename { "GeneralManagerProfile" }
     team_id { Faker::Alphanumeric.alpha(number: 20) }
-    wins { Faker::Number.between(from: 0, to: 500) }
+    annual_salary { Faker::Number.between(from: 100000, to: 150000) }
     team_league { Faker::Base.sample(leagues) }
     team_formed_on { Faker::Date.between(from: recent_date - (5 * 365), to: recent_date - 365).iso8601 }
   end

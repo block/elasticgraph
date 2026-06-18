@@ -24,12 +24,12 @@ json_schema_version: 1
         enum:
         - Address
         - BrokerWholesaler
-        - CoachRecord
+        - CoachProfile
         - Company
         - Component
         - DirectWholesaler
         - ElectricalPart
-        - GeneralManagerRecord
+        - GeneralManagerProfile
         - Manufacturer
         - MechanicalPart
         - OnlineStore
@@ -201,7 +201,7 @@ json_schema_version: 1
     required:
     - id
     - name
-  CoachRecord:
+  CoachProfile:
     type: object
     properties:
       id:
@@ -220,7 +220,7 @@ json_schema_version: 1
           - "$ref": "#/$defs/ID"
           - maxLength: 8191
         - type: 'null'
-      wins:
+      annual_salary:
         anyOf:
         - "$ref": "#/$defs/Int"
         - type: 'null'
@@ -236,13 +236,13 @@ json_schema_version: 1
         - type: 'null'
       __typename:
         type: string
-        const: CoachRecord
-        default: CoachRecord
+        const: CoachProfile
+        default: CoachProfile
     required:
     - id
     - team_id
     - coach_id
-    - wins
+    - annual_salary
     - team_league
     - team_formed_on
   Color:
@@ -411,7 +411,7 @@ json_schema_version: 1
     required:
     - id
     - name
-  GeneralManagerRecord:
+  GeneralManagerProfile:
     type: object
     properties:
       id:
@@ -424,7 +424,7 @@ json_schema_version: 1
           - "$ref": "#/$defs/ID"
           - maxLength: 8191
         - type: 'null'
-      wins:
+      annual_salary:
         anyOf:
         - "$ref": "#/$defs/Int"
         - type: 'null'
@@ -440,12 +440,12 @@ json_schema_version: 1
         - type: 'null'
       __typename:
         type: string
-        const: GeneralManagerRecord
-        default: GeneralManagerRecord
+        const: GeneralManagerProfile
+        default: GeneralManagerProfile
     required:
     - id
     - team_id
-    - wins
+    - annual_salary
     - team_league
     - team_formed_on
   GeoLocation:

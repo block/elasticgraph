@@ -77,8 +77,8 @@ module ElasticGraph
             all_types_related_to("NamedEntity") +
             all_types_related_to("WidgetCurrency") +
             all_types_related_to("Team") +
-            all_types_related_to("CoachRecord") +
-            all_types_related_to("GeneralManagerRecord") +
+            all_types_related_to("CoachProfile") +
+            all_types_related_to("GeneralManagerProfile") +
             all_types_related_to("Sponsor") +
             all_types_related_to("Inventor") +
             all_types_related_to("NamedInventor") +

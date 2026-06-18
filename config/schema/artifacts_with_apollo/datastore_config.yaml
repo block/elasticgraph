@@ -1124,7 +1124,7 @@ index_templates:
                     type: keyword
                   name:
                     type: keyword
-                  career_wins:
+                  salary:
                     type: integer
                 type: nested
               general_manager:
@@ -1133,9 +1133,8 @@ index_templates:
                     type: keyword
                   name:
                     type: keyword
-                  career_wins:
+                  salary:
                     type: integer
-            type: object
           __counts:
             properties:
               past_names:
@@ -1577,7 +1576,7 @@ indices:
       index.number_of_replicas: 1
       index.number_of_shards: 1
       index.max_result_window: 10000
-  coach_records:
+  coach_profiles:
     aliases: {}
     mappings:
       dynamic: strict
@@ -1588,7 +1587,7 @@ indices:
           type: keyword
         coach_id:
           type: keyword
-        wins:
+        annual_salary:
           type: integer
         team_league:
           type: keyword
@@ -1605,7 +1604,7 @@ indices:
           dynamic: 'false'
         __typename:
           type: constant_keyword
-          value: CoachRecord
+          value: CoachProfile
       _size:
         enabled: true
     settings:
@@ -1750,7 +1749,7 @@ indices:
       index.number_of_replicas: 1
       index.number_of_shards: 1
       index.max_result_window: 10000
-  general_manager_records:
+  general_manager_profiles:
     aliases: {}
     mappings:
       dynamic: strict
@@ -1759,7 +1758,7 @@ indices:
           type: keyword
         team_id:
           type: keyword
-        wins:
+        annual_salary:
           type: integer
         team_league:
           type: keyword
@@ -1776,7 +1775,7 @@ indices:
           dynamic: 'false'
         __typename:
           type: constant_keyword
-          value: GeneralManagerRecord
+          value: GeneralManagerProfile
       _size:
         enabled: true
     settings:

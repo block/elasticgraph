@@ -674,20 +674,15 @@ type BrokerWholesaler implements DistributionChannel & Wholesale {
 }
 
 type Coach {
-  career_wins: Int
   id: ID!
   name: String
+  salary: Int
 }
 
 """
 Type used to perform aggregation computations on `Coach` fields.
 """
 type CoachAggregatedValues {
-  """
-  Computed aggregate values for the `career_wins` field.
-  """
-  career_wins: IntAggregatedValues
-
   """
   Computed aggregate values for the `id` field.
   """
@@ -697,6 +692,11 @@ type CoachAggregatedValues {
   Computed aggregate values for the `name` field.
   """
   name: NonNumericAggregatedValues
+
+  """
+  Computed aggregate values for the `salary` field.
+  """
+  salary: IntAggregatedValues
 }
 
 """
@@ -727,13 +727,6 @@ input CoachFilterInput {
   any_of: [CoachFilterInput!]
 
   """
-  Used to filter on the `career_wins` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  career_wins: IntFilterInput
-
-  """
   Used to filter on the `id` field.
 
   When `null` or an empty object is passed, matches all documents.
@@ -754,17 +747,19 @@ input CoachFilterInput {
   When `null` or an empty object is passed, matches no documents.
   """
   not: CoachFilterInput
+
+  """
+  Used to filter on the `salary` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  salary: IntFilterInput
 }
 
 """
 Type used to specify the `Coach` fields to group by for aggregations.
 """
 type CoachGroupedBy {
-  """
-  The `career_wins` field value for this group.
-  """
-  career_wins: Int
-
   """
   The `id` field value for this group.
   """
@@ -774,6 +769,11 @@ type CoachGroupedBy {
   The `name` field value for this group.
   """
   name: String
+
+  """
+  The `salary` field value for this group.
+  """
+  salary: Int
 }
 
 """
@@ -841,19 +841,24 @@ input CoachListFilterInput {
   not: CoachListFilterInput
 }
 
-type CoachRecord {
+type CoachProfile {
+  annual_salary: Int
   coach_id: ID
   id: ID!
   team_formed_on: Date
   team_id: ID
   team_league: String
-  wins: Int
 }
 
 """
-Type used to perform aggregation computations on `CoachRecord` fields.
+Type used to perform aggregation computations on `CoachProfile` fields.
 """
-type CoachRecordAggregatedValues {
+type CoachProfileAggregatedValues {
+  """
+  Computed aggregate values for the `annual_salary` field.
+  """
+  annual_salary: IntAggregatedValues
+
   """
   Computed aggregate values for the `coach_id` field.
   """
@@ -878,49 +883,44 @@ type CoachRecordAggregatedValues {
   Computed aggregate values for the `team_league` field.
   """
   team_league: NonNumericAggregatedValues
-
-  """
-  Computed aggregate values for the `wins` field.
-  """
-  wins: IntAggregatedValues
 }
 
 """
-Return type representing a bucket of `CoachRecord` documents for an aggregations query.
+Return type representing a bucket of `CoachProfile` documents for an aggregations query.
 """
-type CoachRecordAggregation {
+type CoachProfileAggregation {
   """
-  Provides computed aggregated values over all `CoachRecord` documents in an aggregation bucket.
+  Provides computed aggregated values over all `CoachProfile` documents in an aggregation bucket.
   """
-  aggregated_values: CoachRecordAggregatedValues
+  aggregated_values: CoachProfileAggregatedValues
 
   """
-  The count of `CoachRecord` documents in an aggregation bucket.
+  The count of `CoachProfile` documents in an aggregation bucket.
   """
   count: JsonSafeLong!
 
   """
-  Used to specify the `CoachRecord` fields to group by. The returned values identify each aggregation bucket.
+  Used to specify the `CoachProfile` fields to group by. The returned values identify each aggregation bucket.
   """
-  grouped_by: CoachRecordGroupedBy
+  grouped_by: CoachProfileGroupedBy
 }
 
 """
-Represents a paginated collection of `CoachRecordAggregation` results.
+Represents a paginated collection of `CoachProfileAggregation` results.
 
 See the [Relay GraphQL Cursor Connections
 Specification](https://relay.dev/graphql/connections.htm#sec-Connection-Types) for more info.
 """
-type CoachRecordAggregationConnection {
+type CoachProfileAggregationConnection {
   """
-  Wraps a specific `CoachRecordAggregation` to pair it with its pagination cursor.
+  Wraps a specific `CoachProfileAggregation` to pair it with its pagination cursor.
   """
-  edges: [CoachRecordAggregationEdge!]!
+  edges: [CoachProfileAggregationEdge!]!
 
   """
-  The list of `CoachRecordAggregation` results.
+  The list of `CoachProfileAggregation` results.
   """
-  nodes: [CoachRecordAggregation!]!
+  nodes: [CoachProfileAggregation!]!
 
   """
   Provides pagination-related information.
@@ -929,41 +929,41 @@ type CoachRecordAggregationConnection {
 }
 
 """
-Represents a specific `CoachRecordAggregation` in the context of a `CoachRecordAggregationConnection`,
-providing access to both the `CoachRecordAggregation` and query-specific information such as the pagination `Cursor`.
+Represents a specific `CoachProfileAggregation` in the context of a `CoachProfileAggregationConnection`,
+providing access to both the `CoachProfileAggregation` and query-specific information such as the pagination `Cursor`.
 
 See the [Relay GraphQL Cursor Connections
 Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for more info.
 """
-type CoachRecordAggregationEdge {
+type CoachProfileAggregationEdge {
   """
-  The `Cursor` of this `CoachRecordAggregation`. This can be passed in the next query as
-  a `before` or `after` argument to continue paginating from this `CoachRecordAggregation`.
+  The `Cursor` of this `CoachProfileAggregation`. This can be passed in the next query as
+  a `before` or `after` argument to continue paginating from this `CoachProfileAggregation`.
   """
   cursor: Cursor
 
   """
-  The `CoachRecordAggregation` of this edge.
+  The `CoachProfileAggregation` of this edge.
   """
-  node: CoachRecordAggregation
+  node: CoachProfileAggregation
 }
 
 """
-Represents a paginated collection of `CoachRecord` results.
+Represents a paginated collection of `CoachProfile` results.
 
 See the [Relay GraphQL Cursor Connections
 Specification](https://relay.dev/graphql/connections.htm#sec-Connection-Types) for more info.
 """
-type CoachRecordConnection {
+type CoachProfileConnection {
   """
-  Wraps a specific `CoachRecord` to pair it with its pagination cursor.
+  Wraps a specific `CoachProfile` to pair it with its pagination cursor.
   """
-  edges: [CoachRecordEdge!]!
+  edges: [CoachProfileEdge!]!
 
   """
-  The list of `CoachRecord` results.
+  The list of `CoachProfile` results.
   """
-  nodes: [CoachRecord!]!
+  nodes: [CoachProfile!]!
 
   """
   Provides pagination-related information.
@@ -977,52 +977,59 @@ type CoachRecordConnection {
 }
 
 """
-Represents a specific `CoachRecord` in the context of a `CoachRecordConnection`,
-providing access to both the `CoachRecord` and query-specific information such as the pagination `Cursor`.
+Represents a specific `CoachProfile` in the context of a `CoachProfileConnection`,
+providing access to both the `CoachProfile` and query-specific information such as the pagination `Cursor`.
 
 See the [Relay GraphQL Cursor Connections
 Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for more info.
 """
-type CoachRecordEdge {
+type CoachProfileEdge {
   """
-  All search highlights for this `CoachRecord`, indicating where in the indexed document the query matched.
+  All search highlights for this `CoachProfile`, indicating where in the indexed document the query matched.
   """
   all_highlights: [SearchHighlight!]!
 
   """
-  The `Cursor` of this `CoachRecord`. This can be passed in the next query as
-  a `before` or `after` argument to continue paginating from this `CoachRecord`.
+  The `Cursor` of this `CoachProfile`. This can be passed in the next query as
+  a `before` or `after` argument to continue paginating from this `CoachProfile`.
   """
   cursor: Cursor
 
   """
-  Specific search highlights for this `CoachRecord`, providing matching snippets for the requested fields.
+  Specific search highlights for this `CoachProfile`, providing matching snippets for the requested fields.
   """
-  highlights: CoachRecordHighlights
+  highlights: CoachProfileHighlights
 
   """
-  The `CoachRecord` of this edge.
+  The `CoachProfile` of this edge.
   """
-  node: CoachRecord
+  node: CoachProfile
 }
 
 """
-Input type used to specify filters on `CoachRecord` fields.
+Input type used to specify filters on `CoachProfile` fields.
 
 Will match all documents if passed as an empty object (or as `null`).
 """
-input CoachRecordFilterInput {
+input CoachProfileFilterInput {
   """
   Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
-  be provided on a single `CoachRecordFilterInput` input because of collisions
+  be provided on a single `CoachProfileFilterInput` input because of collisions
   between key names. For example, if you want to AND multiple
   OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
-  all_of: [CoachRecordFilterInput!]
+  all_of: [CoachProfileFilterInput!]
+
+  """
+  Used to filter on the `annual_salary` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  annual_salary: IntFilterInput
 
   """
   Matches records where any of the provided sub-filters evaluate to true.
@@ -1031,7 +1038,7 @@ input CoachRecordFilterInput {
   When `null` is passed, matches all documents.
   When an empty list is passed, this part of the filter matches no documents.
   """
-  any_of: [CoachRecordFilterInput!]
+  any_of: [CoachProfileFilterInput!]
 
   """
   Used to filter on the `coach_id` field.
@@ -1053,7 +1060,7 @@ input CoachRecordFilterInput {
 
   When `null` or an empty object is passed, matches no documents.
   """
-  not: CoachRecordFilterInput
+  not: CoachProfileFilterInput
 
   """
   Used to filter on the `team_formed_on` field.
@@ -1075,19 +1082,17 @@ input CoachRecordFilterInput {
   When `null` or an empty object is passed, matches all documents.
   """
   team_league: StringFilterInput
-
-  """
-  Used to filter on the `wins` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  wins: IntFilterInput
 }
 
 """
-Type used to specify the `CoachRecord` fields to group by for aggregations.
+Type used to specify the `CoachProfile` fields to group by for aggregations.
 """
-type CoachRecordGroupedBy {
+type CoachProfileGroupedBy {
+  """
+  The `annual_salary` field value for this group.
+  """
+  annual_salary: Int
+
   """
   The `coach_id` field value for this group.
   """
@@ -1107,17 +1112,12 @@ type CoachRecordGroupedBy {
   The `team_league` field value for this group.
   """
   team_league: String
-
-  """
-  The `wins` field value for this group.
-  """
-  wins: Int
 }
 
 """
-Type used to request desired `CoachRecord` search highlight fields.
+Type used to request desired `CoachProfile` search highlight fields.
 """
-type CoachRecordHighlights {
+type CoachProfileHighlights {
   """
   Search highlights for the `coach_id`, providing snippets of the matching text.
   """
@@ -1140,9 +1140,19 @@ type CoachRecordHighlights {
 }
 
 """
-Enumerates the ways `CoachRecord`s can be sorted.
+Enumerates the ways `CoachProfile`s can be sorted.
 """
-enum CoachRecordSortOrderInput {
+enum CoachProfileSortOrderInput {
+  """
+  Sorts ascending by the `annual_salary` field.
+  """
+  annual_salary_ASC
+
+  """
+  Sorts descending by the `annual_salary` field.
+  """
+  annual_salary_DESC
+
   """
   Sorts ascending by the `coach_id` field.
   """
@@ -1192,16 +1202,6 @@ enum CoachRecordSortOrderInput {
   Sorts descending by the `team_league` field.
   """
   team_league_DESC
-
-  """
-  Sorts ascending by the `wins` field.
-  """
-  wins_ASC
-
-  """
-  Sorts descending by the `wins` field.
-  """
-  wins_DESC
 }
 
 enum Color {
@@ -3882,20 +3882,15 @@ input FloatFilterInput {
 }
 
 type GeneralManager {
-  career_wins: Int
   id: ID!
   name: String
+  salary: Int
 }
 
 """
 Type used to perform aggregation computations on `GeneralManager` fields.
 """
 type GeneralManagerAggregatedValues {
-  """
-  Computed aggregate values for the `career_wins` field.
-  """
-  career_wins: IntAggregatedValues
-
   """
   Computed aggregate values for the `id` field.
   """
@@ -3905,6 +3900,11 @@ type GeneralManagerAggregatedValues {
   Computed aggregate values for the `name` field.
   """
   name: NonNumericAggregatedValues
+
+  """
+  Computed aggregate values for the `salary` field.
+  """
+  salary: IntAggregatedValues
 }
 
 """
@@ -3935,13 +3935,6 @@ input GeneralManagerFilterInput {
   any_of: [GeneralManagerFilterInput!]
 
   """
-  Used to filter on the `career_wins` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  career_wins: IntFilterInput
-
-  """
   Used to filter on the `id` field.
 
   When `null` or an empty object is passed, matches all documents.
@@ -3962,17 +3955,19 @@ input GeneralManagerFilterInput {
   When `null` or an empty object is passed, matches no documents.
   """
   not: GeneralManagerFilterInput
+
+  """
+  Used to filter on the `salary` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  salary: IntFilterInput
 }
 
 """
 Type used to specify the `GeneralManager` fields to group by for aggregations.
 """
 type GeneralManagerGroupedBy {
-  """
-  The `career_wins` field value for this group.
-  """
-  career_wins: Int
-
   """
   The `id` field value for this group.
   """
@@ -3982,6 +3977,11 @@ type GeneralManagerGroupedBy {
   The `name` field value for this group.
   """
   name: String
+
+  """
+  The `salary` field value for this group.
+  """
+  salary: Int
 }
 
 """
@@ -3999,18 +3999,23 @@ type GeneralManagerHighlights {
   name: [String!]!
 }
 
-type GeneralManagerRecord {
+type GeneralManagerProfile {
+  annual_salary: Int
   id: ID!
   team_formed_on: Date
   team_id: ID
   team_league: String
-  wins: Int
 }
 
 """
-Type used to perform aggregation computations on `GeneralManagerRecord` fields.
+Type used to perform aggregation computations on `GeneralManagerProfile` fields.
 """
-type GeneralManagerRecordAggregatedValues {
+type GeneralManagerProfileAggregatedValues {
+  """
+  Computed aggregate values for the `annual_salary` field.
+  """
+  annual_salary: IntAggregatedValues
+
   """
   Computed aggregate values for the `id` field.
   """
@@ -4030,49 +4035,44 @@ type GeneralManagerRecordAggregatedValues {
   Computed aggregate values for the `team_league` field.
   """
   team_league: NonNumericAggregatedValues
-
-  """
-  Computed aggregate values for the `wins` field.
-  """
-  wins: IntAggregatedValues
 }
 
 """
-Return type representing a bucket of `GeneralManagerRecord` documents for an aggregations query.
+Return type representing a bucket of `GeneralManagerProfile` documents for an aggregations query.
 """
-type GeneralManagerRecordAggregation {
+type GeneralManagerProfileAggregation {
   """
-  Provides computed aggregated values over all `GeneralManagerRecord` documents in an aggregation bucket.
+  Provides computed aggregated values over all `GeneralManagerProfile` documents in an aggregation bucket.
   """
-  aggregated_values: GeneralManagerRecordAggregatedValues
+  aggregated_values: GeneralManagerProfileAggregatedValues
 
   """
-  The count of `GeneralManagerRecord` documents in an aggregation bucket.
+  The count of `GeneralManagerProfile` documents in an aggregation bucket.
   """
   count: JsonSafeLong!
 
   """
-  Used to specify the `GeneralManagerRecord` fields to group by. The returned values identify each aggregation bucket.
+  Used to specify the `GeneralManagerProfile` fields to group by. The returned values identify each aggregation bucket.
   """
-  grouped_by: GeneralManagerRecordGroupedBy
+  grouped_by: GeneralManagerProfileGroupedBy
 }
 
 """
-Represents a paginated collection of `GeneralManagerRecordAggregation` results.
+Represents a paginated collection of `GeneralManagerProfileAggregation` results.
 
 See the [Relay GraphQL Cursor Connections
 Specification](https://relay.dev/graphql/connections.htm#sec-Connection-Types) for more info.
 """
-type GeneralManagerRecordAggregationConnection {
+type GeneralManagerProfileAggregationConnection {
   """
-  Wraps a specific `GeneralManagerRecordAggregation` to pair it with its pagination cursor.
+  Wraps a specific `GeneralManagerProfileAggregation` to pair it with its pagination cursor.
   """
-  edges: [GeneralManagerRecordAggregationEdge!]!
+  edges: [GeneralManagerProfileAggregationEdge!]!
 
   """
-  The list of `GeneralManagerRecordAggregation` results.
+  The list of `GeneralManagerProfileAggregation` results.
   """
-  nodes: [GeneralManagerRecordAggregation!]!
+  nodes: [GeneralManagerProfileAggregation!]!
 
   """
   Provides pagination-related information.
@@ -4081,42 +4081,42 @@ type GeneralManagerRecordAggregationConnection {
 }
 
 """
-Represents a specific `GeneralManagerRecordAggregation` in the context of a `GeneralManagerRecordAggregationConnection`,
-providing access to both the `GeneralManagerRecordAggregation` and
+Represents a specific `GeneralManagerProfileAggregation` in the context of a `GeneralManagerProfileAggregationConnection`,
+providing access to both the `GeneralManagerProfileAggregation` and
 query-specific information such as the pagination `Cursor`.
 
 See the [Relay GraphQL Cursor Connections
 Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for more info.
 """
-type GeneralManagerRecordAggregationEdge {
+type GeneralManagerProfileAggregationEdge {
   """
-  The `Cursor` of this `GeneralManagerRecordAggregation`. This can be passed in the next query as
-  a `before` or `after` argument to continue paginating from this `GeneralManagerRecordAggregation`.
+  The `Cursor` of this `GeneralManagerProfileAggregation`. This can be passed in the next query as
+  a `before` or `after` argument to continue paginating from this `GeneralManagerProfileAggregation`.
   """
   cursor: Cursor
 
   """
-  The `GeneralManagerRecordAggregation` of this edge.
+  The `GeneralManagerProfileAggregation` of this edge.
   """
-  node: GeneralManagerRecordAggregation
+  node: GeneralManagerProfileAggregation
 }
 
 """
-Represents a paginated collection of `GeneralManagerRecord` results.
+Represents a paginated collection of `GeneralManagerProfile` results.
 
 See the [Relay GraphQL Cursor Connections
 Specification](https://relay.dev/graphql/connections.htm#sec-Connection-Types) for more info.
 """
-type GeneralManagerRecordConnection {
+type GeneralManagerProfileConnection {
   """
-  Wraps a specific `GeneralManagerRecord` to pair it with its pagination cursor.
+  Wraps a specific `GeneralManagerProfile` to pair it with its pagination cursor.
   """
-  edges: [GeneralManagerRecordEdge!]!
+  edges: [GeneralManagerProfileEdge!]!
 
   """
-  The list of `GeneralManagerRecord` results.
+  The list of `GeneralManagerProfile` results.
   """
-  nodes: [GeneralManagerRecord!]!
+  nodes: [GeneralManagerProfile!]!
 
   """
   Provides pagination-related information.
@@ -4130,52 +4130,59 @@ type GeneralManagerRecordConnection {
 }
 
 """
-Represents a specific `GeneralManagerRecord` in the context of a `GeneralManagerRecordConnection`,
-providing access to both the `GeneralManagerRecord` and query-specific information such as the pagination `Cursor`.
+Represents a specific `GeneralManagerProfile` in the context of a `GeneralManagerProfileConnection`,
+providing access to both the `GeneralManagerProfile` and query-specific information such as the pagination `Cursor`.
 
 See the [Relay GraphQL Cursor Connections
 Specification](https://relay.dev/graphql/connections.htm#sec-Edge-Types) for more info.
 """
-type GeneralManagerRecordEdge {
+type GeneralManagerProfileEdge {
   """
-  All search highlights for this `GeneralManagerRecord`, indicating where in the indexed document the query matched.
+  All search highlights for this `GeneralManagerProfile`, indicating where in the indexed document the query matched.
   """
   all_highlights: [SearchHighlight!]!
 
   """
-  The `Cursor` of this `GeneralManagerRecord`. This can be passed in the next query as
-  a `before` or `after` argument to continue paginating from this `GeneralManagerRecord`.
+  The `Cursor` of this `GeneralManagerProfile`. This can be passed in the next query as
+  a `before` or `after` argument to continue paginating from this `GeneralManagerProfile`.
   """
   cursor: Cursor
 
   """
-  Specific search highlights for this `GeneralManagerRecord`, providing matching snippets for the requested fields.
+  Specific search highlights for this `GeneralManagerProfile`, providing matching snippets for the requested fields.
   """
-  highlights: GeneralManagerRecordHighlights
+  highlights: GeneralManagerProfileHighlights
 
   """
-  The `GeneralManagerRecord` of this edge.
+  The `GeneralManagerProfile` of this edge.
   """
-  node: GeneralManagerRecord
+  node: GeneralManagerProfile
 }
 
 """
-Input type used to specify filters on `GeneralManagerRecord` fields.
+Input type used to specify filters on `GeneralManagerProfile` fields.
 
 Will match all documents if passed as an empty object (or as `null`).
 """
-input GeneralManagerRecordFilterInput {
+input GeneralManagerProfileFilterInput {
   """
   Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
 
   Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
-  be provided on a single `GeneralManagerRecordFilterInput` input because of
+  be provided on a single `GeneralManagerProfileFilterInput` input because of
   collisions between key names. For example, if you want to AND multiple
   OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
 
   When `null` or an empty list is passed, matches all documents.
   """
-  all_of: [GeneralManagerRecordFilterInput!]
+  all_of: [GeneralManagerProfileFilterInput!]
+
+  """
+  Used to filter on the `annual_salary` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  annual_salary: IntFilterInput
 
   """
   Matches records where any of the provided sub-filters evaluate to true.
@@ -4184,7 +4191,7 @@ input GeneralManagerRecordFilterInput {
   When `null` is passed, matches all documents.
   When an empty list is passed, this part of the filter matches no documents.
   """
-  any_of: [GeneralManagerRecordFilterInput!]
+  any_of: [GeneralManagerProfileFilterInput!]
 
   """
   Used to filter on the `id` field.
@@ -4199,7 +4206,7 @@ input GeneralManagerRecordFilterInput {
 
   When `null` or an empty object is passed, matches no documents.
   """
-  not: GeneralManagerRecordFilterInput
+  not: GeneralManagerProfileFilterInput
 
   """
   Used to filter on the `team_formed_on` field.
@@ -4221,19 +4228,17 @@ input GeneralManagerRecordFilterInput {
   When `null` or an empty object is passed, matches all documents.
   """
   team_league: StringFilterInput
-
-  """
-  Used to filter on the `wins` field.
-
-  When `null` or an empty object is passed, matches all documents.
-  """
-  wins: IntFilterInput
 }
 
 """
-Type used to specify the `GeneralManagerRecord` fields to group by for aggregations.
+Type used to specify the `GeneralManagerProfile` fields to group by for aggregations.
 """
-type GeneralManagerRecordGroupedBy {
+type GeneralManagerProfileGroupedBy {
+  """
+  The `annual_salary` field value for this group.
+  """
+  annual_salary: Int
+
   """
   Offers the different grouping options for the `team_formed_on` value within this group.
   """
@@ -4248,17 +4253,12 @@ type GeneralManagerRecordGroupedBy {
   The `team_league` field value for this group.
   """
   team_league: String
-
-  """
-  The `wins` field value for this group.
-  """
-  wins: Int
 }
 
 """
-Type used to request desired `GeneralManagerRecord` search highlight fields.
+Type used to request desired `GeneralManagerProfile` search highlight fields.
 """
-type GeneralManagerRecordHighlights {
+type GeneralManagerProfileHighlights {
   """
   Search highlights for the `id`, providing snippets of the matching text.
   """
@@ -4276,9 +4276,19 @@ type GeneralManagerRecordHighlights {
 }
 
 """
-Enumerates the ways `GeneralManagerRecord`s can be sorted.
+Enumerates the ways `GeneralManagerProfile`s can be sorted.
 """
-enum GeneralManagerRecordSortOrderInput {
+enum GeneralManagerProfileSortOrderInput {
+  """
+  Sorts ascending by the `annual_salary` field.
+  """
+  annual_salary_ASC
+
+  """
+  Sorts descending by the `annual_salary` field.
+  """
+  annual_salary_DESC
+
   """
   Sorts ascending by the `id` field.
   """
@@ -4318,16 +4328,6 @@ enum GeneralManagerRecordSortOrderInput {
   Sorts descending by the `team_league` field.
   """
   team_league_DESC
-
-  """
-  Sorts ascending by the `wins` field.
-  """
-  wins_ASC
-
-  """
-  Sorts descending by the `wins` field.
-  """
-  wins_DESC
 }
 
 """
@@ -10297,13 +10297,13 @@ type Query {
   ): AddressConnection
 
   """
-  Aggregations over the `coach_records` data:
+  Aggregations over the `coach_profiles` data:
 
-  > Fetches `CoachRecord`s based on the provided arguments.
+  > Fetches `CoachProfile`s based on the provided arguments.
   """
-  coach_record_aggregations(
+  coach_profile_aggregations(
     """
-    Used to forward-paginate through the `coach_record_aggregations`. When provided, the next page after the
+    Used to forward-paginate through the `coach_profile_aggregations`. When provided, the next page after the
     provided cursor will be returned.
 
     See the [Relay GraphQL Cursor Connections
@@ -10312,7 +10312,7 @@ type Query {
     after: Cursor
 
     """
-    Used to backward-paginate through the `coach_record_aggregations`. When provided, the previous page before the
+    Used to backward-paginate through the `coach_profile_aggregations`. When provided, the previous page before the
     provided cursor will be returned.
 
     See the [Relay GraphQL Cursor Connections
@@ -10321,14 +10321,14 @@ type Query {
     before: Cursor
 
     """
-    Used to filter the `CoachRecord` documents that get aggregated over based on the provided criteria.
+    Used to filter the `CoachProfile` documents that get aggregated over based on the provided criteria.
     """
-    filter: CoachRecordFilterInput
+    filter: CoachProfileFilterInput
 
     """
-    Used in conjunction with the `after` argument to forward-paginate through the `coach_record_aggregations`.
+    Used in conjunction with the `after` argument to forward-paginate through the `coach_profile_aggregations`.
     When provided, limits the number of returned results to the first `n` after the provided
-    `after` cursor (or from the start of the `coach_record_aggregations`, if no `after` cursor is provided).
+    `after` cursor (or from the start of the `coach_profile_aggregations`, if no `after` cursor is provided).
 
     See the [Relay GraphQL Cursor Connections
     Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
@@ -10336,22 +10336,22 @@ type Query {
     first: Int
 
     """
-    Used in conjunction with the `before` argument to backward-paginate through the `coach_record_aggregations`.
+    Used in conjunction with the `before` argument to backward-paginate through the `coach_profile_aggregations`.
     When provided, limits the number of returned results to the last `n` before the provided
-    `before` cursor (or from the end of the `coach_record_aggregations`, if no `before` cursor is provided).
+    `before` cursor (or from the end of the `coach_profile_aggregations`, if no `before` cursor is provided).
 
     See the [Relay GraphQL Cursor Connections
     Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
     """
     last: Int
-  ): CoachRecordAggregationConnection
+  ): CoachProfileAggregationConnection
 
   """
-  Fetches `CoachRecord`s based on the provided arguments.
+  Fetches `CoachProfile`s based on the provided arguments.
   """
-  coach_records(
+  coach_profiles(
     """
-    Used to forward-paginate through the `coach_records`. When provided, the next page after the
+    Used to forward-paginate through the `coach_profiles`. When provided, the next page after the
     provided cursor will be returned.
 
     See the [Relay GraphQL Cursor Connections
@@ -10360,7 +10360,7 @@ type Query {
     after: Cursor
 
     """
-    Used to backward-paginate through the `coach_records`. When provided, the previous page before the
+    Used to backward-paginate through the `coach_profiles`. When provided, the previous page before the
     provided cursor will be returned.
 
     See the [Relay GraphQL Cursor Connections
@@ -10369,14 +10369,14 @@ type Query {
     before: Cursor
 
     """
-    Used to filter the returned `coach_records` based on the provided criteria.
+    Used to filter the returned `coach_profiles` based on the provided criteria.
     """
-    filter: CoachRecordFilterInput
+    filter: CoachProfileFilterInput
 
     """
-    Used in conjunction with the `after` argument to forward-paginate through the `coach_records`.
+    Used in conjunction with the `after` argument to forward-paginate through the `coach_profiles`.
     When provided, limits the number of returned results to the first `n` after the provided
-    `after` cursor (or from the start of the `coach_records`, if no `after` cursor is provided).
+    `after` cursor (or from the start of the `coach_profiles`, if no `after` cursor is provided).
 
     See the [Relay GraphQL Cursor Connections
     Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
@@ -10384,9 +10384,9 @@ type Query {
     first: Int
 
     """
-    Used in conjunction with the `before` argument to backward-paginate through the `coach_records`.
+    Used in conjunction with the `before` argument to backward-paginate through the `coach_profiles`.
     When provided, limits the number of returned results to the last `n` before the provided
-    `before` cursor (or from the end of the `coach_records`, if no `before` cursor is provided).
+    `before` cursor (or from the end of the `coach_profiles`, if no `before` cursor is provided).
 
     See the [Relay GraphQL Cursor Connections
     Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
@@ -10394,10 +10394,10 @@ type Query {
     last: Int
 
     """
-    Used to specify how the returned `coach_records` should be sorted.
+    Used to specify how the returned `coach_profiles` should be sorted.
     """
-    order_by: [CoachRecordSortOrderInput!]
-  ): CoachRecordConnection
+    order_by: [CoachProfileSortOrderInput!]
+  ): CoachProfileConnection
 
   """
   Aggregations over the `components` data:
@@ -10709,13 +10709,13 @@ type Query {
   ): ElectricalPartConnection
 
   """
-  Aggregations over the `general_manager_records` data:
+  Aggregations over the `general_manager_profiles` data:
 
-  > Fetches `GeneralManagerRecord`s based on the provided arguments.
+  > Fetches `GeneralManagerProfile`s based on the provided arguments.
   """
-  general_manager_record_aggregations(
+  general_manager_profile_aggregations(
     """
-    Used to forward-paginate through the `general_manager_record_aggregations`. When provided, the next page after the
+    Used to forward-paginate through the `general_manager_profile_aggregations`. When provided, the next page after the
     provided cursor will be returned.
 
     See the [Relay GraphQL Cursor Connections
@@ -10724,7 +10724,8 @@ type Query {
     after: Cursor
 
     """
-    Used to backward-paginate through the `general_manager_record_aggregations`. When provided, the previous page before the
+    Used to backward-paginate through the
+    `general_manager_profile_aggregations`. When provided, the previous page before the
     provided cursor will be returned.
 
     See the [Relay GraphQL Cursor Connections
@@ -10733,14 +10734,14 @@ type Query {
     before: Cursor
 
     """
-    Used to filter the `GeneralManagerRecord` documents that get aggregated over based on the provided criteria.
+    Used to filter the `GeneralManagerProfile` documents that get aggregated over based on the provided criteria.
     """
-    filter: GeneralManagerRecordFilterInput
+    filter: GeneralManagerProfileFilterInput
 
     """
-    Used in conjunction with the `after` argument to forward-paginate through the `general_manager_record_aggregations`.
+    Used in conjunction with the `after` argument to forward-paginate through the `general_manager_profile_aggregations`.
     When provided, limits the number of returned results to the first `n` after the provided
-    `after` cursor (or from the start of the `general_manager_record_aggregations`, if no `after` cursor is provided).
+    `after` cursor (or from the start of the `general_manager_profile_aggregations`, if no `after` cursor is provided).
 
     See the [Relay GraphQL Cursor Connections
     Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
@@ -10748,22 +10749,22 @@ type Query {
     first: Int
 
     """
-    Used in conjunction with the `before` argument to backward-paginate through the `general_manager_record_aggregations`.
+    Used in conjunction with the `before` argument to backward-paginate through the `general_manager_profile_aggregations`.
     When provided, limits the number of returned results to the last `n` before the provided
-    `before` cursor (or from the end of the `general_manager_record_aggregations`, if no `before` cursor is provided).
+    `before` cursor (or from the end of the `general_manager_profile_aggregations`, if no `before` cursor is provided).
 
     See the [Relay GraphQL Cursor Connections
     Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
     """
     last: Int
-  ): GeneralManagerRecordAggregationConnection
+  ): GeneralManagerProfileAggregationConnection
 
   """
-  Fetches `GeneralManagerRecord`s based on the provided arguments.
+  Fetches `GeneralManagerProfile`s based on the provided arguments.
   """
-  general_manager_records(
+  general_manager_profiles(
     """
-    Used to forward-paginate through the `general_manager_records`. When provided, the next page after the
+    Used to forward-paginate through the `general_manager_profiles`. When provided, the next page after the
     provided cursor will be returned.
 
     See the [Relay GraphQL Cursor Connections
@@ -10772,7 +10773,7 @@ type Query {
     after: Cursor
 
     """
-    Used to backward-paginate through the `general_manager_records`. When provided, the previous page before the
+    Used to backward-paginate through the `general_manager_profiles`. When provided, the previous page before the
     provided cursor will be returned.
 
     See the [Relay GraphQL Cursor Connections
@@ -10781,14 +10782,14 @@ type Query {
     before: Cursor
 
     """
-    Used to filter the returned `general_manager_records` based on the provided criteria.
+    Used to filter the returned `general_manager_profiles` based on the provided criteria.
     """
-    filter: GeneralManagerRecordFilterInput
+    filter: GeneralManagerProfileFilterInput
 
     """
-    Used in conjunction with the `after` argument to forward-paginate through the `general_manager_records`.
+    Used in conjunction with the `after` argument to forward-paginate through the `general_manager_profiles`.
     When provided, limits the number of returned results to the first `n` after the provided
-    `after` cursor (or from the start of the `general_manager_records`, if no `after` cursor is provided).
+    `after` cursor (or from the start of the `general_manager_profiles`, if no `after` cursor is provided).
 
     See the [Relay GraphQL Cursor Connections
     Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
@@ -10796,9 +10797,9 @@ type Query {
     first: Int
 
     """
-    Used in conjunction with the `before` argument to backward-paginate through the `general_manager_records`.
+    Used in conjunction with the `before` argument to backward-paginate through the `general_manager_profiles`.
     When provided, limits the number of returned results to the last `n` before the provided
-    `before` cursor (or from the end of the `general_manager_records`, if no `before` cursor is provided).
+    `before` cursor (or from the end of the `general_manager_profiles`, if no `before` cursor is provided).
 
     See the [Relay GraphQL Cursor Connections
     Specification](https://relay.dev/graphql/connections.htm#sec-Arguments) for more info.
@@ -10806,10 +10807,10 @@ type Query {
     last: Int
 
     """
-    Used to specify how the returned `general_manager_records` should be sorted.
+    Used to specify how the returned `general_manager_profiles` should be sorted.
     """
-    order_by: [GeneralManagerRecordSortOrderInput!]
-  ): GeneralManagerRecordConnection
+    order_by: [GeneralManagerProfileSortOrderInput!]
+  ): GeneralManagerProfileConnection
 
   """
   Aggregations over the `inventors` data:
@@ -16154,16 +16155,6 @@ enum TeamSortOrderInput {
   league_DESC
 
   """
-  Sorts ascending by the `staff.general_manager.career_wins` field.
-  """
-  staff_general_manager_career_wins_ASC
-
-  """
-  Sorts descending by the `staff.general_manager.career_wins` field.
-  """
-  staff_general_manager_career_wins_DESC
-
-  """
   Sorts ascending by the `staff.general_manager.id` field.
   """
   staff_general_manager_id_ASC
@@ -16182,6 +16173,16 @@ enum TeamSortOrderInput {
   Sorts descending by the `staff.general_manager.name` field.
   """
   staff_general_manager_name_DESC
+
+  """
+  Sorts ascending by the `staff.general_manager.salary` field.
+  """
+  staff_general_manager_salary_ASC
+
+  """
+  Sorts descending by the `staff.general_manager.salary` field.
+  """
+  staff_general_manager_salary_DESC
 }
 
 """
