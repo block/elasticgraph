@@ -118,7 +118,7 @@ module ElasticGraph
                 t.index "olap_queries"
               end
             end
-          }.to raise_error(Errors::SchemaError, a_string_including("OlapQuery", "cannot be both an indexed type and a namespace type"))
+          }.to raise_error(Errors::SchemaError, a_string_including("OlapQuery", "cannot be both an indexed type and a GraphQL-only type"))
         end
 
         it "raises a clear error if `Field#type_is_namespace?` is called before user definition is complete" do
