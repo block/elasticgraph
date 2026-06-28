@@ -103,6 +103,10 @@ module ElasticGraph
               "Indices must be configured during initial type definition."
           end
 
+          if graphql_only?
+            raise Errors::SchemaError, "`#{self.name}` cannot be both an indexed type and a GraphQL-only type."
+          end
+
           if @own_index_def
             raise Errors::SchemaError, "Cannot define multiple indices on `#{self.name}`. " \
               "Only one index per type is supported. An index named `#{@own_index_def.name}` has already been defined."

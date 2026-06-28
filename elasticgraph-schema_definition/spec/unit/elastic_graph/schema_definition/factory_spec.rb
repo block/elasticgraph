@@ -18,6 +18,14 @@ module ElasticGraph
         expect(object_type.name).to eq("Widget")
       end
 
+      it "can create a namespace type without a customization block" do
+        namespace_type = build_api.factory.new_namespace_type("WidgetNamespace")
+
+        expect(namespace_type.name).to eq("WidgetNamespace")
+        expect(namespace_type).to be_graphql_only
+        expect(namespace_type.default_graphql_resolver).to be nil
+      end
+
       it "can create an index without a customization block" do
         api = build_api
 
@@ -28,6 +36,33 @@ module ElasticGraph
 
         index = api.state.object_types_by_name.fetch("Widget").own_index_def
         expect(index.name).to eq("widgets")
+      end
+
+      it "builds namespace types through `new_object_type` so factory extensions that customize object types also apply to namespace types" do
+        marker = Module.new
+        customizer = Module.new do
+          define_method(:new_object_type) do |name, &block|
+            super(name) do |type|
+              type.extend(marker)
+              block&.call(type)
+            end
+          end
+        end
+
+        factory = build_api.factory
+        factory.extend(customizer)
+
+        object_type = factory.new_object_type("Widget")
+        customized_namespace_type = nil
+        namespace_type = factory.new_namespace_type("WidgetNamespace") do |type|
+          customized_namespace_type = type
+        end
+
+        expect(namespace_type).to be_a(SchemaElements::ObjectType)
+        # It also went through the overridden `new_object_type`, like an ordinary object type.
+        expect(object_type).to be_a(marker)
+        expect(namespace_type).to be_a(marker)
+        expect(customized_namespace_type).to be(namespace_type)
       end
 
       def build_api
