@@ -1,0 +1,145 @@
+module ElasticGraph
+  module Protobuf
+    module SchemaDefinition
+      class Schema
+        class FieldDefinition
+          attr_reader name: ::String
+          attr_reader type: ::String
+          attr_reader field_number: ::Integer
+          attr_reader repeated: bool
+          attr_reader comment: ::String?
+
+          def self.new: (
+            name: ::String,
+            type: ::String,
+            field_number: ::Integer,
+            repeated: bool,
+            comment: ::String?
+          ) -> instance
+        end
+
+        class MessageDefinition
+          attr_reader name: ::String
+          attr_reader fields: ::Array[FieldDefinition]
+
+          def self.new: (name: ::String, fields: ::Array[FieldDefinition]) -> instance
+        end
+
+        class EnumValueDefinition
+          attr_reader name: ::String
+          attr_reader number: ::Integer
+
+          def self.new: (name: ::String, number: ::Integer) -> instance
+        end
+
+        class EnumDefinition
+          attr_reader name: ::String
+          attr_reader zero_value_name: ::String
+          attr_reader values: ::Array[EnumValueDefinition]
+
+          def self.new: (
+            name: ::String,
+            zero_value_name: ::String,
+            values: ::Array[EnumValueDefinition]
+          ) -> instance
+        end
+
+        class FieldNumberMapping
+          attr_reader field_number: ::Integer
+          attr_reader name_in_index: ::String
+
+          def self.new: (field_number: ::Integer, name_in_index: ::String) -> instance
+        end
+
+        type fieldNumberMappingsByFieldName = ::Hash[::String, FieldNumberMapping]
+
+        SUPPORTED_SYNTAXES: ::Array[::String]
+
+        @syntax: ::String
+        @headers: ::Array[::String]
+        @state: ::ElasticGraph::SchemaDefinition::State
+        @package_name: ::String
+        @proto_enums_by_graphql_enum: ::Hash[::String, untyped]
+        @proto_field_number_mappings_by_message: ::Hash[::String, fieldNumberMappingsByFieldName]
+        @message_definitions_by_name: ::Hash[::String, MessageDefinition]
+        @enum_definitions_by_name: ::Hash[::String, EnumDefinition]
+        @generated_message_definitions_by_name: ::Hash[::String, MessageDefinition]
+        @wrapper_root_name_by_context: ::Hash[::Array[::String | ::Integer], ::String]
+        @type_name_by_message_name: ::Hash[::String, ::String]
+        @type_name_by_enum_name: ::Hash[::String, ::String]
+        @renamed_public_field_names_by_type_name: ::Hash[::String, ::Hash[::String, ::Array[::String]]]?
+
+        def initialize: (
+          state: ::ElasticGraph::SchemaDefinition::State,
+          package_name: ::String,
+          proto_enums_by_graphql_enum: untyped,
+          ?proto_field_number_mappings: untyped,
+          ?syntax: (::Symbol | ::String),
+          ?headers: ::Array[::String]
+        ) -> void
+
+        def to_proto: () -> ::String
+        def field_number_mappings_for_artifact: () -> ::Hash[::String, untyped]
+
+        private
+
+        def indexed_types: () -> ::Array[untyped]
+        def register_type: (untyped type) -> ::String
+        def register_message: (untyped type) -> void
+        def register_enum: (untyped enum_type) -> void
+        def enum_value_names_for: (untyped enum_type) -> ::Array[::String]
+        def enum_value_names_from_proto_mapping: (
+          enum_type_name: ::String,
+          proto_type: untyped,
+          options: ::Hash[untyped, untyped]
+        ) -> ::Array[::String]
+        def field_number_for: (
+          message_name: ::String,
+          type_name: ::String,
+          public_field_name: ::String,
+          name_in_index: ::String
+        ) -> ::Integer
+        def next_available_field_number_for: (fieldNumberMappingsByFieldName) -> ::Integer
+        def migrate_renamed_field_mapping: (
+          fieldNumberMappingsByFieldName,
+          type_name: ::String,
+          public_field_name: ::String
+        ) -> FieldNumberMapping?
+        def proto_field_type_for: (
+          ::ElasticGraph::SchemaDefinition::SchemaElements::TypeReference,
+          context_message_name: ::String,
+          context_field_name: ::String
+        ) -> [bool, ::String]
+        def list_depth_and_base_type: (
+          ::ElasticGraph::SchemaDefinition::SchemaElements::TypeReference
+        ) -> [::Integer, ::ElasticGraph::SchemaDefinition::SchemaElements::TypeReference]
+        def register_nested_list_wrappers: (
+          context_message_name: ::String,
+          context_field_name: ::String,
+          list_depth: ::Integer,
+          base_type_name: ::String
+        ) -> ::String
+        def unique_generated_message_name: (::String) -> ::String
+        def name_taken?: (::String) -> bool
+        def render_headers: () -> ::Array[::String]
+        def render_definitions: () -> ::String
+        def proto_enum_value_name: (::String, ::String) -> ::String
+        def proto_zero_enum_value_name: (::String) -> ::String
+        def enum_value_prefix: (::String) -> ::String
+        def render_enum: (EnumDefinition) -> ::String
+        def render_message: (MessageDefinition) -> ::String
+        def all_enum_definitions: () -> ::Array[EnumDefinition]
+        def all_message_definitions: () -> ::Array[MessageDefinition]
+        def to_title_case: (::String) -> ::String
+        def to_upper_snake_case: (::String | ::Symbol) -> ::String
+        def check_message_name_collision: (::String, ::String) -> void
+        def check_enum_name_collision: (::String, ::String) -> void
+        def normalize_proto_enum_mappings: (untyped) -> ::Hash[::String, untyped]
+        def normalize_proto_field_number_mappings: (untyped) -> ::Hash[::String, fieldNumberMappingsByFieldName]
+        def normalize_field_number_mapping_entry: (::String, ::String, untyped) -> [::Integer, ::String]
+        def renamed_public_field_names_by_type_name: () -> ::Hash[::String, ::Hash[::String, ::Array[::String]]]
+        def fetch_mapping_option: (::Hash[untyped, untyped], ::Symbol, untyped) -> untyped
+      end
+    end
+  end
+end

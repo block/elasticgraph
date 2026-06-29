@@ -34,7 +34,11 @@ module ElasticGraph
         ?extra_comment_lines: ::Array[::String]
       ) -> SchemaArtifact[::Hash[::String, untyped]]
 
-      def new_raw_artifact: (::String, ::String) -> SchemaArtifact[::String]
+      def new_raw_artifact: (
+        ::String,
+        ::String,
+        ?comment_prefix: ::String
+      ) -> SchemaArtifact[::String]
       def pruned_runtime_metadata: (::String) -> SchemaArtifacts::RuntimeMetadata::Schema
     end
 
@@ -44,13 +48,15 @@ module ElasticGraph
       attr_reader dumper: ^(T) -> ::String
       attr_reader loader: ^(::String) -> T
       attr_reader extra_comment_lines: ::Array[::String]
+      attr_reader comment_prefix: ::String
 
       def initialize: (
         ::String,
         T,
         ^(T) -> ::String,
         ^(::String) -> T,
-        ::Array[::String]) -> void
+        ::Array[::String],
+        ::String) -> void
     end
 
     class SchemaArtifact[T] < SchemaArtifactSupertype[T]
