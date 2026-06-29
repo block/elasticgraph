@@ -214,6 +214,18 @@ module ElasticGraph
           expect(result.delete("\n")).to eq("type WidgetOptions {}")
         end
 
+        it "raises a clear error when `index` is called on a GraphQL-only type" do
+          expect {
+            define_schema do |api|
+              api.object_type "Widget" do |t|
+                t.graphql_only true
+                t.field "id", "ID"
+                t.index "widgets"
+              end
+            end
+          }.to raise_error(Errors::SchemaError, a_string_including("Widget", "cannot be both an indexed type and a GraphQL-only type"))
+        end
+
         describe "#implements" do
           include_examples "#implements",
             graphql_definition_keyword: "type",
