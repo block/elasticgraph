@@ -24,10 +24,12 @@ json_schema_version: 1
         enum:
         - Address
         - BrokerWholesaler
+        - CoachProfile
         - Company
         - Component
         - DirectWholesaler
         - ElectricalPart
+        - GeneralManagerProfile
         - Manufacturer
         - MechanicalPart
         - OnlineStore
@@ -212,6 +214,94 @@ json_schema_version: 1
     required:
     - id
     - active
+  Coach:
+    type: object
+    properties:
+      id:
+        allOf:
+        - "$ref": "#/$defs/ID"
+        - maxLength: 8191
+        ElasticGraph:
+          type: ID!
+          nameInIndex: id
+      name:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/String"
+          - maxLength: 8191
+        - type: 'null'
+        ElasticGraph:
+          type: String
+          nameInIndex: name
+      __typename:
+        type: string
+        const: Coach
+        default: Coach
+    required:
+    - id
+    - name
+  CoachProfile:
+    type: object
+    properties:
+      id:
+        allOf:
+        - "$ref": "#/$defs/ID"
+        - maxLength: 8191
+        ElasticGraph:
+          type: ID!
+          nameInIndex: id
+      team_id:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/ID"
+          - maxLength: 8191
+        - type: 'null'
+        ElasticGraph:
+          type: ID
+          nameInIndex: team_id
+      coach_id:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/ID"
+          - maxLength: 8191
+        - type: 'null'
+        ElasticGraph:
+          type: ID
+          nameInIndex: coach_id
+      annual_salary:
+        anyOf:
+        - "$ref": "#/$defs/Int"
+        - type: 'null'
+        ElasticGraph:
+          type: Int
+          nameInIndex: annual_salary
+      team_league:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/String"
+          - maxLength: 8191
+        - type: 'null'
+        ElasticGraph:
+          type: String
+          nameInIndex: team_league
+      team_formed_on:
+        anyOf:
+        - "$ref": "#/$defs/Date"
+        - type: 'null'
+        ElasticGraph:
+          type: Date
+          nameInIndex: team_formed_on
+      __typename:
+        type: string
+        const: CoachProfile
+        default: CoachProfile
+    required:
+    - id
+    - team_id
+    - coach_id
+    - annual_salary
+    - team_league
+    - team_formed_on
   Color:
     type: string
     enum:
@@ -412,6 +502,84 @@ json_schema_version: 1
     - manufacturer_id
   Float:
     type: number
+  GeneralManager:
+    type: object
+    properties:
+      id:
+        allOf:
+        - "$ref": "#/$defs/ID"
+        - maxLength: 8191
+        ElasticGraph:
+          type: ID!
+          nameInIndex: id
+      name:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/String"
+          - maxLength: 8191
+        - type: 'null'
+        ElasticGraph:
+          type: String
+          nameInIndex: name
+      __typename:
+        type: string
+        const: GeneralManager
+        default: GeneralManager
+    required:
+    - id
+    - name
+  GeneralManagerProfile:
+    type: object
+    properties:
+      id:
+        allOf:
+        - "$ref": "#/$defs/ID"
+        - maxLength: 8191
+        ElasticGraph:
+          type: ID!
+          nameInIndex: id
+      team_id:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/ID"
+          - maxLength: 8191
+        - type: 'null'
+        ElasticGraph:
+          type: ID
+          nameInIndex: team_id
+      annual_salary:
+        anyOf:
+        - "$ref": "#/$defs/Int"
+        - type: 'null'
+        ElasticGraph:
+          type: Int
+          nameInIndex: annual_salary
+      team_league:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/String"
+          - maxLength: 8191
+        - type: 'null'
+        ElasticGraph:
+          type: String
+          nameInIndex: team_league
+      team_formed_on:
+        anyOf:
+        - "$ref": "#/$defs/Date"
+        - type: 'null'
+        ElasticGraph:
+          type: Date
+          nameInIndex: team_formed_on
+      __typename:
+        type: string
+        const: GeneralManagerProfile
+        default: GeneralManagerProfile
+    required:
+    - id
+    - team_id
+    - annual_salary
+    - team_league
+    - team_formed_on
   GeoLocation:
     type: object
     properties:
@@ -885,6 +1053,30 @@ json_schema_version: 1
     required:
     - sponsor_id
     - annual_total
+  Staff:
+    type: object
+    properties:
+      coaches:
+        type: array
+        items:
+          "$ref": "#/$defs/Coach"
+        ElasticGraph:
+          type: "[Coach!]!"
+          nameInIndex: coaches
+      general_manager:
+        anyOf:
+        - "$ref": "#/$defs/GeneralManager"
+        - type: 'null'
+        ElasticGraph:
+          type: GeneralManager
+          nameInIndex: general_manager
+      __typename:
+        type: string
+        const: Staff
+        default: Staff
+    required:
+    - coaches
+    - general_manager
   String:
     type: string
   Team:
@@ -1019,6 +1211,13 @@ json_schema_version: 1
         ElasticGraph:
           type: TeamNestedFields
           nameInIndex: nested_fields2
+      staff:
+        anyOf:
+        - "$ref": "#/$defs/Staff"
+        - type: 'null'
+        ElasticGraph:
+          type: Staff
+          nameInIndex: staff
       __typename:
         type: string
         const: Team
@@ -1042,6 +1241,7 @@ json_schema_version: 1
     - seasons_object
     - nested_fields
     - nested_fields2
+    - staff
     description: For more performant queries on this type, please filter on `league`
       if possible.
   TeamDetails:
