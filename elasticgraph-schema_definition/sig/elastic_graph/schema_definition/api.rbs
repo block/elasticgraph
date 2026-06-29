@@ -67,7 +67,7 @@ module ElasticGraph
 
       def raw_sdl: (::String) -> void
       def object_type: (::String) { (SchemaElements::ObjectType) -> void } -> void
-      def namespace_type: (::String) ?{ (SchemaElements::NamespaceType) -> void } -> void
+      def namespace_type: (::String) ?{ (SchemaElements::ObjectType) -> void } -> void
       def interface_type: (::String) { (SchemaElements::InterfaceType) -> void } -> void
       def enum_type: (::String) { (SchemaElements::EnumType) -> void } -> void
       def union_type: (::String) { (SchemaElements::UnionType) -> void } -> void

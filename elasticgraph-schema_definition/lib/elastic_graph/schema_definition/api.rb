@@ -151,7 +151,7 @@ module ElasticGraph
       #   intermediate namespace fields.
       #
       # @param name [String] name of the namespace type
-      # @yield [SchemaElements::NamespaceType] namespace type object, for further customization
+      # @yield [SchemaElements::ObjectType] namespace type object, for further customization
       # @return [void]
       #
       # @example Group an indexed type's root query fields under an `OlapQuery` namespace

@@ -27,7 +27,6 @@ require "elastic_graph/schema_definition/schema_elements/graphql_sdl_enumerator"
 require "elastic_graph/schema_definition/schema_elements/input_field"
 require "elastic_graph/schema_definition/schema_elements/input_type"
 require "elastic_graph/schema_definition/schema_elements/interface_type"
-require "elastic_graph/schema_definition/schema_elements/namespace_type"
 require "elastic_graph/schema_definition/schema_elements/object_type"
 require "elastic_graph/schema_definition/schema_elements/relationship"
 require "elastic_graph/schema_definition/schema_elements/scalar_type"
@@ -233,9 +232,12 @@ module ElasticGraph
       @@interface_type_new = prevent_non_factory_instantiation_of(SchemaElements::InterfaceType)
 
       def new_namespace_type(name, &block)
-        @@namespace_type_new.call(@state, name.to_s, &block)
+        new_object_type(name) do |type|
+          type.graphql_only true
+          type.resolve_fields_with nil
+          yield type if block_given?
+        end
       end
-      @@namespace_type_new = prevent_non_factory_instantiation_of(SchemaElements::NamespaceType)
 
       def new_object_type(name)
         @@object_type_new.call(@state, name.to_s) do |object_type|
