@@ -331,7 +331,7 @@ RSpec.shared_context "datastore support", :capture_logs do
         destination_index_mapping = indexer.schema_artifacts.index_mappings_by_index_def_name.fetch(index_def.name)
         ElasticGraph::Indexer::Operation::Update.new(
           event: event,
-          prepared_record: indexer.record_preparer_factory.for_latest_json_schema_version.prepare_for_index(
+          prepared_record: indexer.record_preparer_factory.for_latest_schema_version.prepare_for_index(
             event.fetch("type"),
             event.fetch("record"),
             destination_index_mapping.fetch("properties")

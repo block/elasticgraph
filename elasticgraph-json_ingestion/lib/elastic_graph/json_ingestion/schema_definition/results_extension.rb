@@ -35,9 +35,26 @@ module ElasticGraph
           @available_json_schema_versions ||= Set[latest_json_schema_version]
         end
 
+        # @return [Set<Integer>] set of available schema versions
+        def available_schema_versions
+          available_json_schema_versions
+        end
+
         # @return [Integer] the current JSON schema version
         def latest_json_schema_version
           current_public_json_schema[JSON_SCHEMA_VERSION_KEY]
+        end
+
+        # @return [Integer] the current schema version
+        def latest_schema_version
+          latest_json_schema_version
+        end
+
+        # @param event [Hash<String, Object>] the ElasticGraph indexing event
+        # @param schema_version [Integer] the schema artifact version selected for validation
+        # @return [Hash<String, Object>]
+        def event_for_schema_version_validation(event, schema_version)
+          event.except(SCHEMA_VERSION_KEY).merge(JSON_SCHEMA_VERSION_KEY => schema_version)
         end
 
         # @private

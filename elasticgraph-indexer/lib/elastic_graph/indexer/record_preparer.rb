@@ -11,7 +11,7 @@ require "elastic_graph/errors"
 module ElasticGraph
   class Indexer
     class RecordPreparer
-      # Provides the ability to get a `RecordPreparer` for a specific JSON schema version.
+      # Provides the ability to get a `RecordPreparer` for a specific schema artifact version.
       class Factory
         def initialize(schema_artifacts)
           @schema_artifacts = schema_artifacts
@@ -21,7 +21,7 @@ module ElasticGraph
             hash[type_name] = scalar_types_by_name[type_name]&.load_indexing_preparer&.extension_class
           end # : ::Hash[::String, SchemaArtifacts::RuntimeMetadata::extensionClass?]
 
-          @preparers_by_json_schema_version = ::Hash.new do |hash, version|
+          @preparers_by_schema_version = ::Hash.new do |hash, version|
             hash[version] = RecordPreparer.new(
               indexing_preparer_by_scalar_type_name,
               build_type_metas_from(@schema_artifacts.json_schemas_for(version))
@@ -29,15 +29,15 @@ module ElasticGraph
           end
         end
 
-        # Gets the `RecordPreparer` for the given JSON schema version.
-        def for_json_schema_version(json_schema_version)
-          @preparers_by_json_schema_version[json_schema_version] # : RecordPreparer
+        # Gets the `RecordPreparer` for the given schema artifact version.
+        def for_schema_version(schema_version)
+          @preparers_by_schema_version[schema_version] # : RecordPreparer
         end
 
-        # Gets the `RecordPreparer` for the latest JSON schema version. Intended primarily
+        # Gets the `RecordPreparer` for the latest schema artifact version. Intended primarily
         # for use in tests for convenience.
-        def for_latest_json_schema_version
-          for_json_schema_version(@schema_artifacts.latest_json_schema_version)
+        def for_latest_schema_version
+          for_schema_version(@schema_artifacts.latest_schema_version)
         end
 
         private

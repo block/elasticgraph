@@ -24,7 +24,7 @@ module ElasticGraph
         # Strips indexed-type-only keys, converting an indexed factory hash
         # to one suitable for embedding in another record.
         def as_embedded
-          except(:__version, :__json_schema_version)
+          except(:__version, :__schema_version)
         end
       end
     end
@@ -94,7 +94,7 @@ FactoryBot.define do
     # For tests that really care about the version, they override it to control this more tightly.
     __version { version_counter += 1 }
     __typename { raise NotImplementedError, "You must supply __typename." }
-    __json_schema_version { 1 }
+    __schema_version { 1 }
     id { Faker::Alphanumeric.alpha(number: 20) }
   end
 

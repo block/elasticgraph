@@ -35,21 +35,21 @@ module ElasticGraph
         }).record_preparer_factory
       end
 
-      describe "#for_json_schema_version" do
+      describe "#for_schema_version" do
         it "memoizes `RecordPreparer` since they are immutable and that saves on memory" do
-          for_v1 = factory_with_multiple_versions.for_json_schema_version(1)
-          for_v2 = factory_with_multiple_versions.for_json_schema_version(2)
+          for_v1 = factory_with_multiple_versions.for_schema_version(1)
+          for_v2 = factory_with_multiple_versions.for_schema_version(2)
 
           expect(for_v1).not_to eq(for_v2)
-          expect(factory_with_multiple_versions.for_json_schema_version(1)).to be for_v1
+          expect(factory_with_multiple_versions.for_schema_version(1)).to be for_v1
         end
       end
 
-      describe "#for_latest_json_schema_version" do
-        it "returns the record preparer for the latest JSON schema version" do
-          for_v2 = factory_with_multiple_versions.for_json_schema_version(2)
+      describe "#for_latest_schema_version" do
+        it "returns the record preparer for the latest schema version" do
+          for_v2 = factory_with_multiple_versions.for_schema_version(2)
 
-          expect(factory_with_multiple_versions.for_latest_json_schema_version).to be for_v2
+          expect(factory_with_multiple_versions.for_latest_schema_version).to be for_v2
         end
       end
     end
@@ -572,7 +572,7 @@ module ElasticGraph
 
           allow(v2_results).to receive(:json_schemas_for).with(1).and_return(v1_merge_result.json_schema)
 
-          RecordPreparer::Factory.new(v2_results).for_json_schema_version(1)
+          RecordPreparer::Factory.new(v2_results).for_schema_version(1)
         end
 
         def define_schema(&schema_definition)
@@ -587,12 +587,12 @@ module ElasticGraph
       def build_preparer(**config_overrides, &schema_definition)
         build_indexer(schema_definition: schema_definition, **config_overrides)
           .record_preparer_factory
-          .for_latest_json_schema_version
+          .for_latest_schema_version
       end
 
       def build_preparer_with_artifacts(**config_overrides, &schema_definition)
         indexer = build_indexer(schema_definition: schema_definition, **config_overrides)
-        preparer = indexer.record_preparer_factory.for_latest_json_schema_version
+        preparer = indexer.record_preparer_factory.for_latest_schema_version
         [preparer, indexer.schema_artifacts]
       end
     end

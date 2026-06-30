@@ -11,13 +11,13 @@ module ElasticGraph
       class Factory
         def initialize: (schemaArtifacts) -> void
 
-        def for_json_schema_version: (::Integer) -> RecordPreparer
-        def for_latest_json_schema_version: () -> RecordPreparer
+        def for_schema_version: (::Integer) -> RecordPreparer
+        def for_latest_schema_version: () -> RecordPreparer
 
         private
 
         @schema_artifacts: schemaArtifacts
-        @preparers_by_json_schema_version: ::Hash[::Integer, RecordPreparer]
+        @preparers_by_schema_version: ::Hash[::Integer, RecordPreparer]
 
         def build_type_metas_from: (::Hash[::String, untyped]) -> ::Array[TypeMetadata]
       end

@@ -601,7 +601,7 @@ module ElasticGraph
 
         arguments = {
           event: event,
-          prepared_record: indexer.record_preparer_factory.for_latest_json_schema_version.prepare_for_index(
+          prepared_record: indexer.record_preparer_factory.for_latest_schema_version.prepare_for_index(
             event.fetch("type"),
             event.fetch("record"),
             destination_index_mapping.fetch("properties")

@@ -92,6 +92,13 @@ module ElasticGraph
         end
       end
 
+      # Provides the set of available schema versions for indexing events.
+      #
+      # @return [Set<Integer>]
+      def available_schema_versions
+        available_json_schema_versions
+      end
+
       # Provides the latest JSON schema version.
       #
       # @return [Integer]
@@ -108,6 +115,22 @@ module ElasticGraph
           "The directory for versioned JSON schemas (#{::File.join(artifacts_dir, JSON_SCHEMAS_BY_VERSION_DIRECTORY)}) could not be found. " \
           "Either the schema artifacts haven't been dumped yet or the schema artifacts directory (#{artifacts_dir}) is misconfigured."
         )
+      end
+
+      # Provides the latest schema version for indexing events.
+      #
+      # @return [Integer]
+      def latest_schema_version
+        latest_json_schema_version
+      end
+
+      # Adapts an indexing event for validating it against the schema artifact at the given version.
+      #
+      # @param event [Hash<String, Object>] the ElasticGraph indexing event
+      # @param schema_version [Integer] the schema artifact version selected for validation
+      # @return [Hash<String, Object>]
+      def event_for_schema_version_validation(event, schema_version)
+        event.except(SCHEMA_VERSION_KEY).merge(JSON_SCHEMA_VERSION_KEY => schema_version)
       end
 
       # Provides the datastore configuration. The datastore configuration defines the full configuration--including indices, templates,
