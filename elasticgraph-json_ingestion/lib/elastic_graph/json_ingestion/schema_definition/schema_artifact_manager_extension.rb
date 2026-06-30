@@ -22,10 +22,10 @@ module ElasticGraph
         # Overrides `dump_artifacts` to add JSON schema version bump checking before dumping.
         def dump_artifacts
           schema_results = json_ingestion_schema_definition_results
-          state = json_ingestion_state
+          ingestion_state = json_ingestion_state
 
           json_ingestion_check_if_needs_json_schema_version_bump do |recommended_json_schema_version|
-            if state.enforce_json_schema_version
+            if ingestion_state.enforce_json_schema_version
               # @type var setter_location: ::Thread::Backtrace::Location
               # We use `_ =` because while `json_schema_version_setter_location` can be nil,
               # it'll never be nil if we get here and we want the type to be non-nilable.
@@ -59,7 +59,8 @@ module ElasticGraph
         end
 
         def json_ingestion_state
-          json_ingestion_schema_definition_results.state # : ElasticGraph::SchemaDefinition::State & StateExtension
+          extension_state = json_ingestion_schema_definition_results.state # : ElasticGraph::SchemaDefinition::State & StateExtension
+          extension_state.json_ingestion_state
         end
 
         # Overrides the base `artifacts_from_schema_def` method to add JSON schema artifacts.

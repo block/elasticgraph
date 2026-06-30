@@ -19,12 +19,13 @@ module ElasticGraph
       class JSONSchemaBuilder
         def initialize(state:, all_types:, derived_indexing_type_names:)
           @state = state
+          @json_ingestion_state = state.json_ingestion_state
           @all_types = all_types
           @derived_indexing_type_names = derived_indexing_type_names
         end
 
         def public_json_schema
-          json_schema_version = @state.json_schema_version
+          json_schema_version = @json_ingestion_state.json_schema_version
           if json_schema_version.nil?
             raise Errors::SchemaError, "`json_schema_version` must be specified in the schema. To resolve, add `schema.json_schema_version 1` in a schema definition block."
           end

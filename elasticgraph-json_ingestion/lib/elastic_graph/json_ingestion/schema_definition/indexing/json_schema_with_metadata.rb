@@ -52,13 +52,14 @@ module ElasticGraph
             attr_reader :unused_deprecated_elements
 
             def initialize(schema_def_results)
-              json_ingestion_state = schema_def_results.state # : ::ElasticGraph::SchemaDefinition::State & SchemaDefinition::StateExtension
+              state = schema_def_results.state # : ::ElasticGraph::SchemaDefinition::State & SchemaDefinition::StateExtension
+              json_ingestion_state = state.json_ingestion_state
               @field_metadata_by_type_and_field_name = schema_def_results.json_schema_field_metadata_by_type_and_field_name
               @renamed_types_by_old_name = json_ingestion_state.renamed_types_by_old_name
               @deleted_types_by_old_name = json_ingestion_state.deleted_types_by_old_name
               @renamed_fields_by_type_name_and_old_field_name = json_ingestion_state.renamed_fields_by_type_name_and_old_field_name
               @deleted_fields_by_type_name_and_old_field_name = json_ingestion_state.deleted_fields_by_type_name_and_old_field_name
-              @state = schema_def_results.state
+              @state = state
               @derived_indexing_type_names = schema_def_results.derived_indexing_type_names
 
               @unused_deprecated_elements = (

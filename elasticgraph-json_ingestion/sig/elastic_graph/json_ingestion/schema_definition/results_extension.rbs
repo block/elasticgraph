@@ -20,7 +20,7 @@ module ElasticGraph
         @json_ingestion_json_schema_builder: JSONSchemaBuilder?
         @json_ingestion_json_schema_with_metadata_merger: Indexing::JSONSchemaWithMetadata::Merger?
 
-        def json_ingestion_state: () -> (::ElasticGraph::SchemaDefinition::State & StateExtension)
+        def json_ingestion_state: () -> JSONIngestionState
         def json_ingestion_json_schema_builder: () -> JSONSchemaBuilder
         def json_ingestion_json_schema_with_metadata_merger: () -> Indexing::JSONSchemaWithMetadata::Merger
       end

@@ -97,7 +97,7 @@ module ElasticGraph
       ElasticGraph.define_schema do |schema|
         # `schema.json_schema_version` raises an error when the version is set more than once.
         # By default we set it above. Here we clear it to allow our example to set it.
-        schema.state.json_schema_version = nil
+        schema.state.json_ingestion_state.json_schema_version = nil
       end
     end
 

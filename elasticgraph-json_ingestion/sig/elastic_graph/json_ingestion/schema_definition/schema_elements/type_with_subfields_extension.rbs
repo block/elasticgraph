@@ -11,7 +11,7 @@ module ElasticGraph
 
           private
 
-          def json_ingestion_state: () -> (::ElasticGraph::SchemaDefinition::State & SchemaDefinition::StateExtension)
+          def json_ingestion_state: () -> SchemaDefinition::JSONIngestionState
         end
       end
     end

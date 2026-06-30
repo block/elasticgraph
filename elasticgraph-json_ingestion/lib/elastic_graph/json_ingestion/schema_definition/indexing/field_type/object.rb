@@ -57,7 +57,8 @@ module ElasticGraph
                   json_schema_subfields = json_schema_candidate_subfields.reject(&:runtime_field_script)
                   required_fields = json_schema_subfields
                   state = schema_def_state # : ::ElasticGraph::SchemaDefinition::State & ::ElasticGraph::JSONIngestion::SchemaDefinition::StateExtension
-                  required_fields = required_fields.reject(&:nullable?) if state.allow_omitted_json_schema_fields
+                  json_ingestion_state = state.json_ingestion_state
+                  required_fields = required_fields.reject(&:nullable?) if json_ingestion_state.allow_omitted_json_schema_fields
 
                   {
                     "type" => "object",
@@ -66,7 +67,7 @@ module ElasticGraph
                     # we want it validated (as we do by merging in `json_schema_typename_field`) but we only want
                     # to require it in the context of a union type. The union's JSON schema requires the field.
                     "required" => required_fields.map(&:name).freeze,
-                    "additionalProperties" => (false unless state.allow_extra_json_schema_fields),
+                    "additionalProperties" => (false unless json_ingestion_state.allow_extra_json_schema_fields),
                     "description" => doc_comment
                   }.compact.freeze
                 else
