@@ -315,7 +315,7 @@ module ElasticGraph
         else
           props = json_schema_def.fetch("properties")
           data.to_h do |field_name, field_value|
-            unless [:__version, :__typename, :__json_schema_version].include?(field_name)
+            unless [:__version, :__typename, :__schema_version].include?(field_name)
               field_type = props.fetch(word_to_snake_case(field_name.to_s)).fetch("ElasticGraph").fetch("type")[/\w+/]
               field_value = update_enum_values_in(field_value, json_schema_defs, field_type)
             end

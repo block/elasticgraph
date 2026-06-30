@@ -19,7 +19,8 @@ module ElasticGraph
 
       private
 
-      def select_json_schema_version: (Indexer::event) { (Indexer::IngestionAdapter::ValidationResult) -> bot } -> (::Integer | bot)
+      def event_for_json_schema_validation: (Indexer::event, ::Integer) -> ::Hash[::String, untyped]
+      def select_schema_version: (Indexer::event) { (Indexer::IngestionAdapter::ValidationResult) -> bot } -> (::Integer | bot)
       def validator: (::String, ::Integer) -> Support::JSONSchema::Validator
 
       @validator_factories_by_version: ::Hash[::Integer, Support::JSONSchema::ValidatorFactory]?
