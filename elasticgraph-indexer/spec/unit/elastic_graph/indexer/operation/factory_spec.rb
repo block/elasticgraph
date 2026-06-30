@@ -37,7 +37,7 @@ module ElasticGraph
               "type" => "Widget",
               "version" => 1,
               "record" => event["record"],
-              JSON_SCHEMA_VERSION_KEY => 1
+              SCHEMA_VERSION_KEY => 1
             }
 
             expect(build_expecting_success(event)).to contain_exactly(
@@ -103,7 +103,7 @@ module ElasticGraph
                 "type" => "Component",
                 "version" => 1,
                 "record" => event["record"],
-                JSON_SCHEMA_VERSION_KEY => 1
+                SCHEMA_VERSION_KEY => 1
               })])
             end
 
@@ -212,7 +212,7 @@ module ElasticGraph
                 "type" => "Widget",
                 "version" => 1,
                 "record" => event["record"],
-                JSON_SCHEMA_VERSION_KEY => 1
+                SCHEMA_VERSION_KEY => 1
               }
 
               expect(build_expecting_success(event)).to contain_exactly(
@@ -335,7 +335,7 @@ module ElasticGraph
               "type" => "Component",
               "version" => 1,
               "record" => event["record"],
-              JSON_SCHEMA_VERSION_KEY => 1
+              SCHEMA_VERSION_KEY => 1
             }.merge(latency_timestamps))])
           end
 
@@ -345,7 +345,7 @@ module ElasticGraph
               "id" => "1",
               "type" => "MyOwnInvalidGraphQlType",
               "version" => 1,
-              JSON_SCHEMA_VERSION_KEY => 1,
+              SCHEMA_VERSION_KEY => 1,
               "record" => {"field1" => "value1", "field2" => "value2", "id" => "1"}
             }
 
@@ -359,7 +359,7 @@ module ElasticGraph
               "id" => "1",
               "type" => "WidgetOptions",
               "version" => 1,
-              JSON_SCHEMA_VERSION_KEY => 1,
+              SCHEMA_VERSION_KEY => 1,
               "record" => {"field1" => "value1", "field2" => "value2", "id" => "1"}
             }
 
@@ -376,17 +376,17 @@ module ElasticGraph
             expect_failed_event_error(event, "missing_keys", "type", expect_no_ops: true)
           end
 
-          it "notifies an error on missing `#{JSON_SCHEMA_VERSION_KEY}`" do
-            event = build_upsert_event(:component).except(JSON_SCHEMA_VERSION_KEY)
+          it "notifies an error on missing `#{SCHEMA_VERSION_KEY}`" do
+            event = build_upsert_event(:component).except(SCHEMA_VERSION_KEY)
 
-            expect_failed_event_error(event, JSON_SCHEMA_VERSION_KEY)
+            expect_failed_event_error(event, SCHEMA_VERSION_KEY)
           end
 
           it "notifies an error on wrong field types" do
             event = {
               "op" => "upsert",
               "id" => 1,
-              JSON_SCHEMA_VERSION_KEY => 1,
+              SCHEMA_VERSION_KEY => 1,
               "type" => [],
               "version" => "1",
               "record" => ""

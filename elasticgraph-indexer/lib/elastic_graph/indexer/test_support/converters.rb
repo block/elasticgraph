@@ -21,8 +21,8 @@ module ElasticGraph
             "id" => record.fetch("id"),
             "type" => record.fetch("__typename"),
             "version" => record.fetch("__version"),
-            "record" => record.except("__typename", "__version", "__json_schema_version"),
-            JSON_SCHEMA_VERSION_KEY => record.fetch("__json_schema_version")
+            "record" => record.except("__typename", "__version", "__schema_version"),
+            SCHEMA_VERSION_KEY => record.fetch("__schema_version")
           }
         end
 

@@ -26,6 +26,14 @@ module ElasticGraph
         ])
       end
 
+      it "maps `json_schema_version` to the generic `schema_version` key" do
+        decoder = IndexingEventDecoder.new(config: {}, schema_artifacts: nil, logger: nil) # args are not used
+
+        expect(decoder.decode('{"op":"upsert","id":"1","json_schema_version":3}')).to eq([
+          {"op" => "upsert", "id" => "1", SCHEMA_VERSION_KEY => 3}
+        ])
+      end
+
       it "implements the indexing event decoder interface defined by `elasticgraph-indexer`" do
         loader = SchemaArtifacts::RuntimeMetadata::ExtensionLoader.new(Indexer::IndexingEventDecoder::Interface)
 

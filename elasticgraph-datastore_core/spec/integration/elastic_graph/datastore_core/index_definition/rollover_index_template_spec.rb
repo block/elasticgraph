@@ -54,7 +54,7 @@ module ElasticGraph
               "created_at" => "2019-06-02T12:00:00Z",
               "__typename" => "Widget",
               "__version" => 1,
-              "__json_schema_version" => 1
+              "__schema_version" => 1
             }
             index_name_for_writes = index_definition.index_name_for_writes(record)
             derive_index_from_template(record, datastore_core)
