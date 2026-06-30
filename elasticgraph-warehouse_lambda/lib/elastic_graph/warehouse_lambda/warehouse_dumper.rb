@@ -34,20 +34,20 @@ module ElasticGraph
       end
 
       # Processes a batch of indexing operations by dumping them to S3 as gzipped JSONL files.
-      # Operations are grouped by GraphQL type and JSON schema version, with each group written to a separate file.
+      # Operations are grouped by GraphQL type and schema version, with each group written to a separate file.
       #
       # @param operations [Array<Operation>] the indexing operations to process
       # @param refresh [Boolean] ignored (included for interface compatibility with DatastoreIndexingRouter)
       # @return [BulkResult] result containing success status for all operations
       def bulk(operations, refresh: false)
-        operations_by_type_and_json_schema_version = operations.group_by { |op| [op.event.fetch("type"), op.event.fetch(JSON_SCHEMA_VERSION_KEY)] }
+        operations_by_type_and_schema_version = operations.group_by { |op| [op.event.fetch("type"), op.event.fetch(SCHEMA_VERSION_KEY)] }
 
         @logger.info({
           "message_type" => LOG_MSG_RECEIVED_BATCH,
-          "record_counts_by_type" => operations_by_type_and_json_schema_version.transform_keys { |(type, _json_schema_version)| type }.transform_values(&:size)
+          "record_counts_by_type" => operations_by_type_and_schema_version.transform_keys { |(type, _schema_version)| type }.transform_values(&:size)
         })
 
-        operations_by_type_and_json_schema_version.each do |(type, json_schema_version), operations|
+        operations_by_type_and_schema_version.each do |(type, schema_version), operations|
           # Operations coming from the indexer are always Update operations for warehouse dumping
           update_operations = operations # : ::Array[::ElasticGraph::Indexer::Operation::Update]
           jsonl_data = build_jsonl_file_from(update_operations)
@@ -56,7 +56,7 @@ module ElasticGraph
           next if jsonl_data.empty?
 
           gzip_data = compress(jsonl_data)
-          s3_key = generate_s3_key_for(type, json_schema_version)
+          s3_key = generate_s3_key_for(type, schema_version)
 
           # Use if_none_match: "*" to prevent overwrites (defense-in-depth, though UUIDs make collisions impossible)
           @s3_client.put_object(
@@ -72,7 +72,7 @@ module ElasticGraph
             "s3_bucket" => @s3_bucket_name,
             "s3_key" => s3_key,
             "type" => type,
-            JSON_SCHEMA_VERSION_KEY => json_schema_version,
+            SCHEMA_VERSION_KEY => schema_version,
             "record_count" => operations.size,
             "json_size" => jsonl_data.bytesize,
             "gzip_size" => gzip_data.bytesize
@@ -97,14 +97,14 @@ module ElasticGraph
 
       private
 
-      def generate_s3_key_for(type, json_schema_version)
+      def generate_s3_key_for(type, schema_version)
         date = @clock.now.utc.strftime("%Y-%m-%d")
         uuid = ::SecureRandom.uuid
 
         [
           @s3_file_prefix,
           type,
-          "v#{json_schema_version}",
+          "v#{schema_version}",
           date,
           "#{uuid}.jsonl.gz"
         ].join("/")

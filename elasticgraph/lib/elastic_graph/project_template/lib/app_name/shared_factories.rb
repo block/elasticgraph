@@ -20,7 +20,9 @@ FactoryBot.define do
 
   factory :indexed_type_base, parent: :hash_base, traits: [:uuid_id, :versioned] do
     __typename { raise NotImplementedError, "You must supply __typename" }
-    __json_schema_version do
+    # The JSON schema version identifies the schema of each generated record. The indexing event
+    # uses the ingestion-format-neutral `schema_version` key, so name the factory attribute to match.
+    __schema_version do
       current_json_schema_version ||= begin
         json_schema_file = File.expand_path("../../config/schema/artifacts/json_schemas.yaml", __dir__)
         YAML.safe_load_file(json_schema_file).fetch("json_schema_version")

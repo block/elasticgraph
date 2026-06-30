@@ -4,7 +4,7 @@ Write ElasticGraph-shaped JSONL files to S3, packaged for AWS Lambda.
 
 This gem adapts ElasticGraph's indexing pipeline so that, instead of writing to the datastore,
 it writes batched, gzipped [JSON Lines](https://jsonlines.org/) (JSONL) files to Amazon S3. Each line in the file
-conforms to a specific JSON Schema version for the corresponding object type, with files partitioned by schema version.
+conforms to a specific schema version for the corresponding object type, with files partitioned by schema version.
 
 **Note:** This code does not deduplicate when writing to S3, so the data will contain all events
 and versions published, plus any Lambda retries. Consumers of the S3 bucket are responsible for
@@ -33,10 +33,10 @@ graph LR;
 
 ## What it does
 
-- Consumes ElasticGraph indexing operations and groups them by GraphQL type and JSON schema version
+- Consumes ElasticGraph indexing operations and groups them by GraphQL type and schema version
 - Transforms each operation into a flattened JSON document that matches your ElasticGraph schema
-- Writes one gzipped JSONL file per type per JSON schema version per batch to S3 with deterministic keys:
-  - `s3://<bucket>/<s3_path_prefix>/<TypeName>/v<json_schema_version>/<YYYY-MM-DD>/<uuid>.jsonl.gz`
+- Writes one gzipped JSONL file per type per schema version per batch to S3 with deterministic keys:
+  - `s3://<bucket>/<s3_path_prefix>/<TypeName>/v<schema_version>/<YYYY-MM-DD>/<uuid>.jsonl.gz`
 - Emits structured logs for observability (counts, sizes, S3 key, etc.)
 
 ## When to use it
@@ -67,13 +67,13 @@ warehouse:
 Files are written with the following S3 key format:
 
 ```
-<s3_path_prefix>/<TypeName>/v<json_schema_version>/<YYYY-MM-DD>/<uuid>.jsonl.gz
+<s3_path_prefix>/<TypeName>/v<schema_version>/<YYYY-MM-DD>/<uuid>.jsonl.gz
 ```
 
 - **s3_path_prefix**: Configurable in YAML (warehouse.s3_path_prefix). This is the full prefix you control,
   so you can organize your data however you like (e.g., "dumped-data/Data001" or "prod/analytics/v2").
 - **TypeName**: GraphQL type from the ElasticGraph event
-- **json_schema_version**: The JSON Schema version **selected based on the ingested event's requested version**
+- **schema_version**: The schema version **selected based on the ingested event's requested version**
   (or the closest available version if the exact version isn't available). This ensures data partitioning
   matches the actual schema version used to process each event, making it easier to handle schema evolution
   and version-specific data processing.

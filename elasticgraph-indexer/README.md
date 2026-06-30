@@ -89,3 +89,7 @@ module MyCompany
   end
 end
 ```
+
+Decoded event hashes do not need to provide a schema version. When a version is omitted, the latest
+available schema artifact version is used for validation and record preparation. Decoders may include
+`schema_version` to request a specific schema artifact version.

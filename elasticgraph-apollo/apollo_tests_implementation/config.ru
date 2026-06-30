@@ -107,7 +107,7 @@ events = records_by_type.flat_map do |type_name, records|
     {
       __typename: type_name,
       __version: 1,
-      __json_schema_version: 1
+      __schema_version: 1
     }.merge(record)
   end
 
