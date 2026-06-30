@@ -205,7 +205,9 @@ module ElasticGraph
           end
 
           @parent_ref = ParentRef.new(
-            type_ref: schema_def_state.type_ref(parent_type_name),
+            # `to_final_form` applies any configured `type_name_overrides` (consistent with `relates_to_*`), so
+            # the stored ref resolves against the schema's actual (possibly overridden) type names.
+            type_ref: schema_def_state.type_ref(parent_type_name).to_final_form,
             relationship_name: parent_relationship_name,
             field_name: embedded_at
           )

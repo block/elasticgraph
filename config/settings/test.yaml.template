@@ -34,8 +34,10 @@ datastore:
       setting_overrides:
         number_of_shards: 1
       setting_overrides_by_timestamp: {}
+    coach_profiles: *main_index_settings
     components: *main_index_settings
     electrical_parts: *main_index_settings
+    general_manager_profiles: *main_index_settings
     named_inventors: *main_index_settings
     manufacturers: *main_index_settings
     mechanical_parts: *main_index_settings

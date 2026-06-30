@@ -145,10 +145,12 @@ module ElasticGraph
             prepared_record: prepared_record
           )
 
-          # The normal indexing script uses `__counts`. Other indexing scripts (e.g. the ones generated
-          # for derived indexing) do not use `__counts` so there's no point in spending effort on computing
-          # it. Plus, the logic below raises an exception in that case, so it's important we avoid it.
+          # `__counts` and `sourcedFromNestedPaths` are only used by the normal indexing script. Other
+          # scripts (e.g. derived indexing) don't use them, and the `__counts` logic below raises if applied
+          # to them, so we bail out early.
           return initial_params unless update_target.for_normal_indexing?
+
+          initial_params["sourcedFromNestedPaths"] = destination_index_def.sourced_from_nested_paths_as_painless_param
 
           CountAccumulator.merge_list_counts_into(
             initial_params,

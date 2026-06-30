@@ -78,6 +78,8 @@ FactoryBot.define do
 
     nested_fields2 { nested_fields }
 
+    staff { build :staff }
+
     transient do
       sponsors { [] }
       current_players do
@@ -88,6 +90,44 @@ FactoryBot.define do
         Array.new(Faker::Number.between(from: 2, to: 5)) { build :team_season }.uniq { |h| h.fetch(:year) }
       end
     end
+  end
+
+  factory :staff, parent: :hash_base do
+    __typename { "Staff" }
+    coaches { Array.new(Faker::Number.between(from: 2, to: 5)) { build :coach } }
+    general_manager { build :general_manager }
+  end
+
+  factory :coach, parent: :hash_base do
+    __typename { "Coach" }
+    id { Faker::Alphanumeric.alpha(number: 20) }
+    name { Faker::Name.name }
+    # `salary` is intentionally omitted: it is a nested `sourced_from` field, filled in from a
+    # `:coach_profile` event rather than provided on the embedded element.
+  end
+
+  factory :general_manager, parent: :hash_base do
+    __typename { "GeneralManager" }
+    id { Faker::Alphanumeric.alpha(number: 20) }
+    name { Faker::Name.name }
+    # `salary` is sourced from a `:general_manager_profile`; see the note on `:coach`.
+  end
+
+  factory :coach_profile, parent: :indexed_type do
+    __typename { "CoachProfile" }
+    team_id { Faker::Alphanumeric.alpha(number: 20) }
+    coach_id { Faker::Alphanumeric.alpha(number: 20) }
+    annual_salary { Faker::Number.between(from: 50000, to: 100000) }
+    team_league { Faker::Base.sample(leagues) }
+    team_formed_on { Faker::Date.between(from: recent_date - (5 * 365), to: recent_date - 365).iso8601 }
+  end
+
+  factory :general_manager_profile, parent: :indexed_type do
+    __typename { "GeneralManagerProfile" }
+    team_id { Faker::Alphanumeric.alpha(number: 20) }
+    annual_salary { Faker::Number.between(from: 100000, to: 150000) }
+    team_league { Faker::Base.sample(leagues) }
+    team_formed_on { Faker::Date.between(from: recent_date - (5 * 365), to: recent_date - 365).iso8601 }
   end
 
   factory :team_details, parent: :hash_base do
