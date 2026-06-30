@@ -9,6 +9,7 @@
 require_relative "../../../../script/list_eg_gems"
 require "elastic_graph/support/json_schema/meta_schema_validator"
 require "elastic_graph/support/json_schema/validator"
+require "yaml"
 
 module ElasticGraph
   RSpec.describe "ElasticGraph gems" do
@@ -195,6 +196,24 @@ module ElasticGraph
         extra_config_attributes = (gem_name == "elasticgraph-graphql") ? [:extension_settings] : []
         include_examples "an ElasticGraph gem", gem_name, extra_config_attributes: extra_config_attributes
       end
+    end
+
+    # Every EG gem that ships RBS signatures (i.e. has a `sig` directory) must be listed in
+    # `rbs_collection.yaml` with `ignore: true`. Otherwise, `rbs collection install` pulls the
+    # gem's signatures in via bundler while those same signatures _also_ exist locally in this
+    # monorepo, and Steep fails with "declaration is duplicated" errors. The bootstrap gem
+    # `elasticgraph` (no dash) ships no signatures, so it is intentionally excluded.
+    it "ignores every EG gem that ships RBS signatures in `rbs_collection.yaml` to avoid Steep `declaration is duplicated` errors" do
+      eg_gems_with_sig = ::ElasticGraphGems.list.select do |gem_name|
+        ::File.directory?(::File.join(CommonSpecHelpers::REPO_ROOT, gem_name, "sig"))
+      end
+
+      rbs_config = ::YAML.safe_load_file(::File.join(CommonSpecHelpers::REPO_ROOT, "rbs_collection.yaml"))
+      ignored_eg_gems = rbs_config.fetch("gems")
+        .select { |gem| gem.fetch("name").start_with?("elasticgraph") && gem["ignore"] == true }
+        .map { |gem| gem.fetch("name") }
+
+      expect(ignored_eg_gems).to match_array(eg_gems_with_sig)
     end
 
     # We don't expect any variation in these gemspec attributes.
