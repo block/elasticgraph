@@ -90,7 +90,7 @@ module ElasticGraph
               extended_type.json_schema(**options)
             end
 
-            yield extended_type
+            yield extended_type if block_given?
             extended_type.finalize_json_schema_configuration!
           end
         end
@@ -104,7 +104,7 @@ module ElasticGraph
         def new_type_with_subfields(schema_kind, name, wrapping_type:, field_factory:)
           super(schema_kind, name, wrapping_type: wrapping_type, field_factory: field_factory) do |type|
             extended_type = type.extend(SchemaElements::TypeWithSubfieldsExtension) # : ::ElasticGraph::SchemaDefinition::SchemaElements::TypeWithSubfields & SchemaElements::TypeWithSubfieldsExtension
-            yield extended_type
+            yield extended_type if block_given?
           end
         end
 

@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/indexer/record_preparer"
+require "elastic_graph/json_ingestion/schema_definition/api_extension"
 require "elastic_graph/spec_support/schema_definition_helpers"
 require "support/multiple_version_support"
 

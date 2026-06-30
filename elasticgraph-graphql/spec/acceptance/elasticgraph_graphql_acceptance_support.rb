@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/graphql/datastore_search_router"
+require "elastic_graph/json_ingestion/schema_definition/api_extension"
 require "elastic_graph/schema_definition/schema_elements/type_namer"
 require "elastic_graph/spec_support/builds_admin"
 require "graphql"
@@ -92,6 +93,9 @@ module ElasticGraph
             derived_type_name_formats: derived_type_name_formats,
             type_name_overrides: {Cursor: "String"},
             enum_value_overrides_by_type: enum_value_overrides_by_type,
+            # The camelCase schema definition below is derived from the repository's main test schema,
+            # which uses the JSON ingestion schema definition DSL, so it requires this extension.
+            schema_definition_extension_modules: [JSONIngestion::SchemaDefinition::APIExtension],
             schema_definition: ->(schema) do
               # standard:disable Security/Eval -- it's ok here in a test.
               schema.as_active_instance { eval(camel_case_schema_def) }

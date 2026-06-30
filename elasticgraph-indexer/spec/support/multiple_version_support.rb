@@ -6,6 +6,7 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/json_ingestion/schema_definition/api_extension"
 require "elastic_graph/spec_support/schema_definition_helpers"
 
 module ElasticGraph
@@ -15,7 +16,12 @@ module ElasticGraph
 
       def build_indexer_with_multiple_schema_versions(schema_versions:)
         results_by_version = schema_versions.to_h do |json_schema_version, prior_def|
-          results = define_schema(schema_element_name_form: :snake_case, json_schema_version: json_schema_version, &prior_def)
+          results = define_schema(
+            schema_element_name_form: :snake_case,
+            json_schema_version: json_schema_version,
+            extension_modules: [JSONIngestion::SchemaDefinition::APIExtension],
+            &prior_def
+          )
           [json_schema_version, results]
         end
 

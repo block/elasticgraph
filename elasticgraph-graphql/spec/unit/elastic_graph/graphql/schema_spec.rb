@@ -16,7 +16,6 @@ module ElasticGraph
         define_schema do |schema|
           schema.scalar_type "_FieldSet" do |t|
             t.mapping type: "keyword"
-            t.json_schema type: "string"
           end
 
           schema.object_type "Widget" do |t|

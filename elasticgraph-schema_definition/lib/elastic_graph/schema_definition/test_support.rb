@@ -79,8 +79,10 @@ module ElasticGraph
         # exists when an extension that implements JSON schema generation (such as
         # `elasticgraph-json_ingestion`) is loaded; without one there is no JSON schema version to set.
         if !json_schema_version.nil? && api.respond_to?(:json_schema_version)
+          # :nocov: -- only entered when a JSON schema extension is loaded, which is not the case in elasticgraph-schema_definition's tests.
           versioned_api = api # : untyped
           versioned_api.json_schema_version(json_schema_version) if versioned_api.state.json_schema_version.nil?
+          # :nocov:
         end
 
         # :nocov: -- the else branch and code past this aren't used by tests in elasticgraph-schema_definition.

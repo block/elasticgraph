@@ -8,6 +8,7 @@
 
 require "elastic_graph/constants"
 require "elastic_graph/datastore_core/index_definition"
+require "elastic_graph/json_ingestion/schema_definition/api_extension"
 require "elastic_graph/support/hash_util"
 require "stringio"
 require_relative "implementation_shared_examples"
@@ -16,6 +17,12 @@ module ElasticGraph
   class DatastoreCore
     module IndexDefinition
       RSpec.describe RolloverIndexTemplate, :uses_datastore, :builds_indexer do
+        # Documents indexed by these specs are validated against the JSON schemas, so the schemas
+        # defined in this file all include the JSON ingestion schema definition extension.
+        def build_datastore_core(**options, &block)
+          super(schema_definition_extension_modules: [JSONIngestion::SchemaDefinition::APIExtension], **options, &block)
+        end
+
         # Use different index names than any other tests use, because most tests expect a specific index
         # configuration (based on `config/schema.graphql`) and we do not want to mess with it here.
         let(:index_prefix) { unique_index_name }

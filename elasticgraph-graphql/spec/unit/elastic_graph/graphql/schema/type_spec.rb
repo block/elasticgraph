@@ -955,7 +955,6 @@ module ElasticGraph
             schema = define_schema do |s|
               s.scalar_type "CustomScalar" do |t|
                 t.mapping type: "keyword"
-                t.json_schema type: "string"
               end
             end
 
@@ -967,7 +966,6 @@ module ElasticGraph
             schema = define_schema do |s|
               s.scalar_type "CustomScalar" do |t|
                 t.mapping type: "keyword"
-                t.json_schema type: "string"
                 t.grouping_missing_value_placeholder "MISSING"
               end
             end
@@ -980,7 +978,6 @@ module ElasticGraph
             schema = define_schema do |s|
               s.scalar_type "CustomScalar" do |t|
                 t.mapping type: "keyword"
-                t.json_schema type: "string"
                 t.grouping_missing_value_placeholder nil
               end
             end
@@ -1007,7 +1004,6 @@ module ElasticGraph
                 t.field "name", "String"
                 t.field "count", "Int"
                 t.field "price", "Float"
-                t.field "big_number", "JsonSafeLong"
                 t.index "things"
               end
             end
@@ -1016,7 +1012,6 @@ module ElasticGraph
             expect(schema.type_named("String").grouping_missing_value_placeholder).to eq MISSING_STRING_PLACEHOLDER_VALUE
             expect(schema.type_named("Int").grouping_missing_value_placeholder).to eq MISSING_NUMERIC_PLACEHOLDER
             expect(schema.type_named("Float").grouping_missing_value_placeholder).to eq MISSING_NUMERIC_PLACEHOLDER
-            expect(schema.type_named("JsonSafeLong").grouping_missing_value_placeholder).to eq MISSING_NUMERIC_PLACEHOLDER
           end
 
           it "returns nil for object types" do
