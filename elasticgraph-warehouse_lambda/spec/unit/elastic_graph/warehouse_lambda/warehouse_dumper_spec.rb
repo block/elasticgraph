@@ -30,22 +30,22 @@ module ElasticGraph
           "type" => "Widget",
           "id" => "1",
           "version" => 3,
-          "json_schema_version" => 1,
+          SCHEMA_VERSION_KEY => 1,
           "record" => {"id" => "1", "dayOfWeek" => "MON", "created_at" => "2024-09-15T12:30:12Z", "workspace_id" => "ws-1"}
         })
       end
 
       it "writes operations to S3 as gzipped JSONL files and returns success results" do
-        op1 = new_primary_indexing_operation({"type" => "Widget", "id" => "1", "version" => 3, "json_schema_version" => 1, "record" => {"id" => "1", "dayOfWeek" => "MON", "created_at" => "2024-09-15T12:30:12Z", "workspace_id" => "ws-1"}})
-        op2 = new_primary_indexing_operation({"type" => "Widget", "id" => "2", "version" => 5, "json_schema_version" => 2, "record" => {"id" => "2", "dayOfWeek" => "TUE", "created_at" => "2024-09-15T13:30:12Z", "workspace_id" => "ws-2"}})
+        op1 = new_primary_indexing_operation({"type" => "Widget", "id" => "1", "version" => 3, SCHEMA_VERSION_KEY => 1, "record" => {"id" => "1", "dayOfWeek" => "MON", "created_at" => "2024-09-15T12:30:12Z", "workspace_id" => "ws-1"}})
+        op2 = new_primary_indexing_operation({"type" => "Widget", "id" => "2", "version" => 5, SCHEMA_VERSION_KEY => 2, "record" => {"id" => "2", "dayOfWeek" => "TUE", "created_at" => "2024-09-15T13:30:12Z", "workspace_id" => "ws-2"}})
         operations = [op1, op2]
 
         results = warehouse_dumper.bulk(operations)
 
-        # Verify S3 uploads - should have 2 files (one for json_schema_version 1, one for json_schema_version 2)
+        # Verify S3 uploads - should have 2 files (one for schema version 1, one for schema version 2)
         expect(s3_client.api_requests.map { |req| req[:operation_name] }).to eq [:put_object, :put_object]
 
-        # Verify first file (json_schema_version 1)
+        # Verify first file (schema version 1)
         params1 = s3_client.api_requests[0].fetch(:params)
         expect(params1[:bucket]).to eq s3_bucket_name
         expect(params1[:key]).to match %r{Data0001/Widget/v1/2024-09-15/[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}\.jsonl\.gz}
@@ -61,7 +61,7 @@ module ElasticGraph
         lines1 = jsonl_content1.split("\n")
         expect(lines1.size).to eq 1
 
-        # Verify second file (json_schema_version 2)
+        # Verify second file (schema version 2)
         params2 = s3_client.api_requests[1].fetch(:params)
         expect(params2[:key]).to match %r{Data0001/Widget/v2/2024-09-15/[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}\.jsonl\.gz}
 
@@ -99,8 +99,8 @@ module ElasticGraph
       end
 
       it "writes operations of different types to separate S3 files" do
-        widget_op = new_primary_indexing_operation({"type" => "Widget", "id" => "1", "version" => 3, "json_schema_version" => 1, "record" => {"id" => "1", "dayOfWeek" => "MON", "created_at" => "2024-09-15T12:30:12Z", "workspace_id" => "ws-1"}})
-        component_op = new_primary_indexing_operation({"type" => "Component", "id" => "c1", "version" => 2, "json_schema_version" => 1, "record" => {"id" => "c1", "created_at" => "2024-09-15T12:30:12Z"}})
+        widget_op = new_primary_indexing_operation({"type" => "Widget", "id" => "1", "version" => 3, SCHEMA_VERSION_KEY => 1, "record" => {"id" => "1", "dayOfWeek" => "MON", "created_at" => "2024-09-15T12:30:12Z", "workspace_id" => "ws-1"}})
+        component_op = new_primary_indexing_operation({"type" => "Component", "id" => "c1", "version" => 2, SCHEMA_VERSION_KEY => 1, "record" => {"id" => "c1", "created_at" => "2024-09-15T12:30:12Z"}})
         operations = [widget_op, component_op]
 
         warehouse_dumper.bulk(operations)
@@ -113,8 +113,8 @@ module ElasticGraph
       end
 
       it "logs structured information about received batch and dumped files" do
-        widget_op = new_primary_indexing_operation({"type" => "Widget", "id" => "1", "version" => 3, "json_schema_version" => 1, "record" => {"id" => "1", "dayOfWeek" => "MON", "created_at" => "2024-09-15T12:30:12Z", "workspace_id" => "ws-1"}})
-        component_op = new_primary_indexing_operation({"type" => "Component", "id" => "c1", "version" => 2, "json_schema_version" => 1, "record" => {"id" => "c1", "created_at" => "2024-09-15T12:30:12Z"}})
+        widget_op = new_primary_indexing_operation({"type" => "Widget", "id" => "1", "version" => 3, SCHEMA_VERSION_KEY => 1, "record" => {"id" => "1", "dayOfWeek" => "MON", "created_at" => "2024-09-15T12:30:12Z", "workspace_id" => "ws-1"}})
+        component_op = new_primary_indexing_operation({"type" => "Component", "id" => "c1", "version" => 2, SCHEMA_VERSION_KEY => 1, "record" => {"id" => "c1", "created_at" => "2024-09-15T12:30:12Z"}})
         operations = [widget_op, component_op]
 
         warehouse_dumper.bulk(operations)
@@ -127,13 +127,13 @@ module ElasticGraph
           a_hash_including({
             "s3_bucket" => s3_bucket_name,
             "type" => "Widget",
-            "json_schema_version" => 1,
+            SCHEMA_VERSION_KEY => 1,
             "record_count" => 1
           }),
           a_hash_including({
             "s3_bucket" => s3_bucket_name,
             "type" => "Component",
-            "json_schema_version" => 1,
+            SCHEMA_VERSION_KEY => 1,
             "record_count" => 1
           })
         ]
@@ -183,7 +183,7 @@ module ElasticGraph
           "type" => "Widget",
           "id" => "1",
           "version" => 3,
-          "json_schema_version" => 1,
+          SCHEMA_VERSION_KEY => 1,
           "record" => {"id" => "1", "dayOfWeek" => "MON", "created_at" => "2024-09-15T12:30:12Z", "workspace_id" => "ws-1"}
         })
 
