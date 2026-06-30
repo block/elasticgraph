@@ -36,10 +36,6 @@ module ElasticGraph
       :sdl_parts,
       :paginated_collection_element_types,
       :user_defined_fields,
-      :renamed_types_by_old_name,
-      :deleted_types_by_old_name,
-      :renamed_fields_by_type_name_and_old_field_name,
-      :deleted_fields_by_type_name_and_old_field_name,
       :reserved_type_names,
       :graphql_extension_modules,
       :graphql_resolvers_by_name,
@@ -83,10 +79,6 @@ module ElasticGraph
           sdl_parts: [],
           paginated_collection_element_types: ::Set.new,
           user_defined_fields: ::Set.new,
-          renamed_types_by_old_name: {},
-          deleted_types_by_old_name: {},
-          renamed_fields_by_type_name_and_old_field_name: ::Hash.new { |h, k| h[k] = {} },
-          deleted_fields_by_type_name_and_old_field_name: ::Hash.new { |h, k| h[k] = {} },
           reserved_type_names: ::Set.new,
           graphql_extension_modules: [],
           graphql_resolvers_by_name: {},
@@ -137,40 +129,6 @@ module ElasticGraph
           raise Errors::SchemaError, "Duplicate index name `#{name}` defined on `#{type.name}` and `#{existing_type.name}`. Each index can only be defined once."
         end
         indexed_types_by_index_name[name] = type
-      end
-
-      def register_renamed_type(type_name, from:, defined_at:, defined_via:)
-        renamed_types_by_old_name[from] = factory.new_deprecated_element(
-          type_name,
-          defined_at: defined_at,
-          defined_via: defined_via
-        )
-      end
-
-      def register_deleted_type(type_name, defined_at:, defined_via:)
-        deleted_types_by_old_name[type_name] = factory.new_deprecated_element(
-          type_name,
-          defined_at: defined_at,
-          defined_via: defined_via
-        )
-      end
-
-      def register_renamed_field(type_name, from:, to:, defined_at:, defined_via:)
-        renamed_fields_by_old_field_name = renamed_fields_by_type_name_and_old_field_name[type_name] # : ::Hash[::String, SchemaElements::DeprecatedElement]
-        renamed_fields_by_old_field_name[from] = factory.new_deprecated_element(
-          to,
-          defined_at: defined_at,
-          defined_via: defined_via
-        )
-      end
-
-      def register_deleted_field(type_name, field_name, defined_at:, defined_via:)
-        deleted_fields_by_old_field_name = deleted_fields_by_type_name_and_old_field_name[type_name] # : ::Hash[::String, SchemaElements::DeprecatedElement]
-        deleted_fields_by_old_field_name[field_name] = factory.new_deprecated_element(
-          field_name,
-          defined_at: defined_at,
-          defined_via: defined_via
-        )
       end
 
       # Registers the given `field` as a user-defined field, unless the user definitions are complete.

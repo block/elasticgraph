@@ -301,28 +301,6 @@ module ElasticGraph
         nil
       end
 
-      # Registers the name of a type that existed in a prior version of the schema but has been deleted.
-      #
-      # @note In situations where this API applies, ElasticGraph will give you an error message indicating that you need to use this API
-      #   or {SchemaElements::TypeWithSubfields#renamed_from}. Likewise, when ElasticGraph no longer needs to know about this, it'll give you a warning
-      #   indicating the call to this method can be removed.
-      #
-      # @param name [String] name of type that used to exist but has been deleted
-      # @return [void]
-      #
-      # @example Indicate that `Widget` has been deleted
-      #   ElasticGraph.define_schema do |schema|
-      #     schema.deleted_type "Widget"
-      #   end
-      def deleted_type(name)
-        @state.register_deleted_type(
-          name,
-          defined_at: caller_locations(1, 1).to_a.first, # : ::Thread::Backtrace::Location
-          defined_via: %(schema.deleted_type "#{name}")
-        )
-        nil
-      end
-
       # Registers a GraphQL extension module that will be loaded and used by `elasticgraph-graphql`. While such
       # extension modules can also be configured in a settings YAML file, it can be useful to register it here
       # when you want to ensure that the extension is used in all environments. For example, an extension library

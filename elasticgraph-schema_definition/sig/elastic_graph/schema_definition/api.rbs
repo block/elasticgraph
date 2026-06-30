@@ -72,7 +72,6 @@ module ElasticGraph
       def enum_type: (::String) { (SchemaElements::EnumType) -> void } -> void
       def union_type: (::String) { (SchemaElements::UnionType) -> void } -> void
       def scalar_type: (::String) { (SchemaElements::ScalarType) -> void } -> void
-      def deleted_type: (::String) -> void
       def as_active_instance: { () -> void } -> void
       @results: Results?
       def results: () -> Results

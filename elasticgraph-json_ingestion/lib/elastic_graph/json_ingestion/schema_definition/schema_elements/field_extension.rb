@@ -90,6 +90,33 @@ module ElasticGraph
             super(**options)
           end
 
+          # Registers an old name that this field used to have in a prior JSON schema version.
+          #
+          # @note In situations where this API applies, ElasticGraph will give you an error message indicating that you need to use this API
+          #   or {TypeWithSubfieldsExtension#deleted_field}. Likewise, when ElasticGraph no longer needs to know about this, it'll give you a warning
+          #   indicating the call to this method can be removed.
+          #
+          # @param old_name [String] old name this field used to have in a prior version of the schema
+          # @return [void]
+          #
+          # @example Indicate that `Widget.description` used to be called `Widget.notes`.
+          #   ElasticGraph.define_schema do |schema|
+          #     schema.object_type "Widget" do |t|
+          #       t.field "description", "String" do |f|
+          #         f.renamed_from "notes"
+          #       end
+          #     end
+          #   end
+          def renamed_from(old_name)
+            json_ingestion_state.register_renamed_field(
+              parent_type.name,
+              from: old_name,
+              to: name,
+              defined_at: caller_locations(1, 1).to_a.first, # : ::Thread::Backtrace::Location
+              defined_via: %(field.renamed_from "#{old_name}")
+            )
+          end
+
           # @private
           def to_indexing_field_reference
             reference = super
@@ -103,6 +130,12 @@ module ElasticGraph
               json_schema_customizations: json_schema_options,
               doc_comment: doc_comment
             )
+          end
+
+          private
+
+          def json_ingestion_state
+            schema_def_state # : ::ElasticGraph::SchemaDefinition::State & SchemaDefinition::StateExtension
           end
         end
       end

@@ -5,13 +5,13 @@ module ElasticGraph
         def initialize: (io) -> void
 
         def report_errors: (::Array[Indexing::JSONSchemaWithMetadata]) -> void
-        def report_warnings: (::Set[::ElasticGraph::SchemaDefinition::SchemaElements::DeprecatedElement]) -> void
+        def report_warnings: (::Set[::ElasticGraph::JSONIngestion::SchemaDefinition::DeprecatedElement]) -> void
 
         private
 
         @output: io
 
-        def format_deprecated_elements: (::Enumerable[::ElasticGraph::SchemaDefinition::SchemaElements::DeprecatedElement]) -> ::String
+        def format_deprecated_elements: (::Enumerable[::ElasticGraph::JSONIngestion::SchemaDefinition::DeprecatedElement]) -> ::String
         def missing_field_error_for: (::String, ::Array[::Integer]) -> ::String
         def missing_type_error_for: (::String, ::Array[::Integer]) -> ::String
         def missing_necessary_field_error_for: (Indexing::JSONSchemaWithMetadata::MissingNecessaryField, ::Array[::Integer]) -> ::String

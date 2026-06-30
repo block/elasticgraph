@@ -5,7 +5,13 @@ module ElasticGraph
         module TypeWithSubfieldsExtension: ::ElasticGraph::SchemaDefinition::SchemaElements::TypeWithSubfields
           include HasJSONSchema
 
+          def deleted_field: (::String) -> void
+          def renamed_from: (::String) -> void
           def to_indexing_field_type: () -> Indexing::FieldType::Object
+
+          private
+
+          def json_ingestion_state: () -> (::ElasticGraph::SchemaDefinition::State & SchemaDefinition::StateExtension)
         end
       end
     end

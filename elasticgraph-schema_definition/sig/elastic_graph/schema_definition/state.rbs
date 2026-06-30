@@ -14,10 +14,6 @@ module ElasticGraph
       attr_reader sdl_parts: ::Array[::String]
       attr_reader paginated_collection_element_types: ::Set[::String]
       attr_reader user_defined_fields: ::Set[SchemaElements::Field]
-      attr_reader renamed_types_by_old_name: ::Hash[::String, SchemaElements::DeprecatedElement]
-      attr_reader deleted_types_by_old_name: ::Hash[::String, SchemaElements::DeprecatedElement]
-      attr_reader renamed_fields_by_type_name_and_old_field_name: ::Hash[::String, ::Hash[::String, SchemaElements::DeprecatedElement]]
-      attr_reader deleted_fields_by_type_name_and_old_field_name: ::Hash[::String, ::Hash[::String, SchemaElements::DeprecatedElement]]
       attr_reader reserved_type_names: ::Set[::String]
       attr_reader graphql_extension_modules: ::Array[SchemaArtifacts::RuntimeMetadata::GraphQLExtension]
       attr_reader graphql_resolvers_by_name: ::Hash[::Symbol, SchemaArtifacts::RuntimeMetadata::GraphQLResolver]
@@ -47,10 +43,6 @@ module ElasticGraph
         sdl_parts: ::Array[::String],
         paginated_collection_element_types: ::Set[::String],
         user_defined_fields: ::Set[SchemaElements::Field],
-        renamed_types_by_old_name: ::Hash[::String, SchemaElements::DeprecatedElement],
-        deleted_types_by_old_name: ::Hash[::String, SchemaElements::DeprecatedElement],
-        renamed_fields_by_type_name_and_old_field_name: ::Hash[::String, ::Hash[::String, SchemaElements::DeprecatedElement]],
-        deleted_fields_by_type_name_and_old_field_name: ::Hash[::String, ::Hash[::String, SchemaElements::DeprecatedElement]],
         reserved_type_names: ::Set[::String],
         graphql_extension_modules: ::Array[SchemaArtifacts::RuntimeMetadata::GraphQLExtension],
         graphql_resolvers_by_name: ::Hash[::Symbol, SchemaArtifacts::RuntimeMetadata::GraphQLResolver],
@@ -87,10 +79,6 @@ module ElasticGraph
       def register_enum_type: (SchemaElements::EnumType) -> void
       def register_scalar_type: (SchemaElements::ScalarType) -> void
       def register_input_type: (SchemaElements::InputType) -> void
-      def register_renamed_type: (::String, from: ::String, defined_at: ::Thread::Backtrace::Location?, defined_via: ::String) -> void
-      def register_deleted_type: (::String, defined_at: ::Thread::Backtrace::Location?, defined_via: ::String) -> void
-      def register_renamed_field: (::String, from: ::String, to: ::String, defined_at: ::Thread::Backtrace::Location?, defined_via: ::String) -> void
-      def register_deleted_field: (::String, ::String, defined_at: ::Thread::Backtrace::Location?, defined_via: ::String) -> void
       def register_user_defined_field: (SchemaElements::Field) -> void
 
       @factory: Factory?
