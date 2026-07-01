@@ -183,17 +183,19 @@ module ElasticGraph
           desired_contents,
           ->(hash) { ::YAML.dump(hash) },
           ->(string) { ::YAML.safe_load(string) },
-          extra_comment_lines
+          extra_comment_lines,
+          "#"
         )
       end
 
-      def new_raw_artifact(file_name, desired_contents)
+      def new_raw_artifact(file_name, desired_contents, comment_prefix: "#")
         SchemaArtifact.new(
           ::File.join(@schema_artifacts_directory, file_name),
           desired_contents,
           _ = :itself.to_proc,
           _ = :itself.to_proc,
-          []
+          [],
+          comment_prefix
         )
       end
 
@@ -215,7 +217,7 @@ module ElasticGraph
     end
 
     # @private
-    class SchemaArtifact < Support::MemoizableData.define(:file_name, :desired_contents, :dumper, :loader, :extra_comment_lines)
+    class SchemaArtifact < Support::MemoizableData.define(:file_name, :desired_contents, :dumper, :loader, :extra_comment_lines, :comment_prefix)
       def dump(output)
         if out_of_date?
           dirname = File.dirname(file_name)
@@ -271,7 +273,7 @@ module ElasticGraph
         ]
 
         lines = extra_comment_lines + [""] + lines unless extra_comment_lines.empty?
-        lines.map { |line| "# #{line}".strip }.join("\n")
+        lines.map { |line| "#{comment_prefix} #{line}".rstrip }.join("\n")
       end
     end
   end
