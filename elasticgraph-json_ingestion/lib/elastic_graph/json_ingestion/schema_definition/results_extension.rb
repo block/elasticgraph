@@ -67,11 +67,11 @@ module ElasticGraph
 
         private
 
-        # Returns the wrapped state narrowed to include this gem's `StateExtension`. Centralizes
-        # the Steep cast that's needed because Steep can't see the `extend(StateExtension)` applied
-        # at runtime in {APIExtension.extended}.
+        # Returns the wrapped state's JSON ingestion state. Centralizes the Steep cast that's needed
+        # because Steep can't see the `extend(StateExtension)` applied at runtime in {APIExtension.extended}.
         def json_ingestion_state
-          state # : ElasticGraph::SchemaDefinition::State & StateExtension
+          extension_state = state # : ElasticGraph::SchemaDefinition::State & StateExtension
+          extension_state.json_ingestion_state
         end
 
         def json_ingestion_json_schema_builder
@@ -80,9 +80,10 @@ module ElasticGraph
             # runs the `on_built_in_types` callbacks, including the GeoLocation JSON schema field
             # customizations registered by `APIExtension.extended`.
             materialized_all_types = all_types
+            extension_state = state # : ElasticGraph::SchemaDefinition::State & StateExtension
 
             JSONSchemaBuilder.new(
-              state: json_ingestion_state,
+              state: extension_state,
               all_types: materialized_all_types,
               derived_indexing_type_names: derived_indexing_type_names
             )

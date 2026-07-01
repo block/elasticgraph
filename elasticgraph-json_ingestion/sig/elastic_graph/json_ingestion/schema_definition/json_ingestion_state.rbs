@@ -1,0 +1,27 @@
+module ElasticGraph
+  module JSONIngestion
+    module SchemaDefinition
+      class JSONIngestionState
+        attr_accessor json_schema_version: ::Integer?
+        attr_accessor json_schema_version_setter_location: ::Thread::Backtrace::Location?
+        attr_accessor enforce_json_schema_version: bool
+        attr_accessor allow_omitted_json_schema_fields: bool
+        attr_accessor allow_extra_json_schema_fields: bool
+        attr_reader renamed_types_by_old_name: ::Hash[::String, DeprecatedElement]
+        attr_reader deleted_types_by_old_name: ::Hash[::String, DeprecatedElement]
+        attr_reader renamed_fields_by_type_name_and_old_field_name: ::Hash[::String, ::Hash[::String, DeprecatedElement]]
+        attr_reader deleted_fields_by_type_name_and_old_field_name: ::Hash[::String, ::Hash[::String, DeprecatedElement]]
+
+        def initialize: (schema_def_state: ::ElasticGraph::SchemaDefinition::State) -> void
+        def register_renamed_type: (::String, from: ::String, defined_at: ::Thread::Backtrace::Location, defined_via: ::String) -> void
+        def register_deleted_type: (::String, defined_at: ::Thread::Backtrace::Location, defined_via: ::String) -> void
+        def register_renamed_field: (::String, from: ::String, to: ::String, defined_at: ::Thread::Backtrace::Location, defined_via: ::String) -> void
+        def register_deleted_field: (::String, ::String, defined_at: ::Thread::Backtrace::Location, defined_via: ::String) -> void
+
+        private
+
+        @schema_def_state: ::ElasticGraph::SchemaDefinition::State
+      end
+    end
+  end
+end

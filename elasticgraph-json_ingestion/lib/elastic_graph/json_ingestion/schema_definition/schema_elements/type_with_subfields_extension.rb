@@ -75,7 +75,8 @@ module ElasticGraph
           private
 
           def json_ingestion_state
-            schema_def_state # : ::ElasticGraph::SchemaDefinition::State & SchemaDefinition::StateExtension
+            extension_state = schema_def_state # : ::ElasticGraph::SchemaDefinition::State & SchemaDefinition::StateExtension
+            extension_state.json_ingestion_state
           end
         end
       end

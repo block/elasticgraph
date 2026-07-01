@@ -8,7 +8,7 @@ module ElasticGraph
         @json_ingestion_json_schema_merge_reporter: JSONSchemaMergeReporter?
 
         def json_ingestion_schema_definition_results: () -> (::ElasticGraph::SchemaDefinition::Results & ResultsExtension)
-        def json_ingestion_state: () -> (::ElasticGraph::SchemaDefinition::State & StateExtension)
+        def json_ingestion_state: () -> JSONIngestionState
         def artifacts_from_schema_def: () -> ::Array[::ElasticGraph::SchemaDefinition::SchemaArtifact[untyped]]
         def json_ingestion_json_schemas_artifact: () -> ::ElasticGraph::SchemaDefinition::SchemaArtifact[::Hash[::String, untyped]]
         def json_ingestion_check_if_needs_json_schema_version_bump: () { (::Integer) -> void } -> void

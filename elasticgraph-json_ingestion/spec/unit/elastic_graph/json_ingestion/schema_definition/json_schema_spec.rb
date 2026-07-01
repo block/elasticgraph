@@ -2979,7 +2979,7 @@ module ElasticGraph
             s.enforce_json_schema_version false
           end
 
-          expect(result.state.enforce_json_schema_version).to eq false
+          expect(result.state.json_ingestion_state.enforce_json_schema_version).to eq false
         end
 
         it "fails if json_schema_version enforcement is set to a non-boolean value" do

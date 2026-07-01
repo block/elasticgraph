@@ -25,21 +25,23 @@ module ElasticGraph
             end
           end.state
 
-          expect(state.deleted_types_by_old_name.keys).to eq ["OldType"]
-          expect(state.renamed_types_by_old_name.keys).to eq ["OldWidget"]
-          expect(state.deleted_fields_by_type_name_and_old_field_name.fetch("Widget").keys).to eq ["legacy_name"]
-          expect(state.renamed_fields_by_type_name_and_old_field_name.fetch("Widget").keys).to eq ["old_name"]
+          json_ingestion_state = state.json_ingestion_state
 
-          expect(state.deleted_types_by_old_name.fetch("OldType").description).to match(
+          expect(json_ingestion_state.deleted_types_by_old_name.keys).to eq ["OldType"]
+          expect(json_ingestion_state.renamed_types_by_old_name.keys).to eq ["OldWidget"]
+          expect(json_ingestion_state.deleted_fields_by_type_name_and_old_field_name.fetch("Widget").keys).to eq ["legacy_name"]
+          expect(json_ingestion_state.renamed_fields_by_type_name_and_old_field_name.fetch("Widget").keys).to eq ["old_name"]
+
+          expect(json_ingestion_state.deleted_types_by_old_name.fetch("OldType").description).to match(
             /\A`schema\.deleted_type "OldType"` at .+:\d+\z/
           )
-          expect(state.renamed_types_by_old_name.fetch("OldWidget").description).to match(
+          expect(json_ingestion_state.renamed_types_by_old_name.fetch("OldWidget").description).to match(
             /\A`type\.renamed_from "OldWidget"` at .+:\d+\z/
           )
-          expect(state.deleted_fields_by_type_name_and_old_field_name.fetch("Widget").fetch("legacy_name").description).to match(
+          expect(json_ingestion_state.deleted_fields_by_type_name_and_old_field_name.fetch("Widget").fetch("legacy_name").description).to match(
             /\A`type\.deleted_field "legacy_name"` at .+:\d+\z/
           )
-          expect(state.renamed_fields_by_type_name_and_old_field_name.fetch("Widget").fetch("old_name").description).to match(
+          expect(json_ingestion_state.renamed_fields_by_type_name_and_old_field_name.fetch("Widget").fetch("old_name").description).to match(
             /\A`field\.renamed_from "old_name"` at .+:\d+\z/
           )
         end

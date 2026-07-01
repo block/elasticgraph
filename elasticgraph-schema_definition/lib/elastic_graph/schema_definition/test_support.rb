@@ -81,7 +81,8 @@ module ElasticGraph
         if !json_schema_version.nil? && api.respond_to?(:json_schema_version)
           # :nocov: -- only entered when a JSON schema extension is loaded, which is not the case in elasticgraph-schema_definition's tests.
           versioned_api = api # : untyped
-          versioned_api.json_schema_version(json_schema_version) if versioned_api.state.json_schema_version.nil?
+          json_ingestion_state = versioned_api.state.json_ingestion_state
+          versioned_api.json_schema_version(json_schema_version) if json_ingestion_state.json_schema_version.nil?
           # :nocov:
         end
 

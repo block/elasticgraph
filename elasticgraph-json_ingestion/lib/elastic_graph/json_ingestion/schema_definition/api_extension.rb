@@ -64,18 +64,18 @@ module ElasticGraph
         #     schema.json_schema_version 1
         #   end
         def json_schema_version(version)
-          state = json_ingestion_state
+          ingestion_state = json_ingestion_state
 
           if !version.is_a?(Integer) || version < 1
             raise Errors::SchemaError, "`json_schema_version` must be a positive integer. Specified version: #{version}"
           end
 
-          if state.json_schema_version
-            raise Errors::SchemaError, "`json_schema_version` can only be set once on a schema. Previously-set version: #{state.json_schema_version}"
+          if ingestion_state.json_schema_version
+            raise Errors::SchemaError, "`json_schema_version` can only be set once on a schema. Previously-set version: #{ingestion_state.json_schema_version}"
           end
 
-          state.json_schema_version = version
-          state.json_schema_version_setter_location = caller_locations(1, 1).to_a.first
+          ingestion_state.json_schema_version = version
+          ingestion_state.json_schema_version_setter_location = caller_locations(1, 1).to_a.first
           nil
         end
 
@@ -128,7 +128,7 @@ module ElasticGraph
         #     schema.json_schema_strictness allow_omitted_fields: true, allow_extra_fields: false
         #   end
         def json_schema_strictness(allow_omitted_fields: false, allow_extra_fields: true)
-          state = json_ingestion_state
+          ingestion_state = json_ingestion_state
 
           unless [true, false].include?(allow_omitted_fields)
             raise Errors::SchemaError, "`allow_omitted_fields` must be true or false"
@@ -138,8 +138,8 @@ module ElasticGraph
             raise Errors::SchemaError, "`allow_extra_fields` must be true or false"
           end
 
-          state.allow_omitted_json_schema_fields = allow_omitted_fields
-          state.allow_extra_json_schema_fields = allow_extra_fields
+          ingestion_state.allow_omitted_json_schema_fields = allow_omitted_fields
+          ingestion_state.allow_extra_json_schema_fields = allow_extra_fields
           nil
         end
 
@@ -167,11 +167,11 @@ module ElasticGraph
 
         private
 
-        # Returns the API's `state` narrowed to include this gem's `StateExtension`. Centralizes
-        # the Steep cast that's needed because Steep can't see the `extend(StateExtension)` applied
-        # at runtime in `extended`.
+        # Returns the API's JSON ingestion state. Centralizes the Steep cast that's needed
+        # because Steep can't see the `extend(StateExtension)` applied at runtime in `extended`.
         def json_ingestion_state
-          state # : ElasticGraph::SchemaDefinition::State & StateExtension
+          extension_state = state # : ElasticGraph::SchemaDefinition::State & StateExtension
+          extension_state.json_ingestion_state
         end
       end
     end

@@ -13,7 +13,8 @@ module ElasticGraph
 
         private
 
-        @state: ::ElasticGraph::SchemaDefinition::State & StateExtension
+        @state: ::ElasticGraph::SchemaDefinition::State
+        @json_ingestion_state: JSONIngestionState
         @all_types: ::Array[::ElasticGraph::SchemaDefinition::SchemaElements::graphQLType]
         @derived_indexing_type_names: ::Set[::String]
         @indexing_field_types_by_name: ::Hash[::String, Indexing::_JSONFieldType]?
