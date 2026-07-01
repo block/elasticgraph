@@ -190,6 +190,7 @@ Custom gems can be added via `Gemfile-custom` (see `Gemfile-custom.example`), th
 - Avoid defensive code for impossible cases. Don't add checks, tests, or handling for scenarios that should never occur due to the design of the system. If something can only happen due to a bug in the implementation, it's better to fail fast than to silently handle it.
 - Drop unnecessary namespace prefixes. When code is already inside `module ElasticGraph`, use `Indexer` instead of `::ElasticGraph::Indexer`, and `Errors::ConfigError` instead of `::ElasticGraph::Errors::ConfigError`. Use fully qualified names only when necessary to avoid ambiguity.
 - Prefer using `prepend` + `super` rather than `alias_method` when needing to hook in and override a method.
+- Keep `require` statements alphabetically sorted (by the required path string). This applies to both `lib` and `spec` files. When adding a new `require`, insert it in the correct alphabetical position rather than appending it to the end. An exception can be made if the files have to be required in a specific order (this should be **very** rare).
 
 ### RBS Type Signatures
 

@@ -11,35 +11,31 @@ module ElasticGraph
     module SchemaDefinition
       RSpec.describe FactoryExtension do
         it "extends enum types created without customization blocks" do
-          api = build_api
-          api.enum_type "EmptyEnum"
+          define_schema(schema_element_name_form: "snake_case") do |api|
+            # Create the enum without a customization block (the case being exercised), then add a
+            # value afterward so the schema is valid (enums must have at least one value).
+            api.enum_type "SomeEnum"
+            enum_type = api.state.enum_types_by_name.fetch("SomeEnum")
+            enum_type.value "SOME_VALUE"
 
-          # An enum's derived GraphQL types are built from a derived scalar twin, which can only be
-          # built if `EnumTypeExtension` configured the twin's `json_schema`; otherwise building it
-          # raises a "lacks `json_schema`" error.
-          expect {
-            api.state.enum_types_by_name.fetch("EmptyEnum").derived_graphql_types
-          }.not_to raise_error
+            # An enum's derived GraphQL types are built from a derived scalar twin, which can only be
+            # built if `EnumTypeExtension` configured the twin's `json_schema`; otherwise building it
+            # raises a "lacks `json_schema`" error.
+            expect {
+              enum_type.derived_graphql_types
+            }.not_to raise_error
+          end
         end
 
         it "extends interface types created without customization blocks" do
-          api = build_api
-          api.interface_type "EmptyInterface"
+          define_schema(schema_element_name_form: "snake_case") do |api|
+            api.interface_type "EmptyInterface"
 
-          interface_type = api.state.object_types_by_name.fetch("EmptyInterface")
-          interface_type.json_schema minProperties: 1
+            interface_type = api.state.object_types_by_name.fetch("EmptyInterface")
+            interface_type.json_schema minProperties: 1
 
-          expect(interface_type.json_schema_options).to eq({minProperties: 1})
-        end
-
-        def build_api
-          schema_elements = SchemaArtifacts::RuntimeMetadata::SchemaElementNames.new(form: "snake_case")
-          ::ElasticGraph::SchemaDefinition::API.new(
-            schema_elements,
-            true,
-            extension_modules: json_ingestion_schema_definition_extension_modules,
-            output: log_device
-          )
+            expect(interface_type.json_schema_options).to eq({minProperties: 1})
+          end
         end
       end
     end

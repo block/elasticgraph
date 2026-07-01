@@ -7,7 +7,6 @@
 # frozen_string_literal: true
 
 require "elastic_graph/errors"
-require "elastic_graph/json_ingestion/schema_definition/api_extension"
 require "elastic_graph/spec_support/have_readable_to_s_and_inspect_output"
 require_relative "graphql_schema_spec_support"
 
@@ -92,37 +91,6 @@ module ElasticGraph
             "`SomeReservedName` cannot be used as a schema type",
             "reserved name"
           )
-        end
-
-        it "allows test schemas to skip JSON schema version setup" do
-          result = define_schema(json_schema_version: nil) do |schema|
-            schema.object_type("Widget") do |t|
-              t.field "id", "ID"
-            end
-          end
-
-          expect(type_def_from(result, "Widget")).to eq(<<~EOS.strip)
-            type Widget {
-              id: ID
-            }
-          EOS
-        end
-
-        it "allows test schemas to set the JSON schema version themselves" do
-          # If the test support logic re-set the version it would fail with a "can only be set once" error.
-          result = define_schema(extension_modules: [JSONIngestion::SchemaDefinition::APIExtension]) do |schema|
-            schema.json_schema_version 7
-
-            schema.object_type("Widget") do |t|
-              t.field "id", "ID"
-            end
-          end
-
-          expect(type_def_from(result, "Widget")).to eq(<<~EOS.strip)
-            type Widget {
-              id: ID
-            }
-          EOS
         end
 
         it "produces the same GraphQL output, regardless of the order the types are defined in" do
