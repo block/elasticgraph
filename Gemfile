@@ -36,7 +36,7 @@ group :development do
   gem "rubocop-rspec", "~> 3.9.0"
   gem "simplecov", "~> 0.22"
   gem "simplecov-console", "~> 0.9", ">= 0.9.5"
-  gem "standard", "~> 1.54.0"
+  gem "standard", "~> 1.55.0"
   gem "steep", "~> 2.0.0", platforms: :ruby
   gem "super_diff", "~> 0.19"
   gem "vcr", "~> 6.4"
