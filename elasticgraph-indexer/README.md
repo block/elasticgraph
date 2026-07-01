@@ -48,3 +48,29 @@ indexer = ElasticGraph::Indexer.from_yaml_file("config/settings/local.yaml")
 events = [] # JSON events read from an async datastream
 indexer.processor.process(events)
 ```
+
+## Custom Payload Decoding
+
+`ElasticGraph::Indexer` can be configured with an indexing event decoder extension. Decoders turn raw payload strings
+from a transport into ElasticGraph indexing event hashes before the normal validation and indexing pipeline runs. The
+default decoder expects JSON Lines.
+
+```yaml
+indexer:
+  indexing_event_decoder:
+    name: MyCompany::ElasticGraph::CSVIndexingEventDecoder
+    require_path: ./lib/my_company/elastic_graph/csv_indexing_event_decoder
+    config:
+      delimiter: ","
+```
+
+Decoder extensions must implement:
+
+```ruby
+def initialize(config:, schema_artifacts:, logger:)
+end
+
+def decode(payload)
+  # return an array of ElasticGraph indexing event hashes
+end
+```
