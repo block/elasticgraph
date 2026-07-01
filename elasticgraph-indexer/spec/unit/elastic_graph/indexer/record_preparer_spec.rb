@@ -576,11 +576,7 @@ module ElasticGraph
         end
 
         def define_schema(&schema_definition)
-          super(
-            schema_element_name_form: "snake_case",
-            extension_modules: json_ingestion_schema_definition_extension_modules,
-            &schema_definition
-          )
+          super(schema_element_name_form: "snake_case", &schema_definition)
         end
       end
 

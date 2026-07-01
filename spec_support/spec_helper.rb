@@ -366,8 +366,7 @@ module ElasticGraph
       schema_element_name_overrides: {},
       derived_type_name_formats: {},
       type_name_overrides: {},
-      enum_value_overrides_by_type: {},
-      reload_schema_artifacts: false
+      enum_value_overrides_by_type: {}
     )
       require "elastic_graph/schema_definition/test_support"
       require "stringio"
@@ -387,7 +386,6 @@ module ElasticGraph
         type_name_overrides: type_name_overrides,
         enum_value_overrides_by_type: enum_value_overrides_by_type,
         extension_modules: extension_modules,
-        reload_schema_artifacts: reload_schema_artifacts,
         output: output
       ) do |schema|
         if block_given?

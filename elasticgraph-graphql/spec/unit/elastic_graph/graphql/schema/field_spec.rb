@@ -7,7 +7,10 @@
 # frozen_string_literal: true
 
 require "elastic_graph/graphql/schema/field"
+require "elastic_graph/schema_artifacts/from_disk"
+require "stringio"
 require "support/aggregations_helpers"
+require "tmpdir"
 
 module ElasticGraph
   class GraphQL
@@ -156,9 +159,9 @@ module ElasticGraph
           end
 
           it "raises an error if a sort enum value is omitted from runtime metadata (e.g. because it lacks a `sort_field`)" do
-            # `reload_schema_artifacts: true` is necessary to cause the runtime metadata to get pruned
-            # and put it into the state we are exercising here.
-            schema = define_schema(reload_schema_artifacts: true) do |s|
+            # Dumping the schema artifacts and reloading them from disk is necessary to cause the
+            # runtime metadata to get pruned and put it into the state we are exercising here.
+            schema = define_schema_from_reloaded_artifacts do |s|
               s.object_type "Photo" do |t|
                 t.field "id", "ID!"
               end
@@ -530,6 +533,23 @@ module ElasticGraph
 
         def define_schema(index_definitions: nil, **options, &schema_def)
           build_graphql(schema_definition: schema_def, index_definitions: index_definitions, **options).schema
+        end
+
+        # Builds a GraphQL schema from schema artifacts that have been dumped to disk and reloaded,
+        # which applies the extra pruning/validation (e.g. runtime metadata pruning) that only happens
+        # when artifacts round-trip through disk.
+        def define_schema_from_reloaded_artifacts(&schema_def)
+          results = generate_schema_artifacts(&schema_def)
+
+          ::Dir.mktmpdir do |tmp_dir|
+            results.state.factory.new_schema_artifact_manager(
+              schema_definition_results: results,
+              schema_artifacts_directory: tmp_dir,
+              output: ::StringIO.new
+            ).dump_artifacts
+
+            build_graphql(schema_artifacts: SchemaArtifacts::FromDisk.new(tmp_dir)).schema
+          end
         end
       end
     end

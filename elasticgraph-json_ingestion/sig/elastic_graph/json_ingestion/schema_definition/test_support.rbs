@@ -1,0 +1,23 @@
+module ElasticGraph
+  module JSONIngestion
+    module SchemaDefinition
+      module TestSupport
+        include ElasticGraph::SchemaDefinition::TestSupport
+
+        def define_schema: (
+          schema_element_name_form: ElasticGraph::SchemaArtifacts::RuntimeMetadata::SchemaElementNames::form,
+          ?schema_element_name_overrides: ::Hash[::Symbol, ::String],
+          ?json_schema_version: ::Integer?,
+          **untyped
+        ) ?{ (ElasticGraph::SchemaDefinition::API) -> void } -> ElasticGraph::SchemaDefinition::Results
+
+        def define_schema_with_schema_elements: (
+          ElasticGraph::SchemaArtifacts::RuntimeMetadata::SchemaElementNames,
+          ?json_schema_version: ::Integer?,
+          ?extension_modules: ::Array[::Module],
+          **untyped
+        ) ?{ (ElasticGraph::SchemaDefinition::API) -> void } -> ElasticGraph::SchemaDefinition::Results
+      end
+    end
+  end
+end

@@ -7,10 +7,8 @@
 # frozen_string_literal: true
 
 require "elastic_graph/errors"
-require "elastic_graph/schema_artifacts/from_disk"
 require "elastic_graph/schema_artifacts/runtime_metadata/schema_element_names"
 require "elastic_graph/schema_definition/api"
-require "elastic_graph/schema_definition/schema_artifact_manager"
 
 module ElasticGraph
   module SchemaDefinition
@@ -24,12 +22,10 @@ module ElasticGraph
         schema_element_name_form:,
         schema_element_name_overrides: {},
         index_document_sizes: true,
-        json_schema_version: 1,
         extension_modules: [],
         derived_type_name_formats: {},
         type_name_overrides: {},
         enum_value_overrides_by_type: {},
-        reload_schema_artifacts: false,
         output: nil,
         &block
       )
@@ -41,12 +37,10 @@ module ElasticGraph
         define_schema_with_schema_elements(
           schema_elements,
           index_document_sizes: index_document_sizes,
-          json_schema_version: json_schema_version,
           extension_modules: extension_modules,
           derived_type_name_formats: derived_type_name_formats,
           type_name_overrides: type_name_overrides,
           enum_value_overrides_by_type: enum_value_overrides_by_type,
-          reload_schema_artifacts: reload_schema_artifacts,
           output: output,
           &block
         )
@@ -55,12 +49,10 @@ module ElasticGraph
       def define_schema_with_schema_elements(
         schema_elements,
         index_document_sizes: true,
-        json_schema_version: 1,
         extension_modules: [],
         derived_type_name_formats: {},
         type_name_overrides: {},
         enum_value_overrides_by_type: {},
-        reload_schema_artifacts: false,
         output: nil
       )
         api = API.new(
@@ -75,36 +67,7 @@ module ElasticGraph
 
         yield api if block_given?
 
-        # Set the json_schema_version to the provided value, if needed. The `json_schema_version` API only
-        # exists when an extension that implements JSON schema generation (such as
-        # `elasticgraph-json_ingestion`) is loaded; without one there is no JSON schema version to set.
-        if !json_schema_version.nil? && api.respond_to?(:json_schema_version)
-          # :nocov: -- only entered when a JSON schema extension is loaded, which is not the case in elasticgraph-schema_definition's tests.
-          versioned_api = api # : untyped
-          versioned_api.json_schema_version(json_schema_version) if versioned_api.state.json_schema_version.nil?
-          # :nocov:
-        end
-
-        # :nocov: -- the else branch and code past this aren't used by tests in elasticgraph-schema_definition.
-        return api.results unless reload_schema_artifacts
-
-        # Reloading the schema artifacts takes extra time that we don't usually want to spend (so it's opt-in)
-        # but it can be useful in some cases because there is a bit of extra pruning/validation that it applies.
-        if api.respond_to?(:enforce_json_schema_version)
-          versioned_api = api # : untyped
-          versioned_api.enforce_json_schema_version false
-        end
-        tmp_dir = ::Dir.mktmpdir
-        artifacts_manager = api.factory.new_schema_artifact_manager(
-          schema_definition_results: api.results,
-          schema_artifacts_directory: tmp_dir,
-          output: ::StringIO.new
-        )
-
-        artifacts_manager.dump_artifacts
-
-        SchemaArtifacts::FromDisk.new(tmp_dir)
-        # :nocov:
+        api.results
       end
 
       DOC_COMMENTS = (
