@@ -44,8 +44,8 @@ PATH
   specs:
     elasticgraph-elasticsearch (1.2.1.pre)
       elasticgraph-support (= 1.2.1.pre)
-      elasticsearch (~> 9.4)
-      faraday (~> 2.14, >= 2.14.2)
+      elasticsearch (~> 9.4, >= 9.4.3)
+      faraday (~> 2.14, >= 2.14.3)
       faraday-retry (~> 2.4)
 
 PATH
@@ -136,7 +136,7 @@ PATH
   specs:
     elasticgraph-opensearch (1.2.1.pre)
       elasticgraph-support (= 1.2.1.pre)
-      faraday (~> 2.14, >= 2.14.2)
+      faraday (~> 2.14, >= 2.14.3)
       faraday-retry (~> 2.4)
       opensearch-ruby (~> 3.4)
 
@@ -759,7 +759,7 @@ CHECKSUMS
   benchmark-ips (2.15.1) sha256=07a1a9f3c6105ecaf68c174fc3fbcddd71a0e9ada6236ae03093a0dcfd812d59
   bigdecimal (4.1.2) sha256=53d217666027eab4280346fba98e7d5b66baaae1b9c3c1c0ffe89d48188a3fbd
   bigdecimal (4.1.2-java) sha256=ccc836eab720a525529f70ed0de26a206fdbc9a9e8ac67b3b4ac7318b03e114d
-  bundler (4.0.15) sha256=a4ceb882fe94a0e0ac63cd0813932bbfd631a14e5ac0b7975189b19a4d28d9e7
+  bundler (4.0.13) sha256=19f08be7f27022cf0b89f27da0b044ae075e8270a9ef44ad248a932614e1ca3b
   coderay (1.1.3) sha256=dc530018a4684512f8f38143cd2a096c9f02a1fc2459edcfe534787a7fc77d4b
   colorator (1.1.0) sha256=e2f85daf57af47d740db2a32191d1bdfb0f6503a0dfbc8327d0c9154d5ddfc38
   concurrent-ruby (1.3.7) sha256=4412caec3a5ea2e5fdc52076724c071a81f2c0593d83b2ac8cbb8ca63b3151b0
