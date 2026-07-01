@@ -163,6 +163,228 @@ module ElasticGraph
           expect(generated).to include("STATUS_LEGACY = 2;")
         end
 
+        it "requires external enum types to have exactly one enum mapping source" do
+          results = define_proto_schema do |s|
+            s.proto_external_types(
+              "Status" => {
+                proto: "squareup.connect.v2.Status",
+                import: "squareup/connect/v2/status.proto"
+              }
+            )
+
+            s.enum_type "Status" do |t|
+              t.values "ACTIVE"
+            end
+
+            s.object_type "Account" do |t|
+              t.field "id", "ID"
+              t.field "status", "Status"
+              t.index "accounts"
+            end
+          end
+
+          expect {
+            proto_schema_from(results)
+          }.to raise_error(Errors::SchemaError, a_string_including("must also configure `proto_enum_mappings`"))
+        end
+
+        it "rejects external enum types with transformed enum mappings" do
+          results = define_proto_schema do |s|
+            s.proto_enum_mappings(
+              "Status" => {
+                ::Object.new => {
+                  expected_extras: [:LEGACY]
+                }
+              }
+            )
+            s.proto_external_types(
+              "Status" => {
+                proto: "squareup.connect.v2.Status",
+                import: "squareup/connect/v2/status.proto"
+              }
+            )
+
+            s.enum_type "Status" do |t|
+              t.values "ACTIVE"
+            end
+
+            s.object_type "Account" do |t|
+              t.field "id", "ID"
+              t.field "status", "Status"
+              t.index "accounts"
+            end
+          end
+
+          expect {
+            proto_schema_from(results)
+          }.to raise_error(Errors::SchemaError, a_string_including("must use an empty `proto_enum_mappings` options hash"))
+        end
+
+        it "rejects external enum types with multiple enum mapping sources" do
+          results = define_proto_schema do |s|
+            s.proto_enum_mappings("Status" => {::Object.new => {}, ::Object.new => {}})
+            s.proto_external_types(
+              "Status" => {
+                proto: "squareup.connect.v2.Status",
+                import: "squareup/connect/v2/status.proto"
+              }
+            )
+
+            s.enum_type "Status" do |t|
+              t.values "ACTIVE"
+            end
+
+            s.object_type "Account" do |t|
+              t.field "id", "ID"
+              t.field "status", "Status"
+              t.index "accounts"
+            end
+          end
+
+          expect {
+            proto_schema_from(results)
+          }.to raise_error(Errors::SchemaError, a_string_including("must use exactly one `proto_enum_mappings` source"))
+        end
+
+        it "deduplicates imports for repeated external enum references" do
+          proto_status = ::Class.new do
+            def self.enums
+              [::Data.define(:name).new(name: :ACTIVE)]
+            end
+          end
+
+          results = define_proto_schema do |s|
+            s.proto_enum_mappings("Status" => {proto_status => {}})
+            s.proto_external_types(
+              "Status" => {
+                "proto" => "squareup.connect.v2.Status",
+                "import" => "squareup/connect/v2/status.proto"
+              }
+            )
+
+            s.enum_type "Status" do |t|
+              t.values "ACTIVE"
+            end
+
+            s.object_type "Account" do |t|
+              t.field "id", "ID"
+              t.field "status", "Status"
+              t.field "previous_status", "Status"
+              t.index "accounts"
+            end
+          end
+
+          generated = proto_schema_from(results)
+          expect(generated.scan('import "squareup/connect/v2/status.proto";').size).to eq(1)
+          expect(generated).to include("squareup.connect.v2.Status status = 2;")
+          expect(generated).to include("squareup.connect.v2.Status previous_status = 3;")
+        end
+
+        it "validates external enum values against the ElasticGraph enum values" do
+          proto_status = ::Class.new do
+            def self.enums
+              [
+                ::Data.define(:name).new(name: :ACTIVE),
+                ::Data.define(:name).new(name: :PENDING)
+              ]
+            end
+          end
+
+          results = define_proto_schema do |s|
+            s.proto_enum_mappings("Status" => {proto_status => {}})
+            s.proto_external_types(
+              "Status" => {
+                proto: "squareup.connect.v2.Status",
+                import: "squareup/connect/v2/status.proto"
+              }
+            )
+
+            s.enum_type "Status" do |t|
+              t.values "ACTIVE", "INACTIVE"
+            end
+
+            s.object_type "Account" do |t|
+              t.field "id", "ID"
+              t.field "status", "Status"
+              t.index "accounts"
+            end
+          end
+
+          expect {
+            proto_schema_from(results)
+          }.to raise_error(Errors::SchemaError, a_string_including("values do not match"))
+        end
+
+        it "rejects external proto type references for non-enum types" do
+          results = define_proto_schema do |s|
+            s.proto_external_types(
+              "Address" => {
+                proto: "squareup.connect.v2.Address",
+                import: "squareup/connect/v2/address.proto"
+              }
+            )
+
+            s.object_type "Address" do |t|
+              t.field "street", "String"
+            end
+
+            s.object_type "Account" do |t|
+              t.field "id", "ID"
+              t.field "address", "Address"
+              t.index "accounts"
+            end
+          end
+
+          expect {
+            proto_schema_from(results)
+          }.to raise_error(Errors::SchemaError, a_string_including("Only enum types are supported"))
+        end
+
+        it "validates external proto type mapping input type" do
+          results = define_proto_schema do |s|
+            s.proto_external_types("bad")
+
+            s.object_type "Account" do |t|
+              t.field "id", "ID"
+              t.index "accounts"
+            end
+          end
+
+          expect {
+            proto_schema_from(results)
+          }.to raise_error(Errors::SchemaError, a_string_including("External proto type mappings must be a Hash"))
+        end
+
+        it "validates per-type external proto type mapping structure" do
+          results = define_proto_schema do |s|
+            s.proto_external_types("Status" => "bad")
+
+            s.object_type "Account" do |t|
+              t.field "id", "ID"
+              t.index "accounts"
+            end
+          end
+
+          expect {
+            proto_schema_from(results)
+          }.to raise_error(Errors::SchemaError, a_string_including("External proto type mapping for `Status` must be a Hash"))
+        end
+
+        it "requires external proto type mappings to define proto and import strings" do
+          results = define_proto_schema do |s|
+            s.proto_external_types("Status" => {proto: "squareup.connect.v2.Status"})
+
+            s.object_type "Account" do |t|
+              t.field "id", "ID"
+              t.index "accounts"
+            end
+          end
+
+          expect {
+            proto_schema_from(results)
+          }.to raise_error(Errors::SchemaError, a_string_including("must include a non-empty `import` String"))
+        end
+
         it "raises on field-number mapping collisions for a message" do
           results = define_proto_schema do |s|
             s.configure_proto_field_number_mappings(
@@ -332,6 +554,7 @@ module ElasticGraph
             state: build_fake_state,
             package_name: "elasticgraph",
             proto_enums_by_graphql_enum: nil,
+            proto_external_types: nil,
             proto_field_number_mappings: nil
           )
 

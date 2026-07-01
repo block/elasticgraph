@@ -52,6 +52,7 @@ module ElasticGraph
               state: state,
               package_name: state.proto_schema_package_name,
               proto_enums_by_graphql_enum: state.proto_enums_by_graphql_enum,
+              proto_external_types: state.proto_external_types,
               proto_field_number_mappings: state.proto_field_number_mappings,
               syntax: state.proto_schema_syntax,
               headers: state.proto_schema_headers

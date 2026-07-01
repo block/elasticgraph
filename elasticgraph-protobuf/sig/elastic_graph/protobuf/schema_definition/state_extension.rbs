@@ -4,6 +4,7 @@ module ElasticGraph
       module StateExtension: ::ElasticGraph::SchemaDefinition::State
         attr_accessor proto_schema_package_name: ::String
         attr_accessor proto_enums_by_graphql_enum: untyped
+        attr_accessor proto_external_types: untyped
         attr_accessor proto_field_number_mappings: untyped
         attr_accessor proto_schema_syntax: (::Symbol | ::String)
         attr_accessor proto_schema_headers: ::Array[::String]

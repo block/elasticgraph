@@ -162,6 +162,36 @@ end
 When a mapping exists for an enum, `elasticgraph-protobuf` uses the mapped proto enum(s)
 as the source of enum values (respecting `exclusions`, `expected_extras`, and `name_transform`).
 
+### Referencing Existing Protobuf Types
+
+For enums that exactly match a canonical proto enum, you can import and reference
+the existing proto type instead of generating a duplicate local enum:
+
+```ruby
+# in config/schema/protobuf.rb
+
+ElasticGraph.define_schema do |schema|
+  if defined?(Squareup::Connect::V2::Resources::Card::Type)
+    schema.proto_enum_mappings(
+      "CardType" => {
+        Squareup::Connect::V2::Resources::Card::Type => {}
+      }
+    )
+
+    schema.proto_external_types(
+      "CardType" => {
+        proto: "squareup.connect.v2.resources.Card.Type",
+        import: "squareup/connect/v2/resources/card.proto"
+      }
+    )
+  end
+end
+```
+
+External type references currently support enums only. The matching
+`proto_enum_mappings` entry must have exactly one source and no transform options;
+otherwise the enum stays generated locally so value curation remains explicit.
+
 ### Stable Field Numbers
 
 `schema_artifacts:dump` automatically reads and writes `proto_field_numbers.yaml`

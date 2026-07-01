@@ -493,6 +493,50 @@ module ElasticGraph
           expect(generated).not_to include("OBSOLETE")
         end
 
+        it "can import and reference an external proto enum type" do
+          proto_status = ::Class.new do
+            def self.enums
+              [
+                ::Data.define(:name).new(name: :ACTIVE),
+                ::Data.define(:name).new(name: :INACTIVE)
+              ]
+            end
+          end
+
+          results = define_proto_schema do |s|
+            s.proto_enum_mappings("Status" => {proto_status => {}})
+            s.proto_external_types(
+              "Status" => {
+                proto: "squareup.connect.v2.Status",
+                import: "squareup/connect/v2/status.proto"
+              }
+            )
+
+            s.enum_type "Status" do |t|
+              t.values "ACTIVE", "INACTIVE"
+            end
+
+            s.object_type "Account" do |t|
+              t.field "id", "ID"
+              t.field "status", "Status"
+              t.index "accounts"
+            end
+          end
+
+          expect(proto_schema_from(results)).to eq(<<~PROTO)
+            syntax = "proto3";
+
+            package elasticgraph;
+
+            import "squareup/connect/v2/status.proto";
+
+            message Account {
+              string id = 1;
+              squareup.connect.v2.Status status = 2;
+            }
+          PROTO
+        end
+
         it "raises when mapped proto enum sources produce inconsistent values" do
           proto_status_a = ::Class.new do
             def self.enums
