@@ -12,7 +12,7 @@
 # For example, to see your indexing preparer being used, this requires that it is registered
 # on your scalar type correctly, whereas if this directly called your indexing preparer
 # it wouldn't require it to be correctly registered.
-RSpec.shared_context "indexing preparer support" do |scalar_type|
+RSpec.shared_context "indexing preparer support", :json_ingestion_schema_definition do |scalar_type|
   before(:context) do
     @record_preparer = build_indexer(clients_by_name: {}, schema_definition: lambda do |schema|
       schema.object_type "MyType" do |t|

@@ -467,7 +467,6 @@ module ElasticGraph
           clients_by_name: datastore_clients_by_name,
           clock: class_double(::Time, now: now),
           schema_definition: schema_definition,
-          schema_definition_extension_modules: [],
           index_definitions: index_definitions,
           extension_settings: {"health_check" => health_check_settings}.compact
         )

@@ -8,14 +8,12 @@
 
 require "elastic_graph/constants"
 require "elastic_graph/errors"
-require "support/json_ingestion_schema_definition_helpers"
 require "support/json_schema_matcher"
 
 module ElasticGraph
   module JSONIngestion
     module SchemaDefinition
       RSpec.describe "JSON schema generation" do
-        include_context "JSONIngestionSchemaDefinitionHelpers"
         json_schema_id = {"allOf" => [{"$ref" => "#/$defs/ID"}, {"maxLength" => DEFAULT_MAX_KEYWORD_LENGTH}]}
         json_schema_float = {"$ref" => "#/$defs/Float"}
         json_schema_integer = {"$ref" => "#/$defs/Int"}

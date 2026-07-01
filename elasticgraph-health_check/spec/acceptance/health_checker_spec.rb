@@ -13,7 +13,7 @@ require "yaml"
 
 module ElasticGraph
   module HealthCheck
-    RSpec.describe "HealthChecker", :uses_datastore, :factories, :builds_graphql, :capture_logs do
+    RSpec.describe "HealthChecker", :ingests_json_data, :factories, :builds_graphql, :capture_logs do
       let(:now) { ::Time.iso8601("2022-02-14T12:30:00Z") }
       let(:graphql) { build_graphql }
       let(:health_checker) { HealthChecker.build_from(graphql) }

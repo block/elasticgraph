@@ -210,7 +210,9 @@ RSpec.configure do |config|
   config.raise_on_warning = true
   config.raise_errors_for_deprecations!
 
+  config.when_first_matching_example_defined(:json_ingestion_schema_definition) { require "elastic_graph/spec_support/json_ingestion_schema_definition" }
   config.when_first_matching_example_defined(:uses_datastore) { require "elastic_graph/spec_support/uses_datastore" }
+  config.when_first_matching_example_defined(:ingests_json_data) { require "elastic_graph/spec_support/ingests_json_data" }
   config.when_first_matching_example_defined(:builds_admin) { require "elastic_graph/spec_support/builds_admin" }
   config.when_first_matching_example_defined(:builds_datastore_core) { require "elastic_graph/spec_support/builds_datastore_core" }
   config.when_first_matching_example_defined(:builds_indexer) { require "elastic_graph/spec_support/builds_indexer" }
@@ -442,6 +444,12 @@ module ElasticGraph
 end
 
 RSpec.configure do |c|
+  c.define_derived_metadata(:ingests_json_data) do |m|
+    m[:json_ingestion_schema_definition] = true
+    m[:uses_datastore] = true
+    m[:builds_indexer] = true
+  end
+
   c.define_derived_metadata(type: :unit) { |m| m[:stub_datastore_client] = true unless m.key?(:stub_datastore_client) }
   c.include ElasticGraph::CommonSpecHelpers
 end

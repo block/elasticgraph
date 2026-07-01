@@ -11,7 +11,7 @@ require "elastic_graph/support/monotonic_clock"
 
 module ElasticGraph
   class Indexer
-    RSpec.describe DatastoreIndexingRouter, :uses_datastore, :capture_logs do
+    RSpec.describe DatastoreIndexingRouter, :ingests_json_data, :capture_logs do
       describe "#source_event_versions_in_index", :factories do
         let(:indexer) { build_indexer }
         let(:router) { indexer.datastore_router }

@@ -15,7 +15,7 @@ require "support/aggregations_helpers"
 module ElasticGraph
   class GraphQL
     module Resolvers
-      RSpec.describe NestedRelationshipsSource, :factories, :uses_datastore, :capture_logs do
+      RSpec.describe NestedRelationshipsSource, :factories, :ingests_json_data, :capture_logs do
         include AggregationsHelpers
 
         let(:merged_queries_message_type) { "NestedRelationshipsMergedQueries" }

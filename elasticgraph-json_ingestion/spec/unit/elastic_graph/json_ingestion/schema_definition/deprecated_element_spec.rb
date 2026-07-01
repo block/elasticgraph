@@ -6,14 +6,10 @@
 #
 # frozen_string_literal: true
 
-require "support/json_ingestion_schema_definition_helpers"
-
 module ElasticGraph
   module JSONIngestion
     module SchemaDefinition
       RSpec.describe DeprecatedElement do
-        include_context "JSONIngestionSchemaDefinitionHelpers"
-
         it "records `deleted_type`, `deleted_field`, and `renamed_from` calls so that schema artifact tooling can consume them" do
           state = define_schema(schema_element_name_form: "snake_case") do |schema|
             schema.deleted_type "OldType"

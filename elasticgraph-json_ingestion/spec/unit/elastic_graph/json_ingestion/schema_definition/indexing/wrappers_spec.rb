@@ -11,15 +11,12 @@ require "elastic_graph/errors"
 require "elastic_graph/json_ingestion/schema_definition/indexing/field"
 require "elastic_graph/json_ingestion/schema_definition/indexing/field_reference"
 require "elastic_graph/json_ingestion/schema_definition/indexing/field_type/object"
-require "support/json_ingestion_schema_definition_helpers"
 require "support/json_schema_matcher"
 
 module ElasticGraph
   module JSONIngestion
     module SchemaDefinition
       RSpec.describe "JSON schema indexing wrappers" do
-        include_context "JSONIngestionSchemaDefinitionHelpers"
-
         # `FieldReference#resolve` is a lazy reference: the referenced type need not exist when a field is
         # defined, only when artifacts are dumped. These two specs drive both outcomes (resolves / never
         # resolves) through the public schema-definition API.

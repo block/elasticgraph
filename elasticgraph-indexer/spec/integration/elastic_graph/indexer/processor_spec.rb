@@ -10,7 +10,7 @@ require "elastic_graph/indexer/processor"
 
 module ElasticGraph
   class Indexer
-    RSpec.describe Processor, :uses_datastore, :factories, :capture_logs do
+    RSpec.describe Processor, :ingests_json_data, :factories, :capture_logs do
       let(:indexer) { build_indexer }
 
       context "process non-rollover upsert events" do

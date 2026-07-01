@@ -38,7 +38,7 @@ module ElasticGraph
         end
       end
 
-      RSpec.shared_examples_for IndexDefinitionConfigurator, :uses_datastore, :builds_indexer do
+      RSpec.shared_examples_for IndexDefinitionConfigurator, :uses_datastore do
         let(:output_io) { StringIO.new }
         let(:clock) { class_double(::Time, now: ::Time.utc(2024, 3, 20, 12, 0, 0)) }
         let(:mapping_removal_note_snippet) { "extra fields listed here will not actually get removed" }

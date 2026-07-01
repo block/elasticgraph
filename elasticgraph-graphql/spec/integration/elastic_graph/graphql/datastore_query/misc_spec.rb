@@ -9,7 +9,6 @@
 require_relative "datastore_query_integration_support"
 require "elastic_graph/errors"
 require "elastic_graph/graphql/datastore_search_router"
-require "elastic_graph/json_ingestion/schema_definition/api_extension"
 
 module ElasticGraph
   class GraphQL
@@ -86,7 +85,7 @@ module ElasticGraph
 
       context "when the indexed type has nested `default_sort_fields`" do
         let(:graphql) do
-          build_graphql(schema_definition_extension_modules: [JSONIngestion::SchemaDefinition::APIExtension], schema_definition: lambda do |schema|
+          build_graphql(schema_definition: lambda do |schema|
             schema.object_type "Money" do |t|
               t.field "currency", "String!"
               t.field "amount_cents", "Int!"

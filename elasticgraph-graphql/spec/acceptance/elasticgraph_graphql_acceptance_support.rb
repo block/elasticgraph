@@ -7,7 +7,6 @@
 # frozen_string_literal: true
 
 require "elastic_graph/graphql/datastore_search_router"
-require "elastic_graph/json_ingestion/schema_definition/api_extension"
 require "elastic_graph/schema_definition/schema_elements/type_namer"
 require "elastic_graph/spec_support/builds_admin"
 require "graphql"
@@ -20,7 +19,13 @@ module ElasticGraph
 
   self.camel_case_cluster_configured = false
 
-  RSpec.shared_context "ElasticGraph GraphQL acceptance support", :factories, :uses_datastore, :capture_logs, :builds_indexer, :builds_admin do
+  # We list the `:ingests_json_data` component tags (`:json_ingestion_schema_definition`,
+  # `:uses_datastore`, `:builds_indexer`) individually rather than using `:ingests_json_data`
+  # itself. Applying the derived `:ingests_json_data` tag to a `shared_context` and then combining
+  # it with `include_examples` crashes RSpec (`undefined method 'key?' for nil`), whereas literal
+  # tags are inherited correctly. Once https://github.com/rspec/rspec/issues/333 is fixed we can
+  # collapse these back to `:ingests_json_data`.
+  RSpec.shared_context "ElasticGraph GraphQL acceptance support", :factories, :json_ingestion_schema_definition, :uses_datastore, :builds_indexer, :capture_logs, :builds_admin do
     include GraphQLSupport
     include PreventSearchesFromUsingWriteRequests
 
@@ -93,9 +98,6 @@ module ElasticGraph
             derived_type_name_formats: derived_type_name_formats,
             type_name_overrides: {Cursor: "String"},
             enum_value_overrides_by_type: enum_value_overrides_by_type,
-            # The camelCase schema definition below is derived from the repository's main test schema,
-            # which uses the JSON ingestion schema definition DSL, so it requires this extension.
-            schema_definition_extension_modules: [JSONIngestion::SchemaDefinition::APIExtension],
             schema_definition: ->(schema) do
               # standard:disable Security/Eval -- it's ok here in a test.
               schema.as_active_instance { eval(camel_case_schema_def) }

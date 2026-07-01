@@ -18,7 +18,14 @@ module ElasticGraph
     # triggered a `null_pointer_exception` in one shard, which caused the datastore to
     # return a partial response that our router handled by logging a warning. The
     # `:capture_logs` here caused the tests to fail until we fixed that issue.
-    RSpec.shared_context "DatastoreQueryIntegrationSupport", :uses_datastore, :factories, :capture_logs do
+    #
+    # We list the `:ingests_json_data` component tags (`:json_ingestion_schema_definition`,
+    # `:uses_datastore`, `:builds_indexer`) individually rather than using `:ingests_json_data`
+    # itself. Applying the derived `:ingests_json_data` tag to a `shared_context` and then combining
+    # it with `include_examples` crashes RSpec (`undefined method 'key?' for nil`), whereas literal
+    # tags are inherited correctly. Once https://github.com/rspec/rspec/issues/333 is fixed we can
+    # collapse these back to `:ingests_json_data`.
+    RSpec.shared_context "DatastoreQueryIntegrationSupport", :json_ingestion_schema_definition, :uses_datastore, :builds_indexer, :factories, :capture_logs do
       include AggregationsHelpers
       include SortSupport
 

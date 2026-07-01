@@ -13,7 +13,7 @@ require "graphql"
 module ElasticGraph
   class GraphQL
     module Resolvers
-      RSpec.describe QuerySource, :factories, :uses_datastore do
+      RSpec.describe QuerySource, :factories, :ingests_json_data do
         let(:graphql) { build_graphql }
 
         it "batches up multiple queries, sending an msearch request containing them all to the datastore" do
