@@ -60,6 +60,13 @@ module ElasticGraph
         # @!attribute [r] name_in_index
         #   @return [String]
         FieldNumberMapping = ::Data.define(:field_number, :name_in_index)
+        # Internal representation of an externally-defined protobuf type.
+        #
+        # @!attribute [r] fqn
+        #   @return [String]
+        # @!attribute [r] import
+        #   @return [String]
+        ExternalTypeDefinition = ::Data.define(:fqn, :import)
 
         # Protobuf syntaxes this generator can emit.
         SUPPORTED_SYNTAXES = %w[proto2 proto3].freeze
@@ -67,6 +74,7 @@ module ElasticGraph
         # @param state [ElasticGraph::SchemaDefinition::State]
         # @param package_name [String]
         # @param proto_enums_by_graphql_enum [Hash]
+        # @param proto_external_types [Hash]
         # @param proto_field_number_mappings [Hash]
         # @param syntax [Symbol, String] `:proto3` (default) or `:proto2`; validated by {APIExtension#proto_schema_artifacts}
         # @param headers [Array<String>] file-level header lines (e.g. `option` declarations) rendered verbatim
@@ -74,6 +82,7 @@ module ElasticGraph
           state:,
           package_name:,
           proto_enums_by_graphql_enum:,
+          proto_external_types: {},
           proto_field_number_mappings: {},
           syntax: :proto3,
           headers: []
@@ -83,7 +92,10 @@ module ElasticGraph
           @state = state
           @package_name = Identifier.package_name(package_name)
           @proto_enums_by_graphql_enum = normalize_proto_enum_mappings(proto_enums_by_graphql_enum)
+          @proto_external_types_by_type_name = normalize_proto_external_types(proto_external_types)
           @proto_field_number_mappings_by_message = normalize_proto_field_number_mappings(proto_field_number_mappings)
+          @imports = ::Set.new
+          @registered_external_type_names = ::Set.new
           @message_definitions_by_name = {}
           @enum_definitions_by_name = {}
           @generated_message_definitions_by_name = {}
@@ -105,8 +117,9 @@ module ElasticGraph
             %(syntax = "#{@syntax}";),
             "package #{@package_name};",
             *render_headers,
+            *render_imports,
             render_definitions
-          ]
+          ].reject(&:empty?)
 
           sections.join("\n\n") + "\n"
         end
@@ -146,6 +159,11 @@ module ElasticGraph
 
         # Registers the type's proto definition (if it needs one) and returns its proto field type name.
         def register_type(type)
+          if type.respond_to?(:name) && (external_type = @proto_external_types_by_type_name[type.name.to_s])
+            register_external_type(type, external_type)
+            return external_type.fqn
+          end
+
           case type
           when SchemaElements::EnumTypeExtension
             register_enum(type)
@@ -159,6 +177,55 @@ module ElasticGraph
           end
 
           type.to_proto_field_type
+        end
+
+        def register_external_type(type, external_type)
+          type_name = type.name.to_s
+
+          case type
+          when SchemaElements::EnumTypeExtension
+            unless @registered_external_type_names.include?(type_name)
+              validate_external_enum_type(type)
+              @registered_external_type_names << type_name
+            end
+
+            @imports << external_type.import
+          else
+            raise Errors::SchemaError, "External proto type `#{type.name}` cannot be referenced yet. " \
+              "Only enum types are supported by `proto_external_types` in this release."
+          end
+        end
+
+        def validate_external_enum_type(enum_type)
+          enum_type_name = enum_type.name.to_s
+          mapping_entries = @proto_enums_by_graphql_enum[enum_type_name]
+          if mapping_entries.nil? || mapping_entries.empty?
+            raise Errors::SchemaError, "External proto enum `#{enum_type_name}` must also configure " \
+              "`proto_enum_mappings` with exactly one untransformed source so its values can be verified."
+          end
+
+          unless mapping_entries.size == 1
+            raise Errors::SchemaError, "External proto enum `#{enum_type_name}` must use exactly one " \
+              "`proto_enum_mappings` source; multi-source enum mappings cannot be safely referenced externally."
+          end
+
+          proto_type, options = mapping_entries.first
+          options_are_empty = options.nil? || (options.is_a?(Hash) && options.empty?)
+          unless options_are_empty
+            raise Errors::SchemaError, "External proto enum `#{enum_type_name}` must use an empty " \
+              "`proto_enum_mappings` options hash; transformed, excluded, or extra values must stay generated locally."
+          end
+
+          proto_value_names = enum_value_names_from_proto_mapping(
+            enum_type_name: enum_type_name,
+            proto_type: proto_type,
+            options: {}
+          ).uniq.sort
+          eg_value_names = enum_type.values_by_name.keys.map(&:to_s).uniq.sort
+          return if proto_value_names == eg_value_names
+
+          raise Errors::SchemaError, "External proto enum `#{enum_type_name}` values do not match the ElasticGraph enum values. " \
+            "External values: #{proto_value_names.join(", ")}. ElasticGraph values: #{eg_value_names.join(", ")}."
         end
 
         def register_message(type)
@@ -428,6 +495,10 @@ module ElasticGraph
             @enum_definitions_by_name.key?(name)
         end
 
+        def render_imports
+          @imports.sort.map { |import| "import \"#{import}\";" }
+        end
+
         # Renders the custom header lines as a single contiguous section (so they are not
         # blank-line separated). Returns `[]` when no headers were configured.
         def render_headers
@@ -541,6 +612,46 @@ module ElasticGraph
           end
 
           normalized
+        end
+
+        def normalize_proto_external_types(raw_mappings)
+          normalized = {} # : ::Hash[::String, ExternalTypeDefinition]
+          return normalized if raw_mappings.nil?
+
+          unless raw_mappings.is_a?(Hash)
+            raise Errors::SchemaError, "External proto type mappings must be a Hash, got: #{raw_mappings.class}."
+          end
+
+          raw_mappings.each do |type_name, mapping|
+            unless mapping.is_a?(Hash)
+              raise Errors::SchemaError, "External proto type mapping for `#{type_name}` must be a Hash."
+            end
+
+            proto_type_name = fetch_external_type_mapping_value(type_name, mapping, :proto)
+            import = fetch_external_type_mapping_value(type_name, mapping, :import)
+
+            normalized[type_name.to_s] = ExternalTypeDefinition.new(
+              fqn: Identifier.external_type_name(proto_type_name),
+              import: import
+            )
+          end
+
+          normalized
+        end
+
+        def fetch_external_type_mapping_value(type_name, mapping, key)
+          value =
+            if mapping.key?(key)
+              mapping.fetch(key)
+            elsif mapping.key?(key.to_s)
+              mapping.fetch(key.to_s)
+            end
+
+          if value.is_a?(String) && !value.empty?
+            value
+          else
+            raise Errors::SchemaError, "External proto type mapping for `#{type_name}` must include a non-empty `#{key}` String."
+          end
         end
 
         def normalize_proto_field_number_mappings(raw_mappings)

@@ -51,6 +51,13 @@ module ElasticGraph
           def self.new: (field_number: ::Integer, name_in_index: ::String) -> instance
         end
 
+        class ExternalTypeDefinition
+          attr_reader fqn: ::String
+          attr_reader import: ::String
+
+          def self.new: (fqn: ::String, import: ::String) -> instance
+        end
+
         type fieldNumberMappingsByFieldName = ::Hash[::String, FieldNumberMapping]
 
         SUPPORTED_SYNTAXES: ::Array[::String]
@@ -60,7 +67,10 @@ module ElasticGraph
         @state: ::ElasticGraph::SchemaDefinition::State
         @package_name: ::String
         @proto_enums_by_graphql_enum: ::Hash[::String, untyped]
+        @proto_external_types_by_type_name: ::Hash[::String, ExternalTypeDefinition]
         @proto_field_number_mappings_by_message: ::Hash[::String, fieldNumberMappingsByFieldName]
+        @imports: ::Set[::String]
+        @registered_external_type_names: ::Set[::String]
         @message_definitions_by_name: ::Hash[::String, MessageDefinition]
         @enum_definitions_by_name: ::Hash[::String, EnumDefinition]
         @generated_message_definitions_by_name: ::Hash[::String, MessageDefinition]
@@ -73,6 +83,7 @@ module ElasticGraph
           state: ::ElasticGraph::SchemaDefinition::State,
           package_name: ::String,
           proto_enums_by_graphql_enum: untyped,
+          ?proto_external_types: untyped,
           ?proto_field_number_mappings: untyped,
           ?syntax: (::Symbol | ::String),
           ?headers: ::Array[::String]
@@ -85,6 +96,8 @@ module ElasticGraph
 
         def indexed_types: () -> ::Array[untyped]
         def register_type: (untyped type) -> ::String
+        def register_external_type: (untyped type, ExternalTypeDefinition) -> void
+        def validate_external_enum_type: (untyped enum_type) -> void
         def register_message: (untyped type) -> void
         def register_enum: (untyped enum_type) -> void
         def enum_value_names_for: (untyped enum_type) -> ::Array[::String]
@@ -121,6 +134,7 @@ module ElasticGraph
         ) -> ::String
         def unique_generated_message_name: (::String) -> ::String
         def name_taken?: (::String) -> bool
+        def render_imports: () -> ::Array[::String]
         def render_headers: () -> ::Array[::String]
         def render_definitions: () -> ::String
         def proto_enum_value_name: (::String, ::String) -> ::String
@@ -135,6 +149,8 @@ module ElasticGraph
         def check_message_name_collision: (::String, ::String) -> void
         def check_enum_name_collision: (::String, ::String) -> void
         def normalize_proto_enum_mappings: (untyped) -> ::Hash[::String, untyped]
+        def normalize_proto_external_types: (untyped) -> ::Hash[::String, ExternalTypeDefinition]
+        def fetch_external_type_mapping_value: (::String | ::Symbol, ::Hash[untyped, untyped], ::Symbol) -> ::String
         def normalize_proto_field_number_mappings: (untyped) -> ::Hash[::String, fieldNumberMappingsByFieldName]
         def normalize_field_number_mapping_entry: (::String, ::String, untyped) -> [::Integer, ::String]
         def renamed_public_field_names_by_type_name: () -> ::Hash[::String, ::Hash[::String, ::Array[::String]]]

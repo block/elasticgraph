@@ -27,6 +27,11 @@ module ElasticGraph
           expect(Identifier.field_name("string")).to eq("string_")
           expect(Identifier.enum_value_name("stream")).to eq("stream_")
         end
+
+        it "preserves external dotted type names" do
+          expect(Identifier.external_type_name("squareup.connect.v2.resources.Card.Type"))
+            .to eq("squareup.connect.v2.resources.Card.Type")
+        end
       end
     end
   end

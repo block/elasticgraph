@@ -106,6 +106,26 @@ module ElasticGraph
           nil
         end
 
+        # Registers GraphQL types that should be referenced from existing proto files instead of
+        # generated locally in `schema.proto`.
+        #
+        # @param proto_external_types [Hash] map of GraphQL type name to `proto` and `import` values
+        # @return [void]
+        #
+        # @example Reference an external enum type
+        #   ElasticGraph.define_schema do |schema|
+        #     schema.proto_external_types(
+        #       "CardType" => {
+        #         proto: "squareup.connect.v2.resources.Card.Type",
+        #         import: "squareup/connect/v2/resources/card.proto"
+        #       }
+        #     )
+        #   end
+        def proto_external_types(proto_external_types)
+          protobuf_state.proto_external_types = proto_external_types
+          nil
+        end
+
         # Configures proto field-number mappings directly from a hash.
         # Useful for tests and advanced use cases where mappings are sourced outside artifacts.
         # When artifacts are dumped, mappings from the existing `proto_field_numbers.yaml` artifact

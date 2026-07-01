@@ -51,6 +51,15 @@ module ElasticGraph
           escape_keyword(name.to_s)
         end
 
+        # Builds a reference to an externally-defined protobuf type. Unlike generated local
+        # identifiers, this preserves dotted fully-qualified names verbatim.
+        #
+        # @param name [#to_s]
+        # @return [String]
+        def self.external_type_name(name)
+          name.to_s
+        end
+
         # Escapes protobuf reserved keywords by suffixing them with an underscore.
         #
         # @param identifier [String]

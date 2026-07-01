@@ -7,6 +7,7 @@ module ElasticGraph
         def self.extended: (::ElasticGraph::SchemaDefinition::API & APIExtension) -> void
         def proto_schema_artifacts: (?package_name: ::String, ?syntax: ::Symbol, ?headers: ::Array[::String]) -> void
         def proto_enum_mappings: (untyped) -> void
+        def proto_external_types: (untyped) -> void
         def configure_proto_field_number_mappings: (untyped) -> void
 
         private
