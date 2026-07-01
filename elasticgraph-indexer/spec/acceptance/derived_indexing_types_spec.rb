@@ -7,7 +7,7 @@
 # frozen_string_literal: true
 
 module ElasticGraph
-  RSpec.describe "A derived indexing type", :uses_datastore, :factories, :capture_logs do
+  RSpec.describe "A derived indexing type", :ingests_json_data, :factories, :capture_logs do
     let(:indexer) { build_indexer }
 
     it "maintains derived fields, handling nested source and destination fields as needed" do

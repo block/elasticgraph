@@ -6,15 +6,10 @@
 #
 # frozen_string_literal: true
 
-require "elastic_graph/json_ingestion/schema_definition/api_extension"
-require "elastic_graph/spec_support/schema_definition_helpers"
-
 module ElasticGraph
   module JSONIngestion
     module SchemaDefinition
       RSpec.describe FactoryExtension do
-        include_context "SchemaDefinitionHelpers"
-
         it "extends enum types created without customization blocks" do
           api = build_api
           api.enum_type "EmptyEnum"
@@ -42,7 +37,7 @@ module ElasticGraph
           ::ElasticGraph::SchemaDefinition::API.new(
             schema_elements,
             true,
-            extension_modules: [APIExtension],
+            extension_modules: json_ingestion_schema_definition_extension_modules,
             output: log_device
           )
         end

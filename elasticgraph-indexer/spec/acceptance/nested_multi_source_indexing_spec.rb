@@ -7,7 +7,7 @@
 # frozen_string_literal: true
 
 module ElasticGraph
-  RSpec.describe "Nested multi-source indexing", :uses_datastore, :factories, :capture_logs do
+  RSpec.describe "Nested multi-source indexing", :ingests_json_data, :factories, :capture_logs do
     let(:indexer) { build_indexer }
     let(:league) { "NBA" }
     let(:formed_on) { "2019-04-23" }

@@ -11,7 +11,7 @@ require "elastic_graph/graphql/resolvers/nested_relationships"
 module ElasticGraph
   class GraphQL
     module Resolvers
-      RSpec.describe NestedRelationships, :factories, :uses_datastore, :capture_logs, :resolver do
+      RSpec.describe NestedRelationships, :factories, :ingests_json_data, :capture_logs, :resolver do
         # :expect_search_routing because the relation we use here uses an outbaund foreign key, which
         # is implemented via a filter on `id` (the search routing field)
         context "when the field being resolved is a relay connection field", :expect_search_routing do

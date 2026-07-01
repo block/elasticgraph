@@ -549,6 +549,5 @@ RSpec.configure do |config|
     # Note: we MUST consider the `body` when matching requests, because the body is
     # part of the core identity of requests to the datastore.
     meta[:vcr] = {match_requests_on: [:method, :uri, :body]} unless meta.key?(:vcr)
-    meta[:builds_indexer] = true
   end
 end

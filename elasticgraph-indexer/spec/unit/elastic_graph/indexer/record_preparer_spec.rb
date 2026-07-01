@@ -12,7 +12,7 @@ require "support/multiple_version_support"
 
 module ElasticGraph
   class Indexer
-    RSpec.describe RecordPreparer::Factory do
+    RSpec.describe RecordPreparer::Factory, :json_ingestion_schema_definition do
       include_context "MultipleVersionSupport"
 
       let(:factory_with_multiple_versions) do
@@ -54,7 +54,7 @@ module ElasticGraph
       end
     end
 
-    RSpec.describe RecordPreparer do
+    RSpec.describe RecordPreparer, :json_ingestion_schema_definition do
       describe "#prepare_for_index" do
         it "tolerates a `nil` value where an object would usually be" do
           preparer = build_preparer do |s|
@@ -494,7 +494,7 @@ module ElasticGraph
         end
       end
 
-      context "when working with events for an old JSON schema version" do
+      context "when working with events for an old JSON schema version", :json_ingestion_schema_definition do
         include_context "SchemaDefinitionHelpers"
 
         it "handles events for old versions before a field was deleted" do
@@ -578,7 +578,7 @@ module ElasticGraph
         def define_schema(&schema_definition)
           super(
             schema_element_name_form: "snake_case",
-            extension_modules: [JSONIngestion::SchemaDefinition::APIExtension],
+            extension_modules: json_ingestion_schema_definition_extension_modules,
             &schema_definition
           )
         end

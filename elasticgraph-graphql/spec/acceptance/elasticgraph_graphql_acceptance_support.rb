@@ -19,7 +19,13 @@ module ElasticGraph
 
   self.camel_case_cluster_configured = false
 
-  RSpec.shared_context "ElasticGraph GraphQL acceptance support", :factories, :uses_datastore, :capture_logs, :builds_indexer, :builds_admin do
+  # We list the `:ingests_json_data` component tags (`:json_ingestion_schema_definition`,
+  # `:uses_datastore`, `:builds_indexer`) individually rather than using `:ingests_json_data`
+  # itself. Applying the derived `:ingests_json_data` tag to a `shared_context` and then combining
+  # it with `include_examples` crashes RSpec (`undefined method 'key?' for nil`), whereas literal
+  # tags are inherited correctly. Once https://github.com/rspec/rspec/issues/333 is fixed we can
+  # collapse these back to `:ingests_json_data`.
+  RSpec.shared_context "ElasticGraph GraphQL acceptance support", :factories, :json_ingestion_schema_definition, :uses_datastore, :builds_indexer, :capture_logs, :builds_admin do
     include GraphQLSupport
     include PreventSearchesFromUsingWriteRequests
 

@@ -7,14 +7,11 @@
 # frozen_string_literal: true
 
 require "elastic_graph/json_ingestion/schema_definition/indexing/json_schema_field_metadata"
-require "elastic_graph/spec_support/schema_definition_helpers"
 
 module ElasticGraph
   module JSONIngestion
     module SchemaDefinition
       RSpec.describe "JSON schema field metadata generation" do
-        include_context "SchemaDefinitionHelpers"
-
         it "generates no field metadata for built-in scalar and enum types" do
           metadata_by_type_and_field_name = dump_metadata
 
@@ -141,10 +138,10 @@ module ElasticGraph
           define_schema(&schema_definition).json_schema_field_metadata_by_type_and_field_name
         end
 
-        def define_schema(&schema_definition)
+        def define_schema(**options, &schema_definition)
           super(
             schema_element_name_form: "snake_case",
-            extension_modules: [APIExtension],
+            **options,
             &schema_definition
           )
         end

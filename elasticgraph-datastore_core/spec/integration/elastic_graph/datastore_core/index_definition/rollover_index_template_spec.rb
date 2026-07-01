@@ -15,7 +15,7 @@ require_relative "implementation_shared_examples"
 module ElasticGraph
   class DatastoreCore
     module IndexDefinition
-      RSpec.describe RolloverIndexTemplate, :uses_datastore, :builds_indexer do
+      RSpec.describe RolloverIndexTemplate, :ingests_json_data do
         # Use different index names than any other tests use, because most tests expect a specific index
         # configuration (based on `config/schema.graphql`) and we do not want to mess with it here.
         let(:index_prefix) { unique_index_name }

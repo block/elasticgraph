@@ -15,7 +15,7 @@ require "json"
 module ElasticGraph
   class Indexer
     module Operation
-      RSpec.describe Update do
+      RSpec.describe Update, :json_ingestion_schema_definition do
         include SchemaArtifacts::RuntimeMetadata::RuntimeMetadataSupport
 
         let(:indexer) { build_indexer }

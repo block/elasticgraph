@@ -8,12 +8,11 @@
 
 require "elastic_graph/graphql"
 require "elastic_graph/indexer"
-require "elastic_graph/json_ingestion/schema_definition/api_extension"
 require "elastic_graph/schema_definition/rake_tasks"
 require "support/graphql"
 
 module ElasticGraph
-  RSpec.describe "Querying an evolving schema", :uses_datastore, :factories, :capture_logs, :in_temp_dir, :rake_task do
+  RSpec.describe "Querying an evolving schema", :ingests_json_data, :factories, :capture_logs, :in_temp_dir, :rake_task do
     include GraphQLSupport
 
     let(:path_to_schema) { "config/schema.rb" }
@@ -66,7 +65,7 @@ module ElasticGraph
       run_rake "schema_artifacts:dump" do |output|
         SchemaDefinition::RakeTasks.new(
           schema_element_name_form: :snake_case,
-          extension_modules: [JSONIngestion::SchemaDefinition::APIExtension],
+          extension_modules: json_ingestion_schema_definition_extension_modules,
           index_document_sizes: true,
           path_to_schema: path_to_schema,
           schema_artifacts_directory: "config/schema/artifacts",

@@ -10,7 +10,7 @@ require "elastic_graph/spec_support/schema_definition_helpers"
 
 module ElasticGraph
   class Indexer
-    ::RSpec.shared_context "MultipleVersionSupport" do
+    ::RSpec.shared_context "MultipleVersionSupport", :json_ingestion_schema_definition do
       include_context "SchemaDefinitionHelpers"
 
       def build_indexer_with_multiple_schema_versions(schema_versions:)

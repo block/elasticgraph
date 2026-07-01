@@ -138,7 +138,7 @@ module ElasticGraph
             end
           end
 
-          context "when a concrete index has been derived from the template", :factories do
+          context "when a concrete index has been derived from the template", :factories, :ingests_json_data do
             include ConcreteIndexAdapter
 
             # our schema in the tests here is more limited than the main widget schema, so select only some fields.

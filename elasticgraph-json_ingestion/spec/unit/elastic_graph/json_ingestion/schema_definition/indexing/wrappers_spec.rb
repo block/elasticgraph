@@ -11,15 +11,12 @@ require "elastic_graph/errors"
 require "elastic_graph/json_ingestion/schema_definition/indexing/field"
 require "elastic_graph/json_ingestion/schema_definition/indexing/field_reference"
 require "elastic_graph/json_ingestion/schema_definition/indexing/field_type/object"
-require "elastic_graph/spec_support/schema_definition_helpers"
 require "support/json_schema_matcher"
 
 module ElasticGraph
   module JSONIngestion
     module SchemaDefinition
       RSpec.describe "JSON schema indexing wrappers" do
-        include_context "SchemaDefinitionHelpers"
-
         # `FieldReference#resolve` is a lazy reference: the referenced type need not exist when a field is
         # defined, only when artifacts are dumped. These two specs drive both outcomes (resolves / never
         # resolves) through the public schema-definition API.
@@ -46,7 +43,11 @@ module ElasticGraph
             })
           end
 
-          it "raises a clear error (rather than blowing up internally) for a field whose type never resolves" do
+          # `:dont_validate_graphql_schema` matters here: with `VALIDATE_GRAPHQL_SCHEMAS=1` (as on CI), the
+          # eager SDL validation would raise this error during GraphQL schema generation, before the JSON
+          # schema generation path exercises the wrapped `FieldReference#resolve` nil return that this
+          # example exists to cover.
+          it "raises a clear error (rather than blowing up internally) for a field whose type never resolves", :dont_validate_graphql_schema do
             # When a field references a type that is never defined, the wrapped `FieldReference#resolve`
             # returns `nil`. The schema definition machinery relies on that `nil` to detect the unresolvable
             # type and surface a helpful error instead of crashing.

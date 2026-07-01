@@ -15,7 +15,7 @@ require "elastic_graph/spec_support/builds_indexer_operation"
 
 module ElasticGraph
   class Indexer
-    RSpec.describe DatastoreIndexingRouter, :capture_logs do
+    RSpec.describe DatastoreIndexingRouter, :json_ingestion_schema_definition, :capture_logs do
       include SpecSupport::BuildsIndexerOperation
 
       let(:main_datastore_client) { instance_spy(Elasticsearch::Client, cluster_name: "main") }

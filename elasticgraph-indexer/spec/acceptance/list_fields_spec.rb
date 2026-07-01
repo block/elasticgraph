@@ -7,7 +7,7 @@
 # frozen_string_literal: true
 
 module ElasticGraph
-  RSpec.describe "Indexing into list fields", :uses_datastore, :factories, :capture_logs do
+  RSpec.describe "Indexing into list fields", :ingests_json_data, :factories, :capture_logs do
     let(:indexer) { build_indexer }
 
     it "indexes counts of any list fields so we can later use it for filtering" do

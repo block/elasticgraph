@@ -19,7 +19,6 @@ module ElasticGraph
           self.schema_artifacts = generate_schema_artifacts do |schema|
             schema.scalar_type "MyInt" do |t|
               t.mapping type: "integer"
-              t.json_schema type: "integer"
             end
 
             schema.object_type "PersonIdentifiers" do |t|

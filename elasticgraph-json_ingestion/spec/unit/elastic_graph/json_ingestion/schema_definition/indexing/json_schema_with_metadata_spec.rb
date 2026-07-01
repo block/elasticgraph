@@ -7,15 +7,12 @@
 # frozen_string_literal: true
 
 require "elastic_graph/json_ingestion/schema_definition/indexing/json_schema_with_metadata"
-require "elastic_graph/spec_support/schema_definition_helpers"
 
 module ElasticGraph
   module JSONIngestion
     module SchemaDefinition
       module Indexing
         ::RSpec.describe JSONSchemaWithMetadata do
-          include_context "SchemaDefinitionHelpers"
-
           it "ignores derived indexed types that do not show up in the JSON schema" do
             v1_json_schema = dump_versioned_json_schema do |schema|
               schema.json_schema_version 1
@@ -1054,10 +1051,10 @@ module ElasticGraph
             json_schema.dig("$defs", type, "properties", field, "ElasticGraph")
           end
 
-          def define_schema(&schema_definition)
+          def define_schema(**options, &schema_definition)
             super(
               schema_element_name_form: "snake_case",
-              extension_modules: [APIExtension],
+              **options,
               &schema_definition
             )
           end

@@ -210,7 +210,9 @@ RSpec.configure do |config|
   config.raise_on_warning = true
   config.raise_errors_for_deprecations!
 
+  config.when_first_matching_example_defined(:json_ingestion_schema_definition) { require "elastic_graph/spec_support/json_ingestion_schema_definition" }
   config.when_first_matching_example_defined(:uses_datastore) { require "elastic_graph/spec_support/uses_datastore" }
+  config.when_first_matching_example_defined(:ingests_json_data) { require "elastic_graph/spec_support/ingests_json_data" }
   config.when_first_matching_example_defined(:builds_admin) { require "elastic_graph/spec_support/builds_admin" }
   config.when_first_matching_example_defined(:builds_datastore_core) { require "elastic_graph/spec_support/builds_datastore_core" }
   config.when_first_matching_example_defined(:builds_indexer) { require "elastic_graph/spec_support/builds_indexer" }
@@ -356,7 +358,10 @@ module ElasticGraph
     end
     # :nocov:
 
+    # `extension_modules` intentionally defaults to none: specs must opt in explicitly to schema
+    # definition extensions (such as the one from `elasticgraph-json_ingestion`).
     def generate_schema_artifacts(
+      extension_modules: [],
       schema_element_name_form: :snake_case,
       schema_element_name_overrides: {},
       derived_type_name_formats: {},
@@ -365,8 +370,14 @@ module ElasticGraph
       reload_schema_artifacts: false
     )
       require "elastic_graph/schema_definition/test_support"
-      require "elastic_graph/spec_support/schema_definition_helpers"
       require "stringio"
+
+      unless block_given?
+        # When no block is given we load the repository's main test schema (`config/schema.rb`),
+        # which uses the JSON ingestion schema definition DSL, so it requires this extension.
+        require "elastic_graph/json_ingestion/schema_definition/api_extension"
+        extension_modules += [JSONIngestion::SchemaDefinition::APIExtension]
+      end
 
       output = ::StringIO.new # to silence warnings.
       ::ElasticGraph::SchemaDefinition::TestSupport.define_schema(
@@ -375,7 +386,7 @@ module ElasticGraph
         derived_type_name_formats: derived_type_name_formats,
         type_name_overrides: type_name_overrides,
         enum_value_overrides_by_type: enum_value_overrides_by_type,
-        extension_modules: ::ElasticGraph::SpecSupport::DEFAULT_SCHEMA_DEFINITION_EXTENSION_MODULES.dup,
+        extension_modules: extension_modules,
         reload_schema_artifacts: reload_schema_artifacts,
         output: output
       ) do |schema|
@@ -433,6 +444,12 @@ module ElasticGraph
 end
 
 RSpec.configure do |c|
+  c.define_derived_metadata(:ingests_json_data) do |m|
+    m[:json_ingestion_schema_definition] = true
+    m[:uses_datastore] = true
+    m[:builds_indexer] = true
+  end
+
   c.define_derived_metadata(type: :unit) { |m| m[:stub_datastore_client] = true unless m.key?(:stub_datastore_client) }
   c.include ElasticGraph::CommonSpecHelpers
 end

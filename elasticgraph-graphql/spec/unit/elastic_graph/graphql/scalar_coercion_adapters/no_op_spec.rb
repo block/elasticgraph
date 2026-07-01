@@ -14,7 +14,6 @@ module ElasticGraph
       RSpec.describe "NoOp" do
         include_context("scalar coercion adapter support", "SomeCustomScalar", schema_definition: ->(schema) do
           schema.scalar_type "SomeCustomScalar" do |t|
-            t.json_schema type: "null"
             t.mapping type: nil
           end
 

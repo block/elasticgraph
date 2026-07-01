@@ -7,7 +7,6 @@
 # frozen_string_literal: true
 
 require "elastic_graph/constants"
-require "elastic_graph/json_ingestion/schema_definition/api_extension"
 require "elastic_graph/schema_definition/rake_tasks"
 require "yaml"
 
@@ -620,7 +619,7 @@ module ElasticGraph
               index_document_sizes: true,
               path_to_schema: "schema.rb",
               schema_artifacts_directory: "config/schema/artifacts",
-              extension_modules: [APIExtension, extension_module],
+              extension_modules: json_ingestion_schema_definition_extension_modules([extension_module]),
               output: output
             )
           end
