@@ -37,8 +37,9 @@ module ElasticGraph
         #
         #   - If the index did not already exist: creates the index with the desired mappings and settings.
         #   - If the desired mapping has fewer fields than what is in the index template: updates the template
-        #     to drop those fields. Related concrete indices preserve their existing fields because the datastore
-        #     provides no way to remove fields from index mappings.
+        #     to drop those fields (see `put_index_template` for the operational caveats of dropping fields).
+        #     Related concrete indices preserve their existing fields because the datastore provides no way
+        #     to remove fields from index mappings.
         #   - If the settings have desired changes: updates the settings, restoring any setting that
         #     no longer has a desired value to its default.
         #   - If the mapping has desired changes: updates the mappings.
@@ -66,6 +67,24 @@ module ElasticGraph
 
         private
 
+        # Creates or updates the index template to exactly match the desired configuration -- including
+        # dropping any fields that have been removed from the schema. This intentionally differs from how
+        # we treat concrete indices (see `MappingUpdate.merge_existing_fields_into`): the datastore does
+        # not support removing fields from an existing index, so we preserve them there, but it does allow
+        # template fields to be dropped, and dropping them keeps templates from accumulating stale fields
+        # forever.
+        #
+        # Dropping a template field is not risk-free, though. New rollover indices are auto-created from
+        # the template at indexing time, and ElasticGraph mappings use `dynamic: strict`--so once a field
+        # is dropped from the template, any indexer that still publishes that field will fail to index
+        # documents into newly created indices. We have previously had a near-SEV from dropping a template
+        # field while deployed indexers were still running an old version of the code that used it, and for
+        # a long time this logic preserved existing template fields to guard against a repeat. That guard
+        # came at the cost of never being able to garbage-collect stale template fields, so we now drop
+        # them and instead rely on the schema evolution workflow: only remove a field from the schema once
+        # no deployed indexer still publishes it (and no old events containing it will be replayed). Any
+        # dropped fields show up as deletions in the diff reported below, giving operators a chance to
+        # catch a premature removal.
         def put_index_template
           action_description = if index_template_exists?
             "Updated index template: `#{@index_template.name}`:\n#{config_diff}"
