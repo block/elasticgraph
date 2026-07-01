@@ -2967,11 +2967,17 @@ module ElasticGraph
         end
 
         it "sets json_schema_version to the specified (valid) value" do
-          result = define_schema(schema_element_name_form: "snake_case") do |s|
+          results = define_schema(schema_element_name_form: "snake_case") do |s|
             s.json_schema_version 1
-          end.json_schemas_for(1)
+          end
 
-          expect(result[JSON_SCHEMA_VERSION_KEY]).to eq(1)
+          expect(results.json_schemas_for(1)[JSON_SCHEMA_VERSION_KEY]).to eq(1)
+          expect(results.available_schema_versions).to eq(Set[1])
+          expect(results.latest_schema_version).to eq(1)
+          expect(results.event_for_schema_version_validation({"id" => "1", SCHEMA_VERSION_KEY => 2}, 1)).to eq(
+            "id" => "1",
+            JSON_SCHEMA_VERSION_KEY => 1
+          )
         end
 
         it "allows json_schema_version enforcement to be disabled" do

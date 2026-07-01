@@ -40,6 +40,10 @@ module ElasticGraph
           expect(available_versions).not_to include(nil) # No `nil` values should be present.
         end
 
+        it "lists the available schema versions" do
+          expect(artifacts.available_schema_versions).to eq(artifacts.available_json_schema_versions)
+        end
+
         it "raises if an unavailable json_schema version is requested" do
           expect {
             artifacts.json_schemas_for(9999)
@@ -48,6 +52,19 @@ module ElasticGraph
 
         it "returns the largest JSON schema version as the `latest_json_schema_version`" do
           expect(artifacts.latest_json_schema_version).to eq 2
+        end
+
+        it "returns the latest schema version" do
+          expect(artifacts.latest_schema_version).to eq 2
+        end
+
+        it "adapts events for schema version validation" do
+          event = {"id" => "1", SCHEMA_VERSION_KEY => 1}
+
+          expect(artifacts.event_for_schema_version_validation(event, 2)).to eq(
+            "id" => "1",
+            JSON_SCHEMA_VERSION_KEY => 2
+          )
         end
       end
 
@@ -65,8 +82,16 @@ module ElasticGraph
           expect(artifacts.available_json_schema_versions).to eq Set.new
         end
 
+        it "returns an empty set from `available_schema_versions`" do
+          expect(artifacts.available_schema_versions).to eq Set.new
+        end
+
         it "raises an error from `latest_json_schema_version`" do
           expect { artifacts.latest_json_schema_version }.to raise_missing_artifacts_error
+        end
+
+        it "raises an error from `latest_schema_version`" do
+          expect { artifacts.latest_schema_version }.to raise_missing_artifacts_error
         end
 
         def raise_missing_artifacts_error

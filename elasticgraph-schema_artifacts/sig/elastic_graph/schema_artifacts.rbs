@@ -13,6 +13,12 @@ module ElasticGraph
     def json_schemas_for: (::Integer) -> ::Hash[::String, untyped]
     def available_json_schema_versions: () -> ::Set[::Integer]
     def latest_json_schema_version: () -> ::Integer
+    def available_schema_versions: () -> ::Set[::Integer]
+    def latest_schema_version: () -> ::Integer
+    def event_for_schema_version_validation: (
+      ::Hash[::String, untyped],
+      ::Integer
+    ) -> ::Hash[::String, untyped]
   end
 
   module SchemaArtifacts

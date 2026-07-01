@@ -125,7 +125,7 @@ module ElasticGraph
             "message_id" => event["message_id"],
             "event_type" => event.fetch("type"),
             "event_id" => EventID.from_event(event).to_s,
-            JSON_SCHEMA_VERSION_KEY => event.fetch(JSON_SCHEMA_VERSION_KEY),
+            SCHEMA_VERSION_KEY => event.fetch(SCHEMA_VERSION_KEY),
             "latencies_in_ms_from" => latencies_in_ms_from,
             "slo_results" => slo_results,
             "result" => result

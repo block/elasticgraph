@@ -27,6 +27,8 @@ module ElasticGraph
 
         allow(artifacts).to receive(:available_json_schema_versions).and_return(json_schemas_by_version.keys.to_set)
         allow(artifacts).to receive(:latest_json_schema_version).and_return(json_schemas_by_version.keys.max)
+        allow(artifacts).to receive(:available_schema_versions).and_return(json_schemas_by_version.keys.to_set)
+        allow(artifacts).to receive(:latest_schema_version).and_return(json_schemas_by_version.keys.max)
         allow(artifacts).to receive(:json_schemas_for) do |version|
           json_schemas_by_version.fetch(version)
         end

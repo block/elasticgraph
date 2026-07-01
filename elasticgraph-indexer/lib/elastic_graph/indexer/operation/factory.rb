@@ -28,37 +28,30 @@ module ElasticGraph
         def build(event)
           event = prepare_event(event)
 
-          selected_json_schema_version = select_json_schema_version(event) { |failure| return failure }
+          requested_schema_version = schema_version_from(event)
+          selected_schema_version = select_schema_version(event, requested_schema_version) { |failure| return failure }
+          event = event.merge(SCHEMA_VERSION_KEY => requested_schema_version)
 
-          # Because the `select_json_schema_version` picks the closest-matching json schema version, the incoming
-          # event might not match the expected json_schema_version value in the json schema (which is a `const` field).
-          # This is by design, since we're picking a schema based on best-effort, so to avoid that by-design validation error,
-          # performing the envelope validation on a "patched" version of the event.
-          event_with_patched_envelope = event.merge({JSON_SCHEMA_VERSION_KEY => selected_json_schema_version})
+          event_for_validation = schema_artifacts.event_for_schema_version_validation(event, selected_schema_version)
 
-          if (error_message = validator(EVENT_ENVELOPE_JSON_SCHEMA_NAME, selected_json_schema_version).validate_with_error_message(event_with_patched_envelope))
+          if (error_message = validator(EVENT_ENVELOPE_JSON_SCHEMA_NAME, selected_schema_version).validate_with_error_message(event_for_validation))
             return build_failed_result(event, "event payload", error_message)
           end
 
-          failed_result = validate_record_returning_failure(event, selected_json_schema_version)
+          failed_result = validate_record_returning_failure(event, selected_schema_version)
           failed_result || BuildResult.success(build_all_operations_for(
             event,
-            record_preparer_factory.for_json_schema_version(selected_json_schema_version)
+            record_preparer_factory.for_schema_version(selected_schema_version)
           ))
         end
 
         private
 
-        def select_json_schema_version(event)
-          available_json_schema_versions = schema_artifacts.available_json_schema_versions
+        def select_schema_version(event, requested_schema_version)
+          available_schema_versions = schema_artifacts.available_schema_versions
 
-          requested_json_schema_version = event[JSON_SCHEMA_VERSION_KEY]
-
-          # First check that a valid value has been requested (a positive integer)
-          if !event.key?(JSON_SCHEMA_VERSION_KEY)
-            yield build_failed_result(event, JSON_SCHEMA_VERSION_KEY, "Event lacks a `#{JSON_SCHEMA_VERSION_KEY}`")
-          elsif !requested_json_schema_version.is_a?(Integer) || requested_json_schema_version < 1
-            yield build_failed_result(event, JSON_SCHEMA_VERSION_KEY, "#{JSON_SCHEMA_VERSION_KEY} (#{requested_json_schema_version}) must be a positive integer.")
+          unless requested_schema_version.is_a?(Integer) && requested_schema_version >= 1
+            yield build_failed_result(event, SCHEMA_VERSION_KEY, "#{SCHEMA_VERSION_KEY} (#{requested_schema_version}) must be a positive integer.")
           end
 
           # The requested version might not necessarily be available (if the publisher is deployed ahead of the indexer, or an old schema
@@ -67,46 +60,46 @@ module ElasticGraph
           # the event can still be indexed.
           #
           # This min_by block will take the closest version in the list. If a tie occurs, the first value in the list wins. The desired
-          # behavior is in the event of a tie (highly unlikely, there shouldn't be a gap in available json schema versions), the higher version
+          # behavior is in the event of a tie (highly unlikely, there shouldn't be a gap in available schema versions), the higher version
           # should be selected. So to get that behavior, the list is sorted in descending order.
           #
-          selected_json_schema_version = available_json_schema_versions.sort.reverse.min_by { |version| (requested_json_schema_version - version).abs }
+          selected_schema_version = available_schema_versions.sort.reverse.min_by { |version| (requested_schema_version - version).abs }
 
-          if selected_json_schema_version != requested_json_schema_version
+          if selected_schema_version != requested_schema_version
             logger.info({
-              "message_type" => "ElasticGraphMissingJSONSchemaVersion",
+              "message_type" => "ElasticGraphMissingSchemaVersion",
               "message_id" => event["message_id"],
               "event_id" => EventID.from_event(event),
               "event_type" => event["type"],
-              "requested_json_schema_version" => requested_json_schema_version,
-              "selected_json_schema_version" => selected_json_schema_version
+              "requested_schema_version" => requested_schema_version,
+              "selected_schema_version" => selected_schema_version
             })
           end
 
-          if selected_json_schema_version.nil?
+          if selected_schema_version.nil?
             yield build_failed_result(
-              event, JSON_SCHEMA_VERSION_KEY,
-              "Failed to select json schema version. Requested version: #{event[JSON_SCHEMA_VERSION_KEY]}. \
-              Available json schema versions: #{available_json_schema_versions.sort.join(", ")}"
+              event, SCHEMA_VERSION_KEY,
+              "Failed to select schema version. Requested version: #{requested_schema_version}. \
+              Available schema versions: #{available_schema_versions.sort.join(", ")}"
             )
           end
 
-          selected_json_schema_version
+          selected_schema_version
         end
 
-        def validator(type, selected_json_schema_version)
-          factory = validator_factories_by_version[selected_json_schema_version] # : Support::JSONSchema::ValidatorFactory
+        def validator(type, selected_schema_version)
+          factory = validator_factories_by_version[selected_schema_version] # : Support::JSONSchema::ValidatorFactory
           factory.validator_for(type)
         end
 
         def validator_factories_by_version
-          @validator_factories_by_version ||= ::Hash.new do |hash, json_schema_version|
+          @validator_factories_by_version ||= ::Hash.new do |hash, schema_version|
             factory = Support::JSONSchema::ValidatorFactory.new(
-              schema: schema_artifacts.json_schemas_for(json_schema_version),
+              schema: schema_artifacts.json_schemas_for(schema_version),
               sanitize_pii: true
             )
             factory = configure_record_validator.call(factory) if configure_record_validator
-            hash[json_schema_version] = factory
+            hash[schema_version] = factory
           end
         end
 
@@ -117,10 +110,14 @@ module ElasticGraph
           event.merge("record" => event["record"].merge("id" => event.fetch("id")))
         end
 
-        def validate_record_returning_failure(event, selected_json_schema_version)
+        def schema_version_from(event)
+          event.fetch(SCHEMA_VERSION_KEY) { schema_artifacts.available_schema_versions.max }
+        end
+
+        def validate_record_returning_failure(event, selected_schema_version)
           record = event.fetch("record")
           graphql_type_name = event.fetch("type")
-          validator = validator(graphql_type_name, selected_json_schema_version)
+          validator = validator(graphql_type_name, selected_schema_version)
 
           if (error_message = validator.validate_with_error_message(record))
             build_failed_result(event, "#{graphql_type_name} record", error_message)
@@ -130,7 +127,7 @@ module ElasticGraph
         def build_failed_result(event, payload_description, validation_message)
           message = "Malformed #{payload_description}. #{validation_message}"
 
-          # Here we use the `RecordPreparer::Identity` record preparer because we may not have a valid JSON schema
+          # Here we use the `RecordPreparer::Identity` record preparer because we may not have a valid schema
           # version number in this case (which is usually required to get a `RecordPreparer` from the factory), and
           # we won't wind up using the record preparer for real on these operations, anyway.
           operations = build_all_operations_for(event, RecordPreparer::Identity)

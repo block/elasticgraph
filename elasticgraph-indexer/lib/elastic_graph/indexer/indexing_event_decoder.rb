@@ -24,7 +24,8 @@ module ElasticGraph
         end
 
         # @param payload [String] a raw payload from the transport
-        # @return [Array<Hash<String, Object>>] the decoded ElasticGraph indexing events
+        # @return [Array<Hash<String, Object>>] the decoded ElasticGraph indexing events. Events do not
+        #   need to include a schema version; when omitted, the latest available schema version is used.
         def decode(payload)
           # :nocov: -- must return an array to satisfy Steep type checking but never called
           []

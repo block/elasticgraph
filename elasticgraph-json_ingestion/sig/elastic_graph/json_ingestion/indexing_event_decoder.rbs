@@ -1,0 +1,21 @@
+module ElasticGraph
+  module JSONIngestion
+    module IndexingEventDecoder
+      class JSONLines
+        def initialize: (
+          config: ::Hash[::Symbol | ::String, untyped],
+          schema_artifacts: untyped,
+          logger: untyped
+        ) -> void
+
+        def decode: (::String) -> ::Array[::Hash[::String, untyped]]
+
+        private
+
+        def adapt_json_schema_version: (
+          ::Hash[::String, untyped]
+        ) -> ::Hash[::String, untyped]
+      end
+    end
+  end
+end

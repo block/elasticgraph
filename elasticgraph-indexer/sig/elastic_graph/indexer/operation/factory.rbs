@@ -42,8 +42,9 @@ module ElasticGraph
         @validator_factories_by_version: ::Hash[::Integer, Support::JSONSchema::ValidatorFactory]?
         def validator_factories_by_version: () -> ::Hash[::Integer, Support::JSONSchema::ValidatorFactory]
 
-        def select_json_schema_version: (event) { (BuildResult) -> bot } -> (::Integer | bot)
+        def select_schema_version: (event, untyped) { (BuildResult) -> bot } -> (::Integer | bot)
         def prepare_event: (event) -> event
+        def schema_version_from: (event) -> untyped
         def validate_record_returning_failure: (event, ::Integer) -> BuildResult?
         def build_failed_result: (event, ::String, ::String) -> BuildResult
         def build_all_operations_for: (event, _RecordPreparer) -> ::Array[_Operation]

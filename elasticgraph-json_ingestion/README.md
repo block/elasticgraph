@@ -7,6 +7,19 @@ events and validates JSON-ingestion-specific schema options. Generated ElasticGr
 and enable it by default. Applications that wire schema-definition tasks manually enable it by adding
 `ElasticGraph::JSONIngestion::SchemaDefinition::APIExtension` to their schema-definition extension modules.
 
+## Indexing Event Decoder
+
+JSON ingestion payloads can include `json_schema_version` to request a specific JSON schema artifact
+version. Configure the JSON ingestion decoder when the indexer consumes those payloads so the JSON-specific
+field is mapped to the indexer's generic `schema_version` event field.
+
+```yaml
+indexer:
+  indexing_event_decoder:
+    name: ElasticGraph::JSONIngestion::IndexingEventDecoder::JSONLines
+    require_path: elastic_graph/json_ingestion/indexing_event_decoder
+```
+
 ## Schema Definition APIs
 
 Use `schema.json_schema_version` to identify the current JSON schema artifact. Every change that affects
