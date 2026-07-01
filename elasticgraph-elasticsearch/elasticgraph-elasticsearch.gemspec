@@ -43,6 +43,6 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "elasticgraph-support", ElasticGraph::VERSION
   spec.add_dependency "elasticsearch", "~> 9.4"
-  spec.add_dependency "faraday", "~> 2.14", ">= 2.14.2"
+  spec.add_dependency "faraday", "~> 2.14", ">= 2.14.3"
   spec.add_dependency "faraday-retry", "~> 2.4"
 end
