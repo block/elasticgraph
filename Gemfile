@@ -18,9 +18,9 @@ group :development do
   gem "factory_bot", "~> 6.6"
   gem "faker", "~> 3.8"
   gem "flatware-rspec", "~> 2.4", platforms: :ruby
-  gem "httpx", "~> 1.7", ">= 1.7.8"
+  gem "httpx", "~> 1.8"
   gem "memory_profiler", "~> 1.1"
-  gem "nokogiri", "~> 1.19", ">= 1.19.3"
+  gem "nokogiri", "~> 1.19"
   gem "method_source", "~> 1.1"
   gem "rack-test", "~> 2.2"
   gem "rspec", "~> 3.13", ">= 3.13.2"
@@ -33,10 +33,10 @@ group :development do
   gem "rubocop-rake", "~> 0.6.0"
   # We are waiting to upgrade to >= 3.5 until standardrb compatibility with rubocop plugins is fixed:
   # https://github.com/standardrb/standard/issues/701
-  gem "rubocop-rspec", "~> 3.9.0"
+  gem "rubocop-rspec", "~> 3.10.2"
   gem "simplecov", "~> 0.22"
   gem "simplecov-console", "~> 0.9", ">= 0.9.5"
-  gem "standard", "~> 1.54.0"
+  gem "standard", "~> 1.55.0"
   gem "steep", "~> 2.0.0", platforms: :ruby
   gem "super_diff", "~> 0.19"
   gem "vcr", "~> 6.4"
