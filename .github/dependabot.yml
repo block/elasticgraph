@@ -16,7 +16,7 @@ updates:
     allow:
       - dependency-type: "all" # Allow both direct and transitive updates for all packages.
     schedule:
-      interval: weekly
+      interval: monthly
     open-pull-requests-limit: 10
     groups:
       # 1 PR for every single dependency is overkill (it's tedious to have to wade through 20 dependabot PRs!).
@@ -27,8 +27,6 @@ updates:
         exclude-patterns:
           - "elasticsearch" # listed here as gem releases align with releases of Elasticsearch itself, and a PR notifies us of it
           - "graphql"
-          - "json_schemer"
-          - "rack"
           - "rbs"
           - "standard"
           - "steep"
@@ -38,7 +36,7 @@ updates:
     allow:
       - dependency-type: "all" # Allow both direct and transitive updates for all packages.
     schedule:
-      interval: weekly
+      interval: monthly
     open-pull-requests-limit: 1
     groups:
       release-gems:
@@ -49,7 +47,7 @@ updates:
     allow:
       - dependency-type: "all" # Allow both direct and transitive updates for all packages.
     schedule:
-      interval: weekly
+      interval: monthly
     open-pull-requests-limit: 1
     groups:
       npm:
@@ -60,7 +58,7 @@ updates:
     allow:
       - dependency-type: "all" # Allow both direct and transitive updates for all packages.
     schedule:
-      interval: weekly
+      interval: monthly
     open-pull-requests-limit: 1
     groups:
       apollo-docker:
@@ -71,7 +69,7 @@ updates:
     allow:
       - dependency-type: "all" # Allow both direct and transitive updates for all packages.
     schedule:
-      interval: weekly
+      interval: monthly
     open-pull-requests-limit: 1
     groups:
       elasticsearch-docker:
@@ -82,7 +80,7 @@ updates:
     allow:
       - dependency-type: "all" # Allow both direct and transitive updates for all packages.
     schedule:
-      interval: weekly
+      interval: monthly
     open-pull-requests-limit: 1
     groups:
       opensearch-docker:
@@ -93,7 +91,7 @@ updates:
     allow:
       - dependency-type: "all" # Allow both direct and transitive updates for all packages.
     schedule:
-      interval: weekly
+      interval: monthly
     open-pull-requests-limit: 1
     groups:
       pip:
