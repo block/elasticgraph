@@ -80,8 +80,9 @@ After the final gate passes, print the final report (see "Final report" below). 
 - Predicate methods over truthy getters. `has_own_index_def?` exists — use it in `select(&:...)` instead of `select(&:own_index_def)`.
 - ES/OS domain terms used precisely. "root document type" means *root of an index* (per ES/OS docs); for "queryable off GraphQL Query" use `directly_queryable?`.
 
-### `respond_to?` is a code smell
+### `respond_to?` and type checks are code smells
 - `respond_to?` branches that exist only because one subtype has a method the other doesn't -> push the method up to the shared mixin (usually `HasIndices`, `ImplementsInterfaces`), give the other type a trivial return (`[]`, `{}`, `nil`), delete the check.
+- `is_a?`/`instance_of?` branching to pick behavior per type -> add a polymorphic method to each type instead. Adapters, schema element types, etc. are meant to be polymorphic so callers never type-check (e.g. a `cursor_type` method on each acceptance adapter, not `is_a?(CamelCaseGraphQLAcceptanceAdapter)`).
 
 ### Inheritance over parallel methods
 - Two similarly shaped methods across a type + its specialization (e.g. `resolve_interface_supertypes` beside `recursively_resolve_supertypes`) -> collapse via `super`. Shared behavior in the mixin; subclass does `super + extra`.
@@ -105,6 +106,7 @@ After the final gate passes, print the final report (see "Final report" below). 
 - Preserve comments unless they are inaccurate. If a move or extraction drops a comment, verify the comment is obsolete before deleting it.
 
 ### Extension mechanics
+- Core gems stay ignorant of extensions. `elasticgraph-schema_definition` (and other core gems) must not reference extension concepts (warehouse columns, JSON-ingestion metadata); the extension fully implements its own logic through the extension system. A fix that adds extension-specific code to a core gem belongs in the extension instead.
 - Prefer one extension strategy at a time. Use factory-applied extension modules for normal EG extension points; use `DelegateClass` wrappers when wrapping frozen/Data-backed core objects or holding side state. Do not wrap and then extend the wrapper unless the extra layer has a concrete purpose.
 - Extension modules should define only new public APIs or composable overrides that call `super`. Generic private helper names can collide when multiple extensions are loaded; move those helpers into a namespaced helper class/module and delegate to it.
 - If an extension module needs setup when applied, prefer an `extended` hook over requiring the caller to call a setup method immediately after `extend`.
@@ -117,11 +119,19 @@ After the final gate passes, print the final report (see "Final report" below). 
 - Unused args should be removed when the caller contract allows it; do not leave compatibility-shaped parameters without a reason.
 - Watch for accidental behavior drift in moves/extractions/wrappers. If behavior changes, either preserve the old behavior or add a targeted test and make the change intentional.
 
+### Fix the root cause, not the instance
+- When a bug spans a whole category (every built-in scalar, every relationship in a chain), fix it at the general level. A patch that handles only the reported case leaves its siblings broken.
+- Pair the fix with a test spanning the full category — one that passes with the general fix but fails with an instance-only fix.
+
 ### Defaults & truthiness
 - Explicit `true`/`false` for boolean defaults in DSL call sites. `returnable: true`, not `returnable: nil`, even if `nil` evaluates correctly.
 
 ### Impossible cases
 - Guards, early-returns, and "just in case" branches for scenarios that can't happen by design -> delete, along with their tests.
+
+### Comments and known limitations
+- Non-obvious "why" gets a comment: skip/early-return cases, surprising structure, a branch that looks like it should use a value but doesn't. If a reviewer would ask "why?", answer it inline.
+- Known limitations and deferred work -> link a tracking issue in the comment/TODO (`TODO(#1234): ...`, `// Known limitation--see #1234.`) so the decision has a home even when it's not fixed now.
 
 ### Config & env vars
 - New ENV var reads that the AWS/SDK client already handles natively -> delete, let the SDK fall back.
@@ -153,13 +163,24 @@ For classes like `WarehouseLambda`, `DatastoreCore`, `Indexer`, `GraphQL`, `Admi
 ### Tests must fail when the implementation is wrong
 - Before leaving a test alone, mentally revert the production change — do the tests still pass? If yes, the test is load-bearing on nothing. Strengthen the assertion or add a targeted case.
 - Common gaps: clause-order swaps still pass, `name_in_index`-vs-public-name swaps still pass, parent-false/child-true traversal skipped.
+- A test the implementation could satisfy by returning a degenerate constant (`{}`, `[]`, `nil`, one hardcoded case) proves nothing. Feed non-empty / multi-case inputs so a stubbed-constant implementation fails.
 
 ### Eliminate duplicate tests
 - Two tests that will always pass/fail together -> delete the less-specific one.
 - Tests that duplicate behavior guaranteed by shared infra (e.g. `Support::Config` already rejects unknown keys) -> delete.
 
+### Make tests self-contained
+- Every detail that matters to a test should be visible in its body. If a helper (`team_event`, a factory) silently creates the sibling records an assertion depends on, surface that in the test. Duplication that aids understanding beats hidden setup — this coexists with "eliminate duplicate tests" (dedupe tests that add no clarity, not details that do).
+
 ### Don't couple to library internals
 - Specs spying on internal `graphql` gem classes (`::GraphQL::StaticValidation::BaseVisitor`) -> replace with observable-behavior assertions (e.g. a deliberately-invalid registered query has `query.valid? == true` because validation is skipped).
+
+### Drive behavior through the public API
+- Prefer exercising behavior through the EG public API (schema definition, query execution, artifact dumping) over instantiating internal wrapper/collaborator classes directly. A test that news up internals can pass even when the piece isn't wired into the real flow (adapter registered for the wrong type, extension never applied); a public-API test fails in that case.
+- Unit tests exist to exhaustively cover edge cases. Don't lean on an integration/acceptance test to incidentally cover an edge case -> add the unit test too.
+
+### Preserve coverage when relocating tests
+- Moving or rewriting a test (into another gem/file) -> port the full assertions; don't substitute a thinner version. If the original covered version-bump enforcement, metadata upkeep, etc., the replacement covers all of it.
 
 ### Use the standard helpers
 - Subjects via `build_*` helpers in `spec/support/builds_*.rb`. Missing helper for a new wrapper class -> add `spec/support/builds_<name>.rb` following the existing pattern.
