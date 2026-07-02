@@ -1889,6 +1889,30 @@ module ElasticGraph
           }})
         end
 
+        specify "`not` negates a sub-filter mixing a negated condition and an `any_of` as a unit, per De Morgan's law" do
+          query = new_query(client_filter: {"not" => {
+            "age" => {"equal_to_any_of" => [nil]},
+            "any_of" => [
+              {"height" => {"gt" => 100}},
+              {"height" => {"lt" => 50}}
+            ]
+          }})
+
+          # The sub-filter mixes a `must_not` clause (`age = nil`) with a `should` clause (the
+          # `any_of`). Both must stay inside the single negating `must_not` so that neither the
+          # negated `age` clause is pulled up nor the `should`/`minimum_should_match` bleeds out.
+          expect(datastore_body_of(query)).to query_datastore_with({bool: {
+            must_not: [{bool: {
+              must_not: [{bool: {filter: [{exists: {"field" => "age"}}]}}],
+              minimum_should_match: 1,
+              should: [
+                {bool: {filter: [{range: {"height" => {gt: 100}}}]}},
+                {bool: {filter: [{range: {"height" => {lt: 50}}}]}}
+              ]
+            }}]
+          }})
+        end
+
         specify "`not: {all_of: [...]}` returns only the documents that are unmatched by `all_of: [...]`" do
           query = new_query(client_filter: {
             "not" => {

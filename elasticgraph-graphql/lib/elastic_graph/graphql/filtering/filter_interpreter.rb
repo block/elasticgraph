@@ -115,14 +115,14 @@ module ElasticGraph
 
           sub_bool = sub_filter.fetch(:bool)
 
-          if sub_bool.keys == [:must_not] && sub_bool.fetch(:must_not).size == 1
+          if sub_bool.keys == [:must_not] && (negated_clauses = sub_bool.fetch(:must_not)).size == 1
             # The sub-filter is purely a negation of a single clause, so negating it again would
             # double-negate that clause. Since `NOT (NOT A) == A`, we can instead require the inner
             # clause to positively match. Note that this is only sound because `must_not` is the
             # *only* part of the sub-filter; if the sub-filter had any other clauses, they would be
             # ANDed with the negated clause, and negating the conjunction as a whole would require
             # an OR of the negated parts (per De Morgan's law) rather than a simple pull-up.
-            bool_node[:filter] << sub_bool.fetch(:must_not).first
+            bool_node[:filter] << negated_clauses.first
           else
             # Negate the entire sub-filter as a single unit. The sub-filter's clauses are ANDed
             # together, so wrapping them in one `must_not` clause gives us `NOT (A AND B AND ...)`.
