@@ -113,23 +113,21 @@ module ElasticGraph
             return
           end
 
-          # Prevent any negated filters from being unnecessarily double-negated by
-          # converting them to a positive filter (i.e., !!A == A).
-          if sub_filter[:bool].key?(:must_not)
-            # Pull clauses up to current bool_node to remove negation
-            sub_filter[:bool][:must_not].each do |negated_clause|
-              negated_clause_bool = negated_clause[:bool]
-              # `minimum_should_match` is not a list like the other clauses, and needs to be handled separately.
-              negated_clause_bool.except(:minimum_should_match).each { |k, v| bool_node[k].concat(v) }
-              if (min_should_match = negated_clause_bool[:minimum_should_match])
-                bool_node[:minimum_should_match] = min_should_match
-              end
-            end
-          end
+          sub_bool = sub_filter.fetch(:bool)
 
-          # Don't drop any other filters! Let's negate them now.
-          other_filters = sub_filter[:bool].except(:must_not)
-          bool_node[:must_not] << {bool: other_filters} unless other_filters.empty?
+          if sub_bool.keys == [:must_not] && sub_bool.fetch(:must_not).size == 1
+            # The sub-filter is purely a negation of a single clause, so negating it again would
+            # double-negate that clause. Since `NOT (NOT A) == A`, we can instead require the inner
+            # clause to positively match. Note that this is only sound because `must_not` is the
+            # *only* part of the sub-filter; if the sub-filter had any other clauses, they would be
+            # ANDed with the negated clause, and negating the conjunction as a whole would require
+            # an OR of the negated parts (per De Morgan's law) rather than a simple pull-up.
+            bool_node[:filter] << sub_bool.fetch(:must_not).first
+          else
+            # Negate the entire sub-filter as a single unit. The sub-filter's clauses are ANDed
+            # together, so wrapping them in one `must_not` clause gives us `NOT (A AND B AND ...)`.
+            bool_node[:must_not] << {bool: sub_bool}
+          end
         end
 
         # There are two cases for `any_satisfy`, each of which is handled differently:

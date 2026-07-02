@@ -1864,6 +1864,51 @@ module ElasticGraph
           expect(triple_nested_not).to match_array(ids_of(widget1, widget3))
         end
 
+        it "negates a multi-condition sub-filter as a single unit, per De Morgan's law, when one condition is itself a negation" do
+          index_into(
+            graphql,
+            _widget1 = build(:widget, amount_cents: nil, name: "foo"),
+            widget2 = build(:widget, amount_cents: nil, name: "bar"),
+            widget3 = build(:widget, amount_cents: 100, name: "foo"),
+            widget4 = build(:widget, amount_cents: 250, name: "bar")
+          )
+
+          # `NOT (amount_cents = nil AND name = "foo")` must match every widget that has a non-nil
+          # `amount_cents` OR a name other than "foo"--not just the widgets satisfying both.
+          result = search_with_freeform_filter({"not" => {
+            "amount_cents" => {"equal_to_any_of" => [nil]},
+            "name" => {"equal_to_any_of" => ["foo"]}
+          }})
+
+          expect(result).to match_array(ids_of(widget2, widget3, widget4))
+        end
+
+        it "keeps a double-negated `any_of` independently required alongside a sibling `any_of`" do
+          index_into(
+            graphql,
+            widget1 = build(:widget, amount_cents: 100),
+            _widget2 = build(:widget, amount_cents: 205),
+            _widget3 = build(:widget, amount_cents: 400),
+            widget4 = build(:widget, amount_cents: 550)
+          )
+
+          # This must behave as `(< 150 OR > 500) AND (< 300 OR > 450)`; the two OR groups must
+          # not collapse into a single `< 150 OR > 500 OR < 300 OR > 450` group (which would
+          # wrongly match `_widget2`).
+          result = search_with_freeform_filter({
+            "any_of" => [
+              {"amount_cents" => {"lt" => 150}},
+              {"amount_cents" => {"gt" => 500}}
+            ],
+            "not" => {"not" => {"any_of" => [
+              {"amount_cents" => {"lt" => 300}},
+              {"amount_cents" => {"gt" => 450}}
+            ]}}
+          })
+
+          expect(result).to match_array(ids_of(widget1, widget4))
+        end
+
         it "matches no documents when set to `nil`" do
           index_into(
             graphql,
