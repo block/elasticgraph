@@ -1962,6 +1962,7 @@ index_definitions_by_name:
       __counts.shapes|type:
         source: __self
       full_address:
+        retrieved_from: doc_values
         source: __self
       geo_location.lat:
         source: __self
@@ -3240,6 +3241,7 @@ index_definitions_by_name:
       weight_in_ng_str:
         source: __self
       workspace_id2:
+        retrieved_from: doc_values
         source: __self
       workspace_name:
         source: workspace
@@ -3371,9 +3373,6 @@ object_types_by_name:
       cursor:
         resolver:
           name: object_without_lookahead
-      highlights:
-        resolver:
-          name: object_without_lookahead
       node:
         resolver:
           name: object_without_lookahead
@@ -3385,11 +3384,6 @@ object_types_by_name:
       timestamps:
         resolver:
           name: object_with_lookahead
-  AddressHighlights:
-    graphql_fields_by_name:
-      full_address:
-        resolver:
-          name: get_record_field_value
   AddressTimestamps:
     graphql_fields_by_name:
       created_at:
@@ -6072,10 +6066,6 @@ object_types_by_name:
           name: get_record_field_value
       widget_workspace_id:
         name_in_index: widget_workspace_id3
-        resolver:
-          name: get_record_field_value
-      workspace_id:
-        name_in_index: workspace_id2
         resolver:
           name: get_record_field_value
       workspace_name:
@@ -9284,10 +9274,6 @@ object_types_by_name:
         name_in_index: the_opts
         resolver:
           name: get_record_field_value
-      workspace_id:
-        name_in_index: workspace_id2
-        resolver:
-          name: get_record_field_value
       workspace_name:
         resolver:
           name: get_record_field_value
@@ -9861,9 +9847,6 @@ object_types_by_name:
       fees:
         resolver:
           name: get_record_field_value
-      full_address:
-        resolver:
-          name: get_record_field_value
       id:
         resolver:
           name: get_record_field_value
@@ -9900,10 +9883,6 @@ object_types_by_name:
           name: get_record_field_value
       the_options:
         name_in_index: the_opts
-        resolver:
-          name: get_record_field_value
-      workspace_id:
-        name_in_index: workspace_id2
         resolver:
           name: get_record_field_value
       workspace_name:

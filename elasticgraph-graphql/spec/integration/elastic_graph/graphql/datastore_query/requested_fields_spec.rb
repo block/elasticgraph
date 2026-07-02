@@ -50,6 +50,15 @@ module ElasticGraph
         expect(results.first.payload.keys).to include("name", "id", "options", "the_opts", "tags")
         expect(results.first["options"].keys).to include("size", "the_sighs")
       end
+
+      specify "returns docvalue-backed fields if passed `request_all_fields: true`" do
+        widget = build(:widget, workspace_id: "ws-1")
+        index_into(graphql, widget)
+
+        results = search_datastore(request_all_fields: true)
+
+        expect(results.first["workspace_id2"]).to eq "ws-1"
+      end
     end
   end
 end
