@@ -144,7 +144,9 @@ tables:
         widget_options STRUCT<sizes ARRAY<STRING>, colors ARRAY<STRING>>,
         nested_fields STRUCT<max_widget_cost INT>,
         oldest_widget_created_at TIMESTAMP,
-        max_weight_in_ng BIGINT
+        max_weight_in_ng BIGINT,
+        min_weight_in_grams FLOAT,
+        max_weight_in_grams FLOAT
       )
   widget_records:
     table_schema: |-
@@ -177,6 +179,7 @@ tables:
         named_inventor STRUCT<id STRING, name STRING, nationality STRING, __typename STRING, stock_ticker STRING>,
         weight_in_ng_str BIGINT,
         weight_in_ng BIGINT,
+        weight_in_grams FLOAT,
         tags ARRAY<STRING>,
         amounts ARRAY<INT>,
         fees ARRAY<STRUCT<currency STRING, amount_cents INT>>,
