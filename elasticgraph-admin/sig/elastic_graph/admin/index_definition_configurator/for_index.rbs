@@ -28,9 +28,6 @@ module ElasticGraph
         def cannot_modify_mapping_field_type_error: () -> ::String
         def index_exists?: () -> bool
 
-        @mapping_removals: ::Array[::String]?
-        def mapping_removals: () -> ::Array[::String]
-
         @mapping_type_changes: ::Array[::String]?
         def mapping_type_changes: () -> ::Array[::String]
 
@@ -39,7 +36,8 @@ module ElasticGraph
         @settings_updates: DatastoreCore::indexSettingsHash?
         def settings_updates: () -> DatastoreCore::indexSettingsHash
 
-        def mapping_fields_from: (DatastoreCore::indexMappingHash, ?::String) -> ::Array[::String]
+        @desired_mapping_for_update: DatastoreCore::indexMappingHash?
+        def desired_mapping_for_update: () -> DatastoreCore::indexMappingHash
 
         def desired_mapping: () -> DatastoreCore::indexMappingHash
 

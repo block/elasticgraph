@@ -36,9 +36,10 @@ module ElasticGraph
         # and the state of the index in the datastore, does one of the following:
         #
         #   - If the index did not already exist: creates the index with the desired mappings and settings.
-        #   - If the desired mapping has fewer fields than what is in the index: raises an exception,
-        #     because the datastore provides no way to remove fields from a mapping and it would be confusing
-        #     for this method to silently ignore the issue.
+        #   - If the desired mapping has fewer fields than what is in the index template: updates the template
+        #     to drop those fields (see `put_index_template` for the operational caveats of dropping fields).
+        #     Related concrete indices preserve their existing fields because the datastore provides no way
+        #     to remove fields from index mappings.
         #   - If the settings have desired changes: updates the settings, restoring any setting that
         #     no longer has a desired value to its default.
         #   - If the mapping has desired changes: updates the mappings.
@@ -66,20 +67,32 @@ module ElasticGraph
 
         private
 
+        # Creates or updates the index template to exactly match the desired configuration -- including
+        # dropping any fields that have been removed from the schema. This intentionally differs from how
+        # we treat concrete indices (see `MappingUpdate.merge_existing_fields_into`): the datastore does
+        # not support removing fields from an existing index, so we preserve them there, but it does allow
+        # template fields to be dropped, and dropping them keeps templates from accumulating stale fields
+        # forever.
+        #
+        # Dropping a template field is not risk-free, though. New rollover indices are auto-created from
+        # the template at indexing time, and ElasticGraph mappings use `dynamic: strict`--so once a field
+        # is dropped from the template, any indexer that still publishes that field will fail to index
+        # documents into newly created indices. We have previously had a near-SEV from dropping a template
+        # field while deployed indexers were still running an old version of the code that used it, and for
+        # a long time this logic preserved existing template fields to guard against a repeat. That guard
+        # came at the cost of never being able to garbage-collect stale template fields, so we now drop
+        # them and instead rely on the schema evolution workflow: only remove a field from the schema once
+        # no deployed indexer still publishes it (and no old events containing it will be replayed). Any
+        # dropped fields show up as deletions in the diff reported below, giving operators a chance to
+        # catch a premature removal.
         def put_index_template
-          desired_template_config_payload = Support::HashUtil.deep_merge(
-            desired_config_parent,
-            {"template" => {"mappings" => merge_properties(desired_mapping, current_mapping)}}
-          )
-
-          action_description = "Updated index template: `#{@index_template.name}`:\n#{config_diff}"
-
-          if mapping_removals.any?
-            action_description += "\n\nNote: the extra fields listed here will not actually get removed. " \
-              "Mapping removals are unsupported (but ElasticGraph will leave them alone and they'll cause no problems)."
+          action_description = if index_template_exists?
+            "Updated index template: `#{@index_template.name}`:\n#{config_diff}"
+          else
+            "Created index template: `#{@index_template.name}`"
           end
 
-          @datastore_client.put_index_template(name: @index_template.name, body: desired_template_config_payload)
+          @datastore_client.put_index_template(name: @index_template.name, body: desired_config_parent)
           report_action action_description
         end
 
@@ -90,10 +103,6 @@ module ElasticGraph
 
         def index_template_exists?
           !current_config_parent.empty?
-        end
-
-        def mapping_removals
-          @mapping_removals ||= mapping_fields_from(current_mapping) - mapping_fields_from(desired_mapping)
         end
 
         def mapping_type_changes
@@ -116,17 +125,6 @@ module ElasticGraph
             # Updating a setting to null will cause the datastore to restore the default value of the setting.
             restore_to_defaults = (current_settings.keys - desired_settings.keys).to_h { |key| [key, nil] }
             desired_settings.select { |key, value| current_settings[key] != value }.merge(restore_to_defaults)
-          end
-        end
-
-        def mapping_fields_from(mapping_hash, prefix = "")
-          (mapping_hash["properties"] || []).flat_map do |key, params|
-            field = prefix + key
-            if params.key?("properties")
-              [field] + mapping_fields_from(params, "#{field}.")
-            else
-              [field]
-            end
           end
         end
 
@@ -183,36 +181,6 @@ module ElasticGraph
 
         def report_action(message)
           @reporter.report_action(message)
-        end
-
-        # Helper method used to merge properties between a _desired_ configuration and a _current_ configuration.
-        # This is used when we are figuring out how to update an index template. We do not want to delete existing
-        # fields from a template--while the datastore would allow it, our schema evolution strategy depends upon
-        # us not dropping old unused fields. The datastore doesn't allow it on indices, anyway (though it does allow
-        # it on index templates). We've ran into trouble (a near SEV) when allowing the logic here to delete an unused
-        # field from an index template. The indexer "mapping completeness" check started failing because an old version
-        # of the code (from back when the field in question was still used) noticed the expected field was missing and
-        # started failing on every event.
-        #
-        # This helps us avoid that problem by retaining any currently existing fields.
-        #
-        # Long term, if we want to support fully "garbage collecting" these old fields on templates, we will need
-        # to have them get dropped in a follow up step. We could have our `update_datastore_config` script notice that
-        # the deployed prod indexers are at a version that will tolerate the fields being dropped, or support it
-        # via an opt-in flag or something.
-        def merge_properties(desired_object, current_object)
-          desired_properties = desired_object.fetch("properties") { _ = {} }
-          current_properties = current_object.fetch("properties") { _ = {} }
-
-          merged_properties = desired_properties.merge(current_properties) do |key, desired, current|
-            if current.is_a?(::Hash) && current.key?("properties") && desired.key?("properties")
-              merge_properties(desired, current)
-            else
-              desired
-            end
-          end
-
-          desired_object.merge("properties" => merged_properties)
         end
 
         def related_index_configurators

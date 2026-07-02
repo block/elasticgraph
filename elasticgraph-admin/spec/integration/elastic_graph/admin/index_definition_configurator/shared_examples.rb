@@ -41,7 +41,6 @@ module ElasticGraph
       RSpec.shared_examples_for IndexDefinitionConfigurator, :uses_datastore do
         let(:output_io) { StringIO.new }
         let(:clock) { class_double(::Time, now: ::Time.utc(2024, 3, 20, 12, 0, 0)) }
-        let(:mapping_removal_note_snippet) { "extra fields listed here will not actually get removed" }
         let(:index_meta_fields) { ["__nested_sourced_data", "__sources", "__typename", "__versions"] }
 
         it "idempotently creates an index or index template, avoiding unneeded datastore write calls" do
@@ -60,7 +59,7 @@ module ElasticGraph
           }.to maintain { get_index_definition_configuration(unique_index_name) }
             .and make_no_datastore_write_calls("main")
 
-          expect(output_io.string).not_to include(mapping_removal_note_snippet)
+          expect(output_io.string).to exclude("+ mappings", "+ settings")
         end
 
         it "allows new top-level fields to be added to an existing index or index template" do
@@ -77,7 +76,6 @@ module ElasticGraph
           # The printed description of what was changed should not mention settings that are not being updated.
           # (Requires us to normalize settings properly in the logic for this to be the case).
           expect(output_io.string).to include("properties.amount_cents").and exclude("coerce", "ignore_malformed", "number_of_replicas", "number_of_shards")
-          expect(output_io.string).not_to include(mapping_removal_note_snippet)
         end
 
         it "handles both `object` lists and `nested` lists" do
@@ -153,6 +151,7 @@ module ElasticGraph
               end
             }
           ))
+          output_io.string = +"" # use `+` so it is not a frozen string literal.
 
           expect {
             configure_index_definition(schema_def)
@@ -160,6 +159,8 @@ module ElasticGraph
             .from({"type" => "keyword", "meta" => {"foo" => "1"}})
             .to({"type" => "keyword"})
             .and make_datastore_calls_to_configure_index_def(unique_index_name, :mappings)
+
+          expect(output_io.string).to include("properties.name.meta")
         end
 
         it "allows some previously unset settings to be changed on an existing index or index template" do
@@ -200,24 +201,6 @@ module ElasticGraph
               simulate_presence_of_extra_setting(admin, unique_index_name, "index.version.upgraded", "7070099")
             end)
           }.to make_no_datastore_write_calls("main")
-        end
-
-        it "is a no-op when we attempt to drop a field because the datastore doesn't support dropping mapping fields" do
-          configure_index_definition(schema_def)
-
-          expect {
-            # Here we remove the `name` field and the `options.size` field to verify it works for both root and nested fields.
-            configure_index_definition(schema_def(
-              avoid_defining_widget_fields: %w[name],
-              avoid_defining_widget_options_fields: %w[size]
-            ))
-          }.to maintain {
-            props = get_index_definition_configuration(unique_index_name).dig("mappings", "properties")
-            [props.keys.sort, props.dig("options", "properties").keys.sort]
-          }.from([[*index_meta_fields, "created_at", "id", "name", "options"], ["color", "size"]])
-            .and make_datastore_calls_to_configure_index_def(unique_index_name, :mappings)
-
-          expect(output_io.string).to include(mapping_removal_note_snippet)
         end
 
         it "maintains `_meta.ElasticGraph.sources` as a stateful append-only-set that remembers sources that were once active but we no longer have" do
