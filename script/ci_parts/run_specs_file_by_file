@@ -6,22 +6,15 @@ source "script/ci_parts/setup_env" "test" $1 $2
 # of entire gems when just one spec file is run.
 unset COVERAGE
 
-# Setup standalone binstubs for RSpec that we use below.
-bundle install --standalone && bundle binstubs rspec-core --standalone
-
 function run_gem_specs_file_by_file() {
   gem=$1
   pushd $gem
-    for file in `find spec -iname '*_spec.rb'`; do
-      echo "Running $file"
-
-      # Note: here we avoid using `bundle exec`, opting for a binstub instead.
-      # Our `bundle install` command (with `--standalone` and `binstubs` options) creates the
-      # rspec binstub in a way where it won't actually load bundler at runtime. This is
-      # *slightly* faster. Not enough to usually matter, but it adds up when we boot rspec
-      # once for each spec file as we do here!
-      ../bin/rspec $file -b --format progress --no-profile
-    done
+    # Note: here we avoid booting `rspec` (and paying for `bundle exec`) once per spec
+    # file. The runner script boots bundler and rspec-core a single time and then runs
+    # each spec file in a `fork`, so every file still executes in its own isolated
+    # process. That saves 1-2 seconds per spec file, which adds up over the hundreds of
+    # spec files this build part covers.
+    ../script/rspec_file_by_file `find spec -iname '*_spec.rb'`
   popd
 }
 
