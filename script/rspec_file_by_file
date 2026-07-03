@@ -23,9 +23,20 @@
 # https://github.com/elastic/elastic-transport-ruby/pull/128 for an example of a gem
 # that breaks when loaded without activation.
 
+invocation_env = ENV.to_h
+
 ENV["BUNDLE_GEMFILE"] ||= ::File.expand_path("../Gemfile", __dir__)
 require "bundler/setup"
 require "rspec/core"
+
+# Booting bundler above mutated ENV (BUNDLE_GEMFILE, RUBYOPT, etc.) and captured that
+# mutated state in `Bundler::ORIGINAL_ENV`, which children inherit. A freshly booted
+# `rspec` process wouldn't have any of that: it would load bundler lazily (if at all)
+# with the unmodified environment, so e.g. `Bundler.with_original_env` in a spec would
+# restore the clean invocation environment for shelled-out commands. Restore both here
+# so forked children observe the same environment a fresh process would.
+ENV.replace(invocation_env)
+::Bundler::ORIGINAL_ENV.replace(invocation_env)
 
 ARGV.each do |spec_file|
   puts "Running #{spec_file}"
