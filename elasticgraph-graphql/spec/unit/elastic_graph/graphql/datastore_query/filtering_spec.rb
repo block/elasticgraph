@@ -558,7 +558,7 @@ module ElasticGraph
           query = new_query(client_filter: {"not" => {"age" => {"equal_to_any_of" => [nil]}}})
 
           expect(datastore_body_of(query)).to query_datastore_with({
-            bool: {filter: [{exists: {"field" => "age"}}]}
+            bool: {filter: [{bool: {filter: [{exists: {"field" => "age"}}]}}]}
           })
         end
 
@@ -596,7 +596,7 @@ module ElasticGraph
 
           expect(datastore_body_of(query)).to query_datastore_with({bool: {
             filter: [
-              {exists: {"field" => "age"}},
+              {bool: {filter: [{exists: {"field" => "age"}}]}},
               {terms: {"color" => %w[blue green]}}
             ]
           }})
@@ -609,7 +609,7 @@ module ElasticGraph
           })
 
           expect(datastore_body_of(query)).to query_datastore_with({bool: {
-            filter: [{exists: {"field" => "age"}}],
+            filter: [{bool: {filter: [{exists: {"field" => "age"}}]}}],
             must_not: [{bool: {filter: [{terms: {"color" => %w[blue green]}}]}}]
           }})
         end
@@ -1808,10 +1808,109 @@ module ElasticGraph
             ]
           }
 
-          query1 = new_query(client_filter: {"not" => {"not" => inner_filter}})
-          query2 = new_query(client_filter: inner_filter)
+          query = new_query(client_filter: {"not" => {"not" => inner_filter}})
 
-          expect(datastore_body_of(query1)).to eq(datastore_body_of(query2))
+          # The double negation is unwrapped (`NOT (NOT A) == A`), with the `any_of` kept as a
+          # single self-contained clause so that its `should`/`minimum_should_match` cannot bleed
+          # into (or get clobbered by) sibling filter clauses.
+          expect(datastore_body_of(query)).to query_datastore_with({bool: {filter: [{bool: {
+            minimum_should_match: 1,
+            should: [
+              {bool: {filter: [{terms: {"age" => [25, 30]}}]}},
+              {bool: {filter: [{range: {"height" => {gt: 10}}}]}}
+            ]
+          }}]}})
+        end
+
+        specify "an `any_of` alongside a double-negated `any_of` keeps the two OR groups independently required" do
+          query = new_query(client_filter: {
+            "any_of" => [
+              {"age" => {"gt" => 90}},
+              {"age" => {"lt" => 10}}
+            ],
+            "not" => {"not" => {"any_of" => [
+              {"height" => {"gt" => 100}},
+              {"height" => {"lt" => 50}}
+            ]}}
+          })
+
+          # The pulled-up double negation must not merge its `should` clauses (or its
+          # `minimum_should_match`) into the sibling `any_of`'s--that would turn
+          # `(A OR B) AND (C OR D)` into `A OR B OR C OR D`.
+          expect(datastore_body_of(query)).to query_datastore_with({bool: {
+            minimum_should_match: 1,
+            should: [
+              {bool: {filter: [{range: {"age" => {gt: 90}}}]}},
+              {bool: {filter: [{range: {"age" => {lt: 10}}}]}}
+            ],
+            filter: [{bool: {
+              minimum_should_match: 1,
+              should: [
+                {bool: {filter: [{range: {"height" => {gt: 100}}}]}},
+                {bool: {filter: [{range: {"height" => {lt: 50}}}]}}
+              ]
+            }}]
+          }})
+        end
+
+        specify "`not` negates multiple sub-filter conditions as a unit, per De Morgan's law, when one is itself a negation" do
+          query = new_query(client_filter: {"not" => {
+            "age" => {"equal_to_any_of" => [nil]},
+            "height" => {"gt" => 10}
+          }})
+
+          # `NOT (age = nil AND height > 10)` must be `age != nil OR height <= 10`. The negated
+          # `age = nil` clause must not be pulled up out of the `NOT` as an independently required
+          # `exists` clause--that would produce `age != nil AND height <= 10` instead.
+          expect(datastore_body_of(query)).to query_datastore_with({bool: {
+            must_not: [{bool: {
+              must_not: [{bool: {filter: [{exists: {"field" => "age"}}]}}],
+              filter: [{range: {"height" => {gt: 10}}}]
+            }}]
+          }})
+        end
+
+        specify "`not` negates multiple negated sub-filter conditions as a unit, per De Morgan's law" do
+          query = new_query(client_filter: {"not" => {
+            "age" => {"equal_to_any_of" => [nil]},
+            "name" => {"equal_to_any_of" => [nil]}
+          }})
+
+          # `NOT (age = nil AND name = nil)` must be `age != nil OR name != nil`. The negated
+          # clauses must not each be un-negated and pulled up as independently required `exists`
+          # clauses--that would produce `age != nil AND name != nil` instead.
+          expect(datastore_body_of(query)).to query_datastore_with({bool: {
+            must_not: [{bool: {
+              must_not: [
+                {bool: {filter: [{exists: {"field" => "age"}}]}},
+                {bool: {filter: [{exists: {"field" => "name"}}]}}
+              ]
+            }}]
+          }})
+        end
+
+        specify "`not` negates a sub-filter mixing a negated condition and an `any_of` as a unit, per De Morgan's law" do
+          query = new_query(client_filter: {"not" => {
+            "age" => {"equal_to_any_of" => [nil]},
+            "any_of" => [
+              {"height" => {"gt" => 100}},
+              {"height" => {"lt" => 50}}
+            ]
+          }})
+
+          # The sub-filter mixes a `must_not` clause (`age = nil`) with a `should` clause (the
+          # `any_of`). Both must stay inside the single negating `must_not` so that neither the
+          # negated `age` clause is pulled up nor the `should`/`minimum_should_match` bleeds out.
+          expect(datastore_body_of(query)).to query_datastore_with({bool: {
+            must_not: [{bool: {
+              must_not: [{bool: {filter: [{exists: {"field" => "age"}}]}}],
+              minimum_should_match: 1,
+              should: [
+                {bool: {filter: [{range: {"height" => {gt: 100}}}]}},
+                {bool: {filter: [{range: {"height" => {lt: 50}}}]}}
+              ]
+            }}]
+          }})
         end
 
         specify "`not: {all_of: [...]}` returns only the documents that are unmatched by `all_of: [...]`" do
@@ -1983,7 +2082,7 @@ module ElasticGraph
             "age" => {"not" => {"not" => {"any_of" => []}}}
           })
 
-          expect(datastore_body_of(query)).to query_datastore_with(always_false_condition)
+          expect(datastore_body_of(query)).to query_datastore_with({bool: {filter: [always_false_condition]}})
         end
 
         # Note: the GraphQL schema does not allow `any_of: {}` (`any_of` is a list field). However, we're testing

@@ -1860,8 +1860,112 @@ module ElasticGraph
             }
           }})
 
+          # A double-negated multi-clause `any_of` must return the same results as the un-negated
+          # `any_of`. The pulled-up `any_of` is wrapped in a self-contained `bool` clause rather than
+          # emitted byte-for-byte identically, but the wrapper is inert, so `NOT (NOT A) == A` must
+          # still hold at the results level.
+          any_of_filter = {"any_of" => [
+            {"amount_cents" => {"lt" => 150}},
+            {"amount_cents" => {"gt" => 300}}
+          ]}
+          double_negated_any_of_result = search_with_freeform_filter({"not" => {"not" => any_of_filter}})
+          un_negated_any_of_result = search_with_freeform_filter(any_of_filter)
+
           expect(inner_not_result).to eq(outer_not_result).and match_array(ids_of(widget2))
           expect(triple_nested_not).to match_array(ids_of(widget1, widget3))
+          expect(double_negated_any_of_result).to eq(un_negated_any_of_result).and match_array(ids_of(widget1, widget3))
+        end
+
+        it "negates a multi-condition sub-filter as a single unit, per De Morgan's law, when one condition is itself a negation" do
+          index_into(
+            graphql,
+            _widget1 = build(:widget, amount_cents: nil, name: "foo"),
+            widget2 = build(:widget, amount_cents: nil, name: "bar"),
+            widget3 = build(:widget, amount_cents: 100, name: "foo"),
+            widget4 = build(:widget, amount_cents: 250, name: "bar")
+          )
+
+          # `NOT (amount_cents = nil AND name = "foo")` must match every widget that has a non-nil
+          # `amount_cents` OR a name other than "foo"--not just the widgets satisfying both.
+          result = search_with_freeform_filter({"not" => {
+            "amount_cents" => {"equal_to_any_of" => [nil]},
+            "name" => {"equal_to_any_of" => ["foo"]}
+          }})
+
+          expect(result).to match_array(ids_of(widget2, widget3, widget4))
+        end
+
+        it "negates a sub-filter of multiple negated conditions as a unit, per De Morgan's law" do
+          index_into(
+            graphql,
+            _widget1 = build(:widget, amount_cents: nil, name: nil),
+            widget2 = build(:widget, amount_cents: nil, name: "bar"),
+            widget3 = build(:widget, amount_cents: 100, name: nil),
+            widget4 = build(:widget, amount_cents: 250, name: "bar")
+          )
+
+          # Both sub-conditions negate (`equal_to_any_of: [nil]` compiles to a `must_not`), so the
+          # sub-filter is `{must_not: [<amount_cents>, <name>]}`. This is the discriminator case: the
+          # sub-filter is purely `must_not` but has more than one clause, so it must NOT pull each
+          # clause up (which would wrongly produce `amount_cents != nil AND name != nil`). Per De
+          # Morgan's law, `NOT (amount_cents = nil AND name = nil)` must match every widget with a
+          # non-nil `amount_cents` OR a non-nil `name`--i.e. every widget except the all-nil one.
+          result = search_with_freeform_filter({"not" => {
+            "amount_cents" => {"equal_to_any_of" => [nil]},
+            "name" => {"equal_to_any_of" => [nil]}
+          }})
+
+          expect(result).to match_array(ids_of(widget2, widget3, widget4))
+        end
+
+        it "negates a sub-filter mixing a negated condition and an `any_of` as a unit, per De Morgan's law" do
+          index_into(
+            graphql,
+            _widget1 = build(:widget, amount_cents: nil, name: "foo"),
+            widget2 = build(:widget, amount_cents: 100, name: "foo"),
+            widget3 = build(:widget, amount_cents: nil, name: "baz"),
+            _widget4 = build(:widget, amount_cents: nil, name: "bar")
+          )
+
+          # The sub-filter mixes a `must_not` clause (`amount_cents = nil`) with a `should` clause
+          # (the `any_of`), so `should`/`minimum_should_match` must not bleed out of the negation.
+          # Per De Morgan's law, `NOT (amount_cents = nil AND (name = "foo" OR name = "bar"))` must
+          # match a widget with a non-nil `amount_cents` OR a name other than "foo"/"bar".
+          result = search_with_freeform_filter({"not" => {
+            "amount_cents" => {"equal_to_any_of" => [nil]},
+            "any_of" => [
+              {"name" => {"equal_to_any_of" => ["foo"]}},
+              {"name" => {"equal_to_any_of" => ["bar"]}}
+            ]
+          }})
+
+          expect(result).to match_array(ids_of(widget2, widget3))
+        end
+
+        it "keeps a double-negated `any_of` independently required alongside a sibling `any_of`" do
+          index_into(
+            graphql,
+            widget1 = build(:widget, amount_cents: 100),
+            _widget2 = build(:widget, amount_cents: 205),
+            _widget3 = build(:widget, amount_cents: 400),
+            widget4 = build(:widget, amount_cents: 550)
+          )
+
+          # This must behave as `(< 150 OR > 500) AND (< 300 OR > 450)`; the two OR groups must
+          # not collapse into a single `< 150 OR > 500 OR < 300 OR > 450` group (which would
+          # wrongly match `_widget2`).
+          result = search_with_freeform_filter({
+            "any_of" => [
+              {"amount_cents" => {"lt" => 150}},
+              {"amount_cents" => {"gt" => 500}}
+            ],
+            "not" => {"not" => {"any_of" => [
+              {"amount_cents" => {"lt" => 300}},
+              {"amount_cents" => {"gt" => 350}}
+            ]}}
+          })
+
+          expect(result).to match_array(ids_of(widget1, widget4))
         end
 
         it "matches no documents when set to `nil`" do
