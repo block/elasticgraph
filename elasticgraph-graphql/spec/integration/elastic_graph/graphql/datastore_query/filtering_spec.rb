@@ -1961,7 +1961,7 @@ module ElasticGraph
             ],
             "not" => {"not" => {"any_of" => [
               {"amount_cents" => {"lt" => 300}},
-              {"amount_cents" => {"gt" => 450}}
+              {"amount_cents" => {"gt" => 350}}
             ]}}
           })
 
