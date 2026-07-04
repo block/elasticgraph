@@ -6,11 +6,15 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/spec_support/schema_definition_helpers"
+
 module ElasticGraph
-  module JSONIngestion
-    module SchemaDefinition
+  module SchemaDefinition
+    module SchemaElements
       RSpec.describe DeprecatedElement do
-        it "records `deleted_type`, `deleted_field`, and `renamed_from` calls so that schema artifact tooling can consume them" do
+        include_context "SchemaDefinitionHelpers"
+
+        it "records `deleted_type`, `deleted_field`, and `renamed_from` calls so that extensions (such as ingestion serializers) can consume them" do
           state = define_schema(schema_element_name_form: "snake_case") do |schema|
             schema.deleted_type "OldType"
 
@@ -42,6 +46,17 @@ module ElasticGraph
           expect(state.renamed_fields_by_type_name_and_old_field_name.fetch("Widget").fetch("old_name").description).to match(
             /\A`field\.renamed_from "old_name"` at .+:\d+\z/
           )
+        end
+
+        it "reports the caller's schema definition location (not ElasticGraph internals) as `defined_at`" do
+          state = define_schema(schema_element_name_form: "snake_case") do |schema|
+            schema.object_type "Widget" do |t|
+              t.renamed_from "OldWidget"
+              t.field "id", "ID!"
+            end
+          end.state
+
+          expect(state.renamed_types_by_old_name.fetch("OldWidget").defined_at.path).to eq __FILE__
         end
       end
     end

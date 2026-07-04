@@ -9,12 +9,7 @@ module ElasticGraph
 
           def non_nullable_in_json_schema?: () -> bool
           def json_schema: (?nullable: bool?, **untyped) -> void
-          def renamed_from: (::String) -> void
           def to_indexing_field_reference: () -> Indexing::FieldReference?
-
-          private
-
-          def json_ingestion_state: () -> (::ElasticGraph::SchemaDefinition::State & SchemaDefinition::StateExtension)
         end
       end
     end

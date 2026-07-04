@@ -1,14 +1,14 @@
 module ElasticGraph
-  module JSONIngestion
-    module SchemaDefinition
+  module SchemaDefinition
+    module SchemaElements
       class DeprecatedElement
-        attr_reader schema_def_state: ::ElasticGraph::SchemaDefinition::State & StateExtension
+        attr_reader schema_def_state: State
         attr_reader name: ::String
         attr_reader defined_at: ::Thread::Backtrace::Location
         attr_reader defined_via: ::String
 
         def initialize: (
-          schema_def_state: ::ElasticGraph::SchemaDefinition::State & StateExtension,
+          schema_def_state: State,
           name: ::String,
           defined_at: ::Thread::Backtrace::Location,
           defined_via: ::String

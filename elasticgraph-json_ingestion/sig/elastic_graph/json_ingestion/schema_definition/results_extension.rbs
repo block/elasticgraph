@@ -9,7 +9,7 @@ module ElasticGraph
         def json_schema_field_metadata_by_type_and_field_name: () -> ::Hash[::String, ::Hash[::String, Indexing::JSONSchemaFieldMetadata]]
         def current_public_json_schema: () -> ::Hash[::String, untyped]
         def merge_field_metadata_into_json_schema: (::Hash[::String, untyped]) -> Indexing::JSONSchemaWithMetadata
-        def unused_deprecated_elements: () -> ::Set[::ElasticGraph::JSONIngestion::SchemaDefinition::DeprecatedElement]
+        def unused_deprecated_elements: () -> ::Set[::ElasticGraph::SchemaDefinition::SchemaElements::DeprecatedElement]
 
         private
 
