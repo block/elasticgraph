@@ -5,24 +5,22 @@ module ElasticGraph
 
       attr_reader latency_slo_thresholds_by_timestamp_in_ms: ::Hash[::String, ::Integer]
       attr_reader skip_derived_indexing_type_updates: ::Hash[::String, ::Set[::String]]
-      attr_reader indexing_event_decoder: SchemaArtifacts::RuntimeMetadata::Extension
+      attr_reader indexing_event_decoder: SchemaArtifacts::RuntimeMetadata::Extension?
 
       def initialize: (
         ?latency_slo_thresholds_by_timestamp_in_ms: ::Hash[::String, ::Integer],
         ?skip_derived_indexing_type_updates: ::Hash[::String, ::Set[::String]],
-        ?indexing_event_decoder: ::Hash[::String, untyped]) -> void
+        ?indexing_event_decoder: ::Hash[::String, untyped]?) -> void
 
       def with: (
         ?latency_slo_thresholds_by_timestamp_in_ms: ::Hash[::String, ::Integer],
         ?skip_derived_indexing_type_updates: ::Hash[::String, ::Set[::String]],
-        ?indexing_event_decoder: SchemaArtifacts::RuntimeMetadata::Extension) -> Config
+        ?indexing_event_decoder: SchemaArtifacts::RuntimeMetadata::Extension?) -> Config
 
       def self.members: () -> ::Array[::Symbol]
     end
 
     class Config < ConfigSupertype
-      DEFAULT_INDEXING_EVENT_DECODER: ::Hash[::String, untyped]
-
       private
 
       def convert_values: (
@@ -31,7 +29,7 @@ module ElasticGraph
         indexing_event_decoder: untyped
       ) -> ::Hash[::Symbol, untyped]
 
-      def load_indexing_event_decoder: (::Hash[::String, untyped]) -> SchemaArtifacts::RuntimeMetadata::Extension
+      def load_indexing_event_decoder: (::Hash[::String, untyped]?) -> SchemaArtifacts::RuntimeMetadata::Extension?
     end
   end
 end

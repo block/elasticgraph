@@ -12,9 +12,6 @@ module ElasticGraph
 
         def decode: (::String) -> ::Array[event]
       end
-
-      class JSONLines < Interface
-      end
     end
   end
 end

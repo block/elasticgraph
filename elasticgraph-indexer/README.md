@@ -49,11 +49,12 @@ events = [] # JSON events read from an async datastream
 indexer.processor.process(events)
 ```
 
-## Custom Payload Decoding
+## Payload Decoding
 
-`ElasticGraph::Indexer` can be configured with an indexing event decoder extension. Decoders turn raw payload strings
-from a transport into ElasticGraph indexing event hashes before the normal validation and indexing pipeline runs. The
-default decoder expects JSON Lines.
+Ingesting encoded payloads from a transport (such as the SQS lambdas) requires an indexing event decoder extension,
+configured via the `indexer.indexing_event_decoder` setting. Decoders turn raw payload strings into ElasticGraph
+indexing event hashes before the normal validation and indexing pipeline runs. Ingestion format gems provide decoder
+implementations, or you can define your own:
 
 ```yaml
 indexer:

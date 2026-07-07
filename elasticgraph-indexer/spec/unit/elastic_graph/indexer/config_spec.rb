@@ -32,8 +32,8 @@ module ElasticGraph
         expect(config.skip_derived_indexing_type_updates).to eq("WidgetCurrency" => ["USD"].to_set)
       end
 
-      it "uses the JSON Lines indexing event decoder by default" do
-        expect(Config.new.indexing_event_decoder.extension_class).to be(IndexingEventDecoder::JSONLines)
+      it "leaves the indexing event decoder unconfigured by default" do
+        expect(Config.new.indexing_event_decoder).to be nil
       end
 
       it "loads a configured indexing event decoder" do

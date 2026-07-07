@@ -11,7 +11,12 @@ require "elastic_graph/indexer"
 module ElasticGraph
   RSpec.describe Indexer do
     it "returns non-nil values from each attribute" do
-      expect_to_return_non_nil_values_from_all_attributes(build_indexer)
+      indexer = build_indexer(indexing_event_decoder: {
+        "name" => "ExampleIndexingEventDecoder",
+        "require_path" => "support/example_extensions/indexing_event_decoder"
+      })
+
+      expect_to_return_non_nil_values_from_all_attributes(indexer)
     end
 
     describe ".from_parsed_yaml" do
@@ -32,14 +37,11 @@ module ElasticGraph
 
     describe "#indexing_event_decoder" do
       it "builds the configured indexing event decoder" do
-        config = Indexer::Config.from_parsed_yaml("indexer" => {
-          "indexing_event_decoder" => {
-            "name" => "ExampleIndexingEventDecoder",
-            "require_path" => "support/example_extensions/indexing_event_decoder",
-            "config" => {"delimiter" => "|"}
-          }
+        indexer = build_indexer(indexing_event_decoder: {
+          "name" => "ExampleIndexingEventDecoder",
+          "require_path" => "support/example_extensions/indexing_event_decoder",
+          "config" => {"delimiter" => "|"}
         })
-        indexer = Indexer.new(config: config, datastore_core: build_datastore_core)
 
         decoder = indexer.indexing_event_decoder
 
@@ -51,6 +53,14 @@ module ElasticGraph
           {"value" => "one"},
           {"value" => "two"}
         ])
+      end
+
+      it "raises a clear error when no indexing event decoder is configured" do
+        indexer = build_indexer
+
+        expect {
+          indexer.indexing_event_decoder
+        }.to raise_error Errors::ConfigError, a_string_including("indexer.indexing_event_decoder")
       end
     end
   end

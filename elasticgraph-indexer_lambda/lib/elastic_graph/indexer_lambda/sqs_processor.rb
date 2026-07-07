@@ -58,8 +58,8 @@ module ElasticGraph
       # for you (with some limits), you can get multiple.
       #
       # We also want to do our own batching in order to cram more into a given payload
-      # and issue fewer SQS entries and Lambda invocations when possible. The default decoder expects
-      # JSON Lines (http://jsonlines.org/), but custom decoders can support other payload formats.
+      # and issue fewer SQS entries and Lambda invocations when possible. The configured indexing
+      # event decoder determines the payload format (e.g. JSON Lines: http://jsonlines.org/).
       def events_from(lambda_event)
         sqs_received_at_by_message_id = {} # : Hash[String, String]
         lambda_event.fetch("Records").flat_map do |record|

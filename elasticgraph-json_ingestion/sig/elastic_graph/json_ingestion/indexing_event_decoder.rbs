@@ -1,0 +1,13 @@
+module ElasticGraph
+  module JSONIngestion
+    class IndexingEventDecoder
+      def initialize: (
+        config: ::Hash[::Symbol | ::String, untyped],
+        schema_artifacts: schemaArtifacts,
+        logger: ::Logger
+      ) -> void
+
+      def decode: (::String) -> ::Array[::Hash[::String, untyped]]
+    end
+  end
+end

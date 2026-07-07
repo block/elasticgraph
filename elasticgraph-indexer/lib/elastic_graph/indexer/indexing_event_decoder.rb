@@ -6,8 +6,6 @@
 #
 # frozen_string_literal: true
 
-require "json"
-
 module ElasticGraph
   class Indexer
     # Namespace for indexing event decoders, which turn raw payload strings from a transport into
@@ -29,19 +27,6 @@ module ElasticGraph
           # :nocov: -- must return an array to satisfy Steep type checking but never called
           []
           # :nocov:
-        end
-      end
-
-      # The default indexing event decoder, which expects newline-delimited JSON objects.
-      class JSONLines < Interface
-        # (see Interface#initialize)
-        def initialize(config:, schema_artifacts:, logger:)
-          # must be defined for extension interface verification, but nothing to do
-        end
-
-        # (see Interface#decode)
-        def decode(payload)
-          payload.split("\n").map { |event| JSON.parse(event) }
         end
       end
     end

@@ -510,8 +510,12 @@ properties:
           - ABC12345678
       indexing_event_decoder:
         description: Extension object used to decode raw indexing payloads into ElasticGraph
-          indexing event hashes. The default decoder expects JSON Lines.
-        type: object
+          indexing event hashes. Required when using a transport that delivers encoded
+          payloads (such as the SQS lambdas). Ingestion format gems provide decoder
+          implementations.
+        type:
+        - object
+        - 'null'
         properties:
           name:
             description: The name of the indexing event decoder extension class.
@@ -537,11 +541,7 @@ properties:
         - name
         - require_path
         default:
-          name: ElasticGraph::Indexer::IndexingEventDecoder::JSONLines
-          require_path: elastic_graph/indexer/indexing_event_decoder
         examples:
-        - name: ElasticGraph::Indexer::IndexingEventDecoder::JSONLines
-          require_path: elastic_graph/indexer/indexing_event_decoder
         - name: MyCompany::ElasticGraph::CSVIndexingEventDecoder
           require_path: "./lib/my_company/elastic_graph/csv_indexing_event_decoder"
           config:

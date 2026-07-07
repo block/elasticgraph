@@ -36,6 +36,9 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "elasticgraph-support", ElasticGraph::VERSION
 
+  # The test suite verifies `IndexingEventDecoder` against the decoder interface defined by
+  # `elasticgraph-indexer`. Keeping this as a development dependency avoids a runtime dependency cycle.
+  spec.add_development_dependency "elasticgraph-indexer", ElasticGraph::VERSION
   # This gem's schema-definition extension code references `elasticgraph-schema_definition`, but
   # applications load it through schema-definition tasks after `elasticgraph-schema_definition` is already
   # available. Keeping this as a development dependency avoids a runtime dependency cycle.

@@ -11,6 +11,7 @@ require "elastic_graph/indexer/failed_event_error"
 require "elastic_graph/indexer/indexing_event_decoder"
 require "elastic_graph/indexer/processor"
 require "elastic_graph/indexer_lambda/sqs_processor"
+require "elastic_graph/json_ingestion/indexing_event_decoder"
 require "elastic_graph/spec_support/lambda_function"
 require "json"
 require "aws-sdk-s3"
@@ -394,9 +395,9 @@ module ElasticGraph
       end
 
       def build_sqs_processor(**options)
-        json_lines_decoder = Indexer::IndexingEventDecoder::JSONLines.new(
+        json_lines_decoder = JSONIngestion::IndexingEventDecoder.new(
           config: {},
-          schema_artifacts: nil, # not used by `JSONLines`
+          schema_artifacts: nil, # not used by the JSON Lines decoder
           logger: logger
         )
 

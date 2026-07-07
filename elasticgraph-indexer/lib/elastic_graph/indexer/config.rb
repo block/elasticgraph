@@ -14,11 +14,6 @@ require "elastic_graph/support/config"
 module ElasticGraph
   class Indexer
     class Config < Support::Config.define(:latency_slo_thresholds_by_timestamp_in_ms, :skip_derived_indexing_type_updates, :indexing_event_decoder)
-      DEFAULT_INDEXING_EVENT_DECODER = {
-        "name" => "ElasticGraph::Indexer::IndexingEventDecoder::JSONLines",
-        "require_path" => "elastic_graph/indexer/indexing_event_decoder"
-      }
-
       json_schema at: "indexer",
         optional: false,
         description: "Configuration for indexing operations and metrics used by `elasticgraph-indexer`.",
@@ -51,8 +46,10 @@ module ElasticGraph
             ]
           },
           indexing_event_decoder: {
-            description: "Extension object used to decode raw indexing payloads into ElasticGraph indexing event hashes. The default decoder expects JSON Lines.",
-            type: "object",
+            description: "Extension object used to decode raw indexing payloads into ElasticGraph indexing event hashes. " \
+              "Required when using a transport that delivers encoded payloads (such as the SQS lambdas). Ingestion " \
+              "format gems provide decoder implementations.",
+            type: ["object", "null"],
             properties: {
               name: {
                 description: "The name of the indexing event decoder extension class.",
@@ -77,9 +74,8 @@ module ElasticGraph
               }
             },
             required: ["name", "require_path"],
-            default: DEFAULT_INDEXING_EVENT_DECODER,
+            default: nil,
             examples: [
-              DEFAULT_INDEXING_EVENT_DECODER,
               {
                 "name" => "MyCompany::ElasticGraph::CSVIndexingEventDecoder",
                 "require_path" => "./lib/my_company/elastic_graph/csv_indexing_event_decoder",
@@ -100,6 +96,8 @@ module ElasticGraph
       end
 
       def load_indexing_event_decoder(config)
+        return nil if config.nil?
+
         loader = SchemaArtifacts::RuntimeMetadata::ExtensionLoader.new(IndexingEventDecoder::Interface)
         loader.load(
           config.fetch("name"),

@@ -48,5 +48,9 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "aws_lambda_ric", "~> 3.2"
   spec.add_development_dependency "elasticgraph-elasticsearch", ElasticGraph::VERSION
+  # The test suite exercises JSON Lines payload decoding via the decoder provided by `elasticgraph-json_ingestion`.
+  # This is a development dependency (rather than a runtime one) so that applications using a different
+  # ingestion format can configure their own decoder without bundling `elasticgraph-json_ingestion`.
+  spec.add_development_dependency "elasticgraph-json_ingestion", ElasticGraph::VERSION
   spec.add_development_dependency "elasticgraph-opensearch", ElasticGraph::VERSION
 end
