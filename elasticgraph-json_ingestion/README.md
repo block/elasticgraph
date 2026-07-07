@@ -102,6 +102,19 @@ ElasticGraph.define_schema do |schema|
 end
 ```
 
+## Indexing Support
+
+Beyond schema definition, this gem teaches `elasticgraph-indexer` how to ingest JSON events: it provides an
+ingestion adapter that validates each event against the JSON schema identified by the event's
+`json_schema_version` and prepares its record for indexing using that version's view of the schema.
+
+No configuration is needed: defining your schema with this gem's `SchemaDefinition::APIExtension` registers
+an indexer extension in your schema artifacts' runtime metadata, which the indexer applies when it boots.
+
+This gem also provides the `be_a_valid_elastic_graph_event` RSpec matcher (via
+`require "elastic_graph/json_ingestion/spec_support/event_matcher"`) for testing that publisher events
+conform to your schema.
+
 ## Dependency Diagram
 
 ```mermaid

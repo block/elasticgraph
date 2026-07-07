@@ -48,4 +48,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "elasticgraph-graphql", ElasticGraph::VERSION
   spec.add_development_dependency "elasticgraph-indexer", ElasticGraph::VERSION
   spec.add_development_dependency "elasticgraph-indexer_autoscaler_lambda", ElasticGraph::VERSION
+  # The test suite builds indexers from the shared test schema artifacts, whose runtime metadata
+  # registers the JSON ingestion indexer extension provided by `elasticgraph-json_ingestion`.
+  spec.add_development_dependency "elasticgraph-json_ingestion", ElasticGraph::VERSION
 end

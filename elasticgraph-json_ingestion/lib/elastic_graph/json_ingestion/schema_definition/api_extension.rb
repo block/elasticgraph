@@ -29,6 +29,11 @@ module ElasticGraph
           state.reserved_type_names << EVENT_ENVELOPE_JSON_SCHEMA_NAME
           api.factory.extend(FactoryExtension)
 
+          # Register the indexer extension so that any schema defined with JSON ingestion support
+          # automatically gets JSON event ingestion at indexing time.
+          require(indexer_extension_require_path = "elastic_graph/json_ingestion/indexer_extension")
+          api.register_indexer_extension(IndexerExtension, defined_at: indexer_extension_require_path)
+
           api.on_built_in_types do |type|
             if type.name == api.state.type_ref("GeoLocation").to_final_form.name
               # @type var geo_location_type: ElasticGraph::SchemaDefinition::SchemaElements::TypeWithSubfields & SchemaElements::TypeWithSubfieldsExtension
