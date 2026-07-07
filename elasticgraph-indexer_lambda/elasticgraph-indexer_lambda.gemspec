@@ -44,4 +44,9 @@ Gem::Specification.new do |spec|
   spec.add_dependency "elasticgraph-indexer", ElasticGraph::VERSION
   spec.add_dependency "elasticgraph-lambda_support", ElasticGraph::VERSION
   spec.add_dependency "aws-sdk-s3", "~> 1.226"
+
+  # The test suite exercises JSON Lines payload decoding via the decoder provided by `elasticgraph-json_ingestion`.
+  # This is a development dependency (rather than a runtime one) so that applications using a different
+  # ingestion format can configure their own decoder without bundling `elasticgraph-json_ingestion`.
+  spec.add_development_dependency "elasticgraph-json_ingestion", ElasticGraph::VERSION
 end

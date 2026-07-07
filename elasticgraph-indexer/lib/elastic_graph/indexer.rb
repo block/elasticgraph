@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/datastore_core"
+require "elastic_graph/errors"
 require "elastic_graph/indexer/config"
 require "elastic_graph/support/from_yaml_file"
 
@@ -82,6 +83,25 @@ module ElasticGraph
           logger: datastore_core.logger,
           skip_derived_indexing_type_updates: config.skip_derived_indexing_type_updates,
           configure_record_validator: nil
+        )
+      end
+    end
+
+    def indexing_event_decoder
+      @indexing_event_decoder ||= begin
+        extension = config.indexing_event_decoder
+
+        if extension.nil?
+          raise Errors::ConfigError, "`indexer.indexing_event_decoder` is not configured, but is required to " \
+            "decode indexing event payloads. Configure it with a decoder extension provided by an ingestion " \
+            "format gem (or one of your own) that understands your transport's payload format."
+        end
+
+        decoder_class = extension.extension_class # : untyped
+        decoder_class.new(
+          config: extension.config,
+          schema_artifacts: schema_artifacts,
+          logger: logger
         )
       end
     end

@@ -8,8 +8,10 @@
 
 require "elastic_graph/errors"
 require "elastic_graph/indexer/failed_event_error"
+require "elastic_graph/indexer/indexing_event_decoder"
 require "elastic_graph/indexer/processor"
 require "elastic_graph/indexer_lambda/sqs_processor"
+require "elastic_graph/json_ingestion/indexing_event_decoder"
 require "elastic_graph/spec_support/lambda_function"
 require "json"
 require "aws-sdk-s3"
@@ -72,6 +74,22 @@ module ElasticGraph
             {"field3" => {}, "message_id" => "b"},
             {"field4" => {}, "message_id" => "b"},
             {"field5" => {}, "message_id" => "b"}
+          ], refresh_indices: false)
+        end
+
+        it "uses the configured indexing event decoder" do
+          custom_decoder = instance_spy(Indexer::IndexingEventDecoder::Interface, decode: [{"field1" => {}}])
+          lambda_event = {
+            "Records" => [
+              sqs_message("a", "not-json")
+            ]
+          }
+
+          build_sqs_processor(indexing_event_decoder: custom_decoder).process(lambda_event)
+
+          expect(custom_decoder).to have_received(:decode).with("not-json")
+          expect(indexer_processor).to have_received(:process_returning_failures).with([
+            {"field1" => {}, "message_id" => "a"}
           ], refresh_indices: false)
         end
 
@@ -377,9 +395,16 @@ module ElasticGraph
       end
 
       def build_sqs_processor(**options)
+        json_lines_decoder = JSONIngestion::IndexingEventDecoder.new(
+          config: {},
+          schema_artifacts: nil, # not used by the JSON Lines decoder
+          logger: logger
+        )
+
         SqsProcessor.new(
           indexer_processor,
           logger: logger,
+          indexing_event_decoder: json_lines_decoder,
           ignore_sqs_latency_timestamps_from_arns: ignore_sqs_latency_timestamps_from_arns,
           **options
         )

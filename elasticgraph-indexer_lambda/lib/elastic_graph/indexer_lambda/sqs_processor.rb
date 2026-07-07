@@ -19,9 +19,10 @@ module ElasticGraph
       # @dynamic ignore_sqs_latency_timestamps_from_arns
       attr_reader :ignore_sqs_latency_timestamps_from_arns
 
-      def initialize(indexer_processor, logger:, ignore_sqs_latency_timestamps_from_arns:, s3_client: nil)
+      def initialize(indexer_processor, logger:, ignore_sqs_latency_timestamps_from_arns:, indexing_event_decoder:, s3_client: nil)
         @indexer_processor = indexer_processor
         @logger = logger
+        @indexing_event_decoder = indexing_event_decoder
         @s3_client = s3_client
         @ignore_sqs_latency_timestamps_from_arns = ignore_sqs_latency_timestamps_from_arns
       end
@@ -41,32 +42,24 @@ module ElasticGraph
 
       private
 
-      # Given a lambda event payload, returns an array of raw operations in JSON format.
+      # Given a lambda event payload, returns an array of raw ElasticGraph indexing events.
       #
       # The SQS payload is wrapped in the following format already:
       # See https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html#example-standard-queue-message-event for more details
       # {
-      #   Records: {
-      #     [
-      #        { body: <JSON Lines encoded JSON where each line is a JSON object> },
-      #        { body: <JSON Lines encoded JSON where each line is a JSON object> },
-      #        ...
-      #      ]
-      #   }
+      #   "Records" => [
+      #     {"body" => <encoded payload understood by the configured indexing event decoder>},
+      #     {"body" => <encoded payload understood by the configured indexing event decoder>},
+      #     ...
+      #   ]
       # }
       #
-      # Each entry in "Records" is a SQS entry.  Since lambda handles some batching
+      # Each entry in "Records" is a SQS entry. Since lambda handles some batching
       # for you (with some limits), you can get multiple.
       #
       # We also want to do our own batching in order to cram more into a given payload
-      # and issue fewer SQS entries and Lambda invocations when possible. As such, we
-      # encoded multiple JSON with JSON Lines (http://jsonlines.org/) in record body.
-      # Each JSON Lines object under 'body' should be of the form:
-      #
-      #  {op: 'upsert', __typename: 'Payment', id: "123", version: "1", record: {...} } \n
-      #  {op: 'upsert', __typename: 'Payment', id: "123", version: "2", record: {...} } \n
-      #   ...
-      # Note: "\n" at the end of each line is a single byte newline control character, instead of a string sequence
+      # and issue fewer SQS entries and Lambda invocations when possible. The configured indexing
+      # event decoder determines the payload format (e.g. JSON Lines: http://jsonlines.org/).
       def events_from(lambda_event)
         sqs_received_at_by_message_id = {} # : Hash[String, String]
         lambda_event.fetch("Records").flat_map do |record|
@@ -80,7 +73,7 @@ module ElasticGraph
             sqs_metadata = sqs_metadata.except("latency_timestamps")
           end
 
-          parse_jsonl(record.fetch("body")).map do |event|
+          decoded_events_from(record.fetch("body")).map do |event|
             ElasticGraph::Support::HashUtil.deep_merge(event, sqs_metadata)
           end
         end.tap do
@@ -93,11 +86,12 @@ module ElasticGraph
 
       S3_OFFLOADING_INDICATOR = '["software.amazon.payloadoffloading.PayloadS3Pointer"'
 
-      def parse_jsonl(jsonl_string)
-        if jsonl_string.start_with?(S3_OFFLOADING_INDICATOR)
-          jsonl_string = get_payload_from_s3(jsonl_string)
+      def decoded_events_from(payload)
+        if payload.start_with?(S3_OFFLOADING_INDICATOR)
+          payload = get_payload_from_s3(payload)
         end
-        jsonl_string.split("\n").map { |event| JSON.parse(event) }
+
+        @indexing_event_decoder.decode(payload)
       end
 
       def extract_sqs_metadata(record)
