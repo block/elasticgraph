@@ -27,8 +27,8 @@ module ElasticGraph
 
         @sqs_processor = IndexerLambda::SqsProcessor.new(
           warehouse_lambda.processor,
-          ignore_sqs_latency_timestamps_from_arns: ignore_sqs_latency_timestamps_from_arns,
           indexing_event_decoder: warehouse_lambda.indexer.indexing_event_decoder,
+          ignore_sqs_latency_timestamps_from_arns: ignore_sqs_latency_timestamps_from_arns,
           logger: warehouse_lambda.logger
         )
       end

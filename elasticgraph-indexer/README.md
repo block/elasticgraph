@@ -64,13 +64,27 @@ indexer:
       delimiter: ","
 ```
 
-Decoder extensions must implement:
+Decoder extensions must implement this interface:
 
 ```ruby
-def initialize(config:, schema_artifacts:, logger:)
-end
+# lib/my_company/elastic_graph/csv_indexing_event_decoder.rb
+module MyCompany
+  module ElasticGraph
+    class CSVIndexingEventDecoder
+      def initialize(config:, schema_artifacts:, logger:)
+        # `config` is a hash containing parameterized configuration values from the
+        # `indexing_event_decoder.config` setting (see above for an example).
+        #
+        # `schema_artifacts` provides access to the schema artifacts, in case decoding
+        # depends on the schema.
+        #
+        # `logger` is the ElasticGraph logger.
+      end
 
-def decode(payload)
-  # return an array of ElasticGraph indexing event hashes
+      def decode(payload)
+        # Must return an array of ElasticGraph indexing event hashes.
+      end
+    end
+  end
 end
 ```

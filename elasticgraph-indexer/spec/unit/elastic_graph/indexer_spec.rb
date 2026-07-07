@@ -28,8 +28,10 @@ module ElasticGraph
 
         expect(indexer).to be_a(Indexer)
       end
+    end
 
-      it "builds a configured indexing event decoder" do
+    describe "#indexing_event_decoder" do
+      it "builds the configured indexing event decoder" do
         config = Indexer::Config.from_parsed_yaml("indexer" => {
           "indexing_event_decoder" => {
             "name" => "ExampleIndexingEventDecoder",
