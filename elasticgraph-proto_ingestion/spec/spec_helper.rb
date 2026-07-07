@@ -1,0 +1,10 @@
+# Copyright 2024 - 2026 Block, Inc.
+#
+# Use of this source code is governed by an MIT-style
+# license that can be found in the LICENSE file or at
+# https://opensource.org/licenses/MIT.
+#
+# frozen_string_literal: true
+
+# This file contains RSpec configuration for `elasticgraph-proto_ingestion`.
+# It is loaded by the shared spec helper at `spec_support/spec_helper.rb`.

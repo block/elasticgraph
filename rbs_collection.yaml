@@ -82,6 +82,8 @@ gems:
     ignore: true
   - name: elasticgraph-opensearch
     ignore: true
+  - name: elasticgraph-proto_ingestion
+    ignore: true
   - name: elasticgraph-query_interceptor
     ignore: true
   - name: elasticgraph-query_registry
