@@ -18,7 +18,7 @@ group :development do
   gem "factory_bot", "~> 6.6"
   gem "faker", "~> 3.8"
   gem "flatware-rspec", "~> 2.4", platforms: :ruby
-  gem "httpx", "~> 1.7", ">= 1.7.8"
+  gem "httpx", "~> 1.8"
   gem "memory_profiler", "~> 1.1"
   gem "nokogiri", "~> 1.19", ">= 1.19.4"
   gem "method_source", "~> 1.1"
@@ -33,7 +33,7 @@ group :development do
   gem "rubocop-rake", "~> 0.6.0"
   # We are waiting to upgrade to >= 3.5 until standardrb compatibility with rubocop plugins is fixed:
   # https://github.com/standardrb/standard/issues/701
-  gem "rubocop-rspec", "~> 3.9.0"
+  gem "rubocop-rspec", "~> 3.10.2"
   gem "simplecov", "~> 0.22"
   gem "simplecov-console", "~> 0.9", ">= 0.9.5"
   gem "standard", "~> 1.55.0"
@@ -46,10 +46,18 @@ end
 group :site do
   gem "filewatcher", "~> 3.0", ">= 3.0.1"
 
+  # These are all restricted to MRI because they're only used for doc/site generation (which
+  # never runs on JRuby). Notably, `irb` and `yard-markdown` transitively depend on `rdoc`, which
+  # as of rdoc 8.0 depends on `rbs`. `rbs` has a C native extension that fails to compile on JRuby,
+  # so allowing these onto JRuby breaks `bundle install` there.
   platforms :ruby do
     gem "html-proofer", "~> 5.2", ">= 5.2.1"
     gem "jekyll", "~> 4.4", ">= 4.4.1"
     gem "redcarpet", "~> 3.6", ">= 3.6.1"
+    gem "yard", "~> 0.9", ">= 0.9.44"
+    gem "yard-doctest", "~> 0.1", ">= 0.1.17"
+    gem "yard-markdown", "~> 0.7", ">= 0.7.1"
+    gem "irb", "~> 1.18" # Needed for yard on Ruby 4.0
   end
 
   # Pull in a YAML syntax highlighting fix so that our JSON schemas render correctly at the website:
@@ -57,11 +65,6 @@ group :site do
   #
   # TODO: switch back to a release version once that fix is merged and released.
   gem "rouge", github: "myronmarston/rouge", ref: "12c0da6aa98e0d0a0762c47103b64290c88620a1"
-
-  gem "yard", "~> 0.9", ">= 0.9.44"
-  gem "yard-doctest", "~> 0.1", ">= 0.1.17"
-  gem "yard-markdown", "~> 0.7", ">= 0.7.1"
-  gem "irb", "~> 1.18" # Needed for yard on Ruby 4.0
 end
 
 # Since this file gets symlinked both at the repo root and into each Gem directory, we have
