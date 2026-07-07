@@ -460,7 +460,7 @@ module ElasticGraph
             Update.operations_for(
               event: event,
               destination_index_def: index_defs_by_name.fetch(destination_index),
-              record_preparer: indexer.record_preparer_factory.for_latest_json_schema_version,
+              record_preparer: latest_json_record_preparer_for(indexer),
               update_target: update_target,
               destination_index_mapping: indexer.schema_artifacts.index_mappings_by_index_def_name.fetch(destination_index)
             )
