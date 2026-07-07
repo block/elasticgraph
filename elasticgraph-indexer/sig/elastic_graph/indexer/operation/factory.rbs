@@ -1,37 +1,32 @@
 module ElasticGraph
   class Indexer
     type event = ::Hash[::String, untyped]
-    type validator = Support::JSONSchema::Validator
-    type validatorFactory = Support::JSONSchema::ValidatorFactory
 
     module Operation
       class FactorySupertype
         attr_reader schema_artifacts: schemaArtifacts
         attr_reader index_definitions_by_graphql_type: ::Hash[::String, ::Array[DatastoreCore::_IndexDefinition]]
-        attr_reader record_preparer_factory: RecordPreparer::Factory
+        attr_reader ingestion_adapters: ::Array[IngestionAdapter::_Adapter]
         attr_reader logger: ::Logger
         attr_reader skip_derived_indexing_type_updates: ::Hash[::String, ::Set[::String]]
         attr_reader skip_record_validation_percents_by_type: ::Hash[::String, ::Float]
-        attr_reader configure_record_validator: (^(validatorFactory) -> validatorFactory)?
 
         def initialize: (
           schema_artifacts: schemaArtifacts,
           index_definitions_by_graphql_type: ::Hash[::String, ::Array[DatastoreCore::_IndexDefinition]],
-          record_preparer_factory: RecordPreparer::Factory,
+          ingestion_adapters: ::Array[IngestionAdapter::_Adapter],
           logger: ::Logger,
           skip_derived_indexing_type_updates: ::Hash[::String, ::Set[::String]],
-          skip_record_validation_percents_by_type: ::Hash[::String, ::Float],
-          configure_record_validator: (^(validatorFactory) -> validatorFactory)?
+          skip_record_validation_percents_by_type: ::Hash[::String, ::Float]
         ) -> void
 
         def with: (
           ?schema_artifacts: schemaArtifacts,
           ?index_definitions_by_graphql_type: ::Hash[::String, ::Array[DatastoreCore::_IndexDefinition]],
-          ?record_preparer_factory: RecordPreparer::Factory,
+          ?ingestion_adapters: ::Array[IngestionAdapter::_Adapter],
           ?logger: ::Logger,
           ?skip_derived_indexing_type_updates: ::Hash[::String, ::Set[::String]],
-          ?skip_record_validation_percents_by_type: ::Hash[::String, ::Float],
-          ?configure_record_validator: (^(validatorFactory) -> validatorFactory)?
+          ?skip_record_validation_percents_by_type: ::Hash[::String, ::Float]
         ) -> instance
       end
 
@@ -40,16 +35,10 @@ module ElasticGraph
 
         private
 
-        def validator: (::String, ::Integer) -> Support::JSONSchema::Validator
-
-        @validator_factories_by_version: ::Hash[::Integer, Support::JSONSchema::ValidatorFactory]?
-        def validator_factories_by_version: () -> ::Hash[::Integer, Support::JSONSchema::ValidatorFactory]
-
-        def select_json_schema_version: (event) { (BuildResult) -> bot } -> (::Integer | bot)
+        def ingestion_adapter_for: (event) -> IngestionAdapter::_Adapter?
         def prepare_event: (event) -> event
-        def validate_record_returning_failure: (event, ::String, ::Integer) -> BuildResult?
-        def build_success_result: (event, ::Integer, type_with_skipped_validation: ::String?) -> BuildResult
-        def build_success_result_isolating_malformed_records: (event, ::String, ::Integer) -> BuildResult
+        def build_success_result: (event, _RecordPreparer, type_with_skipped_validation: ::String?) -> BuildResult
+        def build_success_result_isolating_malformed_records: (event, _RecordPreparer, IngestionAdapter::_Adapter) -> BuildResult
         CRC32_SPACE_PER_PERCENT: ::Float
         def skip_validation?: (::String, event) -> bool
         def build_failed_result: (event, ::String, ::String) -> BuildResult

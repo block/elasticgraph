@@ -6,8 +6,9 @@
 #
 # frozen_string_literal: true
 
-require "elastic_graph/indexer"
 require "elastic_graph/constants"
+require "elastic_graph/indexer"
+require "elastic_graph/indexer/ingestion_adapter/json_events"
 require "elastic_graph/indexer/operation/factory"
 require "elastic_graph/spec_support/builds_indexer_operation"
 require "json"
@@ -311,12 +312,17 @@ module ElasticGraph
           # A factory whose record preparation fails for a reason record validation cannot detect: a
           # runtime metadata defect, standing in for any bug that is not about the data itself.
           def factory_whose_record_preparation_is_broken
-            record_preparer_factory = instance_double(RecordPreparer::Factory)
+            record_preparer = instance_double(RecordPreparer)
 
-            allow(record_preparer_factory).to receive(:for_json_schema_version)
+            allow(record_preparer).to receive(:prepare_for_index)
               .and_raise(::KeyError, 'key not found: "nameInIndex"')
 
-            indexer.operation_factory.with(record_preparer_factory: record_preparer_factory)
+            adapter = indexer.ingestion_adapters.first
+            allow(adapter).to receive(:validate_event).and_wrap_original do |original, *args, **kwargs|
+              original.call(*args, **kwargs).with(record_preparer: record_preparer)
+            end
+
+            indexer.operation_factory
           end
 
           it "generates a primary indexing operation for a single index with latency metrics" do
@@ -677,6 +683,58 @@ module ElasticGraph
             end
           end
 
+          context "when multiple ingestion adapters are available" do
+            it "routes each event to the first adapter that recognizes it" do
+              event = build_upsert_event(:component, id: "1", __version: 1)
+
+              non_matching_adapter = instance_double(IngestionAdapter::Interface, handles_event?: false)
+              matching_adapter = instance_double(
+                IngestionAdapter::Interface,
+                handles_event?: true,
+                validate_event: IngestionAdapter::ValidationResult.valid(RecordPreparer::Identity)
+              )
+
+              factory = indexer.operation_factory.with(ingestion_adapters: [non_matching_adapter, matching_adapter])
+              result = factory.build(event)
+
+              expect(result.failed_event_error).to be nil
+              expect(result.operations).not_to be_empty
+              expect(matching_adapter).to have_received(:validate_event).with(a_hash_including("type" => "Component"), skip_record_validation: false)
+            end
+
+            it "fails the event when no adapter recognizes it" do
+              event = build_upsert_event(:component, id: "1", __version: 1)
+
+              adapters = [
+                instance_double(IngestionAdapter::Interface, handles_event?: false),
+                instance_double(IngestionAdapter::Interface, handles_event?: false)
+              ]
+
+              factory = indexer.operation_factory.with(ingestion_adapters: adapters)
+
+              expect_failed_event_error(event, "No available ingestion adapter recognized this event.", factory: factory)
+            end
+          end
+
+          context "when a single ingestion adapter is available" do
+            it "routes all events to it, even ones it does not recognize, so that its more specific failure messages are used" do
+              event = build_upsert_event(:component, id: "1", __version: 1)
+
+              adapter = instance_double(
+                IngestionAdapter::Interface,
+                handles_event?: false,
+                validate_event: IngestionAdapter::ValidationResult.invalid(
+                  payload_description: "event payload",
+                  message: "not recognizable by this adapter"
+                )
+              )
+
+              factory = indexer.operation_factory.with(ingestion_adapters: [adapter])
+
+              expect_failed_event_error(event, "not recognizable by this adapter", factory: factory)
+            end
+          end
+
           def expect_failed_event_error(event, *error_message_snippets, factory: indexer.operation_factory, expect_no_ops: false)
             result = factory.build(event)
 
@@ -718,10 +776,19 @@ module ElasticGraph
         end
 
         def build_expecting_success(event, **options, &configure_record_validator)
-          result = indexer
-            .operation_factory
-            .with(configure_record_validator: configure_record_validator)
-            .build(event, **options)
+          factory = indexer.operation_factory
+
+          if configure_record_validator
+            json_events_adapter = IngestionAdapter::JSONEvents.new(
+              schema_artifacts: indexer.schema_artifacts,
+              logger: indexer.logger,
+              configure_record_validator: configure_record_validator
+            )
+
+            factory = factory.with(ingestion_adapters: [json_events_adapter])
+          end
+
+          result = factory.build(event, **options)
 
           raise result.failed_event_error if result.failed_event_error
           result.operations
