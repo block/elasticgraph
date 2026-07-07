@@ -52,6 +52,9 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "elasticgraph-schema_definition", ElasticGraph::VERSION
   spec.add_development_dependency "elasticgraph-admin", ElasticGraph::VERSION
   spec.add_development_dependency "elasticgraph-elasticsearch", ElasticGraph::VERSION
+  # The test suite builds indexers from the shared test schema artifacts, whose runtime metadata
+  # registers the JSON ingestion indexer extension provided by `elasticgraph-json_ingestion`.
+  spec.add_development_dependency "elasticgraph-json_ingestion", ElasticGraph::VERSION
   spec.add_development_dependency "elasticgraph-opensearch", ElasticGraph::VERSION
   spec.add_development_dependency "elasticgraph-indexer", ElasticGraph::VERSION
 end

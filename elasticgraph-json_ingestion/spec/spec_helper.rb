@@ -14,6 +14,7 @@ require "elastic_graph/spec_support/schema_definition_helpers"
 
 RSpec.configure do |config|
   config.define_derived_metadata(absolute_file_path: %r{/elasticgraph-json_ingestion/}) do |meta|
+    meta[:builds_indexer] = true
     meta[:json_ingestion_schema_definition] = true
   end
 
