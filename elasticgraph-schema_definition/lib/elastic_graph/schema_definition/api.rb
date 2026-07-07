@@ -348,6 +348,36 @@ module ElasticGraph
         nil
       end
 
+      # Registers an indexer extension module that will be loaded and used by `elasticgraph-indexer`. While such
+      # extension modules can also be configured in a settings YAML file, it can be useful to register it here
+      # when you want to ensure that the extension is used in all environments. For example, an ingestion format
+      # library needs to ensure its corresponding indexer extension module is used since events of its format
+      # would not be ingestible otherwise.
+      #
+      # @param extension_module [Module] indexer extension module
+      # @param defined_at [String] the `require` path of the extension module
+      # @param config [Hash<Symbol, Object>] configuration options for the extension module
+      # @return [void]
+      #
+      # @example Register an indexer extension module
+      #   # In `my_gem/indexer_extension.rb`:
+      #   module MyGem
+      #     module IndexerExtension
+      #     end
+      #   end
+      #
+      #   require(indexer_extension_require_path = "./my_gem/indexer_extension")
+      #
+      #   ElasticGraph.define_schema do |schema|
+      #     schema.register_indexer_extension MyGem::IndexerExtension,
+      #       defined_at: indexer_extension_require_path
+      #   end
+      def register_indexer_extension(extension_module, defined_at:, **config)
+        extension = SchemaArtifacts::RuntimeMetadata::Extension.new(extension_module, defined_at, config)
+        @state.indexer_extension_modules << SchemaArtifacts::RuntimeMetadata::ComponentExtension.new(extension.to_dumpable_hash)
+        nil
+      end
+
       # Registers a GraphQL resolver that will be loaded and used by `elasticgraph-graphql`. To use a GraphQL resolver you have
       # registered, set a field's `resolver` to the name you provide when registering your resolver.
       #

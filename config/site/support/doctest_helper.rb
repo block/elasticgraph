@@ -157,6 +157,16 @@ module ElasticGraph
       ::File.write("artist_resolver.rb", "")
     end
 
+    doctest.before "ElasticGraph::SchemaDefinition::API#register_indexer_extension" do
+      ::FileUtils.mkdir_p "my_gem"
+      ::File.write("my_gem/indexer_extension.rb", <<~EOS)
+        module MyGem
+          module IndexerExtension
+          end
+        end
+      EOS
+    end
+
     [
       "ElasticGraph::Apollo@Use elasticgraph-apollo in a project",
       "ElasticGraph::Apollo::SchemaDefinition::APIExtension@Define local rake tasks with this extension module",

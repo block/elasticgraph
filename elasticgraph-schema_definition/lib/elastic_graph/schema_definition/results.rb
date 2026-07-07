@@ -125,7 +125,7 @@ module ElasticGraph
           schema_element_names: state.schema_elements,
           graphql_extension_modules: state.graphql_extension_modules,
           graphql_resolvers_by_name: state.graphql_resolvers_by_name,
-          indexer_extension_modules: [],
+          indexer_extension_modules: state.indexer_extension_modules,
           static_script_ids_by_scoped_name: STATIC_SCRIPT_REPO.script_ids_by_scoped_name
         ).tap { |rm| verify_runtime_metadata(rm) }
       end
