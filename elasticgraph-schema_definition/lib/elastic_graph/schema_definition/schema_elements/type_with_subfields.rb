@@ -441,6 +441,7 @@ module ElasticGraph
             defined_at: caller_locations(2, 1).to_a.first, # : ::Thread::Backtrace::Location
             defined_via: %(type.deleted_field "#{field_name}")
           )
+          nil
         end
 
         # Registers an old name that this type used to have in a prior version of the schema.
@@ -465,6 +466,7 @@ module ElasticGraph
             defined_at: caller_locations(2, 1).to_a.first, # : ::Thread::Backtrace::Location
             defined_via: %(type.renamed_from "#{old_name}")
           )
+          nil
         end
 
         # Converts the type to GraphQL SDL syntax.

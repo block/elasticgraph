@@ -590,6 +590,7 @@ module ElasticGraph
             defined_at: caller_locations(1, 1).to_a.first, # : ::Thread::Backtrace::Location
             defined_via: %(field.renamed_from "#{old_name}")
           )
+          nil
         end
 
         # @private
