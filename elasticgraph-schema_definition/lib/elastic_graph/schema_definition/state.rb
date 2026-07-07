@@ -9,7 +9,6 @@
 require "elastic_graph/errors"
 require "elastic_graph/schema_definition/factory"
 require "elastic_graph/schema_definition/mixins/has_readable_to_s_and_inspect"
-require "elastic_graph/schema_definition/schema_elements/deprecated_element"
 require "elastic_graph/schema_definition/schema_elements/enum_value_namer"
 require "elastic_graph/schema_definition/schema_elements/field_path"
 require "elastic_graph/schema_definition/schema_elements/sub_aggregation_path"
@@ -146,41 +145,21 @@ module ElasticGraph
       end
 
       def register_renamed_type(type_name, from:, defined_at:, defined_via:)
-        renamed_types_by_old_name[from] = SchemaElements::DeprecatedElement.new(
-          schema_def_state: self,
-          name: type_name,
-          defined_at: defined_at,
-          defined_via: defined_via
-        )
+        renamed_types_by_old_name[from] = factory.new_deprecated_element(type_name, defined_at: defined_at, defined_via: defined_via)
       end
 
       def register_deleted_type(type_name, defined_at:, defined_via:)
-        deleted_types_by_old_name[type_name] = SchemaElements::DeprecatedElement.new(
-          schema_def_state: self,
-          name: type_name,
-          defined_at: defined_at,
-          defined_via: defined_via
-        )
+        deleted_types_by_old_name[type_name] = factory.new_deprecated_element(type_name, defined_at: defined_at, defined_via: defined_via)
       end
 
       def register_renamed_field(type_name, from:, to:, defined_at:, defined_via:)
         renamed_fields_by_old_field_name = renamed_fields_by_type_name_and_old_field_name[type_name]
-        renamed_fields_by_old_field_name[from] = SchemaElements::DeprecatedElement.new(
-          schema_def_state: self,
-          name: to,
-          defined_at: defined_at,
-          defined_via: defined_via
-        )
+        renamed_fields_by_old_field_name[from] = factory.new_deprecated_element(to, defined_at: defined_at, defined_via: defined_via)
       end
 
       def register_deleted_field(type_name, field_name, defined_at:, defined_via:)
         deleted_fields_by_old_field_name = deleted_fields_by_type_name_and_old_field_name[type_name]
-        deleted_fields_by_old_field_name[field_name] = SchemaElements::DeprecatedElement.new(
-          schema_def_state: self,
-          name: field_name,
-          defined_at: defined_at,
-          defined_via: defined_via
-        )
+        deleted_fields_by_old_field_name[field_name] = factory.new_deprecated_element(field_name, defined_at: defined_at, defined_via: defined_via)
       end
 
       def user_defined_field_references_by_type_name

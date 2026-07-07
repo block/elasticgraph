@@ -565,9 +565,9 @@ module ElasticGraph
 
         # Registers an old name that this field used to have in a prior version of the schema. Extensions
         # use this to deal with schema evolution — for example, `elasticgraph-json_ingestion` uses it to
-        # migrate data ingested under the old JSON schema version.
+        # ingest events that contain old field names that are no longer in the current schema.
         #
-        # @note When `elasticgraph-json_ingestion` is in use and this API applies, ElasticGraph will give you an error message
+        # @note In situations where this API is needed, ElasticGraph will give you an error message
         #   indicating that you need to use this API or `deleted_field`. Likewise, when ElasticGraph no longer needs to know
         #   about this, it'll give you a warning indicating the call to this method can be removed.
         #

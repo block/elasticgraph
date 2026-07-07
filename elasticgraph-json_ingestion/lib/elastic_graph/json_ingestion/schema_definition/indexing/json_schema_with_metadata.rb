@@ -53,11 +53,11 @@ module ElasticGraph
 
             def initialize(schema_def_results)
               @field_metadata_by_type_and_field_name = schema_def_results.json_schema_field_metadata_by_type_and_field_name
-              @renamed_types_by_old_name = schema_def_results.state.renamed_types_by_old_name
-              @deleted_types_by_old_name = schema_def_results.state.deleted_types_by_old_name
-              @renamed_fields_by_type_name_and_old_field_name = schema_def_results.state.renamed_fields_by_type_name_and_old_field_name
-              @deleted_fields_by_type_name_and_old_field_name = schema_def_results.state.deleted_fields_by_type_name_and_old_field_name
               @state = schema_def_results.state
+              @renamed_types_by_old_name = @state.renamed_types_by_old_name
+              @deleted_types_by_old_name = @state.deleted_types_by_old_name
+              @renamed_fields_by_type_name_and_old_field_name = @state.renamed_fields_by_type_name_and_old_field_name
+              @deleted_fields_by_type_name_and_old_field_name = @state.deleted_fields_by_type_name_and_old_field_name
               @derived_indexing_type_names = schema_def_results.derived_indexing_type_names
 
               @unused_deprecated_elements = (

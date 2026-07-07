@@ -49,14 +49,46 @@ module ElasticGraph
         end
 
         it "reports the caller's schema definition location (not ElasticGraph internals) as `defined_at`" do
+          deleted_type_callsite = nil
+          renamed_type_callsite = nil
+          deleted_field_callsite = nil
+          renamed_field_callsite = nil
+
           state = define_schema(schema_element_name_form: "snake_case") do |schema|
+            deleted_type_callsite = __LINE__ + 1
+            schema.deleted_type "OldType"
+
             schema.object_type "Widget" do |t|
+              renamed_type_callsite = __LINE__ + 1
               t.renamed_from "OldWidget"
+
+              deleted_field_callsite = __LINE__ + 1
+              t.deleted_field "legacy_name"
+
               t.field "id", "ID!"
+              t.field "name", "String" do |f|
+                renamed_field_callsite = __LINE__ + 1
+                f.renamed_from "old_name"
+              end
             end
           end.state
 
-          expect(state.renamed_types_by_old_name.fetch("OldWidget").defined_at.path).to eq __FILE__
+          expect(state.deleted_types_by_old_name.fetch("OldType").defined_at).to have_attributes(
+            path: __FILE__,
+            lineno: deleted_type_callsite
+          )
+          expect(state.renamed_types_by_old_name.fetch("OldWidget").defined_at).to have_attributes(
+            path: __FILE__,
+            lineno: renamed_type_callsite
+          )
+          expect(state.deleted_fields_by_type_name_and_old_field_name.fetch("Widget").fetch("legacy_name").defined_at).to have_attributes(
+            path: __FILE__,
+            lineno: deleted_field_callsite
+          )
+          expect(state.renamed_fields_by_type_name_and_old_field_name.fetch("Widget").fetch("old_name").defined_at).to have_attributes(
+            path: __FILE__,
+            lineno: renamed_field_callsite
+          )
         end
       end
     end

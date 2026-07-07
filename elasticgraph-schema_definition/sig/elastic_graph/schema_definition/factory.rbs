@@ -7,6 +7,13 @@ module ElasticGraph
 
       def self.prevent_non_factory_instantiation_of: (::Class) -> ::Method
 
+      def new_deprecated_element: (
+        ::String,
+        defined_at: ::Thread::Backtrace::Location,
+        defined_via: ::String
+      ) -> SchemaElements::DeprecatedElement
+      @@deprecated_element_new: ::Method
+
       def new_argument: (SchemaElements::Field, ::String, SchemaElements::TypeReference) ?{ (SchemaElements::Argument) -> void } -> SchemaElements::Argument
       @@argument_new: ::Method
 

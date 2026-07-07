@@ -303,7 +303,7 @@ module ElasticGraph
 
       # Registers the name of a type that existed in a prior version of the schema but has been deleted.
       #
-      # @note When `elasticgraph-json_ingestion` is in use and this API applies, ElasticGraph will give you an error message
+      # @note In situations where this API is needed, ElasticGraph will give you an error message
       #   indicating that you need to use this API or {SchemaElements::TypeWithSubfields#renamed_from}. Likewise, when
       #   ElasticGraph no longer needs to know about this, it'll give you a warning indicating the call to this method can
       #   be removed.
