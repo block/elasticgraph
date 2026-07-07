@@ -6,12 +6,12 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/schema_artifacts/runtime_metadata/extension_loader"
 require "elastic_graph/support/config"
-require "elastic_graph/errors"
 
 module ElasticGraph
   class Indexer
-    class Config < Support::Config.define(:latency_slo_thresholds_by_timestamp_in_ms, :skip_derived_indexing_type_updates)
+    class Config < Support::Config.define(:latency_slo_thresholds_by_timestamp_in_ms, :skip_derived_indexing_type_updates, :extension_modules)
       json_schema at: "indexer",
         optional: false,
         description: "Configuration for indexing operations and metrics used by `elasticgraph-indexer`.",
@@ -42,15 +42,17 @@ module ElasticGraph
               {}, # : untyped
               {"WidgetWorkspace" => ["ABC12345678"]}
             ]
-          }
+          },
+          extension_modules: Support::Config::EXTENSION_MODULE_SCHEMA
         }
 
       private
 
-      def convert_values(skip_derived_indexing_type_updates:, latency_slo_thresholds_by_timestamp_in_ms:)
+      def convert_values(skip_derived_indexing_type_updates:, latency_slo_thresholds_by_timestamp_in_ms:, extension_modules:)
         {
           skip_derived_indexing_type_updates: skip_derived_indexing_type_updates.transform_values(&:to_set),
-          latency_slo_thresholds_by_timestamp_in_ms: latency_slo_thresholds_by_timestamp_in_ms
+          latency_slo_thresholds_by_timestamp_in_ms: latency_slo_thresholds_by_timestamp_in_ms,
+          extension_modules: SchemaArtifacts::RuntimeMetadata::ExtensionLoader.load_component_extensions(extension_modules)
         }
       end
     end

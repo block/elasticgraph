@@ -31,6 +31,57 @@ module ElasticGraph
 
         expect(config.skip_derived_indexing_type_updates).to eq("WidgetCurrency" => ["USD"].to_set)
       end
+
+      describe "#extension_modules", :in_temp_dir do
+        it "loads the extension modules from disk" do
+          File.write("eg_extension_module1.rb", <<~EOS)
+            module EgExtensionModule1
+            end
+          EOS
+
+          File.write("eg_extension_module2.rb", <<~EOS)
+            module EgExtensionModule2
+            end
+          EOS
+
+          extension_modules = extension_modules_from(<<~YAML)
+            extension_modules:
+              - require_path: ./eg_extension_module1
+                name: EgExtensionModule1
+              - require_path: ./eg_extension_module2
+                name: EgExtensionModule2
+          YAML
+
+          expect(extension_modules).to eq([::EgExtensionModule1, ::EgExtensionModule2])
+        end
+
+        it "raises a clear error if the config is malformed" do
+          expect {
+            extension_modules_from(<<~YAML)
+              extension_modules:
+                - require: ./not_real
+                  name: NotReal
+            YAML
+          }.to raise_error a_string_including("require_path")
+
+          File.write("eg_extension_module1.rb", <<~EOS)
+            module EgExtensionModule1
+            end
+          EOS
+
+          expect {
+            extension_modules_from(<<~YAML)
+              extension_modules:
+                - require_path: ./eg_extension_module1
+                  extension: EgExtensionModule1
+            YAML
+          }.to raise_error a_string_including("name")
+        end
+
+        def extension_modules_from(yaml)
+          Config.from_parsed_yaml("indexer" => ::YAML.safe_load(yaml)).extension_modules
+        end
+      end
     end
   end
 end

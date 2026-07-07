@@ -16,6 +16,41 @@ module ElasticGraph
   module Support
     # Provides a standard way to define an ElasticGraph configuration class.
     module Config
+      # JSON schema for an `extension_modules` config setting, for use by ElasticGraph components
+      # (such as `elasticgraph-graphql` and `elasticgraph-indexer`) that support extension modules
+      # being extended onto their component instances.
+      EXTENSION_MODULE_SCHEMA = {
+        description: "Array of modules that will be extended onto the component instance to support extension libraries.",
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            name: {
+              type: "string",
+              minLength: 1,
+              description: "The name of the extension module class to load.",
+              examples: ["MyExtensionModule", "ElasticGraph::MyExtension"]
+            },
+            require_path: {
+              type: "string",
+              minLength: 1,
+              description: "The path to require to load the extension module.",
+              examples: ["./my_extension_module", "elastic_graph/my_extension"]
+            }
+          },
+          required: ["name", "require_path"]
+        },
+        default: [], # : untyped
+        examples: [
+          [], # : untyped
+          [
+            {
+              "name" => "MyExtensionModule",
+              "require_path" => "./my_extension_module"
+            }
+          ]
+        ]
+      }
       # Defines a configuration class with the given attributes.
       #
       # @param attrs [::Symbol] attribute names

@@ -29,5 +29,50 @@ module ElasticGraph
         expect(indexer).to be_a(Indexer)
       end
     end
+
+    context "when `config.extension_modules` or runtime metadata indexer extension modules are configured" do
+      it "applies the extensions when the Indexer instance is instantiated without impacting any other instances" do
+        config_extension_module = Module.new do
+          def datastore_router
+            :config_router
+          end
+        end
+        stub_const("ConfigExtensionModule", config_extension_module)
+
+        runtime_metadata_extension_module = Module.new do
+          def processor
+            :runtime_metadata_processor
+          end
+        end
+        stub_const("RuntimeMetadataExtensionModule", runtime_metadata_extension_module)
+
+        extended_indexer = build_indexer(
+          extension_modules: [config_extension_module],
+          schema_definition: lambda do |schema|
+            # `defined_at` just needs a valid require path, but needs to be outside ElasticGraph
+            # to not mess with our code coverage measurement.
+            schema.register_indexer_extension runtime_metadata_extension_module, defined_at: "time"
+            define_schema_elements(schema)
+          end
+        )
+
+        normal_indexer = build_indexer(
+          schema_definition: lambda { |schema| define_schema_elements(schema) }
+        )
+
+        expect(extended_indexer.datastore_router).to eq :config_router
+        expect(extended_indexer.processor).to eq :runtime_metadata_processor
+
+        expect(normal_indexer.datastore_router).to be_a(Indexer::DatastoreIndexingRouter)
+        expect(normal_indexer.processor).to be_a(Indexer::Processor)
+      end
+
+      def define_schema_elements(schema)
+        schema.object_type "Widget" do |t|
+          t.field "id", "ID!"
+          t.index "widgets"
+        end
+      end
+    end
   end
 end

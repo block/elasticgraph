@@ -109,6 +109,58 @@ module ElasticGraph
           end
         end
 
+        describe ".load_component_extensions", :in_temp_dir do
+          it "loads the extension modules from disk" do
+            ::File.write("eg_extension_module1.rb", <<~EOS)
+              module EgExtensionModule1
+              end
+            EOS
+
+            ::File.write("eg_extension_module2.rb", <<~EOS)
+              module EgExtensionModule2
+              end
+            EOS
+
+            extension_modules = ExtensionLoader.load_component_extensions([
+              {"name" => "EgExtensionModule1", "require_path" => "./eg_extension_module1"},
+              {"name" => "EgExtensionModule2", "require_path" => "./eg_extension_module2"}
+            ])
+
+            expect(extension_modules).to eq([::EgExtensionModule1, ::EgExtensionModule2])
+          end
+
+          it "raises a clear error if an extension can't be loaded" do
+            expect {
+              ExtensionLoader.load_component_extensions([
+                {"name" => "NotReal", "require_path" => "./not_real"}
+              ])
+            }.to raise_error LoadError, a_string_including("not_real")
+          end
+
+          it "raises a clear error if a named extension is not a module" do
+            ::File.write("eg_extension_class1.rb", <<~EOS)
+              class EgExtensionClass1
+              end
+            EOS
+
+            expect {
+              ExtensionLoader.load_component_extensions([
+                {"name" => "EgExtensionClass1", "require_path" => "./eg_extension_class1"}
+              ])
+            }.to raise_error a_string_including("not a module")
+
+            ::File.write("eg_extension_object1.rb", <<~EOS)
+              EgExtensionObject1 = Object.new
+            EOS
+
+            expect {
+              ExtensionLoader.load_component_extensions([
+                {"name" => "EgExtensionObject1", "require_path" => "./eg_extension_object1"}
+              ])
+            }.to raise_error a_string_including("not a class or module")
+          end
+        end
+
         def eq_extension(extension_class, from:, config:)
           eq(Extension.new(extension_class, from, config))
         end

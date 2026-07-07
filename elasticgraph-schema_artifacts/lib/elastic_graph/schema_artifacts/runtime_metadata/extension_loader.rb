@@ -25,6 +25,20 @@ module ElasticGraph
       #
       # @private
       class ExtensionLoader
+        # Loads the component extension modules described by the given config hashes (as configured
+        # via an `extension_modules` config setting), verifying that each is a module.
+        def self.load_component_extensions(extension_module_hashes)
+          extension_loader = new(::Module.new)
+
+          extension_module_hashes.map do |mod_hash|
+            extension_loader.load(mod_hash.fetch("name"), from: mod_hash.fetch("require_path"), config: {}).extension_class.tap do |mod|
+              unless mod.instance_of?(::Module)
+                raise Errors::ConfigError, "`#{mod_hash.fetch("name")}` is not a module, but all application extension modules must be modules."
+              end
+            end
+          end
+        end
+
         def initialize(interface_def)
           @interface_def = interface_def
           @loaded_by_name = {}

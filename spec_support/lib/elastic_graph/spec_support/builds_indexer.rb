@@ -18,18 +18,24 @@ module ElasticGraph
       datastore_core: nil,
       latency_slo_thresholds_by_timestamp_in_ms: {},
       skip_derived_indexing_type_updates: {},
+      extension_modules: [],
       datastore_router: nil,
       clock: nil,
       monotonic_clock: nil,
       **datastore_core_options,
       &customize_datastore_config
     )
+      config = Indexer::Config.new(
+        latency_slo_thresholds_by_timestamp_in_ms: latency_slo_thresholds_by_timestamp_in_ms,
+        skip_derived_indexing_type_updates: skip_derived_indexing_type_updates
+      )
+
+      # This config setting must bypass the JSON schema validation so we provide it via `with`.
+      config = config.with(extension_modules: config.extension_modules + extension_modules)
+
       Indexer.new(
         datastore_core: datastore_core || build_datastore_core(**datastore_core_options, &customize_datastore_config),
-        config: Indexer::Config.new(
-          latency_slo_thresholds_by_timestamp_in_ms: latency_slo_thresholds_by_timestamp_in_ms,
-          skip_derived_indexing_type_updates: skip_derived_indexing_type_updates
-        ),
+        config: config,
         datastore_router: datastore_router,
         clock: clock,
         monotonic_clock: monotonic_clock

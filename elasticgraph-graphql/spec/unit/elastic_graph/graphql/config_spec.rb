@@ -150,16 +150,6 @@ module ElasticGraph
           expect(extension_modules).to eq([::EgExtensionModule1, ::EgExtensionModule2])
         end
 
-        it "raises a clear error if the extension can't be loaded" do
-          expect {
-            extension_modules_from(<<~YAML)
-              extension_modules:
-                - require_path: ./not_real
-                  name: NotReal
-            YAML
-          }.to raise_error LoadError, a_string_including("not_real")
-        end
-
         it "raises a clear error if the config is malformed" do
           expect {
             extension_modules_from(<<~YAML)
@@ -181,33 +171,6 @@ module ElasticGraph
                   extension: EgExtensionModule1
             YAML
           }.to raise_error a_string_including("name")
-        end
-
-        it "raises a clear error if the named extension is not a module" do
-          File.write("eg_extension_class1.rb", <<~EOS)
-            class EgExtensionClass1
-            end
-          EOS
-
-          expect {
-            extension_modules_from(<<~YAML)
-              extension_modules:
-                - require_path: ./eg_extension_class1
-                  name: EgExtensionClass1
-            YAML
-          }.to raise_error a_string_including("not a module")
-
-          File.write("eg_extension_object1.rb", <<~EOS)
-            EgExtensionObject1 = Object.new
-          EOS
-
-          expect {
-            extension_modules_from(<<~YAML)
-              extension_modules:
-                - require_path: ./eg_extension_object1
-                  name: EgExtensionObject1
-            YAML
-          }.to raise_error a_string_including("not a class or module")
         end
 
         def load_config_from_yaml(yaml)
