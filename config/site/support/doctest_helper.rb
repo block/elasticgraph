@@ -8,6 +8,7 @@
 
 require "elastic_graph/apollo/schema_definition/api_extension"
 require "elastic_graph/json_ingestion/schema_definition/api_extension"
+require "elastic_graph/proto_ingestion/schema_definition/api_extension"
 require "elastic_graph/schema_artifacts/runtime_metadata/schema_element_names"
 require "elastic_graph/schema_definition/api"
 require "elastic_graph/schema_definition/schema_artifact_manager"
@@ -53,6 +54,7 @@ module ElasticGraph
       "ElasticGraph.define_schema" => [],
       "ElasticGraph::Apollo::SchemaDefinition" => [Apollo::SchemaDefinition::APIExtension],
       "ElasticGraph::JSONIngestion::SchemaDefinition" => [JSONIngestion::SchemaDefinition::APIExtension],
+      "ElasticGraph::ProtoIngestion::SchemaDefinition" => [ProtoIngestion::SchemaDefinition::APIExtension],
       "ElasticGraph::SchemaDefinition" => [],
       "ElasticGraph::Warehouse::SchemaDefinition" => [Warehouse::SchemaDefinition::APIExtension]
     }

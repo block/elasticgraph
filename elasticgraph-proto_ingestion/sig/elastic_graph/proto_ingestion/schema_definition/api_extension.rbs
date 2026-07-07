@@ -1,0 +1,8 @@
+module ElasticGraph
+  module ProtoIngestion
+    module SchemaDefinition
+      module APIExtension
+      end
+    end
+  end
+end
