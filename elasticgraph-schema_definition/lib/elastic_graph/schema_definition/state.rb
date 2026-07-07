@@ -49,7 +49,11 @@ module ElasticGraph
       :output,
       :type_namer,
       :enum_value_namer,
-      :indexed_types_by_index_name
+      :indexed_types_by_index_name,
+      :renamed_types_by_old_name,
+      :deleted_types_by_old_name,
+      :renamed_fields_by_type_name_and_old_field_name,
+      :deleted_fields_by_type_name_and_old_field_name
     )
       include Mixins::HasReadableToSAndInspect.new
 
@@ -95,7 +99,11 @@ module ElasticGraph
           ),
           enum_value_namer: SchemaElements::EnumValueNamer.new(enum_value_overrides_by_type),
           output: output,
-          indexed_types_by_index_name: {}
+          indexed_types_by_index_name: {},
+          renamed_types_by_old_name: {},
+          deleted_types_by_old_name: {},
+          renamed_fields_by_type_name_and_old_field_name: ::Hash.new { |h, k| h[k] = {} },
+          deleted_fields_by_type_name_and_old_field_name: ::Hash.new { |h, k| h[k] = {} }
         )
       end
 
@@ -134,6 +142,24 @@ module ElasticGraph
       # Registers the given `field` as a user-defined field, unless the user definitions are complete.
       def register_user_defined_field(field)
         user_defined_fields << field
+      end
+
+      def register_renamed_type(type_name, from:, defined_at:, defined_via:)
+        renamed_types_by_old_name[from] = factory.new_deprecated_element(type_name, defined_at: defined_at, defined_via: defined_via)
+      end
+
+      def register_deleted_type(type_name, defined_at:, defined_via:)
+        deleted_types_by_old_name[type_name] = factory.new_deprecated_element(type_name, defined_at: defined_at, defined_via: defined_via)
+      end
+
+      def register_renamed_field(type_name, from:, to:, defined_at:, defined_via:)
+        renamed_fields_by_old_field_name = renamed_fields_by_type_name_and_old_field_name[type_name]
+        renamed_fields_by_old_field_name[from] = factory.new_deprecated_element(to, defined_at: defined_at, defined_via: defined_via)
+      end
+
+      def register_deleted_field(type_name, field_name, defined_at:, defined_via:)
+        deleted_fields_by_old_field_name = deleted_fields_by_type_name_and_old_field_name[type_name]
+        deleted_fields_by_old_field_name[field_name] = factory.new_deprecated_element(field_name, defined_at: defined_at, defined_via: defined_via)
       end
 
       def user_defined_field_references_by_type_name

@@ -79,6 +79,7 @@ module ElasticGraph
         def to_sdl: (?type_structure_only: bool, ?default_value_sdl: ::String?) ?{ (argument) -> boolish } -> ::String
         def sourced_from: (::String, ::String) -> void
         def resolve_with: (::Symbol?, **untyped) -> void
+        def renamed_from: (::String) -> void
         def paths_to_lists_for_count_indexing: (?has_list_ancestor: bool) -> ::Array[::String]
         def index_leaf?: () -> bool
 

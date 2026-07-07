@@ -28,6 +28,10 @@ module ElasticGraph
       attr_reader enum_value_namer: SchemaElements::EnumValueNamer
       attr_accessor output: io
       attr_accessor indexed_types_by_index_name: ::Hash[::String, indexableType]
+      attr_accessor renamed_types_by_old_name: ::Hash[::String, SchemaElements::DeprecatedElement]
+      attr_accessor deleted_types_by_old_name: ::Hash[::String, SchemaElements::DeprecatedElement]
+      attr_accessor renamed_fields_by_type_name_and_old_field_name: ::Hash[::String, ::Hash[::String, SchemaElements::DeprecatedElement]]
+      attr_accessor deleted_fields_by_type_name_and_old_field_name: ::Hash[::String, ::Hash[::String, SchemaElements::DeprecatedElement]]
 
       def initialize: (
         api: API,
@@ -57,6 +61,10 @@ module ElasticGraph
         enum_value_namer: SchemaElements::EnumValueNamer,
         output: io,
         indexed_types_by_index_name: ::Hash[::String, indexableType],
+        renamed_types_by_old_name: ::Hash[::String, SchemaElements::DeprecatedElement],
+        deleted_types_by_old_name: ::Hash[::String, SchemaElements::DeprecatedElement],
+        renamed_fields_by_type_name_and_old_field_name: ::Hash[::String, ::Hash[::String, SchemaElements::DeprecatedElement]],
+        deleted_fields_by_type_name_and_old_field_name: ::Hash[::String, ::Hash[::String, SchemaElements::DeprecatedElement]],
       ) -> void
     end
 
@@ -80,6 +88,10 @@ module ElasticGraph
       def register_scalar_type: (SchemaElements::ScalarType) -> void
       def register_input_type: (SchemaElements::InputType) -> void
       def register_user_defined_field: (SchemaElements::Field) -> void
+      def register_renamed_type: (::String, from: ::String, defined_at: ::Thread::Backtrace::Location, defined_via: ::String) -> void
+      def register_deleted_type: (::String, defined_at: ::Thread::Backtrace::Location, defined_via: ::String) -> void
+      def register_renamed_field: (::String, from: ::String, to: ::String, defined_at: ::Thread::Backtrace::Location, defined_via: ::String) -> void
+      def register_deleted_field: (::String, ::String, defined_at: ::Thread::Backtrace::Location, defined_via: ::String) -> void
 
       @factory: Factory?
       def factory: () -> Factory

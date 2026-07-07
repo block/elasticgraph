@@ -76,6 +76,8 @@ module ElasticGraph
 
         def relates_to_one: (::String, ::String, via: ::String, dir: foreignKeyDirection, ?indexing_only: bool) ?{ (Relationship) -> void } -> void
         def relates_to_many: (::String, ::String, via: ::String, dir: foreignKeyDirection, ?singular: ::String?, ?indexing_only: bool) ?{ (Relationship) -> void } -> void
+        def deleted_field: (::String) -> void
+        def renamed_from: (::String) -> void
 
         def generate_sdl: (name_section: ::String) ?{ (Field::argument) -> boolish } -> String
         def current_sources: () -> ::Array[::String]
