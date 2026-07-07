@@ -6,21 +6,21 @@
 #
 # frozen_string_literal: true
 
-require "elastic_graph/schema_artifacts/runtime_metadata/graphql_extension"
+require "elastic_graph/schema_artifacts/runtime_metadata/component_extension"
 
 module ElasticGraph
   module SchemaArtifacts
     module RuntimeMetadata
-      RSpec.describe GraphQLExtension do
+      RSpec.describe ComponentExtension do
         it "loads extension lazily" do
-          graphql_extension = GraphQLExtension.new(
+          component_extension = ComponentExtension.new(
             extension_ref: {
               "name" => "ElasticGraph::Extensions::Valid",
               "require_path" => "support/example_extensions/valid"
             }
           )
 
-          extension = graphql_extension.load_extension
+          extension = component_extension.load_extension
 
           expect(extension).to be_a(RuntimeMetadata::Extension)
           expect(extension.extension_class).to be_a(::Module).and have_attributes(name: "ElasticGraph::Extensions::Valid")

@@ -12,7 +12,7 @@ module ElasticGraph
   module SchemaArtifacts
     module RuntimeMetadata
       # @private
-      class GraphQLExtension < ::Data.define(:extension_ref)
+      class ComponentExtension < ::Data.define(:extension_ref)
         def self.loader
           @loader ||= ExtensionLoader.new(Module.new)
         end
@@ -20,7 +20,7 @@ module ElasticGraph
         EXTENSION_REF = "extension_ref"
 
         def load_extension
-          Extension.load_from_hash(extension_ref, via: GraphQLExtension.loader)
+          Extension.load_from_hash(extension_ref, via: ComponentExtension.loader)
         end
 
         def self.from_hash(hash)

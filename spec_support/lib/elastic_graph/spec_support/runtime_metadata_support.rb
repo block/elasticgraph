@@ -21,6 +21,7 @@ module ElasticGraph
           schema_element_names: SchemaElementNames.new(form: :snake_case),
           graphql_extension_modules: [],
           graphql_resolvers_by_name: {},
+          indexer_extension_modules: [],
           static_script_ids_by_scoped_name: {}
         )
           Schema.new(
@@ -32,6 +33,7 @@ module ElasticGraph
             schema_element_names: schema_element_names,
             graphql_extension_modules: graphql_extension_modules,
             graphql_resolvers_by_name: graphql_resolvers_by_name,
+            indexer_extension_modules: indexer_extension_modules,
             static_script_ids_by_scoped_name: static_script_ids_by_scoped_name
           )
         end
@@ -213,9 +215,9 @@ module ElasticGraph
           Extension.new(IndexingPreparer2, "support/example_extensions/indexing_preparers", {})
         end
 
-        def graphql_extension_module1
-          extension = Extension.new(GraphQLExtensionModule1, "support/example_extensions/graphql_extension_modules", {})
-          GraphQLExtension.new(extension_ref: extension.to_dumpable_hash)
+        def component_extension_module1
+          extension = Extension.new(ComponentExtensionModule1, "support/example_extensions/component_extension_modules", {})
+          ComponentExtension.new(extension_ref: extension.to_dumpable_hash)
         end
 
         def graphql_resolver_with_lookahead(**config)

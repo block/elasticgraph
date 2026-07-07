@@ -15,7 +15,7 @@ require "elastic_graph/schema_artifacts/runtime_metadata/scalar_type"
 require "elastic_graph/schema_artifacts/runtime_metadata/schema"
 require "elastic_graph/spec_support/runtime_metadata_support"
 require "elastic_graph/spec_support/example_extensions/graphql_resolvers"
-require "support/example_extensions/graphql_extension_modules"
+require "support/example_extensions/component_extension_modules"
 require "support/example_extensions/indexing_preparers"
 require "support/example_extensions/scalar_coercion_adapters"
 require "yaml"
@@ -158,13 +158,14 @@ module ElasticGraph
               form: :snake_case,
               overrides: {"any_of" => "or"}
             ),
-            graphql_extension_modules: [graphql_extension_module1],
+            graphql_extension_modules: [component_extension_module1],
             graphql_resolvers_by_name: {
               resolver1: graphql_resolver_with(
                 needs_lookahead: true,
                 resolver_ref: graphql_resolver_with_lookahead(limit: 10).to_dumpable_hash
               )
             },
+            indexer_extension_modules: [component_extension_module1],
             static_script_ids_by_scoped_name: {
               "filter/time_of_day" => "time_of_day_4474b200b6a00f385ed49f7c9669cbf3"
             }
@@ -302,8 +303,8 @@ module ElasticGraph
             },
             "graphql_extension_modules" => [{
               "extension_ref" => {
-                "name" => "ElasticGraph::SchemaArtifacts::GraphQLExtensionModule1",
-                "require_path" => "support/example_extensions/graphql_extension_modules"
+                "name" => "ElasticGraph::SchemaArtifacts::ComponentExtensionModule1",
+                "require_path" => "support/example_extensions/component_extension_modules"
               }
             }],
             "graphql_resolvers_by_name" => {
@@ -316,6 +317,12 @@ module ElasticGraph
                 }
               }
             },
+            "indexer_extension_modules" => [{
+              "extension_ref" => {
+                "name" => "ElasticGraph::SchemaArtifacts::ComponentExtensionModule1",
+                "require_path" => "support/example_extensions/component_extension_modules"
+              }
+            }],
             "static_script_ids_by_scoped_name" => {
               "filter/time_of_day" => "time_of_day_4474b200b6a00f385ed49f7c9669cbf3"
             }
@@ -387,6 +394,7 @@ module ElasticGraph
             schema_element_names: SchemaElementNames.from_hash({"form" => "camelCase"}),
             graphql_extension_modules: [],
             graphql_resolvers_by_name: {},
+            indexer_extension_modules: [],
             static_script_ids_by_scoped_name: {}
           )
         end
