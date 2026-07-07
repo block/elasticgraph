@@ -8,8 +8,8 @@
 
 require "elastic_graph/constants"
 require "elastic_graph/indexer"
-require "elastic_graph/indexer/ingestion_adapter/json_events"
 require "elastic_graph/indexer/operation/factory"
+require "elastic_graph/json_ingestion/record_preparer_factory"
 require "elastic_graph/spec_support/builds_indexer_operation"
 require "json"
 
@@ -90,43 +90,6 @@ module ElasticGraph
             }.merge(latency_timestamps))])
           end
 
-          it 'notifies an error when latency metrics contain keys that violate regex "^\\w+_at$"' do
-            valid_event = build_upsert_event(:component, id: "1", __version: 1)
-            invalid_event = valid_event.merge({
-              "latency_timestamps" => {
-                "created_in_esperanto_at" => "2012-04-23T18:25:43.511Z",
-                "bad metric with spaces _at" => "2012-04-20T18:25:43.511Z",
-                "bad_metric" => "2012-04-20T18:25:43.511Z"
-              }
-            })
-
-            expect_failed_event_error(invalid_event, "/latency_timestamps/bad_metric", "bad metric with spaces _at")
-          end
-
-          it "notifies an error when latency metrics contain values that are not ISO8601 date-time" do
-            valid_event = build_upsert_event(:component, id: "1", __version: 1)
-            invalid_event = valid_event.merge({
-              "latency_timestamps" => {
-                "created_in_esperanto_at" => "2012-04-23T18:25:43.511Z",
-                "bad_metric_at" => "malformed datetime"
-              }
-            })
-
-            expect_failed_event_error(invalid_event, "/latency_timestamps/bad_metric")
-          end
-
-          it "notifies an error on version number less than 1" do
-            event = build_upsert_event(:widget, __version: -1)
-
-            expect_failed_event_error(event, "/properties/version")
-          end
-
-          it "notifies an error on version number greater than 2^63 - 1" do
-            event = build_upsert_event(:widget, __version: 2**64)
-
-            expect_failed_event_error(event, "/properties/version")
-          end
-
           it "notifies an error on unknown graphql type" do
             event = {
               "op" => "upsert",
@@ -157,41 +120,11 @@ module ElasticGraph
             expect_failed_event_error(event, "/properties/type", expect_no_ops: true)
           end
 
-          it "notifies an error on invalid operation" do
-            event = build_upsert_event(:widget).merge("op" => "invalid_op")
-
-            expect_failed_event_error(event, "/properties/op")
-          end
-
-          it "notifies an error on missing operation" do
-            event = build_upsert_event(:widget).except("op")
-
-            expect_failed_event_error(event, "missing_keys", "op")
-          end
-
-          it "notifies an error on missing record for upsert" do
-            event = build_upsert_event(:component).except("record")
-
-            expect_failed_event_error(event, "/then")
-          end
-
-          it "notifies an error on missing id" do
-            event = build_upsert_event(:component).except("id")
-
-            expect_failed_event_error(event, "missing_keys", "id")
-          end
-
           it "notifies an error on missing type" do
             event = build_upsert_event(:component).except("type")
 
             # We can't build any operations when the `type` isn't in the event. We don't know what index to target!
             expect_failed_event_error(event, "missing_keys", "type", expect_no_ops: true)
-          end
-
-          it "notifies an error on missing version" do
-            event = build_upsert_event(:component).except("version")
-
-            expect_failed_event_error(event, "missing_keys", "version")
           end
 
           it "notifies an error on missing `#{JSON_SCHEMA_VERSION_KEY}`" do
@@ -233,152 +166,6 @@ module ElasticGraph
             expect_failed_event_error(bad_widget1, "/workspace_id")
             expect_failed_event_error(bad_widget2, "/workspace_id")
             expect_failed_event_error(bad_widget3, "/workspace_id")
-          end
-
-          it "allows the validator to be configured with a block" do
-            event_with_extra_field = build_upsert_event(:widget, extra_field: 17)
-
-            expect {
-              build_expecting_success(event_with_extra_field)
-            }.not_to raise_error
-
-            expect {
-              build_expecting_success(event_with_extra_field) { |v| v.with_unknown_properties_disallowed }
-            }.to raise_error FailedEventError, a_string_including("extra_field")
-          end
-
-          context "when the indexer has json schemas v2 and v4 (v4 adds yellow color)" do
-            before do
-              # With the "real" version one as a baseline, create a separate version with a small schema change.
-              # Tests will then specify the desired json_schema_version in the event payload to test the schema-choosing
-              # behavior of the `factory` class.
-              schemas = {
-                2 => indexer.schema_artifacts.json_schemas_for(1),
-                4 => ::Marshal.load(::Marshal.dump(indexer.schema_artifacts.json_schemas_for(1))).tap do |schema|
-                  schema["$defs"]["Color"]["enum"] << "YELLOW"
-                end
-              }
-
-              allow(indexer.schema_artifacts).to receive(:available_json_schema_versions).and_return(schemas.keys.to_set)
-              allow(indexer.schema_artifacts).to receive(:latest_json_schema_version).and_return(schemas.keys.max)
-              allow(indexer.schema_artifacts).to receive(:json_schemas_for) do |version|
-                ::Marshal.load(::Marshal.dump(schemas.fetch(version))).tap do |schema|
-                  schema[JSON_SCHEMA_VERSION_KEY] = version
-                  schema["$defs"]["ElasticGraphEventEnvelope"]["properties"][JSON_SCHEMA_VERSION_KEY]["const"] = version
-                end
-              end
-            end
-
-            it "validates against an older version of a json schema if specified" do
-              # YELLOW doesn't exist in schema version 2. So expect an error when json_schema_version is set to 2.
-              event = build_upsert_event(:widget, id: "1", __version: 1, __json_schema_version: 2)
-              event["record"]["options"]["color"] = "YELLOW"
-
-              expect_failed_event_error(event, "/options/color")
-            end
-
-            it "validates against the latest version of a json schema if specified" do
-              event = build_upsert_event(:widget, id: "1", __version: 1, __json_schema_version: 4)
-              event["record"]["options"]["color"] = "YELLOW"
-
-              expect(build_expecting_success(event)).to include(new_primary_indexing_operation({
-                "op" => "upsert",
-                "id" => "1",
-                "type" => "Widget",
-                "version" => 1,
-                "record" => event["record"],
-                JSON_SCHEMA_VERSION_KEY => 4
-              }, index_def: index_def_named("widgets")))
-            end
-
-            it "validates against the closest version if the requested version is newer than what's available" do
-              # 5 is closest to "4", validation should match behavior from version "4" - YELLOW should pass validation.
-              event = build_upsert_event(:widget, id: "1", __version: 1, __json_schema_version: 5)
-              event["record"]["options"]["color"] = "YELLOW"
-
-              expect(build_expecting_success(event)).to include(new_primary_indexing_operation({
-                "op" => "upsert",
-                "id" => "1",
-                "type" => "Widget",
-                "version" => 1,
-                "record" => event["record"],
-                JSON_SCHEMA_VERSION_KEY => 5 # Originally-specified version.
-              }, index_def: index_def_named("widgets")))
-
-              expect(logged_jsons_of_type("ElasticGraphMissingJSONSchemaVersion").last).to include(
-                "event_id" => "Widget:1@v1",
-                "event_type" => "Widget",
-                "requested_json_schema_version" => 5,
-                "selected_json_schema_version" => 4
-              )
-            end
-
-            it "validates against the closest version if the requested version older than what's available" do
-              # 1 is closest to "2", validation should match behavior from version "2" - YELLOW should fail validation.
-              event = build_upsert_event(:widget, id: "1", __version: 1, __json_schema_version: 1).merge("message_id" => "m123")
-              event["record"]["options"]["color"] = "YELLOW"
-
-              # Should fail, but should still log the version mismatch as well.
-              expect_failed_event_error(
-                event,
-                "Malformed Widget record",
-                "1",
-                "/options/color"
-              )
-
-              expect(logged_jsons_of_type("ElasticGraphMissingJSONSchemaVersion").last).to include(
-                "event_id" => "Widget:1@v1",
-                "message_id" => "m123",
-                "event_type" => "Widget",
-                "requested_json_schema_version" => 1,
-                "selected_json_schema_version" => 2
-              )
-            end
-
-            it "validates against a version newer than what's requested, if the requested version is equidistant from two available versions" do
-              event = build_upsert_event(:widget, id: "1", __version: 1, __json_schema_version: 3)
-              event["record"]["options"]["color"] = "YELLOW"
-
-              expect(build_expecting_success(event)).to include(new_primary_indexing_operation({
-                "op" => "upsert",
-                "id" => "1",
-                "type" => "Widget",
-                "version" => 1,
-                "record" => event["record"],
-                JSON_SCHEMA_VERSION_KEY => 3 # Originally-specified version.
-              }, index_def: index_def_named("widgets")))
-
-              expect(logged_jsons_of_type("ElasticGraphMissingJSONSchemaVersion").last).to include(
-                "event_id" => "Widget:1@v1",
-                "event_type" => "Widget",
-                "requested_json_schema_version" => 3,
-                "selected_json_schema_version" => 4
-              )
-            end
-
-            it "notifies an error if an invalid (e.g. negative) json_schema_version is specified" do
-              event = build_upsert_event(:widget, id: "1", __version: 1, __json_schema_version: -1)
-
-              expect_failed_event_error(event, "must be a positive integer", "(-1)")
-            end
-
-            it "notifies an error if it's unable to select a json_schema_version" do
-              event = build_upsert_event(:component, id: "1", __version: 1)
-              event["record"]["name"] = 123
-
-              fake_empty_schema_artifacts = instance_double(
-                "ElasticGraph::SchemaArtifacts::FromDisk",
-                available_json_schema_versions: Set[],
-                runtime_metadata: indexer.schema_artifacts.runtime_metadata,
-                indices: indexer.schema_artifacts.indices,
-                index_templates: indexer.schema_artifacts.index_templates,
-                index_mappings_by_index_def_name: indexer.schema_artifacts.index_mappings_by_index_def_name
-              )
-
-              operation_factory = build_indexer(schema_artifacts: fake_empty_schema_artifacts).operation_factory
-
-              expect_failed_event_error(event, "Failed to select json schema version", factory: operation_factory)
-            end
           end
 
           it "also generates an update operation for related types that have fields `sourced_from` this event type" do
@@ -484,22 +271,10 @@ module ElasticGraph
           end
         end
 
-        def build_expecting_success(event, **options, &configure_record_validator)
-          factory = indexer.operation_factory
+        def build_expecting_success(event, **options)
+          result = indexer.operation_factory.build(event, **options)
 
-          if configure_record_validator
-            json_events_adapter = IngestionAdapter::JSONEvents.new(
-              schema_artifacts: indexer.schema_artifacts,
-              logger: indexer.logger,
-              configure_record_validator: configure_record_validator
-            )
-
-            factory = factory.with(ingestion_adapters: [json_events_adapter])
-          end
-
-          result = factory.build(event, **options)
-
-          raise result.failed_event_error if result.failed_event_error
+          expect(result.failed_event_error).to be nil
           result.operations
         end
 
@@ -507,7 +282,7 @@ module ElasticGraph
           operations = Update.operations_for(
             event: event,
             destination_index_def: index_def_named("widget_currencies"),
-            record_preparer: indexer.record_preparer_factory.for_latest_json_schema_version,
+            record_preparer: JSONIngestion::RecordPreparerFactory.new(indexer.schema_artifacts).for_latest_json_schema_version,
             update_target: indexer.schema_artifacts.runtime_metadata.object_types_by_name.fetch("Widget").update_targets.first,
             destination_index_mapping: indexer.schema_artifacts.index_mappings_by_index_def_name.fetch("widget_currencies")
           )

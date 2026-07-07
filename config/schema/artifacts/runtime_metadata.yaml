@@ -3219,6 +3219,10 @@ index_definitions_by_name:
       frequency: yearly
       timestamp_field_path: created_at
     route_with: workspace_id2
+indexer_extension_modules:
+- extension_ref:
+    name: ElasticGraph::JSONIngestion::IndexerExtension
+    require_path: elastic_graph/json_ingestion/indexer_extension
 object_types_by_name:
   Address:
     graphql_fields_by_name:
