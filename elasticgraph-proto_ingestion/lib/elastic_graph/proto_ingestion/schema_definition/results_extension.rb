@@ -42,7 +42,9 @@ module ElasticGraph
               state: extension_state,
               all_types: all_types,
               package_name: ingestion_state.package_name,
-              proto_field_number_mappings: ingestion_state.field_number_mappings
+              proto_field_number_mappings: ingestion_state.field_number_mappings,
+              syntax: ingestion_state.syntax,
+              headers: ingestion_state.headers
             )
           end
         end

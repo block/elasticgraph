@@ -75,7 +75,7 @@ module ElasticGraph
                 public_field_name: schema_field.name,
                 name_in_index: field.name_in_index
               )
-              label = "repeated " if repeated
+              label = schema.field_label(repeated)
               line = "  #{label}#{field_type} #{field_name} = #{field_number};"
               comment_parts = [] # : ::Array[::String]
               comment_parts << "source name: #{field.name}" if field_name != field.name

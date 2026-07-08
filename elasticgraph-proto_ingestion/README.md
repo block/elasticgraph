@@ -1,7 +1,9 @@
 # ElasticGraph::ProtoIngestion
 
 An ElasticGraph extension that supports ingesting Protocol Buffer data into ElasticGraph.
-Currently it generates `proto3` Protocol Buffers schema artifacts from ElasticGraph schemas.
+Currently it generates Protocol Buffers schema artifacts from ElasticGraph schemas: it emits
+`proto3` by default and can emit `proto2`, and supports arbitrary file-level headers (such
+as `option` declarations).
 
 ## Dependency Diagram
 
@@ -78,6 +80,54 @@ After running `bundle exec rake schema_artifacts:dump`, ElasticGraph will genera
 - `proto_field_numbers.yaml`
 
 ## Schema Definition API
+
+### Protobuf Syntax (`proto2` / `proto3`)
+
+`proto_schema_artifacts` emits `proto3` by default. Pass `syntax: :proto2` to emit a proto2 file
+instead (every field is then labeled `optional` or `repeated`). This is useful when the generated
+messages need to reference proto2 types — for example, `protoc` forbids a `proto3` message from
+referencing a `proto2` enum:
+
+```ruby
+# in config/schema/protobuf.rb
+
+ElasticGraph.define_schema do |schema|
+  schema.proto_schema_artifacts package_name: "myapp.events.v1", syntax: :proto2
+end
+```
+
+### Custom Headers
+
+Pass `headers:` an array of strings to inject file-level lines (such as `option` declarations)
+verbatim, as a contiguous section immediately after the `package` declaration. This lets you set
+language-specific options without the gem baking in any particular convention:
+
+```ruby
+# in config/schema/protobuf.rb
+
+ElasticGraph.define_schema do |schema|
+  schema.proto_schema_artifacts(
+    package_name: "myapp.events.v1",
+    headers: [
+      %(option java_package = "com.myapp.events";),
+      "option java_multiple_files = true;"
+    ]
+  )
+end
+```
+
+produces:
+
+```text
+syntax = "proto3";
+
+package myapp.events.v1;
+
+option java_package = "com.myapp.events";
+option java_multiple_files = true;
+
+// ...messages...
+```
 
 ### Custom Scalar Types
 
