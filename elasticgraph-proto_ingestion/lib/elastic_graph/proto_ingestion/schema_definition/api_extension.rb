@@ -34,14 +34,26 @@ module ElasticGraph
         # Configures protobuf artifact generation behavior.
         #
         # @param package_name [String] proto package name to emit
+        # @param syntax [Symbol] `:proto3` (default) or `:proto2`
+        # @param headers [Array<String>] file-level lines rendered verbatim after the package declaration
         # @return [void]
         #
         # @example Set the proto package name
         #   ElasticGraph.define_schema do |schema|
         #     schema.proto_schema_artifacts package_name: "myapp.events.v1"
         #   end
-        def proto_schema_artifacts(package_name:)
-          proto_ingestion_state.package_name = Identifier.validate_package_name(package_name)
+        def proto_schema_artifacts(package_name:, syntax: :proto3, headers: [])
+          unless Schema::SUPPORTED_SYNTAXES.include?(syntax.to_s)
+            raise Errors::SchemaError, "`syntax` must be one of #{Schema::SUPPORTED_SYNTAXES.inspect}, got: #{syntax.inspect}"
+          end
+          if !headers.is_a?(Array) || headers.any? { |header| !header.is_a?(String) }
+            raise Errors::SchemaError, "`headers` must be an Array of Strings"
+          end
+
+          ingestion_state = proto_ingestion_state
+          ingestion_state.package_name = Identifier.validate_package_name(package_name)
+          ingestion_state.syntax = syntax
+          ingestion_state.headers = headers
           nil
         end
 

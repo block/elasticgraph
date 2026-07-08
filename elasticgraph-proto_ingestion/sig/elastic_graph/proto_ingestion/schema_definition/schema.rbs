@@ -2,6 +2,10 @@ module ElasticGraph
   module ProtoIngestion
     module SchemaDefinition
       class Schema
+        SUPPORTED_SYNTAXES: ::Array[::String]
+
+        @syntax: ::String
+        @headers: ::Array[::String]
         @state: ::ElasticGraph::SchemaDefinition::State
         @all_types: ::Array[::ElasticGraph::SchemaDefinition::SchemaElements::graphQLType]
         @package_name: ::String
@@ -12,7 +16,9 @@ module ElasticGraph
           state: ::ElasticGraph::SchemaDefinition::State,
           all_types: ::Array[::ElasticGraph::SchemaDefinition::SchemaElements::graphQLType],
           package_name: ::String,
-          ?proto_field_number_mappings: untyped
+          ?proto_field_number_mappings: untyped,
+          ?syntax: (::Symbol | ::String),
+          ?headers: ::Array[::String]
         ) -> void
 
         def to_proto: () -> ::String
@@ -27,12 +33,14 @@ module ElasticGraph
         def enum_value_numbers_for: (::String, ::Array[::String]) -> ::Hash[::String, ::Integer]
         def next_enum_value_number_for: (::String) -> ::Integer
         def reserved_enum_value_numbers_for: (::String, ::Array[::String]) -> ::Hash[::String, ::Integer]
+        def field_label: (bool) -> ::String?
 
         private
 
         def proto_types: () -> ::Array[untyped]
         def render_definitions: (::Array[untyped] types) -> ::String
         def render_imports: (::Array[untyped] types) -> ::Array[::String]
+        def render_headers: () -> ::Array[::String]
         def validate_unique_enum_value_prefixes: (::Array[untyped] types) -> void
         def previous_field_names_for: (::String, ::String) -> ::Array[::String]
         def previous_field_names_by_type_name_and_field_name: () -> ::Hash[::String, ::Hash[::String, ::Array[::String]]]

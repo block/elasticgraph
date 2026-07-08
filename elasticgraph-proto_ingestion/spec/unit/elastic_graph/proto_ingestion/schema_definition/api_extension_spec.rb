@@ -51,6 +51,37 @@ module ElasticGraph
           end
         end
 
+        it "requires `syntax` to be a supported protobuf syntax" do
+          expect {
+            define_proto_schema do |s|
+              s.proto_schema_artifacts package_name: "elasticgraph", syntax: :proto1
+            end
+          }.to raise_error(Errors::SchemaError, a_string_including("`syntax` must be one of"))
+        end
+
+        it "requires `headers` to be an Array of Strings" do
+          expect {
+            define_proto_schema do |s|
+              s.proto_schema_artifacts(
+                package_name: "elasticgraph",
+                headers: %(option java_package = "com.example";)
+              )
+            end
+          }.to raise_error(Errors::SchemaError, a_string_including("`headers` must be an Array of Strings"))
+
+          expect {
+            define_proto_schema do |s|
+              s.proto_schema_artifacts package_name: "elasticgraph", headers: [:not_a_string]
+            end
+          }.to raise_error(Errors::SchemaError, a_string_including("`headers` must be an Array of Strings"))
+
+          expect {
+            define_proto_schema do |s|
+              s.proto_schema_artifacts package_name: "elasticgraph", headers: ["valid", :not_a_string]
+            end
+          }.to raise_error(Errors::SchemaError, a_string_including("`headers` must be an Array of Strings"))
+        end
+
         it "rejects invalid package names when they are configured" do
           invalid_package_names = [
             "",
