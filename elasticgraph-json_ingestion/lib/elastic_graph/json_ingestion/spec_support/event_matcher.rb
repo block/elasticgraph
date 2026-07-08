@@ -6,13 +6,13 @@
 #
 # frozen_string_literal: true
 
-require "elastic_graph/indexer/ingestion_adapter/json_events"
+require "elastic_graph/json_ingestion/ingestion_adapter"
 require "json"
 
-# Defines an RSpec matcher that can be used to validate ElasticGraph events.
+# Defines an RSpec matcher that can be used to validate ElasticGraph JSON events.
 ::RSpec::Matchers.define :be_a_valid_elastic_graph_event do |for_indexer:|
   match do |event|
-    json_events_adapter = ElasticGraph::Indexer::IngestionAdapter::JSONEvents.new(
+    ingestion_adapter = ElasticGraph::JSONIngestion::IngestionAdapter.new(
       schema_artifacts: for_indexer.schema_artifacts,
       logger: for_indexer.logger,
       configure_record_validator: block_arg
@@ -20,7 +20,7 @@ require "json"
 
     result = for_indexer
       .operation_factory
-      .with(ingestion_adapters: [json_events_adapter])
+      .with(ingestion_adapters: [ingestion_adapter])
       .build(event)
 
     @validation_failure = result.failed_event_error

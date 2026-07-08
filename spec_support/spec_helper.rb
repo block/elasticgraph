@@ -334,6 +334,13 @@ module ElasticGraph
       CommonSpecHelpers.parsed_test_settings_yaml
     end
 
+    # Provides the record preparer an indexer would use for JSON events at the latest JSON schema
+    # version, for tests that need to build expected operations "as the indexer would".
+    def latest_json_record_preparer_for(indexer)
+      require "elastic_graph/json_ingestion/record_preparer_factory"
+      JSONIngestion::RecordPreparerFactory.new(indexer.schema_artifacts).for_latest_json_schema_version
+    end
+
     module_function
 
     def expect_to_return_non_nil_values_from_all_attributes(object)
