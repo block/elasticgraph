@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/admin/cluster_configurator/action_reporter"
+require "elastic_graph/admin/index_definition_configurator/mapping_update"
 require "elastic_graph/datastore_core/index_config_normalizer"
 require "elastic_graph/indexer/hash_differ"
 require "elastic_graph/support/hash_util"
@@ -32,9 +33,8 @@ module ElasticGraph
         # and the state of the index in the datastore, does one of the following:
         #
         #   - If the index did not already exist: creates the index with the desired mappings and settings.
-        #   - If the desired mapping has fewer fields than what is in the index: raises an exception,
-        #     because the datastore provides no way to remove fields from a mapping and it would be confusing
-        #     for this method to silently ignore the issue.
+        #   - If the desired mapping has fewer fields than what is in the index: leaves the existing fields
+        #     alone, because the datastore provides no way to remove fields from a mapping.
         #   - If the settings have desired changes: updates the settings, restoring any setting that
         #     no longer has a desired value to its default.
         #   - If the mapping has desired changes: updates the mappings.
@@ -75,13 +75,8 @@ module ElasticGraph
         end
 
         def update_mapping
-          @datastore_client.put_index_mapping(index: @index.name, body: desired_mapping)
+          @datastore_client.put_index_mapping(index: @index.name, body: desired_mapping_for_update)
           action_description = "Updated mappings for index `#{@index.name}`:\n#{mapping_diff}"
-
-          if mapping_removals.any?
-            action_description += "\n\nNote: the extra fields listed here will not actually get removed. " \
-              "Mapping removals are unsupported (but ElasticGraph will leave them alone and they'll cause no problems)."
-          end
 
           report_action action_description
         end
@@ -100,10 +95,6 @@ module ElasticGraph
           !current_config.empty?
         end
 
-        def mapping_removals
-          @mapping_removals ||= mapping_fields_from(current_mapping) - mapping_fields_from(desired_mapping)
-        end
-
         def mapping_type_changes
           @mapping_type_changes ||= begin
             flattened_current = Support::HashUtil.flatten_and_stringify_keys(current_mapping)
@@ -116,7 +107,7 @@ module ElasticGraph
         end
 
         def has_mapping_updates?
-          current_mapping != desired_mapping
+          current_mapping != desired_mapping_for_update
         end
 
         def settings_updates
@@ -127,15 +118,8 @@ module ElasticGraph
           end
         end
 
-        def mapping_fields_from(mapping_hash, prefix = "")
-          (mapping_hash["properties"] || []).flat_map do |key, params|
-            field = prefix + key
-            if params.key?("properties")
-              [field] + mapping_fields_from(params, "#{field}.")
-            else
-              [field]
-            end
-          end
+        def desired_mapping_for_update
+          @desired_mapping_for_update ||= MappingUpdate.build_mapping_update(desired: desired_mapping, current: current_mapping)
         end
 
         def desired_mapping
@@ -178,7 +162,7 @@ module ElasticGraph
         end
 
         def mapping_diff
-          @mapping_diff ||= Indexer::HashDiffer.diff(current_mapping, desired_mapping) || "(no diff)"
+          @mapping_diff ||= Indexer::HashDiffer.diff(current_mapping, desired_mapping_for_update) || "(no diff)"
         end
 
         def settings_diff
