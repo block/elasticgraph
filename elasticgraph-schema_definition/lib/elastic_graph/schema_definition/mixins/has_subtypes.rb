@@ -77,6 +77,12 @@ module ElasticGraph
           end
         end
 
+        def protected_from_removal_field_paths(path_prefix: "")
+          resolve_subtypes.flat_map do |t|
+            t.protected_from_removal_field_paths(path_prefix: path_prefix)
+          end
+        end
+
         private
 
         def merge_fields_by_name_from_subtypes

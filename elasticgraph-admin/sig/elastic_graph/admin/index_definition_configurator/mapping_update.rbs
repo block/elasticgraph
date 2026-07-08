@@ -4,7 +4,14 @@ module ElasticGraph
       module MappingUpdate
         EMPTY_PROPERTIES: ::Hash[::String, untyped]
 
-        def self.build_mapping_update: (desired: ::Hash[::String, untyped], current: ::Hash[::String, untyped]) -> ::Hash[::String, untyped]
+        def self.build_mapping_update: (
+          desired: ::Hash[::String, untyped],
+          current: ::Hash[::String, untyped],
+          ?protected_field_paths: ::Set[::String]?,
+          ?parent_path: ::String
+        ) -> ::Hash[::String, untyped]
+
+        def self.preserve_missing_field?: (::Set[::String]?, ::String) -> bool
       end
     end
   end

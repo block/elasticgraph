@@ -203,25 +203,6 @@ module ElasticGraph
           }.to make_no_datastore_write_calls("main")
         end
 
-        it "is a no-op when attempting to drop a mapping field, preserving the existing field" do
-          configure_index_definition(schema_def)
-          output_io.string = +"" # use `+` so it is not a frozen string literal.
-
-          expect {
-            # Here we remove the `name` field and the `options.size` field to verify it works for both root and nested fields.
-            configure_index_definition(schema_def(
-              avoid_defining_widget_fields: %w[name],
-              avoid_defining_widget_options_fields: %w[size]
-            ))
-          }.to maintain {
-            props = get_index_definition_configuration(unique_index_name).dig("mappings", "properties")
-            [props.keys.sort, props.dig("options", "properties").keys.sort]
-          }.from([[*index_meta_fields, "created_at", "id", "name", "options"], ["color", "size"]])
-            .and make_no_datastore_write_calls("main")
-
-          expect(output_io.string).to exclude("Updated", "properties.name", "properties.options.properties.size")
-        end
-
         it "maintains `_meta.ElasticGraph.sources` as a stateful append-only-set that remembers sources that were once active but we no longer have" do
           expect {
             configure_index_definition(schema_def(

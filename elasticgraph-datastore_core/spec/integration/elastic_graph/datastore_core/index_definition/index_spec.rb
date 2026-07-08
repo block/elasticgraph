@@ -88,6 +88,7 @@ module ElasticGraph
             default_sort_fields: [],
             current_sources: [SELF_RELATIONSHIP_NAME],
             fields_by_path: {},
+            field_paths_protected_from_removal: [],
             has_had_multiple_sources: false,
             sourced_from_nested_paths_by_qualified_relationship: {}
           )

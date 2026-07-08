@@ -35,6 +35,7 @@ module ElasticGraph
           ?parent_source: ::String,
           ?list_counts_state: SchemaElements::ListCountsState
         ) -> ::Array[[::String, SchemaArtifacts::RuntimeMetadata::IndexField]]
+      def protected_from_removal_field_paths: (?path_prefix: ::String) -> ::Array[::String]
       def derived_indexed_types: () -> ::Array[Indexing::DerivedIndexedType]
       def verify_graphql_correctness!: () -> void
       def relay_pagination_type: () -> bool

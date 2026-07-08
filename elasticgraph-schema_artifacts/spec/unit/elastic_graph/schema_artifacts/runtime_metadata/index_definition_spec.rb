@@ -24,6 +24,7 @@ module ElasticGraph
             default_sort_fields: [],
             current_sources: Set.new,
             fields_by_path: {},
+            field_paths_protected_from_removal: Set.new,
             has_had_multiple_sources: false,
             sourced_from_nested_paths_by_qualified_relationship: {}
           )
@@ -42,6 +43,14 @@ module ElasticGraph
             "foo.bar" => index_field_with(source: SELF_RELATIONSHIP_NAME).to_dumpable_hash,
             "foo.bazz" => index_field_with(source: "other").to_dumpable_hash
           })
+        end
+
+        it "round-trips `field_paths_protected_from_removal` through a dumped hash as a sorted list" do
+          index_def = index_definition_with(field_paths_protected_from_removal: ["options.size", "name"])
+
+          dumped = index_def.to_dumpable_hash
+          expect(dumped["field_paths_protected_from_removal"]).to eq ["name", "options.size"]
+          expect(IndexDefinition.from_hash(dumped).field_paths_protected_from_removal).to eq ["name", "options.size"].to_set
         end
 
         it "prunes `has_had_multiple_sources: false` from the dumped hash but includes `has_had_multiple_sources: true`" do

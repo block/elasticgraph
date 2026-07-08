@@ -1193,6 +1193,65 @@ module ElasticGraph
         end
       end
 
+      describe "`field_paths_protected_from_removal`" do
+        it "is empty when the schema definition has no `deleted_field` or `renamed_from` declarations" do
+          widgets = index_definition_metadata_for("widgets")
+
+          expect(widgets.field_paths_protected_from_removal).to be_empty
+        end
+
+        it "includes fields referenced by `deleted_field` and `renamed_from` declarations on the indexed type" do
+          widgets = index_definition_metadata_for("widgets", on_my_type: ->(t) {
+            t.deleted_field "old_field"
+            t.field "new_name", "String" do |f|
+              f.renamed_from "old_name"
+            end
+          })
+
+          expect(widgets.field_paths_protected_from_removal).to eq ["old_field", "old_name"].to_set
+        end
+
+        it "includes declarations on embedded object types at their full path, using the `name_in_index` of parent fields" do
+          runtime_metadata = define_schema do |s|
+            s.object_type "NestedFields" do |t|
+              t.field "some_id_gql", "ID", name_in_index: "some_id_index"
+              t.deleted_field "old_nested_field"
+            end
+
+            s.object_type "MyType" do |t|
+              t.field "id", "ID!"
+              t.field "nested_fields_gql", "NestedFields", name_in_index: "nested_fields_index"
+              t.index "widgets"
+            end
+          end.runtime_metadata
+
+          widgets = runtime_metadata.index_definitions_by_name.fetch("widgets")
+          expect(widgets.field_paths_protected_from_removal).to eq ["nested_fields_index.old_nested_field"].to_set
+        end
+
+        it "includes declarations from all subtypes of an indexed union type" do
+          runtime_metadata = define_schema do |s|
+            s.object_type "Widget" do |t|
+              t.field "id", "ID!"
+              t.deleted_field "old_widget_field"
+            end
+
+            s.object_type "Component" do |t|
+              t.field "id", "ID!"
+              t.deleted_field "old_component_field"
+            end
+
+            s.union_type "Thing" do |t|
+              t.subtypes "Widget", "Component"
+              t.index "things"
+            end
+          end.runtime_metadata
+
+          things = runtime_metadata.index_definitions_by_name.fetch("things")
+          expect(things.field_paths_protected_from_removal).to eq ["old_widget_field", "old_component_field"].to_set
+        end
+      end
+
       def index_definition_metadata_for(name, type_definition_order: ["NestedFields", "MyType"], on_my_type: nil, **options, &block)
         type_defs = {
           "NestedFields" => ->(t) do

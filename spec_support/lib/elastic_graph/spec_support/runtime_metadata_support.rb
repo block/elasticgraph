@@ -117,13 +117,14 @@ module ElasticGraph
           StaticParam.new(value: value)
         end
 
-        def index_definition_with(route_with: nil, rollover: nil, default_sort_fields: [], current_sources: [SELF_RELATIONSHIP_NAME], fields_by_path: {}, has_had_multiple_sources: false, sourced_from_nested_paths_by_qualified_relationship: {})
+        def index_definition_with(route_with: nil, rollover: nil, default_sort_fields: [], current_sources: [SELF_RELATIONSHIP_NAME], fields_by_path: {}, field_paths_protected_from_removal: [], has_had_multiple_sources: false, sourced_from_nested_paths_by_qualified_relationship: {})
           IndexDefinition.new(
             route_with: route_with,
             rollover: rollover,
             default_sort_fields: default_sort_fields,
             current_sources: current_sources,
             fields_by_path: fields_by_path,
+            field_paths_protected_from_removal: field_paths_protected_from_removal,
             has_had_multiple_sources: has_had_multiple_sources,
             sourced_from_nested_paths_by_qualified_relationship: sourced_from_nested_paths_by_qualified_relationship
           )

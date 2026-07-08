@@ -18,13 +18,27 @@ module ElasticGraph
         # Elasticsearch/OpenSearch do not support removing mapping fields from an index. Preserve current
         # fields when building index mapping update payloads and diffs, while still allowing updates to
         # existing field parameters and additions of new fields.
-        def self.build_mapping_update(desired:, current:)
+        #
+        # `protected_field_paths` limits which fields missing from the desired mapping get preserved: when
+        # provided, a missing field is preserved only if its path (or a descendant's path) is in the set,
+        # and other missing fields are dropped from the built update. When `nil`, all missing fields are
+        # preserved.
+        def self.build_mapping_update(desired:, current:, protected_field_paths: nil, parent_path: "")
           desired_properties = desired.fetch("properties", EMPTY_PROPERTIES)
           current_properties = current.fetch("properties", EMPTY_PROPERTIES)
 
-          merged_properties = desired_properties.merge(current_properties) do |_key, desired_value, current_value|
+          preserved_current_properties = current_properties.select do |field_name, _|
+            desired_properties.key?(field_name) || preserve_missing_field?(protected_field_paths, "#{parent_path}#{field_name}")
+          end
+
+          merged_properties = desired_properties.merge(preserved_current_properties) do |field_name, desired_value, current_value|
             if current_value.is_a?(::Hash) && current_value.key?("properties") && desired_value.key?("properties")
-              build_mapping_update(desired: desired_value, current: current_value)
+              build_mapping_update(
+                desired: desired_value,
+                current: current_value,
+                protected_field_paths: protected_field_paths,
+                parent_path: "#{parent_path}#{field_name}."
+              )
             else
               desired_value
             end
@@ -32,6 +46,15 @@ module ElasticGraph
 
           desired.merge("properties" => merged_properties)
         end
+
+        # A missing field is preserved if it is protected itself, or if any protected path sits underneath
+        # it (dropping the field would drop the protected descendant along with it).
+        def self.preserve_missing_field?(protected_field_paths, path)
+          return true if protected_field_paths.nil?
+
+          protected_field_paths.include?(path) || protected_field_paths.any? { |protected_path| protected_path.start_with?("#{path}.") }
+        end
+        private_class_method :preserve_missing_field?
       end
     end
   end

@@ -26,6 +26,7 @@ module ElasticGraph
       def default_sort_clauses: () -> ::Array[::Hash[::String, ::String]]
       def current_sources: () -> ::Set[::String]
       def fields_by_path: () -> ::Hash[::String, SchemaArtifacts::RuntimeMetadata::IndexField]
+      def field_paths_protected_from_removal: () -> ::Set[::String]
       def has_had_multiple_sources: () -> bool
       def sourced_from_nested_paths_by_qualified_relationship: () -> ::Hash[::String, ::Array[SchemaArtifacts::RuntimeMetadata::sourcedFromNestedPathSegment]]
       def env_index_config: () -> Configuration::IndexDefinition

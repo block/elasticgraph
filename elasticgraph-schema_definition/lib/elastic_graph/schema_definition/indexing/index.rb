@@ -267,6 +267,7 @@ module ElasticGraph
             rollover: rollover_config&.runtime_metadata,
             current_sources: indexed_type.current_sources,
             fields_by_path: indexed_type.index_field_runtime_metadata_tuples.to_h,
+            field_paths_protected_from_removal: indexed_type.protected_from_removal_field_paths.uniq,
             default_sort_fields: default_sort_pairs.each_slice(2).map do |(graphql_field_path_name, direction)|
               SchemaArtifacts::RuntimeMetadata::SortField.new(
                 field_path: public_field_path(graphql_field_path_name, explanation: "it is referenced as an index `default_sort` field").path_in_index,

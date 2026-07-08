@@ -37,8 +37,9 @@ module ElasticGraph
         # and the state of the index in the datastore, does one of the following:
         #
         #   - If the index did not already exist: creates the index with the desired mappings and settings.
-        #   - If the desired mapping has fewer fields than what is in the index template: leaves the existing
-        #     fields alone (see `put_index_template` for why).
+        #   - If the desired mapping has fewer fields than what is in the index template: preserves fields
+        #     that the schema definition still references (via `deleted_field`/`renamed_from` declarations)
+        #     and drops fields whose last schema reference has been removed (see `put_index_template`).
         #   - If the settings have desired changes: updates the settings, restoring any setting that
         #     no longer has a desired value to its default.
         #   - If the mapping has desired changes: updates the mappings.
@@ -66,22 +67,46 @@ module ElasticGraph
 
         private
 
-        # Creates or updates the index template. While the datastore allows template fields to be dropped
-        # (in contrast to concrete indices), we preserve any fields that exist on the current template but
-        # are no longer desired (see `MappingUpdate.build_mapping_update`): new rollover indices are
-        # auto-created from the template at indexing time with `dynamic: strict` mappings, so a dropped
-        # field would cause indexing failures on those new indices for as long as any indexer (or replayed
-        # event) can still write that field. We have previously had a near-SEV from dropping a template
-        # field while deployed indexers were still running an old version of the code that used it.
+        # Creates or updates the index template. Fields that exist on the current template but not in the
+        # desired configuration are dropped only when it is provably safe. New rollover indices are
+        # auto-created from the template at indexing time with `dynamic: strict` mappings, so dropping a
+        # field that something can still write would cause indexing failures on those new indices--we have
+        # previously had a near-SEV from dropping a template field while deployed indexers were still
+        # running an old version of the code that used it. So, as long as a field is referenced by a
+        # `deleted_field` or `renamed_from` declaration in the schema definition (meaning an old JSON
+        # schema version may still reference it, and an indexer deployed with an older schema version or a
+        # replayed old event may still write it), we preserve it via `field_paths_protected_from_removal`.
+        # Once the last reference is removed from the schema definition--which `eg-schema_def` only
+        # sanctions once no JSON schema version references the field--the field is dropped on the next
+        # admin run, keeping templates from accumulating stale fields forever.
         def put_index_template
           action_description = if index_template_exists?
-            "Updated index template: `#{@index_template.name}`:\n#{config_diff}"
+            "Updated index template: `#{@index_template.name}`:\n#{config_diff}#{removed_fields_note}"
           else
             "Created index template: `#{@index_template.name}`"
           end
 
           @datastore_client.put_index_template(name: @index_template.name, body: desired_config_parent_for_update)
           report_action action_description
+        end
+
+        # Dropped fields show up as deletions in the reported diff, but we also call them out explicitly
+        # since a field removal is the part of a mapping update most worth a second look from operators.
+        def removed_fields_note
+          removed_fields = mapping_field_paths_of(current_mapping) - mapping_field_paths_of(desired_mapping_for_update)
+          return "" if removed_fields.empty?
+
+          "\n\n" + <<~EOS.chomp
+            Removed #{removed_fields.size} stale field(s) from index template `#{@index_template.name}` that are no longer referenced by the schema: #{removed_fields.join(", ")}.
+            New rollover indices created from this template will reject documents that still contain these fields (mappings are `dynamic: strict`).
+          EOS
+        end
+
+        def mapping_field_paths_of(mapping, parent_path: "")
+          mapping.fetch("properties", MappingUpdate::EMPTY_PROPERTIES).flat_map do |field_name, field_mapping|
+            path = "#{parent_path}#{field_name}"
+            [path] + mapping_field_paths_of(field_mapping, parent_path: "#{path}.")
+          end
         end
 
         def cannot_modify_mapping_field_type_error
@@ -117,7 +142,11 @@ module ElasticGraph
         end
 
         def desired_mapping_for_update
-          @desired_mapping_for_update ||= MappingUpdate.build_mapping_update(desired: desired_mapping, current: current_mapping)
+          @desired_mapping_for_update ||= MappingUpdate.build_mapping_update(
+            desired: desired_mapping,
+            current: current_mapping,
+            protected_field_paths: @index_template.field_paths_protected_from_removal
+          )
         end
 
         def desired_config_parent_for_update
