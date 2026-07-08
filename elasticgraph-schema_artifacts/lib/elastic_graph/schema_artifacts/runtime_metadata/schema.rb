@@ -7,10 +7,10 @@
 # frozen_string_literal: true
 
 require "elastic_graph/constants"
+require "elastic_graph/schema_artifacts/runtime_metadata/component_extension"
 require "elastic_graph/schema_artifacts/runtime_metadata/enum"
 require "elastic_graph/schema_artifacts/runtime_metadata/extension"
 require "elastic_graph/schema_artifacts/runtime_metadata/extension_loader"
-require "elastic_graph/schema_artifacts/runtime_metadata/graphql_extension"
 require "elastic_graph/schema_artifacts/runtime_metadata/graphql_resolver"
 require "elastic_graph/schema_artifacts/runtime_metadata/hash_dumper"
 require "elastic_graph/schema_artifacts/runtime_metadata/index_definition"
@@ -34,6 +34,7 @@ module ElasticGraph
         :schema_element_names,
         :graphql_extension_modules,
         :graphql_resolvers_by_name,
+        :indexer_extension_modules,
         :static_script_ids_by_scoped_name
       )
         # @private
@@ -52,6 +53,8 @@ module ElasticGraph
         GRAPHQL_EXTENSION_MODULES = "graphql_extension_modules"
         # @private
         GRAPHQL_RESOLVERS_BY_NAME = "graphql_resolvers_by_name"
+        # @private
+        INDEXER_EXTENSION_MODULES = "indexer_extension_modules"
         # @private
         STATIC_SCRIPT_IDS_BY_NAME = "static_script_ids_by_scoped_name"
 
@@ -90,12 +93,17 @@ module ElasticGraph
 
           graphql_extension_modules =
             hash[GRAPHQL_EXTENSION_MODULES]&.map do |ext_mod_hash|
-              GraphQLExtension.from_hash(ext_mod_hash)
+              ComponentExtension.from_hash(ext_mod_hash)
             end || []
 
           graphql_resolvers_by_name = hash[GRAPHQL_RESOLVERS_BY_NAME]&.to_h do |name, resolver_hash|
             [name.to_sym, GraphQLResolver.from_hash(resolver_hash)]
           end || {}
+
+          indexer_extension_modules =
+            hash[INDEXER_EXTENSION_MODULES]&.map do |ext_mod_hash|
+              ComponentExtension.from_hash(ext_mod_hash)
+            end || []
 
           static_script_ids_by_scoped_name = hash[STATIC_SCRIPT_IDS_BY_NAME] || {}
 
@@ -108,6 +116,7 @@ module ElasticGraph
             schema_element_names: schema_element_names,
             graphql_extension_modules: graphql_extension_modules,
             graphql_resolvers_by_name: graphql_resolvers_by_name,
+            indexer_extension_modules: indexer_extension_modules,
             static_script_ids_by_scoped_name: static_script_ids_by_scoped_name
           )
         end
@@ -123,6 +132,7 @@ module ElasticGraph
             GRAPHQL_EXTENSION_MODULES => graphql_extension_modules.map(&:to_dumpable_hash),
             GRAPHQL_RESOLVERS_BY_NAME => HashDumper.dump_hash(graphql_resolvers_by_name.transform_keys(&:to_s), &:to_dumpable_hash),
             INDEX_DEFINITIONS_BY_NAME => HashDumper.dump_hash(index_definitions_by_name, &:to_dumpable_hash),
+            INDEXER_EXTENSION_MODULES => indexer_extension_modules.map(&:to_dumpable_hash),
             OBJECT_TYPES_BY_NAME => HashDumper.dump_hash(object_types_by_name, &:to_dumpable_hash),
             SCALAR_TYPES_BY_NAME => HashDumper.dump_hash(scalar_types_by_name, &:to_dumpable_hash),
             SCHEMA_ELEMENT_NAMES => schema_element_names.to_dumpable_hash,

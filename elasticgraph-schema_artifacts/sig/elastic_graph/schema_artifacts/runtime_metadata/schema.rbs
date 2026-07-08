@@ -8,8 +8,9 @@ module ElasticGraph
         attr_reader enum_types_by_name: ::Hash[::String, Enum::Type]
         attr_reader index_definitions_by_name: ::Hash[::String, IndexDefinition]
         attr_reader schema_element_names: SchemaElementNames
-        attr_reader graphql_extension_modules: ::Array[GraphQLExtension]
+        attr_reader graphql_extension_modules: ::Array[ComponentExtension]
         attr_reader graphql_resolvers_by_name: ::Hash[::Symbol, GraphQLResolver]
+        attr_reader indexer_extension_modules: ::Array[ComponentExtension]
         attr_reader static_script_ids_by_scoped_name: ::Hash[::String, ::String]
 
         def initialize: (
@@ -19,8 +20,9 @@ module ElasticGraph
           enum_types_by_name: ::Hash[::String, Enum::Type],
           index_definitions_by_name: ::Hash[::String, IndexDefinition],
           schema_element_names: SchemaElementNames,
-          graphql_extension_modules: ::Array[GraphQLExtension],
+          graphql_extension_modules: ::Array[ComponentExtension],
           graphql_resolvers_by_name: ::Hash[::Symbol, GraphQLResolver],
+          indexer_extension_modules: ::Array[ComponentExtension],
           static_script_ids_by_scoped_name: ::Hash[::String, ::String]) -> void
 
         def with: (
@@ -30,8 +32,9 @@ module ElasticGraph
           ?enum_types_by_name: ::Hash[::String, Enum::Type],
           ?index_definitions_by_name: ::Hash[::String, IndexDefinition],
           ?schema_element_names: SchemaElementNames,
-          ?graphql_extension_modules: ::Array[GraphQLExtension],
+          ?graphql_extension_modules: ::Array[ComponentExtension],
           ?graphql_resolvers_by_name: ::Hash[::Symbol, GraphQLResolver],
+          ?indexer_extension_modules: ::Array[ComponentExtension],
           ?static_script_ids_by_scoped_name: ::Hash[::String, ::String]) -> Schema
       end
 
@@ -44,6 +47,7 @@ module ElasticGraph
         SCHEMA_ELEMENT_NAMES: "schema_element_names"
         GRAPHQL_EXTENSION_MODULES: "graphql_extension_modules"
         GRAPHQL_RESOLVERS_BY_NAME: "graphql_resolvers_by_name"
+        INDEXER_EXTENSION_MODULES: "indexer_extension_modules"
         STATIC_SCRIPT_IDS_BY_NAME: "static_script_ids_by_scoped_name"
 
         def self.from_hash: (::Hash[::String, untyped]) -> Schema

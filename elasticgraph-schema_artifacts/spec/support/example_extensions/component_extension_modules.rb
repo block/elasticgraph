@@ -8,7 +8,7 @@
 
 module ElasticGraph
   module SchemaArtifacts
-    module GraphQLExtensionModule1
+    module ComponentExtensionModule1
     end
   end
 end

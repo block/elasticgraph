@@ -28,10 +28,10 @@ module ElasticGraph
         end.runtime_metadata
 
         expect(metadata.graphql_extension_modules).to eq [
-          SchemaArtifacts::RuntimeMetadata::GraphQLExtension.new(
+          SchemaArtifacts::RuntimeMetadata::ComponentExtension.new(
             SchemaArtifacts::RuntimeMetadata::Extension.new(extension_module1, __FILE__, {}).to_dumpable_hash
           ),
-          SchemaArtifacts::RuntimeMetadata::GraphQLExtension.new(
+          SchemaArtifacts::RuntimeMetadata::ComponentExtension.new(
             SchemaArtifacts::RuntimeMetadata::Extension.new(extension_module2, __FILE__, {}).to_dumpable_hash
           )
         ]
