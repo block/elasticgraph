@@ -441,7 +441,7 @@ properties:
           header_name: X-Client-Name
         additionalProperties: false
       extension_modules:
-        description: Array of modules that will be extended onto the `GraphQL` instance
+        description: Array of modules that will be extended onto the component instance
           to support extension libraries.
         type: array
         items:
@@ -508,6 +508,36 @@ properties:
         - {}
         - WidgetWorkspace:
           - ABC12345678
+      extension_modules:
+        description: Array of modules that will be extended onto the component instance
+          to support extension libraries.
+        type: array
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+              minLength: 1
+              description: The name of the extension module class to load.
+              examples:
+              - MyExtensionModule
+              - ElasticGraph::MyExtension
+            require_path:
+              type: string
+              minLength: 1
+              description: The path to require to load the extension module.
+              examples:
+              - "./my_extension_module"
+              - elastic_graph/my_extension
+          required:
+          - name
+          - require_path
+          additionalProperties: false
+        default: []
+        examples:
+        - []
+        - - name: MyExtensionModule
+            require_path: "./my_extension_module"
     additionalProperties: false
   logger:
     description: Configuration for logging used by all parts of ElasticGraph.

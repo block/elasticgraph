@@ -43,7 +43,6 @@ module ElasticGraph
       ) -> ::Hash[::Symbol, untyped]
 
       def load_client_resolver: (::Hash[::String, untyped]) -> Client::_Resolver
-      def load_extension_modules: (::Array[::Hash[::String, untyped]]) -> ::Array[::Module]
     end
   end
 end

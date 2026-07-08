@@ -40,6 +40,10 @@ module ElasticGraph
       @schema_artifacts = @datastore_core.schema_artifacts
       @monotonic_clock = monotonic_clock
       @clock = clock || ::Time
+
+      # Apply any extension modules that have been configured.
+      config.extension_modules.each { |mod| extend mod }
+      @schema_artifacts.runtime_metadata.indexer_extension_modules.each { |ext_mod| extend ext_mod.load_extension.extension_class }
     end
 
     def datastore_router

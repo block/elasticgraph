@@ -7,7 +7,6 @@
 # frozen_string_literal: true
 
 require "elastic_graph/support/config"
-require "elastic_graph/errors"
 require "elastic_graph/graphql/client"
 require "elastic_graph/schema_artifacts/runtime_metadata/extension_loader"
 
@@ -79,38 +78,7 @@ module ElasticGraph
               }
             ]
           },
-          extension_modules: {
-            description: "Array of modules that will be extended onto the `GraphQL` instance to support extension libraries.",
-            type: "array",
-            items: {
-              type: "object",
-              properties: {
-                name: {
-                  type: "string",
-                  minLength: 1,
-                  description: "The name of the extension module class to load.",
-                  examples: ["MyExtensionModule", "ElasticGraph::MyExtension"]
-                },
-                require_path: {
-                  type: "string",
-                  minLength: 1,
-                  description: "The path to require to load the extension module.",
-                  examples: ["./my_extension_module", "elastic_graph/my_extension"]
-                }
-              },
-              required: ["name", "require_path"]
-            },
-            default: [], # : untyped
-            examples: [
-              [], # : untyped
-              [
-                {
-                  "name" => "MyExtensionModule",
-                  "require_path" => "./my_extension_module"
-                }
-              ]
-            ]
-          }
+          extension_modules: Support::Config::EXTENSION_MODULE_SCHEMA
         }
 
       # The standard ElasticGraph root config setting keys; anything else is assumed to be extension settings.
@@ -128,7 +96,7 @@ module ElasticGraph
 
       def convert_values(client_resolver:, extension_modules:, **values)
         client_resolver = load_client_resolver(client_resolver)
-        extension_modules = load_extension_modules(extension_modules)
+        extension_modules = SchemaArtifacts::RuntimeMetadata::ExtensionLoader.load_component_extensions(extension_modules)
 
         values.merge({
           client_resolver: client_resolver,
@@ -149,18 +117,6 @@ module ElasticGraph
         extension_class = extension.extension_class # : ::Class
 
         __skip__ = extension_class.new(extension.config)
-      end
-
-      def load_extension_modules(extension_module_hashes)
-        extension_loader = SchemaArtifacts::RuntimeMetadata::ExtensionLoader.new(::Module.new)
-
-        extension_module_hashes.map do |mod_hash|
-          extension_loader.load(mod_hash.fetch("name"), from: mod_hash.fetch("require_path"), config: {}).extension_class.tap do |mod|
-            unless mod.instance_of?(::Module)
-              raise Errors::ConfigError, "`#{mod_hash.fetch("name")}` is not a module, but all application extension modules must be modules."
-            end
-          end
-        end
       end
     end
   end
