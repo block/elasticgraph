@@ -6,6 +6,8 @@ module ElasticGraph
 
         def artifacts_from_schema_def: () -> ::Array[::ElasticGraph::SchemaDefinition::SchemaArtifact[untyped]]
         def protobuf_schema_definition_results: () -> (::ElasticGraph::SchemaDefinition::Results & ResultsExtension)
+        def proto_ingestion_state: () -> ProtoIngestionState
+        def protobuf_load_existing_field_number_mappings: () -> void
       end
     end
   end

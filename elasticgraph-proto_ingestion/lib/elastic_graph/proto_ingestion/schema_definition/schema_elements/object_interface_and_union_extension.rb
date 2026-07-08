@@ -20,8 +20,8 @@ module ElasticGraph
           # Renders this type's protobuf message definition.
           #
           # @return [String]
-          def to_proto
-            render_proto_message(proto_name)
+          def to_proto(schema)
+            render_proto_message(schema, proto_name)
           end
 
           # Returns the kind used to order this definition in a protobuf schema.
@@ -54,8 +54,8 @@ module ElasticGraph
 
           private
 
-          def render_proto_message(message_name)
-            return render_proto_oneof(message_name) if abstract?
+          def render_proto_message(schema, message_name)
+            return render_proto_oneof(schema, message_name) if abstract?
 
             fields = proto_fields
             field_names = fields.map { |_, field| Identifier.field_name(field.name) }
@@ -66,9 +66,15 @@ module ElasticGraph
 
             lines = ProtoDocumentation.comment_lines_for(doc_comment)
             lines << "message #{message_name} {"
-            fields.each.with_index(1) do |(schema_field, field), field_number|
+            fields.each do |schema_field, field|
               field_name = Identifier.field_name(field.name)
               repeated, field_type = proto_field_type_for(field.type, context_field_name: field.name)
+              field_number = schema.field_number_for(
+                message_name: message_name,
+                type_name: name,
+                public_field_name: schema_field.name,
+                name_in_index: field.name_in_index
+              )
               label = "repeated " if repeated
               line = "  #{label}#{field_type} #{field_name} = #{field_number};"
               line += " // source name: #{field.name}" if field_name != field.name
@@ -79,15 +85,21 @@ module ElasticGraph
             lines.join("\n")
           end
 
-          def render_proto_oneof(message_name)
+          def render_proto_oneof(schema, message_name)
             # @type var abstract_type: ::ElasticGraph::SchemaDefinition::Mixins::HasSubtypes
             abstract_type = _ = self
             lines = ProtoDocumentation.comment_lines_for(doc_comment)
             lines << "message #{message_name} {"
             lines << "  oneof value {"
-            abstract_type.recursively_resolve_subtypes.each.with_index(1) do |subtype, field_number|
+            abstract_type.recursively_resolve_subtypes.each do |subtype|
               subtype_name = (_ = subtype).proto_name
               field_name = Identifier.field_name(Support::Casing.to_upper_snake(subtype_name).downcase)
+              field_number = schema.field_number_for(
+                message_name: message_name,
+                type_name: name,
+                public_field_name: field_name,
+                name_in_index: field_name
+              )
               lines << "    #{subtype_name} #{field_name} = #{field_number};"
             end
             lines << "  }"

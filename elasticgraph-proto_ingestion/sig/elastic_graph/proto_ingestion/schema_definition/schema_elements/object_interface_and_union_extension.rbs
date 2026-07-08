@@ -6,14 +6,14 @@ module ElasticGraph
           @proto_name: ::String?
 
           def proto_name: () -> ::String
-          def to_proto: () -> ::String
+          def to_proto: (Schema) -> ::String
           def proto_definition_kind: () -> :message
           def referenced_proto_types: () -> ::Array[::ElasticGraph::SchemaDefinition::SchemaElements::graphQLType]
 
           private
 
-          def render_proto_message: (::String message_name) -> ::String
-          def render_proto_oneof: (::String message_name) -> ::String
+          def render_proto_message: (Schema, ::String message_name) -> ::String
+          def render_proto_oneof: (Schema, ::String message_name) -> ::String
           def proto_fields: () -> ::Array[[
             ::ElasticGraph::SchemaDefinition::SchemaElements::Field,
             ::ElasticGraph::SchemaDefinition::Indexing::Field

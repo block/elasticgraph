@@ -48,8 +48,8 @@ module ElasticGraph
           # Renders this enum's protobuf definition.
           #
           # @return [String]
-          def to_proto
-            render_proto_enum
+          def to_proto(schema)
+            render_proto_enum(schema)
           end
 
           # Returns the kind used to order this definition in a protobuf schema.
@@ -82,8 +82,10 @@ module ElasticGraph
 
           private
 
-          def render_proto_enum
+          def render_proto_enum(schema)
             values = values_by_name.values
+            value_numbers = schema.enum_value_numbers_for(proto_name, values_by_name.keys)
+
             zero_value_name = "#{enum_value_prefix}_UNSPECIFIED"
 
             lines = ProtoDocumentation.comment_lines_for(doc_comment)
@@ -91,10 +93,10 @@ module ElasticGraph
             lines << "  // The default value when no enum value has been explicitly set. Do not use this value."
             lines << "  // See https://protobuf.dev/programming-guides/proto3/#enum-default."
             lines << "  #{zero_value_name} = 0;"
-            values.each.with_index(1) do |raw_value, number|
+            values.each do |raw_value|
               value = raw_value # : ::ElasticGraph::SchemaDefinition::SchemaElements::EnumValue & EnumValueExtension
               lines.concat(ProtoDocumentation.comment_lines_for(value.doc_comment, indent: "  "))
-              lines << "  #{value.proto_name(enum_value_prefix)} = #{number};"
+              lines << "  #{value.proto_name(enum_value_prefix)} = #{value_numbers.fetch(value.name)};"
             end
             lines << "}"
             lines.join("\n")

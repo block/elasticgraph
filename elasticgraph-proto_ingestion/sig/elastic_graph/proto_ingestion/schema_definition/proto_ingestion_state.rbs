@@ -3,8 +3,9 @@ module ElasticGraph
     module SchemaDefinition
       class ProtoIngestionStateSupertype
         attr_accessor package_name: ::String
+        attr_accessor field_number_mappings: untyped
 
-        def initialize: (package_name: ::String) -> void
+        def initialize: (package_name: ::String, field_number_mappings: untyped) -> void
       end
 
       class ProtoIngestionState < ProtoIngestionStateSupertype

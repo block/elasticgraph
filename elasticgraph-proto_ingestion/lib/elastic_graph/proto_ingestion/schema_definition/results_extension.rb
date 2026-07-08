@@ -20,19 +20,31 @@ module ElasticGraph
           @proto_schema ||= protobuf_schema_generator.to_proto
         end
 
+        # Returns proto field-number mappings suitable for artifact storage.
+        #
+        # @return [Hash]
+        def proto_field_number_mappings
+          # Ensure generation has occurred before reading mappings from the generator.
+          proto_schema
+          protobuf_schema_generator.field_number_mappings_for_artifact
+        end
+
         private
 
         def protobuf_schema_generator
-          # The cast is needed because Steep can't see the `extend(StateExtension)` applied at
-          # runtime in {APIExtension.extended}.
-          extension_state = state # : ElasticGraph::SchemaDefinition::State & StateExtension
-          ingestion_state = extension_state.proto_ingestion_state
+          @protobuf_schema_generator ||= begin
+            # The cast is needed because Steep can't see the `extend(StateExtension)` applied at
+            # runtime in {APIExtension.extended}.
+            extension_state = state # : ElasticGraph::SchemaDefinition::State & StateExtension
+            ingestion_state = extension_state.proto_ingestion_state
 
-          Schema.new(
-            state: extension_state,
-            all_types: all_types,
-            package_name: ingestion_state.package_name
-          )
+            Schema.new(
+              state: extension_state,
+              all_types: all_types,
+              package_name: ingestion_state.package_name,
+              proto_field_number_mappings: ingestion_state.field_number_mappings
+            )
+          end
         end
       end
     end

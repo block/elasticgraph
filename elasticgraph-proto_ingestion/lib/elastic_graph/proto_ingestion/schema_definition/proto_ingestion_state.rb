@@ -14,7 +14,7 @@ module ElasticGraph
       # Holds the proto ingestion extension's schema definition state.
       #
       # @private
-      class ProtoIngestionState < ::Struct.new(:package_name)
+      class ProtoIngestionState < ::Struct.new(:package_name, :field_number_mappings)
         def initialize(...)
           super
           @type_name_by_proto_name = {}

@@ -7,14 +7,14 @@ module ElasticGraph
 
           def value: (::String) ?{ (::ElasticGraph::SchemaDefinition::SchemaElements::EnumValue & EnumValueExtension) -> void } -> void
           def proto_name: () -> ::String
-          def to_proto: () -> ::String
+          def to_proto: (Schema) -> ::String
           def proto_definition_kind: () -> :enum
           def referenced_proto_types: () -> ::Array[::ElasticGraph::SchemaDefinition::SchemaElements::graphQLType]
           def configure_derived_scalar_type: (::ElasticGraph::SchemaDefinition::SchemaElements::ScalarType) -> void
 
           private
 
-          def render_proto_enum: () -> ::String
+          def render_proto_enum: (Schema) -> ::String
           def enum_value_prefix: () -> ::String
         end
       end
