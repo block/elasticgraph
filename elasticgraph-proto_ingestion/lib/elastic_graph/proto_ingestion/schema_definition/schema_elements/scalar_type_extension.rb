@@ -40,7 +40,7 @@ module ElasticGraph
           # Scalars map to protobuf field types and do not render standalone definitions.
           #
           # @return [nil]
-          def to_proto(_package_name)
+          def to_proto(_schema, _package_name)
             nil
           end
 

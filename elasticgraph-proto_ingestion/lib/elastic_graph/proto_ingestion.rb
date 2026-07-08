@@ -11,5 +11,8 @@ module ElasticGraph
   module ProtoIngestion
     # The name of the generated Protocol Buffers schema file.
     PROTO_SCHEMA_FILE = "schema.proto"
+
+    # The name of the generated proto field-number mapping file.
+    PROTO_FIELD_NUMBERS_FILE = "proto_field_numbers.yaml"
   end
 end

@@ -9,7 +9,7 @@ module ElasticGraph
           def finalize_protobuf_configuration!: () -> void
           def proto_name: () -> ::String
           def proto_type_reference: (::String package_name) -> ::String
-          def to_proto: (::String package_name) -> nil
+          def to_proto: (Schema schema, ::String package_name) -> nil
           def referenced_proto_types: () -> ::Array[::ElasticGraph::SchemaDefinition::SchemaElements::graphQLType]
         end
       end

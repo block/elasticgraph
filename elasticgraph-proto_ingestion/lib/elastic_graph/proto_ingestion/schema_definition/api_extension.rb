@@ -45,6 +45,18 @@ module ElasticGraph
           nil
         end
 
+        # Configures proto field-number mappings directly from a hash.
+        # Useful for tests and advanced use cases where mappings are sourced outside artifacts.
+        # When artifacts are dumped, mappings from the existing `proto_field_numbers.yaml` artifact
+        # are loaded automatically; this method does not need to be called in that case.
+        #
+        # @param proto_field_number_mappings [Hash]
+        # @return [void]
+        def configure_proto_field_number_mappings(proto_field_number_mappings)
+          proto_ingestion_state.field_number_mappings = proto_field_number_mappings
+          nil
+        end
+
         private
 
         # Returns this gem's state container. Centralizes the Steep cast that's needed because

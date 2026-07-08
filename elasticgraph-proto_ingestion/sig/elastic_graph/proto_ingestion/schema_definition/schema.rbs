@@ -2,22 +2,64 @@ module ElasticGraph
   module ProtoIngestion
     module SchemaDefinition
       class Schema
+        class FieldNumberMapping
+          attr_reader field_number: ::Integer
+          attr_reader name_in_index: ::String
+
+          def self.new: (field_number: ::Integer, name_in_index: ::String) -> instance
+        end
+
+        type fieldNumberMappingsByFieldName = ::Hash[::String, FieldNumberMapping]
+
+        MAX_FIELD_NUMBER: ::Integer
+        RESERVED_FIELD_NUMBER_RANGE: ::Range[::Integer]
+        MAX_ENUM_VALUE_NUMBER: ::Integer
+
         @state: ::ElasticGraph::SchemaDefinition::State
         @all_types: ::Array[::ElasticGraph::SchemaDefinition::SchemaElements::graphQLType]
         @package_name: ::String
+        @proto_field_number_mappings_by_message: ::Hash[::String, fieldNumberMappingsByFieldName]
+        @proto_enum_value_numbers_by_enum: ::Hash[::String, ::Hash[::String, ::Integer]]
+        @used_field_numbers_by_message: ::Hash[::String, ::Set[::Integer]]
+        @used_enum_value_numbers_by_enum: ::Hash[::String, ::Set[::Integer]]
+        @renamed_public_field_names_by_type_name: ::Hash[::String, ::Hash[::String, ::Array[::String]]]?
 
         def initialize: (
           state: ::ElasticGraph::SchemaDefinition::State,
           all_types: ::Array[::ElasticGraph::SchemaDefinition::SchemaElements::graphQLType],
-          package_name: ::String
+          package_name: ::String,
+          ?proto_field_number_mappings: untyped
         ) -> void
 
         def to_proto: () -> ::String
+        def field_number_mappings_for_artifact: () -> ::Hash[::String, untyped]
+        def field_number_for: (
+          message_name: ::String,
+          type_name: ::String,
+          public_field_name: ::String,
+          name_in_index: ::String
+        ) -> ::Integer
+        def enum_value_numbers_for: (::String, ::Array[::String]) -> ::Hash[::String, ::Integer]
 
         private
 
         def proto_types: () -> ::Array[untyped]
         def render_definitions: (::Array[untyped] types) -> ::String
+        def valid_field_number?: (::Integer) -> bool
+        def next_available_field_number: (::Set[::Integer]) -> ::Integer
+        def next_available_enum_value_number: (::Set[::Integer]) -> ::Integer
+        def used_enum_value_numbers_for: (::String, ::Hash[::String, ::Integer]) -> ::Set[::Integer]
+        def migrate_renamed_field_mapping: (
+          fieldNumberMappingsByFieldName,
+          type_name: ::String,
+          public_field_name: ::String
+        ) -> FieldNumberMapping?
+        def normalize_proto_field_number_mappings: (untyped) -> ::Hash[::String, fieldNumberMappingsByFieldName]
+        def normalize_proto_enum_value_number_mappings: (untyped) -> ::Hash[::String, ::Hash[::String, ::Integer]]
+        def normalize_field_number_mapping_entry: (::String, ::String, untyped) -> [::Integer, ::String]
+        def integral_field_number: (::String, ::String, untyped) -> ::Integer
+        def integral_number: (untyped) -> ::Integer?
+        def renamed_public_field_names_by_type_name: () -> ::Hash[::String, ::Hash[::String, ::Array[::String]]]
       end
     end
   end

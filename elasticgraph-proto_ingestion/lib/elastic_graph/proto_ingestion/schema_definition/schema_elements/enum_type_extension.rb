@@ -42,8 +42,8 @@ module ElasticGraph
           # Renders this enum's protobuf definition.
           #
           # @return [String]
-          def to_proto(_package_name)
-            render_proto_enum
+          def to_proto(schema, _package_name)
+            render_proto_enum(schema)
           end
 
           # Returns the schema types referenced by this definition.
@@ -76,13 +76,15 @@ module ElasticGraph
 
           private
 
-          def render_proto_enum
+          def render_proto_enum(schema)
             documentation = ProtoDocumentation.comment_lines_for(doc_comment).map { |line| "#{line}\n" }.join
-            values = [proto_zero_value] + values_by_name.values
-            value_definitions = values.each.with_index.map do |raw_value, number|
+            values = values_by_name.values
+            value_numbers = schema.enum_value_numbers_for(proto_name, values_by_name.keys)
+            value_definitions = [proto_zero_value.to_proto(0, proto_enum_value_prefix: proto_enum_value_prefix)]
+            value_definitions.concat(values.map do |raw_value|
               value = raw_value # : ::ElasticGraph::SchemaDefinition::SchemaElements::EnumValue & EnumValueExtension
-              value.to_proto(number, proto_enum_value_prefix: proto_enum_value_prefix)
-            end
+              value.to_proto(value_numbers.fetch(value.name), proto_enum_value_prefix: proto_enum_value_prefix)
+            end)
 
             <<~PROTO.chomp
               #{documentation}enum #{proto_name} {
