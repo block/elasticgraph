@@ -20,6 +20,8 @@ module ElasticGraph
           ?list_counts_state: SchemaElements::ListCountsState
         ) -> ::Array[[::String, SchemaArtifacts::RuntimeMetadata::IndexField]]
 
+        def protected_from_removal_field_paths: (?path_prefix: ::String) -> ::Array[::String]
+
         private
 
         def merge_fields_by_name_from_subtypes: () {

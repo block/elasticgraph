@@ -14,14 +14,14 @@ module ElasticGraph
   class DatastoreCore
     module IndexDefinition
       class Index < Support::MemoizableData.define(
-        :name, :route_with, :default_sort_clauses, :current_sources, :fields_by_path,
+        :name, :route_with, :default_sort_clauses, :current_sources, :fields_by_path, :field_paths_protected_from_removal,
         :env_index_config, :defined_clusters, :datastore_clients_by_name, :env_agnostic_settings, :has_had_multiple_sources,
         :sourced_from_nested_paths_by_qualified_relationship
       )
         # `Data.define` provides all these methods:
         # @dynamic name, route_with, default_sort_clauses, current_sources, fields_by_path, env_index_config, env_agnostic_settings
         # @dynamic defined_clusters, datastore_clients_by_name, initialize, has_had_multiple_sources
-        # @dynamic sourced_from_nested_paths_by_qualified_relationship
+        # @dynamic sourced_from_nested_paths_by_qualified_relationship, field_paths_protected_from_removal
 
         # `include IndexDefinition::Base` provides all these methods. Steep should be able to detect it
         # but can't for some reason so we have to declare them with `@dynamic`.

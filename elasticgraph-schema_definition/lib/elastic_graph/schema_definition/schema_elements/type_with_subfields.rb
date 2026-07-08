@@ -544,6 +544,35 @@ module ElasticGraph
           end
         end
 
+        # Index field paths that no longer exist in the current schema but must be preserved on the index
+        # template mapping: as long as a `deleted_field` or `renamed_from` declaration references a field,
+        # an old JSON schema version may still reference it, meaning an indexer deployed with an older
+        # schema version may still write it. Note that the old field's `name_in_index` is not recorded
+        # anywhere, so we use the declared field name here--they are the same unless the old field used a
+        # custom `name_in_index`.
+        #
+        # @private
+        def protected_from_removal_field_paths(path_prefix: "")
+          deprecated_fields_by_old_name =
+            schema_def_state.deleted_fields_by_type_name_and_old_field_name.fetch(name) do
+              {} # : ::Hash[::String, DeprecatedElement]
+            end.merge(schema_def_state.renamed_fields_by_type_name_and_old_field_name.fetch(name) do
+              {} # : ::Hash[::String, DeprecatedElement]
+            end)
+
+          own_paths = deprecated_fields_by_old_name.keys.map { |field_name| path_prefix + field_name }
+
+          nested_paths = indexing_fields_by_name_in_index.flat_map do |name_in_index, field|
+            if (object_type = field.type.fully_unwrapped.as_object_type)
+              object_type.protected_from_removal_field_paths(path_prefix: "#{path_prefix}#{name_in_index}.")
+            else
+              [] # : ::Array[::String]
+            end
+          end
+
+          own_paths + nested_paths
+        end
+
         private
 
         def fields_sdl(&arg_selector)

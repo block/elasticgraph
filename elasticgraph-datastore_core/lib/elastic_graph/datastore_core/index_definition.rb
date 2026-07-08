@@ -30,6 +30,7 @@ module ElasticGraph
           default_sort_clauses: runtime_metadata.default_sort_fields.map(&:to_query_clause),
           current_sources: runtime_metadata.current_sources,
           fields_by_path: runtime_metadata.fields_by_path,
+          field_paths_protected_from_removal: runtime_metadata.field_paths_protected_from_removal,
           env_index_config: env_index_config,
           defined_clusters: config.clusters.keys.to_set,
           datastore_clients_by_name: datastore_clients_by_name,

@@ -87,6 +87,8 @@ module ElasticGraph
           ?list_counts_state: ListCountsState
         ) -> ::Array[[::String, SchemaArtifacts::RuntimeMetadata::IndexField]]
 
+        def protected_from_removal_field_paths: (?path_prefix: ::String) -> ::Array[::String]
+
         private
 
         def fields_sdl: () ?{ (Field::argument) -> boolish } -> String

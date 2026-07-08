@@ -95,6 +95,56 @@ module ElasticGraph
               .and make_datastore_calls_to_configure_index_def(unique_index_name, :settings)
           end
 
+          it "drops mapping fields whose last schema reference has been removed, while leaving concrete indices unchanged" do
+            configure_index_definition(schema_def)
+            output_io.string = +"" # use `+` so it is not a frozen string literal.
+
+            expect {
+              # Here we remove the `name` field and the `options.size` field to verify it works for both root and nested fields.
+              configure_index_definition(schema_def(
+                avoid_defining_widget_fields: %w[name],
+                avoid_defining_widget_options_fields: %w[size]
+              ))
+            }.to change {
+              props = get_index_template_definition_configuration(unique_index_name).dig("mappings", "properties")
+              [props.keys.sort, props.dig("options", "properties").keys.sort]
+            }.from([[*index_meta_fields, "created_at", "id", "name", "options"], ["color", "size"]])
+              .to([[*index_meta_fields, "created_at", "id", "options"], ["color"]])
+              .and maintain {
+                props = main_datastore_client.get_index(concrete_index_name_for_now(unique_index_name)).dig("mappings", "properties")
+                [props.keys.sort, props.dig("options", "properties").keys.sort]
+              }.from([[*index_meta_fields, "created_at", "id", "name", "options"], ["color", "size"]])
+              .and make_datastore_write_calls("main", "PUT #{put_index_template_definition_url(unique_index_name)}")
+
+            expect(output_io.string).to include(
+              "Updated index template: `#{unique_index_name}`",
+              "properties.name", "properties.options.properties.size",
+              "Removed 2 stale field(s) from index template `#{unique_index_name}` that are no longer referenced by the schema: name, options.size.",
+              "New rollover indices created from this template will reject documents that still contain these fields (mappings are `dynamic: strict`)."
+            )
+          end
+
+          it "preserves removed mapping fields that `deleted_field` declarations still reference, since indexers running an older schema version may still write them" do
+            configure_index_definition(schema_def)
+            output_io.string = +"" # use `+` so it is not a frozen string literal.
+
+            expect {
+              # Here we remove the `name` field and the `options.size` field to verify it works for both root and nested fields.
+              configure_index_definition(schema_def(
+                avoid_defining_widget_fields: %w[name],
+                avoid_defining_widget_options_fields: %w[size],
+                configure_widget: ->(t) { t.deleted_field "name" },
+                configure_widget_options: ->(t) { t.deleted_field "size" }
+              ))
+            }.to maintain {
+              props = get_index_template_definition_configuration(unique_index_name).dig("mappings", "properties")
+              [props.keys.sort, props.dig("options", "properties").keys.sort]
+            }.from([[*index_meta_fields, "created_at", "id", "name", "options"], ["color", "size"]])
+              .and make_no_datastore_write_calls("main")
+
+            expect(output_io.string).to exclude("Updated index template", "Removed")
+          end
+
           it "creates concrete indices based on `setting_overrides_by_timestamp` configuration, and avoids creating an extra index for 'now'" do
             jan_2020_index_name = unique_index_name + "_rollover__2020-01"
 

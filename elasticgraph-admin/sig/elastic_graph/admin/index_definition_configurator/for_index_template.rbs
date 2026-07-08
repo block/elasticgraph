@@ -26,6 +26,8 @@ module ElasticGraph
         @clock: singleton(::Time)
 
         def put_index_template: () -> void
+        def removed_fields_note: () -> ::String
+        def mapping_field_paths_of: (DatastoreCore::indexMappingHash, ?parent_path: ::String) -> ::Array[::String]
         def cannot_modify_mapping_field_type_error: () -> ::String
         def index_template_exists?: () -> bool
 

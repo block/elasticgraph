@@ -7,6 +7,7 @@ module ElasticGraph
         attr_reader default_sort_fields: ::Array[SortField]
         attr_reader current_sources: ::Set[::String]
         attr_reader fields_by_path: ::Hash[::String, IndexField]
+        attr_reader field_paths_protected_from_removal: ::Set[::String]
         attr_reader has_had_multiple_sources: bool
         attr_reader sourced_from_nested_paths_by_qualified_relationship: ::Hash[::String, ::Array[sourcedFromNestedPathSegment]]
 
@@ -16,6 +17,7 @@ module ElasticGraph
           default_sort_fields: ::Array[SortField],
           current_sources: ::Set[::String],
           fields_by_path: ::Hash[::String, IndexField],
+          field_paths_protected_from_removal: ::Set[::String],
           has_had_multiple_sources: bool,
           sourced_from_nested_paths_by_qualified_relationship: ::Hash[::String, ::Array[sourcedFromNestedPathSegment]]
         ) -> void
@@ -26,6 +28,7 @@ module ElasticGraph
           ?default_sort_fields: ::Array[SortField],
           ?current_sources: ::Enumerable[::String],
           ?fields_by_path: ::Hash[::String, IndexField],
+          ?field_paths_protected_from_removal: ::Enumerable[::String],
           ?has_had_multiple_sources: bool,
           ?sourced_from_nested_paths_by_qualified_relationship: ::Hash[::String, ::Array[sourcedFromNestedPathSegment]]
         ) -> IndexDefinition
@@ -37,6 +40,7 @@ module ElasticGraph
         DEFAULT_SORT_FIELDS: "default_sort_fields"
         CURRENT_SOURCES: "current_sources"
         FIELDS_BY_PATH: "fields_by_path"
+        FIELD_PATHS_PROTECTED_FROM_REMOVAL: "field_paths_protected_from_removal"
         HAS_HAD_MULTIPLE_SOURCES: "has_had_multiple_sources"
         SOURCED_FROM_NESTED_PATHS_BY_QUALIFIED_RELATIONSHIP: "sourced_from_nested_paths_by_qualified_relationship"
 
@@ -46,6 +50,7 @@ module ElasticGraph
           default_sort_fields: ::Array[SortField],
           current_sources: ::Enumerable[::String],
           fields_by_path: ::Hash[::String, IndexField],
+          field_paths_protected_from_removal: ::Enumerable[::String],
           has_had_multiple_sources: bool,
           sourced_from_nested_paths_by_qualified_relationship: ::Hash[::String, ::Array[sourcedFromNestedPathSegment]]
         ) -> void
