@@ -780,6 +780,108 @@ module ElasticGraph
           expect(proto_type_def_from(proto, "Command")).to include("COMMAND_OPTION = 1;", "COMMAND_STREAM = 2;")
           expect(proto_type_def_from(proto, "Request")).to include("string package_ = 2; // source name: package")
         end
+
+        it "sources enum values from an external proto enum" do
+          proto_status = ::Class.new do
+            def self.enums
+              [
+                ::Data.define(:name).new(name: :UNKNOWN_DO_NOT_USE),
+                ::Data.define(:name).new(name: :ACTIVE),
+                ::Data.define(:name).new(name: :INACTIVE)
+              ]
+            end
+          end
+
+          results = define_proto_schema do |s|
+            s.enum_type "Status" do |t|
+              t.values "ACTIVE", "INACTIVE", "OBSOLETE"
+              t.external_proto_enum proto_status,
+                exclusions: [:UNKNOWN_DO_NOT_USE],
+                expected_extras: [:LEGACY]
+            end
+
+            s.object_type "Account" do |t|
+              t.field "id", "ID"
+              t.field "status", "Status"
+              t.index "accounts"
+            end
+          end
+
+          generated = proto_schema_from(results)
+          expect(generated).to include("STATUS_ACTIVE = 1;")
+          expect(generated).to include("STATUS_INACTIVE = 2;")
+          expect(generated).to include("STATUS_LEGACY = 3;")
+          expect(generated).not_to include("OBSOLETE")
+        end
+
+        it "applies `name_transform` to external proto enum value names" do
+          proto_currency = ::Class.new do
+            def self.enums
+              [
+                ::Data.define(:name).new(name: :CURRENCY_USD),
+                ::Data.define(:name).new(name: :CURRENCY_CAD)
+              ]
+            end
+          end
+
+          results = define_proto_schema do |s|
+            s.enum_type "Currency" do |t|
+              t.values "USD", "CAD"
+              t.external_proto_enum proto_currency, name_transform: ->(name) { name.sub(/\ACURRENCY_/, "") }
+            end
+
+            s.object_type "Account" do |t|
+              t.field "id", "ID"
+              t.field "currency", "Currency"
+              t.index "accounts"
+            end
+          end
+
+          generated = proto_schema_from(results)
+          expect(generated).to include("CURRENCY_USD = 1;")
+          expect(generated).to include("CURRENCY_CAD = 2;")
+          expect(generated).not_to include("CURRENCY_CURRENCY_")
+        end
+
+        it "raises when external proto enum sources produce inconsistent values" do
+          proto_status_a = ::Class.new do
+            def self.enums
+              [
+                ::Data.define(:name).new(name: :ACTIVE),
+                ::Data.define(:name).new(name: :INACTIVE)
+              ]
+            end
+          end
+
+          proto_status_b = ::Class.new do
+            def self.enums
+              [
+                ::Data.define(:name).new(name: :ACTIVE),
+                ::Data.define(:name).new(name: :PENDING)
+              ]
+            end
+          end
+
+          results = define_proto_schema do |s|
+            s.enum_type "Status" do |t|
+              t.values "ACTIVE", "INACTIVE"
+              t.external_proto_enum proto_status_a
+              t.external_proto_enum proto_status_b
+            end
+
+            s.object_type "Account" do |t|
+              t.field "id", "ID"
+              t.field "status", "Status"
+              t.index "accounts"
+            end
+          end
+
+          expect {
+            proto_schema_from(results)
+          }.to raise_error(Errors::SchemaError, a_string_including(
+            "External proto enums for `Status` produce inconsistent value sets"
+          ))
+        end
       end
     end
   end

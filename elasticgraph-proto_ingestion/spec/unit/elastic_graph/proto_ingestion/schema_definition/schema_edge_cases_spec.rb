@@ -85,6 +85,73 @@ module ElasticGraph
           expect(proto_type_def_from(proto, "Account")).to include("Status status = 2;")
           expect(proto_type_def_from(proto, "User")).to include("Status status = 2;")
         end
+
+        it "raises when `external_proto_enum` is given an object without `.enums`" do
+          expect {
+            define_proto_schema do |s|
+              s.enum_type "Status" do |t|
+                t.values "ACTIVE"
+                t.external_proto_enum ::Object.new
+              end
+            end
+          }.to raise_error(Errors::SchemaError, a_string_including(
+            "`external_proto_enum` on `Status`", "must be given a proto enum class with `.enums`"
+          ))
+        end
+
+        it "wraps unexpected exceptions from external proto enum sources" do
+          proto_status = ::Class.new do
+            def self.enums
+              [::Data.define(:name).new(name: :ACTIVE)]
+            end
+          end
+
+          expect {
+            define_proto_schema do |s|
+              s.enum_type "Status" do |t|
+                t.values "ACTIVE"
+                t.external_proto_enum proto_status, name_transform: ->(_name) { raise "boom" }
+              end
+
+              s.object_type "Account" do |t|
+                t.field "id", "ID"
+                t.field "status", "Status"
+                t.index "accounts"
+              end
+            end
+          }.to raise_error(Errors::SchemaError, a_string_including("Failed loading external proto enum values for `Status`"))
+        end
+
+        it "accepts multiple external proto enum sources when they resolve to the same values" do
+          proto_status_a = ::Class.new do
+            def self.enums
+              [::Data.define(:name).new(name: :ACTIVE)]
+            end
+          end
+
+          proto_status_b = ::Class.new do
+            def self.enums
+              [::Data.define(:name).new(name: :ACTIVE)]
+            end
+          end
+
+          proto = define_proto_schema do |s|
+            s.enum_type "Status" do |t|
+              t.values "ACTIVE"
+              t.external_proto_enum proto_status_a
+              t.external_proto_enum proto_status_b
+            end
+
+            s.object_type "Account" do |t|
+              t.field "id", "ID"
+              t.field "status", "Status"
+              t.index "accounts"
+            end
+          end
+
+          expect(proto).to include("STATUS_ACTIVE = 1;")
+        end
+
         it "raises on field-number mapping collisions for a message" do
           results = define_proto_schema_results do |s|
             s.configure_proto_field_number_mappings(
