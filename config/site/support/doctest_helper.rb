@@ -104,6 +104,29 @@ module ElasticGraph
       end
     end
 
+    doctest.before "ElasticGraph::ProtoIngestion::SchemaDefinition::SchemaElements::EnumTypeExtension#external_proto_enum" do
+      extend ::RSpec::Mocks::ExampleMethods
+
+      # The examples source enum values from an app-defined proto enum class; provide one here.
+      proto_enum_entry = ::Data.define(:name, :number)
+      currency_proto_enum = ::Class.new
+      currency_proto_enum.define_singleton_method(:enums) do
+        [:CURRENCY_UNKNOWN_DO_NOT_USE, :CURRENCY_USD, :CURRENCY_CAD].each_with_index.map do |name, number|
+          proto_enum_entry.new(name: name, number: number)
+        end
+      end
+
+      stub_const("MyApp::Protos::Currency", currency_proto_enum)
+
+      # Its names match an ElasticGraph enum exactly, so it can be referenced rather than sourced.
+      currency_code_proto_enum = ::Class.new
+      currency_code_proto_enum.define_singleton_method(:enums) do
+        [proto_enum_entry.new(name: :USD, number: 1), proto_enum_entry.new(name: :CAD, number: 2)]
+      end
+
+      stub_const("MyApp::Protos::CurrencyCode", currency_code_proto_enum)
+    end
+
     doctest.before "ElasticGraph::SchemaDefinition::SchemaElements::ScalarType#coerce_with" do
       ::FileUtils.mkdir_p "coercion_adapters"
       ::File.write("coercion_adapters/phone_number.rb", <<~EOS)
