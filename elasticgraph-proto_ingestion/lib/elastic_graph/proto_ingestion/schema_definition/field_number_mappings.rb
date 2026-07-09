@@ -257,6 +257,14 @@ module ElasticGraph
           reserved_numbers_by_name(value_numbers, active_value_names)
         end
 
+        # Returns the previously pinned numbers for a protobuf enum.
+        #
+        # @param enum_name [String]
+        # @return [Hash<String, Integer>]
+        def pinned_enum_value_numbers(enum_name)
+          @enum_mappings_by_name[enum_name]&.value_numbers_by_name || {}
+        end
+
         # Serializes the mappings back to the `proto_field_numbers.yaml` artifact format, with
         # messages and enums sorted by name and their fields and values sorted by number.
         #
