@@ -66,6 +66,14 @@ module ElasticGraph
             ".#{package_name}.#{proto_name}"
           end
 
+          # Messages carry their documentation on the message definition itself, so fields of this
+          # type get no trailing format comment. Only scalar types document a format.
+          #
+          # @return [nil]
+          def protobuf_comment
+            nil
+          end
+
           private
 
           def render_proto_message(schema, message_name, package_name)
@@ -75,7 +83,7 @@ module ElasticGraph
             active_field_names = fields.map { |schema_field, _| schema_field.name }
             documentation = ProtoDocumentation.comment_lines_for(doc_comment).map { |line| "#{line}\n" }.join
             field_definitions = fields.map do |schema_field, field|
-              repeated, field_type = proto_field_type_for(
+              repeated, field_type, type_comment = proto_field_type_for(
                 field.type,
                 package_name: package_name,
                 context_field_name: field.name
@@ -87,6 +95,7 @@ module ElasticGraph
               )
               label = "repeated " if repeated
               line = "  #{label}#{field_type} #{schema_field.name} = #{field_number};"
+              line += " // #{type_comment}" if type_comment
               field_documentation = ProtoDocumentation
                 .comment_lines_for(schema_field.doc_comment, indent: "  ")
                 .map { |comment_line| "#{comment_line}\n" }
@@ -160,7 +169,7 @@ module ElasticGraph
             end
 
             proto_type = _ = base_type_ref.resolved
-            [list_depth == 1, proto_type.proto_type_reference(package_name)]
+            [list_depth == 1, proto_type.proto_type_reference(package_name), proto_type.protobuf_comment]
           end
         end
       end

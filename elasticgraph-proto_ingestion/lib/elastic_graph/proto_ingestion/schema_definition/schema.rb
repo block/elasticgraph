@@ -48,6 +48,7 @@ module ElasticGraph
           sections = [
             %(syntax = "proto3";),
             "package #{@package_name};",
+            *render_imports(types),
             render_definitions(types)
           ]
 
@@ -105,6 +106,13 @@ module ElasticGraph
             .sort_by(&:proto_name)
             .filter_map { |type| type.to_proto(self, @package_name) }
             .join("\n\n")
+        end
+
+        # Only scalar types can map to an externally defined proto type, so only they can require an import.
+        def render_imports(types)
+          imports = types.grep(SchemaElements::ScalarTypeExtension).filter_map(&:protobuf_import).uniq.sort
+
+          imports.empty? ? [] : [imports.map { |import| %(import "#{import}";) }.join("\n")]
         end
 
         def validate_unique_enum_value_prefixes(types)

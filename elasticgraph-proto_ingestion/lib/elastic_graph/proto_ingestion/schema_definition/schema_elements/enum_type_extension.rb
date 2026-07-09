@@ -67,6 +67,14 @@ module ElasticGraph
             ".#{package_name}.#{proto_name}"
           end
 
+          # Enum values are self-describing, so fields of this type get no trailing format comment.
+          # Only scalar types document a format.
+          #
+          # @return [nil]
+          def protobuf_comment
+            nil
+          end
+
           # Returns the package-level prefix applied to this enum's protobuf values.
           #
           # @return [String]

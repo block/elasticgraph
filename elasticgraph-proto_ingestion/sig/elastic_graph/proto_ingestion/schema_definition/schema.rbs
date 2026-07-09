@@ -34,6 +34,7 @@ module ElasticGraph
 
         def proto_types: () -> ::Array[untyped]
         def render_definitions: (::Array[untyped] types) -> ::String
+        def render_imports: (::Array[untyped] types) -> ::Array[::String]
         def validate_unique_enum_value_prefixes: (::Array[untyped] types) -> void
         def previous_field_names_for: (::String, ::String) -> ::Array[::String]
         def previous_field_names_by_type_name_and_field_name: () -> ::Hash[::String, ::Hash[::String, ::Array[::String]]]

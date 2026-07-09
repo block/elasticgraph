@@ -14,33 +14,64 @@ module ElasticGraph
       module SchemaElements
         # Extends ScalarType with proto field type conversion.
         module ScalarTypeExtension
-          # Default protobuf types applied to ElasticGraph's built-in scalar types as they are constructed.
-          BUILT_IN_SCALAR_PROTO_TYPES_BY_NAME = {
-            "Boolean" => "bool",
-            "Cursor" => "string",
-            "Date" => "string",
-            "DateTime" => "string",
-            "Float" => "double",
-            "ID" => "string",
-            "Int" => "int32",
-            "JsonSafeLong" => "int64",
-            "LocalTime" => "string",
-            "LongString" => "int64",
-            "String" => "string",
-            "TimeZone" => "string",
-            "Untyped" => "string"
-          }.freeze
+          # Default protobuf options applied to ElasticGraph's built-in scalar types as they are constructed.
+          BUILT_IN_SCALAR_PROTO_OPTIONS_BY_NAME = {
+            "Boolean" => {type: "bool"},
+            "Cursor" => {type: "string"},
+            "Date" => {type: "string", comment: %(ISO 8601 date, e.g. "2024-11-25")},
+            "DateTime" => {type: "google.protobuf.Timestamp", import: "google/protobuf/timestamp.proto"},
+            "Float" => {type: "double"},
+            "ID" => {type: "string"},
+            "Int" => {type: "int32"},
+            "JsonSafeLong" => {type: "int64"},
+            "LocalTime" => {type: "string", comment: %(ISO 8601 local time, e.g. "14:23:12")},
+            "LongString" => {type: "int64"},
+            "String" => {type: "string"},
+            "TimeZone" => {type: "string", comment: %(IANA time zone identifier, e.g. "America/Los_Angeles")},
+            "Untyped" => {type: "string"}
+          }.freeze # : ::Hash[::String, {type: ::String, ?import: ::String, ?comment: ::String}]
+
+          # An `import` is rendered as `import "PATH";`, so a quote or newline in the path would
+          # produce invalid proto. `protoc` also requires the path to name a `.proto` file.
+          VALID_PROTOBUF_IMPORT_PATH = %r{\A[\w./-]+\.proto\z}
 
           # Configured protobuf type (e.g. string, int64, bool).
           # @dynamic protobuf_type
           attr_reader :protobuf_type
 
+          # Proto file to import for the configured protobuf type, if it is externally defined.
+          # @dynamic protobuf_import
+          attr_reader :protobuf_import
+
+          # Comment rendered on generated proto fields of this scalar type.
+          # @dynamic protobuf_comment
+          attr_reader :protobuf_comment
+
           # Configures the protobuf type for this scalar type.
           #
-          # @param type [String] protobuf scalar type name
+          # @param type [String] protobuf type name
+          # @param import [String, nil] proto file to import for an externally defined type
+          # @param comment [String, nil] single-line comment rendered on generated fields of this type
           # @return [void]
-          def protobuf(type:)
+          # @raise [Errors::SchemaError] when `import` is not a `.proto` file path
+          # @raise [Errors::SchemaError] when `comment` spans multiple lines
+          def protobuf(type:, import: nil, comment: nil)
+            if import && !VALID_PROTOBUF_IMPORT_PATH.match?(import)
+              raise Errors::SchemaError, "`protobuf` import for `#{name}` must be the path of a `.proto` file, " \
+                "but got: #{import.inspect}."
+            end
+
+            # The comment is rendered as a trailing `// ...` on the field line, so a newline would
+            # push the remainder onto its own line as bare, invalid proto syntax. Multi-line prose
+            # belongs on the field's GraphQL doc comment, which renders as `//` lines above the field.
+            if comment&.include?("\n")
+              raise Errors::SchemaError, "`protobuf` comment for `#{name}` must be a single line, but got: #{comment.inspect}. " \
+                "Use the field's doc comment for multi-line documentation."
+            end
+
             @protobuf_type = type
+            @protobuf_import = import
+            @protobuf_comment = comment
           end
 
           # Applies any built-in protobuf type, yields for further configuration, and validates the result.
@@ -50,8 +81,8 @@ module ElasticGraph
           # @raise [Errors::SchemaError] when a protobuf type is missing
           def initialize_proto_extension
             original_name = type_ref.with_reverted_override.name
-            if (proto_type = BUILT_IN_SCALAR_PROTO_TYPES_BY_NAME[original_name])
-              protobuf type: proto_type
+            if (proto_options = BUILT_IN_SCALAR_PROTO_OPTIONS_BY_NAME[original_name])
+              protobuf(**proto_options)
             end
 
             yield

@@ -94,27 +94,92 @@ ElasticGraph.define_schema do |schema|
 end
 ```
 
+A custom scalar can also map to an externally defined proto type. Pass `import:` with the path of
+the proto file that defines the type:
+
+```ruby
+# in config/schema/duration.rb
+
+ElasticGraph.define_schema do |schema|
+  schema.scalar_type "Duration" do |t|
+    t.mapping type: "keyword"
+    t.json_schema type: "string"
+    t.protobuf type: "google.protobuf.Duration", import: "google/protobuf/duration.proto"
+  end
+end
+```
+
+The generated `schema.proto` then contains `import "google/protobuf/duration.proto";`. ElasticGraph
+emits the import only when a generated message uses the scalar. The `import:` value must be the
+path of a `.proto` file.
+
+`comment:` documents the expected format on each generated field. This is useful when the proto
+type is wider than the ElasticGraph type:
+
+```ruby
+# in config/schema/phone_number.rb
+
+ElasticGraph.define_schema do |schema|
+  schema.scalar_type "PhoneNumber" do |t|
+    t.mapping type: "keyword"
+    t.json_schema type: "string"
+    t.protobuf type: "string", comment: "E.164 phone number"
+  end
+end
+```
+
+A `PhoneNumber` field then renders as `string phone_number = 1; // E.164 phone number`.
+
+`comment:` renders as a trailing `//` comment on the field line, so it must be a single line.
+Put multi-line documentation on the field's doc comment instead, which renders as `//` lines
+above the field.
+
+### Overriding a Built-in Scalar
+
+Use `on_built_in_types` to change the protobuf type of a built-in scalar. For example, map
+`DateTime` to `string` to keep the original UTC offset of each event:
+
+```ruby
+# in config/schema/protobuf.rb
+
+ElasticGraph.define_schema do |schema|
+  schema.on_built_in_types do |type|
+    type.protobuf type: "string", comment: "ISO 8601 timestamp" if type.name == "DateTime"
+  end
+end
+```
+
+The override also clears the built-in `import:` value, so `schema.proto` no longer imports
+`google/protobuf/timestamp.proto`.
+
 ## Type Mappings
 
 The generated `schema.proto` uses these built-in scalar mappings:
 
-| ElasticGraph Type | Protobuf Type |
-|-------------------|------------|
-| `Boolean`         | `bool`     |
-| `Cursor`          | `string`   |
-| `Date`            | `string`   |
-| `DateTime`        | `string`   |
-| `Float`           | `double`   |
-| `ID`              | `string`   |
-| `Int`             | `int32`    |
-| `JsonSafeLong`    | `int64`    |
-| `LocalTime`       | `string`   |
-| `LongString`      | `int64`    |
-| `String`          | `string`   |
-| `TimeZone`        | `string`   |
-| `Untyped`         | `string`   |
+| ElasticGraph Type | Protobuf Type               |
+|-------------------|-----------------------------|
+| `Boolean`         | `bool`                      |
+| `Cursor`          | `string`                    |
+| `Date`            | `string`                    |
+| `DateTime`        | `google.protobuf.Timestamp` |
+| `Float`           | `double`                    |
+| `ID`              | `string`                    |
+| `Int`             | `int32`                     |
+| `JsonSafeLong`    | `int64`                     |
+| `LocalTime`       | `string`                    |
+| `LongString`      | `int64`                     |
+| `String`          | `string`                    |
+| `TimeZone`        | `string`                    |
+| `Untyped`         | `string`                    |
 
 Additionally:
+- `DateTime` uses the [well-known `Timestamp` type](https://protobuf.dev/reference/protobuf/google.protobuf/#timestamp);
+  `schema.proto` imports `google/protobuf/timestamp.proto` automatically. Note that a `Timestamp`
+  is a UTC instant, so a publisher's original UTC offset is not preserved.
+- `string`-typed temporal scalars (`Date`, `LocalTime`, `TimeZone`) are wider than the
+  ElasticGraph types they carry, so generated fields of these types document the expected format
+  in a comment (e.g. `// ISO 8601 date, e.g. "2024-11-25"`). Values are validated when events
+  are ingested, just as with JSON ingestion.
 - List types become `repeated` fields.
 - Lists of lists (e.g. `[[Float!]!]!`) are not supported because Protocol Buffers cannot represent
   them directly. Schema artifact generation raises an error identifying the unsupported field.
