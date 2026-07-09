@@ -4,8 +4,10 @@ module ElasticGraph
       module SchemaElements
         module ScalarTypeExtension: ::ElasticGraph::SchemaDefinition::SchemaElements::ScalarType
           attr_reader protobuf_type: ::String?
+          attr_reader protobuf_import: ::String?
+          attr_reader protobuf_comment: ::String?
 
-          def protobuf: (type: ::String) -> void
+          def protobuf: (type: ::String, ?import: ::String?, ?comment: ::String?) -> void
           def finalize_protobuf_configuration!: () -> void
           def proto_name: () -> ::String
           def proto_type_reference: (::String package_name) -> ::String

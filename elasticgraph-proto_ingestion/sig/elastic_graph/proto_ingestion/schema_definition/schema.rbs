@@ -45,6 +45,7 @@ module ElasticGraph
 
         def proto_types: () -> ::Array[untyped]
         def render_definitions: (::Array[untyped] types) -> ::String
+        def render_imports: (::Array[untyped] types) -> ::Array[::String]
         def valid_field_number?: (::Integer) -> bool
         def next_available_field_number: (::Set[::Integer]) -> ::Integer
         def next_available_enum_value_number: (::Set[::Integer]) -> ::Integer

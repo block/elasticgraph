@@ -96,6 +96,22 @@ ElasticGraph.define_schema do |schema|
 end
 ```
 
+A custom scalar can also map to an externally defined proto type by passing `import:` with the
+proto file that defines it, and `comment:` documents the expected format on each generated field
+(useful when the proto type is wider than the ElasticGraph type):
+
+```ruby
+# in config/schema/phone_number.rb
+
+ElasticGraph.define_schema do |schema|
+  schema.scalar_type "PhoneNumber" do |t|
+    t.mapping type: "keyword"
+    t.json_schema type: "string"
+    t.protobuf type: "string", comment: "E.164 phone number"
+  end
+end
+```
+
 ### Stable Field Numbers
 
 `schema_artifacts:dump` automatically reads and writes `proto_field_numbers.yaml`
@@ -143,23 +159,30 @@ enums:
 
 The generated `schema.proto` uses these built-in scalar mappings:
 
-| ElasticGraph Type | Protobuf Type |
-|-------------------|------------|
-| `Boolean`         | `bool`     |
-| `Cursor`          | `string`   |
-| `Date`            | `string`   |
-| `DateTime`        | `string`   |
-| `Float`           | `double`   |
-| `ID`              | `string`   |
-| `Int`             | `int32`    |
-| `JsonSafeLong`    | `int64`    |
-| `LocalTime`       | `string`   |
-| `LongString`      | `int64`    |
-| `String`          | `string`   |
-| `TimeZone`        | `string`   |
-| `Untyped`         | `string`   |
+| ElasticGraph Type | Protobuf Type               |
+|-------------------|-----------------------------|
+| `Boolean`         | `bool`                      |
+| `Cursor`          | `string`                    |
+| `Date`            | `string`                    |
+| `DateTime`        | `google.protobuf.Timestamp` |
+| `Float`           | `double`                    |
+| `ID`              | `string`                    |
+| `Int`             | `int32`                     |
+| `JsonSafeLong`    | `int64`                     |
+| `LocalTime`       | `string`                    |
+| `LongString`      | `int64`                     |
+| `String`          | `string`                    |
+| `TimeZone`        | `string`                    |
+| `Untyped`         | `string`                    |
 
 Additionally:
+- `DateTime` uses the [well-known `Timestamp` type](https://protobuf.dev/reference/protobuf/google.protobuf/#timestamp);
+  `schema.proto` imports `google/protobuf/timestamp.proto` automatically. Note that a `Timestamp`
+  is a UTC instant, so a publisher's original UTC offset is not preserved.
+- `string`-typed temporal scalars (`Date`, `LocalTime`, `TimeZone`) are wider than the
+  ElasticGraph types they carry, so generated fields of these types document the expected format
+  in a comment (e.g. `// ISO 8601 date, e.g. "2024-11-25"`). Values are validated when events
+  are ingested, just as with JSON ingestion.
 - List types become `repeated` fields.
 - Lists of lists (e.g. `[[Float!]!]!`) are not supported because Protocol Buffers cannot represent
   them directly. Schema artifact generation raises an error identifying the unsupported field.

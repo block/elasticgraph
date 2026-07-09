@@ -35,7 +35,7 @@ module ElasticGraph
           field_types = []
           proto = define_proto_schema do |s|
             s.object_type "Widget" do |t|
-              FactoryExtension::BUILT_IN_SCALAR_PROTO_TYPES_BY_NAME.each_key do |type_name|
+              FactoryExtension::BUILT_IN_SCALAR_PROTO_OPTIONS_BY_NAME.each_key do |type_name|
                 t.field type_name.downcase, type_name
               end
               field_types = t.graphql_fields_by_name.values.map { |field| field.type.name }
@@ -43,9 +43,10 @@ module ElasticGraph
             end
           end
 
-          expect(field_types).to match_array(FactoryExtension::BUILT_IN_SCALAR_PROTO_TYPES_BY_NAME.keys)
-          FactoryExtension::BUILT_IN_SCALAR_PROTO_TYPES_BY_NAME.each.with_index(1) do |(type_name, proto_type), field_number|
-            expect(proto).to include("#{proto_type} #{type_name.downcase} = #{field_number};")
+          expect(field_types).to match_array(FactoryExtension::BUILT_IN_SCALAR_PROTO_OPTIONS_BY_NAME.keys)
+          expect(proto).to include('import "google/protobuf/timestamp.proto";')
+          FactoryExtension::BUILT_IN_SCALAR_PROTO_OPTIONS_BY_NAME.each.with_index(1) do |(type_name, proto_options), field_number|
+            expect(proto).to include("#{proto_options.fetch(:type)} #{type_name.downcase} = #{field_number};")
           end
         end
 
