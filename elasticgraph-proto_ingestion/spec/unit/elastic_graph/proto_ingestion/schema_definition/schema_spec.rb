@@ -792,7 +792,7 @@ module ElasticGraph
             end
           end
 
-          results = define_proto_schema do |s|
+          proto = define_proto_schema do |s|
             s.enum_type "Status" do |t|
               t.values "ACTIVE", "INACTIVE", "OBSOLETE"
               t.external_proto_enum proto_status,
@@ -807,7 +807,7 @@ module ElasticGraph
             end
           end
 
-          generated = proto_schema_from(results)
+          generated = proto
           expect(generated).to include("STATUS_ACTIVE = 1;")
           expect(generated).to include("STATUS_INACTIVE = 2;")
           expect(generated).to include("STATUS_LEGACY = 3;")
@@ -824,7 +824,7 @@ module ElasticGraph
             end
           end
 
-          results = define_proto_schema do |s|
+          proto = define_proto_schema do |s|
             s.enum_type "Currency" do |t|
               t.values "USD", "CAD"
               t.external_proto_enum proto_currency, name_transform: ->(name) { name.sub(/\ACURRENCY_/, "") }
@@ -837,7 +837,7 @@ module ElasticGraph
             end
           end
 
-          generated = proto_schema_from(results)
+          generated = proto
           expect(generated).to include("CURRENCY_USD = 1;")
           expect(generated).to include("CURRENCY_CAD = 2;")
           expect(generated).not_to include("CURRENCY_CURRENCY_")
@@ -862,7 +862,7 @@ module ElasticGraph
             end
           end
 
-          results = define_proto_schema do |s|
+          results = define_proto_schema_results do |s|
             s.enum_type "Status" do |t|
               t.values "ACTIVE", "INACTIVE"
               t.external_proto_enum proto_status_a
@@ -877,10 +877,75 @@ module ElasticGraph
           end
 
           expect {
-            proto_schema_from(results)
+            results.proto_schema
           }.to raise_error(Errors::SchemaError, a_string_including(
             "External proto enums for `Status` produce inconsistent value sets"
           ))
+        end
+
+        it "references an external proto enum type instead of generating a local enum" do
+          proto_status = ::Class.new do
+            def self.enums
+              [
+                ::Data.define(:name, :number).new(name: :ACTIVE, number: 1),
+                ::Data.define(:name, :number).new(name: :INACTIVE, number: 2)
+              ]
+            end
+          end
+
+          proto = define_proto_schema do |s|
+            s.enum_type "Status" do |t|
+              t.values "ACTIVE", "INACTIVE"
+              t.external_proto_enum proto_status,
+                proto: "myapp.types.Status",
+                import: "myapp/types/status.proto"
+            end
+
+            s.object_type "Account" do |t|
+              t.field "id", "ID"
+              t.field "status", "Status"
+              t.field "previous_status", "Status"
+              t.index "accounts"
+            end
+          end
+
+          generated = proto
+          expect(generated.scan('import "myapp/types/status.proto";').size).to eq(1)
+          expect(generated).to include("myapp.types.Status status = 2;")
+          expect(generated).to include("myapp.types.Status previous_status = 3;")
+          expect(generated).not_to include("enum Status")
+        end
+
+        it "accepts a referenced enum whose numbers match previously pinned enum value numbers" do
+          proto_status = ::Class.new do
+            def self.enums
+              [
+                ::Data.define(:name, :number).new(name: :ACTIVE, number: 1),
+                ::Data.define(:name, :number).new(name: :INACTIVE, number: 2)
+              ]
+            end
+          end
+
+          proto = define_proto_schema do |s|
+            s.configure_proto_field_number_mappings(
+              {"enums" => {"Status" => {"values" => {"ACTIVE" => 1, "INACTIVE" => 2}}}}
+            )
+
+            s.enum_type "Status" do |t|
+              t.values "ACTIVE", "INACTIVE"
+              t.external_proto_enum proto_status,
+                proto: "myapp.types.Status",
+                import: "myapp/types/status.proto"
+            end
+
+            s.object_type "Account" do |t|
+              t.field "id", "ID"
+              t.field "status", "Status"
+              t.index "accounts"
+            end
+          end
+
+          expect(proto).to include("myapp.types.Status status = 2;")
         end
       end
     end

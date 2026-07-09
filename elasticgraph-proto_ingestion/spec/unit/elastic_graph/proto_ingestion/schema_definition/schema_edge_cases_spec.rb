@@ -36,6 +36,36 @@ module ElasticGraph
           ))
         end
 
+        it "raises when externally sourced enum values map to duplicate proto value names" do
+          proto_status = ::Class.new do
+            def self.enums
+              [
+                ::Data.define(:name).new(name: :option),
+                ::Data.define(:name).new(name: :OPTION)
+              ]
+            end
+          end
+
+          results = define_proto_schema_results do |s|
+            s.enum_type "Status" do |t|
+              t.value "ACTIVE"
+              t.external_proto_enum proto_status
+            end
+
+            s.object_type "Account" do |t|
+              t.field "id", "ID"
+              t.field "status", "Status"
+              t.index "accounts"
+            end
+          end
+
+          expect {
+            results.proto_schema
+          }.to raise_error(Errors::SchemaError, a_string_including(
+            "Enum `Status` maps to duplicate proto enum value names: STATUS_OPTION"
+          ))
+        end
+
         it "raises when an enum value conflicts with the generated zero value" do
           expect {
             define_proto_schema do |s|
@@ -106,19 +136,21 @@ module ElasticGraph
             end
           end
 
-          expect {
-            define_proto_schema do |s|
-              s.enum_type "Status" do |t|
-                t.values "ACTIVE"
-                t.external_proto_enum proto_status, name_transform: ->(_name) { raise "boom" }
-              end
-
-              s.object_type "Account" do |t|
-                t.field "id", "ID"
-                t.field "status", "Status"
-                t.index "accounts"
-              end
+          results = define_proto_schema_results do |s|
+            s.enum_type "Status" do |t|
+              t.values "ACTIVE"
+              t.external_proto_enum proto_status, name_transform: ->(_name) { raise "boom" }
             end
+
+            s.object_type "Account" do |t|
+              t.field "id", "ID"
+              t.field "status", "Status"
+              t.index "accounts"
+            end
+          end
+
+          expect {
+            results.proto_schema
           }.to raise_error(Errors::SchemaError, a_string_including("Failed loading external proto enum values for `Status`"))
         end
 
@@ -135,7 +167,7 @@ module ElasticGraph
             end
           end
 
-          proto = define_proto_schema do |s|
+          results = define_proto_schema_results do |s|
             s.enum_type "Status" do |t|
               t.values "ACTIVE"
               t.external_proto_enum proto_status_a
@@ -149,7 +181,196 @@ module ElasticGraph
             end
           end
 
-          expect(proto).to include("STATUS_ACTIVE = 1;")
+          expect(results.proto_schema).to include("STATUS_ACTIVE = 1;")
+        end
+
+        it "requires both `proto` and `import` as non-empty Strings to reference an external proto enum type" do
+          # The eager validation raises before `.enums` is ever consulted.
+          proto_status = ::Object.new
+          proto_status.define_singleton_method(:enums) { [] }
+
+          [
+            {proto: "myapp.types.Status"},
+            {import: "myapp/types/status.proto"},
+            {proto: "", import: "myapp/types/status.proto"},
+            {proto: :"myapp.types.Status", import: "myapp/types/status.proto"}
+          ].each do |reference_options|
+            expect {
+              define_proto_schema do |s|
+                s.enum_type "Status" do |t|
+                  t.values "ACTIVE"
+                  t.external_proto_enum proto_status, **reference_options
+                end
+              end
+            }.to raise_error(Errors::SchemaError, a_string_including(
+              "`external_proto_enum` on `Status`", "must be given both `proto` and `import` as non-empty Strings"
+            ))
+          end
+        end
+
+        it "raises when an external reference is combined with transform options" do
+          # The eager validation raises before `.enums` is ever consulted.
+          proto_status = ::Object.new
+          proto_status.define_singleton_method(:enums) { [] }
+
+          expect {
+            define_proto_schema do |s|
+              s.enum_type "Status" do |t|
+                t.values "ACTIVE"
+                t.external_proto_enum proto_status,
+                  exclusions: [:LEGACY],
+                  proto: "myapp.types.Status",
+                  import: "myapp/types/status.proto"
+              end
+            end
+          }.to raise_error(Errors::SchemaError, a_string_including(
+            "cannot combine `proto`/`import` with `exclusions`, `expected_extras`, or `name_transform`",
+            "must stay generated locally"
+          ))
+        end
+
+        it "raises when a referenced enum has multiple sources" do
+          # The multi-source validation raises before `.enums` is ever consulted.
+          proto_status_a = ::Object.new
+          proto_status_a.define_singleton_method(:enums) { [] }
+          proto_status_b = ::Object.new
+          proto_status_b.define_singleton_method(:enums) { [] }
+
+          results = define_proto_schema_results do |s|
+            s.enum_type "Status" do |t|
+              t.values "ACTIVE"
+              t.external_proto_enum proto_status_a,
+                proto: "myapp.types.Status",
+                import: "myapp/types/status.proto"
+              t.external_proto_enum proto_status_b
+            end
+
+            s.object_type "Account" do |t|
+              t.field "id", "ID"
+              t.field "status", "Status"
+              t.index "accounts"
+            end
+          end
+
+          expect {
+            results.proto_schema
+          }.to raise_error(Errors::SchemaError, a_string_including(
+            "must use exactly one `external_proto_enum` source",
+            "cannot be safely referenced externally"
+          ))
+        end
+
+        it "raises when a referenced enum's external values do not match the ElasticGraph enum values" do
+          proto_status = ::Class.new do
+            def self.enums
+              [
+                ::Data.define(:name, :number).new(name: :ACTIVE, number: 1),
+                ::Data.define(:name, :number).new(name: :PENDING, number: 2)
+              ]
+            end
+          end
+
+          results = define_proto_schema_results do |s|
+            s.enum_type "Status" do |t|
+              t.values "ACTIVE", "INACTIVE"
+              t.external_proto_enum proto_status,
+                proto: "myapp.types.Status",
+                import: "myapp/types/status.proto"
+            end
+
+            s.object_type "Account" do |t|
+              t.field "id", "ID"
+              t.field "status", "Status"
+              t.index "accounts"
+            end
+          end
+
+          expect {
+            results.proto_schema
+          }.to raise_error(Errors::SchemaError, a_string_including(
+            "External proto enum `Status` values do not match the ElasticGraph enum values",
+            "External values: ACTIVE, PENDING",
+            "ElasticGraph values: ACTIVE, INACTIVE"
+          ))
+        end
+
+        it "raises when a referenced enum's entries do not expose value numbers" do
+          proto_status = ::Class.new do
+            def self.enums
+              [::Data.define(:name).new(name: :ACTIVE)]
+            end
+          end
+
+          results = define_referenced_status_schema(proto_status, values: ["ACTIVE"])
+
+          expect {
+            results.proto_schema
+          }.to raise_error(Errors::SchemaError, a_string_including(
+            "must expose `.number` so its values can be verified against previously pinned numbers"
+          ))
+        end
+
+        it "raises when a referenced enum changes a pinned value's number" do
+          proto_status = ::Class.new do
+            def self.enums
+              [
+                ::Data.define(:name, :number).new(name: :ACTIVE, number: 2),
+                ::Data.define(:name, :number).new(name: :INACTIVE, number: 1)
+              ]
+            end
+          end
+
+          results = define_referenced_status_schema(
+            proto_status,
+            values: ["ACTIVE", "INACTIVE"],
+            pinned_value_numbers: {"ACTIVE" => 1, "INACTIVE" => 2}
+          )
+
+          expect {
+            results.proto_schema
+          }.to raise_error(Errors::SchemaError, a_string_including(
+            "assigns `ACTIVE` the number 2, but previously dumped artifacts pin it to 1",
+            "silently reinterpret existing wire data"
+          ))
+        end
+
+        it "raises when a referenced enum reuses a pinned number for a different value" do
+          proto_status = ::Class.new do
+            def self.enums
+              [
+                ::Data.define(:name, :number).new(name: :ACTIVE, number: 1),
+                ::Data.define(:name, :number).new(name: :LEGACY, number: 2)
+              ]
+            end
+          end
+
+          # `PAUSED` was removed from the enum; its number stays reserved in the artifact.
+          results = define_referenced_status_schema(
+            proto_status,
+            values: ["ACTIVE", "LEGACY"],
+            pinned_value_numbers: {"ACTIVE" => 1, "PAUSED" => 2}
+          )
+
+          expect {
+            results.proto_schema
+          }.to raise_error(Errors::SchemaError, a_string_including(
+            "assigns `LEGACY` the number 2, which previously dumped artifacts pin to `PAUSED`",
+            "silently reinterpret existing wire data"
+          ))
+        end
+
+        it "wraps unexpected exceptions from referenced proto enum sources" do
+          proto_status = ::Class.new do
+            def self.enums
+              raise "boom"
+            end
+          end
+
+          results = define_referenced_status_schema(proto_status, values: ["ACTIVE"])
+
+          expect {
+            results.proto_schema
+          }.to raise_error(Errors::SchemaError, a_string_including("Failed loading external proto enum values for `Status`"))
         end
 
         it "raises on field-number mapping collisions for a message" do
@@ -560,6 +781,29 @@ module ElasticGraph
 
           expect(results.proto_schema).to include("string id = 1;")
           expect(results.proto_schema).to include("string display_name = 2;")
+        end
+
+        private
+
+        def define_referenced_status_schema(proto_status, values:, pinned_value_numbers: nil)
+          define_proto_schema_results do |s|
+            if pinned_value_numbers
+              s.configure_proto_field_number_mappings({"enums" => {"Status" => {"values" => pinned_value_numbers}}})
+            end
+
+            s.enum_type "Status" do |t|
+              t.values(*values)
+              t.external_proto_enum proto_status,
+                proto: "myapp.types.Status",
+                import: "myapp/types/status.proto"
+            end
+
+            s.object_type "Account" do |t|
+              t.field "id", "ID"
+              t.field "status", "Status"
+              t.index "accounts"
+            end
+          end
         end
       end
     end

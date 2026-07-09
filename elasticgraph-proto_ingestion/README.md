@@ -219,12 +219,14 @@ In the examples below, this stand-in plays the role of your app's generated prot
 module MyApp
   module Protos
     class Currency
-      EnumEntry = ::Data.define(:name)
+      EnumEntry = ::Data.define(:name, :number)
 
       def self.enums
-        [:CURRENCY_UNKNOWN_DO_NOT_USE, :CURRENCY_USD, :CURRENCY_CAD].map do |name|
-          EnumEntry.new(name: name)
-        end
+        [
+          EnumEntry.new(name: :CURRENCY_UNKNOWN_DO_NOT_USE, number: 0),
+          EnumEntry.new(name: :CURRENCY_USD, number: 1),
+          EnumEntry.new(name: :CURRENCY_CAD, number: 2)
+        ]
       end
     end
   end
@@ -253,6 +255,33 @@ end
 When an enum has one or more external sources, `elasticgraph-proto_ingestion` uses them
 as the source of the generated enum's values. When multiple sources are registered for the
 same enum, they must all resolve to the same value set.
+
+### Referencing Existing Protobuf Types
+
+For enums that exactly match a canonical proto enum, you can go further and reference the
+existing proto type instead of generating a duplicate local enum. Pass `proto:` and `import:`
+to `external_proto_enum`, and `schema.proto` will import the named file and use the external
+type name directly:
+
+```ruby
+# in config/schema/currency.rb
+
+ElasticGraph.define_schema do |schema|
+  schema.enum_type "Currency" do |t|
+    t.values "USD", "CAD"
+    t.external_proto_enum MyApp::Protos::Currency,
+      proto: "myapp.types.Currency",
+      import: "myapp/types/currency.proto"
+  end
+end
+```
+
+A referenced enum must have exactly one option-free source whose values match the
+ElasticGraph enum's values; transformed, curated, or multi-source enums stay generated
+locally so value curation remains explicit. The source's enum entries must also expose
+`.number`, and those numbers must agree with any numbers previously pinned in
+`proto_field_numbers.yaml` — otherwise switching to the external type would silently
+reinterpret existing wire data.
 
 ## Type Mappings
 

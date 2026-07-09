@@ -157,6 +157,13 @@ module ElasticGraph
           end
         end
 
+        # Returns previously pinned numbers for a protobuf enum.
+        #
+        # @api private
+        def pinned_enum_value_numbers(enum_name)
+          @proto_enum_value_numbers_by_enum[enum_name] || {}
+        end
+
         # Returns the label for a protobuf field under the configured syntax.
         #
         # @api private

@@ -45,6 +45,7 @@ module ElasticGraph
           name_in_index: ::String
         ) -> ::Integer
         def enum_value_numbers_for: (::String, ::Array[::String]) -> ::Hash[::String, ::Integer]
+        def pinned_enum_value_numbers: (::String) -> ::Hash[::String, ::Integer]
         def field_label: (bool) -> ::String?
 
         private
