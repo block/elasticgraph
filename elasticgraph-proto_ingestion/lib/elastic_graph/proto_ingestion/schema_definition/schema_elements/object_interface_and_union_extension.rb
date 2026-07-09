@@ -68,7 +68,7 @@ module ElasticGraph
             lines << "message #{message_name} {"
             fields.each do |schema_field, field|
               field_name = Identifier.field_name(field.name)
-              repeated, field_type = proto_field_type_for(field.type, context_field_name: field.name)
+              repeated, field_type, type_comment = proto_field_type_for(field.type, context_field_name: field.name)
               field_number = schema.field_number_for(
                 message_name: message_name,
                 type_name: name,
@@ -77,7 +77,10 @@ module ElasticGraph
               )
               label = "repeated " if repeated
               line = "  #{label}#{field_type} #{field_name} = #{field_number};"
-              line += " // source name: #{field.name}" if field_name != field.name
+              comment_parts = [] # : ::Array[::String]
+              comment_parts << "source name: #{field.name}" if field_name != field.name
+              comment_parts << type_comment if type_comment
+              line += " // #{comment_parts.join("; ")}" if comment_parts.any?
               lines.concat(ProtoDocumentation.comment_lines_for(schema_field.doc_comment, indent: "  "))
               lines << line
             end
@@ -126,7 +129,8 @@ module ElasticGraph
             end
 
             proto_type = _ = base_type_ref.resolved
-            [list_depth == 1, proto_type.proto_name]
+            type_comment = (ScalarTypeExtension === proto_type) ? proto_type.protobuf_comment : nil
+            [list_depth == 1, proto_type.proto_name, type_comment]
           end
 
           def list_depth_and_base_type(type_ref)

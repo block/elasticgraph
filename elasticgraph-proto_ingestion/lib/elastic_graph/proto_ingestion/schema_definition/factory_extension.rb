@@ -18,21 +18,21 @@ module ElasticGraph
     module SchemaDefinition
       # Extension module applied to Factory to add proto support.
       module FactoryExtension
-        # Default protobuf types applied to ElasticGraph's built-in scalar types as they are constructed.
-        BUILT_IN_SCALAR_PROTO_TYPES_BY_NAME = {
-          "Boolean" => "bool",
-          "Cursor" => "string",
-          "Date" => "string",
-          "DateTime" => "string",
-          "Float" => "double",
-          "ID" => "string",
-          "Int" => "int32",
-          "JsonSafeLong" => "int64",
-          "LocalTime" => "string",
-          "LongString" => "int64",
-          "String" => "string",
-          "TimeZone" => "string",
-          "Untyped" => "string"
+        # Default protobuf options applied to ElasticGraph's built-in scalar types as they are constructed.
+        BUILT_IN_SCALAR_PROTO_OPTIONS_BY_NAME = {
+          "Boolean" => {type: "bool"},
+          "Cursor" => {type: "string"},
+          "Date" => {type: "string", comment: %(ISO 8601 date, e.g. "2024-11-25")},
+          "DateTime" => {type: "google.protobuf.Timestamp", import: "google/protobuf/timestamp.proto"},
+          "Float" => {type: "double"},
+          "ID" => {type: "string"},
+          "Int" => {type: "int32"},
+          "JsonSafeLong" => {type: "int64"},
+          "LocalTime" => {type: "string", comment: %(ISO 8601 local time, e.g. "14:23:12")},
+          "LongString" => {type: "int64"},
+          "String" => {type: "string"},
+          "TimeZone" => {type: "string", comment: %(IANA time zone identifier, e.g. "America/Los_Angeles")},
+          "Untyped" => {type: "string"}
         }.freeze
 
         # Creates a new enum type with proto extensions.
@@ -97,8 +97,12 @@ module ElasticGraph
             extended_type = type.extend(SchemaElements::ScalarTypeExtension) # : ::ElasticGraph::SchemaDefinition::SchemaElements::ScalarType & SchemaElements::ScalarTypeExtension
 
             if state.initially_registered_built_in_types.empty? &&
-                (proto_type = BUILT_IN_SCALAR_PROTO_TYPES_BY_NAME[name.to_s])
-              extended_type.protobuf type: proto_type
+                (proto_options = BUILT_IN_SCALAR_PROTO_OPTIONS_BY_NAME[name.to_s])
+              extended_type.protobuf(
+                type: proto_options.fetch(:type),
+                import: proto_options[:import],
+                comment: proto_options[:comment]
+              )
             end
 
             yield extended_type if block_given?

@@ -61,6 +61,7 @@ module ElasticGraph
           sections = [
             %(syntax = "proto3";),
             "package #{@package_name};",
+            *render_imports(types),
             render_definitions(types)
           ]
 
@@ -175,6 +176,14 @@ module ElasticGraph
               type.proto_definition_kind ? type.to_proto(self) : type.to_proto
             end
             .join("\n\n")
+        end
+
+        def render_imports(types)
+          imports = types.filter_map do |type|
+            type.protobuf_import if type.respond_to?(:protobuf_import)
+          end.uniq.sort
+
+          imports.empty? ? [] : [imports.map { |import| %(import "#{import}";) }.join("\n")]
         end
 
         def valid_field_number?(number)

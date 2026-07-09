@@ -21,7 +21,7 @@ module ElasticGraph
           def proto_field_type_for: (
             ::ElasticGraph::SchemaDefinition::SchemaElements::TypeReference,
             context_field_name: ::String
-          ) -> [bool, ::String]
+          ) -> [bool, ::String, ::String?]
           def list_depth_and_base_type: (
             ::ElasticGraph::SchemaDefinition::SchemaElements::TypeReference
           ) -> [::Integer, ::ElasticGraph::SchemaDefinition::SchemaElements::TypeReference]

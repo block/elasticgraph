@@ -38,6 +38,7 @@ module ElasticGraph
           end
 
           expect(field_types).to match_array(FactoryExtension::BUILT_IN_SCALAR_PROTO_TYPES_BY_NAME.keys)
+          expect(proto).to include('import "google/protobuf/timestamp.proto";')
           FactoryExtension::BUILT_IN_SCALAR_PROTO_TYPES_BY_NAME.each.with_index(1) do |(type_name, proto_type), field_number|
             field_name = Identifier.field_name(type_name.downcase)
             expect(proto).to include("#{proto_type} #{field_name} = #{field_number};")
