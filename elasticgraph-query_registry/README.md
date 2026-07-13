@@ -141,7 +141,7 @@ artifacts:
 bundle exec rake "query_registry:dump_variables[client_name, query_name]"
 ```
 
-Don't worry about if you forget this, though--the `query_registry:validate_queries`
+Don't worry if you forget this, though--the `query_registry:validate_queries`
 task will also fail and give you instructions anytime a variables file is not up-to-date.
 
 You should also run `query_registry:validate_queries` as part of CI for any application that

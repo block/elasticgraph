@@ -19,7 +19,7 @@ module ElasticGraph
       #   This is intended to be used when a single routing value contains such a large portion of the dataset that it creates lopsided shards.
       #   By including that routing value in this config setting, it'll spread that value's data across all shards instead of concentrating it on a single shard.
       # - query_cluster: named search cluster to be used for queries on this index.
-      # - index_into_cluster: named search clusters to index data into.
+      # - index_into_clusters: named search clusters to index data into.
       # - setting_overrides: overrides for index (or index template) settings.
       # - setting_overrides_by_timestamp: overrides for index template settings for specific dates,
       #   allowing us to have different settings than the template for some timestamp.

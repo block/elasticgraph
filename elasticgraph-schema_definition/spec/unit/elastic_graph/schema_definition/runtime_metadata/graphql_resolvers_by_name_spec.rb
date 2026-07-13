@@ -72,7 +72,7 @@ module ElasticGraph
         )
       end
 
-      it "verifies the registered resolver to confirm it confirms to the resolver interface" do
+      it "verifies the registered resolver to confirm it conforms to the resolver interface" do
         expect {
           graphql_resolvers_by_name do |schema|
             schema.register_graphql_resolver :missing_args,

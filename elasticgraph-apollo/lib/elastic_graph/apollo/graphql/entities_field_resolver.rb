@@ -79,7 +79,7 @@ module ElasticGraph
         #
         # Based on whether or not this is successful, one of two things will happen:
         #
-        # - If we can't parse it, an error description will be yielded and `nil` will be return
+        # - If we can't parse it, an error description will be yielded and `nil` will be returned
         #   (to indicate we couldn't parse it).
         # - If we can parse it, the representation will be returned (and nothing will be yielded).
         def try_parse_representation(representation, schema)
@@ -239,7 +239,7 @@ module ElasticGraph
           # @dynamic type
 
           # Each `RepresentationWithoutId` instance needs to be handled by a separate adapter. We can't
-          # safely combine representations into a single datastore query, so we want each to handled
+          # safely combine representations into a single datastore query, so we want each to be handled
           # by a separate adapter instance. So, we use the representation itself as the adapter.
           def adapter
             self

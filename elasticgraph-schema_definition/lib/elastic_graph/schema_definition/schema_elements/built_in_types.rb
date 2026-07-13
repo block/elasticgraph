@@ -62,7 +62,7 @@ module ElasticGraph
       # : A numeric type for large integer values that can serialize safely as JSON. While JSON
       #   itself has no hard limit on the size of integers, the RFC-7159 spec mentions that
       #   values outside of the range -9,007,199,254,740,991 (-(2^53) + 1) to 9,007,199,254,740,991
-      #   (2^53 - 1) may not be interopable with all JSON implementations. As it turns out, the
+      #   (2^53 - 1) may not be interoperable with all JSON implementations. As it turns out, the
       #   number implementation used by JavaScript has this issue. When you parse a JSON string that
       #   contains a numeric value like `4693522397653681111`, the parsed result will contain a
       #   rounded value like `4693522397653681000`. While this is entirely a client-side problem,
@@ -85,7 +85,7 @@ module ElasticGraph
       # LongString
       # : A numeric type for large integer values in the inclusive range -2^63 (-9,223,372,036,854,775,808)
       #   to (2^63 - 1) (9,223,372,036,854,775,807). Note that `LongString` values are serialized as strings
-      #   within JSON, to avoid interopability problems with JavaScript. If you want a large integer type
+      #   within JSON, to avoid interoperability problems with JavaScript. If you want a large integer type
       #   that serializes within JSON as a number, use `JsonSafeLong`.
       #
       # TimeZone
@@ -419,12 +419,12 @@ module ElasticGraph
           schema_def_api.object_type "GeoLocation" do |t|
             t.documentation "Geographic coordinates representing a location on the Earth's surface."
 
-            # As per the Elasticsearch docs, the field MUST come in named `lat` in Elastisearch (but we want the full name in GraphQL).
+            # As per the Elasticsearch docs, the field MUST come in named `lat` in Elasticsearch (but we want the full name in GraphQL).
             t.field names.latitude, "Float", name_in_index: "lat" do |f|
               f.documentation "Angular distance north or south of the Earth's equator, measured in degrees from -90 to +90."
             end
 
-            # As per the Elasticsearch docs, the field MUST come in named `lon` in Elastisearch (but we want the full name in GraphQL).
+            # As per the Elasticsearch docs, the field MUST come in named `lon` in Elasticsearch (but we want the full name in GraphQL).
             t.field names.longitude, "Float", name_in_index: "lon" do |f|
               f.documentation "Angular distance east or west of the Prime Meridian at Greenwich, UK, measured in degrees from -180 to +180."
             end
@@ -875,7 +875,7 @@ module ElasticGraph
 
               # With our initial implementation of `time_of_day` filtering, it's tricky to support `any_of`/`all_of`/`not` within
               # the `time_of_day: {...}` input object. They are still supported outside of `time_of_day` (on the parent
-              # input object) so no functionality is losts by omitting these. Also, this aligns with our `GeoLocationDistanceFilterInput`
+              # input object) so no functionality is lost by omitting these. Also, this aligns with our `GeoLocationDistanceFilterInput`
               # which is a similarly complex filter where we didn't include them.
               remove_any_of_and_all_of_and_not_filter_operators_on(t)
             end
@@ -955,7 +955,7 @@ module ElasticGraph
 
               While JSON itself has no hard limit on the size of integers, the RFC-7159 spec
               mentions that values outside of the range #{format_number(JSON_SAFE_LONG_MIN)} (-(2^53) + 1)
-              to #{format_number(JSON_SAFE_LONG_MAX)} (2^53 - 1) may not be interopable with all JSON
+              to #{format_number(JSON_SAFE_LONG_MAX)} (2^53 - 1) may not be interoperable with all JSON
               implementations. As it turns out, the number implementation used by JavaScript
               has this issue. When you parse a JSON string that contains a numeric value like
               `4693522397653681111`, the parsed result will contain a rounded value like
@@ -997,7 +997,7 @@ module ElasticGraph
               (#{format_number(LONG_STRING_MIN)}) to (2^63 - 1) (#{format_number(LONG_STRING_MAX)}).
 
               Note that `LongString` values are serialized as strings within JSON, to avoid
-              interopability problems with JavaScript. If you want a large integer type that
+              interoperability problems with JavaScript. If you want a large integer type that
               serializes within JSON as a number, use `JsonSafeLong`.
             EOS
 
@@ -1487,7 +1487,7 @@ module ElasticGraph
         def define_local_time_grouping_arguments(grouping_field)
           define_calendar_type_grouping_arguments(grouping_field, schema_def_state.type_ref("LocalTime"), <<~EOS)
             For example, when grouping by `HOUR`, you can apply an offset of -5 minutes to shift `LocalTime`
-            values to the prior hour when they fall between the the top of an hour and 5 after.
+            values to the prior hour when they fall between the top of an hour and 5 after.
           EOS
         end
 

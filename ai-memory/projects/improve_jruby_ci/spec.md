@@ -12,7 +12,7 @@ JRuby. We would like to close this gap and properly cover it.
 
 A prior attempt at fixing this was done in #1037. However, I'm not satisfied with the solution: it hacks the
 implementation to treat `--daemonize` in a special way to avoid using `fork`. I don't want to complicate the
-implementation just for JRuby. Instead, I'd like to find a way to isolate the JRuby work around to only being
+implementation just for JRuby. Instead, I'd like to find a way to isolate the JRuby workaround to only being
 in the tests. The implementation should stay simple and not branch on the basis of a `--daemonize` flag. However,
 if we need to introduce a seam that the tests can hook into for JRuby, that's fine.
 

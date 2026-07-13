@@ -69,7 +69,7 @@ module ElasticGraph
         expect(encode(data, validate_roundtrip: false)).to eq('{"2":"d","3":"b","a":1}')
       end
 
-      # This helper method enforces  an invariant: parsing the resulting JSON string
+      # This helper method enforces an invariant: parsing the resulting JSON string
       # should always produce the original value
       def encode(original_value, validate_roundtrip: true)
         UntypedEncoder.encode(original_value).tap do |prepared_value|

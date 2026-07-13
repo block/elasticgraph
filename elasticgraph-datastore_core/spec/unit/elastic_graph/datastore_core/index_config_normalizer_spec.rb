@@ -92,7 +92,7 @@ module ElasticGraph
         end
       end
 
-      it "drops `type: object` when it is along side `properties` since the datastore treats that as the default type when `properties` are used and omits it" do
+      it "drops `type: object` when it is alongside `properties` since the datastore treats that as the default type when `properties` are used and omits it" do
         index_config = {
           "mappings" => {
             "type" => "object",

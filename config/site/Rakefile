@@ -169,7 +169,7 @@ module ElasticGraph
 
           Dir.chdir(YARD_OUTPUT_DIR) do
             # --no-xattrs is necessary to ensure that apple-specific attributes are excluded from the archive.
-            # When unpacking the archives on linux system, it produces warnings if we allow apple's extended
+            # When unpacking the archives on a linux system, it produces warnings if we allow apple's extended
             # attributes to be included.
             sh "tar --no-xattrs -czf #{archive_path} ."
           end
@@ -330,7 +330,7 @@ module ElasticGraph
           # Check each page to make sure the frontmatter specifies a `permalink`. This matters because it ensures consistent behavior
           # when serving the site locally (e.g. for development) and on GitHub pages. We've discovered that when serving the site locally
           # through jekyll, the server is more "forgiving" than GitHub pages. For example, the local server served `search.html` from
-          # `/search/` and `/search`, but on GitHub pages it only served from `/search`.Requiring a permalink set on each page forces us
+          # `/search/` and `/search`, but on GitHub pages it only served from `/search`. Requiring a permalink set on each page forces us
           # to explicitly pick what URL the page is served from, and will help ensure consistent behavior between local development and
           # GitHub pages.
           failed_pages = pages.filter_map do |page|
@@ -620,7 +620,7 @@ module ElasticGraph
       end
     end
 
-    # Yard doesn't allow us to suppress warnings. Warnings are for code constructs its not able to understand, and sometimes we're ok
+    # Yard doesn't allow us to suppress warnings. Warnings are for code constructs it's not able to understand, and sometimes we're ok
     # with that (e.g. when the alternative is making the code worse or more verbose). Here we suppress warnings using custom logic:
     # we filter out specific warnings that we don't want to be notified about.
     YARD_WARNINGS_TO_IGNORE = {

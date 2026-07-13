@@ -40,7 +40,7 @@ RSpec.shared_context "lambda function" do |config_overrides_in_yaml: {}|
   def expect_loading_lambda_to_define_constant(lambda:, const:)
     expect(::Object.const_defined?(const)).to be false
 
-    # Loading the lambda function mutates are global set of constants. To isolate our tests,
+    # Loading the lambda function mutates our global set of constants. To isolate our tests,
     # we load it in a sub process--that keeps the parent test process "clean", helping to
     # prevent order-dependent test results.
     new_constants = in_sub_process do

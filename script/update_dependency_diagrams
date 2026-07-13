@@ -96,7 +96,7 @@ module ElasticGraph
         if DIAGRAM_SECTION_REGEX.match?(actual_content)
           actual_content.split(DIAGRAM_SECTION_REGEX)[0].to_s
         else
-          # THe README does nto already have a diagram section. We consider all content before the first "## " line to be the intro.
+          # The README does not already have a diagram section. We consider all content before the first "## " line to be the intro.
           actual_content.lines.take_while { |line| !line.start_with?("## ") }.join
         end.strip
     end
@@ -106,7 +106,7 @@ module ElasticGraph
         if DIAGRAM_SECTION_REGEX.match?(actual_content)
           actual_content.split(DIAGRAM_SECTION_REGEX)[1].to_s
         else
-          # THe README does nto already have a diagram section. We consider all content starting from the "## " line to be the rest.
+          # The README does not already have a diagram section. We consider all content starting from the "## " line to be the rest.
           actual_content.lines.drop_while { |line| !line.start_with?("## ") }.join
         end.strip
     end
@@ -247,7 +247,7 @@ module ElasticGraph
       EOS
 
       "lambda" => new("AWS Lambda Integration Libraries", <<~EOS)
-        These libraries wrap the the core ElasticGraph libraries so that they can be deployed using AWS Lambda.
+        These libraries wrap the core ElasticGraph libraries so that they can be deployed using AWS Lambda.
       EOS
     }
   end

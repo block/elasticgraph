@@ -20,7 +20,7 @@ permissions:
 jobs:
   release:
     name: Release Gems
-    # Limit who can run run this action to admins.
+    # Limit who can run this action to admins.
     if: github.repository == 'block/elasticgraph' && contains('["myronmarston", "bsorbo"]', github.actor)
     runs-on: ubuntu-latest
 

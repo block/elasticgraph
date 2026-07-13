@@ -1912,7 +1912,7 @@ module ElasticGraph
             .except(SELF_RELATIONSHIP_NAME)
         end
 
-        # Asserts the full nested `UpdateTarget` `StatLine` events produce for `Team`, with defaults for the
+        # Asserts the full nested `UpdateTarget` that `StatLine` events produce for `Team`, with defaults for the
         # common `nested_sourced_from_schema` case so each test overrides only the attributes it exercises.
         def expect_statline_update_target_with(
           metadata,

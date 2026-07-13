@@ -50,7 +50,7 @@ module ElasticGraph
         })
       end
 
-      it "raises an error when same mapping field is defined twice with different mapping types" do
+      it "raises an error when the same mapping field is defined twice with different mapping types" do
         expect {
           index_mapping_for "cards" do |s|
             s.object_type "Card" do |t|

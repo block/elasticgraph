@@ -97,11 +97,11 @@ module ElasticGraph
       end
 
       # To make the recency query more optimal, we filter on the timestamp field. This can provide
-      # a couple optimizations:
+      # a couple of optimizations:
       #
-      # - If its a rollover index and the timestamp is the field we use for rollover, this allows
+      # - If it's a rollover index and the timestamp is the field we use for rollover, this allows
       #   the ElasticGraph query engine to hit only a subset of indices for better perf.
-      # - We've been told (by AWS support) that sorting a larger result set if more expensive than
+      # - We've been told (by AWS support) that sorting a larger result set is more expensive than
       #   a small result set (presumably larger than filtering cost) so even if we can't limit what
       #   indices we hit with this, it should still be helpful.
       #

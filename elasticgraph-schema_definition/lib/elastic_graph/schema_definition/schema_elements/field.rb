@@ -487,7 +487,7 @@ module ElasticGraph
         # support filtering, grouping, sorting, or aggregating data on a field from a related object.
         #
         # @param relationship [String] name of a relationship defined with {TypeWithSubfields#relates_to_one} using an inbound foreign key
-        #   which contains the the field you wish to source values from
+        #   which contains the field you wish to source values from
         # @param field_path [String] dot-separated path to the field on the related type containing values that should be copied to this
         #   field
         # @return [void]
@@ -636,10 +636,10 @@ module ElasticGraph
 
           # Elasticsearch/OpenSearch do not support sorting text fields:
           # > Text fields are not used for sorting...
-          # (from https://www.elastic.co/guide/en/elasticsearch/reference/current/the datastore.html#text)
+          # (from https://www.elastic.co/docs/reference/elasticsearch/mapping-reference/text)
           return false if text?
 
-          # If the type uses custom mapping type we don't know how if the datastore can sort by it, so we assume it's not sortable.
+          # If the type uses custom mapping type we don't know if the datastore can sort by it, so we assume it's not sortable.
           return false if type.as_object_type&.has_custom_mapping_type?
 
           # Default every other field to being sortable.
@@ -1063,7 +1063,7 @@ module ElasticGraph
           # confidence of these.
           medium: 2,
 
-          # :low is assigned to the ElastcField inferred for the foreign key of an inbound relation. The
+          # :low is assigned to the `Field` inferred for the foreign key of an inbound relation. The
           # nullability/cardinality of the foreign key field cannot be known from the relation metadata,
           # so we just guess what seems safest (`[:nullable]`). If the field is defined another way
           # we should prefer it, so we give these fields :low confidence.

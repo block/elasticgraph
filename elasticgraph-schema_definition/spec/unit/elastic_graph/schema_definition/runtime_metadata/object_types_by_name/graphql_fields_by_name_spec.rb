@@ -99,7 +99,7 @@ module ElasticGraph
         )
       end
 
-      it "raises an error when an object field field lacks a resolver, as it won't be resolvable by elasticgraph-graphql" do
+      it "raises an error when an object field lacks a resolver, as it won't be resolvable by elasticgraph-graphql" do
         expect {
           object_type_metadata_for "Widget" do |s|
             s.object_type "Widget" do |t|
@@ -235,7 +235,7 @@ module ElasticGraph
         end
       end
 
-      it "dumps the `name_in_index: #{LIST_COUNTS_FIELD}` for all `*ListFilterInput` and `*FieldsListFilterInput` types so that our filter interpreter knows that its for the special `#{LIST_COUNTS_FIELD}` field" do
+      it "dumps the `name_in_index: #{LIST_COUNTS_FIELD}` for all `*ListFilterInput` and `*FieldsListFilterInput` types so that our filter interpreter knows that it's for the special `#{LIST_COUNTS_FIELD}` field" do
         results = define_schema do |schema|
           schema.enum_type "Color" do |t|
             t.values "RED", "GREEN", "BLUE"

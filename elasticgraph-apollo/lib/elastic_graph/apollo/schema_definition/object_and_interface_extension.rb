@@ -38,7 +38,7 @@ module ElasticGraph
         # @param id_field_name_in_index [String] Name of the backing ID field in the datastore index
         # @return [void]
         # @note This can be used for either a singleton or list reference, based on if `type` is a list.
-        # @note The resulting field will be only be available for clients to request as a return field. It will not support filtering,
+        # @note The resulting field will only be available for clients to request as a return field. It will not support filtering,
         #   sorting, grouping, aggregated values, or highlights.
         # @see #apollo_entity_ref_paginated_collection_field
         #
@@ -115,7 +115,7 @@ module ElasticGraph
         # @param id_field_name_in_index [String] Name of the backing ID field in the datastore index
         # @return [void]
         # @note This requires `id_field_name_in_index` to be a list or paginated collection field.
-        # @note The resulting field will be only be available for clients to request as a return field. It will not support filtering,
+        # @note The resulting field will only be available for clients to request as a return field. It will not support filtering,
         #   sorting, grouping, aggregated values, or highlights.
         # @see #apollo_entity_ref_field
         # @see ElasticGraph::SchemaDefinition::SchemaElements::TypeWithSubfields#paginated_collection_field

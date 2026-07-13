@@ -56,7 +56,7 @@ module ElasticGraph
         widget(nil, nil, "USD", name: nil, options: nil, tags: [], created_at: "2023-11-07T10:30:00.000Z"), # ...as should nil parent objects
         widget("MEDIUM", "GREEN", nil, name: "foo3", tags: ["z12"]), # ...as should events with `nil` for the derived indexing type id
         widget("MEDIUM", "GREEN", "", name: "foo3", tags: ["z12"]), # ...as should events with empty string for the derived indexing type id
-        widget("SMALL", "RED", "USD", name: "", tags: ["g8"], created_at: "2023-11-08T10:30:00.000Z") # but empty string values can be put in the set. It's odd but seems more correct then not allowing it.
+        widget("SMALL", "RED", "USD", name: "", tags: ["g8"], created_at: "2023-11-08T10:30:00.000Z") # but empty string values can be put in the set. It's odd but seems more correct than not allowing it.
       )
 
       expect_payload_from_lookup_and_search({
@@ -143,7 +143,7 @@ module ElasticGraph
     end
 
     describe "`immutable_value` fields" do
-      it "does not allow it change value" do
+      it "does not allow it to change value" do
         index_records(
           widget("LARGE", "RED", "USD", cost_currency_name: "United States Dollar", cost_currency_unit: "dollars", cost_currency_symbol: "$")
         )

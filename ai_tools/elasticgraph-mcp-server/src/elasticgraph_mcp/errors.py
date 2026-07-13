@@ -29,7 +29,7 @@ def create_command_error(
     data: dict[str, Any] | None = None,
 ) -> McpError:
     """
-    Create a McpError with command execution details.
+    Create an McpError with command execution details.
 
     Args:
         message: Human-readable error message
@@ -76,7 +76,7 @@ def create_command_error(
 
 def create_not_in_project_error(details: str | None = None) -> McpError:
     """
-    Create a McpError indicating not in an ElasticGraph project directory.
+    Create an McpError indicating not in an ElasticGraph project directory.
 
     Args:
         details: Optional additional error details

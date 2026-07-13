@@ -103,7 +103,7 @@ module ElasticGraph
           @schema.type_from(@graphql_type.of_type)
         end
 
-        # Fully unwraps this type, in order to extracts the underlying type (an object or scalar)
+        # Fully unwraps this type, in order to extract the underlying type (an object or scalar)
         # from its wrappings. As needed, this will unwrap any of these wrappings:
         #
         #   - non-null

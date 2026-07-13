@@ -53,7 +53,7 @@ module ElasticGraph
       # Builds a `GraphQL::Query` object for the given query string, and validates that it is
       # an allowed query. Returns a list of registry validation errors in addition to the built
       # query object. The list of validation errors will be empty if the query should be allowed.
-      # A query can be allowed either by virtue of being registered for usage by the given clent,
+      # A query can be allowed either by virtue of being registered for usage by the given client,
       # or by being for a completely unregistered client (if `allow_unregistered_clients` is `true`).
       #
       # This is also tolerant of some minimal differences in the query string (such as comments

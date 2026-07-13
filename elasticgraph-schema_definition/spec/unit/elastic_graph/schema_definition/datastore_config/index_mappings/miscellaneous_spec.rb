@@ -52,7 +52,7 @@ module ElasticGraph
         #   dynamic: strict
         #
         # In the latter case, `dynamic: strict` is pushed way down in the YAML file where it's less
-        # clear what index it applies to. Since `dynamic: string` is always a one-liner in the YAML
+        # clear what index it applies to. Since `dynamic: strict` is always a one-liner in the YAML
         # while `properties` can have many lines, it's helpful to put `dynamic` first.
         expect(mapping.keys).to eq %w[dynamic properties]
       end
@@ -68,7 +68,7 @@ module ElasticGraph
         expect(mapping).to include("dynamic" => "strict")
       end
 
-      it "set runtime script which will include the runtime fields" do
+      it "sets a runtime script which will include the runtime fields" do
         mapping = index_mapping_for "my_type" do |s|
           s.object_type "MyType" do |t|
             t.field "id", "ID" do |f|

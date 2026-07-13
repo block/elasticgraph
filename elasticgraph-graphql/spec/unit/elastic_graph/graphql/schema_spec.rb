@@ -147,7 +147,7 @@ module ElasticGraph
           )
         end
 
-        it "raises an exception if given an unrecognizd index name" do
+        it "raises an exception if given an unrecognized index name" do
           schema = schema_with_indices("Person" => "people", "Widget" => "widgets")
 
           expect {

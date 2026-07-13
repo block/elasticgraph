@@ -257,7 +257,7 @@ module ElasticGraph
           let(:cluster_names) { ["other2"] }
 
           # The situation here is that only "other2" is an accessible cluster. The healthcheck is configured to check "main". The
-          # Widget type references "main" as an "query" cluster - health_checker should not claim "main" is unrecognized.
+          # Widget type references "main" as a "query" cluster - health_checker should not claim "main" is unrecognized.
           it "uses query clusters on indexing definitions for recognizing clusters" do
             expect {
               health_checker = build_health_checker(
@@ -288,7 +288,7 @@ module ElasticGraph
               "1 cluster(s) were unavailable for health-checking", "main")
           end
 
-          # The state here is only "other2" is an accessible cluster. The cluster health check is configured to check "main". The
+          # The state here is that only "other2" is an accessible cluster. The cluster health check is configured to check "main". The
           # Widget type references "main" as an "index_into" cluster - health_checker should not claim "main" is unrecognized.
           it "uses index_into clusters on indexing definitions for recognizing clusters" do
             expect {
@@ -489,7 +489,7 @@ module ElasticGraph
       def build_msearch_response(request, latest_record_by_type)
         # Our query logic generates a payload with a mixture of string and symbol keys
         # (it doesn't matter to the datastore since it serializes in JSON the same).
-        # Here we do not want to be mix and match (or be coupled to the current key form
+        # Here we do not want to mix and match (or be coupled to the current key form
         # being used) so we normalize to string keys here.
         normalized_request = Support::HashUtil.stringify_keys(request)
 

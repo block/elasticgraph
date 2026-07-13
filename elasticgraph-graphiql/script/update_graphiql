@@ -172,7 +172,7 @@ Dir.mktmpdir("graphiql_build") do |temp_dir|
 
   # Record the GraphiQL git ref we used so there's a record of it.
   ::File.write(::File.expand_path("../assets_info.md", TARGET_ASSETS_TARBALL_PATH), <<~EOS)
-    The `assets.tar.gz` tarball was built using the `elasticgraph-graphiql/scripts/update_graphiql` script, which
+    The `assets.tar.gz` tarball was built using the `elasticgraph-graphiql/script/update_graphiql` script, which
     also updates this file.
 
     It was last run using git ref `#{git_ref}` and it sourced GraphiQL from:

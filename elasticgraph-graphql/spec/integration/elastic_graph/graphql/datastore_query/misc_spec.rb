@@ -75,7 +75,7 @@ module ElasticGraph
             end
           }.to raise_error(Errors::RequestExceededDeadlineError, a_string_including("request exceeded timeout"))
             # Really it should take ~50 ms, but give extra time for ruby VM overhead.
-            # On CI we've seen it take 1000-1100 ms but never move than that. Meanwhile,
+            # On CI we've seen it take 1000-1100 ms but never more than that. Meanwhile,
             # without the `monotonic_clock_deadline:` arg, the query takes 3-4 seconds, so
             # it taking under 1200 ms still demonstrates the query is being aborted early.
             .and take_less_than(1200).milliseconds

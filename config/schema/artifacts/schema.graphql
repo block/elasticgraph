@@ -2660,7 +2660,7 @@ type DateTimeGroupedBy {
     Amount of offset (positive or negative) to shift the `LocalTime` boundaries of each grouping bucket.
 
     For example, when grouping by `HOUR`, you can apply an offset of -5 minutes to shift `LocalTime`
-    values to the prior hour when they fall between the the top of an hour and 5 after.
+    values to the prior hour when they fall between the top of an hour and 5 after.
     """
     offset: LocalTimeGroupingOffsetInput
 
@@ -5117,7 +5117,7 @@ A numeric type for large integer values that can serialize safely as JSON.
 
 While JSON itself has no hard limit on the size of integers, the RFC-7159 spec
 mentions that values outside of the range -9,007,199,254,740,991 (-(2^53) + 1)
-to 9,007,199,254,740,991 (2^53 - 1) may not be interopable with all JSON
+to 9,007,199,254,740,991 (2^53 - 1) may not be interoperable with all JSON
 implementations. As it turns out, the number implementation used by JavaScript
 has this issue. When you parse a JSON string that contains a numeric value like
 `4693522397653681111`, the parsed result will contain a rounded value like
@@ -5573,7 +5573,7 @@ A numeric type for large integer values in the inclusive range -2^63
 (-9,223,372,036,854,775,808) to (2^63 - 1) (9,223,372,036,854,775,807).
 
 Note that `LongString` values are serialized as strings within JSON, to avoid
-interopability problems with JavaScript. If you want a large integer type that
+interoperability problems with JavaScript. If you want a large integer type that
 serializes within JSON as a number, use `JsonSafeLong`.
 """
 scalar LongString

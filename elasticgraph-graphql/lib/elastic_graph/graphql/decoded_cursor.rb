@@ -90,8 +90,8 @@ module ElasticGraph
 
           if sort_fields.uniq.size < sort_fields.size
             raise Errors::InvalidSortFieldsError,
-              "Given `sort_list` contains a duplicate field, which the CursorEncoder cannot handler. " \
-              "The caller is responsible for de-duplicating the sort list fist. Got: #{sort_list.inspect}"
+              "Given `sort_list` contains a duplicate field, which the CursorEncoder cannot handle. " \
+              "The caller is responsible for de-duplicating the sort list first. Got: #{sort_list.inspect}"
           end
 
           new(sort_fields)

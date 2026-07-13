@@ -49,7 +49,7 @@ module ElasticGraphProfiler
       count = durations.count
       max_result = results_for_id.max_by { |h| h.fetch(:duration) }
 
-      # Identify where in the spec this method was called--preferrably
+      # Identify where in the spec this method was called--preferably
       # from a spec file itself, but if we can't find it there, a support
       # file in the spec directory is also OK.
       callsite = max_result.fetch(:caller_frames).find do |line|

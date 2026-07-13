@@ -63,7 +63,7 @@ module ElasticGraph
 
     # Exposes the datastore index definitions as a map, keyed by GraphQL type.
     # Note: the GraphQL type name is also used in non-GraphQL contexts (e.g. it is
-    # used in events processed by elasticgraph-indexer), so we expose this hear instead
+    # used in events processed by elasticgraph-indexer), so we expose this here instead
     # of from elasticgraph-graphql.
     def index_definitions_by_graphql_type
       @index_definitions_by_graphql_type ||= schema_artifacts

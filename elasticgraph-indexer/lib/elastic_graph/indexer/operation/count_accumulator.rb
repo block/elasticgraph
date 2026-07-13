@@ -103,7 +103,7 @@ module ElasticGraph
           new(initial_counts, nil, path_from_root, mapping, list_counts_field_paths_for_source, false)
         end
 
-        # Processes the given hash, beginning a new parent if need. A new parent is needed if the
+        # Processes the given hash, beginning a new parent if needed. A new parent is needed if the
         # current mapping has a `__counts` field.
         #
         # Yields repeatedly (once per hash entry). We yield the entry key/value, and an accumulator
@@ -114,7 +114,7 @@ module ElasticGraph
           mapping_type = mapping["type"]
 
           # As we traverse through the JSON object structure, we also have to traverse through the
-          # condenseed mapping. Doing this requires that the `properties` of the index mapping
+          # condensed mapping. Doing this requires that the `properties` of the index mapping
           # match the fields of the JSON data structure. However, Elasticsearch/OpenSearch have a number of field
           # types which can be represented as a JSON object in an indexing call, but which have no
           # `properties` in the mapping. We can't successfully traverse through the JSON data and the
@@ -123,7 +123,7 @@ module ElasticGraph
           # have any lists to count, anyway.
           return hash if DATASTORE_PROPERTYLESS_OBJECT_TYPES.include?(mapping_type)
 
-          # THe `nested` type indicates a new document level, so if it's not `nested`, we should process the hash without making a new parent.
+          # The `nested` type indicates a new document level, so if it's not `nested`, we should process the hash without making a new parent.
           return hash.to_h { |key, value| yield key, value, self } unless mapping_type == "nested"
 
           # ...but otherwise, we should make a new parent.

@@ -42,7 +42,7 @@ The other parts of ElasticGraph depend on and use this gem automatically. Here's
 require "elastic_graph/datastore_core"
 
 datastore_core = ElasticGraph::DatastoreCore.from_yaml_file("config/settings/local.yaml")
-datastore_core.index_definitions_by_name # Hash of index definitition objects, keyed by index name
-datastore_core.index_definitions_by_graphql_type # Hash of index definitition objects, keyed by GraphQL type name
+datastore_core.index_definitions_by_name # Hash of index definition objects, keyed by index name
+datastore_core.index_definitions_by_graphql_type # Hash of index definition objects, keyed by GraphQL type name
 datastore_core.clients_by_name # Hash of datastore clients, keyed by name
 ```

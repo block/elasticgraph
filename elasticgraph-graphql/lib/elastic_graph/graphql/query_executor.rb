@@ -30,7 +30,7 @@ module ElasticGraph
       # is exceeded, `Errors::RequestExceededDeadlineError` will be raised. Note that `timeout_in_ms`
       # does not provide an absolute guarantee that the query will take no longer than the
       # provided value; it is only used to halt datastore queries. In process computation
-      # can make the total query time exceeded the specified timeout.
+      # can make the total query time exceed the specified timeout.
       #
       # `context` is merged into the context hash passed to the resolvers.
       def execute(

@@ -45,7 +45,7 @@ module ElasticGraph
       # ActiveSupport (from rails) provides this functionality, but we don't depend on rails at all and don't
       # want to add such a heavyweight dependency for such a small thing.
       #
-      # Luckily, our needs are quite limited, which makes this a much simpler problem then a general purpose `time.advance(...)` API:
+      # Luckily, our needs are quite limited, which makes this a much simpler problem than a general purpose `time.advance(...)` API:
       #
       # - We only need to support year, month, day, and hour advances.
       # - We only ever need to advance a single unit.

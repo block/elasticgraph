@@ -8,7 +8,7 @@
 
 require "elastic_graph/schema_definition/test_support"
 
-# Combines `:capture_logs` with `ElasicGraph::SchemaDefinition::TestSupport` in order
+# Combines `:capture_logs` with `ElasticGraph::SchemaDefinition::TestSupport` in order
 # to silence log output and fail if any tests result in logged warnings.
 ::RSpec.shared_context "SchemaDefinitionHelpers", :capture_logs do
   include ::ElasticGraph::SchemaDefinition::TestSupport

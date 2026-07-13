@@ -18,7 +18,7 @@ module ElasticGraph
     # - The frozen string literal magic comment.
     #
     # The latter can have significant performance benefits, but standardrb (our linter) doesn't enforce it or
-    # allow you to enforce it with the standard Rubucop Cop--so we are including it here.
+    # allow you to enforce it with the standard RuboCop Cop--so we are including it here.
     #
     # For further discussion, see:
     # https://github.com/standardrb/standard/pull/181

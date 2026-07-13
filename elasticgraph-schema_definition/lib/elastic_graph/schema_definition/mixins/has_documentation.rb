@@ -56,7 +56,7 @@ module ElasticGraph
           %("""\n#{comment.chomp}\n"""\n)
         end
 
-        # Generates a documentation string that is derived from the schema elements existing documentation.
+        # Generates a documentation string that is derived from the schema element's existing documentation.
         #
         # @param intro [String] string that goes before the schema element's existing documentation
         # @param outro [String, nil] string that goes after the schema element's existing documentation

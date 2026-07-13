@@ -180,20 +180,20 @@ ElasticGraph.define_schema do |schema|
     t.field "id", "ID!"
     t.relates_to_many "teams", "Team", via: "country_code", dir: :in, singular: "team"
 
-    # :nocov: -- only one side of these conditionals is executed in our test suite (but both both are covered by rake tasks)
+    # :nocov: -- only one side of these conditionals is executed in our test suite (but both are covered by rake tasks)
     t.apollo_key fields: "id" if t.respond_to?(:apollo_key)
     # :nocov:
 
     # Note: we use `paginated_collection_field` here in order to exercise a case with the Apollo entity resolver and
     # a paginated collection field, which initially yielded an exception.
     t.paginated_collection_field "names", "String" do |f|
-      # :nocov: -- only one side of these conditionals is executed in our test suite (but both both are covered by rake tasks)
+      # :nocov: -- only one side of these conditionals is executed in our test suite (but both are covered by rake tasks)
       f.apollo_external if f.respond_to?(:apollo_external)
       # :nocov:
     end
 
     t.field "currency", "String" do |f|
-      # :nocov: -- only one side of these conditionals is executed in our test suite (but both both are covered by rake tasks)
+      # :nocov: -- only one side of these conditionals is executed in our test suite (but both are covered by rake tasks)
       f.apollo_external if f.respond_to?(:apollo_external)
       # :nocov:
     end

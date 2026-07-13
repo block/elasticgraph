@@ -37,7 +37,7 @@ module ElasticGraph
             # Store a reference to our wrapped data class so we can use it in `ClassMethods` below.
             const_set(:DATA_CLASS, data_class)
 
-            # Define default version of` after_initialize`. This is a hook that a user may override.
+            # Define default version of `after_initialize`. This is a hook that a user may override.
             # standard:disable Lint/NestedMethodDefinition
             private def after_initialize
             end
@@ -48,7 +48,7 @@ module ElasticGraph
               original_initialize = instance_method(:initialize)
               module_eval(&block)
 
-              # It's useful for the caller to be define `initialize` in order to provide field defaults, as
+              # It's useful for the caller to define `initialize` in order to provide field defaults, as
               # shown in the `Data` docs:
               #
               # https://rubyapi.org/3.4/o/data

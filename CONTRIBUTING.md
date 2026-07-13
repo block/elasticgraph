@@ -273,7 +273,7 @@ Next, implement the logic to translate from GraphQL to the appropriate datastore
     [ElasticGraph::GraphQL::Aggregation](https://github.com/block/elasticgraph/tree/main/elasticgraph-graphql/lib/elastic_graph/graphql/aggregation) module:
     * [ElasticGraph::GraphQL::Aggregation::Query](https://github.com/block/elasticgraph/blob/main/elasticgraph-graphql/lib/elastic_graph/graphql/aggregation/query.rb)
       models an aggregation query.
-    * [ElasticGraph::GraphQL:::Aggregation::QueryAdapter](https://github.com/block/elasticgraph/blob/main/elasticgraph-graphql/lib/elastic_graph/graphql/aggregation/query_adapter.rb)
+    * [ElasticGraph::GraphQL::Aggregation::QueryAdapter](https://github.com/block/elasticgraph/blob/main/elasticgraph-graphql/lib/elastic_graph/graphql/aggregation/query_adapter.rb)
       is responsible for building an `ElasticGraph::GraphQL::Aggregation::Query` from the GraphQL query AST.
     * The [ElasticGraph::GraphQL::Aggregation::Resolvers module](https://github.com/block/elasticgraph/tree/main/elasticgraph-graphql/lib/elastic_graph/graphql/aggregation/resolvers)
       is responsible for resolving GraphQL aggregation fields by extracting values from the datastore response.

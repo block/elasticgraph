@@ -34,7 +34,7 @@ module ElasticGraph
       # Defaults to `false` since it requires a plugin.
       #
       # @note Enabling this requires the [mapper-size plugin](https://www.elastic.co/guide/en/elasticsearch/plugins/8.15/mapper-size.html)
-      #   to be installed on your datastore cluster. You are responsible for ensuring that is installed if you enable this feature. If you
+      #   to be installed on your datastore cluster. You are responsible for ensuring that it is installed if you enable this feature. If you
       #   enable this and the plugin is not installed, you will get errors!
       #
       # @return [Boolean] whether or not the `_size` field should be indexed on each indexed type
@@ -93,7 +93,7 @@ module ElasticGraph
       attr_accessor :schema_element_name_overrides
 
       # Overrides for the naming formats used by ElasticGraph for derived GraphQL type names. For example, to use `Metrics` instead of
-      # `AggregatedValues` as the suffix for the generated types supporting getting aggregated metrid values, set to
+      # `AggregatedValues` as the suffix for the generated types supporting getting aggregated metric values, set to
       # `{AggregatedValues: "%{base}Metrics"}`. See {SchemaDefinition::SchemaElements::TypeNamer::DEFAULT_FORMATS} for the available
       # formats.
       #
@@ -214,7 +214,7 @@ module ElasticGraph
       attr_accessor :schema_definition_extension_modules
 
       # List of Elasticsearch versions you want to be able to boot. Rake tasks will be defined for each version to support booting and
-      # halting Elasticsearch locally. If the configuration of `local_config_yaml` only configures `opensearch` as a cluster backend,
+      # halting Elasticsearch locally. If the configuration of `local_config_yaml` only configures `opensearch` as a cluster backend, it
       # will default to an empty array. Otherwise, defaults to the versions of Elasticsearch that are exercised by the ElasticGraph test suite, as
       # defined by `lib/elastic_graph/local/tested_datastore_versions.yaml`:
       #
@@ -235,7 +235,7 @@ module ElasticGraph
       attr_accessor :elasticsearch_versions
 
       # List of OpenSearch versions you want to be able to boot. Rake tasks will be defined for each version to support booting and
-      # halting OpenSearch locally. If the configuration of `local_config_yaml` only configures `elasticsearch` as a cluster backend,
+      # halting OpenSearch locally. If the configuration of `local_config_yaml` only configures `elasticsearch` as a cluster backend, it
       # will default to an empty array. Otherwise, defaults to the versions of OpenSearch that are exercised by the ElasticGraph test suite, as
       # defined by `lib/elastic_graph/local/tested_datastore_versions.yaml`:
       #
@@ -299,7 +299,7 @@ module ElasticGraph
       # @private
       VALID_PORT_RANGE = 1024..(49151 - UI_PORT_OFFSET)
 
-      # Register a callback for use when indexing a batch fake data. An `index_fake_data:[type]` rake task will be generated for each
+      # Register a callback for use when indexing a batch of fake data. An `index_fake_data:[type]` rake task will be generated for each
       # registered callback.
       #
       # @param type [Symbol] type of data batch. Can be the name of a GraphQL type or any other name you want to give a batch of fake data

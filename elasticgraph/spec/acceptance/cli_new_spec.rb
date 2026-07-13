@@ -73,7 +73,7 @@ module ElasticGraph
         # as ERB. This would catch it.
         expect(all_committed_code_in("musical_artists1")).to exclude("<%", "%>")
 
-        # Verify that the only TODO comments in the project comte from our template, not from our generated artifacts.
+        # Verify that the only TODO comments in the project come from our template, not from our generated artifacts.
         expect(todo_comments_in("musical_artists1").join("\n")).to eq(todo_comments_in(CLI.source_root).join("\n"))
       end
     end
@@ -191,7 +191,7 @@ module ElasticGraph
     # yet been released (but are available locally, and will be in the next release).
     #
     # Here we hook into the call to `ElasticGraph.setup_env` in order to override its
-    # `gemfile_elasticgraph_details_code_snippet`, to force it to use oru local gems.
+    # `gemfile_elasticgraph_details_code_snippet`, to force it to use our local gems.
     def override_gemfile_to_use_local_elasticgraph_gems
       with_env "ELASTICGRAPH_GEMS_PATH" => CommonSpecHelpers::REPO_ROOT do
         yield

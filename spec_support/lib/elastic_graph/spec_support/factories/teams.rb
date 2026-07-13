@@ -11,7 +11,7 @@ require "time"
 
 # Note: it is *essential* that all factories defined here generate records
 # deterministically, in order for the request bodies to (and responses from)
-# the dataastore to not change between VCR cassettes being recorded and replayed.
+# the datastore to not change between VCR cassettes being recorded and replayed.
 
 # Note: in our JSON Schema, `__typename` is defined for ALL object types but is only _required_ on abstract object types
 # (e.g. for type unions or interfaces). However, clients that publish using egpublisher always include it on every object

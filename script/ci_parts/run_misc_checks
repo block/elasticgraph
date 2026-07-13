@@ -20,12 +20,12 @@ bundle exec rake schema_artifacts:check VERBOSE=true
 bundle exec rake "index_fake_data:widgets[1]"
 bundle exec rspec config/linting
 
-# Validate the website. We get frozen string errors form liquid if we leave
+# Validate the website. We get frozen string errors from liquid if we leave
 # frozen string literals enabled, so we have to disable them here.
 RUBYOPT=--disable-frozen-string-literal bundle exec rake site:validate
 
 # The apollo compatibility tests boot docker containers and need all the resources we can provide them.
-# There does not appear to be enough resources on GitHub Actions for them to run while the the datastore
+# There does not appear to be enough resources on GitHub Actions for them to run while the datastore
 # docker container is still running, so we halt it before running the compatibility tests.
 halt_datastore_daemon
 

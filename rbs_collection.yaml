@@ -48,7 +48,7 @@ gems:
     ignore: false
 
   # We must ignore all ElasticGraph gems because they are declared as dependencies with
-  # bundler and `rbs collection install` pulls them in. But they they are _also_ directly
+  # bundler and `rbs collection install` pulls them in. But they are _also_ directly
   # available in this codebase and steep complains about duplicate definitions.
   - name: elasticgraph-admin
     ignore: true

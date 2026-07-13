@@ -76,7 +76,7 @@ module ElasticGraph
         end
 
         describe "#revert_override_for" do
-          it "echoes back the given name if it has not and overridden name" do
+          it "echoes back the given name if it has no overridden name" do
             namer = TypeNamer.new
 
             expect(namer.revert_override_for("SomeName")).to eq "SomeName"
@@ -151,7 +151,7 @@ module ElasticGraph
               )
             end
 
-            it "raises a clear error when its includes an unknown placeholder" do
+            it "raises a clear error when it includes an unknown placeholder" do
               expect_instantiation_config_error(
                 %(1. The #{format_name} format "#{default_format}Alt%{extra1}%{extra2}" has excess placeholders: extra1, extra2. Example valid format: "#{default_format}".),
                 format_name => "#{default_format}Alt%{extra1}%{extra2}"
@@ -199,7 +199,7 @@ module ElasticGraph
                 expect(namer.extract_base_from("Invalid", format: format_name)).to eq nil
               end
             else
-              it "raises a clear error indicating this format does not support base extraction since it's format is not limited to a single `base` parameter" do
+              it "raises a clear error indicating this format does not support base extraction since its format is not limited to a single `base` parameter" do
                 namer = TypeNamer.new
                 name = namer.generate_name_for(format_name, **valid_args)
 

@@ -10,7 +10,7 @@ module ElasticGraph
   class GraphQL
     module Aggregation
       # The CompositeAggregationAdapter and NonCompositeAggregationAdapter deal with the same requests and responses
-      # when no groupign is involved, so we can use shared examples for those cases.
+      # when no grouping is involved, so we can use shared examples for those cases.
       RSpec.shared_examples_for "ungrouped sub-aggregations" do
         it "resolves all `page_info` fields on ungrouped sub-aggregations" do
           aggs = {
@@ -307,7 +307,7 @@ module ElasticGraph
           }]
         end
 
-        it "treats an empty filter treating as `true`" do
+        it "treats an empty filter as `true`" do
           aggs = {
             "target:seasons_nested" => {"doc_count" => 423, "meta" => outer_meta}
           }

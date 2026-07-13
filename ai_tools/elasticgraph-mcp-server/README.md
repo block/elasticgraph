@@ -44,7 +44,7 @@ Add a development build to Goose:
 
 1. In Goose, navigate to **Settings > Extensions > Add**.
 2. Set **Type** to **StandardIO**.
-3. Paste the run command for your local development version, it will start with `uv run </path/to/elasticgraph_mcp/.venv/bin/elasticgraph-mcp-server>`
+3. Paste the run command for your local development version. It will start with `uv run </path/to/elasticgraph_mcp/.venv/bin/elasticgraph-mcp-server>`
 
 ```
 # Copy the run command to your clipboard
@@ -54,7 +54,7 @@ echo "uv run $(realpath .venv/bin/elasticgraph-mcp-server)" | pbcopy
 
 4. Enable the extension and verify that Goose recognizes your tools.
 
-Ask goose: What tools and resources for ElasticGraph do you have?
+Ask Goose: What tools and resources for ElasticGraph do you have?
 
 ## Development commands
 
@@ -105,4 +105,4 @@ Try this prompt:
 
 The [elasticgraph-mcp-server](https://pypi.org/project/elasticgraph-mcp-server/) package is published to PyPI via a GitHub workflow manual action. See `.github/workflows/publish-mcp-server.yaml`.
 
-To publish a new version bump the `.ai_tools/elasticgraph-mcp-server/pyproject.toml` version and then manually trigger the workflow via the GitHub Action UI: https://github.com/block/elasticgraph/actions.
+To publish a new version, bump the `ai_tools/elasticgraph-mcp-server/pyproject.toml` version and then manually trigger the workflow via the GitHub Actions UI: https://github.com/block/elasticgraph/actions.

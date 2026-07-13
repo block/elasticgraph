@@ -44,7 +44,7 @@ module ElasticGraph
           )
         end
 
-        it "does not add Apollo tracing if the `Apollo-Federation-Include-Trace` header is set another value, regardless of its casing" do
+        it "does not add Apollo tracing if the `Apollo-Federation-Include-Trace` header is set to another value, regardless of its casing" do
           response_body = execute_expecting_no_errors(query, headers: {"Apollo-Federation-Include-Trace" => "ftv2"})
 
           expect(response_body).to eq("data" => {"__typename" => "Query"})

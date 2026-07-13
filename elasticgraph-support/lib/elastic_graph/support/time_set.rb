@@ -113,7 +113,7 @@ module ElasticGraph
         new_ranges = other.ranges.to_a.reduce(ranges.to_a) do |accum, other_range|
           accum.flat_map do |self_range|
             if ranges_intersect?(self_range, other_range)
-              # Since the ranges intersect, `self_range` must be reduced some how. Depending on what kind of
+              # Since the ranges intersect, `self_range` must be reduced somehow. Depending on what kind of
               # intersection we have (e.g. exact equality, `self_range` fully inside `other_range`, `other_range`
               # fully inside `self_range`, partial overlap where `self_range` begins before `other_range`, or partial
               # overlap where `self_range` ends after `other_range`), we may have a part of `self_range` that comes
@@ -229,7 +229,7 @@ module ElasticGraph
         # Since we can't predict how many iterations it'll take, we loop here, and break as
         # soon as there is no more progress to be made.
         #
-        # While we can't predice how many iterations it'll take, we can put an upper bound on it:
+        # While we can't predict how many iterations it'll take, we can put an upper bound on it:
         # it should take no more than `all_ranges.size` times, because every iteration should shrink
         # `all_ranges` by at least one element--if not, that iteration didn't make any progress
         # (and we're done anyway).
@@ -261,7 +261,7 @@ module ElasticGraph
 
       # Helper method for `merge_overlapping_or_adjacent_ranges` used to return the most "lenient" range boundary value.
       # `nil` is used for a beginless or endless range, so we return that if available; otherwise
-      # we apply `min_or_max`.`
+      # we apply `min_or_max`.
       def nil_or(min_or_max, from:)
         return nil if from.include?(nil)
         from.public_send(min_or_max)

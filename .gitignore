@@ -42,14 +42,14 @@ Gemfile-custom
 .rspec-local
 /*/.rspec-local
 
-# Ignore RBS collection directory--it can be regenerated from `rbs_collection.lockl.yaml`.
+# Ignore RBS collection directory--it can be regenerated from `rbs_collection.lock.yaml`.
 .gem_rbs_collection
 
 # Mac OSX file.
 .DS_Store
 /*/.DS_Store
 
-# This is git-ignored because we dynamically gnerate it from test.yaml.template on each test run
+# This is git-ignored because we dynamically generate it from test.yaml.template on each test run
 # based on which datastore backend is being used.
 /config/settings/test.yaml
 

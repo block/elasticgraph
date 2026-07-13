@@ -126,7 +126,7 @@ module ElasticGraph
         expect(client.delete_index_template("my_template")).to eq("ok")
       end
 
-      it "ignores 404s when deleting a template since that means its already in the desired state" do
+      it "ignores 404s when deleting a template since that means it's already in the desired state" do
         client = build_client({delete_index_template_my_template: :not_found})
 
         expect(client.delete_index_template("my_template")).to eq({})
@@ -212,7 +212,7 @@ module ElasticGraph
         }.to raise_error a_string_including(":unsupported_value is not registered on Faraday::Adapter")
       end
 
-      it "immediately raises an error set to an supported but unavailable value (e.g. due to a missing gem)" do
+      it "immediately raises an error if set to a supported but unavailable value (e.g. due to a missing gem)" do
         expect {
           build_unstubbed_client(faraday_adapter: :patron)
         }.to raise_error a_string_including(":patron is not registered on Faraday::Adapter")

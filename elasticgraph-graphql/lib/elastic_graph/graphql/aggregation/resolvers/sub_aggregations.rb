@@ -40,7 +40,7 @@ module ElasticGraph
 
           def extract_buckets(aggregation_field_path, args)
             # When the client passes `first: 0`, we omit the sub-aggregation from the query body entirely,
-            # and it wont' be in `sub_aggs_by_agg_key`. Instead, we can just return an empty list of buckets.
+            # and it won't be in `sub_aggs_by_agg_key`. Instead, we can just return an empty list of buckets.
             return [] if args[schema.element_names.first] == 0
 
             sub_agg_key = Key.encode(parent_queries.map(&:name) + [aggregation_field_path])
@@ -51,7 +51,7 @@ module ElasticGraph
             # the datastore will be the unfiltered sub-aggregation. To get the filtered sub-aggregation (the data our client
             # actually cares about), we have a sub-aggregation under that.
             #
-            # To indicate this case, our query includes a `meta` field which which tells us which sub-key # has the actual data we care about in it:
+            # To indicate this case, our query includes a `meta` field which tells us which sub-key has the actual data we care about in it:
             # - If grouping has been applied (leading to multiple buckets): `meta: {buckets_path: [path, to, bucket]}`
             # - If no grouping has been applied (leading to a single bucket): `meta: {bucket_path: [path, to, bucket]}`
             if (buckets_path = meta["buckets_path"])

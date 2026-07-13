@@ -302,7 +302,7 @@ module ElasticGraph
         EOS
       end
 
-      it "does not care if one subtype has extra fields that another subtypes lacks" do
+      it "does not care if one subtype has extra fields that another subtype lacks" do
         result = define_schema do |schema|
           schema.public_send ruby_definition_method, "Thing1" do |t|
             t.implements "HasName"

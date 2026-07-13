@@ -71,7 +71,7 @@ module LogCaptureSupport
   def logged_warnings
     # Ruby's standard log format starts each message with a level indicator:
     # https://docs.ruby-lang.org/en/master/Logger.html#class-Logger-label-Log+Level
-    # e.g. "I, ..." for info, `W, ..." for warn, etc.
+    # e.g. "I, ..." for info, "W, ..." for warn, etc.
     # Here we want to only consider messages that are warning level or more severe.
     # W=WARN, E=ERROR, F=FATAL, A=UNKNOWN
     logged_messages.select do |message|
@@ -105,7 +105,7 @@ module LogCaptureSupport
   def logged_messages
     # Ruby's standard log format starts each message with a level indicator:
     # https://docs.ruby-lang.org/en/master/Logger.html#class-Logger-label-Log+Level
-    # e.g. "I, ..." for info, `W, ..." for warn, etc.
+    # e.g. "I, ..." for info, "W, ..." for warn, etc.
     logged_output.split(/(?=^[DIWEFA], )/)
   end
 end

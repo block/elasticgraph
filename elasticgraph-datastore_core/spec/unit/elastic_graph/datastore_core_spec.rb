@@ -13,7 +13,7 @@ require "logger"
 
 module ElasticGraph
   # stub_datastore_client - the specs below depend on using a real datastore client (but don't send any
-  #                       requests to the datastore, so they are stll unit tests).
+  #                       requests to the datastore, so they are still unit tests).
   RSpec.describe DatastoreCore, stub_datastore_client: false do
     it "returns non-nil values from each attribute" do
       expect_to_return_non_nil_values_from_all_attributes(build_datastore_core(

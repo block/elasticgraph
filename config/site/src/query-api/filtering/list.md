@@ -5,7 +5,7 @@ permalink: "/query-api/filtering/list/"
 nav_title: List
 menu_order: 80
 ---
-ElasticGraph supports a couple predicates for filtering on list fields:
+ElasticGraph supports a couple of predicates for filtering on list fields:
 
 {% include filtering_predicate_definitions/any_satisfy.md %}
 {% include filtering_predicate_definitions/count.md %}
@@ -22,7 +22,7 @@ This query, for example, will find artists that released a platinum-selling albu
 One thing to bear in mind: this query is selecting which _artists_ to return,
 not which _albums_ to return. You might expect that the returned `nodes.albums` would
 all be platinum-selling 90s albums, but that's not how the filtering API works. Only artists
-that had a platinum-selling 90s album will be returned, and for each returned artists, all
+that had a platinum-selling 90s album will be returned, and for each returned artist, all
 their albums will be returned--even ones that sold poorly or were released outside the 1990s.
 
 ### Filtering on the list size with `count`

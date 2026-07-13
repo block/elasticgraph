@@ -14,7 +14,7 @@ require "elastic_graph/spec_support/lambda_function"
 RSpec.describe "Autoscale indexer lambda function" do
   include_context "lambda function"
 
-  it "autscales the concurrency of the lambda" do
+  it "autoscales the concurrency of the lambda" do
     sqs_client = ::Aws::SQS::Client.new(stub_responses: true).tap do |sqs_client|
       sqs_client.stub_responses(:get_queue_attributes, {
         attributes: {

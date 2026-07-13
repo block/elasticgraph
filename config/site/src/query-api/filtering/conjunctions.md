@@ -33,7 +33,7 @@ list]({% link query-api/filtering/list.md %}). Consider this query:
 
 {% include copyable_code_snippet.html language="graphql" data="music_queries.filtering.ArtistsWithPlatinum90sAlbum" %}
 
-This query finds artists who released an album in the 90's that sold more than million copies.
+This query finds artists who released an album in the 90's that sold more than a million copies.
 If you wanted to broaden the query to find artists with at least one 90's album and at least one
 platinum-selling album--without requiring it to be the same album--you could do this:
 

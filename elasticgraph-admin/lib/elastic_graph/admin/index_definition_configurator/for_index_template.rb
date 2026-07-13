@@ -184,11 +184,11 @@ module ElasticGraph
 
         def related_index_configurators
           # Here we fan out and get a configurator for each related index. These are generally concrete
-          # index that are based on a template, either via being specified in our config YAML, or via
+          # indices that are based on a template, either via being specified in our config YAML, or via
           # auto creation at indexing time.
           #
-          # Note that it should not matter whether the related indices are configured before of after
-          # its rollover template; our use of index maintenance mode below prevents new indidces from
+          # Note that it should not matter whether the related indices are configured before or after
+          # its rollover template; our use of index maintenance mode below prevents new indices from
           # being auto-created while this configuration process runs.
           @related_index_configurators ||= begin
             rollover_indices = @index_template.related_rollover_indices(@datastore_client)

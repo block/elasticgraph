@@ -69,7 +69,7 @@ module ElasticGraph
             expect_result_to_be_returned(date, as: string)
           end
 
-          it "returns a string already formatted in ISO8061 format as-is" do
+          it "returns a string already formatted in ISO8601 format as-is" do
             string, _date = string_date_pair_from("2021-11-05")
 
             expect_result_to_be_returned(string, as: string)

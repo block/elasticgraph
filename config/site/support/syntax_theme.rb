@@ -11,7 +11,7 @@ require "rouge"
 module ElasticGraph
   # A custom Rouge theme based on Tulip but without the purple background
   # Tulip appears to provide the best looking syntax highlighting theme of all the built-in rouge themes,
-  # apart from the purple background..
+  # apart from the purple background.
   class SyntaxTheme < Rouge::Themes::Tulip
     name "elasticgraph"
 

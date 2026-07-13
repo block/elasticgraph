@@ -29,7 +29,7 @@ Different ElasticGraph versions have had slightly different configuration schema
 
 {% endfor %}
 
-This rest of this guide covers the available configuration options in the latest ElasticGraph release ({{ site.data.doc_versions.latest_version }}).
+The rest of this guide covers the available configuration options in the latest ElasticGraph release ({{ site.data.doc_versions.latest_version }}).
 
 ### Configuration File Structure
 

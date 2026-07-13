@@ -31,7 +31,7 @@ module ElasticGraph
                 },
                 require_path: {
                   description: "The path to require to load the interceptor extension. This should be a relative path from a directory on " \
-                    "the Ruby `$LOAD_PATH` or a a relative path from the ElasticGraph application root.",
+                    "the Ruby `$LOAD_PATH` or a relative path from the ElasticGraph application root.",
                   type: "string",
                   minLength: 1,
                   examples: ["./lib/interceptors/hide_internal_records_interceptor"]

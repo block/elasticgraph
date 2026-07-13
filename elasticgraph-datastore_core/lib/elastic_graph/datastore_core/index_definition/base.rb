@@ -94,7 +94,7 @@ module ElasticGraph
           end
         end
 
-        # Indicates whether not the index is be accessible from GraphQL queries, by virtue of
+        # Indicates whether or not the index is accessible from GraphQL queries, by virtue of
         # the `cluster_to_query` being a defined cluster or not. This will be used to
         # hide GraphQL schema elements that can't be queried when our config omits the means
         # to query an index (e.g. due to lacking a configured URL).
@@ -107,7 +107,7 @@ module ElasticGraph
         # index definition is configured to query. Note that for performance reasons, this method
         # memoizes the result of querying the datastore for its current list of indices, and as
         # a result the return value may be out of date. If it is absolutely essential that you get
-        # an up-to-date list of related indices, use `related_rollover_indices(datastore_client`) instead of
+        # an up-to-date list of related indices, use `related_rollover_indices(datastore_client)` instead of
         # this method.
         #
         # Note, however, that indices generally change *very* rarely (say, monthly or yearly) and as such

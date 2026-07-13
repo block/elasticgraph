@@ -61,7 +61,7 @@ module ElasticGraph
             further_detail =
               if (more_detail = error["caused_by"])
                 # Usually the type/reason details are nested an extra level (`caused_by.caused_by`) but sometimes
-                # it's not. I think it's nested when the script itself throws an exception where as it's unnested
+                # it's not. I think it's nested when the script itself throws an exception whereas it's unnested
                 # when the datastore is unable to run the script.
                 more_detail = more_detail["caused_by"] if more_detail.key?("caused_by")
                 " (#{more_detail["type"]}: #{more_detail["reason"]})"
@@ -117,7 +117,7 @@ module ElasticGraph
         def update_request
           {
             script: {id: update_target.script_id, params: script_params},
-            # We use a scripted upsert instead of formatting an upsert document because it creates
+            # We use a scripted upsert instead of formatting an upsert document because it allows
             # for simpler code. To create the upsert document, we'd have to convert the param
             # values to their "upsert form"--for example, for an `append_only_set` field, the param
             # value is generally a single scalar value while in an upsert document it would need to

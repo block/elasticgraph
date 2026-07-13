@@ -52,7 +52,7 @@ module ElasticGraph
         # - If `SINGLETON_CURSOR` was provide for either `before` or `after`, we also return an empty hash,
         #   because we know there cannot be any results to return--the cursor is a reference to
         #   the one and only item in the list, and nothing can exist before or after it.
-        # - Otherwise, we return an aggregatinos hash based on the groupings, computations, and sub-aggregations.
+        # - Otherwise, we return an aggregations hash based on the groupings, computations, and sub-aggregations.
         def build_agg_hash(filter_interpreter)
           build_agg_detail(filter_interpreter, field_path: [], parent_queries: [])&.clauses || {}
         end

@@ -312,7 +312,7 @@ module ElasticGraph
               )
             end
 
-            it "validates against the closest version if the requested version older than what's available" do
+            it "validates against the closest version if the requested version is older than what's available" do
               # 1 is closest to "2", validation should match behavior from version "2" - YELLOW should fail validation.
               event = build_upsert_event(:widget, id: "1", __version: 1, __json_schema_version: 1).merge("message_id" => "m123")
               event["record"]["options"]["color"] = "YELLOW"

@@ -149,7 +149,7 @@ module ElasticGraph
             expect_to_be_leaf "SortOrderInput", enum: true, format: :SortOrder
           end
 
-          it "considers a scalr type to be a scalar leaf instead of an object" do
+          it "considers a scalar type to be a scalar leaf instead of an object" do
             type = type_ref("JsonSafeLong")
             expect(type.object?).to be false
             expect(type.leaf?).to be true
@@ -577,7 +577,7 @@ module ElasticGraph
                   f.mapping type: "nested"
                 end
 
-                # Some derived types are only generated when a type is used by a a list of `object` field.
+                # Some derived types are only generated when a type is used by a list of `object` field.
                 t.field "widgets_object", "[Widget!]!" do |f|
                   f.mapping type: "object"
                 end

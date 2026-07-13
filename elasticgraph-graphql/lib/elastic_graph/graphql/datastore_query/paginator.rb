@@ -104,7 +104,7 @@ module ElasticGraph
           search_in_reverse? ? decoded_before : decoded_after
         end
 
-        # In some cases, we're forced to search in reverse; in those caes, this is used to restore
+        # In some cases, we're forced to search in reverse; in those cases, this is used to restore
         # the ordering of the items to the intended order.
         def restore_intended_item_order(items)
           search_in_reverse? ? items.reverse : items
@@ -114,7 +114,7 @@ module ElasticGraph
         # may be necessary because we may request an extra item as part of our pagination implementation.
         def truncate_items(items)
           # Remove the extra doc we requested by doing `size: size + 1`, if an extra was returned.
-          # Removing the first or last doc (as this will do) will signal to `bulid_page_info`
+          # Removing the first or last doc (as this will do) will signal to `build_page_info`
           # that there definitely is a previous or next page.
           # Note: we use `to_a` to satisfy steep, since `Array#[]` can return `nil`--but with the arg
           # we pass, never does when items is non-empty, which our conditional enforces here.

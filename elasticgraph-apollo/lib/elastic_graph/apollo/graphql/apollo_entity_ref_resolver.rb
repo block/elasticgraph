@@ -31,7 +31,7 @@ module ElasticGraph
           end
         end
 
-        # GraphQL resolver for fields defined with `apollo_entity_ref_field` that are backed by an list of ids.
+        # GraphQL resolver for fields defined with `apollo_entity_ref_field` that are backed by a list of ids.
         #
         # @private
         class ForIdList

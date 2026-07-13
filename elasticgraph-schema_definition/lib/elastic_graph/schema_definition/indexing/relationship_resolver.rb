@@ -69,7 +69,7 @@ module ElasticGraph
 
         def validate_foreign_key(foreign_key_parent_type, relation_metadata)
           foreign_key_field = schema_def_state.field_path_resolver.resolve_public_path(foreign_key_parent_type, relation_metadata.foreign_key) { true }
-          # If its an inbound foreign key, verify that the foreign key exists on the related type.
+          # If it's an inbound foreign key, verify that the foreign key exists on the related type.
           # Note: we don't verify this for outbound foreign keys, because when we define a relationship with an outbound foreign
           # key, we automatically define an indexing only field for the foreign key (since it exists on the same type). We don't
           # do that for an inbound foreign key, though (since the foreign key exists on another type). Allowing a relationship
@@ -80,7 +80,7 @@ module ElasticGraph
               "that uses it as the foreign key, use another field as the foreign key, or remove the `#{relationship_description}` definition."
           elsif foreign_key_field && foreign_key_field.type.fully_unwrapped.name != "ID"
             "#{relationship_error_prefix} uses `#{foreign_key_field.fully_qualified_path}` as the foreign key, " \
-              "but that field is not an `ID` field as expected. To continue, change it's type, use another field " \
+              "but that field is not an `ID` field as expected. To continue, change its type, use another field " \
               "as the foreign key, or remove the `#{relationship_description}` definition."
           end
         end

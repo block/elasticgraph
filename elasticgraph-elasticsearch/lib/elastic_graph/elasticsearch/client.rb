@@ -162,7 +162,7 @@ module ElasticGraph
         # `allow_no_indices: true` is needed when we attempt to delete a non-existing index to avoid errors. For rollover indices,
         # when we delete the actual indices, we will always perform a wildcard deletion, and `allow_no_indices: true` is needed.
         #
-        # Note that the Elasticsearch API documentation[^1] says that `allow_no_indices` defaults to `true` but a Elasticsearch Ruby
+        # Note that the Elasticsearch API documentation[^1] says that `allow_no_indices` defaults to `true` but an Elasticsearch Ruby
         # client code comment[^2] says it defaults to `false`. Regardless, we don't want to rely on the default behavior that could change.
         #
         # [^1]: https://www.elastic.co/guide/en/elasticsearch/reference/8.12/indices-delete-index.html#delete-index-api-query-params

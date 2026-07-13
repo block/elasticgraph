@@ -645,7 +645,7 @@ module ElasticGraph
                 expect(sub_agg_query.paginator.desired_page_size).to eq(212)
               end
 
-              it "return an error if `first` is specified as a negative number in the query" do
+              it "returns an error if `first` is specified as a negative number in the query" do
                 sub_agg_query = build_sub_aggregation_query({first: -10}, default_page_size: 47, max_page_size: 212)
 
                 expect {

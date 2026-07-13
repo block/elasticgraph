@@ -22,7 +22,7 @@ module ElasticGraph
 
   ::YARD::Doctest.configure do |doctest|
     # Run each doctest in an empty temp dir. This ensures that the doc tests are not able
-    # to implicitly rely on the surrounding file system state, and allows doc test to interactive
+    # to implicitly rely on the surrounding file system state, and allows doc tests to interact
     # with the file system as needed without worrying about it corrupting our local file system.
     #
     # In addition, capture output so our examples can print without it actually showing up in
@@ -209,9 +209,9 @@ module ElasticGraph
   # * The example for `ElasticGraph::GraphiQL` and `ElasticGraph::Rack::GraphQLEndpoint` both depend on `run` being
   #   defined since they are `config.ru` examples.
   # * We have a `before` hook above which defines the `run` method they need.
-  # * When `ElasticGraph::GraphiQL` is loaded it turns around and loads `ElasticGraph::Rack:::GraphQLEndpoint` since
+  # * When `ElasticGraph::GraphiQL` is loaded it turns around and loads `ElasticGraph::Rack::GraphQLEndpoint` since
   #   it depends on it.
-  # * That means that if the `GraphQLEndpoint` runs first everything works fine; but if the `GraphiQL` examples runs first, then
+  # * That means that if the `GraphQLEndpoint` runs first everything works fine; but if the `GraphiQL` example runs first, then
   #   when the `GraphQLEndpoint` example runs, its class is defined and it changes how yard-doctest evaluates the example.
   #
   # To ensure consistent, predictable evaluation, we override `evaluate` to _always_ use the binding of the example instance,

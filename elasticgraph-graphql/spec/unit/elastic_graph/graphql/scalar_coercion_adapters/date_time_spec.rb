@@ -107,7 +107,7 @@ module ElasticGraph
             expect_result_to_be_returned(time, as: string.sub("00Z", "00.000Z"))
           end
 
-          it "returns a string already formatted in ISO8061 format as-is" do
+          it "returns a string already formatted in ISO8601 format as-is" do
             string, _time = string_time_pair_from("2021-11-05T12:30:00.123Z")
 
             expect_result_to_be_returned(string, as: string)

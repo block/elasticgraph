@@ -105,7 +105,7 @@ A given ElasticGraph GraphQL endpoint does not necessarily have access to all da
 to clusters present in the `datastore.clusters` configuration map.
 
 If a health check is configured for either a cluster or type that the GraphQL endpoint does not have access to, the respective check will be skipped. This is appropriate,
-as since the GraphQL endpoint does not have access to the cluster/type, the cluster's/type's health is immaterial.
+since the GraphQL endpoint does not have access to the cluster/type, the cluster's/type's health is immaterial.
 
 For example, with the following configuration:
 

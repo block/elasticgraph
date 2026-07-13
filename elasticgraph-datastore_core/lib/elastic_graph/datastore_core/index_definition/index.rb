@@ -44,7 +44,7 @@ module ElasticGraph
         #
         # Use of this is considered a mild code smell.  When feasible, it's generally better to
         # implement a new polymorphic API on the IndexDefinition interface, rather
-        # then branching on the value of this predicate.
+        # than branching on the value of this predicate.
         def rollover_index_template?
           false
         end

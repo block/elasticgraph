@@ -353,7 +353,7 @@ module ElasticGraph
             )
           end
 
-          it "mentions the `message_id` in the exception message if its available" do
+          it "mentions the `message_id` in the exception message if it's available" do
             expect {
               events_with_msg_ids = events.map.with_index(1) { |e, index| e.merge("message_id" => "m#{index}") }
               process(events_with_msg_ids)
@@ -381,7 +381,7 @@ module ElasticGraph
 
           def make_component_bad(component)
             component.merge("record" => component["record"].merge(
-              "name" => 17 # must be an string
+              "name" => 17 # must be a string
             ))
           end
         end

@@ -153,7 +153,7 @@ module ElasticGraph
             end
           end
 
-          context "when given a query string that has lacks a directive (that is not `@egLatencySlo`) present on the registered query" do
+          context "when given a query string that lacks a directive (that is not `@egLatencySlo`) present on the registered query" do
             it "returns a validation error since the extra directive could be a substantive difference" do
               registry = registry_with({"my_client" => [widget_name_string, add_query_directives_to(part_name_string, "@some_other_directive")]})
 
@@ -249,7 +249,7 @@ module ElasticGraph
           context "when given a query string that has only minor formatting differences compared to a registered query" do
             include_examples "any case when a query is returned"
 
-            it "caches the parsed form of the mostly recently seen alternate query string, to avoid unneeded reparsing" do
+            it "caches the parsed form of the most recently seen alternate query string, to avoid unneeded reparsing" do
               parse_counts_by_query_string = track_parse_counts
 
               registry = prepare_registry_with(part_name_string)

@@ -1428,7 +1428,7 @@ module ElasticGraph
             }.to raise_error(Errors::SchemaError, a_string_including("rollover field `Widget.color: Color` cannot be used for rollover since it is not a `Date` or `DateTime` field"))
           end
 
-          it "raises an error if a rollover timestamp field references an scalar type that can't be used for rollover" do
+          it "raises an error if a rollover timestamp field references a scalar type that can't be used for rollover" do
             expect {
               dump_schema do |s|
                 s.object_type "Widget" do |t|
@@ -1893,7 +1893,7 @@ module ElasticGraph
           })
         end
 
-        it "raises a Errors::SchemaError when a conflicting type is specified" do
+        it "raises an Errors::SchemaError when a conflicting type is specified" do
           dump_schema do |s|
             s.object_type "MyType" do |t|
               t.field "built_in_scalar_replaced", "String!" do |f|
@@ -2151,7 +2151,7 @@ module ElasticGraph
               })
             end
 
-            it "includes an array foreign key field if its a `relates_to_many` field" do
+            it "includes an array foreign key field if it's a `relates_to_many` field" do
               json_schema = dump_schema do |s|
                 s.object_type "OtherType" do |t|
                   t.field "id", "ID!"

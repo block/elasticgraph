@@ -69,7 +69,7 @@ class RequestTracker
   Request = ::Data.define(:http_method, :url, :body, :timeout) do
     def profiling_id
       # The time a request takes is entirely different if VCR is involved, so mention it
-      # in the profiling id if we are planing back.
+      # in the profiling id if we are playing back.
       # :nocov: -- which branch executes depends on `NO_VCR` env var, and a single test  run will never cover all branches.
       vcr_playing_back =
         if !defined?(::VCR)
@@ -158,7 +158,7 @@ RSpec.shared_context "datastore support", :capture_logs do
   # This can allow us to avoid the need to frequently delete indices, leading to faster test runs.
   #
   # This can also be used as a prefix for an index name, and tests that use this to create a new
-  # index or template do not have to cleanup after themselves; all indices that use this will be cleaned
+  # index or template do not have to clean up after themselves; all indices that use this will be cleaned
   # up at the start of each test run automatically.
   let(:unique_index_name) do |example|
     # `example.id` is a string like:
@@ -423,7 +423,7 @@ RSpec.shared_context "datastore support", :capture_logs do
 
   # Helper method that forces the `known_related_query_rollover_indices` to be computed and cached. This is
   # useful since some tests strictly verify what datastore requests are made and `known_related_query_rollover_indices`
-  # is called as part of preparing to query the datastore. Since it caches the result it can non-determnistically
+  # is called as part of preparing to query the datastore. Since it caches the result it can non-deterministically
   # trigger a new datastore request in the middle of a test that is unexpected. We can use this in such a test
   # to make it deterministic.
   def pre_cache_index_state(graphql)

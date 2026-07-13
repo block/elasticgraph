@@ -75,14 +75,14 @@ bundle exec rake boot_locally
 That sequences each of the other tasks so that, with a single command, you can go from nothing to a
 locally running ElasticGraph instance with data that you can query from your browser.
 
-### Managing Elasticsearch/Opensearch
+### Managing Elasticsearch/OpenSearch
 
 The `opensearch:`/`elasticsearch:` tasks will boot the desired Elasticsearch or OpenSearch version using docker
 along with the corresponding dashboards (Kibana for Elasticsearch, OpenSearch Dashboards for OpenSearch). You can
 use either the `:boot` or `:daemon` tasks:
 
-* The `:boot` task will keep Elasticsearch/Opensearch in the foreground, allowing you to see the logs.
-* The `:daemon` task runs Elasticsearch/Opensearch as a background daemon task. Notably, it waits to return
-  until Elasticsearch/Opensearch are ready to receive traffic.
+* The `:boot` task will keep Elasticsearch/OpenSearch in the foreground, allowing you to see the logs.
+* The `:daemon` task runs Elasticsearch/OpenSearch as a background daemon task. Notably, it waits to return
+  until Elasticsearch/OpenSearch are ready to receive traffic.
 
 If you use a `:daemon` task, you can later use the corresponding `:halt` task to stop the daemon.

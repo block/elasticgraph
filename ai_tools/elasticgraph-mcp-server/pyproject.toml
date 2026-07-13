@@ -4,7 +4,7 @@
 [project]
 name = "elasticgraph-mcp-server"
 version = "0.1.2"
-description = "MCP Server for ElasticGraph to allow Goose, Cursor, etc to create and manage your ElasticGraph project."
+description = "MCP Server for ElasticGraph to allow Goose, Cursor, etc. to create and manage your ElasticGraph project."
 readme = "README.md"
 requires-python = "~=3.13"
 license = "MIT"

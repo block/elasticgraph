@@ -6,7 +6,7 @@
 # (just run this script).
 #
 # Note that it does assume that all gems are in a direct subdirectory of the
-# the repository root. Our glob only looks one level deep to avoid pulling in
+# repository root. Our glob only looks one level deep to avoid pulling in
 # gems that could be installed in `bundle` (e.g. if `bundle --standalone` is
 # being used).
 

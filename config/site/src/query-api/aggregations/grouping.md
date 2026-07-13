@@ -41,7 +41,7 @@ argument (default is "UTC"):
 
 {% include copyable_code_snippet.html language="graphql" data="music_queries.aggregations.TourAttendanceByYear" %}
 
-Sub-day granualarities (`HOUR`, `MINUTE`, `SECOND`) are supported when you use `asDateTime` instead of `asDate`:
+Sub-day granularities (`HOUR`, `MINUTE`, `SECOND`) are supported when you use `asDateTime` instead of `asDate`:
 
 {% include copyable_code_snippet.html language="graphql" data="music_queries.aggregations.TourAttendanceByHour" %}
 

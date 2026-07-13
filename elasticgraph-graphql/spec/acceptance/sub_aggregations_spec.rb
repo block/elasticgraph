@@ -217,7 +217,7 @@ module ElasticGraph
           })
           expect_to_have_excluded_indices("main", [index_definition_name_for("teams_rollover__1883")])
 
-          # Test a sub-aggregation grouping of two `terms` field
+          # Test a sub-aggregation grouping of two `terms` fields
           team_seasons_nodes = aggregate_season_counts_grouped_by("year", "note")
           expect(indexed_counts_from(team_seasons_nodes)).to eq({
             {"year" => 2020, "note" => "covid"} => count_detail_of(1),
@@ -361,8 +361,8 @@ module ElasticGraph
           test_optimizable_aggregations_with_sub_aggregations
           verify_2_subaggregations_on_same_field_under_different_parent_fields
 
-          # Demonstrate that we can group subaggregations by fields that have a mixture of types with some `null` values mixed it.
-          # (At one point this lead to an exception).
+          # Demonstrate that we can group subaggregations by fields that have a mixture of types with some `null` values mixed in.
+          # (At one point this led to an exception).
           team_seasons_nodes = aggregate_season_counts_grouped_by("note, record { losses}")
           expect(team_seasons_nodes.map { |n| n.fetch(case_correctly("grouped_by")) }).to include(
             {"note" => nil, "record" => {"losses" => nil}},

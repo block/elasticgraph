@@ -121,7 +121,7 @@ module ElasticGraph
         end
       end
 
-      # Pick the most complete example (treating the size of the example asn indication of its completeness).
+      # Pick the most complete example (treating the size of the example as an indication of its completeness).
       examples.max_by { |e| e.respond_to?(:size) ? e.size : 0 }
     end
 

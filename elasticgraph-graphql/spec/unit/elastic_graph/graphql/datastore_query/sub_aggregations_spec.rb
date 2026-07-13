@@ -103,7 +103,7 @@ module ElasticGraph
         })
       end
 
-      it "supports nesting sub-aggreations under an extra object layer" do
+      it "supports nesting sub-aggregations under an extra object layer" do
         query = new_query(aggregations: [aggregation_query_of(name: "teams", sub_aggregations: [
           nested_sub_aggregation_of(path_in_index: ["the_nested_fields", "current_players"], query: sub_aggregation_query_of(name: "current_players"))
         ])])
@@ -200,7 +200,7 @@ module ElasticGraph
         })
       end
 
-      it "treats empty filters treating as `true`" do
+      it "treats empty filters as `true`" do
         query = new_query(aggregations: [aggregation_query_of(name: "teams", sub_aggregations: [
           nested_sub_aggregation_of(path_in_index: ["current_players_nested"], query: sub_aggregation_query_of(name: "current_players_nested", filter: {
             "name" => {"equal_to_any_of" => nil}

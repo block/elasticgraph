@@ -188,7 +188,7 @@ module ElasticGraph
       end
 
       describe "#current_sources" do
-        it "only contains `#{SELF_RELATIONSHIP_NAME}` on a index that has no `sourced_from` fields (but has fields)" do
+        it "only contains `#{SELF_RELATIONSHIP_NAME}` on an index that has no `sourced_from` fields (but has fields)" do
           current_sources = current_sources_for "widgets" do |s|
             s.object_type "Widget" do |t|
               t.field "id", "ID!"

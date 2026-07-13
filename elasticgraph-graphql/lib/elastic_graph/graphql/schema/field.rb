@@ -49,7 +49,7 @@ module ElasticGraph
         def relation_join
           # Not every field has a join relation, so it can be nil. But we do not want
           # to re-compute that on every call, so we return @relation_join if it's already
-          # defined rather than if its truthy.
+          # defined rather than if it's truthy.
           return @relation_join if defined?(@relation_join)
           @relation_join = RelationJoin.from(self)
         end
