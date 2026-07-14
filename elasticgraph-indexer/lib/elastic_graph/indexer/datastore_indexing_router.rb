@@ -175,7 +175,7 @@ module ElasticGraph
                   # And we intentionally do NOT provide a routing value--we want to find the version, no matter what shard the document
                   # lives on.
                   #
-                  # Since this `source_event_versions_in_index` is for handling malformed events, its possible that the
+                  # Since this `source_event_versions_in_index` is for handling malformed events, it's possible that the
                   # rollover timestamp or routing value on the operation is wrong and that the correct document lives in
                   # a different shard and index than what the operation is targeted at. We want to search across all of them
                   # so that we will find it, regardless of where it lives.

@@ -55,12 +55,12 @@ module ElasticGraph
       #   }
       # }
       #
-      # Each entry in "Records" is a SQS entry.  Since lambda handles some batching
+      # Each entry in "Records" is an SQS entry. Since lambda handles some batching
       # for you (with some limits), you can get multiple.
       #
       # We also want to do our own batching in order to cram more into a given payload
       # and issue fewer SQS entries and Lambda invocations when possible. As such, we
-      # encoded multiple JSON with JSON Lines (http://jsonlines.org/) in record body.
+      # encode multiple JSON objects with JSON Lines (http://jsonlines.org/) in the record body.
       # Each JSON Lines object under 'body' should be of the form:
       #
       #  {op: 'upsert', __typename: 'Payment', id: "123", version: "1", record: {...} } \n

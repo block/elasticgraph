@@ -2,12 +2,12 @@
 
 # This script is meant to run a "quick" build. A "full" build performed on CI
 # isn't terribly suitable for engineers running locally: it assumes everything
-# has to be setup from scratch, and opts for completeness/strictness over build
+# has to be set up from scratch, and opts for completeness/strictness over build
 # speed to an extreme level that is great for CI but not for local builds.
 # For example, it opts in to some extra GraphQL schema validation and runs the
 # test suite without VCR, which verifies the test suite passes without VCR
 # recordings, but makes the test suite take much longer (e.g. 2.5-3 minutes
-# instead 30-45 seconds). Similarly, the full CI build runs the specs "file by file"
+# instead of 30-45 seconds). Similarly, the full CI build runs the specs "file by file"
 # to ensure every spec file passes when run on its own. This fails *very* rarely but
 # is quite slow so we do not want to include it here.
 
@@ -15,7 +15,7 @@
 # Verbose form of `set -e`.
 set -o errexit
 
-# Attempt to use undefined variable outputs error message, and forces an exit
+# Attempting to use an undefined variable outputs an error message and forces an exit.
 # Verbose form of `set -u`.
 set -o nounset
 

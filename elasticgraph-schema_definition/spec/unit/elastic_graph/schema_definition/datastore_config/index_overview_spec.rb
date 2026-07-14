@@ -42,7 +42,7 @@ module ElasticGraph
         expect(config2.keys).to eq ["a_type", "b_type"]
       end
 
-      it "dumps an index with `rollover` as a template with and `index_pattern`" do
+      it "dumps an index with `rollover` as a template with an `index_pattern`" do
         widgets = index_template_configs_for "widgets" do |s|
           s.object_type "Widget" do |t|
             t.field "id", "ID!"
@@ -132,7 +132,7 @@ module ElasticGraph
         }.not_to raise_error
       end
 
-      it "does not allow an index to have the infix follover marker in the name, since ElasticGraph uses that to mark and parse rollover index names" do
+      it "does not allow an index to have the infix rollover marker in the name, since ElasticGraph uses that to mark and parse rollover index names" do
         expect {
           index_template_configs_for "widgets" do |s|
             s.object_type "Widget" do |t|

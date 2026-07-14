@@ -19,7 +19,7 @@ module ElasticGraph
       end
 
       # Like `Hash#to_h`, but strict. When the given input has conflicting keys, `Hash#to_h` will happily let
-      # the last pair when. This method instead raises an exception.
+      # the last pair win. This method instead raises an exception.
       def self.strict_to_h(pairs)
         hash = pairs.to_h
 

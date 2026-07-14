@@ -11,7 +11,7 @@ module ElasticGraph
     module Filtering
       # A set that can represent either a specific list of values or all values except a specific
       # list, with support for common set operations (union, intersection, negation). In contrast
-      # to other set implementations that work with `FilterValueSetExtractor`, only only works with
+      # to other set implementations that work with `FilterValueSetExtractor`, this only works with
       # `equal_to_any_of` filtering (hence the `EqualityValueSet` name).
       class EqualityValueSet < Data.define(:type, :values)
         # `Data.define` provides the following methods:

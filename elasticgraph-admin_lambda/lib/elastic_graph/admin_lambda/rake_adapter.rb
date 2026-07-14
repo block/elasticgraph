@@ -53,7 +53,7 @@ module ElasticGraph
       end
 
       # A subclass that forces rake to use our desired Rakefile, and configures Rake to act
-      # a bit different.
+      # a bit differently.
       class Application < ::Rake::Application
         def initialize
           super

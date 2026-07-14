@@ -18,13 +18,13 @@ module ElasticGraph
     # like that in new tests, though.
     RSpec.describe TimeSet do
       describe ".of_range" do
-        it "prevents `gt` and `gte` being used together as that would create two lower builds" do
+        it "prevents `gt` and `gte` being used together as that would create two lower bounds" do
           expect {
             TimeSet.of_range(gt: ::Time.at(1), gte: ::Time.at(2))
           }.to raise_error ArgumentError, a_string_including("two lower bound")
         end
 
-        it "prevents `lt` and `lte` being used together as that would create two upper builds" do
+        it "prevents `lt` and `lte` being used together as that would create two upper bounds" do
           expect {
             TimeSet.of_range(lt: ::Time.at(1000), lte: ::Time.at(2000))
           }.to raise_error ArgumentError, a_string_including("two upper bounds")

@@ -39,7 +39,7 @@ module ElasticGraph
           )
         end
 
-        it "verifies the extension matches the interface definition, notifying of argument mis-matches" do
+        it "verifies the extension matches the interface definition, notifying of argument mismatches" do
           expect {
             verify!("ElasticGraph::Extensions::ArgsMismatch", from: "support/example_extensions/args_mismatch")
           }.to raise_error Errors::InvalidExtensionError, a_string_including(

@@ -16,7 +16,7 @@ module ElasticGraph
       # which leads to a more secure setup (as the GraphQL endpoint can be blocked from performing any writes).
       #
       # Note: before elasticsearch-ruby 7.9.0, `msearch` used an HTTP GET request, so this simply restores that behavior.
-      # This results in an HTTP GET with a request body, but it works just fine and its what the Ruby Elasticsearch client
+      # This results in an HTTP GET with a request body, but it works just fine and it's what the Ruby Elasticsearch client
       # did for years.
       #
       # For more info, see: https://github.com/elastic/elasticsearch-ruby/issues/1005

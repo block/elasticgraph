@@ -1222,7 +1222,7 @@ module ElasticGraph
             })
           end
 
-          it "correct detects when an expression with multiple predicates could match zero" do
+          it "correctly detects when an expression with multiple predicates could match zero" do
             query = new_query(client_filter: {
               "past_names" => {LIST_COUNTS_FIELD => {"gte" => 0, "lt" => 10}}
             })

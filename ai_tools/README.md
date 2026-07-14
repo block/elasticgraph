@@ -4,7 +4,7 @@ To help you build an ElasticGraph project, you can use these tools with AI agent
 
 ## Components
 
-### ElasticGraph MCP Servier
+### ElasticGraph MCP Server
 
 Located in [`elasticgraph-mcp-server/`](./elasticgraph-mcp-server/), this provides a server implementation for the [Model Context Protocol](https://modelcontextprotocol.io/). MCP enables AI agents to:
 

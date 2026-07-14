@@ -262,7 +262,7 @@ graph LR;
 
 ### AWS Lambda Integration Libraries (6 gems)
 
-These libraries wrap the the core ElasticGraph libraries so that they can be deployed using AWS Lambda.
+These libraries wrap the core ElasticGraph libraries so that they can be deployed using AWS Lambda.
 
 * [elasticgraph-admin_lambda](elasticgraph-admin_lambda/README.md): Adapts elasticgraph-admin to run as an AWS Lambda.
 * [elasticgraph-graphql_lambda](elasticgraph-graphql_lambda/README.md): Adapts elasticgraph-graphql to run as an AWS Lambda.

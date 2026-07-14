@@ -16,7 +16,7 @@ module ElasticGraph
       @index_prefix ||= "test_env_#{test_env_number}_"
     end
 
-    # Our various parallel spec runner adapters need to be hook into other classes in order to patch how they work to be compatible
+    # Our various parallel spec runner adapters need to hook into other classes in order to patch how they work to be compatible
     # with running concurrently at the same time as specs in another worker process. However, we support running our tests in multiple
     # ways, including in the context of a single gem's bundle. When running in a single gem's bundle, some dependencies may be unavailable
     # (it depends on what's in the gem's `gemspec` file). In that case, a require performed from one or more of these adapters may fail

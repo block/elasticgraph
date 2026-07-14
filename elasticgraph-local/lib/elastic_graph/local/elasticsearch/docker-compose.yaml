@@ -26,7 +26,7 @@ services:
     # > security."
     #
     # Since this is only used in local dev/test environments where the added security would make things harder
-    # (we'd have to setup credentials in our tests), it's simpler/better just to explicitly disable the security,
+    # (we'd have to set up credentials in our tests), it's simpler/better just to explicitly disable the security,
     # which silences the warning.
     - xpack.security.enabled=false
     # We disable `xpack.ml` because it's not compatible with the `darwin-aarch64` distribution we use on M1 Macs.

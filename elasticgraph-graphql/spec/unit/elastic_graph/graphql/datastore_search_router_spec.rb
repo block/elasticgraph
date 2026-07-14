@@ -208,7 +208,7 @@ module ElasticGraph
           }.to raise_error(Errors::SearchFailedError, a_string_including(
             "2) ", '{"index":"widgets_rollover__*"}', '{"bad stuff" => "happened"}'
           ).and(excluding(
-            # These are parts of the body of the request, which we don't want included because it could contain PII!.
+            # These are parts of the body of the request, which we don't want included because it could contain PII!
             "track_total_hits", "size",
             # The error should not contain a stray double quote dangling after the inspected error hash.
             '{"bad stuff" => "happened"}"'

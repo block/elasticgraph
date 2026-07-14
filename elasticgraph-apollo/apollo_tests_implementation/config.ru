@@ -18,7 +18,7 @@ indexer = ElasticGraph::Indexer.from_yaml_file("config/settings.yaml")
 
 admin.cluster_configurator.configure_cluster($stdout)
 
-# Example records expected by the apollo-federation-subgraph-compatibility test suite. based on:
+# Example records expected by the apollo-federation-subgraph-compatibility test suite, based on:
 # https://github.com/apollographql/apollo-federation-subgraph-compatibility/blob/2.1.0/COMPATIBILITY.md#expected-data-sets
 dimension = {
   size: "small",

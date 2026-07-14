@@ -16,7 +16,7 @@ module ElasticGraph
     #   - The amount of time it takes to boot the lambda is logged.
     #   - An error handling hook is provided which applies both to boot-time logic and request handling.
     #
-    # It is designed to be prepending onto a class, like so:
+    # It is designed to be prepended onto a class, like so:
     #
     # class DoSomething
     #   prepend LambdaFunction

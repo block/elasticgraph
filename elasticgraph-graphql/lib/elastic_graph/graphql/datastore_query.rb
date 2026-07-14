@@ -176,8 +176,8 @@ module ElasticGraph
         search_index_expression.split(",").any? { |expr| expr.start_with?("-") }
       end
 
-      # Returns the name of the datastore cluster as a String where this query should be setn.
-      # Unless exactly 1 cluster name is found, this method raises a Errors::ConfigError.
+      # Returns the name of the datastore cluster as a String where this query should be sent.
+      # Unless exactly 1 cluster name is found, this method raises an Errors::ConfigError.
       def cluster_name
         cluster_name = initial_search_index_definitions.map(&:cluster_to_query).uniq
         return cluster_name.first if cluster_name.size == 1
@@ -191,7 +191,7 @@ module ElasticGraph
       # it to only the shards containing documents for that routing value.
       #
       # Note that this returns a list due to our support for type unions. A unioned type
-      # can be composed of subtypes that have use different shard routing; this will return
+      # can be composed of subtypes that use different shard routing; this will return
       # the set union of them all.
       def route_with_field_paths
         initial_search_index_definitions.map(&:route_with).uniq
@@ -206,7 +206,7 @@ module ElasticGraph
         @shard_routing_values ||=
           if routing_values&.empty? && !aggregations_datastore_body.empty?
             # If we return an empty array of routing values, no shards will get searched, which causes a problem for aggregations.
-            # When a query includes aggregations, there are normally aggregation structures on the respopnse (even when there are no
+            # When a query includes aggregations, there are normally aggregation structures on the response (even when there are no
             # search hits to aggregate over!) but if there are no routing values, those aggregation structures will be missing from
             # the response. It's complex to handle that in our downstream response handling code, so we prefer to force a "fallback"
             # routing value here to ensure that at least one shard gets searched. Which shard gets searched doesn't matter; the search

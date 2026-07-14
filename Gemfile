@@ -77,7 +77,7 @@ gems_in_this_repo = ::Dir.glob("#{repo_root}/*/*.gemspec").map do |gemspec|
 end.to_set
 
 # This file is symlinked from the repo root into each gem directory. To detect which case we're in,
-# we can compare the the current directory to the repo root.
+# we can compare the current directory to the repo root.
 if repo_root == __dir__
   require_relative "elasticgraph-support/lib/elastic_graph/version"
 

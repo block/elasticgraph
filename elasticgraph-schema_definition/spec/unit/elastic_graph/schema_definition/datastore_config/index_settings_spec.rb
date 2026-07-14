@@ -29,7 +29,7 @@ module ElasticGraph
         )
       end
 
-      it "allows specific settings to be overridden via the `index` options in the schema definitionAPI" do
+      it "allows specific settings to be overridden via the `index` options in the schema definition API" do
         settings = index_settings_for "my_type" do |s|
           s.object_type "MyType" do |t|
             t.field "id", "ID"

@@ -31,7 +31,7 @@ module ElasticGraph
       end
     end
 
-    # Hook in to the API tests use to define schemas so that we can automatically validate each schema.
+    # Hook into the API that tests use to define schemas so that we can automatically validate each schema.
     SchemaDefinition::TestSupport.prepend(self)
 
     def self.validate_graphql_schema!(results)

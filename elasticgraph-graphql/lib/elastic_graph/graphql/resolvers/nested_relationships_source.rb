@@ -13,7 +13,7 @@ module ElasticGraph
     module Resolvers
       # A GraphQL dataloader responsible for solving a thorny N+1 query problem related to our `NestedRelationships` resolver.
       # The `QuerySource` dataloader implements a basic batching optimization: multiple datastore queries are batched up into
-      # a single `msearch` call against the dataastore. This is significantly better than submitting a separate request per
+      # a single `msearch` call against the datastore. This is significantly better than submitting a separate request per
       # query, but is still not optimal--the datastore still must execute N different queries, which could cause significant load.
       #
       # A significantly improved optimization is possible in one particular situation from our `NestedRelationships` resolver.
@@ -144,7 +144,7 @@ module ElasticGraph
         #
         #   - It builds and executes an initial optimized merged query, with a large `size_multiplier` which gives us a good bit of
         #     "headroom" for this kind of situation. In the example above, if we requested 60 results from the datastore, we'd be
-        #     able to get the 10 results for both id sets we are looking for--50 for `id_set_1` nad 10 for `id_set_2`.
+        #     able to get the 10 results for both id sets we are looking for--50 for `id_set_1` and 10 for `id_set_2`.
         #   - It then inspects the response. If the datastore returned fewer results than we asked for, then there are no missing
         #     results and we can trust that we got all the results we would have gotten if we had executed a separate query per
         #     id set.
@@ -178,7 +178,7 @@ module ElasticGraph
             # 5 sets of ids, then, at a minimum, we need to request 50 results (10 results for each id set).
             #
             # In addition, we apply `EXTRA_SIZE_MULTIPLIER` to increase the size further and make it less likely that
-            # we we get incomplete results and have to retry.
+            # we get incomplete results and have to retry.
             size_multiplier: id_sets.size * EXTRA_SIZE_MULTIPLIER
           )
 

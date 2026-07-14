@@ -350,7 +350,7 @@ module ElasticGraph
 
         it "successfully checks schema artifacts when the rake task is run within a minimal schema definition bundle" do
           # We want to ensure that `elasticgraph-schema_definition` gem declares (in its gemspec) all the
-          # dependencies necessary for the schema definition rake tasks. Unfortunately, it's test suite
+          # dependencies necessary for the schema definition rake tasks. Unfortunately, its test suite
           # alone can't detect this, even when run via `script/run_gem_specs`, due to transitive dependencies
           # of some of the test dependencies. For example, in January 2023, `elasticgraph-schema_definition`
           # began needing parts of `elasticgraph-indexer` at run time, but we forgot to add it to the gemspec,

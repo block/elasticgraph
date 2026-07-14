@@ -12,7 +12,7 @@ AllCops:
     - "*/vendor/**/*"
 
 # Put any custom Rubocop configuration here. Note, however, that standardrb (which wraps rubocop)
-# does not allow its lint settings to be overriden--we can only add new cops here, so please confirm
+# does not allow its lint settings to be overridden--we can only add new cops here, so please confirm
 # that any new cops added here are actually effective.
 
 require:

@@ -27,7 +27,7 @@ module ElasticGraph
             expect(encoded).to eq "my_aggs:my_field:sum"
           end
 
-          it "allows an `AggregatedValue` for an nested field to be encoded" do
+          it "allows an `AggregatedValue` for a nested field to be encoded" do
             key = Key::AggregatedValue.new(
               aggregation_name: "my_aggs",
               field_path: ["transaction", "amountMoney", "amount"],

@@ -9,7 +9,7 @@
 module ElasticGraph
   module QueryRegistry
     # Responsible for comparing old and new variable type info to see if any changes are backwards
-    # incompatible (and thus my break the client). Incompatibilities are identified by path and described.
+    # incompatible (and thus may break the client). Incompatibilities are identified by path and described.
     class VariableBackwardIncompatibilityDetector
       # Entry point. Given the old variables for an operation, and the new variables for it, describes
       # any backward incompatibilities in them.
@@ -86,7 +86,7 @@ module ElasticGraph
       end
 
       # Handles the fact that `type_info` can sometimes be a simple string, normalizing
-      # it to a hash so that we can consistently treat all type infos as hashes with a `type` field.
+      # it to a hash so that we can consistently treat all type info as hashes with a `type` field.
       def normalize_type_info(type_info)
         return {"type" => type_info} if type_info.is_a?(::String)
         _ = type_info

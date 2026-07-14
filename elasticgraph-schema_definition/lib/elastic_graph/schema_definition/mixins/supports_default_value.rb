@@ -21,7 +21,7 @@ module ElasticGraph
           @default_value = default_value
         end
 
-        # Generates SDL for the default value. Suitable for inclusion in the schema elememnts `#to_sdl`.
+        # Generates SDL for the default value. Suitable for inclusion in the schema element's `#to_sdl`.
         #
         # @return [String]
         def default_value_sdl

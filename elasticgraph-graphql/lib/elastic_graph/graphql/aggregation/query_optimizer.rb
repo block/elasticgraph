@@ -15,7 +15,7 @@ module ElasticGraph
       # our aggregations API. To explain what this does, it's useful to see an example:
       #
       # ```
-      # query WigdetsBySizeAndColor($filter: WidgetFilterInput) {
+      # query WidgetsBySizeAndColor($filter: WidgetFilterInput) {
       #   by_size: widgetAggregations(filter: $filter) {
       #     edges { node {
       #       size
@@ -33,7 +33,7 @@ module ElasticGraph
       # ```
       #
       # With this API, two separate datastore queries get built--one for `by_size`, and one
-      # for `by_color`. While we're able to send them to the datastore in a single `msearch` request,
+      # for `by_color`. We're able to send them to the datastore in a single `msearch` request,
       # as it allows a single search to have multiple aggregations in it. The aggregations
       # API we offered before April 2023 directly supported this, allowing for more efficient
       # queries. (But it had other significant downsides).
@@ -144,7 +144,7 @@ module ElasticGraph
           (_ = queries.first).with(aggregations: all_aggs_by_name)
         end
 
-        # "Unmerges" a response to convert it to what it woulud have been if we hadn't merged queries.
+        # "Unmerges" a response to convert it to what it would have been if we hadn't merged queries.
         # To do that, we need to do two things:
         #
         # - Filter down the aggregations to just the ones that are for the original query.

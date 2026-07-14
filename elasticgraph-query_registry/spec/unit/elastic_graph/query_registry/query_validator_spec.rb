@@ -163,7 +163,7 @@ module ElasticGraph
         end
 
         context "when the `@eg_latency_slo` directive is not required" do
-          it "does still allows the query to have an `@eg_latency_slo` directive" do
+          it "still allows the query to have an `@eg_latency_slo` directive" do
             query_string = <<~EOS
               query MyQuery @eg_latency_slo(ms: 5000) {
                 widgets {

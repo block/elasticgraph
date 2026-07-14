@@ -301,7 +301,7 @@ module ElasticGraph
           })
         end
 
-        it "merge values between nested hashes with different keys" do
+        it "merges values between nested hashes with different keys" do
           hash1 = {
             property1: {
               property2: {
@@ -500,7 +500,7 @@ module ElasticGraph
           expect(values).to eq []
         end
 
-        it "returns `[]` when a the nested path has an explicit `nil` value" do
+        it "returns `[]` when the nested path has an explicit `nil` value" do
           hash = {"foo" => {"bar" => nil}}
           values = HashUtil.fetch_leaf_values_at_path(hash, ["foo", "bar"])
           expect(values).to eq []

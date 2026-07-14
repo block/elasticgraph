@@ -207,8 +207,8 @@ module ElasticGraph
 
               # Indicates if the given `field_path` is (1) necessary and (2) missing from the JSON schema, indicating a problem.
               #
-              # - Returns `false` is the given `field_path` is present in the JSON schema.
-              # - Returns `false` is the parent type of `field_path` has not been retained in this JSON schema version
+              # - Returns `false` if the given `field_path` is present in the JSON schema.
+              # - Returns `false` if the parent type of `field_path` has not been retained in this JSON schema version
               #   (in that case, the field path is not necessary).
               # - Otherwise, returns `true` since the field path is both necessary and missing.
               def necessary_path_missing?(field_path)

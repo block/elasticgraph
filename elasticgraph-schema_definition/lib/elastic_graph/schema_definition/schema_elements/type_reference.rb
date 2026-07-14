@@ -80,7 +80,7 @@ module ElasticGraph
           end
 
           # For derived GraphQL types, the name usually implies what kind of type it is.
-          # The derived types get generated last, so this prediate may be called before the
+          # The derived types get generated last, so this predicate may be called before the
           # type has been defined.
           case schema_kind_implied_by_name
           when :object
@@ -101,7 +101,7 @@ module ElasticGraph
           end
 
           # For derived GraphQL types, the name usually implies what kind of type it is.
-          # The derived types get generated last, so this prediate may be called before the
+          # The derived types get generated last, so this predicate may be called before the
           # type has been defined.
           case schema_kind_implied_by_name
           when :object

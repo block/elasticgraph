@@ -117,7 +117,7 @@ module ElasticGraph
             .fetch("index_templates").to_h do |entry|
               index_template = entry.fetch("index_template")
 
-              # OpenSearch ignores  `flat_settings` on the `/_index_template` API (but _only_ returns flattened settings from the index
+              # OpenSearch ignores `flat_settings` on the `/_index_template` API (but _only_ returns flattened settings from the index
               # API). Here we flatten the settings to align with the flattened form ElasticGraph expects and uses everywhere.
               flattened_settings = Support::HashUtil.flatten_and_stringify_keys(index_template.fetch("template").fetch("settings"))
 
@@ -179,7 +179,7 @@ module ElasticGraph
         # `allow_no_indices: true` is needed when we attempt to delete a non-existing index to avoid errors. For rollover indices,
         # when we delete the actual indices, we will always perform a wildcard deletion, and `allow_no_indices: true` is needed.
         #
-        # Note that the Elasticsearch API documentation[^1] says that `allow_no_indices` defaults to `true` but a Elasticsearch Ruby
+        # Note that the Elasticsearch API documentation[^1] says that `allow_no_indices` defaults to `true` but an Elasticsearch Ruby
         # client code comment[^2] says it defaults to `false`. Regardless, we don't want to rely on the default behavior that could change.
         #
         # [^1]: https://www.elastic.co/guide/en/elasticsearch/reference/8.12/indices-delete-index.html#delete-index-api-query-params

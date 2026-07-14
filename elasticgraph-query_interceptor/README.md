@@ -44,7 +44,7 @@ index 4a5ef1e..5c16c2b 100644
 
 ```
 
-Next, define the interceptor. Interceptor must implement this interface:
+Next, define the interceptor. The interceptor must implement this interface:
 
 ```ruby
 # lib/example_interceptor.rb
@@ -54,7 +54,7 @@ class ExampleInterceptor
     # datastore client in case you need it in your interceptor. This can be useful if you need to perform
     # lookups on a derived index as part of your interceptor logic.
     #
-    # `config` is a hash containing parameterized configuration values specific in the YAML settings
+    # `config` is a hash containing parameterized configuration values specified in the YAML settings
     # (see below for an example).
   end
 

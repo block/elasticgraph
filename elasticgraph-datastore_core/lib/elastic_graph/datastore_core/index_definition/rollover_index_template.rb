@@ -54,7 +54,7 @@ module ElasticGraph
         #
         # Use of this is considered a mild code smell.  When feasible, it's generally better to
         # implement a new polymorphic API on the IndexDefinition interface, rather
-        # then branching on the value of this predicate.
+        # than branching on the value of this predicate.
         def rollover_index_template?
           true
         end
@@ -77,7 +77,7 @@ module ElasticGraph
 
         # Returns a list of indices related to this template. This includes both indices that are
         # specified in our configuration settings (e.g. via `setting_overrides_by_timestamp` and
-        # `custom_time_sets`) and also indices that have been auto-created from the template.
+        # `custom_timestamp_ranges`) and also indices that have been auto-created from the template.
         #
         # Note that there can be discrepancies between the configuration settings and the indices in
         # the datastore. Sometimes this is planned/expected (e.g. such as when invoking `elasticgraph-admin`
@@ -90,7 +90,7 @@ module ElasticGraph
         # - When `true`, any indices in our configuration that do not exist are ignored, and not included in the returned list.
         #   This is appropriate for searching the datastore: if we attempt to exclude an index which is defined in config but does
         #   not exist (e.g. via `-[index_name]` in the search index expression), the datastore will return an error, but we can
-        #   safely ignore the index. Likewise, if we have an index in the datastore which we cannot infer a timestamp range, we
+        #   safely ignore the index. Likewise, if we have an index in the datastore for which we cannot infer a timestamp range, we
         #   need to ignore it to avoid getting errors. Ignoring an index is safe when searching because our search logic uses a
         #   wildcard to match _all_ indices with the same prefix, and then excludes certain known indices that it can safely
         #   exclude based on their timestamp range. Ignored indices which exist will still be searched.

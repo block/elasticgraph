@@ -159,7 +159,7 @@ module ElasticGraph
         }]
       end
 
-      it "supports nesting sub-aggreations under an extra object layer" do
+      it "supports nesting sub-aggregations under an extra object layer" do
         query = aggregation_query_of(name: "teams", sub_aggregations: [
           nested_sub_aggregation_of(path_in_index: ["the_nested_fields", "current_players"], query: sub_aggregation_query_of(name: "current_players"))
         ])
@@ -629,7 +629,7 @@ module ElasticGraph
           }])
         end
 
-        it "can group sub-aggregations on a multiple date fields" do
+        it "can group sub-aggregations on multiple date fields" do
           query = aggregation_query_of(name: "teams", sub_aggregations: [
             nested_sub_aggregation_of(path_in_index: ["seasons_nested"], query: sub_aggregation_query_of(name: "seasons_nested", groupings: [
               date_histogram_grouping_of("seasons_nested", "started_at", "year"),

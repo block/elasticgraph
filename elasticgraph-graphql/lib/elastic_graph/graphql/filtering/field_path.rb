@@ -49,7 +49,7 @@ module ElasticGraph
 
         # Converts the current paths to what they need to be to be able to query our hidden `__counts` field (which
         # is a map containing the counts of elements of every list field on the document). The `__counts` field
-        # sits a the root of every document (for both an overall root document and a `nested` document). Here's an
+        # sits at the root of every document (for both an overall root document and a `nested` document). Here's an
         # example (which assumes `seasons` and `seasons.players` fields which are both `nested` and an `awards` field
         # which is a list of strings). Given a filter like this:
         #

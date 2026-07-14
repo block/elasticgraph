@@ -50,7 +50,7 @@ module ElasticGraph
 
         # If the given `potentially_overriden_name` is an overridden name, returns the name from before the
         # override was applied. Note: this may not be the true "original" name that ElasticGraph would have
-        # have used (e.g. it could still be customized by `formats`) but it will be the name that would
+        # used (e.g. it could still be customized by `formats`) but it will be the name that would
         # be used without any `name_overrides`.
         #
         # @private

@@ -201,7 +201,7 @@ module ElasticGraph
         expect(page_info).to have_attributes(has_previous_page: a_boolean, has_next_page: a_boolean)
       end
 
-      it "returns correct values for `has_next_page` and `has_previous_page` when the page only one element" do
+      it "returns correct values for `has_next_page` and `has_previous_page` when the page has only one element" do
         items, page_info = paginated_search(first: 1, after: cursor_of(item4))
         expect(ids_of(items)).to eq ids_of(item5)
         expect(page_info).to have_attributes(has_previous_page: true, has_next_page: false)
@@ -223,7 +223,7 @@ module ElasticGraph
         expect(page_info).to have_attributes(has_previous_page: true, has_next_page: false)
       end
 
-      it "correctly handles the a page of one item when that item's cursor is used for `before` and/or `after`" do
+      it "correctly handles a page of one item when that item's cursor is used for `before` and/or `after`" do
         items, page_info = paginated_search(filter_to: item1)
         expect(ids_of(items)).to eq ids_of(item1)
         expect(page_info).to have_attributes(has_previous_page: false, has_next_page: false)

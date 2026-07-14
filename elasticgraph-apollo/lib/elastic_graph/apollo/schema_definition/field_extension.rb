@@ -27,7 +27,7 @@ module ElasticGraph
         # Extension method designed to support Apollo's [contract variant tagging](https://www.apollographql.com/docs/studio/contracts/).
         #
         # Calling this method on a field will cause the field and every schema element derived from the field (e.g. the filter field,
-        # he aggregation field, etc), to be tagged with the given `tag_name`, ensuring that all capabilities related to the field are
+        # the aggregation field, etc), to be tagged with the given `tag_name`, ensuring that all capabilities related to the field are
         # available in the contract variant.
         #
         # @param tag_name [String] tag to add to schema elements generated for this field

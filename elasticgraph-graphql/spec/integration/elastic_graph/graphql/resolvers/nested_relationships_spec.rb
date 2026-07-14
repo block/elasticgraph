@@ -12,7 +12,7 @@ module ElasticGraph
   class GraphQL
     module Resolvers
       RSpec.describe NestedRelationships, :factories, :ingests_json_data, :capture_logs, :resolver do
-        # :expect_search_routing because the relation we use here uses an outbaund foreign key, which
+        # :expect_search_routing because the relation we use here uses an outbound foreign key, which
         # is implemented via a filter on `id` (the search routing field)
         context "when the field being resolved is a relay connection field", :expect_search_routing do
           let(:graphql) do
@@ -107,7 +107,7 @@ module ElasticGraph
           let(:widget2) { build(:widget, components: [component2], created_at: "2019-06-02T00:00:00Z") }
           let(:widget3) { build(:widget, amount_cents: 200, components: [component3], created_at: "2019-06-03T00:00:00Z") }
 
-          # :expect_search_routing because the relation we use here uses an outbaund foreign key, which
+          # :expect_search_routing because the relation we use here uses an outbound foreign key, which
           # is implemented via a filter on `id` (the search routing field)
           context "loading the relates_to_many", :expect_search_routing do
             before do
@@ -335,7 +335,7 @@ module ElasticGraph
             end
           end
 
-          # :expect_search_routing because the relation we use here uses an outbaund foreign key, which
+          # :expect_search_routing because the relation we use here uses an outbound foreign key, which
           # is implemented via a filter on `id` (the search routing field)
           context "loading the relates_to_one", :expect_search_routing do
             before do
@@ -348,7 +348,7 @@ module ElasticGraph
               expect(result.fetch("id")).to eq manufacturer1.fetch(:id)
             end
 
-            it "tolerates not finding a record the given id" do
+            it "tolerates not finding a record for the given id" do
               result = resolve("ElectricalPart", "manufacturer", {"manufacturer_id" => build(:manufacturer).fetch(:id)})
 
               expect(result).to eq nil
@@ -421,10 +421,10 @@ module ElasticGraph
           # Here we explicitly create parts of both unioned types. That ensures that both indices are created
           # in the datastore. Otherwise, some of the tests below may run with one or the other index missing,
           # if all 4 parts are randomly created of the same type. While we can easily work around that with
-          # The datastore's `search` using `ignore_unavailable: true`, the same thing is not supported for `msearch`,
+          # the datastore's `search` using `ignore_unavailable: true`, the same thing is not supported for `msearch`,
           # which we are migrating to. We do not expect this to ever be a problem outside tests, and we plan
           # to solve this in a more robust way by explicitly putting mappings into the datastore, but for now
-          # this is simple work around.
+          # this is a simple workaround.
           let(:part1) { build(:mechanical_part, name: "p1", created_at: "2019-06-01T00:00:00Z") }
           let(:part2) { build(:mechanical_part, name: "p2", created_at: "2019-06-02T00:00:00Z") }
           let(:part3) { build(:electrical_part, name: "p3", created_at: "2019-06-03T00:00:00Z") }
@@ -434,7 +434,7 @@ module ElasticGraph
           let(:component3) { build(:component, parts: [part2, part3], name: "c3", created_at: "2019-06-03T00:00:00Z") }
           let(:component4) { build(:component, name: "c4") }
 
-          # :expect_search_routing because the relation we use here uses an outbaund foreign key, which
+          # :expect_search_routing because the relation we use here uses an outbound foreign key, which
           # is implemented via a filter on `id` (the search routing field)
           context "loading the relates_to_many with an outbound foreign key", :expect_search_routing do
             before do
@@ -599,7 +599,7 @@ module ElasticGraph
           let(:address3) { build(:address, manufacturer: manufacturer2) }
           let(:address4) { build(:address, manufacturer: manufacturer3) }
 
-          # :expect_search_routing because the relation we use here uses an outbaund foreign key, which
+          # :expect_search_routing because the relation we use here uses an outbound foreign key, which
           # is implemented via a filter on `id` (the search routing field)
           context "loading the relates_to_one with the outbound foreign key", :expect_search_routing do
             before do
@@ -731,7 +731,7 @@ module ElasticGraph
         def resolve(*args, requested_fields: ["id", "created_at"], **options)
           result = nil
 
-          # Perform any cached calls to the datastore to happen before our `perform_datastore_search`
+          # Allow any cached calls to the datastore to happen before our `perform_datastore_search`
           # matcher below which tries to assert which specific requests get made, since index definitions
           # have caching behavior that can make the presence or absence of that request slightly non-deterministic.
           pre_cache_index_state(graphql)

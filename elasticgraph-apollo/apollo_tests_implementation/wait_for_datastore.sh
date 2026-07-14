@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Inspired by an example from the docker docks:
+# Inspired by an example from the docker docs:
 # https://docs.docker.com/compose/startup-order/
 
 set -e

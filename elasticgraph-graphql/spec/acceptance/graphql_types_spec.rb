@@ -271,7 +271,7 @@ module ElasticGraph
           {case_correctly("full_address") => "space-needle"}
         ]
 
-        # For now, other features (e,g. sorting and aggregating) are not supported on GeoLocation values.
+        # For now, other features (e.g. sorting and aggregating) are not supported on GeoLocation values.
       end
     end
 

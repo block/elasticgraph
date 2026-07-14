@@ -74,7 +74,7 @@ module ElasticGraph
             # multiple copies of the document in different indexes or shards. `source_event_versions_in_index`
             # returns a list of found versions.
             #
-            # We only need to consider the largest version when deciding if a failure has been supeseded or not.
+            # We only need to consider the largest version when deciding if a failure has been superseded or not.
             # An event with a larger version is considered to be a full replacement for an earlier event for the
             # same entity, so if we've processed an event for the same entity with a larger version, we can consider
             # the failure superseded.

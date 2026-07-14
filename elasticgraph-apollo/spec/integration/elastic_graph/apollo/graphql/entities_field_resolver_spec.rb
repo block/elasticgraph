@@ -425,7 +425,7 @@ module ElasticGraph
             }.to log_warning(a_string_including("is not a JSON object"))
           end
 
-          it "returns an error if the representations lacks a `__typename`, while still returning the entities that it can" do
+          it "returns an error if the representation lacks a `__typename`, while still returning the entities that it can" do
             index_records(
               build(:widget, id: "w1", name: "widget1")
             )

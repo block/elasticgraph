@@ -80,7 +80,7 @@ module ElasticGraph
         )
       end
 
-      it "identifies a variable with a changed type to be potentially breaking unless its only relaxing nullability" do
+      it "identifies a variable with a changed type to be potentially breaking unless it's only relaxing nullability" do
         incompatibilities = detect_incompatibilities(
           old: {"id" => "ID!", "count" => "Int", "foo" => "String", "bar" => "Float"},
           new: {"id" => "ID", "count" => "Int!", "foo" => "Int", "bar" => "Int!"}

@@ -36,7 +36,7 @@ module ElasticGraph
             requested_fields: ["id"]
           )
 
-          # Perform any cached calls to the datastore to prevent them from alter interacting with the
+          # Perform any cached calls to the datastore to prevent them from later interacting with the
           # `perform_datastore_msearch` assertion below.
           pre_cache_index_state(graphql)
           query_tracker = QueryDetailsTracker.empty

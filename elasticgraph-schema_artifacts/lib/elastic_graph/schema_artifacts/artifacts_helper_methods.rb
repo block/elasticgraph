@@ -10,9 +10,9 @@ module ElasticGraph
   module SchemaArtifacts
     # Mixin that offers convenient helper methods on top of the basic schema artifacts.
     # Intended to be mixed into {FromDisk} and other implementations of the same interface
-    # (such as {SchemaDefinition::Results}.
+    # (such as {SchemaDefinition::Results}).
     module ArtifactsHelperMethods
-      # Provides accesses to the datastore scripts, typically written using the [painless scripting
+      # Provides access to the datastore scripts, typically written using the [painless scripting
       # language](https://www.elastic.co/docs/explore-analyze/scripting/modules-scripting-painless).
       #
       # @return [Hash<String, Hash<String, Object>>]
@@ -20,7 +20,7 @@ module ElasticGraph
         datastore_config.fetch("scripts")
       end
 
-      # Provides accesses to the datastore index templates, which are used for a rollover index defined using
+      # Provides access to the datastore index templates, which are used for a rollover index defined using
       # {SchemaDefinition::Indexing::Index#rollover}.
       #
       # @return [Hash<String, Hash<String, Object>>]
@@ -28,7 +28,7 @@ module ElasticGraph
         datastore_config.fetch("index_templates")
       end
 
-      # Provides accesses to the datastore indices, used for an index that does not rollover.
+      # Provides access to the datastore indices, used for an index that does not rollover.
       #
       # @return [Hash<String, Hash<String, Object>>]
       def indices

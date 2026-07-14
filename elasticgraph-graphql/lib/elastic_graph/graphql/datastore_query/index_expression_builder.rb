@@ -99,7 +99,7 @@ module ElasticGraph
             #
             # - We could return an `IndexExpression` with no exclusions, but that would search across all indices, which is less efficient.
             # - We could pick the first index to search (as we do for the `time_set.empty?` case), but that could cause matching documents
-            #   to be be missed, because it's possible that matching documents exist in just-created index that is not in
+            #   to be missed, because it's possible that matching documents exist in just-created index that is not in
             #   `known_related_query_rollover_indices`. Therefore, it's important that we still search the rollover wildcard expression,
             #   and we want to exclude all but one of the known indices.
             indices_to_exclude = indices_to_exclude.drop(1)

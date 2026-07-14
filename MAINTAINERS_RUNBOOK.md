@@ -19,7 +19,7 @@ Release a new version using the [Release workflow](https://github.com/block/elas
 
 > [!Important]
 > If there's any question about the readiness to release a new version to end users, please release a release candidate
-> using a version number like `1.2.0.rc1`, `1.2.0.rc2`, etc. After the release candidate has been thorougly tested, we
+> using a version number like `1.2.0.rc1`, `1.2.0.rc2`, etc. After the release candidate has been thoroughly tested, we
 > can cut the final release.
 
 After the workflow completes, review the PR that gets opened ([example](https://github.com/block/elasticgraph/pull/618)) and follow its
@@ -255,7 +255,7 @@ Occasionally, it's useful to create a new gem that's part of the set of ElasticG
 cp -R elasticgraph-opensearch elasticgraph-newgem
 ```
 
-2. Cleanup the `lib`/`spec`/`sig` files that were originally in `elasticgraph-opensearch` (these will be entirely different for your new gem):
+2. Clean up the `lib`/`spec`/`sig` files that were originally in `elasticgraph-opensearch` (these will be entirely different for your new gem):
 
 ```bash
 rm -rf elasticgraph-newgem/lib/elastic_graph/opensearch

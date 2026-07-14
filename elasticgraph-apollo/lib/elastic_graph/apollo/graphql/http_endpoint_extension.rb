@@ -19,7 +19,7 @@ module ElasticGraph
       # Luckily, the apollo-federation gem supports this--we just need to:
       #
       # 1. Use the `ApolloFederation::Tracing` plugin (implemented via `EngineExtension#graphql_gem_plugins`).
-      # 2. Conditionally pass `tracing_enabled: true` into in `context`.
+      # 2. Conditionally pass `tracing_enabled: true` into `context`.
       #
       # This extension handles the latter requirement. For more info, see:
       # https://github.com/Gusto/apollo-federation-ruby#tracing

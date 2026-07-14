@@ -11,7 +11,7 @@ ElasticGraph supports three full-text search filtering predicates:
 
 ### Matches Query
 
-`matchesQuery` is the more lenient of the two predicates. It's designed to match broadly. Here's an example:
+`matchesQuery` is the more lenient of the three predicates. It's designed to match broadly. Here's an example:
 
 {% include copyable_code_snippet.html language="graphql" data="music_queries.filtering.AccordionOrViolinSearch" %}
 
@@ -20,7 +20,7 @@ This query will match artists with bios like:
 > Renowned for his mesmerizing performances, Luca "The Breeze" Fontana captivates audiences with his accordion,
 > weaving intricate melodies that dance between the notes of traditional folk and modern jazz.
 
-> Sylvia  Varela's avant-garde violin playing defies tradition, blending haunting dissonance with unexpected rhythms.
+> Sylvia Varela's avant-garde violin playing defies tradition, blending haunting dissonance with unexpected rhythms.
 
 Notably, the description needs `accordion` OR `violin`, but not both. In addition, it would match an artist bio that
 mentioned "viola" since it supports fuzzy matching by default and "viola" is only 2 edits away from "violin". Arguments

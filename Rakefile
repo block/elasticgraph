@@ -55,7 +55,7 @@ configure_local_rake_tasks = ->(tasks) do
     require "rspec/core" # the factories file expects RSpec to be loaded, so load it.
 
     # spec_support is not a full-fledged gem and is not on the load path, so we have to
-    # add it's lib dir to the load path before we can require things from it.
+    # add its lib dir to the load path before we can require things from it.
     $LOAD_PATH.unshift ::File.join(__dir__, "spec_support", "lib")
     require "elastic_graph/spec_support/factories"
 

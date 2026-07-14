@@ -4,7 +4,7 @@
 # Verbose form of `set -e`.
 set -o errexit
 
-# Attempt to use undefined variable outputs error message, and forces an exit
+# Attempting to use an undefined variable outputs an error message and forces an exit.
 # Verbose form of `set -u`.
 set -o nounset
 
@@ -46,7 +46,7 @@ export gems_to_build_with_datastore_booted=$(echo ${all_gems[@]} ${gems_to_build
 # message and skip.
 if [ "$#" -lt 2 ]; then
   echo "No datastore argument specified; will assume the datastore is already running."
-  echo "If you need want the ci_parts script to boot the datastore, specify the datastore as the first argument, like:"
+  echo "If you need the ci_parts script to boot the datastore, specify the datastore as the first argument, like:"
   echo "script/ci_parts/run_each_gem_spec elasticsearch:8.13.0"
 
   function halt_datastore_daemon() {
@@ -65,7 +65,7 @@ else
 
   bundle exec rake ${datastore_backend}:${boot_env}:${datastore_version}:daemon
 
-  # Occasionally, we've see transient "Partial shards failure (N shards unavailable)" errors from
+  # Occasionally, we've seen transient "Partial shards failure (N shards unavailable)" errors from
   # Elasticsearch/OpenSearch on CI from the first tests that run after booting it. Locally that
   # never happens--likely because we do not immediately run tests after booting Elasticsearch/OpenSearch.
   #

@@ -12,7 +12,7 @@ Here's an example:
 
 This example query aggregates the values of the `Artist.lifetimeSales` field using all 4 of the standard numeric
 aggregated values: `min`, `max`, `avg`, and `sum`. These are qualified with `approximate` or `exact` to indicate
-the level of precision they offer. The documentation for `approximateSum` and `exactSum` provide more detail:
+the level of precision they offer. The documentation for `approximateSum` and `exactSum` provides more detail:
 
 `approximateSum`
 : The (approximate) sum of the field values within this grouping.

@@ -254,11 +254,11 @@ module ElasticGraph
           expect(results).to match_array(ids_of(team1, team3))
 
           results = search_with_filter("forbes_valuations", "all_of", nil)
-          # all teamss qualify for `all_of: nil`
+          # all teams qualify for `all_of: nil`
           expect(results).to match_array(ids_of(team1, team2, team3))
 
           results = search_with_filter("forbes_valuations", "all_of", [])
-          # all teamss qualify for `all_of: []`
+          # all teams qualify for `all_of: []`
           expect(results).to match_array(ids_of(team1, team2, team3))
         end
 
@@ -680,7 +680,7 @@ module ElasticGraph
             graphql,
             # In 2022, DST started on 2022-03-13, so on this date the Pacific Time offset was -8 hours.
             widget_02am = build(:widget, id: "02am", created_at: "2022-03-12T10:23:10Z"), # Local time in Pacific: 02:23:10
-            # ...on on this date the Pacific Time offset was -7 hours.
+            # ...and on this date the Pacific Time offset was -7 hours.
             widget_03am = build(:widget, id: "03am", created_at: "2022-03-13T10:23:10Z"), # Local time in Pacific: 03:23:10
             # ...and on this date the Pacific Time offset was -7 hours.
             widget_08pm = build(:widget, id: "08pm", created_at: "2022-04-12T03:05:00Z"), # Local time in Pacific: 20:05:00

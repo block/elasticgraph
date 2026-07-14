@@ -391,7 +391,7 @@ module ElasticGraph
             when :minimum_should_match
               0 # doesn't have any clauses on its own, just controls how many `:should` clauses are required.
             else
-              # For all other occurrences, each cluse must match.
+              # For all other occurrences, each clause must match.
               clauses.size
             end + count
           end

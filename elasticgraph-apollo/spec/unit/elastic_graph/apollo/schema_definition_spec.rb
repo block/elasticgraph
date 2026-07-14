@@ -667,7 +667,7 @@ module ElasticGraph
               schema.object_type "Widget" do |t|
                 t.field "id", "ID"
                 t.field "component_id", "ID!"
-                # Demnonstrate that it works with and without a block, supporting both nullable and non-null fields.
+                # Demonstrate that it works with and without a block, supporting both nullable and non-null fields.
                 t.apollo_entity_ref_field "component1", "Component", id_field_name_in_index: "component_id"
                 t.apollo_entity_ref_field "component2", "Component!", id_field_name_in_index: "component_id" do |f|
                   f.documentation "A component entity reference."
@@ -758,7 +758,7 @@ module ElasticGraph
               schema.object_type "Widget" do |t|
                 t.field "id", "ID"
                 t.field "component_ids", "[ID!]!", singular: "component_id"
-                # Demnonstrate that it works with and without a block, supporting both nullable and non-null fields.
+                # Demonstrate that it works with and without a block, supporting both nullable and non-null fields.
                 t.apollo_entity_ref_field "components1", "[Component!]!", id_field_name_in_index: "component_ids"
                 t.apollo_entity_ref_field "components2", "[Component]", id_field_name_in_index: "component_ids" do |f|
                   f.documentation "Component entity references."
@@ -847,7 +847,7 @@ module ElasticGraph
               schema.object_type "Widget" do |t|
                 t.field "id", "ID"
                 t.field "component_ids", "[ID!]!", singular: "component_id"
-                # Demnonstrate that it works with and without a block
+                # Demonstrate that it works with and without a block
                 t.apollo_entity_ref_paginated_collection_field "components1", "Component", id_field_name_in_index: "component_ids"
                 t.apollo_entity_ref_paginated_collection_field "components2", "Component", id_field_name_in_index: "component_ids" do |f|
                   f.directive "deprecated"
@@ -941,7 +941,7 @@ module ElasticGraph
               schema.object_type "Widget" do |t|
                 t.field "id", "ID"
                 t.paginated_collection_field "component_ids", "ID", singular: "component_id"
-                # Demnonstrate that it works with and without a block
+                # Demonstrate that it works with and without a block
                 t.apollo_entity_ref_paginated_collection_field "components1", "Component", id_field_name_in_index: "component_ids"
                 t.apollo_entity_ref_paginated_collection_field "components2", "Component", id_field_name_in_index: "component_ids" do |f|
                   f.directive "deprecated"

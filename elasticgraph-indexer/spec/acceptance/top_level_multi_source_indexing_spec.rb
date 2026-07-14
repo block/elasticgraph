@@ -31,7 +31,7 @@ module ElasticGraph
       # ingest an updated widget (with a changed name)
       indexer.processor.process([widget_v8], refresh_indices: true)
 
-      # ingest component2 after related widge, and ingest standalone component3
+      # ingest component2 after related widget, and ingest standalone component3
       indexer.processor.process([component2, component3], refresh_indices: true)
 
       # ingest an old version of the widget (with a different name); it should be ignored
@@ -133,7 +133,7 @@ module ElasticGraph
       })
     end
 
-    it "does not allow mutations of relationships used by `sourced_from`, since allowing such a mutation would break ElasticGraph's 'ingest in any order' guaranteees" do
+    it "does not allow mutations of relationships used by `sourced_from`, since allowing such a mutation would break ElasticGraph's 'ingest in any order' guarantees" do
       widget1 = build_upsert_event(:widget, id: "w1", component_ids: ["c23"])
       widget2 = build_upsert_event(:widget, id: "w2", component_ids: ["c23"])
 

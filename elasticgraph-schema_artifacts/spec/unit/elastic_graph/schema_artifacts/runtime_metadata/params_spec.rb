@@ -26,7 +26,7 @@ module ElasticGraph
           expect(loaded.cardinality).to eq(:one)
         end
 
-        it "sets `source_path` in the dumped hashunset if it is different from the param name" do
+        it "sets `source_path` in the dumped hash if it is different from the param name" do
           param = dynamic_param_with(source_path: "foo")
 
           dumped = param.to_dumpable_hash("bar")

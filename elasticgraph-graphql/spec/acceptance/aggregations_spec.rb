@@ -225,7 +225,7 @@ module ElasticGraph
         end
         expect(aggregations_with_divergent_field_names).to eq(expected_result_with_divergent_field_names)
 
-        # Verify single grouping aggregation on an nested field
+        # Verify single grouping aggregation on a nested field
         aggregations = list_widgets_with_aggregations(amount_aggregation("cost.currency"))
 
         expect(aggregations).to contain_exactly(
@@ -1039,7 +1039,7 @@ module ElasticGraph
           build(:mechanical_part, name: "p2")
         )
 
-        # Run on aggregation on a type union (`parts`)
+        # Run an aggregation on a type union (`parts`)
         results = call_graphql_query(<<~EOS).dig("data", case_correctly("part_aggregations"), "edges").map { |e| e["node"] }
           query {
             part_aggregations {
@@ -1058,7 +1058,7 @@ module ElasticGraph
           {case_correctly("grouped_by") => {"name" => "p2"}, "count" => 1}
         )
 
-        # Run on aggregation on an interface (`named_entities`)
+        # Run an aggregation on an interface (`named_entities`)
         results = call_graphql_query(<<~EOS).dig("data", case_correctly("named_entity_aggregations"), "edges").map { |e| e["node"] }
           query {
             named_entity_aggregations {
@@ -1360,7 +1360,7 @@ module ElasticGraph
         # avg and count cannot be combined with the others because they request the document count WITHOUT a `grouped_by`.
         # The datastore aggregations API does not provide a way to get a count without grouping; instead you have to request the
         # document count from the main search body. As a result, the `DatastoreQuery` for avg/count has differences from
-        # the others beyond just the aggregations. With out current `Aggregation::QueryOptimizer` implementation, we don't
+        # the others beyond just the aggregations. With our current `Aggregation::QueryOptimizer` implementation, we don't
         # combine these.
         expect(count_of_searches_in(datastore_msearch_requests("main").first)).to eq 2
         expect(logged_jsons_of_type("AggregationQueryOptimizerMergedQueries").size).to eq 2
@@ -1575,7 +1575,7 @@ module ElasticGraph
           }
         )
 
-        # Verify that we an query just `page_info` (no groupings or aggregated values)
+        # Verify that we can query just `page_info` (no groupings or aggregated values)
         results = call_graphql_query(<<~QUERY).dig("data", case_correctly("widget_aggregations"), case_correctly("page_info"))
           query {
             widget_aggregations {

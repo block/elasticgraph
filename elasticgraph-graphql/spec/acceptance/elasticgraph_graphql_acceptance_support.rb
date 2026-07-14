@@ -46,7 +46,7 @@ module ElasticGraph
     end
 
     before do
-      # Perform any cached calls to the datastore to happen before our `perform_datastore_msearch`
+      # Allow any cached calls to the datastore to happen before our `perform_datastore_msearch`
       # matcher in some tests which tries to assert which specific requests get made, since index definitions
       # have caching behavior that can make the presence or absence of that request slightly non-deterministic.
       pre_cache_index_state(graphql)
@@ -422,7 +422,7 @@ module ElasticGraph
   RSpec.shared_context "ElasticGraph GraphQL acceptance aggregation support" do
     include_context "ElasticGraph GraphQL acceptance support"
 
-    # To ensure that aggregation queries are as efficient as possible, we want these hold true for all aggregation queries:
+    # To ensure that aggregation queries are as efficient as possible, we want these to hold true for all aggregation queries:
     #
     # - `size: 0` should be passed to avoid requesting individual documents.
     # - No `sort` option should be passed since we're not requesting individual documents.

@@ -32,7 +32,7 @@ This gem is designed to run in an AWS lambda that consumes from an SQS queue. Me
 [JSON Lines](https://jsonlines.org/) format to encode indexing events.
 
 JSON lines format contains individual JSON objects
-delimited by a newline control character(not the `\n` string sequence), such as:
+delimited by a newline control character (not the `\n` string sequence), such as:
 
 ```
 {"op": "upsert", "__typename": "Widget", "id": "123", "version": 1, "record": {...} }

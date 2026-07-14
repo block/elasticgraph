@@ -29,7 +29,7 @@ module ElasticGraph
             # here on input filters. If we don't set this to an empty set we'll get exceptions in `new_filter` above
             # when we generate our standard filter operators.
             #
-            # Note: we opt-out of the reserved field names here rather then opting in on the other `TypeWithSubfields`
+            # Note: we opt-out of the reserved field names here rather than opting in on the other `TypeWithSubfields`
             # subtypes because this is the only case where we don't want the reserved field name check applied (but we
             # have multiple subtypes where we do want it applied).
             type.reserved_field_names = Set.new

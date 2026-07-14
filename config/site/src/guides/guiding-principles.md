@@ -31,7 +31,7 @@ These are the "north stars" that guide ElasticGraph development. They guide the 
 
 **We aim to maximize query functionality while minimizing the API surface area.**
 : This allows users to learn fewer concepts and apply them to more situations.
-  For example, we don't provide a specific API to lookup documents by `id`--instead
+  For example, we don't provide a specific API to look up documents by `id`--instead
   the filtering API (which can be used to search on any field) can be used to search
   on ids.
 

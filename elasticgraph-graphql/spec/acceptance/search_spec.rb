@@ -331,7 +331,7 @@ module ElasticGraph
           order_by: [:created_at_ASC])
         expect(widgets).to match([
           string_hash_of(widget2, :id, created_at: "2019-07-02T12:00:00.000Z"), # 2 am Pacific
-          string_hash_of(widget3, :id, created_at: "2019-08-02T18:00:00.000Z") # 10 am pacific
+          string_hash_of(widget3, :id, created_at: "2019-08-02T18:00:00.000Z") # 10 am Pacific
         ])
 
         # Demonstrate that `time_of_day.time_zone` defaults to UTC when not provided.
@@ -454,7 +454,7 @@ module ElasticGraph
 
         # Test `equal_to_any_of` with `[nil, other_value]`
         widgets = list_widgets_with(:amount_cents,
-          filter: {name: {equal_to_any_of: [nil, "thing234", "", " ", "\n"]}}, # empty strings should be ignored.,
+          filter: {name: {equal_to_any_of: [nil, "thing234", "", " ", "\n"]}}, # empty strings should be ignored.
           order_by: [:amount_cents_DESC])
 
         expect(widgets).to match([
@@ -1099,7 +1099,7 @@ module ElasticGraph
           expect(results).to eq [{"id" => "t1"}, {"id" => "t3"}]
           # Verify `any_satisfy: {...}` with substring filtering
           results = query_teams_with(filter: {past_names: {any_satisfy: {contains: {any_substring_of: ["Pilot"]}}}})
-          # t1, t2, and t3 both have Pilot in a past name.
+          # t1, t2, and t3 all have Pilot in a past name.
           expect(results).to eq [{"id" => "t1"}, {"id" => "t2"}, {"id" => "t3"}]
           # Verify `any_satisfy: {...}` with substring filtering
           results = query_teams_with(filter: {past_names: {any_satisfy: {starts_with: {any_prefix_of: ["Pill"]}}}})
@@ -1250,7 +1250,7 @@ module ElasticGraph
           # t1 and t3 have players with > 150 games played or < 100 games played
           expect(results).to eq [{"id" => "t1"}, {"id" => "t3"}]
           results = query_teams_with(filter: {current_players_object: {seasons_nested: {any_satisfy: {awards: {count: {gt: 2}}}}}})
-          # t1 has a a player with a season with more than 2 awards
+          # t1 has a player with a season with more than 2 awards
           expect(results).to eq [{"id" => "t1"}]
 
           # Verify `any_satisfy` and `count` on a list-of-nested-of-nested field
@@ -1264,7 +1264,7 @@ module ElasticGraph
           # t1 and t3 have players with > 150 games played or < 100 games played
           expect(results).to eq [{"id" => "t1"}, {"id" => "t3"}]
           results = query_teams_with(filter: {current_players_nested: {any_satisfy: {seasons_nested: {any_satisfy: {awards: {count: {gt: 2}}}}}}})
-          # t1 has a a player with a season with more than 2 awards
+          # t1 has a player with a season with more than 2 awards
           expect(results).to eq [{"id" => "t1"}]
 
           # Verify `any_satisfy` and `count` on a list-of-nested-of-objects field
@@ -1278,7 +1278,7 @@ module ElasticGraph
           # t1 and t3 have players with > 150 games played or < 100 games played
           expect(results).to eq [{"id" => "t1"}, {"id" => "t3"}]
           results = query_teams_with(filter: {current_players_nested: {any_satisfy: {seasons_object: {awards: {count: {gt: 2}}}}}})
-          # t1 has a a player with a season with more than 2 awards
+          # t1 has a player with a season with more than 2 awards
           expect(results).to eq [{"id" => "t1"}]
 
           # Verify `all_of: [...]` with 2 `any_satisfy` sub-clauses.

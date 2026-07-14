@@ -155,7 +155,7 @@ module ElasticGraph
   INDEX_DATA_UPDATE_SCRIPT_ID = "update_index_data_52c5d011ab80b55684bf2f65af001803"
 
   # When an update script has a no-op result we often want to communicate more information about
-  # why it was a no-op back to ElatsicGraph from the script. The only way to do that is to throw
+  # why it was a no-op back to ElasticGraph from the script. The only way to do that is to throw
   # an exception with an error message, but, as far as I can tell, painless doesn't let you define
   # custom exception classes. To allow elasticgraph-indexer to detect that the script "failed" due
   # to a no-op (rather than a true failure) we include this common preamble in the exception message
@@ -288,7 +288,7 @@ module ElasticGraph
   MISSING_STRING_PLACEHOLDER = "$SECURE_RANDOM_VALUE"
 
   # A random 18 byte (24 character) base64 string used as the missing value placeholder
-  # for subaggregation on string fields. UUID are generally consider safe to use without
+  # for subaggregation on string fields. UUIDs are generally considered safe to use without
   # risk of collision and since this has more random bits than a UUID it should have even
   # less risk of collision. This uses a value generated randomly at runtime instead
   # of using a hard-coded value in order to avoid intentional collision attacks.
@@ -299,7 +299,7 @@ module ElasticGraph
   # This never collides with any numeric values in the datastore because JSON, ElasticSearch,
   # and OpenSearch aren't capable of storing NaN.
   # NaN works as a placeholder for missing numeric values, but it does have the side-effect of coercing
-  # integers to floats so we only use it on types limited to the the JsonSafeLong range.
+  # integers to floats so we only use it on types limited to the JsonSafeLong range.
   # @private
   MISSING_NUMERIC_PLACEHOLDER = "NaN"
 

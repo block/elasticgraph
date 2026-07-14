@@ -36,7 +36,7 @@ module ElasticGraph
             # local usage, and are not intended to be available to be run from the `admin` lambda.
             a_string_starting_with("lambda:"),
             a_string_starting_with("terraform:"),
-            # The `schema_artifacts:*` task are only intended for local usage, and should not be available in the lambda context.
+            # The `schema_artifacts:*` tasks are only intended for local usage, and should not be available in the lambda context.
             a_string_starting_with("schema_artifacts:")
           )
         end

@@ -8,7 +8,7 @@ To build the site and documentation locally, run `bundle exec rake -T | grep sit
 
 CSS Styling is powered by [Tailwind CSS](https://tailwindcss.com/) via the `package.json` script: `npm run build:css`.
 
-Tip: most LLM's do a good job of generating Tailwind CSS classes.
+Tip: most LLMs do a good job of generating Tailwind CSS classes.
 
 Extract common classes to `src/_config.yaml`
 
@@ -22,6 +22,6 @@ Write any standalone content (non-documentation) as regular Markdown files with 
 
 ## Icons
 
-Icons are SVG's copied from [heroicons](https://heroicons.com/) (MIT licensed).
+Icons are SVGs copied from [heroicons](https://heroicons.com/) (MIT licensed).
 
 Include them via `{% include svg/document-duplicate.svg %}`

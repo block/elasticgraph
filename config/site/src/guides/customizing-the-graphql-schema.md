@@ -14,7 +14,7 @@ The customizations primarily fall into two groups:
 
 - **Naming options** are passed to [`Local::RakeTasks`]({% api_doc_url path="ElasticGraph/Local/RakeTasks.html" %})
   in your `Rakefile`. They control the casing and spelling of generated names without changing schema structure.
-- **Schema definition hooks** let you customize generated types and fields; adding directives, documentation, or 
+- **Schema definition hooks** let you customize generated types and fields, adding directives, documentation, or
   grouping fields under namespace types.
 
 ## Casing of Generated Fields

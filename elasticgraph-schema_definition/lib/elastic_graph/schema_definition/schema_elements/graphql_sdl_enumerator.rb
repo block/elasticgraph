@@ -24,7 +24,7 @@ module ElasticGraph
         end
 
         # Yields the SDL for each GraphQL type, including both explicitly defined
-        # GraphQL types and derived GraphqL types.
+        # GraphQL types and derived GraphQL types.
         def each(&block)
           all_types = @all_types.sort_by(&:name)
           all_type_names = all_types.map(&:name).to_set

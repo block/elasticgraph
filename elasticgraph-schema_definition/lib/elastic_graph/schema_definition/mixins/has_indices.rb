@@ -208,7 +208,7 @@ module ElasticGraph
         #
         #       t.index "student_course_enrollments"
         #
-        #       # Here we define how the `Course` indexed type  is derived when we index `StudentCourseEnrollment` events.
+        #       # Here we define how the `Course` indexed type is derived when we index `StudentCourseEnrollment` events.
         #       t.derive_indexed_type_fields "Course", from_id: "courseId" do |derive|
         #         # `derive` is an instance of `DerivedIndexedType`.
         #         derive.immutable_value "name", from: "courseName"

@@ -4,7 +4,7 @@
 # Verbose form of `set -e`.
 set -o errexit
 
-# Attempt to use undefined variable outputs error message, and forces an exit
+# Attempting to use an undefined variable outputs an error message and forces an exit.
 # Verbose form of `set -u`.
 set -o nounset
 

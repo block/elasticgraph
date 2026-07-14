@@ -219,7 +219,7 @@ module ElasticGraph
           #  => "2021-12-02T12:30:30+00:00"
           #
           # We want to preserve the `Z` suffix on the advanced time (if it was there on the original time),
-          # so the extra check on the ISO8601 repsentation enforces that.
+          # so the extra check on the ISO8601 representation enforces that.
           eq(time).and have_attributes(iso8601: time.iso8601)
         end
       end

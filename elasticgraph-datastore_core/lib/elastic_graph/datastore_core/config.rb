@@ -146,8 +146,8 @@ module ElasticGraph
                     type: "array",
                     items: {"type" => "string"},
                     description: "Shard routing values for which the data should be spread across all shards instead of concentrating it " \
-                      "on a single shard. This is intended to be used when a handful of known routing value contain such a large portion " \
-                      "of the dataset that it extremely lopsided shards would result. Spreading the data across all shards may perform " \
+                      "on a single shard. This is intended to be used when a handful of known routing values contain such a large portion " \
+                      "of the dataset that extremely lopsided shards would result. Spreading the data across all shards may perform " \
                       "better.",
                     default: [], # : untyped
                     examples: [

@@ -310,7 +310,7 @@ module ElasticGraph
         # @param type [String] name of the related type
         # @param via [String] name of the foreign key field
         # @param dir [:in, :out] direction of the foreign key. Use `:in` for an inbound foreign key that resides on the related type and
-        #   references the `id` of this type. Use `:out` for an outbound foreign key that resides on this type  and references the `id` of
+        #   references the `id` of this type. Use `:out` for an outbound foreign key that resides on this type and references the `id` of
         #   the related type.
         # @param indexing_only [Boolean] when true, the relationship is used only for indexing purposes (e.g. `sourced_from`) and will not
         #   generate a GraphQL field.
@@ -350,7 +350,7 @@ module ElasticGraph
         # @param type [String] name of the related type
         # @param via [String] name of the foreign key field
         # @param dir [:in, :out] direction of the foreign key. Use `:in` for an inbound foreign key that resides on the related type and
-        #   references the `id` of this type. Use `:out` for an outbound foreign key that resides on this type  and references the `id` of
+        #   references the `id` of this type. Use `:out` for an outbound foreign key that resides on this type and references the `id` of
         #   the related type.
         # @param singular [String] singular form of the `field_name`; will be used (along with an `Aggregations` suffix) for the name of
         #   the generated aggregations field. Not required when `indexing_only: true`.

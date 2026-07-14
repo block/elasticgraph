@@ -59,7 +59,7 @@ datastore:
       # time range. If we relied on that, our tests would be slightly non-deterministic, where the
       # indices available to exclude would depend on what tests had run before.
       #
-      # Here we avoid that non-determism by explicitly defining the indices: one per year between
+      # Here we avoid that non-determinism by explicitly defining the indices: one per year between
       # 2019 and 2021, one for before 2019, and one for after 2021. All possible timestamps are
       # covered by these defined indices so no new indices will be created lazily when documents
       # are indexed.

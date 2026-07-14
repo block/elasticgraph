@@ -62,7 +62,7 @@ module ElasticGraph
 
       def script_artifacts_for_widget_currency_from(type_name, ...)
         generate_script_artifacts("Widget", "WidgetCurrency") do |schema|
-          # Ensure `WidgetCurrency` is defined as the caller defines deriviation rules for it.
+          # Ensure `WidgetCurrency` is defined as the caller defines derivation rules for it.
           schema.object_type "WidgetCurrency" do |t|
             t.field "id", "ID!"
             t.index "widget_currencies"

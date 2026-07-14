@@ -97,7 +97,7 @@ RSpec.configure do |config|
 
     # RSpec truncates the output when it formats our arbitrary objects in its
     # failure messages to ensure there isn't a giant wall of text. It truncates
-    # it at a couple hundered characters, which is shorter than we'd like and
+    # it at a couple hundred characters, which is shorter than we'd like and
     # omits useful detail so here we make it larger.
     expectations.max_formatted_output_length = 10_000
   end
@@ -279,7 +279,7 @@ module ElasticGraph
 
     # The test settings file path is always the same. However, the contents of that file must be different when we are running the
     # test suite against OpenSearch vs Elasticsearch, and `datastore_backend=` generates the test settings file with appropriately
-    # different contents in tbhose two cases. In cases where the specific backend used really matters, `datastore_backend=` gets
+    # different contents in those two cases. In cases where the specific backend used really matters, `datastore_backend=` gets
     # eagerly called to force which one is used. Otherwise, we lazily pick one of the two backends here. In that case, which we use
     # shouldn't matter. To ensure we don't assume one or the other, we randomly pick one of the two backends.
     #

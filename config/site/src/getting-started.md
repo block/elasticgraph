@@ -136,14 +136,14 @@ Then define your own schema in a Ruby file under `config/schema`.
 * Run `bundle exec rake` and deal with any errors that are reported.
 * Hint: search the project codebase for `TODO` comments to find things that need updating.
 
-### Setup a CI Build
+### Set Up a CI Build
 
 Your ElasticGraph project includes a command that's designed to be run on CI:
 
 {% include copyable_code_snippet.html language="shell" code="bundle exec rake check" %}
 
 This should be run on every commit (ideally before merging a pull request) using a CI system
-such as [Buildkite](https://buildkite.com/), [Circle CI](https://circleci.com/),
+such as [Buildkite](https://buildkite.com/), [CircleCI](https://circleci.com/),
 [GitHub Actions](https://github.com/features/actions), or [Jenkins](https://www.jenkins.io/).
 
 ### Deploy

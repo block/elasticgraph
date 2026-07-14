@@ -197,7 +197,7 @@ module ElasticGraph
             configure_index_definition(schema_def, customize_admin: lambda do |admin|
               # Add in the weird index setting we are seeing on AWS but cannot find any documentation about
               # what it means and when it is present. It appears to be related to upgrading a cluster, which
-              # is hard to setup in our tests, so we adding it in here.
+              # is hard to set up in our tests, so we are adding it in here.
               simulate_presence_of_extra_setting(admin, unique_index_name, "index.version.upgraded", "7070099")
             end)
           }.to make_no_datastore_write_calls("main")
@@ -329,7 +329,7 @@ module ElasticGraph
         def configure_index_def_using_admin(admin, try_dry_run: true, &customize_admin)
           if try_dry_run
             # To relieve us of the need of having to write manual test coverage for each possible configuration
-            # action, to verify that it's `dry_run` mode works correctly, here we test it automatically.
+            # action, to verify that its `dry_run` mode works correctly, here we test it automatically.
             # Before performing the action with the normal datastore client, we first try it with the dry
             # run client to prove that it makes no write calls to the datastore.
             expect do

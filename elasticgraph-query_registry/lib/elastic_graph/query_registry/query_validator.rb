@@ -72,7 +72,7 @@ module ElasticGraph
           # The structure of variables has changed in a way that may break the client. Tell the user to verify with them.
           descriptions = incompatibilities.map(&:description).join(", ")
           [{
-            "message" => "The structure of the query variables have had backwards-incompatible changes that may break `#{client_name}`: #{descriptions}. " \
+            "message" => "The structure of the query variables has had backwards-incompatible changes that may break `#{client_name}`: #{descriptions}. " \
             "To proceed, check with the client to see if this change is compatible with their logic, then run `#{rake_task}` to update the dumped info."
           }]
         else

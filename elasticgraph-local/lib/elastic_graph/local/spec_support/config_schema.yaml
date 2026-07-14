@@ -169,8 +169,8 @@ properties:
                   type: string
                 description: Shard routing values for which the data should be spread
                   across all shards instead of concentrating it on a single shard.
-                  This is intended to be used when a handful of known routing value
-                  contain such a large portion of the dataset that it extremely lopsided
+                  This is intended to be used when a handful of known routing values
+                  contain such a large portion of the dataset that extremely lopsided
                   shards would result. Spreading the data across all shards may perform
                   better.
                 default: []
@@ -668,7 +668,7 @@ properties:
             require_path:
               description: The path to require to load the interceptor extension.
                 This should be a relative path from a directory on the Ruby `$LOAD_PATH`
-                or a a relative path from the ElasticGraph application root.
+                or a relative path from the ElasticGraph application root.
               type: string
               minLength: 1
               examples:

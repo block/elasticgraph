@@ -971,7 +971,7 @@ module ElasticGraph
           end
         end
 
-        context "when building a query for a a nested type union relay connection relation" do
+        context "when building a query for a nested type union relay connection relation" do
           it "requests the set union of fields from each type fragment" do
             query = datastore_query_for(:Component, :parts, <<~QUERY)
               query {
