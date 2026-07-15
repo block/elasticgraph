@@ -45,6 +45,15 @@ module ElasticGraph
         to_camel(name).sub(/\A(\w)/, &:upcase)
       end
 
+      # Downcases the first letter of an identifier, leaving the rest unchanged
+      # (`"WidgetCurrency"` becomes `"widgetCurrency"`).
+      #
+      # @param name [String] identifier to convert
+      # @return [String] converted identifier
+      def self.uncapitalize(name)
+        name.sub(/\A(\w)/, &:downcase)
+      end
+
       # Converts an identifier to UPPER_SNAKE_CASE. In contrast to {.to_snake}, a multi-letter
       # acronym is kept intact as a single word, and a leading uppercase letter does not produce
       # a leading underscore (`"HTTPResponse"` becomes `"HTTP_RESPONSE"`). A digit is treated as

@@ -10,6 +10,7 @@ require "elastic_graph/constants"
 require "elastic_graph/errors"
 require "elastic_graph/schema_artifacts/runtime_metadata/configured_graphql_resolver"
 require "elastic_graph/schema_definition/indexing/update_target_factory"
+require "elastic_graph/support/casing"
 
 module ElasticGraph
   module SchemaDefinition
@@ -543,8 +544,7 @@ module ElasticGraph
         end
 
         def to_field_name(type_name)
-          name_without_leading_uppercase = type_name.sub(/^([[:upper:]])/) { $1.downcase }
-          schema_def_state.schema_elements.normalize_case(name_without_leading_uppercase)
+          schema_def_state.schema_elements.normalize_case(Support::Casing.uncapitalize(type_name))
         end
       end
     end

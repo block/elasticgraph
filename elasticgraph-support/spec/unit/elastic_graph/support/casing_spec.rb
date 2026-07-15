@@ -65,6 +65,21 @@ module ElasticGraph
         end
       end
 
+      describe ".uncapitalize" do
+        it "downcases the first letter, leaving the rest unchanged" do
+          expect(Casing.uncapitalize("WidgetCurrency")).to eq("widgetCurrency")
+          expect(Casing.uncapitalize("alreadyLower")).to eq("alreadyLower")
+        end
+
+        it "leaves a leading underscore intact" do
+          expect(Casing.uncapitalize("_typename")).to eq("_typename")
+        end
+
+        it "downcases only the first letter of an UPPER_SNAKE_CASE string" do
+          expect(Casing.uncapitalize("UPPER_SNAKE_CASE")).to eq("uPPER_SNAKE_CASE")
+        end
+      end
+
       describe ".to_upper_snake" do
         it "converts camelCase or snake_case to UPPER_SNAKE_CASE" do
           expect(Casing.to_upper_snake("someWord")).to eq("SOME_WORD")
