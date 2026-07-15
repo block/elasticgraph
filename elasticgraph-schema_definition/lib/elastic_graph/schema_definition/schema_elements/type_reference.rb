@@ -176,8 +176,7 @@ module ElasticGraph
         # is source_type + suffix). This is a map of all of these.
         STATIC_FORMAT_NAME_BY_CATEGORY = TypeNamer::REQUIRED_PLACEHOLDERS.filter_map do |format_name, placeholders|
           if placeholders == [:base]
-            as_snake_case = Support::Casing.to_snake(format_name.to_s)
-              .delete_prefix("_")
+            as_snake_case = Support::Casing.to_snake(format_name.to_s).delete_prefix("_")
 
             [as_snake_case.to_sym, format_name]
           end
@@ -241,7 +240,7 @@ module ElasticGraph
         # what the parent doc types are (so that we can offer sub-aggregations of the parent doc types!)
         # and the field path (for the 2nd case).
         def as_aggregation_sub_aggregations(parent_doc_types: [fully_unwrapped.name], field_path: [])
-          field_part = field_path.map { |f| to_title_case(f.name) }.join
+          field_part = field_path.map { |f| Support::Casing.to_title(f.name) }.join
 
           renamed_with_same_wrappings(type_namer.generate_name_for(
             :SubAggregations,
@@ -323,10 +322,6 @@ module ElasticGraph
             return :enum if ENUM_FORMATS.any? { |f| type_namer.matches_format?(as_output_enum_name, f) }
             :enum if as_output_enum_name != self.name && schema_def_state.type_ref(as_output_enum_name).enum? { false }
           end
-        end
-
-        def to_title_case(name)
-          Support::Casing.to_camel(name).sub(/\A(\w)/, &:upcase)
         end
       end
     end

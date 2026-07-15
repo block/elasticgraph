@@ -9,8 +9,13 @@
 module ElasticGraph
   module Support
     # Provides shared identifier casing conversions.
+    #
+    # @private
     class Casing
-      # Converts an identifier to snake_case.
+      # Converts an identifier to snake_case. Treats every uppercase letter as the start of a
+      # new word: a multi-letter acronym gets split into one "word" per letter, and a leading
+      # uppercase letter produces a leading underscore (`"HTTPResponse"` becomes
+      # `"_h_t_t_p_response"`). Contrast with {.to_upper_snake}, which keeps acronyms intact.
       #
       # @param name [String] identifier to convert
       # @return [String] converted identifier
@@ -32,7 +37,18 @@ module ElasticGraph
         end
       end
 
-      # Converts an identifier to UPPER_SNAKE_CASE, preserving acronym boundaries.
+      # Converts an identifier to TitleCase.
+      #
+      # @param name [String] identifier to convert
+      # @return [String] converted identifier
+      def self.to_title(name)
+        to_camel(name).sub(/\A(\w)/, &:upcase)
+      end
+
+      # Converts an identifier to UPPER_SNAKE_CASE. In contrast to {.to_snake}, a multi-letter
+      # acronym is kept intact as a single word, and a leading uppercase letter does not produce
+      # a leading underscore (`"HTTPResponse"` becomes `"HTTP_RESPONSE"`). A digit is treated as
+      # part of the word that precedes it (`"Sha256Hash"` becomes `"SHA256_HASH"`).
       #
       # @param name [String] identifier to convert
       # @return [String] converted identifier

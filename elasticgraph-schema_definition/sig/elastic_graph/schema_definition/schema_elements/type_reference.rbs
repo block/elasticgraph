@@ -64,8 +64,6 @@ module ElasticGraph
         ENUM_FORMATS: ::Set[::Symbol]
         OBJECT_FORMATS: ::Set[::Symbol]
         def schema_kind_implied_by_name: () -> (:enum | :object)?
-
-        def to_title_case: (::String) -> ::String
       end
     end
   end

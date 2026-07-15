@@ -3,6 +3,7 @@ module ElasticGraph
     class Casing
       def self.to_snake: (::String) -> ::String
       def self.to_camel: (::String) -> ::String
+      def self.to_title: (::String) -> ::String
       def self.to_upper_snake: (::String) -> ::String
     end
   end
