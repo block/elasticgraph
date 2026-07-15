@@ -32,6 +32,10 @@ module ElasticGraph
         it "prefixes an underscore before each letter of an UPPER_SNAKE_CASE string" do
           expect(Casing.to_snake("UPPER_SNAKE_CASE")).to eq("_u_p_p_e_r__s_n_a_k_e__c_a_s_e")
         end
+
+        it "treats a non-ASCII uppercase letter as a word start" do
+          expect(Casing.to_snake("ÉtudeBar")).to eq("_étude_bar")
+        end
       end
 
       describe ".to_camel" do
@@ -46,6 +50,19 @@ module ElasticGraph
 
         it "strips the underscores from an UPPER_SNAKE_CASE string" do
           expect(Casing.to_camel("UPPER_SNAKE_CASE")).to eq("UPPERSNAKECASE")
+        end
+
+        it "treats a digit as a word character both before and after an underscore" do
+          expect(Casing.to_camel("sha_256_hash")).to eq("sha256Hash")
+        end
+
+        it "preserves consecutive underscores" do
+          expect(Casing.to_camel("__typename")).to eq("__typename")
+          expect(Casing.to_camel("foo__bar")).to eq("foo__bar")
+        end
+
+        it "treats non-ASCII letters as word characters" do
+          expect(Casing.to_camel("café_word")).to eq("caféWord")
         end
       end
 
@@ -63,6 +80,14 @@ module ElasticGraph
         it "strips the underscores from an UPPER_SNAKE_CASE string" do
           expect(Casing.to_title("UPPER_SNAKE_CASE")).to eq("UPPERSNAKECASE")
         end
+
+        it "capitalizes a non-ASCII leading letter" do
+          expect(Casing.to_title("étude_word")).to eq("ÉtudeWord")
+        end
+
+        it "only capitalizes at the start of the identifier, not after an embedded newline" do
+          expect(Casing.to_title("\nfoo")).to eq("\nfoo")
+        end
       end
 
       describe ".uncapitalize" do
@@ -77,6 +102,16 @@ module ElasticGraph
 
         it "downcases only the first letter of an UPPER_SNAKE_CASE string" do
           expect(Casing.uncapitalize("UPPER_SNAKE_CASE")).to eq("uPPER_SNAKE_CASE")
+        end
+
+        it "downcases non-ASCII uppercase letters" do
+          expect(Casing.uncapitalize("Étude")).to eq("étude")
+          expect(Casing.uncapitalize("ⅠFoo")).to eq("ⅰFoo")
+          expect(Casing.uncapitalize("ⒶFoo")).to eq("ⓐFoo")
+        end
+
+        it "only downcases at the start of the identifier, not after an embedded newline" do
+          expect(Casing.uncapitalize("\nFoo")).to eq("\nFoo")
         end
       end
 
@@ -100,6 +135,11 @@ module ElasticGraph
 
         it "leaves an UPPER_SNAKE_CASE string unchanged" do
           expect(Casing.to_upper_snake("UPPER_SNAKE_CASE")).to eq("UPPER_SNAKE_CASE")
+        end
+
+        it "treats non-ASCII letters as word boundaries" do
+          expect(Casing.to_upper_snake("fooÉtude")).to eq("FOO_ÉTUDE")
+          expect(Casing.to_upper_snake("CAFÉCode")).to eq("CAFÉ_CODE")
         end
       end
     end

@@ -17,41 +17,43 @@ module ElasticGraph
       # uppercase letter produces a leading underscore (`"HTTPResponse"` becomes
       # `"_h_t_t_p_response"`). Contrast with {.to_upper_snake}, which keeps acronyms intact.
       #
-      # @param name [String] identifier to convert
+      # @param identifier [String] identifier to convert
       # @return [String] converted identifier
-      def self.to_snake(name)
-        name.gsub(/([[:upper:]])/) do
+      def self.to_snake(identifier)
+        identifier.gsub(/([[:upper:]])/) do
           uppercase_letter = $1 # : ::String
           "_#{uppercase_letter.downcase}"
         end
       end
 
-      # Converts an identifier to camelCase.
+      # Converts an identifier to camelCase. Each single underscore between two letters or digits
+      # is removed, and the following character is uppercased. Leading and consecutive underscores
+      # are left intact (`"__typename"` remains `"__typename"`).
       #
-      # @param name [String] identifier to convert
+      # @param identifier [String] identifier to convert
       # @return [String] converted identifier
-      def self.to_camel(name)
-        name.gsub(/(?<=\w)_(\w)/) do
-          letter_after_underscore = $1 # : ::String
-          letter_after_underscore.upcase
+      def self.to_camel(identifier)
+        identifier.gsub(/(?<=[[:alnum:]])_([[:alnum:]])/) do
+          character_after_underscore = $1 # : ::String
+          character_after_underscore.upcase
         end
       end
 
       # Converts an identifier to TitleCase.
       #
-      # @param name [String] identifier to convert
+      # @param identifier [String] identifier to convert
       # @return [String] converted identifier
-      def self.to_title(name)
-        to_camel(name).sub(/\A(\w)/, &:upcase)
+      def self.to_title(identifier)
+        to_camel(identifier).sub(/\A([[:alpha:]])/, &:upcase)
       end
 
       # Downcases the first letter of an identifier, leaving the rest unchanged
       # (`"WidgetCurrency"` becomes `"widgetCurrency"`).
       #
-      # @param name [String] identifier to convert
+      # @param identifier [String] identifier to convert
       # @return [String] converted identifier
-      def self.uncapitalize(name)
-        name.sub(/\A(\w)/, &:downcase)
+      def self.uncapitalize(identifier)
+        identifier.sub(/\A([[:upper:]])/, &:downcase)
       end
 
       # Converts an identifier to UPPER_SNAKE_CASE. In contrast to {.to_snake}, a multi-letter
@@ -59,10 +61,10 @@ module ElasticGraph
       # a leading underscore (`"HTTPResponse"` becomes `"HTTP_RESPONSE"`). A digit is treated as
       # part of the word that precedes it (`"Sha256Hash"` becomes `"SHA256_HASH"`).
       #
-      # @param name [String] identifier to convert
+      # @param identifier [String] identifier to convert
       # @return [String] converted identifier
-      def self.to_upper_snake(name)
-        name
+      def self.to_upper_snake(identifier)
+        identifier
           .gsub(/([[:upper:]]+)([[:upper:]][[:lower:]])/, "\\1_\\2")
           .gsub(/([[:lower:]\d])([[:upper:]])/, "\\1_\\2")
           .upcase
