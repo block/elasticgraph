@@ -9,6 +9,7 @@
 require "elastic_graph/graphql/datastore_search_router"
 require "elastic_graph/schema_definition/schema_elements/type_namer"
 require "elastic_graph/spec_support/builds_admin"
+require "elastic_graph/support/casing"
 require "graphql"
 require "support/graphql"
 
@@ -155,7 +156,7 @@ module ElasticGraph
     end
 
     def case_correctly(word)
-      ::ElasticGraph::SchemaArtifacts::RuntimeMetadata::SchemaElementNamesDefinition::SnakeCaseConverter.normalize_case(word)
+      Support::Casing.to_snake(word)
     end
 
     def index_definition_name_for(snake_case_name)
@@ -410,12 +411,12 @@ module ElasticGraph
     end
 
     def word_to_camel_case(word)
-      ::ElasticGraph::SchemaArtifacts::RuntimeMetadata::SchemaElementNamesDefinition::CamelCaseConverter.normalize_case(word)
+      Support::Casing.to_camel(word)
     end
     alias_method :case_correctly, :word_to_camel_case
 
     def word_to_snake_case(word)
-      ::ElasticGraph::SchemaArtifacts::RuntimeMetadata::SchemaElementNamesDefinition::SnakeCaseConverter.normalize_case(word)
+      Support::Casing.to_snake(word)
     end
   end
 

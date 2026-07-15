@@ -66,7 +66,6 @@ module ElasticGraph
         def schema_kind_implied_by_name: () -> (:enum | :object)?
 
         def to_title_case: (::String) -> ::String
-        CamelCaseConverter: singleton(SchemaArtifacts::RuntimeMetadata::SchemaElementNamesDefinition::CamelCaseConverter)
       end
     end
   end

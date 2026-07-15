@@ -10,6 +10,7 @@ require "elastic_graph/errors"
 require "elastic_graph/schema_artifacts/runtime_metadata/schema_element_names"
 require "elastic_graph/schema_definition/mixins/verifies_graphql_name"
 require "elastic_graph/schema_definition/schema_elements/type_namer"
+require "elastic_graph/support/casing"
 require "elastic_graph/support/memoizable_data"
 require "forwardable"
 
@@ -175,8 +176,7 @@ module ElasticGraph
         # is source_type + suffix). This is a map of all of these.
         STATIC_FORMAT_NAME_BY_CATEGORY = TypeNamer::REQUIRED_PLACEHOLDERS.filter_map do |format_name, placeholders|
           if placeholders == [:base]
-            as_snake_case = SchemaArtifacts::RuntimeMetadata::SchemaElementNamesDefinition::SnakeCaseConverter
-              .normalize_case(format_name.to_s)
+            as_snake_case = Support::Casing.to_snake(format_name.to_s)
               .delete_prefix("_")
 
             [as_snake_case.to_sym, format_name]
@@ -326,10 +326,8 @@ module ElasticGraph
         end
 
         def to_title_case(name)
-          CamelCaseConverter.normalize_case(name).sub(/\A(\w)/, &:upcase)
+          Support::Casing.to_camel(name).sub(/\A(\w)/, &:upcase)
         end
-
-        CamelCaseConverter = SchemaArtifacts::RuntimeMetadata::SchemaElementNamesDefinition::CamelCaseConverter
       end
     end
   end
