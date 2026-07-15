@@ -8,6 +8,7 @@
 
 require "elastic_graph/constants"
 require "elastic_graph/errors"
+require "elastic_graph/support/casing"
 
 module ElasticGraph
   module SchemaArtifacts
@@ -37,7 +38,7 @@ module ElasticGraph
               exposed_name_by_canonical_name = element_names.each_with_object({}) do |element, names|
                 names[element] = overrides.fetch(element) do
                   overrides.fetch(element.to_s) do
-                    converter.normalize_case(element.to_s)
+                    converter.call(element.to_s)
                   end
                 end.to_s
               end.freeze
@@ -55,13 +56,13 @@ module ElasticGraph
 
             # standard:disable Lint/NestedMethodDefinition
             element_names.each do |element|
-              method_name = SnakeCaseConverter.normalize_case(element.to_s)
+              method_name = Support::Casing.to_snake(element.to_s)
               define_method(method_name) { exposed_name_by_canonical_name.fetch(element) }
             end
 
             # Converts a name to the configured case form (snake_case or camelCase).
             def normalize_case(name)
-              CONVERTERS.fetch(form.to_s).normalize_case(name)
+              CONVERTERS.fetch(form.to_s).call(name)
             end
 
             # Returns the _canonical_ name for the given _exposed name_. The canonical name
@@ -114,27 +115,9 @@ module ElasticGraph
         FORM = "form"
         OVERRIDES = "overrides"
 
-        # @private
-        module SnakeCaseConverter
-          extend self
-
-          def normalize_case(name)
-            name.gsub(/([[:upper:]])/) { "_#{$1.downcase}" }
-          end
-        end
-
-        # @private
-        module CamelCaseConverter
-          extend self
-
-          def normalize_case(name)
-            name.gsub(/(?<=\w)_(\w)/) { $1.upcase }
-          end
-        end
-
         CONVERTERS = {
-          "snake_case" => SnakeCaseConverter,
-          "camelCase" => CamelCaseConverter
+          "snake_case" => Support::Casing.method(:to_snake),
+          "camelCase" => Support::Casing.method(:to_camel)
         }
       end
 

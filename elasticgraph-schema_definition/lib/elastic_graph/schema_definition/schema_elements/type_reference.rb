@@ -10,6 +10,7 @@ require "elastic_graph/errors"
 require "elastic_graph/schema_artifacts/runtime_metadata/schema_element_names"
 require "elastic_graph/schema_definition/mixins/verifies_graphql_name"
 require "elastic_graph/schema_definition/schema_elements/type_namer"
+require "elastic_graph/support/casing"
 require "elastic_graph/support/memoizable_data"
 require "forwardable"
 
@@ -175,9 +176,7 @@ module ElasticGraph
         # is source_type + suffix). This is a map of all of these.
         STATIC_FORMAT_NAME_BY_CATEGORY = TypeNamer::REQUIRED_PLACEHOLDERS.filter_map do |format_name, placeholders|
           if placeholders == [:base]
-            as_snake_case = SchemaArtifacts::RuntimeMetadata::SchemaElementNamesDefinition::SnakeCaseConverter
-              .normalize_case(format_name.to_s)
-              .delete_prefix("_")
+            as_snake_case = Support::Casing.to_snake(format_name.to_s).delete_prefix("_")
 
             [as_snake_case.to_sym, format_name]
           end
@@ -241,7 +240,7 @@ module ElasticGraph
         # what the parent doc types are (so that we can offer sub-aggregations of the parent doc types!)
         # and the field path (for the 2nd case).
         def as_aggregation_sub_aggregations(parent_doc_types: [fully_unwrapped.name], field_path: [])
-          field_part = field_path.map { |f| to_title_case(f.name) }.join
+          field_part = field_path.map { |f| Support::Casing.to_title(f.name) }.join
 
           renamed_with_same_wrappings(type_namer.generate_name_for(
             :SubAggregations,
@@ -324,12 +323,6 @@ module ElasticGraph
             :enum if as_output_enum_name != self.name && schema_def_state.type_ref(as_output_enum_name).enum? { false }
           end
         end
-
-        def to_title_case(name)
-          CamelCaseConverter.normalize_case(name).sub(/\A(\w)/, &:upcase)
-        end
-
-        CamelCaseConverter = SchemaArtifacts::RuntimeMetadata::SchemaElementNamesDefinition::CamelCaseConverter
       end
     end
   end

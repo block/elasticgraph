@@ -3,13 +3,6 @@ module ElasticGraph
     module RuntimeMetadata
       # Note: this is a partial signature definition (the ruby file is ignored in `Steepfile`)
       class SchemaElementNamesDefinition
-        module SnakeCaseConverter
-          def self.normalize_case: (::String) -> ::String
-        end
-
-        module CamelCaseConverter
-          def self.normalize_case: (::String) -> ::String
-        end
       end
 
       class SchemaElementNames
