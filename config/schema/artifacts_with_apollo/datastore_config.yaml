@@ -2288,7 +2288,7 @@ scripts:
 
         // No timestamp values matched the params, so return `false`.
         return false;
-  update_index_data_52c5d011ab80b55684bf2f65af001803:
+  update_index_data_27fac9da6430f05440528c771880c7e6:
     context: update
     script:
       lang: painless
@@ -2343,13 +2343,14 @@ scripts:
             if (segment.containsKey("sourceField")) {
               parts.add(sourcedFromNestedPathIdentifiers[segment.sourceField]);
             } else {
-              parts.add(segment.get("field"));
+              parts.add(segment.field);
             }
           }
           return parts;
         }
 
-        // Finds the element of `elements` whose `id` equals `matchValue`, or null.
+        // Finds the first element of `elements` whose `id` equals `matchValue`, or null. Element ids are assumed unique
+        // within a collection, so we return the first match rather than scanning for duplicates.
         def findInList(List elements, String matchValue) {
           for (Map element : elements) {
             if (matchValue == element.id) {
@@ -2367,19 +2368,18 @@ scripts:
 
           for (int i = 0; i < pathSegments.size(); i++) {
             Map segment = (Map) pathSegments.get(i);
-            String field = (String) segment.get("field");
+            String field = (String) segment.field;
 
             def subField = current.get(field);
 
             if (subField instanceof List) {
               current = (Map) findInList((List) subField, (String) keyParts.get(i));
+              if (current == null) {
+                return null;
+              }
             } else if (subField instanceof Map) {
               current = (Map) subField;
             } else {
-              current = null;
-            }
-
-            if (current == null) {
               return null;
             }
           }
@@ -2486,7 +2486,7 @@ scripts:
             }
 
             // NOTE: orphaned buffer entries (a nested element removed from its parent) are never pruned, so
-            // `__nested_sourced_data` can grow unbounded for churning collections. Known limitation, will address in future PR.
+            // `__nested_sourced_data` can grow unbounded for churning collections. Known limitation--see #1270.
             Map target = (Map) extractNestedElement(doc, pathSegments, keyParts);
             if (target != null) {
               target.putAll((Map) entry.getValue());
