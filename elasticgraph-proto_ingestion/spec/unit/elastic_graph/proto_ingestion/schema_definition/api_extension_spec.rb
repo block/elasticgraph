@@ -83,6 +83,12 @@ module ElasticGraph
               s.proto_schema_artifacts package_name: "elasticgraph", headers: [:not_a_string]
             end
           }.to raise_error(Errors::SchemaError, a_string_including("`headers` must be an Array of Strings"))
+
+          expect {
+            define_proto_schema do |s|
+              s.proto_schema_artifacts package_name: "elasticgraph", headers: ["valid", :not_a_string]
+            end
+          }.to raise_error(Errors::SchemaError, a_string_including("`headers` must be an Array of Strings"))
         end
 
         it "rejects invalid package names when they are configured" do
