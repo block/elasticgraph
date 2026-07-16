@@ -311,6 +311,29 @@ module ElasticGraph
           })
         end
 
+        it "exposes field and enum number mappings in canonical order" do
+          results = define_proto_schema_results do |s|
+            s.configure_proto_field_number_mappings(
+              {
+                "messages" => {
+                  "ZMessage" => {"fields" => {"second" => 2, "first" => 1}},
+                  "AMessage" => {"fields" => {"only" => 3}}
+                },
+                "enums" => {
+                  "ZEnum" => {"values" => {"SECOND" => 2, "FIRST" => 1}},
+                  "AEnum" => {"values" => {"ONLY" => 3}}
+                }
+              }
+            )
+          end
+
+          mappings = results.proto_field_number_mappings
+          expect(mappings.fetch("messages").keys).to eq(["AMessage", "ZMessage"])
+          expect(mappings.dig("messages", "ZMessage", "fields").keys).to eq(["first", "second"])
+          expect(mappings.fetch("enums").keys).to eq(["AEnum", "ZEnum"])
+          expect(mappings.dig("enums", "ZEnum", "values").keys).to eq(["FIRST", "SECOND"])
+        end
+
         it "preserves reserved numbers for removed fields and allocates new numbers above them" do
           results = define_proto_schema_results do |s|
             s.configure_proto_field_number_mappings(
