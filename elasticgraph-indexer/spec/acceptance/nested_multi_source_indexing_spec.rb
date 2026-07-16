@@ -99,6 +99,11 @@ module ElasticGraph
       expect(coaches_by_id.fetch("c1")).to eq("id" => "c1", "name" => "Alice", "salary" => nil)
       # The sibling coach is unaffected by clearing c1's sourced value (and was never sourced, so no `salary`).
       expect(coaches_by_id.fetch("cø")).to eq("id" => "cø", "name" => "Bob")
+
+      # A still-newer profile restores the value, confirming clearing isn't permanent.
+      indexer.processor.process([coach_profile_event("c1", 150, version: 3)], refresh_indices: true)
+
+      expect(coaches_by_id_in(fetch_team_source("t1")).fetch("c1")).to eq("id" => "c1", "name" => "Alice", "salary" => 150)
     end
 
     it "rejects a mutation of the relationship used by a nested `sourced_from` field" do
