@@ -41,6 +41,9 @@ module ElasticGraph
       # qualified relationship. These keys are hardcoded (not computed) so the test pins the exact script output.
       expect(source.fetch("__sources")).to contain_exactly("__self", "staff.coaches.profile", "staff.general_manager.profile")
 
+      # `staff` shows up twice per key because the halves are independent: the qualified relationship (kept verbatim
+      # for the script's nested-paths lookup), then one identifier part per path segment--an object segment
+      # contributes its field name since it has no per-element id.
       expect(source.fetch("__versions")).to eq(
         "__self" => {"t1" => 10},
         "21:staff.coaches.profile|5:staff|2:c1|" => {"prof-c1" => 11},
