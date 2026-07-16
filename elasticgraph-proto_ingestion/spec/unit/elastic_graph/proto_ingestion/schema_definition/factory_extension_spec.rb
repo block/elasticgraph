@@ -54,6 +54,31 @@ module ElasticGraph
             end
           }.to raise_error(Errors::SchemaError, a_string_including("both map to the same proto type name `package_`"))
         end
+
+        it "detects proto type name collisions after enum configuration blocks run" do
+          proto_status = ::Data.define(:enums).new(enums: [])
+
+          expect {
+            define_proto_schema do |s|
+              s.enum_type "CurrentStatus" do |t|
+                t.value "ACTIVE"
+                t.external_proto_enum proto_status,
+                  proto: "myapp.types.Status",
+                  import: "myapp/types/status.proto"
+              end
+
+              s.enum_type "PreviousStatus" do |t|
+                t.value "ACTIVE"
+                t.external_proto_enum proto_status,
+                  proto: "myapp.types.Status",
+                  import: "myapp/types/status.proto"
+              end
+            end
+          }.to raise_error(Errors::SchemaError, a_string_including(
+            "Type names `CurrentStatus` and `PreviousStatus`",
+            "same proto type name `myapp.types.Status`"
+          ))
+        end
       end
     end
   end

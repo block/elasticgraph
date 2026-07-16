@@ -862,11 +862,21 @@ module ElasticGraph
             end
           end
 
+          proto_status_c = ::Class.new do
+            def self.enums
+              [
+                ::Data.define(:name).new(name: :ACTIVE),
+                ::Data.define(:name).new(name: :INACTIVE)
+              ]
+            end
+          end
+
           results = define_proto_schema_results do |s|
             s.enum_type "Status" do |t|
               t.values "ACTIVE", "INACTIVE"
               t.external_proto_enum proto_status_a
               t.external_proto_enum proto_status_b
+              t.external_proto_enum proto_status_c
             end
 
             s.object_type "Account" do |t|
@@ -896,6 +906,7 @@ module ElasticGraph
           proto = define_proto_schema do |s|
             s.enum_type "Status" do |t|
               t.values "ACTIVE", "INACTIVE"
+              expect(t.proto_name).to eq("Status")
               t.external_proto_enum proto_status,
                 proto: "myapp.types.Status",
                 import: "myapp/types/status.proto"

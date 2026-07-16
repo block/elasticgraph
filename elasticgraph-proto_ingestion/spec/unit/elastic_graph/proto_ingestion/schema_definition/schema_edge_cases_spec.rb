@@ -66,6 +66,34 @@ module ElasticGraph
           ))
         end
 
+        it "raises when an externally sourced enum value conflicts with the generated zero value" do
+          proto_status = ::Class.new do
+            def self.enums
+              [::Data.define(:name).new(name: :UNSPECIFIED)]
+            end
+          end
+
+          results = define_proto_schema_results do |s|
+            s.enum_type "Status" do |t|
+              t.value "ACTIVE"
+              t.external_proto_enum proto_status
+            end
+
+            s.object_type "Account" do |t|
+              t.field "id", "ID"
+              t.field "status", "Status"
+              t.index "accounts"
+            end
+          end
+
+          expect {
+            results.proto_schema
+          }.to raise_error(Errors::SchemaError, a_string_including(
+            "Enum `Status` value `UNSPECIFIED`",
+            "conflicts with the generated zero value `STATUS_UNSPECIFIED`"
+          ))
+        end
+
         it "raises when an enum value conflicts with the generated zero value" do
           expect {
             define_proto_schema do |s|
