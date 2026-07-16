@@ -219,6 +219,38 @@ module ElasticGraph
           PROTO
         end
 
+        it "sorts and de-duplicates imports shared by distinct protobuf types" do
+          proto = define_proto_schema do |s|
+            s.scalar_type "FirstZType" do |t|
+              t.mapping type: "keyword"
+              t.protobuf type: "example.FirstZType", import: "z/types.proto"
+            end
+
+            s.scalar_type "SecondZType" do |t|
+              t.mapping type: "keyword"
+              t.protobuf type: "example.SecondZType", import: "z/types.proto"
+            end
+
+            s.scalar_type "AType" do |t|
+              t.mapping type: "keyword"
+              t.protobuf type: "example.AType", import: "a/types.proto"
+            end
+
+            s.object_type "Event" do |t|
+              t.field "id", "ID"
+              t.field "first_z", "FirstZType"
+              t.field "second_z", "SecondZType"
+              t.field "a", "AType"
+              t.index "events"
+            end
+          end
+
+          expect(proto.lines.grep(/\Aimport /).map(&:chomp)).to eq([
+            %(import "a/types.proto";),
+            %(import "z/types.proto";)
+          ])
+        end
+
         it "renders format comments on fields whose scalar type documents one" do
           proto = define_proto_schema do |s|
             s.object_type "Person" do |t|
