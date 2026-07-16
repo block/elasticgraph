@@ -245,18 +245,21 @@ module ElasticGraph
           end
         end
 
-        it "accepts the maximum protobuf field number while allowing enum values in the field-reserved range" do
+        it "accepts maximum protobuf numbers while allowing enum values in the field-reserved range" do
           results = define_proto_schema_results do |s|
             s.configure_proto_field_number_mappings(
               {
                 "messages" => {"Account" => {"id" => Schema::MAX_FIELD_NUMBER}},
                 # Enum value numbers have no protobuf-reserved range, so 19000-19999 is fine here.
-                "enums" => {"Status" => {"values" => {"ACTIVE" => 19_005}}}
+                "enums" => {"Status" => {"values" => {
+                  "ACTIVE" => Schema::MAX_ENUM_VALUE_NUMBER,
+                  "INACTIVE" => 19_005
+                }}}
               }
             )
 
             s.enum_type "Status" do |t|
-              t.values "ACTIVE"
+              t.values "ACTIVE", "INACTIVE"
             end
 
             s.object_type "Account" do |t|
@@ -268,7 +271,8 @@ module ElasticGraph
 
           generated = results.proto_schema
           expect(generated).to include("string id = #{Schema::MAX_FIELD_NUMBER};")
-          expect(generated).to include("STATUS_ACTIVE = 19005;")
+          expect(generated).to include("STATUS_ACTIVE = #{Schema::MAX_ENUM_VALUE_NUMBER};")
+          expect(generated).to include("STATUS_INACTIVE = 19005;")
         end
 
         it "skips the protobuf-reserved range when allocating new field numbers" do
