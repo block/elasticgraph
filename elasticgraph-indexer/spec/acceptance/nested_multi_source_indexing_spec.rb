@@ -113,7 +113,6 @@ module ElasticGraph
     def team_event(version: nil)
       build_upsert_event(
         :team,
-        **(version ? {__version: version} : {}),
         id: "t1",
         league: league,
         formed_on: formed_on,
@@ -124,20 +123,21 @@ module ElasticGraph
             build(:coach, id: "cø", name: "Bob")
           ],
           general_manager: build(:general_manager, id: "gm1", name: "Casey")
-        )
+        ),
+        **{__version: version}.compact
       )
     end
 
     def coach_profile_event(coach_id, annual_salary, id: "prof-#{coach_id}", version: nil)
       build_upsert_event(
         :coach_profile,
-        **(version ? {__version: version} : {}),
         id: id,
         team_id: "t1",
         coach_id: coach_id,
         annual_salary: annual_salary,
         team_league: league,
-        team_formed_on: formed_on
+        team_formed_on: formed_on,
+        **{__version: version}.compact
       )
     end
 
