@@ -1,0 +1,15 @@
+module ElasticGraph
+  module ProtoIngestion
+    module SchemaDefinition
+      module ResultsExtension : ::ElasticGraph::SchemaDefinition::Results
+        def proto_schema: () -> ::String
+
+        private
+
+        def protobuf_schema_generator: () -> Schema
+
+        @proto_schema: ::String?
+      end
+    end
+  end
+end

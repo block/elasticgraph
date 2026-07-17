@@ -7,25 +7,63 @@
 # frozen_string_literal: true
 
 require "elastic_graph/proto_ingestion/schema_definition/api_extension"
-require "elastic_graph/spec_support/schema_definition_helpers"
 
 module ElasticGraph
   module ProtoIngestion
     module SchemaDefinition
       RSpec.describe APIExtension do
-        include_context "SchemaDefinitionHelpers"
+        it "emits the configured package name" do
+          proto = define_proto_schema do |s|
+            s.proto_schema_artifacts package_name: "sales.v1"
 
-        it "can be used as a schema definition extension module, without customizing the schema definition yet" do
-          with_extension, without_extension = [[APIExtension], []].map do |extension_modules|
-            define_schema(schema_element_name_form: "snake_case", extension_modules: extension_modules) do |schema|
-              schema.object_type "Widget" do |t|
-                t.field "id", "ID!"
-                t.index "widgets"
-              end
-            end.graphql_schema_string
+            s.object_type "Widget" do |t|
+              t.field "id", "ID"
+              t.index "widgets"
+            end
           end
 
-          expect(with_extension).to eq(without_extension)
+          expect(proto).to include("package sales.v1;")
+        end
+
+        it "maps every built-in scalar to a proto field type" do
+          field_types = []
+          proto = define_proto_schema do |s|
+            s.object_type "Widget" do |t|
+              FactoryExtension::BUILT_IN_SCALAR_PROTO_TYPES_BY_NAME.each_key do |type_name|
+                t.field type_name.downcase, type_name
+              end
+              field_types = t.graphql_fields_by_name.values.map { |field| field.type.name }
+              t.index "widgets"
+            end
+          end
+
+          expect(field_types).to match_array(FactoryExtension::BUILT_IN_SCALAR_PROTO_TYPES_BY_NAME.keys)
+          FactoryExtension::BUILT_IN_SCALAR_PROTO_TYPES_BY_NAME.each.with_index(1) do |(type_name, proto_type), field_number|
+            field_name = Identifier.field_name(type_name.downcase)
+            expect(proto).to include("#{proto_type} #{field_name} = #{field_number};")
+          end
+        end
+
+        it "requires `package_name` to be a non-empty String" do
+          expect {
+            define_proto_schema do |s|
+              s.proto_schema_artifacts package_name: ""
+            end
+          }.to raise_error(Errors::SchemaError, a_string_including("`package_name` must be a non-empty String"))
+
+          expect {
+            define_proto_schema do |s|
+              s.proto_schema_artifacts package_name: :symbol_package
+            end
+          }.to raise_error(Errors::SchemaError, a_string_including("`package_name` must be a non-empty String"))
+        end
+
+        it "rejects invalid package names when they are configured" do
+          expect {
+            define_proto_schema do |s|
+              s.proto_schema_artifacts package_name: "my-app.events"
+            end
+          }.to raise_error(Errors::SchemaError, a_string_including("`package_name`", "my-app.events"))
         end
       end
     end
