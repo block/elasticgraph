@@ -73,6 +73,56 @@ module ElasticGraph
           PROTO
         end
 
+        it "emits proto2 syntax with an explicit label on every field when `syntax: :proto2`" do
+          proto = define_proto_schema do |s|
+            s.proto_schema_artifacts package_name: "elasticgraph", syntax: :proto2
+
+            s.enum_type "Status" do |t|
+              t.values "ACTIVE", "INACTIVE"
+            end
+
+            s.object_type "Account" do |t|
+              t.field "id", "ID"
+              t.field "status", "Status"
+              t.field "tags", "[String!]!"
+              t.index "accounts"
+            end
+          end
+
+          expect(proto).to start_with(%(syntax = "proto2";))
+          expect(proto_type_def_from(proto, "Account")).to include(
+            "optional string id = 1;",
+            "optional Status status = 2;",
+            "repeated string tags = 3;"
+          )
+        end
+
+        it "renders custom `headers` verbatim after the package declaration" do
+          proto = define_proto_schema do |s|
+            s.proto_schema_artifacts(
+              package_name: "myapp.events.v1",
+              headers: [
+                %(option java_package = "com.myapp.events";),
+                "option java_multiple_files = true;"
+              ]
+            )
+
+            s.object_type "Account" do |t|
+              t.field "id", "ID"
+              t.index "accounts"
+            end
+          end
+
+          expect(proto).to include(<<~PROTO)
+            package myapp.events.v1;
+
+            option java_package = "com.myapp.events";
+            option java_multiple_files = true;
+
+            message Account {
+          PROTO
+        end
+
         it "generates oneof wrappers for indexed interface and union types" do
           proto = define_proto_schema do |s|
             s.object_type "Car" do |t|
