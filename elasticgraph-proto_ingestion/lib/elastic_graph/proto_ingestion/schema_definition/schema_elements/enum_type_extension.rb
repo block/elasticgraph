@@ -18,6 +18,58 @@ module ElasticGraph
       module SchemaElements
         # Extends EnumType with proto field type conversion.
         module EnumTypeExtension
+          # Describes an external proto enum registered as the source of this enum's generated values.
+          ExternalProtoEnumSource = ::Data.define(:proto_enum, :exclusions, :expected_extras, :name_transform)
+
+          # Describes an existing proto enum type referenced instead of generating a local definition.
+          ExternalProtoEnumReference = ::Data.define(:proto_name, :import)
+
+          # Sources this enum's generated proto values from an existing proto enum class. Passing
+          # `proto:` and `import:` references that enum directly instead of generating a local enum.
+          #
+          # @return [void]
+          def external_proto_enum(proto_enum, exclusions: [], expected_extras: [], name_transform: nil, proto: nil, import: nil)
+            unless proto_enum.respond_to?(:enums)
+              raise Errors::SchemaError, "`external_proto_enum` on `#{name}` must be given a proto enum class with `.enums`, " \
+                "but got: #{proto_enum.inspect}."
+            end
+
+            if proto || import
+              unless proto.is_a?(String) && !proto.empty? && import.is_a?(String) && !import.empty?
+                raise Errors::SchemaError, "`external_proto_enum` on `#{name}` must be given both `proto` and `import` " \
+                  "as non-empty Strings to reference an external proto enum type."
+              end
+              unless exclusions.empty? && expected_extras.empty? && name_transform.nil?
+                raise Errors::SchemaError, "`external_proto_enum` on `#{name}` cannot combine `proto`/`import` with " \
+                  "`exclusions`, `expected_extras`, or `name_transform`; transformed or curated enums must stay generated locally."
+              end
+
+              @external_proto_reference = ExternalProtoEnumReference.new(proto_name: proto, import: import)
+              @proto_name = nil
+            end
+
+            external_proto_enum_sources << ExternalProtoEnumSource.new(
+              proto_enum: proto_enum,
+              exclusions: exclusions.map(&:to_s),
+              expected_extras: expected_extras.map(&:to_s),
+              name_transform: name_transform
+            )
+            nil
+          end
+
+          # External proto enums registered via {#external_proto_enum}.
+          #
+          # @return [Array<ExternalProtoEnumSource>]
+          def external_proto_enum_sources
+            @external_proto_enum_sources ||= []
+          end
+
+          # The external proto enum type referenced instead of generating a local enum, if configured.
+          #
+          # @dynamic external_proto_reference
+          # @return [ExternalProtoEnumReference, nil]
+          attr_reader :external_proto_reference
+
           # Defines an enum value and immediately validates its protobuf name.
           #
           # @return [void]
@@ -49,6 +101,11 @@ module ElasticGraph
           #
           # @return [String]
           def to_proto(schema)
+            if external_proto_reference
+              validate_external_proto_reference(schema)
+              return nil
+            end
+
             render_proto_enum(schema)
           end
 
@@ -70,7 +127,14 @@ module ElasticGraph
           #
           # @return [String]
           def proto_name
-            @proto_name ||= Identifier.enum_name(name)
+            @proto_name ||= external_proto_reference&.proto_name || Identifier.enum_name(name)
+          end
+
+          # Returns the proto file imported for an externally referenced enum.
+          #
+          # @return [String, nil]
+          def protobuf_import
+            external_proto_reference&.import
           end
 
           # @private
@@ -83,20 +147,33 @@ module ElasticGraph
           private
 
           def render_proto_enum(schema)
-            values = values_by_name.values
-            value_numbers = schema.enum_value_numbers_for(proto_name, values_by_name.keys)
+            source_value_names = proto_enum_value_names
+            proto_value_names_by_source_name = source_value_names.to_h do |source_name|
+              [source_name, proto_enum_value_name(source_name)]
+            end
+            duplicate_names = proto_value_names_by_source_name.values.tally.select { |_, count| count > 1 }
+            if duplicate_names.any?
+              raise Errors::SchemaError, "Enum `#{name}` maps to duplicate proto enum value names: #{duplicate_names.keys.sort.join(", ")}."
+            end
+            value_numbers = schema.enum_value_numbers_for(proto_name, source_value_names)
 
             zero_value_name = "#{enum_value_prefix}_UNSPECIFIED"
+            if (source_name = proto_value_names_by_source_name.key(zero_value_name))
+              raise Errors::SchemaError, "Enum `#{name}` value `#{source_name}` maps to proto enum value name " \
+                "`#{zero_value_name}`, which conflicts with the generated zero value `#{zero_value_name}`."
+            end
 
             lines = ProtoDocumentation.comment_lines_for(doc_comment)
             lines << "enum #{proto_name} {"
             lines << "  // The default value when no enum value has been explicitly set. Do not use this value."
             lines << "  // See https://protobuf.dev/programming-guides/proto3/#enum-default."
             lines << "  #{zero_value_name} = 0;"
-            values.each do |raw_value|
-              value = raw_value # : ::ElasticGraph::SchemaDefinition::SchemaElements::EnumValue & EnumValueExtension
-              lines.concat(ProtoDocumentation.comment_lines_for(value.doc_comment, indent: "  "))
-              lines << "  #{value.proto_name(enum_value_prefix)} = #{value_numbers.fetch(value.name)};"
+            proto_value_names_by_source_name.each do |source_name, proto_value_name|
+              if (raw_value = values_by_name[source_name])
+                value = raw_value # : ::ElasticGraph::SchemaDefinition::SchemaElements::EnumValue & EnumValueExtension
+                lines.concat(ProtoDocumentation.comment_lines_for(value.doc_comment, indent: "  "))
+              end
+              lines << "  #{proto_value_name} = #{value_numbers.fetch(source_name)};"
             end
             lines << "}"
             lines.join("\n")
@@ -104,6 +181,82 @@ module ElasticGraph
 
           def enum_value_prefix
             Support::Casing.to_upper_snake(name)
+          end
+
+          def proto_enum_value_name(value_name)
+            if (raw_value = values_by_name[value_name])
+              value = raw_value # : ::ElasticGraph::SchemaDefinition::SchemaElements::EnumValue & EnumValueExtension
+              value.proto_name(enum_value_prefix)
+            else
+              Identifier.enum_value_name("#{enum_value_prefix}_#{Support::Casing.to_upper_snake(value_name)}")
+            end
+          end
+
+          def proto_enum_value_names
+            return values_by_name.keys if external_proto_enum_sources.empty?
+
+            values_by_source = external_proto_enum_sources.map { |source| enum_value_names_from_source(source) }
+            canonical_values = values_by_source.first
+            canonical_set = canonical_values.uniq.sort
+            if values_by_source.drop(1).any? { |source_values| source_values.uniq.sort != canonical_set }
+              raise Errors::SchemaError, "External proto enums for `#{name}` produce inconsistent value sets. " \
+                "Ensure each `external_proto_enum` source (with exclusions/expected_extras/name_transform) resolves to the same values."
+            end
+            canonical_values
+          end
+
+          def enum_value_names_from_source(source)
+            name_transform = source.name_transform || :itself.to_proc
+            mapped_values = source.proto_enum.enums.map { |entry| name_transform.call(entry.name.to_s).to_s }
+            (mapped_values - source.exclusions + source.expected_extras).uniq
+          rescue => e
+            raise Errors::SchemaError, "Failed loading external proto enum values for `#{name}` from `#{source.proto_enum}`: #{e.message}"
+          end
+
+          def validate_external_proto_reference(schema)
+            unless external_proto_enum_sources.one?
+              raise Errors::SchemaError, "External proto enum `#{name}` must use exactly one `external_proto_enum` " \
+                "source; multi-source enums cannot be safely referenced externally."
+            end
+
+            numbers_by_value_name = enum_value_numbers_from_source(external_proto_enum_sources.first)
+            external_names = numbers_by_value_name.keys.sort
+            elasticgraph_names = values_by_name.keys.map(&:to_s).uniq.sort
+            if external_names != elasticgraph_names
+              raise Errors::SchemaError, "External proto enum `#{name}` values do not match the ElasticGraph enum values. " \
+                "External values: #{external_names.join(", ")}. ElasticGraph values: #{elasticgraph_names.join(", ")}."
+            end
+
+            schema.pinned_enum_value_numbers(Identifier.enum_name(name)).each do |value_name, pinned_number|
+              external_number = numbers_by_value_name[value_name]
+              if external_number && external_number != pinned_number
+                raise Errors::SchemaError, "External proto enum `#{name}` assigns `#{value_name}` the number " \
+                  "#{external_number}, but previously dumped artifacts pin it to #{pinned_number}; referencing it would " \
+                  "silently reinterpret existing wire data."
+              end
+
+              conflicting_name = numbers_by_value_name.find do |external_name, number|
+                external_name != value_name && number == pinned_number
+              end&.first
+              if conflicting_name
+                raise Errors::SchemaError, "External proto enum `#{name}` assigns `#{conflicting_name}` the number " \
+                  "#{pinned_number}, which previously dumped artifacts pin to `#{value_name}`; referencing it would " \
+                  "silently reinterpret existing wire data."
+              end
+            end
+          end
+
+          def enum_value_numbers_from_source(source)
+            entries = source.proto_enum.enums
+            unless entries.all? { |entry| entry.respond_to?(:number) }
+              raise Errors::SchemaError, "External proto enum `#{name}` cannot be referenced: its enum entries " \
+                "must expose `.number` so its values can be verified against previously pinned numbers."
+            end
+            entries.to_h { |entry| [entry.name.to_s, entry.number] }
+          rescue Errors::SchemaError
+            raise
+          rescue => e
+            raise Errors::SchemaError, "Failed loading external proto enum values for `#{name}` from `#{source.proto_enum}`: #{e.message}"
           end
         end
       end
