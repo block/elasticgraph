@@ -49,17 +49,30 @@ module ElasticGraph
           ))
         end
 
-        it "raises when two fields collapse to the same proto field name after keyword escaping" do
-          expect {
-            define_proto_schema do |s|
-              s.object_type "Account" do |t|
-                t.field "id", "ID"
-                t.field "string", "String"
-                t.field "string_", "String"
-                t.index "accounts"
-              end
+        it "fully qualifies local type references so they do not conflict with contextual protobuf keywords" do
+          proto = define_proto_schema do |s|
+            s.enum_type "option" do |t|
+              t.value "ACTIVE"
             end
-          }.to raise_error(Errors::SchemaError, a_string_including("duplicate proto field names"))
+
+            s.object_type "string" do |t|
+              t.field "id", "ID"
+            end
+
+            s.object_type "Event" do |t|
+              t.field "id", "ID"
+              t.field "option", "option"
+              t.field "message", "string"
+              t.index "events"
+            end
+          end
+
+          expect(proto_type_def_from(proto, "option")).to start_with("enum option {")
+          expect(proto_type_def_from(proto, "string")).to start_with("message string {")
+          expect(proto_type_def_from(proto, "Event")).to include(
+            ".elasticgraph.option option = 2;",
+            ".elasticgraph.string message = 3;"
+          )
         end
 
         it "raises when proto fields are accessed before the schema definition is complete" do
@@ -93,8 +106,8 @@ module ElasticGraph
           end
 
           expect(proto.scan(/^enum Status \{/).size).to eq(1)
-          expect(proto_type_def_from(proto, "Account")).to include("Status status = 2;")
-          expect(proto_type_def_from(proto, "User")).to include("Status status = 2;")
+          expect(proto_type_def_from(proto, "Account")).to include(".elasticgraph.Status status = 2;")
+          expect(proto_type_def_from(proto, "User")).to include(".elasticgraph.Status status = 2;")
         end
       end
     end

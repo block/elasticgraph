@@ -12,10 +12,6 @@ module ElasticGraph
         def new_union_type: (::String) ?{ (::ElasticGraph::SchemaDefinition::SchemaElements::UnionType & SchemaElements::ObjectInterfaceAndUnionExtension) -> void } -> (::ElasticGraph::SchemaDefinition::SchemaElements::UnionType & SchemaElements::ObjectInterfaceAndUnionExtension)
         def new_results: () -> ::ElasticGraph::SchemaDefinition::Results
         def new_schema_artifact_manager: (**untyped) -> ::ElasticGraph::SchemaDefinition::SchemaArtifactManager
-
-        private
-
-        def register_proto_type_name: (untyped) -> void
       end
     end
   end

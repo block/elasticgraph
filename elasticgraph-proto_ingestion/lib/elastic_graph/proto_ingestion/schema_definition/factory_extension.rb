@@ -44,7 +44,6 @@ module ElasticGraph
           super(name) do |type|
             extended_type = type.extend(SchemaElements::EnumTypeExtension) # : ::ElasticGraph::SchemaDefinition::SchemaElements::EnumType & SchemaElements::EnumTypeExtension
             yield extended_type if block_given?
-            register_proto_type_name(extended_type)
           end
         end
 
@@ -70,7 +69,6 @@ module ElasticGraph
           super(name) do |type|
             extended_type = type.extend(SchemaElements::ObjectInterfaceAndUnionExtension) # : ::ElasticGraph::SchemaDefinition::SchemaElements::InterfaceType & SchemaElements::ObjectInterfaceAndUnionExtension
             yield extended_type if block_given?
-            register_proto_type_name(extended_type)
           end
         end
 
@@ -83,7 +81,6 @@ module ElasticGraph
           super(name) do |type|
             extended_type = type.extend(SchemaElements::ObjectInterfaceAndUnionExtension) # : ::ElasticGraph::SchemaDefinition::SchemaElements::ObjectType & SchemaElements::ObjectInterfaceAndUnionExtension
             yield extended_type if block_given?
-            register_proto_type_name(extended_type)
           end
         end
 
@@ -114,7 +111,6 @@ module ElasticGraph
           super(name) do |type|
             extended_type = type.extend(SchemaElements::ObjectInterfaceAndUnionExtension) # : ::ElasticGraph::SchemaDefinition::SchemaElements::UnionType & SchemaElements::ObjectInterfaceAndUnionExtension
             yield extended_type if block_given?
-            register_proto_type_name(extended_type)
           end
         end
 
@@ -134,13 +130,6 @@ module ElasticGraph
           super.tap do |manager|
             manager.extend SchemaArtifactManagerExtension
           end
-        end
-
-        private
-
-        def register_proto_type_name(type)
-          extension_state = state # : ElasticGraph::SchemaDefinition::State & StateExtension
-          extension_state.proto_ingestion_state.register_proto_type_name(type.proto_name, type.name)
         end
       end
     end

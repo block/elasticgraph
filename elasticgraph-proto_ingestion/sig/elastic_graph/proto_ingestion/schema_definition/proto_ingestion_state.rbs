@@ -2,23 +2,17 @@ module ElasticGraph
   module ProtoIngestion
     module SchemaDefinition
       class ProtoIngestionStateSupertype
-        attr_reader schema_def_state: ::ElasticGraph::SchemaDefinition::State
         attr_accessor package_name: ::String
-        attr_reader type_name_by_proto_name: ::Hash[::String, ::String]
 
         def initialize: (
-          schema_def_state: ::ElasticGraph::SchemaDefinition::State,
-          package_name: ::String,
-          type_name_by_proto_name: ::Hash[::String, ::String]
+          package_name: ::String
         ) -> void
       end
 
       class ProtoIngestionState < ProtoIngestionStateSupertype
         def initialize: (
-          schema_def_state: ::ElasticGraph::SchemaDefinition::State,
           package_name: ::String
         ) -> void
-        def register_proto_type_name: (::String proto_name, ::String type_name) -> void
       end
     end
   end

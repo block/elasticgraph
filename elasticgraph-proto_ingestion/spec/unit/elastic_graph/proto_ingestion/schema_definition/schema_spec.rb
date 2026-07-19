@@ -61,8 +61,8 @@ module ElasticGraph
             message Account {
               // The account's unique identifier.
               string id = 1;
-              Status status = 2;
-              Address address = 3;
+              .elasticgraph.Status status = 2;
+              .elasticgraph.Address address = 3;
               repeated string tags = 4;
             }
 
@@ -111,16 +111,16 @@ module ElasticGraph
           expect(proto_type_def_from(proto, "Vehicle")).to eq(<<~PROTO.strip)
             message Vehicle {
               oneof value {
-                Car car = 1;
-                Bike bike = 2;
+                .elasticgraph.Car car = 1;
+                .elasticgraph.Bike bike = 2;
               }
             }
           PROTO
           expect(proto_type_def_from(proto, "Inventor")).to eq(<<~PROTO.strip)
             message Inventor {
               oneof value {
-                Person person = 1;
-                Company company = 2;
+                .elasticgraph.Person person = 1;
+                .elasticgraph.Company company = 2;
               }
             }
           PROTO
@@ -153,7 +153,7 @@ module ElasticGraph
           expect(proto_type_def_from(proto, "Vehicle")).to eq(<<~PROTO.strip)
             message Vehicle {
               oneof value {
-                Car car = 1;
+                .elasticgraph.Car car = 1;
               }
             }
           PROTO
@@ -177,7 +177,7 @@ module ElasticGraph
           expect(proto_type_def_from(proto, "Vehicle")).to eq(<<~PROTO.strip)
             message Vehicle {
               oneof value {
-                DeliveryVehicle delivery_vehicle = 1;
+                .elasticgraph.DeliveryVehicle delivery_vehicle = 1;
               }
             }
           PROTO
@@ -303,7 +303,7 @@ module ElasticGraph
           expect(proto_type_def_from(proto, "Command")).to include("COMMAND_START = 1;", "COMMAND_STOP = 2;")
         end
 
-        it "escapes proto keywords in generated identifiers" do
+        it "uses source field names even when they are contextual protobuf keywords" do
           proto = define_proto_schema do |s|
             s.object_type "Request" do |t|
               t.field "id", "ID"
@@ -312,7 +312,7 @@ module ElasticGraph
             end
           end
 
-          expect(proto_type_def_from(proto, "Request")).to include("string package_ = 2; // source name: package")
+          expect(proto_type_def_from(proto, "Request")).to include("string package = 2;")
         end
       end
     end

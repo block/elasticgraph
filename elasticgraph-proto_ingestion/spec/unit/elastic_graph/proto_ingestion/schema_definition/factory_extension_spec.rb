@@ -46,21 +46,6 @@ module ElasticGraph
             "Protobuf type not configured for scalar type `UnconfiguredScalar`"
           ))
         end
-
-        it "rejects colliding proto type names as soon as the second type is defined" do
-          expect {
-            define_proto_schema do |s|
-              s.enum_type "package" do |t|
-                t.value "ACTIVE"
-              end
-
-              s.object_type "package_" do |t|
-                t.field "id", "ID"
-                t.index "packages"
-              end
-            end
-          }.to raise_error(Errors::SchemaError, a_string_including("both map to the same proto type name `package_`"))
-        end
       end
     end
   end

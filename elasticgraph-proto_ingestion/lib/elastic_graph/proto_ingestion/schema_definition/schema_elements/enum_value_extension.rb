@@ -6,7 +6,6 @@
 #
 # frozen_string_literal: true
 
-require "elastic_graph/proto_ingestion/schema_definition/identifier"
 require "elastic_graph/proto_ingestion/schema_definition/schema_elements/proto_documentation"
 require "elastic_graph/support/casing"
 
@@ -21,7 +20,7 @@ module ElasticGraph
           # @param enum_value_prefix [String] normalized prefix of the containing enum
           # @return [String]
           def proto_name(enum_value_prefix)
-            Identifier.enum_value_name("#{enum_value_prefix}_#{Support::Casing.to_upper_snake(name)}")
+            "#{enum_value_prefix}_#{Support::Casing.to_upper_snake(name)}"
           end
 
           # Renders this value's protobuf definition.

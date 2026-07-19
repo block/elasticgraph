@@ -63,7 +63,7 @@ module ElasticGraph
         def render_definitions(types)
           types
             .sort_by { |type| [type.proto_definition_priority, type.proto_name] }
-            .filter_map(&:to_proto)
+            .filter_map { |type| type.to_proto(@package_name) }
             .join("\n\n")
         end
       end

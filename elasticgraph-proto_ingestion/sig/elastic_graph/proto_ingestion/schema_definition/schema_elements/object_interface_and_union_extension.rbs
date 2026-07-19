@@ -3,14 +3,14 @@ module ElasticGraph
     module SchemaDefinition
       module SchemaElements
         module ObjectInterfaceAndUnionExtension : ::ElasticGraph::SchemaDefinition::SchemaElements::ObjectType
-          @proto_name: ::String?
           @proto_fields: ::Array[[
             ::ElasticGraph::SchemaDefinition::SchemaElements::Field,
             ::ElasticGraph::SchemaDefinition::Indexing::Field
           ]]?
 
           def proto_name: () -> ::String
-          def to_proto: () -> ::String
+          def proto_type_reference: (::String package_name) -> ::String
+          def to_proto: (::String package_name) -> ::String
           def proto_definition_priority: () -> 1
           def referenced_proto_types: () -> ::Array[::ElasticGraph::SchemaDefinition::SchemaElements::graphQLType]
           def self.list_depth_and_base_type: (
@@ -19,14 +19,15 @@ module ElasticGraph
 
           private
 
-          def render_proto_message: (::String message_name) -> ::String
-          def render_proto_oneof: (::String message_name) -> ::String
+          def render_proto_message: (::String message_name, ::String package_name) -> ::String
+          def render_proto_oneof: (::String message_name, ::String package_name) -> ::String
           def proto_fields: () -> ::Array[[
             ::ElasticGraph::SchemaDefinition::SchemaElements::Field,
             ::ElasticGraph::SchemaDefinition::Indexing::Field
           ]]
           def proto_field_type_for: (
             ::ElasticGraph::SchemaDefinition::SchemaElements::TypeReference,
+            package_name: ::String,
             context_field_name: ::String
           ) -> [bool, ::String]
         end

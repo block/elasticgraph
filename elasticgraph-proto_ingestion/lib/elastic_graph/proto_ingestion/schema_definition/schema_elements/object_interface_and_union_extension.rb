@@ -7,7 +7,6 @@
 # frozen_string_literal: true
 
 require "elastic_graph/errors"
-require "elastic_graph/proto_ingestion/schema_definition/identifier"
 require "elastic_graph/proto_ingestion/schema_definition/schema_elements/proto_documentation"
 require "elastic_graph/support/casing"
 
@@ -20,8 +19,8 @@ module ElasticGraph
           # Renders this type's protobuf message definition.
           #
           # @return [String]
-          def to_proto
-            render_proto_message(proto_name)
+          def to_proto(package_name)
+            render_proto_message(proto_name, package_name)
           end
 
           # Returns the priority used to order this definition in a protobuf schema.
@@ -64,28 +63,31 @@ module ElasticGraph
           #
           # @return [String]
           def proto_name
-            @proto_name ||= Identifier.message_name(name)
+            name
+          end
+
+          # Returns the fully qualified name used to reference this message from protobuf fields.
+          #
+          # @return [String]
+          def proto_type_reference(package_name)
+            ".#{package_name}.#{proto_name}"
           end
 
           private
 
-          def render_proto_message(message_name)
-            return render_proto_oneof(message_name) if abstract?
+          def render_proto_message(message_name, package_name)
+            return render_proto_oneof(message_name, package_name) if abstract?
 
             fields = proto_fields
-            field_names = fields.map { |_, field| Identifier.field_name(field.name) }
-            duplicate_names = field_names.tally.select { |_, count| count > 1 }
-            if duplicate_names.any?
-              raise Errors::SchemaError, "Type `#{name}` maps to duplicate proto field names: #{duplicate_names.keys.sort.join(", ")}."
-            end
-
             documentation = ProtoDocumentation.comment_lines_for(doc_comment).map { |line| "#{line}\n" }.join
             field_definitions = fields.each.with_index(1).map do |(schema_field, field), field_number|
-              field_name = Identifier.field_name(field.name)
-              repeated, field_type = proto_field_type_for(field.type, context_field_name: field.name)
+              repeated, field_type = proto_field_type_for(
+                field.type,
+                package_name: package_name,
+                context_field_name: field.name
+              )
               label = "repeated " if repeated
-              line = "  #{label}#{field_type} #{field_name} = #{field_number};"
-              line += " // source name: #{field.name}" if field_name != field.name
+              line = "  #{label}#{field_type} #{field.name} = #{field_number};"
               field_documentation = ProtoDocumentation
                 .comment_lines_for(schema_field.doc_comment, indent: "  ")
                 .map { |comment_line| "#{comment_line}\n" }
@@ -101,14 +103,14 @@ module ElasticGraph
             PROTO
           end
 
-          def render_proto_oneof(message_name)
+          def render_proto_oneof(message_name, package_name)
             # @type var abstract_type: ::ElasticGraph::SchemaDefinition::Mixins::HasSubtypes
             abstract_type = _ = self
             documentation = ProtoDocumentation.comment_lines_for(doc_comment).map { |line| "#{line}\n" }.join
             alternatives = abstract_type.recursively_resolve_subtypes.each.with_index(1).map do |subtype, field_number|
-              subtype_name = (_ = subtype).proto_name
-              field_name = Identifier.field_name(Support::Casing.to_upper_snake(subtype_name).downcase)
-              "    #{subtype_name} #{field_name} = #{field_number};"
+              proto_subtype = _ = subtype
+              field_name = Support::Casing.to_upper_snake(proto_subtype.proto_name).downcase
+              "    #{proto_subtype.proto_type_reference(package_name)} #{field_name} = #{field_number};"
             end
 
             <<~PROTO.chomp
@@ -135,7 +137,7 @@ module ElasticGraph
             end
           end
 
-          def proto_field_type_for(type_ref, context_field_name:)
+          def proto_field_type_for(type_ref, package_name:, context_field_name:)
             list_depth, base_type_ref = ObjectInterfaceAndUnionExtension.list_depth_and_base_type(type_ref)
 
             if list_depth > 1
@@ -145,7 +147,7 @@ module ElasticGraph
             end
 
             proto_type = _ = base_type_ref.resolved
-            [list_depth == 1, proto_type.proto_name]
+            [list_depth == 1, proto_type.proto_type_reference(package_name)]
           end
         end
       end

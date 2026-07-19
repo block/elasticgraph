@@ -40,7 +40,7 @@ module ElasticGraph
           # Scalars map to protobuf field types and do not render standalone definitions.
           #
           # @return [nil]
-          def to_proto
+          def to_proto(_package_name)
             nil
           end
 
@@ -64,6 +64,13 @@ module ElasticGraph
           def proto_name
             protobuf_type || raise(Errors::SchemaError, "Protobuf type not configured for scalar type `#{name}`. " \
                 'To proceed, call `protobuf type: "TYPE"` on the scalar type definition.')
+          end
+
+          # Returns this scalar's name when referenced by a protobuf field.
+          #
+          # @return [String]
+          def proto_type_reference(_package_name)
+            proto_name
           end
         end
       end

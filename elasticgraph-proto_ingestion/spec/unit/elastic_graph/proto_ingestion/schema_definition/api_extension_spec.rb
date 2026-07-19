@@ -16,13 +16,19 @@ module ElasticGraph
           proto = define_proto_schema do |s|
             s.proto_schema_artifacts package_name: "sales.v1"
 
+            s.object_type "Address" do |t|
+              t.field "street", "String"
+            end
+
             s.object_type "Widget" do |t|
               t.field "id", "ID"
+              t.field "address", "Address"
               t.index "widgets"
             end
           end
 
           expect(proto).to include("package sales.v1;")
+          expect(proto_type_def_from(proto, "Widget")).to include(".sales.v1.Address address = 2;")
         end
 
         it "maps every built-in scalar to a proto field type" do
@@ -39,8 +45,7 @@ module ElasticGraph
 
           expect(field_types).to match_array(FactoryExtension::BUILT_IN_SCALAR_PROTO_TYPES_BY_NAME.keys)
           FactoryExtension::BUILT_IN_SCALAR_PROTO_TYPES_BY_NAME.each.with_index(1) do |(type_name, proto_type), field_number|
-            field_name = Identifier.field_name(type_name.downcase)
-            expect(proto).to include("#{proto_type} #{field_name} = #{field_number};")
+            expect(proto).to include("#{proto_type} #{type_name.downcase} = #{field_number};")
           end
         end
 

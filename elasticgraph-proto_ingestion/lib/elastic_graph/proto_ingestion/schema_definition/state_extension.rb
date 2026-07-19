@@ -21,7 +21,7 @@ module ElasticGraph
         def self.extended(state)
           state.instance_variable_set(
             :@proto_ingestion_state,
-            ProtoIngestionState.new(schema_def_state: state, package_name: "elasticgraph")
+            ProtoIngestionState.new(package_name: "elasticgraph")
           )
         end
       end

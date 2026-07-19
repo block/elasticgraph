@@ -7,7 +7,6 @@
 # frozen_string_literal: true
 
 require "elastic_graph/errors"
-require "elastic_graph/proto_ingestion/schema_definition/identifier"
 require "elastic_graph/proto_ingestion/schema_definition/schema_elements/proto_documentation"
 require "elastic_graph/support/casing"
 
@@ -43,7 +42,7 @@ module ElasticGraph
           # Renders this enum's protobuf definition.
           #
           # @return [String]
-          def to_proto
+          def to_proto(_package_name)
             render_proto_enum
           end
 
@@ -65,7 +64,14 @@ module ElasticGraph
           #
           # @return [String]
           def proto_name
-            @proto_name ||= Identifier.enum_name(name)
+            name
+          end
+
+          # Returns the fully qualified name used to reference this enum from protobuf fields.
+          #
+          # @return [String]
+          def proto_type_reference(package_name)
+            ".#{package_name}.#{proto_name}"
           end
 
           # @private
