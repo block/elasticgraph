@@ -16,6 +16,7 @@ module ElasticGraph
           proto = define_proto_schema do |s|
             s.enum_type "Status"
             s.state.enum_types_by_name.fetch("Status").value "ACTIVE"
+            s.state.factory.new_enum_value("STANDALONE", "STANDALONE")
 
             s.interface_type "Named"
             s.state.object_types_by_name.fetch("Named").field "name", "String"
@@ -25,6 +26,12 @@ module ElasticGraph
 
             s.union_type "Entity"
             s.state.object_types_by_name.fetch("Entity").subtype "UnconfiguredRecord"
+
+            s.on_root_query_type do |t|
+              t.field "record", "UnconfiguredRecord" do |f|
+                f.resolve_with :object_without_lookahead
+              end
+            end
           end
 
           expect(proto).to eq("")

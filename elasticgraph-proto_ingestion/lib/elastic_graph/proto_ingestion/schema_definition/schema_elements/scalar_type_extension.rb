@@ -24,7 +24,6 @@ module ElasticGraph
           # @return [void]
           def protobuf(type:)
             @protobuf_type = type
-            @proto_name = nil
           end
 
           # Validates that a protobuf type has been configured on this scalar type. GraphQL-only
@@ -45,11 +44,11 @@ module ElasticGraph
             nil
           end
 
-          # Returns the kind used to order this definition in a protobuf schema.
+          # Returns the priority used to order this definition in a protobuf schema.
           #
-          # @return [nil]
-          def proto_definition_kind
-            nil
+          # @return [Integer]
+          def proto_definition_priority
+            2
           end
 
           # Returns the schema types referenced by this definition.
@@ -63,8 +62,7 @@ module ElasticGraph
           #
           # @return [String]
           def proto_name
-            @proto_name ||= protobuf_type ||
-              raise(Errors::SchemaError, "Protobuf type not configured for scalar type `#{name}`. " \
+            protobuf_type || raise(Errors::SchemaError, "Protobuf type not configured for scalar type `#{name}`. " \
                 'To proceed, call `protobuf type: "TYPE"` on the scalar type definition.')
           end
         end

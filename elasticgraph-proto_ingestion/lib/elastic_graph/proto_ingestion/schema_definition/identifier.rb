@@ -22,10 +22,13 @@ module ElasticGraph
         class << self
           # Validates a protobuf package identifier.
           #
-          # @param name [#to_s]
+          # @param name [String]
           # @return [String]
           def validate_package_name(name)
-            name = name.to_s
+            if !name.is_a?(String) || name.empty?
+              raise Errors::SchemaError, "`package_name` must be a non-empty String"
+            end
+
             segments = name.split(".", -1)
 
             if segments.empty? || segments.any? { |segment| !VALID_IDENTIFIER.match?(segment) }

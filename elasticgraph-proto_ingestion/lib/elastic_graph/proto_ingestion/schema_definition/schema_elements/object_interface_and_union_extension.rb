@@ -24,11 +24,11 @@ module ElasticGraph
             render_proto_message(proto_name)
           end
 
-          # Returns the kind used to order this definition in a protobuf schema.
+          # Returns the priority used to order this definition in a protobuf schema.
           #
-          # @return [Symbol]
-          def proto_definition_kind
-            :message
+          # @return [Integer]
+          def proto_definition_priority
+            1
           end
 
           # Returns the schema types referenced by this definition.
@@ -43,6 +43,21 @@ module ElasticGraph
                 _ = field.type.fully_unwrapped.resolved
               end
             end
+          end
+
+          # Returns a type reference's list depth and fully unwrapped base type.
+          #
+          # @return [Array]
+          def self.list_depth_and_base_type(type_ref)
+            list_depth = 0
+            current = type_ref.unwrap_non_null
+
+            while current.list?
+              list_depth += 1
+              current = current.unwrap_list.unwrap_non_null
+            end
+
+            [list_depth, current]
           end
 
           # Returns this type's name in protobuf schemas.
@@ -64,48 +79,64 @@ module ElasticGraph
               raise Errors::SchemaError, "Type `#{name}` maps to duplicate proto field names: #{duplicate_names.keys.sort.join(", ")}."
             end
 
-            lines = ProtoDocumentation.comment_lines_for(doc_comment)
-            lines << "message #{message_name} {"
-            fields.each.with_index(1) do |(schema_field, field), field_number|
+            documentation = ProtoDocumentation.comment_lines_for(doc_comment).map { |line| "#{line}\n" }.join
+            field_definitions = fields.each.with_index(1).map do |(schema_field, field), field_number|
               field_name = Identifier.field_name(field.name)
               repeated, field_type = proto_field_type_for(field.type, context_field_name: field.name)
               label = "repeated " if repeated
               line = "  #{label}#{field_type} #{field_name} = #{field_number};"
               line += " // source name: #{field.name}" if field_name != field.name
-              lines.concat(ProtoDocumentation.comment_lines_for(schema_field.doc_comment, indent: "  "))
-              lines << line
+              field_documentation = ProtoDocumentation
+                .comment_lines_for(schema_field.doc_comment, indent: "  ")
+                .map { |comment_line| "#{comment_line}\n" }
+                .join
+
+              "#{field_documentation}#{line}"
             end
-            lines << "}"
-            lines.join("\n")
+
+            <<~PROTO.chomp
+              #{documentation}message #{message_name} {
+              #{field_definitions.join("\n")}
+              }
+            PROTO
           end
 
           def render_proto_oneof(message_name)
             # @type var abstract_type: ::ElasticGraph::SchemaDefinition::Mixins::HasSubtypes
             abstract_type = _ = self
-            lines = ProtoDocumentation.comment_lines_for(doc_comment)
-            lines << "message #{message_name} {"
-            lines << "  oneof value {"
-            abstract_type.recursively_resolve_subtypes.each.with_index(1) do |subtype, field_number|
+            documentation = ProtoDocumentation.comment_lines_for(doc_comment).map { |line| "#{line}\n" }.join
+            alternatives = abstract_type.recursively_resolve_subtypes.each.with_index(1).map do |subtype, field_number|
               subtype_name = (_ = subtype).proto_name
               field_name = Identifier.field_name(Support::Casing.to_upper_snake(subtype_name).downcase)
-              lines << "    #{subtype_name} #{field_name} = #{field_number};"
+              "    #{subtype_name} #{field_name} = #{field_number};"
             end
-            lines << "  }"
-            lines << "}"
-            lines.join("\n")
+
+            <<~PROTO.chomp
+              #{documentation}message #{message_name} {
+                oneof value {
+              #{alternatives.join("\n")}
+                }
+              }
+            PROTO
           end
 
           def proto_fields
-            indexing_fields_by_name_in_index.values.filter_map do |schema_field|
-              next if schema_field.name == "__typename"
+            @proto_fields ||= begin
+              unless schema_def_state.user_definition_complete
+                raise Errors::SchemaError, "Cannot access `proto_fields` until the schema definition is complete."
+              end
 
-              indexing_field = schema_field.to_indexing_field # : ElasticGraph::SchemaDefinition::Indexing::Field
-              [schema_field, indexing_field] # : [::ElasticGraph::SchemaDefinition::SchemaElements::Field, ::ElasticGraph::SchemaDefinition::Indexing::Field]
+              indexing_fields_by_name_in_index.values.filter_map do |schema_field|
+                next if schema_field.name == "__typename"
+
+                indexing_field = schema_field.to_indexing_field # : ElasticGraph::SchemaDefinition::Indexing::Field
+                [schema_field, indexing_field] # : [::ElasticGraph::SchemaDefinition::SchemaElements::Field, ::ElasticGraph::SchemaDefinition::Indexing::Field]
+              end
             end
           end
 
           def proto_field_type_for(type_ref, context_field_name:)
-            list_depth, base_type_ref = list_depth_and_base_type(type_ref)
+            list_depth, base_type_ref = ObjectInterfaceAndUnionExtension.list_depth_and_base_type(type_ref)
 
             if list_depth > 1
               raise Errors::SchemaError, "Field `#{name}.#{context_field_name}` has type `#{type_ref.name}`, " \
@@ -115,18 +146,6 @@ module ElasticGraph
 
             proto_type = _ = base_type_ref.resolved
             [list_depth == 1, proto_type.proto_name]
-          end
-
-          def list_depth_and_base_type(type_ref)
-            list_depth = 0
-            current = type_ref.unwrap_non_null
-
-            while current.list?
-              list_depth += 1
-              current = current.unwrap_list.unwrap_non_null
-            end
-
-            [list_depth, current]
           end
         end
       end

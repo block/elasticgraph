@@ -132,9 +132,9 @@ module ElasticGraph
           expect(proto).not_to include("__typename")
         end
 
-        it "flattens nested interfaces and snake-cases multiword oneof alternatives" do
+        it "flattens nested interfaces" do
           proto = define_proto_schema do |s|
-            s.object_type "DeliveryVehicle" do |t|
+            s.object_type "Car" do |t|
               t.implements "MotorVehicle"
               t.field "id", "ID"
             end
@@ -153,12 +153,34 @@ module ElasticGraph
           expect(proto_type_def_from(proto, "Vehicle")).to eq(<<~PROTO.strip)
             message Vehicle {
               oneof value {
+                Car car = 1;
+              }
+            }
+          PROTO
+          expect(proto_type_def_from(proto, "Car")).to include("string id = 1;")
+          expect(proto_type_def_from(proto, "MotorVehicle")).to be_nil
+        end
+
+        it "snake-cases multiword oneof alternatives" do
+          proto = define_proto_schema do |s|
+            s.object_type "DeliveryVehicle" do |t|
+              t.implements "Vehicle"
+              t.field "id", "ID"
+            end
+
+            s.interface_type "Vehicle" do |t|
+              t.field "id", "ID"
+              t.index "vehicles"
+            end
+          end
+
+          expect(proto_type_def_from(proto, "Vehicle")).to eq(<<~PROTO.strip)
+            message Vehicle {
+              oneof value {
                 DeliveryVehicle delivery_vehicle = 1;
               }
             }
           PROTO
-          expect(proto_type_def_from(proto, "DeliveryVehicle")).to include("string id = 1;")
-          expect(proto_type_def_from(proto, "MotorVehicle")).to be_nil
         end
 
         it "rejects lists of lists" do
@@ -198,14 +220,14 @@ module ElasticGraph
           proto = define_proto_schema do |s|
             s.object_type "Widget" do |t|
               t.field "id", "ID"
-              t.field "display_name", "String", name_in_index: "displayName"
+              t.field "display_name", "String", name_in_index: "display_name_in_index"
               t.index "widgets"
             end
           end
 
           widget = proto_type_def_from(proto, "Widget")
           expect(widget).to include("string display_name = 2;")
-          expect(widget).not_to include("displayName")
+          expect(widget).not_to include("display_name_in_index")
         end
 
         it "renders independently each time it is called" do
@@ -257,29 +279,39 @@ module ElasticGraph
           proto = define_proto_schema(type_name_overrides: {"JsonSafeLong" => "BigNumber"}) do |s|
             s.object_type "Account" do |t|
               t.field "id", "ID"
-              t.field "count", "BigNumber"
+              t.field "amount", "BigNumber"
               t.index "accounts"
             end
           end
 
-          expect(proto_type_def_from(proto, "Account")).to include("int64 count = 2;")
+          expect(proto_type_def_from(proto, "Account")).to include("int64 amount = 2;")
         end
 
-        it "prefixes enum values and escapes proto keywords in generated identifiers" do
+        it "prefixes enum values" do
           proto = define_proto_schema do |s|
             s.enum_type "Command" do |t|
-              t.values "option", "stream"
+              t.values "START", "STOP"
             end
 
             s.object_type "Request" do |t|
               t.field "id", "ID"
-              t.field "package", "String"
               t.field "command", "Command"
               t.index "requests"
             end
           end
 
-          expect(proto_type_def_from(proto, "Command")).to include("COMMAND_OPTION = 1;", "COMMAND_STREAM = 2;")
+          expect(proto_type_def_from(proto, "Command")).to include("COMMAND_START = 1;", "COMMAND_STOP = 2;")
+        end
+
+        it "escapes proto keywords in generated identifiers" do
+          proto = define_proto_schema do |s|
+            s.object_type "Request" do |t|
+              t.field "id", "ID"
+              t.field "package", "String"
+              t.index "requests"
+            end
+          end
+
           expect(proto_type_def_from(proto, "Request")).to include("string package_ = 2; // source name: package")
         end
       end

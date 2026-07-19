@@ -6,7 +6,6 @@
 #
 # frozen_string_literal: true
 
-require "elastic_graph/errors"
 require "elastic_graph/proto_ingestion"
 require "elastic_graph/proto_ingestion/schema_definition/factory_extension"
 require "elastic_graph/proto_ingestion/schema_definition/identifier"
@@ -42,10 +41,6 @@ module ElasticGraph
         #     schema.proto_schema_artifacts package_name: "myapp.events.v1"
         #   end
         def proto_schema_artifacts(package_name:)
-          if !package_name.is_a?(String) || package_name.empty?
-            raise Errors::SchemaError, "`package_name` must be a non-empty String"
-          end
-
           proto_ingestion_state.package_name = Identifier.validate_package_name(package_name)
           nil
         end

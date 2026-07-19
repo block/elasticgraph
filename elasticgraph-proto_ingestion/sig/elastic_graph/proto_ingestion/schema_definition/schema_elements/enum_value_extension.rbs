@@ -3,9 +3,8 @@ module ElasticGraph
     module SchemaDefinition
       module SchemaElements
         module EnumValueExtension: ::ElasticGraph::SchemaDefinition::SchemaElements::EnumValue
-          @proto_name: ::String?
-
           def proto_name: (::String enum_value_prefix) -> ::String
+          def to_proto: (::Integer number, proto_enum_value_prefix: ::String) -> ::String
         end
       end
     end

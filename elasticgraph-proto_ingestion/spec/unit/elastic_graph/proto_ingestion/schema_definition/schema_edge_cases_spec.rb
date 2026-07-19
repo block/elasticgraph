@@ -62,6 +62,17 @@ module ElasticGraph
           }.to raise_error(Errors::SchemaError, a_string_including("duplicate proto field names"))
         end
 
+        it "raises when proto fields are accessed before the schema definition is complete" do
+          expect {
+            define_proto_schema do |s|
+              s.object_type "Account" do |t|
+                t.field "id", "ID"
+                t.send(:proto_fields)
+              end
+            end
+          }.to raise_error(Errors::SchemaError, "Cannot access `proto_fields` until the schema definition is complete.")
+        end
+
         it "renders a shared enum only once when multiple indexed types reference it" do
           proto = define_proto_schema do |s|
             s.enum_type "Status" do |t|

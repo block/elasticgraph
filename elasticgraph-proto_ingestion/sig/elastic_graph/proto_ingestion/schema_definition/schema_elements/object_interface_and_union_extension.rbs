@@ -4,11 +4,18 @@ module ElasticGraph
       module SchemaElements
         module ObjectInterfaceAndUnionExtension : ::ElasticGraph::SchemaDefinition::SchemaElements::ObjectType
           @proto_name: ::String?
+          @proto_fields: ::Array[[
+            ::ElasticGraph::SchemaDefinition::SchemaElements::Field,
+            ::ElasticGraph::SchemaDefinition::Indexing::Field
+          ]]?
 
           def proto_name: () -> ::String
           def to_proto: () -> ::String
-          def proto_definition_kind: () -> :message
+          def proto_definition_priority: () -> 1
           def referenced_proto_types: () -> ::Array[::ElasticGraph::SchemaDefinition::SchemaElements::graphQLType]
+          def self.list_depth_and_base_type: (
+            ::ElasticGraph::SchemaDefinition::SchemaElements::TypeReference
+          ) -> [::Integer, ::ElasticGraph::SchemaDefinition::SchemaElements::TypeReference]
 
           private
 
@@ -22,9 +29,6 @@ module ElasticGraph
             ::ElasticGraph::SchemaDefinition::SchemaElements::TypeReference,
             context_field_name: ::String
           ) -> [bool, ::String]
-          def list_depth_and_base_type: (
-            ::ElasticGraph::SchemaDefinition::SchemaElements::TypeReference
-          ) -> [::Integer, ::ElasticGraph::SchemaDefinition::SchemaElements::TypeReference]
         end
       end
     end

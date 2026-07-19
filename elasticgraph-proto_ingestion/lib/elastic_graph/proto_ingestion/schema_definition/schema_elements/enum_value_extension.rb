@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/proto_ingestion/schema_definition/identifier"
+require "elastic_graph/proto_ingestion/schema_definition/schema_elements/proto_documentation"
 require "elastic_graph/support/casing"
 
 module ElasticGraph
@@ -20,7 +21,21 @@ module ElasticGraph
           # @param enum_value_prefix [String] normalized prefix of the containing enum
           # @return [String]
           def proto_name(enum_value_prefix)
-            @proto_name ||= Identifier.enum_value_name("#{enum_value_prefix}_#{Support::Casing.to_upper_snake(name)}")
+            Identifier.enum_value_name("#{enum_value_prefix}_#{Support::Casing.to_upper_snake(name)}")
+          end
+
+          # Renders this value's protobuf definition.
+          #
+          # @param number [Integer] protobuf enum value number
+          # @param proto_enum_value_prefix [String] normalized prefix of the containing enum
+          # @return [String]
+          def to_proto(number, proto_enum_value_prefix:)
+            documentation = ProtoDocumentation
+              .comment_lines_for(doc_comment, indent: "  ")
+              .map { |line| "#{line}\n" }
+              .join
+
+            "#{documentation}  #{proto_name(proto_enum_value_prefix)} = #{number};"
           end
         end
       end

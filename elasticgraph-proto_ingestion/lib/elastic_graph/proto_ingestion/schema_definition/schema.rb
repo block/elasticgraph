@@ -56,13 +56,13 @@ module ElasticGraph
           end
 
           @all_types.select do |type|
-            type_names_to_render.include?(type.name) && type.respond_to?(:to_proto)
+            type_names_to_render.include?(type.name)
           end
         end
 
         def render_definitions(types)
           types
-            .sort_by { |type| [(type.proto_definition_kind == :enum) ? 0 : 1, type.proto_name] }
+            .sort_by { |type| [type.proto_definition_priority, type.proto_name] }
             .filter_map(&:to_proto)
             .join("\n\n")
         end

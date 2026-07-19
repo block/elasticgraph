@@ -4,18 +4,25 @@ module ElasticGraph
       module SchemaElements
         module EnumTypeExtension: ::ElasticGraph::SchemaDefinition::SchemaElements::EnumType
           @proto_name: ::String?
+          @proto_enum_value_prefix: ::String?
+          @proto_zero_value: (::ElasticGraph::SchemaDefinition::SchemaElements::EnumValue & EnumValueExtension)?
+          @proto_zero_value_name: ::String?
+          @values_by_proto_name: ::Hash[::String, ::ElasticGraph::SchemaDefinition::SchemaElements::EnumValue & EnumValueExtension]?
 
           def value: (::String) ?{ (::ElasticGraph::SchemaDefinition::SchemaElements::EnumValue & EnumValueExtension) -> void } -> void
           def proto_name: () -> ::String
           def to_proto: () -> ::String
-          def proto_definition_kind: () -> :enum
+          def proto_definition_priority: () -> 0
           def referenced_proto_types: () -> ::Array[::ElasticGraph::SchemaDefinition::SchemaElements::graphQLType]
           def configure_derived_scalar_type: (::ElasticGraph::SchemaDefinition::SchemaElements::ScalarType) -> void
 
           private
 
           def render_proto_enum: () -> ::String
-          def enum_value_prefix: () -> ::String
+          def proto_zero_value: () -> (::ElasticGraph::SchemaDefinition::SchemaElements::EnumValue & EnumValueExtension)
+          def proto_zero_value_name: () -> ::String
+          def proto_enum_value_prefix: () -> ::String
+          def values_by_proto_name: () -> ::Hash[::String, ::ElasticGraph::SchemaDefinition::SchemaElements::EnumValue & EnumValueExtension]
         end
       end
     end

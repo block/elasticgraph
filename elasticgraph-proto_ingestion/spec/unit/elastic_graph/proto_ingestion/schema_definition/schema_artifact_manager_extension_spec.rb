@@ -25,6 +25,12 @@ module ElasticGraph
               t.field "x", "Float"
               t.field "y", "Float"
             end
+
+            s.on_root_query_type do |t|
+              t.field "point", "Point" do |f|
+                f.resolve_with :object_without_lookahead
+              end
+            end
           end
 
           artifact_base_names = artifacts_for(results)

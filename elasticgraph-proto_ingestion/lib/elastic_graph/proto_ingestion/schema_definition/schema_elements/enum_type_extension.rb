@@ -21,28 +21,23 @@ module ElasticGraph
           # Defines an enum value and immediately validates its protobuf name.
           #
           # @return [void]
-          def value(value_name, &block)
-            super
-            new_value = values_by_name.values.last # : ::ElasticGraph::SchemaDefinition::SchemaElements::EnumValue & EnumValueExtension
-            new_proto_name = new_value.proto_name(enum_value_prefix)
-            zero_value_name = "#{enum_value_prefix}_UNSPECIFIED"
+          def value(value_name)
+            super(value_name) do |new_value|
+              new_proto_name = new_value.proto_name(proto_enum_value_prefix)
 
-            if new_proto_name == zero_value_name
-              raise Errors::SchemaError, "Enum `#{name}` value `#{new_value.name}` maps to proto enum value name " \
-                "`#{new_proto_name}`, which conflicts with the generated zero value `#{zero_value_name}`."
+              if new_proto_name == proto_zero_value_name
+                raise Errors::SchemaError, "Enum `#{name}` value `#{new_value.name}` maps to proto enum value name " \
+                  "`#{new_proto_name}`, which conflicts with the generated zero value `#{proto_zero_value_name}`."
+              end
+
+              if (duplicate = values_by_proto_name[new_proto_name])
+                raise Errors::SchemaError, "Enum `#{name}` values `#{duplicate.name}` and `#{new_value.name}` " \
+                  "map to duplicate proto enum value name `#{new_proto_name}`."
+              end
+
+              yield new_value if block_given?
+              values_by_proto_name[new_proto_name] = new_value
             end
-
-            duplicate = values_by_name.values.find do |raw_value|
-              existing_value = raw_value # : ::ElasticGraph::SchemaDefinition::SchemaElements::EnumValue & EnumValueExtension
-              !existing_value.equal?(new_value) && existing_value.proto_name(enum_value_prefix) == new_proto_name
-            end
-
-            if duplicate
-              raise Errors::SchemaError, "Enum `#{name}` values `#{duplicate.name}` and `#{new_value.name}` " \
-                "map to duplicate proto enum value name `#{new_proto_name}`."
-            end
-
-            nil
           end
 
           # Renders this enum's protobuf definition.
@@ -52,11 +47,11 @@ module ElasticGraph
             render_proto_enum
           end
 
-          # Returns the kind used to order this definition in a protobuf schema.
+          # Returns the priority used to order this definition in a protobuf schema.
           #
-          # @return [Symbol]
-          def proto_definition_kind
-            :enum
+          # @return [Integer]
+          def proto_definition_priority
+            0
           end
 
           # Returns the schema types referenced by this definition.
@@ -83,25 +78,40 @@ module ElasticGraph
           private
 
           def render_proto_enum
-            values = values_by_name.values
-            zero_value_name = "#{enum_value_prefix}_UNSPECIFIED"
-
-            lines = ProtoDocumentation.comment_lines_for(doc_comment)
-            lines << "enum #{proto_name} {"
-            lines << "  // The default value when no enum value has been explicitly set. Do not use this value."
-            lines << "  // See https://protobuf.dev/programming-guides/proto3/#enum-default."
-            lines << "  #{zero_value_name} = 0;"
-            values.each.with_index(1) do |raw_value, number|
+            documentation = ProtoDocumentation.comment_lines_for(doc_comment).map { |line| "#{line}\n" }.join
+            values = [proto_zero_value] + values_by_name.values
+            value_definitions = values.each.with_index.map do |raw_value, number|
               value = raw_value # : ::ElasticGraph::SchemaDefinition::SchemaElements::EnumValue & EnumValueExtension
-              lines.concat(ProtoDocumentation.comment_lines_for(value.doc_comment, indent: "  "))
-              lines << "  #{value.proto_name(enum_value_prefix)} = #{number};"
+              value.to_proto(number, proto_enum_value_prefix: proto_enum_value_prefix)
             end
-            lines << "}"
-            lines.join("\n")
+
+            <<~PROTO.chomp
+              #{documentation}enum #{proto_name} {
+              #{value_definitions.join("\n")}
+              }
+            PROTO
           end
 
-          def enum_value_prefix
-            Support::Casing.to_upper_snake(name)
+          def proto_zero_value
+            factory = schema_def_state.factory # : ::ElasticGraph::SchemaDefinition::Factory & ::ElasticGraph::ProtoIngestion::SchemaDefinition::FactoryExtension
+            @proto_zero_value ||= factory.new_enum_value("UNSPECIFIED", "UNSPECIFIED") do |value|
+              value.documentation <<~EOS
+                The default value when no enum value has been explicitly set. Do not use this value.
+                See https://protobuf.dev/programming-guides/proto3/#enum-default.
+              EOS
+            end
+          end
+
+          def proto_zero_value_name
+            @proto_zero_value_name ||= "#{proto_enum_value_prefix}_UNSPECIFIED"
+          end
+
+          def proto_enum_value_prefix
+            @proto_enum_value_prefix ||= Support::Casing.to_upper_snake(name)
+          end
+
+          def values_by_proto_name
+            @values_by_proto_name ||= {}
           end
         end
       end

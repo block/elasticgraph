@@ -96,8 +96,7 @@ module ElasticGraph
           super(name) do |type|
             extended_type = type.extend(SchemaElements::ScalarTypeExtension) # : ::ElasticGraph::SchemaDefinition::SchemaElements::ScalarType & SchemaElements::ScalarTypeExtension
 
-            if state.initially_registered_built_in_types.empty? &&
-                (proto_type = BUILT_IN_SCALAR_PROTO_TYPES_BY_NAME[name.to_s])
+            if (proto_type = BUILT_IN_SCALAR_PROTO_TYPES_BY_NAME[name.to_s])
               extended_type.protobuf type: proto_type
             end
 
