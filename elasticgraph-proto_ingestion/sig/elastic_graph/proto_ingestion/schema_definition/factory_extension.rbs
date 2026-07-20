@@ -1,0 +1,18 @@
+module ElasticGraph
+  module ProtoIngestion
+    module SchemaDefinition
+      module FactoryExtension: ::ElasticGraph::SchemaDefinition::Factory
+        BUILT_IN_SCALAR_PROTO_TYPES_BY_NAME: ::Hash[::String, ::String]
+
+        def new_enum_type: (::String) ?{ (::ElasticGraph::SchemaDefinition::SchemaElements::EnumType & SchemaElements::EnumTypeExtension) -> void } -> (::ElasticGraph::SchemaDefinition::SchemaElements::EnumType & SchemaElements::EnumTypeExtension)
+        def new_enum_value: (::String, ::String) ?{ (::ElasticGraph::SchemaDefinition::SchemaElements::EnumValue & SchemaElements::EnumValueExtension) -> void } -> (::ElasticGraph::SchemaDefinition::SchemaElements::EnumValue & SchemaElements::EnumValueExtension)
+        def new_interface_type: (::String) ?{ (::ElasticGraph::SchemaDefinition::SchemaElements::InterfaceType & SchemaElements::ObjectInterfaceAndUnionExtension) -> void } -> (::ElasticGraph::SchemaDefinition::SchemaElements::InterfaceType & SchemaElements::ObjectInterfaceAndUnionExtension)
+        def new_object_type: (::String) ?{ (::ElasticGraph::SchemaDefinition::SchemaElements::ObjectType & SchemaElements::ObjectInterfaceAndUnionExtension) -> void } -> (::ElasticGraph::SchemaDefinition::SchemaElements::ObjectType & SchemaElements::ObjectInterfaceAndUnionExtension)
+        def new_scalar_type: (::String) ?{ (::ElasticGraph::SchemaDefinition::SchemaElements::ScalarType & SchemaElements::ScalarTypeExtension) -> void } -> (::ElasticGraph::SchemaDefinition::SchemaElements::ScalarType & SchemaElements::ScalarTypeExtension)
+        def new_union_type: (::String) ?{ (::ElasticGraph::SchemaDefinition::SchemaElements::UnionType & SchemaElements::ObjectInterfaceAndUnionExtension) -> void } -> (::ElasticGraph::SchemaDefinition::SchemaElements::UnionType & SchemaElements::ObjectInterfaceAndUnionExtension)
+        def new_results: () -> ::ElasticGraph::SchemaDefinition::Results
+        def new_schema_artifact_manager: (**untyped) -> ::ElasticGraph::SchemaDefinition::SchemaArtifactManager
+      end
+    end
+  end
+end

@@ -1,0 +1,16 @@
+module ElasticGraph
+  module ProtoIngestion
+    module SchemaDefinition
+      class ProtoIngestionStateSupertype
+        attr_accessor package_name: ::String
+
+        def initialize: (
+          package_name: ::String
+        ) -> void
+      end
+
+      class ProtoIngestionState < ProtoIngestionStateSupertype
+      end
+    end
+  end
+end

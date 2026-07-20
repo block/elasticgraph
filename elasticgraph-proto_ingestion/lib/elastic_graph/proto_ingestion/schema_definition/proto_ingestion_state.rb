@@ -7,9 +7,13 @@
 # frozen_string_literal: true
 
 module ElasticGraph
-  # Namespace for Protocol Buffers schema artifact generation extensions.
   module ProtoIngestion
-    # The name of the generated Protocol Buffers schema file.
-    PROTO_SCHEMA_FILE = "schema.proto"
+    module SchemaDefinition
+      # Holds the proto ingestion extension's schema definition state.
+      #
+      # @private
+      class ProtoIngestionState < ::Struct.new(:package_name)
+      end
+    end
   end
 end

@@ -1,0 +1,11 @@
+module ElasticGraph
+  module ProtoIngestion
+    module SchemaDefinition
+      module StateExtension: ::ElasticGraph::SchemaDefinition::State
+        attr_reader proto_ingestion_state: ProtoIngestionState
+
+        def self.extended: (::ElasticGraph::SchemaDefinition::State & StateExtension) -> void
+      end
+    end
+  end
+end

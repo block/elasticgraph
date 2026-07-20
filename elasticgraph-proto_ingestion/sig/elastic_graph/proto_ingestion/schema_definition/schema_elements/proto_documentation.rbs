@@ -1,0 +1,11 @@
+module ElasticGraph
+  module ProtoIngestion
+    module SchemaDefinition
+      module SchemaElements
+        module ProtoDocumentation
+          def self.comment_lines_for: (::String?, ?indent: ::String) -> ::Array[::String]
+        end
+      end
+    end
+  end
+end
