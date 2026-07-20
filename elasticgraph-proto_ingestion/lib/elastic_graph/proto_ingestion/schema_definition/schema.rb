@@ -73,7 +73,6 @@ module ElasticGraph
           enum_type_by_prefix = {} # : ::Hash[::String, untyped]
 
           types.grep(SchemaElements::EnumTypeExtension).each do |type|
-
             if (existing_enum_type = enum_type_by_prefix[type.proto_enum_value_prefix])
               raise Errors::SchemaError, "Enum types `#{existing_enum_type.name}` and `#{type.name}` map to " \
                 "duplicate protobuf enum value prefix `#{type.proto_enum_value_prefix}`."
