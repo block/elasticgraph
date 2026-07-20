@@ -105,7 +105,7 @@ module ElasticGraph
             end
           end
 
-          expect(proto.scan(/^enum Status \{/).size).to eq(1)
+          expect(proto.scan("enum Status ").size).to eq(1)
           expect(proto_type_def_from(proto, "Account")).to include(".elasticgraph.Status status = 2;")
           expect(proto_type_def_from(proto, "User")).to include(".elasticgraph.Status status = 2;")
         end

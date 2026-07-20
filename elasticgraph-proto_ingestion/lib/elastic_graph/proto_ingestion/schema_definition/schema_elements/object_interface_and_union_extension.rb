@@ -23,13 +23,6 @@ module ElasticGraph
             render_proto_message(proto_name, package_name)
           end
 
-          # Returns the priority used to order this definition in a protobuf schema.
-          #
-          # @return [Integer]
-          def proto_definition_priority
-            1
-          end
-
           # Returns the schema types referenced by this definition.
           #
           # @return [Array]

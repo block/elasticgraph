@@ -26,12 +26,6 @@ module ElasticGraph
 
             s.union_type "Entity"
             s.state.object_types_by_name.fetch("Entity").subtype "UnconfiguredRecord"
-
-            s.on_root_query_type do |t|
-              t.field "record", "UnconfiguredRecord" do |f|
-                f.resolve_with :object_without_lookahead
-              end
-            end
           end
 
           expect(proto).to eq("")

@@ -46,13 +46,6 @@ module ElasticGraph
             render_proto_enum
           end
 
-          # Returns the priority used to order this definition in a protobuf schema.
-          #
-          # @return [Integer]
-          def proto_definition_priority
-            0
-          end
-
           # Returns the schema types referenced by this definition.
           #
           # @return [Array]
@@ -99,12 +92,14 @@ module ElasticGraph
           end
 
           def proto_zero_value
-            factory = schema_def_state.factory # : ::ElasticGraph::SchemaDefinition::Factory & ::ElasticGraph::ProtoIngestion::SchemaDefinition::FactoryExtension
-            @proto_zero_value ||= factory.new_enum_value("UNSPECIFIED", "UNSPECIFIED") do |value|
-              value.documentation <<~EOS
-                The default value when no enum value has been explicitly set. Do not use this value.
-                See https://protobuf.dev/programming-guides/proto3/#enum-default.
-              EOS
+            @proto_zero_value ||= begin
+              factory = schema_def_state.factory # : ::ElasticGraph::SchemaDefinition::Factory & ::ElasticGraph::ProtoIngestion::SchemaDefinition::FactoryExtension
+              factory.new_enum_value("UNSPECIFIED", "UNSPECIFIED") do |value|
+                value.documentation <<~EOS
+                  The default value when no enum value has been explicitly set. Do not use this value.
+                  See https://protobuf.dev/programming-guides/proto3/#enum-default.
+                EOS
+              end
             end
           end
 

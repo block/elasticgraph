@@ -27,6 +27,7 @@ module ElasticGraph
             end
 
             s.on_root_query_type do |t|
+              # Avoid an "Object types must have fields" warning from the GraphQL gem.
               t.field "point", "Point" do |f|
                 f.resolve_with :object_without_lookahead
               end

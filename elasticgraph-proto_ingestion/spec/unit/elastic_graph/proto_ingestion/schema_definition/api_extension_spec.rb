@@ -12,9 +12,9 @@ module ElasticGraph
   module ProtoIngestion
     module SchemaDefinition
       RSpec.describe APIExtension do
-        it "emits the configured package name" do
+        it "uses the configured package name" do
           proto = define_proto_schema do |s|
-            s.proto_schema_artifacts package_name: "sales.v1"
+            s.proto_schema_artifacts package_name: "proto.package.v1"
 
             s.object_type "Address" do |t|
               t.field "street", "String"
@@ -27,8 +27,8 @@ module ElasticGraph
             end
           end
 
-          expect(proto).to include("package sales.v1;")
-          expect(proto_type_def_from(proto, "Widget")).to include(".sales.v1.Address address = 2;")
+          expect(proto).to include("package proto.package.v1;")
+          expect(proto_type_def_from(proto, "Widget")).to include(".proto.package.v1.Address address = 2;")
         end
 
         it "maps every built-in scalar to a proto field type" do
@@ -49,26 +49,26 @@ module ElasticGraph
           end
         end
 
-        it "requires `package_name` to be a non-empty String" do
-          expect {
-            define_proto_schema do |s|
-              s.proto_schema_artifacts package_name: ""
-            end
-          }.to raise_error(Errors::SchemaError, a_string_including("`package_name` must be a non-empty String"))
-
-          expect {
-            define_proto_schema do |s|
-              s.proto_schema_artifacts package_name: :symbol_package
-            end
-          }.to raise_error(Errors::SchemaError, a_string_including("`package_name` must be a non-empty String"))
-        end
-
         it "rejects invalid package names when they are configured" do
-          expect {
-            define_proto_schema do |s|
-              s.proto_schema_artifacts package_name: "my-app.events"
+          invalid_package_names = [
+            "",
+            :symbol_package,
+            "my-app.events",
+            "myapp..events",
+            "1myapp.events",
+            "myapp.events.",
+            ".elasticgraph.events"
+          ]
+
+          aggregate_failures do
+            invalid_package_names.each do |package_name|
+              expect {
+                define_proto_schema do |s|
+                  s.proto_schema_artifacts package_name: package_name
+                end
+              }.to raise_error(Errors::SchemaError, a_string_including("`package_name`"))
             end
-          }.to raise_error(Errors::SchemaError, a_string_including("`package_name`", "my-app.events"))
+          end
         end
       end
     end

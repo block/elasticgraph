@@ -13,9 +13,6 @@ module ElasticGraph
       #
       # @private
       class ProtoIngestionState < ::Struct.new(:package_name)
-        def initialize(package_name:)
-          super(package_name:)
-        end
       end
     end
   end

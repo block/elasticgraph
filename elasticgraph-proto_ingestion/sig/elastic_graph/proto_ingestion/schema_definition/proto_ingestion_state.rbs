@@ -10,9 +10,6 @@ module ElasticGraph
       end
 
       class ProtoIngestionState < ProtoIngestionStateSupertype
-        def initialize: (
-          package_name: ::String
-        ) -> void
       end
     end
   end

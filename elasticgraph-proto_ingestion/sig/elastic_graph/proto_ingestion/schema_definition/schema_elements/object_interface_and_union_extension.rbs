@@ -11,7 +11,6 @@ module ElasticGraph
           def proto_name: () -> ::String
           def proto_type_reference: (::String package_name) -> ::String
           def to_proto: (::String package_name) -> ::String
-          def proto_definition_priority: () -> 1
           def referenced_proto_types: () -> ::Array[::ElasticGraph::SchemaDefinition::SchemaElements::graphQLType]
           def self.list_depth_and_base_type: (
             ::ElasticGraph::SchemaDefinition::SchemaElements::TypeReference

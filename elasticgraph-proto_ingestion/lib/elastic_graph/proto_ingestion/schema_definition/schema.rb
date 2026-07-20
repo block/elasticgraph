@@ -6,7 +6,6 @@
 #
 # frozen_string_literal: true
 
-require "elastic_graph/proto_ingestion/schema_definition/identifier"
 require "elastic_graph/proto_ingestion/schema_definition/schema_elements/enum_type_extension"
 require "elastic_graph/proto_ingestion/schema_definition/schema_elements/object_interface_and_union_extension"
 require "elastic_graph/proto_ingestion/schema_definition/schema_elements/scalar_type_extension"
@@ -22,7 +21,7 @@ module ElasticGraph
         def initialize(state:, all_types:, package_name:)
           @state = state
           @all_types = all_types
-          @package_name = Identifier.validate_package_name(package_name)
+          @package_name = package_name
         end
 
         # Renders the schema as a valid `proto3` file.
@@ -62,7 +61,7 @@ module ElasticGraph
 
         def render_definitions(types)
           types
-            .sort_by { |type| [type.proto_definition_priority, type.proto_name] }
+            .sort_by(&:proto_name)
             .filter_map { |type| type.to_proto(@package_name) }
             .join("\n\n")
         end

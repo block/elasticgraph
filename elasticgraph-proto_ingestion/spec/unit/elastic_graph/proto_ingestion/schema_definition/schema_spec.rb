@@ -14,19 +14,6 @@ module ElasticGraph
       RSpec.describe Schema do
         it "generates a proto schema from indexed types" do
           proto = define_proto_schema do |s|
-            s.enum_type "Status" do |t|
-              t.documentation "The status of an account.\n\nUsed when ingesting accounts."
-              t.value "ACTIVE" do |v|
-                v.documentation "The account is active."
-              end
-              t.value "INACTIVE"
-            end
-
-            s.object_type "Address" do |t|
-              t.field "street", "String"
-              t.field "city", "String"
-            end
-
             s.object_type "Account" do |t|
               t.documentation "An account in the system.\n\n"
               t.field "id", "ID" do |f|
@@ -38,24 +25,25 @@ module ElasticGraph
               t.field "display_name", "String", graphql_only: true
               t.index "accounts"
             end
+
+            s.object_type "Address" do |t|
+              t.field "street", "String"
+              t.field "city", "String"
+            end
+
+            s.enum_type "Status" do |t|
+              t.documentation "The status of an account.\n\nUsed when ingesting accounts."
+              t.value "ACTIVE" do |v|
+                v.documentation "The account is active."
+              end
+              t.value "INACTIVE"
+            end
           end
 
           expect(proto).to eq(<<~PROTO)
             syntax = "proto3";
 
             package elasticgraph;
-
-            // The status of an account.
-            //
-            // Used when ingesting accounts.
-            enum Status {
-              // The default value when no enum value has been explicitly set. Do not use this value.
-              // See https://protobuf.dev/programming-guides/proto3/#enum-default.
-              STATUS_UNSPECIFIED = 0;
-              // The account is active.
-              STATUS_ACTIVE = 1;
-              STATUS_INACTIVE = 2;
-            }
 
             // An account in the system.
             message Account {
@@ -70,7 +58,45 @@ module ElasticGraph
               string street = 1;
               string city = 2;
             }
+
+            // The status of an account.
+            //
+            // Used when ingesting accounts.
+            enum Status {
+              // The default value when no enum value has been explicitly set. Do not use this value.
+              // See https://protobuf.dev/programming-guides/proto3/#enum-default.
+              STATUS_UNSPECIFIED = 0;
+              // The account is active.
+              STATUS_ACTIVE = 1;
+              STATUS_INACTIVE = 2;
+            }
           PROTO
+        end
+
+        it "sorts enum and message definitions together alphabetically" do
+          proto = define_proto_schema do |s|
+            s.enum_type "Zulu" do |t|
+              t.value "LAST"
+            end
+
+            s.object_type "Yak" do |t|
+              t.field "id", "ID"
+            end
+
+            s.enum_type "Beta" do |t|
+              t.value "SECOND"
+            end
+
+            s.object_type "Alpha" do |t|
+              t.field "id", "ID"
+              t.field "beta", "Beta"
+              t.field "yak", "Yak"
+              t.field "zulu", "Zulu"
+              t.index "alphas"
+            end
+          end
+
+          expect(proto.scan(/^(?:enum|message) (\w+) \{/).flatten).to eq(%w[Alpha Beta Yak Zulu])
         end
 
         it "generates oneof wrappers for indexed interface and union types" do
