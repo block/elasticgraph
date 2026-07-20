@@ -8,3 +8,13 @@
 
 # This file contains RSpec configuration for `elasticgraph-proto_ingestion`.
 # It is loaded by the shared spec helper at `spec_support/spec_helper.rb`.
+
+RSpec.configure do |config|
+  config.define_derived_metadata(absolute_file_path: %r{/elasticgraph-proto_ingestion/}) do |meta|
+    meta[:proto_schema] = true
+  end
+
+  config.when_first_matching_example_defined(:proto_schema) do
+    require "support/proto_schema_support"
+  end
+end

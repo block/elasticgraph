@@ -1501,6 +1501,12 @@ module ElasticGraph
             expect_statline_update_target_with(metadata)
           end
 
+          it "resolves the parent type by its overridden name when `type_name_overrides` renames it" do
+            metadata = nested_sourced_from_schema(type_name_overrides: {"Team" => "RenamedTeam"})
+
+            expect_statline_update_target_with(metadata, type: "RenamedTeam")
+          end
+
           it "discovers an embedding field declared with `indexing_only: true`" do
             # An `indexing_only: true` field is absent from `graphql_fields_by_name` but present in
             # `indexing_fields_by_name_in_index`, so this only resolves when the latter is used.
@@ -1917,6 +1923,7 @@ module ElasticGraph
         def expect_statline_update_target_with(
           metadata,
           relationship: "players.statLine",
+          type: "Team",
           routing_value_source: nil,
           rollover_timestamp_value_source: nil,
           field_params: {"goals" => dynamic_param_with(source_path: "goals", cardinality: :one)},
@@ -1926,7 +1933,7 @@ module ElasticGraph
           expect(targets.keys).to contain_exactly(relationship)
 
           target = targets.fetch(relationship)
-          expect(target.type).to eq "Team"
+          expect(target.type).to eq type
           expect(target.relationship).to eq relationship
           expect(target.script_id).to eq(INDEX_DATA_UPDATE_SCRIPT_ID)
           expect(target.id_source).to eq "teamId"
@@ -1954,10 +1961,11 @@ module ElasticGraph
           player_goals_type: "Int",
           player_goals_source: "goals",
           player_statline_dir: :in,
-          player_statline_via: "playerId"
+          player_statline_via: "playerId",
+          type_name_overrides: {}
         )
           # `StatLine` is the source type, so its metadata carries the nested update targets we assert on.
-          object_type_metadata_for "StatLine" do |s|
+          object_type_metadata_for "StatLine", type_name_overrides: type_name_overrides do |s|
             if embed_players_under
               s.object_type s.state.type_ref(embed_players_under).fully_unwrapped.name do |t|
                 t.field "players", players_field do |f|

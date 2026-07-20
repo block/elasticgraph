@@ -86,7 +86,7 @@ module ElasticGraph
         def new_scalar_type(name)
           super(name) do |type|
             extended_type = type.extend(SchemaElements::ScalarTypeExtension) # : ::ElasticGraph::SchemaDefinition::SchemaElements::ScalarType & SchemaElements::ScalarTypeExtension
-            if state.initially_registered_built_in_types.empty? && (options = BUILT_IN_SCALAR_JSON_SCHEMA_OPTIONS_BY_NAME[name.to_s])
+            if (options = BUILT_IN_SCALAR_JSON_SCHEMA_OPTIONS_BY_NAME[name.to_s])
               extended_type.json_schema(**options)
             end
 

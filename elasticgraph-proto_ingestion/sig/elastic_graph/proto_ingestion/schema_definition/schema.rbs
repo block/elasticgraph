@@ -1,0 +1,25 @@
+module ElasticGraph
+  module ProtoIngestion
+    module SchemaDefinition
+      class Schema
+        @state: ::ElasticGraph::SchemaDefinition::State
+        @all_types: ::Array[::ElasticGraph::SchemaDefinition::SchemaElements::graphQLType]
+        @package_name: ::String
+
+        def initialize: (
+          state: ::ElasticGraph::SchemaDefinition::State,
+          all_types: ::Array[::ElasticGraph::SchemaDefinition::SchemaElements::graphQLType],
+          package_name: ::String
+        ) -> void
+
+        def to_proto: () -> ::String
+
+        private
+
+        def proto_types: () -> ::Array[untyped]
+        def render_definitions: (::Array[untyped] types) -> ::String
+        def validate_unique_enum_value_prefixes: (::Array[untyped] types) -> void
+      end
+    end
+  end
+end

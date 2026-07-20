@@ -1,0 +1,11 @@
+module ElasticGraph
+  module ProtoIngestion
+    module SchemaDefinition
+      class Identifier
+        VALID_PACKAGE_SEGMENT: ::Regexp
+
+        def self.validate_package_name: (::String) -> ::String
+      end
+    end
+  end
+end
