@@ -1,7 +1,13 @@
 module ElasticGraph
   module ProtoIngestion
     module SchemaDefinition
-      module APIExtension
+      module APIExtension: ::ElasticGraph::SchemaDefinition::API
+        def self.extended: (::ElasticGraph::SchemaDefinition::API & APIExtension) -> void
+        def proto_schema_artifacts: (package_name: ::String) -> void
+
+        private
+
+        def proto_ingestion_state: () -> ProtoIngestionState
       end
     end
   end

@@ -1,0 +1,11 @@
+module ElasticGraph
+  module Support
+    class Casing
+      def self.to_snake: (::String) -> ::String
+      def self.to_camel: (::String) -> ::String
+      def self.to_title: (::String) -> ::String
+      def self.uncapitalize: (::String) -> ::String
+      def self.to_upper_snake: (::String) -> ::String
+    end
+  end
+end

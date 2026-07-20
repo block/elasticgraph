@@ -1,0 +1,12 @@
+module ElasticGraph
+  module ProtoIngestion
+    module SchemaDefinition
+      module SchemaElements
+        module EnumValueExtension: ::ElasticGraph::SchemaDefinition::SchemaElements::EnumValue
+          def proto_name: (::String enum_value_prefix) -> ::String
+          def to_proto: (::Integer number, proto_enum_value_prefix: ::String) -> ::String
+        end
+      end
+    end
+  end
+end
