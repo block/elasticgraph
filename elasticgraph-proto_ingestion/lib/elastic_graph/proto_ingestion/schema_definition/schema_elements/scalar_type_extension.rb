@@ -14,6 +14,23 @@ module ElasticGraph
       module SchemaElements
         # Extends ScalarType with proto field type conversion.
         module ScalarTypeExtension
+          # Default protobuf types applied to ElasticGraph's built-in scalar types as they are constructed.
+          BUILT_IN_SCALAR_PROTO_TYPES_BY_NAME = {
+            "Boolean" => "bool",
+            "Cursor" => "string",
+            "Date" => "string",
+            "DateTime" => "string",
+            "Float" => "double",
+            "ID" => "string",
+            "Int" => "int32",
+            "JsonSafeLong" => "int64",
+            "LocalTime" => "string",
+            "LongString" => "int64",
+            "String" => "string",
+            "TimeZone" => "string",
+            "Untyped" => "string"
+          }.freeze
+
           # Configured protobuf type (e.g. string, int64, bool).
           # @dynamic protobuf_type
           attr_reader :protobuf_type
@@ -26,13 +43,20 @@ module ElasticGraph
             @protobuf_type = type
           end
 
-          # Validates that a protobuf type has been configured on this scalar type. GraphQL-only
-          # scalar types are skipped because they are not part of ingestion.
+          # Applies any built-in protobuf type, yields for further configuration, and validates the result.
           #
+          # @yield additional scalar type configuration
           # @return [void]
-          # @raise [Errors::SchemaError] when missing
-          def finalize_protobuf_configuration!
+          # @raise [Errors::SchemaError] when a protobuf type is missing
+          def initialize_proto_extension
+            original_name = type_ref.with_reverted_override.name
+            if (proto_type = BUILT_IN_SCALAR_PROTO_TYPES_BY_NAME[original_name])
+              protobuf type: proto_type
+            end
+
+            yield
             return if graphql_only?
+
             proto_name
             nil
           end
