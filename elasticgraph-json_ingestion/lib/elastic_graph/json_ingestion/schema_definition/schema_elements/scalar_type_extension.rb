@@ -6,6 +6,8 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/constants"
+require "elastic_graph/graphql/scalar_coercion_adapters/valid_time_zones"
 require "elastic_graph/json_ingestion/schema_definition/schema_elements/has_json_schema"
 
 module ElasticGraph
@@ -16,13 +18,36 @@ module ElasticGraph
         module ScalarTypeExtension
           include HasJSONSchema
 
-          # Validates that json_schema has been configured on this scalar type, and applies
-          # post-yield runtime metadata derived from the final JSON schema configuration.
-          # GraphQL-only scalar types are skipped because they are not part of ingestion.
+          # Default JSON schema options applied to ElasticGraph's built-in scalar types as they are constructed.
+          BUILT_IN_SCALAR_JSON_SCHEMA_OPTIONS_BY_NAME = {
+            "Boolean" => {type: "boolean"},
+            "Float" => {type: "number"},
+            "ID" => {type: "string"},
+            "Int" => {type: "integer", minimum: INT_MIN, maximum: INT_MAX},
+            "String" => {type: "string"},
+            "Cursor" => {type: "string"},
+            "Date" => {type: "string", format: "date"},
+            "DateTime" => {type: "string", format: "date-time"},
+            "LocalTime" => {type: "string", pattern: VALID_LOCAL_TIME_JSON_SCHEMA_PATTERN},
+            "TimeZone" => {type: "string", enum: GraphQL::ScalarCoercionAdapters::VALID_TIME_ZONES.to_a.freeze},
+            "Untyped" => {type: ["array", "boolean", "integer", "number", "object", "string"].freeze},
+            "JsonSafeLong" => {type: "integer", minimum: JSON_SAFE_LONG_MIN, maximum: JSON_SAFE_LONG_MAX},
+            "LongString" => {type: "integer", minimum: LONG_STRING_MIN, maximum: LONG_STRING_MAX}
+          }.freeze
+
+          # Applies any built-in JSON schema options, yields for further configuration, validates the result,
+          # and applies runtime metadata derived from the final JSON schema configuration.
           #
+          # @yield additional scalar type configuration
           # @raise [Errors::SchemaError] if json_schema has not been configured on an ingested scalar type
           # @return [void]
-          def finalize_json_schema_configuration!
+          def initialize_json_schema_extension
+            original_name = type_ref.with_reverted_override.name
+            if (options = BUILT_IN_SCALAR_JSON_SCHEMA_OPTIONS_BY_NAME[original_name])
+              json_schema(**options)
+            end
+
+            yield
             return if graphql_only?
 
             if json_schema_options.empty?

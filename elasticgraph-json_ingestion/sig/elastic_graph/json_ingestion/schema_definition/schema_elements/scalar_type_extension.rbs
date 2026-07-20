@@ -3,9 +3,11 @@ module ElasticGraph
     module SchemaDefinition
       module SchemaElements
         module ScalarTypeExtension: ::ElasticGraph::SchemaDefinition::SchemaElements::ScalarType
+          BUILT_IN_SCALAR_JSON_SCHEMA_OPTIONS_BY_NAME: ::Hash[::String, ::Hash[::Symbol, untyped]]
+
           include HasJSONSchema
 
-          def finalize_json_schema_configuration!: () -> void
+          def initialize_json_schema_extension: () { () -> void } -> void
 
           private
 
