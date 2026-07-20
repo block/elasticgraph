@@ -67,6 +67,13 @@ module ElasticGraph
             ".#{package_name}.#{proto_name}"
           end
 
+          # Returns the package-level prefix applied to this enum's protobuf values.
+          #
+          # @return [String]
+          def proto_enum_value_prefix
+            @proto_enum_value_prefix ||= Support::Casing.to_upper_snake(name)
+          end
+
           # @private
           def configure_derived_scalar_type(scalar_type)
             super
@@ -105,10 +112,6 @@ module ElasticGraph
 
           def proto_zero_value_name
             @proto_zero_value_name ||= "#{proto_enum_value_prefix}_UNSPECIFIED"
-          end
-
-          def proto_enum_value_prefix
-            @proto_enum_value_prefix ||= Support::Casing.to_upper_snake(name)
           end
 
           def values_by_proto_name

@@ -6,6 +6,7 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/errors"
 require "elastic_graph/proto_ingestion/schema_definition/schema_elements/enum_type_extension"
 require "elastic_graph/proto_ingestion/schema_definition/schema_elements/object_interface_and_union_extension"
 require "elastic_graph/proto_ingestion/schema_definition/schema_elements/scalar_type_extension"
@@ -30,6 +31,8 @@ module ElasticGraph
         def to_proto
           types = proto_types
           return "" if types.empty?
+
+          validate_unique_enum_value_prefixes(types)
 
           sections = [
             %(syntax = "proto3";),
@@ -64,6 +67,21 @@ module ElasticGraph
             .sort_by(&:proto_name)
             .filter_map { |type| type.to_proto(@package_name) }
             .join("\n\n")
+        end
+
+        def validate_unique_enum_value_prefixes(types)
+          enum_type_by_prefix = {} # : ::Hash[::String, untyped]
+
+          types.each do |type|
+            next unless type.is_a?(SchemaElements::EnumTypeExtension)
+
+            if (existing_enum_type = enum_type_by_prefix[type.proto_enum_value_prefix])
+              raise Errors::SchemaError, "Enum types `#{existing_enum_type.name}` and `#{type.name}` map to " \
+                "duplicate protobuf enum value prefix `#{type.proto_enum_value_prefix}`."
+            end
+
+            enum_type_by_prefix[type.proto_enum_value_prefix] = type
+          end
         end
       end
     end
