@@ -242,6 +242,95 @@ module ElasticGraph
           expect(proto_type_def_from(proto, "Event")).to include("int64 occurred_at = 2;")
         end
 
+        it "maps `DateTime` fields to `google.protobuf.Timestamp`, importing its proto file once" do
+          proto = define_proto_schema do |s|
+            s.object_type "Event" do |t|
+              t.field "id", "ID"
+              t.field "created_at", "DateTime"
+              t.field "updated_at", "DateTime"
+              t.index "events"
+            end
+          end
+
+          expect(proto).to eq(<<~PROTO)
+            syntax = "proto3";
+
+            package elasticgraph;
+
+            import "google/protobuf/timestamp.proto";
+
+            message Event {
+              string id = 1;
+              google.protobuf.Timestamp created_at = 2;
+              google.protobuf.Timestamp updated_at = 3;
+            }
+          PROTO
+        end
+
+        it "sorts and de-duplicates imports shared by distinct protobuf types" do
+          proto = define_proto_schema do |s|
+            s.scalar_type "FirstZType" do |t|
+              t.mapping type: "keyword"
+              t.protobuf type: "example.FirstZType", import: "z/types.proto"
+            end
+
+            s.scalar_type "SecondZType" do |t|
+              t.mapping type: "keyword"
+              t.protobuf type: "example.SecondZType", import: "z/types.proto"
+            end
+
+            s.scalar_type "AType" do |t|
+              t.mapping type: "keyword"
+              t.protobuf type: "example.AType", import: "a/types.proto"
+            end
+
+            s.object_type "Event" do |t|
+              t.field "id", "ID"
+              t.field "first_z", "FirstZType"
+              t.field "second_z", "SecondZType"
+              t.field "a", "AType"
+              t.index "events"
+            end
+          end
+
+          expect(proto.lines.grep(/\Aimport /).map(&:chomp)).to eq([
+            %(import "a/types.proto";),
+            %(import "z/types.proto";)
+          ])
+        end
+
+        it "renders format comments on fields whose scalar type documents one" do
+          proto = define_proto_schema do |s|
+            s.object_type "Person" do |t|
+              t.field "id", "ID"
+              t.field "birth_date", "Date"
+              t.index "people"
+            end
+          end
+
+          expect(proto).to include(
+            %(string birth_date = 2; // ISO 8601 date, e.g. "2024-11-25")
+          )
+        end
+
+        it "supports `import:` and `comment:` on custom scalar types" do
+          proto = define_proto_schema do |s|
+            s.scalar_type "Money" do |t|
+              t.mapping type: "keyword"
+              t.protobuf type: "myapp.types.Money", import: "myapp/types/money.proto", comment: "amount + currency"
+            end
+
+            s.object_type "Order" do |t|
+              t.field "id", "ID"
+              t.field "total", "Money"
+              t.index "orders"
+            end
+          end
+
+          expect(proto).to include('import "myapp/types/money.proto";')
+          expect(proto).to include("myapp.types.Money total = 2; // amount + currency")
+        end
+
         it "can assign field numbers from configured mappings" do
           results = define_proto_schema_results do |s|
             s.configure_proto_field_number_mappings(

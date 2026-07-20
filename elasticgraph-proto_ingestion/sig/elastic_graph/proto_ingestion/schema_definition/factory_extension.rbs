@@ -2,7 +2,7 @@ module ElasticGraph
   module ProtoIngestion
     module SchemaDefinition
       module FactoryExtension: ::ElasticGraph::SchemaDefinition::Factory
-        BUILT_IN_SCALAR_PROTO_TYPES_BY_NAME: ::Hash[::String, ::String]
+        BUILT_IN_SCALAR_PROTO_OPTIONS_BY_NAME: ::Hash[::String, ::Hash[::Symbol, ::String]]
 
         def new_enum_type: (::String) ?{ (::ElasticGraph::SchemaDefinition::SchemaElements::EnumType & SchemaElements::EnumTypeExtension) -> void } -> (::ElasticGraph::SchemaDefinition::SchemaElements::EnumType & SchemaElements::EnumTypeExtension)
         def new_enum_value: (::String, ::String) ?{ (::ElasticGraph::SchemaDefinition::SchemaElements::EnumValue & SchemaElements::EnumValueExtension) -> void } -> (::ElasticGraph::SchemaDefinition::SchemaElements::EnumValue & SchemaElements::EnumValueExtension)

@@ -18,12 +18,24 @@ module ElasticGraph
           # @dynamic protobuf_type
           attr_reader :protobuf_type
 
+          # Proto file to import for the configured protobuf type, if it is externally defined.
+          # @dynamic protobuf_import
+          attr_reader :protobuf_import
+
+          # Comment rendered on generated proto fields of this scalar type.
+          # @dynamic protobuf_comment
+          attr_reader :protobuf_comment
+
           # Configures the protobuf type for this scalar type.
           #
-          # @param type [String] protobuf scalar type name
+          # @param type [String] protobuf type name
+          # @param import [String, nil] proto file to import for an externally defined type
+          # @param comment [String, nil] comment rendered on generated fields of this type
           # @return [void]
-          def protobuf(type:)
+          def protobuf(type:, import: nil, comment: nil)
             @protobuf_type = type
+            @protobuf_import = import
+            @protobuf_comment = comment
           end
 
           # Validates that a protobuf type has been configured on this scalar type. GraphQL-only

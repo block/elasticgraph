@@ -32,10 +32,11 @@ module ElasticGraph
         end
 
         it "maps every built-in scalar to a proto field type" do
+          built_in_scalar_options = FactoryExtension::BUILT_IN_SCALAR_PROTO_OPTIONS_BY_NAME
           field_types = []
           proto = define_proto_schema do |s|
             s.object_type "Widget" do |t|
-              FactoryExtension::BUILT_IN_SCALAR_PROTO_TYPES_BY_NAME.each_key do |type_name|
+              built_in_scalar_options.each_key do |type_name|
                 t.field type_name.downcase, type_name
               end
               field_types = t.graphql_fields_by_name.values.map { |field| field.type.name }
@@ -43,9 +44,10 @@ module ElasticGraph
             end
           end
 
-          expect(field_types).to match_array(FactoryExtension::BUILT_IN_SCALAR_PROTO_TYPES_BY_NAME.keys)
-          FactoryExtension::BUILT_IN_SCALAR_PROTO_TYPES_BY_NAME.each.with_index(1) do |(type_name, proto_type), field_number|
-            expect(proto).to include("#{proto_type} #{type_name.downcase} = #{field_number};")
+          expect(field_types).to match_array(built_in_scalar_options.keys)
+          expect(proto).to include('import "google/protobuf/timestamp.proto";')
+          built_in_scalar_options.each.with_index(1) do |(type_name, options), field_number|
+            expect(proto).to include("#{options.fetch(:type)} #{type_name.downcase} = #{field_number};")
           end
         end
 
