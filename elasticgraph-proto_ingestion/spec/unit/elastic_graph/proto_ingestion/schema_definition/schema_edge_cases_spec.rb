@@ -49,6 +49,51 @@ module ElasticGraph
           ))
         end
 
+        it "raises when emitted enums map to the same protobuf enum value prefix" do
+          expect {
+            define_proto_schema do |s|
+              s.enum_type "HttpStatus" do |t|
+                t.value "AVAILABLE"
+              end
+
+              s.enum_type "HTTPStatus" do |t|
+                t.value "UNAVAILABLE"
+              end
+
+              s.object_type "Endpoint" do |t|
+                t.field "id", "ID"
+                t.field "externalStatus", "HttpStatus"
+                t.field "internalStatus", "HTTPStatus"
+                t.index "endpoints"
+              end
+            end
+          }.to raise_error(Errors::SchemaError, a_string_including(
+            "Enum types `HttpStatus` and `HTTPStatus`",
+            "duplicate protobuf enum value prefix `HTTP_STATUS`"
+          ))
+        end
+
+        it "allows colliding enum value prefixes when only one enum is emitted" do
+          proto = define_proto_schema do |s|
+            s.enum_type "HttpStatus" do |t|
+              t.value "AVAILABLE"
+            end
+
+            s.enum_type "HTTPStatus" do |t|
+              t.value "UNAVAILABLE"
+            end
+
+            s.object_type "Endpoint" do |t|
+              t.field "id", "ID"
+              t.field "status", "HttpStatus"
+              t.index "endpoints"
+            end
+          end
+
+          expect(proto).to include("enum HttpStatus {")
+          expect(proto).not_to include("enum HTTPStatus {")
+        end
+
         it "fully qualifies local type references so they do not conflict with contextual protobuf keywords" do
           proto = define_proto_schema do |s|
             s.enum_type "option" do |t|
