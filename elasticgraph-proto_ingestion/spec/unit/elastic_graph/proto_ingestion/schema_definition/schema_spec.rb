@@ -242,8 +242,123 @@ module ElasticGraph
           expect(proto_type_def_from(proto, "Event")).to include("int64 occurred_at = 2;")
         end
 
-        it "uses public field names in schema.proto when `name_in_index` differs" do
-          proto = define_proto_schema do |s|
+        it "assigns the lowest unused field number to a new field, rather than the number after the maximum used one" do
+          # A gap below the maximum used number can only arise from a hand-edited artifact:
+          # organic schema evolution never creates one, since removed fields keep their numbers
+          # reserved. So this test must seed raw mappings instead of results from a prior dump.
+          results = define_proto_schema_results(proto_field_number_mappings: {
+            "messages" => {
+              "Account" => {
+                "fields" => {
+                  "id" => 7
+                }
+              }
+            }
+          }) do |s|
+            s.object_type "Account" do |t|
+              t.field "id", "ID"
+              t.field "name", "String"
+              t.index "accounts"
+            end
+          end
+
+          generated = results.proto_schema
+          expect(generated).to include("string id = 7;")
+          expect(generated).to include("string name = 1;")
+        end
+
+        it "preserves proto field numbers when fields are re-ordered" do
+          results1 = define_proto_schema_results do |s|
+            s.object_type "Account" do |t|
+              t.field "id", "ID"
+              t.field "name", "String"
+              t.field "age", "Int"
+              t.index "accounts"
+            end
+          end
+
+          expect(proto_type_def_from(results1.proto_schema, "Account")).to include(
+            "string id = 1;", "string name = 2;", "int32 age = 3;"
+          )
+
+          results2 = define_proto_schema_results(results1) do |s|
+            s.object_type "Account" do |t|
+              t.field "age", "Int"
+              t.field "id", "ID"
+              t.field "name", "String"
+              t.index "accounts"
+            end
+          end
+
+          expect(proto_type_def_from(results2.proto_schema, "Account")).to include(
+            "string id = 1;", "string name = 2;", "int32 age = 3;"
+          )
+          expect(results2.proto_field_number_mappings).to eq(results1.proto_field_number_mappings)
+        end
+
+        it "exposes generated field-number mappings as an artifact hash" do
+          results = define_proto_schema_results do |s|
+            s.object_type "Account" do |t|
+              t.field "id", "ID"
+              t.field "name", "String"
+              t.index "accounts"
+            end
+          end
+
+          expect(results.proto_field_number_mappings).to eq({
+            "enums" => {},
+            "messages" => {
+              "Account" => {
+                "fields" => {
+                  "id" => 1,
+                  "name" => 2
+                }
+              }
+            }
+          })
+        end
+
+        it "keeps a removed field's number reserved instead of reusing it for a new field" do
+          results1 = define_proto_schema_results do |s|
+            s.object_type "Account" do |t|
+              t.field "id", "ID"
+              t.field "legacy_field", "String"
+              t.index "accounts"
+            end
+          end
+
+          expect(results1.proto_schema).to include("string legacy_field = 2;")
+
+          # `legacy_field` has been removed and `name` added since the mappings were dumped.
+          results2 = define_proto_schema_results(results1) do |s|
+            s.object_type "Account" do |t|
+              t.field "id", "ID"
+              t.field "name", "String"
+              t.index "accounts"
+            end
+          end
+
+          generated = results2.proto_schema
+          expect(generated).to include("string id = 1;")
+          expect(generated).to include("string name = 3;")
+
+          # `legacy_field` keeps its number reserved in the artifact so it is never reused.
+          expect(results2.proto_field_number_mappings).to eq({
+            "enums" => {},
+            "messages" => {
+              "Account" => {
+                "fields" => {
+                  "id" => 1,
+                  "legacy_field" => 2,
+                  "name" => 3
+                }
+              }
+            }
+          })
+        end
+
+        it "uses public field names in schema.proto and stores name_in_index overrides in the mapping artifact" do
+          results = define_proto_schema_results do |s|
             s.object_type "Widget" do |t|
               t.field "id", "ID"
               t.field "display_name", "String", name_in_index: "display_name_in_index"
@@ -251,9 +366,182 @@ module ElasticGraph
             end
           end
 
-          widget = proto_type_def_from(proto, "Widget")
-          expect(widget).to include("string display_name = 2;")
-          expect(widget).not_to include("display_name_in_index")
+          expect(results.proto_schema).to include("string display_name = 2;")
+          expect(results.proto_schema).not_to include("display_name_in_index")
+
+          expect(results.proto_field_number_mappings).to eq({
+            "enums" => {},
+            "messages" => {
+              "Widget" => {
+                "fields" => {
+                  "id" => 1,
+                  "display_name" => {
+                    "field_number" => 2,
+                    "name_in_index" => "display_name_in_index"
+                  }
+                }
+              }
+            }
+          })
+        end
+
+        it "updates a stored `name_in_index` in the mapping artifact when the field's index name changes" do
+          results1 = define_proto_schema_results do |s|
+            s.object_type "Widget" do |t|
+              t.field "id", "ID"
+              t.field "display_name", "String", name_in_index: "old_index_name"
+              t.index "widgets"
+            end
+          end
+
+          results2 = define_proto_schema_results(results1) do |s|
+            s.object_type "Widget" do |t|
+              t.field "id", "ID"
+              t.field "display_name", "String", name_in_index: "new_index_name"
+              t.index "widgets"
+            end
+          end
+
+          expect(results2.proto_field_number_mappings.dig("messages", "Widget", "fields")).to eq({
+            "id" => 1,
+            "display_name" => {
+              "field_number" => 2,
+              "name_in_index" => "new_index_name"
+            }
+          })
+        end
+
+        it "preserves a field number across a public field rename" do
+          results1 = define_proto_schema_results do |s|
+            s.object_type "Account" do |t|
+              t.field "full_name", "String"
+              t.field "id", "ID"
+              t.index "accounts"
+            end
+          end
+
+          expect(results1.proto_schema).to include("string full_name = 1;")
+
+          results2 = define_proto_schema_results(results1) do |s|
+            s.object_type "Account" do |t|
+              t.field "id", "ID"
+              t.field "display_name", "String" do |f|
+                f.renamed_from "full_name"
+              end
+              t.index "accounts"
+            end
+          end
+
+          expect(results2.proto_schema).to include("string id = 2;")
+          expect(results2.proto_schema).to include("string display_name = 1;")
+          expect(results2.proto_field_number_mappings).to eq({
+            "enums" => {},
+            "messages" => {
+              "Account" => {
+                "fields" => {
+                  "id" => 2,
+                  "display_name" => 1
+                }
+              }
+            }
+          })
+        end
+
+        it "preserves enum value numbers as the enum evolves, reserving removed values' numbers" do
+          results1 = define_proto_schema_results do |s|
+            s.enum_type "Status" do |t|
+              t.values "ACTIVE", "PAUSED", "INACTIVE"
+            end
+
+            s.object_type "Account" do |t|
+              t.field "id", "ID"
+              t.field "status", "Status"
+              t.index "accounts"
+            end
+          end
+
+          expect(proto_type_def_from(results1.proto_schema, "Status")).to include(
+            "STATUS_ACTIVE = 1;",
+            "STATUS_PAUSED = 2;",
+            "STATUS_INACTIVE = 3;"
+          )
+
+          # `PAUSED` has been removed and `ARCHIVED` added since the mappings were dumped.
+          results2 = define_proto_schema_results(results1) do |s|
+            s.enum_type "Status" do |t|
+              t.values "ACTIVE", "INACTIVE", "ARCHIVED"
+            end
+
+            s.object_type "Account" do |t|
+              t.field "id", "ID"
+              t.field "status", "Status"
+              t.index "accounts"
+            end
+          end
+
+          expect(proto_type_def_from(results2.proto_schema, "Status")).to include(
+            "STATUS_ACTIVE = 1;",
+            "STATUS_INACTIVE = 3;",
+            "STATUS_ARCHIVED = 4;"
+          )
+
+          # `PAUSED` keeps its number reserved in the artifact so it is never reused for a new value.
+          expect(results2.proto_field_number_mappings.fetch("enums")).to eq({
+            "Status" => {
+              "values" => {
+                "ACTIVE" => 1,
+                "PAUSED" => 2,
+                "INACTIVE" => 3,
+                "ARCHIVED" => 4
+              }
+            }
+          })
+        end
+
+        it "preserves stable field numbers for oneof alternatives as subtypes are added and removed" do
+          results1 = define_proto_schema_results do |s|
+            ["Truck", "Car", "Bike"].each do |type_name|
+              s.object_type type_name do |t|
+                t.field "id", "ID"
+              end
+            end
+
+            s.union_type "Vehicle" do |t|
+              t.subtypes "Truck", "Car", "Bike"
+              t.index "vehicles"
+            end
+          end
+
+          expect(proto_type_def_from(results1.proto_schema, "Vehicle")).to include(
+            "Truck truck = 1;", "Car car = 2;", "Bike bike = 3;"
+          )
+
+          # `Truck` has been removed and `Scooter` added since the mappings were dumped.
+          results2 = define_proto_schema_results(results1) do |s|
+            ["Car", "Bike", "Scooter"].each do |type_name|
+              s.object_type type_name do |t|
+                t.field "id", "ID"
+              end
+            end
+
+            s.union_type "Vehicle" do |t|
+              t.subtypes "Car", "Bike", "Scooter"
+              t.index "vehicles"
+            end
+          end
+
+          vehicle = proto_type_def_from(results2.proto_schema, "Vehicle")
+          expect(vehicle).to include("Car car = 2;", "Bike bike = 3;", "Scooter scooter = 4;")
+
+          # `truck` keeps its number reserved in the artifact so it is never reused.
+          expect(results2.proto_field_number_mappings.fetch("messages").fetch("Vehicle")).to eq({
+            "fields" => {
+              "truck" => 1,
+              "car" => 2,
+              "bike" => 3,
+              "scooter" => 4
+            }
+          })
         end
 
         it "renders independently each time it is called" do

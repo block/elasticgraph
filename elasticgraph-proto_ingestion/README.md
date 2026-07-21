@@ -72,7 +72,10 @@ ElasticGraph.define_schema do |schema|
 end
 ```
 
-After running `bundle exec rake schema_artifacts:dump`, ElasticGraph will generate `schema.proto`.
+After running `bundle exec rake schema_artifacts:dump`, ElasticGraph will generate:
+
+- `schema.proto`
+- `proto_field_numbers.yaml`
 
 ## Schema Definition API
 
@@ -118,3 +121,50 @@ Additionally:
 - Lists of lists (e.g. `[[Float!]!]!`) are not supported because Protocol Buffers cannot represent
   them directly. Schema artifact generation raises an error identifying the unsupported field.
 - Enum types generate `enum` definitions whose values are prefixed with the enum type name in `UPPER_SNAKE_CASE`, including a zero-valued `*_UNSPECIFIED` entry.
+
+## Stable Field Numbers
+
+`schema_artifacts:dump` automatically reads and writes `proto_field_numbers.yaml`
+in the schema artifacts directory. Existing numbers stay fixed even if field order
+changes, and new fields get the next available numbers. Field numbers follow protobuf's
+rules: they must be between 1 and 536,870,911, and the protobuf-reserved 19000-19999
+range is never allocated and is rejected in mappings.
+
+The file is safe to hand-edit (e.g. when resolving a merge conflict), but it is strictly
+validated: unknown keys, non-integer numbers, out-of-range numbers, and duplicate numbers
+are all rejected at dump time rather than silently reassigning numbers.
+
+Alternatives inside generated interface and union `oneof` blocks use the same stable
+message-field mappings, so adding or removing a concrete subtype does not renumber the
+remaining alternatives.
+
+`schema.proto` always uses the public GraphQL field names. When a field uses a
+different `name_in_index`, the sidecar YAML stores that override privately:
+
+```yaml
+messages:
+  Widget:
+    fields:
+      id: 1
+      display_name:
+        field_number: 2
+        name_in_index: displayName
+```
+
+If a field is renamed with `field.renamed_from`, `elasticgraph-proto_ingestion` reuses the
+existing field number under the new public field name.
+
+## Stable Enum Value Numbers
+
+Enum value numbers are pinned the same way, in an `enums` section of the sidecar. Existing
+values keep their numbers when other values are added or removed, new values get the next
+available numbers, and removed values keep their numbers reserved so they are never reused
+(number `0` is always the generated `*_UNSPECIFIED` value):
+
+```yaml
+enums:
+  WidgetColor:
+    values:
+      RED: 1
+      BLUE: 2
+```

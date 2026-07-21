@@ -19,8 +19,8 @@ module ElasticGraph
           # Renders this type's protobuf message definition.
           #
           # @return [String]
-          def to_proto(package_name)
-            render_proto_message(proto_name, package_name)
+          def to_proto(schema, package_name)
+            render_proto_message(schema, proto_name, package_name)
           end
 
           # Returns the schema types referenced by this definition.
@@ -68,19 +68,25 @@ module ElasticGraph
 
           private
 
-          def render_proto_message(message_name, package_name)
-            return render_proto_oneof(message_name, package_name) if abstract?
+          def render_proto_message(schema, message_name, package_name)
+            return render_proto_oneof(schema, message_name, package_name) if abstract?
 
             fields = proto_fields
             documentation = ProtoDocumentation.comment_lines_for(doc_comment).map { |line| "#{line}\n" }.join
-            field_definitions = fields.each.with_index(1).map do |(schema_field, field), field_number|
+            field_definitions = fields.map do |schema_field, field|
               repeated, field_type = proto_field_type_for(
                 field.type,
                 package_name: package_name,
                 context_field_name: field.name
               )
+              field_number = schema.field_number_for(
+                message_name: message_name,
+                type_name: name,
+                public_field_name: schema_field.name,
+                name_in_index: field.name_in_index
+              )
               label = "repeated " if repeated
-              line = "  #{label}#{field_type} #{field.name} = #{field_number};"
+              line = "  #{label}#{field_type} #{schema_field.name} = #{field_number};"
               field_documentation = ProtoDocumentation
                 .comment_lines_for(schema_field.doc_comment, indent: "  ")
                 .map { |comment_line| "#{comment_line}\n" }
@@ -96,13 +102,19 @@ module ElasticGraph
             PROTO
           end
 
-          def render_proto_oneof(message_name, package_name)
+          def render_proto_oneof(schema, message_name, package_name)
             # @type var abstract_type: ::ElasticGraph::SchemaDefinition::Mixins::HasSubtypes
             abstract_type = _ = self
             documentation = ProtoDocumentation.comment_lines_for(doc_comment).map { |line| "#{line}\n" }.join
-            alternatives = abstract_type.recursively_resolve_subtypes.each.with_index(1).map do |subtype, field_number|
+            alternatives = abstract_type.recursively_resolve_subtypes.map do |subtype|
               proto_subtype = _ = subtype
               field_name = Support::Casing.to_upper_snake(proto_subtype.proto_name).downcase
+              field_number = schema.field_number_for(
+                message_name: message_name,
+                type_name: name,
+                public_field_name: field_name,
+                name_in_index: field_name
+              )
               "    #{proto_subtype.proto_type_reference(package_name)} #{field_name} = #{field_number};"
             end
 

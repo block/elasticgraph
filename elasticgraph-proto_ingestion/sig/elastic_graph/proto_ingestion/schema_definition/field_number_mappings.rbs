@@ -1,0 +1,56 @@
+module ElasticGraph
+  module ProtoIngestion
+    module SchemaDefinition
+      class FieldNumberMappings
+        class FieldMapping
+          attr_reader field_number: ::Integer
+          attr_reader name_in_index: ::String
+
+          def self.new: (field_number: ::Integer, name_in_index: ::String) -> instance
+          def with: (?field_number: ::Integer, ?name_in_index: ::String) -> instance
+        end
+
+        type mappingsByFieldName = ::Hash[::String, FieldMapping]
+
+        MAX_FIELD_NUMBER: ::Integer
+        RESERVED_FIELD_NUMBER_RANGE: ::Range[::Integer]
+        MAX_ENUM_VALUE_NUMBER: ::Integer
+
+        @mappings_by_message: ::Hash[::String, mappingsByFieldName]
+        @value_numbers_by_enum: ::Hash[::String, ::Hash[::String, ::Integer]]
+        @used_field_numbers_by_message: ::Hash[::String, ::Set[::Integer]]
+        @used_enum_value_numbers_by_enum: ::Hash[::String, ::Set[::Integer]]
+
+        def self.from_artifact: (untyped) -> instance
+        def self.parse_messages: (untyped) -> ::Hash[::String, mappingsByFieldName]
+        def self.parse_enums: (untyped) -> ::Hash[::String, ::Hash[::String, ::Integer]]
+        def self.parse_field_entry: (::String, ::String, untyped) -> FieldMapping
+        def self.validated_field_number: (::String, ::String, untyped) -> ::Integer
+        def self.verify_no_number_collisions: (::Hash[::String, ::Integer], ::String) -> void
+        def self.verify_known_keys: (::Hash[untyped, untyped], ::Array[::String], ::String) -> void
+
+        def initialize: (
+          mappings_by_message: ::Hash[::String, mappingsByFieldName],
+          value_numbers_by_enum: ::Hash[::String, ::Hash[::String, ::Integer]]
+        ) -> void
+
+        def field_number_for: (
+          message_name: ::String,
+          public_field_name: ::String,
+          name_in_index: ::String,
+          previous_field_names: ::Array[::String]
+        ) -> ::Integer
+        def enum_value_numbers_for: (::String, ::Array[::String]) -> ::Hash[::String, ::Integer]
+        def to_artifact: () -> ::Hash[::String, untyped]
+
+        private
+
+        def used_field_numbers_for: (::String, mappingsByFieldName) -> ::Set[::Integer]
+        def used_enum_value_numbers_for: (::String, ::Hash[::String, ::Integer]) -> ::Set[::Integer]
+        def next_available_field_number: (::Set[::Integer]) -> ::Integer
+        def next_available_enum_value_number: (::Set[::Integer]) -> ::Integer
+        def migrate_renamed_field_mapping: (mappingsByFieldName, ::Array[::String]) -> FieldMapping?
+      end
+    end
+  end
+end

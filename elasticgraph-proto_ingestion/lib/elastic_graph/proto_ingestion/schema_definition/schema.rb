@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/errors"
+require "elastic_graph/proto_ingestion/schema_definition/field_number_mappings"
 require "elastic_graph/proto_ingestion/schema_definition/schema_elements/enum_type_extension"
 require "elastic_graph/proto_ingestion/schema_definition/schema_elements/object_interface_and_union_extension"
 require "elastic_graph/proto_ingestion/schema_definition/schema_elements/scalar_type_extension"
@@ -19,10 +20,17 @@ module ElasticGraph
         # @param state [ElasticGraph::SchemaDefinition::State]
         # @param all_types [Array<ElasticGraph::SchemaDefinition::SchemaElements::graphQLType>]
         # @param package_name [String]
-        def initialize(state:, all_types:, package_name:)
+        # @param proto_field_number_mappings [Hash, nil] mappings in the `proto_field_numbers.yaml` artifact format
+        def initialize(
+          state:,
+          all_types:,
+          package_name:,
+          proto_field_number_mappings: {}
+        )
           @state = state
           @all_types = all_types
           @package_name = package_name
+          @field_number_mappings = FieldNumberMappings.from_artifact(proto_field_number_mappings)
         end
 
         # Renders the schema as a valid `proto3` file.
@@ -41,6 +49,32 @@ module ElasticGraph
           ]
 
           sections.join("\n\n") + "\n"
+        end
+
+        # Exposes the field-number and enum-value-number mappings for writing to artifact YAML.
+        #
+        # @return [Hash<String, Object>]
+        def field_number_mappings_for_artifact
+          @field_number_mappings.to_artifact
+        end
+
+        # Returns the stable protobuf number for a message field.
+        #
+        # @api private
+        def field_number_for(message_name:, type_name:, public_field_name:, name_in_index:)
+          @field_number_mappings.field_number_for(
+            message_name: message_name,
+            public_field_name: public_field_name,
+            name_in_index: name_in_index,
+            previous_field_names: previous_field_names_for(type_name, public_field_name)
+          )
+        end
+
+        # Returns the stable protobuf numbers for an enum's values.
+        #
+        # @api private
+        def enum_value_numbers_for(enum_name, value_names)
+          @field_number_mappings.enum_value_numbers_for(enum_name, value_names)
         end
 
         private
@@ -65,7 +99,7 @@ module ElasticGraph
         def render_definitions(types)
           types
             .sort_by(&:proto_name)
-            .filter_map { |type| type.to_proto(@package_name) }
+            .filter_map { |type| type.to_proto(self, @package_name) }
             .join("\n\n")
         end
 
@@ -79,6 +113,18 @@ module ElasticGraph
             end
 
             enum_type_by_prefix[type.proto_enum_value_prefix] = type
+          end
+        end
+
+        def previous_field_names_for(type_name, public_field_name)
+          renamed_public_field_names_by_type_name.dig(type_name, public_field_name) || []
+        end
+
+        def renamed_public_field_names_by_type_name
+          @renamed_public_field_names_by_type_name ||= @state.renamed_fields_by_type_name_and_old_field_name.transform_values do |old_to_new|
+            old_to_new
+              .group_by { |_, renamed_field| renamed_field.name }
+              .transform_values { |renames| renames.map(&:first) }
           end
         end
       end
