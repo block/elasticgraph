@@ -9,6 +9,7 @@
 require "elastic_graph/proto_ingestion"
 require "elastic_graph/proto_ingestion/schema_definition/api_extension"
 require "elastic_graph/schema_definition/rake_tasks"
+require "yaml"
 
 module ElasticGraph
   module ProtoIngestion
@@ -50,7 +51,70 @@ module ElasticGraph
             expect {
               output = run_rake_with_proto("schema_artifacts:dump")
               expect(output.lines).to include(a_string_including("already up to date", PROTO_SCHEMA_FILE))
-            }.to maintain { read_artifact(PROTO_SCHEMA_FILE) }
+            }.to maintain { read_artifact(PROTO_SCHEMA_FILE) }.and maintain { read_proto_field_numbers }
+          end
+
+          it "persists proto field-number mappings and reuses them on the next dump" do
+            write_proto_schema(table_defs: <<~EOS)
+              s.object_type "Product" do |t|
+                t.field "id", "ID"
+                t.field "name", "String"
+                t.index "products"
+              end
+            EOS
+
+            expect {
+              run_rake_with_proto("schema_artifacts:dump")
+            }.to change { read_proto_field_numbers }
+              .from(nil)
+              .to(a_string_starting_with("# This file is part of your schema definition"))
+
+            # The file is maintained alongside the schema definition, not in the schema artifacts directory.
+            expect(read_artifact(PROTO_FIELD_NUMBERS_FILE)).to be_nil
+            expect(parsed_proto_field_numbers).to eq({
+              "enums" => {},
+              "messages" => {
+                "Product" => {
+                  "fields" => {
+                    "id" => 1,
+                    "name" => 2
+                  }
+                }
+              }
+            })
+
+            write_proto_schema(table_defs: <<~EOS)
+              s.object_type "Product" do |t|
+                t.field "name", "String"
+                t.field "id", "ID"
+                t.index "products"
+              end
+            EOS
+
+            run_rake_with_proto("schema_artifacts:dump")
+
+            expect(read_artifact(PROTO_SCHEMA_FILE)).to include("string id = 1;", "string name = 2;")
+          end
+        end
+
+        describe "schema_artifacts:check" do
+          it "reports `#{PROTO_FIELD_NUMBERS_FILE}` until it has been dumped alongside the schema definition" do
+            write_proto_schema(table_defs: <<~EOS)
+              s.object_type "Product" do |t|
+                t.field "id", "ID"
+                t.index "products"
+              end
+            EOS
+
+            # The leading space verifies the file is reported at the root (alongside the schema
+            # definition) rather than nested in the schema artifacts directory.
+            expect {
+              run_rake_with_proto("schema_artifacts:check")
+            }.to abort_with a_string_including(" #{PROTO_FIELD_NUMBERS_FILE} (file does not exist)")
+
+            run_rake_with_proto("schema_artifacts:dump")
+
+            expect(run_rake_with_proto("schema_artifacts:check")).to include(PROTO_FIELD_NUMBERS_FILE, "up to date")
           end
         end
 
@@ -80,6 +144,15 @@ module ElasticGraph
         def read_artifact(name)
           path = File.join("config", "schema", "artifacts", name)
           File.read(path) if File.exist?(path)
+        end
+
+        # The field-numbers file is dumped as a sibling of `path_to_schema` (`schema.rb`, above).
+        def read_proto_field_numbers
+          File.read(PROTO_FIELD_NUMBERS_FILE) if File.exist?(PROTO_FIELD_NUMBERS_FILE)
+        end
+
+        def parsed_proto_field_numbers
+          ::YAML.safe_load(read_proto_field_numbers)
         end
       end
     end
