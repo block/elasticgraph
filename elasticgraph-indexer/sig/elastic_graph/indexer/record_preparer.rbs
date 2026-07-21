@@ -8,6 +8,9 @@ module ElasticGraph
       type egMetaByFieldHash = ::Hash[::String, {"type" => ::String, "nameInIndex" => ::String}]
       type egMetaByFieldByTypeHash = ::Hash[::String, egMetaByFieldHash]
 
+      class UnknownTypeError < ::KeyError[untyped, untyped]
+      end
+
       class Factory
         def initialize: (schemaArtifacts) -> void
 
