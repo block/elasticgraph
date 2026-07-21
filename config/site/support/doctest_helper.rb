@@ -64,6 +64,7 @@ module ElasticGraph
         @api = SchemaDefinition::API.new(
           SchemaArtifacts::RuntimeMetadata::SchemaElementNames.new(form: :camelCase, overrides: {}),
           true,
+          path_to_schema: "#{@tmp_dir}/schema.rb",
           extension_modules: extension_modules
         )
 

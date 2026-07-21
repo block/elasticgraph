@@ -57,6 +57,15 @@ module ElasticGraph
         ^(::String) -> T,
         ::Array[::String],
         ::String) -> void
+
+      def with: (
+        ?file_name: ::String,
+        ?desired_contents: T,
+        ?dumper: ^(T) -> ::String,
+        ?loader: ^(::String) -> T,
+        ?extra_comment_lines: ::Array[::String],
+        ?comment_prefix: ::String
+      ) -> self
     end
 
     class SchemaArtifact[T] < SchemaArtifactSupertype[T]

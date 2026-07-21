@@ -5,6 +5,7 @@ module ElasticGraph
         attr_reader proto_ingestion_state: ProtoIngestionState
 
         def self.extended: (::ElasticGraph::SchemaDefinition::State & StateExtension) -> void
+        def proto_field_numbers_path: () -> ::String?
       end
     end
   end

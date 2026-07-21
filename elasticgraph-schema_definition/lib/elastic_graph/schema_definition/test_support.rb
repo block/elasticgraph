@@ -22,6 +22,7 @@ module ElasticGraph
         schema_element_name_form:,
         schema_element_name_overrides: {},
         index_document_sizes: true,
+        path_to_schema: nil,
         extension_modules: [],
         derived_type_name_formats: {},
         type_name_overrides: {},
@@ -37,6 +38,7 @@ module ElasticGraph
         define_schema_with_schema_elements(
           schema_elements,
           index_document_sizes: index_document_sizes,
+          path_to_schema: path_to_schema,
           extension_modules: extension_modules,
           derived_type_name_formats: derived_type_name_formats,
           type_name_overrides: type_name_overrides,
@@ -49,6 +51,7 @@ module ElasticGraph
       def define_schema_with_schema_elements(
         schema_elements,
         index_document_sizes: true,
+        path_to_schema: nil,
         extension_modules: [],
         derived_type_name_formats: {},
         type_name_overrides: {},
@@ -58,6 +61,7 @@ module ElasticGraph
         api = API.new(
           schema_elements,
           index_document_sizes,
+          path_to_schema: path_to_schema,
           extension_modules: extension_modules,
           derived_type_name_formats: derived_type_name_formats,
           type_name_overrides: type_name_overrides,
