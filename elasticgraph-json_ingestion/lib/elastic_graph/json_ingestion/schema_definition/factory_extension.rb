@@ -6,13 +6,11 @@
 #
 # frozen_string_literal: true
 
-require "elastic_graph/constants"
 require "elastic_graph/json_ingestion/schema_definition/indexing/field_type/enum"
 require "elastic_graph/json_ingestion/schema_definition/indexing/field_type/object"
 require "elastic_graph/json_ingestion/schema_definition/indexing/field_type/scalar"
 require "elastic_graph/json_ingestion/schema_definition/indexing/field_type/union"
 require "elastic_graph/json_ingestion/schema_definition/indexing/index_extension"
-require "elastic_graph/graphql/scalar_coercion_adapters/valid_time_zones"
 require "elastic_graph/json_ingestion/schema_definition/results_extension"
 require "elastic_graph/json_ingestion/schema_definition/schema_artifact_manager_extension"
 require "elastic_graph/json_ingestion/schema_definition/schema_elements/enum_type_extension"
@@ -28,26 +26,6 @@ module ElasticGraph
       #
       # @api private
       module FactoryExtension
-        # Default JSON schema options applied to ElasticGraph's built-in scalar types as they
-        # are constructed. Keyed by the un-overridden type name, because built-in type
-        # registration always uses the canonical type name before `type_name_overrides` are
-        # applied to the resulting type reference.
-        BUILT_IN_SCALAR_JSON_SCHEMA_OPTIONS_BY_NAME = {
-          "Boolean" => {type: "boolean"},
-          "Float" => {type: "number"},
-          "ID" => {type: "string"},
-          "Int" => {type: "integer", minimum: INT_MIN, maximum: INT_MAX},
-          "String" => {type: "string"},
-          "Cursor" => {type: "string"},
-          "Date" => {type: "string", format: "date"},
-          "DateTime" => {type: "string", format: "date-time"},
-          "LocalTime" => {type: "string", pattern: VALID_LOCAL_TIME_JSON_SCHEMA_PATTERN},
-          "TimeZone" => {type: "string", enum: GraphQL::ScalarCoercionAdapters::VALID_TIME_ZONES.to_a.freeze},
-          "Untyped" => {type: ["array", "boolean", "integer", "number", "object", "string"].freeze},
-          "JsonSafeLong" => {type: "integer", minimum: JSON_SAFE_LONG_MIN, maximum: JSON_SAFE_LONG_MAX},
-          "LongString" => {type: "integer", minimum: LONG_STRING_MIN, maximum: LONG_STRING_MAX}
-        }.freeze
-
         # @private
         def new_enum_type(name)
           super(name) do |type|
@@ -86,12 +64,9 @@ module ElasticGraph
         def new_scalar_type(name)
           super(name) do |type|
             extended_type = type.extend(SchemaElements::ScalarTypeExtension) # : ::ElasticGraph::SchemaDefinition::SchemaElements::ScalarType & SchemaElements::ScalarTypeExtension
-            if (options = BUILT_IN_SCALAR_JSON_SCHEMA_OPTIONS_BY_NAME[name.to_s])
-              extended_type.json_schema(**options)
+            extended_type.initialize_json_schema_extension do
+              yield extended_type
             end
-
-            yield extended_type
-            extended_type.finalize_json_schema_configuration!
           end
         end
 

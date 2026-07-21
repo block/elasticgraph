@@ -2,8 +2,6 @@ module ElasticGraph
   module JSONIngestion
     module SchemaDefinition
       module FactoryExtension: ::ElasticGraph::SchemaDefinition::Factory
-        BUILT_IN_SCALAR_JSON_SCHEMA_OPTIONS_BY_NAME: ::Hash[::String, ::Hash[::Symbol, untyped]]
-
         def new_enum_type: (::String) ?{ (::ElasticGraph::SchemaDefinition::SchemaElements::EnumType & SchemaElements::EnumTypeExtension) -> void } -> (::ElasticGraph::SchemaDefinition::SchemaElements::EnumType & SchemaElements::EnumTypeExtension)
         def new_enum_indexing_field_type: (::Array[::String]) -> Indexing::FieldType::Enum
         def new_field: (**untyped) ?{ (::ElasticGraph::SchemaDefinition::SchemaElements::Field & SchemaElements::FieldExtension) -> void } -> (::ElasticGraph::SchemaDefinition::SchemaElements::Field & SchemaElements::FieldExtension)
