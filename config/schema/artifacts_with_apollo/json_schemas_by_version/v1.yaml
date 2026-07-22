@@ -1644,6 +1644,13 @@ json_schema_version: 1
         ElasticGraph:
           type: JsonSafeLong!
           nameInIndex: weight_in_ng
+      weight_in_grams:
+        anyOf:
+        - "$ref": "#/$defs/Float"
+        - type: 'null'
+        ElasticGraph:
+          type: Float
+          nameInIndex: weight_in_grams
       tags:
         type: array
         items:
@@ -1709,6 +1716,7 @@ json_schema_version: 1
     - named_inventor
     - weight_in_ng_str
     - weight_in_ng
+    - weight_in_grams
     - tags
     - amounts
     - fees
