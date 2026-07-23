@@ -1,0 +1,42 @@
+module ElasticGraph
+  class Indexer
+    module IngestionAdapter
+      interface _Adapter
+        def handles_event?: (event) -> bool
+        def validate_event: (event) -> ValidationResult
+      end
+
+      class Interface
+        include _Adapter
+
+        def initialize: (schema_artifacts: schemaArtifacts, logger: ::Logger) -> void
+      end
+
+      class FailureSupertype < ::Data
+        attr_reader payload_description: ::String
+        attr_reader message: ::String
+
+        def initialize: (payload_description: ::String, message: ::String) -> void
+        def self.new: (payload_description: ::String, message: ::String) -> instance
+        def self.members: () -> ::Array[::Symbol]
+      end
+
+      class Failure < FailureSupertype
+      end
+
+      class ValidationResultSupertype < ::Data
+        attr_reader record_preparer: _RecordPreparer?
+        attr_reader failure: Failure?
+
+        def initialize: (record_preparer: _RecordPreparer?, failure: Failure?) -> void
+        def self.new: (record_preparer: _RecordPreparer?, failure: Failure?) -> instance
+        def self.members: () -> ::Array[::Symbol]
+      end
+
+      class ValidationResult < ValidationResultSupertype
+        def self.valid: (_RecordPreparer) -> ValidationResult
+        def self.invalid: (payload_description: ::String, message: ::String) -> ValidationResult
+      end
+    end
+  end
+end
