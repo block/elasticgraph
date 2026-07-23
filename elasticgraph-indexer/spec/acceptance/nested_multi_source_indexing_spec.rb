@@ -55,6 +55,10 @@ module ElasticGraph
         "29:staff.general_manager.profile|5:staff|15:general_manager|" => {"prof-gm1" => 13}
       )
 
+      # The top-level team event has no nested sourced fields, so `__self` should not get added to `__nested_sourced_data` even
+      # though `__self` shows up in `__versions`.
+      expect(source.fetch("__nested_sourced_data").keys).to match_array(source.fetch("__versions").except("__self").keys)
+
       # The list count for the nested coaches comes from the team event; nested source events don't affect it.
       expect(source.fetch(LIST_COUNTS_FIELD)).to include("staff|coaches" => 2)
     end
@@ -82,17 +86,20 @@ module ElasticGraph
       expect(source.fetch(LIST_COUNTS_FIELD)).to include("staff|coaches" => 2)
     end
 
-    it "ignores a stale (lower-version) source event for an already-sourced nested element" do
+    it "ignores a stale (event.version <= stored.version) source event for an already-sourced nested element" do
       team = team_event(version: 1, coaches: [build(:coach, id: "c1", name: "Alice"), build(:coach, id: "c2", name: "Bob")])
 
       indexer.processor.process([team], refresh_indices: true)
       indexer.processor.process([coach_profile_event("c1", 200, id: "prof-c1", version: 5)], refresh_indices: true)
-      indexer.processor.process([coach_profile_event("c1", 100, id: "prof-c1", version: 2)], refresh_indices: true)
+      indexer.processor.process([
+        coach_profile_event("c1", 100, id: "prof-c1", version: 2), # ignored since 2 <= 5
+        coach_profile_event("c1", 300, id: "prof-c1", version: 5)  # ignored since 5 <= 5
+      ], refresh_indices: true)
 
       source = fetch_team_source("t1")
       coaches_by_id = coaches_by_id_in(source)
       expect(coaches_by_id.fetch("c1")).to eq("id" => "c1", "name" => "Alice", "salary" => 200)
-      # The sibling coach was never sourced, so `salary` is absent and applying c1's events leaves it alone.
+      # c2's profile was never sourced, so `salary` is absent and applying c1's events leaves it alone.
       expect(coaches_by_id.fetch("c2")).to eq("id" => "c2", "name" => "Bob")
       # The recorded version stays at the newer event's, not the stale one's.
       expect(source.fetch("__versions").fetch("21:staff.coaches.profile|5:staff|2:c1|")).to eq("prof-c1" => 5)
@@ -167,15 +174,13 @@ module ElasticGraph
       expect(coaches_by_id_in(fetch_team_source("t1")).fetch("c3")).to eq("id" => "c3", "name" => "Dana", "salary" => 300)
     end
 
-    it "materializes a ghost document from a source event targeting a singleton object path" do
-      # The GM profile arrives before the team exists at all, materializing a ghost document with the GM's
-      # salary buffered through the object path segments.
+    it "materializes an incomplete document from a source event targeting a singleton object path" do
+      # The GM profile arrives before the team exists at all, materializing an incomplete document with the
+      # GM's salary buffered through the object path segments.
       indexer.processor.process([gm_profile_event(300, id: "prof-gm1", version: 1)], refresh_indices: true)
 
-      # The full ghost document: no `staff` (or any other team field) yet--just the identity, bookkeeping,
-      # and the buffered salary awaiting its target element. The ghost is the one document small enough to
-      # pin in full, which also pins the `__nested_sourced_data` buffer entry (real docs carry it too--it's
-      # never pruned--but there it's incidental to what those tests verify).
+      # The incomplete document has no `staff` (or any other team field) yet--just the identity, bookkeeping,
+      # and the buffered salary awaiting its target element.
       expect(fetch_team_source("t1")).to eq(
         "id" => "t1",
         "__counts" => {},
