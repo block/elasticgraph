@@ -20,6 +20,7 @@ module ElasticGraph
       @indexing_latency_slo_thresholds_by_timestamp_in_ms: ::Hash[::String, ::Integer]
       @clock: singleton(::Time)
 
+      def log_skipped_record_validations: (::Array[Operation::Factory::BuildResult]) -> void
       def categorize_failures: (::Array[FailedEventError], ::Array[event]) -> ::Array[FailedEventError]
       def calculate_latency_metrics: (::Array[_Operation], ::Array[Operation::Result]) -> void
     end
