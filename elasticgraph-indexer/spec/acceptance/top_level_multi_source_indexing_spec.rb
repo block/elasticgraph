@@ -165,7 +165,7 @@ module ElasticGraph
       expect(indexed_widget_source).to include({
         "id" => "w1",
         "created_at" => timestamp_in_2023,
-        "workspace_id2" => "wid_23",
+        # Note: `workspace_id2` is not in `_source` because its schema field uses `retrieved_from: :doc_values`.
         "workspace_name" => "Garage" # the sourced_from field copied from the `WidgetWorkspace`
       })
     end

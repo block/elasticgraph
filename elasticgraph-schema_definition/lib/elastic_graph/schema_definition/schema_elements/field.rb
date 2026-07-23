@@ -91,7 +91,7 @@ module ElasticGraph
         :name, :original_type, :parent_type, :original_type_for_derived_types, :schema_def_state, :accuracy_confidence,
         :filter_customizations, :grouped_by_customizations, :highlights_customizations, :sub_aggregations_customizations,
         :aggregated_values_customizations, :sort_order_enum_value_customizations, :args,
-        :sortable, :filterable, :aggregatable, :groupable, :highlightable, :returnable,
+        :sortable, :filterable, :aggregatable, :groupable, :highlightable, :returnable, :retrieved_from,
         :graphql_only, :source, :runtime_field_script, :relationship, :singular_name,
         :computation_detail, :as_input,
         :name_in_index, :resolver
@@ -106,7 +106,7 @@ module ElasticGraph
           name:, type:, parent_type:, schema_def_state:,
           accuracy_confidence: :high, name_in_index: name,
           type_for_derived_types: nil, graphql_only: nil, singular: nil,
-          sortable: nil, filterable: nil, aggregatable: nil, groupable: nil, highlightable: nil, returnable: nil,
+          sortable: nil, filterable: nil, aggregatable: nil, groupable: nil, highlightable: nil, returnable: nil, retrieved_from: nil,
           as_input: false, resolver: nil
         )
           type_ref = schema_def_state.type_ref(type)
@@ -130,6 +130,7 @@ module ElasticGraph
             groupable: groupable,
             highlightable: highlightable,
             returnable: returnable,
+            retrieved_from: retrieved_from&.to_s,
             graphql_only: graphql_only,
             source: nil,
             runtime_field_script: nil,
@@ -155,6 +156,12 @@ module ElasticGraph
               raise Errors::SchemaError,
                 "#{self} has an invalid `name_in_index`: #{name_in_index.inspect}. " \
                 "Only `graphql_only: true` fields can have a `name_in_index` that references a child field."
+            end
+          end
+
+          if retrieved_from
+            schema_def_state.after_user_definition_complete do
+              validate_retrieved_from!
             end
           end
 
@@ -738,6 +745,7 @@ module ElasticGraph
           return highlightable unless highlightable.nil?
           return false if relationship
           return false unless returnable?
+          return false if retrieved_from_doc_values?
           return true if HIGHLIGHTABLE_MAPPING_TYPES.include?(mapping_type)
 
           type_for_derived_types.fully_unwrapped.as_object_type&.supports?(&:highlightable?)
@@ -751,6 +759,20 @@ module ElasticGraph
         def returnable?
           return true if returnable.nil?
           returnable
+        end
+
+        # Indicates if this field should be retrieved from datastore doc values rather than `_source`.
+        #
+        # @return [Boolean] true if this field should be returned via `docvalue_fields`
+        def retrieved_from_doc_values?
+          retrieved_from == "doc_values"
+        end
+
+        # Indicates if the field should be omitted from stored `_source`.
+        #
+        # @return [Boolean]
+        def source_excluded?(under_non_returnable_parent = false)
+          retrieved_from_doc_values? || ((under_non_returnable_parent || !returnable?) && !highlightable?)
         end
 
         # @return [Boolean] true if this field's return type is a {API#namespace_type namespace type}.
@@ -921,7 +943,8 @@ module ElasticGraph
             resolver: nil,
             # Filter fields should always appear in their parent input type's SDL regardless
             # of the source field's returnability.
-            returnable: true
+            returnable: true,
+            retrieved_from: nil
           )
 
           schema_def_state.factory.new_field(**params).tap do |f|
@@ -1268,6 +1291,39 @@ module ElasticGraph
               [^2]: https://www.elastic.co/guide/en/elasticsearch/reference/8.10/joining-queries.html
               [^3]: https://www.elastic.co/guide/en/elasticsearch/reference/8.10/index-modules-index-sorting.html
             EOS
+          end
+        end
+
+        def validate_retrieved_from!
+          unless retrieved_from == "doc_values"
+            raise Errors::SchemaError,
+              "#{self} has an invalid `retrieved_from`: #{retrieved_from.inspect}. " \
+              "The only supported value is `:doc_values`."
+          end
+
+          unless parent_type.root_document_type?
+            raise Errors::SchemaError,
+              "#{self} uses `retrieved_from: :doc_values`, but that is only supported on direct fields of indexed root document types."
+          end
+
+          unless type_for_derived_types.fully_unwrapped.leaf?
+            raise Errors::SchemaError,
+              "#{self} uses `retrieved_from: :doc_values`, but that is only supported on GraphQL leaf fields."
+          end
+
+          if type_for_derived_types.list?
+            raise Errors::SchemaError,
+              "#{self} uses `retrieved_from: :doc_values`, but that is only supported on non-list GraphQL leaf fields because datastore doc values do not preserve list semantics."
+          end
+
+          if name_in_index.include?(".")
+            raise Errors::SchemaError,
+              "#{self} uses `retrieved_from: :doc_values`, but that is only supported on direct document fields without a dotted `name_in_index`."
+          end
+
+          if text?
+            raise Errors::SchemaError,
+              "#{self} uses `retrieved_from: :doc_values`, but text fields do not support datastore doc values."
           end
         end
       end

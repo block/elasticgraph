@@ -8,19 +8,22 @@
 
 require "elastic_graph/graphql/decoded_cursor"
 require "elastic_graph/support/memoizable_data"
+require "elastic_graph/support/hash_util"
 require "forwardable"
 
 module ElasticGraph
   class GraphQL
     module DatastoreResponse
+      # @private
+      # Sentinel value to distinguish "no default given" from an explicit `nil` default in {Document#fetch_value_at}.
+      UNSET = ::Object.new.freeze
+
       # Represents a document fetched from the datastore. Exposes both the raw metadata
       # provided by the datastore and the doc payload itself. In addition, you can treat
       # it just like a document hash using `#[]` or `#fetch`.
       Document = Support::MemoizableData.define(:raw_data, :payload, :decoded_cursor_factory) do
         # @implements Document
         extend Forwardable
-
-        def_delegators :payload, :[], :fetch
 
         def self.build(raw_data, decoded_cursor_factory: DecodedCursor::Factory::Null)
           source = raw_data.fetch("_source") do
@@ -51,6 +54,38 @@ module ElasticGraph
           raw_data["_id"]
         end
 
+        def [](key)
+          return payload[key] if payload.key?(key)
+          docvalue_field(key)&.first
+        end
+
+        def fetch(key, default = UNSET)
+          return payload[key] if payload.key?(key)
+          if (field_values = docvalue_field(key))
+            return field_values.first
+          end
+          return yield(key) if block_given?
+          return default unless default.equal?(UNSET)
+          raise KeyError, "key not found: #{key.inspect}"
+        end
+
+        def fetch_value_at(path, default_value: UNSET)
+          Support::HashUtil.fetch_value_at_path(payload, path) do
+            if (field_values = docvalue_field(path.join(".")))
+              next field_values.first
+            end
+            next yield(path) if block_given?
+            next default_value unless default_value.equal?(UNSET)
+            raise KeyError, "path not found: #{path.join(".")}"
+          end
+        end
+
+        def value_at(path)
+          Support::HashUtil.fetch_value_at_path(payload, path) do
+            docvalue_field(path.join("."))&.first
+          end
+        end
+
         def sort
           raw_data["sort"]
         end
@@ -77,6 +112,14 @@ module ElasticGraph
           "#<#{self.class.name} #{datastore_path}>"
         end
         alias_method :inspect, :to_s
+
+        private
+
+        # Returns the doc_values field array for the given key, or nil if not present.
+        # Datastore doc_values are always returned as arrays (e.g. `{"name" => ["Bob"]}`).
+        def docvalue_field(key)
+          raw_data.dig("fields", key)
+        end
       end
     end
   end
