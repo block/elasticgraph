@@ -154,6 +154,63 @@ module ElasticGraph
           expect(proto_type_def_from(proto, "Account")).to include(".elasticgraph.Status status = 2;")
           expect(proto_type_def_from(proto, "User")).to include(".elasticgraph.Status status = 2;")
         end
+
+        it "raises when a hand-edited mappings artifact is invalid" do
+          # An invalid artifact can only arise from hand-editing (a prior dump is always valid),
+          # so this test must seed raw mappings instead of results from a prior dump.
+          results = define_proto_schema_results(proto_field_number_mappings: {
+            "messages" => {"Account" => {"fields" => {"id" => 0}}}
+          }) do |s|
+            s.object_type "Account" do |t|
+              t.field "id", "ID"
+              t.index "accounts"
+            end
+          end
+
+          expect {
+            results.proto_schema
+          }.to raise_error(Errors::SchemaError, a_string_including("must be a valid protobuf field number"))
+        end
+
+        it "skips the protobuf-reserved range when allocating new field numbers" do
+          # Reaching the real reserved range (19000-19999) would require ~19,000 fields, so we
+          # stub it to a small range to verify the allocator respects the constant.
+          stub_const("ElasticGraph::ProtoIngestion::SchemaDefinition::FieldNumberMappings::RESERVED_FIELD_NUMBER_RANGE", 3..4)
+
+          proto = define_proto_schema do |s|
+            s.object_type "Account" do |t|
+              t.field "id", "ID"
+              t.field "name", "String"
+              t.field "email", "String"
+              t.index "accounts"
+            end
+          end
+
+          expect(proto).to include("string id = 1;", "string name = 2;", "string email = 5;")
+        end
+
+        it "allocates the next available field number when a renamed field has no old mapping entry" do
+          results1 = define_proto_schema_results do |s|
+            s.object_type "Account" do |t|
+              t.field "id", "ID"
+              t.index "accounts"
+            end
+          end
+
+          # `display_name` declares a rename from `full_name`, but no `full_name` mapping was ever dumped.
+          results2 = define_proto_schema_results(results1) do |s|
+            s.object_type "Account" do |t|
+              t.field "id", "ID"
+              t.field "display_name", "String" do |f|
+                f.renamed_from "full_name"
+              end
+              t.index "accounts"
+            end
+          end
+
+          expect(results2.proto_schema).to include("string id = 1;")
+          expect(results2.proto_schema).to include("string display_name = 2;")
+        end
       end
     end
   end

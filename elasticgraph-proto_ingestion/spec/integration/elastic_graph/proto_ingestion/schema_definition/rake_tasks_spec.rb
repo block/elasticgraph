@@ -9,6 +9,7 @@
 require "elastic_graph/proto_ingestion"
 require "elastic_graph/proto_ingestion/schema_definition/api_extension"
 require "elastic_graph/schema_definition/rake_tasks"
+require "yaml"
 
 module ElasticGraph
   module ProtoIngestion
@@ -52,6 +53,44 @@ module ElasticGraph
               expect(output.lines).to include(a_string_including("already up to date", PROTO_SCHEMA_FILE))
             }.to maintain { read_artifact(PROTO_SCHEMA_FILE) }
           end
+
+          it "can persist and reuse proto field-number mappings from an artifact file" do
+            write_proto_schema(table_defs: <<~EOS)
+              s.object_type "Product" do |t|
+                t.field "id", "ID"
+                t.field "name", "String"
+                t.index "products"
+              end
+            EOS
+
+            run_rake_with_proto("schema_artifacts:dump")
+
+            expect(read_artifact(PROTO_FIELD_NUMBERS_FILE)).not_to be_nil
+            expect(parsed_proto_field_numbers).to eq({
+              "enums" => {},
+              "messages" => {
+                "Product" => {
+                  "fields" => {
+                    "id" => 1,
+                    "name" => 2
+                  }
+                }
+              }
+            })
+
+            write_proto_schema(table_defs: <<~EOS)
+              s.object_type "Product" do |t|
+                t.field "name", "String"
+                t.field "id", "ID"
+                t.index "products"
+              end
+            EOS
+
+            run_rake_with_proto("schema_artifacts:dump")
+
+            expect(read_artifact(PROTO_SCHEMA_FILE)).to include("string name = 2;")
+            expect(read_artifact(PROTO_SCHEMA_FILE)).to include("string id = 1;")
+          end
         end
 
         private
@@ -80,6 +119,10 @@ module ElasticGraph
         def read_artifact(name)
           path = File.join("config", "schema", "artifacts", name)
           File.read(path) if File.exist?(path)
+        end
+
+        def parsed_proto_field_numbers
+          ::YAML.safe_load(read_artifact(PROTO_FIELD_NUMBERS_FILE))
         end
       end
     end

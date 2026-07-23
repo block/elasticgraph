@@ -5,20 +5,33 @@ module ElasticGraph
         @state: ::ElasticGraph::SchemaDefinition::State
         @all_types: ::Array[::ElasticGraph::SchemaDefinition::SchemaElements::graphQLType]
         @package_name: ::String
+        @field_number_mappings: FieldNumberMappings
+        @renamed_public_field_names_by_type_name: ::Hash[::String, ::Hash[::String, ::Array[::String]]]?
 
         def initialize: (
           state: ::ElasticGraph::SchemaDefinition::State,
           all_types: ::Array[::ElasticGraph::SchemaDefinition::SchemaElements::graphQLType],
-          package_name: ::String
+          package_name: ::String,
+          ?proto_field_number_mappings: untyped
         ) -> void
 
         def to_proto: () -> ::String
+        def field_number_mappings_for_artifact: () -> ::Hash[::String, untyped]
+        def field_number_for: (
+          message_name: ::String,
+          type_name: ::String,
+          public_field_name: ::String,
+          name_in_index: ::String
+        ) -> ::Integer
+        def enum_value_numbers_for: (::String, ::Array[::String]) -> ::Hash[::String, ::Integer]
 
         private
 
         def proto_types: () -> ::Array[untyped]
         def render_definitions: (::Array[untyped] types) -> ::String
         def validate_unique_enum_value_prefixes: (::Array[untyped] types) -> void
+        def previous_field_names_for: (::String, ::String) -> ::Array[::String]
+        def renamed_public_field_names_by_type_name: () -> ::Hash[::String, ::Hash[::String, ::Array[::String]]]
       end
     end
   end
