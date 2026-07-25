@@ -59,6 +59,7 @@ module ElasticGraph
       def initialize(
         schema_elements,
         index_document_sizes,
+        path_to_schema: nil,
         extension_modules: [],
         derived_type_name_formats: {},
         type_name_overrides: {},
@@ -69,6 +70,7 @@ module ElasticGraph
           api: self,
           schema_elements: schema_elements,
           index_document_sizes: index_document_sizes,
+          path_to_schema: path_to_schema,
           derived_type_name_formats: derived_type_name_formats,
           type_name_overrides: type_name_overrides,
           enum_value_overrides_by_type: enum_value_overrides_by_type,

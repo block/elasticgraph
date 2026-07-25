@@ -4,6 +4,7 @@ module ElasticGraph
       attr_reader api: API
       attr_reader schema_elements: SchemaArtifacts::RuntimeMetadata::SchemaElementNames
       attr_reader index_document_sizes: bool
+      attr_reader path_to_schema: ::String?
       attr_reader types_by_name: SchemaElements::typesByNameHash
       attr_reader object_types_by_name: ::Hash[::String, indexableType]
       attr_reader namespace_types_by_name: ::Hash[::String, SchemaElements::ObjectType]
@@ -38,6 +39,7 @@ module ElasticGraph
         api: API,
         schema_elements: SchemaArtifacts::RuntimeMetadata::SchemaElementNames,
         index_document_sizes: bool,
+        path_to_schema: ::String?,
         types_by_name: SchemaElements::typesByNameHash,
         object_types_by_name: ::Hash[::String, indexableType],
         namespace_types_by_name: ::Hash[::String, SchemaElements::ObjectType],
@@ -78,6 +80,7 @@ module ElasticGraph
         derived_type_name_formats: ::Hash[::Symbol, ::String],
         type_name_overrides: ::Hash[::String, ::String] | ::Hash[::Symbol, ::String],
         enum_value_overrides_by_type: ::Hash[::String | ::Symbol, ::Hash[::String | ::Symbol, ::String]],
+        ?path_to_schema: ::String?,
         ?output: io
       ) -> State
 
