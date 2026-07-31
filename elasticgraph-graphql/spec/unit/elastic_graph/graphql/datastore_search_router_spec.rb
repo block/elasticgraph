@@ -69,7 +69,7 @@ module ElasticGraph
         let(:query1) { new_widgets_query(default_page_size: 10, individual_docs_needed: true) }
         let(:query2) { new_widgets_query(default_page_size: 3, individual_docs_needed: true) }
 
-        it "passes a set of empty headers along with each search body to the datastore, since it requires that for msearch" do
+        it "passes index options along with each search body to the datastore" do
           router.msearch([query1, query2])
 
           expect(main_datastore_client).to have_received(:msearch).with(a_hash_including(body: [
@@ -265,6 +265,12 @@ module ElasticGraph
 
           responses_by_query = router.msearch([query1, query_excluding_indices])
           expect(responses_by_query.values.map(&:documents)).to eq [[], []]
+          expect(main_datastore_client).to have_received(:msearch).with(a_hash_including(body: [
+            {index: "widgets_rollover__*"},
+            anything,
+            {index: "widgets_rollover__*,-widgets_rollover__2024", ignore_unavailable: true},
+            anything
+          ]))
         end
 
         it "logs warning if a query has failed shards" do

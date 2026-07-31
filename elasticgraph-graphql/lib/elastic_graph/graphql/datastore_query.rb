@@ -239,7 +239,11 @@ module ElasticGraph
       end
 
       def to_datastore_msearch_header
-        @to_datastore_msearch_header ||= {index: search_index_expression, routing: shard_routing_values&.join(",")}.compact
+        @to_datastore_msearch_header ||= {
+          index: search_index_expression,
+          ignore_unavailable: excluding_indices? || nil,
+          routing: shard_routing_values&.join(",")
+        }.compact
       end
 
       # `DatastoreQuery` objects are used as keys in a hash. Computing `#hash` can be expensive (given how many fields
