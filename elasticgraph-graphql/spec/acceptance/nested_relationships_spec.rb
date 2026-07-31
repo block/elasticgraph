@@ -206,6 +206,8 @@ module ElasticGraph
           part_args = {order_by: [:id_DESC]} # ensure deterministic ordering of parts
           address_args = {order_by: [:full_address_ASC]} # ensure deterministic ordering of addresses
 
+          # Nested relationship levels can share an `_msearch` request depending on fiber scheduling, so assert
+          # the logical search count and routing below rather than the number of transport requests.
           [component_args_without_not, component_args_with_not].each do |component_args|
             expect {
               expect(query_all_relationship_levels_from_widgets(component_args: component_args, part_args: part_args)).to match edges_of(
@@ -226,7 +228,7 @@ module ElasticGraph
                   ))
                 ))
               )
-            }.to perform_datastore_msearch("main", 6).times.and perform_datastore_search("main", 6).times
+            }.to perform_datastore_search("main", 6).times
 
             expect_to_have_routed_to_shards_with("main",
               # Root `widgets` query isn't filtering on anything and uses no routing.
@@ -264,7 +266,7 @@ module ElasticGraph
                     ))
                   )))
               )
-            }.to perform_datastore_msearch("main", 6).times.and perform_datastore_search("main", 6).times
+            }.to perform_datastore_search("main", 6).times
 
             expect_to_have_routed_to_shards_with("main",
               # Root `addresses` query isn't filtering on anything and uses no routing.
