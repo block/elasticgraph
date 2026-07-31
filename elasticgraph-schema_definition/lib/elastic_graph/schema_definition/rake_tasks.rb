@@ -168,6 +168,7 @@ module ElasticGraph
           API.new(
             @schema_element_names,
             @index_document_sizes,
+            path_to_schema: @path_to_schema.to_s,
             extension_modules: @extension_modules,
             derived_type_name_formats: @derived_type_name_formats,
             type_name_overrides: @type_name_overrides,

@@ -32,6 +32,20 @@ module ElasticGraph
       end
 
       describe "schema_artifacts:dump", :in_temp_dir do
+        it "exposes `path_to_schema` on schema definition state before applying extensions" do
+          write_elastic_graph_schema_def_code
+          observed_paths = []
+          extension_module = Module.new do
+            define_singleton_method(:extended) do |api|
+              observed_paths << api.state.path_to_schema
+            end
+          end
+
+          run_rake("schema_artifacts:dump", extension_modules: [extension_module])
+
+          expect(observed_paths).to eq(["schema.rb"])
+        end
+
         it "idempotently dumps all schema artifacts, and is able to check if they are current with `:check`" do
           write_elastic_graph_schema_def_code
           expect_all_artifacts_out_of_date_because_they_havent_been_dumped
