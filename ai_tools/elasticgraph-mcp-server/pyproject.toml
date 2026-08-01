@@ -19,7 +19,7 @@ classifiers = [
 ]
 dependencies = [
     "httpx~=0.28.1",
-    "mcp[cli]~=1.28.1",
+    "mcp[cli]~=2.0.0",
     "packaging~=26.2",
 ]
 
@@ -39,10 +39,10 @@ packages = ["src/elasticgraph_mcp"]
 
 [dependency-groups]
 dev = [
-    "ruff~=0.15.20",
+    "ruff~=0.16.0",
     "pytest~=9.1.1",
     "pytest-cov~=7.1.0",
-    "pre-commit~=4.6.0",
+    "pre-commit~=4.6.1",
     "pytest-asyncio~=1.4.0",
 ]
 
