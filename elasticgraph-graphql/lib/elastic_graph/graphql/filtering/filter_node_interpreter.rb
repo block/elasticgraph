@@ -135,7 +135,7 @@ module ElasticGraph
                 sub_expressions << {bool: {minimum_should_match: 1, should: should_sub_expressions}}
               end
 
-              if ored_substrings&.empty?
+              if ored_substrings && ored_substrings.empty?
                 BooleanQuery::ALWAYS_FALSE_FILTER
               elsif sub_expressions.size > 0
                 BooleanQuery.filter(*sub_expressions)
@@ -153,7 +153,7 @@ module ElasticGraph
                 }}}
               end
 
-              if ored_prefixes&.empty?
+              if ored_prefixes && ored_prefixes.empty?
                 BooleanQuery::ALWAYS_FALSE_FILTER
               elsif sub_expressions.size > 0
                 BooleanQuery.filter({bool: {minimum_should_match: 1, should: sub_expressions}})
