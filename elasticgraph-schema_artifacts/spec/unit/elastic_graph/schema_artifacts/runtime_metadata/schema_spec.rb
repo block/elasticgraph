@@ -63,13 +63,13 @@ module ElasticGraph
                 ],
                 graphql_fields_by_name: {
                   "name_graphql" => GraphQLField.new(
-                    computation_detail: nil,
+                    computation_function: nil,
                     name_in_index: "name_index",
                     relation: nil,
                     resolver: ConfiguredGraphQLResolver.new(:self, {arg1: 17})
                   ),
                   "parent" => GraphQLField.new(
-                    computation_detail: nil,
+                    computation_function: nil,
                     name_in_index: "parent",
                     relation: Relation.new(
                       foreign_key: "grandparents.parents.some_id",
@@ -80,10 +80,7 @@ module ElasticGraph
                     resolver: ConfiguredGraphQLResolver.new(:self, {})
                   ),
                   "sum" => GraphQLField.new(
-                    computation_detail: ComputationDetail.new(
-                      empty_bucket_value: 0,
-                      function: :sum
-                    ),
+                    computation_function: :sum,
                     name_in_index: "sum",
                     relation: nil,
                     resolver: ConfiguredGraphQLResolver.new(:self, {})
@@ -212,10 +209,7 @@ module ElasticGraph
                     "resolver" => {"name" => "self"}
                   },
                   "sum" => {
-                    "computation_detail" => {
-                      "empty_bucket_value" => 0,
-                      "function" => "sum"
-                    },
+                    "computation_function" => "sum",
                     "resolver" => {"name" => "self"}
                   }
                 },
@@ -348,7 +342,7 @@ module ElasticGraph
             "FieldsByGraphQLOnly" => object_type_with(graphql_fields_by_name: {
               "name_graphql" => GraphQLField.new(
                 name_in_index: "name_index",
-                computation_detail: nil,
+                computation_function: nil,
                 relation: nil,
                 resolver: ConfiguredGraphQLResolver.new(:self, {})
               )

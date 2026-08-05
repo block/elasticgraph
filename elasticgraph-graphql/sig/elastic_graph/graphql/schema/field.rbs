@@ -10,7 +10,7 @@ module ElasticGraph
         attr_reader parent_type: Type
         attr_reader type: Type
         attr_reader graphql_field: ::GraphQL::Schema::Field
-        attr_reader computation_detail: SchemaArtifacts::RuntimeMetadata::ComputationDetail?
+        attr_reader function_adapter: Aggregation::FunctionAdapter::adapter?
         attr_reader relation: SchemaArtifacts::RuntimeMetadata::Relation
 
         def aggregated?: () -> bool

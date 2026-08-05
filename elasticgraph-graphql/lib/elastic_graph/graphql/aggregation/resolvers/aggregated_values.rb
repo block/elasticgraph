@@ -24,7 +24,8 @@ module ElasticGraph
               function_name: PathSegment.for(field: field, lookahead: lookahead).name_in_graphql_query
             )
 
-            result = Support::HashUtil.verbose_fetch(bucket, key.encode)
+            function_adapter = field.function_adapter # : FunctionAdapter::adapter
+            result = function_adapter.extract_result(Support::HashUtil.verbose_fetch(bucket, key.encode))
 
             # Aggregated value results always have a `value` key; in addition, for `date` field, they also have a `value_as_string`.
             # In that case, `value` is a number (e.g. ms since epoch) whereas `value_as_string` is a formatted value. ElasticGraph

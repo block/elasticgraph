@@ -69,7 +69,7 @@ module ElasticGraph
             }
 
             empty_bucket_computations = query.computations.to_h do |computation|
-              [computation.key(aggregation_name: query.name), {"value" => computation.detail.empty_bucket_value}]
+              [computation.key(aggregation_name: query.name), computation.function_adapter.empty_bucket_result]
             end
 
             defaults

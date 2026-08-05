@@ -87,6 +87,34 @@ module ElasticGraph
         })
       end
 
+      it "dumps the aggregation function recorded by `computes`" do
+        metadata = object_type_metadata_for "Widget" do |s|
+          s.object_type "Widget" do |t|
+            t.field "id", "ID"
+            t.field "total", "Int", graphql_only: true do |f|
+              f.computes :sum
+            end
+          end
+        end
+
+        expect(metadata.graphql_fields_by_name.fetch("total").computation_function).to eq :sum
+      end
+
+      it "raises an error when `computes` is given an unregistered function name, since the query engine would have no adapter for it" do
+        expect {
+          object_type_metadata_for "Widget" do |s|
+            s.object_type "Widget" do |t|
+              t.field "id", "ID"
+              t.field "total", "Int", graphql_only: true do |f|
+                f.computes :not_a_real_function
+              end
+            end
+          end
+        }.to raise_error Errors::SchemaError, a_string_including(
+          "`Widget.total` has an unregistered aggregation function: `not_a_real_function`."
+        )
+      end
+
       it "raises an error when a custom `Query` field lacks a resolver, as it won't be resolvable by elasticgraph-graphql" do
         expect {
           object_type_metadata_for "Query" do |s|

@@ -681,7 +681,7 @@ module ElasticGraph
             t.customize_aggregated_values_type do |avt|
               # not nullable, since sum(empty_set) == 0
               avt.field names.approximate_sum, "Float!", graphql_only: true do |f|
-                f.runtime_metadata_computation_detail empty_bucket_value: 0, function: :sum
+                f.computes :sum
 
                 f.documentation <<~EOS
                   The sum of the field values within this grouping.
@@ -701,7 +701,7 @@ module ElasticGraph
               end
 
               avt.field names.approximate_avg, "Float", graphql_only: true do |f|
-                f.runtime_metadata_computation_detail empty_bucket_value: nil, function: :avg
+                f.computes :avg
 
                 f.documentation <<~EOS
                   The average (mean) of the field values within this grouping.
@@ -1004,7 +1004,7 @@ module ElasticGraph
             t.customize_aggregated_values_type do |avt|
               # not nullable, since sum(empty_set) == 0
               avt.field names.approximate_sum, "Float!", graphql_only: true do |f|
-                f.runtime_metadata_computation_detail empty_bucket_value: 0, function: :sum
+                f.computes :sum
 
                 f.documentation <<~EOS
                   The (approximate) sum of the field values within this grouping.
@@ -1016,7 +1016,7 @@ module ElasticGraph
               end
 
               avt.field names.exact_sum, "JsonSafeLong", graphql_only: true do |f|
-                f.runtime_metadata_computation_detail empty_bucket_value: 0, function: :sum
+                f.computes :sum
 
                 f.documentation <<~EOS
                   The exact sum of the field values within this grouping, if it fits in a `JsonSafeLong`.
@@ -1045,7 +1045,7 @@ module ElasticGraph
                 names.exact_max => [:max, "maximum", names.approximate_max, "largest"]
               }.each do |exact_name, (func, full_name, approx_name, adjective)|
                 avt.field approx_name, "LongString", graphql_only: true do |f|
-                  f.runtime_metadata_computation_detail empty_bucket_value: nil, function: func
+                  f.computes func
 
                   f.documentation <<~EOS
                     The #{full_name} of the field values within this grouping.
@@ -1060,7 +1060,7 @@ module ElasticGraph
               end
 
               avt.field names.approximate_avg, "Float", graphql_only: true do |f|
-                f.runtime_metadata_computation_detail empty_bucket_value: nil, function: :avg
+                f.computes :avg
 
                 f.documentation <<~EOS
                   The average (mean) of the field values within this grouping.
@@ -1532,7 +1532,7 @@ module ElasticGraph
           scalar_type.customize_aggregated_values_type do |t|
             # not nullable, since sum(empty_set) == 0
             t.field names.approximate_sum, "Float!", graphql_only: true do |f|
-              f.runtime_metadata_computation_detail empty_bucket_value: 0, function: :sum
+              f.computes :sum
 
               f.documentation <<~EOS
                 The (approximate) sum of the field values within this grouping.
@@ -1544,7 +1544,7 @@ module ElasticGraph
             end
 
             t.field names.exact_sum, long_type, graphql_only: true do |f|
-              f.runtime_metadata_computation_detail empty_bucket_value: 0, function: :sum
+              f.computes :sum
 
               f.documentation <<~EOS
                 The exact sum of the field values within this grouping, if it fits in a `#{long_type}`.
@@ -1563,7 +1563,7 @@ module ElasticGraph
             end
 
             t.field names.approximate_avg, "Float", graphql_only: true do |f|
-              f.runtime_metadata_computation_detail empty_bucket_value: nil, function: :avg
+              f.computes :avg
 
               f.documentation <<~EOS
                 The average (mean) of the field values within this grouping.
@@ -1580,7 +1580,7 @@ module ElasticGraph
           define_exact_min_and_max_on_aggregated_values(aggregated_values_type, scalar_type, &block)
 
           aggregated_values_type.field names.approximate_avg, scalar_type, graphql_only: true do |f|
-            f.runtime_metadata_computation_detail empty_bucket_value: nil, function: :avg
+            f.computes :avg
 
             f.documentation <<~EOS
               The average (mean) of the field values within this grouping.
@@ -1597,7 +1597,7 @@ module ElasticGraph
             discussion = yield(adjective: adjective, full_name: full_name)
 
             aggregated_values_type.field name, scalar_type, graphql_only: true do |f|
-              f.runtime_metadata_computation_detail empty_bucket_value: nil, function: func
+              f.computes func
 
               f.documentation ["The #{full_name} of the field values within this grouping.", discussion].compact.join("\n\n")
             end

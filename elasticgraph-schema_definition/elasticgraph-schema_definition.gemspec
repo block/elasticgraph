@@ -41,7 +41,7 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = [">= 3.4", "< 4.1"]
 
-  spec.add_dependency "elasticgraph-graphql", ElasticGraph::VERSION # needed since we validate that scalar `coerce_with` options are valid (which loads scalar coercion adapters)
+  spec.add_dependency "elasticgraph-graphql", ElasticGraph::VERSION # needed since we validate that scalar `coerce_with` options and aggregation function names are valid (which loads scalar coercion adapters and the aggregation function adapter registry)
   spec.add_dependency "elasticgraph-indexer", ElasticGraph::VERSION # needed since we validate that scalar `prepare_for_indexing_with` options are valid (which loads indexing preparer adapters)
   spec.add_dependency "elasticgraph-schema_artifacts", ElasticGraph::VERSION
   spec.add_dependency "elasticgraph-support", ElasticGraph::VERSION
