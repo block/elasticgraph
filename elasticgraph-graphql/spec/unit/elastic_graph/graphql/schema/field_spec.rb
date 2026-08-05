@@ -193,22 +193,18 @@ module ElasticGraph
           end
         end
 
-        describe "#computation_detail" do
-          it "returns the aggregation function from an aggregated values field" do
-            field = define_schema do |s|
+        describe "#function_adapter" do
+          it "resolves an aggregated values field's function name to its registered adapter, and is nil for a field that computes nothing" do
+            schema = define_schema do |s|
               s.object_type "Photo" do |t|
                 t.field "id", "ID!"
                 t.field "some_field", "Int"
                 t.index "photos"
               end
-            end.field_named("IntAggregatedValues", "exact_sum")
+            end
 
-            expect(field.computation_detail).to eq(
-              SchemaArtifacts::RuntimeMetadata::ComputationDetail.new(
-                function: :sum,
-                empty_bucket_value: 0
-              )
-            )
+            expect(schema.field_named("IntAggregatedValues", "exact_sum").function_adapter).to be Aggregation::FunctionAdapter::BY_NAME.fetch(:sum)
+            expect(schema.field_named("Photo", "some_field").function_adapter).to be nil
           end
         end
 

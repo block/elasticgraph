@@ -8,6 +8,7 @@
 
 require "delegate"
 require "elastic_graph/constants"
+require "elastic_graph/graphql/aggregation/function_adapter"
 require "elastic_graph/schema_artifacts/runtime_metadata/configured_graphql_resolver"
 require "elastic_graph/schema_definition/indexing/field"
 require "elastic_graph/schema_definition/indexing/field_reference"
@@ -83,7 +84,7 @@ module ElasticGraph
       #   @private
       # @!attribute [rw] singular_name
       #   @private
-      # @!attribute [rw] computation_detail
+      # @!attribute [rw] computation_function
       #   @private
       # @!attribute [rw] as_input
       #   @private
@@ -93,7 +94,7 @@ module ElasticGraph
         :aggregated_values_customizations, :sort_order_enum_value_customizations, :args,
         :sortable, :filterable, :aggregatable, :groupable, :highlightable, :returnable,
         :graphql_only, :source, :runtime_field_script, :relationship, :singular_name,
-        :computation_detail, :as_input,
+        :computation_function, :as_input,
         :name_in_index, :resolver
       )
         include Mixins::HasDocumentation
@@ -1091,24 +1092,27 @@ module ElasticGraph
           mapping_type == "nested"
         end
 
-        # Records the `ComputationDetail` that should be on the `runtime_metadata_graphql_field`.
+        # Records the aggregation function this field computes, which the query engine resolves to a
+        # {ElasticGraph::GraphQL::Aggregation::FunctionAdapter} when it builds the field.
         #
         # @private
-        def runtime_metadata_computation_detail(empty_bucket_value:, function:)
-          self.computation_detail = SchemaArtifacts::RuntimeMetadata::ComputationDetail.new(
-            empty_bucket_value: empty_bucket_value,
-            function: function
-          )
+        def computes(function)
+          unless GraphQL::Aggregation::FunctionAdapter::BY_NAME.key?(function)
+            raise Errors::SchemaError, "`#{parent_type.name}.#{name}` has an unregistered aggregation function: `#{function}`. " \
+              "Valid functions are: #{GraphQL::Aggregation::FunctionAdapter::BY_NAME.keys.map(&:inspect).join(", ")}."
+          end
+
+          self.computation_function = function
         end
 
-        # Lazily creates and returns a GraphQLField using the field's {#name_in_index}, {#computation_detail},
+        # Lazily creates and returns a GraphQLField using the field's {#name_in_index}, {#computation_function},
         # and {#relationship}.
         #
         # @private
         def runtime_metadata_graphql_field
           SchemaArtifacts::RuntimeMetadata::GraphQLField.new(
             name_in_index: name_in_index,
-            computation_detail: computation_detail,
+            computation_function: computation_function,
             relation: relationship&.runtime_metadata,
             resolver: resolver
           )

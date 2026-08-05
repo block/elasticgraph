@@ -370,7 +370,7 @@ module ElasticGraph
               it usually differs from the true distinct value count by less than 7%.
             EOS
 
-            f.runtime_metadata_computation_detail empty_bucket_value: 0, function: :cardinality
+            f.computes :cardinality
           end
 
           yield type

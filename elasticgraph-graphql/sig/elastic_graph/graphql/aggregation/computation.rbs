@@ -4,7 +4,8 @@ module ElasticGraph
       class Computation
         attr_reader source_field_path: fieldPath
         attr_reader leaf: PathSegment
-        attr_reader detail: SchemaArtifacts::RuntimeMetadata::ComputationDetail
+        attr_reader function_adapter: FunctionAdapter::adapter
+        attr_reader function_args: FunctionAdapter::functionArgs
 
         def key: (aggregation_name: ::String) -> ::String
         def clause: () -> ::Hash[::String, untyped]
@@ -12,13 +13,15 @@ module ElasticGraph
         def initialize : (
           source_field_path: fieldPath,
           leaf: PathSegment,
-          detail: SchemaArtifacts::RuntimeMetadata::ComputationDetail
+          function_adapter: FunctionAdapter::adapter,
+          function_args: FunctionAdapter::functionArgs
         ) -> void
 
         def with: (
           ?source_field_path: fieldPath,
           ?leaf: PathSegment,
-          ?detail: SchemaArtifacts::RuntimeMetadata::ComputationDetail
+          ?function_adapter: FunctionAdapter::adapter,
+          ?function_args: FunctionAdapter::functionArgs
         ) -> instance
       end
     end

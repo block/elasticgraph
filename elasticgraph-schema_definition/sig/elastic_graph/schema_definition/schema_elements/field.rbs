@@ -18,7 +18,7 @@ module ElasticGraph
         attr_reader parent_type: indexableType
         attr_reader schema_def_state: State
         attr_reader accuracy_confidence: accuracyConfidence
-        attr_accessor computation_detail: SchemaArtifacts::RuntimeMetadata::ComputationDetail
+        attr_accessor computation_function: ::Symbol?
         attr_reader filter_customizations: ::Array[^(Field) -> void]
         attr_reader sort_order_enum_value_customizations: ::Array[^(SortOrderEnumValue) -> void]
         attr_reader source: FieldSource?
@@ -93,7 +93,7 @@ module ElasticGraph
 
         def nested?: () -> bool
 
-        def runtime_metadata_computation_detail: (empty_bucket_value: ::Numeric?, function: ::Symbol) -> void
+        def computes: (::Symbol) -> void
         def runtime_metadata_graphql_field: () -> SchemaArtifacts::RuntimeMetadata::GraphQLField
 
         def backing_indexing_field: () -> Field?

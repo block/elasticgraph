@@ -4,43 +4,38 @@ module ElasticGraph
       class GraphQLFieldSupertype
         attr_reader name_in_index: ::String?
         attr_reader relation: Relation?
-        attr_reader computation_detail: ComputationDetail?
+        attr_reader computation_function: ::Symbol?
         attr_reader resolver: ConfiguredGraphQLResolver?
 
         def initialize: (
           name_in_index: ::String?,
           relation: Relation?,
-          computation_detail: ComputationDetail?,
+          computation_function: ::Symbol?,
           resolver: ConfiguredGraphQLResolver?
         ) -> void
 
         def with: (
           ?name_in_index: ::String?,
           ?relation: Relation?,
-          ?computation_detail: ComputationDetail?,
+          ?computation_function: ::Symbol?,
           ?resolver: ConfiguredGraphQLResolver?
         ) -> instance
 
         def self.new:
-          (name_in_index: ::String?, relation: Relation?, computation_detail: ComputationDetail?, resolver: ConfiguredGraphQLResolver?) -> instance
-          | (::String?, Relation?, ComputationDetail?, ConfiguredGraphQLResolver?) -> instance
+          (name_in_index: ::String?, relation: Relation?, computation_function: ::Symbol?, resolver: ConfiguredGraphQLResolver?) -> instance
+          | (::String?, Relation?, ::Symbol?, ConfiguredGraphQLResolver?) -> instance
       end
 
       class GraphQLField < GraphQLFieldSupertype
         EMPTY: GraphQLField
         NAME_IN_INDEX: "name_in_index"
         RELATION: "relation"
-        AGGREGATION_DETAIL: "computation_detail"
+        COMPUTATION_FUNCTION: "computation_function"
         RESOLVER: "resolver"
 
         def self.from_hash: (::Hash[::String, untyped]) -> GraphQLField
         def to_dumpable_hash: () -> ::Hash[::String, untyped]
         def needed?: (::String) -> bool
-
-        def with_computation_detail: (
-          empty_bucket_value: ::Numeric?,
-          function: ::Symbol
-        ) -> GraphQLField
       end
     end
   end

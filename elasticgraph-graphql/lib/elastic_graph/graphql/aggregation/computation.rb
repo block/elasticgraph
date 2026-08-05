@@ -19,7 +19,16 @@ module ElasticGraph
       # https://www.elastic.co/guide/en/elasticsearch/reference/7.12/search-aggregations-metrics-max-aggregation.html
       # https://www.elastic.co/guide/en/elasticsearch/reference/7.12/search-aggregations-metrics-min-aggregation.html
       # https://www.elastic.co/guide/en/elasticsearch/reference/7.12/search-aggregations-metrics-sum-aggregation.html
-      Computation = ::Data.define(:source_field_path, :leaf, :detail) do
+      Computation = ::Data.define(
+        :source_field_path,
+        # The path segment for the computation function itself (e.g. `exactMin`), potentially aliased.
+        :leaf,
+        # The adapter that owns this function's datastore-specific behavior.
+        :function_adapter,
+        # The canonically-keyed GraphQL arguments passed to the function, as produced by
+        # `function_adapter.extract_args` at query building time.
+        :function_args
+      ) do
         # @implements Computation
 
         def key(aggregation_name:)
@@ -32,7 +41,8 @@ module ElasticGraph
 
         def clause
           encoded_path = FieldPathEncoder.join(source_field_path.filter_map(&:name_in_index))
-          {detail.function.to_s => {"field" => encoded_path}}
+          clause_body = {"field" => encoded_path}.merge(function_adapter.clause_options(function_args))
+          {function_adapter.datastore_function_name => clause_body}
         end
       end
     end

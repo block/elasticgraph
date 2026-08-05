@@ -10,27 +10,25 @@ require "elastic_graph/graphql/aggregation/composite_grouping_adapter"
 require "elastic_graph/graphql/aggregation/computation"
 require "elastic_graph/graphql/aggregation/date_histogram_grouping"
 require "elastic_graph/graphql/aggregation/field_term_grouping"
+require "elastic_graph/graphql/aggregation/function_adapter"
 require "elastic_graph/graphql/aggregation/key"
 require "elastic_graph/graphql/aggregation/nested_sub_aggregation"
 require "elastic_graph/graphql/aggregation/non_composite_grouping_adapter"
 require "elastic_graph/graphql/aggregation/path_segment"
 require "elastic_graph/graphql/aggregation/query"
 require "elastic_graph/graphql/aggregation/script_term_grouping"
-require "elastic_graph/schema_artifacts/runtime_metadata/computation_detail"
 require "elastic_graph/schema_artifacts/runtime_metadata/schema_element_names"
 
 module ElasticGraph
   module AggregationsHelpers
-    def computation_of(*field_names_in_index, function, computed_field_name: function.to_s, leaf_alias: computed_field_name, field_names_in_graphql_query: field_names_in_index)
+    def computation_of(*field_names_in_index, function, computed_field_name: function.to_s, leaf_alias: computed_field_name, field_names_in_graphql_query: field_names_in_index, function_args: {})
       source_field_path = build_field_path(names_in_index: field_names_in_index, names_in_graphql_query: field_names_in_graphql_query)
 
       GraphQL::Aggregation::Computation.new(
         source_field_path: source_field_path,
         leaf: GraphQL::Aggregation::PathSegment.new(name_in_graphql_query: leaf_alias, name_in_index: computed_field_name),
-        detail: SchemaArtifacts::RuntimeMetadata::ComputationDetail.new(
-          function: function,
-          empty_bucket_value: (function == :sum || function == :cardinality) ? 0 : nil
-        )
+        function_adapter: GraphQL::Aggregation::FunctionAdapter::BY_NAME.fetch(function),
+        function_args: function_args
       )
     end
 

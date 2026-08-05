@@ -19,30 +19,23 @@ module ElasticGraph
           field = GraphQLField.from_hash({})
 
           expect(field).to eq GraphQLField.new(
-            computation_detail: nil,
+            computation_function: nil,
             name_in_index: nil,
             relation: nil,
             resolver: nil
           )
         end
 
-        it "offers `with_computation_detail` updating aggregation detail" do
+        it "round-trips `computation_function` through the dumped form, symbolizing it on load" do
           field = GraphQLField.new(
-            computation_detail: nil,
+            computation_function: :sum,
             name_in_index: nil,
             relation: nil,
             resolver: configured_graphql_resolver(:self)
           )
 
-          updated = field.with_computation_detail(
-            empty_bucket_value: 0,
-            function: :sum
-          )
-
-          expect(updated.computation_detail).to eq(ComputationDetail.new(
-            empty_bucket_value: 0,
-            function: :sum
-          ))
+          expect(field.to_dumpable_hash).to include("computation_function" => "sum")
+          expect(GraphQLField.from_hash(field.to_dumpable_hash).computation_function).to eq :sum
         end
 
         it "exposes `resolver` as nil when it is unset" do
