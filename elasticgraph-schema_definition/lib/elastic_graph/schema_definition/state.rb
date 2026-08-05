@@ -26,6 +26,7 @@ module ElasticGraph
       :api,
       :schema_elements,
       :index_document_sizes,
+      :path_to_schema,
       :types_by_name,
       :object_types_by_name,
       :namespace_types_by_name,
@@ -65,6 +66,7 @@ module ElasticGraph
         derived_type_name_formats:,
         type_name_overrides:,
         enum_value_overrides_by_type:,
+        path_to_schema: nil,
         output: $stdout
       )
         # @type var types_by_name: SchemaElements::typesByNameHash
@@ -74,6 +76,7 @@ module ElasticGraph
           api: api,
           schema_elements: schema_elements,
           index_document_sizes: index_document_sizes,
+          path_to_schema: path_to_schema,
           types_by_name: types_by_name,
           object_types_by_name: {},
           namespace_types_by_name: {},

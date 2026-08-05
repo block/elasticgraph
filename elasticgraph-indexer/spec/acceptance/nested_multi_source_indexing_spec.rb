@@ -13,12 +13,16 @@ module ElasticGraph
     let(:formed_on) { "2019-04-23" }
 
     it "fills in nested sourced fields on embedded list elements and singleton objects, regardless of ingestion order" do
-      team = team_event(version: 10)
-      coach_profile_1 = coach_profile_event("c1", 100, version: 11)
+      team = team_event(
+        version: 10,
+        coaches: [build(:coach, id: "c1", name: "Alice"), build(:coach, id: "cø", name: "Bob")],
+        general_manager: build(:general_manager, id: "gm1", name: "Casey")
+      )
+      coach_profile_1 = coach_profile_event("c1", 100, id: "prof-c1", version: 11)
       # `cø` is 2 UTF-16 code units but 3 UTF-8 bytes, so the `2:cø|` key part below confirms the element-key
       # prefix counts code units (what painless `String.length()` returns), not bytes.
-      coach_profile_2 = coach_profile_event("cø", 200, version: 12)
-      gm_profile = gm_profile_event(300, version: 13)
+      coach_profile_2 = coach_profile_event("cø", 200, id: "prof-cø", version: 12)
+      gm_profile = gm_profile_event(300, id: "prof-gm1", version: 13)
 
       # `coach_profile_1` arrives BEFORE the team exists (out-of-order buffer path); the rest arrive after.
       indexer.processor.process([coach_profile_1], refresh_indices: true)
@@ -27,7 +31,7 @@ module ElasticGraph
 
       source = fetch_team_source("t1")
 
-      expect(source["id"]).to eq("t1")
+      expect(source.fetch("id")).to eq("t1")
 
       coaches_by_id = coaches_by_id_in(source)
       expect(coaches_by_id.keys).to contain_exactly("c1", "cø")
@@ -41,49 +45,70 @@ module ElasticGraph
       # qualified relationship. These keys are hardcoded (not computed) so the test pins the exact script output.
       expect(source.fetch("__sources")).to contain_exactly("__self", "staff.coaches.profile", "staff.general_manager.profile")
 
+      # `staff` shows up twice per key because the halves are independent: the qualified relationship (kept verbatim
+      # for the script's nested-paths lookup), then one identifier part per path segment--an object segment
+      # contributes its field name since it has no per-element id.
       expect(source.fetch("__versions")).to eq(
         "__self" => {"t1" => 10},
         "21:staff.coaches.profile|5:staff|2:c1|" => {"prof-c1" => 11},
         "21:staff.coaches.profile|5:staff|2:cø|" => {"prof-cø" => 12},
         "29:staff.general_manager.profile|5:staff|15:general_manager|" => {"prof-gm1" => 13}
       )
+
+      # The top-level team event has no nested sourced fields, so `__self` should not get added to `__nested_sourced_data` even
+      # though `__self` shows up in `__versions`.
+      expect(source.fetch("__nested_sourced_data").keys).to match_array(source.fetch("__versions").except("__self").keys)
+
+      # The list count for the nested coaches comes from the team event; nested source events don't affect it.
+      expect(source.fetch(LIST_COUNTS_FIELD)).to include("staff|coaches" => 2)
     end
 
     it "preserves already-sourced nested fields when the root document is re-indexed" do
-      indexer.processor.process([coach_profile_event("c1", 100)], refresh_indices: true)
-      indexer.processor.process([team_event(version: 1)], refresh_indices: true)
+      coaches = [build(:coach, id: "c1", name: "Alice"), build(:coach, id: "c2", name: "Bob")]
+      gm = build(:general_manager, id: "gm1", name: "Casey")
+
+      indexer.processor.process([coach_profile_event("c1", 100, version: 1)], refresh_indices: true)
+      indexer.processor.process([team_event(version: 1, coaches: coaches, general_manager: gm)], refresh_indices: true)
 
       expect(coaches_by_id_in(fetch_team_source("t1")).fetch("c1")).to eq("id" => "c1", "name" => "Alice", "salary" => 100)
 
       # The re-indexed team re-sends `staff.coaches` without `salary` (publishers don't know about sourced
       # fields), overwriting the nested array; the buffered sourced data must be re-applied so it survives.
-      indexer.processor.process([team_event(version: 2)], refresh_indices: true)
+      indexer.processor.process([team_event(version: 2, coaches: coaches, general_manager: gm)], refresh_indices: true)
 
       source = fetch_team_source("t1")
       coaches_by_id = coaches_by_id_in(source)
       expect(coaches_by_id.fetch("c1")).to eq("id" => "c1", "name" => "Alice", "salary" => 100)
       # The sibling coach and the GM are never sourced, so `salary` is absent (not nil) and the re-index
       # leaves them untouched.
-      expect(coaches_by_id.fetch("cø")).to eq("id" => "cø", "name" => "Bob")
+      expect(coaches_by_id.fetch("c2")).to eq("id" => "c2", "name" => "Bob")
       expect(source.fetch("staff").fetch("general_manager")).to eq("id" => "gm1", "name" => "Casey")
+      expect(source.fetch(LIST_COUNTS_FIELD)).to include("staff|coaches" => 2)
     end
 
-    it "ignores a stale (lower-version) source event for an already-sourced nested element" do
-      indexer.processor.process([team_event], refresh_indices: true)
-      indexer.processor.process([coach_profile_event("c1", 200, version: 5)], refresh_indices: true)
-      indexer.processor.process([coach_profile_event("c1", 100, version: 2)], refresh_indices: true)
+    it "ignores a stale (event.version <= stored.version) source event for an already-sourced nested element" do
+      team = team_event(version: 1, coaches: [build(:coach, id: "c1", name: "Alice"), build(:coach, id: "c2", name: "Bob")])
+
+      indexer.processor.process([team], refresh_indices: true)
+      indexer.processor.process([coach_profile_event("c1", 200, id: "prof-c1", version: 5)], refresh_indices: true)
+      indexer.processor.process([
+        coach_profile_event("c1", 100, id: "prof-c1", version: 2), # ignored since 2 <= 5
+        coach_profile_event("c1", 300, id: "prof-c1", version: 5)  # ignored since 5 <= 5
+      ], refresh_indices: true)
 
       source = fetch_team_source("t1")
       coaches_by_id = coaches_by_id_in(source)
       expect(coaches_by_id.fetch("c1")).to eq("id" => "c1", "name" => "Alice", "salary" => 200)
-      # The sibling coach was never sourced, so `salary` is absent and applying c1's events leaves it alone.
-      expect(coaches_by_id.fetch("cø")).to eq("id" => "cø", "name" => "Bob")
+      # c2's profile was never sourced, so `salary` is absent and applying c1's events leaves it alone.
+      expect(coaches_by_id.fetch("c2")).to eq("id" => "c2", "name" => "Bob")
       # The recorded version stays at the newer event's, not the stale one's.
       expect(source.fetch("__versions").fetch("21:staff.coaches.profile|5:staff|2:c1|")).to eq("prof-c1" => 5)
     end
 
     it "clears an already-sourced nested field when a newer source event drops the value upstream" do
-      indexer.processor.process([team_event], refresh_indices: true)
+      team = team_event(version: 1, coaches: [build(:coach, id: "c1", name: "Alice"), build(:coach, id: "c2", name: "Bob")])
+
+      indexer.processor.process([team], refresh_indices: true)
       indexer.processor.process([coach_profile_event("c1", 100, version: 1)], refresh_indices: true)
 
       expect(coaches_by_id_in(fetch_team_source("t1")).fetch("c1")).to eq("id" => "c1", "name" => "Alice", "salary" => 100)
@@ -95,62 +120,137 @@ module ElasticGraph
       coaches_by_id = coaches_by_id_in(fetch_team_source("t1"))
       expect(coaches_by_id.fetch("c1")).to eq("id" => "c1", "name" => "Alice", "salary" => nil)
       # The sibling coach is unaffected by clearing c1's sourced value (and was never sourced, so no `salary`).
-      expect(coaches_by_id.fetch("cø")).to eq("id" => "cø", "name" => "Bob")
+      expect(coaches_by_id.fetch("c2")).to eq("id" => "c2", "name" => "Bob")
+
+      # A still-newer profile restores the value, confirming clearing isn't permanent.
+      indexer.processor.process([coach_profile_event("c1", 150, version: 3)], refresh_indices: true)
+
+      expect(coaches_by_id_in(fetch_team_source("t1")).fetch("c1")).to eq("id" => "c1", "name" => "Alice", "salary" => 150)
     end
 
     it "rejects a mutation of the relationship used by a nested `sourced_from` field" do
-      indexer.processor.process([team_event], refresh_indices: true)
-      indexer.processor.process([coach_profile_event("c1", 100, id: "prof-a")], refresh_indices: true)
+      indexer.processor.process([team_event(version: 1)], refresh_indices: true)
+      indexer.processor.process([coach_profile_event("c1", 100, id: "prof-a", version: 1)], refresh_indices: true)
 
       # A different source id for the same coach is a relationship mutation, which breaks out-of-order guarantees.
+      # The newer version shows it's the id change (not staleness) that triggers the rejection.
       expect {
-        indexer.processor.process([coach_profile_event("c1", 200, id: "prof-b")], refresh_indices: true)
+        indexer.processor.process([coach_profile_event("c1", 200, id: "prof-b", version: 2)], refresh_indices: true)
       }.to raise_error Indexer::IndexingFailuresError, a_string_including(
         "apparently changed", "mutations of relationships used with `sourced_from` are not supported"
       )
     end
 
-    def team_event(version: nil)
+    it "re-applies a buffered value when a dropped element is later re-added, since buffer entries are never pruned" do
+      alice = build(:coach, id: "c1", name: "Alice")
+      bob = build(:coach, id: "c2", name: "Bob")
+
+      indexer.processor.process([team_event(version: 1, coaches: [alice, bob])], refresh_indices: true)
+      indexer.processor.process([coach_profile_event("c1", 100, version: 1)], refresh_indices: true)
+
+      # A re-indexed team drops `c1`, orphaning its buffer entry.
+      indexer.processor.process([team_event(version: 2, coaches: [bob])], refresh_indices: true)
+      expect(coaches_by_id_in(fetch_team_source("t1")).keys).to contain_exactly("c2")
+
+      # A later re-index re-adds `c1`; its salary re-applies from the surviving buffer entry.
+      indexer.processor.process([team_event(version: 3, coaches: [alice, bob])], refresh_indices: true)
+
+      expect(coaches_by_id_in(fetch_team_source("t1")).fetch("c1")).to eq("id" => "c1", "name" => "Alice", "salary" => 100)
+    end
+
+    it "buffers a source event that matches no nested element until a later event adds the element" do
+      alice = build(:coach, id: "c1", name: "Alice")
+      bob = build(:coach, id: "c2", name: "Bob")
+      dana = build(:coach, id: "c3", name: "Dana")
+
+      indexer.processor.process([team_event(version: 1, coaches: [alice, bob])], refresh_indices: true)
+
+      # The team has no `c3` coach, so this profile's salary is buffered but applied to nothing.
+      indexer.processor.process([coach_profile_event("c3", 300, version: 1)], refresh_indices: true)
+      expect(coaches_by_id_in(fetch_team_source("t1")).keys).to contain_exactly("c1", "c2")
+
+      indexer.processor.process([team_event(version: 2, coaches: [alice, bob, dana])], refresh_indices: true)
+
+      expect(coaches_by_id_in(fetch_team_source("t1")).fetch("c3")).to eq("id" => "c3", "name" => "Dana", "salary" => 300)
+    end
+
+    it "materializes an incomplete document from a source event targeting a singleton object path" do
+      # The GM profile arrives before the team exists at all, materializing an incomplete document with the
+      # GM's salary buffered through the object path segments.
+      indexer.processor.process([gm_profile_event(300, id: "prof-gm1", version: 1)], refresh_indices: true)
+
+      # The incomplete document has no `staff` (or any other team field) yet--just the identity, bookkeeping,
+      # and the buffered salary awaiting its target element.
+      expect(fetch_team_source("t1")).to eq(
+        "id" => "t1",
+        "__counts" => {},
+        "__sources" => ["staff.general_manager.profile"],
+        "__versions" => {"29:staff.general_manager.profile|5:staff|15:general_manager|" => {"prof-gm1" => 1}},
+        "__nested_sourced_data" => {"29:staff.general_manager.profile|5:staff|15:general_manager|" => {"salary" => 300}}
+      )
+
+      team = team_event(version: 1, general_manager: build(:general_manager, id: "gm1", name: "Casey"))
+      indexer.processor.process([team], refresh_indices: true)
+
+      expect(fetch_team_source("t1").fetch("staff").fetch("general_manager")).to eq("id" => "gm1", "name" => "Casey", "salary" => 300)
+    end
+
+    it "keys nested elements unambiguously even when an element id mimics the key encoding" do
+      # An id embedding `:` and `|` with a plausible length prefix would corrupt the composite key if `decodeKey`
+      # scanned for separators instead of slicing by the length prefix.
+      adversarial_id = "3:x|"
+      mallory = build(:coach, id: adversarial_id, name: "Mallory")
+
+      indexer.processor.process([team_event(version: 1, coaches: [mallory])], refresh_indices: true)
+      indexer.processor.process([coach_profile_event(adversarial_id, 400, id: "prof-mallory", version: 1)], refresh_indices: true)
+
+      source = fetch_team_source("t1")
+      expect(coaches_by_id_in(source).fetch(adversarial_id)).to eq("id" => adversarial_id, "name" => "Mallory", "salary" => 400)
+      expect(source.fetch("__versions")).to include(
+        "21:staff.coaches.profile|5:staff|4:3:x||" => {"prof-mallory" => 1}
+      )
+    end
+
+    # Tests that depend on specific roster members build them explicitly in their bodies; these defaults
+    # exist only for tests where the roster is incidental.
+    def team_event(version:, coaches: nil, general_manager: nil)
       build_upsert_event(
         :team,
-        **(version ? {__version: version} : {}),
         id: "t1",
         league: league,
         formed_on: formed_on,
         staff: build(
           :staff,
-          coaches: [
-            build(:coach, id: "c1", name: "Alice"),
-            build(:coach, id: "cø", name: "Bob")
-          ],
-          general_manager: build(:general_manager, id: "gm1", name: "Casey")
-        )
+          coaches: coaches || [build(:coach, id: "c1", name: "Alice"), build(:coach, id: "c2", name: "Bob")],
+          general_manager: general_manager || build(:general_manager, id: "gm1", name: "Casey")
+        ),
+        __version: version
       )
     end
 
-    def coach_profile_event(coach_id, annual_salary, id: "prof-#{coach_id}", version: nil)
+    def coach_profile_event(coach_id, annual_salary, version:, id: "prof-#{coach_id}")
       build_upsert_event(
         :coach_profile,
-        **(version ? {__version: version} : {}),
         id: id,
         team_id: "t1",
         coach_id: coach_id,
         annual_salary: annual_salary,
         team_league: league,
-        team_formed_on: formed_on
+        team_formed_on: formed_on,
+        __version: version
       )
     end
 
     # GM events are a distinct source type, matched purely by `team_id`.
-    def gm_profile_event(annual_salary, version:)
+    def gm_profile_event(annual_salary, version:, id: "prof-gm1")
       build_upsert_event(
         :general_manager_profile,
-        __version: version,
-        id: "prof-gm1",
+        id: id,
         team_id: "t1",
         annual_salary: annual_salary,
         team_league: league,
-        team_formed_on: formed_on
+        team_formed_on: formed_on,
+        __version: version
       )
     end
 

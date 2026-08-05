@@ -222,7 +222,7 @@ ElasticGraph.define_schema do |schema|
     t.field "annual_salary", "Int"
     t.field "team_league", "String"
     t.field "team_formed_on", "Date"
-    t.index "coach_profiles"
+    t.index "coach_profiles" # TODO(#1273): remove this index once we can
   end
 
   schema.object_type "GeneralManagerProfile" do |t|
@@ -231,7 +231,7 @@ ElasticGraph.define_schema do |schema|
     t.field "annual_salary", "Int"
     t.field "team_league", "String"
     t.field "team_formed_on", "Date"
-    t.index "general_manager_profiles"
+    t.index "general_manager_profiles" # TODO(#1273): remove this index once we can
   end
 
   schema.object_type "Coach" do |t|

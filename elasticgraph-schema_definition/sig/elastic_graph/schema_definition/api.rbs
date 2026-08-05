@@ -58,6 +58,7 @@ module ElasticGraph
       def initialize: (
         SchemaArtifacts::RuntimeMetadata::SchemaElementNames,
         bool,
+        ?path_to_schema: ::String?,
         ?extension_modules: ::Array[::Module],
         ?derived_type_name_formats: ::Hash[::Symbol, ::String],
         ?type_name_overrides: ::Hash[::Symbol, ::String],
