@@ -82,9 +82,9 @@ PATH
   remote: elasticgraph-indexer_autoscaler_lambda
   specs:
     elasticgraph-indexer_autoscaler_lambda (1.2.1.pre)
-      aws-sdk-cloudwatch (>= 1.141, < 1.146)
-      aws-sdk-lambda (~> 1.186)
-      aws-sdk-sqs (~> 1.116)
+      aws-sdk-cloudwatch (~> 1.145.0)
+      aws-sdk-lambda (~> 1.191)
+      aws-sdk-sqs (~> 1.117)
       elasticgraph-datastore_core (= 1.2.1.pre)
       elasticgraph-lambda_support (= 1.2.1.pre)
 
@@ -92,7 +92,7 @@ PATH
   remote: elasticgraph-indexer_lambda
   specs:
     elasticgraph-indexer_lambda (1.2.1.pre)
-      aws-sdk-s3 (~> 1.226)
+      aws-sdk-s3 (~> 1.228, >= 1.228.1)
       elasticgraph-indexer (= 1.2.1.pre)
       elasticgraph-lambda_support (= 1.2.1.pre)
 
@@ -197,7 +197,7 @@ PATH
   remote: elasticgraph-warehouse_lambda
   specs:
     elasticgraph-warehouse_lambda (1.2.1.pre)
-      aws-sdk-s3 (~> 1.226)
+      aws-sdk-s3 (~> 1.228, >= 1.228.1)
       elasticgraph-indexer_lambda (= 1.2.1.pre)
       elasticgraph-lambda_support (= 1.2.1.pre)
 
@@ -698,8 +698,8 @@ DEPENDENCIES
   filewatcher (~> 3.0, >= 3.0.1)
   flatware-rspec (~> 2.4)
   graphql-c_parser (~> 1.1, >= 1.1.3)
-  html-proofer (~> 5.2)
-  httpx (~> 1.8)
+  html-proofer (~> 5.2, >= 5.2.2)
+  httpx (~> 1.8, >= 1.8.1)
   irb (~> 1.18)
   jekyll (~> 4.4, >= 4.4.1)
   memory_profiler (~> 1.1)
@@ -713,15 +713,15 @@ DEPENDENCIES
   rubocop-factory_bot (~> 2.28.0)
   rubocop-rake (~> 0.6.0)
   rubocop-rspec (~> 3.10.2)
-  simplecov (~> 1.0)
+  simplecov (~> 1.0, >= 1.0.3)
   simplecov-console (~> 0.9, >= 0.9.5)
   standard (~> 1.56.0)
   steep (~> 2.0.0)
   super_diff (~> 0.19)
   vcr (~> 6.4)
-  yard (~> 0.9)
+  yard (~> 0.9, >= 0.9.45)
   yard-doctest (~> 0.1, >= 0.1.17)
-  yard-markdown (~> 0.7)
+  yard-markdown (~> 0.7, >= 0.7.2)
 
 CHECKSUMS
   Ascii85 (2.0.1) sha256=15cb5d941808543cbb9e7e6aea3c8ec3877f154c3461e8b3673e97f7ecedbe5a

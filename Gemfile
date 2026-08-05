@@ -18,7 +18,7 @@ group :development do
   gem "factory_bot", "~> 6.6"
   gem "faker", "~> 3.8"
   gem "flatware-rspec", "~> 2.4", platforms: :ruby
-  gem "httpx", "~> 1.8"
+  gem "httpx", "~> 1.8", ">= 1.8.1"
   gem "memory_profiler", "~> 1.1"
   gem "nokogiri", "~> 1.19", ">= 1.19.4"
   gem "method_source", "~> 1.1"
@@ -34,7 +34,7 @@ group :development do
   # We are waiting to upgrade to >= 3.5 until standardrb compatibility with rubocop plugins is fixed:
   # https://github.com/standardrb/standard/issues/701
   gem "rubocop-rspec", "~> 3.10.2"
-  gem "simplecov", "~> 1.0"
+  gem "simplecov", "~> 1.0", ">= 1.0.3"
   gem "simplecov-console", "~> 0.9", ">= 0.9.5"
   gem "standard", "~> 1.56.0"
   gem "steep", "~> 2.0.0", platforms: :ruby
@@ -51,12 +51,12 @@ group :site do
   # as of rdoc 8.0 depends on `rbs`. `rbs` has a C native extension that fails to compile on JRuby,
   # so allowing these onto JRuby breaks `bundle install` there.
   platforms :ruby do
-    gem "html-proofer", "~> 5.2"
+    gem "html-proofer", "~> 5.2", ">= 5.2.2"
     gem "jekyll", "~> 4.4", ">= 4.4.1"
     gem "redcarpet", "~> 3.6", ">= 3.6.1"
-    gem "yard", "~> 0.9"
+    gem "yard", "~> 0.9", ">= 0.9.45"
     gem "yard-doctest", "~> 0.1", ">= 0.1.17"
-    gem "yard-markdown", "~> 0.7"
+    gem "yard-markdown", "~> 0.7", ">= 0.7.2"
     gem "irb", "~> 1.18" # Needed for yard on Ruby 4.0
   end
 
