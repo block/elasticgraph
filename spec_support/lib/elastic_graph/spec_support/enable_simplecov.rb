@@ -119,7 +119,9 @@ SimpleCov.start do
   ])
 
   gems_being_tested_globs = gems_being_tested_dirs.flat_map { |dir| [dir / "lib/**/*.rb", dir / "spec/**/*.rb"] }
-  track_files "{#{gems_being_tested_globs.join(",")}}"
+  # An empty pattern here (e.g. when running specs that aren't under any gem's directory, like `config/linting`)
+  # causes simplecov 1.x to attempt to read the repo root directory as a file, raising `Errno::EISDIR`.
+  track_files "{#{gems_being_tested_globs.join(",")}}" unless gems_being_tested_globs.empty?
 
   enable_coverage :branch
   minimum_coverage line: 100, branch: 100
