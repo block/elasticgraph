@@ -30,6 +30,12 @@ bundle exec rake elasticsearch:test:boot
 bundle exec rake opensearch:test:boot
 ```
 
+#### Test runtime expectations (avoid waiting on a stuck run)
+
+- **Expected runtimes**: `script/run_gem_specs elasticgraph-graphql` ≈ 1-2 min; full `script/run_specs` ≈ 5-8 min. If a test run exceeds ~3x the expected time, do NOT keep waiting — the datastore is likely in a bad state.
+- **Diagnosing a stuck/slow run**: check `curl -s localhost:9234/_cluster/health` and look for a large `active_shards` count, and check `log/datastore_client.test.log` for repeated 429 `rejected_execution_exception` errors. Recover by killing the test run and re-booting the datastore (`bundle exec rake elasticsearch:test:boot` or `opensearch:test:boot`), then re-run.
+- **Always pipe long test runs to a file** (e.g. `> /tmp/specs.log 2>&1`) rather than through `tail`/`grep`, so you can observe incremental progress and distinguish "still working" from "hung".
+
 ### Build & Validation
 - `script/quick_build` - Run abridged CI build (recommended before opening PRs)
 - `script/lint` - Run linter (Standard Ruby)
