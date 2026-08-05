@@ -1440,7 +1440,11 @@ module ElasticGraph
               name: "widget_aggregations",
               computations: [
                 computation_of("amount_cents", :avg, computed_field_name: "approximate_avg", field_names_in_graphql_query: ["ac1"]),
-                computation_of("amount_cents", :avg, computed_field_name: "approximate_avg", field_names_in_graphql_query: ["ac2"]),
+                # `aa1` and `aa2` are two aliases of the same function under the same field. Since the leaf key is
+                # derived from the alias, these produce two distinct computations (and, ultimately, two identical
+                # datastore aggregation clauses) rather than collapsing into one.
+                computation_of("amount_cents", :avg, computed_field_name: "approximate_avg", leaf_alias: "aa1", field_names_in_graphql_query: ["ac2"]),
+                computation_of("amount_cents", :avg, computed_field_name: "approximate_avg", leaf_alias: "aa2", field_names_in_graphql_query: ["ac2"]),
                 computation_of("amount_cents", :sum, computed_field_name: "exact_sum", field_names_in_graphql_query: ["ac2"])
               ]
             )])
@@ -1793,8 +1797,8 @@ module ElasticGraph
             expect(aggregations).to eq([aggregation_query_of(
               name: "wa",
               computations: [
-                computation_of("amount_cents", :avg, computed_field_name: "approximate_avg", field_names_in_graphql_query: ["ac"]),
-                computation_of("amount_cents", :max, computed_field_name: "exact_max", field_names_in_graphql_query: ["ac"])
+                computation_of("amount_cents", :avg, computed_field_name: "approximate_avg", leaf_alias: "aa", field_names_in_graphql_query: ["ac"]),
+                computation_of("amount_cents", :max, computed_field_name: "exact_max", leaf_alias: "em", field_names_in_graphql_query: ["ac"])
               ],
               groupings: [
                 field_term_grouping_of("size", field_names_in_graphql_query: ["s"]),
@@ -1900,8 +1904,8 @@ module ElasticGraph
             expect(aggregations).to eq([aggregation_query_of(
               name: "wa",
               computations: [
-                computation_of("amount_cents", :avg, computed_field_name: "approximate_avg", field_names_in_graphql_query: ["ac"]),
-                computation_of("amount_cents", :max, computed_field_name: "exact_max", field_names_in_graphql_query: ["ac"])
+                computation_of("amount_cents", :avg, computed_field_name: "approximate_avg", leaf_alias: "aa", field_names_in_graphql_query: ["ac"]),
+                computation_of("amount_cents", :max, computed_field_name: "exact_max", leaf_alias: "em", field_names_in_graphql_query: ["ac"])
               ],
               groupings: [
                 field_term_grouping_of("size", field_names_in_graphql_query: ["s"]),

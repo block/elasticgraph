@@ -21,7 +21,7 @@ module ElasticGraph
             key = Key::AggregatedValue.new(
               aggregation_name: aggregation_name,
               field_path: field_path.map(&:name_in_graphql_query),
-              function_name: field.name_in_index
+              function_name: PathSegment.for(field: field, lookahead: lookahead).name_in_graphql_query
             )
 
             result = Support::HashUtil.verbose_fetch(bucket, key.encode)

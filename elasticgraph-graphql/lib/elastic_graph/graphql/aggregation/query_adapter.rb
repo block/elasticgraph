@@ -188,11 +188,11 @@ module ElasticGraph
 
               get_children_nodes(node).map do |fn_node|
                 computed_field = field_from_node(fn_node)
-                computation_detail = field_from_node(fn_node).computation_detail # : SchemaArtifacts::RuntimeMetadata::ComputationDetail
+                computation_detail = computed_field.computation_detail # : SchemaArtifacts::RuntimeMetadata::ComputationDetail
 
                 Aggregation::Computation.new(
                   source_field_path: field_path,
-                  computed_index_field_name: computed_field.name_in_index,
+                  leaf: PathSegment.for(field: computed_field, lookahead: fn_node),
                   detail: computation_detail
                 )
               end

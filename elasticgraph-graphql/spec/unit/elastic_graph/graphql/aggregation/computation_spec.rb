@@ -27,6 +27,20 @@ module ElasticGraph
 
             expect(computation.key(aggregation_name: "my_aggs")).to eq aggregated_value_key_of("oof", "rab", "average", aggregation_name: "my_aggs").encode
           end
+
+          it "uses the leaf's GraphQL query alias rather than its name in the index" do
+            computation = computation_of("foo", "bar", :min, computed_field_name: "exact_min", leaf_alias: "myMin")
+
+            expect(computation.key(aggregation_name: "my_aggs")).to eq aggregated_value_key_of("foo", "bar", "myMin", aggregation_name: "my_aggs").encode
+          end
+
+          it "differs between two aliases of the same function under the same field, so they don't collapse into one computation" do
+            computation = computation_of("foo", :min, computed_field_name: "exact_min", leaf_alias: "exactMin")
+            aliased_computation = computation_of("foo", :min, computed_field_name: "exact_min", leaf_alias: "myMin")
+
+            expect(computation).not_to eq(aliased_computation)
+            expect(computation.key(aggregation_name: "my_aggs")).not_to eq(aliased_computation.key(aggregation_name: "my_aggs"))
+          end
         end
 
         describe "#clause" do
@@ -46,6 +60,12 @@ module ElasticGraph
             computation = computation_of("foo.c", "bar.d", :avg, field_names_in_graphql_query: ["oof", "rab"])
 
             expect(computation.clause).to eq({"avg" => {"field" => "foo.c.bar.d"}})
+          end
+
+          it "is unaffected by an alias on the leaf" do
+            computation = computation_of("foo", "bar", :avg, computed_field_name: "approximate_avg", leaf_alias: "myAvg")
+
+            expect(computation.clause).to eq({"avg" => {"field" => "foo.bar"}})
           end
         end
       end

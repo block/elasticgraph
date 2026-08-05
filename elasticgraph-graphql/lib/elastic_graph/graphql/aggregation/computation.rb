@@ -6,8 +6,9 @@
 #
 # frozen_string_literal: true
 
-require "elastic_graph/graphql/aggregation/key"
 require "elastic_graph/graphql/aggregation/field_path_encoder"
+require "elastic_graph/graphql/aggregation/key"
+require "elastic_graph/graphql/aggregation/path_segment"
 
 module ElasticGraph
   class GraphQL
@@ -18,14 +19,14 @@ module ElasticGraph
       # https://www.elastic.co/guide/en/elasticsearch/reference/7.12/search-aggregations-metrics-max-aggregation.html
       # https://www.elastic.co/guide/en/elasticsearch/reference/7.12/search-aggregations-metrics-min-aggregation.html
       # https://www.elastic.co/guide/en/elasticsearch/reference/7.12/search-aggregations-metrics-sum-aggregation.html
-      Computation = ::Data.define(:source_field_path, :computed_index_field_name, :detail) do
+      Computation = ::Data.define(:source_field_path, :leaf, :detail) do
         # @implements Computation
 
         def key(aggregation_name:)
           Key::AggregatedValue.new(
             aggregation_name: aggregation_name,
             field_path: source_field_path.map(&:name_in_graphql_query),
-            function_name: computed_index_field_name
+            function_name: leaf.name_in_graphql_query
           ).encode
         end
 

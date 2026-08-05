@@ -284,6 +284,39 @@ module ElasticGraph
           ]
         end
 
+        it "uses GraphQL field aliases when resolving the aggregation function leaf fields, allowing the same function to be requested multiple times under one field" do
+          aggs = {
+            aggregated_value_key_of("amount_cents", "es") => {"value" => 900.0},
+            aggregated_value_key_of("amount_cents", "exact_sum") => {"value" => 900.0},
+            aggregated_value_key_of("cost", "amount_cents", "mx") => {"value" => 400.0}
+          }
+
+          response = resolve_target_nodes(<<~QUERY, aggs: aggs)
+            target: widget_aggregations {
+              nodes {
+                aggregated_values {
+                  amount_cents {
+                    es: exact_sum
+                    exact_sum
+                  }
+                  cost {
+                    amount_cents { mx: exact_max }
+                  }
+                }
+              }
+            }
+          QUERY
+
+          expect(response).to eq [
+            {
+              "aggregated_values" => {
+                "amount_cents" => {"es" => 900, "exact_sum" => 900},
+                "cost" => {"amount_cents" => {"mx" => 400}}
+              }
+            }
+          ]
+        end
+
         it "resolves aggregated Date/DateTime/LocalTime values" do
           aggs = {
             aggregated_value_key_of("created_at", "exact_min") => {"value" => 1696854612000.0, "value_as_string" => "2023-10-09T12:30:12.000Z"},
