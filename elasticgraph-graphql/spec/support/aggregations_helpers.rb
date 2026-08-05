@@ -21,12 +21,12 @@ require "elastic_graph/schema_artifacts/runtime_metadata/schema_element_names"
 
 module ElasticGraph
   module AggregationsHelpers
-    def computation_of(*field_names_in_index, function, computed_field_name: function.to_s, field_names_in_graphql_query: field_names_in_index)
+    def computation_of(*field_names_in_index, function, computed_field_name: function.to_s, leaf_alias: computed_field_name, field_names_in_graphql_query: field_names_in_index)
       source_field_path = build_field_path(names_in_index: field_names_in_index, names_in_graphql_query: field_names_in_graphql_query)
 
       GraphQL::Aggregation::Computation.new(
         source_field_path: source_field_path,
-        computed_index_field_name: computed_field_name,
+        leaf: GraphQL::Aggregation::PathSegment.new(name_in_graphql_query: leaf_alias, name_in_index: computed_field_name),
         detail: SchemaArtifacts::RuntimeMetadata::ComputationDetail.new(
           function: function,
           empty_bucket_value: (function == :sum || function == :cardinality) ? 0 : nil

@@ -3,7 +3,7 @@ module ElasticGraph
     module Aggregation
       class Computation
         attr_reader source_field_path: fieldPath
-        attr_reader computed_index_field_name: ::String
+        attr_reader leaf: PathSegment
         attr_reader detail: SchemaArtifacts::RuntimeMetadata::ComputationDetail
 
         def key: (aggregation_name: ::String) -> ::String
@@ -11,13 +11,13 @@ module ElasticGraph
 
         def initialize : (
           source_field_path: fieldPath,
-          computed_index_field_name: ::String,
+          leaf: PathSegment,
           detail: SchemaArtifacts::RuntimeMetadata::ComputationDetail
         ) -> void
 
         def with: (
           ?source_field_path: fieldPath,
-          ?computed_index_field_name: ::String,
+          ?leaf: PathSegment,
           ?detail: SchemaArtifacts::RuntimeMetadata::ComputationDetail
         ) -> instance
       end

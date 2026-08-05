@@ -151,6 +151,21 @@ module ElasticGraph
         size_uniq_count = widget_ungrouped_aggregated_values_for("size { approximate_distinct_value_count }")
         expect(size_uniq_count).to eq({"size" => {case_correctly("approximate_distinct_value_count") => 2}})
 
+        # Verify that two aliases of the same aggregated value function under one field each resolve correctly,
+        # rather than colliding on a single datastore aggregation.
+        aliased_mins = widget_ungrouped_aggregated_values_for(<<~QUERY)
+          #{amount_cents} {
+            #{case_correctly("exact_min")}
+            #{case_correctly("my_min")}: #{case_correctly("exact_min")}
+          }
+        QUERY
+        expect(aliased_mins).to eq({
+          amount_cents => {
+            case_correctly("exact_min") => 100,
+            case_correctly("my_min") => 100
+          }
+        })
+
         aggregations = group_widget_currencies_by_widget_name
         expect(aggregations).to eq [
           {"count" => 1, case_correctly("grouped_by") => {case_correctly("widget_name") => "w100"}},
