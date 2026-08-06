@@ -7079,6 +7079,11 @@ type NamedEntityAggregatedValues {
   voltage: IntAggregatedValues
 
   """
+  Computed aggregate values for the `weight_in_grams` field.
+  """
+  weight_in_grams: FloatAggregatedValues
+
+  """
   Computed aggregate values for the `weight_in_ng` field.
   """
   weight_in_ng: JsonSafeLongAggregatedValues
@@ -7534,6 +7539,13 @@ input NamedEntityFilterInput {
   voltage: IntFilterInput
 
   """
+  Used to filter on the `weight_in_grams` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  weight_in_grams: FloatFilterInput
+
+  """
   Used to filter on the `weight_in_ng` field.
 
   When `null` or an empty object is passed, matches all documents.
@@ -7781,6 +7793,11 @@ type NamedEntityGroupedBy {
   The `voltage` field value for this group.
   """
   voltage: Int
+
+  """
+  The `weight_in_grams` field value for this group.
+  """
+  weight_in_grams: Float
 
   """
   The `weight_in_ng` field value for this group.
@@ -8391,6 +8408,16 @@ enum NamedEntitySortOrderInput {
   Sorts descending by the `voltage` field.
   """
   voltage_DESC
+
+  """
+  Sorts ascending by the `weight_in_grams` field.
+  """
+  weight_in_grams_ASC
+
+  """
+  Sorts descending by the `weight_in_grams` field.
+  """
+  weight_in_grams_DESC
 
   """
   Sorts ascending by the `weight_in_ng` field.
@@ -17049,6 +17076,7 @@ type Widget implements NamedEntity {
   size: Size
   tags: [String!]!
   the_options: WidgetOptions
+  weight_in_grams: Float
   weight_in_ng: JsonSafeLong!
   weight_in_ng_str: LongString!
   workspace_id: ID
@@ -17205,6 +17233,11 @@ type WidgetAggregatedValues {
   the_options: WidgetOptionsAggregatedValues
 
   """
+  Computed aggregate values for the `weight_in_grams` field.
+  """
+  weight_in_grams: FloatAggregatedValues
+
+  """
   Computed aggregate values for the `weight_in_ng` field.
   """
   weight_in_ng: JsonSafeLongAggregatedValues
@@ -17323,7 +17356,9 @@ type WidgetCurrency {
   details: CurrencyDetails
   id: ID!
   introduced_on: Date
+  max_weight_in_grams: Float
   max_weight_in_ng: JsonSafeLong
+  min_weight_in_grams: Float
   name: String
   nested_fields: WidgetCurrencyNestedFields
   oldest_widget_created_at: DateTime
@@ -17392,9 +17427,19 @@ type WidgetCurrencyAggregatedValues {
   introduced_on: DateAggregatedValues
 
   """
+  Computed aggregate values for the `max_weight_in_grams` field.
+  """
+  max_weight_in_grams: FloatAggregatedValues
+
+  """
   Computed aggregate values for the `max_weight_in_ng` field.
   """
   max_weight_in_ng: JsonSafeLongAggregatedValues
+
+  """
+  Computed aggregate values for the `min_weight_in_grams` field.
+  """
+  min_weight_in_grams: FloatAggregatedValues
 
   """
   Computed aggregate values for the `name` field.
@@ -17607,11 +17652,25 @@ input WidgetCurrencyFilterInput {
   introduced_on: DateFilterInput
 
   """
+  Used to filter on the `max_weight_in_grams` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  max_weight_in_grams: FloatFilterInput
+
+  """
   Used to filter on the `max_weight_in_ng` field.
 
   When `null` or an empty object is passed, matches all documents.
   """
   max_weight_in_ng: JsonSafeLongFilterInput
+
+  """
+  Used to filter on the `min_weight_in_grams` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  min_weight_in_grams: FloatFilterInput
 
   """
   Used to filter on the `name` field.
@@ -17693,9 +17752,19 @@ type WidgetCurrencyGroupedBy {
   introduced_on: DateGroupedBy
 
   """
+  The `max_weight_in_grams` field value for this group.
+  """
+  max_weight_in_grams: Float
+
+  """
   The `max_weight_in_ng` field value for this group.
   """
   max_weight_in_ng: JsonSafeLong
+
+  """
+  The `min_weight_in_grams` field value for this group.
+  """
+  min_weight_in_grams: Float
 
   """
   The `name` field value for this group.
@@ -17886,6 +17955,16 @@ enum WidgetCurrencySortOrderInput {
   introduced_on_DESC
 
   """
+  Sorts ascending by the `max_weight_in_grams` field.
+  """
+  max_weight_in_grams_ASC
+
+  """
+  Sorts descending by the `max_weight_in_grams` field.
+  """
+  max_weight_in_grams_DESC
+
+  """
   Sorts ascending by the `max_weight_in_ng` field.
   """
   max_weight_in_ng_ASC
@@ -17894,6 +17973,16 @@ enum WidgetCurrencySortOrderInput {
   Sorts descending by the `max_weight_in_ng` field.
   """
   max_weight_in_ng_DESC
+
+  """
+  Sorts ascending by the `min_weight_in_grams` field.
+  """
+  min_weight_in_grams_ASC
+
+  """
+  Sorts descending by the `min_weight_in_grams` field.
+  """
+  min_weight_in_grams_DESC
 
   """
   Sorts ascending by the `name` field.
@@ -18219,6 +18308,13 @@ input WidgetFilterInput {
   the_options: WidgetOptionsFilterInput
 
   """
+  Used to filter on the `weight_in_grams` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  weight_in_grams: FloatFilterInput
+
+  """
   Used to filter on the `weight_in_ng` field.
 
   When `null` or an empty object is passed, matches all documents.
@@ -18411,6 +18507,11 @@ type WidgetGroupedBy {
   The `the_options` field value for this group.
   """
   the_options: WidgetOptionsGroupedBy
+
+  """
+  The `weight_in_grams` field value for this group.
+  """
+  weight_in_grams: Float
 
   """
   The `weight_in_ng` field value for this group.
@@ -19014,6 +19115,11 @@ type WidgetOrAddressAggregatedValues {
   timestamps: AddressTimestampsAggregatedValues
 
   """
+  Computed aggregate values for the `weight_in_grams` field.
+  """
+  weight_in_grams: FloatAggregatedValues
+
+  """
   Computed aggregate values for the `weight_in_ng` field.
   """
   weight_in_ng: JsonSafeLongAggregatedValues
@@ -19437,6 +19543,13 @@ input WidgetOrAddressFilterInput {
   timestamps: AddressTimestampsFilterInput
 
   """
+  Used to filter on the `weight_in_grams` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  weight_in_grams: FloatFilterInput
+
+  """
   Used to filter on the `weight_in_ng` field.
 
   When `null` or an empty object is passed, matches all documents.
@@ -19639,6 +19752,11 @@ type WidgetOrAddressGroupedBy {
   The `timestamps` field value for this group.
   """
   timestamps: AddressTimestampsGroupedBy
+
+  """
+  The `weight_in_grams` field value for this group.
+  """
+  weight_in_grams: Float
 
   """
   The `weight_in_ng` field value for this group.
@@ -20151,6 +20269,16 @@ enum WidgetOrAddressSortOrderInput {
   timestamps_created_at_DESC
 
   """
+  Sorts ascending by the `weight_in_grams` field.
+  """
+  weight_in_grams_ASC
+
+  """
+  Sorts descending by the `weight_in_grams` field.
+  """
+  weight_in_grams_DESC
+
+  """
   Sorts ascending by the `weight_in_ng` field.
   """
   weight_in_ng_ASC
@@ -20544,6 +20672,16 @@ enum WidgetSortOrderInput {
   Sorts descending by the `the_options.the_size` field.
   """
   the_options_the_size_DESC
+
+  """
+  Sorts ascending by the `weight_in_grams` field.
+  """
+  weight_in_grams_ASC
+
+  """
+  Sorts descending by the `weight_in_grams` field.
+  """
+  weight_in_grams_DESC
 
   """
   Sorts ascending by the `weight_in_ng` field.

@@ -1322,6 +1322,10 @@ index_templates:
             format: strict_date_time
           max_weight_in_ng:
             type: long
+          min_weight_in_grams:
+            type: double
+          max_weight_in_grams:
+            type: double
           __counts:
             properties:
               widget_names2:
@@ -1469,6 +1473,8 @@ index_templates:
             type: long
           weight_in_ng:
             type: long
+          weight_in_grams:
+            type: double
           tags:
             type: keyword
           amounts:
@@ -1984,11 +1990,31 @@ indices:
       index.number_of_shards: 1
       index.max_result_window: 10000
 scripts:
-  update_WidgetCurrency_from_Widget_e72813bd1a8767343222b77bf53be31c:
+  update_WidgetCurrency_from_Widget_514248e200403f9ab1766130a517439a:
     context: update
     script:
       lang: painless
       source: |-
+        // Compares two values of a min or max field, coercing numeric values as needed.
+        //
+        // Different `Number` implementations (e.g. `Integer` vs `Long`, or `Long` vs `Double`) cannot be
+        // compared with `compareTo` (it throws a `ClassCastException`), and JSON parsing can produce any
+        // of them for the same field (e.g. `2` parses as an `Integer` while `2.9` parses as a `Double`).
+        // Integral values are compared as `long`s to preserve full precision (a `double` cannot exactly
+        // represent all integral values above 2^53), while comparisons involving a floating point value
+        // are performed as `double`s to avoid truncating fractional parts.
+        int minOrMaxValue_compareValues(def value1, def value2) {
+          if (value1 instanceof Number && value2 instanceof Number) {
+            if (value1 instanceof Float || value1 instanceof Double || value2 instanceof Float || value2 instanceof Double) {
+              return Double.compare(((Number)value1).doubleValue(), ((Number)value2).doubleValue());
+            }
+
+            return Long.compare(((Number)value1).longValue(), ((Number)value2).longValue());
+          }
+
+          return value1.compareTo(value2);
+        }
+
         // Idempotently inserts the given value in the `sortedList`, returning `true` if the list was updated.
         boolean appendOnlySet_idempotentlyInsertValue(def value, List sortedList) {
           // As per https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Collections.html#binarySearch(java.util.List,java.lang.Object):
@@ -2074,58 +2100,46 @@ scripts:
 
         boolean maxValue_idempotentlyUpdateValue(List values, def parentObject, String fieldName) {
           def currentFieldValue = parentObject[fieldName];
-          // Normalize incoming list numerics to long to avoid Integer/Long class cast issues
-          List coercedValues = new ArrayList();
-          for (def v : values) {
-            if (v != null) {
-              if (v instanceof Number) {
-                coercedValues.add(((Number)v).longValue());
-              } else {
-                coercedValues.add(v);
-              }
+
+          // Track the winning value itself (rather than a coerced copy of it) so that the exact value
+          // from the source event or existing document gets stored, with no coercion applied.
+          def maxValue = currentFieldValue;
+          boolean updated = false;
+
+          for (def value : values) {
+            if (value != null && (maxValue == null || minOrMaxValue_compareValues(value, maxValue) > 0)) {
+              maxValue = value;
+              updated = true;
             }
           }
-          def maxNewValue = coercedValues.isEmpty() ? null : Collections.max(coercedValues);
 
-          def coercedCurrentFieldValue = null;
-          if (currentFieldValue != null) {
-            coercedCurrentFieldValue = (currentFieldValue instanceof Number) ? ((Number)currentFieldValue).longValue() : currentFieldValue;
+          if (updated) {
+            parentObject[fieldName] = maxValue;
           }
 
-          if (maxNewValue != null && (coercedCurrentFieldValue == null || maxNewValue.compareTo(coercedCurrentFieldValue) > 0)) {
-            parentObject[fieldName] = maxNewValue;
-            return true;
-          }
-
-          return false;
+          return updated;
         }
 
         boolean minValue_idempotentlyUpdateValue(List values, def parentObject, String fieldName) {
           def currentFieldValue = parentObject[fieldName];
-          // Normalize incoming list numerics to long to avoid Integer/Long class cast issues
-          List coercedValues = new ArrayList();
-          for (def v : values) {
-            if (v != null) {
-              if (v instanceof Number) {
-                coercedValues.add(((Number)v).longValue());
-              } else {
-                coercedValues.add(v);
-              }
+
+          // Track the winning value itself (rather than a coerced copy of it) so that the exact value
+          // from the source event or existing document gets stored, with no coercion applied.
+          def minValue = currentFieldValue;
+          boolean updated = false;
+
+          for (def value : values) {
+            if (value != null && (minValue == null || minOrMaxValue_compareValues(value, minValue) < 0)) {
+              minValue = value;
+              updated = true;
             }
           }
-          def minNewValue = coercedValues.isEmpty() ? null : Collections.min(coercedValues);
 
-          def coercedCurrentFieldValue = null;
-          if (currentFieldValue != null) {
-            coercedCurrentFieldValue = (currentFieldValue instanceof Number) ? ((Number)currentFieldValue).longValue() : currentFieldValue;
+          if (updated) {
+            parentObject[fieldName] = minValue;
           }
 
-          if (minNewValue != null && (coercedCurrentFieldValue == null || minNewValue.compareTo(coercedCurrentFieldValue) < 0)) {
-            parentObject[fieldName] = minNewValue;
-            return true;
-          }
-
-          return false;
+          return updated;
         }
 
         Map data = params.topLevelFields;
@@ -2159,7 +2173,9 @@ scripts:
         boolean details__symbol_was_noop = !immutableValue_idempotentlyUpdateValue(scriptErrors, data["cost_currency_symbol"], ctx._source.details, "details.symbol", "symbol", true, true);
         boolean details__unit_was_noop = !immutableValue_idempotentlyUpdateValue(scriptErrors, data["cost_currency_unit"], ctx._source.details, "details.unit", "unit", false, false);
         boolean introduced_on_was_noop = !immutableValue_idempotentlyUpdateValue(scriptErrors, data["cost_currency_introduced_on"], ctx._source, "introduced_on", "introduced_on", true, false);
+        boolean max_weight_in_grams_was_noop = !maxValue_idempotentlyUpdateValue(data["weight_in_grams"], ctx._source, "max_weight_in_grams");
         boolean max_weight_in_ng_was_noop = !maxValue_idempotentlyUpdateValue(data["weight_in_ng"], ctx._source, "max_weight_in_ng");
+        boolean min_weight_in_grams_was_noop = !minValue_idempotentlyUpdateValue(data["weight_in_grams"], ctx._source, "min_weight_in_grams");
         boolean name_was_noop = !immutableValue_idempotentlyUpdateValue(scriptErrors, data["cost_currency_name"], ctx._source, "name", "name", true, false);
         boolean nested_fields__max_widget_cost_was_noop = !maxValue_idempotentlyUpdateValue(data["cost.amount_cents"], ctx._source.nested_fields, "max_widget_cost");
         boolean oldest_widget_created_at_was_noop = !minValue_idempotentlyUpdateValue(data["created_at"], ctx._source, "oldest_widget_created_at");
@@ -2176,7 +2192,7 @@ scripts:
 
         // For records with no new values to index, only skip the update if the document itself doesn't already exist.
         // Otherwise create an (empty) document to reflect the fact that the id has been seen.
-        if (ctx._source.id != null && details__symbol_was_noop && details__unit_was_noop && introduced_on_was_noop && max_weight_in_ng_was_noop && name_was_noop && nested_fields__max_widget_cost_was_noop && oldest_widget_created_at_was_noop && primary_continent_was_noop && widget_fee_currencies_was_noop && widget_names2_was_noop && widget_options__colors_was_noop && widget_options__sizes_was_noop && widget_tags_was_noop) {
+        if (ctx._source.id != null && details__symbol_was_noop && details__unit_was_noop && introduced_on_was_noop && max_weight_in_grams_was_noop && max_weight_in_ng_was_noop && min_weight_in_grams_was_noop && name_was_noop && nested_fields__max_widget_cost_was_noop && oldest_widget_created_at_was_noop && primary_continent_was_noop && widget_fee_currencies_was_noop && widget_names2_was_noop && widget_options__colors_was_noop && widget_options__sizes_was_noop && widget_tags_was_noop) {
           ctx.op = 'none';
         } else {
           // Here we set `_source.id` because if we don't, it'll never be set, making these docs subtly
