@@ -33,7 +33,8 @@ both in a single query:
 
 `approximatePercentile`
 : An approximate percentile of the field values within this grouping. The `percentile` argument specifies
-  the desired percentile rank, from `0` to `100` (e.g. `50` for the median, `90` for the 90th percentile).
+  the desired percentile rank, from `0` to `100` (e.g. `0` for the min, `100` for the max, `50` for the
+  median, `90` for the 90th percentile).
 
   Percentiles are computed using an approximate algorithm, so the returned value may not be exact--this is
   true regardless of the field's type, so there is no `exactPercentile` counterpart the way there is for
