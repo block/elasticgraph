@@ -3,27 +3,32 @@ module ElasticGraph
     module Aggregation
       module Resolvers
         class AggregatedValuesSupertype
+          attr_reader schema: Schema
           attr_reader aggregation_name: ::String
           attr_reader bucket: ::Hash[::String, untyped]
           attr_reader field_path: ::Array[PathSegment]
 
           def initialize: (
+            schema: Schema,
             aggregation_name: ::String,
             bucket: ::Hash[::String, untyped],
             field_path: ::Array[PathSegment]
           ) -> void
 
           def self.new: (
+            schema: Schema,
             aggregation_name: ::String,
             bucket: ::Hash[::String, untyped],
             field_path: ::Array[PathSegment]
           ) -> instance | (
+            Schema,
             ::String,
             ::Hash[::String, untyped],
             ::Array[PathSegment]
           ) -> instance
 
           def with: (
+            ?schema: Schema,
             ?aggregation_name: ::String,
             ?bucket: ::Hash[::String, untyped],
             ?field_path: ::Array[PathSegment]

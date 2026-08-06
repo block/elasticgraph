@@ -6,6 +6,8 @@
 #
 # frozen_string_literal: true
 
+require "graphql"
+
 module ElasticGraph
   class GraphQL
     module Aggregation
@@ -39,12 +41,48 @@ module ElasticGraph
           end
         end
 
+        # Adapter for the `percentiles` aggregation, which takes a `percentile` argument and
+        # returns a nested `{"values" => [{"key" => ..., "value" => ...}]}` response rather than
+        # the flat `{"value" => ...}` shape `SimpleMetric` handles.
+        #
+        # @private
+        class Percentile < ::Data.define(:datastore_function_name)
+          def extract_args(args, element_names)
+            percentile = args.fetch(element_names.percentile)
+
+            unless percentile.is_a?(::Numeric) && percentile >= 0 && percentile <= 100
+              raise ::GraphQL::ExecutionError, "`#{element_names.percentile}` must be between 0 and 100, but is #{percentile.inspect}."
+            end
+
+            {percentile: percentile}
+          end
+
+          def clause_options(function_args)
+            # `keyed: false` gives us an array response (`"values" => [{"key" => ..., "value" => ...}]`)
+            # instead of a string-keyed hash (`"values" => {"50.0" => ...}`), which avoids having to
+            # reconstruct the datastore's float-formatted string key to look up our single requested value.
+            {"percents" => [function_args.fetch(:percentile)], "keyed" => false}
+          end
+
+          def extract_result(raw)
+            # We always request exactly one percentile per computation (multiple requested ranks are
+            # expressed as multiple aliased GraphQL field selections, each becoming its own computation),
+            # so the single entry in `values` is always the one we want.
+            raw.fetch("values").first
+          end
+
+          def empty_bucket_result
+            {"values" => [{"value" => nil}]}
+          end
+        end
+
         # The registered adapters, keyed by the function name used in runtime metadata.
         BY_NAME = {
           avg: SimpleMetric.new(datastore_function_name: "avg", empty_bucket_value: nil),
           cardinality: SimpleMetric.new(datastore_function_name: "cardinality", empty_bucket_value: 0),
           max: SimpleMetric.new(datastore_function_name: "max", empty_bucket_value: nil),
           min: SimpleMetric.new(datastore_function_name: "min", empty_bucket_value: nil),
+          percentiles: Percentile.new(datastore_function_name: "percentiles"),
           sum: SimpleMetric.new(datastore_function_name: "sum", empty_bucket_value: 0)
         }.freeze
       end

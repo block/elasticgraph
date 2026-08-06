@@ -412,6 +412,46 @@ module ElasticGraph
           ]
         end
 
+        it "resolves sibling aggregated value fields normally and returns `null` (with a precisely-pathed error) for an out-of-range `approximate_percentile`, rather than failing the whole query" do
+          aggs = {
+            aggregated_value_key_of("amount_cents", "exact_sum") => {"value" => 900.0},
+            aggregated_value_key_of("amount_cents", "good") => {"values" => [{"value" => 500.0}]}
+          }
+
+          response = resolve_target_nodes(<<~QUERY, aggs: aggs, allow_errors: true)
+            target: widget_aggregations {
+              nodes {
+                aggregated_values {
+                  amount_cents {
+                    exact_sum
+                    good: approximate_percentile(percentile: 50)
+                    bad: approximate_percentile(percentile: 150)
+                  }
+                }
+              }
+            }
+          QUERY
+
+          expect(response.dig("data", "target", "nodes")).to eq [
+            {
+              "aggregated_values" => {
+                "amount_cents" => {
+                  "exact_sum" => 900,
+                  "good" => 500,
+                  "bad" => nil
+                }
+              }
+            }
+          ]
+
+          expect(response.fetch("errors")).to contain_exactly(
+            hash_including(
+              "message" => "`percentile` must be between 0 and 100, but is 150.0.",
+              "path" => ["target", "nodes", 0, "aggregated_values", "amount_cents", "bad"]
+            )
+          )
+        end
+
         def aggregated_value_key_of(*field_path, function_name, aggregation_name: "target")
           super(*field_path, function_name, aggregation_name: "target").encode
         end

@@ -24,7 +24,7 @@ module ElasticGraph
           end
 
           def aggregated_values
-            @aggregated_values ||= AggregatedValues.new(query.name, bucket, field_path)
+            @aggregated_values ||= AggregatedValues.new(schema, query.name, bucket, field_path)
           end
 
           def sub_aggregations

@@ -4033,6 +4033,10 @@ object_types_by_name:
         computation_function: cardinality
         resolver:
           name: object_with_lookahead
+      approximate_percentile:
+        computation_function: percentiles
+        resolver:
+          name: object_with_lookahead
       exact_max:
         computation_function: max
         resolver:
@@ -4065,6 +4069,10 @@ object_types_by_name:
           name: object_with_lookahead
       approximate_distinct_value_count:
         computation_function: cardinality
+        resolver:
+          name: object_with_lookahead
+      approximate_percentile:
+        computation_function: percentiles
         resolver:
           name: object_with_lookahead
       exact_max:
@@ -4413,6 +4421,10 @@ object_types_by_name:
         computation_function: cardinality
         resolver:
           name: object_with_lookahead
+      approximate_percentile:
+        computation_function: percentiles
+        resolver:
+          name: object_with_lookahead
       approximate_sum:
         computation_function: sum
         resolver:
@@ -4673,6 +4685,10 @@ object_types_by_name:
         computation_function: cardinality
         resolver:
           name: object_with_lookahead
+      approximate_percentile:
+        computation_function: percentiles
+        resolver:
+          name: object_with_lookahead
       approximate_sum:
         computation_function: sum
         resolver:
@@ -4826,6 +4842,10 @@ object_types_by_name:
         computation_function: cardinality
         resolver:
           name: object_with_lookahead
+      approximate_percentile:
+        computation_function: percentiles
+        resolver:
+          name: object_with_lookahead
       approximate_sum:
         computation_function: sum
         resolver:
@@ -4858,6 +4878,10 @@ object_types_by_name:
         computation_function: cardinality
         resolver:
           name: object_with_lookahead
+      approximate_percentile:
+        computation_function: percentiles
+        resolver:
+          name: object_with_lookahead
       exact_max:
         computation_function: max
         resolver:
@@ -4884,6 +4908,10 @@ object_types_by_name:
           name: object_with_lookahead
       approximate_min:
         computation_function: min
+        resolver:
+          name: object_with_lookahead
+      approximate_percentile:
+        computation_function: percentiles
         resolver:
           name: object_with_lookahead
       approximate_sum:

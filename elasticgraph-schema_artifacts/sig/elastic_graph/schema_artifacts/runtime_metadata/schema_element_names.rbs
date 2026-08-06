@@ -96,6 +96,8 @@ module ElasticGraph
         attr_reader approximate_sum: ::String
         attr_reader exact_sum: ::String
         attr_reader approximate_distinct_value_count: ::String
+        attr_reader approximate_percentile: ::String
+        attr_reader percentile: ::String
 
         def normalize_case: (::String) -> ::String
         def self.from_hash: (::Hash[::String, untyped]) -> SchemaElementNames

@@ -30,7 +30,8 @@ module ElasticGraph
             "exact_sum" => :sum,
             "exact_max" => :max,
             "exact_min" => :min,
-            "approximate_distinct_value_count" => :cardinality
+            "approximate_distinct_value_count" => :cardinality,
+            "approximate_percentile" => :percentiles
           )
         end
 
@@ -49,7 +50,8 @@ module ElasticGraph
             "approximate_sum" => :sum,
             "exact_max" => :max,
             "exact_min" => :min,
-            "approximate_distinct_value_count" => :cardinality
+            "approximate_distinct_value_count" => :cardinality,
+            "approximate_percentile" => :percentiles
           )
         end
 
@@ -69,7 +71,8 @@ module ElasticGraph
             "exact_sum" => :sum,
             "exact_max" => :max,
             "exact_min" => :min,
-            "approximate_distinct_value_count" => :cardinality
+            "approximate_distinct_value_count" => :cardinality,
+            "approximate_percentile" => :percentiles
           )
         end
 
@@ -91,7 +94,8 @@ module ElasticGraph
             "exact_max" => :max,
             "approximate_min" => :min,
             "exact_min" => :min,
-            "approximate_distinct_value_count" => :cardinality
+            "approximate_distinct_value_count" => :cardinality,
+            "approximate_percentile" => :percentiles
           )
         end
       end

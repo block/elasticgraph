@@ -2437,6 +2437,22 @@ type DateAggregatedValues @shareable {
   approximate_distinct_value_count: JsonSafeLong
 
   """
+  An approximate percentile of the field values within this grouping.
+
+  Percentiles are computed using an approximate algorithm, so the returned value may not be
+  exact. Request a specific percentile via the `percentile` argument (e.g.
+  `percentile: 50` for the median). To request multiple percentiles in a single query,
+  use a GraphQL alias for each: `p50: approximate_percentile(percentile: 50)`.
+  """
+  approximate_percentile(
+    """
+    The percentile rank to compute, from `0` to `100` (e.g. `0` for the min,
+    `100` for the max, `50` for the median, `99` for the 99th percentile).
+    """
+    percentile: Float!
+  ): Date
+
+  """
   The maximum of the field values within this grouping.
 
   So long as the grouping contains at least one non-null value for the
@@ -2752,6 +2768,22 @@ type DateTimeAggregatedValues @shareable {
   it usually differs from the true distinct value count by less than 7%.
   """
   approximate_distinct_value_count: JsonSafeLong
+
+  """
+  An approximate percentile of the field values within this grouping.
+
+  Percentiles are computed using an approximate algorithm, so the returned value may not be
+  exact. Request a specific percentile via the `percentile` argument (e.g.
+  `percentile: 50` for the median). To request multiple percentiles in a single query,
+  use a GraphQL alias for each: `p50: approximate_percentile(percentile: 50)`.
+  """
+  approximate_percentile(
+    """
+    The percentile rank to compute, from `0` to `100` (e.g. `0` for the min,
+    `100` for the max, `50` for the median, `99` for the 99th percentile).
+    """
+    percentile: Float!
+  ): DateTime
 
   """
   The maximum of the field values within this grouping.
@@ -4061,6 +4093,22 @@ type FloatAggregatedValues @shareable {
   approximate_distinct_value_count: JsonSafeLong
 
   """
+  An approximate percentile of the field values within this grouping.
+
+  Percentiles are computed using an approximate algorithm, so the returned value may not be
+  exact. Request a specific percentile via the `percentile` argument (e.g.
+  `percentile: 50` for the median). To request multiple percentiles in a single query,
+  use a GraphQL alias for each: `p50: approximate_percentile(percentile: 50)`.
+  """
+  approximate_percentile(
+    """
+    The percentile rank to compute, from `0` to `100` (e.g. `0` for the min,
+    `100` for the max, `50` for the median, `99` for the 99th percentile).
+    """
+    percentile: Float!
+  ): Float
+
+  """
   The sum of the field values within this grouping.
 
   As with all double-precision `Float` values, operations are subject to floating-point loss
@@ -4860,6 +4908,22 @@ type IntAggregatedValues @shareable {
   approximate_distinct_value_count: JsonSafeLong
 
   """
+  An approximate percentile of the field values within this grouping.
+
+  Percentiles are computed using an approximate algorithm, so the returned value may not be
+  exact. Request a specific percentile via the `percentile` argument (e.g.
+  `percentile: 50` for the median). To request multiple percentiles in a single query,
+  use a GraphQL alias for each: `p50: approximate_percentile(percentile: 50)`.
+  """
+  approximate_percentile(
+    """
+    The percentile rank to compute, from `0` to `100` (e.g. `0` for the min,
+    `100` for the max, `50` for the median, `99` for the 99th percentile).
+    """
+    percentile: Float!
+  ): Float
+
+  """
   The (approximate) sum of the field values within this grouping.
 
   Sums of large `Int` values can result in overflow, where the exact sum cannot
@@ -5445,6 +5509,22 @@ type JsonSafeLongAggregatedValues @shareable {
   approximate_distinct_value_count: JsonSafeLong
 
   """
+  An approximate percentile of the field values within this grouping.
+
+  Percentiles are computed using an approximate algorithm, so the returned value may not be
+  exact. Request a specific percentile via the `percentile` argument (e.g.
+  `percentile: 50` for the median). To request multiple percentiles in a single query,
+  use a GraphQL alias for each: `p50: approximate_percentile(percentile: 50)`.
+  """
+  approximate_percentile(
+    """
+    The percentile rank to compute, from `0` to `100` (e.g. `0` for the min,
+    `100` for the max, `50` for the median, `99` for the 99th percentile).
+    """
+    percentile: Float!
+  ): Float
+
+  """
   The (approximate) sum of the field values within this grouping.
 
   Sums of large `JsonSafeLong` values can result in overflow, where the exact sum cannot
@@ -5696,6 +5776,22 @@ type LocalTimeAggregatedValues @shareable {
   approximate_distinct_value_count: JsonSafeLong
 
   """
+  An approximate percentile of the field values within this grouping.
+
+  Percentiles are computed using an approximate algorithm, so the returned value may not be
+  exact. Request a specific percentile via the `percentile` argument (e.g.
+  `percentile: 50` for the median). To request multiple percentiles in a single query,
+  use a GraphQL alias for each: `p50: approximate_percentile(percentile: 50)`.
+  """
+  approximate_percentile(
+    """
+    The percentile rank to compute, from `0` to `100` (e.g. `0` for the min,
+    `100` for the max, `50` for the median, `99` for the 99th percentile).
+    """
+    percentile: Float!
+  ): LocalTime
+
+  """
   The maximum of the field values within this grouping.
 
   So long as the grouping contains at least one non-null value for the
@@ -5904,6 +6000,22 @@ type LongStringAggregatedValues @shareable {
   a value which may be approximate.
   """
   approximate_min: LongString
+
+  """
+  An approximate percentile of the field values within this grouping.
+
+  Percentiles are computed using an approximate algorithm, so the returned value may not be
+  exact. Request a specific percentile via the `percentile` argument (e.g.
+  `percentile: 50` for the median). To request multiple percentiles in a single query,
+  use a GraphQL alias for each: `p50: approximate_percentile(percentile: 50)`.
+  """
+  approximate_percentile(
+    """
+    The percentile rank to compute, from `0` to `100` (e.g. `0` for the min,
+    `100` for the max, `50` for the median, `99` for the 99th percentile).
+    """
+    percentile: Float!
+  ): Float
 
   """
   The (approximate) sum of the field values within this grouping.

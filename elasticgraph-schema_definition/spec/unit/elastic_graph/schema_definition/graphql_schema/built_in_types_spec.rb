@@ -1134,6 +1134,19 @@ module ElasticGraph
                 outside the `JsonSafeLong` range (-9,007,199,254,740,991 to 9,007,199,254,740,991).
                 """
                 #{schema_elements.approximate_avg}: Float
+                """
+                An approximate percentile of the field values within this grouping.
+
+                Percentiles are computed using an approximate algorithm, so the returned value may not be
+                exact. Request a specific percentile via the `#{schema_elements.percentile}` argument (e.g.
+                `#{schema_elements.percentile}: 50` for the median). To request multiple percentiles in a single query,
+                use a GraphQL alias for each: `p50: #{schema_elements.approximate_percentile}(#{schema_elements.percentile}: 50)`.
+                """
+                #{schema_elements.approximate_percentile}(
+                  """
+                  The percentile rank to compute, from `0` to `100` (e.g. `0` for the min, `100` for the max, `50` for the median, `99` for the 99th percentile).
+                  """
+                  #{schema_elements.percentile}: Float!): Float
               }
             EOS
           end
@@ -1173,6 +1186,19 @@ module ElasticGraph
                 The returned value will be rounded to the nearest `#{scalar_type}` value.
                 """
                 #{schema_elements.approximate_avg}: #{scalar_type}
+                """
+                An approximate percentile of the field values within this grouping.
+
+                Percentiles are computed using an approximate algorithm, so the returned value may not be
+                exact. Request a specific percentile via the `#{schema_elements.percentile}` argument (e.g.
+                `#{schema_elements.percentile}: 50` for the median). To request multiple percentiles in a single query,
+                use a GraphQL alias for each: `p50: #{schema_elements.approximate_percentile}(#{schema_elements.percentile}: 50)`.
+                """
+                #{schema_elements.approximate_percentile}(
+                  """
+                  The percentile rank to compute, from `0` to `100` (e.g. `0` for the min, `100` for the max, `50` for the median, `99` for the 99th percentile).
+                  """
+                  #{schema_elements.percentile}: Float!): #{scalar_type}
               }
             EOS
           end
@@ -1290,6 +1316,19 @@ module ElasticGraph
                   to 9,007,199,254,740,991).
                   """
                   #{schema_elements.approximate_avg}: Float
+                  """
+                  An approximate percentile of the field values within this grouping.
+
+                  Percentiles are computed using an approximate algorithm, so the returned value may not be
+                  exact. Request a specific percentile via the `#{schema_elements.percentile}` argument (e.g.
+                  `#{schema_elements.percentile}: 50` for the median). To request multiple percentiles in a single query,
+                  use a GraphQL alias for each: `p50: #{schema_elements.approximate_percentile}(#{schema_elements.percentile}: 50)`.
+                  """
+                  #{schema_elements.approximate_percentile}(
+                    """
+                    The percentile rank to compute, from `0` to `100` (e.g. `0` for the min, `100` for the max, `50` for the median, `99` for the 99th percentile).
+                    """
+                    #{schema_elements.percentile}: Float!): Float
                 }
               EOS
             end
@@ -1377,6 +1416,19 @@ module ElasticGraph
                 to 9,007,199,254,740,991).
                 """
                 #{schema_elements.approximate_avg}: Float
+                """
+                An approximate percentile of the field values within this grouping.
+
+                Percentiles are computed using an approximate algorithm, so the returned value may not be
+                exact. Request a specific percentile via the `#{schema_elements.percentile}` argument (e.g.
+                `#{schema_elements.percentile}: 50` for the median). To request multiple percentiles in a single query,
+                use a GraphQL alias for each: `p50: #{schema_elements.approximate_percentile}(#{schema_elements.percentile}: 50)`.
+                """
+                #{schema_elements.approximate_percentile}(
+                  """
+                  The percentile rank to compute, from `0` to `100` (e.g. `0` for the min, `100` for the max, `50` for the median, `99` for the 99th percentile).
+                  """
+                  #{schema_elements.percentile}: Float!): Float
               }
             EOS
           end

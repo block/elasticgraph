@@ -17,6 +17,7 @@ require "elastic_graph/graphql/aggregation/script_term_grouping"
 require "elastic_graph/graphql/schema/arguments"
 require "elastic_graph/support/hash_util"
 require "elastic_graph/support/memoizable_data"
+require "graphql"
 
 module ElasticGraph
   class GraphQL
@@ -186,15 +187,24 @@ module ElasticGraph
             if field.aggregated?
               field_path = from_field_path + field_path
 
-              get_children_nodes(node).map do |fn_node|
+              get_children_nodes(node).filter_map do |fn_node|
                 computed_field = field_from_node(fn_node)
                 function_adapter = computed_field.function_adapter # : FunctionAdapter::adapter
+
+                # An invalid argument (e.g. an out-of-range `percentile`) raises here. Skip building a
+                # `Computation` for it rather than letting that fail the whole aggregations field--the
+                # resolver re-runs `extract_args` at resolve time and attributes the error precisely.
+                begin
+                  function_args = function_adapter.extract_args(computed_field.args_to_schema_form(fn_node.arguments), element_names)
+                rescue ::GraphQL::ExecutionError
+                  next
+                end
 
                 Aggregation::Computation.new(
                   source_field_path: field_path,
                   leaf: PathSegment.for(field: computed_field, lookahead: fn_node),
                   function_adapter: function_adapter,
-                  function_args: function_adapter.extract_args(computed_field.args_to_schema_form(fn_node.arguments), element_names)
+                  function_args: function_args
                 )
               end
             end
