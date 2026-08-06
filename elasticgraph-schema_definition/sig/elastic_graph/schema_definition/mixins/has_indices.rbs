@@ -28,6 +28,7 @@ module ElasticGraph
         def root_query_fields_target_namespace: () -> ::String
         def register_root_query_fields: () -> void
         def fields_with_sources: () -> ::Array[SchemaElements::Field]
+        def source_excludes_paths: (?::String, ?bool) -> ::Array[::String]
         def indexing_fields_by_name_in_index: () -> ::Hash[::String, SchemaElements::Field]
       end
     end

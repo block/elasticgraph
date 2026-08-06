@@ -189,11 +189,6 @@ type AddressEdge {
   cursor: Cursor
 
   """
-  Specific search highlights for this `Address`, providing matching snippets for the requested fields.
-  """
-  highlights: AddressHighlights
-
-  """
   The `Address` of this edge.
   """
   node: Address
@@ -269,16 +264,6 @@ type AddressGroupedBy {
   The `timestamps` field value for this group.
   """
   timestamps: AddressTimestampsGroupedBy
-}
-
-"""
-Type used to request desired `Address` search highlight fields.
-"""
-type AddressHighlights {
-  """
-  Search highlights for the `full_address`, providing snippets of the matching text.
-  """
-  full_address: [String!]!
 }
 
 """
@@ -8238,11 +8223,6 @@ type NamedEntityHighlights {
   Search highlights for the `widget_workspace_id`, providing snippets of the matching text.
   """
   widget_workspace_id: [String!]!
-
-  """
-  Search highlights for the `workspace_id`, providing snippets of the matching text.
-  """
-  workspace_id: [String!]!
 
   """
   Search highlights for the `workspace_name`, providing snippets of the matching text.
@@ -18856,11 +18836,6 @@ type WidgetHighlights {
   the_options: WidgetOptionsHighlights
 
   """
-  Search highlights for the `workspace_id`, providing snippets of the matching text.
-  """
-  workspace_id: [String!]!
-
-  """
   Search highlights for the `workspace_name`, providing snippets of the matching text.
   """
   workspace_name: [String!]!
@@ -20024,11 +19999,6 @@ type WidgetOrAddressHighlights {
   fees: MoneyHighlights
 
   """
-  Search highlights for the `full_address`, providing snippets of the matching text.
-  """
-  full_address: [String!]!
-
-  """
   Search highlights for the `id`, providing snippets of the matching text.
   """
   id: [String!]!
@@ -20087,11 +20057,6 @@ type WidgetOrAddressHighlights {
   Search highlights for the `the_options`, providing snippets of the matching text.
   """
   the_options: WidgetOptionsHighlights
-
-  """
-  Search highlights for the `workspace_id`, providing snippets of the matching text.
-  """
-  workspace_id: [String!]!
 
   """
   Search highlights for the `workspace_name`, providing snippets of the matching text.
