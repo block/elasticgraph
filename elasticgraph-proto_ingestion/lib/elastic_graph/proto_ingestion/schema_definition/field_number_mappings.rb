@@ -16,14 +16,6 @@ module ElasticGraph
       # out the next available numbers for new fields and enum values, and serializes the updated
       # mappings for the next artifact dump so that numbers stay stable over time.
       class FieldNumberMappings
-        # Stored mapping for a single message field.
-        #
-        # @!attribute [r] field_number
-        #   @return [Integer]
-        # @!attribute [r] name_in_index
-        #   @return [String]
-        FieldMapping = ::Data.define(:field_number, :name_in_index)
-
         # The largest field number protobuf allows (2^29 - 1), per
         # https://protobuf.dev/programming-guides/proto3/#assigning.
         MAX_FIELD_NUMBER = 536_870_911
@@ -41,7 +33,7 @@ module ElasticGraph
         # @return [FieldNumberMappings]
         # @raise [Errors::SchemaError] if the mappings deviate from the artifact format or contain invalid numbers
         def self.from_artifact(artifact)
-          return new(mappings_by_message: {}, value_numbers_by_enum: {}) if artifact.nil?
+          return new(field_numbers_by_message: {}, value_numbers_by_enum: {}) if artifact.nil?
 
           unless artifact.is_a?(::Hash)
             raise Errors::SchemaError, "Protobuf field-number mappings must be a Hash, got: #{artifact.class}."
@@ -52,16 +44,16 @@ module ElasticGraph
           empty_section = {} # : ::Hash[untyped, untyped]
 
           new(
-            mappings_by_message: parse_messages(artifact.fetch("messages", empty_section)),
+            field_numbers_by_message: parse_messages(artifact.fetch("messages", empty_section)),
             value_numbers_by_enum: parse_enums(artifact.fetch("enums", empty_section))
           )
         end
 
-        # @param mappings_by_message [Hash<String, Hash<String, FieldMapping>>] validated field mappings
+        # @param field_numbers_by_message [Hash<String, Hash<String, Integer>>] validated field-number mappings
         # @param value_numbers_by_enum [Hash<String, Hash<String, Integer>>] validated enum value numbers
         # @api private
-        def initialize(mappings_by_message:, value_numbers_by_enum:)
-          @mappings_by_message = mappings_by_message
+        def initialize(field_numbers_by_message:, value_numbers_by_enum:)
+          @field_numbers_by_message = field_numbers_by_message
           @value_numbers_by_enum = value_numbers_by_enum
           @used_field_numbers_by_message = {}
           @used_enum_value_numbers_by_enum = {}
@@ -73,23 +65,14 @@ module ElasticGraph
         #
         # @param message_name [String]
         # @param public_field_name [String]
-        # @param name_in_index [String]
         # @param previous_field_names [Array<String>] old public names of the field, if renamed
         # @return [Integer]
-        def field_number_for(message_name:, public_field_name:, name_in_index:, previous_field_names:)
-          mappings_for_message = @mappings_by_message[message_name] ||= {}
-          used_numbers = used_field_numbers_for(message_name, mappings_for_message)
+        def field_number_for(message_name:, public_field_name:, previous_field_names:)
+          field_numbers = @field_numbers_by_message[message_name] ||= {}
+          used_numbers = used_field_numbers_for(message_name, field_numbers)
 
-          stored_mapping = mappings_for_message.fetch(public_field_name) do
-            migrate_renamed_field_mapping(mappings_for_message, previous_field_names) ||
-              FieldMapping.new(field_number: allocate_field_number(used_numbers), name_in_index: name_in_index)
-          end
-
-          # Re-stamp `name_in_index` so that a change to it gets reflected in the next dump.
-          mapping = stored_mapping.with(name_in_index: name_in_index)
-          mappings_for_message[public_field_name] = mapping
-
-          mapping.field_number
+          field_numbers[public_field_name] ||= migrate_renamed_field_number(field_numbers, previous_field_names) ||
+            allocate_field_number(used_numbers)
         end
 
         # Returns the stable protobuf numbers for an enum's values, assigning the next available
@@ -114,23 +97,11 @@ module ElasticGraph
         # @return [Hash<String, Object>]
         def to_artifact
           {
-            "messages" => @mappings_by_message
+            "messages" => @field_numbers_by_message
               .sort_by(&:first)
-              .to_h do |message_name, mappings_by_field_name|
+              .to_h do |message_name, field_numbers_by_name|
                 [message_name, {
-                  "fields" => mappings_by_field_name.sort_by { |field_name, mapping| [mapping.field_number, field_name] }.to_h do |field_name, mapping|
-                    artifact_mapping =
-                      if mapping.name_in_index == field_name
-                        mapping.field_number
-                      else
-                        {
-                          "field_number" => mapping.field_number,
-                          "name_in_index" => mapping.name_in_index
-                        }
-                      end
-
-                    [field_name, artifact_mapping]
-                  end
+                  "fields" => field_numbers_by_name.sort_by { |field_name, number| [number, field_name] }.to_h
                 }]
               end,
             "enums" => @value_numbers_by_enum
@@ -145,8 +116,8 @@ module ElasticGraph
 
         private
 
-        def used_field_numbers_for(message_name, mappings_for_message)
-          @used_field_numbers_by_message[message_name] ||= ::Set.new(mappings_for_message.each_value.map(&:field_number))
+        def used_field_numbers_for(message_name, field_numbers)
+          @used_field_numbers_by_message[message_name] ||= ::Set.new(field_numbers.values)
         end
 
         def used_enum_value_numbers_for(enum_name, value_numbers)
@@ -173,10 +144,10 @@ module ElasticGraph
           candidate
         end
 
-        def migrate_renamed_field_mapping(mappings_for_message, previous_field_names)
+        def migrate_renamed_field_number(field_numbers, previous_field_names)
           previous_field_names.each do |old_field_name|
-            mapping = mappings_for_message.delete(old_field_name)
-            return mapping if mapping
+            field_number = field_numbers.delete(old_field_name)
+            return field_number if field_number
           end
 
           nil
@@ -199,12 +170,12 @@ module ElasticGraph
               raise Errors::SchemaError, "Field-number mapping for message `#{message_name}` must contain a `fields` Hash."
             end
 
-            parsed_fields = fields.to_h do |field_name, field_entry|
-              [field_name, parse_field_entry(message_name, field_name, field_entry)]
+            parsed_fields = fields.to_h do |field_name, field_number|
+              [field_name, validated_field_number(message_name, field_name, field_number)]
             end
 
             verify_no_number_collisions(
-              parsed_fields.transform_values(&:field_number),
+              parsed_fields,
               "field-number mapping collision in message `#{message_name}`"
             )
 
@@ -243,32 +214,6 @@ module ElasticGraph
 
             [enum_name, parsed_values]
           end
-        end
-
-        private_class_method def self.parse_field_entry(message_name, field_name, field_entry)
-          unless field_entry.is_a?(::Hash)
-            return FieldMapping.new(
-              field_number: validated_field_number(message_name, field_name, field_entry),
-              name_in_index: field_name
-            )
-          end
-
-          verify_known_keys(field_entry, ["field_number", "name_in_index"], "field-number mapping for `#{message_name}.#{field_name}`")
-
-          field_number = field_entry.fetch("field_number") do
-            raise Errors::SchemaError, "Field-number mapping for `#{message_name}.#{field_name}` must include `field_number`."
-          end
-
-          name_in_index = field_entry.fetch("name_in_index", field_name)
-          unless name_in_index.is_a?(::String)
-            raise Errors::SchemaError, "Field-number mapping for `#{message_name}.#{field_name}` " \
-              "must use a String `name_in_index`, got: #{name_in_index.inspect}."
-          end
-
-          FieldMapping.new(
-            field_number: validated_field_number(message_name, field_name, field_number),
-            name_in_index: name_in_index
-          )
         end
 
         private_class_method def self.validated_field_number(message_name, field_name, field_number)

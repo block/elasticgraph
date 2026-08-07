@@ -82,8 +82,7 @@ module ElasticGraph
               field_number = schema.field_number_for(
                 message_name: message_name,
                 type_name: name,
-                public_field_name: schema_field.name,
-                name_in_index: field.name_in_index
+                public_field_name: schema_field.name
               )
               label = "repeated " if repeated
               line = "  #{label}#{field_type} #{schema_field.name} = #{field_number};"
@@ -112,8 +111,7 @@ module ElasticGraph
               field_number = schema.field_number_for(
                 message_name: message_name,
                 type_name: name,
-                public_field_name: field_name,
-                name_in_index: field_name
+                public_field_name: field_name
               )
               "    #{proto_subtype.proto_type_reference(package_name)} #{field_name} = #{field_number};"
             end

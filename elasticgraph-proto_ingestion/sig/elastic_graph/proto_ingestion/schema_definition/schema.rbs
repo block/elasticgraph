@@ -20,8 +20,7 @@ module ElasticGraph
         def field_number_for: (
           message_name: ::String,
           type_name: ::String,
-          public_field_name: ::String,
-          name_in_index: ::String
+          public_field_name: ::String
         ) -> ::Integer
         def enum_value_numbers_for: (::String, ::Array[::String]) -> ::Hash[::String, ::Integer]
 
