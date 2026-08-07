@@ -61,11 +61,10 @@ module ElasticGraph
         # Returns the stable protobuf number for a message field.
         #
         # @api private
-        def field_number_for(message_name:, type_name:, public_field_name:, name_in_index:)
+        def field_number_for(message_name:, type_name:, public_field_name:)
           @field_number_mappings.field_number_for(
             message_name: message_name,
             public_field_name: public_field_name,
-            name_in_index: name_in_index,
             previous_field_names: previous_field_names_for(type_name, public_field_name)
           )
         end

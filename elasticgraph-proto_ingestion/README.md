@@ -144,18 +144,9 @@ Alternatives inside generated interface and union `oneof` blocks use the same st
 message-field mappings, so adding or removing a concrete subtype does not renumber the
 remaining alternatives.
 
-`schema.proto` always uses the public GraphQL field names. When a field uses a
-different `name_in_index`, the sidecar YAML stores that override privately:
-
-```yaml
-messages:
-  Widget:
-    fields:
-      id: 1
-      display_name:
-        field_number: 2
-        name_in_index: displayName
-```
+Both `schema.proto` and the sidecar use public GraphQL field names. Index field names,
+including `name_in_index` overrides, are not part of the protobuf wire schema or its
+stable-numbering state.
 
 If a field is renamed with `field.renamed_from`, `elasticgraph-proto_ingestion` reuses the
 existing field number under the new public field name.

@@ -353,35 +353,7 @@ module ElasticGraph
           })
         end
 
-        it "uses public field names in schema.proto and stores name_in_index overrides in the mapping artifact" do
-          results = define_proto_schema_results do |s|
-            s.object_type "Widget" do |t|
-              t.field "id", "ID"
-              t.field "display_name", "String", name_in_index: "display_name_in_index"
-              t.index "widgets"
-            end
-          end
-
-          expect(results.proto_schema).to include("string display_name = 2;")
-          expect(results.proto_schema).not_to include("display_name_in_index")
-
-          expect(results.proto_field_number_mappings).to eq({
-            "enums" => {},
-            "messages" => {
-              "Widget" => {
-                "fields" => {
-                  "id" => 1,
-                  "display_name" => {
-                    "field_number" => 2,
-                    "name_in_index" => "display_name_in_index"
-                  }
-                }
-              }
-            }
-          })
-        end
-
-        it "updates a stored `name_in_index` in the mapping artifact when the field's index name changes" do
+        it "keeps index field names out of the protobuf schema and field-number mappings" do
           results1 = define_proto_schema_results do |s|
             s.object_type "Widget" do |t|
               t.field "id", "ID"
@@ -398,12 +370,13 @@ module ElasticGraph
             end
           end
 
+          expect(results1.proto_schema).to include("string display_name = 2;")
+          expect(results1.proto_schema).not_to include("old_index_name")
+          expect(results2.proto_schema).to eq(results1.proto_schema)
+
           expect(results2.proto_field_number_mappings.dig("messages", "Widget", "fields")).to eq({
             "id" => 1,
-            "display_name" => {
-              "field_number" => 2,
-              "name_in_index" => "new_index_name"
-            }
+            "display_name" => 2
           })
         end
 

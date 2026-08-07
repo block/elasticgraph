@@ -30,7 +30,6 @@ module ElasticGraph
               [{"messagez" => {}}, "\"messagez\""],
               [{messages: {}}, ":messages"],
               [{"messages" => {"Account" => {"fieldz" => {}}}}, "\"fieldz\""],
-              [{"messages" => {"Account" => {"fields" => {"id" => {"field_number" => 1, "name_in_indexx" => "x"}}}}}, "\"name_in_indexx\""],
               [{"enums" => {"Status" => {"valuez" => {}}}}, "\"valuez\""]
             ].each do |artifact, unknown_key|
               expect {
@@ -75,10 +74,14 @@ module ElasticGraph
             end
           end
 
-          it "rejects field numbers that are not integers rather than silently truncating them" do
-            expect {
-              FieldNumberMappings.from_artifact({"messages" => {"Account" => {"fields" => {"id" => 1.5}}}})
-            }.to raise_error(Errors::SchemaError, a_string_including("`Account.id`", "must be an integer", "1.5"))
+          it "rejects field numbers that are not integers rather than coercing or silently truncating them" do
+            [1.5, {"field_number" => 7}].each do |non_integer|
+              expect {
+                FieldNumberMappings.from_artifact({"messages" => {"Account" => {"fields" => {"id" => non_integer}}}})
+              }.to raise_error(Errors::SchemaError, a_string_including(
+                "`Account.id`", "must be an integer", non_integer.inspect
+              ))
+            end
           end
 
           it "raises a clear error when two fields of a message are mapped to the same number" do
@@ -89,26 +92,6 @@ module ElasticGraph
               "`id` and `name`",
               "number 1"
             ))
-          end
-
-          it "validates that structured field mappings include `field_number`" do
-            expect {
-              FieldNumberMappings.from_artifact({"messages" => {"Account" => {"fields" => {"id" => {"name_in_index" => "account_id"}}}}})
-            }.to raise_error(Errors::SchemaError, a_string_including("must include `field_number`"))
-          end
-
-          it "validates that structured field mappings use a String `name_in_index`" do
-            expect {
-              FieldNumberMappings.from_artifact({"messages" => {"Account" => {"fields" => {"id" => {"field_number" => 7, "name_in_index" => 123}}}}})
-            }.to raise_error(Errors::SchemaError, a_string_including("must use a String `name_in_index`"))
-          end
-
-          it "defaults a structured field mapping without `name_in_index` to the field name" do
-            mappings = FieldNumberMappings.from_artifact(
-              {"messages" => {"Account" => {"fields" => {"display_name" => {"field_number" => 7}}}}}
-            )
-
-            expect(mappings.to_artifact.dig("messages", "Account", "fields")).to eq({"display_name" => 7})
           end
 
           it "accepts maximum protobuf numbers while allowing enum values in the field-reserved range" do
