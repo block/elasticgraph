@@ -1,34 +1,29 @@
 module ElasticGraph
   class Indexer
     type event = ::Hash[::String, untyped]
-    type validator = Support::JSONSchema::Validator
-    type validatorFactory = Support::JSONSchema::ValidatorFactory
 
     module Operation
       class FactorySupertype
         attr_reader schema_artifacts: schemaArtifacts
         attr_reader index_definitions_by_graphql_type: ::Hash[::String, ::Array[DatastoreCore::_IndexDefinition]]
-        attr_reader record_preparer_factory: RecordPreparer::Factory
+        attr_reader ingestion_adapters: ::Array[IngestionAdapter::_Adapter]
         attr_reader logger: ::Logger
         attr_reader skip_derived_indexing_type_updates: ::Hash[::String, ::Set[::String]]
-        attr_reader configure_record_validator: (^(validatorFactory) -> validatorFactory)?
 
         def initialize: (
           schema_artifacts: schemaArtifacts,
           index_definitions_by_graphql_type: ::Hash[::String, ::Array[DatastoreCore::_IndexDefinition]],
-          record_preparer_factory: RecordPreparer::Factory,
+          ingestion_adapters: ::Array[IngestionAdapter::_Adapter],
           logger: ::Logger,
-          skip_derived_indexing_type_updates: ::Hash[::String, ::Set[::String]],
-          configure_record_validator: (^(validatorFactory) -> validatorFactory)?
+          skip_derived_indexing_type_updates: ::Hash[::String, ::Set[::String]]
         ) -> void
 
         def with: (
           ?schema_artifacts: schemaArtifacts,
           ?index_definitions_by_graphql_type: ::Hash[::String, ::Array[DatastoreCore::_IndexDefinition]],
-          ?record_preparer_factory: RecordPreparer::Factory,
+          ?ingestion_adapters: ::Array[IngestionAdapter::_Adapter],
           ?logger: ::Logger,
-          ?skip_derived_indexing_type_updates: ::Hash[::String, ::Set[::String]],
-          ?configure_record_validator: (^(validatorFactory) -> validatorFactory)?
+          ?skip_derived_indexing_type_updates: ::Hash[::String, ::Set[::String]]
         ) -> instance
       end
 
@@ -37,14 +32,8 @@ module ElasticGraph
 
         private
 
-        def validator: (::String, ::Integer) -> Support::JSONSchema::Validator
-
-        @validator_factories_by_version: ::Hash[::Integer, Support::JSONSchema::ValidatorFactory]?
-        def validator_factories_by_version: () -> ::Hash[::Integer, Support::JSONSchema::ValidatorFactory]
-
-        def select_json_schema_version: (event) { (BuildResult) -> bot } -> (::Integer | bot)
+        def ingestion_adapter_for: (event) -> IngestionAdapter::_Adapter?
         def prepare_event: (event) -> event
-        def validate_record_returning_failure: (event, ::Integer) -> BuildResult?
         def build_failed_result: (event, ::String, ::String) -> BuildResult
         def build_all_operations_for: (event, _RecordPreparer) -> ::Array[_Operation]
         def index_definitions_for: (::String) -> ::Array[DatastoreCore::_IndexDefinition]
