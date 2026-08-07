@@ -1602,7 +1602,7 @@ module ElasticGraph
             f.computes :percentiles
 
             f.argument names.percentile, "Float!" do |a|
-              a.documentation "The percentile rank to compute, from `0` to `100` (e.g. `0` for the min, `100` for the max, `50` for the median, `99` for the 99th percentile)."
+              a.documentation "The percentile to compute, from `0` to `100` (e.g. `0` for the min, `100` for the max, `50` for the median, `99` for the 99th percentile)."
             end
 
             f.documentation <<~EOS
