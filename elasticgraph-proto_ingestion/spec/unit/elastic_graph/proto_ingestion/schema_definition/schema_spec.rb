@@ -242,16 +242,16 @@ module ElasticGraph
           expect(proto_type_def_from(proto, "Event")).to include("int64 occurred_at = 2;")
         end
 
-        it "assigns the lowest unused field number to a new field, rather than the number after the maximum used one" do
-          # A gap below the maximum used number can only arise from a hand-edited artifact:
-          # organic schema evolution never creates one, since removed fields keep their numbers
-          # reserved. So this test must seed raw mappings instead of results from a prior dump.
+        it "assigns a new field the stored `next_number` rather than filling an earlier gap" do
+          # A cursor with gaps below it can only arise from a hand-edited artifact, so this test
+          # must seed raw mappings instead of results from a prior dump.
           results = define_proto_schema_results(proto_field_number_mappings: {
             "messages" => {
               "Account" => {
                 "fields" => {
                   "id" => 7
-                }
+                },
+                "next_number" => 10
               }
             }
           }) do |s|
@@ -262,7 +262,8 @@ module ElasticGraph
             end
           end
 
-          expect(results.proto_schema).to include("string id = 7;", "string name = 1;")
+          expect(results.proto_schema).to include("string id = 7;", "string name = 10;")
+          expect(results.proto_field_number_mappings.dig("messages", "Account", "next_number")).to eq(11)
         end
 
         it "preserves proto field numbers when fields are re-ordered" do
@@ -310,7 +311,8 @@ module ElasticGraph
                 "fields" => {
                   "id" => 1,
                   "name" => 2
-                }
+                },
+                "next_number" => 3
               }
             }
           })
@@ -347,7 +349,8 @@ module ElasticGraph
                   "id" => 1,
                   "legacy_field" => 2,
                   "name" => 3
-                }
+                },
+                "next_number" => 4
               }
             }
           })
@@ -409,7 +412,8 @@ module ElasticGraph
                 "fields" => {
                   "id" => 2,
                   "display_name" => 1
-                }
+                },
+                "next_number" => 3
               }
             }
           })
@@ -508,7 +512,8 @@ module ElasticGraph
               "car" => 2,
               "bike" => 3,
               "scooter" => 4
-            }
+            },
+            "next_number" => 5
           })
         end
 

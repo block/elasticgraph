@@ -67,6 +67,7 @@ module ElasticGraph
               Widget:
                 fields:
                   id: 7
+                next_number: 8
             enums:
               Status:
                 values:
@@ -87,6 +88,7 @@ module ElasticGraph
 
           expect(results.proto_schema).to include(
             "string id = 7;",
+            ".elasticgraph.Status status = 8;",
             "STATUS_ACTIVE = 1;",
             "STATUS_INACTIVE = 5;"
           )

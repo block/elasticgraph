@@ -125,7 +125,16 @@ Additionally:
 `schema_artifacts:dump` automatically reads and writes `proto_field_numbers.yaml`,
 stored alongside your schema definition (as a sibling of the file `path_to_schema`
 points to). Existing numbers stay fixed even if field order changes, and new fields
-get the next available numbers.
+use each message's stored `next_number`, so gaps below that cursor are never filled:
+
+```yaml
+messages:
+  Widget:
+    fields:
+      id: 1
+      display_name: 2
+    next_number: 3
+```
 
 Unlike the schema artifacts--which are safe to delete and regenerate at any time--this
 file is part of your schema definition: it is an input to `schema.proto` generation.

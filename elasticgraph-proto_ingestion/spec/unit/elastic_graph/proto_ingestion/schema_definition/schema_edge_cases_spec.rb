@@ -177,7 +177,7 @@ module ElasticGraph
           # stub it to a small range to verify the allocator respects the constant.
           stub_const("ElasticGraph::ProtoIngestion::SchemaDefinition::FieldNumberMappings::RESERVED_FIELD_NUMBER_RANGE", 3..4)
 
-          proto = define_proto_schema do |s|
+          results = define_proto_schema_results do |s|
             s.object_type "Account" do |t|
               t.field "id", "ID"
               t.field "name", "String"
@@ -186,7 +186,8 @@ module ElasticGraph
             end
           end
 
-          expect(proto).to include("string id = 1;", "string name = 2;", "string email = 5;")
+          expect(results.proto_schema).to include("string id = 1;", "string name = 2;", "string email = 5;")
+          expect(results.proto_field_number_mappings.dig("messages", "Account", "next_number")).to eq(6)
         end
 
         it "allocates the next available field number when a renamed field has no old mapping entry" do

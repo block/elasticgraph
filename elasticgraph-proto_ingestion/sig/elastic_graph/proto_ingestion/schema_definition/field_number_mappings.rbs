@@ -4,24 +4,32 @@ module ElasticGraph
       class FieldNumberMappings
         type fieldNumbersByName = ::Hash[::String, ::Integer]
 
+        class MessageMapping
+          attr_reader field_numbers_by_name: fieldNumbersByName
+          attr_reader next_number: ::Integer
+
+          def self.new: (field_numbers_by_name: fieldNumbersByName, next_number: ::Integer) -> instance
+          def with: (?field_numbers_by_name: fieldNumbersByName, ?next_number: ::Integer) -> instance
+        end
+
         MAX_FIELD_NUMBER: ::Integer
         RESERVED_FIELD_NUMBER_RANGE: ::Range[::Integer]
         MAX_ENUM_VALUE_NUMBER: ::Integer
 
-        @field_numbers_by_message: ::Hash[::String, fieldNumbersByName]
+        @message_mappings_by_name: ::Hash[::String, MessageMapping]
         @value_numbers_by_enum: ::Hash[::String, ::Hash[::String, ::Integer]]
-        @used_field_numbers_by_message: ::Hash[::String, ::Set[::Integer]]
         @used_enum_value_numbers_by_enum: ::Hash[::String, ::Set[::Integer]]
 
         def self.from_artifact: (untyped) -> instance
-        def self.parse_messages: (untyped) -> ::Hash[::String, fieldNumbersByName]
+        def self.parse_messages: (untyped) -> ::Hash[::String, MessageMapping]
         def self.parse_enums: (untyped) -> ::Hash[::String, ::Hash[::String, ::Integer]]
         def self.validated_field_number: (::String, ::String, untyped) -> ::Integer
+        def self.validated_next_number: (::String, untyped, fieldNumbersByName) -> ::Integer
         def self.verify_no_number_collisions: (::Hash[::String, ::Integer], ::String) -> void
         def self.verify_known_keys: (::Hash[untyped, untyped], ::Array[::String], ::String) -> void
 
         def initialize: (
-          field_numbers_by_message: ::Hash[::String, fieldNumbersByName],
+          message_mappings_by_name: ::Hash[::String, MessageMapping],
           value_numbers_by_enum: ::Hash[::String, ::Hash[::String, ::Integer]]
         ) -> void
 
@@ -35,9 +43,8 @@ module ElasticGraph
 
         private
 
-        def used_field_numbers_for: (::String, fieldNumbersByName) -> ::Set[::Integer]
         def used_enum_value_numbers_for: (::String, ::Hash[::String, ::Integer]) -> ::Set[::Integer]
-        def allocate_field_number: (::Set[::Integer]) -> ::Integer
+        def allocate_field_number: (::String, MessageMapping) -> ::Integer
         def allocate_enum_value_number: (::Set[::Integer]) -> ::Integer
         def migrate_renamed_field_number: (fieldNumbersByName, ::Array[::String]) -> ::Integer?
       end

@@ -78,7 +78,8 @@ module ElasticGraph
                   "fields" => {
                     "id" => 1,
                     "name" => 2
-                  }
+                  },
+                  "next_number" => 3
                 }
               }
             })
