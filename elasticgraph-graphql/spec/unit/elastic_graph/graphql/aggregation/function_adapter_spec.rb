@@ -15,7 +15,7 @@ module ElasticGraph
       RSpec.describe FunctionAdapter do
         describe "BY_NAME" do
           it "registers an adapter for each supported aggregated value function" do
-            expect(FunctionAdapter::BY_NAME.keys).to contain_exactly(:avg, :cardinality, :max, :min, :sum)
+            expect(FunctionAdapter::BY_NAME.keys).to contain_exactly(:avg, :cardinality, :max, :min, :percentile, :sum)
           end
 
           it "maps each function to its datastore aggregation name" do
@@ -24,6 +24,7 @@ module ElasticGraph
               cardinality: "cardinality",
               max: "max",
               min: "min",
+              percentile: "percentiles",
               sum: "sum"
             )
           end
@@ -34,6 +35,7 @@ module ElasticGraph
               cardinality: {"value" => 0},
               max: {"value" => nil},
               min: {"value" => nil},
+              percentile: {"values" => [{"value" => nil}]},
               sum: {"value" => 0}
             )
           end
@@ -48,7 +50,7 @@ module ElasticGraph
           end
 
           it "extracts no args, since these functions take none" do
-            expect(adapter.extract_args({"some_arg" => 3}, element_names)).to eq({})
+            expect(adapter.extract_args({"some_arg" => 3}, element_names) { |msg| raise msg }).to eq({})
           end
 
           it "contributes no extra clause options beyond the `field` the clause builder provides" do
@@ -62,6 +64,51 @@ module ElasticGraph
           it "fabricates an empty bucket response using the configured empty bucket value" do
             expect(adapter.empty_bucket_result).to eq({"value" => nil})
             expect(FunctionAdapter::SimpleMetric.new(datastore_function_name: "sum", empty_bucket_value: 0).empty_bucket_result).to eq({"value" => 0})
+          end
+        end
+
+        describe FunctionAdapter::Percentile do
+          let(:element_names) { SchemaArtifacts::RuntimeMetadata::SchemaElementNames.new(form: :snake_case, overrides: {}) }
+          let(:adapter) { FunctionAdapter::Percentile.new(datastore_function_name: "percentiles") }
+
+          it "exposes the datastore function name it was configured with" do
+            expect(adapter.datastore_function_name).to eq "percentiles"
+          end
+
+          it "extracts the requested percentile from the args" do
+            expect(extract_args({"percentile" => 50.0})).to eq({percentile: 50.0})
+          end
+
+          it "accepts the boundary values 0 and 100" do
+            expect(extract_args({"percentile" => 0})).to eq({percentile: 0})
+            expect(extract_args({"percentile" => 100})).to eq({percentile: 100})
+          end
+
+          it "yields an error message--rather than raising--when the requested percentile is outside 0 to 100" do
+            expect(extract_args({"percentile" => -1})).to eq "`percentile` must be between 0 and 100, but is -1."
+            expect(extract_args({"percentile" => 150})).to eq "`percentile` must be between 0 and 100, but is 150."
+          end
+
+          it "yields an error message when the requested percentile is not numeric" do
+            expect(extract_args({"percentile" => "50"})).to eq '`percentile` must be between 0 and 100, but is "50".'
+          end
+
+          it "requests a single unkeyed percentile in the clause options" do
+            expect(adapter.clause_options({percentile: 99.9})).to eq({"percents" => [99.9], "keyed" => false})
+          end
+
+          it "extracts the single value from the datastore's array-shaped response" do
+            expect(adapter.extract_result({"values" => [{"key" => 50.0, "value" => 3.7}]})).to eq({"key" => 50.0, "value" => 3.7})
+          end
+
+          it "fabricates an empty bucket response with a nil value" do
+            expect(adapter.empty_bucket_result).to eq({"values" => [{"value" => nil}]})
+          end
+
+          # Returns the extracted args, or--when the args are invalid--the yielded error message,
+          # so that a single expectation can cover either outcome.
+          def extract_args(args)
+            adapter.extract_args(args, element_names) { |message| return message }
           end
         end
       end

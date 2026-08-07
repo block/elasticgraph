@@ -17,6 +17,7 @@ require "elastic_graph/graphql/aggregation/script_term_grouping"
 require "elastic_graph/graphql/schema/arguments"
 require "elastic_graph/support/hash_util"
 require "elastic_graph/support/memoizable_data"
+require "graphql"
 
 module ElasticGraph
   class GraphQL
@@ -185,20 +186,26 @@ module ElasticGraph
           build_clauses_from(aggregated_values_node) do |node, field, field_path|
             if field.aggregated?
               field_path = from_field_path + field_path
-
-              get_children_nodes(node).map do |fn_node|
-                computed_field = field_from_node(fn_node)
-                function_adapter = computed_field.function_adapter # : FunctionAdapter::adapter
-
-                Aggregation::Computation.new(
-                  source_field_path: field_path,
-                  leaf: PathSegment.for(field: computed_field, lookahead: fn_node),
-                  function_adapter: function_adapter,
-                  function_args: function_adapter.extract_args(computed_field.args_to_schema_form(fn_node.arguments), element_names)
-                )
-              end
+              get_children_nodes(node).filter_map { |fn_node| computation_for(fn_node, field_path) }
             end
           end
+        end
+
+        # Builds the `Computation` for an aggregated value function node, or returns `nil` if the node
+        # has invalid args (e.g. an out-of-range `percentile`). We omit the computation rather than
+        # failing the whole aggregations field here: the resolver detects the same invalid args when it
+        # resolves this specific field, and can attribute the error to that field's precise path.
+        def computation_for(fn_node, field_path)
+          computed_field = field_from_node(fn_node)
+          function_adapter = computed_field.function_adapter # : FunctionAdapter::adapter
+          args = computed_field.args_to_schema_form(fn_node.arguments)
+
+          Aggregation::Computation.new(
+            source_field_path: field_path,
+            leaf: PathSegment.for(field: computed_field, lookahead: fn_node),
+            function_adapter: function_adapter,
+            function_args: function_adapter.extract_args(args, element_names) { return nil }
+          )
         end
 
         def build_groupings_from(node_node, aggregation_name, from_field_path: [])

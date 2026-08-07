@@ -16,6 +16,9 @@ query BluegrassArtistLifetimeSales {
           approximateSum
 
           approximateAvg
+
+          median: approximatePercentile(percentile: 50)
+          p90: approximatePercentile(percentile: 90)
         }
       }
     }

@@ -91,6 +91,11 @@ module ElasticGraph
           ?from_field_path: ::Array[PathSegment]
         ) -> ::Set[Computation]
 
+        def computation_for: (
+          ::GraphQL::Execution::Lookahead,
+          ::Array[PathSegment]
+        ) -> Computation?
+
         def build_groupings_from: (
           ::GraphQL::Execution::Lookahead,
           ::String,
