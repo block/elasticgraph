@@ -15,7 +15,7 @@ module ElasticGraph
       RSpec.describe FunctionAdapter do
         describe "BY_NAME" do
           it "registers an adapter for each supported aggregated value function" do
-            expect(FunctionAdapter::BY_NAME.keys).to contain_exactly(:avg, :cardinality, :max, :min, :percentiles, :sum)
+            expect(FunctionAdapter::BY_NAME.keys).to contain_exactly(:avg, :cardinality, :max, :min, :percentile, :sum)
           end
 
           it "maps each function to its datastore aggregation name" do
@@ -24,7 +24,7 @@ module ElasticGraph
               cardinality: "cardinality",
               max: "max",
               min: "min",
-              percentiles: "percentiles",
+              percentile: "percentiles",
               sum: "sum"
             )
           end
@@ -35,7 +35,7 @@ module ElasticGraph
               cardinality: {"value" => 0},
               max: {"value" => nil},
               min: {"value" => nil},
-              percentiles: {"values" => [{"value" => nil}]},
+              percentile: {"values" => [{"value" => nil}]},
               sum: {"value" => 0}
             )
           end
@@ -50,7 +50,7 @@ module ElasticGraph
           end
 
           it "extracts no args, since these functions take none" do
-            expect(adapter.extract_args({"some_arg" => 3}, element_names)).to eq({})
+            expect(adapter.extract_args({"some_arg" => 3}, element_names) { |msg| raise msg }).to eq({})
           end
 
           it "contributes no extra clause options beyond the `field` the clause builder provides" do
@@ -75,25 +75,22 @@ module ElasticGraph
             expect(adapter.datastore_function_name).to eq "percentiles"
           end
 
-          it "extracts the requested percentile rank from the args" do
-            expect(adapter.extract_args({"percentile" => 50.0}, element_names)).to eq({percentile: 50.0})
+          it "extracts the requested percentile from the args" do
+            expect(extract_args({"percentile" => 50.0})).to eq({percentile: 50.0})
           end
 
           it "accepts the boundary values 0 and 100" do
-            expect(adapter.extract_args({"percentile" => 0}, element_names)).to eq({percentile: 0})
-            expect(adapter.extract_args({"percentile" => 100}, element_names)).to eq({percentile: 100})
+            expect(extract_args({"percentile" => 0})).to eq({percentile: 0})
+            expect(extract_args({"percentile" => 100})).to eq({percentile: 100})
           end
 
-          it "raises a GraphQL::ExecutionError when the requested percentile is below 0" do
-            expect {
-              adapter.extract_args({"percentile" => -1}, element_names)
-            }.to raise_error(::GraphQL::ExecutionError, "`percentile` must be between 0 and 100, but is -1.")
+          it "yields an error message--rather than raising--when the requested percentile is outside 0 to 100" do
+            expect(extract_args({"percentile" => -1})).to eq "`percentile` must be between 0 and 100, but is -1."
+            expect(extract_args({"percentile" => 150})).to eq "`percentile` must be between 0 and 100, but is 150."
           end
 
-          it "raises a GraphQL::ExecutionError when the requested percentile is above 100" do
-            expect {
-              adapter.extract_args({"percentile" => 150}, element_names)
-            }.to raise_error(::GraphQL::ExecutionError, "`percentile` must be between 0 and 100, but is 150.")
+          it "yields an error message when the requested percentile is not numeric" do
+            expect(extract_args({"percentile" => "50"})).to eq '`percentile` must be between 0 and 100, but is "50".'
           end
 
           it "requests a single unkeyed percentile in the clause options" do
@@ -106,6 +103,12 @@ module ElasticGraph
 
           it "fabricates an empty bucket response with a nil value" do
             expect(adapter.empty_bucket_result).to eq({"values" => [{"value" => nil}]})
+          end
+
+          # Returns the extracted args, or--when the args are invalid--the yielded error message,
+          # so that a single expectation can cover either outcome.
+          def extract_args(args)
+            adapter.extract_args(args, element_names) { |message| return message }
           end
         end
       end

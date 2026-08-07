@@ -1599,7 +1599,7 @@ module ElasticGraph
 
         def define_approximate_percentile_on_aggregated_values(aggregated_values_type, scalar_type)
           aggregated_values_type.field names.approximate_percentile, scalar_type, graphql_only: true do |f|
-            f.computes :percentiles
+            f.computes :percentile
 
             f.argument names.percentile, "Float!" do |a|
               a.documentation "The percentile to compute, from `0` to `100` (e.g. `0` for the min, `100` for the max, `50` for the median, `99` for the 99th percentile)."

@@ -2446,8 +2446,8 @@ type DateAggregatedValues @shareable {
   """
   approximate_percentile(
     """
-    The percentile rank to compute, from `0` to `100` (e.g. `0` for the min,
-    `100` for the max, `50` for the median, `99` for the 99th percentile).
+    The percentile to compute, from `0` to `100` (e.g. `0` for the min, `100`
+    for the max, `50` for the median, `99` for the 99th percentile).
     """
     percentile: Float!
   ): Date
@@ -2779,8 +2779,8 @@ type DateTimeAggregatedValues @shareable {
   """
   approximate_percentile(
     """
-    The percentile rank to compute, from `0` to `100` (e.g. `0` for the min,
-    `100` for the max, `50` for the median, `99` for the 99th percentile).
+    The percentile to compute, from `0` to `100` (e.g. `0` for the min, `100`
+    for the max, `50` for the median, `99` for the 99th percentile).
     """
     percentile: Float!
   ): DateTime
@@ -4102,8 +4102,8 @@ type FloatAggregatedValues @shareable {
   """
   approximate_percentile(
     """
-    The percentile rank to compute, from `0` to `100` (e.g. `0` for the min,
-    `100` for the max, `50` for the median, `99` for the 99th percentile).
+    The percentile to compute, from `0` to `100` (e.g. `0` for the min, `100`
+    for the max, `50` for the median, `99` for the 99th percentile).
     """
     percentile: Float!
   ): Float
@@ -4917,8 +4917,8 @@ type IntAggregatedValues @shareable {
   """
   approximate_percentile(
     """
-    The percentile rank to compute, from `0` to `100` (e.g. `0` for the min,
-    `100` for the max, `50` for the median, `99` for the 99th percentile).
+    The percentile to compute, from `0` to `100` (e.g. `0` for the min, `100`
+    for the max, `50` for the median, `99` for the 99th percentile).
     """
     percentile: Float!
   ): Float
@@ -5518,8 +5518,8 @@ type JsonSafeLongAggregatedValues @shareable {
   """
   approximate_percentile(
     """
-    The percentile rank to compute, from `0` to `100` (e.g. `0` for the min,
-    `100` for the max, `50` for the median, `99` for the 99th percentile).
+    The percentile to compute, from `0` to `100` (e.g. `0` for the min, `100`
+    for the max, `50` for the median, `99` for the 99th percentile).
     """
     percentile: Float!
   ): Float
@@ -5785,8 +5785,8 @@ type LocalTimeAggregatedValues @shareable {
   """
   approximate_percentile(
     """
-    The percentile rank to compute, from `0` to `100` (e.g. `0` for the min,
-    `100` for the max, `50` for the median, `99` for the 99th percentile).
+    The percentile to compute, from `0` to `100` (e.g. `0` for the min, `100`
+    for the max, `50` for the median, `99` for the 99th percentile).
     """
     percentile: Float!
   ): LocalTime
@@ -6011,8 +6011,8 @@ type LongStringAggregatedValues @shareable {
   """
   approximate_percentile(
     """
-    The percentile rank to compute, from `0` to `100` (e.g. `0` for the min,
-    `100` for the max, `50` for the median, `99` for the 99th percentile).
+    The percentile to compute, from `0` to `100` (e.g. `0` for the min, `100`
+    for the max, `50` for the median, `99` for the 99th percentile).
     """
     percentile: Float!
   ): Float

@@ -1144,7 +1144,7 @@ module ElasticGraph
                 """
                 #{schema_elements.approximate_percentile}(
                   """
-                  The percentile rank to compute, from `0` to `100` (e.g. `0` for the min, `100` for the max, `50` for the median, `99` for the 99th percentile).
+                  The percentile to compute, from `0` to `100` (e.g. `0` for the min, `100` for the max, `50` for the median, `99` for the 99th percentile).
                   """
                   #{schema_elements.percentile}: Float!): Float
               }
@@ -1196,7 +1196,7 @@ module ElasticGraph
                 """
                 #{schema_elements.approximate_percentile}(
                   """
-                  The percentile rank to compute, from `0` to `100` (e.g. `0` for the min, `100` for the max, `50` for the median, `99` for the 99th percentile).
+                  The percentile to compute, from `0` to `100` (e.g. `0` for the min, `100` for the max, `50` for the median, `99` for the 99th percentile).
                   """
                   #{schema_elements.percentile}: Float!): #{scalar_type}
               }
@@ -1326,7 +1326,7 @@ module ElasticGraph
                   """
                   #{schema_elements.approximate_percentile}(
                     """
-                    The percentile rank to compute, from `0` to `100` (e.g. `0` for the min, `100` for the max, `50` for the median, `99` for the 99th percentile).
+                    The percentile to compute, from `0` to `100` (e.g. `0` for the min, `100` for the max, `50` for the median, `99` for the 99th percentile).
                     """
                     #{schema_elements.percentile}: Float!): Float
                 }
@@ -1426,7 +1426,7 @@ module ElasticGraph
                 """
                 #{schema_elements.approximate_percentile}(
                   """
-                  The percentile rank to compute, from `0` to `100` (e.g. `0` for the min, `100` for the max, `50` for the median, `99` for the 99th percentile).
+                  The percentile to compute, from `0` to `100` (e.g. `0` for the min, `100` for the max, `50` for the median, `99` for the 99th percentile).
                   """
                   #{schema_elements.percentile}: Float!): Float
               }

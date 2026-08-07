@@ -21,26 +21,26 @@ module ElasticGraph
 
             function_adapter = field.function_adapter # : FunctionAdapter::adapter
 
-            # `QueryAdapter` already validated this field's args when the query was built, but it can't
-            # raise there without failing resolution of the entire aggregations field rather than just
-            # this one leaf--so it skips building a datastore clause for an invalid field instead. Here,
-            # at resolve time, we're actually resolving this specific field, so we re-run the same
-            # validation and can attribute an error to the correct, precise path when it fails.
+            # `QueryAdapter` detected any invalid args when the query was built, but it can't report an
+            # error there without failing resolution of the entire aggregations field rather than just
+            # this one leaf--so it omits the datastore clause for an invalid field instead. Here, at
+            # resolve time, we're resolving this specific field, so we can report the error at the
+            # correct, precise path.
             #
             # `args` is already in schema form here (`GraphQLAdapterBuilder` converts it before calling
             # `resolve`), unlike at query-build time where `QueryAdapter` converts the raw AST arguments
             # itself--so, unlike there, we pass `args` through as-is rather than re-converting it.
-            begin
-              function_adapter.extract_args(args, schema.element_names)
-            rescue ::GraphQL::ExecutionError => e
+            function_adapter.extract_args(args, schema.element_names) do |message|
+              error = ::GraphQL::ExecutionError.new(message)
+
               # Neither `context.add_error` nor `context.execution_errors.add` sets `path` for us--that
               # only happens automatically when an `ExecutionError` is raised and returned as a field's
               # own resolution result, which isn't the case here since we're continuing on to resolve
               # sibling fields normally. So we set `path` ourselves from `context.current_path`, which
               # is already the precise path to this field (e.g. `[..., "aggregatedValues", "amountCents",
               # "p150"]`), so the error in the response is attributed to this specific field.
-              e.path ||= context.current_path
-              context.add_error(e)
+              error.path = context.current_path
+              context.add_error(error)
               return nil
             end
 

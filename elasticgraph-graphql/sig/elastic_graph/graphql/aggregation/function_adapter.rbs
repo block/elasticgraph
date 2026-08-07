@@ -25,7 +25,7 @@ module ElasticGraph
         end
 
         class SimpleMetric < SimpleMetricSupertype
-          def extract_args: (::Hash[::String, untyped], SchemaArtifacts::RuntimeMetadata::SchemaElementNames) -> functionArgs
+          def extract_args: (::Hash[::String, untyped], SchemaArtifacts::RuntimeMetadata::SchemaElementNames) { (::String) -> bot } -> functionArgs
           def clause_options: (functionArgs) -> ::Hash[::String, untyped]
           def extract_result: (::Hash[::String, untyped]) -> ::Hash[::String, untyped]
           def empty_bucket_result: () -> ::Hash[::String, untyped]
@@ -39,7 +39,7 @@ module ElasticGraph
         end
 
         class Percentile < PercentileSupertype
-          def extract_args: (::Hash[::String, untyped], SchemaArtifacts::RuntimeMetadata::SchemaElementNames) -> functionArgs
+          def extract_args: (::Hash[::String, untyped], SchemaArtifacts::RuntimeMetadata::SchemaElementNames) { (::String) -> bot } -> functionArgs
           def clause_options: (functionArgs) -> ::Hash[::String, untyped]
           def extract_result: (::Hash[::String, untyped]) -> ::Hash[::String, untyped]
           def empty_bucket_result: () -> ::Hash[::String, untyped]

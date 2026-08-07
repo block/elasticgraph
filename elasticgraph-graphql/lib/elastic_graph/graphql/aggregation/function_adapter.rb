@@ -6,8 +6,6 @@
 #
 # frozen_string_literal: true
 
-require "graphql"
-
 module ElasticGraph
   class GraphQL
     module Aggregation
@@ -17,6 +15,11 @@ module ElasticGraph
       # locate its value in the datastore response, and what response to fabricate for a bucket
       # the datastore omitted.
       #
+      # When an adapter's `extract_args` is given args it considers invalid, it yields an error
+      # message instead of returning extracted args. Each caller passes a block that exits
+      # non-locally (the args of an invalid field are never used), which lets a field with invalid
+      # args be handled without disrupting the sibling fields being processed alongside it.
+      #
       # @private
       module FunctionAdapter
         # Adapter for metric aggregations that take no arguments and return a flat
@@ -24,6 +27,7 @@ module ElasticGraph
         #
         # @private
         class SimpleMetric < ::Data.define(:datastore_function_name, :empty_bucket_value)
+          # These functions take no args, so there's nothing to extract and nothing that can be invalid.
           def extract_args(args, element_names)
             {}
           end
@@ -51,7 +55,7 @@ module ElasticGraph
             percentile = args.fetch(element_names.percentile)
 
             unless percentile.is_a?(::Numeric) && percentile >= 0 && percentile <= 100
-              raise ::GraphQL::ExecutionError, "`#{element_names.percentile}` must be between 0 and 100, but is #{percentile.inspect}."
+              return yield "`#{element_names.percentile}` must be between 0 and 100, but is #{percentile.inspect}."
             end
 
             {percentile: percentile}

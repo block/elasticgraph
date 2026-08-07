@@ -418,7 +418,7 @@ module ElasticGraph
             aggregated_value_key_of("amount_cents", "good") => {"values" => [{"value" => 500.0}]}
           }
 
-          response = resolve_target_nodes(<<~QUERY, aggs: aggs, allow_errors: true)
+          response = resolve_target_nodes(<<~QUERY, aggs: aggs, expect_errors: true)
             target: widget_aggregations {
               nodes {
                 aggregated_values {

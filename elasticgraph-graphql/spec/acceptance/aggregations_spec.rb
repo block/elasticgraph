@@ -923,6 +923,10 @@ module ElasticGraph
         max = raw_values.max
         sum = raw_values.sum
         avg = raw_values.empty? ? nil : sum.to_f / raw_values.size
+        # Exact values for `percentile: 50`/`75`, verified against a real OpenSearch `percentiles`
+        # aggregation for each of this file's fixture shapes (empty, singletons, pairs, and the full
+        # triple)--every shape here lands on a clean value, not a t-digest approximation artifact.
+        median, p75 = percentile_50_and_75_of(raw_values)
 
         {
           case_correctly("approximate_sum") => float_of(sum),
@@ -932,9 +936,30 @@ module ElasticGraph
           # same expected values to verify `approximate_percentile` without needing separate fixture data.
           "p0" => float_of(min),
           "p100" => float_of(max),
+          # `p50`/`p75` (unlike p0/p100) can't be satisfied by an implementation that only supports
+          # min/max, so they're what actually proves full percentile support works.
+          "p50" => float_of(median),
+          "p75" => float_of(p75),
           case_correctly("exact_min") => int_of(min),
           case_correctly("exact_max") => int_of(max)
         }
+      end
+
+      # OpenSearch's percentile algorithm (t-digest) is generally approximate, but for these small,
+      # duplicate-free fixture sizes it always lands on one of the input values, so we can hardcode the
+      # expectation. Verified directly against a real OpenSearch `percentiles` aggregation, not derived
+      # by formula, since t-digest doesn't guarantee a standard percentile-interpolation formula's result.
+      def percentile_50_and_75_of(raw_values)
+        case raw_values.sort
+        when [] then [nil, nil]
+        when [100] then [100.0, 100.0]
+        when [200] then [200.0, 200.0]
+        when [300] then [300.0, 300.0]
+        when [100, 200] then [200.0, 200.0]
+        when [100, 300] then [300.0, 300.0]
+        when [100, 200, 300] then [200.0, 300.0]
+        else raise "No verified p50/p75 for #{raw_values.inspect}--verify against a real datastore and add it here."
+        end
       end
 
       def verify_all_timestamp_groupings_valid(widget_id, truncation_unit_type:, field:)
@@ -1824,6 +1849,8 @@ module ElasticGraph
                   exact_sum
                   approximate_avg
                   p0: approximate_percentile(percentile: 0)
+                  p50: approximate_percentile(percentile: 50)
+                  p75: approximate_percentile(percentile: 75)
                   p100: approximate_percentile(percentile: 100)
                   exact_min
                   exact_max
@@ -1835,6 +1862,8 @@ module ElasticGraph
                     exact_sum
                     approximate_avg
                     p0: approximate_percentile(percentile: 0)
+                    p50: approximate_percentile(percentile: 50)
+                    p75: approximate_percentile(percentile: 75)
                     p100: approximate_percentile(percentile: 100)
                     exact_min
                     exact_max
@@ -1860,6 +1889,8 @@ module ElasticGraph
                   exact_sum
                   approximate_avg
                   p0: approximate_percentile(percentile: 0)
+                  p50: approximate_percentile(percentile: 50)
+                  p75: approximate_percentile(percentile: 75)
                   p100: approximate_percentile(percentile: 100)
                   exact_min
                   exact_max
@@ -1871,6 +1902,8 @@ module ElasticGraph
                     exact_sum
                     approximate_avg
                     p0: approximate_percentile(percentile: 0)
+                    p50: approximate_percentile(percentile: 50)
+                    p75: approximate_percentile(percentile: 75)
                     p100: approximate_percentile(percentile: 100)
                     exact_min
                     exact_max

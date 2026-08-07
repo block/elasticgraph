@@ -4136,7 +4136,7 @@ object_types_by_name:
         resolver:
           name: object_with_lookahead
       approximate_percentile:
-        computation_function: percentiles
+        computation_function: percentile
         resolver:
           name: object_with_lookahead
       exact_max:
@@ -4174,7 +4174,7 @@ object_types_by_name:
         resolver:
           name: object_with_lookahead
       approximate_percentile:
-        computation_function: percentiles
+        computation_function: percentile
         resolver:
           name: object_with_lookahead
       exact_max:
@@ -4524,7 +4524,7 @@ object_types_by_name:
         resolver:
           name: object_with_lookahead
       approximate_percentile:
-        computation_function: percentiles
+        computation_function: percentile
         resolver:
           name: object_with_lookahead
       approximate_sum:
@@ -4788,7 +4788,7 @@ object_types_by_name:
         resolver:
           name: object_with_lookahead
       approximate_percentile:
-        computation_function: percentiles
+        computation_function: percentile
         resolver:
           name: object_with_lookahead
       approximate_sum:
@@ -4945,7 +4945,7 @@ object_types_by_name:
         resolver:
           name: object_with_lookahead
       approximate_percentile:
-        computation_function: percentiles
+        computation_function: percentile
         resolver:
           name: object_with_lookahead
       approximate_sum:
@@ -4981,7 +4981,7 @@ object_types_by_name:
         resolver:
           name: object_with_lookahead
       approximate_percentile:
-        computation_function: percentiles
+        computation_function: percentile
         resolver:
           name: object_with_lookahead
       exact_max:
@@ -5013,7 +5013,7 @@ object_types_by_name:
         resolver:
           name: object_with_lookahead
       approximate_percentile:
-        computation_function: percentiles
+        computation_function: percentile
         resolver:
           name: object_with_lookahead
       approximate_sum:

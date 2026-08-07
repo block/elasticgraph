@@ -31,7 +31,7 @@ module ElasticGraph
             "exact_max" => :max,
             "exact_min" => :min,
             "approximate_distinct_value_count" => :cardinality,
-            "approximate_percentile" => :percentiles
+            "approximate_percentile" => :percentile
           )
         end
 
@@ -51,7 +51,7 @@ module ElasticGraph
             "exact_max" => :max,
             "exact_min" => :min,
             "approximate_distinct_value_count" => :cardinality,
-            "approximate_percentile" => :percentiles
+            "approximate_percentile" => :percentile
           )
         end
 
@@ -72,7 +72,7 @@ module ElasticGraph
             "exact_max" => :max,
             "exact_min" => :min,
             "approximate_distinct_value_count" => :cardinality,
-            "approximate_percentile" => :percentiles
+            "approximate_percentile" => :percentile
           )
         end
 
@@ -95,7 +95,7 @@ module ElasticGraph
             "approximate_min" => :min,
             "exact_min" => :min,
             "approximate_distinct_value_count" => :cardinality,
-            "approximate_percentile" => :percentiles
+            "approximate_percentile" => :percentile
           )
         end
       end
