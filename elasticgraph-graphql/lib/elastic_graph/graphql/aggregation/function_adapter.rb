@@ -82,7 +82,7 @@ module ElasticGraph
           cardinality: SimpleMetric.new(datastore_function_name: "cardinality", empty_bucket_value: 0),
           max: SimpleMetric.new(datastore_function_name: "max", empty_bucket_value: nil),
           min: SimpleMetric.new(datastore_function_name: "min", empty_bucket_value: nil),
-          percentiles: Percentile.new(datastore_function_name: "percentiles"),
+          percentile: Percentile.new(datastore_function_name: "percentiles"),
           sum: SimpleMetric.new(datastore_function_name: "sum", empty_bucket_value: 0)
         }.freeze
       end
