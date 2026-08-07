@@ -94,9 +94,59 @@ module ElasticGraph
             ))
           end
 
+          it "validates that a message's `next_number` is an integer" do
+            expect {
+              FieldNumberMappings.from_artifact({
+                "messages" => {"Account" => {"fields" => {"id" => 7}, "next_number" => "8"}}
+              })
+            }.to raise_error(Errors::SchemaError, a_string_including(
+              "`next_number` for message `Account`", "must be an integer", '"8"'
+            ))
+          end
+
+          it "validates that a message's `next_number` is in the allocatable range" do
+            [0, 19_000, FieldNumberMappings::MAX_FIELD_NUMBER + 2].each do |invalid_number|
+              expect {
+                FieldNumberMappings.from_artifact({
+                  "messages" => {"Account" => {"fields" => {}, "next_number" => invalid_number}}
+                })
+              }.to raise_error(Errors::SchemaError, a_string_including(
+                "must be between 1 and #{FieldNumberMappings::MAX_FIELD_NUMBER + 1}",
+                "excluding the reserved 19000-19999 range",
+                invalid_number.to_s
+              ))
+            end
+          end
+
+          it "validates that a message's `next_number` is greater than every mapped field number" do
+            expect {
+              FieldNumberMappings.from_artifact({
+                "messages" => {"Account" => {"fields" => {"id" => 7}, "next_number" => 7}}
+              })
+            }.to raise_error(Errors::SchemaError, a_string_including(
+              "must be greater than every mapped field number", "maximum: 7", "got: 7"
+            ))
+          end
+
+          it "derives and dumps `next_number` when upgrading a mapping that does not store it" do
+            {
+              7 => 8,
+              18_999 => 20_000
+            }.each do |field_number, expected_next_number|
+              mappings = FieldNumberMappings.from_artifact({
+                "messages" => {"Account" => {"fields" => {"id" => field_number}}}
+              })
+
+              expect(mappings.to_artifact.dig("messages", "Account", "next_number")).to eq(expected_next_number)
+            end
+          end
+
           it "accepts maximum protobuf numbers while allowing enum values in the field-reserved range" do
             artifact = {
-              "messages" => {"Account" => {"fields" => {"id" => FieldNumberMappings::MAX_FIELD_NUMBER}}},
+              "messages" => {"Account" => {
+                "fields" => {"id" => FieldNumberMappings::MAX_FIELD_NUMBER},
+                "next_number" => FieldNumberMappings::MAX_FIELD_NUMBER + 1
+              }},
               # Enum value numbers have no protobuf-reserved range, so 19000-19999 is fine here.
               "enums" => {"Status" => {"values" => {
                 "ACTIVE" => FieldNumberMappings::MAX_ENUM_VALUE_NUMBER,
@@ -162,6 +212,24 @@ module ElasticGraph
           end
         end
 
+        describe "#field_number_for" do
+          it "raises a clear error when the field-number range has been exhausted" do
+            mappings = FieldNumberMappings.from_artifact({
+              "messages" => {"Account" => {
+                "fields" => {"id" => FieldNumberMappings::MAX_FIELD_NUMBER},
+                "next_number" => FieldNumberMappings::MAX_FIELD_NUMBER + 1
+              }}
+            })
+
+            expect {
+              mappings.field_number_for(message_name: "Account", public_field_name: "name", previous_field_names: [])
+            }.to raise_error(Errors::SchemaError, a_string_including(
+              "Cannot allocate another protobuf field number for message `Account`",
+              "maximum field number (#{FieldNumberMappings::MAX_FIELD_NUMBER}) has been reached"
+            ))
+          end
+        end
+
         describe "#to_artifact" do
           it "sorts messages and enums by name, and their fields and values by number" do
             mappings = FieldNumberMappings.from_artifact(
@@ -180,6 +248,7 @@ module ElasticGraph
             artifact = mappings.to_artifact
             expect(artifact.fetch("messages").keys).to eq(["AMessage", "ZMessage"])
             expect(artifact.dig("messages", "ZMessage", "fields").keys).to eq(["second", "first"])
+            expect(artifact.dig("messages", "ZMessage", "next_number")).to eq(3)
             expect(artifact.fetch("enums").keys).to eq(["AEnum", "ZEnum"])
             expect(artifact.dig("enums", "ZEnum", "values").keys).to eq(["SECOND", "FIRST"])
           end
