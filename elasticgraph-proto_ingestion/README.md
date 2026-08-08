@@ -72,7 +72,8 @@ ElasticGraph.define_schema do |schema|
 end
 ```
 
-After running `bundle exec rake schema_artifacts:dump`, ElasticGraph will generate `schema.proto`.
+After running `bundle exec rake schema_artifacts:dump`, ElasticGraph will generate a `schema.proto`
+schema artifact, and will maintain a `proto_field_numbers.yaml` file alongside your schema definition.
 
 ## Schema Definition API
 
@@ -118,3 +119,67 @@ Additionally:
 - Lists of lists (e.g. `[[Float!]!]!`) are not supported because Protocol Buffers cannot represent
   them directly. Schema artifact generation raises an error identifying the unsupported field.
 - Enum types generate `enum` definitions whose values are prefixed with the enum type name in `UPPER_SNAKE_CASE`, including a zero-valued `*_UNSPECIFIED` entry.
+
+## Stable Field Numbers
+
+`schema_artifacts:dump` automatically reads and writes `proto_field_numbers.yaml`,
+stored alongside your schema definition (as a sibling of the file `path_to_schema`
+points to). Existing numbers stay fixed even if field or enum value order changes. New fields,
+`oneof` alternatives, and enum values use their type's stored `next_number`, so gaps below that
+cursor are never filled:
+
+```yaml
+messages:
+  Widget:
+    fields:
+      id: 1
+      display_name: 2
+    next_number: 3
+```
+
+Unlike the schema artifacts--which are safe to delete and regenerate at any time--this
+file is part of your schema definition: it is an input to `schema.proto` generation.
+While prototyping, you may delete it and regenerate it to reset the number assignments.
+Once generated protos have been used to serialize data or consumed by another codebase,
+however, you must not delete and regenerate it or the original number assignments will be
+lost. Commit it to version control alongside your schema definition; `schema_artifacts:check`
+reports it as out of date when your schema has changed but the file has not been dumped,
+so CI will catch a forgotten dump.
+
+The file is safe to hand-edit (e.g. when resolving a merge conflict), but it is strictly
+validated: unknown keys, non-integer numbers, out-of-range numbers, and duplicate numbers
+are all rejected at dump time rather than silently reassigning numbers.
+
+Alternatives inside generated interface and union `oneof` blocks use the same stable
+message-field mappings, so adding or removing a concrete subtype does not renumber the
+remaining alternatives.
+
+Removed fields and `oneof` alternatives remain in the sidecar. Their numbers are explicitly
+reserved in `schema.proto`, with comments recording the prior names, while every generated
+message includes a comment identifying its next field number. If a removed field or alternative
+is restored under the same name, it reuses its original number and is no longer reserved.
+
+Both `schema.proto` and the sidecar use public GraphQL field names. Index field names,
+including `name_in_index` overrides, are not part of the protobuf wire schema or its
+stable-numbering state.
+
+If a field is renamed with `field.renamed_from`, `elasticgraph-proto_ingestion` reuses the
+existing field number under the new public field name.
+
+## Stable Enum Value Numbers
+
+Enum value numbers are pinned the same way, in an `enums` section of the sidecar. Existing
+values keep their numbers when other values are added or removed, new values claim the stored
+`next_number`, and removed values keep their numbers reserved so they are never reused
+(number `0` is always the generated `*_UNSPECIFIED` value). `schema.proto` explicitly reserves
+each removed value number, includes a comment recording its prior name, and identifies the next
+value number for each enum:
+
+```yaml
+enums:
+  WidgetColor:
+    values:
+      RED: 1
+      BLUE: 2
+    next_number: 3
+```

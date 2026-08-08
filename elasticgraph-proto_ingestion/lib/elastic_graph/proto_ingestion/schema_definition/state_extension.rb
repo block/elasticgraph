@@ -6,6 +6,8 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/proto_ingestion"
+require "elastic_graph/proto_ingestion/schema_definition/field_number_mappings"
 require "elastic_graph/proto_ingestion/schema_definition/proto_ingestion_state"
 
 module ElasticGraph
@@ -19,10 +21,25 @@ module ElasticGraph
         attr_reader :proto_ingestion_state
 
         def self.extended(state)
+          field_number_mappings =
+            if (path = state.proto_field_numbers_path) && ::File.exist?(path)
+              FieldNumberMappings.from_yaml_file(path).to_dumpable_hash
+            else
+              {} # : ::Hash[::String, untyped]
+            end
+
           state.instance_variable_set(
             :@proto_ingestion_state,
-            ProtoIngestionState.new(package_name: "elasticgraph")
+            ProtoIngestionState.new(package_name: "elasticgraph", field_number_mappings: field_number_mappings)
           )
+        end
+
+        def proto_field_numbers_path
+          return unless (path = path_to_schema)
+
+          # The `./` prefix is dropped so that a schema definition at the root yields a path that
+          # reads like the other artifact paths when the rake tasks report on it.
+          ::File.join(::File.dirname(path), PROTO_FIELD_NUMBERS_FILE).delete_prefix("./")
         end
       end
     end

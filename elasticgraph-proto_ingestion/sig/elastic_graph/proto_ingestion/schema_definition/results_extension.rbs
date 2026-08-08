@@ -3,12 +3,14 @@ module ElasticGraph
     module SchemaDefinition
       module ResultsExtension : ::ElasticGraph::SchemaDefinition::Results
         def proto_schema: () -> ::String
+        def proto_field_number_mappings: () -> ::Hash[::String, untyped]
 
         private
 
         def protobuf_schema_generator: () -> Schema
 
         @proto_schema: ::String?
+        @protobuf_schema_generator: Schema?
       end
     end
   end

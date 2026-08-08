@@ -1,0 +1,64 @@
+module ElasticGraph
+  module ProtoIngestion
+    module SchemaDefinition
+      class FieldNumberMappings
+        extend Support::FromYamlFile[FieldNumberMappings]
+
+        type fieldNumbersByName = ::Hash[::String, ::Integer]
+
+        class MessageMapping
+          attr_reader field_numbers_by_name: fieldNumbersByName
+          attr_reader next_number: ::Integer
+
+          def self.new: (field_numbers_by_name: fieldNumbersByName, next_number: ::Integer) -> instance
+          def with: (?field_numbers_by_name: fieldNumbersByName, ?next_number: ::Integer) -> instance
+        end
+
+        class EnumMapping
+          attr_reader value_numbers_by_name: fieldNumbersByName
+          attr_reader next_number: ::Integer
+
+          def self.new: (value_numbers_by_name: fieldNumbersByName, next_number: ::Integer) -> instance
+          def with: (?value_numbers_by_name: fieldNumbersByName, ?next_number: ::Integer) -> instance
+        end
+
+        MAX_FIELD_NUMBER: ::Integer
+        RESERVED_FIELD_NUMBER_RANGE: ::Range[::Integer]
+        MAX_ENUM_VALUE_NUMBER: ::Integer
+        JSON_SCHEMA: ::Hash[::String, untyped]
+        VALIDATOR: Support::JSONSchema::Validator
+
+        @message_mappings_by_name: ::Hash[::String, MessageMapping]
+        @enum_mappings_by_name: ::Hash[::String, EnumMapping]
+
+        def self.from_parsed_yaml: (untyped) ?{ (untyped) -> void } -> instance
+        def self.parse_messages: (untyped) -> ::Hash[::String, MessageMapping]
+        def self.parse_enums: (untyped) -> ::Hash[::String, EnumMapping]
+        def self.verify_next_number_is_after_mapped_numbers: (::String, ::Integer, fieldNumbersByName) -> void
+        def self.verify_no_number_collisions: (::Hash[::String, ::Integer], ::String) -> void
+
+        def initialize: (
+          message_mappings_by_name: ::Hash[::String, MessageMapping],
+          enum_mappings_by_name: ::Hash[::String, EnumMapping]
+        ) -> void
+
+        def field_number_for: (
+          message_name: ::String,
+          public_field_name: ::String,
+          previous_field_names: ::Array[::String]
+        ) -> ::Integer
+        def next_field_number_for: (::String) -> ::Integer
+        def reserved_field_numbers_for: (::String, ::Array[::String]) -> fieldNumbersByName
+        def enum_value_numbers_for: (::String, ::Array[::String]) -> ::Hash[::String, ::Integer]
+        def next_enum_value_number_for: (::String) -> ::Integer
+        def reserved_enum_value_numbers_for: (::String, ::Array[::String]) -> ::Hash[::String, ::Integer]
+        def to_dumpable_hash: () -> ::Hash[::String, untyped]
+
+        private
+
+        def reserved_numbers_by_name: (fieldNumbersByName, ::Array[::String]) -> fieldNumbersByName
+        def allocate_field_number: (::String, ::String, MessageMapping) -> MessageMapping
+      end
+    end
+  end
+end

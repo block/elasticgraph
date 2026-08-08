@@ -19,8 +19,8 @@ module ElasticGraph
           # Renders this type's protobuf message definition.
           #
           # @return [String]
-          def to_proto(package_name)
-            render_proto_message(proto_name, package_name)
+          def to_proto(schema, package_name)
+            render_proto_message(schema, proto_name, package_name)
           end
 
           # Returns the schema types referenced by this definition.
@@ -68,19 +68,25 @@ module ElasticGraph
 
           private
 
-          def render_proto_message(message_name, package_name)
-            return render_proto_oneof(message_name, package_name) if abstract?
+          def render_proto_message(schema, message_name, package_name)
+            return render_proto_oneof(schema, message_name, package_name) if abstract?
 
             fields = proto_fields
+            active_field_names = fields.map { |schema_field, _| schema_field.name }
             documentation = ProtoDocumentation.comment_lines_for(doc_comment).map { |line| "#{line}\n" }.join
-            field_definitions = fields.each.with_index(1).map do |(schema_field, field), field_number|
+            field_definitions = fields.map do |schema_field, field|
               repeated, field_type = proto_field_type_for(
                 field.type,
                 package_name: package_name,
                 context_field_name: field.name
               )
+              field_number = schema.field_number_for(
+                message_name: message_name,
+                type_name: name,
+                public_field_name: schema_field.name
+              )
               label = "repeated " if repeated
-              line = "  #{label}#{field_type} #{field.name} = #{field_number};"
+              line = "  #{label}#{field_type} #{schema_field.name} = #{field_number};"
               field_documentation = ProtoDocumentation
                 .comment_lines_for(schema_field.doc_comment, indent: "  ")
                 .map { |comment_line| "#{comment_line}\n" }
@@ -88,6 +94,10 @@ module ElasticGraph
 
               "#{field_documentation}#{line}"
             end
+            schema.reserved_field_numbers_for(message_name, active_field_names).each do |field_name, field_number|
+              field_definitions << "  reserved #{field_number}; // Previously used by #{field_name}."
+            end
+            field_definitions << "  // Next field number: #{schema.next_field_number_for(message_name)}"
 
             <<~PROTO.chomp
               #{documentation}message #{message_name} {
@@ -96,21 +106,31 @@ module ElasticGraph
             PROTO
           end
 
-          def render_proto_oneof(message_name, package_name)
+          def render_proto_oneof(schema, message_name, package_name)
             # @type var abstract_type: ::ElasticGraph::SchemaDefinition::Mixins::HasSubtypes
             abstract_type = _ = self
             documentation = ProtoDocumentation.comment_lines_for(doc_comment).map { |line| "#{line}\n" }.join
-            alternatives = abstract_type.recursively_resolve_subtypes.each.with_index(1).map do |subtype, field_number|
+            active_field_names = [] # : ::Array[::String]
+            alternatives = abstract_type.recursively_resolve_subtypes.map do |subtype|
               proto_subtype = _ = subtype
               field_name = Support::Casing.to_upper_snake(proto_subtype.proto_name).downcase
+              active_field_names << field_name
+              field_number = schema.field_number_for(
+                message_name: message_name,
+                type_name: name,
+                public_field_name: field_name
+              )
               "    #{proto_subtype.proto_type_reference(package_name)} #{field_name} = #{field_number};"
             end
+            body_lines = ["  oneof value {", *alternatives, "  }"]
+            schema.reserved_field_numbers_for(message_name, active_field_names).each do |field_name, field_number|
+              body_lines << "  reserved #{field_number}; // Previously used by #{field_name}."
+            end
+            body_lines << "  // Next field number: #{schema.next_field_number_for(message_name)}"
 
             <<~PROTO.chomp
               #{documentation}message #{message_name} {
-                oneof value {
-              #{alternatives.join("\n")}
-                }
+              #{body_lines.join("\n")}
               }
             PROTO
           end
