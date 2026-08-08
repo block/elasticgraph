@@ -14,33 +14,45 @@ module ElasticGraph
       module SchemaElements
         # Extends ScalarType with proto field type conversion.
         module ScalarTypeExtension
-          # Default protobuf types applied to ElasticGraph's built-in scalar types as they are constructed.
-          BUILT_IN_SCALAR_PROTO_TYPES_BY_NAME = {
-            "Boolean" => "bool",
-            "Cursor" => "string",
-            "Date" => "string",
-            "DateTime" => "string",
-            "Float" => "double",
-            "ID" => "string",
-            "Int" => "int32",
-            "JsonSafeLong" => "int64",
-            "LocalTime" => "string",
-            "LongString" => "int64",
-            "String" => "string",
-            "TimeZone" => "string",
-            "Untyped" => "string"
+          # Default protobuf options applied to ElasticGraph's built-in scalar types as they are constructed.
+          BUILT_IN_SCALAR_PROTO_OPTIONS_BY_NAME = {
+            "Boolean" => {type: "bool"},
+            "Cursor" => {type: "string"},
+            "Date" => {type: "string", comment: %(ISO 8601 date, e.g. "2024-11-25")},
+            "DateTime" => {type: "google.protobuf.Timestamp", import: "google/protobuf/timestamp.proto"},
+            "Float" => {type: "double"},
+            "ID" => {type: "string"},
+            "Int" => {type: "int32"},
+            "JsonSafeLong" => {type: "int64"},
+            "LocalTime" => {type: "string", comment: %(ISO 8601 local time, e.g. "14:23:12")},
+            "LongString" => {type: "int64"},
+            "String" => {type: "string"},
+            "TimeZone" => {type: "string", comment: %(IANA time zone identifier, e.g. "America/Los_Angeles")},
+            "Untyped" => {type: "string"}
           }.freeze
 
           # Configured protobuf type (e.g. string, int64, bool).
           # @dynamic protobuf_type
           attr_reader :protobuf_type
 
+          # Proto file to import for the configured protobuf type, if it is externally defined.
+          # @dynamic protobuf_import
+          attr_reader :protobuf_import
+
+          # Comment rendered on generated proto fields of this scalar type.
+          # @dynamic protobuf_comment
+          attr_reader :protobuf_comment
+
           # Configures the protobuf type for this scalar type.
           #
-          # @param type [String] protobuf scalar type name
+          # @param type [String] protobuf type name
+          # @param import [String, nil] proto file to import for an externally defined type
+          # @param comment [String, nil] comment rendered on generated fields of this type
           # @return [void]
-          def protobuf(type:)
+          def protobuf(type:, import: nil, comment: nil)
             @protobuf_type = type
+            @protobuf_import = import
+            @protobuf_comment = comment
           end
 
           # Applies any built-in protobuf type, yields for further configuration, and validates the result.
@@ -50,8 +62,12 @@ module ElasticGraph
           # @raise [Errors::SchemaError] when a protobuf type is missing
           def initialize_proto_extension
             original_name = type_ref.with_reverted_override.name
-            if (proto_type = BUILT_IN_SCALAR_PROTO_TYPES_BY_NAME[original_name])
-              protobuf type: proto_type
+            if (proto_options = BUILT_IN_SCALAR_PROTO_OPTIONS_BY_NAME[original_name])
+              protobuf(
+                type: proto_options.fetch(:type),
+                import: proto_options[:import],
+                comment: proto_options[:comment]
+              )
             end
 
             yield

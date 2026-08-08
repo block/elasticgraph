@@ -28,7 +28,7 @@ module ElasticGraph
             ::ElasticGraph::SchemaDefinition::SchemaElements::TypeReference,
             package_name: ::String,
             context_field_name: ::String
-          ) -> [bool, ::String]
+          ) -> [bool, ::String, ::String?]
         end
       end
     end

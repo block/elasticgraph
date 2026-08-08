@@ -75,7 +75,7 @@ module ElasticGraph
             active_field_names = fields.map { |schema_field, _| schema_field.name }
             documentation = ProtoDocumentation.comment_lines_for(doc_comment).map { |line| "#{line}\n" }.join
             field_definitions = fields.map do |schema_field, field|
-              repeated, field_type = proto_field_type_for(
+              repeated, field_type, type_comment = proto_field_type_for(
                 field.type,
                 package_name: package_name,
                 context_field_name: field.name
@@ -87,6 +87,7 @@ module ElasticGraph
               )
               label = "repeated " if repeated
               line = "  #{label}#{field_type} #{schema_field.name} = #{field_number};"
+              line += " // #{type_comment}" if type_comment
               field_documentation = ProtoDocumentation
                 .comment_lines_for(schema_field.doc_comment, indent: "  ")
                 .map { |comment_line| "#{comment_line}\n" }
@@ -160,7 +161,8 @@ module ElasticGraph
             end
 
             proto_type = _ = base_type_ref.resolved
-            [list_depth == 1, proto_type.proto_type_reference(package_name)]
+            type_comment = (ScalarTypeExtension === proto_type) ? proto_type.protobuf_comment : nil
+            [list_depth == 1, proto_type.proto_type_reference(package_name), type_comment]
           end
         end
       end
