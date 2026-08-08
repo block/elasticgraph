@@ -935,18 +935,26 @@ module ElasticGraph
           # `p50`/`p75` (unlike p0/p100) can't be satisfied by an implementation that only supports
           # min/max, so they're what actually proves full percentile support works. We can't pin an
           # exact expected value here: different datastore versions/backends use different (equally
-          # valid) interpolation conventions for a rank that doesn't land exactly on one data point, so
-          # we only assert it's a real number within [min, max] (a property every backend guarantees).
-          "p50" => percentile_of(min, max),
-          "p75" => percentile_of(min, max),
+          # valid) interpolation conventions for a rank that doesn't land exactly on one data point.
+          # Both the nearest-rank method (OpenSearch) and linear interpolation (Elasticsearch) are
+          # guaranteed to land between the two order statistics bracketing that rank, so `percentile_of`
+          # narrows the expectation to that bracket instead of the full `[min, max]` range.
+          "p50" => percentile_of(raw_values, 50),
+          "p75" => percentile_of(raw_values, 75),
           case_correctly("exact_min") => int_of(min),
           case_correctly("exact_max") => int_of(max)
         }
       end
 
-      def percentile_of(min, max)
-        return nil if min.nil?
-        (be >= min).and(be <= max).and a_kind_of(::Float)
+      def percentile_of(raw_values, percent)
+        return nil if raw_values.empty?
+
+        sorted = raw_values.sort
+        rank = (percent / 100.0) * (sorted.size - 1)
+        lower_bound = sorted[rank.floor]
+        upper_bound = sorted[rank.ceil]
+
+        (be >= lower_bound).and(be <= upper_bound).and a_kind_of(::Float)
       end
 
       def verify_all_timestamp_groupings_valid(widget_id, truncation_unit_type:, field:)

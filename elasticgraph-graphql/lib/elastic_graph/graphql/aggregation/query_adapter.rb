@@ -17,7 +17,6 @@ require "elastic_graph/graphql/aggregation/script_term_grouping"
 require "elastic_graph/graphql/schema/arguments"
 require "elastic_graph/support/hash_util"
 require "elastic_graph/support/memoizable_data"
-require "graphql"
 
 module ElasticGraph
   class GraphQL

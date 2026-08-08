@@ -31,12 +31,11 @@ module ElasticGraph
 
           if expect_errors
             expect(response["errors"]).not_to be_empty
+            response
           else
             expect(response["errors"]).to eq([]).or eq(nil)
+            response.dig(*path)
           end
-
-          return response if expect_errors
-          response.dig(*path)
         end
 
         def datastore_response_payload_with_aggs(aggregations, hit_count)
