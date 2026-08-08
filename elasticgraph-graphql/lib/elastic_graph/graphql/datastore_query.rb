@@ -172,8 +172,13 @@ module ElasticGraph
         ).to_s
       end
 
-      def excluding_indices?
-        search_index_expression.split(",").any? { |expr| expr.start_with?("-") }
+      # Indicates if this query targets indices that our cached index state says exist. When true, a response
+      # reporting zero searched shards means those indices have been deleted since we cached them--not that the
+      # cluster was never configured.
+      def searches_only_deleted_indices?
+        !search_index_expression.empty? && narrowed_search_index_definitions.any? do |index_def|
+          index_def.rollover_index_template? && !index_def.known_related_query_rollover_indices.empty?
+        end
       end
 
       # Returns the name of the datastore cluster as a String where this query should be sent.
@@ -239,7 +244,11 @@ module ElasticGraph
       end
 
       def to_datastore_msearch_header
-        @to_datastore_msearch_header ||= {index: search_index_expression, routing: shard_routing_values&.join(",")}.compact
+        @to_datastore_msearch_header ||= {
+          index: search_index_expression,
+          ignore_unavailable: true,
+          routing: shard_routing_values&.join(",")
+        }.compact
       end
 
       # `DatastoreQuery` objects are used as keys in a hash. Computing `#hash` can be expensive (given how many fields
