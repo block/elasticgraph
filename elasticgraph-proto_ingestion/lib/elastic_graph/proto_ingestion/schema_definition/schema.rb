@@ -15,8 +15,11 @@ require "elastic_graph/proto_ingestion/schema_definition/schema_elements/scalar_
 module ElasticGraph
   module ProtoIngestion
     module SchemaDefinition
-      # Builds a `proto3` schema string from an ElasticGraph schema definition.
+      # Builds a `proto2` or `proto3` schema string from an ElasticGraph schema definition.
       class Schema
+        # Protobuf syntaxes this generator can emit.
+        SUPPORTED_SYNTAXES = %w[proto2 proto3].freeze
+
         # @param state [ElasticGraph::SchemaDefinition::State]
         # @param all_types [Array<ElasticGraph::SchemaDefinition::SchemaElements::graphQLType>]
         # @param package_name [String]
@@ -25,8 +28,12 @@ module ElasticGraph
           state:,
           all_types:,
           package_name:,
-          proto_field_number_mappings: {}
+          proto_field_number_mappings: {},
+          syntax: :proto3,
+          headers: []
         )
+          @syntax = syntax.to_s
+          @headers = headers
           @state = state
           @all_types = all_types
           @package_name = package_name
@@ -43,8 +50,9 @@ module ElasticGraph
           validate_unique_enum_value_prefixes(types)
 
           sections = [
-            %(syntax = "proto3";),
+            %(syntax = "#{@syntax}";),
             "package #{@package_name};",
+            *render_headers,
             *render_imports(types),
             render_definitions(types)
           ]
@@ -105,6 +113,14 @@ module ElasticGraph
           @field_number_mappings.reserved_enum_value_numbers_for(enum_name, active_value_names)
         end
 
+        # Returns the label for a protobuf field under the configured syntax.
+        #
+        # @api private
+        def field_label(repeated)
+          return repeated ? "repeated " : "optional " if @syntax == "proto2"
+          repeated ? "repeated " : nil
+        end
+
         private
 
         # Selects the indexed root types and every type transitively referenced by their protobuf
@@ -137,6 +153,10 @@ module ElasticGraph
           end.uniq.sort
 
           imports.empty? ? [] : [imports.map { |import| %(import "#{import}";) }.join("\n")]
+        end
+
+        def render_headers
+          @headers.empty? ? [] : [@headers.join("\n")]
         end
 
         def validate_unique_enum_value_prefixes(types)
