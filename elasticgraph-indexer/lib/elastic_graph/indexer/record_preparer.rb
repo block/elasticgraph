@@ -11,6 +11,13 @@ require "elastic_graph/errors"
 module ElasticGraph
   class Indexer
     class RecordPreparer
+      # Raised when an abstract-type record is missing a `__typename` (or carries one that does not
+      # name a known concrete subtype). Normally JSON-schema validation prevents reaching here, but
+      # `Indexer::Config#skip_record_validation_for` lets that validation be skipped -- so this error
+      # exists as a typed, catchable signal that callers can convert into a structured failure.
+      class UnknownTypeError < ::KeyError
+      end
+
       # Provides the ability to get a `RecordPreparer` for a specific JSON schema version.
       class Factory
         def initialize(schema_artifacts)
@@ -116,7 +123,10 @@ module ElasticGraph
           #
           # If `type_name` is an abstract type, we need to look at the `__typename` field to see
           # what the concrete subtype is. `__typename` is required on abstract types and indicates that.
-          eg_meta_by_field_name = @eg_meta_by_field_name_by_concrete_type.fetch(value["__typename"] || type_name)
+          concrete_type = value["__typename"] || type_name
+          eg_meta_by_field_name = @eg_meta_by_field_name_by_concrete_type.fetch(concrete_type) do
+            raise UnknownTypeError, "No concrete type named `#{concrete_type}` is known to the record preparer."
+          end
 
           # We only want to consider __typename if it's in the per-record mapping in order to determine
           # whether __typename is required on records. When it's a constant_keyword it exists at the index

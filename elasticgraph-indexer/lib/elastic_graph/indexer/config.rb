@@ -11,7 +11,7 @@ require "elastic_graph/support/config"
 
 module ElasticGraph
   class Indexer
-    class Config < Support::Config.define(:latency_slo_thresholds_by_timestamp_in_ms, :skip_derived_indexing_type_updates, :extension_modules)
+    class Config < Support::Config.define(:latency_slo_thresholds_by_timestamp_in_ms, :skip_derived_indexing_type_updates, :skip_record_validation_for, :extension_modules)
       json_schema at: "indexer",
         optional: false,
         description: "Configuration for indexing operations and metrics used by `elasticgraph-indexer`.",
@@ -43,15 +43,36 @@ module ElasticGraph
               {"WidgetWorkspace" => ["ABC12345678"]}
             ]
           },
+          skip_record_validation_for: {
+            description: "Map of GraphQL type names to the fraction of records (in `[0.0, 1.0]`) whose " \
+              "per-type JSON schema validation should be skipped. `0.0` (or an absent key) validates every record; " \
+              "`1.0` skips every record; values in between sample. The decision is deterministic per event id " \
+              "(`type:id@vversion`) so the same event makes the same skip decision on retry across indexer pods. " \
+              "The event envelope (op, id, type, version, json_schema_version, latency_timestamps) is always " \
+              "validated. Intended for backfills of trusted, pre-validated data where skipping the per-record " \
+              "schema walk yields meaningful ingest speedups, with a sampled fraction left validated as a canary " \
+              "for schema drift. Leave empty for live-traffic ingestion: the datastore mappings will not catch all " \
+              "the constraints (regex, enum, min/max, format, abstract-type discriminators) that the JSON schema " \
+              "enforces.",
+            type: "object",
+            patternProperties: {/^[A-Z]\w*$/.source => {type: "number", minimum: 0, maximum: 1}},
+            additionalProperties: false,
+            default: {}, # : untyped
+            examples: [
+              {}, # : untyped
+              {"Widget" => 0.9, "Component" => 1.0}
+            ]
+          },
           extension_modules: Support::Config::EXTENSION_MODULE_SCHEMA
         }
 
       private
 
-      def convert_values(skip_derived_indexing_type_updates:, latency_slo_thresholds_by_timestamp_in_ms:, extension_modules:)
+      def convert_values(skip_derived_indexing_type_updates:, latency_slo_thresholds_by_timestamp_in_ms:, skip_record_validation_for:, extension_modules:)
         {
           skip_derived_indexing_type_updates: skip_derived_indexing_type_updates.transform_values(&:to_set),
           latency_slo_thresholds_by_timestamp_in_ms: latency_slo_thresholds_by_timestamp_in_ms,
+          skip_record_validation_for: skip_record_validation_for.transform_values(&:to_f),
           extension_modules: SchemaArtifacts::RuntimeMetadata::ExtensionLoader.load_component_extensions(extension_modules)
         }
       end

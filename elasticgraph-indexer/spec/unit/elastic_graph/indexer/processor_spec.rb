@@ -386,6 +386,47 @@ module ElasticGraph
           end
         end
 
+        context "when the indexer skips per-record validation for some types" do
+          # `skip_record_validation_for` is intentionally not exposed via `build_indexer`, so we
+          # construct the indexer directly (reusing the spec's router spy and clock) to enable it.
+          let(:indexer) do
+            Indexer.new(
+              datastore_core: build_datastore_core,
+              config: Indexer::Config.new(
+                latency_slo_thresholds_by_timestamp_in_ms: {},
+                skip_derived_indexing_type_updates: {},
+                skip_record_validation_for: {"Component" => 1.0}
+              ),
+              datastore_router: datastore_router,
+              clock: clock
+            )
+          end
+
+          it "logs a single aggregate `RecordValidationSkipped` entry per batch, counted by type" do
+            component1 = build_upsert_event(:component, id: "c1", __version: 1)
+            component2 = build_upsert_event(:component, id: "c2", __version: 1)
+            address = build_upsert_event(:address, id: "a1", __version: 1)
+
+            process([component1, component2, address])
+
+            expect(logged_jsons_of_type("RecordValidationSkipped")).to contain_exactly(
+              a_hash_including(
+                "message_type" => "RecordValidationSkipped",
+                "count" => 2,
+                "counts_by_type" => {"Component" => 2}
+              )
+            )
+          end
+
+          it "logs nothing when no records in the batch had validation skipped" do
+            address = build_upsert_event(:address, id: "a1", __version: 1)
+
+            process([address])
+
+            expect(logged_jsons_of_type("RecordValidationSkipped")).to be_empty
+          end
+        end
+
         def build_indexer_with(latency_thresholds:)
           build_indexer(
             clock: clock,

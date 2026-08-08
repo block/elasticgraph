@@ -32,6 +32,33 @@ module ElasticGraph
         expect(config.skip_derived_indexing_type_updates).to eq("WidgetCurrency" => ["USD"].to_set)
       end
 
+      it "coerces `skip_record_validation_for` rates to floats (so integer YAML values like `1` become `1.0`)" do
+        config = Config.from_parsed_yaml("indexer" => {
+          "latency_slo_thresholds_by_timestamp_in_ms" => {},
+          "skip_record_validation_for" => {
+            "Widget" => 1,
+            "Component" => 0.5
+          }
+        })
+
+        expect(config.skip_record_validation_for).to eq("Widget" => 1.0, "Component" => 0.5)
+        expect(config.skip_record_validation_for.values).to all(be_a(::Float))
+      end
+
+      it "rejects `skip_record_validation_for` rates outside `[0.0, 1.0]`" do
+        expect {
+          Config.from_parsed_yaml("indexer" => {
+            "skip_record_validation_for" => {"Widget" => 1.5}
+          })
+        }.to raise_error Errors::ConfigError
+
+        expect {
+          Config.from_parsed_yaml("indexer" => {
+            "skip_record_validation_for" => {"Widget" => -0.1}
+          })
+        }.to raise_error Errors::ConfigError
+      end
+
       describe "#extension_modules", :in_temp_dir do
         it "loads the extension modules from disk" do
           File.write("eg_extension_module1.rb", <<~EOS)
