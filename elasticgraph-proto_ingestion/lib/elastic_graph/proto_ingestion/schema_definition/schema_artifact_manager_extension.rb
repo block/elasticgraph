@@ -8,7 +8,6 @@
 
 require "elastic_graph/errors"
 require "elastic_graph/proto_ingestion"
-require "elastic_graph/proto_ingestion/schema_definition/schema_artifact_extension"
 
 module ElasticGraph
   module ProtoIngestion
@@ -18,6 +17,20 @@ module ElasticGraph
       #
       # @private
       module SchemaArtifactManagerExtension
+        PROTO_FIELD_NUMBERS_COMMENT_PREAMBLE_LINES = [
+          "This file is part of your schema definition--not a regenerable schema artifact. It is an",
+          "input to `schema.proto` generation: ElasticGraph reads it to keep protobuf field and enum",
+          "value numbers stable as your schema evolves, and `rake schema_artifacts:dump` maintains it",
+          "for you.",
+          "",
+          "You may update it by hand (e.g. to assign a specific number). While prototyping, you may",
+          "delete this file and regenerate it to reset the number assignments.",
+          "",
+          "Once generated protos have been used to serialize data or consumed by another codebase,",
+          "you must NOT delete this file and regenerate it. The original number assignments would be",
+          "lost, and previously serialized protobuf messages would be misread."
+        ].freeze
+
         private
 
         # Overrides the base `artifacts_from_schema_def` method to add proto artifacts.
@@ -37,8 +50,10 @@ module ElasticGraph
         # lives alongside `path_to_schema` instead of in the schema artifacts directory.
         def proto_field_numbers_artifact
           new_yaml_artifact(PROTO_FIELD_NUMBERS_FILE, protobuf_schema_definition_results.proto_field_number_mappings)
-            .with(file_name: proto_field_numbers_path)
-            .extend(SchemaArtifactExtension)
+            .with(
+              file_name: proto_field_numbers_path,
+              comment_preamble_lines: PROTO_FIELD_NUMBERS_COMMENT_PREAMBLE_LINES
+            )
         end
 
         def proto_field_numbers_path

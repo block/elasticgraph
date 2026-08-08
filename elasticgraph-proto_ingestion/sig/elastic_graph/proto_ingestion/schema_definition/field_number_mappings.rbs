@@ -2,6 +2,8 @@ module ElasticGraph
   module ProtoIngestion
     module SchemaDefinition
       class FieldNumberMappings
+        extend Support::FromYamlFile[FieldNumberMappings]
+
         type fieldNumbersByName = ::Hash[::String, ::Integer]
 
         class MessageMapping
@@ -12,25 +14,32 @@ module ElasticGraph
           def with: (?field_numbers_by_name: fieldNumbersByName, ?next_number: ::Integer) -> instance
         end
 
+        class EnumMapping
+          attr_reader value_numbers_by_name: fieldNumbersByName
+          attr_reader next_number: ::Integer
+
+          def self.new: (value_numbers_by_name: fieldNumbersByName, next_number: ::Integer) -> instance
+          def with: (?value_numbers_by_name: fieldNumbersByName, ?next_number: ::Integer) -> instance
+        end
+
         MAX_FIELD_NUMBER: ::Integer
         RESERVED_FIELD_NUMBER_RANGE: ::Range[::Integer]
         MAX_ENUM_VALUE_NUMBER: ::Integer
+        JSON_SCHEMA: ::Hash[::String, untyped]
+        VALIDATOR: Support::JSONSchema::Validator
 
         @message_mappings_by_name: ::Hash[::String, MessageMapping]
-        @value_numbers_by_enum: ::Hash[::String, ::Hash[::String, ::Integer]]
-        @used_enum_value_numbers_by_enum: ::Hash[::String, ::Set[::Integer]]
+        @enum_mappings_by_name: ::Hash[::String, EnumMapping]
 
-        def self.from_artifact: (untyped) -> instance
+        def self.from_parsed_yaml: (untyped) ?{ (untyped) -> void } -> instance
         def self.parse_messages: (untyped) -> ::Hash[::String, MessageMapping]
-        def self.parse_enums: (untyped) -> ::Hash[::String, ::Hash[::String, ::Integer]]
-        def self.validated_field_number: (::String, ::String, untyped) -> ::Integer
-        def self.validated_next_number: (::String, untyped, fieldNumbersByName) -> ::Integer
+        def self.parse_enums: (untyped) -> ::Hash[::String, EnumMapping]
+        def self.verify_next_number_is_after_mapped_numbers: (::String, ::Integer, fieldNumbersByName) -> void
         def self.verify_no_number_collisions: (::Hash[::String, ::Integer], ::String) -> void
-        def self.verify_known_keys: (::Hash[untyped, untyped], ::Array[::String], ::String) -> void
 
         def initialize: (
           message_mappings_by_name: ::Hash[::String, MessageMapping],
-          value_numbers_by_enum: ::Hash[::String, ::Hash[::String, ::Integer]]
+          enum_mappings_by_name: ::Hash[::String, EnumMapping]
         ) -> void
 
         def field_number_for: (
@@ -38,15 +47,17 @@ module ElasticGraph
           public_field_name: ::String,
           previous_field_names: ::Array[::String]
         ) -> ::Integer
+        def next_field_number_for: (::String) -> ::Integer
+        def reserved_field_numbers_for: (::String, ::Array[::String]) -> fieldNumbersByName
         def enum_value_numbers_for: (::String, ::Array[::String]) -> ::Hash[::String, ::Integer]
-        def to_artifact: () -> ::Hash[::String, untyped]
+        def next_enum_value_number_for: (::String) -> ::Integer
+        def reserved_enum_value_numbers_for: (::String, ::Array[::String]) -> ::Hash[::String, ::Integer]
+        def to_dumpable_hash: () -> ::Hash[::String, untyped]
 
         private
 
-        def used_enum_value_numbers_for: (::String, ::Hash[::String, ::Integer]) -> ::Set[::Integer]
-        def allocate_field_number: (::String, MessageMapping) -> ::Integer
-        def allocate_enum_value_number: (::Set[::Integer]) -> ::Integer
-        def migrate_renamed_field_number: (fieldNumbersByName, ::Array[::String]) -> ::Integer?
+        def reserved_numbers_by_name: (fieldNumbersByName, ::Array[::String]) -> fieldNumbersByName
+        def allocate_field_number: (::String, ::String, MessageMapping) -> MessageMapping
       end
     end
   end

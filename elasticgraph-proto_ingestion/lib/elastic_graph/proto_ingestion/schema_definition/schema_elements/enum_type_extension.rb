@@ -92,6 +92,10 @@ module ElasticGraph
               value = raw_value # : ::ElasticGraph::SchemaDefinition::SchemaElements::EnumValue & EnumValueExtension
               value.to_proto(value_numbers.fetch(value.name), proto_enum_value_prefix: proto_enum_value_prefix)
             end)
+            schema.reserved_enum_value_numbers_for(proto_name, values_by_name.keys).each do |value_name, value_number|
+              value_definitions << "  reserved #{value_number}; // Previously used by #{value_name}."
+            end
+            value_definitions << "  // Next value number: #{schema.next_enum_value_number_for(proto_name)}"
 
             <<~PROTO.chomp
               #{documentation}enum #{proto_name} {

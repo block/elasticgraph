@@ -124,8 +124,9 @@ Additionally:
 
 `schema_artifacts:dump` automatically reads and writes `proto_field_numbers.yaml`,
 stored alongside your schema definition (as a sibling of the file `path_to_schema`
-points to). Existing numbers stay fixed even if field order changes, and new fields
-use each message's stored `next_number`, so gaps below that cursor are never filled:
+points to). Existing numbers stay fixed even if field or enum value order changes. New fields,
+`oneof` alternatives, and enum values use their type's stored `next_number`, so gaps below that
+cursor are never filled:
 
 ```yaml
 messages:
@@ -153,6 +154,11 @@ Alternatives inside generated interface and union `oneof` blocks use the same st
 message-field mappings, so adding or removing a concrete subtype does not renumber the
 remaining alternatives.
 
+Removed fields and `oneof` alternatives remain in the sidecar. Their numbers are explicitly
+reserved in `schema.proto`, with comments recording the prior names, while every generated
+message includes a comment identifying its next field number. If a removed field or alternative
+is restored under the same name, it reuses its original number and is no longer reserved.
+
 Both `schema.proto` and the sidecar use public GraphQL field names. Index field names,
 including `name_in_index` overrides, are not part of the protobuf wire schema or its
 stable-numbering state.
@@ -163,9 +169,11 @@ existing field number under the new public field name.
 ## Stable Enum Value Numbers
 
 Enum value numbers are pinned the same way, in an `enums` section of the sidecar. Existing
-values keep their numbers when other values are added or removed, new values get the next
-available numbers, and removed values keep their numbers reserved so they are never reused
-(number `0` is always the generated `*_UNSPECIFIED` value):
+values keep their numbers when other values are added or removed, new values claim the stored
+`next_number`, and removed values keep their numbers reserved so they are never reused
+(number `0` is always the generated `*_UNSPECIFIED` value). `schema.proto` explicitly reserves
+each removed value number, includes a comment recording its prior name, and identifies the next
+value number for each enum:
 
 ```yaml
 enums:
@@ -173,4 +181,5 @@ enums:
     values:
       RED: 1
       BLUE: 2
+    next_number: 3
 ```

@@ -7,6 +7,8 @@
 # frozen_string_literal: true
 
 require "elastic_graph/errors"
+require "elastic_graph/support/from_yaml_file"
+require "elastic_graph/support/json_schema/validator_factory"
 
 module ElasticGraph
   module ProtoIngestion
@@ -16,6 +18,8 @@ module ElasticGraph
       # out the next available numbers for new fields and enum values, and serializes the updated
       # mappings for the next artifact dump so that numbers stay stable over time.
       class FieldNumberMappings
+        extend Support::FromYamlFile
+
         # Stored field numbers and allocation cursor for a single protobuf message.
         #
         # @!attribute [r] field_numbers_by_name
@@ -24,6 +28,15 @@ module ElasticGraph
         #   @return [Integer]
         MessageMapping = ::Data.define(:field_numbers_by_name, :next_number)
         private_constant :MessageMapping
+
+        # Stored value numbers and allocation cursor for a single protobuf enum.
+        #
+        # @!attribute [r] value_numbers_by_name
+        #   @return [Hash<String, Integer>]
+        # @!attribute [r] next_number
+        #   @return [Integer]
+        EnumMapping = ::Data.define(:value_numbers_by_name, :next_number)
+        private_constant :EnumMapping
 
         # The largest field number protobuf allows (2^29 - 1), per
         # https://protobuf.dev/programming-guides/proto3/#assigning.
@@ -35,36 +48,110 @@ module ElasticGraph
         # https://protobuf.dev/programming-guides/proto3/#enum.
         MAX_ENUM_VALUE_NUMBER = 2_147_483_647
 
-        # Builds an instance from mappings in the `proto_field_numbers.yaml` artifact format,
-        # validating the structure and every mapped number.
+        # JSON schema for the `proto_field_numbers.yaml` artifact.
+        JSON_SCHEMA = {
+          "$schema" => "http://json-schema.org/draft-07/schema#",
+          "definitions" => {
+            "field_number" => {
+              "type" => "integer",
+              "minimum" => 1,
+              "maximum" => MAX_FIELD_NUMBER,
+              "not" => {
+                "minimum" => RESERVED_FIELD_NUMBER_RANGE.begin,
+                "maximum" => RESERVED_FIELD_NUMBER_RANGE.end
+              }
+            },
+            "next_field_number" => {
+              "type" => "integer",
+              "minimum" => 1,
+              "maximum" => MAX_FIELD_NUMBER + 1,
+              "not" => {
+                "minimum" => RESERVED_FIELD_NUMBER_RANGE.begin,
+                "maximum" => RESERVED_FIELD_NUMBER_RANGE.end
+              }
+            },
+            "enum_value_number" => {
+              "type" => "integer",
+              "minimum" => 1,
+              "maximum" => MAX_ENUM_VALUE_NUMBER
+            },
+            "next_enum_value_number" => {
+              "type" => "integer",
+              "minimum" => 1,
+              "maximum" => MAX_ENUM_VALUE_NUMBER + 1
+            }
+          },
+          "type" => "object",
+          "properties" => {
+            "messages" => {
+              "type" => "object",
+              "additionalProperties" => {
+                "type" => "object",
+                "properties" => {
+                  "fields" => {
+                    "type" => "object",
+                    "additionalProperties" => {"$ref" => "#/definitions/field_number"}
+                  },
+                  "next_number" => {"$ref" => "#/definitions/next_field_number"}
+                },
+                "required" => ["fields", "next_number"],
+                "additionalProperties" => false
+              }
+            },
+            "enums" => {
+              "type" => "object",
+              "additionalProperties" => {
+                "type" => "object",
+                "properties" => {
+                  "values" => {
+                    "type" => "object",
+                    "additionalProperties" => {"$ref" => "#/definitions/enum_value_number"}
+                  },
+                  "next_number" => {"$ref" => "#/definitions/next_enum_value_number"}
+                },
+                "required" => ["values", "next_number"],
+                "additionalProperties" => false
+              }
+            }
+          },
+          "additionalProperties" => false
+        }
+
+        VALIDATOR = Support::JSONSchema::Validator.new(
+          schema: Support::JSONSchema::ValidatorFactory.new(
+            schema: JSON_SCHEMA,
+            sanitize_pii: false
+          ).root_schema,
+          sanitize_pii: false
+        )
+        private_constant :VALIDATOR
+
+        # Builds an instance from parsed `proto_field_numbers.yaml`, validating its structure and
+        # every mapped number.
         #
-        # @param artifact [Hash, nil] parsed contents of the artifact (or a hash in the same format)
+        # @param parsed_yaml [Hash, nil] parsed contents of the artifact (or a hash in the same format)
         # @return [FieldNumberMappings]
         # @raise [Errors::SchemaError] if the mappings deviate from the artifact format or contain invalid numbers
-        def self.from_artifact(artifact)
-          return new(message_mappings_by_name: {}, value_numbers_by_enum: {}) if artifact.nil?
-
-          unless artifact.is_a?(::Hash)
-            raise Errors::SchemaError, "Protobuf field-number mappings must be a Hash, got: #{artifact.class}."
+        def self.from_parsed_yaml(parsed_yaml)
+          parsed_yaml ||= {} # : ::Hash[::String, untyped]
+          if (validation_error = VALIDATOR.validate_with_error_message(parsed_yaml))
+            raise Errors::SchemaError, "Invalid protobuf field-number mappings:\n\n#{validation_error}"
           end
-
-          verify_known_keys(artifact, ["messages", "enums"], "protobuf field-number mappings")
 
           empty_section = {} # : ::Hash[untyped, untyped]
 
           new(
-            message_mappings_by_name: parse_messages(artifact.fetch("messages", empty_section)),
-            value_numbers_by_enum: parse_enums(artifact.fetch("enums", empty_section))
+            message_mappings_by_name: parse_messages(parsed_yaml.fetch("messages", empty_section)),
+            enum_mappings_by_name: parse_enums(parsed_yaml.fetch("enums", empty_section))
           )
         end
 
         # @param message_mappings_by_name [Hash<String, MessageMapping>] validated message mappings
-        # @param value_numbers_by_enum [Hash<String, Hash<String, Integer>>] validated enum value numbers
+        # @param enum_mappings_by_name [Hash<String, EnumMapping>] validated enum mappings
         # @api private
-        def initialize(message_mappings_by_name:, value_numbers_by_enum:)
+        def initialize(message_mappings_by_name:, enum_mappings_by_name:)
           @message_mappings_by_name = message_mappings_by_name
-          @value_numbers_by_enum = value_numbers_by_enum
-          @used_enum_value_numbers_by_enum = {}
+          @enum_mappings_by_name = enum_mappings_by_name
         end
 
         # Returns the stable protobuf number for a message field, assigning the message's stored
@@ -76,19 +163,45 @@ module ElasticGraph
         # @param previous_field_names [Array<String>] old public names of the field, if renamed
         # @return [Integer]
         def field_number_for(message_name:, public_field_name:, previous_field_names:)
-          message_mapping = @message_mappings_by_name[message_name] ||= MessageMapping.new(
-            field_numbers_by_name: {},
-            next_number: 1
-          )
+          message_mapping = @message_mappings_by_name.fetch(message_name) do
+            MessageMapping.new(field_numbers_by_name: {}, next_number: 1)
+          end
           field_numbers = message_mapping.field_numbers_by_name
 
           return field_numbers.fetch(public_field_name) if field_numbers.key?(public_field_name)
 
-          if (renamed_field_number = migrate_renamed_field_number(field_numbers, previous_field_names))
-            return field_numbers[public_field_name] = renamed_field_number
-          end
+          old_field_name = previous_field_names.find { |field_name| field_numbers.key?(field_name) }
+          updated_mapping =
+            if old_field_name
+              message_mapping.with(
+                field_numbers_by_name: field_numbers
+                  .except(old_field_name)
+                  .merge(public_field_name => field_numbers.fetch(old_field_name))
+              )
+            else
+              allocate_field_number(message_name, public_field_name, message_mapping)
+            end
 
-          field_numbers[public_field_name] = allocate_field_number(message_name, message_mapping)
+          @message_mappings_by_name = @message_mappings_by_name.merge(message_name => updated_mapping)
+          updated_mapping.field_numbers_by_name.fetch(public_field_name)
+        end
+
+        # Returns the next field number that will be assigned for the given message.
+        #
+        # @param message_name [String]
+        # @return [Integer]
+        def next_field_number_for(message_name)
+          @message_mappings_by_name[message_name]&.next_number || 1
+        end
+
+        # Returns field names and numbers retained in the mappings but absent from the message.
+        #
+        # @param message_name [String]
+        # @param active_field_names [Array<String>]
+        # @return [Hash<String, Integer>]
+        def reserved_field_numbers_for(message_name, active_field_names)
+          field_numbers = @message_mappings_by_name[message_name]&.field_numbers_by_name || {}
+          reserved_numbers_by_name(field_numbers, active_field_names)
         end
 
         # Returns the stable protobuf numbers for an enum's values, assigning the next available
@@ -98,20 +211,57 @@ module ElasticGraph
         # @param value_names [Array<String>]
         # @return [Hash<String, Integer>]
         def enum_value_numbers_for(enum_name, value_names)
-          value_numbers = @value_numbers_by_enum[enum_name] ||= {}
-          used_numbers = used_enum_value_numbers_for(enum_name, value_numbers)
+          enum_mapping = @enum_mappings_by_name.fetch(enum_name) do
+            EnumMapping.new(value_numbers_by_name: {}, next_number: 1)
+          end
+          value_numbers = enum_mapping.value_numbers_by_name
+          new_value_names = value_names - value_numbers.keys
+          first_new_number = enum_mapping.next_number
+          last_new_number = first_new_number + new_value_names.size - 1
+
+          if new_value_names.any? && last_new_number > MAX_ENUM_VALUE_NUMBER
+            raise Errors::SchemaError, "Cannot allocate another protobuf enum value number for enum `#{enum_name}`: " \
+              "the maximum enum value number (#{MAX_ENUM_VALUE_NUMBER}) has been reached."
+          end
+
+          new_value_numbers = new_value_names.each_with_index.to_h do |value_name, index|
+            [value_name, first_new_number + index]
+          end
+          updated_value_numbers = value_numbers.merge(new_value_numbers)
+          updated_mapping = enum_mapping.with(
+            value_numbers_by_name: updated_value_numbers,
+            next_number: last_new_number + 1
+          )
+          @enum_mappings_by_name = @enum_mappings_by_name.merge(enum_name => updated_mapping)
 
           value_names.to_h do |value_name|
-            number = value_numbers[value_name] ||= allocate_enum_value_number(used_numbers)
-            [value_name, number]
+            [value_name, updated_value_numbers.fetch(value_name)]
           end
+        end
+
+        # Returns the next value number that will be assigned for the given enum.
+        #
+        # @param enum_name [String]
+        # @return [Integer]
+        def next_enum_value_number_for(enum_name)
+          @enum_mappings_by_name[enum_name]&.next_number || 1
+        end
+
+        # Returns value names and numbers retained in the mappings but absent from the enum.
+        #
+        # @param enum_name [String]
+        # @param active_value_names [Array<String>]
+        # @return [Hash<String, Integer>]
+        def reserved_enum_value_numbers_for(enum_name, active_value_names)
+          value_numbers = @enum_mappings_by_name[enum_name]&.value_numbers_by_name || {}
+          reserved_numbers_by_name(value_numbers, active_value_names)
         end
 
         # Serializes the mappings back to the `proto_field_numbers.yaml` artifact format, with
         # messages and enums sorted by name and their fields and values sorted by number.
         #
         # @return [Hash<String, Object>]
-        def to_artifact
+        def to_dumpable_hash
           {
             "messages" => @message_mappings_by_name
               .sort_by(&:first)
@@ -121,11 +271,12 @@ module ElasticGraph
                   "next_number" => message_mapping.next_number
                 }]
               end,
-            "enums" => @value_numbers_by_enum
+            "enums" => @enum_mappings_by_name
               .sort_by(&:first)
-              .to_h do |enum_name, value_numbers|
+              .to_h do |enum_name, enum_mapping|
                 [enum_name, {
-                  "values" => value_numbers.sort_by { |value_name, number| [number, value_name] }.to_h
+                  "values" => enum_mapping.value_numbers_by_name.sort_by { |value_name, number| [number, value_name] }.to_h,
+                  "next_number" => enum_mapping.next_number
                 }]
               end
           }
@@ -133,13 +284,16 @@ module ElasticGraph
 
         private
 
-        def used_enum_value_numbers_for(enum_name, value_numbers)
-          @used_enum_value_numbers_by_enum[enum_name] ||= ::Set.new(value_numbers.values)
+        def reserved_numbers_by_name(numbers_by_name, active_names)
+          numbers_by_name
+            .except(*active_names)
+            .sort_by { |name, number| [number, name] }
+            .to_h
         end
 
-        # Claims and returns the message's stored allocation cursor, advancing it past the claimed
-        # number and protobuf's reserved 19000..19999 range.
-        def allocate_field_number(message_name, message_mapping)
+        # Returns a message mapping with the stored allocation cursor assigned to `field_name` and
+        # advanced past the claimed number and protobuf's reserved 19000..19999 range.
+        def allocate_field_number(message_name, field_name, message_mapping)
           field_number = message_mapping.next_number
           if field_number > MAX_FIELD_NUMBER
             raise Errors::SchemaError, "Cannot allocate another protobuf field number for message `#{message_name}`: " \
@@ -151,133 +305,47 @@ module ElasticGraph
             next_number = RESERVED_FIELD_NUMBER_RANGE.end + 1
           end
 
-          @message_mappings_by_name[message_name] = message_mapping.with(next_number: next_number)
-          field_number
-        end
-
-        # Claims and returns the smallest positive enum value number not yet present in
-        # `used_numbers`. Unlike field tags, enum value numbers have no protobuf-reserved range.
-        def allocate_enum_value_number(used_numbers)
-          candidate = 1
-          candidate += 1 while used_numbers.include?(candidate)
-          used_numbers << candidate
-          candidate
-        end
-
-        def migrate_renamed_field_number(field_numbers, previous_field_names)
-          previous_field_names.each do |old_field_name|
-            field_number = field_numbers.delete(old_field_name)
-            return field_number if field_number
-          end
-
-          nil
+          message_mapping.with(
+            field_numbers_by_name: message_mapping.field_numbers_by_name.merge(field_name => field_number),
+            next_number: next_number
+          )
         end
 
         private_class_method def self.parse_messages(messages_section)
-          unless messages_section.is_a?(::Hash)
-            raise Errors::SchemaError, "Protobuf field-number mappings must have a `messages` Hash."
-          end
-
           messages_section.to_h do |message_name, message_entry|
-            unless message_entry.is_a?(::Hash)
-              raise Errors::SchemaError, "Field-number mapping for message `#{message_name}` must be a Hash."
-            end
-
-            verify_known_keys(message_entry, ["fields", "next_number"], "field-number mapping for message `#{message_name}`")
-
-            fields = message_entry["fields"]
-            unless fields.is_a?(::Hash)
-              raise Errors::SchemaError, "Field-number mapping for message `#{message_name}` must contain a `fields` Hash."
-            end
-
-            parsed_fields = fields.to_h do |field_name, field_number|
-              [field_name, validated_field_number(message_name, field_name, field_number)]
-            end
+            fields = message_entry.fetch("fields") # : ::Hash[::String, ::Integer]
 
             verify_no_number_collisions(
-              parsed_fields,
+              fields,
               "field-number mapping collision in message `#{message_name}`"
             )
 
-            next_number =
-              if message_entry.key?("next_number")
-                validated_next_number(message_name, message_entry.fetch("next_number"), parsed_fields)
-              else
-                candidate = (parsed_fields.values.max || 0) + 1
-                RESERVED_FIELD_NUMBER_RANGE.cover?(candidate) ? RESERVED_FIELD_NUMBER_RANGE.end + 1 : candidate
-              end
+            next_number = message_entry.fetch("next_number") # : ::Integer
 
-            [message_name, MessageMapping.new(field_numbers_by_name: parsed_fields, next_number: next_number)]
+            verify_next_number_is_after_mapped_numbers("message `#{message_name}`", next_number, fields)
+            [message_name, MessageMapping.new(field_numbers_by_name: fields, next_number: next_number)]
           end
         end
 
         private_class_method def self.parse_enums(enums_section)
-          unless enums_section.is_a?(::Hash)
-            raise Errors::SchemaError, "Protobuf enum value-number mappings must have an `enums` Hash."
-          end
-
           enums_section.to_h do |enum_name, enum_entry|
-            unless enum_entry.is_a?(::Hash)
-              raise Errors::SchemaError, "Enum value-number mapping for enum `#{enum_name}` must be a Hash."
-            end
+            values = enum_entry.fetch("values") # : ::Hash[::String, ::Integer]
+            verify_no_number_collisions(values, "enum value-number mapping collision in enum `#{enum_name}`")
 
-            verify_known_keys(enum_entry, ["values"], "enum value-number mapping for enum `#{enum_name}`")
-
-            values = enum_entry["values"]
-            unless values.is_a?(::Hash)
-              raise Errors::SchemaError, "Enum value-number mapping for enum `#{enum_name}` must contain a `values` Hash."
-            end
-
-            parsed_values = values.to_h do |value_name, value_number|
-              unless value_number.is_a?(::Integer) && value_number.between?(1, MAX_ENUM_VALUE_NUMBER)
-                raise Errors::SchemaError, "Enum value-number mapping for `#{enum_name}.#{value_name}` " \
-                  "must be a positive integer no greater than #{MAX_ENUM_VALUE_NUMBER} " \
-                  "(0 is reserved for the `_UNSPECIFIED` value), got: #{value_number.inspect}."
-              end
-
-              [value_name, value_number]
-            end
-
-            verify_no_number_collisions(parsed_values, "enum value-number mapping collision in enum `#{enum_name}`")
-
-            [enum_name, parsed_values]
+            next_number = enum_entry.fetch("next_number") # : ::Integer
+            verify_next_number_is_after_mapped_numbers("enum `#{enum_name}`", next_number, values)
+            [enum_name, EnumMapping.new(value_numbers_by_name: values, next_number: next_number)]
           end
         end
 
-        private_class_method def self.validated_field_number(message_name, field_name, field_number)
-          unless field_number.is_a?(::Integer)
-            raise Errors::SchemaError, "Field-number mapping for `#{message_name}.#{field_name}` " \
-              "must be an integer, got: #{field_number.inspect}."
+        private_class_method def self.verify_next_number_is_after_mapped_numbers(mapping_description, next_number, numbers)
+          max_number = numbers.values.max
+          if max_number && next_number <= max_number
+            raise Errors::SchemaError, "Protobuf `next_number` for #{mapping_description} must be greater than " \
+              "every mapped number (maximum: #{max_number}), got: #{next_number}."
           end
 
-          unless field_number.between?(1, MAX_FIELD_NUMBER) && !RESERVED_FIELD_NUMBER_RANGE.cover?(field_number)
-            raise Errors::SchemaError, "Field-number mapping for `#{message_name}.#{field_name}` " \
-              "must be a valid protobuf field number (1 to #{MAX_FIELD_NUMBER}, excluding the reserved " \
-              "#{RESERVED_FIELD_NUMBER_RANGE.begin}-#{RESERVED_FIELD_NUMBER_RANGE.end} range), got: #{field_number.inspect}."
-          end
-
-          field_number
-        end
-
-        private_class_method def self.validated_next_number(message_name, next_number, field_numbers)
-          unless next_number.is_a?(::Integer)
-            raise Errors::SchemaError, "Protobuf `next_number` for message `#{message_name}` " \
-              "must be an integer, got: #{next_number.inspect}."
-          end
-
-          unless next_number.between?(1, MAX_FIELD_NUMBER + 1) && !RESERVED_FIELD_NUMBER_RANGE.cover?(next_number)
-            raise Errors::SchemaError, "Protobuf `next_number` for message `#{message_name}` must be between 1 and " \
-              "#{MAX_FIELD_NUMBER + 1}, excluding the reserved #{RESERVED_FIELD_NUMBER_RANGE.begin}-" \
-              "#{RESERVED_FIELD_NUMBER_RANGE.end} range, got: #{next_number.inspect}."
-          end
-
-          max_field_number = field_numbers.values.max
-          if max_field_number && next_number <= max_field_number
-            raise Errors::SchemaError, "Protobuf `next_number` for message `#{message_name}` must be greater than " \
-              "every mapped field number (maximum: #{max_field_number}), got: #{next_number}."
-          end
-
-          next_number
+          nil
         end
 
         private_class_method def self.verify_no_number_collisions(numbers_by_name, collision_description)
@@ -288,14 +356,6 @@ module ElasticGraph
             raise Errors::SchemaError, "Protobuf #{collision_description}: " \
               "#{names} are both mapped to number #{entries.first.last}."
           end
-        end
-
-        private_class_method def self.verify_known_keys(hash, known_keys, description)
-          unknown_keys = hash.keys - known_keys
-          return if unknown_keys.empty?
-
-          raise Errors::SchemaError, "Unknown key(s) in #{description}: #{unknown_keys.map(&:inspect).join(", ")}. " \
-            "Supported keys: #{known_keys.map { |key| "`#{key}`" }.join(", ")}."
         end
       end
     end

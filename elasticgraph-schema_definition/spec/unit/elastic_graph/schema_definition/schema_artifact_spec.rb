@@ -14,12 +14,13 @@ module ElasticGraph
     RSpec.describe SchemaArtifact, :in_temp_dir do
       it "renders the comment preamble using the configured comment prefix so artifacts can use their format's comment syntax" do
         artifact = SchemaArtifact.new(
-          "widgets.proto",
-          "message Widget {}",
-          :itself.to_proc,
-          :itself.to_proc,
-          [],
-          "//"
+          file_name: "widgets.proto",
+          desired_contents: "message Widget {}",
+          dumper: :itself.to_proc,
+          loader: :itself.to_proc,
+          extra_comment_lines: [],
+          comment_prefix: "//",
+          comment_preamble_lines: SchemaArtifact::COMMENT_PREAMBLE_LINES
         )
 
         artifact.dump(::StringIO.new)
@@ -29,6 +30,30 @@ module ElasticGraph
           // DO NOT EDIT BY HAND. Any edits will be lost the next time the rake task is run.
           message Widget {}
         EOS
+      end
+
+      it "renders configured comment preamble lines" do
+        artifact = SchemaArtifact.new(
+          file_name: "widgets.proto",
+          desired_contents: "message Widget {}",
+          dumper: :itself.to_proc,
+          loader: :itself.to_proc,
+          extra_comment_lines: ["Extra context."],
+          comment_prefix: "//",
+          comment_preamble_lines: ["Custom preamble."]
+        )
+
+        artifact.dump(::StringIO.new)
+
+        expect(::File.read("widgets.proto")).to eq(<<~EOS.strip)
+          // Extra context.
+          //
+          // Custom preamble.
+          message Widget {}
+        EOS
+
+        identical_artifact = artifact.with
+        expect(identical_artifact).not_to be_out_of_date
       end
     end
   end

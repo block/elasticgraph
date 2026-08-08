@@ -72,6 +72,7 @@ module ElasticGraph
               Status:
                 values:
                   INACTIVE: 5
+                next_number: 8
           YAML
 
           results = define_proto_schema_results(path_to_schema: ::File.join("config", "schema.rb")) do |s|
@@ -89,8 +90,9 @@ module ElasticGraph
           expect(results.proto_schema).to include(
             "string id = 7;",
             ".elasticgraph.Status status = 8;",
-            "STATUS_ACTIVE = 1;",
-            "STATUS_INACTIVE = 5;"
+            "STATUS_ACTIVE = 8;",
+            "STATUS_INACTIVE = 5;",
+            "// Next value number: 9"
           )
         end
 

@@ -7,8 +7,8 @@
 # frozen_string_literal: true
 
 require "elastic_graph/proto_ingestion"
+require "elastic_graph/proto_ingestion/schema_definition/field_number_mappings"
 require "elastic_graph/proto_ingestion/schema_definition/proto_ingestion_state"
-require "yaml"
 
 module ElasticGraph
   module ProtoIngestion
@@ -23,7 +23,7 @@ module ElasticGraph
         def self.extended(state)
           field_number_mappings =
             if (path = state.proto_field_numbers_path) && ::File.exist?(path)
-              ::YAML.safe_load_file(path, aliases: false)
+              FieldNumberMappings.from_yaml_file(path).to_dumpable_hash
             else
               {} # : ::Hash[::String, untyped]
             end
