@@ -52,11 +52,13 @@ module ElasticGraph
               .elasticgraph.Status status = 2;
               .elasticgraph.Address address = 3;
               repeated string tags = 4;
+              // Next field number: 5
             }
 
             message Address {
               string street = 1;
               string city = 2;
+              // Next field number: 3
             }
 
             // The status of an account.
@@ -69,6 +71,7 @@ module ElasticGraph
               // The account is active.
               STATUS_ACTIVE = 1;
               STATUS_INACTIVE = 2;
+              // Next value number: 3
             }
           PROTO
         end
@@ -140,6 +143,7 @@ module ElasticGraph
                 .elasticgraph.Car car = 1;
                 .elasticgraph.Bike bike = 2;
               }
+              // Next field number: 3
             }
           PROTO
           expect(proto_type_def_from(proto, "Inventor")).to eq(<<~PROTO.strip)
@@ -148,6 +152,7 @@ module ElasticGraph
                 .elasticgraph.Person person = 1;
                 .elasticgraph.Company company = 2;
               }
+              // Next field number: 3
             }
           PROTO
           expect(proto_type_def_from(proto, "Car")).to include("string id = 1;", "int32 doors = 2;")
@@ -181,6 +186,7 @@ module ElasticGraph
               oneof value {
                 .elasticgraph.Car car = 1;
               }
+              // Next field number: 2
             }
           PROTO
           expect(proto_type_def_from(proto, "Car")).to include("string id = 1;")
@@ -205,6 +211,7 @@ module ElasticGraph
               oneof value {
                 .elasticgraph.DeliveryVehicle delivery_vehicle = 1;
               }
+              // Next field number: 2
             }
           PROTO
         end
@@ -263,6 +270,7 @@ module ElasticGraph
           end
 
           expect(results.proto_schema).to include("string id = 7;", "string name = 10;")
+          expect(proto_type_def_from(results.proto_schema, "Account")).to include("// Next field number: 11")
           expect(results.proto_field_number_mappings.dig("messages", "Account", "next_number")).to eq(11)
         end
 
@@ -318,7 +326,7 @@ module ElasticGraph
           })
         end
 
-        it "keeps a removed field's number reserved instead of reusing it for a new field" do
+        it "keeps a removed field's number reserved and restores it if the field is re-added" do
           results1 = define_proto_schema_results do |s|
             s.object_type "Account" do |t|
               t.field "id", "ID"
@@ -339,6 +347,7 @@ module ElasticGraph
           end
 
           expect(results2.proto_schema).to include("string id = 1;", "string name = 3;")
+          expect(results2.proto_schema).to include("reserved 2; // Previously used by legacy_field.")
 
           # `legacy_field` keeps its number reserved in the artifact so it is never reused.
           expect(results2.proto_field_number_mappings).to eq({
@@ -354,6 +363,22 @@ module ElasticGraph
               }
             }
           })
+
+          # `legacy_field` is restored after the intermediate artifact has been dumped.
+          results3 = define_proto_schema_results(results2) do |s|
+            s.object_type "Account" do |t|
+              t.field "id", "ID"
+              t.field "legacy_field", "String"
+              t.field "name", "String"
+              t.index "accounts"
+            end
+          end
+
+          expect(results3.proto_schema).to include(
+            "string id = 1;", "string legacy_field = 2;", "string name = 3;", "// Next field number: 4"
+          )
+          expect(results3.proto_schema).not_to include("reserved 2;")
+          expect(results3.proto_field_number_mappings).to eq(results2.proto_field_number_mappings)
         end
 
         it "keeps index field names out of the protobuf schema and field-number mappings" do
@@ -405,6 +430,7 @@ module ElasticGraph
           end
 
           expect(results2.proto_schema).to include("string id = 2;", "string display_name = 1;")
+          expect(results2.proto_schema).not_to include("reserved 1;")
           expect(results2.proto_field_number_mappings).to eq({
             "enums" => {},
             "messages" => {
@@ -435,7 +461,8 @@ module ElasticGraph
           expect(proto_type_def_from(results1.proto_schema, "Status")).to include(
             "STATUS_ACTIVE = 1;",
             "STATUS_PAUSED = 2;",
-            "STATUS_INACTIVE = 3;"
+            "STATUS_INACTIVE = 3;",
+            "// Next value number: 4"
           )
 
           # `PAUSED` has been removed and `ARCHIVED` added since the mappings were dumped.
@@ -454,7 +481,9 @@ module ElasticGraph
           expect(proto_type_def_from(results2.proto_schema, "Status")).to include(
             "STATUS_ACTIVE = 1;",
             "STATUS_INACTIVE = 3;",
-            "STATUS_ARCHIVED = 4;"
+            "STATUS_ARCHIVED = 4;",
+            "reserved 2; // Previously used by PAUSED.",
+            "// Next value number: 5"
           )
 
           # `PAUSED` keeps its number reserved in the artifact so it is never reused for a new value.
@@ -465,7 +494,8 @@ module ElasticGraph
                 "PAUSED" => 2,
                 "INACTIVE" => 3,
                 "ARCHIVED" => 4
-              }
+              },
+              "next_number" => 5
             }
           })
         end
@@ -503,7 +533,12 @@ module ElasticGraph
           end
 
           vehicle = proto_type_def_from(results2.proto_schema, "Vehicle")
-          expect(vehicle).to include("Car car = 2;", "Bike bike = 3;", "Scooter scooter = 4;")
+          expect(vehicle).to include(
+            "Car car = 2;",
+            "Bike bike = 3;",
+            "Scooter scooter = 4;",
+            "reserved 1; // Previously used by truck."
+          )
 
           # `truck` keeps its number reserved in the artifact so it is never reused.
           expect(results2.proto_field_number_mappings.fetch("messages").fetch("Vehicle")).to eq({

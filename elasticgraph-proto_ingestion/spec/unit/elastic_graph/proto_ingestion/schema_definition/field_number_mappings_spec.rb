@@ -7,214 +7,129 @@
 # frozen_string_literal: true
 
 require "elastic_graph/proto_ingestion/schema_definition/field_number_mappings"
+require "elastic_graph/support/json_schema/meta_schema_validator"
 
 module ElasticGraph
   module ProtoIngestion
     module SchemaDefinition
       RSpec.describe FieldNumberMappings do
-        describe ".from_artifact" do
+        describe ".from_parsed_yaml" do
           it "returns empty mappings for `nil`, as parsing an empty artifact file yields" do
-            mappings = FieldNumberMappings.from_artifact(nil)
+            mappings = FieldNumberMappings.from_parsed_yaml(nil)
 
-            expect(mappings.to_artifact).to eq({"enums" => {}, "messages" => {}})
+            expect(mappings.to_dumpable_hash).to eq({"enums" => {}, "messages" => {}})
           end
 
-          it "validates that the artifact is a hash" do
-            expect {
-              FieldNumberMappings.from_artifact("bad")
-            }.to raise_error(Errors::SchemaError, a_string_including("must be a Hash"))
-          end
+          describe "artifact structure validation" do
+            it "uses a valid JSON schema to reject malformed artifacts" do
+              expect(Support::JSONSchema.strict_meta_schema_validator.valid?(FieldNumberMappings::JSON_SCHEMA)).to be(true)
 
-          it "rejects unknown keys at every level so hand-edit typos do not silently discard mappings" do
-            [
-              [{"messagez" => {}}, "\"messagez\""],
-              [{messages: {}}, ":messages"],
-              [{"messages" => {"Account" => {"fieldz" => {}}}}, "\"fieldz\""],
-              [{"enums" => {"Status" => {"valuez" => {}}}}, "\"valuez\""]
-            ].each do |artifact, unknown_key|
-              expect {
-                FieldNumberMappings.from_artifact(artifact)
-              }.to raise_error(Errors::SchemaError, a_string_including("Unknown key(s)", unknown_key))
+              invalid_artifacts = [
+                "bad",
+                {"messagez" => {}},
+                {"messages" => {"Account" => {"fields" => {"id" => 7}}}},
+                {"enums" => {"Status" => {"values" => {"ACTIVE" => 1}}}},
+                {"messages" => {"Account" => {"fields" => {"id" => "7"}}}},
+                {"messages" => {"Account" => {"fields" => {"id" => 19_000}}}},
+                {"messages" => {"Account" => {"fields" => {}, "next_number" => 19_000}}},
+                {"enums" => {"Status" => {"values" => {"ACTIVE" => 0}}}},
+                {"enums" => {"Status" => {"values" => {}, "next_number" => 0}}}
+              ]
+
+              invalid_artifacts.each do |artifact|
+                expect {
+                  FieldNumberMappings.from_parsed_yaml(artifact)
+                }.to raise_error(Errors::SchemaError, a_string_including(
+                  "Invalid protobuf field-number mappings", "Validation errors"
+                ))
+              end
             end
           end
 
-          it "validates that `messages` is a hash" do
-            expect {
-              FieldNumberMappings.from_artifact({"messages" => "bad"})
-            }.to raise_error(Errors::SchemaError, a_string_including("must have a `messages` Hash"))
-          end
-
-          it "validates that each message's mapping is a hash" do
-            expect {
-              FieldNumberMappings.from_artifact({"messages" => {"Account" => "bad"}})
-            }.to raise_error(Errors::SchemaError, a_string_including("mapping for message `Account` must be a Hash"))
-          end
-
-          it "validates that each message's nested `fields` is a hash" do
-            expect {
-              FieldNumberMappings.from_artifact({"messages" => {"Account" => {"fields" => "bad"}}})
-            }.to raise_error(Errors::SchemaError, a_string_including("must contain a `fields` Hash"))
-          end
-
-          it "validates that mapped field numbers are valid protobuf field tags" do
-            [0, FieldNumberMappings::MAX_FIELD_NUMBER + 1, 19_000, 19_999].each do |invalid_number|
+          describe "mapping consistency validation" do
+            it "raises clear errors when fields or enum values collide" do
               expect {
-                FieldNumberMappings.from_artifact({"messages" => {"Account" => {"fields" => {"id" => invalid_number}}}})
-              }.to raise_error(Errors::SchemaError, a_string_including(
-                "must be a valid protobuf field number", "excluding the reserved 19000-19999 range", invalid_number.to_s
-              ))
-            end
-          end
-
-          it "rejects field numbers given as strings rather than coercing them" do
-            ["abc", "7"].each do |non_integer|
-              expect {
-                FieldNumberMappings.from_artifact({"messages" => {"Account" => {"fields" => {"id" => non_integer}}}})
-              }.to raise_error(Errors::SchemaError, a_string_including("must be an integer", non_integer.inspect))
-            end
-          end
-
-          it "rejects field numbers that are not integers rather than coercing or silently truncating them" do
-            [1.5, {"field_number" => 7}].each do |non_integer|
-              expect {
-                FieldNumberMappings.from_artifact({"messages" => {"Account" => {"fields" => {"id" => non_integer}}}})
-              }.to raise_error(Errors::SchemaError, a_string_including(
-                "`Account.id`", "must be an integer", non_integer.inspect
-              ))
-            end
-          end
-
-          it "raises a clear error when two fields of a message are mapped to the same number" do
-            expect {
-              FieldNumberMappings.from_artifact({"messages" => {"Account" => {"fields" => {"id" => 1, "name" => 1}}}})
-            }.to raise_error(Errors::SchemaError, a_string_including(
-              "field-number mapping collision in message `Account`",
-              "`id` and `name`",
-              "number 1"
-            ))
-          end
-
-          it "validates that a message's `next_number` is an integer" do
-            expect {
-              FieldNumberMappings.from_artifact({
-                "messages" => {"Account" => {"fields" => {"id" => 7}, "next_number" => "8"}}
-              })
-            }.to raise_error(Errors::SchemaError, a_string_including(
-              "`next_number` for message `Account`", "must be an integer", '"8"'
-            ))
-          end
-
-          it "validates that a message's `next_number` is in the allocatable range" do
-            [0, 19_000, FieldNumberMappings::MAX_FIELD_NUMBER + 2].each do |invalid_number|
-              expect {
-                FieldNumberMappings.from_artifact({
-                  "messages" => {"Account" => {"fields" => {}, "next_number" => invalid_number}}
+                FieldNumberMappings.from_parsed_yaml({
+                  "messages" => {"Account" => {"fields" => {"id" => 1, "name" => 1}, "next_number" => 2}}
                 })
               }.to raise_error(Errors::SchemaError, a_string_including(
-                "must be between 1 and #{FieldNumberMappings::MAX_FIELD_NUMBER + 1}",
-                "excluding the reserved 19000-19999 range",
-                invalid_number.to_s
+                "field-number mapping collision in message `Account`", "`id` and `name`", "number 1"
+              ))
+
+              expect {
+                FieldNumberMappings.from_parsed_yaml({
+                  "enums" => {"Status" => {"values" => {"ACTIVE" => 1, "INACTIVE" => 1}, "next_number" => 2}}
+                })
+              }.to raise_error(Errors::SchemaError, a_string_including(
+                "enum value-number mapping collision in enum `Status`", "`ACTIVE` and `INACTIVE`", "number 1"
+              ))
+            end
+
+            it "validates that each `next_number` is greater than every mapped number" do
+              expect {
+                FieldNumberMappings.from_parsed_yaml({
+                  "messages" => {"Account" => {"fields" => {"id" => 7}, "next_number" => 7}}
+                })
+              }.to raise_error(Errors::SchemaError, a_string_including(
+                "`next_number` for message `Account`", "greater than every mapped number", "maximum: 7", "got: 7"
+              ))
+
+              expect {
+                FieldNumberMappings.from_parsed_yaml({
+                  "enums" => {"Status" => {"values" => {"ACTIVE" => 7}, "next_number" => 7}}
+                })
+              }.to raise_error(Errors::SchemaError, a_string_including(
+                "`next_number` for enum `Status`", "greater than every mapped number", "maximum: 7", "got: 7"
               ))
             end
           end
 
-          it "validates that a message's `next_number` is greater than every mapped field number" do
-            expect {
-              FieldNumberMappings.from_artifact({
-                "messages" => {"Account" => {"fields" => {"id" => 7}, "next_number" => 7}}
-              })
-            }.to raise_error(Errors::SchemaError, a_string_including(
-              "must be greater than every mapped field number", "maximum: 7", "got: 7"
-            ))
-          end
+          describe "protobuf number boundaries" do
+            it "accepts maximum numbers while allowing enum values in the field-reserved range" do
+              artifact = {
+                "messages" => {"Account" => {
+                  "fields" => {"id" => FieldNumberMappings::MAX_FIELD_NUMBER},
+                  "next_number" => FieldNumberMappings::MAX_FIELD_NUMBER + 1
+                }},
+                # Enum value numbers have no protobuf-reserved range, so 19000-19999 is fine here.
+                "enums" => {"Status" => {"values" => {
+                  "ACTIVE" => FieldNumberMappings::MAX_ENUM_VALUE_NUMBER,
+                  "INACTIVE" => 19_005
+                }, "next_number" => FieldNumberMappings::MAX_ENUM_VALUE_NUMBER + 1}}
+              }
 
-          it "derives and dumps `next_number` when upgrading a mapping that does not store it" do
-            {
-              7 => 8,
-              18_999 => 20_000
-            }.each do |field_number, expected_next_number|
-              mappings = FieldNumberMappings.from_artifact({
-                "messages" => {"Account" => {"fields" => {"id" => field_number}}}
-              })
-
-              expect(mappings.to_artifact.dig("messages", "Account", "next_number")).to eq(expected_next_number)
+              expect(FieldNumberMappings.from_parsed_yaml(artifact).to_dumpable_hash).to eq(artifact)
             end
           end
+        end
 
-          it "accepts maximum protobuf numbers while allowing enum values in the field-reserved range" do
-            artifact = {
-              "messages" => {"Account" => {
-                "fields" => {"id" => FieldNumberMappings::MAX_FIELD_NUMBER},
-                "next_number" => FieldNumberMappings::MAX_FIELD_NUMBER + 1
-              }},
-              # Enum value numbers have no protobuf-reserved range, so 19000-19999 is fine here.
-              "enums" => {"Status" => {"values" => {
-                "ACTIVE" => FieldNumberMappings::MAX_ENUM_VALUE_NUMBER,
-                "INACTIVE" => 19_005
-              }}}
-            }
+        describe ".from_yaml_file" do
+          it "loads mappings through `FromYamlFile`", :in_temp_dir do
+            ::File.write("proto_field_numbers.yaml", <<~YAML)
+              messages:
+                Account:
+                  fields:
+                    id: 7
+                  next_number: 8
+              enums:
+                Status:
+                  values:
+                    ACTIVE: 3
+                  next_number: 8
+            YAML
 
-            expect(FieldNumberMappings.from_artifact(artifact).to_artifact).to eq(artifact)
-          end
+            mappings = FieldNumberMappings.from_yaml_file("proto_field_numbers.yaml")
 
-          it "validates that `enums` is a hash" do
-            expect {
-              FieldNumberMappings.from_artifact({"enums" => "bad"})
-            }.to raise_error(Errors::SchemaError, a_string_including("must have an `enums` Hash"))
-          end
-
-          it "validates that each enum's mapping is a hash" do
-            expect {
-              FieldNumberMappings.from_artifact({"enums" => {"Status" => "bad"}})
-            }.to raise_error(Errors::SchemaError, a_string_including("mapping for enum `Status` must be a Hash"))
-          end
-
-          it "validates that each enum's nested `values` is a hash" do
-            expect {
-              FieldNumberMappings.from_artifact({"enums" => {"Status" => {"values" => "bad"}}})
-            }.to raise_error(Errors::SchemaError, a_string_including("must contain a `values` Hash"))
-          end
-
-          it "validates that mapped enum value numbers are positive integers, since 0 is reserved" do
-            expect {
-              FieldNumberMappings.from_artifact({"enums" => {"Status" => {"values" => {"ACTIVE" => 0}}}})
-            }.to raise_error(Errors::SchemaError, a_string_including("must be a positive integer", "_UNSPECIFIED"))
-          end
-
-          it "validates that mapped enum value numbers do not exceed the int32 maximum" do
-            expect {
-              FieldNumberMappings.from_artifact(
-                {"enums" => {"Status" => {"values" => {"ACTIVE" => FieldNumberMappings::MAX_ENUM_VALUE_NUMBER + 1}}}}
-              )
-            }.to raise_error(Errors::SchemaError, a_string_including("must be a positive integer no greater than 2147483647"))
-          end
-
-          it "rejects enum value numbers given as strings rather than coercing them" do
-            expect {
-              FieldNumberMappings.from_artifact({"enums" => {"Status" => {"values" => {"ACTIVE" => "5"}}}})
-            }.to raise_error(Errors::SchemaError, a_string_including("must be a positive integer", "\"5\""))
-          end
-
-          it "rejects enum value numbers that are not integers rather than silently truncating them" do
-            expect {
-              FieldNumberMappings.from_artifact({"enums" => {"Status" => {"values" => {"ACTIVE" => 1.5}}}})
-            }.to raise_error(Errors::SchemaError, a_string_including("must be a positive integer", "1.5"))
-          end
-
-          it "raises a clear error when two values of an enum are mapped to the same number" do
-            expect {
-              FieldNumberMappings.from_artifact({"enums" => {"Status" => {"values" => {"ACTIVE" => 1, "INACTIVE" => 1}}}})
-            }.to raise_error(Errors::SchemaError, a_string_including(
-              "enum value-number mapping collision in enum `Status`",
-              "`ACTIVE` and `INACTIVE`",
-              "number 1"
-            ))
+            expect(mappings.to_dumpable_hash).to eq({
+              "messages" => {"Account" => {"fields" => {"id" => 7}, "next_number" => 8}},
+              "enums" => {"Status" => {"values" => {"ACTIVE" => 3}, "next_number" => 8}}
+            })
           end
         end
 
         describe "#field_number_for" do
           it "raises a clear error when the field-number range has been exhausted" do
-            mappings = FieldNumberMappings.from_artifact({
+            mappings = FieldNumberMappings.from_parsed_yaml({
               "messages" => {"Account" => {
                 "fields" => {"id" => FieldNumberMappings::MAX_FIELD_NUMBER},
                 "next_number" => FieldNumberMappings::MAX_FIELD_NUMBER + 1
@@ -230,27 +145,101 @@ module ElasticGraph
           end
         end
 
-        describe "#to_artifact" do
+        describe "allocation cursor readers" do
+          it "returns stored cursors, defaulting to 1 for unmapped messages and enums" do
+            mappings = FieldNumberMappings.from_parsed_yaml({
+              "messages" => {"Account" => {"fields" => {"id" => 7}, "next_number" => 10}},
+              "enums" => {"Status" => {"values" => {"ACTIVE" => 3}, "next_number" => 8}}
+            })
+
+            expect(mappings.next_field_number_for("Account")).to eq(10)
+            expect(mappings.next_field_number_for("UnmappedMessage")).to eq(1)
+            expect(mappings.next_enum_value_number_for("Status")).to eq(8)
+            expect(mappings.next_enum_value_number_for("UnmappedEnum")).to eq(1)
+          end
+        end
+
+        describe "#enum_value_numbers_for" do
+          it "allocates from the saved cursor without filling gaps" do
+            mappings = FieldNumberMappings.from_parsed_yaml({
+              "enums" => {"Status" => {"values" => {"ACTIVE" => 3}, "next_number" => 10}}
+            })
+
+            expect(mappings.enum_value_numbers_for("Status", ["ARCHIVED", "ACTIVE", "DELETED"])).to eq({
+              "ARCHIVED" => 10,
+              "ACTIVE" => 3,
+              "DELETED" => 11
+            })
+            expect(mappings.to_dumpable_hash.dig("enums", "Status", "values")).to eq({
+              "ACTIVE" => 3,
+              "ARCHIVED" => 10,
+              "DELETED" => 11
+            })
+            expect(mappings.next_enum_value_number_for("Status")).to eq(12)
+          end
+
+          it "raises a clear error when the enum value-number range has been exhausted" do
+            mappings = FieldNumberMappings.from_parsed_yaml({
+              "enums" => {"Status" => {
+                "values" => {"ACTIVE" => FieldNumberMappings::MAX_ENUM_VALUE_NUMBER},
+                "next_number" => FieldNumberMappings::MAX_ENUM_VALUE_NUMBER + 1
+              }}
+            })
+
+            expect {
+              mappings.enum_value_numbers_for("Status", ["ACTIVE", "INACTIVE"])
+            }.to raise_error(Errors::SchemaError, a_string_including(
+              "Cannot allocate another protobuf enum value number for enum `Status`",
+              "maximum enum value number (#{FieldNumberMappings::MAX_ENUM_VALUE_NUMBER}) has been reached"
+            ))
+          end
+        end
+
+        describe "reserved number readers" do
+          it "returns mapped names that are not active, ordered by number" do
+            mappings = FieldNumberMappings.from_parsed_yaml({
+              "messages" => {"Account" => {
+                "fields" => {"name" => 3, "legacy_id" => 1, "id" => 2},
+                "next_number" => 4
+              }},
+              "enums" => {"Status" => {"values" => {"PAUSED" => 2, "ACTIVE" => 1}, "next_number" => 3}}
+            })
+
+            reserved_field_numbers = mappings.reserved_field_numbers_for("Account", ["id"])
+            expect(reserved_field_numbers).to eq({
+              "legacy_id" => 1,
+              "name" => 3
+            })
+            expect(reserved_field_numbers.keys).to eq(["legacy_id", "name"])
+            expect(mappings.reserved_enum_value_numbers_for("Status", ["ACTIVE"])).to eq({"PAUSED" => 2})
+            expect(mappings.reserved_field_numbers_for("MissingMessage", [])).to eq({})
+            expect(mappings.reserved_enum_value_numbers_for("MissingEnum", [])).to eq({})
+          end
+        end
+
+        describe "#to_dumpable_hash" do
           it "sorts messages and enums by name, and their fields and values by number" do
-            mappings = FieldNumberMappings.from_artifact(
+            mappings = FieldNumberMappings.from_parsed_yaml(
               {
                 "messages" => {
-                  "ZMessage" => {"fields" => {"first" => 2, "second" => 1}},
-                  "AMessage" => {"fields" => {"only" => 3}}
+                  "ZMessage" => {"fields" => {"first" => 2, "second" => 1}, "next_number" => 3},
+                  "AMessage" => {"fields" => {"only" => 3}, "next_number" => 4}
                 },
                 "enums" => {
-                  "ZEnum" => {"values" => {"FIRST" => 2, "SECOND" => 1}},
-                  "AEnum" => {"values" => {"ONLY" => 3}}
+                  "ZEnum" => {"values" => {"FIRST" => 2, "SECOND" => 1}, "next_number" => 3},
+                  "AEnum" => {"values" => {"ONLY" => 3}, "next_number" => 4}
                 }
               }
             )
 
-            artifact = mappings.to_artifact
+            artifact = mappings.to_dumpable_hash
             expect(artifact.fetch("messages").keys).to eq(["AMessage", "ZMessage"])
             expect(artifact.dig("messages", "ZMessage", "fields").keys).to eq(["second", "first"])
             expect(artifact.dig("messages", "ZMessage", "next_number")).to eq(3)
             expect(artifact.fetch("enums").keys).to eq(["AEnum", "ZEnum"])
             expect(artifact.dig("enums", "ZEnum", "values").keys).to eq(["SECOND", "FIRST"])
+            expect(artifact.dig("enums", "ZEnum", "next_number")).to eq(3)
+            expect(artifact.dig("enums", "AEnum", "next_number")).to eq(4)
           end
         end
       end

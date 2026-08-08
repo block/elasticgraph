@@ -2,6 +2,8 @@ module ElasticGraph
   module ProtoIngestion
     module SchemaDefinition
       module SchemaArtifactManagerExtension : ::ElasticGraph::SchemaDefinition::SchemaArtifactManager
+        PROTO_FIELD_NUMBERS_COMMENT_PREAMBLE_LINES: ::Array[::String]
+
         private
 
         def artifacts_from_schema_def: () -> ::Array[::ElasticGraph::SchemaDefinition::SchemaArtifact[untyped]]

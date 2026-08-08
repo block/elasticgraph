@@ -49,14 +49,17 @@ module ElasticGraph
       attr_reader loader: ^(::String) -> T
       attr_reader extra_comment_lines: ::Array[::String]
       attr_reader comment_prefix: ::String
+      attr_reader comment_preamble_lines: ::Array[::String]
 
       def initialize: (
-        ::String,
-        T,
-        ^(T) -> ::String,
-        ^(::String) -> T,
-        ::Array[::String],
-        ::String) -> void
+        file_name: ::String,
+        desired_contents: T,
+        dumper: ^(T) -> ::String,
+        loader: ^(::String) -> T,
+        extra_comment_lines: ::Array[::String],
+        comment_prefix: ::String,
+        comment_preamble_lines: ::Array[::String]
+      ) -> void
 
       def with: (
         ?file_name: ::String,
@@ -64,11 +67,14 @@ module ElasticGraph
         ?dumper: ^(T) -> ::String,
         ?loader: ^(::String) -> T,
         ?extra_comment_lines: ::Array[::String],
-        ?comment_prefix: ::String
+        ?comment_prefix: ::String,
+        ?comment_preamble_lines: ::Array[::String]
       ) -> self
     end
 
     class SchemaArtifact[T] < SchemaArtifactSupertype[T]
+      COMMENT_PREAMBLE_LINES: ::Array[::String]
+
       def dump: (io) -> void
       def out_of_date?: () -> bool
       def existing_dumped_contents: () -> T?
@@ -82,6 +88,7 @@ module ElasticGraph
       @dumped_contents: ::String?
       def dumped_contents: () -> ::String
       def comment_preamble: () -> ::String
+      def comment_preamble_lines_with_extras: () -> ::Array[::String]
     end
   end
 end

@@ -30,7 +30,7 @@ module ElasticGraph
           @state = state
           @all_types = all_types
           @package_name = package_name
-          @field_number_mappings = FieldNumberMappings.from_artifact(proto_field_number_mappings)
+          @field_number_mappings = FieldNumberMappings.from_parsed_yaml(proto_field_number_mappings)
         end
 
         # Renders the schema as a valid `proto3` file.
@@ -55,7 +55,7 @@ module ElasticGraph
         #
         # @return [Hash<String, Object>]
         def field_number_mappings_for_artifact
-          @field_number_mappings.to_artifact
+          @field_number_mappings.to_dumpable_hash
         end
 
         # Returns the stable protobuf number for a message field.
@@ -69,11 +69,39 @@ module ElasticGraph
           )
         end
 
+        # Returns the next protobuf field number that will be assigned for a message.
+        #
+        # @api private
+        def next_field_number_for(message_name)
+          @field_number_mappings.next_field_number_for(message_name)
+        end
+
+        # Returns field names and numbers that must be reserved in a protobuf message.
+        #
+        # @api private
+        def reserved_field_numbers_for(message_name, active_field_names)
+          @field_number_mappings.reserved_field_numbers_for(message_name, active_field_names)
+        end
+
         # Returns the stable protobuf numbers for an enum's values.
         #
         # @api private
         def enum_value_numbers_for(enum_name, value_names)
           @field_number_mappings.enum_value_numbers_for(enum_name, value_names)
+        end
+
+        # Returns the next protobuf value number that will be assigned for an enum.
+        #
+        # @api private
+        def next_enum_value_number_for(enum_name)
+          @field_number_mappings.next_enum_value_number_for(enum_name)
+        end
+
+        # Returns value names and numbers that must be reserved in a protobuf enum.
+        #
+        # @api private
+        def reserved_enum_value_numbers_for(enum_name, active_value_names)
+          @field_number_mappings.reserved_enum_value_numbers_for(enum_name, active_value_names)
         end
 
         private

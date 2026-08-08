@@ -169,7 +169,9 @@ module ElasticGraph
 
           expect {
             results.proto_schema
-          }.to raise_error(Errors::SchemaError, a_string_including("must be a valid protobuf field number"))
+          }.to raise_error(Errors::SchemaError, a_string_including(
+            "Invalid protobuf field-number mappings", "/messages/Account/fields/id", "less than: 1"
+          ))
         end
 
         it "skips the protobuf-reserved range when allocating new field numbers" do
