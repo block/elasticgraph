@@ -22,13 +22,20 @@ module ElasticGraph
           target_buckets: [],
           hit_count: nil,
           aggs: {"target" => {"buckets" => target_buckets}},
-          path: ["data", "target", "nodes"]
+          path: ["data", "target", "nodes"],
+          expect_errors: false
         )
           allow(datastore_client).to receive(:msearch).and_return({"responses" => [datastore_response_payload_with_aggs(aggs, hit_count)]})
 
           response = graphql.graphql_query_executor.execute("query { #{inner_query} }")
-          expect(response["errors"]).to eq([]).or eq(nil)
-          response.dig(*path)
+
+          if expect_errors
+            expect(response["errors"]).not_to be_empty
+            response
+          else
+            expect(response["errors"]).to eq([]).or eq(nil)
+            response.dig(*path)
+          end
         end
 
         def datastore_response_payload_with_aggs(aggregations, hit_count)

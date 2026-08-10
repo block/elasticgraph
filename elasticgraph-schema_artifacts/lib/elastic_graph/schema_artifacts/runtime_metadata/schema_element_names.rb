@@ -151,7 +151,7 @@ module ElasticGraph
         :query, :phrase, :query_with_prefix, :allowed_edits_per_term, :require_all_terms,
         # Aggregated values field names:
         :exact_min, :exact_max, :approximate_min, :approximate_max, :approximate_avg, :approximate_sum, :exact_sum,
-        :approximate_distinct_value_count
+        :approximate_distinct_value_count, :approximate_percentile, :percentile
       )
     end
   end

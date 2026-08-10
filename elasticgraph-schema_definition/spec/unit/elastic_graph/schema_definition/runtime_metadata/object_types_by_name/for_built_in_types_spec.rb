@@ -24,13 +24,14 @@ module ElasticGraph
           end
 
           expect(metadata.elasticgraph_category).to eq :scalar_aggregated_values
-          expect(metadata.graphql_fields_by_name.transform_values(&:computation_detail)).to eq(
-            "approximate_avg" => agg_detail_of(:avg, nil),
-            "approximate_sum" => agg_detail_of(:sum, 0),
-            "exact_sum" => agg_detail_of(:sum, 0),
-            "exact_max" => agg_detail_of(:max, nil),
-            "exact_min" => agg_detail_of(:min, nil),
-            "approximate_distinct_value_count" => agg_detail_of(:cardinality, 0)
+          expect(metadata.graphql_fields_by_name.transform_values(&:computation_function)).to eq(
+            "approximate_avg" => :avg,
+            "approximate_sum" => :sum,
+            "exact_sum" => :sum,
+            "exact_max" => :max,
+            "exact_min" => :min,
+            "approximate_distinct_value_count" => :cardinality,
+            "approximate_percentile" => :percentile
           )
         end
 
@@ -44,12 +45,13 @@ module ElasticGraph
           end
 
           expect(metadata.elasticgraph_category).to eq :scalar_aggregated_values
-          expect(metadata.graphql_fields_by_name.transform_values(&:computation_detail)).to eq(
-            "approximate_avg" => agg_detail_of(:avg, nil),
-            "approximate_sum" => agg_detail_of(:sum, 0),
-            "exact_max" => agg_detail_of(:max, nil),
-            "exact_min" => agg_detail_of(:min, nil),
-            "approximate_distinct_value_count" => agg_detail_of(:cardinality, 0)
+          expect(metadata.graphql_fields_by_name.transform_values(&:computation_function)).to eq(
+            "approximate_avg" => :avg,
+            "approximate_sum" => :sum,
+            "exact_max" => :max,
+            "exact_min" => :min,
+            "approximate_distinct_value_count" => :cardinality,
+            "approximate_percentile" => :percentile
           )
         end
 
@@ -63,13 +65,14 @@ module ElasticGraph
           end
 
           expect(metadata.elasticgraph_category).to eq :scalar_aggregated_values
-          expect(metadata.graphql_fields_by_name.transform_values(&:computation_detail)).to eq(
-            "approximate_avg" => agg_detail_of(:avg, nil),
-            "approximate_sum" => agg_detail_of(:sum, 0),
-            "exact_sum" => agg_detail_of(:sum, 0),
-            "exact_max" => agg_detail_of(:max, nil),
-            "exact_min" => agg_detail_of(:min, nil),
-            "approximate_distinct_value_count" => agg_detail_of(:cardinality, 0)
+          expect(metadata.graphql_fields_by_name.transform_values(&:computation_function)).to eq(
+            "approximate_avg" => :avg,
+            "approximate_sum" => :sum,
+            "exact_sum" => :sum,
+            "exact_max" => :max,
+            "exact_min" => :min,
+            "approximate_distinct_value_count" => :cardinality,
+            "approximate_percentile" => :percentile
           )
         end
 
@@ -83,15 +86,16 @@ module ElasticGraph
           end
 
           expect(metadata.elasticgraph_category).to eq :scalar_aggregated_values
-          expect(metadata.graphql_fields_by_name.transform_values(&:computation_detail)).to eq(
-            "approximate_avg" => agg_detail_of(:avg, nil),
-            "approximate_sum" => agg_detail_of(:sum, 0),
-            "exact_sum" => agg_detail_of(:sum, 0),
-            "approximate_max" => agg_detail_of(:max, nil),
-            "exact_max" => agg_detail_of(:max, nil),
-            "approximate_min" => agg_detail_of(:min, nil),
-            "exact_min" => agg_detail_of(:min, nil),
-            "approximate_distinct_value_count" => agg_detail_of(:cardinality, 0)
+          expect(metadata.graphql_fields_by_name.transform_values(&:computation_function)).to eq(
+            "approximate_avg" => :avg,
+            "approximate_sum" => :sum,
+            "exact_sum" => :sum,
+            "approximate_max" => :max,
+            "exact_max" => :max,
+            "approximate_min" => :min,
+            "exact_min" => :min,
+            "approximate_distinct_value_count" => :cardinality,
+            "approximate_percentile" => :percentile
           )
         end
       end
@@ -120,13 +124,6 @@ module ElasticGraph
 
           expect(metadata.elasticgraph_category).to eq :date_grouped_by_object
         end
-      end
-
-      def agg_detail_of(function, empty_bucket_value)
-        SchemaArtifacts::RuntimeMetadata::ComputationDetail.new(
-          function: function,
-          empty_bucket_value: empty_bucket_value
-        )
       end
 
       prepend Module.new {

@@ -72,7 +72,7 @@ module ElasticGraph
               "foo1" => graphql_field_with(name_in_index: "foo1"),
               "foo2" => graphql_field_with(name_in_index: "foo2_in_index"),
               "foo3" => graphql_field_with(name_in_index: "foo3", relation: relation_with),
-              "foo4" => graphql_field_with(name_in_index: "foo4", computation_detail: computation_detail_with),
+              "foo4" => graphql_field_with(name_in_index: "foo4", computation_function: :sum),
               "foo5" => graphql_field_with(resolver: :other, name_in_index: "foo5"),
               "foo6" => graphql_field_with(name_in_index: nil)
             }

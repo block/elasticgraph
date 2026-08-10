@@ -46,6 +46,31 @@ module ElasticGraph
     end
   end
 
+  # SimpleCov backfills `track_files`-matched files that a process never loaded with simulated
+  # coverage based on `Coverage.line_stub`. On CRuby 4.0.0 through 4.0.3 (fixed in 4.0.4),
+  # `Coverage.line_stub` classifies a few lines (e.g. continuation lines of multi-line hash
+  # literals, and `in` clauses of `case`/`in` expressions) as relevant-but-uncovered (`0`) even
+  # though the runtime `Coverage` API classifies them as not relevant (`nil`) when the file is
+  # actually loaded. When such a simulated result (e.g. from the flatware main process, which runs
+  # no tests) merges with a real result, SimpleCov 1.x treats "relevant on either side" as
+  # relevant, so the phantom `0` survives the merge and the file misleadingly reports < 100%
+  # coverage. On affected Ruby versions, we restore SimpleCov 0.22's merge semantics: an unexecuted
+  # (`0`) line only counts as relevant if BOTH sides agree it is relevant. Genuinely unloaded files
+  # are unaffected--all of their merged values are `0`-vs-`0`, which still merges to `0`--and
+  # executed lines are unaffected (`nil`-vs-positive still merges to the positive count).
+  #
+  # :nocov: -- which branch executes depends on the Ruby version.
+  if ::RUBY_ENGINE == "ruby" && ("4.0.0"..."4.0.4").cover?(::RUBY_VERSION)
+    module LinesCombinerPatch
+      def merge_line_coverage(first_val, second_val)
+        return nil if (first_val.nil? || second_val.nil?) && first_val.to_i + second_val.to_i == 0
+        super
+      end
+    end
+    ::SimpleCov::Combine::LinesCombiner.singleton_class.prepend LinesCombinerPatch
+  end
+  # :nocov:
+
   if defined?(::Flatware)
     module SimpleCovPatches
       attr_accessor :flatware_main_process_pid

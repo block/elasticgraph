@@ -4128,24 +4128,23 @@ object_types_by_name:
     elasticgraph_category: scalar_aggregated_values
     graphql_fields_by_name:
       approximate_avg:
-        computation_detail:
-          function: avg
+        computation_function: avg
         resolver:
           name: object_with_lookahead
       approximate_distinct_value_count:
-        computation_detail:
-          empty_bucket_value: 0
-          function: cardinality
+        computation_function: cardinality
+        resolver:
+          name: object_with_lookahead
+      approximate_percentile:
+        computation_function: percentile
         resolver:
           name: object_with_lookahead
       exact_max:
-        computation_detail:
-          function: max
+        computation_function: max
         resolver:
           name: object_with_lookahead
       exact_min:
-        computation_detail:
-          function: min
+        computation_function: min
         resolver:
           name: object_with_lookahead
     graphql_only_return_type: true
@@ -4167,24 +4166,23 @@ object_types_by_name:
     elasticgraph_category: scalar_aggregated_values
     graphql_fields_by_name:
       approximate_avg:
-        computation_detail:
-          function: avg
+        computation_function: avg
         resolver:
           name: object_with_lookahead
       approximate_distinct_value_count:
-        computation_detail:
-          empty_bucket_value: 0
-          function: cardinality
+        computation_function: cardinality
+        resolver:
+          name: object_with_lookahead
+      approximate_percentile:
+        computation_function: percentile
         resolver:
           name: object_with_lookahead
       exact_max:
-        computation_detail:
-          function: max
+        computation_function: max
         resolver:
           name: object_with_lookahead
       exact_min:
-        computation_detail:
-          function: min
+        computation_function: min
         resolver:
           name: object_with_lookahead
     graphql_only_return_type: true
@@ -4518,30 +4516,27 @@ object_types_by_name:
     elasticgraph_category: scalar_aggregated_values
     graphql_fields_by_name:
       approximate_avg:
-        computation_detail:
-          function: avg
+        computation_function: avg
         resolver:
           name: object_with_lookahead
       approximate_distinct_value_count:
-        computation_detail:
-          empty_bucket_value: 0
-          function: cardinality
+        computation_function: cardinality
+        resolver:
+          name: object_with_lookahead
+      approximate_percentile:
+        computation_function: percentile
         resolver:
           name: object_with_lookahead
       approximate_sum:
-        computation_detail:
-          empty_bucket_value: 0
-          function: sum
+        computation_function: sum
         resolver:
           name: object_with_lookahead
       exact_max:
-        computation_detail:
-          function: max
+        computation_function: max
         resolver:
           name: object_with_lookahead
       exact_min:
-        computation_detail:
-          function: min
+        computation_function: min
         resolver:
           name: object_with_lookahead
     graphql_only_return_type: true
@@ -4785,36 +4780,31 @@ object_types_by_name:
     elasticgraph_category: scalar_aggregated_values
     graphql_fields_by_name:
       approximate_avg:
-        computation_detail:
-          function: avg
+        computation_function: avg
         resolver:
           name: object_with_lookahead
       approximate_distinct_value_count:
-        computation_detail:
-          empty_bucket_value: 0
-          function: cardinality
+        computation_function: cardinality
+        resolver:
+          name: object_with_lookahead
+      approximate_percentile:
+        computation_function: percentile
         resolver:
           name: object_with_lookahead
       approximate_sum:
-        computation_detail:
-          empty_bucket_value: 0
-          function: sum
+        computation_function: sum
         resolver:
           name: object_with_lookahead
       exact_max:
-        computation_detail:
-          function: max
+        computation_function: max
         resolver:
           name: object_with_lookahead
       exact_min:
-        computation_detail:
-          function: min
+        computation_function: min
         resolver:
           name: object_with_lookahead
       exact_sum:
-        computation_detail:
-          empty_bucket_value: 0
-          function: sum
+        computation_function: sum
         resolver:
           name: object_with_lookahead
     graphql_only_return_type: true
@@ -4947,36 +4937,31 @@ object_types_by_name:
     elasticgraph_category: scalar_aggregated_values
     graphql_fields_by_name:
       approximate_avg:
-        computation_detail:
-          function: avg
+        computation_function: avg
         resolver:
           name: object_with_lookahead
       approximate_distinct_value_count:
-        computation_detail:
-          empty_bucket_value: 0
-          function: cardinality
+        computation_function: cardinality
+        resolver:
+          name: object_with_lookahead
+      approximate_percentile:
+        computation_function: percentile
         resolver:
           name: object_with_lookahead
       approximate_sum:
-        computation_detail:
-          empty_bucket_value: 0
-          function: sum
+        computation_function: sum
         resolver:
           name: object_with_lookahead
       exact_max:
-        computation_detail:
-          function: max
+        computation_function: max
         resolver:
           name: object_with_lookahead
       exact_min:
-        computation_detail:
-          function: min
+        computation_function: min
         resolver:
           name: object_with_lookahead
       exact_sum:
-        computation_detail:
-          empty_bucket_value: 0
-          function: sum
+        computation_function: sum
         resolver:
           name: object_with_lookahead
     graphql_only_return_type: true
@@ -4988,24 +4973,23 @@ object_types_by_name:
     elasticgraph_category: scalar_aggregated_values
     graphql_fields_by_name:
       approximate_avg:
-        computation_detail:
-          function: avg
+        computation_function: avg
         resolver:
           name: object_with_lookahead
       approximate_distinct_value_count:
-        computation_detail:
-          empty_bucket_value: 0
-          function: cardinality
+        computation_function: cardinality
+        resolver:
+          name: object_with_lookahead
+      approximate_percentile:
+        computation_function: percentile
         resolver:
           name: object_with_lookahead
       exact_max:
-        computation_detail:
-          function: max
+        computation_function: max
         resolver:
           name: object_with_lookahead
       exact_min:
-        computation_detail:
-          function: min
+        computation_function: min
         resolver:
           name: object_with_lookahead
     graphql_only_return_type: true
@@ -5013,46 +4997,39 @@ object_types_by_name:
     elasticgraph_category: scalar_aggregated_values
     graphql_fields_by_name:
       approximate_avg:
-        computation_detail:
-          function: avg
+        computation_function: avg
         resolver:
           name: object_with_lookahead
       approximate_distinct_value_count:
-        computation_detail:
-          empty_bucket_value: 0
-          function: cardinality
+        computation_function: cardinality
         resolver:
           name: object_with_lookahead
       approximate_max:
-        computation_detail:
-          function: max
+        computation_function: max
         resolver:
           name: object_with_lookahead
       approximate_min:
-        computation_detail:
-          function: min
+        computation_function: min
+        resolver:
+          name: object_with_lookahead
+      approximate_percentile:
+        computation_function: percentile
         resolver:
           name: object_with_lookahead
       approximate_sum:
-        computation_detail:
-          empty_bucket_value: 0
-          function: sum
+        computation_function: sum
         resolver:
           name: object_with_lookahead
       exact_max:
-        computation_detail:
-          function: max
+        computation_function: max
         resolver:
           name: object_with_lookahead
       exact_min:
-        computation_detail:
-          function: min
+        computation_function: min
         resolver:
           name: object_with_lookahead
       exact_sum:
-        computation_detail:
-          empty_bucket_value: 0
-          function: sum
+        computation_function: sum
         resolver:
           name: object_with_lookahead
     graphql_only_return_type: true
@@ -6208,9 +6185,7 @@ object_types_by_name:
     elasticgraph_category: scalar_aggregated_values
     graphql_fields_by_name:
       approximate_distinct_value_count:
-        computation_detail:
-          empty_bucket_value: 0
-          function: cardinality
+        computation_function: cardinality
         resolver:
           name: object_with_lookahead
     graphql_only_return_type: true

@@ -151,6 +151,70 @@ module ElasticGraph
         size_uniq_count = widget_ungrouped_aggregated_values_for("size { approximate_distinct_value_count }")
         expect(size_uniq_count).to eq({"size" => {case_correctly("approximate_distinct_value_count") => 2}})
 
+        # Verify that two aliases of the same aggregated value function under one field each resolve correctly,
+        # rather than colliding on a single datastore aggregation.
+        aliased_mins = widget_ungrouped_aggregated_values_for(<<~QUERY)
+          #{amount_cents} {
+            #{case_correctly("exact_min")}
+            #{case_correctly("my_min")}: #{case_correctly("exact_min")}
+          }
+        QUERY
+        expect(aliased_mins).to eq({
+          amount_cents => {
+            case_correctly("exact_min") => 100,
+            case_correctly("my_min") => 100
+          }
+        })
+
+        # Verify that two aliased `approximate_percentile` selections under one field, each requesting a
+        # different rank, resolve independently rather than colliding on a single datastore aggregation.
+        aliased_percentiles = widget_ungrouped_aggregated_values_for(<<~QUERY)
+          #{amount_cents} {
+            p0: #{case_correctly("approximate_percentile")}(#{case_correctly("percentile")}: 0)
+            p100: #{case_correctly("approximate_percentile")}(#{case_correctly("percentile")}: 100)
+          }
+        QUERY
+        expect(aliased_percentiles).to eq({
+          amount_cents => {
+            "p0" => 100.0,
+            "p100" => 300.0
+          }
+        })
+
+        # Verify that an out-of-range `percentile` resolves to `null` (with a precisely-pathed error)
+        # rather than failing the entire `aggregated_values` subtree--sibling fields (including another,
+        # valid `approximate_percentile` alias) still resolve normally.
+        out_of_range_response = nil
+        expect {
+          out_of_range_response = call_graphql_query(<<~QUERY, allow_errors: true)
+            query {
+              #{case_correctly("widget_aggregations")} {
+                nodes {
+                  #{aggregated_values} {
+                    #{amount_cents} {
+                      #{case_correctly("exact_min")}
+                      good: #{case_correctly("approximate_percentile")}(#{case_correctly("percentile")}: 50)
+                      bad: #{case_correctly("approximate_percentile")}(#{case_correctly("percentile")}: 150)
+                    }
+                  }
+                }
+              }
+            }
+          QUERY
+        }.to log_warning(a_string_including("percentile` must be between 0 and 100"))
+
+        expect(out_of_range_response.dig("data", case_correctly("widget_aggregations"), "nodes", 0, aggregated_values, amount_cents)).to eq({
+          case_correctly("exact_min") => 100,
+          "good" => 200.0,
+          "bad" => nil
+        })
+        expect(out_of_range_response.fetch("errors")).to contain_exactly(
+          hash_including(
+            "message" => "`#{case_correctly("percentile")}` must be between 0 and 100, but is 150.0.",
+            "path" => [case_correctly("widget_aggregations"), "nodes", 0, aggregated_values, amount_cents, "bad"]
+          )
+        )
+
         aggregations = group_widget_currencies_by_widget_name
         expect(aggregations).to eq [
           {"count" => 1, case_correctly("grouped_by") => {case_correctly("widget_name") => "w100"}},
@@ -864,9 +928,33 @@ module ElasticGraph
           case_correctly("approximate_sum") => float_of(sum),
           case_correctly("exact_sum") => int_of(sum),
           case_correctly("approximate_avg") => float_of(avg),
+          # `percentile: 0`/`percentile: 100` are equivalent to min/max, so we reuse `float_of` with the
+          # same expected values to verify `approximate_percentile` without needing separate fixture data.
+          "p0" => float_of(min),
+          "p100" => float_of(max),
+          # `p50`/`p75` (unlike p0/p100) can't be satisfied by an implementation that only supports
+          # min/max, so they're what actually proves full percentile support works. We can't pin an
+          # exact expected value here: different datastore versions/backends use different (equally
+          # valid) interpolation conventions for a rank that doesn't land exactly on one data point.
+          # Both the nearest-rank method (OpenSearch) and linear interpolation (Elasticsearch) are
+          # guaranteed to land between the two order statistics bracketing that rank, so `percentile_of`
+          # narrows the expectation to that bracket instead of the full `[min, max]` range.
+          "p50" => percentile_of(raw_values, 50),
+          "p75" => percentile_of(raw_values, 75),
           case_correctly("exact_min") => int_of(min),
           case_correctly("exact_max") => int_of(max)
         }
+      end
+
+      def percentile_of(raw_values, percent)
+        return nil if raw_values.empty?
+
+        sorted = raw_values.sort
+        rank = (percent / 100.0) * (sorted.size - 1)
+        lower_bound = sorted[rank.floor]
+        upper_bound = sorted[rank.ceil]
+
+        (be >= lower_bound).and(be <= upper_bound).and a_kind_of(::Float)
       end
 
       def verify_all_timestamp_groupings_valid(widget_id, truncation_unit_type:, field:)
@@ -1755,6 +1843,10 @@ module ElasticGraph
                   approximate_sum
                   exact_sum
                   approximate_avg
+                  p0: approximate_percentile(percentile: 0)
+                  p50: approximate_percentile(percentile: 50)
+                  p75: approximate_percentile(percentile: 75)
+                  p100: approximate_percentile(percentile: 100)
                   exact_min
                   exact_max
                 }
@@ -1764,6 +1856,10 @@ module ElasticGraph
                     approximate_sum
                     exact_sum
                     approximate_avg
+                    p0: approximate_percentile(percentile: 0)
+                    p50: approximate_percentile(percentile: 50)
+                    p75: approximate_percentile(percentile: 75)
+                    p100: approximate_percentile(percentile: 100)
                     exact_min
                     exact_max
                   }
@@ -1787,6 +1883,10 @@ module ElasticGraph
                   approximate_sum
                   exact_sum
                   approximate_avg
+                  p0: approximate_percentile(percentile: 0)
+                  p50: approximate_percentile(percentile: 50)
+                  p75: approximate_percentile(percentile: 75)
+                  p100: approximate_percentile(percentile: 100)
                   exact_min
                   exact_max
                 }
@@ -1796,6 +1896,10 @@ module ElasticGraph
                     approximate_sum
                     exact_sum
                     approximate_avg
+                    p0: approximate_percentile(percentile: 0)
+                    p50: approximate_percentile(percentile: 50)
+                    p75: approximate_percentile(percentile: 75)
+                    p100: approximate_percentile(percentile: 100)
                     exact_min
                     exact_max
                   }

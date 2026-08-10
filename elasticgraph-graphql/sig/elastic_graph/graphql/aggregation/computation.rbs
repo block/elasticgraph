@@ -3,22 +3,25 @@ module ElasticGraph
     module Aggregation
       class Computation
         attr_reader source_field_path: fieldPath
-        attr_reader computed_index_field_name: ::String
-        attr_reader detail: SchemaArtifacts::RuntimeMetadata::ComputationDetail
+        attr_reader leaf: PathSegment
+        attr_reader function_adapter: FunctionAdapter::adapter
+        attr_reader function_args: FunctionAdapter::functionArgs
 
         def key: (aggregation_name: ::String) -> ::String
         def clause: () -> ::Hash[::String, untyped]
 
         def initialize : (
           source_field_path: fieldPath,
-          computed_index_field_name: ::String,
-          detail: SchemaArtifacts::RuntimeMetadata::ComputationDetail
+          leaf: PathSegment,
+          function_adapter: FunctionAdapter::adapter,
+          function_args: FunctionAdapter::functionArgs
         ) -> void
 
         def with: (
           ?source_field_path: fieldPath,
-          ?computed_index_field_name: ::String,
-          ?detail: SchemaArtifacts::RuntimeMetadata::ComputationDetail
+          ?leaf: PathSegment,
+          ?function_adapter: FunctionAdapter::adapter,
+          ?function_args: FunctionAdapter::functionArgs
         ) -> instance
       end
     end

@@ -203,6 +203,11 @@ module ElasticGraph
         expect(value_at_path(aggregations.first, aggregated_values, "weight_in_ng_str", "exact_sum")).to be nil
         expect(value_at_path(aggregations.first, aggregated_values, "weight_in_ng", "approximate_avg")).to be_a(::Float).and be_approximately(weight_in_ngs.sum / weight_in_ngs.size)
         expect(value_at_path(aggregations.first, aggregated_values, "weight_in_ng_str", "approximate_avg")).to be_a(::Float).and be_approximately(weight_in_ng_strs.sum / weight_in_ng_strs.size)
+        # `approximate_percentile` returns `Float` even for these integral types, since the percentile
+        # computation interpolates between adjacent values and can produce a non-integer result. Using
+        # `percentile: 0` (equivalent to min) lets us assert an exact expected value here.
+        expect(value_at_path(aggregations.first, aggregated_values, "weight_in_ng", "approximate_percentile")).to be_a(::Float).and be_approximately(weight_in_ngs.min)
+        expect(value_at_path(aggregations.first, aggregated_values, "weight_in_ng_str", "approximate_percentile")).to be_a(::Float).and be_approximately(weight_in_ng_strs.min)
         expect(value_at_path(aggregations.first, aggregated_values, "weight_in_ng", "exact_min")).to be_a(::Integer).and eq(weight_in_ngs.min)
         expect(value_at_path(aggregations.first, aggregated_values, "weight_in_ng_str", "exact_min")).to be_a(::Integer).and eq(weight_in_ng_strs.min)
         expect(value_at_path(aggregations.first, aggregated_values, "weight_in_ng_str", "approximate_min")).to be_a(::String).and eq(weight_in_ng_strs.min.to_s)
@@ -228,6 +233,8 @@ module ElasticGraph
         expect(value_at_path(aggregations.first, aggregated_values, "weight_in_ng_str", "exact_sum")).to be_a(::Integer).and eq(weight_in_ng_strs.sum)
         expect(value_at_path(aggregations.first, aggregated_values, "weight_in_ng", "approximate_avg")).to be_a(::Float).and be_approximately(weight_in_ngs.sum / weight_in_ngs.size)
         expect(value_at_path(aggregations.first, aggregated_values, "weight_in_ng_str", "approximate_avg")).to be_a(::Float).and be_approximately(weight_in_ng_strs.sum / weight_in_ng_strs.size)
+        expect(value_at_path(aggregations.first, aggregated_values, "weight_in_ng", "approximate_percentile")).to be_a(::Float).and be_approximately(weight_in_ngs.min)
+        expect(value_at_path(aggregations.first, aggregated_values, "weight_in_ng_str", "approximate_percentile")).to be_a(::Float).and be_approximately(weight_in_ng_strs.min)
         expect(value_at_path(aggregations.first, aggregated_values, "weight_in_ng", "exact_min")).to be_a(::Integer).and eq(weight_in_ngs.min)
         expect(value_at_path(aggregations.first, aggregated_values, "weight_in_ng_str", "exact_min")).to be_a(::Integer).and eq(weight_in_ng_strs.min)
         expect(value_at_path(aggregations.first, aggregated_values, "weight_in_ng_str", "approximate_min")).to be_a(::String).and eq(weight_in_ng_strs.min.to_s)
@@ -367,6 +374,7 @@ module ElasticGraph
                   approximate_sum
                   exact_sum
                   approximate_avg
+                  approximate_percentile(percentile: 0)
                   exact_min
                   exact_max
                 }
@@ -375,6 +383,7 @@ module ElasticGraph
                   approximate_sum
                   exact_sum
                   approximate_avg
+                  approximate_percentile(percentile: 0)
                   exact_min
                   approximate_min
                   exact_max
