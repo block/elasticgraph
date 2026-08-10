@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/errors"
+require "elastic_graph/graphql/aggregation/function_adapter"
 require "elastic_graph/graphql/schema/relation_join"
 require "elastic_graph/graphql/schema/arguments"
 
@@ -18,7 +19,12 @@ module ElasticGraph
         # The type in which the field resides.
         attr_reader :parent_type
 
-        attr_reader :schema, :schema_element_names, :graphql_field, :name_in_index, :relation, :computation_detail, :resolver
+        # The adapter for the aggregation function this field computes, or nil for a field that
+        # computes none. Resolved from the registry once here (fields are built once and cached)
+        # so that an unregistered function name fails at boot rather than mid-query.
+        attr_reader :function_adapter
+
+        attr_reader :schema, :schema_element_names, :graphql_field, :name_in_index, :relation, :resolver
 
         def initialize(schema, parent_type, graphql_field, runtime_metadata, resolvers_needing_lookahead)
           @schema = schema
@@ -26,7 +32,9 @@ module ElasticGraph
           @parent_type = parent_type
           @graphql_field = graphql_field
           @relation = runtime_metadata&.relation
-          @computation_detail = runtime_metadata&.computation_detail
+          @function_adapter = runtime_metadata&.computation_function&.then do |function|
+            Aggregation::FunctionAdapter::BY_NAME.fetch(function)
+          end
           @resolver = runtime_metadata&.resolver
           @name_in_index = runtime_metadata&.name_in_index || name
           @graphql_field.extras([:lookahead]) if resolvers_needing_lookahead.include?(@resolver&.name)

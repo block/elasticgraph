@@ -284,6 +284,39 @@ module ElasticGraph
           ]
         end
 
+        it "uses GraphQL field aliases when resolving the aggregation function leaf fields, allowing the same function to be requested multiple times under one field" do
+          aggs = {
+            aggregated_value_key_of("amount_cents", "es") => {"value" => 900.0},
+            aggregated_value_key_of("amount_cents", "exact_sum") => {"value" => 900.0},
+            aggregated_value_key_of("cost", "amount_cents", "mx") => {"value" => 400.0}
+          }
+
+          response = resolve_target_nodes(<<~QUERY, aggs: aggs)
+            target: widget_aggregations {
+              nodes {
+                aggregated_values {
+                  amount_cents {
+                    es: exact_sum
+                    exact_sum
+                  }
+                  cost {
+                    amount_cents { mx: exact_max }
+                  }
+                }
+              }
+            }
+          QUERY
+
+          expect(response).to eq [
+            {
+              "aggregated_values" => {
+                "amount_cents" => {"es" => 900, "exact_sum" => 900},
+                "cost" => {"amount_cents" => {"mx" => 400}}
+              }
+            }
+          ]
+        end
+
         it "resolves aggregated Date/DateTime/LocalTime values" do
           aggs = {
             aggregated_value_key_of("created_at", "exact_min") => {"value" => 1696854612000.0, "value_as_string" => "2023-10-09T12:30:12.000Z"},
@@ -377,6 +410,46 @@ module ElasticGraph
               "node" => {"grouped_by" => {"name" => "bar"}}
             }
           ]
+        end
+
+        it "resolves sibling aggregated value fields normally and returns `null` (with a precisely-pathed error) for an out-of-range `approximate_percentile`, rather than failing the whole query" do
+          aggs = {
+            aggregated_value_key_of("amount_cents", "exact_sum") => {"value" => 900.0},
+            aggregated_value_key_of("amount_cents", "good") => {"values" => [{"value" => 500.0}]}
+          }
+
+          response = resolve_target_nodes(<<~QUERY, aggs: aggs, expect_errors: true)
+            target: widget_aggregations {
+              nodes {
+                aggregated_values {
+                  amount_cents {
+                    exact_sum
+                    good: approximate_percentile(percentile: 50)
+                    bad: approximate_percentile(percentile: 150)
+                  }
+                }
+              }
+            }
+          QUERY
+
+          expect(response.dig("data", "target", "nodes")).to eq [
+            {
+              "aggregated_values" => {
+                "amount_cents" => {
+                  "exact_sum" => 900,
+                  "good" => 500,
+                  "bad" => nil
+                }
+              }
+            }
+          ]
+
+          expect(response.fetch("errors")).to contain_exactly(
+            hash_including(
+              "message" => "`percentile` must be between 0 and 100, but is 150.0.",
+              "path" => ["target", "nodes", 0, "aggregated_values", "amount_cents", "bad"]
+            )
+          )
         end
 
         def aggregated_value_key_of(*field_path, function_name, aggregation_name: "target")

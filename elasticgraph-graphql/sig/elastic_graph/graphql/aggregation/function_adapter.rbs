@@ -1,0 +1,52 @@
+module ElasticGraph
+  class GraphQL
+    module Aggregation
+      module FunctionAdapter
+        # Adapters need not all be data class instances. A function whose behavior is not a
+        # parameterization of anything is registered as a singleton module instead, and joins
+        # this union as a `singleton(...)` member.
+        type adapter = SimpleMetric | Percentile
+
+        type functionArgs = ::Hash[::Symbol, untyped]
+
+        class SimpleMetricSupertype < Data
+          attr_reader datastore_function_name: ::String
+          attr_reader empty_bucket_value: ::Numeric?
+
+          def initialize: (
+            datastore_function_name: ::String,
+            empty_bucket_value: ::Numeric?
+          ) -> void
+
+          def self.new: (
+            datastore_function_name: ::String,
+            empty_bucket_value: ::Numeric?
+          ) -> SimpleMetric
+        end
+
+        class SimpleMetric < SimpleMetricSupertype
+          def extract_args: (::Hash[::String, untyped], SchemaArtifacts::RuntimeMetadata::SchemaElementNames) { (::String) -> bot } -> functionArgs
+          def clause_options: (functionArgs) -> ::Hash[::String, untyped]
+          def extract_result: (::Hash[::String, untyped]) -> ::Hash[::String, untyped]
+          def empty_bucket_result: () -> ::Hash[::String, untyped]
+        end
+
+        class PercentileSupertype < Data
+          attr_reader datastore_function_name: ::String
+
+          def initialize: (datastore_function_name: ::String) -> void
+          def self.new: (datastore_function_name: ::String) -> Percentile
+        end
+
+        class Percentile < PercentileSupertype
+          def extract_args: (::Hash[::String, untyped], SchemaArtifacts::RuntimeMetadata::SchemaElementNames) { (::String) -> bot } -> functionArgs
+          def clause_options: (functionArgs) -> ::Hash[::String, untyped]
+          def extract_result: (::Hash[::String, untyped]) -> ::Hash[::String, untyped]
+          def empty_bucket_result: () -> ::Hash[::String, untyped]
+        end
+
+        BY_NAME: ::Hash[::Symbol, adapter]
+      end
+    end
+  end
+end

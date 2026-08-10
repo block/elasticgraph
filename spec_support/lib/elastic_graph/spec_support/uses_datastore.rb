@@ -481,6 +481,17 @@ RSpec.configure do |config|
   end
   # :nocov:
 
+  # Our between-test cleanup strategy (a `/_delete_by_query` against all indices) opens one scroll
+  # context per shard. We intentionally keep the datastore (and its indices) running across many
+  # test runs, so shards accumulate over time (each parallel test worker gets its own `test_env_N_*`
+  # indices). If the shard count reaches the datastore's `search.max_open_scroll_context` limit
+  # (500 by default), every cleanup request fails with a 429 "Trying to create too many scroll
+  # contexts" error, poisoning the entire test run in a way that is slow and confusing to debug.
+  # Here we raise the limit to give us ample headroom. We do it here (rather than in the
+  # elasticgraph-local docker-compose configs) because the accumulation only happens from runs of
+  # this test suite--EG users booting the datastore locally don't need a raised limit.
+  `curl -s -X PUT '#{datastore_url}/_cluster/settings' -H 'Content-Type: application/json' -d '{"persistent": {"search.max_open_scroll_context": 10000}}'`
+
   version_info = JSON.parse(curl_output.sub(/\A[^{]+/, "")).fetch("version")
   version = version_info.fetch("number")
   backend = version_info.fetch("distribution") { "elasticsearch" }.to_sym

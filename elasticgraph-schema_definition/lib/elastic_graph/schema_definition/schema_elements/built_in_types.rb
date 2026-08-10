@@ -681,7 +681,7 @@ module ElasticGraph
             t.customize_aggregated_values_type do |avt|
               # not nullable, since sum(empty_set) == 0
               avt.field names.approximate_sum, "Float!", graphql_only: true do |f|
-                f.runtime_metadata_computation_detail empty_bucket_value: 0, function: :sum
+                f.computes :sum
 
                 f.documentation <<~EOS
                   The sum of the field values within this grouping.
@@ -701,7 +701,7 @@ module ElasticGraph
               end
 
               avt.field names.approximate_avg, "Float", graphql_only: true do |f|
-                f.runtime_metadata_computation_detail empty_bucket_value: nil, function: :avg
+                f.computes :avg
 
                 f.documentation <<~EOS
                   The average (mean) of the field values within this grouping.
@@ -711,6 +711,8 @@ module ElasticGraph
                   outside the `JsonSafeLong` range (#{format_number(JSON_SAFE_LONG_MIN)} to #{format_number(JSON_SAFE_LONG_MAX)}).
                 EOS
               end
+
+              define_approximate_percentile_on_aggregated_values(avt, "Float")
             end
           end
 
@@ -791,7 +793,7 @@ module ElasticGraph
             EOS
 
             t.customize_aggregated_values_type do |avt|
-              define_exact_min_max_and_approx_avg_on_aggregated_values(avt, "Date") do |adjective:, full_name:|
+              define_temporal_aggregated_values(avt, "Date") do |adjective:, full_name:|
                 <<~EOS
                   So long as the grouping contains at least one non-null value for the
                   underlying indexed field, this will return an exact non-null value.
@@ -827,7 +829,7 @@ module ElasticGraph
             end
 
             t.customize_aggregated_values_type do |avt|
-              define_exact_min_max_and_approx_avg_on_aggregated_values(avt, "DateTime") do |adjective:, full_name:|
+              define_temporal_aggregated_values(avt, "DateTime") do |adjective:, full_name:|
                 <<~EOS
                   So long as the grouping contains at least one non-null value for the
                   underlying indexed field, this will return an exact non-null value.
@@ -893,7 +895,7 @@ module ElasticGraph
             t.mapping type: "date", format: "HH:mm:ss||HH:mm:ss.S||HH:mm:ss.SS||HH:mm:ss.SSS"
 
             t.customize_aggregated_values_type do |avt|
-              define_exact_min_max_and_approx_avg_on_aggregated_values(avt, "LocalTime") do |adjective:, full_name:|
+              define_temporal_aggregated_values(avt, "LocalTime") do |adjective:, full_name:|
                 <<~EOS
                   So long as the grouping contains at least one non-null value for the
                   underlying indexed field, this will return an exact non-null value.
@@ -1004,7 +1006,7 @@ module ElasticGraph
             t.customize_aggregated_values_type do |avt|
               # not nullable, since sum(empty_set) == 0
               avt.field names.approximate_sum, "Float!", graphql_only: true do |f|
-                f.runtime_metadata_computation_detail empty_bucket_value: 0, function: :sum
+                f.computes :sum
 
                 f.documentation <<~EOS
                   The (approximate) sum of the field values within this grouping.
@@ -1016,7 +1018,7 @@ module ElasticGraph
               end
 
               avt.field names.exact_sum, "JsonSafeLong", graphql_only: true do |f|
-                f.runtime_metadata_computation_detail empty_bucket_value: 0, function: :sum
+                f.computes :sum
 
                 f.documentation <<~EOS
                   The exact sum of the field values within this grouping, if it fits in a `JsonSafeLong`.
@@ -1045,7 +1047,7 @@ module ElasticGraph
                 names.exact_max => [:max, "maximum", names.approximate_max, "largest"]
               }.each do |exact_name, (func, full_name, approx_name, adjective)|
                 avt.field approx_name, "LongString", graphql_only: true do |f|
-                  f.runtime_metadata_computation_detail empty_bucket_value: nil, function: func
+                  f.computes func
 
                   f.documentation <<~EOS
                     The #{full_name} of the field values within this grouping.
@@ -1060,7 +1062,7 @@ module ElasticGraph
               end
 
               avt.field names.approximate_avg, "Float", graphql_only: true do |f|
-                f.runtime_metadata_computation_detail empty_bucket_value: nil, function: :avg
+                f.computes :avg
 
                 f.documentation <<~EOS
                   The average (mean) of the field values within this grouping.
@@ -1070,6 +1072,8 @@ module ElasticGraph
                   to #{format_number(JSON_SAFE_LONG_MAX)}).
                 EOS
               end
+
+              define_approximate_percentile_on_aggregated_values(avt, "Float")
             end
           end
         end
@@ -1532,7 +1536,7 @@ module ElasticGraph
           scalar_type.customize_aggregated_values_type do |t|
             # not nullable, since sum(empty_set) == 0
             t.field names.approximate_sum, "Float!", graphql_only: true do |f|
-              f.runtime_metadata_computation_detail empty_bucket_value: 0, function: :sum
+              f.computes :sum
 
               f.documentation <<~EOS
                 The (approximate) sum of the field values within this grouping.
@@ -1544,7 +1548,7 @@ module ElasticGraph
             end
 
             t.field names.exact_sum, long_type, graphql_only: true do |f|
-              f.runtime_metadata_computation_detail empty_bucket_value: 0, function: :sum
+              f.computes :sum
 
               f.documentation <<~EOS
                 The exact sum of the field values within this grouping, if it fits in a `#{long_type}`.
@@ -1563,7 +1567,7 @@ module ElasticGraph
             end
 
             t.field names.approximate_avg, "Float", graphql_only: true do |f|
-              f.runtime_metadata_computation_detail empty_bucket_value: nil, function: :avg
+              f.computes :avg
 
               f.documentation <<~EOS
                 The average (mean) of the field values within this grouping.
@@ -1573,18 +1577,41 @@ module ElasticGraph
                 to #{format_number(JSON_SAFE_LONG_MAX)}).
               EOS
             end
+
+            define_approximate_percentile_on_aggregated_values(t, "Float")
           end
         end
 
-        def define_exact_min_max_and_approx_avg_on_aggregated_values(aggregated_values_type, scalar_type, &block)
+        def define_temporal_aggregated_values(aggregated_values_type, scalar_type, &block)
           define_exact_min_and_max_on_aggregated_values(aggregated_values_type, scalar_type, &block)
 
           aggregated_values_type.field names.approximate_avg, scalar_type, graphql_only: true do |f|
-            f.runtime_metadata_computation_detail empty_bucket_value: nil, function: :avg
+            f.computes :avg
 
             f.documentation <<~EOS
               The average (mean) of the field values within this grouping.
               The returned value will be rounded to the nearest `#{scalar_type}` value.
+            EOS
+          end
+
+          define_approximate_percentile_on_aggregated_values(aggregated_values_type, scalar_type)
+        end
+
+        def define_approximate_percentile_on_aggregated_values(aggregated_values_type, scalar_type)
+          aggregated_values_type.field names.approximate_percentile, scalar_type, graphql_only: true do |f|
+            f.computes :percentile
+
+            f.argument names.percentile, "Float!" do |a|
+              a.documentation "The percentile to compute, from `0` to `100` (e.g. `0` for the min, `100` for the max, `50` for the median, `99` for the 99th percentile)."
+            end
+
+            f.documentation <<~EOS
+              An approximate percentile of the field values within this grouping.
+
+              Percentiles are computed using an approximate algorithm, so the returned value may not be
+              exact. Request a specific percentile via the `#{names.percentile}` argument (e.g.
+              `#{names.percentile}: 50` for the median). To request multiple percentiles in a single query,
+              use a GraphQL alias for each: `p50: #{names.approximate_percentile}(#{names.percentile}: 50)`.
             EOS
           end
         end
@@ -1597,7 +1624,7 @@ module ElasticGraph
             discussion = yield(adjective: adjective, full_name: full_name)
 
             aggregated_values_type.field name, scalar_type, graphql_only: true do |f|
-              f.runtime_metadata_computation_detail empty_bucket_value: nil, function: func
+              f.computes func
 
               f.documentation ["The #{full_name} of the field values within this grouping.", discussion].compact.join("\n\n")
             end

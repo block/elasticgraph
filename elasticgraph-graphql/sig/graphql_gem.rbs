@@ -36,6 +36,7 @@ module GraphQL
   end
 
   class ExecutionError < StandardError
+    attr_accessor path: ::Array[::String | ::Integer]?
   end
 
   module Language
@@ -127,6 +128,7 @@ module GraphQL
       def fetch: (untyped) -> untyped
       def add_error: (ExecutionError) -> void
       def dataloader: () -> Dataloader
+      def current_path: () -> ::Array[::String | ::Integer]?
     end
 
     class Result
