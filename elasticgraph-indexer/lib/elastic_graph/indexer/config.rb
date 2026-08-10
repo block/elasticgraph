@@ -53,7 +53,14 @@ module ElasticGraph
               "schema walk yields meaningful ingest speedups, with a sampled fraction left validated as a canary " \
               "for schema drift. Leave empty for live-traffic ingestion: the datastore mappings will not catch all " \
               "the constraints (regex, enum, min/max, format, abstract-type discriminators) that the JSON schema " \
-              "enforces.",
+              "enforces. Note also that only a missing or unknown `__typename` on an abstract-type field is " \
+              "guaranteed to fail in isolation (as a structured event failure) when validation is skipped. Other " \
+              "malformed data that per-record validation would normally catch (e.g. a value that cannot be coerced " \
+              "to its expected type, or a missing field needed to compute the document id, routing key, or rollover " \
+              "index suffix) may raise an unhandled error that fails the entire batch rather than just the offending " \
+              "record. Since such a batch produces no partial-failure response, the queue will redeliver all of its " \
+              "events, and the malformed record will fail them again on each retry until it is drained to the dead " \
+              "letter queue.",
             type: "object",
             patternProperties: {/^[A-Z]\w*$/.source => {type: "number", minimum: 0, maximum: 1}},
             additionalProperties: false,
