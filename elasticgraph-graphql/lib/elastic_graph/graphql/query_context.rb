@@ -8,6 +8,7 @@
 
 require "elastic_graph/errors"
 require "elastic_graph/graphql/client"
+require "elastic_graph/graphql/lookahead_errors"
 require "elastic_graph/graphql/query_details_tracker"
 require "graphql"
 
@@ -90,6 +91,37 @@ module ElasticGraph
       def fetch(key, *args, &block)
         raise_if_removed_key(key)
         super
+      end
+
+      # Records that `node`, a `GraphQL::Execution::Lookahead` node at or beneath the field currently
+      # being resolved, is invalid, with the given `message`. Intended for a custom lookahead-driven
+      # resolver that discovers a problem with itself or a *descendant* field while building its
+      # datastore query, and cannot raise a `GraphQL::ExecutionError` for it there (doing so would
+      # fail this resolver's entire subtree instead of just the one bad field).
+      #
+      # `extensions`, if provided, is included verbatim under the `"extensions"` key of the error
+      # in the GraphQL response; when omitted, no `"extensions"` key is added.
+      #
+      # `node` is resolved into a matching field the next time GraphQL execution reaches it: instead
+      # of running the registered resolver, ElasticGraph fails that field with a
+      # `GraphQL::ExecutionError` built from `message`/`extensions`, without disrupting sibling
+      # fields. A resolver that flags *itself* can report the error by returning
+      # `#matching_lookahead_error`, giving it one consistent way to fail a field regardless of
+      # whether the problem is with itself or a descendant.
+      #
+      # Must be called while the recording field is being resolved, since `node` is resolved to a
+      # response path relative to `#current_path`. Raises `Errors::ConfigError` if `node` is not
+      # selected at or beneath that path.
+      def record_lookahead_error(node, message, extensions: nil)
+        current_path = self.current_path # : Array[String | Integer]
+        (@lookahead_errors ||= LookaheadErrors.new).record(node, message, root_lookahead: query.lookahead, recording_path: current_path, extensions: extensions)
+      end
+
+      # Returns a `GraphQL::ExecutionError` for the field about to be resolved (at `#current_path`)
+      # if an ancestor resolver recorded a lookahead error matching it, or `nil` otherwise.
+      def matching_lookahead_error
+        current_path = self.current_path # : Array[String | Integer]
+        (@lookahead_errors ||= LookaheadErrors.new).matching_error_for(current_path)
       end
 
       private

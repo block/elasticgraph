@@ -183,13 +183,16 @@ module ElasticGraph
 
         # Verify that an out-of-range `percentile` resolves to `null` (with a precisely-pathed error)
         # rather than failing the entire `aggregated_values` subtree--sibling fields (including another,
-        # valid `approximate_percentile` alias) still resolve normally.
+        # valid `approximate_percentile` alias) still resolve normally. Grouping (rather than querying
+        # ungrouped) also proves the same recorded error independently flags the invalid field in
+        # *every* bucket, not just the first.
         out_of_range_response = nil
         expect {
           out_of_range_response = call_graphql_query(<<~QUERY, allow_errors: true)
             query {
               #{case_correctly("widget_aggregations")} {
                 nodes {
+                  #{grouped_by} { options { size } }
                   #{aggregated_values} {
                     #{amount_cents} {
                       #{case_correctly("exact_min")}
@@ -203,17 +206,26 @@ module ElasticGraph
           QUERY
         }.to log_warning(a_string_including("percentile` must be between 0 and 100"))
 
-        expect(out_of_range_response.dig("data", case_correctly("widget_aggregations"), "nodes", 0, aggregated_values, amount_cents)).to eq({
-          case_correctly("exact_min") => 100,
-          "good" => 200.0,
+        nodes = out_of_range_response.dig("data", case_correctly("widget_aggregations"), "nodes")
+        expect(nodes.size).to eq 2 # one bucket for size SMALL (w100, w200), one for size MEDIUM (w300)
+        nodes.each { |node| expect(node.dig(aggregated_values, amount_cents, "bad")).to eq nil }
+
+        # `w300` is the only widget in the MEDIUM bucket, so `good` (p50) is unambiguously its own
+        # `amount_cents`, regardless of the datastore's percentile interpolation method.
+        medium_node = nodes.find { |node| node.dig(grouped_by, "options", "size") == enum_value("MEDIUM") }
+        expect(medium_node.dig(aggregated_values, amount_cents)).to eq({
+          case_correctly("exact_min") => 300,
+          "good" => 300.0,
           "bad" => nil
         })
-        expect(out_of_range_response.fetch("errors")).to contain_exactly(
+
+        expected_errors = nodes.each_index.map do |index|
           hash_including(
             "message" => "`#{case_correctly("percentile")}` must be between 0 and 100, but is 150.0.",
-            "path" => [case_correctly("widget_aggregations"), "nodes", 0, aggregated_values, amount_cents, "bad"]
+            "path" => [case_correctly("widget_aggregations"), "nodes", index, aggregated_values, amount_cents, "bad"]
           )
-        )
+        end
+        expect(out_of_range_response.fetch("errors")).to contain_exactly(*expected_errors)
 
         aggregations = group_widget_currencies_by_widget_name
         expect(aggregations).to eq [
@@ -915,6 +927,28 @@ module ElasticGraph
 
         verify_all_timestamp_groupings_valid(widget1.fetch(:id), truncation_unit_type: "DateTimeGroupingTruncationUnitInput", field: "created_at")
         verify_all_datetime_offset_units_valid(widget1.fetch(:id))
+      end
+
+      it "does not error or warn about an out-of-range percentile when the aggregation has no buckets" do
+        # An *ungrouped* aggregation always has exactly one (possibly empty) bucket, but a *grouped*
+        # one has zero buckets when there's no matching data--which is the case we want here.
+        response = call_graphql_query(<<~QUERY)
+          query {
+            #{case_correctly("widget_aggregations")} {
+              nodes {
+                #{grouped_by} { tag }
+                #{aggregated_values} {
+                  #{amount_cents} {
+                    bad: #{case_correctly("approximate_percentile")}(#{case_correctly("percentile")}: 150)
+                  }
+                }
+              }
+            }
+          }
+        QUERY
+
+        expect(response.dig("data", case_correctly("widget_aggregations"), "nodes")).to eq []
+        expect(response).not_to have_key("errors")
       end
 
       def expected_aggregated_amounts_of(*raw_values)
