@@ -9,6 +9,7 @@
 require "graphql"
 require "elastic_graph/constants"
 require "elastic_graph/errors"
+require "elastic_graph/graphql/query_context"
 require "elastic_graph/graphql/schema/field"
 require "elastic_graph/graphql/schema/type"
 
@@ -69,6 +70,11 @@ module ElasticGraph
           using: graphql_gem_plugins
         )
 
+        @graphql_schema.context_class(QueryContext.new_class(
+          elastic_graph_schema: self,
+          datastore_search_router: @datastore_search_router
+        ))
+
         # Pre-load all defined types so that all field extras can get configured as part
         # of loading the schema, before we execute the first query.
         @types_by_name = build_types_by_name
@@ -92,11 +98,7 @@ module ElasticGraph
           operation_name: operation_name,
           document: document,
           validate: validate,
-          context: context.merge({
-            datastore_search_router: @datastore_search_router,
-            elastic_graph_schema: self,
-            visibility_profile: VISIBILITY_PROFILE
-          })
+          context: context.merge({visibility_profile: VISIBILITY_PROFILE})
         )
       end
 

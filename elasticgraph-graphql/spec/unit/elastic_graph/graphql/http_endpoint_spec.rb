@@ -59,7 +59,7 @@ module ElasticGraph
           let(:graphql) do
             adapter = Class.new do
               def call(query:, context:, **)
-                user_name = context.fetch(:http_request).normalized_headers["USER-NAME"]
+                user_name = context.http_request.normalized_headers["USER-NAME"]
                 query.merge_with(internal_filters: [{"user_name" => {"equal_to_any_of" => [user_name]}}])
               end
             end.new

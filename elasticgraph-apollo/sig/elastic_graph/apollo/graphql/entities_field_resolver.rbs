@@ -43,7 +43,7 @@ module ElasticGraph
           def identify_matching_hit: (
             I,
             R,
-            context: ::GraphQL::Query::Context,
+            context: ElasticGraph::GraphQL::QueryContext,
             index: ::Integer
           ) -> (ElasticGraph::GraphQL::DatastoreResponse::Document | ::Hash[::String, untyped])?
 

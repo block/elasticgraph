@@ -1,0 +1,78 @@
+# Copyright 2024 - 2026 Block, Inc.
+#
+# Use of this source code is governed by an MIT-style
+# license that can be found in the LICENSE file or at
+# https://opensource.org/licenses/MIT.
+#
+# frozen_string_literal: true
+
+require "elastic_graph/graphql/client"
+require "elastic_graph/graphql/query_details_tracker"
+require "graphql"
+
+module ElasticGraph
+  class GraphQL
+    # `GraphQL::Query::Context` subclass used by ElasticGraph, providing typed accessors in
+    # place of untyped context hash keys. Registered as the `context_class` on the `GraphQL::Schema`
+    # built by `Schema`, via `new_class`, so that every query gets an instance closed over the
+    # `Schema` and `DatastoreSearchRouter` in use for that schema.
+    class QueryContext < ::GraphQL::Query::Context
+      def self.elastic_graph_schema
+        @elastic_graph_schema
+      end
+
+      def self.datastore_search_router
+        @datastore_search_router
+      end
+
+      # Builds a `QueryContext` subclass closed over the given `elastic_graph_schema` and
+      # `datastore_search_router`, suitable for registering as a `GraphQL::Schema#context_class`.
+      def self.new_class(elastic_graph_schema:, datastore_search_router:)
+        klass = ::Class.new(self) # : singleton(QueryContext)
+        klass.instance_variable_set(:@elastic_graph_schema, elastic_graph_schema)
+        klass.instance_variable_set(:@datastore_search_router, datastore_search_router)
+        klass
+      end
+
+      # `elastic_graph_schema` is only `nil` before `new_class` has closed over it, which never
+      # happens for a `QueryContext` actually used to execute a query (see `Schema#initialize`).
+      def elastic_graph_schema
+        self.class.elastic_graph_schema # : Schema
+      end
+
+      def datastore_search_router
+        self.class.datastore_search_router # : DatastoreSearchRouter
+      end
+
+      # @dynamic monotonic_clock_deadline, elastic_graph_client, http_request
+      attr_reader :monotonic_clock_deadline, :elastic_graph_client, :http_request
+
+      # Registers the given ElasticGraph-managed values on this context. Intended to be called
+      # exactly once, by `Schema#new_graphql_query` callers immediately after building a query and
+      # before making it available to resolvers or other user-facing code. Not for use elsewhere.
+      def register_elastic_graph_values(monotonic_clock_deadline: nil, elastic_graph_client: Client::ANONYMOUS, http_request: nil)
+        @monotonic_clock_deadline = monotonic_clock_deadline
+        @elastic_graph_client = elastic_graph_client
+        @http_request = http_request
+      end
+
+      # Lazily builds (and memoizes) the `QueryDetailsTracker` for this query.
+      def elastic_graph_query_tracker
+        @elastic_graph_query_tracker ||= QueryDetailsTracker.empty
+      end
+
+      # Caches the result of the given block (a built `DatastoreQuery`) under `cache_key`, scoped to
+      # this single query execution. See `Resolvers::QueryAdapter#build_query_from` for why this
+      # memoization is beneficial.
+      def cache_datastore_query(cache_key)
+        datastore_query_cache[cache_key] ||= yield
+      end
+
+      private
+
+      def datastore_query_cache
+        @datastore_query_cache ||= {}
+      end
+    end
+  end
+end

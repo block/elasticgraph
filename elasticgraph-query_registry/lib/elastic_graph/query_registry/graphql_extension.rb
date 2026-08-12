@@ -59,16 +59,18 @@ module ElasticGraph
 
       private
 
-      def build_and_execute_query(query_string:, variables:, operation_name:, context:, client:)
+      def build_and_execute_query(query_string:, variables:, operation_name:, context:, client:, monotonic_clock_deadline:, http_request:)
         query, errors, registration_status = @registry.build_and_validate_query(
           query_string,
           variables: variables,
           operation_name: operation_name,
           context: context,
-          client: client
+          client: client,
+          monotonic_clock_deadline: monotonic_clock_deadline,
+          http_request: http_request
         )
 
-        context.fetch(:elastic_graph_query_tracker)["query_registration_status"] = registration_status
+        query.context.elastic_graph_query_tracker["query_registration_status"] = registration_status
 
         if errors.empty?
           [query, execute_query(query, client: client)]

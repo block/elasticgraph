@@ -117,6 +117,11 @@ module GraphQL
     attr_reader result: Result
     attr_reader query_string: ::String?
 
+    # Note: in reality this returns a `Query::Context`, but ElasticGraph always registers
+    # `ElasticGraph::GraphQL::QueryContext` as the schema's `context_class`, so every context
+    # ElasticGraph code encounters is actually one of those.
+    attr_reader context: ::ElasticGraph::GraphQL::QueryContext
+
     def selected_operation: () -> Language::Nodes::OperationDefinition?
     def selected_operation_name: () -> ::String?
     def static_errors: () -> ::Array[_ValidationError]
@@ -142,8 +147,10 @@ module GraphQL
     attr_reader static_validator: StaticValidation::Validator
 
     def execute: (::String, **untyped) -> ::Hash[::String, untyped]
+    def possible_types: (untyped, **untyped) -> ::Array[_Type]
     def self.from_definition: (::String) -> Schema
     def to_definition: () -> ::String
+    def context_class: (::Class) -> void
     def type_from_ast: (
       Language::Nodes::AbstractNode,
       ?context: Query::Context

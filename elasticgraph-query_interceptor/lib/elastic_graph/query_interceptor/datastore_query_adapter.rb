@@ -17,7 +17,9 @@ module ElasticGraph
       end
 
       def call(query:, args:, lookahead:, field:, context:)
-        http_request = context[:http_request]
+        # This extension is only usable in HTTP-serving deployments (per the `_Interceptor#intercept`
+        # interface, which requires `http_request:`), so `http_request` is always present here.
+        http_request = context.http_request # : GraphQL::HTTPRequest
 
         interceptors.reduce(query) do |accum, interceptor|
           interceptor.intercept(accum, field: field, args: args, http_request: http_request, context: context)

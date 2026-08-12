@@ -7,7 +7,6 @@
 # frozen_string_literal: true
 
 require "elastic_graph/graphql/client"
-require "elastic_graph/graphql/query_details_tracker"
 require "elastic_graph/support/hash_util"
 
 module ElasticGraph
@@ -40,6 +39,7 @@ module ElasticGraph
         timeout_in_ms: nil,
         operation_name: nil,
         context: {},
+        http_request: nil,
         start_time_in_ms: @monotonic_clock.now_in_ms
       )
         # Before executing the query, prune any null-valued variable fields. This means we
@@ -50,19 +50,17 @@ module ElasticGraph
         # due to a null-valued field referencing an undefined schema element.
         variables = ElasticGraph::Support::HashUtil.recursively_prune_nils_from(variables)
 
-        query_tracker = QueryDetailsTracker.empty
-
         query, result = build_and_execute_query(
           query_string: query_string,
           variables: variables,
           operation_name: operation_name,
           client: client,
-          context: context.merge({
-            monotonic_clock_deadline: timeout_in_ms&.+(start_time_in_ms),
-            elastic_graph_query_tracker: query_tracker,
-            elastic_graph_client: client
-          }.compact)
+          context: context,
+          monotonic_clock_deadline: timeout_in_ms&.+(start_time_in_ms),
+          http_request: http_request
         )
+
+        query_tracker = query.context.elastic_graph_query_tracker
 
         unless result.to_h.fetch("errors", []).empty?
           @logger.error <<~EOS
@@ -128,12 +126,17 @@ module ElasticGraph
 
       # Note: this is designed so that `elasticgraph-query_registry` can hook into this method. It needs to be able
       # to override how the query is built and executed.
-      def build_and_execute_query(query_string:, variables:, operation_name:, context:, client:)
+      def build_and_execute_query(query_string:, variables:, operation_name:, context:, client:, monotonic_clock_deadline:, http_request:)
         query = @schema.new_graphql_query(
           query_string,
           variables: variables,
           operation_name: operation_name,
           context: context
+        )
+        query.context.register_elastic_graph_values(
+          monotonic_clock_deadline: monotonic_clock_deadline,
+          elastic_graph_client: client,
+          http_request: http_request
         )
 
         [query, execute_query(query, client: client)]

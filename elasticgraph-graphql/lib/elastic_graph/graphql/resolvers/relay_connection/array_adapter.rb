@@ -26,7 +26,7 @@ module ElasticGraph
           def_delegators :graphql_impl, :start_cursor, :end_cursor, :has_next_page, :has_previous_page
 
           def self.build(nodes, args, context)
-            schema = context.fetch(:elastic_graph_schema)
+            schema = context.elastic_graph_schema
             schema_element_names = schema.element_names
             nodes ||= [] # : ::Array[untyped]
 

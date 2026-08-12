@@ -18,7 +18,7 @@ module ElasticGraph
         end
 
         def resolve(field:, object:, args:, context:)
-          {"sdl" => service_sdl(context.fetch(:elastic_graph_schema))}
+          {"sdl" => service_sdl(context.elastic_graph_schema)}
         end
 
         private

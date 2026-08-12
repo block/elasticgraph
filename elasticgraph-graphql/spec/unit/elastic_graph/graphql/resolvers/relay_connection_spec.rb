@@ -6,6 +6,7 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/graphql/query_context"
 require "elastic_graph/graphql/resolvers/relay_connection"
 require "support/aggregations_helpers"
 
@@ -62,7 +63,7 @@ module ElasticGraph
 
             graphql = build_graphql(schema_artifacts: schema_artifacts)
             field = graphql.schema.field_named("Query", field_name)
-            context = {elastic_graph_schema: graphql.schema}
+            context = instance_double(QueryContext, elastic_graph_schema: graphql.schema)
 
             lookahead = ::GraphQL::Execution::Lookahead.new(
               query: nil,

@@ -40,11 +40,19 @@ module ElasticGraph
           client_data_by_client_name.key?(client_name)
         end
 
-        def build_and_validate_query(query_string, client:, variables: {}, operation_name: nil, context: {})
+        def build_and_validate_query(query_string, client:, variables: {}, operation_name: nil, context: {}, monotonic_clock_deadline: nil, http_request: nil)
           client_data = client_data_for(client.name)
 
           if (cached_query = client_data.cached_query_for(query_string.to_s))
-            prepared_query = prepare_query_for_execution(cached_query, variables: variables, operation_name: operation_name, context: context)
+            prepared_query = prepare_query_for_execution(
+              cached_query,
+              client: client,
+              variables: variables,
+              operation_name: operation_name,
+              context: context,
+              monotonic_clock_deadline: monotonic_clock_deadline,
+              http_request: http_request
+            )
             return [prepared_query, [], RegistrationStatus::MATCHED_REGISTERED_QUERY]
           end
 
@@ -82,7 +90,7 @@ module ElasticGraph
           # to be in that alternate form every single time, so caching it can be a nice win.
           atomically_update_cached_client_data_for(client.name) do |cached_client_data|
             # We don't want the cached form of the query to persist the current variables, context, etc being used for this request.
-            cachable_query = prepare_query_for_execution(query, variables: {}, operation_name: nil, context: {})
+            cachable_query = prepare_query_for_execution(query, client: client, variables: {}, operation_name: nil, context: {})
 
             # We use `_` here because Steep believes `client_data` could be nil. In general, this is
             # true; it can be nil, but not at this callsite, because we are in a branch that is only
@@ -90,7 +98,15 @@ module ElasticGraph
             (_ = cached_client_data).with_updated_last_query(query_string, cachable_query)
           end
 
-          prepared_query = prepare_query_for_execution(query, variables: variables, operation_name: operation_name, context: context)
+          prepared_query = prepare_query_for_execution(
+            query,
+            client: client,
+            variables: variables,
+            operation_name: operation_name,
+            context: context,
+            monotonic_clock_deadline: monotonic_clock_deadline,
+            http_request: http_request
+          )
 
           [prepared_query, [], registration_status]
         end
@@ -122,8 +138,8 @@ module ElasticGraph
           end
         end
 
-        def prepare_query_for_execution(query, variables:, operation_name:, context:)
-          schema.new_graphql_query(
+        def prepare_query_for_execution(query, client:, variables:, operation_name:, context:, monotonic_clock_deadline: nil, http_request: nil)
+          new_query = schema.new_graphql_query(
             # Here we pass `document` instead of query string, so that we don't have to re-parse the query.
             # However, when the document is nil, we still need to pass the query string.
             query.document ? nil : query.query_string,
@@ -139,6 +155,12 @@ module ElasticGraph
             # are still reported as errors on every request.
             validate: false
           )
+          new_query.context.register_elastic_graph_values(
+            monotonic_clock_deadline: monotonic_clock_deadline,
+            elastic_graph_client: client,
+            http_request: http_request
+          )
+          new_query
         end
       end
     end

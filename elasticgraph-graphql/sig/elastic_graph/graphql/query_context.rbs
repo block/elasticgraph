@@ -1,0 +1,36 @@
+module ElasticGraph
+  class GraphQL
+    class QueryContext < ::GraphQL::Query::Context
+      self.@elastic_graph_schema: Schema?
+      def self.elastic_graph_schema: () -> Schema?
+
+      self.@datastore_search_router: DatastoreSearchRouter?
+      def self.datastore_search_router: () -> DatastoreSearchRouter?
+
+      def self.new_class: (elastic_graph_schema: Schema, datastore_search_router: DatastoreSearchRouter) -> singleton(QueryContext)
+
+      def elastic_graph_schema: () -> Schema
+      def datastore_search_router: () -> DatastoreSearchRouter
+
+      attr_reader monotonic_clock_deadline: ::Integer?
+      attr_reader elastic_graph_client: Client?
+      attr_reader http_request: HTTPRequest?
+
+      def register_elastic_graph_values: (
+        ?monotonic_clock_deadline: ::Integer?,
+        ?elastic_graph_client: Client?,
+        ?http_request: HTTPRequest?
+      ) -> void
+
+      @elastic_graph_query_tracker: QueryDetailsTracker?
+      def elastic_graph_query_tracker: () -> QueryDetailsTracker
+
+      def cache_datastore_query: (untyped cache_key) { () -> DatastoreQuery } -> DatastoreQuery
+
+      private
+
+      @datastore_query_cache: ::Hash[untyped, DatastoreQuery]?
+      def datastore_query_cache: () -> ::Hash[untyped, DatastoreQuery]
+    end
+  end
+end

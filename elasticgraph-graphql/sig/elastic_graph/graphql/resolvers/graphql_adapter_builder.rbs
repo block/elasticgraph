@@ -20,9 +20,9 @@ module ElasticGraph
 
         private
 
-        def scalar_type_hash: () -> ::Hash[::String, ::Hash[::String, ^(untyped, ::GraphQL::Query::Context) -> untyped]]
-        def object_type_hash: () -> ::Hash[::String, ::Hash[::String, ^(untyped, ::Hash[::Symbol, untyped], ::GraphQL::Query::Context) -> untyped]]
-        def resolve_type: (::Module, untyped, ::GraphQL::Query::Context) -> untyped
+        def scalar_type_hash: () -> ::Hash[::String, ::Hash[::String, ^(untyped, QueryContext) -> untyped]]
+        def object_type_hash: () -> ::Hash[::String, ::Hash[::String, ^(untyped, ::Hash[::Symbol, untyped], QueryContext) -> untyped]]
+        def resolve_type: (::Module, untyped, QueryContext) -> untyped
       end
     end
   end

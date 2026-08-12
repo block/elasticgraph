@@ -32,7 +32,9 @@ module ElasticGraph
           client: GraphQL::Client,
           ?variables: ::Hash[::String, untyped],
           ?operation_name: ::String?,
-          ?context: ::Hash[::Symbol, untyped]
+          ?context: ::Hash[::Symbol, untyped],
+          ?monotonic_clock_deadline: ::Integer?,
+          ?http_request: GraphQL::HTTPRequest?
         ) { () -> ::GraphQL::Query } -> [::GraphQL::Query, ::Array[::String], ::String]
 
         private
@@ -42,9 +44,12 @@ module ElasticGraph
 
         def prepare_query_for_execution: (
           ::GraphQL::Query,
+          client: GraphQL::Client,
           variables: ::Hash[::String, untyped],
           operation_name: ::String?,
-          context: ::Hash[::Symbol, untyped]
+          context: ::Hash[::Symbol, untyped],
+          ?monotonic_clock_deadline: ::Integer?,
+          ?http_request: GraphQL::HTTPRequest?
         ) -> ::GraphQL::Query
       end
     end

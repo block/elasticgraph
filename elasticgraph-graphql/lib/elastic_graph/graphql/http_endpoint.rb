@@ -57,6 +57,7 @@ module ElasticGraph
             client: client_or_response,
             timeout_in_ms: parsed.timeout_in_ms,
             context: parsed.context,
+            http_request: request,
             start_time_in_ms: start_time_in_ms
           )
 
@@ -155,17 +156,18 @@ module ElasticGraph
         yield [max_timeout_in_ms, requested_timeout_in_ms].compact.min
       end
 
-      # Responsible for determining any `context` values to pass down into the `query_executor`,
-      # which in turn will make the values available to the GraphQL resolvers.
+      # Responsible for determining any extra `context` values to pass down into the `query_executor`,
+      # which in turn will make the values available to the GraphQL resolvers. (`http_request` itself is
+      # always passed down separately--see `process`--so it does not need to be added here.)
       #
-      # By default, our only context value is the HTTP request. This method exists to provide an extension
+      # By default we have no extra context values. This method exists to provide an extension
       # point so that ElasticGraph extensions can add `context` values based on the `request` as desired.
       #
       # Extensions can return an `HTTPResponse` with an error if the `request` is invalid according
       # to their requirements. Otherwise, they must call `super` (to delegate to this and any other
       # extensions) with a block. In the block, they must merge in their `context` values and then `yield`.
       def with_context(request)
-        yield({http_request: request})
+        yield({})
       end
 
       ParsedRequest = Data.define(:query_string, :variables, :operation_name, :timeout_in_ms, :context)
