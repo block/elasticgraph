@@ -19,6 +19,7 @@ module ElasticGraph
         attr_reader sourced_fields: ::Array[SchemaElements::Field]
 
         def relationship_error_prefix: () -> ::String
+        def validate_non_indexed_related_type_id_field: (indexableType) -> ::String?
         def validate_foreign_key: (
           indexableType,
           SchemaArtifacts::RuntimeMetadata::Relation
