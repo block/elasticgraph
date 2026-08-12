@@ -55,6 +55,11 @@ module ElasticGraph
           .to_set
       end
 
+      # @private
+      def sourced_update_targets_by_source_type_name
+        @sourced_update_targets_by_source_type_name ||= Indexing::SourcedFromUpdateTargetsResolver.new(state).resolve
+      end
+
       private
 
       def after_initialize
@@ -89,7 +94,9 @@ module ElasticGraph
       end
 
       def build_runtime_metadata
-        sourced_update_targets_by_source_type_name = Indexing::SourcedFromUpdateTargetsResolver.new(state).resolve
+        # Resolve `sourced_from` update targets before touching `all_types` so that `sourced_from`
+        # validation errors take precedence over any errors raised while generating derived types.
+        sourced_update_targets_by_source_type_name = self.sourced_update_targets_by_source_type_name
 
         object_types_by_name = all_types
           .select { |t| t.respond_to?(:graphql_fields_by_name) }

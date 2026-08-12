@@ -12,6 +12,7 @@ module ElasticGraph
       def datastore_config: () -> ::Hash[::String, untyped]
       def runtime_metadata: () -> SchemaArtifacts::RuntimeMetadata::Schema
       def derived_indexing_type_names: () -> ::Set[::String]
+      def sourced_update_targets_by_source_type_name: () -> ::Hash[::String, ::Array[SchemaArtifacts::RuntimeMetadata::UpdateTarget]]
 
       @graphql_schema_string: ::String?
       @datastore_config: ::Hash[::String, untyped]
@@ -20,6 +21,7 @@ module ElasticGraph
       @no_circular_dependencies: bool?
       @field_path_resolver: SchemaElements::FieldPath::Resolver?
       @derived_indexing_type_names: ::Set[::String]?
+      @sourced_update_targets_by_source_type_name: ::Hash[::String, ::Array[SchemaArtifacts::RuntimeMetadata::UpdateTarget]]?
 
       STATIC_SCRIPT_REPO: Scripting::FileSystemRepository
 
