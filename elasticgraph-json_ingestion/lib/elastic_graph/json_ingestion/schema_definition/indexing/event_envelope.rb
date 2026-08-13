@@ -17,10 +17,11 @@ module ElasticGraph
         #
         # @api private
         module EventEnvelope
-          # @param indexed_type_names [Array<String>] names of the indexed types
+          # @param ingestible_type_names [Array<String>] names of the types events can be ingested for (indexed
+          #   document types plus non-indexed `sourced_from` source types)
           # @param json_schema_version [Integer] the version of the JSON schema
-          # @return [Hash<String, Object>] the JSON schema for the ElasticGraph event envelope for the given `indexed_type_names`.
-          def self.json_schema(indexed_type_names, json_schema_version)
+          # @return [Hash<String, Object>] the JSON schema for the ElasticGraph event envelope for the given `ingestible_type_names`.
+          def self.json_schema(ingestible_type_names, json_schema_version)
             {
               "type" => "object",
               "description" => "Required by ElasticGraph to wrap every data event.",
@@ -34,7 +35,7 @@ module ElasticGraph
                   "description" => "The type of object present in `record`.",
                   "type" => "string",
                   # Sorting doesn't really matter here, but it's nice for the output in the schema artifact to be consistent.
-                  "enum" => indexed_type_names.sort
+                  "enum" => ingestible_type_names.sort
                 },
                 "id" => {
                   "description" => "The unique identifier of the record.",

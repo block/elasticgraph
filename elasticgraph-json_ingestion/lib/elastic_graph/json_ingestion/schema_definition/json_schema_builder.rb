@@ -17,10 +17,11 @@ module ElasticGraph
       #
       # @private
       class JSONSchemaBuilder
-        def initialize(state:, all_types:, derived_indexing_type_names:)
+        def initialize(state:, all_types:, derived_indexing_type_names:, sourced_from_source_type_names:)
           @state = state
           @all_types = all_types
           @derived_indexing_type_names = derived_indexing_type_names
+          @sourced_from_source_type_names = sourced_from_source_type_names
         end
 
         def public_json_schema
@@ -33,7 +34,7 @@ module ElasticGraph
             "$schema" => JSON_META_SCHEMA,
             JSON_SCHEMA_VERSION_KEY => json_schema_version,
             "$defs" => {
-              "ElasticGraphEventEnvelope" => Indexing::EventEnvelope.json_schema(root_document_type_names, json_schema_version)
+              "ElasticGraphEventEnvelope" => Indexing::EventEnvelope.json_schema(ingestible_type_names, json_schema_version)
             }.merge(definitions_by_name)
           }
         end
@@ -44,10 +45,13 @@ module ElasticGraph
 
         private
 
-        def root_document_type_names
+        # The types the indexer can ingest events for: indexed document types plus `sourced_from` source types
+        # (which need not be indexed themselves). Derived indexing types are excluded because their documents
+        # are built from other types' events rather than ingested directly.
+        def ingestible_type_names
           @state.object_types_by_name.values
-            .select { |type| type.root_document_type? && !type.abstract? }
-            .reject { |type| @derived_indexing_type_names.include?(type.name) }
+            .select { |type| type.root_document_type? || @sourced_from_source_type_names.include?(type.name) }
+            .reject { |type| type.abstract? || @derived_indexing_type_names.include?(type.name) }
             .map(&:name)
         end
 
