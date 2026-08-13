@@ -36,8 +36,12 @@ module ElasticGraph
               end
 
             [nil, "#{relationship_error_prefix} #{issue}"]
-          elsif !related_type.root_document_type?
-            [nil, "#{relationship_error_prefix} references a type which is not a root document type: `#{related_type.name}`. Only root document types can be used in relations."]
+          elsif !related_type.root_document_type? && !relationship.indexing_only
+            [nil, "#{relationship_error_prefix} references a type which is not a root document type: `#{related_type.name}`. " \
+              "Only root document types can be used in relations exposed to GraphQL. To relate to a non-indexed source type " \
+              "purely for indexing purposes (e.g. `sourced_from`), declare the relationship with `indexing_only: true`."]
+          elsif (id_field_error = validate_non_indexed_related_type_id_field(related_type))
+            [nil, id_field_error]
           else
             relation_metadata = relationship.runtime_metadata # : SchemaArtifacts::RuntimeMetadata::Relation
             foreign_key_parent_type = (relation_metadata.direction == :in) ? related_type : object_type
@@ -65,6 +69,18 @@ module ElasticGraph
             end
 
           "`#{relationship_description}`#{sourced_fields_description}"
+        end
+
+        # A non-indexed related type never goes through the `id` validation that `t.index` performs on indexed
+        # types, but relationships join on `id`, so we must verify it here.
+        def validate_non_indexed_related_type_id_field(related_type)
+          return nil if related_type.root_document_type?
+
+          id_field = schema_def_state.field_path_resolver.resolve_public_path(related_type, "id") { true }
+          return nil if id_field
+
+          "#{relationship_error_prefix} references `#{related_type.name}`, which lacks an `id` field. Related types " \
+            "must define an `id` field since relationships join on it."
         end
 
         def validate_foreign_key(foreign_key_parent_type, relation_metadata)
