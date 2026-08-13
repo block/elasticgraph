@@ -61,6 +61,13 @@ module ElasticGraph
 
       # The list count for the nested coaches comes from the team event; nested source events don't affect it.
       expect(source.fetch(LIST_COUNTS_FIELD)).to include("staff|coaches" => 2)
+
+      # The profile types are pure-source (non-indexed), so their events update the team document only--
+      # no standalone profile documents get written.
+      profile_hits = main_datastore_client
+        .msearch(body: [{index: "coach_profiles*,general_manager_profiles*"}, {query: {match_all: {}}}])
+        .dig("responses", 0, "hits", "hits")
+      expect(profile_hits).to eq []
     end
 
     it "preserves already-sourced nested fields when the root document is re-indexed" do
