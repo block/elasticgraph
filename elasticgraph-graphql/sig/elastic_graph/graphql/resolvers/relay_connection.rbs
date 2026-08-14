@@ -5,7 +5,7 @@ module ElasticGraph
         def self.maybe_wrap: (
           DatastoreResponse::SearchResponse,
           field: Schema::Field,
-          context: ::GraphQL::Query::Context,
+          context: QueryContext,
           lookahead: ::GraphQL::Execution::Lookahead,
           query: DatastoreQuery
         ) -> (DatastoreResponse::SearchResponse | GenericAdapter[DatastoreResponse::Document] | GenericAdapter[Aggregation::Resolvers::Node])

@@ -337,9 +337,7 @@ module ElasticGraph
             }
           QUERY
 
-          expect(submitted_query_context_for(query, timeout_in_ms: 500)).to include(
-            monotonic_clock_deadline: monontonic_now_time + 500
-          )
+          expect(submitted_query_context_for(query, timeout_in_ms: 500).monotonic_clock_deadline).to eq(monontonic_now_time + 500)
         end
 
         it "passes no `monotonic_clock_deadline` in `context` when no `timeout_in_ms` is provided" do
@@ -351,7 +349,7 @@ module ElasticGraph
             }
           QUERY
 
-          expect(submitted_query_context_for(query)).not_to include(:monotonic_clock_deadline)
+          expect(submitted_query_context_for(query).monotonic_clock_deadline).to be_nil
         end
 
         it "allows full introspection on all built-in schema types" do
@@ -397,7 +395,7 @@ module ElasticGraph
           it "includes extension data in the logged duration message" do
             # Simulate an extension setting data in the query tracker
             allow(::GraphQL::Execution::Interpreter).to receive(:run_all).and_wrap_original do |original, schema, queries, context:|
-              query_tracker = context[:elastic_graph_query_tracker]
+              query_tracker = context.elastic_graph_query_tracker
               query_tracker["custom_field"] = "custom_value"
               query_tracker["another_field"] = "another_value"
               original.call(schema, queries, context: context)

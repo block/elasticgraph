@@ -49,7 +49,7 @@ module ElasticGraph
     def resolve: (
       field: ElasticGraph::GraphQL::Schema::Field,
       object: untyped,
-      context: ::GraphQL::Query::Context,
+      context: ElasticGraph::GraphQL::QueryContext,
       args: ::Hash[::String, untyped],
       lookahead: ::GraphQL::Execution::Lookahead
     ) { () -> ElasticGraph::GraphQL::DatastoreQuery } -> untyped
@@ -59,7 +59,7 @@ module ElasticGraph
     def resolve: (
       field: ElasticGraph::GraphQL::Schema::Field,
       object: untyped,
-      context: ::GraphQL::Query::Context,
+      context: ElasticGraph::GraphQL::QueryContext,
       args: ::Hash[::String, untyped]
     ) -> untyped
   end

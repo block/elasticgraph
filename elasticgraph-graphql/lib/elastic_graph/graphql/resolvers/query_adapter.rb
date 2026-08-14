@@ -18,7 +18,7 @@ module ElasticGraph
         end
 
         def build_query_from(field:, args:, lookahead:, context:)
-          monotonic_clock_deadline = context[:monotonic_clock_deadline]
+          monotonic_clock_deadline = context.monotonic_clock_deadline
 
           # Building an `DatastoreQuery` is not cheap; we do a lot of work to:
           #
@@ -53,9 +53,9 @@ module ElasticGraph
           # instance, so we can safely cache things in it and trust that it will not "leak" to another
           # query execution. We carefully build a cache key below to ensure that we only ever reuse
           # the same `DatastoreQuery` in a situation that would produce the exact same `DatastoreQuery`.
-          context[:datastore_query_cache] ||= {}
-          context[:datastore_query_cache][cache_key_for(field, args, lookahead)] ||=
+          context.cache_datastore_query(cache_key_for(field, args, lookahead)) do
             build_new_query_from(field, args, lookahead, context, monotonic_clock_deadline)
+          end
         end
 
         private

@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/graphql/client"
+require "elastic_graph/graphql/query_context"
 require "elastic_graph/graphql/resolvers/query_source"
 
 module ElasticGraph
@@ -21,11 +22,12 @@ module ElasticGraph
               extra_opaque_id_parts: ["tenant=acme"]
             )
             graphql_query = instance_double(::GraphQL::Query, fingerprint: "GetColors/abc123")
-            for_context = ::GraphQL::Query::Context.new(
+            for_context = QueryContext.new(
               query: graphql_query,
               schema: Class.new(::GraphQL::Schema),
-              values: {elastic_graph_client: client}
+              values: {}
             )
+            for_context.register_elastic_graph_values(elastic_graph_client: client)
 
             parts = QuerySource.send(:datastore_opaque_id_parts_for, for_context)
 

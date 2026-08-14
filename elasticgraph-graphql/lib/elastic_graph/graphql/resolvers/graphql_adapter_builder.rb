@@ -54,7 +54,7 @@ module ElasticGraph
                 resolver_lambda =
                   if resolver.method(:resolve).parameters.include?([:keyreq, :lookahead])
                     lambda do |object, args, context|
-                      schema_field = context.fetch(:elastic_graph_schema).field_named(type_name, field_name)
+                      schema_field = context.elastic_graph_schema.field_named(type_name, field_name)
 
                       # Extract the `:lookahead` extra that we have configured all fields to provide.
                       # See https://graphql-ruby.org/api-doc/1.10.8/GraphQL/Execution/Lookahead.html for more info.
@@ -80,7 +80,7 @@ module ElasticGraph
                     end
                   else
                     lambda do |object, args, context|
-                      schema_field = context.fetch(:elastic_graph_schema).field_named(type_name, field_name)
+                      schema_field = context.elastic_graph_schema.field_named(type_name, field_name)
                       # Convert args to the form they were defined in the schema, undoing the normalization
                       # the GraphQL gem does to convert them to Ruby keyword args form.
                       args = schema_field.args_to_schema_form(args)
@@ -109,7 +109,7 @@ module ElasticGraph
 
         # In order to support unions and interfaces, we must implement `resolve_type`.
         def resolve_type(supertype, object, context)
-          schema = context.fetch(:elastic_graph_schema)
+          schema = context.elastic_graph_schema
           # If `__typename` is available, use that to resolve. It will be present on embedded abstract
           # types, and also on root documents indexed in a shared interface/union index.
           # (See `Inventor` in `config/schema/widgets.rb` for an example of an embedded abstract type.)
@@ -124,7 +124,8 @@ module ElasticGraph
             # (See `Part` in `config/schema/widgets.rb` for an example of this kind of type union.)
             # This branch is only reached for individually-indexed types (no `__typename`
             # in the document), so the set always contains exactly one type.
-            schema.document_types_stored_in(object.index_definition_name).first.graphql_type
+            type = schema.document_types_stored_in(object.index_definition_name).first # : Schema::Type
+            type.graphql_type
           end
         end
       end

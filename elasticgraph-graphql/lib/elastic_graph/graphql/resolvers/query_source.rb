@@ -36,8 +36,8 @@ module ElasticGraph
         end
 
         def self.execute_many(queries, for_context:)
-          datastore_router = for_context.fetch(:datastore_search_router)
-          query_tracker = for_context.fetch(:elastic_graph_query_tracker)
+          datastore_router = for_context.datastore_search_router
+          query_tracker = for_context.elastic_graph_query_tracker
           opaque_id_parts = datastore_opaque_id_parts_for(for_context)
           dataloader = for_context.dataloader
 
@@ -49,11 +49,11 @@ module ElasticGraph
           execute_many([query], for_context: for_context).fetch(query)
         end
 
-        # `QueryExecutor` adds `:elastic_graph_client` to the GraphQL context before
+        # `Schema#new_graphql_query` sets `elastic_graph_client` on the context before
         # resolver execution begins, so resolver-side datastore queries can reuse the
         # same client identity in their datastore `X-Opaque-Id` headers.
         private_class_method def self.datastore_opaque_id_parts_for(for_context)
-          client = for_context.fetch(:elastic_graph_client)
+          client = for_context.elastic_graph_client # : Client
           graphql_query = for_context.query
           [
             "elasticgraph-graphql",

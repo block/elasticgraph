@@ -145,7 +145,7 @@ module ElasticGraph
           end
 
           it "passes along the `monotonic_clock_deadline` from the `context` to the query" do
-            datastore_query = build_query_from({}, context: {monotonic_clock_deadline: 1234})
+            datastore_query = build_query_from({}, monotonic_clock_deadline: 1234)
             expect(datastore_query.monotonic_clock_deadline).to eq 1234
           end
 
@@ -207,12 +207,13 @@ module ElasticGraph
             expect(child_widget_queries.map(&:__id__).uniq.size).to eq 2
           end
 
-          def build_query_from(args, field: self.field, context: {})
-            context = ::GraphQL::Query::Context.new(
+          def build_query_from(args, field: self.field, monotonic_clock_deadline: nil)
+            context = graphql.schema.graphql_schema.context_class.new(
               query: nil,
               schema: graphql.schema.graphql_schema,
-              values: context.merge(elastic_graph_schema: graphql.schema)
+              values: {}
             )
+            context.register_elastic_graph_values(monotonic_clock_deadline: monotonic_clock_deadline)
 
             query_adapter.build_query_from(
               field: field,

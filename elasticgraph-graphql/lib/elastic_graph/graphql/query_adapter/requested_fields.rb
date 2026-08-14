@@ -21,7 +21,7 @@ module ElasticGraph
           def call(field:, query:, lookahead:, args:, context:)
             return query if field.type.unwrap_fully.indexed_aggregation?
 
-            RequestedFields.new(context.fetch(:elastic_graph_schema)).call(
+            RequestedFields.new(context.elastic_graph_schema).call(
               field: field,
               query: query,
               lookahead: lookahead,
