@@ -47,7 +47,7 @@ module ElasticGraph
   end
 
   # SimpleCov backfills `track_files`-matched files that a process never loaded with simulated
-  # coverage based on `Coverage.line_stub`. On CRuby 4.0.0 through 4.0.3 (fixed in 4.0.4),
+  # coverage based on `Coverage.line_stub`. On affected CRuby versions (see below),
   # `Coverage.line_stub` classifies a few lines (e.g. continuation lines of multi-line hash
   # literals, and `in` clauses of `case`/`in` expressions) as relevant-but-uncovered (`0`) even
   # though the runtime `Coverage` API classifies them as not relevant (`nil`) when the file is
@@ -59,8 +59,18 @@ module ElasticGraph
   # are unaffected--all of their merged values are `0`-vs-`0`, which still merges to `0`--and
   # executed lines are unaffected (`nil`-vs-positive still merges to the positive count).
   #
+  # Affected versions (verified with a `Coverage.line_stub`-vs-runtime probe against docker
+  # ruby-slim images): 3.4.1 through 4.0.3; 3.4.0 and 4.0.4 are clean, and no 3.4.x has the fix
+  # backported as of 3.4.7. On 3.4.x the mismatch shows up for multi-line all-static hash literals
+  # in files with a `# frozen_string_literal: true` magic comment (i.e. every file in this repo):
+  # the literal is compile-time folded so its continuation lines fire no runtime line events, but
+  # `Coverage.line_stub` still marks them relevant. On 4.0.0-4.0.3 the same happens without the
+  # magic comment. If a future 3.4.x release ships the backported fix, this range will over-apply
+  # to it, which is harmless; tighten the range at that point to keep the gate meaningful.
+  #
   # :nocov: -- which branch executes depends on the Ruby version.
-  if ::RUBY_ENGINE == "ruby" && ("4.0.0"..."4.0.4").cover?(::RUBY_VERSION)
+  affected_versions = ::Gem::Version.new("3.4.1")...::Gem::Version.new("4.0.4")
+  if ::RUBY_ENGINE == "ruby" && affected_versions.cover?(::Gem::Version.new(::RUBY_VERSION))
     module LinesCombinerPatch
       def merge_line_coverage(first_val, second_val)
         return nil if (first_val.nil? || second_val.nil?) && first_val.to_i + second_val.to_i == 0
