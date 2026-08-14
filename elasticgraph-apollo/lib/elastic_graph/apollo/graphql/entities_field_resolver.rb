@@ -294,7 +294,7 @@ module ElasticGraph
             self
           end
 
-          # :nocov: -- these methods are not called on an adapter when `root_document_type?` returns `false`.
+          # simplecov:disable -- these methods are not called on an adapter when `root_document_type?` returns `false`.
           def customize_query(query, representations)
             nil
           end
@@ -302,7 +302,7 @@ module ElasticGraph
           def index_search_hits(response)
             nil
           end
-          # :nocov:
+          # simplecov:enable
 
           def identify_matching_hit(indexed_search_hits, representation, context:, index:)
             representation.representation_hash

@@ -498,9 +498,9 @@ module ElasticGraph
             case headers.fetch("index")
             when /widget/ then "Widget"
             when /component/ then "Component"
-            # :nocov: -- this `else` case is only hit when tests here have bugs
+            # simplecov:disable -- this `else` case is only hit when tests here have bugs
             else raise "Unknown index: #{headers.fetch("index")}"
-              # :nocov:
+              # simplecov:enable
             end
 
           datastore_query_body_by_type[type] = body

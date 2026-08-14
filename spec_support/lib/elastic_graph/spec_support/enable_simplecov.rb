@@ -22,7 +22,7 @@ module ElasticGraph
         #{"=" * 100}
         Your test run had #{result.missed_lines} lines and #{result.missed_branches} code branches that were not covered by the executed tests.
         We do not have a goal of 100% test coverage in ElasticGraph; however, we do have the goal of having
-        all uncovered code explicitly labeled as such with `# :nocov:` so that it is easy to tell at a
+        all uncovered code explicitly labeled as such with `# simplecov:disable` so that it is easy to tell at a
         glance what code is uncovered by tests. And we do want a high level of test coverage; Ruby's dynamic
         nature means that misspelled variables, method names, etc can usually only be detected at run time, meaning
         that every uncovered line of code is a line that our CI build may not be able to detect a breakage in.
@@ -34,19 +34,20 @@ module ElasticGraph
 
         2) Add test coverage. (This might require refactoring the code to make it more testable).
 
-        3) Surround the code with `# :nocov:` comments (on the lines before and after) to mark it as a known
-           uncovered bit of code. This should only be done for code that you have determined would cost more
-           to test than the value we would get from the tests. For example, this is sometimes the case for
-           code that only ever runs locally (e.g. in a rake task) that interacts heavily with the environment.
-           Note: if you add a `# :nocov:` comment, please leave an explanation for why the code is not being
-           covered.
+        3) Surround the code with `# simplecov:disable` / `# simplecov:enable` comments (on the lines before
+           and after) to mark it as a known uncovered bit of code. This should only be done for code that you
+           have determined would cost more to test than the value we would get from the tests. For example,
+           this is sometimes the case for code that only ever runs locally (e.g. in a rake task) that
+           interacts heavily with the environment.
+           Note: if you add a `# simplecov:disable` comment, please leave an explanation for why the code is
+           not being covered.
         #{"=" * 100}
 
       EOS
     end
   end
 
-  # SimpleCov backfills `track_files`-matched files that a process never loaded with simulated
+  # SimpleCov backfills `cover`-glob-matched files that a process never loaded with simulated
   # coverage based on `Coverage.line_stub`. On CRuby 4.0.0 through 4.0.3 (fixed in 4.0.4),
   # `Coverage.line_stub` classifies a few lines (e.g. continuation lines of multi-line hash
   # literals, and `in` clauses of `case`/`in` expressions) as relevant-but-uncovered (`0`) even
@@ -59,7 +60,7 @@ module ElasticGraph
   # are unaffected--all of their merged values are `0`-vs-`0`, which still merges to `0`--and
   # executed lines are unaffected (`nil`-vs-positive still merges to the positive count).
   #
-  # :nocov: -- which branch executes depends on the Ruby version.
+  # simplecov:disable -- which branch executes depends on the Ruby version.
   if ::RUBY_ENGINE == "ruby" && ("4.0.0"..."4.0.4").cover?(::RUBY_VERSION)
     module LinesCombinerPatch
       def merge_line_coverage(first_val, second_val)
@@ -69,7 +70,7 @@ module ElasticGraph
     end
     ::SimpleCov::Combine::LinesCombiner.singleton_class.prepend LinesCombinerPatch
   end
-  # :nocov:
+  # simplecov:enable
 
   if defined?(::Flatware)
     module SimpleCovPatches
@@ -105,7 +106,7 @@ tmp_coverage_dir = "#{repo_root}/tmp/coverage"
 # Don't allow results from a prior run to "contaminate" the current run.
 FileUtils.rm_rf(tmp_coverage_dir)
 
-SimpleCov.enable_for_subprocesses(true)
+SimpleCov.merge_subprocesses(true)
 
 SimpleCov.start do
   if gems_being_tested_dirs.one?
@@ -119,23 +120,23 @@ SimpleCov.start do
 
   coverage_dir tmp_coverage_dir
 
-  add_filter "/bundle"
+  skip "/bundle"
 
-  add_filter "/elastic_graph/project_template/"
+  skip "/elastic_graph/project_template/"
 
   # When we use `script/run_specs` we avoid running the `elasticgraph-local` specs, but some of the
   # elasticgraph-local code gets loaded and used as a dependency. We don't want to consider its coverage
   # status if we're not running it's test suite.
-  add_filter "/elasticgraph-local/" unless spec_files_to_run.any? { |f| f.include?("/elasticgraph-local/") }
+  skip "/elasticgraph-local/" unless spec_files_to_run.any? { |f| f.include?("/elasticgraph-local/") }
 
   # This version file is loaded from our gemspecs, which can get loaded by bundler before we get here.
   # SimpleCov is only able to track coverage of files loaded after it starts, so we need to filter them out if
   # their constant is already defined. They don't contain any branching statements or anything so it's ok to
   # ignore them here.
-  add_filter "lib/elastic_graph/version.rb" if defined?(::ElasticGraph::VERSION)
+  skip "lib/elastic_graph/version.rb" if defined?(::ElasticGraph::VERSION)
 
   # Don't track coverage of JRuby patch files as we only enforce coverage on MRI..
-  add_filter "jruby_patches"
+  skip "jruby_patches"
 
   formatter SimpleCov::Formatter::MultiFormatter.new([
     SimpleCov::Formatter::HTMLFormatter,
@@ -146,7 +147,13 @@ SimpleCov.start do
   gems_being_tested_globs = gems_being_tested_dirs.flat_map { |dir| [dir / "lib/**/*.rb", dir / "spec/**/*.rb"] }
   # An empty pattern here (e.g. when running specs that aren't under any gem's directory, like `config/linting`)
   # causes simplecov 1.x to attempt to read the repo root directory as a file, raising `Errno::EISDIR`.
-  track_files "{#{gems_being_tested_globs.join(",")}}" unless gems_being_tested_globs.empty?
+  unless gems_being_tested_globs.empty?
+    cover "{#{gems_being_tested_globs.join(",")}}"
+    # The glob above backfills gem files the run never loaded, but `cover` also restricts the report to its
+    # matchers. This match-everything block keeps loaded files outside the glob (e.g. `spec_support`) in the
+    # report, preserving the semantics of the deprecated `track_files`.
+    cover { |_source_file| true }
+  end
 
   enable_coverage :branch
   minimum_coverage line: 100, branch: 100

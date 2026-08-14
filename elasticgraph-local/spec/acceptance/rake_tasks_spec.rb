@@ -119,9 +119,9 @@ module ElasticGraph
         config_dir = ::Pathname.new(::File.join(CommonSpecHelpers::REPO_ROOT, "config"))
 
         # Give a longer timeout to CI than we tolerate locally.
-        # :nocov: -- only one of the two sides of the ternary gets covered.
+        # simplecov:disable -- only one of the two sides of the ternary gets covered.
         daemon_timeout ||= ENV["CI"] ? 120 : 60
-        # :nocov:
+        # simplecov:enable
 
         # We need to run without bundler because some tasks shell out and run `bundle exec` and
         # the local bundler we're running within could interfere.
@@ -146,7 +146,7 @@ module ElasticGraph
                 Array.new(batch_size) { build(:widget) }
               end
 
-              # :nocov: -- only runs on JRuby
+              # simplecov:disable -- only runs on JRuby
               if RUBY_ENGINE == "jruby"
                 # rackup --daemonize uses fork(), unavailable on JRuby.
                 # Override run_rackup to use Process.spawn instead.
@@ -158,7 +158,7 @@ module ElasticGraph
                   ::File.write(pid_file, pid.to_s) if pid_file
                 end
               end
-              # :nocov:
+              # simplecov:enable
             end
           end
         end
@@ -167,11 +167,11 @@ module ElasticGraph
       end
 
       def without_bundler
-        # :nocov: -- Bundler doesn't have to be used to run our test suite, so we handle both cases here
+        # simplecov:disable -- Bundler doesn't have to be used to run our test suite, so we handle both cases here
         #            But only one branch is taken on a given run of the test suite.
         return yield unless defined?(::Bundler)
         ::Bundler.with_original_env { yield }
-        # :nocov:
+        # simplecov:enable
       end
 
       def query_server_on(port, path: "/", parse_json: true)
@@ -190,7 +190,7 @@ module ElasticGraph
           begin
             yield pid_file
           ensure
-            # :nocov: -- under normal conditions some branches here aren't used
+            # simplecov:disable -- under normal conditions some branches here aren't used
             pid = begin
               pid_contents = ::File.read(pid_file)
               Integer(pid_contents)
@@ -200,7 +200,7 @@ module ElasticGraph
 
             ::Process.kill(9, pid) if pid
             ::FileUtils.rm_rf(pid_file) # Necessary to avoid an Errno::ENOTEMPTY
-            # :nocov:
+            # simplecov:enable
           end
         end
       end
@@ -218,24 +218,24 @@ module ElasticGraph
         # Wait up to 30 seconds on CI or 15 seconds locally. (We give CI more time because we have occasionally seen it
         # fail at 10 seconds there, and can tolerate it taking longer. The local timeout accommodates JRuby's JVM startup
         # overhead; the loop returns as soon as the server responds, so this doesn't slow MRI tests).
-        # :nocov: -- we give CI more time than we do locally, so only one branch will be covered.
+        # simplecov:disable -- we give CI more time than we do locally, so only one branch will be covered.
         iterations = ENV["CI"] ? 300 : 150
-        # :nocov:
+        # simplecov:enable
 
         iterations.times do
           query_server_on(port, path: path, parse_json: false)
         rescue Errno::ECONNREFUSED, EOFError => e
-          # :nocov: -- not always covered (depends on if the rack server is ready).
+          # simplecov:disable -- not always covered (depends on if the rack server is ready).
           last_error = e
           sleep 0.1
-          # :nocov:
+          # simplecov:enable
         else
           return
         end
 
-        # :nocov: -- only hit when the server fails to boot (which doesn't happen on a successful test run)
+        # simplecov:disable -- only hit when the server fails to boot (which doesn't happen on a successful test run)
         raise "Server on port #{port} failed to boot in #{::Time.now - started_waiting_at} seconds; Last error from #{path} was: #{last_error.class}: #{last_error.message}"
-        # :nocov:
+        # simplecov:enable
       end
     end
   end

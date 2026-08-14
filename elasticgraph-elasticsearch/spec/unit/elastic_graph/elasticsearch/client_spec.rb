@@ -74,9 +74,9 @@ module ElasticGraph
               stub.post("/test_env_7_%2A/_delete_by_query?refresh=true&scroll=10s") { |env| response_for(body, env) }
 
             else
-              # :nocov: -- none of our current tests hit this case
+              # simplecov:disable -- none of our current tests hit this case
               raise "Unexpected stub name: #{stub_name.inspect}"
-              # :nocov:
+              # simplecov:enable
             end
           end
         end

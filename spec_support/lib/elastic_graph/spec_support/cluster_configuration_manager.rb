@@ -44,20 +44,20 @@ module ElasticGraph
         end
       end
 
-      # :nocov: -- to save time, avoids executing when the indices are already configured correctly
+      # simplecov:disable -- to save time, avoids executing when the indices are already configured correctly
       if !File.exist?(state_file_path) || current_cluster_state != File.read(state_file_path)
         recreate_index_configuration
         ::FileUtils.mkdir_p(File.dirname(state_file_path))
         File.write(state_file_path, current_cluster_state)
       end
-      # :nocov:
+      # simplecov:enable
 
       @version + current_cluster_state # return the current state
     end
 
     private
 
-    # :nocov: -- to save time, avoids executing when the indices are already configured correctly
+    # simplecov:disable -- to save time, avoids executing when the indices are already configured correctly
     def recreate_index_configuration
       without_vcr do
         start = ::Time.now
@@ -81,7 +81,7 @@ module ElasticGraph
     def notify_recreated_cluster_configuration(duration)
       puts "done in #{RSpec::Core::Formatters::Helpers.format_duration(duration)}."
     end
-    # :nocov:
+    # simplecov:enable
 
     STATE_FILE_DIR = "tmp/datastore-state-files"
 
@@ -96,21 +96,21 @@ module ElasticGraph
       })
     end
 
-    # :nocov: -- to save time, avoids executing when the indices are already configured correctly.
+    # simplecov:disable -- to save time, avoids executing when the indices are already configured correctly.
     def index_definitions
       @index_definitions ||= admin.datastore_core.index_definitions_by_name.values
     end
-    # :nocov:
+    # simplecov:enable
 
     def datastore_scripts
       @datastore_scripts ||= admin.schema_artifacts.datastore_scripts
     end
 
-    # :nocov: -- to save time, avoids executing when the indices are already configured correctly
+    # simplecov:disable -- to save time, avoids executing when the indices are already configured correctly
     def without_vcr
       return yield unless defined?(::VCR) # since we support running w/o VCR.
       VCR.turned_off { yield }
     end
-    # :nocov:
+    # simplecov:enable
   end
 end

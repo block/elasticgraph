@@ -70,7 +70,7 @@ class RequestTracker
     def profiling_id
       # The time a request takes is entirely different if VCR is involved, so mention it
       # in the profiling id if we are playing back.
-      # :nocov: -- which branch executes depends on `NO_VCR` env var, and a single test  run will never cover all branches.
+      # simplecov:disable -- which branch executes depends on `NO_VCR` env var, and a single test  run will never cover all branches.
       vcr_playing_back =
         if !defined?(::VCR)
           false
@@ -79,7 +79,7 @@ class RequestTracker
         else
           false
         end
-      # :nocov:
+      # simplecov:enable
 
       # Use the first path segment to identify the Datastore action into a broad category.
       # (Note that due to the leading `/` we have to take the first 2 split parts to actually get
@@ -87,9 +87,9 @@ class RequestTracker
       # Also, group all `unique_index` resources as one since the unique index name is different every time.
       resource = url.path.split("/").first(2).join("/").sub(/unique_index_\w+/, "unique_index_*")
 
-      # :nocov: -- `vcr_playing_back` depends on `NO_VCR` env var, and a single test run will never cover all branches.
+      # simplecov:disable -- `vcr_playing_back` depends on `NO_VCR` env var, and a single test run will never cover all branches.
       "datastore--#{http_method.upcase} #{resource}#{" (w/ VCR playback)" if vcr_playing_back}"
-      # :nocov:
+      # simplecov:enable
     end
 
     def description
@@ -130,10 +130,10 @@ class DisallowUnsupportedAWSOperations
   end
 
   def call(env)
-    # :nocov: -- normally only the `supported_operation?` branch is taken.
+    # simplecov:disable -- normally only the `supported_operation?` branch is taken.
     return @app.call(env) if supported_operation?(env.url.path)
     raise UnsupportedAWSOpenSearchOperationError, "Operation is unsupported on AWS: #{env.url.path}."
-    # :nocov:
+    # simplecov:enable
   end
 
   def supported_operation?(path)
@@ -179,9 +179,9 @@ RSpec.shared_context "datastore support", :capture_logs do
 
   prepend_before do |ex|
     if ex.metadata[:type] == :unit
-      # :nocov: -- on a successful test run this'll never get executed.
+      # simplecov:disable -- on a successful test run this'll never get executed.
       fail "`:uses_datastore` is only appropriate on integration and acceptance tests, but it is being used by a unit test. Please move the test to `spec/integration` or remove the `:uses_datastore` tag."
-      # :nocov:
+      # simplecov:enable
     end
 
     # flush everything to give us a clean slate between tests
@@ -428,9 +428,9 @@ RSpec.shared_context "datastore support", :capture_logs do
   # to make it deterministic.
   def pre_cache_index_state(graphql)
     graphql.datastore_core.index_definitions_by_name.values.each do |i|
-      # :nocov: -- which side of the conditional is executed depends on the order the tests run in.
+      # simplecov:disable -- which side of the conditional is executed depends on the order the tests run in.
       i.remove_instance_variable(:@known_related_query_rollover_indices) if i.instance_variable_defined?(:@known_related_query_rollover_indices)
-      # :nocov:
+      # simplecov:enable
 
       i.known_related_query_rollover_indices
     end
@@ -468,7 +468,7 @@ end
 RSpec.configure do |config|
   curl_output = `curl -is #{datastore_url}`
 
-  # :nocov: -- only executed when the datastore isn't running.
+  # simplecov:disable -- only executed when the datastore isn't running.
   unless /200 OK/.match?(curl_output)
     abort <<~EOS
       The datastore does not appear to be running at `#{datastore_url}`.  Correct this by running one of these:
@@ -479,7 +479,7 @@ RSpec.configure do |config|
       ...and then try running the test suite again.
     EOS
   end
-  # :nocov:
+  # simplecov:enable
 
   # Our between-test cleanup strategy (a `/_delete_by_query` against all indices) opens one scroll
   # context per shard. We intentionally keep the datastore (and its indices) running across many
@@ -505,7 +505,7 @@ RSpec.configure do |config|
       .new(version: version, datastore_backend: backend)
       .manage_cluster
 
-    # :nocov: -- only executes if VCR is loaded, which is optional
+    # simplecov:disable -- only executes if VCR is loaded, which is optional
     if defined?(::VCR)
       # Add suffix to the VCR cassette library directory based on the state of the datastore
       # index configuration. This ensures that we don't playback VCR cassettes that were recorded
@@ -517,7 +517,7 @@ RSpec.configure do |config|
 
       puts "Using VCR cassette directory: #{VCR.configuration.cassette_library_dir}."
     end
-    # :nocov:
+    # simplecov:enable
   end
 
   DatastoreSpecSupport.module_eval do
@@ -533,9 +533,9 @@ RSpec.configure do |config|
     end
 
     define_method :new_datastore_client do |name| # use `define_method` so we have access to `datastore_url` and `datastore_logs` locals.
-      # :nocov: -- on a given test run only one side of this ternary gets covered.
+      # simplecov:disable -- on a given test run only one side of this ternary gets covered.
       client_class = (datastore_backend == :opensearch) ? ElasticGraph::OpenSearch::Client : ElasticGraph::Elasticsearch::Client
-      # :nocov:
+      # simplecov:enable
 
       client_class.new(name, faraday_adapter: :httpx, url: datastore_url, logger: ElasticGraph::SplitLogger.new(logger, datastore_logs)) do |conn|
         conn.use DisallowUnsupportedAWSOperations

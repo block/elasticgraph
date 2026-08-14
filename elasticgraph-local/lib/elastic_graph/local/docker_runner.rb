@@ -23,7 +23,7 @@ module ElasticGraph
         @output = output
       end
 
-      # :nocov: -- difficult to test `exec` behavior (replaces current process)
+      # simplecov:disable -- difficult to test `exec` behavior (replaces current process)
       def boot
         halt
 
@@ -31,7 +31,7 @@ module ElasticGraph
           exec(command) # we use `exec` so that our process is replaced with that one.
         end
       end
-      # :nocov:
+      # simplecov:enable
 
       def halt
         prepare_docker_compose_run "down --volumes" do |command|

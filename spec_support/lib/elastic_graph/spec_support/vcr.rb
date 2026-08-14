@@ -8,7 +8,7 @@
 
 # On CI, we do want to be able to avoid loading VCR (we care more about accuracy than speed), so
 # we support using `NO_VCR=1 rspec` to skip VCR.
-# :nocov: -- we avoid loading/using VCR when these ENV vars are set
+# simplecov:disable -- we avoid loading/using VCR when these ENV vars are set
 return if ENV["NO_VCR"]
 
 require "vcr"
@@ -144,4 +144,4 @@ RSpec.configure do |config|
     end
   end
 end
-# :nocov:
+# simplecov:enable

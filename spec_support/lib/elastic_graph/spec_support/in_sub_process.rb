@@ -17,9 +17,9 @@ module ElasticGraph
     #
     # On JRuby, fork is unavailable, so this skips the test instead.
     def in_sub_process(&block)
-      # :nocov: -- we only cover one side of this conditional for a given run of the test suite
+      # simplecov:disable -- we only cover one side of this conditional for a given run of the test suite
       skip "Test requires fork (unavailable on JRuby)" if RUBY_ENGINE == "jruby"
-      # :nocov:
+      # simplecov:enable
 
       SubProcess.new.run(&block)
     end
@@ -44,9 +44,9 @@ module ElasticGraph
       ::Process.waitpid(pid)
 
       result, exception = ::Marshal.load(reader.read)
-      # :nocov: -- which branch is taken depends on if a test is failing.
+      # simplecov:disable -- which branch is taken depends on if a test is failing.
       raise exception if exception
-      # :nocov:
+      # simplecov:enable
       result
     ensure
       reader.close
@@ -68,13 +68,13 @@ module ElasticGraph
     def handle_exceptions(suffix = "")
       yield
     rescue ::Exception => ex # standard:disable Lint/RescueException
-      # :nocov: -- we only get here when there's a problem.
+      # simplecov:disable -- we only get here when there's a problem.
       # Not all exceptions can be marshaled (e.g. if they have state that references unmarshable objects such as a proc).
       # Here we just use a `StandardError` with the same message and backtrace to ensure it can be marshaled.
       replacement_exception = ::StandardError.new("#{ex.class}: #{ex.message}#{suffix}")
       replacement_exception.set_backtrace(ex.backtrace)
       writer.write(::Marshal.dump([nil, replacement_exception]))
-      # :nocov:
+      # simplecov:enable
     end
   end
 end

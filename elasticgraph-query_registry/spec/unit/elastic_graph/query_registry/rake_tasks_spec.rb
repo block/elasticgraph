@@ -112,7 +112,7 @@ module ElasticGraph
             run_validate_task(after_dumping_variables: true)
           }.to raise_error(a_string_including("Found 4 validation errors total across all queries."))
 
-          # :nocov: -- only one side of this conditional is covered on a given test run
+          # simplecov:disable -- only one side of this conditional is covered on a given test run
           # The exact error provided by the GraphQL gem varies based on if the C parser has been loaded or not.
           syntax_error =
             if defined?(::GraphQL::CParser)
@@ -120,7 +120,7 @@ module ElasticGraph
             else
               'Expected LCURLY, actual: IDENTIFIER ("parts") at [2, 3]'
             end
-          # :nocov:
+          # simplecov:enable
 
           expect(last_task_output.string.strip).to eq(<<~EOS.strip)
             For client `client_bob`:

@@ -125,9 +125,9 @@ module ElasticGraph
             # We have no information in this clause. The set is unbounded, and may have exclusions.
             UnboundedSetWithExclusions
           else
-            # :nocov: -- not possible to cover without mocking `@filter_node_interpreter` to return a node type outside the allowed values.
+            # simplecov:disable -- not possible to cover without mocking `@filter_node_interpreter` to return a node type outside the allowed values.
             raise "`FilterValueSetExtractor` must be updated to handle `:#{node_type}` nodes."
-            # :nocov:
+            # simplecov:enable
           end
         end
 

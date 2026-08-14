@@ -374,9 +374,9 @@ module ElasticGraph
           when schema_names.gt then operand >= 0
           when schema_names.gte then operand > 0
           else
-            # :nocov: -- all operators are covered above. But simplecov complains about an implicit `else` branch being uncovered, so here we've defined it to wrap it with `:nocov:`.
+            # simplecov:disable -- all operators are covered above. But simplecov complains about an implicit `else` branch being uncovered, so here we've defined it so we can exclude it from coverage.
             false
-            # :nocov:
+            # simplecov:enable
           end
         end
 

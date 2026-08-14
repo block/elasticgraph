@@ -305,9 +305,9 @@ module ElasticGraph
         expect(missing_runtime_metadata).to be_empty
 
         missing_count_name_in_index = has_runtime_metadata.reject do |type|
-          # :nocov: -- some branches of the line below are only covered when the test fails.
+          # simplecov:disable -- some branches of the line below are only covered when the test fails.
           object_types_by_name.fetch(type).graphql_fields_by_name.dig("count")&.name_in_index == LIST_COUNTS_FIELD
-          # :nocov:
+          # simplecov:enable
         end
 
         expect(missing_count_name_in_index).to be_empty

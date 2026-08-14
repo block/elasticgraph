@@ -50,7 +50,7 @@ When in doubt, follow `AGENTS.md` for workflow and coding practices.
 - **Immutable functional style**: Prefer immutable objects and functional transformations where feasible.
 - **Prefer simpler approaches**: Choose simpler implementations for easier debugging and contributor onboarding.
 - **Avoid monkey patching**: Prevents future problems common with this Ruby technique.
-- **100% test coverage**: Every line and branch covered except where explicitly opted out with `:nocov:` comments.
+- **100% test coverage**: Every line and branch covered except where explicitly opted out with `simplecov:disable` comments.
 - **Validate all documentation snippets**: Code examples in documentation are validated by CI to ensure they always work.
 
 ## System Patterns

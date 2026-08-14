@@ -444,7 +444,7 @@ module ElasticGraph
           args.with_defaults(port: 9000, rackup_args: "", no_open: false)
           port = args.fetch(:port)
 
-          # :nocov: -- we can't test `open` behavior through a test
+          # simplecov:disable -- we can't test `open` behavior through a test
           unless args.fetch(:no_open)
             Thread.new do
               sleep 3 # give the app a bit of time to boot before we try to open it.
@@ -452,7 +452,7 @@ module ElasticGraph
               system("open", url) || system("xdg-open", url)
             end
           end
-          # :nocov:
+          # simplecov:enable
 
           run_rackup "ELASTICGRAPH_YAML_FILE=#{@local_config_yaml.shellescape} bundle exec rackup #{::File.join(__dir__.to_s, "config.ru").shellescape} --port #{port} #{args.fetch(:rackup_args)}"
         end

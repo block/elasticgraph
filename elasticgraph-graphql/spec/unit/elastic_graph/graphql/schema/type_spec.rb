@@ -465,7 +465,7 @@ module ElasticGraph
               @satisfied_predicates.sort == expected_predicates.sort
             end
 
-            # :nocov: -- only executed on a test failure
+            # simplecov:disable -- only executed on a test failure
             failure_message do |type|
               parts = [message_part("expected #{type.inspect} to only satisfy", expected_predicates)]
 
@@ -485,7 +485,7 @@ module ElasticGraph
             def message_part(intro, predicates)
               "#{intro}:\n\n  - #{predicates.join("\n  - ")}"
             end
-            # :nocov:
+            # simplecov:enable
           end
 
           def type_for(field_name)

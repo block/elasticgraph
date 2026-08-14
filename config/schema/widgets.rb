@@ -164,9 +164,9 @@ ElasticGraph.define_schema do |schema|
       i.route_with "workspace_id"
       i.default_sort "created_at", :desc
       i.has_had_multiple_sources!
-      # :nocov: -- test suite only covers one side of the conditional
+      # simplecov:disable -- test suite only covers one side of the conditional
       i.warehouse_table "widget_records" if ENV["DEMONSTRATE_WAREHOUSE_APIS"]
-      # :nocov:
+      # simplecov:enable
     end
 
     t.derive_indexed_type_fields "WidgetCurrency", from_id: "cost.currency", route_with: "cost_currency_primary_continent", rollover_with: "cost_currency_introduced_on" do |derive|
@@ -236,9 +236,9 @@ ElasticGraph.define_schema do |schema|
 
     # Exclude this internal lookup table from the data warehouse.
     t.index "widget_workspaces" do |i|
-      # :nocov: -- test suite only covers one side of the conditional
+      # simplecov:disable -- test suite only covers one side of the conditional
       i.exclude_from_warehouse if ENV["DEMONSTRATE_WAREHOUSE_APIS"]
-      # :nocov:
+      # simplecov:enable
     end
   end
 
@@ -293,7 +293,7 @@ ElasticGraph.define_schema do |schema|
 
     # Define some Apollo-specific schema elements when we are defining the schema for Apollo.
     if schema.respond_to?(:target_apollo_federation_version)
-      # :nocov: -- this file is only exercised in a test running without `elasticgraph-apollo`.
+      # simplecov:disable -- this file is only exercised in a test running without `elasticgraph-apollo`.
       t.apollo_entity_ref_field "owner", "ComponentOwner", id_field_name_in_index: "owner_id"
       t.apollo_entity_ref_field "owners", "[ComponentOwner!]!", id_field_name_in_index: "owner_ids"
       t.apollo_entity_ref_paginated_collection_field "owners_paginated", "ComponentOwner", id_field_name_in_index: "owner_ids"
@@ -302,7 +302,7 @@ ElasticGraph.define_schema do |schema|
         t.field "token", "ID"
         t.apollo_key fields: "token", resolvable: false
       end
-      # :nocov:
+      # simplecov:enable
     end
 
     t.index "components" do |i|

@@ -87,9 +87,9 @@ module QueryAdapterSpecSupport
       if schema_field.type.list?
         # Return a list of one item so that the GraphQL engine tries to resolve
         # the subfields (presumably, it wouldn't attempt them if it was an empty list)
-        # :nocov: (branch) -- all our tests that use this so far are for fields that wrap objects, not scalars.
+        # simplecov:disable (branch) -- all our tests that use this so far are for fields that wrap objects, not scalars.
         [schema_field.type.unwrap_fully.object? ? object : default_scalar_value_for(schema_field.type)] * @list_item_count
-        # :nocov: (branch)
+        # simplecov:enable (branch)
       elsif schema_field.type.object?
         object
       else

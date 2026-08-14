@@ -27,9 +27,9 @@ RSpec.configure do |config|
   # this should still guard against a regression even though the "standard" way we run our tests (e.g. the
   # entire test suite) won't benefit from this.
   #
-  # :nocov: -- on any given test run only one side of this conditional is covered.
+  # simplecov:disable -- on any given test run only one side of this conditional is covered.
   if config.files_to_run.all? { |f| f.start_with?(__dir__) }
     $LOAD_PATH.delete_if { |path| path.include?("rexml") }
   end
-  # :nocov:
+  # simplecov:enable
 end

@@ -165,15 +165,15 @@ module ElasticGraph
         it "adds the defined methods only to the `MemoizableData`, not to the wrapped data class" do
           measure = define(:amount, :unit) do
             def initialize(amount:, unit: "unknown")
-              # :nocov:
+              # simplecov:disable
               super(amount: Float(amount), unit:)
-              # :nocov:
+              # simplecov:enable
             end
 
             def description
-              # :nocov:
+              # simplecov:disable
               @description ||= "#{amount} #{unit}"
-              # :nocov:
+              # simplecov:enable
             end
           end
 
@@ -211,9 +211,9 @@ module ElasticGraph
               end
 
               def initialize(amount:, unit: "unknown")
-                # :nocov:
+                # simplecov:disable
                 super(amount: Float(amount), unit:)
-                # :nocov:
+                # simplecov:enable
               end
             end
           }.to raise_error a_string_including("`MyData` overrides `initialize` in a subclass of `ElasticGraph::Support::MemoizableData`, but that can break things.")
@@ -240,9 +240,9 @@ module ElasticGraph
 
         ::Class.new(klass) do
           def sum
-            # :nocov:
+            # simplecov:disable
             x + y
-            # :nocov:
+            # simplecov:enable
           end
         end
       end

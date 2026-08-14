@@ -27,9 +27,9 @@ module ElasticGraph
     def self.safe_require(file)
       require file
     rescue ::LoadError
-      # :nocov: -- we don't get here when running the test suite for the entire repo
+      # simplecov:disable -- we don't get here when running the test suite for the entire repo
       raise if ::File.expand_path(::Dir.pwd) == ::File.expand_path(CommonSpecHelpers::REPO_ROOT)
-      # :nocov:
+      # simplecov:enable
     end
 
     safe_require "elastic_graph/spec_support/parallel_spec_runner/cluster_configuration_manager_adapter"
@@ -40,7 +40,7 @@ module ElasticGraph
 
     ::Flatware.configure do |flatware|
       flatware.after_fork do
-        # :nocov: -- which sides of these conditionals run depends on options used to run the test suite
+        # simplecov:disable -- which sides of these conditionals run depends on options used to run the test suite
         ::SimpleCov.at_fork.call(test_env_number) if defined?(::SimpleCov)
 
         unless ENV["NO_VCR"]
@@ -51,7 +51,7 @@ module ElasticGraph
             config.cassette_library_dir += "/#{index_prefix.delete_suffix("_")}"
           end
         end
-        # :nocov:
+        # simplecov:enable
       end
     end
 
@@ -74,11 +74,11 @@ module ElasticGraph
       def instance_double(constant, *args, **options)
         if constant.is_a?(String)
           file_to_require = TEST_DOUBLE_REQUIRES_BY_CONSTANT_NAME.fetch(constant) do
-            # :nocov: -- only covered when there's a missing entry in `TEST_DOUBLE_REQUIRES_BY_CONSTANT_NAME`.
+            # simplecov:disable -- only covered when there's a missing entry in `TEST_DOUBLE_REQUIRES_BY_CONSTANT_NAME`.
             fail "`instance_double` was called with `#{constant.inspect}`, but `TEST_DOUBLE_REQUIRES_BY_CONSTANT_NAME` " \
               "does not know what file to require for this. Please update `TEST_DOUBLE_REQUIRES_BY_CONSTANT_NAME` (in `#{__FILE__}`) " \
               "or use the direct constant instead of the string name of the constant."
-            # :nocov:
+            # simplecov:enable
           end
 
           require file_to_require

@@ -159,7 +159,7 @@ module ElasticGraph
 
       begin
         ::ElasticGraph::CLI.start(["new", *argv])
-        # :nocov: -- rescue clause is only executed when a test fails.
+        # simplecov:disable -- rescue clause is only executed when a test fails.
       rescue ::Exception => ex # standard:disable Lint/RescueException
         captured_io.rewind
         output = captured_io.read
@@ -173,7 +173,7 @@ module ElasticGraph
         EOS
 
         raise ex
-        # :nocov:
+        # simplecov:enable
       else
         captured_io.rewind
         captured_io.read

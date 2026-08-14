@@ -17,7 +17,7 @@ ElasticGraph::Local::RakeTasks.new(
   tasks.schema_definition_extension_modules << ElasticGraph::JSONIngestion::SchemaDefinition::APIExtension
 end
 
-# :nocov: -- only used for manual live-server query validation, not during the build
+# simplecov:disable -- only used for manual live-server query validation, not during the build
 require "graphql"
 require "json"
 require "net/http"
@@ -214,4 +214,4 @@ namespace :example_queries do
     end
   end
 end
-# :nocov:
+# simplecov:enable

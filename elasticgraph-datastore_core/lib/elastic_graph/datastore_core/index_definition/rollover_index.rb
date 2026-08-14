@@ -36,9 +36,9 @@ module ElasticGraph
           if RolloverIndex === other
             __getobj__ == other.__getobj__ && time_set == other.time_set
           else
-            # :nocov: -- this method isn't explicitly covered by tests (not worth writing a test just to cover this line).
+            # simplecov:disable -- this method isn't explicitly covered by tests (not worth writing a test just to cover this line).
             super
-            # :nocov:
+            # simplecov:enable
           end
         end
         alias_method :eql?, :==

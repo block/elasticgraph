@@ -107,10 +107,10 @@ These are the "north stars" that guide ElasticGraph development. They guide the 
   we avoid it.
 
 **Every line and branch of code must be covered by tests except where we intentionally opt-out.**
-: Our CI build enforces 100% test coverage except where we opt-out using [`:nocov:` comments](https://github.com/search?q=repo%3Ablock%2Felasticgraph%20nocov&type=code).
+: Our CI build enforces 100% test coverage except where we opt-out using [`simplecov:disable` comments](https://github.com/search?q=repo%3Ablock%2Felasticgraph%20%22simplecov%3Adisable%22&type=code).
   This high level of test coverage means that most of the time, if it passes the CI build, it works in production.
   It also makes it obvious at a glance which lines of code are uncovered by tests--if a line isn't wrapped with a
-  `:nocov:` comment then you know it's covered!
+  `simplecov:disable` comment then you know it's covered!
 
 **We aim to validate all snippets and code examples at this website.**
 : Our documentation is so much more useful if users can trust that the code snippets we provide always work.

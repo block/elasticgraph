@@ -14,7 +14,7 @@ module ElasticGraph
       def validate_script(id, payload)
         main_datastore_client.put_script(id: id, body: {script: payload.fetch("script")}, context: payload.fetch("context"))
       rescue Errors::BadDatastoreRequest => ex
-        # :nocov: -- only executed when we have a script that can't compile
+        # simplecov:disable -- only executed when we have a script that can't compile
         message = JSON.pretty_generate(JSON.parse(ex.message.sub(/\A[^{]+/, "")))
 
         raise <<~EOS
@@ -26,7 +26,7 @@ module ElasticGraph
 
           #{message}
         EOS
-        # :nocov:
+        # simplecov:enable
       end
     end
   end
