@@ -548,6 +548,41 @@ module ElasticGraph
             expect(envelope_type_enum_values(schemas)).to eq %w[Component Widget]
             expect(schemas.fetch("Widget")).to include("properties" => hash_including("id", "name", "component_ids"))
           end
+
+          # Tagged `:dont_validate_graphql_schema` because this schema intentionally cannot generate a
+          # valid GraphQL schema: the derived type generation error is what the test is about.
+          it "raises `sourced_from` validation errors in preference to derived GraphQL type generation errors", :dont_validate_graphql_schema do
+            expect {
+              dump_schema do |s|
+                s.object_type "Widget" do |t|
+                  t.field "id", "ID!"
+
+                  # `workspace` is a plain field rather than a relationship, so the `sourced_from` below is
+                  # invalid. The schema is also broken in a second way: generating `Widget`'s derived sort
+                  # order enum fails because `workspace.name` and `workspace_name` both flatten to the same
+                  # `workspace_name_*` enum values.
+                  t.field "workspace", "WidgetWorkspace"
+
+                  t.field "workspace_name", "String" do |f|
+                    f.sourced_from "workspace", "name"
+                  end
+
+                  t.index "widgets" do |i|
+                    i.has_had_multiple_sources!
+                  end
+                end
+
+                s.object_type "WidgetWorkspace" do |t|
+                  t.field "id", "ID!"
+                  t.field "name", "String"
+                  t.field "widget_ids", "[ID!]!"
+                  t.index "widget_workspaces"
+                end
+              end
+            }.to raise_error Errors::SchemaError, a_string_including(
+              "`Widget.workspace` (referenced from `sourced_from` on field(s): `workspace_name`) is not a relationship"
+            )
+          end
         end
 
         %w[ID String].first(1).each do |graphql_type|
