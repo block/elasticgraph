@@ -120,8 +120,13 @@ module ElasticGraph
       # Returns a `GraphQL::ExecutionError` for the field about to be resolved (at `#current_path`)
       # if an ancestor resolver recorded a lookahead error matching it, or `nil` otherwise.
       def matching_lookahead_error
+        # Checked on every field resolution, so the overwhelmingly common case--no lookahead error
+        # ever recorded for this query--must stay cheap: return before building `#current_path`
+        # (which allocates) or a `LookaheadErrors` (which `#record_lookahead_error` never got called
+        # to create).
+        return nil unless (lookahead_errors = @lookahead_errors)
         current_path = self.current_path # : Array[String | Integer]
-        (@lookahead_errors ||= LookaheadErrors.new).matching_error_for(current_path)
+        lookahead_errors.matching_error_for(current_path)
       end
 
       private
