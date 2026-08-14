@@ -73,7 +73,7 @@ module ElasticGraph
     end
 
     class SchemaArtifact[T] < SchemaArtifactSupertype[T]
-      COMMENT_PREAMBLE_LINES: ::Array[::String]
+      DEFAULT_COMMENT_PREAMBLE_LINES: ::Array[::String]
 
       def dump: (io) -> void
       def out_of_date?: () -> bool

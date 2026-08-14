@@ -11,12 +11,15 @@ require "elastic_graph/proto_ingestion/schema_definition/field_number_mappings"
 require "elastic_graph/proto_ingestion/schema_definition/schema_elements/enum_type_extension"
 require "elastic_graph/proto_ingestion/schema_definition/schema_elements/object_interface_and_union_extension"
 require "elastic_graph/proto_ingestion/schema_definition/schema_elements/scalar_type_extension"
+require "forwardable"
 
 module ElasticGraph
   module ProtoIngestion
     module SchemaDefinition
       # Builds a `proto3` schema string from an ElasticGraph schema definition.
       class Schema
+        extend Forwardable
+
         # @param state [ElasticGraph::SchemaDefinition::State]
         # @param all_types [Array<ElasticGraph::SchemaDefinition::SchemaElements::graphQLType>]
         # @param package_name [String]
@@ -69,40 +72,14 @@ module ElasticGraph
           )
         end
 
-        # Returns the next protobuf field number that will be assigned for a message.
-        #
-        # @api private
-        def next_field_number_for(message_name)
-          @field_number_mappings.next_field_number_for(message_name)
-        end
-
-        # Returns field names and numbers that must be reserved in a protobuf message.
-        #
-        # @api private
-        def reserved_field_numbers_for(message_name, active_field_names)
-          @field_number_mappings.reserved_field_numbers_for(message_name, active_field_names)
-        end
-
-        # Returns the stable protobuf numbers for an enum's values.
-        #
-        # @api private
-        def enum_value_numbers_for(enum_name, value_names)
-          @field_number_mappings.enum_value_numbers_for(enum_name, value_names)
-        end
-
-        # Returns the next protobuf value number that will be assigned for an enum.
-        #
-        # @api private
-        def next_enum_value_number_for(enum_name)
-          @field_number_mappings.next_enum_value_number_for(enum_name)
-        end
-
-        # Returns value names and numbers that must be reserved in a protobuf enum.
-        #
-        # @api private
-        def reserved_enum_value_numbers_for(enum_name, active_value_names)
-          @field_number_mappings.reserved_enum_value_numbers_for(enum_name, active_value_names)
-        end
+        # @dynamic next_field_number_for, reserved_field_numbers_for, enum_value_numbers_for
+        # @dynamic next_enum_value_number_for, reserved_enum_value_numbers_for
+        def_delegators :@field_number_mappings,
+          :next_field_number_for,
+          :reserved_field_numbers_for,
+          :enum_value_numbers_for,
+          :next_enum_value_number_for,
+          :reserved_enum_value_numbers_for
 
         private
 

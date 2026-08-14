@@ -31,9 +31,9 @@ module ElasticGraph
         @message_mappings_by_name: ::Hash[::String, MessageMapping]
         @enum_mappings_by_name: ::Hash[::String, EnumMapping]
 
-        def self.from_parsed_yaml: (untyped) ?{ (untyped) -> void } -> instance
-        def self.parse_messages: (untyped) -> ::Hash[::String, MessageMapping]
-        def self.parse_enums: (untyped) -> ::Hash[::String, EnumMapping]
+        def self.from_parsed_yaml: (::Hash[::String, untyped]?) ?{ (untyped) -> void } -> instance
+        def self.parse_messages: (::Hash[::String, untyped]) -> ::Hash[::String, MessageMapping]
+        def self.parse_enums: (::Hash[::String, untyped]) -> ::Hash[::String, EnumMapping]
         def self.verify_next_number_is_after_mapped_numbers: (::String, ::Integer, fieldNumbersByName) -> void
         def self.verify_no_number_collisions: (::Hash[::String, ::Integer], ::String) -> void
 
@@ -56,6 +56,8 @@ module ElasticGraph
 
         private
 
+        def message_mapping_for: (::String) -> MessageMapping
+        def enum_mapping_for: (::String) -> EnumMapping
         def reserved_numbers_by_name: (fieldNumbersByName, ::Array[::String]) -> fieldNumbersByName
         def allocate_field_number: (::String, ::String, MessageMapping) -> MessageMapping
       end

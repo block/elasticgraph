@@ -2,6 +2,8 @@ module ElasticGraph
   module ProtoIngestion
     module SchemaDefinition
       class Schema
+        extend ::Forwardable
+
         @state: ::ElasticGraph::SchemaDefinition::State
         @all_types: ::Array[::ElasticGraph::SchemaDefinition::SchemaElements::graphQLType]
         @package_name: ::String
@@ -12,7 +14,7 @@ module ElasticGraph
           state: ::ElasticGraph::SchemaDefinition::State,
           all_types: ::Array[::ElasticGraph::SchemaDefinition::SchemaElements::graphQLType],
           package_name: ::String,
-          ?proto_field_number_mappings: untyped
+          ?proto_field_number_mappings: ::Hash[::String, untyped]?
         ) -> void
 
         def to_proto: () -> ::String

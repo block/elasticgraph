@@ -116,6 +116,27 @@ module ElasticGraph
         end
 
         describe "#field_number_for" do
+          it "raises a clear error when multiple previous field names have mappings" do
+            mappings = FieldNumberMappings.from_parsed_yaml({
+              "messages" => {"Account" => {
+                "fields" => {"first_name" => 1, "last_name" => 2},
+                "next_number" => 3
+              }}
+            })
+
+            expect {
+              mappings.field_number_for(
+                message_name: "Account",
+                public_field_name: "name",
+                previous_field_names: ["last_name", "first_name"]
+              )
+            }.to raise_error(Errors::SchemaError, a_string_including(
+              "Cannot preserve a protobuf field number for `Account.name`",
+              "multiple previous field names have mappings (`first_name` and `last_name`)",
+              "use `renamed_from` for the name whose number should carry over and `deleted_field` for the others"
+            ))
+          end
+
           it "raises a clear error when the field-number range has been exhausted" do
             mappings = FieldNumberMappings.from_parsed_yaml({
               "messages" => {"Account" => {

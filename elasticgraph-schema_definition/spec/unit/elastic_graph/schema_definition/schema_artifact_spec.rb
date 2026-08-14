@@ -20,7 +20,7 @@ module ElasticGraph
           loader: :itself.to_proc,
           extra_comment_lines: [],
           comment_prefix: "//",
-          comment_preamble_lines: SchemaArtifact::COMMENT_PREAMBLE_LINES
+          comment_preamble_lines: SchemaArtifact::DEFAULT_COMMENT_PREAMBLE_LINES
         )
 
         artifact.dump(::StringIO.new)

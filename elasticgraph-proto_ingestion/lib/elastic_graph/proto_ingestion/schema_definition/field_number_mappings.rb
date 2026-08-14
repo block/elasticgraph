@@ -48,38 +48,30 @@ module ElasticGraph
         # https://protobuf.dev/programming-guides/proto3/#enum.
         MAX_ENUM_VALUE_NUMBER = 2_147_483_647
 
+        field_number_schema = {
+          "type" => "integer",
+          "minimum" => 1,
+          "maximum" => MAX_FIELD_NUMBER,
+          "not" => {
+            "minimum" => RESERVED_FIELD_NUMBER_RANGE.begin,
+            "maximum" => RESERVED_FIELD_NUMBER_RANGE.end
+          }
+        }
+
+        enum_value_number_schema = {
+          "type" => "integer",
+          "minimum" => 1,
+          "maximum" => MAX_ENUM_VALUE_NUMBER
+        }
+
         # JSON schema for the `proto_field_numbers.yaml` artifact.
         JSON_SCHEMA = {
           "$schema" => "http://json-schema.org/draft-07/schema#",
           "definitions" => {
-            "field_number" => {
-              "type" => "integer",
-              "minimum" => 1,
-              "maximum" => MAX_FIELD_NUMBER,
-              "not" => {
-                "minimum" => RESERVED_FIELD_NUMBER_RANGE.begin,
-                "maximum" => RESERVED_FIELD_NUMBER_RANGE.end
-              }
-            },
-            "next_field_number" => {
-              "type" => "integer",
-              "minimum" => 1,
-              "maximum" => MAX_FIELD_NUMBER + 1,
-              "not" => {
-                "minimum" => RESERVED_FIELD_NUMBER_RANGE.begin,
-                "maximum" => RESERVED_FIELD_NUMBER_RANGE.end
-              }
-            },
-            "enum_value_number" => {
-              "type" => "integer",
-              "minimum" => 1,
-              "maximum" => MAX_ENUM_VALUE_NUMBER
-            },
-            "next_enum_value_number" => {
-              "type" => "integer",
-              "minimum" => 1,
-              "maximum" => MAX_ENUM_VALUE_NUMBER + 1
-            }
+            "field_number" => field_number_schema,
+            "next_field_number" => field_number_schema.merge({"maximum" => MAX_FIELD_NUMBER + 1}),
+            "enum_value_number" => enum_value_number_schema,
+            "next_enum_value_number" => enum_value_number_schema.merge({"maximum" => MAX_ENUM_VALUE_NUMBER + 1})
           },
           "type" => "object",
           "properties" => {
@@ -138,7 +130,7 @@ module ElasticGraph
             raise Errors::SchemaError, "Invalid protobuf field-number mappings:\n\n#{validation_error}"
           end
 
-          empty_section = {} # : ::Hash[untyped, untyped]
+          empty_section = {} # : ::Hash[::String, untyped]
 
           new(
             message_mappings_by_name: parse_messages(parsed_yaml.fetch("messages", empty_section)),
@@ -163,14 +155,20 @@ module ElasticGraph
         # @param previous_field_names [Array<String>] old public names of the field, if renamed
         # @return [Integer]
         def field_number_for(message_name:, public_field_name:, previous_field_names:)
-          message_mapping = @message_mappings_by_name.fetch(message_name) do
-            MessageMapping.new(field_numbers_by_name: {}, next_number: 1)
-          end
+          message_mapping = message_mapping_for(message_name)
           field_numbers = message_mapping.field_numbers_by_name
 
           return field_numbers.fetch(public_field_name) if field_numbers.key?(public_field_name)
 
-          old_field_name = previous_field_names.find { |field_name| field_numbers.key?(field_name) }
+          old_field_names = previous_field_names.intersection(field_numbers.keys)
+          if old_field_names.size > 1
+            formatted_old_field_names = old_field_names.sort.map { |name| "`#{name}`" }.join(" and ")
+            raise Errors::SchemaError, "Cannot preserve a protobuf field number for `#{message_name}.#{public_field_name}`: " \
+              "multiple previous field names have mappings (#{formatted_old_field_names}). A field can preserve only one " \
+              "protobuf number; use `renamed_from` for the name whose number should carry over and `deleted_field` for the others."
+          end
+
+          old_field_name = old_field_names.first
           updated_mapping =
             if old_field_name
               message_mapping.with(
@@ -191,7 +189,7 @@ module ElasticGraph
         # @param message_name [String]
         # @return [Integer]
         def next_field_number_for(message_name)
-          @message_mappings_by_name[message_name]&.next_number || 1
+          message_mapping_for(message_name).next_number
         end
 
         # Returns field names and numbers retained in the mappings but absent from the message.
@@ -200,7 +198,7 @@ module ElasticGraph
         # @param active_field_names [Array<String>]
         # @return [Hash<String, Integer>]
         def reserved_field_numbers_for(message_name, active_field_names)
-          field_numbers = @message_mappings_by_name[message_name]&.field_numbers_by_name || {}
+          field_numbers = message_mapping_for(message_name).field_numbers_by_name
           reserved_numbers_by_name(field_numbers, active_field_names)
         end
 
@@ -211,26 +209,24 @@ module ElasticGraph
         # @param value_names [Array<String>]
         # @return [Hash<String, Integer>]
         def enum_value_numbers_for(enum_name, value_names)
-          enum_mapping = @enum_mappings_by_name.fetch(enum_name) do
-            EnumMapping.new(value_numbers_by_name: {}, next_number: 1)
-          end
+          enum_mapping = enum_mapping_for(enum_name)
           value_numbers = enum_mapping.value_numbers_by_name
           new_value_names = value_names - value_numbers.keys
-          first_new_number = enum_mapping.next_number
-          last_new_number = first_new_number + new_value_names.size - 1
+          next_available_number = enum_mapping.next_number
+          next_available_number_after_allocations = next_available_number + new_value_names.size
 
-          if new_value_names.any? && last_new_number > MAX_ENUM_VALUE_NUMBER
+          if next_available_number_after_allocations > MAX_ENUM_VALUE_NUMBER + 1
             raise Errors::SchemaError, "Cannot allocate another protobuf enum value number for enum `#{enum_name}`: " \
               "the maximum enum value number (#{MAX_ENUM_VALUE_NUMBER}) has been reached."
           end
 
           new_value_numbers = new_value_names.each_with_index.to_h do |value_name, index|
-            [value_name, first_new_number + index]
+            [value_name, next_available_number + index]
           end
           updated_value_numbers = value_numbers.merge(new_value_numbers)
           updated_mapping = enum_mapping.with(
             value_numbers_by_name: updated_value_numbers,
-            next_number: last_new_number + 1
+            next_number: next_available_number_after_allocations
           )
           @enum_mappings_by_name = @enum_mappings_by_name.merge(enum_name => updated_mapping)
 
@@ -244,7 +240,7 @@ module ElasticGraph
         # @param enum_name [String]
         # @return [Integer]
         def next_enum_value_number_for(enum_name)
-          @enum_mappings_by_name[enum_name]&.next_number || 1
+          enum_mapping_for(enum_name).next_number
         end
 
         # Returns value names and numbers retained in the mappings but absent from the enum.
@@ -253,7 +249,7 @@ module ElasticGraph
         # @param active_value_names [Array<String>]
         # @return [Hash<String, Integer>]
         def reserved_enum_value_numbers_for(enum_name, active_value_names)
-          value_numbers = @enum_mappings_by_name[enum_name]&.value_numbers_by_name || {}
+          value_numbers = enum_mapping_for(enum_name).value_numbers_by_name
           reserved_numbers_by_name(value_numbers, active_value_names)
         end
 
@@ -283,6 +279,18 @@ module ElasticGraph
         end
 
         private
+
+        def message_mapping_for(message_name)
+          @message_mappings_by_name.fetch(message_name) do
+            MessageMapping.new(field_numbers_by_name: {}, next_number: 1)
+          end
+        end
+
+        def enum_mapping_for(enum_name)
+          @enum_mappings_by_name.fetch(enum_name) do
+            EnumMapping.new(value_numbers_by_name: {}, next_number: 1)
+          end
+        end
 
         def reserved_numbers_by_name(numbers_by_name, active_names)
           numbers_by_name
