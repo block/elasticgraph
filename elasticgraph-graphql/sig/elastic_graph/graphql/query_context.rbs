@@ -27,7 +27,14 @@ module ElasticGraph
 
       def cache_datastore_query: (untyped cache_key) { () -> DatastoreQuery } -> DatastoreQuery
 
+      REMOVED_KEY_REPLACEMENTS: ::Hash[::Symbol, ::String]
+
+      def []: (untyped key) -> untyped
+      def fetch: (untyped key, *untyped args) ?{ (untyped) -> untyped } -> untyped
+
       private
+
+      def raise_if_removed_key: (untyped key) -> void
 
       @datastore_query_cache: ::Hash[untyped, DatastoreQuery]?
       def datastore_query_cache: () -> ::Hash[untyped, DatastoreQuery]

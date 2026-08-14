@@ -6,6 +6,7 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/errors"
 require "elastic_graph/graphql/client"
 require "elastic_graph/graphql/query_details_tracker"
 require "graphql"
@@ -68,7 +69,36 @@ module ElasticGraph
         datastore_query_cache[cache_key] ||= yield
       end
 
+      # These context hash keys were replaced by typed accessors above. `[]`/`fetch` raise a
+      # helpful error here instead of silently returning `nil`, in case any custom resolver code
+      # still reads them as hash keys.
+      REMOVED_KEY_REPLACEMENTS = {
+        elastic_graph_schema: "elastic_graph_schema",
+        datastore_search_router: "datastore_search_router",
+        datastore_query_cache: "cache_datastore_query",
+        elastic_graph_query_tracker: "elastic_graph_query_tracker",
+        monotonic_clock_deadline: "monotonic_clock_deadline",
+        elastic_graph_client: "elastic_graph_client",
+        http_request: "http_request"
+      }
+
+      def [](key)
+        raise_if_removed_key(key)
+        super
+      end
+
+      def fetch(key, *args, &block)
+        raise_if_removed_key(key)
+        super
+      end
+
       private
+
+      def raise_if_removed_key(key)
+        if (replacement = REMOVED_KEY_REPLACEMENTS[key])
+          raise Errors::ConfigError, "`context[#{key.inspect}]` is no longer supported; use `context.#{replacement}` instead."
+        end
+      end
 
       def datastore_query_cache
         @datastore_query_cache ||= {}
