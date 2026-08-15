@@ -5,8 +5,8 @@ module ElasticGraph
     end
 
     class RecordPreparer
-      type egMetaByFieldHash = ::Hash[::String, {"type" => ::String, "nameInIndex" => ::String}]
-      type egMetaByFieldByTypeHash = ::Hash[::String, egMetaByFieldHash]
+      type fieldsByNameHash = ::Hash[::String, FieldMetadata]
+      type fieldsByNameByTypeHash = ::Hash[::String, fieldsByNameHash]
 
       include _RecordPreparer
 
@@ -20,20 +20,35 @@ module ElasticGraph
       ) -> void
 
       @indexing_preparer_by_scalar_type_name: ::Hash[::String, SchemaArtifacts::RuntimeMetadata::extensionClass?]
-      @eg_meta_by_field_name_by_concrete_type: egMetaByFieldByTypeHash
+      @fields_by_name_by_concrete_type: fieldsByNameByTypeHash
+
+      class FieldMetadata
+        attr_reader type: ::String
+        attr_reader name_in_index: ::String
+
+        def initialize: (
+          type: ::String,
+          name_in_index: ::String
+        ) -> void
+
+        def with: (
+          ?type: ::String,
+          ?name_in_index: ::String
+        ) -> FieldMetadata
+      end
 
       class TypeMetadata
         attr_reader name: ::String
-        attr_reader eg_meta_by_field_name: egMetaByFieldHash
+        attr_reader fields_by_name: fieldsByNameHash
 
         def initialize: (
           name: ::String,
-          eg_meta_by_field_name: egMetaByFieldHash
+          fields_by_name: fieldsByNameHash
         ) -> void
 
         def with: (
           ?name: ::String,
-          ?eg_meta_by_field_name: egMetaByFieldHash
+          ?fields_by_name: fieldsByNameHash
         ) -> TypeMetadata
       end
     end
