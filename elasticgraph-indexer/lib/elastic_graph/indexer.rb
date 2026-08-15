@@ -97,6 +97,25 @@ module ElasticGraph
       end
     end
 
+    def indexing_event_decoder
+      @indexing_event_decoder ||= begin
+        extension = config.indexing_event_decoder
+
+        if extension.nil?
+          raise Errors::ConfigError, "`indexer.indexing_event_decoder` is not configured, but is required to " \
+            "decode indexing event payloads. Configure it with a decoder extension provided by an ingestion " \
+            "format gem (or one of your own) that understands your transport's payload format."
+        end
+
+        decoder_class = extension.extension_class # : untyped
+        decoder_class.new(
+          config: extension.config,
+          schema_artifacts: schema_artifacts,
+          logger: logger
+        )
+      end
+    end
+
     def monotonic_clock
       @monotonic_clock ||= begin
         require "elastic_graph/support/monotonic_clock"
