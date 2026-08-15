@@ -77,6 +77,28 @@ end
 After running `bundle exec rake schema_artifacts:dump`, ElasticGraph will generate a `schema.proto`
 schema artifact, and will maintain a `proto_field_numbers.yaml` file alongside your schema definition.
 
+### Protecting Protobuf Compatibility With Buf
+
+Install the [Buf CLI](https://buf.build/docs/installation/) anywhere that dumps schema artifacts.
+Once `schema.proto` exists, ElasticGraph compiles the existing and proposed schemas with Buf whenever
+the artifact changes. It then applies Buf's strict [`FILE` breaking-change
+rules](https://buf.build/docs/breaking/rules/) so changes that break generated code, JSON, or the binary
+wire format cannot be dumped accidentally. Imported schemas are compiled using the project's normal
+Buf configuration and are excluded from the comparison itself, keeping this check scoped to the
+generated `schema.proto`.
+
+A breaking change always fails the dump. Protobuf has no schema version to bump: consumers that
+already deserialize these messages would misread them, and you cannot update every consumer at the
+same moment. So there is no flag to accept a breaking change.
+
+To get past the error, make the change compatible:
+
+- Add a new field instead of a change to the type or the name of an existing field.
+- Reserve the number of every field you remove.
+- Keep enum value numbers stable, and reserve the numbers of values you remove.
+
+Compatible additions dump normally and need no extra step.
+
 ## Schema Definition API
 
 ### Protobuf Syntax (`proto2` / `proto3`)

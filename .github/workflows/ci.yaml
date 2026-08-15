@@ -91,6 +91,13 @@ jobs:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
 
+      - name: Setup Buf
+        if: matrix.build_part == 'run_misc_checks'
+        uses: bufbuild/buf-action@8c6a16e16f12ba20b6470afa9c2ba9b5ba8c97c3 # v1.5.0
+        with:
+          version: "1.72.0"
+          setup_only: true
+
       - name: Setup Docker Compose
         uses: KengoTODA/actions-setup-docker-compose@caf887cb5173b7ea66cce3c7db3b1e04974a53d4 # v1.2.8
         env:
