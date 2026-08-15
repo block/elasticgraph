@@ -87,5 +87,8 @@ logger:
   device: log/test.log
 indexer:
   latency_slo_thresholds_by_timestamp_in_ms: {}
+  indexing_event_decoder:
+    name: ElasticGraph::JSONIngestion::IndexingEventDecoder
+    require_path: elastic_graph/json_ingestion/indexing_event_decoder
 schema_artifacts:
   directory: config/schema/artifacts
