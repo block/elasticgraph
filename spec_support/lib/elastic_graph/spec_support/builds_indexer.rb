@@ -19,6 +19,7 @@ module ElasticGraph
       latency_slo_thresholds_by_timestamp_in_ms: {},
       skip_derived_indexing_type_updates: {},
       extension_modules: [],
+      indexing_event_decoder: nil,
       datastore_router: nil,
       clock: nil,
       monotonic_clock: nil,
@@ -27,7 +28,8 @@ module ElasticGraph
     )
       config = Indexer::Config.new(
         latency_slo_thresholds_by_timestamp_in_ms: latency_slo_thresholds_by_timestamp_in_ms,
-        skip_derived_indexing_type_updates: skip_derived_indexing_type_updates
+        skip_derived_indexing_type_updates: skip_derived_indexing_type_updates,
+        indexing_event_decoder: indexing_event_decoder
       )
 
       # This config setting must bypass the JSON schema validation so we provide it via `with`.
