@@ -38,6 +38,25 @@ module ElasticGraph
               )
           end
 
+          it "does not invoke Buf or dump a proto artifact when no indexed types are defined" do
+            expect(BufBreakingChangeDetector).not_to receive(:new)
+            write_proto_schema(table_defs: <<~EOS)
+              s.object_type "Point" do |t|
+                t.field "x", "Float"
+              end
+
+              s.on_root_query_type do |t|
+                t.field "point", "Point" do |f|
+                  f.resolve_with :object_without_lookahead
+                end
+              end
+            EOS
+
+            run_rake_with_proto("schema_artifacts:dump")
+
+            expect(read_artifact(PROTO_SCHEMA_FILE)).to be_nil
+          end
+
           it "idempotently dumps proto artifacts" do
             write_proto_schema(table_defs: <<~EOS)
               s.object_type "Product" do |t|
@@ -55,6 +74,8 @@ module ElasticGraph
           end
 
           it "persists proto field-number mappings and reuses them on the next dump" do
+            stub_buf_breaking_changes(nil)
+
             write_proto_schema(table_defs: <<~EOS)
               s.object_type "Product" do |t|
                 t.field "id", "ID"
@@ -96,6 +117,88 @@ module ElasticGraph
 
             expect(read_artifact(PROTO_SCHEMA_FILE)).to include("string id = 1;", "string name = 2;")
           end
+
+          it "dumps a compatible change that Buf reports as safe" do
+            write_proto_schema(table_defs: <<~EOS)
+              s.object_type "Product" do |t|
+                t.field "id", "ID"
+                t.index "products"
+              end
+            EOS
+            run_rake_with_proto("schema_artifacts:dump")
+
+            detector = stub_buf_breaking_changes(nil)
+            write_proto_schema(table_defs: <<~EOS)
+              s.object_type "Product" do |t|
+                t.field "id", "ID"
+                t.field "name", "String"
+                t.index "products"
+              end
+            EOS
+
+            expect {
+              run_rake_with_proto("schema_artifacts:dump")
+            }.to change { read_artifact(PROTO_SCHEMA_FILE) }
+
+            expect(detector).to have_received(:breaking_changes).with(
+              current_schema: a_string_including("string name = 2;"),
+              against_schema: a_string_excluding("string name = 2;")
+            )
+          end
+
+          it "refuses to dump a breaking change reported by Buf" do
+            write_proto_schema(table_defs: <<~EOS)
+              s.object_type "Product" do |t|
+                t.field "id", "ID"
+                t.index "products"
+              end
+            EOS
+            run_rake_with_proto("schema_artifacts:dump")
+
+            original_proto = read_artifact(PROTO_SCHEMA_FILE)
+            stub_buf_breaking_changes("schema.proto: Field changed type from string to int32.")
+            write_proto_schema(table_defs: <<~EOS)
+              s.object_type "Product" do |t|
+                t.field "id", "Int"
+                t.index "products"
+              end
+            EOS
+
+            expect {
+              run_rake_with_proto("schema_artifacts:dump")
+            }.to abort_with a_string_including(
+              "Buf detected a breaking change",
+              "Field changed type from string to int32",
+              "Protobuf offers no way to version your way out of this",
+              "reserve the"
+            )
+            expect(read_artifact(PROTO_SCHEMA_FILE)).to eq(original_proto)
+          end
+
+          it "surfaces Buf failures without a stack trace" do
+            write_proto_schema(table_defs: <<~EOS)
+              s.object_type "Product" do |t|
+                t.field "id", "ID"
+                t.index "products"
+              end
+            EOS
+            run_rake_with_proto("schema_artifacts:dump")
+
+            detector = instance_double(BufBreakingChangeDetector)
+            allow(detector).to receive(:breaking_changes).and_raise(Errors::SchemaError, "Buf could not compile an import.")
+            allow(BufBreakingChangeDetector).to receive(:new).and_return(detector)
+            write_proto_schema(table_defs: <<~EOS)
+              s.object_type "Product" do |t|
+                t.field "id", "ID"
+                t.field "name", "String"
+                t.index "products"
+              end
+            EOS
+
+            expect {
+              run_rake_with_proto("schema_artifacts:dump")
+            }.to abort_with("Buf could not compile an import.")
+          end
         end
 
         describe "schema_artifacts:check" do
@@ -127,6 +230,12 @@ module ElasticGraph
               #{table_defs}
             end
           EOS
+        end
+
+        def stub_buf_breaking_changes(changes)
+          detector = instance_double(BufBreakingChangeDetector, breaking_changes: changes)
+          allow(BufBreakingChangeDetector).to receive(:new).and_return(detector)
+          detector
         end
 
         def run_rake_with_proto(*args)
