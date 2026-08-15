@@ -82,6 +82,34 @@ module ElasticGraph
           Config.from_parsed_yaml("indexer" => ::YAML.safe_load(yaml)).extension_modules
         end
       end
+
+      it "leaves the indexing event decoder unconfigured by default" do
+        expect(Config.new.indexing_event_decoder).to be nil
+      end
+
+      it "loads a configured indexing event decoder" do
+        config = Config.from_parsed_yaml("indexer" => {
+          "indexing_event_decoder" => {
+            "name" => "ExampleIndexingEventDecoder",
+            "require_path" => "support/example_extensions/indexing_event_decoder",
+            "config" => {"delimiter" => "|"}
+          }
+        })
+
+        expect(config.indexing_event_decoder.extension_class).to be(ExampleIndexingEventDecoder)
+        expect(config.indexing_event_decoder.config).to eq({"delimiter" => "|"})
+      end
+
+      it "verifies that a configured indexing event decoder implements the expected interface" do
+        expect {
+          Config.from_parsed_yaml("indexer" => {
+            "indexing_event_decoder" => {
+              "name" => "InvalidIndexingEventDecoder",
+              "require_path" => "support/example_extensions/indexing_event_decoder"
+            }
+          })
+        }.to raise_error Errors::InvalidExtensionError, a_string_including("InvalidIndexingEventDecoder", "Missing instance methods: `decode`")
+      end
     end
   end
 end

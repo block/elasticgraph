@@ -38,9 +38,10 @@ Gem::Specification.new do |spec|
 
   # The test suite builds indexers (with real datastore client classes) to exercise the ingestion adapter.
   spec.add_development_dependency "elasticgraph-elasticsearch", ElasticGraph::VERSION
-  # This gem's ingestion adapter code references `elasticgraph-indexer`, but the indexer loads it
-  # through the indexer extension registered in runtime metadata, after `elasticgraph-indexer` is
-  # already available. Keeping this as a development dependency avoids a runtime dependency cycle.
+  # This gem's ingestion adapter and indexing event decoder code references `elasticgraph-indexer`,
+  # but the indexer loads them through the indexer extension registered in runtime metadata and
+  # through the `indexing_event_decoder` setting, after `elasticgraph-indexer` is already available.
+  # Keeping this as a development dependency avoids a runtime dependency cycle.
   spec.add_development_dependency "elasticgraph-indexer", ElasticGraph::VERSION
   # The test suite builds indexers (with real datastore client classes) to exercise the ingestion adapter.
   spec.add_development_dependency "elasticgraph-opensearch", ElasticGraph::VERSION
