@@ -26,8 +26,8 @@ module ElasticGraph
 
       def initialize(indexing_preparer_by_scalar_type_name, type_metas)
         @indexing_preparer_by_scalar_type_name = indexing_preparer_by_scalar_type_name
-        @eg_meta_by_field_name_by_concrete_type = type_metas.to_h do |meta|
-          [meta.name, meta.eg_meta_by_field_name]
+        @fields_by_name_by_concrete_type = type_metas.to_h do |meta|
+          [meta.name, meta.fields_by_name]
         end
       end
 
@@ -59,12 +59,12 @@ module ElasticGraph
           element_type_name = type_name.delete_prefix("[").delete_suffix("]")
           value.map { |v| prepare_for_index(element_type_name, v, mapping_properties) }
         when ::Hash
-          # `@eg_meta_by_field_name_by_concrete_type` does not have abstract types in it (e.g. type unions).
+          # `@fields_by_name_by_concrete_type` does not have abstract types in it (e.g. type unions).
           # Instead, it'll have each concrete subtype in it.
           #
           # If `type_name` is an abstract type, we need to look at the `__typename` field to see
           # what the concrete subtype is. `__typename` is required on abstract types and indicates that.
-          eg_meta_by_field_name = @eg_meta_by_field_name_by_concrete_type.fetch(value["__typename"] || type_name)
+          fields_by_name = @fields_by_name_by_concrete_type.fetch(value["__typename"] || type_name)
 
           # We only want to consider __typename if it's in the per-record mapping in order to determine
           # whether __typename is required on records. When it's a constant_keyword it exists at the index
@@ -76,10 +76,10 @@ module ElasticGraph
             if field_name == "__typename"
               # Only include __typename if the index mapping has it at this position.
               [field_name, field_value] if typename_in_record_mapping
-            elsif (eg_meta = eg_meta_by_field_name[field_name])
-              name_in_index = eg_meta.fetch("nameInIndex")
+            elsif (field = fields_by_name[field_name])
+              name_in_index = field.name_in_index
               nested_mapping_properties = mapping_properties&.dig(name_in_index, "properties")
-              [name_in_index, prepare_for_index(eg_meta.fetch("type"), field_value, nested_mapping_properties)]
+              [name_in_index, prepare_for_index(field.type, field_value, nested_mapping_properties)]
             end
           end.to_h
 
@@ -98,12 +98,24 @@ module ElasticGraph
         end
       end
 
-      TypeMetadata = ::Data.define(
-        # The name of the type this metadata object is for.
-        :name,
-        # The per-field ElasticGraph metadata, keyed by field name.
-        :eg_meta_by_field_name
-      )
+      # Ingestion-format-neutral metadata about a single indexed field. Ingestion adapters build
+      # these from whatever source describes their format (e.g. `elasticgraph-json_ingestion`
+      # derives them from the versioned JSON schemas), so the indexer itself does not need to know
+      # how any particular ingestion format describes its fields.
+      #
+      # @!attribute [r] type
+      #   @return [String] name of the ElasticGraph type of this field
+      # @!attribute [r] name_in_index
+      #   @return [String] name of this field in the index
+      FieldMetadata = ::Data.define(:type, :name_in_index)
+
+      # Ingestion-format-neutral metadata about a single indexed type.
+      #
+      # @!attribute [r] name
+      #   @return [String] the name of the type this metadata object is for
+      # @!attribute [r] fields_by_name
+      #   @return [Hash<String, FieldMetadata>] metadata for each of the type's fields, keyed by field name
+      TypeMetadata = ::Data.define(:name, :fields_by_name)
     end
   end
 end
