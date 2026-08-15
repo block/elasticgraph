@@ -18,13 +18,25 @@ module ElasticGraph
         define_proto_schema_results(**options, &block).proto_schema
       end
 
-      def define_proto_schema_results(**options, &block)
+      # Defines a schema and returns its `Results`. Pass the results of a previous
+      # `define_proto_schema_results` call as `prior_results` to seed the new schema with the
+      # field-number mappings the previous one generated, standing in for the
+      # `proto_field_numbers.yaml` file that `schema_artifacts:dump` would have written between
+      # the two schema definitions. (Loading that file is covered by
+      # `schema_artifact_manager_extension_spec` and `rake_tasks_spec`.) `prior_results` is the
+      # standard way to test mapping behavior; pass raw `proto_field_number_mappings:` only for
+      # scenarios a prior dump cannot produce (such as a hand-edited or invalid file).
+      def define_proto_schema_results(prior_results = nil, proto_field_number_mappings: nil, **options, &block)
+        mappings = proto_field_number_mappings || prior_results&.proto_field_number_mappings
+
         define_schema(
           schema_element_name_form: :snake_case,
           extension_modules: [SchemaDefinition::APIExtension],
-          **options,
-          &block
-        )
+          **options
+        ) do |schema|
+          schema.state.proto_ingestion_state.field_number_mappings = mappings if mappings
+          block.call(schema)
+        end
       end
 
       def proto_type_def_from(proto, type)

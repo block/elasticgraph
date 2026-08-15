@@ -7,19 +7,40 @@
 # frozen_string_literal: true
 
 require "elastic_graph/proto_ingestion/schema_definition/schema_artifact_manager_extension"
+require "fileutils"
 require "stringio"
 
 module ElasticGraph
   module ProtoIngestion
     module SchemaDefinition
       RSpec.describe SchemaArtifactManagerExtension, :in_temp_dir do
-        it "dumps the proto schema artifact alongside the base artifacts" do
-          artifact_base_names = artifacts_for(define_indexed_type_schema)
+        it "locates `#{PROTO_FIELD_NUMBERS_FILE}` alongside the schema definition since it is an input to schema generation, unlike the proper schema artifacts" do
+          artifacts_by_file_name = artifacts_for(define_indexed_type_schema).to_h do |artifact|
+            [artifact.file_name, artifact]
+          end
 
-          expect(artifact_base_names).to include(PROTO_SCHEMA_FILE)
+          expect(artifacts_by_file_name.keys).to include(
+            ::File.join("config", PROTO_FIELD_NUMBERS_FILE),
+            ::File.join("artifacts", PROTO_SCHEMA_FILE)
+          )
         end
 
-        it "omits the proto schema artifact when the schema defines no indexed types" do
+        it "documents the file's hand-editable input-file semantics instead of the standard `DO NOT EDIT BY HAND` preamble" do
+          artifact = artifacts_for(define_indexed_type_schema).find do |candidate|
+            ::File.basename(candidate.file_name) == PROTO_FIELD_NUMBERS_FILE
+          end
+
+          artifact.dump(::StringIO.new)
+          contents = ::File.read(::File.join("config", PROTO_FIELD_NUMBERS_FILE))
+
+          expect(contents).to start_with("# This file is part of your schema definition")
+          expect(contents).to include("While prototyping, you may")
+          expect(contents).to include("Once generated protos have been used")
+          expect(contents).to include("you must NOT delete this file and regenerate it")
+          expect(contents).not_to include("DO NOT EDIT BY HAND")
+        end
+
+        it "omits proto artifacts when the schema defines no indexed types" do
           results = define_proto_schema_results do |s|
             s.object_type "Point" do |t|
               t.field "x", "Float"
@@ -34,13 +55,62 @@ module ElasticGraph
             end
           end
 
-          artifact_base_names = artifacts_for(results)
+          artifact_base_names = artifact_base_names_for(results)
 
-          expect(artifact_base_names).not_to include(PROTO_SCHEMA_FILE)
+          expect(artifact_base_names).not_to include(PROTO_SCHEMA_FILE, PROTO_FIELD_NUMBERS_FILE)
+        end
+
+        it "seeds proto generation with previously dumped field and enum numbers before an artifact manager is constructed" do
+          ::FileUtils.mkdir_p("config")
+          ::File.write(::File.join("config", PROTO_FIELD_NUMBERS_FILE), <<~YAML)
+            messages:
+              Widget:
+                fields:
+                  id: 7
+                next_number: 8
+            enums:
+              Status:
+                values:
+                  INACTIVE: 5
+                next_number: 8
+          YAML
+
+          results = define_proto_schema_results(path_to_schema: ::File.join("config", "schema.rb")) do |s|
+            s.enum_type "Status" do |t|
+              t.values "ACTIVE", "INACTIVE"
+            end
+
+            s.object_type "Widget" do |t|
+              t.field "id", "ID"
+              t.field "status", "Status"
+              t.index "widgets"
+            end
+          end
+
+          expect(results.proto_schema).to include(
+            "string id = 7;",
+            ".elasticgraph.Status status = 8;",
+            "STATUS_ACTIVE = 8;",
+            "STATUS_INACTIVE = 5;",
+            "// Next value number: 9"
+          )
+        end
+
+        it "raises a clear error when dumping proto artifacts without a configured `path_to_schema`" do
+          results = define_proto_schema_results do |s|
+            s.object_type "Widget" do |t|
+              t.field "id", "ID"
+              t.index "widgets"
+            end
+          end
+
+          expect {
+            artifacts_for(results)
+          }.to raise_error Errors::SchemaError, a_string_including("without a configured `path_to_schema`")
         end
 
         def define_indexed_type_schema
-          define_proto_schema_results do |s|
+          define_proto_schema_results(path_to_schema: ::File.join("config", "schema.rb")) do |s|
             s.object_type "Widget" do |t|
               t.field "id", "ID"
               t.index "widgets"
@@ -55,7 +125,11 @@ module ElasticGraph
             output: ::StringIO.new
           )
 
-          manager.send(:artifacts_from_schema_def).map { |artifact| ::File.basename(artifact.file_name) }
+          manager.send(:artifacts_from_schema_def)
+        end
+
+        def artifact_base_names_for(results)
+          artifacts_for(results).map { |artifact| ::File.basename(artifact.file_name) }
         end
       end
     end
