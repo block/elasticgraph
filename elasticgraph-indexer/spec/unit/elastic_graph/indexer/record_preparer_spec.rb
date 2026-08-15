@@ -451,6 +451,36 @@ module ElasticGraph
         end
       end
 
+      context "when built directly from ingestion-format-neutral metadata" do
+        it "prepares records without any JSON schema, so other ingestion formats can supply their own field metadata" do
+          preparer = RecordPreparer.new({}, [
+            RecordPreparer::TypeMetadata.new(
+              name: "MyType",
+              fields_by_name: {
+                "id" => RecordPreparer::FieldMetadata.new(type: "ID!", name_in_index: "id"),
+                "name" => RecordPreparer::FieldMetadata.new(type: "String", name_in_index: "name2"),
+                "options" => RecordPreparer::FieldMetadata.new(type: "WidgetOptions", name_in_index: "options")
+              }
+            ),
+            RecordPreparer::TypeMetadata.new(
+              name: "WidgetOptions",
+              fields_by_name: {
+                "color" => RecordPreparer::FieldMetadata.new(type: "String", name_in_index: "clr")
+              }
+            )
+          ])
+
+          record = preparer.prepare_for_index("MyType", {
+            "id" => "1",
+            "name" => "Winston",
+            "options" => {"color" => "RED"},
+            "not_in_schema" => "should be dropped"
+          }, {})
+
+          expect(record).to eq({"id" => "1", "name2" => "Winston", "options" => {"clr" => "RED"}})
+        end
+      end
+
       def build_preparer(**config_overrides, &schema_definition)
         build_preparer_with_artifacts(**config_overrides, &schema_definition).first
       end
