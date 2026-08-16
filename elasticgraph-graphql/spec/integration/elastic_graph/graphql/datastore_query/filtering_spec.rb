@@ -545,9 +545,9 @@ module ElasticGraph
       end
 
       # Both filters below have two sibling parts that must be ANDed together, and each part produces
-      # `should` clauses. The parts share one `bool` node, so their `should` clauses land in one array
-      # under a single `minimum_should_match: 1`, and `(A OR B) AND (C OR D)` becomes `A OR B OR C OR D`.
-      # These examples show the extra documents that the datastore then returns.
+      # `should` clauses. `minimum_should_match: 1` applies to the entire `should` array of a bool
+      # node, so the two groups must not share one array. If they did, `(A OR B) AND (C OR D)` would
+      # become `A OR B OR C OR D`, and t2 and t3 would also match here.
       describe "sibling filters that each produce `should` clauses" do
         it "requires a document to satisfy both an `any_of` filter and a sibling `any_satisfy: {any_of: ...}` filter" do
           index_into(
@@ -567,7 +567,6 @@ module ElasticGraph
             "forbes_valuations" => {"any_satisfy" => {"any_of" => [{"gt" => 3_000_000}, {"lt" => 100_000}]}}
           }
 
-          pending "known bug: t2 and t3 also match, because the two `should` groups collapse into one flat `should` array"
           expect(search_with_freeform_filter(filter)).to match_array(ids_of(t1))
         end
 
@@ -591,7 +590,6 @@ module ElasticGraph
             sort: []
           ).to_a)
 
-          pending "known bug: the internal filter no longer restricts the results, so t2 and t3 also match"
           expect(results).to match_array(ids_of(t1))
         end
 

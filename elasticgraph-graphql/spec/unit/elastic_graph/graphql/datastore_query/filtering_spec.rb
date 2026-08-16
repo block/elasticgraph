@@ -1039,17 +1039,14 @@ module ElasticGraph
         end
       end
 
-      # Each filter below has two sibling parts that must be ANDed together, and each part produces
-      # `should` clauses. The parts land in the same `bool` node, so their `should` clauses go into
-      # one shared array under a single `minimum_should_match: 1`. That turns `(A OR B) AND (C OR D)`
-      # into `A OR B OR C OR D`, which matches documents the filter excludes.
-      #
-      # The `required_matching_clause_count > 1` guard in `FilterInterpreter` only inspects one
-      # `any_satisfy` sub-filter at a time, so it cannot detect a collision with a sibling filter.
+      # `minimum_should_match: 1` applies to the entire `should` array of a bool node, so a node can
+      # hold only one group of `should` clauses. Each filter below has two sibling parts that must be
+      # ANDed together, and each part produces such a group. The first group stays on the shared bool
+      # node, and each later group gets nested in its own bool query under `filter`, where it is
+      # required on its own. Without that nesting, `(A OR B) AND (C OR D)` would become
+      # `A OR B OR C OR D`, which matches documents the filter excludes.
       describe "sibling filters that each produce `should` clauses" do
-        it "does not merge `any_satisfy: {any_of: ...}` into a sibling `any_of` filter" do
-          pending "known bug: the two `should` groups collapse into one flat `should` array"
-
+        it "ANDs an `any_satisfy: {any_of: ...}` filter with a sibling `any_of` filter" do
           query = new_query(client_filter: {
             "any_of" => [
               {"name" => {"equal_to_any_of" => ["x"]}},
@@ -1059,42 +1056,44 @@ module ElasticGraph
           })
 
           # `(name = x OR name = y) AND (age > 30 OR age < 5)`
-          expect(datastore_body_of(query)).to query_datastore_with({bool: {filter: [
-            {bool: {minimum_should_match: 1, should: [
+          expect(datastore_body_of(query)).to query_datastore_with({bool: {
+            minimum_should_match: 1,
+            should: [
               {bool: {filter: [{terms: {"name" => ["x"]}}]}},
               {bool: {filter: [{terms: {"name" => ["y"]}}]}}
-            ]}},
-            {bool: {minimum_should_match: 1, should: [
-              {bool: {filter: [{range: {"ages" => {gt: 30}}}]}},
-              {bool: {filter: [{range: {"ages" => {lt: 5}}}]}}
-            ]}}
-          ]}})
+            ],
+            filter: [
+              {bool: {minimum_should_match: 1, should: [
+                {bool: {filter: [{range: {"ages" => {gt: 30}}}]}},
+                {bool: {filter: [{range: {"ages" => {lt: 5}}}]}}
+              ]}}
+            ]
+          }})
         end
 
-        it "does not merge two sibling `any_satisfy: {any_of: ...}` filters on different fields" do
-          pending "known bug: the two `should` groups collapse into one flat `should` array"
-
+        it "ANDs two sibling `any_satisfy: {any_of: ...}` filters on different fields" do
           query = new_query(client_filter: {
             "tags" => {"any_satisfy" => {"any_of" => [{"equal_to_any_of" => ["a"]}, {"equal_to_any_of" => ["b"]}]}},
             "ages" => {"any_satisfy" => {"any_of" => [{"gt" => 30}, {"lt" => 5}]}}
           })
 
           # `(tag = a OR tag = b) AND (age > 30 OR age < 5)`
-          expect(datastore_body_of(query)).to query_datastore_with({bool: {filter: [
-            {bool: {minimum_should_match: 1, should: [
+          expect(datastore_body_of(query)).to query_datastore_with({bool: {
+            minimum_should_match: 1,
+            should: [
               {bool: {filter: [{terms: {"tags" => ["a"]}}]}},
               {bool: {filter: [{terms: {"tags" => ["b"]}}]}}
-            ]}},
-            {bool: {minimum_should_match: 1, should: [
-              {bool: {filter: [{range: {"ages" => {gt: 30}}}]}},
-              {bool: {filter: [{range: {"ages" => {lt: 5}}}]}}
-            ]}}
-          ]}})
+            ],
+            filter: [
+              {bool: {minimum_should_match: 1, should: [
+                {bool: {filter: [{range: {"ages" => {gt: 30}}}]}},
+                {bool: {filter: [{range: {"ages" => {lt: 5}}}]}}
+              ]}}
+            ]
+          }})
         end
 
-        it "does not merge an `any_satisfy: {any_of: ...}` client filter into an `any_of` internal filter" do
-          pending "known bug: the two `should` groups collapse into one flat `should` array"
-
+        it "ANDs an `any_satisfy: {any_of: ...}` client filter with an `any_of` internal filter" do
           query = new_query(
             client_filter: {"ages" => {"any_satisfy" => {"any_of" => [{"gt" => 30}, {"lt" => 5}]}}},
             internal_filters: [{"any_of" => [
@@ -1104,21 +1103,22 @@ module ElasticGraph
           )
 
           # `(age > 30 OR age < 5) AND (name = x OR name = y)`
-          expect(datastore_body_of(query)).to query_datastore_with({bool: {filter: [
-            {bool: {minimum_should_match: 1, should: [
+          expect(datastore_body_of(query)).to query_datastore_with({bool: {
+            minimum_should_match: 1,
+            should: [
               {bool: {filter: [{range: {"ages" => {gt: 30}}}]}},
               {bool: {filter: [{range: {"ages" => {lt: 5}}}]}}
-            ]}},
-            {bool: {minimum_should_match: 1, should: [
-              {bool: {filter: [{terms: {"name" => ["x"]}}]}},
-              {bool: {filter: [{terms: {"name" => ["y"]}}]}}
-            ]}}
-          ]}})
+            ],
+            filter: [
+              {bool: {minimum_should_match: 1, should: [
+                {bool: {filter: [{terms: {"name" => ["x"]}}]}},
+                {bool: {filter: [{terms: {"name" => ["y"]}}]}}
+              ]}}
+            ]
+          }})
         end
 
-        it "does not merge an `any_of` client filter into an `any_of` internal filter" do
-          pending "known bug: the two `should` groups collapse into one flat `should` array"
-
+        it "ANDs an `any_of` client filter with an `any_of` internal filter" do
           query = new_query(
             client_filter: {"any_of" => [
               {"name" => {"equal_to_any_of" => ["x"]}},
@@ -1131,19 +1131,76 @@ module ElasticGraph
           )
 
           # `(name = x OR name = y) AND (name = y OR name = z)`
-          expect(datastore_body_of(query)).to query_datastore_with({bool: {filter: [
-            {bool: {minimum_should_match: 1, should: [
+          expect(datastore_body_of(query)).to query_datastore_with({bool: {
+            minimum_should_match: 1,
+            should: [
               {bool: {filter: [{terms: {"name" => ["x"]}}]}},
               {bool: {filter: [{terms: {"name" => ["y"]}}]}}
-            ]}},
-            {bool: {minimum_should_match: 1, should: [
-              {bool: {filter: [{terms: {"name" => ["y"]}}]}},
-              {bool: {filter: [{terms: {"name" => ["z"]}}]}}
-            ]}}
-          ]}})
+            ],
+            filter: [
+              {bool: {minimum_should_match: 1, should: [
+                {bool: {filter: [{terms: {"name" => ["y"]}}]}},
+                {bool: {filter: [{terms: {"name" => ["z"]}}]}}
+              ]}}
+            ]
+          }})
         end
 
-        it "produces the correct query for the equivalent `all_of` filter, showing what the sibling form must produce" do
+        it "unwraps a nested group that has a single `should` clause, so that the datastore can cache it" do
+          query = new_query(
+            client_filter: {"any_of" => [
+              {"name" => {"equal_to_any_of" => ["x"]}},
+              {"name" => {"equal_to_any_of" => ["y"]}}
+            ]},
+            internal_filters: [{"any_of" => [{"name" => {"equal_to_any_of" => ["y"]}}]}]
+          )
+
+          # `(name = x OR name = y) AND name = y`
+          expect(datastore_body_of(query)).to query_datastore_with({bool: {
+            minimum_should_match: 1,
+            should: [
+              {bool: {filter: [{terms: {"name" => ["x"]}}]}},
+              {bool: {filter: [{terms: {"name" => ["y"]}}]}}
+            ],
+            filter: [
+              {bool: {filter: [{terms: {"name" => ["y"]}}]}}
+            ]
+          }})
+        end
+
+        it "ANDs three sibling filters that each produce `should` clauses" do
+          query = new_query(
+            client_filter: {
+              "any_of" => [
+                {"name" => {"equal_to_any_of" => ["x"]}},
+                {"name" => {"equal_to_any_of" => ["y"]}}
+              ],
+              "ages" => {"any_satisfy" => {"any_of" => [{"gt" => 30}, {"lt" => 5}]}}
+            },
+            internal_filters: [{"tags" => {"any_satisfy" => {"any_of" => [{"equal_to_any_of" => ["a"]}, {"equal_to_any_of" => ["b"]}]}}}]
+          )
+
+          # `(name = x OR name = y) AND (age > 30 OR age < 5) AND (tag = a OR tag = b)`
+          expect(datastore_body_of(query)).to query_datastore_with({bool: {
+            minimum_should_match: 1,
+            should: [
+              {bool: {filter: [{terms: {"name" => ["x"]}}]}},
+              {bool: {filter: [{terms: {"name" => ["y"]}}]}}
+            ],
+            filter: [
+              {bool: {minimum_should_match: 1, should: [
+                {bool: {filter: [{range: {"ages" => {gt: 30}}}]}},
+                {bool: {filter: [{range: {"ages" => {lt: 5}}}]}}
+              ]}},
+              {bool: {minimum_should_match: 1, should: [
+                {bool: {filter: [{terms: {"tags" => ["a"]}}]}},
+                {bool: {filter: [{terms: {"tags" => ["b"]}}]}}
+              ]}}
+            ]
+          }})
+        end
+
+        it "produces the same results for the equivalent `all_of` filter" do
           query = new_query(client_filter: {
             "all_of" => [
               {"any_of" => [
