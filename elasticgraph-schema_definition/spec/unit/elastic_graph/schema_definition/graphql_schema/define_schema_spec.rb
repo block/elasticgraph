@@ -93,7 +93,7 @@ module ElasticGraph
           )
         end
 
-        it "produces the same GraphQL output, regardless of the order the types are defined in" do
+        it "produces byte-identical GraphQL output, regardless of the order the types are defined in" do
           object_type_definitions = {
             "Component" => lambda do |t|
               t.field "id", "ID!"
@@ -129,18 +129,24 @@ module ElasticGraph
             %w[WidgetVersion Component Widget]
           ]
 
-          uniq_results_for_each_ordering = all_definition_orderings.map do |type_names_in_order|
-            define_schema do |schema|
+          results_by_definition_order = all_definition_orderings.to_h do |type_names_in_order|
+            result = define_schema do |schema|
               type_names_in_order.each do |type_name|
                 schema.object_type(type_name, &object_type_definitions.fetch(type_name))
               end
             end
-          end.uniq
 
-          expect(uniq_results_for_each_ordering.size).to eq 1
+            [type_names_in_order, result]
+          end
 
-          # Also compare the first and last, so that if there are multiple we get a diff showing how they differ.
-          expect(uniq_results_for_each_ordering.first).to eq uniq_results_for_each_ordering.last
+          reference_order, reference_result = results_by_definition_order.first
+
+          # Compare the raw generated SDL rather than normalizing it through graphql-ruby. Schema definition
+          # order must not affect field order or any other part of the generated schema artifact.
+          results_by_definition_order.drop(1).each do |definition_order, result|
+            expect(result).to eq(reference_result),
+              "Expected definition order #{definition_order.inspect} to match #{reference_order.inspect}"
+          end
         end
 
         it "returns reasonably-sized strings from `#inspect` and `#to_s` for all objects exposed to users so that the exception output if the user misspells a method name is readable" do
