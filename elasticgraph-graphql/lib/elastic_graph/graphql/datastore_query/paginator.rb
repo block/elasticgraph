@@ -6,7 +6,7 @@
 #
 # frozen_string_literal: true
 
-require "elastic_graph/errors"
+require "elastic_graph/graphql/decoded_cursor"
 require "elastic_graph/support/memoizable_data"
 require "graphql"
 
@@ -69,13 +69,13 @@ module ElasticGraph
         # @return [DecodedCursor, nil] the decoded after cursor
         def decoded_after
           return @decoded_after if defined?(@decoded_after)
-          @decoded_after = decode_cursor(after)
+          @decoded_after = DecodedCursor.decode_or_raise_execution_error(after)
         end
 
         # @return [DecodedCursor, nil] the decoded before cursor
         def decoded_before
           return @decoded_before if defined?(@decoded_before)
-          @decoded_before = decode_cursor(before)
+          @decoded_before = DecodedCursor.decode_or_raise_execution_error(before)
         end
 
         def requested_page_size
@@ -152,13 +152,6 @@ module ElasticGraph
         end
 
         private
-
-        def decode_cursor(cursor)
-          return nil if cursor.nil?
-          DecodedCursor.decode!(cursor)
-        rescue Errors::InvalidCursorError => e
-          raise ::GraphQL::ExecutionError, e.message
-        end
 
         def first_n
           @first_n ||= size_arg_value(:first, first)

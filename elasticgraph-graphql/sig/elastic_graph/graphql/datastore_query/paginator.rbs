@@ -42,8 +42,6 @@ module ElasticGraph
 
         private
 
-        def decode_cursor: (::String?) -> DecodedCursor?
-
         @first_n: ::Integer?
         def first_n: () -> ::Integer?
 

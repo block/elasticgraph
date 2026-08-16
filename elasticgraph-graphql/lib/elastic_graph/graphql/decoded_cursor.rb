@@ -10,6 +10,7 @@ require "base64"
 require "elastic_graph/constants"
 require "elastic_graph/errors"
 require "elastic_graph/support/memoizable_data"
+require "graphql"
 require "json"
 
 module ElasticGraph
@@ -50,6 +51,18 @@ module ElasticGraph
         new(::JSON.parse(json))
       rescue ::ArgumentError, ::JSON::ParserError
         raise Errors::InvalidCursorError, "`#{string}` is an invalid cursor."
+      end
+
+      # Decodes the given string cursor, returning `nil` if it is `nil`, and raising a
+      # `GraphQL::ExecutionError` if it is invalid. Use this to decode a cursor that a GraphQL
+      # client provided, so that an invalid cursor produces a clean query error. The `Cursor`
+      # scalar cannot do this validation itself, because the `Cursor` type can be overridden to
+      # `String`, and in that case cursor arguments are not coerced by our `Cursor` scalar.
+      def self.decode_or_raise_execution_error(string)
+        return nil if string.nil?
+        decode!(string)
+      rescue Errors::InvalidCursorError => e
+        raise ::GraphQL::ExecutionError, e.message
       end
 
       # Encodes the cursor to a string using JSON and Base64 encoding.
