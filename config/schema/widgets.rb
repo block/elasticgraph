@@ -279,6 +279,14 @@ ElasticGraph.define_schema do |schema|
       f.sourced_from "widget", "cost"
     end
 
+    # `designer_name` is fed by `ComponentDesign`, a pure-source type, demonstrating that a top-level
+    # `sourced_from` field can be sourced from a type that has no index of its own.
+    t.field "designer_name", "String" do |f|
+      f.sourced_from "design", "designer_name"
+    end
+
+    t.relates_to_one "design", "ComponentDesign", via: "component_id", dir: :in, indexing_only: true
+
     t.relates_to_one "widget", "Widget", via: "component_ids", dir: :in
     t.relates_to_one "dollar_widget", "Widget", via: "component_ids", dir: :in do |rel|
       rel.additional_filter "cost" => {"amount_cents" => {"equal_to_any_of" => [100]}}
@@ -309,6 +317,15 @@ ElasticGraph.define_schema do |schema|
       i.default_sort "created_at", :desc
       i.has_had_multiple_sources!
     end
+  end
+
+  # A pure-source type (no `t.index`): its events only update `Component` documents (via the
+  # `design` relationship backing `Component.designer_name`) and are not written to any index
+  # of their own.
+  schema.object_type "ComponentDesign" do |t|
+    t.field "id", "ID!"
+    t.field "component_id", "ID"
+    t.field "designer_name", "String"
   end
 
   schema.object_type "MechanicalPart" do |t|

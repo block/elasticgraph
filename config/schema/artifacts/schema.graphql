@@ -995,6 +995,7 @@ type Company implements NamedInventor {
 
 type Component implements NamedEntity {
   created_at: DateTime!
+  designer_name: String
   dollar_widget: Widget
   id: ID!
   name: String
@@ -1212,6 +1213,11 @@ type ComponentAggregatedValues {
   created_at: DateTimeAggregatedValues
 
   """
+  Computed aggregate values for the `designer_name` field.
+  """
+  designer_name: NonNumericAggregatedValues
+
+  """
   Computed aggregate values for the `id` field.
   """
   id: NonNumericAggregatedValues
@@ -1413,6 +1419,13 @@ input ComponentFilterInput {
   created_at: DateTimeFilterInput
 
   """
+  Used to filter on the `designer_name` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  designer_name: StringFilterInput
+
+  """
   Used to filter on the `id` field.
 
   When `null` or an empty object is passed, matches all documents.
@@ -1494,6 +1507,11 @@ type ComponentGroupedBy {
   created_at: DateTimeGroupedBy
 
   """
+  The `designer_name` field value for this group.
+  """
+  designer_name: String
+
+  """
   The `name` field value for this group.
   """
   name: String
@@ -1528,6 +1546,11 @@ type ComponentGroupedBy {
 Type used to request desired `Component` search highlight fields.
 """
 type ComponentHighlights {
+  """
+  Search highlights for the `designer_name`, providing snippets of the matching text.
+  """
+  designer_name: [String!]!
+
   """
   Search highlights for the `id`, providing snippets of the matching text.
   """
@@ -1582,6 +1605,16 @@ enum ComponentSortOrderInput {
   Sorts descending by the `created_at` field.
   """
   created_at_DESC
+
+  """
+  Sorts ascending by the `designer_name` field.
+  """
+  designer_name_ASC
+
+  """
+  Sorts descending by the `designer_name` field.
+  """
+  designer_name_DESC
 
   """
   Sorts ascending by the `id` field.
@@ -6402,6 +6435,11 @@ type NamedEntityAggregatedValues {
   created_on: DateAggregatedValues
 
   """
+  Computed aggregate values for the `designer_name` field.
+  """
+  designer_name: NonNumericAggregatedValues
+
+  """
   Computed aggregate values for the `fees` field.
   """
   fees: MoneyAggregatedValues
@@ -6804,6 +6842,13 @@ input NamedEntityFilterInput {
   description: TextFilterInput
 
   """
+  Used to filter on the `designer_name` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  designer_name: StringFilterInput
+
+  """
   Used to filter on the `fees` field.
 
   When `null` or an empty object is passed, matches all documents.
@@ -7085,6 +7130,11 @@ type NamedEntityGroupedBy {
   created_on: DateGroupedBy
 
   """
+  The `designer_name` field value for this group.
+  """
+  designer_name: String
+
+  """
   The `fees` field value for this group.
 
   Note: `fees` is a collection field, but selecting this field will group on
@@ -7279,6 +7329,11 @@ type NamedEntityHighlights {
   Search highlights for the `description`, providing snippets of the matching text.
   """
   description: [String!]!
+
+  """
+  Search highlights for the `designer_name`, providing snippets of the matching text.
+  """
+  designer_name: [String!]!
 
   """
   Search highlights for the `fees`, providing snippets of the matching text.
@@ -7549,6 +7604,16 @@ enum NamedEntitySortOrderInput {
   Sorts descending by the `created_on` field.
   """
   created_on_DESC
+
+  """
+  Sorts ascending by the `designer_name` field.
+  """
+  designer_name_ASC
+
+  """
+  Sorts descending by the `designer_name` field.
+  """
+  designer_name_DESC
 
   """
   Sorts ascending by the `id` field.

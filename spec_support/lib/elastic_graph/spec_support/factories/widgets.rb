@@ -213,6 +213,12 @@ FactoryBot.define do
     end
   end
 
+  factory :component_design, parent: :indexed_type do
+    __typename { "ComponentDesign" }
+    component_id { Faker::Alphanumeric.alpha(number: 20) }
+    designer_name { Faker::Name.name }
+  end
+
   factory :online_store, parent: :indexed_type do
     __typename { "OnlineStore" }
     established_on { Faker::Date.between(from: recent_date - 365, to: recent_date).iso8601 }

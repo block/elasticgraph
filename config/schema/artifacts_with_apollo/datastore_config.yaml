@@ -1610,6 +1610,8 @@ indices:
               type: keyword
             amount_cents:
               type: integer
+        designer_name:
+          type: keyword
         part_ids:
           type: keyword
         owner_ids:

@@ -148,6 +148,50 @@ module ElasticGraph
       )
     end
 
+    it "fills in a top-level sourced field from a pure-source (non-indexed) type, regardless of ingestion order" do
+      design1 = build_upsert_event(:component_design, id: "d1", component_id: "c1", designer_name: "Alice", __version: 1)
+      design2 = build_upsert_event(:component_design, id: "d2", component_id: "c2", designer_name: "Bob", __version: 1)
+      component1 = build_upsert_event(:component, id: "c1", name: "C1", __version: 1)
+      component2 = build_upsert_event(:component, id: "c2", name: "C2", __version: 1)
+
+      # `design1` arrives BEFORE its component exists, materializing an incomplete document containing
+      # just the identity, bookkeeping, and the sourced field.
+      indexer.processor.process([design1], refresh_indices: true)
+
+      expect(component_source("c1")).to eq(
+        "id" => "c1",
+        "__counts" => {},
+        "__sources" => ["design"],
+        "__versions" => {"design" => {"d1" => 1}},
+        "designer_name" => "Alice"
+      )
+
+      indexer.processor.process([component1, component2], refresh_indices: true)
+
+      # `design2` arrives AFTER its component was indexed.
+      indexer.processor.process([design2], refresh_indices: true)
+
+      component1_source = component_source("c1")
+      expect(component1_source).to include("id" => "c1", "name" => "C1", "designer_name" => "Alice")
+      expect(component1_source.fetch("__sources")).to contain_exactly("__self", "design")
+      # Top-level sourced fields record their versions under the bare relationship name (nested ones
+      # use element-qualified keys), and involve none of the nested bookkeeping.
+      expect(component1_source.fetch("__versions")).to eq("__self" => {"c1" => 1}, "design" => {"d1" => 1})
+      expect(component1_source).not_to have_key("__nested_sourced_data")
+
+      component2_source = component_source("c2")
+      expect(component2_source).to include("id" => "c2", "name" => "C2", "designer_name" => "Bob")
+      expect(component2_source.fetch("__sources")).to contain_exactly("__self", "design")
+      expect(component2_source.fetch("__versions")).to eq("__self" => {"c2" => 1}, "design" => {"d2" => 1})
+
+      # `ComponentDesign` is pure-source (non-indexed), so its events update component documents only--
+      # no standalone design documents get written.
+      design_hits = main_datastore_client
+        .msearch(body: [{index: "component_designs*"}, {query: {match_all: {}}}])
+        .dig("responses", 0, "hits", "hits")
+      expect(design_hits).to eq []
+    end
+
     it "is compatible with custom shard routing and rollover indices, so long as `equivalent_field` is used on the schema definition" do
       # Use timestamps with explicit 3-digit millisecond precision to match what the indexer normalizes to
       timestamp_in_2023 = "2023-08-09T10:12:14.000Z"
@@ -168,6 +212,12 @@ module ElasticGraph
         "workspace_id2" => "wid_23",
         "workspace_name" => "Garage" # the sourced_from field copied from the `WidgetWorkspace`
       })
+    end
+
+    def component_source(id)
+      main_datastore_client
+        .msearch(body: [{index: "components*"}, {query: {ids: {values: [id]}}}])
+        .dig("responses", 0, "hits", "hits", 0, "_source")
     end
 
     def search_components
