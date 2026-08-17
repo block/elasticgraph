@@ -43,8 +43,8 @@ RSpec::Matchers.define :take_less_than do |max_expected_duration|
   end
 
   failure_message do
-    # :nocov: -- only executed when a `take_less_than` expectation fails.
+    # simplecov:disable -- only executed when a `take_less_than` expectation fails.
     "expected block to #{description}, but took #{@actual_duration} milliseconds"
-    # :nocov:
+    # simplecov:enable
   end
 end

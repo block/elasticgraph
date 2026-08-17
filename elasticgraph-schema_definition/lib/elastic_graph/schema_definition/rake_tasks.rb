@@ -149,9 +149,9 @@ module ElasticGraph
       def schema_artifact_manager
         require "elastic_graph/schema_definition/api"
 
-        # :nocov: -- tests don't cover the `VERBOSE` side
+        # simplecov:disable -- tests don't cover the `VERBOSE` side
         max_diff_lines = ENV["VERBOSE"] ? 999999999 : 50
-        # :nocov:
+        # simplecov:enable
 
         schema_def_api.factory.new_schema_artifact_manager(
           schema_definition_results: schema_def_api.results,

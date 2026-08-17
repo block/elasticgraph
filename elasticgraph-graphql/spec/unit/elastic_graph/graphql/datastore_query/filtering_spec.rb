@@ -2166,7 +2166,7 @@ module ElasticGraph
           expect(datastore_body[:query]).to eq(expected_query)
         end
 
-        # :nocov: -- only covered when an expectation fails
+        # simplecov:disable -- only covered when an expectation fails
         def expected_json
           @expected_json ||= ::JSON.pretty_generate(normalize(@expected_query))
         end
@@ -2219,7 +2219,7 @@ module ElasticGraph
             value
           end
         end
-        # :nocov:
+        # simplecov:enable
       end
     end
   end

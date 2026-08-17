@@ -117,9 +117,9 @@ module ElasticGraph
 
         def missing_necessary_field_error_for(field, json_schema_versions)
           path = field.fully_qualified_path.split(".").last
-          # :nocov: -- we only cover one side of this ternary.
+          # simplecov:disable -- we only cover one side of this ternary.
           has_or_have = (json_schema_versions.size == 1) ? "has" : "have"
-          # :nocov:
+          # simplecov:enable
 
           <<~EOS
             #{describe_json_schema_versions(json_schema_versions, "and")} #{has_or_have} no field that maps to the #{field.field_type} field path of `#{field.fully_qualified_path}`.

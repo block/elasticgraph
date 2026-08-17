@@ -27,9 +27,9 @@ module ElasticGraph
           if @attributes_needing_merge_test_coverage.include?(attribute)
             @attributes_covered << attribute
           else
-            # :nocov: -- only executed when a test has a typo in its `covers:` metadata
+            # simplecov:disable -- only executed when a test has a typo in its `covers:` metadata
             raise "Attribute `#{attribute}` (from `covers: :#{attribute}`) does not appear to need coverage. Did you misspell it?"
-            # :nocov:
+            # simplecov:enable
           end
         end
       end

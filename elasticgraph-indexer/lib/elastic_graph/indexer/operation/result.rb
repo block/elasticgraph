@@ -52,9 +52,9 @@ module ElasticGraph
         end
 
         def summary
-          # :nocov: -- `description == nil` case is not covered; not simple to test.
+          # simplecov:disable -- `description == nil` case is not covered; not simple to test.
           suffix = description ? "--#{description}" : nil
-          # :nocov:
+          # simplecov:enable
           "<#{operation.description} #{event_id} #{category}#{suffix}>"
         end
 

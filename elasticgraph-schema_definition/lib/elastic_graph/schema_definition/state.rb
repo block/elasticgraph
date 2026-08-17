@@ -189,9 +189,9 @@ module ElasticGraph
         sub_aggregation_paths_by_type.fetch(type) do
           SchemaElements::SubAggregationPath.paths_for(type, schema_def_state: self).uniq.tap do |paths|
             # Cache our results if the user has finished their schema definition. Otherwise, it's not safe to cache.
-            # :nocov: -- we never execute this with `user_definition_complete == false`
+            # simplecov:disable -- we never execute this with `user_definition_complete == false`
             sub_aggregation_paths_by_type[type] = paths if user_definition_complete
-            # :nocov:
+            # simplecov:enable
           end
         end
       end

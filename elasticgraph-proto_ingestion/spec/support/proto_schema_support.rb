@@ -45,10 +45,10 @@ module ElasticGraph
         start_indices = lines.each_index.select { |index| definition_start.match?(lines.fetch(index)) }
 
         if start_indices.size >= 2
-          # :nocov: -- only executed when a mistake has been made; causes a failing test.
+          # simplecov:disable -- only executed when a mistake has been made; causes a failing test.
           raise Errors::SchemaError,
             "Expected to find 0 or 1 proto type definition for #{type}, but found #{start_indices.size}."
-          # :nocov:
+          # simplecov:enable
         end
 
         definition_start_index = start_indices.first

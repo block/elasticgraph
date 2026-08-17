@@ -71,9 +71,9 @@ RSpec.shared_examples "an ElasticGraph project" do |repo_root: Dir.pwd, settings
               # is probably never appropriate.
               index_def_names_without_number_of_shards =
                 comp.datastore_core.index_definitions_by_name.values.filter_map do |index_def|
-                  # :nocov: -- currently not executed during this gem's own test suite run
+                  # simplecov:disable -- currently not executed during this gem's own test suite run
                   index_def.name unless index_def.env_index_config.setting_overrides.key?("number_of_shards")
-                  # :nocov:
+                  # simplecov:enable
                 end
               expect(index_def_names_without_number_of_shards).to be_empty,
                 "Expected all index definitions to configure the `number_of_shards` in #{file_name}, but the following did not:\n" \

@@ -436,7 +436,7 @@ module ElasticGraph
           search_body = ::JSON.parse(body_line)
           if search_body.key?("aggs")
             problems = []
-            # :nocov: -- the branches below are only fully covered when we have a regression.
+            # simplecov:disable -- the branches below are only fully covered when we have a regression.
             problems << "Search body has `size: #{search_body["size"]}` but it should be `size: 0`." unless search_body["size"] == 0
             problems << "Search body has `sort` but it is not needed." if search_body.key?("sort")
             problems << "Search body has `_source:  #{search_body["_source"]}` but it should be `_source: false`." unless search_body["_source"] == false
@@ -446,7 +446,7 @@ module ElasticGraph
                 "#{problems.map { |prob| " - #{prob} " }.join("\n")}\n\n" \
                 "[1] #{::JSON.pretty_generate(search_body)}"
             end
-            # :nocov:
+            # simplecov:enable
           end
         end
       end

@@ -43,9 +43,9 @@ module ElasticGraph
           alias_method :put_index_template_definition_url, :put_index_definition_url
 
           def make_datastore_calls_to_configure_index_def(index_name, subresource = nil)
-            # :nocov: -- when we are building against OpenSearch, one side of this conditional is not covered
+            # simplecov:disable -- when we are building against OpenSearch, one side of this conditional is not covered
             subresource = :mapping if subresource == :mappings && datastore_backend == :elasticsearch
-            # :nocov:
+            # simplecov:enable
 
             path_for_now_index = "/#{concrete_index_name_for_now(index_name)}"
             path_for_now_index += "/_#{subresource}" if subresource

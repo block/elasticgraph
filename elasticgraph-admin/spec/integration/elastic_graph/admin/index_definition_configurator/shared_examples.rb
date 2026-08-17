@@ -20,9 +20,9 @@ module ElasticGraph
 
         def put_index_definition_url(index_definition_name, subresource = nil)
           url = "/#{index_definition_name}"
-          # :nocov: -- when we are building against OpenSearch, one side of this conditional is not covered
+          # simplecov:disable -- when we are building against OpenSearch, one side of this conditional is not covered
           subresource = :mapping if subresource == :mappings && datastore_backend == :elasticsearch
-          # :nocov:
+          # simplecov:enable
           subresource ? "#{url}/_#{subresource}" : url
         end
 

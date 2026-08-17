@@ -51,9 +51,9 @@ module ElasticGraph
           values_by_name = {}
           super(schema_def_state, schema_def_state.type_ref(name).to_final_form, true, values_by_name)
 
-          # :nocov: -- currently all invocations have a block
+          # simplecov:disable -- currently all invocations have a block
           yield self if block_given?
-          # :nocov:
+          # simplecov:enable
         end
 
         # @return [String] name of the enum type

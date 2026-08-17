@@ -67,9 +67,9 @@ module ElasticGraph
           when Array
             args_value.map { |arg_value| to_schema_form(arg_value, args_owner) }
           else
-            # :nocov: -- not sure how to cover this but we want this default branch.
+            # simplecov:disable -- not sure how to cover this but we want this default branch.
             args_value
-            # :nocov:
+            # simplecov:enable
           end
         end
       end

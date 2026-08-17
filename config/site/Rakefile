@@ -579,7 +579,7 @@ module ElasticGraph
 
           Every executable line in example Ruby files must be executed during
           validation. If a line intentionally can't be covered, mark it with
-          `# :nocov:` (same syntax as SimpleCov).
+          `# simplecov:disable` / `# simplecov:enable` (same syntax as SimpleCov).
         EOS
       end
     end
