@@ -27,6 +27,7 @@ json_schema_version: 1
         - CoachProfile
         - Company
         - Component
+        - ComponentDesign
         - DirectWholesaler
         - ElectricalPart
         - GeneralManagerProfile
@@ -422,6 +423,42 @@ json_schema_version: 1
     - part_ids
     - owner_ids
     - owner_id
+  ComponentDesign:
+    type: object
+    properties:
+      id:
+        allOf:
+        - "$ref": "#/$defs/ID"
+        - maxLength: 8191
+        ElasticGraph:
+          type: ID!
+          nameInIndex: id
+      component_id:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/ID"
+          - maxLength: 8191
+        - type: 'null'
+        ElasticGraph:
+          type: ID
+          nameInIndex: component_id
+      designer_name:
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/String"
+          - maxLength: 8191
+        - type: 'null'
+        ElasticGraph:
+          type: String
+          nameInIndex: designer_name
+      __typename:
+        type: string
+        const: ComponentDesign
+        default: ComponentDesign
+    required:
+    - id
+    - component_id
+    - designer_name
   Date:
     type: string
     format: date

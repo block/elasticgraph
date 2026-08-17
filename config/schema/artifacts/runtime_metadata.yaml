@@ -31,6 +31,14 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: created_at
+      designer_name_ASC:
+        sort_field:
+          direction: asc
+          field_path: designer_name
+      designer_name_DESC:
+        sort_field:
+          direction: desc
+          field_path: designer_name
       id_ASC:
         sort_field:
           direction: asc
@@ -515,6 +523,14 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: created_on
+      designer_name_ASC:
+        sort_field:
+          direction: asc
+          field_path: designer_name
+      designer_name_DESC:
+        sort_field:
+          direction: desc
+          field_path: designer_name
       id_ASC:
         sort_field:
           direction: asc
@@ -1860,6 +1876,7 @@ index_definitions_by_name:
   components:
     current_sources:
     - __self
+    - design
     - widget
     default_sort_fields:
     - direction: desc
@@ -1875,6 +1892,8 @@ index_definitions_by_name:
         source: widget
       created_at:
         source: __self
+      designer_name:
+        source: design
       id:
         source: __self
       name:
@@ -3467,6 +3486,9 @@ object_types_by_name:
       created_at:
         resolver:
           name: get_record_field_value
+      designer_name:
+        resolver:
+          name: get_record_field_value
       dollar_widget:
         relation:
           additional_filter:
@@ -3575,6 +3597,9 @@ object_types_by_name:
       created_at:
         resolver:
           name: object_with_lookahead
+      designer_name:
+        resolver:
+          name: object_with_lookahead
       id:
         resolver:
           name: object_with_lookahead
@@ -3652,6 +3677,36 @@ object_types_by_name:
       total_edge_count:
         resolver:
           name: object_without_lookahead
+  ComponentDesign:
+    graphql_fields_by_name:
+      component_id:
+        resolver:
+          name: get_record_field_value
+      designer_name:
+        resolver:
+          name: get_record_field_value
+      id:
+        resolver:
+          name: get_record_field_value
+    update_targets:
+    - id_source: component_id
+      metadata_params:
+        relationship:
+          value: design
+        sourceId:
+          cardinality: one
+          source_path: id
+        sourceType:
+          cardinality: one
+          source_path: type
+        version:
+          cardinality: one
+      relationship: design
+      script_id: update_index_data_27fac9da6430f05440528c771880c7e6
+      top_level_fields_params:
+        designer_name:
+          cardinality: one
+      type: Component
   ComponentEdge:
     elasticgraph_category: relay_edge
     graphql_fields_by_name:
@@ -3676,6 +3731,9 @@ object_types_by_name:
       created_at:
         resolver:
           name: object_with_lookahead
+      designer_name:
+        resolver:
+          name: object_with_lookahead
       name:
         resolver:
           name: object_with_lookahead
@@ -3697,6 +3755,9 @@ object_types_by_name:
           name: object_with_lookahead
   ComponentHighlights:
     graphql_fields_by_name:
+      designer_name:
+        resolver:
+          name: get_record_field_value
       id:
         resolver:
           name: get_record_field_value
@@ -4952,6 +5013,9 @@ object_types_by_name:
       description:
         resolver:
           name: get_record_field_value
+      designer_name:
+        resolver:
+          name: get_record_field_value
       dollar_widget:
         relation:
           additional_filter:
@@ -5146,6 +5210,9 @@ object_types_by_name:
         resolver:
           name: object_with_lookahead
       created_on:
+        resolver:
+          name: object_with_lookahead
+      designer_name:
         resolver:
           name: object_with_lookahead
       fees:
@@ -5359,6 +5426,9 @@ object_types_by_name:
       created_on:
         resolver:
           name: object_with_lookahead
+      designer_name:
+        resolver:
+          name: object_with_lookahead
       fees:
         resolver:
           name: object_with_lookahead
@@ -5465,6 +5535,9 @@ object_types_by_name:
         resolver:
           name: get_record_field_value
       description:
+        resolver:
+          name: get_record_field_value
+      designer_name:
         resolver:
           name: get_record_field_value
       fees:

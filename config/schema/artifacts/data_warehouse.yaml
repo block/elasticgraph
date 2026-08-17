@@ -27,6 +27,7 @@ tables:
         widget_workspace_id3 STRING,
         widget_size STRING,
         widget_cost STRUCT<currency STRING, amount_cents INT>,
+        designer_name STRING,
         part_ids ARRAY<STRING>,
         owner_ids ARRAY<STRING>,
         owner_id STRING
