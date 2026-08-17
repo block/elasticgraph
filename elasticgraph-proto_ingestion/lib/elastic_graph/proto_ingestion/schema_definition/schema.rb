@@ -7,22 +7,33 @@
 # frozen_string_literal: true
 
 require "elastic_graph/errors"
+require "elastic_graph/proto_ingestion/schema_definition/field_number_mappings"
 require "elastic_graph/proto_ingestion/schema_definition/schema_elements/enum_type_extension"
 require "elastic_graph/proto_ingestion/schema_definition/schema_elements/object_interface_and_union_extension"
 require "elastic_graph/proto_ingestion/schema_definition/schema_elements/scalar_type_extension"
+require "forwardable"
 
 module ElasticGraph
   module ProtoIngestion
     module SchemaDefinition
       # Builds a `proto3` schema string from an ElasticGraph schema definition.
       class Schema
+        extend Forwardable
+
         # @param state [ElasticGraph::SchemaDefinition::State]
         # @param all_types [Array<ElasticGraph::SchemaDefinition::SchemaElements::graphQLType>]
         # @param package_name [String]
-        def initialize(state:, all_types:, package_name:)
+        # @param proto_field_number_mappings [Hash, nil] mappings in the `proto_field_numbers.yaml` artifact format
+        def initialize(
+          state:,
+          all_types:,
+          package_name:,
+          proto_field_number_mappings: {}
+        )
           @state = state
           @all_types = all_types
           @package_name = package_name
+          @field_number_mappings = FieldNumberMappings.from_parsed_yaml(proto_field_number_mappings)
         end
 
         # Renders the schema as a valid `proto3` file.
@@ -42,6 +53,33 @@ module ElasticGraph
 
           sections.join("\n\n") + "\n"
         end
+
+        # Exposes the field-number and enum-value-number mappings for writing to artifact YAML.
+        #
+        # @return [Hash<String, Object>]
+        def field_number_mappings_for_artifact
+          @field_number_mappings.to_dumpable_hash
+        end
+
+        # Returns the stable protobuf number for a message field.
+        #
+        # @api private
+        def field_number_for(message_name:, type_name:, public_field_name:)
+          @field_number_mappings.field_number_for(
+            message_name: message_name,
+            public_field_name: public_field_name,
+            previous_field_names: previous_field_names_for(type_name, public_field_name)
+          )
+        end
+
+        # @dynamic next_field_number_for, reserved_field_numbers_for, enum_value_numbers_for
+        # @dynamic next_enum_value_number_for, reserved_enum_value_numbers_for
+        def_delegators :@field_number_mappings,
+          :next_field_number_for,
+          :reserved_field_numbers_for,
+          :enum_value_numbers_for,
+          :next_enum_value_number_for,
+          :reserved_enum_value_numbers_for
 
         private
 
@@ -65,7 +103,7 @@ module ElasticGraph
         def render_definitions(types)
           types
             .sort_by(&:proto_name)
-            .filter_map { |type| type.to_proto(@package_name) }
+            .filter_map { |type| type.to_proto(self, @package_name) }
             .join("\n\n")
         end
 
@@ -79,6 +117,20 @@ module ElasticGraph
             end
 
             enum_type_by_prefix[type.proto_enum_value_prefix] = type
+          end
+        end
+
+        def previous_field_names_for(type_name, public_field_name)
+          previous_field_names_by_type_name_and_field_name.dig(type_name, public_field_name) || []
+        end
+
+        # Inverts the state's `old_field_name => renamed_field` index into the form we need here:
+        # the old public names a field's current public name was renamed from.
+        def previous_field_names_by_type_name_and_field_name
+          @previous_field_names_by_type_name_and_field_name ||= @state.renamed_fields_by_type_name_and_old_field_name.transform_values do |old_to_new|
+            old_to_new
+              .group_by { |_, renamed_field| renamed_field.name }
+              .transform_values { |renames| renames.map(&:first) }
           end
         end
       end

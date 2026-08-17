@@ -5,6 +5,7 @@ module ElasticGraph
         schema_element_name_form: SchemaArtifacts::RuntimeMetadata::SchemaElementNames::form,
         ?schema_element_name_overrides: ::Hash[::Symbol, ::String],
         ?index_document_sizes: bool,
+        ?path_to_schema: ::String?,
         ?extension_modules: ::Array[::Module],
         ?derived_type_name_formats: ::Hash[::Symbol, ::String],
         ?type_name_overrides: ::Hash[::Symbol, ::String],
@@ -15,6 +16,7 @@ module ElasticGraph
       def define_schema_with_schema_elements: (
         SchemaArtifacts::RuntimeMetadata::SchemaElementNames,
         ?index_document_sizes: bool,
+        ?path_to_schema: ::String?,
         ?extension_modules: ::Array[::Module],
         ?derived_type_name_formats: ::Hash[::Symbol, ::String],
         ?type_name_overrides: ::Hash[::Symbol, ::String],

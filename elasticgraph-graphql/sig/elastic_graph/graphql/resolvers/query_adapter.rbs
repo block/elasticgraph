@@ -14,7 +14,7 @@ module ElasticGraph
           field: Schema::Field,
           args: ::Hash[::String, untyped],
           lookahead: ::GraphQL::Execution::Lookahead,
-          context: ::GraphQL::Query::Context
+          context: QueryContext
         ) -> DatastoreQuery
 
         private
@@ -29,8 +29,8 @@ module ElasticGraph
           Schema::Field,
           ::Hash[::String, untyped],
           ::GraphQL::Execution::Lookahead,
-          ::GraphQL::Query::Context,
-          ::Integer
+          QueryContext,
+          ::Integer?
         ) -> DatastoreQuery
       end
     end

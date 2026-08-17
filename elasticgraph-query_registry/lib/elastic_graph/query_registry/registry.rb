@@ -59,7 +59,7 @@ module ElasticGraph
       # This is also tolerant of some minimal differences in the query string (such as comments
       # and whitespace). If the query differs in a significant way from a registered query, it
       # will not be recognized as registered.
-      def build_and_validate_query(query_string, client:, variables: {}, operation_name: nil, context: {})
+      def build_and_validate_query(query_string, client:, variables: {}, operation_name: nil, context: {}, monotonic_clock_deadline: nil, http_request: nil)
         validator =
           if @registered_client_validator.applies_to?(client)
             @registered_client_validator
@@ -67,13 +67,27 @@ module ElasticGraph
             @unregistered_client_validator
           end
 
-        validator.build_and_validate_query(query_string, client: client, variables: variables, operation_name: operation_name, context: context) do
-          @schema.new_graphql_query(
+        validator.build_and_validate_query(
+          query_string,
+          client: client,
+          variables: variables,
+          operation_name: operation_name,
+          context: context,
+          monotonic_clock_deadline: monotonic_clock_deadline,
+          http_request: http_request
+        ) do
+          query = @schema.new_graphql_query(
             query_string,
             variables: variables,
             operation_name: operation_name,
             context: context
           )
+          query.context.register_elastic_graph_values(
+            monotonic_clock_deadline: monotonic_clock_deadline,
+            elastic_graph_client: client,
+            http_request: http_request
+          )
+          query
         end
       end
 

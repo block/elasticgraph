@@ -10,15 +10,15 @@ module ElasticGraph
 
         def self.execute_many: (
           ::Array[DatastoreQuery],
-          for_context: ::GraphQL::Query::Context
+          for_context: QueryContext
         ) -> ::Hash[DatastoreQuery, DatastoreResponse::SearchResponse]
 
         def self.execute_one: (
           DatastoreQuery,
-          for_context: ::GraphQL::Query::Context
+          for_context: QueryContext
         ) -> DatastoreResponse::SearchResponse
 
-        def self.datastore_opaque_id_parts_for: (::GraphQL::Query::Context) -> ::Array[::String]
+        def self.datastore_opaque_id_parts_for: (QueryContext) -> ::Array[::String]
       end
     end
   end

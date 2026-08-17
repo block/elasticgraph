@@ -732,7 +732,7 @@ module ElasticGraph
               )
             end
 
-            it "raises an error if the related type exists but is a non-indexed object type, regardless of whether there are any `sourced_from` fields or not" do
+            it "raises an error if the related type exists but is a non-indexed object type on a GraphQL-exposed relationship, regardless of whether there are any `sourced_from` fields or not" do
               expect {
                 update_targets_for("Widget", index_widget_workspaces: false) do |t|
                   t.relates_to_one "workspace", "WidgetWorkspace", via: "widget_ids", dir: :in
@@ -746,7 +746,7 @@ module ElasticGraph
                   end
                 end
               }.to raise_error_about_workspace_relationship(
-                "references a type which is not a root document type: `WidgetWorkspace`. Only root document types can be used in relations."
+                "references a type which is not a root document type: `WidgetWorkspace`. Only root document types can be used in relations exposed to GraphQL."
               )
 
               expect {
@@ -755,8 +755,46 @@ module ElasticGraph
                   expect(t.fields_with_sources).to be_empty
                 end
               }.to raise_error_about_workspace_relationship(
-                "references a type which is not a root document type: `WidgetWorkspace`. Only root document types can be used in relations.",
+                "references a type which is not a root document type: `WidgetWorkspace`. Only root document types can be used in relations exposed to GraphQL.",
                 sourced_fields: false
+              )
+            end
+
+            it "allows an `indexing_only: true` relationship to reference a non-indexed object type, so `sourced_from` source types need not be indexed" do
+              update_targets = update_targets_for("WidgetWorkspace", index_widget_workspaces: false) do |t|
+                t.relates_to_one "workspace", "WidgetWorkspace", via: "widget_ids", dir: :in, indexing_only: true
+
+                t.field "workspace_name", "String" do |f|
+                  f.sourced_from "workspace", "name"
+                end
+              end
+
+              expect_widget_update_target_with(
+                update_targets,
+                id_source: "widget_ids",
+                routing_value_source: nil,
+                relationship: "workspace",
+                top_level_fields_params: {
+                  "workspace_name" => dynamic_param_with(source_path: "name", cardinality: :one)
+                }
+              )
+            end
+
+            it "raises an error if a non-indexed related type lacks an `id` field, since relationships join on `id` and non-indexed types skip the `id` validation `t.index` performs" do
+              expect {
+                update_targets_for("Widget", index_widget_workspaces: false, define_widget_workspace_id: false) do |t|
+                  t.relates_to_one "workspace", "WidgetWorkspace", via: "widget_ids", dir: :in, indexing_only: true
+
+                  t.field "workspace_name", "String" do |f|
+                    f.sourced_from "workspace", "name"
+                  end
+
+                  t.field "workspace_created_at", "DateTime" do |f|
+                    f.sourced_from "workspace", "created_at"
+                  end
+                end
+              }.to raise_error_about_workspace_relationship(
+                "references `WidgetWorkspace`, which lacks an `id` field. Related types must define an `id` field since relationships join on it."
               )
             end
 
@@ -2039,6 +2077,7 @@ module ElasticGraph
           on_widgets_index: nil,
           on_widget_workspace_type: nil,
           index_widget_workspaces: true,
+          define_widget_workspace_id: true,
           type_name_overrides: {},
           &define_relation_and_sourced_from_fields
         )
@@ -2086,7 +2125,7 @@ module ElasticGraph
             end
 
             s.object_type "WidgetWorkspace" do |t|
-              t.field "id", "ID!"
+              t.field "id", "ID!" if define_widget_workspace_id
               t.field "workspace_owner_id", "ID!"
               t.field "name", widget_workspace_name, **widget_workspace_name_opts
               t.field "created_at", widget_workspace_created_at

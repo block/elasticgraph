@@ -6,7 +6,6 @@
 #
 # frozen_string_literal: true
 
-require "elastic_graph/graphql/query_details_tracker"
 require "elastic_graph/graphql/client"
 require "elastic_graph/graphql/resolvers/nested_relationships_source"
 require "graphql"
@@ -217,17 +216,12 @@ module ElasticGraph
           )
 
           ::GraphQL::Dataloader.with_dataloading do |dataloader|
-            context = ::GraphQL::Query::Context.new(
+            context = graphql.schema.graphql_schema.context_class.new(
               query: instance_double(::GraphQL::Query, fingerprint: "NestedRelationshipsSource/test"),
               schema: graphql.schema.graphql_schema,
-              values: {
-                elastic_graph_schema: graphql.schema,
-                dataloader: dataloader,
-                datastore_search_router: graphql.datastore_search_router,
-                elastic_graph_query_tracker: QueryDetailsTracker.empty,
-                elastic_graph_client: Client::ANONYMOUS
-              }
+              values: {dataloader: dataloader}
             )
+            context.register_elastic_graph_values
 
             dataloader.with(NestedRelationshipsSource, query:, join:, context:, monotonic_clock:).load_all(value_sets.map(&:to_set))
           end

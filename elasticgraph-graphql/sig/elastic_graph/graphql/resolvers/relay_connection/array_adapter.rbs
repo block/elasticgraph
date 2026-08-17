@@ -11,7 +11,7 @@ module ElasticGraph
 
           def initialize: (Schema, ::GraphQL::Pagination::ArrayConnection[N], ::Integer) -> void
 
-          def self.build: [N] (::Array[N], ::Hash[::String, untyped], ::GraphQL::Query::Context) -> ArrayAdapter[N]
+          def self.build: [N] (::Array[N], ::Hash[::String, untyped], QueryContext) -> ArrayAdapter[N]
 
           @edges: ::Array[_RelayEdge[N]]?
           @nodes: ::Array[N]?

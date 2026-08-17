@@ -15,6 +15,7 @@ module ElasticGraph
         ?timeout_in_ms: ::Integer?,
         ?operation_name: ::String?,
         ?context: ::Hash[::Symbol, untyped],
+        ?http_request: HTTPRequest?,
         ?start_time_in_ms: ::Integer
       ) -> ::GraphQL::Query::Result
 
@@ -32,7 +33,9 @@ module ElasticGraph
         variables: ::Hash[::String, untyped],
         operation_name: ::String?,
         context: ::Hash[::Symbol, untyped],
-        client: Client
+        client: Client,
+        monotonic_clock_deadline: ::Integer?,
+        http_request: HTTPRequest?
       ) -> [::GraphQL::Query, ::GraphQL::Query::Result]
 
       def execute_query: (::GraphQL::Query, client: Client) -> ::GraphQL::Query::Result

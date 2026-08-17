@@ -8,14 +8,14 @@ module ElasticGraph
         def initialize: (
           query: DatastoreQuery,
           join: Schema::RelationJoin,
-          context: ::GraphQL::Query::Context,
+          context: QueryContext,
           monotonic_clock: Support::MonotonicClock
         ) -> void
 
         @query: DatastoreQuery
         @join: Schema::RelationJoin
         @filter_id_field_name_path: ::Array[::String]
-        @context: ::GraphQL::Query::Context
+        @context: QueryContext
         @schema_element_names: SchemaArtifacts::RuntimeMetadata::SchemaElementNames
         @logger: ::Logger
         @monotonic_clock: Support::MonotonicClock
@@ -26,7 +26,7 @@ module ElasticGraph
           ::Set[::String],
           query: DatastoreQuery,
           join: Schema::RelationJoin,
-          context: ::GraphQL::Query::Context,
+          context: QueryContext,
           monotonic_clock: Support::MonotonicClock
         ) -> DatastoreResponse::SearchResponse
 

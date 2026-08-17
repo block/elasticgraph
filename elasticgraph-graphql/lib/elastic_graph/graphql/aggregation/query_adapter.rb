@@ -43,7 +43,7 @@ module ElasticGraph
           def call(query:, lookahead:, args:, field:, context:)
             return query unless field.type.unwrap_fully.indexed_aggregation?
 
-            @build_adapter.call(context.fetch(:elastic_graph_schema)).call(
+            @build_adapter.call(context.elastic_graph_schema).call(
               query: query,
               lookahead: lookahead,
               args: args,

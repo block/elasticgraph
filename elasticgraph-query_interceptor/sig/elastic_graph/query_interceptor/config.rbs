@@ -47,7 +47,7 @@ module ElasticGraph
         field: GraphQL::Schema::Field,
         args: ::Hash[::String, untyped],
         http_request: GraphQL::HTTPRequest,
-        context: ::GraphQL::Query::Context
+        context: GraphQL::QueryContext
       ) -> GraphQL::DatastoreQuery
     end
   end

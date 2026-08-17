@@ -20,7 +20,7 @@ module ElasticGraph
         def self.maybe_wrap(search_response, field:, context:, lookahead:, query:)
           return search_response unless field.type.relay_connection?
 
-          schema = context.fetch(:elastic_graph_schema)
+          schema = context.elastic_graph_schema
 
           unless field.type.unwrap_fully.indexed_aggregation?
             return SearchResponseAdapterBuilder.build_from(
