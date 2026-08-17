@@ -21,56 +21,6 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: timestamps.created_at
-  CoachProfileSortOrderInput:
-    values_by_name:
-      annual_salary_ASC:
-        sort_field:
-          direction: asc
-          field_path: annual_salary
-      annual_salary_DESC:
-        sort_field:
-          direction: desc
-          field_path: annual_salary
-      coach_id_ASC:
-        sort_field:
-          direction: asc
-          field_path: coach_id
-      coach_id_DESC:
-        sort_field:
-          direction: desc
-          field_path: coach_id
-      id_ASC:
-        sort_field:
-          direction: asc
-          field_path: id
-      id_DESC:
-        sort_field:
-          direction: desc
-          field_path: id
-      team_formed_on_ASC:
-        sort_field:
-          direction: asc
-          field_path: team_formed_on
-      team_formed_on_DESC:
-        sort_field:
-          direction: desc
-          field_path: team_formed_on
-      team_id_ASC:
-        sort_field:
-          direction: asc
-          field_path: team_id
-      team_id_DESC:
-        sort_field:
-          direction: desc
-          field_path: team_id
-      team_league_ASC:
-        sort_field:
-          direction: asc
-          field_path: team_league
-      team_league_DESC:
-        sort_field:
-          direction: desc
-          field_path: team_league
   ComponentSortOrderInput:
     values_by_name:
       created_at_ASC:
@@ -285,48 +235,6 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: voltage
-  GeneralManagerProfileSortOrderInput:
-    values_by_name:
-      annual_salary_ASC:
-        sort_field:
-          direction: asc
-          field_path: annual_salary
-      annual_salary_DESC:
-        sort_field:
-          direction: desc
-          field_path: annual_salary
-      id_ASC:
-        sort_field:
-          direction: asc
-          field_path: id
-      id_DESC:
-        sort_field:
-          direction: desc
-          field_path: id
-      team_formed_on_ASC:
-        sort_field:
-          direction: asc
-          field_path: team_formed_on
-      team_formed_on_DESC:
-        sort_field:
-          direction: desc
-          field_path: team_formed_on
-      team_id_ASC:
-        sort_field:
-          direction: asc
-          field_path: team_id
-      team_id_DESC:
-        sort_field:
-          direction: desc
-          field_path: team_id
-      team_league_ASC:
-        sort_field:
-          direction: asc
-          field_path: team_league
-      team_league_DESC:
-        sort_field:
-          direction: desc
-          field_path: team_league
   InventorSortOrderInput:
     values_by_name:
       id_ASC:
@@ -1949,23 +1857,6 @@ index_definitions_by_name:
       timestamps.created_at:
         source: __self
     route_with: id
-  coach_profiles:
-    current_sources:
-    - __self
-    fields_by_path:
-      annual_salary:
-        source: __self
-      coach_id:
-        source: __self
-      id:
-        source: __self
-      team_formed_on:
-        source: __self
-      team_id:
-        source: __self
-      team_league:
-        source: __self
-    route_with: id
   components:
     current_sources:
     - __self
@@ -2043,21 +1934,6 @@ index_definitions_by_name:
       name:
         source: __self
       voltage:
-        source: __self
-    route_with: id
-  general_manager_profiles:
-    current_sources:
-    - __self
-    fields_by_path:
-      annual_salary:
-        source: __self
-      id:
-        source: __self
-      team_formed_on:
-        source: __self
-      team_id:
-        source: __self
-      team_league:
         source: __self
     route_with: id
   manufacturers:
@@ -3519,36 +3395,7 @@ object_types_by_name:
       team_league:
         resolver:
           name: get_record_field_value
-    index_definition_names:
-    - coach_profiles
     update_targets:
-    - id_source: id
-      metadata_params:
-        relationship:
-          value: __self
-        sourceId:
-          cardinality: one
-          source_path: id
-        sourceType:
-          cardinality: one
-          source_path: type
-        version:
-          cardinality: one
-      relationship: __self
-      routing_value_source: id
-      script_id: update_index_data_27fac9da6430f05440528c771880c7e6
-      top_level_fields_params:
-        annual_salary:
-          cardinality: one
-        coach_id:
-          cardinality: one
-        team_formed_on:
-          cardinality: one
-        team_id:
-          cardinality: one
-        team_league:
-          cardinality: one
-      type: CoachProfile
     - id_source: team_id
       metadata_params:
         relationship:
@@ -3574,121 +3421,6 @@ object_types_by_name:
           coach_id:
             cardinality: one
       type: Team
-  CoachProfileAggregatedValues:
-    graphql_fields_by_name:
-      annual_salary:
-        resolver:
-          name: object_with_lookahead
-      coach_id:
-        resolver:
-          name: object_with_lookahead
-      id:
-        resolver:
-          name: object_with_lookahead
-      team_formed_on:
-        resolver:
-          name: object_with_lookahead
-      team_id:
-        resolver:
-          name: object_with_lookahead
-      team_league:
-        resolver:
-          name: object_with_lookahead
-  CoachProfileAggregation:
-    elasticgraph_category: indexed_aggregation
-    graphql_fields_by_name:
-      aggregated_values:
-        resolver:
-          name: object_without_lookahead
-      count:
-        resolver:
-          name: object_without_lookahead
-      grouped_by:
-        resolver:
-          name: object_without_lookahead
-    source_type: CoachProfile
-  CoachProfileAggregationConnection:
-    elasticgraph_category: relay_connection
-    graphql_fields_by_name:
-      edges:
-        resolver:
-          name: object_without_lookahead
-      nodes:
-        resolver:
-          name: object_without_lookahead
-      page_info:
-        resolver:
-          name: object_without_lookahead
-  CoachProfileAggregationEdge:
-    elasticgraph_category: relay_edge
-    graphql_fields_by_name:
-      cursor:
-        resolver:
-          name: object_without_lookahead
-      node:
-        resolver:
-          name: object_without_lookahead
-  CoachProfileConnection:
-    elasticgraph_category: relay_connection
-    graphql_fields_by_name:
-      edges:
-        resolver:
-          name: object_without_lookahead
-      nodes:
-        resolver:
-          name: object_without_lookahead
-      page_info:
-        resolver:
-          name: object_without_lookahead
-      total_edge_count:
-        resolver:
-          name: object_without_lookahead
-  CoachProfileEdge:
-    elasticgraph_category: relay_edge
-    graphql_fields_by_name:
-      all_highlights:
-        resolver:
-          name: object_without_lookahead
-      cursor:
-        resolver:
-          name: object_without_lookahead
-      highlights:
-        resolver:
-          name: object_without_lookahead
-      node:
-        resolver:
-          name: object_without_lookahead
-  CoachProfileGroupedBy:
-    graphql_fields_by_name:
-      annual_salary:
-        resolver:
-          name: object_with_lookahead
-      coach_id:
-        resolver:
-          name: object_with_lookahead
-      team_formed_on:
-        resolver:
-          name: object_with_lookahead
-      team_id:
-        resolver:
-          name: object_with_lookahead
-      team_league:
-        resolver:
-          name: object_with_lookahead
-  CoachProfileHighlights:
-    graphql_fields_by_name:
-      coach_id:
-        resolver:
-          name: get_record_field_value
-      id:
-        resolver:
-          name: get_record_field_value
-      team_id:
-        resolver:
-          name: get_record_field_value
-      team_league:
-        resolver:
-          name: get_record_field_value
   ColorListFilterInput:
     graphql_fields_by_name:
       count:
@@ -4496,34 +4228,7 @@ object_types_by_name:
       team_league:
         resolver:
           name: get_record_field_value
-    index_definition_names:
-    - general_manager_profiles
     update_targets:
-    - id_source: id
-      metadata_params:
-        relationship:
-          value: __self
-        sourceId:
-          cardinality: one
-          source_path: id
-        sourceType:
-          cardinality: one
-          source_path: type
-        version:
-          cardinality: one
-      relationship: __self
-      routing_value_source: id
-      script_id: update_index_data_27fac9da6430f05440528c771880c7e6
-      top_level_fields_params:
-        annual_salary:
-          cardinality: one
-        team_formed_on:
-          cardinality: one
-        team_id:
-          cardinality: one
-        team_league:
-          cardinality: one
-      type: GeneralManagerProfile
     - id_source: team_id
       metadata_params:
         relationship:
@@ -4546,112 +4251,6 @@ object_types_by_name:
             cardinality: one
             source_path: annual_salary
       type: Team
-  GeneralManagerProfileAggregatedValues:
-    graphql_fields_by_name:
-      annual_salary:
-        resolver:
-          name: object_with_lookahead
-      id:
-        resolver:
-          name: object_with_lookahead
-      team_formed_on:
-        resolver:
-          name: object_with_lookahead
-      team_id:
-        resolver:
-          name: object_with_lookahead
-      team_league:
-        resolver:
-          name: object_with_lookahead
-  GeneralManagerProfileAggregation:
-    elasticgraph_category: indexed_aggregation
-    graphql_fields_by_name:
-      aggregated_values:
-        resolver:
-          name: object_without_lookahead
-      count:
-        resolver:
-          name: object_without_lookahead
-      grouped_by:
-        resolver:
-          name: object_without_lookahead
-    source_type: GeneralManagerProfile
-  GeneralManagerProfileAggregationConnection:
-    elasticgraph_category: relay_connection
-    graphql_fields_by_name:
-      edges:
-        resolver:
-          name: object_without_lookahead
-      nodes:
-        resolver:
-          name: object_without_lookahead
-      page_info:
-        resolver:
-          name: object_without_lookahead
-  GeneralManagerProfileAggregationEdge:
-    elasticgraph_category: relay_edge
-    graphql_fields_by_name:
-      cursor:
-        resolver:
-          name: object_without_lookahead
-      node:
-        resolver:
-          name: object_without_lookahead
-  GeneralManagerProfileConnection:
-    elasticgraph_category: relay_connection
-    graphql_fields_by_name:
-      edges:
-        resolver:
-          name: object_without_lookahead
-      nodes:
-        resolver:
-          name: object_without_lookahead
-      page_info:
-        resolver:
-          name: object_without_lookahead
-      total_edge_count:
-        resolver:
-          name: object_without_lookahead
-  GeneralManagerProfileEdge:
-    elasticgraph_category: relay_edge
-    graphql_fields_by_name:
-      all_highlights:
-        resolver:
-          name: object_without_lookahead
-      cursor:
-        resolver:
-          name: object_without_lookahead
-      highlights:
-        resolver:
-          name: object_without_lookahead
-      node:
-        resolver:
-          name: object_without_lookahead
-  GeneralManagerProfileGroupedBy:
-    graphql_fields_by_name:
-      annual_salary:
-        resolver:
-          name: object_with_lookahead
-      team_formed_on:
-        resolver:
-          name: object_with_lookahead
-      team_id:
-        resolver:
-          name: object_with_lookahead
-      team_league:
-        resolver:
-          name: object_with_lookahead
-  GeneralManagerProfileHighlights:
-    graphql_fields_by_name:
-      id:
-        resolver:
-          name: get_record_field_value
-      team_id:
-        resolver:
-          name: get_record_field_value
-      team_league:
-        resolver:
-          name: get_record_field_value
   GeoLocation:
     graphql_fields_by_name:
       latitude:
@@ -6600,12 +6199,6 @@ object_types_by_name:
       addresses:
         resolver:
           name: indexed_type_root_fields
-      coach_profile_aggregations:
-        resolver:
-          name: indexed_type_root_fields
-      coach_profiles:
-        resolver:
-          name: indexed_type_root_fields
       component_aggregations:
         resolver:
           name: indexed_type_root_fields
@@ -6622,12 +6215,6 @@ object_types_by_name:
         resolver:
           name: indexed_type_root_fields
       electrical_parts:
-        resolver:
-          name: indexed_type_root_fields
-      general_manager_profile_aggregations:
-        resolver:
-          name: indexed_type_root_fields
-      general_manager_profiles:
         resolver:
           name: indexed_type_root_fields
       inventor_aggregations:

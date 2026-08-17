@@ -362,6 +362,52 @@ module ElasticGraph
           expect(runtime_meta["object_types_by_name"].keys).to exclude("DateTimeListFilterInput")
         end
 
+        it "retains a non-indexed `sourced_from` source type in the dumped runtime metadata even though it is pruned from the GraphQL schema" do
+          ::File.write("schema.rb", <<~EOS)
+            Thread.current[:eg_schema_load_count] = (Thread.current[:eg_schema_load_count] || 0) + 1
+            if Thread.current[:eg_schema_load_count] > 1
+              raise "Schema file \#{__FILE__} was loaded \#{Thread.current[:eg_schema_load_count]} times in a single run!"
+            end
+
+            ElasticGraph.define_schema do |schema|
+              schema.object_type "Widget" do |t|
+                t.field "id", "ID!"
+                t.field "owner_name", "String" do |f|
+                  f.sourced_from "owner", "name"
+                end
+                t.relates_to_one "owner", "WidgetOwner", via: "widget_id", dir: :in, indexing_only: true
+
+                t.index "widgets" do |i|
+                  i.has_had_multiple_sources!
+                end
+              end
+
+              schema.object_type "WidgetOwner" do |t|
+                t.field "id", "ID!"
+                t.field "widget_id", "ID"
+                t.field "name", "String"
+              end
+            end
+          EOS
+
+          run_rake("schema_artifacts:dump")
+
+          # Nothing in the GraphQL schema references `WidgetOwner` (its only relationship is `indexing_only`),
+          # so it gets pruned from the SDL...
+          expect(read_artifact(GRAPHQL_SCHEMA_FILE)).to exclude("WidgetOwner")
+
+          # ...but the indexer still needs its runtime metadata to apply its events to `Widget` documents.
+          runtime_meta = ::YAML.safe_load(read_artifact(RUNTIME_METADATA_FILE))
+          update_target_types_by_ingested_type_name = runtime_meta.fetch("object_types_by_name").transform_values do |object_type|
+            object_type["update_targets"]&.map { |ut| ut.fetch("type") }
+          end.compact
+
+          expect(update_target_types_by_ingested_type_name).to eq({
+            "Widget" => ["Widget"],
+            "WidgetOwner" => ["Widget"]
+          })
+        end
+
         it "successfully checks schema artifacts when the rake task is run within a minimal schema definition bundle" do
           # We want to ensure that `elasticgraph-schema_definition` gem declares (in its gemspec) all the
           # dependencies necessary for the schema definition rake tasks. Unfortunately, its test suite

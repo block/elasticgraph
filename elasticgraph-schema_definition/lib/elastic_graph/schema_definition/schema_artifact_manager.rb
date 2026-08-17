@@ -208,7 +208,11 @@ module ElasticGraph
         schema_type_names = schema.types.keys
         pruned_enum_types = runtime_meta.enum_types_by_name.slice(*schema_type_names)
         pruned_scalar_types = runtime_meta.scalar_types_by_name.slice(*schema_type_names)
-        pruned_object_types = runtime_meta.object_types_by_name.slice(*schema_type_names)
+
+        # A non-indexed `sourced_from` source type is pruned from the GraphQL schema (nothing references it),
+        # but the indexer still needs its runtime metadata (update targets) to process its events.
+        sourced_from_source_type_names = schema_definition_results.sourced_update_targets_by_source_type_name.keys
+        pruned_object_types = runtime_meta.object_types_by_name.slice(*schema_type_names, *sourced_from_source_type_names)
 
         runtime_meta.with(
           enum_types_by_name: pruned_enum_types,
