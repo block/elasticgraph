@@ -398,8 +398,14 @@ module ElasticGraph
 
           # ...but the indexer still needs its runtime metadata to apply its events to `Widget` documents.
           runtime_meta = ::YAML.safe_load(read_artifact(RUNTIME_METADATA_FILE))
-          update_targets = runtime_meta.dig("object_types_by_name", "WidgetOwner", "update_targets")
-          expect(update_targets.map { |ut| ut.fetch("type") }).to eq(["Widget"])
+          update_target_types_by_ingested_type_name = runtime_meta.fetch("object_types_by_name").transform_values do |object_type|
+            object_type["update_targets"]&.map { |ut| ut.fetch("type") }
+          end.compact
+
+          expect(update_target_types_by_ingested_type_name).to eq({
+            "Widget" => ["Widget"],
+            "WidgetOwner" => ["Widget"]
+          })
         end
 
         it "successfully checks schema artifacts when the rake task is run within a minimal schema definition bundle" do
