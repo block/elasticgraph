@@ -456,6 +456,7 @@ module ElasticGraph
               s.object_type "Widget" do |t|
                 t.field "id", "ID!"
                 t.field "name", "String!"
+                t.field "component_ids", "[ID!]!"
 
                 t.index "widgets"
               end
@@ -464,7 +465,7 @@ module ElasticGraph
                 t.field "id", "ID!"
                 t.relates_to_one "widget", "Widget", via: "component_ids", dir: :in
 
-                t.field "widget_name", "String!" do |f|
+                t.field "widget_name", "String" do |f|
                   f.sourced_from "widget", "name"
                 end
 
@@ -490,6 +491,7 @@ module ElasticGraph
                   t.field "id", "ID!"
                   t.field "name", "String!"
                   t.field "size", "Int"
+                  t.field "component_ids", "[ID!]!"
 
                   t.index "widgets"
                 end
@@ -499,7 +501,7 @@ module ElasticGraph
                   t.relates_to_one "widget", "Widget", via: "component_ids", dir: :in
 
                   # Here we call `json_schema` after `sourced_from`...
-                  t.field "widget_name", "String!" do |f|
+                  t.field "widget_name", "String" do |f|
                     f.sourced_from "widget", "name"
                     f.json_schema minLength: 4
                   end
@@ -518,6 +520,67 @@ module ElasticGraph
             }.to raise_error a_string_including(
               "Component` has 2 field(s) (`widget_name`, `widget_size`)",
               "also have JSON schema customizations"
+            )
+          end
+
+          it "includes a non-indexed source type in the event envelope's `type` enum so that its events can be ingested" do
+            schemas = all_type_definitions_for do |s|
+              s.object_type "Widget" do |t|
+                t.field "id", "ID!"
+                t.field "name", "String!"
+                t.field "component_ids", "[ID!]!"
+              end
+
+              s.object_type "Component" do |t|
+                t.field "id", "ID!"
+                t.relates_to_one "widget", "Widget", via: "component_ids", dir: :in, indexing_only: true
+
+                t.field "widget_name", "String" do |f|
+                  f.sourced_from "widget", "name"
+                end
+
+                t.index "components" do |i|
+                  i.has_had_multiple_sources!
+                end
+              end
+            end
+
+            expect(envelope_type_enum_values(schemas)).to eq %w[Component Widget]
+            expect(schemas.fetch("Widget")).to include("properties" => hash_including("id", "name", "component_ids"))
+          end
+
+          # Tagged `:dont_validate_graphql_schema` because this schema intentionally cannot generate a
+          # valid GraphQL schema: the derived type generation error is what the test is about.
+          it "raises `sourced_from` validation errors in preference to derived GraphQL type generation errors", :dont_validate_graphql_schema do
+            expect {
+              dump_schema do |s|
+                s.object_type "Widget" do |t|
+                  t.field "id", "ID!"
+
+                  # `workspace` is a plain field rather than a relationship, so the `sourced_from` below is
+                  # invalid. The schema is also broken in a second way: generating `Widget`'s derived sort
+                  # order enum fails because `workspace.name` and `workspace_name` both flatten to the same
+                  # `workspace_name_*` enum values.
+                  t.field "workspace", "WidgetWorkspace"
+
+                  t.field "workspace_name", "String" do |f|
+                    f.sourced_from "workspace", "name"
+                  end
+
+                  t.index "widgets" do |i|
+                    i.has_had_multiple_sources!
+                  end
+                end
+
+                s.object_type "WidgetWorkspace" do |t|
+                  t.field "id", "ID!"
+                  t.field "name", "String"
+                  t.field "widget_ids", "[ID!]!"
+                  t.index "widget_workspaces"
+                end
+              end
+            }.to raise_error Errors::SchemaError, a_string_including(
+              "`Widget.workspace` (referenced from `sourced_from` on field(s): `workspace_name`) is not a relationship"
             )
           end
         end
@@ -2115,6 +2178,7 @@ module ElasticGraph
               json_schema = dump_schema do |s|
                 s.object_type "OtherType" do |t|
                   t.field "id", "ID!"
+                  t.index "other_type"
                 end
 
                 s.object_type "MyType" do |t|
@@ -2135,6 +2199,7 @@ module ElasticGraph
               json_schema = dump_schema do |s|
                 s.object_type "OtherType" do |t|
                   t.field "id", "ID!"
+                  t.index "other_type"
                 end
 
                 s.object_type "MyType" do |t|
@@ -2182,6 +2247,7 @@ module ElasticGraph
               json_schema = dump_schema do |s|
                 s.object_type "MyType" do |t|
                   t.relates_to_one "parent", "MyType!", via: "parent_id", dir: :out
+                  t.index "my_type"
                 end
               end
 
@@ -2274,6 +2340,7 @@ module ElasticGraph
             json_schema = dump_schema do |s|
               s.object_type "CardInferred" do |t|
                 t.relates_to_one "cloned_from_card", "CardInferred", via: "cloned_from_card_id", dir: :out
+                t.index "card_inferred"
               end
 
               s.object_type "CardExplicit" do |t|

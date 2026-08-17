@@ -76,6 +76,10 @@ module ElasticGraph
 
         def json_ingestion_json_schema_builder
           @json_ingestion_json_schema_builder ||= begin
+            # Resolve `sourced_from` update targets before touching `all_types` so that `sourced_from`
+            # validation errors take precedence over any errors raised while generating derived types.
+            sourced_from_source_type_names = sourced_update_targets_by_source_type_name.keys.to_set
+
             # Force `all_types` to materialize before iterating `state.types_by_name`. Reading `all_types`
             # runs the `on_built_in_types` callbacks, including the GeoLocation JSON schema field
             # customizations registered by `APIExtension.extended`.
@@ -84,7 +88,8 @@ module ElasticGraph
             JSONSchemaBuilder.new(
               state: json_ingestion_state,
               all_types: materialized_all_types,
-              derived_indexing_type_names: derived_indexing_type_names
+              derived_indexing_type_names: derived_indexing_type_names,
+              sourced_from_source_type_names: sourced_from_source_type_names
             )
           end
         end
