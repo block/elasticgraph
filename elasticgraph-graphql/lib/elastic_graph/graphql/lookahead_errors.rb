@@ -56,10 +56,9 @@ module ElasticGraph
       end
 
       # Returns a `GraphQL::ExecutionError` for the first recorded error matching `current_path` (the
-      # path of the field about to be resolved), or `nil` if none match. Cheap (an `Array#find` over
-      # `@records`, empty for the overwhelmingly common query that never records a lookahead error)
-      # with no separate guard needed at call sites. A record legitimately matches nothing at all when
-      # execution never reaches the flagged position (e.g. its parent resolved to an empty list).
+      # path of the field about to be resolved), or `nil` if none match. A record legitimately matches
+      # nothing at all when execution never reaches the flagged position (e.g. its parent resolved to
+      # an empty list).
       def matching_error_for(current_path)
         record = @records.find { |r| r.matches?(current_path) }
         return nil unless record

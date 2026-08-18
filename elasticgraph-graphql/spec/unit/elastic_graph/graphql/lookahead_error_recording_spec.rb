@@ -47,7 +47,7 @@ module ElasticGraph
 
           def resolve(field:, object:, args:, context:, lookahead:)
             flagged_node = lookahead.selection("flagged")
-            context.record_lookahead_error(flagged_node, "flagged field is invalid") if flagged_node.selected?
+            context.record_lookahead_error(flagged_node, "flagged field is invalid", extensions: {"code" => "FLAGGED"}) if flagged_node.selected?
 
             details_node = lookahead.selection("details")
             context.record_lookahead_error(details_node, "details field is invalid") if details_node.selected?
@@ -189,10 +189,10 @@ module ElasticGraph
         expect(response.dig("data", "riskyValue")).to eq 10
 
         expect(response.fetch("errors")).to contain_exactly(
-          hash_including("message" => "flagged field is invalid", "path" => ["widgets", 0, "a"]),
-          hash_including("message" => "flagged field is invalid", "path" => ["widgets", 0, "b"]),
-          hash_including("message" => "flagged field is invalid", "path" => ["widgets", 1, "a"]),
-          hash_including("message" => "flagged field is invalid", "path" => ["widgets", 1, "b"])
+          hash_including("message" => "flagged field is invalid", "path" => ["widgets", 0, "a"], "extensions" => {"code" => "FLAGGED"}),
+          hash_including("message" => "flagged field is invalid", "path" => ["widgets", 0, "b"], "extensions" => {"code" => "FLAGGED"}),
+          hash_including("message" => "flagged field is invalid", "path" => ["widgets", 1, "a"], "extensions" => {"code" => "FLAGGED"}),
+          hash_including("message" => "flagged field is invalid", "path" => ["widgets", 1, "b"], "extensions" => {"code" => "FLAGGED"})
         )
       end
 
