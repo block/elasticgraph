@@ -54,6 +54,7 @@ module ElasticGraph
         def build_aggregation_query_for: (
           ::GraphQL::Execution::Lookahead,
           field: Schema::Field,
+          context: QueryContext,
           grouping_adapter: groupingAdapter,
           ?nested_path: ::Array[PathSegment],
           ?unfiltered: bool
@@ -88,12 +89,14 @@ module ElasticGraph
 
         def build_computations_from: (
           ::GraphQL::Execution::Lookahead,
+          context: QueryContext,
           ?from_field_path: ::Array[PathSegment]
         ) -> ::Set[Computation]
 
         def computation_for: (
           ::GraphQL::Execution::Lookahead,
-          ::Array[PathSegment]
+          ::Array[PathSegment],
+          context: QueryContext
         ) -> Computation?
 
         def build_groupings_from: (
@@ -135,6 +138,7 @@ module ElasticGraph
 
         def build_sub_aggregations_from: (
           ::GraphQL::Execution::Lookahead,
+          context: QueryContext,
           ?parent_nested_path: ::Array[PathSegment]
         ) -> ::Hash[::String, NestedSubAggregation]
 

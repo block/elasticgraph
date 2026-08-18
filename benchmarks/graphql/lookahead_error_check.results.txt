@@ -1,0 +1,133 @@
+
+======================================================================
+small — 5 leaf fields resolved per query
+======================================================================
+ruby 4.0.0 (2025-12-25 revision 553f1675f3) +PRISM [arm64-darwin25]
+Warming up --------------------------------------
+     before (no check, main)   653.000 i/100ms
+unguarded (#1340 as written)   636.000 i/100ms
+       guarded (shipped fix)   658.000 i/100ms
+Calculating -------------------------------------
+     before (no check, main)      6.350k (± 5.5%) i/s  (157.49 μs/i) -     31.997k in   5.039166s
+unguarded (#1340 as written)      6.039k (± 5.7%) i/s  (165.59 μs/i) -     30.528k in   5.055148s
+       guarded (shipped fix)      6.325k (± 4.3%) i/s  (158.11 μs/i) -     32.242k in   5.097622s
+
+Comparison:
+     before (no check, main):     6349.7 i/s
+       guarded (shipped fix):     6324.9 i/s - same-ish: difference falls within error
+unguarded (#1340 as written):     6039.0 i/s - same-ish: difference falls within error
+
+
+======================================================================
+medium — 25 leaf fields resolved per query
+======================================================================
+ruby 4.0.0 (2025-12-25 revision 553f1675f3) +PRISM [arm64-darwin25]
+Warming up --------------------------------------
+     before (no check, main)   341.000 i/100ms
+unguarded (#1340 as written)   330.000 i/100ms
+       guarded (shipped fix)   276.000 i/100ms
+Calculating -------------------------------------
+     before (no check, main)      3.396k (± 3.7%) i/s  (294.44 μs/i) -     17.050k in   5.020214s
+unguarded (#1340 as written)      3.233k (± 3.3%) i/s  (309.26 μs/i) -     16.170k in   5.000779s
+       guarded (shipped fix)      3.332k (± 4.5%) i/s  (300.08 μs/i) -     16.836k in   5.052123s
+
+Comparison:
+     before (no check, main):     3396.3 i/s
+       guarded (shipped fix):     3332.5 i/s - same-ish: difference falls within error
+unguarded (#1340 as written):     3233.5 i/s - same-ish: difference falls within error
+
+
+======================================================================
+large — 100 leaf fields resolved per query
+======================================================================
+ruby 4.0.0 (2025-12-25 revision 553f1675f3) +PRISM [arm64-darwin25]
+Warming up --------------------------------------
+     before (no check, main)   129.000 i/100ms
+unguarded (#1340 as written)   124.000 i/100ms
+       guarded (shipped fix)   128.000 i/100ms
+Calculating -------------------------------------
+     before (no check, main)      1.277k (± 3.2%) i/s  (782.87 μs/i) -      6.450k in   5.049535s
+unguarded (#1340 as written)      1.220k (± 2.9%) i/s  (819.39 μs/i) -      6.200k in   5.080219s
+       guarded (shipped fix)      1.220k (± 3.8%) i/s  (820.00 μs/i) -      6.144k in   5.038067s
+
+Comparison:
+     before (no check, main):     1277.3 i/s
+unguarded (#1340 as written):     1220.4 i/s - same-ish: difference falls within error
+       guarded (shipped fix):     1219.5 i/s - same-ish: difference falls within error
+
+
+======================================================================
+xlarge — 500 leaf fields resolved per query
+======================================================================
+ruby 4.0.0 (2025-12-25 revision 553f1675f3) +PRISM [arm64-darwin25]
+Warming up --------------------------------------
+     before (no check, main)    21.000 i/100ms
+unguarded (#1340 as written)     8.000 i/100ms
+       guarded (shipped fix)    23.000 i/100ms
+Calculating -------------------------------------
+     before (no check, main)    256.320 (± 2.3%) i/s    (3.90 ms/i) -      1.302k in   5.079591s
+unguarded (#1340 as written)    250.039 (± 3.6%) i/s    (4.00 ms/i) -      1.256k in   5.023210s
+       guarded (shipped fix)    267.284 (± 3.4%) i/s    (3.74 ms/i) -      1.357k in   5.077001s
+
+Comparison:
+       guarded (shipped fix):      267.3 i/s
+     before (no check, main):      256.3 i/s - same-ish: difference falls within error
+unguarded (#1340 as written):      250.0 i/s - same-ish: difference falls within error
+
+
+======================================================================
+5000 leaves — 5000 leaf fields resolved per query
+======================================================================
+ruby 4.0.0 (2025-12-25 revision 553f1675f3) +PRISM [arm64-darwin25]
+Warming up --------------------------------------
+     before (no check, main)     3.000 i/100ms
+unguarded (#1340 as written)     2.000 i/100ms
+       guarded (shipped fix)     3.000 i/100ms
+Calculating -------------------------------------
+     before (no check, main)     30.697 (± 3.3%) i/s   (32.58 ms/i) -    156.000 in   5.081942s
+unguarded (#1340 as written)     28.986 (± 3.4%) i/s   (34.50 ms/i) -    146.000 in   5.036878s
+       guarded (shipped fix)     30.702 (± 3.3%) i/s   (32.57 ms/i) -    156.000 in   5.081034s
+
+Comparison:
+       guarded (shipped fix):       30.7 i/s
+     before (no check, main):       30.7 i/s - same-ish: difference falls within error
+unguarded (#1340 as written):       29.0 i/s - same-ish: difference falls within error
+
+
+======================================================================
+50000 leaves — 50000 leaf fields resolved per query
+======================================================================
+ruby 4.0.0 (2025-12-25 revision 553f1675f3) +PRISM [arm64-darwin25]
+Warming up --------------------------------------
+     before (no check, main)     1.000 i/100ms
+unguarded (#1340 as written)     1.000 i/100ms
+       guarded (shipped fix)     1.000 i/100ms
+Calculating -------------------------------------
+     before (no check, main)      3.115 (± 0.0%) i/s  (321.01 ms/i) -     16.000 in   5.136164s
+unguarded (#1340 as written)      2.919 (± 0.0%) i/s  (342.63 ms/i) -     15.000 in   5.139388s
+       guarded (shipped fix)      2.959 (± 0.0%) i/s  (338.00 ms/i) -     15.000 in   5.069968s
+
+Comparison:
+     before (no check, main):        3.1 i/s
+       guarded (shipped fix):        3.0 i/s - 1.05x  slower
+unguarded (#1340 as written):        2.9 i/s - 1.07x  slower
+
+
+======================================================================
+500000 leaves — 500000 leaf fields resolved per query
+======================================================================
+ruby 4.0.0 (2025-12-25 revision 553f1675f3) +PRISM [arm64-darwin25]
+Warming up --------------------------------------
+     before (no check, main)     1.000 i/100ms
+unguarded (#1340 as written)     1.000 i/100ms
+       guarded (shipped fix)     1.000 i/100ms
+Calculating -------------------------------------
+     before (no check, main)      0.271 (± 0.0%) i/s     (3.69 s/i) -      2.000 in   7.374854s
+unguarded (#1340 as written)      0.264 (± 0.0%) i/s     (3.79 s/i) -      2.000 in   7.570256s
+       guarded (shipped fix)      0.274 (± 0.0%) i/s     (3.65 s/i) -      2.000 in   7.293748s
+
+Comparison:
+       guarded (shipped fix):        0.3 i/s
+     before (no check, main):        0.3 i/s - 1.01x  slower
+unguarded (#1340 as written):        0.3 i/s - 1.04x  slower
+
