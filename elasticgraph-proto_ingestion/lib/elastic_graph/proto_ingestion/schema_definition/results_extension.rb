@@ -36,13 +36,11 @@ module ElasticGraph
             # The cast is needed because Steep can't see the `extend(StateExtension)` applied at
             # runtime in {APIExtension.extended}.
             extension_state = state # : ElasticGraph::SchemaDefinition::State & StateExtension
-            ingestion_state = extension_state.proto_ingestion_state
 
             Schema.new(
               state: extension_state,
               all_types: all_types,
-              package_name: ingestion_state.package_name,
-              proto_field_number_mappings: ingestion_state.field_number_mappings
+              ingestion_state: extension_state.proto_ingestion_state
             )
           end
         end

@@ -100,7 +100,7 @@ module ElasticGraph
                 type_name: name,
                 public_field_name: schema_field.name
               )
-              label = "repeated " if repeated
+              label = schema.field_label_prefix(repeated: repeated)
               line = "  #{label}#{field_type} #{schema_field.name} = #{field_number};"
               comment_lines = field_comment_lines_for(schema_field.doc_comment, field_comment)
 
