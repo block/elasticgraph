@@ -2218,7 +2218,7 @@ scripts:
 
         // No timestamp values matched the params, so return `false`.
         return false;
-  update_index_data_27fac9da6430f05440528c771880c7e6:
+  update_index_data_0d2f593f4c3c3084ec4533148311dfca:
     context: update
     script:
       lang: painless
@@ -2348,6 +2348,10 @@ scripts:
           }
         }
 
+        // Refuses the update in two cases:
+        // 1. The data comes from a different source document than the one that has fed this document's
+        //    sourced fields before (e.g. an order's `customer` link switching to another customer).
+        // 2. The event is older than one already applied.
         void validateSource(Map doc, String id, String relationship, String sourceId, long eventVersion, String sourceKey) {
           Map versionsMap = doc.__versions[sourceKey];
           List previousSourceIdsForRelationship = versionsMap.keySet().stream().filter(key -> key != sourceId).collect(Collectors.toList());
