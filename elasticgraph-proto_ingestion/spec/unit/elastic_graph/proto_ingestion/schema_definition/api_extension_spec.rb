@@ -31,11 +31,12 @@ module ElasticGraph
           expect(proto_type_def_from(proto, "Widget")).to include(".proto.package.v1.Address address = 2;")
         end
 
-        it "maps every built-in scalar to a proto field type" do
+        it "maps every built-in scalar to a proto field type, documenting the format of those that need it" do
+          built_in_scalar_options = SchemaElements::ScalarTypeExtension::BUILT_IN_SCALAR_PROTO_OPTIONS_BY_NAME
           field_types = []
           proto = define_proto_schema do |s|
             s.object_type "Widget" do |t|
-              SchemaElements::ScalarTypeExtension::BUILT_IN_SCALAR_PROTO_TYPES_BY_NAME.each_key do |type_name|
+              built_in_scalar_options.each_key do |type_name|
                 t.field type_name.downcase, type_name
               end
               field_types = t.graphql_fields_by_name.values.map { |field| field.type.name }
@@ -43,9 +44,14 @@ module ElasticGraph
             end
           end
 
-          expect(field_types).to match_array(SchemaElements::ScalarTypeExtension::BUILT_IN_SCALAR_PROTO_TYPES_BY_NAME.keys)
-          SchemaElements::ScalarTypeExtension::BUILT_IN_SCALAR_PROTO_TYPES_BY_NAME.each.with_index(1) do |(type_name, proto_type), field_number|
-            expect(proto).to include("#{proto_type} #{type_name.downcase} = #{field_number};")
+          expect(field_types).to match_array(built_in_scalar_options.keys)
+
+          aggregate_failures do
+            built_in_scalar_options.each.with_index(1) do |(type_name, options), field_number|
+              field_line = "  #{options.fetch(:type)} #{type_name.downcase} = #{field_number};"
+              field_comment = options[:field_comment]
+              expect(proto).to include(field_comment ? "  // #{field_comment}\n#{field_line}" : field_line)
+            end
           end
         end
 

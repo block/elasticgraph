@@ -11,6 +11,8 @@ module ElasticGraph
           def value: (::String) ?{ (::ElasticGraph::SchemaDefinition::SchemaElements::EnumValue & EnumValueExtension) -> void } -> void
           def proto_name: () -> ::String
           def proto_type_reference: (::String package_name) -> ::String
+          def protobuf_import: () -> nil
+          def protobuf_field_comment: () -> nil
           def proto_enum_value_prefix: () -> ::String
           def to_proto: (Schema schema, ::String package_name) -> ::String
           def referenced_proto_types: () -> ::Array[::ElasticGraph::SchemaDefinition::SchemaElements::graphQLType]

@@ -66,6 +66,21 @@ module ElasticGraph
             ".#{package_name}.#{proto_name}"
           end
 
+          # Messages render their own protobuf definition, so they never require an import.
+          #
+          # @return [nil]
+          def protobuf_import
+            nil
+          end
+
+          # Messages carry their documentation on the message definition itself, so fields of this
+          # type get no format comment. Only scalar types document a format.
+          #
+          # @return [nil]
+          def protobuf_field_comment
+            nil
+          end
+
           private
 
           def render_proto_message(schema, message_name, package_name)
@@ -75,7 +90,7 @@ module ElasticGraph
             active_field_names = fields.map { |schema_field, _| schema_field.name }
             documentation = ProtoDocumentation.comment_lines_for(doc_comment).map { |line| "#{line}\n" }.join
             field_definitions = fields.map do |schema_field, field|
-              repeated, field_type = proto_field_type_for(
+              repeated, field_type, field_comment = proto_field_type_for(
                 field.type,
                 package_name: package_name,
                 context_field_name: field.name
@@ -87,12 +102,9 @@ module ElasticGraph
               )
               label = "repeated " if repeated
               line = "  #{label}#{field_type} #{schema_field.name} = #{field_number};"
-              field_documentation = ProtoDocumentation
-                .comment_lines_for(schema_field.doc_comment, indent: "  ")
-                .map { |comment_line| "#{comment_line}\n" }
-                .join
+              comment_lines = field_comment_lines_for(schema_field.doc_comment, field_comment)
 
-              "#{field_documentation}#{line}"
+              [*comment_lines, line].join("\n")
             end
             schema.reserved_field_numbers_for(message_name, active_field_names).each do |field_name, field_number|
               field_definitions << "  reserved #{field_number}; // Previously used by #{field_name}."
@@ -150,6 +162,19 @@ module ElasticGraph
             end
           end
 
+          # Renders a field's documentation and its type's format comment as the `//` lines that go
+          # above the field. Proto compilers attach these leading comments to the code they generate
+          # for the field, whereas a trailing comment on the field line is usually discarded.
+          def field_comment_lines_for(doc_comment, field_comment)
+            doc_lines = ProtoDocumentation.comment_lines_for(doc_comment, indent: "  ")
+            return doc_lines unless field_comment
+
+            format_lines = ProtoDocumentation.comment_lines_for(field_comment, indent: "  ")
+            return format_lines if doc_lines.empty?
+
+            doc_lines + ["  //"] + format_lines
+          end
+
           def proto_field_type_for(type_ref, package_name:, context_field_name:)
             list_depth, base_type_ref = ObjectInterfaceAndUnionExtension.list_depth_and_base_type(type_ref)
 
@@ -160,7 +185,7 @@ module ElasticGraph
             end
 
             proto_type = _ = base_type_ref.resolved
-            [list_depth == 1, proto_type.proto_type_reference(package_name)]
+            [list_depth == 1, proto_type.proto_type_reference(package_name), proto_type.protobuf_field_comment]
           end
         end
       end

@@ -48,6 +48,7 @@ module ElasticGraph
           sections = [
             %(syntax = "proto3";),
             "package #{@package_name};",
+            *render_imports(types),
             render_definitions(types)
           ]
 
@@ -105,6 +106,15 @@ module ElasticGraph
             .sort_by(&:proto_name)
             .filter_map { |type| type.to_proto(self, @package_name) }
             .join("\n\n")
+        end
+
+        # Every type reports the proto file it needs imported, or `nil` when it needs none. Today only
+        # scalar types map to an externally defined proto type, but enum and object types can start
+        # requiring an import without any change here.
+        def render_imports(types)
+          imports = types.filter_map(&:protobuf_import).uniq.sort
+
+          imports.empty? ? [] : [imports.map { |import| %(import "#{import}";) }.join("\n")]
         end
 
         def validate_unique_enum_value_prefixes(types)
