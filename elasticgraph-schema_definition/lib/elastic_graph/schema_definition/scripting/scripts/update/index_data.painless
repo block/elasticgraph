@@ -123,6 +123,10 @@ void setup(Map doc, String sourceKey, Map counts) {
   }
 }
 
+// Refuses the update in two cases:
+// 1. The data comes from a different source document than the one that has fed this document's
+//    sourced fields before (e.g. an order's `customer` link switching to another customer).
+// 2. The event is older than one already applied.
 void validateSource(Map doc, String id, String relationship, String sourceId, long eventVersion, String sourceKey) {
   Map versionsMap = doc.__versions[sourceKey];
   List previousSourceIdsForRelationship = versionsMap.keySet().stream().filter(key -> key != sourceId).collect(Collectors.toList());
