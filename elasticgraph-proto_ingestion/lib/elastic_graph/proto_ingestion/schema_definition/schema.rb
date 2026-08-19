@@ -64,9 +64,19 @@ module ElasticGraph
         # @param state [ElasticGraph::SchemaDefinition::State]
         # @param all_types [Array<ElasticGraph::SchemaDefinition::SchemaElements::graphQLType>]
         # @param ingestion_state [ProtoIngestionState] this extension's configured schema definition state
-        def initialize(state:, all_types:, ingestion_state:)
+        # @param sourced_from_source_type_names [Set<String>] names of the types that feed `sourced_from` fields
+        # @param derived_indexing_type_names [Set<String>] names of the types the indexer derives from other types
+        def initialize(
+          state:,
+          all_types:,
+          ingestion_state:,
+          sourced_from_source_type_names:,
+          derived_indexing_type_names:
+        )
           @state = state
           @all_types = all_types
+          @sourced_from_source_type_names = sourced_from_source_type_names
+          @derived_indexing_type_names = derived_indexing_type_names
           @package_name = ingestion_state.package_name
           @syntax = self.class.validate_syntax(ingestion_state.syntax)
           @header_lines = self.class.validate_header_lines(ingestion_state.header_lines)
@@ -146,10 +156,10 @@ module ElasticGraph
 
         private
 
-        # Selects the indexed root types and every type transitively referenced by their protobuf
+        # Selects the ingestible types and every type transitively referenced by their protobuf
         # representations. All traversal state is local so repeated calls are independent.
         def proto_types
-          types_to_visit = _ = @state.indexed_types_by_index_name.values.dup
+          types_to_visit = ingestible_types
           type_names_to_render = ::Set.new
 
           while (type = types_to_visit.shift)
@@ -161,6 +171,22 @@ module ElasticGraph
           @all_types.select do |type|
             type_names_to_render.include?(type.name)
           end
+        end
+
+        # The types a publisher can send events for: the indexed types, plus the `sourced_from`
+        # source types, which need no index of their own. Derived indexing types are excluded
+        # because the indexer builds their documents from the events of other types, so a publisher
+        # never sends one. This matches the set of types the JSON schema event envelope accepts,
+        # except for an abstract type: the envelope accepts each concrete subtype by name, while a
+        # proto schema also gets a `oneof` wrapper message for the abstract type itself.
+        def ingestible_types
+          source_types = @sourced_from_source_type_names.filter_map do |type_name|
+            @state.object_types_by_name[type_name]
+          end
+
+          types = @state.indexed_types_by_index_name.values + source_types
+
+          _ = types.reject { |type| @derived_indexing_type_names.include?(type.name) }
         end
 
         def render_definitions(types)
