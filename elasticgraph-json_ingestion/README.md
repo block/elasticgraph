@@ -106,10 +106,21 @@ end
 
 Beyond schema definition, this gem provides an adapter used by `elasticgraph-indexer` to ingest JSON events. The
 adapter validates each event against the JSON schema identified by the event's
-`json_schema_version` and prepares its record for indexing using that version's view of the schema.
+`schema_version` and prepares its record for indexing using that version's view of the schema.
 
 JSON ingestion is enabled automatically for schemas defined with this gem's `SchemaDefinition::APIExtension`;
 no indexer configuration is needed.
+
+### Schema versions
+
+The adapter resolves the version of each event as follows:
+
+- The `schema_version` key selects the JSON schema version. When the exact version is unavailable, the
+  adapter selects the closest available version and logs `ElasticGraphMissingJSONSchemaVersion`.
+- The legacy `json_schema_version` key still works, so a publisher or an in-process caller that predates
+  the ingestion-format-neutral key needs no change.
+- An event that carries neither key gets the latest available JSON schema version. The adapter still
+  validates the event against that version, so a malformed event still fails.
 
 This gem also provides the `be_a_valid_elastic_graph_event` RSpec matcher (via
 `require "elastic_graph/json_ingestion/spec_support/event_matcher"`) for testing that publisher events

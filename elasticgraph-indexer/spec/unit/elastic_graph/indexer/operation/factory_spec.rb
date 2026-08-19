@@ -376,10 +376,10 @@ module ElasticGraph
             expect_failed_event_error(event, "missing_keys", "type", expect_no_ops: true)
           end
 
-          it "notifies an error on missing `#{SCHEMA_VERSION_KEY}`" do
+          it "builds operations for an event that carries no `#{SCHEMA_VERSION_KEY}`, since the key is optional" do
             event = build_upsert_event(:component).except(SCHEMA_VERSION_KEY)
 
-            expect_failed_event_error(event, SCHEMA_VERSION_KEY)
+            expect(build_expecting_success(event)).not_to be_empty
           end
 
           it "notifies an error on wrong field types" do

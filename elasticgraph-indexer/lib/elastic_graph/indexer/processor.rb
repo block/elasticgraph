@@ -142,12 +142,18 @@ module ElasticGraph
 
           result = successful_events.include?(event) ? "success" : "noop"
 
+          # The schema version is optional, since an ingestion format may have no versions at all.
+          schema_version = event[SCHEMA_VERSION_KEY]
+
           @logger.info({
             "message_type" => "ElasticGraphIndexingLatencies",
             "message_id" => event["message_id"],
             "event_type" => event.fetch("type"),
             "event_id" => EventID.from_event(event).to_s,
-            SCHEMA_VERSION_KEY => event.fetch(SCHEMA_VERSION_KEY),
+            SCHEMA_VERSION_KEY => schema_version,
+            # Deprecated alias of `schema_version`, kept so that dashboards and monitors that watch
+            # the old name keep working.
+            JSON_SCHEMA_VERSION_KEY => schema_version,
             "latencies_in_ms_from" => latencies_in_ms_from,
             "slo_results" => slo_results,
             "result" => result
