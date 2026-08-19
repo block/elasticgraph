@@ -6,6 +6,7 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/graphql/decoded_cursor"
 require "elastic_graph/graphql/resolvers/resolvable_value"
 require "forwardable"
 
@@ -35,12 +36,14 @@ module ElasticGraph
             # Here we map the args back to the canonical relay args so `ArrayConnection` can
             # understand them.
             #
-            # `after` and `before` are encoded to convert them to the string form required by `ArrayConnection`.
+            # `after` and `before` are decoded (and then re-encoded) so that an invalid cursor produces a
+            # clean query error. `ArrayConnection` itself decodes cursors leniently and would silently
+            # treat an invalid cursor as the start of the collection.
             relay_args = {
               first: args[schema_element_names.first],
-              after: args[schema_element_names.after]&.encode,
+              after: DecodedCursor.decode_or_raise_execution_error(args[schema_element_names.after])&.encode,
               last: args[schema_element_names.last],
-              before: args[schema_element_names.before]&.encode
+              before: DecodedCursor.decode_or_raise_execution_error(args[schema_element_names.before])&.encode
             }.compact
 
             graphql_impl = ::GraphQL::Pagination::ArrayConnection.new(nodes, context: context, **relay_args)

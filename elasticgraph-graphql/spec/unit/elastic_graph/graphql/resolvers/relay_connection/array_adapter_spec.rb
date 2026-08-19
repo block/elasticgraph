@@ -112,6 +112,18 @@ module ElasticGraph
             expect(response.nodes).to eq([])
           end
 
+          it "rejects an invalid `after` cursor with a clear error instead of silently returning the first page" do
+            expect {
+              resolve_nums(11, first: 2, after: "not-a-cursor")
+            }.to raise_error ::GraphQL::ExecutionError, "`not-a-cursor` is an invalid cursor."
+          end
+
+          it "rejects an invalid `before` cursor with a clear error instead of silently returning an empty page" do
+            expect {
+              resolve_nums(11, last: 2, before: "not-a-cursor")
+            }.to raise_error ::GraphQL::ExecutionError, "`not-a-cursor` is an invalid cursor."
+          end
+
           context "with `max_page_size` configured" do
             let(:graphql) { build_graphql(max_page_size: 10) }
 
@@ -151,16 +163,6 @@ module ElasticGraph
           end
 
           def resolve_nums(count, **args)
-            # Parse cursors in the same way the GraphQL runtime does.
-            args = args.to_h do |name, value|
-              case name
-              when :after, :aftr, :before, :bfr
-                [name, DecodedCursor.try_decode(value)]
-              else
-                [name, value]
-              end
-            end
-
             natural_numbers = count.is_a?(::Integer) ? 1.upto(count).to_a : count
             resolve("Widget", "natural_numbers", {"natural_numbers" => natural_numbers}, **args)
           end

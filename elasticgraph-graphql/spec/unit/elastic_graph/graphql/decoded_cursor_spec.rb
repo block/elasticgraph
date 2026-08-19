@@ -112,6 +112,27 @@ module ElasticGraph
         end
       end
 
+      describe ".decode_or_raise_execution_error" do
+        it "returns a decoded cursor value" do
+          cursor = DecodedCursor.new(sort_values).encode
+          decoded = DecodedCursor.decode_or_raise_execution_error(cursor)
+
+          expect(decoded.sort_values).to eq sort_values
+        end
+
+        it "returns `nil` when given `nil`" do
+          expect(DecodedCursor.decode_or_raise_execution_error(nil)).to eq nil
+        end
+
+        it "raises a `GraphQL::ExecutionError` when given an invalid cursor" do
+          bad_cursor = DecodedCursor.new(sort_values).encode + ' $1!!@#(#@'
+
+          expect {
+            DecodedCursor.decode_or_raise_execution_error(bad_cursor)
+          }.to raise_error(::GraphQL::ExecutionError, a_string_including(bad_cursor))
+        end
+      end
+
       describe ".factory_from_sort_list" do
         let(:amount) { ::Faker::Number.between(from: 100, to: 900) }
         let(:sort_fields) { %w[created_at amount id] }
