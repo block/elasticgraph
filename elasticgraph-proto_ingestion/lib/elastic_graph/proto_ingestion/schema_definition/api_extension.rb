@@ -34,14 +34,28 @@ module ElasticGraph
         # Configures protobuf artifact generation behavior.
         #
         # @param package_name [String] proto package name to emit
+        # @param syntax [Symbol, String] `:proto3` (default) or `:proto2`
+        # @param header_lines [Array<String>] file-level lines rendered verbatim after the package declaration
         # @return [void]
         #
         # @example Set the proto package name
         #   ElasticGraph.define_schema do |schema|
         #     schema.proto_schema_artifacts package_name: "myapp.events.v1"
         #   end
-        def proto_schema_artifacts(package_name:)
-          proto_ingestion_state.package_name = Identifier.validate_package_name(package_name)
+        #
+        # @example Emit proto2 with file-level options
+        #   ElasticGraph.define_schema do |schema|
+        #     schema.proto_schema_artifacts(
+        #       package_name: "myapp.events.v1",
+        #       syntax: :proto2,
+        #       header_lines: [%(option java_package = "com.myapp.events";)]
+        #     )
+        #   end
+        def proto_schema_artifacts(package_name:, syntax: Schema::DEFAULT_SYNTAX, header_lines: [])
+          ingestion_state = proto_ingestion_state
+          ingestion_state.package_name = Identifier.validate_package_name(package_name)
+          ingestion_state.syntax = Schema.validate_syntax(syntax)
+          ingestion_state.header_lines = Schema.validate_header_lines(header_lines)
           nil
         end
 

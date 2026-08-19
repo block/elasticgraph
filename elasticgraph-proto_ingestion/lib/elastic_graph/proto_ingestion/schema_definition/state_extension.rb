@@ -9,6 +9,7 @@
 require "elastic_graph/proto_ingestion"
 require "elastic_graph/proto_ingestion/schema_definition/field_number_mappings"
 require "elastic_graph/proto_ingestion/schema_definition/proto_ingestion_state"
+require "elastic_graph/proto_ingestion/schema_definition/schema"
 
 module ElasticGraph
   module ProtoIngestion
@@ -30,7 +31,12 @@ module ElasticGraph
 
           state.instance_variable_set(
             :@proto_ingestion_state,
-            ProtoIngestionState.new(package_name: "elasticgraph", field_number_mappings: field_number_mappings)
+            ProtoIngestionState.new(
+              package_name: "elasticgraph",
+              field_number_mappings: field_number_mappings,
+              syntax: Schema::DEFAULT_SYNTAX,
+              header_lines: []
+            )
           )
         end
 

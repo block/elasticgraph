@@ -1,7 +1,9 @@
 # ElasticGraph::ProtoIngestion
 
 An ElasticGraph extension that supports ingesting Protocol Buffer data into ElasticGraph.
-Currently it generates `proto3` Protocol Buffers schema artifacts from ElasticGraph schemas.
+Currently it generates Protocol Buffers schema artifacts from ElasticGraph schemas: it emits
+`proto3` by default and can emit `proto2`, and supports arbitrary file-level header lines (such
+as `option` declarations).
 
 ## Dependency Diagram
 
@@ -77,6 +79,62 @@ schema artifact, and will maintain a `proto_field_numbers.yaml` file alongside y
 
 ## Schema Definition API
 
+### Protobuf Syntax (`proto2` / `proto3`)
+
+`proto_schema_artifacts` emits `proto3` by default. Pass `syntax: :proto2` to emit a proto2 file
+instead (every field is then labeled `optional` or `repeated`). This is useful when the generated
+messages need to reference proto2 types — for example, `protoc` forbids a `proto3` message from
+referencing a `proto2` enum:
+
+```ruby
+# in config/schema/protobuf.rb
+
+ElasticGraph.define_schema do |schema|
+  schema.proto_schema_artifacts package_name: "myapp.events.v1", syntax: :proto2
+end
+```
+
+Field numbers are unaffected by the syntax, so switching an existing schema between `proto2` and
+`proto3` preserves the meaning of every field. One encoding detail does differ: `proto3` packs
+repeated numeric fields by default, and `proto2` does not. ElasticGraph has no per-field option
+for this, and never emits the `[packed=true]` field option that turns packing on under `proto2`.
+Protobuf parsers accept both encodings for repeated numeric fields under either syntax, so data
+written before a switch still decodes correctly.
+
+### Custom Header Lines
+
+Pass `header_lines:` an array of strings to inject file-level lines (such as `option` declarations)
+verbatim, as a contiguous section immediately after the `package` declaration. This lets you set
+language-specific options without the gem baking in any particular convention. Each element
+renders as one line, so no element can contain a newline:
+
+```ruby
+# in config/schema/protobuf.rb
+
+ElasticGraph.define_schema do |schema|
+  schema.proto_schema_artifacts(
+    package_name: "myapp.events.v1",
+    header_lines: [
+      %(option java_package = "com.myapp.events";),
+      "option java_multiple_files = true;"
+    ]
+  )
+end
+```
+
+produces:
+
+```text
+syntax = "proto3";
+
+package myapp.events.v1;
+
+option java_package = "com.myapp.events";
+option java_multiple_files = true;
+
+// ...messages...
+```
+
 ### Custom Scalar Types
 
 Built-in ElasticGraph scalar types are automatically mapped to proto scalar types.
@@ -94,27 +152,100 @@ ElasticGraph.define_schema do |schema|
 end
 ```
 
+A custom scalar can also map to an externally defined proto type. Pass `import:` with the path of
+the proto file that defines the type:
+
+```ruby
+# in config/schema/duration.rb
+
+ElasticGraph.define_schema do |schema|
+  schema.scalar_type "Duration" do |t|
+    t.mapping type: "keyword"
+    t.json_schema type: "string"
+    t.protobuf type: "google.protobuf.Duration", import: "google/protobuf/duration.proto"
+  end
+end
+```
+
+The generated `schema.proto` then contains `import "google/protobuf/duration.proto";`. ElasticGraph
+emits the import only when a generated message uses the scalar. The `import:` value must be the
+path of a `.proto` file.
+
+`field_comment:` documents the expected format on each generated field. This is useful when the
+proto type is wider than the ElasticGraph type:
+
+```ruby
+# in config/schema/phone_number.rb
+
+ElasticGraph.define_schema do |schema|
+  schema.scalar_type "PhoneNumber" do |t|
+    t.mapping type: "keyword"
+    t.json_schema type: "string"
+    t.protobuf type: "string", field_comment: "Must be an E.164 phone number."
+  end
+end
+```
+
+A `PhoneNumber` field then renders as:
+
+```protobuf
+// Must be an E.164 phone number.
+string phone_number = 1;
+```
+
+The comment goes above the field, below the field's own doc comment, because proto compilers
+attach these leading comments to the code they generate for the field. A `field_comment:` can
+span multiple lines. The option is named `field_comment:` rather than `comment:` because a scalar
+type has no proto representation of its own to comment on; the comment applies to each field of
+that type.
+
+### Overriding a Built-in Scalar
+
+Use `on_built_in_types` to change the protobuf type of a built-in scalar. For example, map
+`DateTime` to `string` to keep the original UTC offset of each event:
+
+```ruby
+# in config/schema/protobuf.rb
+
+ElasticGraph.define_schema do |schema|
+  schema.on_built_in_types do |type|
+    type.protobuf type: "string", field_comment: "Must be formatted as an ISO 8601 timestamp." if type.name == "DateTime"
+  end
+end
+```
+
+Each call to `protobuf` replaces the full protobuf configuration. The override above omits
+`import:`, so `schema.proto` no longer imports `google/protobuf/timestamp.proto`. An override that
+omits `field_comment:` likewise drops the built-in comment.
+
 ## Type Mappings
 
 The generated `schema.proto` uses these built-in scalar mappings:
 
-| ElasticGraph Type | Protobuf Type |
-|-------------------|------------|
-| `Boolean`         | `bool`     |
-| `Cursor`          | `string`   |
-| `Date`            | `string`   |
-| `DateTime`        | `string`   |
-| `Float`           | `double`   |
-| `ID`              | `string`   |
-| `Int`             | `int32`    |
-| `JsonSafeLong`    | `int64`    |
-| `LocalTime`       | `string`   |
-| `LongString`      | `int64`    |
-| `String`          | `string`   |
-| `TimeZone`        | `string`   |
-| `Untyped`         | `string`   |
+| ElasticGraph Type | Protobuf Type               |
+|-------------------|-----------------------------|
+| `Boolean`         | `bool`                      |
+| `Cursor`          | `string`                    |
+| `Date`            | `string`                    |
+| `DateTime`        | `google.protobuf.Timestamp` |
+| `Float`           | `double`                    |
+| `ID`              | `string`                    |
+| `Int`             | `int32`                     |
+| `JsonSafeLong`    | `int64`                     |
+| `LocalTime`       | `string`                    |
+| `LongString`      | `int64`                     |
+| `String`          | `string`                    |
+| `TimeZone`        | `string`                    |
+| `Untyped`         | `string`                    |
 
 Additionally:
+- `DateTime` uses the [well-known `Timestamp` type](https://protobuf.dev/reference/protobuf/google.protobuf/#timestamp);
+  `schema.proto` imports `google/protobuf/timestamp.proto` automatically. Note that a `Timestamp`
+  is a UTC instant, so a publisher's original UTC offset is not preserved.
+- `string`-typed temporal scalars (`Date`, `LocalTime`, `TimeZone`) are wider than the
+  ElasticGraph types they carry, so generated fields of these types document the expected format
+  in a comment above the field (e.g. `// Must be formatted as an ISO 8601 date, e.g. "2024-11-25".`).
+  Values are validated when events are ingested, just as with JSON ingestion.
 - List types become `repeated` fields.
 - Lists of lists (e.g. `[[Float!]!]!`) are not supported because Protocol Buffers cannot represent
   them directly. Schema artifact generation raises an error identifying the unsupported field.
