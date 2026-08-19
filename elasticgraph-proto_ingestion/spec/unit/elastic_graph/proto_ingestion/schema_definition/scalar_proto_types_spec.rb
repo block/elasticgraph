@@ -257,6 +257,59 @@ module ElasticGraph
             }
           PROTO
         end
+
+        it "uses custom proto scalar mappings" do
+          proto = define_proto_schema do |s|
+            s.scalar_type "CustomTimestamp" do |t|
+              t.mapping type: "date"
+              t.protobuf type: "int64"
+            end
+
+            s.object_type "Event" do |t|
+              t.field "id", "ID"
+              t.field "occurred_at", "CustomTimestamp"
+              t.index "events"
+            end
+          end
+
+          expect(proto_type_def_from(proto, "Event")).to include("int64 occurred_at = 2;")
+        end
+
+        it "raises when a custom scalar is defined without a protobuf type" do
+          expect {
+            define_proto_schema do |s|
+              s.scalar_type "UnconfiguredScalar" do |t|
+                t.mapping type: "keyword"
+              end
+            end
+          }.to raise_error(Errors::SchemaError, a_string_including(
+            "Protobuf type not configured for scalar type `UnconfiguredScalar`.",
+            "call `protobuf type:"
+          ))
+        end
+
+        it "does not require a protobuf type for GraphQL-only scalars" do
+          proto = define_proto_schema do |s|
+            s.scalar_type "GraphQLOnlyScalar" do |t|
+              t.mapping type: "keyword"
+              t.graphql_only true
+            end
+          end
+
+          expect(proto).to eq("")
+        end
+
+        it "resolves proto field types for built-in scalars that are renamed via `type_name_overrides`" do
+          proto = define_proto_schema(type_name_overrides: {"JsonSafeLong" => "BigNumber"}) do |s|
+            s.object_type "Account" do |t|
+              t.field "id", "ID"
+              t.field "amount", "BigNumber"
+              t.index "accounts"
+            end
+          end
+
+          expect(proto_type_def_from(proto, "Account")).to include("int64 amount = 2;")
+        end
       end
     end
   end
