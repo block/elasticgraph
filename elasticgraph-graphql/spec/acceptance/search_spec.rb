@@ -109,6 +109,14 @@ module ElasticGraph
           case_correctly("widget_fee_currencies") => ["CAD", "USD"]
         }])
 
+        # Demonstrate that a broken cursor on an array-backed connection is rejected, just like it
+        # is on a datastore-backed connection.
+        broken_cursor = "not-a-cursor"
+        expect {
+          response = list_widget_currencies(widget_names_args: {first: 1, after: broken_cursor}, expect_errors: true)
+          expect(response["errors"]).to contain_exactly(a_hash_including("message" => "`#{broken_cursor}` is an invalid cursor."))
+        }.to log_warning a_string_including("`#{broken_cursor}` is an invalid cursor.")
+
         unfiltered_widget_currencies = list_widget_currencies
         expect(unfiltered_widget_currencies).to match([{
           "id" => "USD",
@@ -1941,8 +1949,8 @@ module ElasticGraph
         QUERY
       end
 
-      def list_widget_currencies(widget_names_args: {}, **query_args)
-        call_graphql_query(<<~QUERY).dig("data", case_correctly("widget_currencies"), "edges").map { |we| we.fetch("node") }
+      def list_widget_currencies(widget_names_args: {}, expect_errors: false, **query_args)
+        response = call_graphql_query(<<~QUERY, allow_errors: expect_errors)
           query {
             widget_currencies#{graphql_args(query_args)} {
               edges {
@@ -1974,6 +1982,9 @@ module ElasticGraph
             }
           }
         QUERY
+
+        return response if expect_errors
+        response.dig("data", case_correctly("widget_currencies"), "edges").map { |we| we.fetch("node") }
       end
 
       def list_widget_currencies_by_nodes(**query_args)

@@ -8,6 +8,7 @@ module ElasticGraph
       def encode: () -> ::String
       def self.try_decode: (::String) -> DecodedCursor?
       def self.decode!: (::String) -> DecodedCursor
+      def self.decode_or_raise_execution_error: (::String?) -> DecodedCursor?
       @encode: ::String?
 
       SINGLETON: DecodedCursor
