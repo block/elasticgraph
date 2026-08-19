@@ -164,9 +164,9 @@ ElasticGraph.define_schema do |schema|
       i.route_with "workspace_id"
       i.default_sort "created_at", :desc
       i.has_had_multiple_sources!
-      # :nocov: -- test suite only covers one side of the conditional
+      # simplecov:disable -- test suite only covers one side of the conditional
       i.warehouse_table "widget_records" if ENV["DEMONSTRATE_WAREHOUSE_APIS"]
-      # :nocov:
+      # simplecov:enable
     end
 
     t.derive_indexed_type_fields "WidgetCurrency", from_id: "cost.currency", route_with: "cost_currency_primary_continent", rollover_with: "cost_currency_introduced_on" do |derive|
@@ -236,9 +236,9 @@ ElasticGraph.define_schema do |schema|
 
     # Exclude this internal lookup table from the data warehouse.
     t.index "widget_workspaces" do |i|
-      # :nocov: -- test suite only covers one side of the conditional
+      # simplecov:disable -- test suite only covers one side of the conditional
       i.exclude_from_warehouse if ENV["DEMONSTRATE_WAREHOUSE_APIS"]
-      # :nocov:
+      # simplecov:enable
     end
   end
 
@@ -279,6 +279,14 @@ ElasticGraph.define_schema do |schema|
       f.sourced_from "widget", "cost"
     end
 
+    # `designer_name` is fed by `ComponentDesign`, a pure-source type, demonstrating that a top-level
+    # `sourced_from` field can be sourced from a type that has no index of its own.
+    t.field "designer_name", "String" do |f|
+      f.sourced_from "design", "designer_name"
+    end
+
+    t.relates_to_one "design", "ComponentDesign", via: "component_id", dir: :in, indexing_only: true
+
     t.relates_to_one "widget", "Widget", via: "component_ids", dir: :in
     t.relates_to_one "dollar_widget", "Widget", via: "component_ids", dir: :in do |rel|
       rel.additional_filter "cost" => {"amount_cents" => {"equal_to_any_of" => [100]}}
@@ -293,7 +301,7 @@ ElasticGraph.define_schema do |schema|
 
     # Define some Apollo-specific schema elements when we are defining the schema for Apollo.
     if schema.respond_to?(:target_apollo_federation_version)
-      # :nocov: -- this file is only exercised in a test running without `elasticgraph-apollo`.
+      # simplecov:disable -- this file is only exercised in a test running without `elasticgraph-apollo`.
       t.apollo_entity_ref_field "owner", "ComponentOwner", id_field_name_in_index: "owner_id"
       t.apollo_entity_ref_field "owners", "[ComponentOwner!]!", id_field_name_in_index: "owner_ids"
       t.apollo_entity_ref_paginated_collection_field "owners_paginated", "ComponentOwner", id_field_name_in_index: "owner_ids"
@@ -302,13 +310,22 @@ ElasticGraph.define_schema do |schema|
         t.field "token", "ID"
         t.apollo_key fields: "token", resolvable: false
       end
-      # :nocov:
+      # simplecov:enable
     end
 
     t.index "components" do |i|
       i.default_sort "created_at", :desc
       i.has_had_multiple_sources!
     end
+  end
+
+  # A pure-source type (no `t.index`): its events only update `Component` documents (via the
+  # `design` relationship backing `Component.designer_name`) and are not written to any index
+  # of their own.
+  schema.object_type "ComponentDesign" do |t|
+    t.field "id", "ID!"
+    t.field "component_id", "ID"
+    t.field "designer_name", "String"
   end
 
   schema.object_type "MechanicalPart" do |t|

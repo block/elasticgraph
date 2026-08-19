@@ -162,9 +162,9 @@ module ElasticGraph
             when :array
               {"type" => "array", "items" => schema}
             else
-              # :nocov: - layer is only ever `:nullable` or `:array` so we never get here.
+              # simplecov:disable - layer is only ever `:nullable` or `:array` so we never get here.
               schema
-              # :nocov:
+              # simplecov:enable
             end
           end
         end

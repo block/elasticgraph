@@ -14,16 +14,6 @@ tables:
         shapes ARRAY<STRUCT<type STRING, coordinates ARRAY<FLOAT>>>,
         manufacturer_id STRING
       )
-  coach_profiles:
-    table_schema: |-
-      CREATE TABLE IF NOT EXISTS coach_profiles (
-        id STRING,
-        team_id STRING,
-        coach_id STRING,
-        annual_salary INT,
-        team_league STRING,
-        team_formed_on DATE
-      )
   components:
     table_schema: |-
       CREATE TABLE IF NOT EXISTS components (
@@ -37,6 +27,7 @@ tables:
         widget_workspace_id3 STRING,
         widget_size STRING,
         widget_cost STRUCT<currency STRING, amount_cents INT>,
+        designer_name STRING,
         part_ids ARRAY<STRING>,
         owner_ids ARRAY<STRING>,
         owner_id STRING
@@ -58,15 +49,6 @@ tables:
         created_at TIMESTAMP,
         voltage INT,
         manufacturer_id STRING
-      )
-  general_manager_profiles:
-    table_schema: |-
-      CREATE TABLE IF NOT EXISTS general_manager_profiles (
-        id STRING,
-        team_id STRING,
-        annual_salary INT,
-        team_league STRING,
-        team_formed_on DATE
       )
   manufacturers:
     table_schema: |-

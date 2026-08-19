@@ -6,7 +6,7 @@
 #
 # frozen_string_literal: true
 
-# :nocov: -- when running with the parallel spec runner we patch this to disable it, so things here are uncovered.
+# simplecov:disable -- when running with the parallel spec runner we patch this to disable it, so things here are uncovered.
 module ElasticGraphProfiler
   def self.results
     @results ||= Hash.new { |h, k| h[k] = [] }
@@ -95,4 +95,4 @@ RSpec.configure do |c|
     ElasticGraphProfiler.report_results if c.profile_examples?
   end
 end
-# :nocov:
+# simplecov:enable

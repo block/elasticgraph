@@ -9,7 +9,7 @@
 ::RSpec::Matchers.define :have_readable_to_s_and_inspect_output do
   max_length = 150
 
-  # :nocov: -- the logic in these blocks isn't covered on every test run (e.g. because we don't have failures each test run)
+  # simplecov:disable -- the logic in these blocks isn't covered on every test run (e.g. because we don't have failures each test run)
   chain :including do |*inclusions|
     @inclusions = inclusions
   end
@@ -63,5 +63,5 @@
       str
     end
   end
-  # :nocov:
+  # simplecov:enable
 end

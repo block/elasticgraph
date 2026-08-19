@@ -95,9 +95,9 @@ module ElasticGraph
         end
 
         def intercept(query, field:, args:, http_request:, context:)
-          # :nocov: -- must return a query to satisfy Steep type checking but never called
+          # simplecov:disable -- must return a query to satisfy Steep type checking but never called
           query
-          # :nocov:
+          # simplecov:enable
         end
       end
     end

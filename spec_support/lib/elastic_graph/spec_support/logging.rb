@@ -24,9 +24,9 @@ module LogCaptureSupport
       # the VCR cassette. However, since we also assert that there are no logged warnings in
       # many tests, if we allow the VCR errors to get written to our logs, tests can fail
       # non-deterministically. So here we exclude them from our logs.
-      # :nocov: -- the `unless` branch isn't usually covered.
+      # simplecov:disable -- the `unless` branch isn't usually covered.
       original_formatter.call(*args, msg) unless msg.include?("VCR::Errors::UnhandledHTTPRequestError")
-      # :nocov:
+      # simplecov:enable
     end
 
     def original_formatter

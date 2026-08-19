@@ -32,6 +32,11 @@ module ElasticGraph
       def []: (untyped key) -> untyped
       def fetch: (untyped key, *untyped args) ?{ (untyped) -> untyped } -> untyped
 
+      def record_lookahead_error: (::GraphQL::Execution::Lookahead node, ::String message, ?extensions: ::Hash[::String, untyped]?) -> void
+      def matching_lookahead_error: () -> ::GraphQL::ExecutionError?
+
+      @lookahead_errors: LookaheadErrors?
+
       private
 
       def raise_if_removed_key: (untyped key) -> void

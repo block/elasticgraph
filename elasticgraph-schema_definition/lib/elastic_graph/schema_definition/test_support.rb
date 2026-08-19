@@ -87,10 +87,10 @@ module ElasticGraph
         type_defs = sdl.scan(type_extraction_regex).map { |match| [match].flatten.first }
 
         if type_defs.size >= 2
-          # :nocov: -- only executed when a mistake has been made; causes a failing test.
+          # simplecov:disable -- only executed when a mistake has been made; causes a failing test.
           raise Errors::SchemaError,
             "Expected to find 0 or 1 type definition for #{type}, but found #{type_defs.size}. Type defs:\n\n#{type_defs.join("\n\n")}"
-          # :nocov:
+          # simplecov:enable
         end
 
         result = type_defs.first&.strip

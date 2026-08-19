@@ -180,22 +180,22 @@ ElasticGraph.define_schema do |schema|
     t.field "id", "ID!"
     t.relates_to_many "teams", "Team", via: "country_code", dir: :in, singular: "team"
 
-    # :nocov: -- only one side of these conditionals is executed in our test suite (but both are covered by rake tasks)
+    # simplecov:disable -- only one side of these conditionals is executed in our test suite (but both are covered by rake tasks)
     t.apollo_key fields: "id" if t.respond_to?(:apollo_key)
-    # :nocov:
+    # simplecov:enable
 
     # Note: we use `paginated_collection_field` here in order to exercise a case with the Apollo entity resolver and
     # a paginated collection field, which initially yielded an exception.
     t.paginated_collection_field "names", "String" do |f|
-      # :nocov: -- only one side of these conditionals is executed in our test suite (but both are covered by rake tasks)
+      # simplecov:disable -- only one side of these conditionals is executed in our test suite (but both are covered by rake tasks)
       f.apollo_external if f.respond_to?(:apollo_external)
-      # :nocov:
+      # simplecov:enable
     end
 
     t.field "currency", "String" do |f|
-      # :nocov: -- only one side of these conditionals is executed in our test suite (but both are covered by rake tasks)
+      # simplecov:disable -- only one side of these conditionals is executed in our test suite (but both are covered by rake tasks)
       f.apollo_external if f.respond_to?(:apollo_external)
-      # :nocov:
+      # simplecov:enable
     end
   end
 
@@ -207,6 +207,9 @@ ElasticGraph.define_schema do |schema|
   #
   # The `*Profile` events carry `team_league`/`team_formed_on` equivalents so the indexer can route (`league`)
   # and select the rollover index (`formed_on`) for the `Team` they update.
+  #
+  # The `*Profile` types are pure-source types (no `t.index`): their events only update `Team` documents
+  # and are not written to any index of their own.
   schema.object_type "Staff" do |t|
     t.field "coaches", "[Coach!]!" do |f|
       f.mapping type: "nested"
@@ -222,7 +225,6 @@ ElasticGraph.define_schema do |schema|
     t.field "annual_salary", "Int"
     t.field "team_league", "String"
     t.field "team_formed_on", "Date"
-    t.index "coach_profiles" # TODO(#1273): remove this index once we can
   end
 
   schema.object_type "GeneralManagerProfile" do |t|
@@ -231,7 +233,6 @@ ElasticGraph.define_schema do |schema|
     t.field "annual_salary", "Int"
     t.field "team_league", "String"
     t.field "team_formed_on", "Date"
-    t.index "general_manager_profiles" # TODO(#1273): remove this index once we can
   end
 
   schema.object_type "Coach" do |t|

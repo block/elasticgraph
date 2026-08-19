@@ -87,10 +87,10 @@ module ElasticGraph
           # If you're ever adding new examples to the above, you may also want to enable this
           # (just change to `if true`).
           if ENV["CI"]
-            # :nocov: -- not executed in all environments
+            # simplecov:disable -- not executed in all environments
             nanos_according_to_java = `java --source 11 #{SPEC_ROOT}/support/local_time_to_nano_of_day.java #{local_time}`.strip
             expect(expected_nanos.to_s).to eq(nanos_according_to_java)
-            # :nocov:
+            # simplecov:enable
           end
         end
 

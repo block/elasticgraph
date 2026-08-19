@@ -16,9 +16,10 @@ module ElasticGraph
       # the datastore omitted.
       #
       # When an adapter's `extract_args` is given args it considers invalid, it yields an error
-      # message instead of returning extracted args. Each caller passes a block that exits
-      # non-locally (the args of an invalid field are never used), which lets a field with invalid
-      # args be handled without disrupting the sibling fields being processed alongside it.
+      # message instead of returning extracted args. The caller (`QueryAdapter#computation_for`)
+      # passes a block that exits non-locally (the args of an invalid field are never used), which
+      # lets a field with invalid args be handled without disrupting the sibling fields being
+      # processed alongside it.
       #
       # @private
       module FunctionAdapter

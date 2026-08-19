@@ -451,11 +451,11 @@ module ElasticGraph
 
         def paths_to_non_alphabetical_hashes_in(hash, parent_path: [])
           paths = []
-          # :nocov: -- only fully covered when the test above fails
+          # simplecov:disable -- only fully covered when the test above fails
           if hash.keys != hash.keys.sort
             paths << (parent_path.empty? ? "<ROOT>" : parent_path.join("."))
           end
-          # :nocov:
+          # simplecov:enable
 
           hash.flat_map do |key, value|
             if value.is_a?(::Hash)

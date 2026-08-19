@@ -17,7 +17,7 @@
 # opt in to via the `VALIDATE_GRAPHQL_SCHEMAS` env var. We also pass this env var from our CI
 # build where it's ok if the test suite is slower.
 #
-# :nocov: -- only one of the two branches gets run on any test run.
+# simplecov:disable -- only one of the two branches gets run on any test run.
 return unless ENV["VALIDATE_GRAPHQL_SCHEMAS"]
 
 require "elastic_graph/schema_definition/test_support"
@@ -55,4 +55,4 @@ module ElasticGraph
     end
   end
 end
-# :nocov:
+# simplecov:enable

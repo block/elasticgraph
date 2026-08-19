@@ -63,6 +63,7 @@ module ElasticGraph
           aggregation_query = build_aggregation_query_for(
             aggregations_node,
             field: field,
+            context: context,
             grouping_adapter: CompositeGroupingAdapter,
             # Filters on root aggregations applied to the search query body itself instead of
             # using a filter aggregation, like sub-aggregations do, so we don't want a filter
@@ -95,7 +96,7 @@ module ElasticGraph
           )
         end
 
-        def build_aggregation_query_for(aggregations_node, field:, grouping_adapter:, nested_path: [], unfiltered: false)
+        def build_aggregation_query_for(aggregations_node, field:, context:, grouping_adapter:, nested_path: [], unfiltered: false)
           aggregation_name = name_of(_ = aggregations_node.ast_nodes.first)
 
           # Get the AST node for the `nodes` subfield (e.g. from `fooAggregations { nodes { ... } }`)
@@ -130,8 +131,8 @@ module ElasticGraph
           Query.new(
             name: aggregation_name,
             groupings: build_groupings_from(node_node, aggregation_name, from_field_path: nested_path),
-            computations: build_computations_from(node_node, from_field_path: nested_path),
-            sub_aggregations: build_sub_aggregations_from(node_node, parent_nested_path: nested_path),
+            computations: build_computations_from(node_node, context: context, from_field_path: nested_path),
+            sub_aggregations: build_sub_aggregations_from(node_node, context: context, parent_nested_path: nested_path),
             needs_doc_count: count_detail_node.selected? || node_node.selects?(element_names.count),
             needs_doc_count_error: needs_doc_count_error,
             paginator: build_paginator_for(aggregations_node),
@@ -179,22 +180,22 @@ module ElasticGraph
           end
         end
 
-        def build_computations_from(node_node, from_field_path: [])
+        def build_computations_from(node_node, context:, from_field_path: [])
           aggregated_values_node = node_node.selection(element_names.aggregated_values)
 
           build_clauses_from(aggregated_values_node) do |node, field, field_path|
             if field.aggregated?
               field_path = from_field_path + field_path
-              get_children_nodes(node).filter_map { |fn_node| computation_for(fn_node, field_path) }
+              get_children_nodes(node).filter_map { |fn_node| computation_for(fn_node, field_path, context: context) }
             end
           end
         end
 
         # Builds the `Computation` for an aggregated value function node, or returns `nil` if the node
-        # has invalid args (e.g. an out-of-range `percentile`). We omit the computation rather than
-        # failing the whole aggregations field here: the resolver detects the same invalid args when it
-        # resolves this specific field, and can attribute the error to that field's precise path.
-        def computation_for(fn_node, field_path)
+        # has invalid args (e.g. an out-of-range `percentile`). We record a lookahead error (rather
+        # than failing the whole aggregations field here) and omit the computation; ElasticGraph fails
+        # just this one leaf, at its precise path, when GraphQL execution reaches it.
+        def computation_for(fn_node, field_path, context:)
           computed_field = field_from_node(fn_node)
           function_adapter = computed_field.function_adapter # : FunctionAdapter::adapter
           args = computed_field.args_to_schema_form(fn_node.arguments)
@@ -203,7 +204,10 @@ module ElasticGraph
             source_field_path: field_path,
             leaf: PathSegment.for(field: computed_field, lookahead: fn_node),
             function_adapter: function_adapter,
-            function_args: function_adapter.extract_args(args, element_names) { return nil }
+            function_args: function_adapter.extract_args(args, element_names) do |message|
+              context.record_lookahead_error(fn_node, message)
+              return nil
+            end
           )
         end
 
@@ -306,7 +310,7 @@ module ElasticGraph
           ast_node.alias || ast_node.name
         end
 
-        def build_sub_aggregations_from(node_node, parent_nested_path: [])
+        def build_sub_aggregations_from(node_node, context:, parent_nested_path: [])
           key_sub_agg_pairs =
             build_clauses_from(node_node.selection(element_names.sub_aggregations)) do |node, field, field_path|
               if field.type.elasticgraph_category == :nested_sub_aggregation_connection
@@ -316,6 +320,7 @@ module ElasticGraph
                   query: build_aggregation_query_for(
                     node,
                     field: field,
+                    context: context,
                     grouping_adapter: sub_aggregation_grouping_adapter,
                     nested_path: nested_path
                   )

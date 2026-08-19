@@ -23,9 +23,9 @@ module ElasticGraph
 
     def sort_list_for(*sort_clauses)
       flattened_sort_clauses = sort_clauses.flatten
-      # :nocov: -- currently we don't have any tests that explicitly specify `id` as the sort field, but we might in the future
+      # simplecov:disable -- currently we don't have any tests that explicitly specify `id` as the sort field, but we might in the future
       flattened_sort_clauses + ((flattened_sort_clauses.any? { |s| s.key?("id") }) ? [] : TIEBREAKER_SORT_CLAUSES)
-      # :nocov:
+      # simplecov:enable
     end
 
     def decoded_cursor_factory_for(*sort_clauses_or_fields)

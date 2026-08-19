@@ -31,11 +31,12 @@ module ElasticGraph
           expect(proto_type_def_from(proto, "Widget")).to include(".proto.package.v1.Address address = 2;")
         end
 
-        it "maps every built-in scalar to a proto field type" do
+        it "maps every built-in scalar to a proto field type, documenting the format of those that need it" do
+          built_in_scalar_options = SchemaElements::ScalarTypeExtension::BUILT_IN_SCALAR_PROTO_OPTIONS_BY_NAME
           field_types = []
           proto = define_proto_schema do |s|
             s.object_type "Widget" do |t|
-              SchemaElements::ScalarTypeExtension::BUILT_IN_SCALAR_PROTO_TYPES_BY_NAME.each_key do |type_name|
+              built_in_scalar_options.each_key do |type_name|
                 t.field type_name.downcase, type_name
               end
               field_types = t.graphql_fields_by_name.values.map { |field| field.type.name }
@@ -43,10 +44,55 @@ module ElasticGraph
             end
           end
 
-          expect(field_types).to match_array(SchemaElements::ScalarTypeExtension::BUILT_IN_SCALAR_PROTO_TYPES_BY_NAME.keys)
-          SchemaElements::ScalarTypeExtension::BUILT_IN_SCALAR_PROTO_TYPES_BY_NAME.each.with_index(1) do |(type_name, proto_type), field_number|
-            expect(proto).to include("#{proto_type} #{type_name.downcase} = #{field_number};")
+          expect(field_types).to match_array(built_in_scalar_options.keys)
+
+          aggregate_failures do
+            built_in_scalar_options.each.with_index(1) do |(type_name, options), field_number|
+              field_line = "  #{options.fetch(:type)} #{type_name.downcase} = #{field_number};"
+              field_comment = options[:field_comment]
+              expect(proto).to include(field_comment ? "  // #{field_comment}\n#{field_line}" : field_line)
+            end
           end
+        end
+
+        it "requires `syntax` to be a supported protobuf syntax" do
+          expect {
+            define_proto_schema do |s|
+              s.proto_schema_artifacts package_name: "elasticgraph", syntax: :proto1
+            end
+          }.to raise_error(Errors::SchemaError, a_string_including("`syntax` must be one of"))
+        end
+
+        it "requires `header_lines` to be an Array of Strings" do
+          invalid_header_lines = [
+            %(option java_package = "com.example";), # a bare String rather than an Array
+            [:not_a_string],
+            ["valid", :not_a_string]
+          ]
+
+          aggregate_failures do
+            invalid_header_lines.each do |header_lines|
+              expect {
+                define_proto_schema do |s|
+                  s.proto_schema_artifacts package_name: "elasticgraph", header_lines: header_lines
+                end
+              }.to raise_error(Errors::SchemaError, a_string_including("`header_lines` must be an Array of Strings"))
+            end
+          end
+        end
+
+        it "rejects a `header_lines` element containing a newline, which would render as extra lines" do
+          expect {
+            define_proto_schema do |s|
+              s.proto_schema_artifacts(
+                package_name: "elasticgraph",
+                header_lines: ["option java_multiple_files = true;\noption optimize_for = SPEED;"]
+              )
+            end
+          }.to raise_error(Errors::SchemaError, a_string_including(
+            "`header_lines` must not contain newlines",
+            "Pass one Array element per line."
+          ))
         end
 
         it "rejects invalid package names when they are configured" do

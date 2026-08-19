@@ -54,6 +54,10 @@ module ElasticGraph
                 resolver_lambda =
                   if resolver.method(:resolve).parameters.include?([:keyreq, :lookahead])
                     lambda do |object, args, context|
+                      if (error = context.matching_lookahead_error)
+                        return error
+                      end
+
                       schema_field = context.elastic_graph_schema.field_named(type_name, field_name)
 
                       # Extract the `:lookahead` extra that we have configured all fields to provide.
@@ -80,6 +84,10 @@ module ElasticGraph
                     end
                   else
                     lambda do |object, args, context|
+                      if (error = context.matching_lookahead_error)
+                        return error
+                      end
+
                       schema_field = context.elastic_graph_schema.field_named(type_name, field_name)
                       # Convert args to the form they were defined in the schema, undoing the normalization
                       # the GraphQL gem does to convert them to Ruby keyword args form.

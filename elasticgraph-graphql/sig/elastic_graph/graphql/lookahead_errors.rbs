@@ -1,0 +1,33 @@
+module ElasticGraph
+  class GraphQL
+    class LookaheadErrors
+      class Record
+        attr_reader path: ::Array[::String]
+        attr_reader message: ::String
+        attr_reader extensions: ::Hash[::String, untyped]?
+
+        def initialize: (path: ::Array[::String], message: ::String, extensions: ::Hash[::String, untyped]?) -> void
+
+        def matches?: (::Array[::String | ::Integer] current_path) -> bool
+      end
+
+      @records: ::Array[Record]
+
+      def initialize: () -> void
+
+      def record: (
+        ::GraphQL::Execution::Lookahead node,
+        ::String message,
+        root_lookahead: ::GraphQL::Execution::Lookahead,
+        recording_path: ::Array[::String | ::Integer],
+        ?extensions: ::Hash[::String, untyped]?
+      ) -> void
+
+      def matching_error_for: (::Array[::String | ::Integer] current_path) -> ::GraphQL::ExecutionError?
+
+      private
+
+      def find_paths: (::GraphQL::Execution::Lookahead current, ::Set[::GraphQL::Language::Nodes::Field] target_ast_nodes, ::Array[::String] path_so_far) -> ::Array[::Array[::String]]
+    end
+  end
+end

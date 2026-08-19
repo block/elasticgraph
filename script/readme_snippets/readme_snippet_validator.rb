@@ -17,6 +17,7 @@ require_relative "bash_snippet_validator"
 require_relative "yaml_snippet_validator"
 require_relative "text_snippet_validator"
 require_relative "mermaid_snippet_validator"
+require_relative "protobuf_snippet_validator"
 require_relative "fallback_snippet_validator"
 
 class ReadmeSnippetValidator
@@ -202,7 +203,8 @@ class ReadmeSnippetValidator
         "bash" => BashSnippetValidator.new(project, verbose_output),
         "yaml" => YamlSnippetValidator.new(project, verbose_output),
         "text" => TextSnippetValidator.new(project, verbose_output),
-        "mermaid" => MermaidSnippetValidator.new(project, verbose_output)
+        "mermaid" => MermaidSnippetValidator.new(project, verbose_output),
+        "protobuf" => ProtobufSnippetValidator.new(project, verbose_output)
       }
 
       # Fallback validator for unknown snippet types

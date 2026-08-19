@@ -28,9 +28,9 @@ module ElasticGraph
         def new_enum_type(name)
           super(name) do |type|
             type.extend EnumTypeExtension
-            # :nocov: -- currently all invocations have a block
+            # simplecov:disable -- currently all invocations have a block
             yield type if block_given?
-            # :nocov:
+            # simplecov:enable
           end
         end
 
@@ -59,9 +59,9 @@ module ElasticGraph
         def new_interface_type(name)
           super(name) do |type|
             type.extend ObjectInterfaceAndUnionExtension
-            # :nocov: -- currently all invocations have a block
+            # simplecov:disable -- currently all invocations have a block
             yield type if block_given?
-            # :nocov:
+            # simplecov:enable
           end
         end
 
@@ -73,9 +73,9 @@ module ElasticGraph
         def new_object_type(name)
           super(name) do |type|
             type.extend ObjectInterfaceAndUnionExtension
-            # :nocov: -- currently all invocations have a block
+            # simplecov:disable -- currently all invocations have a block
             yield type if block_given?
-            # :nocov:
+            # simplecov:enable
           end
         end
 
@@ -87,9 +87,9 @@ module ElasticGraph
         def new_scalar_type(name)
           super(name) do |type|
             type.extend ScalarTypeExtension
-            # :nocov: -- currently all invocations have a block
+            # simplecov:disable -- currently all invocations have a block
             yield type if block_given?
-            # :nocov:
+            # simplecov:enable
           end
         end
 
@@ -101,9 +101,9 @@ module ElasticGraph
         def new_union_type(name)
           super(name) do |type|
             type.extend ObjectInterfaceAndUnionExtension
-            # :nocov: -- currently all invocations have a block
+            # simplecov:disable -- currently all invocations have a block
             yield type if block_given?
-            # :nocov:
+            # simplecov:enable
           end
         end
 

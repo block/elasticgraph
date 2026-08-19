@@ -660,7 +660,7 @@ module ElasticGraph
         ])
 
         if ::File.exist?(rspec_results_file) && ::File.mtime(rspec_results_file) < ::File.mtime(filter_by_time_of_day_file)
-          # :nocov: -- often skipped
+          # simplecov:disable -- often skipped
           before do
             admin = build_admin(schema_definition: ->(schema) {})
 
@@ -672,7 +672,7 @@ module ElasticGraph
               admin.schema_artifacts.runtime_metadata.static_script_ids_by_scoped_name
             )
           end
-          # :nocov:
+          # simplecov:enable
         end
 
         it "supports gt/gte/lt/lte/equal_to_any_of operators, honoring the given time zone" do

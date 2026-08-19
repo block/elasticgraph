@@ -13,10 +13,10 @@ module ElasticGraph
   class GraphQLProfilingLoggerDecorator < DelegateClass(::Logger)
     # Profiling is an opt-in thing in our test suite; so here we wrap if profiling is being used.
     def self.maybe_wrap(logger)
-      # :nocov: -- on any given test run, only one side of this conditional will be covered
+      # simplecov:disable -- on any given test run, only one side of this conditional will be covered
       return logger unless defined?(::ElasticGraphProfiler)
       new(logger)
-      # :nocov:
+      # simplecov:enable
     end
 
     def info(message)

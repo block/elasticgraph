@@ -48,9 +48,9 @@ module ElasticGraph
       gemfile_elasticgraph_details_code_snippet = %(["#{VERSION}"])
       if (eg_gems_path = ENV["ELASTICGRAPH_GEMS_PATH"])
         gemfile_elasticgraph_details_code_snippet = %([path: "#{eg_gems_path}"])
-        # :nocov: -- our tests always override `gemfile_elasticgraph_details_code_snippet` using the ENV var.
+        # simplecov:disable -- our tests always override `gemfile_elasticgraph_details_code_snippet` using the ENV var.
       else
-        # :nocov:
+        # simplecov:enable
       end
 
       setup_env = SetupEnv.new(

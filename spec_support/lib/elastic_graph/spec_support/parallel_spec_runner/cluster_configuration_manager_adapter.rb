@@ -26,12 +26,12 @@ module ElasticGraph
         # `notify_recreated_cluster_configuration` below so that we provide a single notification with all the information.
       end
 
-      # :nocov: -- whether this is called depends on whether the datastore is already fully configured or not
+      # simplecov:disable -- whether this is called depends on whether the datastore is already fully configured or not
       def notify_recreated_cluster_configuration(duration)
         puts "\nRecreated test env #{ParallelSpecRunner.test_env_number} cluster configuration (for index definitions: " \
           "#{index_definitions.map(&:name)}) in #{RSpec::Core::Formatters::Helpers.format_duration(duration)}."
       end
-      # :nocov:
+      # simplecov:enable
 
       ClusterConfigurationManager.prepend(self)
     end

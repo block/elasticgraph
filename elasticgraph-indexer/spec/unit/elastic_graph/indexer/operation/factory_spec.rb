@@ -312,7 +312,7 @@ module ElasticGraph
             expect_failed_event_error(event, "/properties/type", expect_no_ops: true)
           end
 
-          it "notifies an error on non-indexed graphql type" do
+          it "notifies an error on a graphql type that is not ingestible" do
             event = {
               "op" => "upsert",
               "id" => "1",
@@ -324,7 +324,7 @@ module ElasticGraph
 
             expect(indexer.datastore_core.index_definitions_by_graphql_type.fetch(event.fetch("type"), [])).to be_empty
 
-            # We can't build any operations when the `type` isn't an indexed type. We don't know what index to target!
+            # We can't build any operations when the `type` isn't an ingestible type
             expect_failed_event_error(event, "/properties/type", expect_no_ops: true)
           end
 
@@ -561,6 +561,48 @@ module ElasticGraph
             expect(operations.map(&:event)).to all eq event
             expect(operations.map(&:destination_index_def)).to all eq index_def_named("components")
             expect(operations.map(&:doc_id)).to contain_exactly("c1", "c2", "c3")
+          end
+
+          context "for an event of a non-indexed `sourced_from` source type", :json_ingestion_schema_definition do
+            let(:indexer) do
+              build_indexer(schema_definition: lambda do |s|
+                s.object_type "Widget" do |t|
+                  t.field "id", "ID!"
+                  t.field "name", "String"
+                  t.field "component_ids", "[ID!]!"
+                end
+
+                s.object_type "Component" do |t|
+                  t.field "id", "ID!"
+                  t.relates_to_one "widget", "Widget", via: "component_ids", dir: :in, indexing_only: true
+
+                  t.field "widget_name", "String" do |f|
+                    f.sourced_from "widget", "name"
+                  end
+
+                  t.index "components" do |i|
+                    i.has_had_multiple_sources!
+                  end
+                end
+              end)
+            end
+
+            it "builds only the `sourced_from` update operations since the source type has no index of its own" do
+              event = {
+                "op" => "upsert",
+                "id" => "w1",
+                "type" => "Widget",
+                "version" => 1,
+                JSON_SCHEMA_VERSION_KEY => 1,
+                "record" => {"id" => "w1", "name" => "Widgy", "component_ids" => ["c1", "c2"]}
+              }
+
+              operations = build_expecting_success(event)
+
+              expect(operations.map { |op| op.update_target.type }).to all eq "Component"
+              expect(operations.map(&:destination_index_def)).to all eq index_def_named("components")
+              expect(operations.map(&:doc_id)).to contain_exactly("c1", "c2")
+            end
           end
 
           def expect_failed_event_error(event, *error_message_snippets, factory: indexer.operation_factory, expect_no_ops: false)

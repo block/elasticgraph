@@ -37,6 +37,8 @@ module GraphQL
 
   class ExecutionError < StandardError
     attr_accessor path: ::Array[::String | ::Integer]?
+
+    def initialize: (::String message, ?extensions: ::Hash[::String, untyped]?) -> void
   end
 
   module Language
@@ -122,6 +124,7 @@ module GraphQL
     # ElasticGraph code encounters is actually one of those.
     attr_reader context: ::ElasticGraph::GraphQL::QueryContext
 
+    def lookahead: () -> Execution::Lookahead
     def selected_operation: () -> Language::Nodes::OperationDefinition?
     def selected_operation_name: () -> ::String?
     def static_errors: () -> ::Array[_ValidationError]

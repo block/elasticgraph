@@ -578,38 +578,49 @@ module ElasticGraph
       end
 
       def verify_aggregate_sibling_and_deeply_nested_grouped_counts_and_aggregated_values
-        team_aggs = call_graphql_query(<<~EOS).dig("data", case_correctly("team_aggregations"))
-          query {
-            team_aggregations {
-              nodes {
-                sub_aggregations {
-                  current_players_nested {
-                    nodes {
-                      grouped_by { name }
-                      count_detail { approximate_value }
-                      aggregated_values { name { approximate_distinct_value_count } }
+        response = nil
+        expect {
+          response = call_graphql_query(<<~EOS, allow_errors: true)
+            query {
+              team_aggregations {
+                nodes {
+                  sub_aggregations {
+                    current_players_nested {
+                      nodes {
+                        grouped_by { name }
+                        count_detail { approximate_value }
+                        aggregated_values { name { approximate_distinct_value_count } }
+                      }
                     }
-                  }
 
-                  seasons_nested {
-                    nodes {
-                      grouped_by { year }
-                      count_detail { approximate_value }
-                      aggregated_values { record { wins { approximate_avg, exact_max } } }
+                    seasons_nested {
+                      nodes {
+                        grouped_by { year }
+                        count_detail { approximate_value }
+                        aggregated_values {
+                          record {
+                            wins {
+                              approximate_avg
+                              exact_max
+                              bad: approximate_percentile(percentile: 150)
+                            }
+                          }
+                        }
 
-                      sub_aggregations {
-                        players_nested {
-                          nodes {
-                            grouped_by { name }
-                            count_detail { approximate_value }
-                            aggregated_values { name { approximate_distinct_value_count } }
+                        sub_aggregations {
+                          players_nested {
+                            nodes {
+                              grouped_by { name }
+                              count_detail { approximate_value }
+                              aggregated_values { name { approximate_distinct_value_count } }
 
-                            sub_aggregations {
-                              seasons_nested {
-                                nodes {
-                                  grouped_by { year }
-                                  count_detail { approximate_value }
-                                  aggregated_values { games_played { exact_max } }
+                              sub_aggregations {
+                                seasons_nested {
+                                  nodes {
+                                    grouped_by { year }
+                                    count_detail { approximate_value }
+                                    aggregated_values { games_played { exact_max } }
+                                  }
                                 }
                               }
                             }
@@ -621,8 +632,27 @@ module ElasticGraph
                 }
               }
             }
-          }
-        EOS
+          EOS
+        }.to log_warning(a_string_including("percentile` must be between 0 and 100"))
+
+        team_aggs = response.dig("data", case_correctly("team_aggregations"))
+
+        # Verify that the out-of-range `bad` percentile--recorded at sub-aggregation depth, on a field
+        # nested two layers under `seasons_nested`--resolves to `null` (with a precisely-pathed error) in
+        # every `seasons_nested` bucket, without disrupting any sibling field, including the `2021` bucket
+        # where `wins` itself is `nil` (proving the recorded error doesn't depend on the field's data).
+        season_nodes = team_aggs.dig(case_correctly("nodes"), 0, case_correctly("sub_aggregations"), case_correctly("seasons_nested"), case_correctly("nodes"))
+        expected_bad_errors = season_nodes.each_index.map do |index|
+          hash_including(
+            "message" => "`#{case_correctly("percentile")}` must be between 0 and 100, but is 150.0.",
+            "path" => [
+              case_correctly("team_aggregations"), "nodes", 0, case_correctly("sub_aggregations"),
+              case_correctly("seasons_nested"), "nodes", index, case_correctly("aggregated_values"),
+              "record", "wins", "bad"
+            ]
+          )
+        end
+        expect(response.fetch("errors")).to contain_exactly(*expected_bad_errors)
 
         expect(team_aggs).to eq({
           case_correctly("nodes") => [
@@ -665,7 +695,8 @@ module ElasticGraph
                       case_correctly("aggregated_values") => {
                         "record" => {"wins" => {
                           case_correctly("approximate_avg") => 40.0,
-                          case_correctly("exact_max") => 50
+                          case_correctly("exact_max") => 50,
+                          "bad" => nil
                         }}
                       },
                       case_correctly("sub_aggregations") => {
@@ -713,7 +744,8 @@ module ElasticGraph
                       case_correctly("aggregated_values") => {
                         "record" => {"wins" => {
                           case_correctly("approximate_avg") => 40.0,
-                          case_correctly("exact_max") => 40
+                          case_correctly("exact_max") => 40,
+                          "bad" => nil
                         }}
                       },
                       case_correctly("sub_aggregations") => {case_correctly("players_nested") => {case_correctly("nodes") => []}}
@@ -724,7 +756,8 @@ module ElasticGraph
                       case_correctly("aggregated_values") => {
                         "record" => {"wins" => {
                           case_correctly("approximate_avg") => nil,
-                          case_correctly("exact_max") => nil
+                          case_correctly("exact_max") => nil,
+                          "bad" => nil
                         }}
                       },
                       case_correctly("sub_aggregations") => {case_correctly("players_nested") => {case_correctly("nodes") => []}}
@@ -735,7 +768,8 @@ module ElasticGraph
                       case_correctly("aggregated_values") => {
                         "record" => {"wins" => {
                           case_correctly("approximate_avg") => 40.0,
-                          case_correctly("exact_max") => 40
+                          case_correctly("exact_max") => 40,
+                          "bad" => nil
                         }}
                       },
                       case_correctly("sub_aggregations") => {case_correctly("players_nested") => {case_correctly("nodes") => []}}
@@ -746,7 +780,8 @@ module ElasticGraph
                       case_correctly("aggregated_values") => {
                         "record" => {"wins" => {
                           case_correctly("approximate_avg") => 50.0,
-                          case_correctly("exact_max") => 50
+                          case_correctly("exact_max") => 50,
+                          "bad" => nil
                         }}
                       },
                       case_correctly("sub_aggregations") => {case_correctly("players_nested") => {case_correctly("nodes") => []}}

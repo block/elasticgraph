@@ -1576,43 +1576,6 @@ indices:
       index.number_of_replicas: 1
       index.number_of_shards: 1
       index.max_result_window: 10000
-  coach_profiles:
-    aliases: {}
-    mappings:
-      dynamic: strict
-      properties:
-        id:
-          type: keyword
-        team_id:
-          type: keyword
-        coach_id:
-          type: keyword
-        annual_salary:
-          type: integer
-        team_league:
-          type: keyword
-        team_formed_on:
-          type: date
-          format: strict_date
-        __nested_sourced_data:
-          type: object
-          dynamic: 'false'
-        __sources:
-          type: keyword
-        __versions:
-          type: object
-          dynamic: 'false'
-        __typename:
-          type: constant_keyword
-          value: CoachProfile
-      _size:
-        enabled: true
-    settings:
-      index.mapping.ignore_malformed: false
-      index.mapping.coerce: false
-      index.number_of_replicas: 1
-      index.number_of_shards: 1
-      index.max_result_window: 10000
   components:
     aliases: {}
     mappings:
@@ -1647,6 +1610,8 @@ indices:
               type: keyword
             amount_cents:
               type: integer
+        designer_name:
+          type: keyword
         part_ids:
           type: keyword
         owner_ids:
@@ -1741,41 +1706,6 @@ indices:
         __typename:
           type: constant_keyword
           value: ElectricalPart
-      _size:
-        enabled: true
-    settings:
-      index.mapping.ignore_malformed: false
-      index.mapping.coerce: false
-      index.number_of_replicas: 1
-      index.number_of_shards: 1
-      index.max_result_window: 10000
-  general_manager_profiles:
-    aliases: {}
-    mappings:
-      dynamic: strict
-      properties:
-        id:
-          type: keyword
-        team_id:
-          type: keyword
-        annual_salary:
-          type: integer
-        team_league:
-          type: keyword
-        team_formed_on:
-          type: date
-          format: strict_date
-        __nested_sourced_data:
-          type: object
-          dynamic: 'false'
-        __sources:
-          type: keyword
-        __versions:
-          type: object
-          dynamic: 'false'
-        __typename:
-          type: constant_keyword
-          value: GeneralManagerProfile
       _size:
         enabled: true
     settings:

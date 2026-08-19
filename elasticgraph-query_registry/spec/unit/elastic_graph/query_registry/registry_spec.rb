@@ -713,12 +713,12 @@ module ElasticGraph
           file_reads_by_name = ::Hash.new(0)
 
           allow(::File).to receive(:read).and_wrap_original do |original, file_name|
-            # :nocov: -- the `else` branch here is only covered when the test is run in isolation
+            # simplecov:disable -- the `else` branch here is only covered when the test is run in isolation
             # (in that case, there are a bunch of config files that are read off disk).
             # When run in a larger test suite those config files have already been read
             # and cached in memory.
             file_reads_by_name[file_name] += 1 if file_name.include?(query_registry_dir)
-            # :nocov:
+            # simplecov:enable
             original.call(file_name)
           end
 

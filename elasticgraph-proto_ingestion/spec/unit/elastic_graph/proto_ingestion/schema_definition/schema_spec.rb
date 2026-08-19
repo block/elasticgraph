@@ -102,6 +102,91 @@ module ElasticGraph
           expect(proto.scan(/^(?:enum|message) (\w+) \{/).flatten).to eq(%w[Alpha Beta Yak Zulu])
         end
 
+        it "emits proto2 syntax with an explicit label on every field when `syntax: :proto2`" do
+          proto = define_proto_schema do |s|
+            s.proto_schema_artifacts package_name: "elasticgraph", syntax: :proto2
+
+            s.enum_type "Status" do |t|
+              t.values "ACTIVE", "INACTIVE"
+            end
+
+            s.object_type "Account" do |t|
+              t.field "id", "ID"
+              t.field "status", "Status"
+              t.field "tags", "[String!]!"
+              t.index "accounts"
+            end
+          end
+
+          expect(proto).to start_with(%(syntax = "proto2";))
+          expect(proto_type_def_from(proto, "Account")).to include(
+            "optional string id = 1;",
+            "optional .elasticgraph.Status status = 2;",
+            "repeated string tags = 3;"
+          )
+        end
+
+        it "omits the field label on `oneof` alternatives under `proto2`, which protoc forbids from carrying one" do
+          proto = define_proto_schema do |s|
+            s.proto_schema_artifacts package_name: "elasticgraph", syntax: :proto2
+
+            s.object_type "Car" do |t|
+              t.implements "Vehicle"
+              t.field "id", "ID"
+            end
+
+            s.object_type "Bike" do |t|
+              t.implements "Vehicle"
+              t.field "id", "ID"
+            end
+
+            s.interface_type "Vehicle" do |t|
+              t.field "id", "ID"
+              t.index "vehicles"
+            end
+          end
+
+          # The alternatives carry no `optional`, unlike the `optional string id` fields on the
+          # concrete messages below, which do get a label under proto2.
+          expect(proto_type_def_from(proto, "Vehicle")).to eq(<<~PROTO.strip)
+            message Vehicle {
+              oneof value {
+                .elasticgraph.Car car = 1;
+                .elasticgraph.Bike bike = 2;
+              }
+              // Next field number: 3
+            }
+          PROTO
+
+          expect(proto_type_def_from(proto, "Car")).to include("optional string id = 1;")
+        end
+
+        it "renders custom `header_lines` verbatim after the package declaration" do
+          proto = define_proto_schema do |s|
+            s.proto_schema_artifacts(
+              package_name: "myapp.events.v1",
+              header_lines: [
+                %(option java_package = "com.myapp.events";),
+                "option java_multiple_files = true;"
+              ]
+            )
+
+            s.object_type "Account" do |t|
+              t.field "id", "ID"
+              t.index "accounts"
+            end
+          end
+
+          expect(proto).to include(<<~PROTO)
+            package myapp.events.v1;
+
+            option java_package = "com.myapp.events";
+            option java_multiple_files = true;
+
+            message Account {
+          PROTO
+        end
+
         it "generates oneof wrappers for indexed interface and union types" do
           proto = define_proto_schema do |s|
             s.object_type "Car" do |t|
@@ -563,7 +648,7 @@ module ElasticGraph
           generator = Schema.new(
             state: results.state,
             all_types: results.send(:all_types),
-            package_name: "elasticgraph"
+            ingestion_state: results.state.proto_ingestion_state
           )
 
           first_generation = generator.to_proto
