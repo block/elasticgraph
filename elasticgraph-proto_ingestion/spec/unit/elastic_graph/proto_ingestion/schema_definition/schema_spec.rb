@@ -129,7 +129,9 @@ module ElasticGraph
           generator = Schema.new(
             state: results.state,
             all_types: results.send(:all_types),
-            ingestion_state: results.state.proto_ingestion_state
+            ingestion_state: results.state.proto_ingestion_state,
+            sourced_from_source_type_names: results.sourced_update_targets_by_source_type_name.keys.to_set,
+            derived_indexing_type_names: results.derived_indexing_type_names
           )
 
           first_generation = generator.to_proto
