@@ -112,6 +112,22 @@ module ElasticGraph
         expect(keys[1]).to match %r{Data0001/Component/v1/2024-09-15/}
       end
 
+      it "uses the `#{WarehouseDumper::UNVERSIONED_S3_KEY_SEGMENT}` segment for an event that carries no schema version" do
+        op = new_primary_indexing_operation({"type" => "Widget", "id" => "1", "version" => 3, "record" => {"id" => "1", "dayOfWeek" => "MON", "created_at" => "2024-09-15T12:30:12Z", "workspace_id" => "ws-1"}})
+
+        warehouse_dumper.bulk([op])
+
+        key = s3_client.api_requests.first.fetch(:params).fetch(:key)
+
+        expect(key).to start_with("Data0001/Widget/#{WarehouseDumper::UNVERSIONED_S3_KEY_SEGMENT}/2024-09-15/")
+        # The segment count must match a versioned key, so that a reader that splits the key keeps working.
+        expect(key.split("/").size).to eq(5)
+
+        expect(logged_jsons_of_type(WarehouseDumper::LOG_MSG_DUMPED_FILE)).to match [
+          a_hash_including({SCHEMA_VERSION_KEY => nil, JSON_SCHEMA_VERSION_KEY => nil})
+        ]
+      end
+
       it "logs structured information about received batch and dumped files" do
         widget_op = new_primary_indexing_operation({"type" => "Widget", "id" => "1", "version" => 3, SCHEMA_VERSION_KEY => 1, "record" => {"id" => "1", "dayOfWeek" => "MON", "created_at" => "2024-09-15T12:30:12Z", "workspace_id" => "ws-1"}})
         component_op = new_primary_indexing_operation({"type" => "Component", "id" => "c1", "version" => 2, SCHEMA_VERSION_KEY => 1, "record" => {"id" => "c1", "created_at" => "2024-09-15T12:30:12Z"}})
@@ -128,12 +144,15 @@ module ElasticGraph
             "s3_bucket" => s3_bucket_name,
             "type" => "Widget",
             SCHEMA_VERSION_KEY => 1,
+            # Deprecated alias, kept for existing dashboards and monitors.
+            JSON_SCHEMA_VERSION_KEY => 1,
             "record_count" => 1
           }),
           a_hash_including({
             "s3_bucket" => s3_bucket_name,
             "type" => "Component",
             SCHEMA_VERSION_KEY => 1,
+            JSON_SCHEMA_VERSION_KEY => 1,
             "record_count" => 1
           })
         ]
