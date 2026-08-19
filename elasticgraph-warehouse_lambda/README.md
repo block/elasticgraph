@@ -76,7 +76,8 @@ Files are written with the following S3 key format:
 - **schema_version**: The schema version **selected based on the ingested event's requested version**
   (or the closest available version if the exact version isn't available). This ensures data partitioning
   matches the actual schema version used to process each event, making it easier to handle schema evolution
-  and version-specific data processing.
+  and version-specific data processing. An ingestion format with no schema versions gets the fixed segment
+  `unversioned` in place of `v<schema_version>`, so the segment count of the key stays the same.
 - **YYYY-MM-DD**: UTC date when the batch was processed (aligns with common data warehouse
   partitioning strategies)
 - **uuid**: A random UUID for uniqueness

@@ -14,16 +14,27 @@ module ElasticGraph
   class Indexer
     module TestSupport
       module Converters
+        # Attributes that describe the event rather than the record, so they never reach the record.
+        # `__json_schema_version` is the legacy name of `__schema_version`; projects generated before
+        # the schema version became ingestion-format-neutral still use it.
+        EVENT_ONLY_ATTRIBUTES = ["__typename", "__version", "__schema_version", "__json_schema_version"]
+
         # Helper method for testing and generating fake data to convert a factory record into an event
         def self.upsert_event_for(record)
-          {
+          event = {
             "op" => "upsert",
             "id" => record.fetch("id"),
             "type" => record.fetch("__typename"),
             "version" => record.fetch("__version"),
-            "record" => record.except("__typename", "__version", "__schema_version"),
-            SCHEMA_VERSION_KEY => record.fetch("__schema_version")
+            "record" => record.except(*EVENT_ONLY_ATTRIBUTES)
           }
+
+          # The schema version is optional, so include it only when the factory supplies one.
+          if (schema_version = record["__schema_version"] || record["__json_schema_version"])
+            event[SCHEMA_VERSION_KEY] = schema_version
+          end
+
+          event
         end
 
         # Helper method to create an array of events given an array of records

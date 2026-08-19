@@ -33,6 +33,42 @@ module ElasticGraph
               SCHEMA_VERSION_KEY => 1
             )
           end
+
+          it "accepts the legacy `__json_schema_version` attribute, so factories from older projects keep working" do
+            factory_record = {
+              "id" => "1",
+              "__version" => 1,
+              "__typename" => "Widget",
+              "__json_schema_version" => 3,
+              "field1" => "value1"
+            }
+
+            expect(TestSupport::Converters.upsert_event_for(factory_record)).to eq(
+              "op" => "upsert",
+              "id" => "1",
+              "version" => 1,
+              "type" => "Widget",
+              "record" => {"id" => "1", "field1" => "value1"},
+              SCHEMA_VERSION_KEY => 3
+            )
+          end
+
+          it "omits the schema version when the factory record supplies none, since the key is optional" do
+            factory_record = {
+              "id" => "1",
+              "__version" => 1,
+              "__typename" => "Widget",
+              "field1" => "value1"
+            }
+
+            expect(TestSupport::Converters.upsert_event_for(factory_record)).to eq(
+              "op" => "upsert",
+              "id" => "1",
+              "version" => 1,
+              "type" => "Widget",
+              "record" => {"id" => "1", "field1" => "value1"}
+            )
+          end
         end
 
         describe ".upsert_events_for_records" do
