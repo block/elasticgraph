@@ -90,6 +90,7 @@ module MyCompany
 end
 ```
 
-Decoded event hashes do not need to provide a schema version. When a version is omitted, the latest
-available schema artifact version is used for validation and record preparation. Decoders may include
-`schema_version` to request a specific schema artifact version.
+A decoded event hash may carry a `schema_version` to request a specific schema artifact version. The
+key is optional, because an ingestion format may have no versions at all. Each ingestion adapter
+decides what a missing version means for its own format. `elasticgraph-json_ingestion` uses the latest
+available JSON schema version.

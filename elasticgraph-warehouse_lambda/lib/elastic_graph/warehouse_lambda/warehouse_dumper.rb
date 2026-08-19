@@ -25,6 +25,10 @@ module ElasticGraph
       # @return [String] message type for logging when a file is dumped to S3
       LOG_MSG_DUMPED_FILE = "DumpedToWarehouseFile"
 
+      # @return [String] S3 key segment used in place of `v<version>` for an ingestion format that
+      #   has no schema versions
+      UNVERSIONED_S3_KEY_SEGMENT = "unversioned"
+
       def initialize(logger:, s3_client:, s3_bucket_name:, s3_file_prefix:, clock:)
         @logger = logger
         @s3_client = s3_client
@@ -40,7 +44,8 @@ module ElasticGraph
       # @param refresh [Boolean] ignored (included for interface compatibility with DatastoreIndexingRouter)
       # @return [BulkResult] result containing success status for all operations
       def bulk(operations, refresh: false)
-        operations_by_type_and_schema_version = operations.group_by { |op| [op.event.fetch("type"), op.event.fetch(SCHEMA_VERSION_KEY)] }
+        # The schema version is optional, since an ingestion format may have no versions at all.
+        operations_by_type_and_schema_version = operations.group_by { |op| [op.event.fetch("type"), op.event[SCHEMA_VERSION_KEY]] }
 
         @logger.info({
           "message_type" => LOG_MSG_RECEIVED_BATCH,
@@ -73,6 +78,9 @@ module ElasticGraph
             "s3_key" => s3_key,
             "type" => type,
             SCHEMA_VERSION_KEY => schema_version,
+            # Deprecated alias of `schema_version`, kept so that dashboards and monitors that watch
+            # the old name keep working.
+            JSON_SCHEMA_VERSION_KEY => schema_version,
             "record_count" => operations.size,
             "json_size" => jsonl_data.bytesize,
             "gzip_size" => gzip_data.bytesize
@@ -101,10 +109,14 @@ module ElasticGraph
         date = @clock.now.utc.strftime("%Y-%m-%d")
         uuid = ::SecureRandom.uuid
 
+        # An ingestion format with no schema versions gets a fixed segment in place of `v<version>`.
+        # The segment count stays the same, so a reader that splits the key keeps working.
+        version_segment = schema_version.nil? ? UNVERSIONED_S3_KEY_SEGMENT : "v#{schema_version}"
+
         [
           @s3_file_prefix,
           type,
-          "v#{schema_version}",
+          version_segment,
           date,
           "#{uuid}.jsonl.gz"
         ].join("/")
