@@ -10,7 +10,8 @@ module ElasticGraph
 
           def proto_name: () -> ::String
           def proto_type_reference: (::String package_name) -> ::String
-          def protobuf_comment: () -> nil
+          def protobuf_import: () -> nil
+          def protobuf_field_comment: () -> nil
           def to_proto: (Schema schema, ::String package_name) -> ::String
           def referenced_proto_types: () -> ::Array[::ElasticGraph::SchemaDefinition::SchemaElements::graphQLType]
           def self.list_depth_and_base_type: (
@@ -25,6 +26,7 @@ module ElasticGraph
             ::ElasticGraph::SchemaDefinition::SchemaElements::Field,
             ::ElasticGraph::SchemaDefinition::Indexing::Field
           ]]
+          def field_comment_lines_for: (::String? doc_comment, ::String? field_comment) -> ::Array[::String]
           def proto_field_type_for: (
             ::ElasticGraph::SchemaDefinition::SchemaElements::TypeReference,
             package_name: ::String,

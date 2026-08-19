@@ -67,11 +67,18 @@ module ElasticGraph
             ".#{package_name}.#{proto_name}"
           end
 
-          # Enum values are self-describing, so fields of this type get no trailing format comment.
+          # Enum types render their own protobuf definition, so they never require an import.
+          #
+          # @return [nil]
+          def protobuf_import
+            nil
+          end
+
+          # Enum values are self-describing, so fields of this type get no format comment.
           # Only scalar types document a format.
           #
           # @return [nil]
-          def protobuf_comment
+          def protobuf_field_comment
             nil
           end
 

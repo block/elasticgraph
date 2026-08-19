@@ -18,18 +18,18 @@ module ElasticGraph
           BUILT_IN_SCALAR_PROTO_OPTIONS_BY_NAME = {
             "Boolean" => {type: "bool"},
             "Cursor" => {type: "string"},
-            "Date" => {type: "string", comment: %(ISO 8601 date, e.g. "2024-11-25")},
+            "Date" => {type: "string", field_comment: %(Must be formatted as an ISO 8601 date, e.g. "2024-11-25".)},
             "DateTime" => {type: "google.protobuf.Timestamp", import: "google/protobuf/timestamp.proto"},
             "Float" => {type: "double"},
             "ID" => {type: "string"},
             "Int" => {type: "int32"},
             "JsonSafeLong" => {type: "int64"},
-            "LocalTime" => {type: "string", comment: %(ISO 8601 local time, e.g. "14:23:12")},
+            "LocalTime" => {type: "string", field_comment: %(Must be formatted as an ISO 8601 local time, e.g. "14:23:12".)},
             "LongString" => {type: "int64"},
             "String" => {type: "string"},
-            "TimeZone" => {type: "string", comment: %(IANA time zone identifier, e.g. "America/Los_Angeles")},
+            "TimeZone" => {type: "string", field_comment: %(Must be an IANA time zone identifier, e.g. "America/Los_Angeles".)},
             "Untyped" => {type: "string"}
-          }.freeze # : ::Hash[::String, {type: ::String, ?import: ::String, ?comment: ::String}]
+          }.freeze # : ::Hash[::String, {type: ::String, ?import: ::String, ?field_comment: ::String}]
 
           # An `import` is rendered as `import "PATH";`, so a quote or newline in the path would
           # produce invalid proto. `protoc` also requires the path to name a `.proto` file.
@@ -43,35 +43,28 @@ module ElasticGraph
           # @dynamic protobuf_import
           attr_reader :protobuf_import
 
-          # Comment rendered on generated proto fields of this scalar type.
-          # @dynamic protobuf_comment
-          attr_reader :protobuf_comment
+          # Comment rendered above each generated proto field of this scalar type.
+          # @dynamic protobuf_field_comment
+          attr_reader :protobuf_field_comment
 
-          # Configures the protobuf type for this scalar type.
+          # Configures the protobuf type for this scalar type. Each call replaces the full protobuf
+          # configuration, so an override that omits `import:` or `field_comment:` clears the value
+          # configured by a prior call.
           #
           # @param type [String] protobuf type name
           # @param import [String, nil] proto file to import for an externally defined type
-          # @param comment [String, nil] single-line comment rendered on generated fields of this type
+          # @param field_comment [String, nil] comment rendered above each generated field of this type
           # @return [void]
           # @raise [Errors::SchemaError] when `import` is not a `.proto` file path
-          # @raise [Errors::SchemaError] when `comment` spans multiple lines
-          def protobuf(type:, import: nil, comment: nil)
+          def protobuf(type:, import: nil, field_comment: nil)
             if import && !VALID_PROTOBUF_IMPORT_PATH.match?(import)
               raise Errors::SchemaError, "`protobuf` import for `#{name}` must be the path of a `.proto` file, " \
                 "but got: #{import.inspect}."
             end
 
-            # The comment is rendered as a trailing `// ...` on the field line, so a newline would
-            # push the remainder onto its own line as bare, invalid proto syntax. Multi-line prose
-            # belongs on the field's GraphQL doc comment, which renders as `//` lines above the field.
-            if comment&.include?("\n")
-              raise Errors::SchemaError, "`protobuf` comment for `#{name}` must be a single line, but got: #{comment.inspect}. " \
-                "Use the field's doc comment for multi-line documentation."
-            end
-
             @protobuf_type = type
             @protobuf_import = import
-            @protobuf_comment = comment
+            @protobuf_field_comment = field_comment
           end
 
           # Applies any built-in protobuf type, yields for further configuration, and validates the result.

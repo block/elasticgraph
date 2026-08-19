@@ -48,9 +48,9 @@ module ElasticGraph
 
           aggregate_failures do
             built_in_scalar_options.each.with_index(1) do |(type_name, options), field_number|
-              field_line = "#{options.fetch(:type)} #{type_name.downcase} = #{field_number};"
-              comment = options[:comment]
-              expect(proto).to include(comment ? "#{field_line} // #{comment}" : field_line)
+              field_line = "  #{options.fetch(:type)} #{type_name.downcase} = #{field_number};"
+              field_comment = options[:field_comment]
+              expect(proto).to include(field_comment ? "  // #{field_comment}\n#{field_line}" : field_line)
             end
           end
         end

@@ -113,8 +113,8 @@ The generated `schema.proto` then contains `import "google/protobuf/duration.pro
 emits the import only when a generated message uses the scalar. The `import:` value must be the
 path of a `.proto` file.
 
-`comment:` documents the expected format on each generated field. This is useful when the proto
-type is wider than the ElasticGraph type:
+`field_comment:` documents the expected format on each generated field. This is useful when the
+proto type is wider than the ElasticGraph type:
 
 ```ruby
 # in config/schema/phone_number.rb
@@ -123,16 +123,23 @@ ElasticGraph.define_schema do |schema|
   schema.scalar_type "PhoneNumber" do |t|
     t.mapping type: "keyword"
     t.json_schema type: "string"
-    t.protobuf type: "string", comment: "E.164 phone number"
+    t.protobuf type: "string", field_comment: "Must be an E.164 phone number."
   end
 end
 ```
 
-A `PhoneNumber` field then renders as `string phone_number = 1; // E.164 phone number`.
+A `PhoneNumber` field then renders as:
 
-`comment:` renders as a trailing `//` comment on the field line, so it must be a single line.
-Put multi-line documentation on the field's doc comment instead, which renders as `//` lines
-above the field.
+```protobuf
+// Must be an E.164 phone number.
+string phone_number = 1;
+```
+
+The comment goes above the field, below the field's own doc comment, because proto compilers
+attach these leading comments to the code they generate for the field. A `field_comment:` can
+span multiple lines. The option is named `field_comment:` rather than `comment:` because a scalar
+type has no proto representation of its own to comment on; the comment applies to each field of
+that type.
 
 ### Overriding a Built-in Scalar
 
@@ -144,13 +151,14 @@ Use `on_built_in_types` to change the protobuf type of a built-in scalar. For ex
 
 ElasticGraph.define_schema do |schema|
   schema.on_built_in_types do |type|
-    type.protobuf type: "string", comment: "ISO 8601 timestamp" if type.name == "DateTime"
+    type.protobuf type: "string", field_comment: "Must be formatted as an ISO 8601 timestamp." if type.name == "DateTime"
   end
 end
 ```
 
-The override also clears the built-in `import:` value, so `schema.proto` no longer imports
-`google/protobuf/timestamp.proto`.
+Each call to `protobuf` replaces the full protobuf configuration. The override above omits
+`import:`, so `schema.proto` no longer imports `google/protobuf/timestamp.proto`. An override that
+omits `field_comment:` likewise drops the built-in comment.
 
 ## Type Mappings
 
@@ -178,8 +186,8 @@ Additionally:
   is a UTC instant, so a publisher's original UTC offset is not preserved.
 - `string`-typed temporal scalars (`Date`, `LocalTime`, `TimeZone`) are wider than the
   ElasticGraph types they carry, so generated fields of these types document the expected format
-  in a comment (e.g. `// ISO 8601 date, e.g. "2024-11-25"`). Values are validated when events
-  are ingested, just as with JSON ingestion.
+  in a comment above the field (e.g. `// Must be formatted as an ISO 8601 date, e.g. "2024-11-25".`).
+  Values are validated when events are ingested, just as with JSON ingestion.
 - List types become `repeated` fields.
 - Lists of lists (e.g. `[[Float!]!]!`) are not supported because Protocol Buffers cannot represent
   them directly. Schema artifact generation raises an error identifying the unsupported field.

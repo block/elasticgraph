@@ -11,7 +11,7 @@ require "elastic_graph/proto_ingestion/schema_definition/api_extension"
 module ElasticGraph
   module ProtoIngestion
     module SchemaDefinition
-      # Covers how scalar types map to proto field types: the `type:`, `import:`, and `comment:`
+      # Covers how scalar types map to proto field types: the `type:`, `import:`, and `field_comment:`
       # options of `protobuf`, and the imports and field comments they produce.
       RSpec.describe Schema, "scalar proto types" do
         it "maps `DateTime` fields to `google.protobuf.Timestamp`, importing its proto file once" do
@@ -40,10 +40,12 @@ module ElasticGraph
           PROTO
         end
 
-        it "lets `on_built_in_types` override a built-in scalar's protobuf type, dropping its import" do
+        it "lets `on_built_in_types` replace a built-in scalar's protobuf type, import, and field comment" do
           proto = define_proto_schema do |s|
             s.on_built_in_types do |type|
-              type.protobuf type: "string", comment: "ISO 8601 timestamp" if type.name == "DateTime"
+              # `protobuf` replaces the full configuration, so omitting `import:` here drops the
+              # built-in `google/protobuf/timestamp.proto` import.
+              type.protobuf type: "string", field_comment: "Must be formatted as an ISO 8601 timestamp." if type.name == "DateTime"
             end
 
             s.object_type "Event" do |t|
@@ -60,7 +62,37 @@ module ElasticGraph
 
             message Event {
               string id = 1;
-              string created_at = 2; // ISO 8601 timestamp
+              // Must be formatted as an ISO 8601 timestamp.
+              string created_at = 2;
+              // Next field number: 3
+            }
+          PROTO
+        end
+
+        it "drops a built-in scalar's field comment when an override omits `field_comment:`" do
+          proto = define_proto_schema do |s|
+            s.on_built_in_types do |type|
+              # `Date` has a built-in `field_comment:` and no `import:`; this override inverts both.
+              type.protobuf type: "google.type.Date", import: "google/type/date.proto" if type.name == "Date"
+            end
+
+            s.object_type "Event" do |t|
+              t.field "id", "ID"
+              t.field "occurred_on", "Date"
+              t.index "events"
+            end
+          end
+
+          expect(proto).to eq(<<~PROTO)
+            syntax = "proto3";
+
+            package elasticgraph;
+
+            import "google/type/date.proto";
+
+            message Event {
+              string id = 1;
+              google.type.Date occurred_on = 2;
               // Next field number: 3
             }
           PROTO
@@ -126,13 +158,14 @@ module ElasticGraph
           expect(proto.lines.grep(/\Aimport /).map(&:chomp)).to eq([%(import "used.proto";)])
         end
 
-        it "renders the format comment after the field number, below any doc comment" do
+        it "renders the field comment above the field, after any doc comment" do
           proto = define_proto_schema do |s|
             s.object_type "Person" do |t|
               t.field "id", "ID"
               t.field "important_dates", "[Date!]!" do |f|
                 f.documentation "The dates that matter to this person."
               end
+              t.field "time_zone", "TimeZone"
               t.index "people"
             end
           end
@@ -141,17 +174,21 @@ module ElasticGraph
             message Person {
               string id = 1;
               // The dates that matter to this person.
-              repeated string important_dates = 2; // ISO 8601 date, e.g. "2024-11-25"
-              // Next field number: 3
+              //
+              // Must be formatted as an ISO 8601 date, e.g. "2024-11-25".
+              repeated string important_dates = 2;
+              // Must be an IANA time zone identifier, e.g. "America/Los_Angeles".
+              string time_zone = 3;
+              // Next field number: 4
             }
           PROTO
         end
 
-        it "renders the `import:` and `comment:` configured on a custom scalar type" do
+        it "renders the `import:` and `field_comment:` configured on a custom scalar type" do
           proto = define_proto_schema do |s|
             s.scalar_type "Money" do |t|
               t.mapping type: "keyword"
-              t.protobuf type: "myapp.types.Money", import: "my-app/types/v1.money.proto", comment: "amount + currency"
+              t.protobuf type: "myapp.types.Money", import: "my-app/types/v1.money.proto", field_comment: "Amount and currency."
             end
 
             s.object_type "Order" do |t|
@@ -162,7 +199,7 @@ module ElasticGraph
           end
 
           expect(proto).to include('import "my-app/types/v1.money.proto";')
-          expect(proto).to include("myapp.types.Money total = 2; // amount + currency")
+          expect(proto).to include("  // Amount and currency.\n  myapp.types.Money total = 2;")
         end
 
         it "rejects an `import:` that is not the path of a `.proto` file" do
@@ -191,15 +228,34 @@ module ElasticGraph
           end
         end
 
-        it "rejects a multi-line `comment:`, which would emit its later lines as bare proto syntax" do
-          expect {
-            define_proto_schema do |s|
-              s.scalar_type "Money" do |t|
-                t.mapping type: "keyword"
-                t.protobuf type: "myapp.types.Money", comment: "amount + currency\nin minor units"
-              end
+        it "renders a multi-line `field_comment:` as multiple comment lines" do
+          proto = define_proto_schema do |s|
+            s.scalar_type "Money" do |t|
+              t.mapping type: "keyword"
+              t.protobuf type: "string", field_comment: "Must be an amount and a currency.\n\nThe amount is in minor units."
             end
-          }.to raise_error(Errors::SchemaError, a_string_including("`protobuf` comment for `Money` must be a single line"))
+
+            s.object_type "Order" do |t|
+              t.field "id", "ID"
+              t.field "total", "Money" do |f|
+                f.documentation "What the customer owes."
+              end
+              t.index "orders"
+            end
+          end
+
+          expect(proto_type_def_from(proto, "Order")).to eq(<<~PROTO.strip)
+            message Order {
+              string id = 1;
+              // What the customer owes.
+              //
+              // Must be an amount and a currency.
+              //
+              // The amount is in minor units.
+              string total = 2;
+              // Next field number: 3
+            }
+          PROTO
         end
       end
     end

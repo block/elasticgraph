@@ -108,9 +108,11 @@ module ElasticGraph
             .join("\n\n")
         end
 
-        # Only scalar types can map to an externally defined proto type, so only they can require an import.
+        # Every type reports the proto file it needs imported, or `nil` when it needs none. Today only
+        # scalar types map to an externally defined proto type, but enum and object types can start
+        # requiring an import without any change here.
         def render_imports(types)
-          imports = types.grep(SchemaElements::ScalarTypeExtension).filter_map(&:protobuf_import).uniq.sort
+          imports = types.filter_map(&:protobuf_import).uniq.sort
 
           imports.empty? ? [] : [imports.map { |import| %(import "#{import}";) }.join("\n")]
         end
