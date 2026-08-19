@@ -5,6 +5,7 @@ module ElasticGraph
 
       LOG_MSG_RECEIVED_BATCH: ::String
       LOG_MSG_DUMPED_FILE: ::String
+      UNVERSIONED_S3_KEY_SEGMENT: ::String
 
       def initialize: (
         logger: ::Logger,
@@ -22,7 +23,7 @@ module ElasticGraph
       @s3_file_prefix: ::String
       @clock: singleton(::Time)
 
-      def generate_s3_key_for: (::String, ::Integer) -> ::String
+      def generate_s3_key_for: (::String, ::Integer?) -> ::String
 
       def build_jsonl_file_from: (
         ::Array[Indexer::Operation::Update]

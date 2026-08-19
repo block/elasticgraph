@@ -135,7 +135,20 @@ module ElasticGraph
 
             expect(logged_jsons_of_type("ElasticGraphIndexingLatencies").first).to include(
               "event_id" => "Component:#{component.fetch("id")}@v#{component.fetch("version")}",
-              "message_id" => "m1"
+              "message_id" => "m1",
+              SCHEMA_VERSION_KEY => component.fetch(SCHEMA_VERSION_KEY),
+              # Deprecated alias, kept for existing dashboards and monitors.
+              JSON_SCHEMA_VERSION_KEY => component.fetch(SCHEMA_VERSION_KEY)
+            )
+          end
+
+          it "logs a nil schema version for an event that carries none, since the key is optional" do
+            component = upsert_event_with_latency_timestamps(:component, 36, 72).except(SCHEMA_VERSION_KEY)
+            process([component])
+
+            expect(logged_jsons_of_type("ElasticGraphIndexingLatencies").first).to include(
+              SCHEMA_VERSION_KEY => nil,
+              JSON_SCHEMA_VERSION_KEY => nil
             )
           end
 

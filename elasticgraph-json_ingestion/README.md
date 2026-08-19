@@ -7,19 +7,6 @@ events and validates JSON-ingestion-specific schema options. Generated ElasticGr
 and enable it by default. Applications that wire schema-definition tasks manually enable it by adding
 `ElasticGraph::JSONIngestion::SchemaDefinition::APIExtension` to their schema-definition extension modules.
 
-## Indexing Event Decoder
-
-JSON ingestion payloads can include `json_schema_version` to request a specific JSON schema artifact
-version. Configure the JSON ingestion decoder when the indexer consumes those payloads so the JSON-specific
-field is mapped to the indexer's generic `schema_version` event field.
-
-```yaml
-indexer:
-  indexing_event_decoder:
-    name: ElasticGraph::JSONIngestion::IndexingEventDecoder::JSONLines
-    require_path: elastic_graph/json_ingestion/indexing_event_decoder
-```
-
 ## Schema Definition APIs
 
 Use `schema.json_schema_version` to identify the current JSON schema artifact. Every change that affects
@@ -119,10 +106,21 @@ end
 
 Beyond schema definition, this gem teaches `elasticgraph-indexer` how to ingest JSON events: it provides an
 ingestion adapter that validates each event against the JSON schema identified by the event's
-`json_schema_version` and prepares its record for indexing using that version's view of the schema.
+`schema_version` and prepares its record for indexing using that version's view of the schema.
 
 No configuration is needed: defining your schema with this gem's `SchemaDefinition::APIExtension` registers
 an indexer extension in your schema artifacts' runtime metadata, which the indexer applies when it boots.
+
+### Schema versions
+
+The adapter resolves the version of each event as follows:
+
+- The `schema_version` key selects the JSON schema version. When the exact version is unavailable, the
+  adapter selects the closest available version and logs `ElasticGraphMissingJSONSchemaVersion`.
+- The legacy `json_schema_version` key still works, so a publisher or an in-process caller that predates
+  the ingestion-format-neutral key needs no change.
+- An event that carries neither key gets the latest available JSON schema version. The adapter still
+  validates the event against that version, so a malformed event still fails.
 
 This gem also provides the `be_a_valid_elastic_graph_event` RSpec matcher (via
 `require "elastic_graph/json_ingestion/spec_support/event_matcher"`) for testing that publisher events

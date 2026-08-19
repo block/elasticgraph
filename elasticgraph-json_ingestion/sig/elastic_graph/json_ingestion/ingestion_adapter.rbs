@@ -20,8 +20,12 @@ module ElasticGraph
       private
 
       def event_for_json_schema_validation: (Indexer::event, ::Integer) -> ::Hash[::String, untyped]
+      def requested_schema_version_for: (Indexer::event) -> untyped
       def select_schema_version: (Indexer::event) { (Indexer::IngestionAdapter::ValidationResult) -> bot } -> (::Integer | bot)
       def validator: (::String, ::Integer) -> Support::JSONSchema::Validator
+
+      @available_schema_versions_descending: ::Array[::Integer]?
+      def available_schema_versions_descending: () -> ::Array[::Integer]
 
       @validator_factories_by_version: ::Hash[::Integer, Support::JSONSchema::ValidatorFactory]?
       def validator_factories_by_version: () -> ::Hash[::Integer, Support::JSONSchema::ValidatorFactory]

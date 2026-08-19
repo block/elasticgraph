@@ -20,6 +20,18 @@ module ElasticGraph
           event = build_upsert_event(:component)
 
           expect(adapter.handles_event?(event)).to be true
+        end
+
+        it "recognizes events that have a legacy `#{JSON_SCHEMA_VERSION_KEY}` in their envelope" do
+          event = build_upsert_event(:component)
+          legacy_event = event.except(SCHEMA_VERSION_KEY).merge(JSON_SCHEMA_VERSION_KEY => event.fetch(SCHEMA_VERSION_KEY))
+
+          expect(adapter.handles_event?(legacy_event)).to be true
+        end
+
+        it "does not claim an event that carries no schema version, since it cannot tell the format" do
+          event = build_upsert_event(:component)
+
           expect(adapter.handles_event?(event.except(SCHEMA_VERSION_KEY))).to be false
         end
       end
@@ -100,10 +112,38 @@ module ElasticGraph
           expect_invalid(event, payload_description: "event payload", message_including: ["missing_keys", "version"])
         end
 
-        it "notifies an error on missing `#{SCHEMA_VERSION_KEY}`" do
+        it "accepts an event that carries no `#{SCHEMA_VERSION_KEY}`" do
           event = build_upsert_event(:component).except(SCHEMA_VERSION_KEY)
 
-          expect_invalid(event, payload_description: SCHEMA_VERSION_KEY, message_including: ["Event lacks a `#{SCHEMA_VERSION_KEY}`"])
+          result = adapter.validate_event(event)
+
+          expect(result.failure).to be nil
+          expect(result.record_preparer.prepare_for_index("Component", {"id" => "1", "unknown_field" => 3}, {}))
+            .to eq({"id" => "1"})
+        end
+
+        it "still validates the record of an event that carries no `#{SCHEMA_VERSION_KEY}`" do
+          event = build_upsert_event(:component, id: "1", __version: 1).except(SCHEMA_VERSION_KEY)
+          event["record"]["name"] = 123
+
+          expect_invalid(event, payload_description: "Component record", message_including: ["name"])
+        end
+
+        it "accepts the legacy `#{JSON_SCHEMA_VERSION_KEY}` key in place of `#{SCHEMA_VERSION_KEY}`" do
+          event = build_upsert_event(:component)
+          legacy_event = event.except(SCHEMA_VERSION_KEY).merge(JSON_SCHEMA_VERSION_KEY => event.fetch(SCHEMA_VERSION_KEY))
+
+          result = adapter.validate_event(legacy_event)
+
+          expect(result.failure).to be nil
+          expect(result.record_preparer.prepare_for_index("Component", {"id" => "1", "unknown_field" => 3}, {}))
+            .to eq({"id" => "1"})
+        end
+
+        it "notifies an error on a `#{SCHEMA_VERSION_KEY}` that is not a positive integer" do
+          event = build_upsert_event(:component).merge(SCHEMA_VERSION_KEY => "not a version")
+
+          expect_invalid(event, payload_description: SCHEMA_VERSION_KEY, message_including: ["must be a positive integer", "not a version"])
         end
 
         it "notifies an error when given a record that does not satisfy the type's JSON schema, while avoiding revealing PII" do
@@ -173,8 +213,8 @@ module ElasticGraph
             expect(logged_jsons_of_type("ElasticGraphMissingJSONSchemaVersion").last).to include(
               "event_id" => "Widget:1@v1",
               "event_type" => "Widget",
-              "requested_schema_version" => 5,
-              "selected_schema_version" => 4
+              "requested_json_schema_version" => 5,
+              "selected_json_schema_version" => 4
             )
           end
 
@@ -190,8 +230,8 @@ module ElasticGraph
               "event_id" => "Widget:1@v1",
               "message_id" => "m123",
               "event_type" => "Widget",
-              "requested_schema_version" => 1,
-              "selected_schema_version" => 2
+              "requested_json_schema_version" => 1,
+              "selected_json_schema_version" => 2
             )
           end
 
@@ -204,8 +244,8 @@ module ElasticGraph
             expect(logged_jsons_of_type("ElasticGraphMissingJSONSchemaVersion").last).to include(
               "event_id" => "Widget:1@v1",
               "event_type" => "Widget",
-              "requested_schema_version" => 3,
-              "selected_schema_version" => 4
+              "requested_json_schema_version" => 3,
+              "selected_json_schema_version" => 4
             )
           end
 
@@ -213,6 +253,32 @@ module ElasticGraph
             event = build_upsert_event(:widget, id: "1", __version: 1, __schema_version: -1)
 
             expect_invalid(event, payload_description: SCHEMA_VERSION_KEY, message_including: ["must be a positive integer", "(-1)"])
+          end
+
+          it "uses the latest available version when the event carries no schema version" do
+            # YELLOW exists only in version 4, so it passes validation only if version 4 was selected.
+            event = build_upsert_event(:widget, id: "1", __version: 1).except(SCHEMA_VERSION_KEY)
+            event["record"]["options"]["color"] = "YELLOW"
+
+            expect(adapter.validate_event(event).failure).to be nil
+          end
+
+          it "does not log a version mismatch when the event carries no schema version" do
+            event = build_upsert_event(:widget, id: "1", __version: 1).except(SCHEMA_VERSION_KEY)
+
+            adapter.validate_event(event)
+
+            expect(logged_jsons_of_type("ElasticGraphMissingJSONSchemaVersion")).to be_empty
+          end
+
+          it "honors the legacy `#{JSON_SCHEMA_VERSION_KEY}` key when selecting the version" do
+            # Requesting version 2 via the legacy key must reject YELLOW, which only version 4 allows.
+            event = build_upsert_event(:widget, id: "1", __version: 1)
+              .except(SCHEMA_VERSION_KEY)
+              .merge(JSON_SCHEMA_VERSION_KEY => 2)
+            event["record"]["options"]["color"] = "YELLOW"
+
+            expect_invalid(event, payload_description: "Widget record", message_including: ["/options/color"])
           end
         end
 
@@ -222,6 +288,14 @@ module ElasticGraph
           event = build_upsert_event(:component, id: "1", __version: 1)
 
           expect_invalid(event, payload_description: SCHEMA_VERSION_KEY, message_including: ["Failed to select schema version"])
+        end
+
+        it "notifies an error if no versions are available and the event requests none" do
+          allow(schema_artifacts).to receive(:available_json_schema_versions).and_return(Set[])
+
+          event = build_upsert_event(:component, id: "1", __version: 1).except(SCHEMA_VERSION_KEY)
+
+          expect_invalid(event, payload_description: SCHEMA_VERSION_KEY, message_including: ["Failed to select schema version", "nil"])
         end
 
         def expect_invalid(event, payload_description:, message_including:)

@@ -36,6 +36,9 @@ module ElasticGraph
         # Validates the given event and resolves the record preparer appropriate for the event's
         # schema version.
         #
+        # The event's `schema_version` is optional, because an ingestion format may have no versions
+        # at all. Each adapter decides what a missing version means for its own format.
+        #
         # @param event [Hash<String, Object>] an ElasticGraph indexing event
         # @param skip_record_validation [Boolean] whether to skip record validation; the event envelope must still be validated
         # @return [ValidationResult] the result of validating the event
