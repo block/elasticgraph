@@ -392,7 +392,7 @@ module ElasticGraph
           indexing_fields_by_name_in_index.values.reject { |f| f.source.nil? }
         end
 
-        # Returns the list of `_source.excludes` paths for non-returnable, non-highlightable fields.
+        # Returns the list of `_source.excludes` paths for fields that should be excluded from stored `_source`.
         #
         # Hidden highlightable fields must remain in `_source` so the datastore can still
         # produce search highlight snippets for them.
@@ -409,12 +409,12 @@ module ElasticGraph
             non_returnable = under_non_returnable_parent || !field.returnable?
 
             if object_type
-              if non_returnable && !field.highlightable?
+              if field.source_excluded?(under_non_returnable_parent)
                 ["#{path}.*"]
               else
                 object_type.source_excludes_paths("#{path}.", non_returnable)
               end
-            elsif non_returnable && !field.highlightable?
+            elsif field.source_excluded?(under_non_returnable_parent)
               [path]
             else
               []

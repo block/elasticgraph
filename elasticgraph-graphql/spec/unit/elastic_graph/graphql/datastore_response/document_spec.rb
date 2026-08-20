@@ -93,6 +93,14 @@ module ElasticGraph
           expect(document.payload).to eq raw_data.fetch("_source")
         end
 
+        it "returns direct field values from docvalue fields when `_source` omits them" do
+          doc = build_doc(raw_data.except("_source").merge("fields" => {"name" => ["HuaweiP Smart"]}))
+
+          expect(doc.value_at(["name"])).to eq "HuaweiP Smart"
+          expect(doc["name"]).to eq "HuaweiP Smart"
+          expect(doc.fetch("name")).to eq "HuaweiP Smart"
+        end
+
         it "exposes its datastore path" do
           expect(document.datastore_path).to eq "/widgets/_doc/qwbfffaijhkljtfmcuwv"
         end
@@ -132,6 +140,52 @@ module ElasticGraph
         it "allows fields to be accessed using `#fetch` like on a hash" do
           expect(document.fetch("amount_cents")).to eq 300
           expect { document.fetch("foo") }.to raise_error(KeyError)
+        end
+
+        it "returns the provided default when `#fetch` is called on a missing field" do
+          expect(document.fetch("foo", "default")).to eq "default"
+        end
+
+        it "prefers the block over the default when `#fetch` is called with both" do
+          expect(document.fetch("amount_cents", "default") { "block" }).to eq 300
+          expect(document.fetch("foo", "default") { "block" }).to eq "block"
+        end
+
+        it "raises `ArgumentError` when `#fetch` is called with too many default arguments" do
+          expect { document.fetch("foo", "default", "extra") }.to raise_error(ArgumentError)
+        end
+
+        it "allows field paths to be accessed using `#fetch_value_at`" do
+          expect(document.fetch_value_at(%w[options size])).to eq "MEDIUM"
+          expect { document.fetch_value_at(%w[options material]) }.to raise_error(KeyError)
+        end
+
+        it "returns the provided default when `#fetch_value_at` is called on a missing field path" do
+          expect(document.fetch_value_at(%w[options material], default_value: "default")).to eq "default"
+        end
+
+        it "returns field path values from docvalue fields when `_source` omits them" do
+          doc = build_doc(raw_data.except("_source").merge("fields" => {"name" => ["HuaweiP Smart"]}))
+
+          expect(doc.fetch_value_at(["name"])).to eq "HuaweiP Smart"
+        end
+
+        it "prefers the block over the default when `#fetch_value_at` is called with both" do
+          expect(document.fetch_value_at(%w[options material], default_value: "default") { "block" }).to eq "block"
+        end
+
+        it "treats a `nil` field value as present when using `#fetch`" do
+          document = Document.with_payload({"foo" => nil})
+
+          expect(document.fetch("foo", "default")).to eq nil
+          expect(document.fetch("foo") { "default" }).to eq nil
+        end
+
+        it "treats a `nil` field value as present when using `#fetch_value_at`" do
+          document = Document.with_payload({"foo" => nil})
+
+          expect(document.fetch_value_at(["foo"], default_value: "default")).to eq nil
+          expect(document.fetch_value_at(["foo"]) { "default" }).to eq nil
         end
 
         it "supports easy construction without the full raw data payload (such as for tests)" do
