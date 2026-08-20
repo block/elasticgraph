@@ -47,7 +47,18 @@ module ElasticGraph
         end
 
         def merge_into(bool_node)
-          bool_node[occurrence].concat(clauses)
+          if occurrence == :should && bool_node.key?(:should)
+            # `minimum_should_match: 1` applies to the entire `should` array of a bool node, so a
+            # node can hold only one group of `should` clauses. `bool_node` already has such a group,
+            # and our clauses are a separate group which must be ANDed with it--not ORed into it.
+            # (Merging them into one array would turn `(A OR B) AND (C OR D)` into `A OR B OR C OR D`.)
+            #
+            # So, we nest our clauses in their own bool query and add that as a `filter` clause, where
+            # it is required on its own.
+            BooleanQuery.filter({bool: {minimum_should_match: 1, should: clauses}}).merge_into(bool_node)
+          else
+            bool_node[occurrence].concat(clauses)
+          end
         end
 
         ALWAYS_FALSE_FILTER = filter({match_none: {}})

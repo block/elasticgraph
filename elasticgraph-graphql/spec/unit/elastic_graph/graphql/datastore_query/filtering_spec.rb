@@ -1039,6 +1039,191 @@ module ElasticGraph
         end
       end
 
+      # `minimum_should_match: 1` applies to the entire `should` array of a bool node, so a node can
+      # hold only one group of `should` clauses. Each filter below has two sibling parts that must be
+      # ANDed together, and each part produces such a group. The first group stays on the shared bool
+      # node, and each later group gets nested in its own bool query under `filter`, where it is
+      # required on its own. Without that nesting, `(A OR B) AND (C OR D)` would become
+      # `A OR B OR C OR D`, which matches documents the filter excludes.
+      describe "sibling filters that each produce `should` clauses" do
+        it "ANDs an `any_satisfy: {any_of: ...}` filter with a sibling `any_of` filter" do
+          query = new_query(client_filter: {
+            "any_of" => [
+              {"name" => {"equal_to_any_of" => ["x"]}},
+              {"name" => {"equal_to_any_of" => ["y"]}}
+            ],
+            "ages" => {"any_satisfy" => {"any_of" => [{"gt" => 30}, {"lt" => 5}]}}
+          })
+
+          # `(name = x OR name = y) AND (age > 30 OR age < 5)`
+          expect(datastore_body_of(query)).to query_datastore_with({bool: {
+            minimum_should_match: 1,
+            should: [
+              {bool: {filter: [{terms: {"name" => ["x"]}}]}},
+              {bool: {filter: [{terms: {"name" => ["y"]}}]}}
+            ],
+            filter: [
+              {bool: {minimum_should_match: 1, should: [
+                {bool: {filter: [{range: {"ages" => {gt: 30}}}]}},
+                {bool: {filter: [{range: {"ages" => {lt: 5}}}]}}
+              ]}}
+            ]
+          }})
+        end
+
+        it "ANDs two sibling `any_satisfy: {any_of: ...}` filters on different fields" do
+          query = new_query(client_filter: {
+            "tags" => {"any_satisfy" => {"any_of" => [{"equal_to_any_of" => ["a"]}, {"equal_to_any_of" => ["b"]}]}},
+            "ages" => {"any_satisfy" => {"any_of" => [{"gt" => 30}, {"lt" => 5}]}}
+          })
+
+          # `(tag = a OR tag = b) AND (age > 30 OR age < 5)`
+          expect(datastore_body_of(query)).to query_datastore_with({bool: {
+            minimum_should_match: 1,
+            should: [
+              {bool: {filter: [{terms: {"tags" => ["a"]}}]}},
+              {bool: {filter: [{terms: {"tags" => ["b"]}}]}}
+            ],
+            filter: [
+              {bool: {minimum_should_match: 1, should: [
+                {bool: {filter: [{range: {"ages" => {gt: 30}}}]}},
+                {bool: {filter: [{range: {"ages" => {lt: 5}}}]}}
+              ]}}
+            ]
+          }})
+        end
+
+        it "ANDs an `any_satisfy: {any_of: ...}` client filter with an `any_of` internal filter" do
+          query = new_query(
+            client_filter: {"ages" => {"any_satisfy" => {"any_of" => [{"gt" => 30}, {"lt" => 5}]}}},
+            internal_filters: [{"any_of" => [
+              {"name" => {"equal_to_any_of" => ["x"]}},
+              {"name" => {"equal_to_any_of" => ["y"]}}
+            ]}]
+          )
+
+          # `(age > 30 OR age < 5) AND (name = x OR name = y)`
+          expect(datastore_body_of(query)).to query_datastore_with({bool: {
+            minimum_should_match: 1,
+            should: [
+              {bool: {filter: [{range: {"ages" => {gt: 30}}}]}},
+              {bool: {filter: [{range: {"ages" => {lt: 5}}}]}}
+            ],
+            filter: [
+              {bool: {minimum_should_match: 1, should: [
+                {bool: {filter: [{terms: {"name" => ["x"]}}]}},
+                {bool: {filter: [{terms: {"name" => ["y"]}}]}}
+              ]}}
+            ]
+          }})
+        end
+
+        it "ANDs an `any_of` client filter with an `any_of` internal filter" do
+          query = new_query(
+            client_filter: {"any_of" => [
+              {"name" => {"equal_to_any_of" => ["x"]}},
+              {"name" => {"equal_to_any_of" => ["y"]}}
+            ]},
+            internal_filters: [{"any_of" => [
+              {"name" => {"equal_to_any_of" => ["y"]}},
+              {"name" => {"equal_to_any_of" => ["z"]}}
+            ]}]
+          )
+
+          # `(name = x OR name = y) AND (name = y OR name = z)`
+          expect(datastore_body_of(query)).to query_datastore_with({bool: {
+            minimum_should_match: 1,
+            should: [
+              {bool: {filter: [{terms: {"name" => ["x"]}}]}},
+              {bool: {filter: [{terms: {"name" => ["y"]}}]}}
+            ],
+            filter: [
+              {bool: {minimum_should_match: 1, should: [
+                {bool: {filter: [{terms: {"name" => ["y"]}}]}},
+                {bool: {filter: [{terms: {"name" => ["z"]}}]}}
+              ]}}
+            ]
+          }})
+        end
+
+        it "unwraps a nested group that has a single `should` clause, so that the datastore can cache it" do
+          query = new_query(
+            client_filter: {"any_of" => [
+              {"name" => {"equal_to_any_of" => ["x"]}},
+              {"name" => {"equal_to_any_of" => ["y"]}}
+            ]},
+            internal_filters: [{"any_of" => [{"name" => {"equal_to_any_of" => ["y"]}}]}]
+          )
+
+          # `(name = x OR name = y) AND name = y`
+          expect(datastore_body_of(query)).to query_datastore_with({bool: {
+            minimum_should_match: 1,
+            should: [
+              {bool: {filter: [{terms: {"name" => ["x"]}}]}},
+              {bool: {filter: [{terms: {"name" => ["y"]}}]}}
+            ],
+            filter: [
+              {bool: {filter: [{terms: {"name" => ["y"]}}]}}
+            ]
+          }})
+        end
+
+        it "ANDs three sibling filters that each produce `should` clauses" do
+          query = new_query(
+            client_filter: {
+              "any_of" => [
+                {"name" => {"equal_to_any_of" => ["x"]}},
+                {"name" => {"equal_to_any_of" => ["y"]}}
+              ],
+              "ages" => {"any_satisfy" => {"any_of" => [{"gt" => 30}, {"lt" => 5}]}}
+            },
+            internal_filters: [{"tags" => {"any_satisfy" => {"any_of" => [{"equal_to_any_of" => ["a"]}, {"equal_to_any_of" => ["b"]}]}}}]
+          )
+
+          # `(name = x OR name = y) AND (age > 30 OR age < 5) AND (tag = a OR tag = b)`
+          expect(datastore_body_of(query)).to query_datastore_with({bool: {
+            minimum_should_match: 1,
+            should: [
+              {bool: {filter: [{terms: {"name" => ["x"]}}]}},
+              {bool: {filter: [{terms: {"name" => ["y"]}}]}}
+            ],
+            filter: [
+              {bool: {minimum_should_match: 1, should: [
+                {bool: {filter: [{range: {"ages" => {gt: 30}}}]}},
+                {bool: {filter: [{range: {"ages" => {lt: 5}}}]}}
+              ]}},
+              {bool: {minimum_should_match: 1, should: [
+                {bool: {filter: [{terms: {"tags" => ["a"]}}]}},
+                {bool: {filter: [{terms: {"tags" => ["b"]}}]}}
+              ]}}
+            ]
+          }})
+        end
+
+        it "produces the same results for the equivalent `all_of` filter" do
+          query = new_query(client_filter: {
+            "all_of" => [
+              {"any_of" => [
+                {"name" => {"equal_to_any_of" => ["x"]}},
+                {"name" => {"equal_to_any_of" => ["y"]}}
+              ]},
+              {"ages" => {"any_satisfy" => {"any_of" => [{"gt" => 30}, {"lt" => 5}]}}}
+            ]
+          })
+
+          expect(datastore_body_of(query)).to query_datastore_with({bool: {filter: [
+            {bool: {minimum_should_match: 1, should: [
+              {bool: {filter: [{terms: {"name" => ["x"]}}]}},
+              {bool: {filter: [{terms: {"name" => ["y"]}}]}}
+            ]}},
+            {bool: {minimum_should_match: 1, should: [
+              {bool: {filter: [{range: {"ages" => {gt: 30}}}]}},
+              {bool: {filter: [{range: {"ages" => {lt: 5}}}]}}
+            ]}}
+          ]}})
+        end
+      end
+
       # Note: a `count` filter gets translated into `__counts` (to distinguish it from a schema field named `count`),
       # and that translation happens as the query is being built, so we use `__counts` in our example filters here.
       describe "`count` operator on a list" do

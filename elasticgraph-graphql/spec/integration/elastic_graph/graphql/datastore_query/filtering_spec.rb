@@ -544,6 +544,60 @@ module ElasticGraph
         end
       end
 
+      # Both filters below have two sibling parts that must be ANDed together, and each part produces
+      # `should` clauses. `minimum_should_match: 1` applies to the entire `should` array of a bool
+      # node, so the two groups must not share one array. If they did, `(A OR B) AND (C OR D)` would
+      # become `A OR B OR C OR D`, and t2 and t3 would also match here.
+      describe "sibling filters that each produce `should` clauses" do
+        it "requires a document to satisfy both an `any_of` filter and a sibling `any_satisfy: {any_of: ...}` filter" do
+          index_into(
+            graphql,
+            t1 = build(:team, id: "t1", current_name: "Yankees", forbes_valuations: [5_000_000]),
+            build(:team, id: "t2", current_name: "Cardinals", forbes_valuations: [5_000_000]),
+            build(:team, id: "t3", current_name: "Dodgers", forbes_valuations: [1_000_000]),
+            build(:team, id: "t4", current_name: "Cardinals", forbes_valuations: [1_000_000])
+          )
+
+          # `(name = Yankees OR name = Dodgers) AND (valuation > 3M OR valuation < 100K)`
+          filter = {
+            "any_of" => [
+              {"current_name" => {"equal_to_any_of" => ["Yankees"]}},
+              {"current_name" => {"equal_to_any_of" => ["Dodgers"]}}
+            ],
+            "forbes_valuations" => {"any_satisfy" => {"any_of" => [{"gt" => 3_000_000}, {"lt" => 100_000}]}}
+          }
+
+          expect(search_with_freeform_filter(filter)).to match_array(ids_of(t1))
+        end
+
+        it "requires a document to satisfy both a client filter and an internal filter that each produce `should` clauses" do
+          index_into(
+            graphql,
+            t1 = build(:team, id: "t1", current_name: "Yankees", forbes_valuations: [5_000_000]),
+            build(:team, id: "t2", current_name: "Cardinals", forbes_valuations: [5_000_000]),
+            build(:team, id: "t3", current_name: "Dodgers", forbes_valuations: [1_000_000]),
+            build(:team, id: "t4", current_name: "Cardinals", forbes_valuations: [1_000_000])
+          )
+
+          # An internal filter (such as a relationship `additional_filter`) must restrict the client's
+          # results, so this is the same `(name = ...) AND (valuation ...)` filter as above.
+          results = ids_of(search_datastore(
+            client_filters: [{"forbes_valuations" => {"any_satisfy" => {"any_of" => [{"gt" => 3_000_000}, {"lt" => 100_000}]}}}],
+            internal_filters: [{"any_of" => [
+              {"current_name" => {"equal_to_any_of" => ["Yankees"]}},
+              {"current_name" => {"equal_to_any_of" => ["Dodgers"]}}
+            ]}],
+            sort: []
+          ).to_a)
+
+          expect(results).to match_array(ids_of(t1))
+        end
+
+        def search_datastore(**options, &before_msearch)
+          super(index_def_name: "teams", **options, &before_msearch)
+        end
+      end
+
       # Note: a `count` filter gets translated into `__counts` (to distinguish it from a schema field named `count`),
       # and that translation happens as the query is being built, so we use `__counts` in our example filters here.
       describe "`count` filtering on a list" do

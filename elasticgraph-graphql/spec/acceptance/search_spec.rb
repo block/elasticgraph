@@ -1028,6 +1028,7 @@ module ElasticGraph
             build(
               :team,
               id: "t1",
+              current_name: "Aces",
               details: build(:team_details, count: 5),
               past_names: ["Pilots", "Pink Sox"],
               won_championships_at: [],
@@ -1043,6 +1044,7 @@ module ElasticGraph
             build(
               :team,
               id: "t2",
+              current_name: "Bees",
               details: build(:team_details, count: 15),
               past_names: ["Pink Sox", "Ace Piloteers"],
               won_championships_at: ["2013-11-27T02:30:00Z", "2013-11-27T22:30:00Z"],
@@ -1061,6 +1063,7 @@ module ElasticGraph
             build(
               :team,
               id: "t3",
+              current_name: "Cyclones",
               details: build(:team_details, count: 4),
               past_names: ["Pilots"],
               won_championships_at: ["2003-10-27T19:30:00Z"],
@@ -1080,6 +1083,7 @@ module ElasticGraph
               :team,
               details: build(:team_details, count: 12),
               id: "t4",
+              current_name: "Dukes",
               past_names: ["Pill Bugs"],
               won_championships_at: ["2005-10-27T12:30:00Z"],
               forbes_valuations: [42],
@@ -1141,6 +1145,18 @@ module ElasticGraph
           results = query_teams_with(filter: {forbes_valuations: {any_satisfy: {any_of: [{gt: 150_000_000}, {lt: 5}]}}})
           # t1 has 200_000_000; t3 has 0
           expect(results).to eq [{"id" => "t1"}, {"id" => "t3"}]
+
+          # Verify `any_of: [...]` next to a sibling `any_satisfy: {any_of: [...]}`. Each filter produces its own
+          # group of `should` clauses, and the two groups must both be true of a document.
+          results = query_teams_with(filter: {
+            any_of: [
+              {current_name: {equal_to_any_of: ["Aces"]}},
+              {current_name: {equal_to_any_of: ["Bees"]}}
+            ],
+            forbes_valuations: {any_satisfy: {any_of: [{gt: 150_000_000}, {lt: 5}]}}
+          })
+          # t1 and t2 match the `any_of`; t1 and t3 match the `any_satisfy`. Only t1 matches both.
+          expect(results).to eq [{"id" => "t1"}]
 
           # Verify we can use the `any_satisfy` filter operator on a list-of-nested objects correctly.
           # Also, verify that the sub-objects are considered independently. Team t3 has a player with the name
