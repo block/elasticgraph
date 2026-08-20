@@ -14,7 +14,7 @@ module ElasticGraph
         HTTPRequest,
         ?max_timeout_in_ms: ::Integer?,
         ?start_time_in_ms: ::Integer
-      ) -> HTTPResponse
+      ) ?{ (::Hash[::String, untyped]) -> untyped } -> HTTPResponse
 
       private
 
@@ -93,21 +93,21 @@ module ElasticGraph
     class HTTPResponse
       attr_reader status_code: ::Integer
       attr_reader headers: ::Hash[::String, ::String]
-      attr_reader body: ::String
+      attr_reader body: untyped
 
       def initialize: (
         status_code: ::Integer,
         headers: ::Hash[::String, ::String],
-        body: ::String) -> void
+        body: untyped) -> void
 
       def self.new:
-        (status_code: ::Integer, headers: ::Hash[::String, ::String], body: ::String) -> instance
-      | (::Integer, ::Hash[::String, ::String], ::String) -> instance
+        (status_code: ::Integer, headers: ::Hash[::String, ::String], body: untyped) -> instance
+      | (::Integer, ::Hash[::String, ::String], untyped) -> instance
 
       def with: (
         ?status_code: ::Integer,
         ?headers: ::Hash[::String, ::String],
-        ?body: ::String) -> HTTPResponse
+        ?body: untyped) -> HTTPResponse
 
       def self.json: (::Integer, ::Hash[::String, untyped]) -> HTTPResponse
       def self.error: (::Integer, ::String) -> HTTPResponse

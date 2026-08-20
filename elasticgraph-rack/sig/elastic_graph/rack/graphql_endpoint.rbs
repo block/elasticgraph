@@ -2,9 +2,10 @@ module ElasticGraph
   module Rack
     class GraphQLEndpoint
       include ::Rack::_Application
-      def initialize: (GraphQL) -> void
+      def initialize: (GraphQL, ?body_serializer: ^(::Hash[::String, untyped]) -> untyped | nil) -> void
       @logger: ::Logger
       @graphql_http_endpoint: GraphQL::HTTPEndpoint
+      @body_serializer: ^(::Hash[::String, untyped]) -> untyped | nil
     end
   end
 end
