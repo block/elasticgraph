@@ -16,12 +16,16 @@ module ElasticGraph
         @all_types: ::Array[::ElasticGraph::SchemaDefinition::SchemaElements::graphQLType]
         @package_name: ::String
         @field_number_mappings: FieldNumberMappings
+        @sourced_from_source_type_names: ::Set[::String]
+        @derived_indexing_type_names: ::Set[::String]
         @previous_field_names_by_type_name_and_field_name: ::Hash[::String, ::Hash[::String, ::Array[::String]]]?
 
         def initialize: (
           state: ::ElasticGraph::SchemaDefinition::State,
           all_types: ::Array[::ElasticGraph::SchemaDefinition::SchemaElements::graphQLType],
-          ingestion_state: ProtoIngestionState
+          ingestion_state: ProtoIngestionState,
+          sourced_from_source_type_names: ::Set[::String],
+          derived_indexing_type_names: ::Set[::String]
         ) -> void
 
         def to_proto: () -> ::String
@@ -44,6 +48,7 @@ module ElasticGraph
         private
 
         def proto_types: () -> ::Array[untyped]
+        def ingestible_types: () -> ::Array[untyped]
         def render_definitions: (::Array[untyped] types) -> ::String
         def render_imports: (::Array[untyped] types) -> ::Array[::String]
         def render_header_lines: () -> ::Array[::String]
