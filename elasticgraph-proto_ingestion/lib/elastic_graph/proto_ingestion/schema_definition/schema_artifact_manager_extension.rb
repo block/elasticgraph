@@ -8,6 +8,7 @@
 
 require "elastic_graph/errors"
 require "elastic_graph/proto_ingestion"
+require "elastic_graph/proto_ingestion/schema_definition/buf_breaking_change_detector"
 
 module ElasticGraph
   module ProtoIngestion
@@ -31,6 +32,24 @@ module ElasticGraph
           "lost, and previously serialized protobuf messages would be misread."
         ].freeze
 
+        # Overrides `dump_artifacts` to reject any change that breaks protobuf wire compatibility.
+        #
+        # A protobuf schema has no version to bump. Every consumer that already deserializes these
+        # messages must keep reading them, and those consumers cannot be updated in lockstep. So a
+        # breaking change is always an error, and the only fix is to make the change compatible.
+        def dump_artifacts
+          proto_schema = protobuf_schema_definition_results.proto_schema
+          return super if proto_schema.empty?
+
+          artifact = proto_schema_artifact
+          existing_schema = artifact.existing_dumped_contents
+          return super unless artifact.out_of_date? && existing_schema
+
+          check_for_breaking_proto_changes(artifact.desired_contents, existing_schema)
+
+          super
+        end
+
         private
 
         # Overrides the base `artifacts_from_schema_def` method to add proto artifacts.
@@ -41,8 +60,39 @@ module ElasticGraph
 
           base_artifacts + [
             proto_field_numbers_artifact,
-            new_raw_artifact(PROTO_SCHEMA_FILE, proto_schema.chomp, comment_prefix: "//")
+            proto_schema_artifact
           ]
+        end
+
+        def proto_schema_artifact
+          @proto_schema_artifact ||= new_raw_artifact(
+            PROTO_SCHEMA_FILE,
+            protobuf_schema_definition_results.proto_schema.chomp,
+            comment_prefix: "//"
+          )
+        end
+
+        def check_for_breaking_proto_changes(current_schema, against_schema)
+          changes = BufBreakingChangeDetector.new(
+            temporary_directory: ::File.dirname(proto_schema_artifact.file_name)
+          ).breaking_changes(
+            current_schema: current_schema,
+            against_schema: against_schema
+          )
+          return unless changes
+
+          abort <<~EOS.strip
+            Buf detected a breaking change to `schema.proto`:
+
+            #{changes}
+
+            Protobuf offers no way to version your way out of this. Consumers that already read
+            these messages would misread them after this change. Make the change compatible
+            instead: add a new field rather than retype or rename an existing one, and reserve the
+            number of every field you remove.
+          EOS
+        rescue Errors::SchemaError => e
+          abort e.message
         end
 
         # Builds the `proto_field_numbers.yaml` artifact. The file is part of the schema definition
