@@ -8,6 +8,10 @@ module ElasticGraph
           def self.new: (::String, ::String, :min | :max) -> instance
 
           def self.function_def: (:min | :max) -> ::String
+
+          private
+
+          COMPARE_VALUES: ::String
         end
       end
     end
