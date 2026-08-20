@@ -723,15 +723,11 @@ module ElasticGraph
         end
 
         it "sources enum values from an external proto enum" do
-          proto_status = ::Class.new do
-            def self.enums
-              [
-                ::Data.define(:name).new(name: :UNKNOWN_DO_NOT_USE),
-                ::Data.define(:name).new(name: :ACTIVE),
-                ::Data.define(:name).new(name: :INACTIVE)
-              ]
-            end
-          end
+          proto_status = SchemaSupport::ProtoEnum.new(enums: [
+            SchemaSupport::ProtoEnumEntryNameOnly.new(name: :UNKNOWN_DO_NOT_USE),
+            SchemaSupport::ProtoEnumEntryNameOnly.new(name: :ACTIVE),
+            SchemaSupport::ProtoEnumEntryNameOnly.new(name: :INACTIVE)
+          ])
 
           proto = define_proto_schema do |s|
             s.enum_type "Status" do |t|
@@ -756,19 +752,15 @@ module ElasticGraph
         end
 
         it "applies `name_transform` to external proto enum value names" do
-          proto_currency = ::Class.new do
-            def self.enums
-              [
-                ::Data.define(:name).new(name: :CURRENCY_USD),
-                ::Data.define(:name).new(name: :CURRENCY_CAD)
-              ]
-            end
-          end
+          proto_currency = SchemaSupport::ProtoEnum.new(enums: [
+            SchemaSupport::ProtoEnumEntryNameOnly.new(name: :CURRENCY_USD),
+            SchemaSupport::ProtoEnumEntryNameOnly.new(name: :CURRENCY_CAD)
+          ])
 
           proto = define_proto_schema do |s|
             s.enum_type "Currency" do |t|
               t.values "USD", "CAD"
-              t.external_proto_enum proto_currency, name_transform: ->(name) { name.sub(/\ACURRENCY_/, "") }
+              t.external_proto_enum proto_currency, name_transform: ->(name) { name.delete_prefix("CURRENCY_") }
             end
 
             s.object_type "Account" do |t|
@@ -785,16 +777,12 @@ module ElasticGraph
         end
 
         it "applies `exclusions` to the transformed names, not the proto enum's original names" do
-          proto_currency = ::Class.new do
-            def self.enums
-              [
-                ::Data.define(:name).new(name: :CURRENCY_UNKNOWN),
-                ::Data.define(:name).new(name: :CURRENCY_USD)
-              ]
-            end
-          end
+          proto_currency = SchemaSupport::ProtoEnum.new(enums: [
+            SchemaSupport::ProtoEnumEntryNameOnly.new(name: :CURRENCY_UNKNOWN),
+            SchemaSupport::ProtoEnumEntryNameOnly.new(name: :CURRENCY_USD)
+          ])
 
-          strip_prefix = ->(name) { name.sub(/\ACURRENCY_/, "") }
+          strip_prefix = ->(name) { name.delete_prefix("CURRENCY_") }
 
           define_currency_schema = lambda do |exclusions|
             define_proto_schema do |s|
@@ -820,11 +808,7 @@ module ElasticGraph
         end
 
         it "does not reserve the number of an `expected_extras` value it just emitted" do
-          proto_status = ::Class.new do
-            def self.enums
-              [::Data.define(:name).new(name: :ACTIVE)]
-            end
-          end
+          proto_status = SchemaSupport::ProtoEnum.new(enums: [SchemaSupport::ProtoEnumEntryNameOnly.new(name: :ACTIVE)])
 
           proto = define_proto_schema do |s|
             s.enum_type "Status" do |t|
@@ -846,32 +830,20 @@ module ElasticGraph
         end
 
         it "raises when external proto enum sources produce inconsistent values" do
-          proto_status_a = ::Class.new do
-            def self.enums
-              [
-                ::Data.define(:name).new(name: :ACTIVE),
-                ::Data.define(:name).new(name: :INACTIVE)
-              ]
-            end
-          end
+          proto_status_a = SchemaSupport::ProtoEnum.new(enums: [
+            SchemaSupport::ProtoEnumEntryNameOnly.new(name: :ACTIVE),
+            SchemaSupport::ProtoEnumEntryNameOnly.new(name: :INACTIVE)
+          ])
 
-          proto_status_b = ::Class.new do
-            def self.enums
-              [
-                ::Data.define(:name).new(name: :ACTIVE),
-                ::Data.define(:name).new(name: :PENDING)
-              ]
-            end
-          end
+          proto_status_b = SchemaSupport::ProtoEnum.new(enums: [
+            SchemaSupport::ProtoEnumEntryNameOnly.new(name: :ACTIVE),
+            SchemaSupport::ProtoEnumEntryNameOnly.new(name: :PENDING)
+          ])
 
-          proto_status_c = ::Class.new do
-            def self.enums
-              [
-                ::Data.define(:name).new(name: :ACTIVE),
-                ::Data.define(:name).new(name: :INACTIVE)
-              ]
-            end
-          end
+          proto_status_c = SchemaSupport::ProtoEnum.new(enums: [
+            SchemaSupport::ProtoEnumEntryNameOnly.new(name: :ACTIVE),
+            SchemaSupport::ProtoEnumEntryNameOnly.new(name: :INACTIVE)
+          ])
 
           results = define_proto_schema_results do |s|
             s.enum_type "Status" do |t|
@@ -896,14 +868,10 @@ module ElasticGraph
         end
 
         it "references an external proto enum type instead of generating a local enum" do
-          proto_status = ::Class.new do
-            def self.enums
-              [
-                ::Data.define(:name, :number).new(name: :ACTIVE, number: 1),
-                ::Data.define(:name, :number).new(name: :INACTIVE, number: 2)
-              ]
-            end
-          end
+          proto_status = SchemaSupport::ProtoEnum.new(enums: [
+            SchemaSupport::ProtoEnumEntry.new(name: :ACTIVE, number: 1),
+            SchemaSupport::ProtoEnumEntry.new(name: :INACTIVE, number: 2)
+          ])
 
           proto = define_proto_schema do |s|
             s.enum_type "Status" do |t|
@@ -930,14 +898,10 @@ module ElasticGraph
         end
 
         it "accepts a referenced enum whose numbers match previously pinned enum value numbers" do
-          proto_status = ::Class.new do
-            def self.enums
-              [
-                ::Data.define(:name, :number).new(name: :ACTIVE, number: 1),
-                ::Data.define(:name, :number).new(name: :INACTIVE, number: 2)
-              ]
-            end
-          end
+          proto_status = SchemaSupport::ProtoEnum.new(enums: [
+            SchemaSupport::ProtoEnumEntry.new(name: :ACTIVE, number: 1),
+            SchemaSupport::ProtoEnumEntry.new(name: :INACTIVE, number: 2)
+          ])
 
           proto = define_proto_schema(proto_field_number_mappings: {
             "enums" => {"Status" => {
@@ -963,14 +927,10 @@ module ElasticGraph
         end
 
         it "records a referenced enum's numbers so dropping `proto:`/`import:` does not renumber it" do
-          proto_status = ::Class.new do
-            def self.enums
-              [
-                ::Data.define(:name, :number).new(name: :ACTIVE, number: 7),
-                ::Data.define(:name, :number).new(name: :INACTIVE, number: 9)
-              ]
-            end
-          end
+          proto_status = SchemaSupport::ProtoEnum.new(enums: [
+            SchemaSupport::ProtoEnumEntry.new(name: :ACTIVE, number: 7),
+            SchemaSupport::ProtoEnumEntry.new(name: :INACTIVE, number: 9)
+          ])
 
           define_account_schema = lambda do |prior_results, &configure_enum|
             define_proto_schema_results(prior_results) do |s|
@@ -1010,14 +970,10 @@ module ElasticGraph
         end
 
         it "raises when a referenced enum uses number 0, which the generated zero value owns" do
-          proto_status = ::Class.new do
-            def self.enums
-              [
-                ::Data.define(:name, :number).new(name: :ACTIVE, number: 0),
-                ::Data.define(:name, :number).new(name: :INACTIVE, number: 1)
-              ]
-            end
-          end
+          proto_status = SchemaSupport::ProtoEnum.new(enums: [
+            SchemaSupport::ProtoEnumEntry.new(name: :ACTIVE, number: 0),
+            SchemaSupport::ProtoEnumEntry.new(name: :INACTIVE, number: 1)
+          ])
 
           expect {
             define_proto_schema do |s|
@@ -1038,14 +994,10 @@ module ElasticGraph
         end
 
         it "raises when a referenced enum uses a number outside the valid protobuf range" do
-          proto_status = ::Class.new do
-            def self.enums
-              [
-                ::Data.define(:name, :number).new(name: :ACTIVE, number: 1),
-                ::Data.define(:name, :number).new(name: :INACTIVE, number: 2_147_483_648)
-              ]
-            end
-          end
+          proto_status = SchemaSupport::ProtoEnum.new(enums: [
+            SchemaSupport::ProtoEnumEntry.new(name: :ACTIVE, number: 1),
+            SchemaSupport::ProtoEnumEntry.new(name: :INACTIVE, number: 2_147_483_648)
+          ])
 
           expect {
             define_proto_schema do |s|
