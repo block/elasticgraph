@@ -36,6 +36,8 @@ module ElasticGraph
         def enum_value_numbers_for: (::String, ::Array[::String]) -> ::Hash[::String, ::Integer]
         def next_enum_value_number_for: (::String) -> ::Integer
         def reserved_enum_value_numbers_for: (::String, ::Array[::String]) -> ::Hash[::String, ::Integer]
+        def pinned_enum_value_numbers: (::String) -> ::Hash[::String, ::Integer]
+        def pin_enum_value_numbers: (::String, ::Hash[::String, ::Integer]) -> void
         def field_label_prefix: (repeated: bool) -> ::String
         def proto2?: () -> bool
 
