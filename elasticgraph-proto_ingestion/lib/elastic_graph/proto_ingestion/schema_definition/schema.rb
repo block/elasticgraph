@@ -112,13 +112,16 @@ module ElasticGraph
         end
 
         # @dynamic next_field_number_for, reserved_field_numbers_for, enum_value_numbers_for
-        # @dynamic next_enum_value_number_for, reserved_enum_value_numbers_for
+        # @dynamic next_enum_value_number_for, reserved_enum_value_numbers_for, pinned_enum_value_numbers
+        # @dynamic pin_enum_value_numbers
         def_delegators :@field_number_mappings,
           :next_field_number_for,
           :reserved_field_numbers_for,
           :enum_value_numbers_for,
           :next_enum_value_number_for,
-          :reserved_enum_value_numbers_for
+          :reserved_enum_value_numbers_for,
+          :pinned_enum_value_numbers,
+          :pin_enum_value_numbers
 
         # Returns the label prefix (including its trailing space) that a field declaration needs
         # under the configured syntax, or an empty string when the field takes no label.
