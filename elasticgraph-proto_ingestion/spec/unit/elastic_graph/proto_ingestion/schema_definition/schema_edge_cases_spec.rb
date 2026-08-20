@@ -37,14 +37,10 @@ module ElasticGraph
         end
 
         it "raises when externally sourced enum values map to duplicate proto value names" do
-          proto_status = ::Class.new do
-            def self.enums
-              [
-                ::Data.define(:name).new(name: :option),
-                ::Data.define(:name).new(name: :OPTION)
-              ]
-            end
-          end
+          proto_status = SchemaSupport::ProtoEnum.new(enums: [
+            SchemaSupport::ProtoEnumEntryNameOnly.new(name: :option),
+            SchemaSupport::ProtoEnumEntryNameOnly.new(name: :OPTION)
+          ])
 
           results = define_proto_schema_results do |s|
             s.enum_type "Status" do |t|
@@ -67,11 +63,7 @@ module ElasticGraph
         end
 
         it "raises when an externally sourced enum value conflicts with the generated zero value" do
-          proto_status = ::Class.new do
-            def self.enums
-              [::Data.define(:name).new(name: :UNSPECIFIED)]
-            end
-          end
+          proto_status = SchemaSupport::ProtoEnum.new(enums: [SchemaSupport::ProtoEnumEntryNameOnly.new(name: :UNSPECIFIED)])
 
           results = define_proto_schema_results do |s|
             s.enum_type "Status" do |t|
@@ -227,11 +219,7 @@ module ElasticGraph
         end
 
         it "wraps unexpected exceptions from external proto enum sources" do
-          proto_status = ::Class.new do
-            def self.enums
-              [::Data.define(:name).new(name: :ACTIVE)]
-            end
-          end
+          proto_status = SchemaSupport::ProtoEnum.new(enums: [SchemaSupport::ProtoEnumEntryNameOnly.new(name: :ACTIVE)])
 
           results = define_proto_schema_results do |s|
             s.enum_type "Status" do |t|
@@ -252,17 +240,9 @@ module ElasticGraph
         end
 
         it "accepts multiple external proto enum sources when they resolve to the same values" do
-          proto_status_a = ::Class.new do
-            def self.enums
-              [::Data.define(:name).new(name: :ACTIVE)]
-            end
-          end
+          proto_status_a = SchemaSupport::ProtoEnum.new(enums: [SchemaSupport::ProtoEnumEntryNameOnly.new(name: :ACTIVE)])
 
-          proto_status_b = ::Class.new do
-            def self.enums
-              [::Data.define(:name).new(name: :ACTIVE)]
-            end
-          end
+          proto_status_b = SchemaSupport::ProtoEnum.new(enums: [SchemaSupport::ProtoEnumEntryNameOnly.new(name: :ACTIVE)])
 
           results = define_proto_schema_results do |s|
             s.enum_type "Status" do |t|
@@ -283,8 +263,7 @@ module ElasticGraph
 
         it "requires both `proto` and `import` as non-empty Strings to reference an external proto enum type" do
           # The eager validation raises before `.enums` is ever consulted.
-          proto_status = ::Object.new
-          proto_status.define_singleton_method(:enums) { [] }
+          proto_status = SchemaSupport::ProtoEnum.new(enums: [])
 
           [
             {proto: "myapp.types.Status"},
@@ -307,8 +286,7 @@ module ElasticGraph
 
         it "raises when an external reference is combined with transform options" do
           # The eager validation raises before `.enums` is ever consulted.
-          proto_status = ::Object.new
-          proto_status.define_singleton_method(:enums) { [] }
+          proto_status = SchemaSupport::ProtoEnum.new(enums: [])
 
           expect {
             define_proto_schema do |s|
@@ -328,10 +306,8 @@ module ElasticGraph
 
         it "raises when a referenced enum has multiple sources" do
           # The multi-source validation raises before `.enums` is ever consulted.
-          proto_status_a = ::Object.new
-          proto_status_a.define_singleton_method(:enums) { [] }
-          proto_status_b = ::Object.new
-          proto_status_b.define_singleton_method(:enums) { [] }
+          proto_status_a = SchemaSupport::ProtoEnum.new(enums: [])
+          proto_status_b = SchemaSupport::ProtoEnum.new(enums: [])
 
           results = define_proto_schema_results do |s|
             s.enum_type "Status" do |t|
@@ -358,14 +334,10 @@ module ElasticGraph
         end
 
         it "raises when a referenced enum's external values do not match the ElasticGraph enum values" do
-          proto_status = ::Class.new do
-            def self.enums
-              [
-                ::Data.define(:name, :number).new(name: :ACTIVE, number: 1),
-                ::Data.define(:name, :number).new(name: :PENDING, number: 2)
-              ]
-            end
-          end
+          proto_status = SchemaSupport::ProtoEnum.new(enums: [
+            SchemaSupport::ProtoEnumEntry.new(name: :ACTIVE, number: 1),
+            SchemaSupport::ProtoEnumEntry.new(name: :PENDING, number: 2)
+          ])
 
           results = define_proto_schema_results do |s|
             s.enum_type "Status" do |t|
@@ -392,11 +364,7 @@ module ElasticGraph
         end
 
         it "raises when a referenced enum's entries do not expose value numbers" do
-          proto_status = ::Class.new do
-            def self.enums
-              [::Data.define(:name).new(name: :ACTIVE)]
-            end
-          end
+          proto_status = SchemaSupport::ProtoEnum.new(enums: [SchemaSupport::ProtoEnumEntryNameOnly.new(name: :ACTIVE)])
 
           results = define_referenced_status_schema(proto_status, values: ["ACTIVE"])
 
@@ -408,14 +376,10 @@ module ElasticGraph
         end
 
         it "raises when a referenced enum changes a pinned value's number" do
-          proto_status = ::Class.new do
-            def self.enums
-              [
-                ::Data.define(:name, :number).new(name: :ACTIVE, number: 2),
-                ::Data.define(:name, :number).new(name: :INACTIVE, number: 1)
-              ]
-            end
-          end
+          proto_status = SchemaSupport::ProtoEnum.new(enums: [
+            SchemaSupport::ProtoEnumEntry.new(name: :ACTIVE, number: 2),
+            SchemaSupport::ProtoEnumEntry.new(name: :INACTIVE, number: 1)
+          ])
 
           results = define_referenced_status_schema(
             proto_status,
@@ -432,14 +396,10 @@ module ElasticGraph
         end
 
         it "raises when a referenced enum reuses a pinned number for a different value" do
-          proto_status = ::Class.new do
-            def self.enums
-              [
-                ::Data.define(:name, :number).new(name: :ACTIVE, number: 1),
-                ::Data.define(:name, :number).new(name: :LEGACY, number: 2)
-              ]
-            end
-          end
+          proto_status = SchemaSupport::ProtoEnum.new(enums: [
+            SchemaSupport::ProtoEnumEntry.new(name: :ACTIVE, number: 1),
+            SchemaSupport::ProtoEnumEntry.new(name: :LEGACY, number: 2)
+          ])
 
           # `PAUSED` was removed from the enum; its number stays reserved in the artifact.
           results = define_referenced_status_schema(
