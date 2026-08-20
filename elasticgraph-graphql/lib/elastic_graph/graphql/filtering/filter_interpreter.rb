@@ -183,12 +183,16 @@ module ElasticGraph
             raise ::GraphQL::ExecutionError, "`#{formatted_filter}` is not supported because it produces " \
               "multiple filtering clauses under `#{schema_names.any_satisfy}`, which doesn't work as expected. " \
               "Remove one or more of your `#{schema_names.any_satisfy}` predicates and try again."
-          elsif (should_clauses = processed_bool_query.fetch(:should, nil))
+          elsif processed_bool_query.key?(:should)
             # Our sub-filter is a group of `should` clauses (from an `any_of`), and only one of them
             # must match. We merge it with `BooleanQuery#merge_into` rather than merging the clauses
             # directly, so that it does not get ORed into a `should` group that a sibling filter has
             # already put on `bool_node`.
-            BooleanQuery.should(*should_clauses).merge_into(bool_node)
+            #
+            # Note: `build_bool_hash` gives `processed_bool_query` a default proc that assigns `[]`, so
+            # `key?` is required here. `processed_bool_query[:should]` would return a truthy `[]` for
+            # every sub-filter and would also add the key.
+            BooleanQuery.should(*processed_bool_query.fetch(:should)).merge_into(bool_node)
           else
             bool_node.update(processed_bool_query) do |_, existing_clauses, any_satisfy_clauses|
               existing_clauses + any_satisfy_clauses
