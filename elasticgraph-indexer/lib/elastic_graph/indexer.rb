@@ -85,6 +85,7 @@ module ElasticGraph
           record_preparer_factory: record_preparer_factory,
           logger: datastore_core.logger,
           skip_derived_indexing_type_updates: config.skip_derived_indexing_type_updates,
+          skip_record_validation_for: config.skip_record_validation_for,
           configure_record_validator: nil
         )
       end
