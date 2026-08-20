@@ -273,14 +273,14 @@ ElasticGraph.define_schema do |schema|
       # Values expected in the generated enum that the proto enum lacks.
       expected_extras: [:LEGACY],
       # Optional transform applied to each proto value name.
-      name_transform: ->(name) { name.sub(/\ACURRENCY_/, "") }
+      name_transform: ->(name) { name.delete_prefix("CURRENCY_") }
   end
 end
 ```
 
 `name_transform` runs first, and `exclusions` and `expected_extras` then apply to the
 transformed names. In the example above the exclusion is therefore `UNKNOWN_DO_NOT_USE`, the
-name left after the transform strips `CURRENCY_`, and not `CURRENCY_UNKNOWN_DO_NOT_USE`.
+name left after the transform strips `CURRENCY_`, rather than `CURRENCY_UNKNOWN_DO_NOT_USE`.
 
 When an enum has one or more external sources, `elasticgraph-proto_ingestion` uses them
 as the source of the generated enum's values. When multiple sources are registered for the
@@ -306,9 +306,10 @@ ElasticGraph.define_schema do |schema|
 end
 ```
 
-A referenced enum must have exactly one option-free source whose values match the
+A referenced enum must have exactly one `external_proto_enum` call that passes no
+`exclusions:`, `expected_extras:`, or `name_transform:`, whose values match the
 ElasticGraph enum's values; transformed, curated, or multi-source enums stay generated
-locally so value curation remains explicit. Note that `MyApp::Protos::Currency` from the
+locally. Note that `MyApp::Protos::Currency` from the
 previous section cannot be referenced this way: its `CURRENCY_`-prefixed names only match
 after a transform, and referenced enums allow no transform.
 

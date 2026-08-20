@@ -45,7 +45,7 @@ module ElasticGraph
           #       t.values "USD", "CAD"
           #       t.external_proto_enum MyApp::Protos::Currency,
           #         exclusions: [:UNKNOWN_DO_NOT_USE],
-          #         name_transform: ->(name) { name.sub(/\ACURRENCY_/, "") }
+          #         name_transform: ->(name) { name.delete_prefix("CURRENCY_") }
           #     end
           #   end
           def external_proto_enum(proto_enum, exclusions: [], expected_extras: [], name_transform: nil, proto: nil, import: nil)
