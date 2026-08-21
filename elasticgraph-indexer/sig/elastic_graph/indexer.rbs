@@ -28,6 +28,9 @@ module ElasticGraph
     @operation_factory: Operation::Factory?
     def operation_factory: () -> Operation::Factory
 
+    @ingestion_adapters: ::Array[IngestionAdapter::_Adapter]?
+    def ingestion_adapters: () -> ::Array[IngestionAdapter::_Adapter]
+
     @monotonic_clock: Support::MonotonicClock?
     def monotonic_clock: () -> Support::MonotonicClock
 
