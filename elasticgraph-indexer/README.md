@@ -89,3 +89,8 @@ module MyCompany
   end
 end
 ```
+
+A decoded event hash may carry a `schema_version` to request a specific schema artifact version. The
+key is optional, because an ingestion format may have no versions at all. Each ingestion adapter
+decides what a missing version means for its own format. `elasticgraph-json_ingestion` uses the latest
+available JSON schema version.

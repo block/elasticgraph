@@ -25,6 +25,10 @@ module ElasticGraph
       # @return [String] message type for logging when a file is dumped to S3
       LOG_MSG_DUMPED_FILE = "DumpedToWarehouseFile"
 
+      # @return [String] S3 key segment used in place of `v<version>` for an ingestion format that
+      #   has no schema versions
+      UNVERSIONED_S3_KEY_SEGMENT = "unversioned"
+
       def initialize(logger:, s3_client:, s3_bucket_name:, s3_file_prefix:, clock:)
         @logger = logger
         @s3_client = s3_client
@@ -34,20 +38,21 @@ module ElasticGraph
       end
 
       # Processes a batch of indexing operations by dumping them to S3 as gzipped JSONL files.
-      # Operations are grouped by GraphQL type and JSON schema version, with each group written to a separate file.
+      # Operations are grouped by GraphQL type and schema version, with each group written to a separate file.
       #
       # @param operations [Array<Operation>] the indexing operations to process
       # @param refresh [Boolean] ignored (included for interface compatibility with DatastoreIndexingRouter)
       # @return [BulkResult] result containing success status for all operations
       def bulk(operations, refresh: false)
-        operations_by_type_and_json_schema_version = operations.group_by { |op| [op.event.fetch("type"), op.event.fetch(JSON_SCHEMA_VERSION_KEY)] }
+        # The schema version is optional, since an ingestion format may have no versions at all.
+        operations_by_type_and_schema_version = operations.group_by { |op| [op.event.fetch("type"), op.event[SCHEMA_VERSION_KEY]] }
 
         @logger.info({
           "message_type" => LOG_MSG_RECEIVED_BATCH,
-          "record_counts_by_type" => operations_by_type_and_json_schema_version.transform_keys { |(type, _json_schema_version)| type }.transform_values(&:size)
+          "record_counts_by_type" => operations_by_type_and_schema_version.transform_keys { |(type, _schema_version)| type }.transform_values(&:size)
         })
 
-        operations_by_type_and_json_schema_version.each do |(type, json_schema_version), operations|
+        operations_by_type_and_schema_version.each do |(type, schema_version), operations|
           # Operations coming from the indexer are always Update operations for warehouse dumping
           update_operations = operations # : ::Array[::ElasticGraph::Indexer::Operation::Update]
           jsonl_data = build_jsonl_file_from(update_operations)
@@ -56,7 +61,7 @@ module ElasticGraph
           next if jsonl_data.empty?
 
           gzip_data = compress(jsonl_data)
-          s3_key = generate_s3_key_for(type, json_schema_version)
+          s3_key = generate_s3_key_for(type, schema_version)
 
           # Use if_none_match: "*" to prevent overwrites (defense-in-depth, though UUIDs make collisions impossible)
           @s3_client.put_object(
@@ -72,7 +77,10 @@ module ElasticGraph
             "s3_bucket" => @s3_bucket_name,
             "s3_key" => s3_key,
             "type" => type,
-            JSON_SCHEMA_VERSION_KEY => json_schema_version,
+            SCHEMA_VERSION_KEY => schema_version,
+            # Deprecated alias of `schema_version`, kept so that dashboards and monitors that watch
+            # the old name keep working.
+            JSON_SCHEMA_VERSION_KEY => schema_version,
             "record_count" => operations.size,
             "json_size" => jsonl_data.bytesize,
             "gzip_size" => gzip_data.bytesize
@@ -97,14 +105,18 @@ module ElasticGraph
 
       private
 
-      def generate_s3_key_for(type, json_schema_version)
+      def generate_s3_key_for(type, schema_version)
         date = @clock.now.utc.strftime("%Y-%m-%d")
         uuid = ::SecureRandom.uuid
+
+        # An ingestion format with no schema versions gets a fixed segment in place of `v<version>`.
+        # The segment count stays the same, so a reader that splits the key keeps working.
+        version_segment = schema_version.nil? ? UNVERSIONED_S3_KEY_SEGMENT : "v#{schema_version}"
 
         [
           @s3_file_prefix,
           type,
-          "v#{json_schema_version}",
+          version_segment,
           date,
           "#{uuid}.jsonl.gz"
         ].join("/")

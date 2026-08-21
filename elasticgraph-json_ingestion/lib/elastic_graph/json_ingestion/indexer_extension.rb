@@ -17,9 +17,13 @@ module ElasticGraph
     module IndexerExtension
       # Adds the JSON {IngestionAdapter} to the indexer's available ingestion adapters.
       #
+      # The memo uses a name specific to this module. Every extension module in the chain assigns
+      # while it calls `super`, so a shared name would make the result depend on the order of
+      # evaluation.
+      #
       # @return [Array<Object>] the available ingestion adapters
       def ingestion_adapters
-        @ingestion_adapters ||= super + [IngestionAdapter.new(schema_artifacts: schema_artifacts, logger: logger)]
+        @json_ingestion_adapters ||= super + [IngestionAdapter.new(schema_artifacts: schema_artifacts, logger: logger)]
       end
     end
   end

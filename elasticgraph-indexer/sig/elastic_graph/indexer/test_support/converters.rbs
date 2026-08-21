@@ -2,6 +2,8 @@ module ElasticGraph
   class Indexer
     module TestSupport
       module Converters
+        EVENT_ONLY_ATTRIBUTES: ::Array[::String]
+
         def self.upsert_event_for: (::Hash[::String, untyped]) -> ::Hash[::String, untyped]
 
         def self.upsert_events_for_records: (
