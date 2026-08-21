@@ -115,6 +115,21 @@ This gem also provides the `be_a_valid_elastic_graph_event` RSpec matcher (via
 `require "elastic_graph/json_ingestion/spec_support/event_matcher"`) for testing that publisher events
 conform to your schema.
 
+## Indexing Event Decoding
+
+This gem also provides `ElasticGraph::JSONIngestion::IndexingEventDecoder`, which decodes JSON Lines payloads
+into ElasticGraph indexing event hashes. Configure it as your indexer's indexing event decoder (generated
+ElasticGraph projects include this configuration):
+
+```yaml
+indexer:
+  indexing_event_decoder:
+    name: ElasticGraph::JSONIngestion::IndexingEventDecoder
+    require_path: elastic_graph/json_ingestion/indexing_event_decoder
+```
+
+See the `elasticgraph-indexer` README for the decoder extension interface.
+
 ## Dependency Diagram
 
 ```mermaid

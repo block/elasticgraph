@@ -46,6 +46,9 @@ Gem::Specification.new do |spec|
   spec.add_dependency "aws-sdk-s3", "~> 1.228", ">= 1.228.1"
 
   # The test suite builds indexers from the shared test schema artifacts, whose runtime metadata
-  # registers the JSON ingestion indexer extension provided by `elasticgraph-json_ingestion`.
+  # registers the JSON ingestion indexer extension provided by `elasticgraph-json_ingestion`, and
+  # exercises JSON Lines payload decoding via that gem's decoder. This is a development dependency
+  # (rather than a runtime one) so that applications using a different ingestion format can
+  # configure their own decoder without bundling `elasticgraph-json_ingestion`.
   spec.add_development_dependency "elasticgraph-json_ingestion", ElasticGraph::VERSION
 end
