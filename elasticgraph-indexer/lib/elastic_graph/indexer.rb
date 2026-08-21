@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/datastore_core"
+require "elastic_graph/errors"
 require "elastic_graph/indexer/config"
 require "elastic_graph/support/from_yaml_file"
 
@@ -56,21 +57,11 @@ module ElasticGraph
       end
     end
 
-    def record_preparer_factory
-      @record_preparer_factory ||= begin
-        require "elastic_graph/indexer/record_preparer"
-        RecordPreparer::Factory.new(schema_artifacts)
-      end
-    end
-
-    # The ingestion adapters available for processing events. For now, only the JSON events
-    # adapter is available; indexer extension modules will be able to contribute additional
-    # adapters as alternate ingestion formats are supported.
+    # The ingestion adapters available for processing events. Returns an empty list by default;
+    # ingestion format gems contribute adapters via indexer extension modules that override this
+    # method.
     def ingestion_adapters
-      @ingestion_adapters ||= begin
-        require "elastic_graph/indexer/ingestion_adapter/json_events"
-        [IngestionAdapter::JSONEvents.new(schema_artifacts: schema_artifacts, logger: logger)]
-      end
+      [] # : ::Array[IngestionAdapter::_Adapter]
     end
 
     def processor
@@ -88,6 +79,13 @@ module ElasticGraph
 
     def operation_factory
       @operation_factory ||= begin
+        if ingestion_adapters.empty?
+          raise Errors::ConfigError, "No ingestion adapters are available to process events. Ingestion format gems " \
+            "make an adapter available by registering an indexer extension (via `register_indexer_extension`) during " \
+            "schema definition; ensure your schema definition uses an ingestion format extension and regenerate your " \
+            "schema artifacts (or configure an extension via the `indexer.extension_modules` setting)."
+        end
+
         require "elastic_graph/indexer/operation/factory"
         Operation::Factory.new(
           schema_artifacts: schema_artifacts,

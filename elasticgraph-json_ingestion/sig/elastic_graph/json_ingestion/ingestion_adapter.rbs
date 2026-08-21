@@ -1,0 +1,31 @@
+module ElasticGraph
+  module JSONIngestion
+    class IngestionAdapter
+      ValidationResult: singleton(Indexer::IngestionAdapter::ValidationResult)
+
+      def initialize: (
+        schema_artifacts: schemaArtifacts,
+        logger: ::Logger,
+        ?configure_record_validator: (^(Support::JSONSchema::ValidatorFactory) -> Support::JSONSchema::ValidatorFactory)?
+      ) -> void
+
+      @schema_artifacts: schemaArtifacts
+      @logger: ::Logger
+      @configure_record_validator: (^(Support::JSONSchema::ValidatorFactory) -> Support::JSONSchema::ValidatorFactory)?
+      @record_preparer_factory: RecordPreparerFactory
+
+      def handles_event?: (Indexer::event) -> bool
+      def validate_event: (Indexer::event) -> Indexer::IngestionAdapter::ValidationResult
+
+      private
+
+      def select_json_schema_version: (Indexer::event) { (Indexer::IngestionAdapter::ValidationResult) -> bot } -> (::Integer | bot)
+      def validator: (::String, ::Integer) -> Support::JSONSchema::Validator
+
+      @validator_factories_by_version: ::Hash[::Integer, Support::JSONSchema::ValidatorFactory]?
+      def validator_factories_by_version: () -> ::Hash[::Integer, Support::JSONSchema::ValidatorFactory]
+
+      def raise: (*untyped) -> bot
+    end
+  end
+end

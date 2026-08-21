@@ -30,6 +30,21 @@ module ElasticGraph
       end
     end
 
+    describe "#operation_factory" do
+      it "raises a clear error when no ingestion adapters are available (e.g. for a schema defined without an ingestion format extension)" do
+        indexer = build_indexer(schema_definition: lambda do |schema|
+          schema.object_type "Widget" do |t|
+            t.field "id", "ID!"
+            t.index "widgets"
+          end
+        end)
+
+        expect {
+          indexer.operation_factory
+        }.to raise_error Errors::ConfigError, a_string_including("No ingestion adapters are available")
+      end
+    end
+
     context "when `config.extension_modules` or runtime metadata indexer extension modules are configured" do
       it "applies the extensions when the Indexer instance is instantiated without impacting any other instances" do
         config_extension_module = Module.new do
@@ -40,8 +55,8 @@ module ElasticGraph
         stub_const("ConfigExtensionModule", config_extension_module)
 
         runtime_metadata_extension_module = Module.new do
-          def processor
-            :runtime_metadata_processor
+          def monotonic_clock
+            :runtime_metadata_clock
           end
         end
         stub_const("RuntimeMetadataExtensionModule", runtime_metadata_extension_module)
@@ -61,10 +76,10 @@ module ElasticGraph
         )
 
         expect(extended_indexer.datastore_router).to eq :config_router
-        expect(extended_indexer.processor).to eq :runtime_metadata_processor
+        expect(extended_indexer.monotonic_clock).to eq :runtime_metadata_clock
 
         expect(normal_indexer.datastore_router).to be_a(Indexer::DatastoreIndexingRouter)
-        expect(normal_indexer.processor).to be_a(Indexer::Processor)
+        expect(normal_indexer.monotonic_clock).to be_a(Support::MonotonicClock)
       end
 
       def define_schema_elements(schema)

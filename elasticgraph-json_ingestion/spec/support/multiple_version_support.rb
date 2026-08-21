@@ -9,7 +9,7 @@
 require "elastic_graph/spec_support/schema_definition_helpers"
 
 module ElasticGraph
-  class Indexer
+  module JSONIngestion
     ::RSpec.shared_context "MultipleVersionSupport", :json_ingestion_schema_definition do
       include_context "SchemaDefinitionHelpers"
 
