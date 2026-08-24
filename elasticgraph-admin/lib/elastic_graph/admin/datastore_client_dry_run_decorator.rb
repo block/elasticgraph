@@ -65,6 +65,8 @@ module ElasticGraph
 
       def put_index_settings(*) = nil
 
+      def update_index_aliases(*) = nil
+
       # Document APIs
       def_delegators :@wrapped_client, :get, :search, :msearch
 

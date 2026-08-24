@@ -92,6 +92,31 @@ module ElasticGraph
         end
       end
 
+      it "drops an empty `aliases` hash since it means the same thing as an absent one and the datastore doesn't consistently echo the key back" do
+        index_config = {
+          "aliases" => {},
+          "settings" => {}
+        }
+
+        normalized = IndexConfigNormalizer.normalize(index_config)
+
+        expect(normalized).to eq({
+          "settings" => {}
+        })
+      end
+
+      it "leaves a non-empty `aliases` hash unchanged" do
+        index_config = {
+          "aliases" => {"my_alias" => {}}
+        }
+
+        normalized = IndexConfigNormalizer.normalize(index_config)
+
+        expect(normalized).to eq({
+          "aliases" => {"my_alias" => {}}
+        })
+      end
+
       it "drops `type: object` when it is alongside `properties` since the datastore treats that as the default type when `properties` are used and omits it" do
         index_config = {
           "mappings" => {

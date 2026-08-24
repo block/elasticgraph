@@ -32,12 +32,14 @@ module ElasticGraph
         # exposed by the `IndexDefinition` object. Based on the configuration of the passed index
         # and the state of the index in the datastore, does one of the following:
         #
-        #   - If the index did not already exist: creates the index with the desired mappings and settings.
+        #   - If the index did not already exist: creates the index with the desired aliases, mappings and settings.
         #   - If the desired mapping has fewer fields than what is in the index: leaves the existing fields
         #     alone, because the datastore provides no way to remove fields from a mapping.
         #   - If the settings have desired changes: updates the settings, restoring any setting that
         #     no longer has a desired value to its default.
         #   - If the mapping has desired changes: updates the mappings.
+        #   - If the aliases have desired changes: adds or updates the desired aliases, leaving aliases
+        #     that were not declared (e.g. ones created outside of ElasticGraph) alone.
         #
         # Note that any of the writes to the index may fail. There are many things that cannot
         # be changed on an existing index (such as static settings, field mapping types, etc). We do not attempt
@@ -57,6 +59,10 @@ module ElasticGraph
           update_settings if settings_updates.any?
 
           update_mapping if has_mapping_updates?
+
+          # Update aliases after mappings, since an alias with a `filter` can reference fields that are
+          # only available once the mapping updates have been applied.
+          update_aliases if alias_updates.any?
         end
 
         def validate
@@ -84,6 +90,15 @@ module ElasticGraph
         def update_settings
           @datastore_client.put_index_settings(index: @index.name, body: settings_updates)
           report_action "Updated settings for index `#{@index.name}`:\n#{settings_diff}"
+        end
+
+        def update_aliases
+          actions = alias_updates.map do |name, definition|
+            {"add" => definition.merge({"index" => @index.name, "alias" => name})}
+          end
+
+          @datastore_client.update_index_aliases(body: {"actions" => actions})
+          report_action "Updated aliases for index `#{@index.name}`:\n#{alias_diff}"
         end
 
         def cannot_modify_mapping_field_type_error
@@ -116,6 +131,22 @@ module ElasticGraph
             restore_to_defaults = (current_settings.keys - desired_settings.keys).to_h { |key| [key, nil] }
             desired_settings.select { |key, value| current_settings[key] != value }.merge(restore_to_defaults)
           end
+        end
+
+        # Note: aliases that exist on the index but are not desired are intentionally left alone rather
+        # than removed. Undeclared aliases may have been created outside of ElasticGraph (which does
+        # nothing with aliases itself), so their absence from our desired configuration just means
+        # ElasticGraph doesn't manage them.
+        def alias_updates
+          @alias_updates ||= desired_aliases.reject { |name, definition| current_aliases[name] == definition }
+        end
+
+        def desired_aliases
+          desired_config["aliases"] || {}
+        end
+
+        def current_aliases
+          current_config["aliases"] || {}
         end
 
         def desired_mapping_for_update
@@ -167,6 +198,10 @@ module ElasticGraph
 
         def settings_diff
           @settings_diff ||= Indexer::HashDiffer.diff(current_settings, desired_settings) || "(no diff)"
+        end
+
+        def alias_diff
+          @alias_diff ||= Indexer::HashDiffer.diff(current_aliases, current_aliases.merge(alias_updates)) || "(no diff)"
         end
 
         def report_action(message)

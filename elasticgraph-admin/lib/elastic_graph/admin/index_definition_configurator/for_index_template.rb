@@ -36,12 +36,14 @@ module ElasticGraph
         # exposed by the `IndexDefinition` object. Based on the configuration of the passed index
         # and the state of the index in the datastore, does one of the following:
         #
-        #   - If the index did not already exist: creates the index with the desired mappings and settings.
+        #   - If the index template did not already exist: creates the index template with the desired
+        #     aliases, mappings and settings.
         #   - If the desired mapping has fewer fields than what is in the index template: leaves the existing
         #     fields alone (see `put_index_template` for why).
-        #   - If the settings have desired changes: updates the settings, restoring any setting that
-        #     no longer has a desired value to its default.
-        #   - If the mapping has desired changes: updates the mappings.
+        #   - If the aliases have desired changes: adds or updates the desired aliases, leaving aliases
+        #     that were not declared (e.g. ones created outside of ElasticGraph) alone.
+        #   - If any other part of the template configuration (settings, mappings, etc.) has desired
+        #     changes: updates the template.
         #
         # Note that any of the writes to the index may fail. There are many things that cannot
         # be changed on an existing index (such as static settings, field mapping types, etc). We do not attempt
@@ -50,8 +52,10 @@ module ElasticGraph
         def configure!
           related_index_configurators.each(&:configure!)
 
-          # there is no partial update for index template config and the same API both creates and updates it
-          put_index_template if has_mapping_updates? || settings_updates.any?
+          # There is no partial update for index template config and the same API both creates and updates it.
+          # Note that we diff the full template config (rather than just mappings and settings) so that a
+          # change to any part of it--such as `customize_config` customizations--triggers an update.
+          put_index_template if has_config_updates?
         end
 
         def validate
@@ -104,16 +108,8 @@ module ElasticGraph
           end
         end
 
-        def has_mapping_updates?
-          current_mapping != desired_mapping_for_update
-        end
-
-        def settings_updates
-          @settings_updates ||= begin
-            # Updating a setting to null will cause the datastore to restore the default value of the setting.
-            restore_to_defaults = (current_settings.keys - desired_settings.keys).to_h { |key| [key, nil] }
-            desired_settings.select { |key, value| current_settings[key] != value }.merge(restore_to_defaults)
-          end
+        def has_config_updates?
+          desired_config_parent_for_update.fetch("template") != (current_config_parent["template"] || {})
         end
 
         def desired_mapping_for_update
@@ -121,18 +117,37 @@ module ElasticGraph
         end
 
         def desired_config_parent_for_update
-          @desired_config_parent_for_update ||= Support::HashUtil.deep_merge(
-            desired_config_parent,
-            {"template" => {"mappings" => desired_mapping_for_update}}
-          )
+          @desired_config_parent_for_update ||= begin
+            template = DatastoreCore::IndexConfigNormalizer.normalize(
+              desired_config_parent.fetch("template").merge({
+                "mappings" => desired_mapping_for_update,
+                "aliases" => aliases_for_update
+              })
+            )
+
+            desired_config_parent.merge({"template" => template})
+          end
+        end
+
+        # Aliases that exist on the current template but are not desired are preserved rather than removed
+        # (the same policy `MappingUpdate` applies to no-longer-desired mapping fields). Undeclared aliases
+        # may have been created outside of ElasticGraph (which does nothing with aliases itself), and since
+        # `put_index_template` replaces the entire template, omitting them here would silently drop them
+        # from all future rollover indices.
+        def aliases_for_update
+          current_aliases.merge(desired_aliases)
+        end
+
+        def desired_aliases
+          desired_config_parent.fetch("template")["aliases"] || {}
+        end
+
+        def current_aliases
+          current_config_parent.dig("template", "aliases") || {}
         end
 
         def desired_mapping
           desired_config_parent.fetch("template").fetch("mappings")
-        end
-
-        def desired_settings
-          @desired_settings ||= desired_config_parent.fetch("template").fetch("settings")
         end
 
         def desired_config_parent
@@ -157,10 +172,6 @@ module ElasticGraph
 
         def current_mapping
           current_config_parent.dig("template", "mappings") || {}
-        end
-
-        def current_settings
-          @current_settings ||= current_config_parent.dig("template", "settings")
         end
 
         def current_config_parent

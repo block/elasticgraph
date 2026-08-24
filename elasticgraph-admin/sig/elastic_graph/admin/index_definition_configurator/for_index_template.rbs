@@ -32,10 +32,7 @@ module ElasticGraph
         @mapping_type_changes: ::Array[::String]?
         def mapping_type_changes: () -> ::Array[::String]
 
-        def has_mapping_updates?: () -> bool
-
-        @settings_updates: DatastoreCore::indexSettingsHash?
-        def settings_updates: () -> DatastoreCore::indexSettingsHash
+        def has_config_updates?: () -> bool
 
         @desired_mapping_for_update: DatastoreCore::indexMappingHash?
         def desired_mapping_for_update: () -> DatastoreCore::indexMappingHash
@@ -43,18 +40,18 @@ module ElasticGraph
         @desired_config_parent_for_update: ::Hash[::String, untyped]?
         def desired_config_parent_for_update: () -> ::Hash[::String, untyped]
 
-        def desired_mapping: () -> DatastoreCore::indexMappingHash
+        def aliases_for_update: () -> DatastoreCore::indexAliasesHash
 
-        @desired_settings: DatastoreCore::indexSettingsHash?
-        def desired_settings: () -> DatastoreCore::indexSettingsHash
+        def desired_aliases: () -> DatastoreCore::indexAliasesHash
+
+        def current_aliases: () -> DatastoreCore::indexAliasesHash
+
+        def desired_mapping: () -> DatastoreCore::indexMappingHash
 
         @desired_config_parent: ::Hash[::String, untyped]
         def desired_config_parent: () -> ::Hash[::String, untyped]
 
         def current_mapping: () -> DatastoreCore::indexMappingHash
-
-        @current_settings: DatastoreCore::indexSettingsHash?
-        def current_settings: () -> DatastoreCore::indexSettingsHash
 
         @current_config_parent: ::Hash[::String, untyped]
         def current_config_parent: () -> ::Hash[::String, untyped]

@@ -48,7 +48,13 @@ module ElasticGraph
       #   (e.g. `"false"` or `"7"` instead of `false` or `7`), so this matches that behavior.
       # - Drops `type: object` from a mapping when there are `properties` because the datastore omits it in that
       #   situation, treating it as the default type.
+      # - Drops an empty `aliases` hash. Empty and absent `aliases` both mean "no declared aliases", but the datastore
+      #   doesn't consistently echo the key back, so we normalize to the absent form for stable comparisons.
       def self.normalize(index_config)
+        if (aliases = index_config["aliases"]) && aliases.empty?
+          index_config = index_config.except("aliases")
+        end
+
         if (settings = index_config["settings"])
           index_config = index_config.merge("settings" => normalize_settings(settings))
         end

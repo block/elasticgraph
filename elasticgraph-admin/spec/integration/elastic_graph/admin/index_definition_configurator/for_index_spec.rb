@@ -39,6 +39,10 @@ module ElasticGraph
             make_datastore_write_calls("main", "PUT #{put_index_definition_url(index_name, subresource)}")
           end
 
+          def make_datastore_calls_to_update_aliases(_index_name)
+            make_datastore_write_calls("main", "POST /_aliases")
+          end
+
           def fetch_artifact_configuration(schema_artifacts, index_def_name)
             schema_artifacts.indices.fetch(index_def_name)
           end

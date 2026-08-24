@@ -79,6 +79,8 @@ module ElasticGraph
               stub.put("/my_index/_mappings") { |env| response_for(body, env) }
             in :put_index_settings_my_index
               stub.put("/my_index/_settings") { |env| response_for(body, env) }
+            in :update_index_aliases
+              stub.post("/_aliases") { |env| response_for(body, env) }
             in :delete_indices_ind1_ind2
               stub.delete("/ind1,ind2?allow_no_indices=true&ignore_unavailable=true") { |env| response_for(body, env) }
 

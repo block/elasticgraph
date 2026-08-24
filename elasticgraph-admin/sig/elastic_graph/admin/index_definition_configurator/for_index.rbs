@@ -25,6 +25,7 @@ module ElasticGraph
         def create_new_index: () -> void
         def update_mapping: () -> void
         def update_settings: () -> void
+        def update_aliases: () -> void
         def cannot_modify_mapping_field_type_error: () -> ::String
         def index_exists?: () -> bool
 
@@ -35,6 +36,13 @@ module ElasticGraph
 
         @settings_updates: DatastoreCore::indexSettingsHash?
         def settings_updates: () -> DatastoreCore::indexSettingsHash
+
+        @alias_updates: DatastoreCore::indexAliasesHash?
+        def alias_updates: () -> DatastoreCore::indexAliasesHash
+
+        def desired_aliases: () -> DatastoreCore::indexAliasesHash
+
+        def current_aliases: () -> DatastoreCore::indexAliasesHash
 
         @desired_mapping_for_update: DatastoreCore::indexMappingHash?
         def desired_mapping_for_update: () -> DatastoreCore::indexMappingHash
@@ -60,6 +68,9 @@ module ElasticGraph
 
         @settings_diff: ::String?
         def settings_diff: () -> ::String
+
+        @alias_diff: ::String?
+        def alias_diff: () -> ::String
 
         def report_action: (::String) -> void
       end

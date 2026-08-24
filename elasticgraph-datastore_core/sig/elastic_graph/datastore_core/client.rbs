@@ -2,6 +2,7 @@ module ElasticGraph
   class DatastoreCore
     type indexMappingHash = ::Hash[::String, untyped]
     type indexSettingsHash = ::Hash[::String, untyped]
+    type indexAliasesHash = ::Hash[::String, untyped]
     type indexConfigHash = ::Hash[::String, untyped]
 
     interface _Client
@@ -25,6 +26,7 @@ module ElasticGraph
       def create_index: (index: ::String, body: ::Hash[::String, untyped]) -> void
       def put_index_mapping: (index: ::String, body: ::Hash[::String, untyped]) -> void
       def put_index_settings: (index: ::String, body: ::Hash[::String, untyped]) -> void
+      def update_index_aliases: (body: ::Hash[::String, untyped]) -> void
       def delete_indices: (*::String) -> void
 
       def msearch: (body: ::Array[::Hash[::String | ::Symbol, untyped]], ?headers: ::Hash[::String, untyped]?) -> ::Hash[::String, untyped]
