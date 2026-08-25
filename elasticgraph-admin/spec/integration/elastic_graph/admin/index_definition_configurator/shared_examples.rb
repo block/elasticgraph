@@ -331,6 +331,24 @@ module ElasticGraph
             .and make_no_datastore_write_calls("main")
         end
 
+        it "applies `customize_config` mapping customizations such as field aliases when creating an index or index template, and reconciles them onto existing ones" do
+          field_alias_mapping = {"type" => "alias", "path" => "created_at"}
+
+          configure_index_definition(schema_def_with_field_aliases("created"))
+          expect(mapping_properties_of(unique_index_name)).to include("created" => field_alias_mapping)
+
+          expect {
+            configure_index_definition(schema_def_with_field_aliases("created", "creation_time"))
+          }.to change { mapping_properties_of(unique_index_name)["creation_time"] }
+            .from(nil)
+            .to(field_alias_mapping)
+            .and make_datastore_calls_to_configure_index_def(unique_index_name, :mappings)
+
+          expect {
+            configure_index_definition(schema_def_with_field_aliases("created", "creation_time"))
+          }.to make_no_datastore_write_calls("main")
+        end
+
         def schema_def_with_aliases(aliases)
           schema_def(configure_index: ->(index) {
             index.customize_config do |config|
@@ -339,8 +357,22 @@ module ElasticGraph
           })
         end
 
+        def schema_def_with_field_aliases(*field_alias_names)
+          schema_def(configure_index: ->(index) {
+            index.customize_config do |config|
+              field_alias_names.each do |name|
+                config["mappings"]["properties"][name] = {"type" => "alias", "path" => "created_at"}
+              end
+            end
+          })
+        end
+
         def aliases_of(index_definition_name)
           get_index_definition_configuration(index_definition_name)["aliases"] || {}
+        end
+
+        def mapping_properties_of(index_definition_name)
+          get_index_definition_configuration(index_definition_name).dig("mappings", "properties") || {}
         end
 
         def schema_def(
