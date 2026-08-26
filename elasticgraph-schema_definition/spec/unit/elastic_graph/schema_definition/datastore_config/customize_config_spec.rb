@@ -105,7 +105,7 @@ module ElasticGraph
       end
 
       it "yields a defensive deep copy so that customization mutations cannot corrupt the index's own internal state" do
-        index = nil # : Indexing::Index?
+        index = nil
         sort_fields = ["created_at"]
 
         campaigns = index_configs_for "campaigns" do |s|
