@@ -247,7 +247,13 @@ module ElasticGraph
         # configuration.
         #
         # @note ElasticGraph does nothing with the customized configuration besides passing it through to the datastore,
-        #   and makes no claims about the safety or correctness of any customization. Use with care!
+        #   and makes no claims about the safety or correctness of any customization. A customization the datastore
+        #   rejects surfaces as an error when `elasticgraph-admin` configures the cluster--after earlier configuration
+        #   steps have been applied--rather than when the schema is defined. Also note that {#rollover} affects what the
+        #   datastore accepts: the customization goes into the index template body, which the datastore validates
+        #   differently than a concrete index, so a customization that works without {#rollover} may be rejected with it.
+        #   **When you add or change a customization, apply it locally against the same datastore version you run in
+        #   production--via `bundle exec rake boot_locally`--to confirm it works as intended.**
         #
         # @yield [Hash<String, Object>] the datastore configuration of the index, to be mutated by the block
         # @return [void]
