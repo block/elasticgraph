@@ -162,7 +162,24 @@ module ElasticGraph
           # Here we use the `RecordPreparer::Identity` record preparer because we may not have a valid JSON schema
           # version number in this case (which is usually required to get a `RecordPreparer` from the factory), and
           # we won't wind up using the record preparer for real on these operations, anyway.
-          operations = build_all_operations_for(event, RecordPreparer::Identity)
+          #
+          # Building operations for an event we already know is malformed can itself fail--for example, when the
+          # record omits a field an update target derives its id from. Reporting what was malformed matters more
+          # than reporting the operations we would have run, and `FailedEventError#operations` is documented to
+          # sometimes be empty for exactly this reason, so we fall back to no operations rather than let a second
+          # failure mask the first.
+          operations = begin
+            build_all_operations_for(event, RecordPreparer::Identity)
+          rescue => exception
+            logger.warn({
+              "message_type" => "FailedEventOperationBuildingFailure",
+              "message_id" => event["message_id"],
+              "event_id" => EventID.from_event(event).to_s,
+              "error_class" => exception.class.name,
+              "error_message" => exception.message
+            })
+            [] # : ::Array[_Operation]
+          end
 
           BuildResult.failure(FailedEventError.new(event: event, operations: operations.to_set, main_message: message))
         end

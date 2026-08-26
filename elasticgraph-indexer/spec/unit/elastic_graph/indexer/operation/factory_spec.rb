@@ -247,6 +247,34 @@ module ElasticGraph
             end
           end
 
+          context "when an event is malformed in a way that also breaks building its operations", :expect_warning_logging do
+            # `Widget` requires `cost`, and its derived `WidgetCurrency` update target sources its id
+            # from `cost.currency`, so a `Widget` with no `cost` both fails validation and breaks
+            # building the operations we attach to the `FailedEventError`. Reporting the malformation
+            # matters more than reporting operations we are never going to run, and
+            # `FailedEventError#operations` is documented as sometimes being empty for this reason.
+            let(:event) do
+              build_upsert_event(:widget, id: "1", __version: 1).tap { |e| e["record"].delete("cost") }
+            end
+
+            it "still reports what was malformed instead of letting the second failure mask the first" do
+              failure = indexer.operation_factory.build(event).failed_event_error
+
+              expect(failure).to be_an(FailedEventError)
+              expect(failure.operations).to be_empty
+              expect(failure.main_message).to include("Malformed Widget record", "cost").and exclude("Key not found")
+            end
+
+            it "logs the failure it swallowed, so a discarded operation-building error is still traceable" do
+              indexer.operation_factory.build(event)
+
+              expect(logged_jsons_of_type("FailedEventOperationBuildingFailure")).to match([a_hash_including(
+                "event_id" => "Widget:1@v1",
+                "error_class" => "KeyError"
+              )])
+            end
+          end
+
           it "generates a primary indexing operation for a single index with latency metrics" do
             event = build_upsert_event(:component, id: "1", __version: 1)
             latency_timestamps = {"latency_timestamps" => {"created_in_esperanto_at" => "2012-04-23T18:25:43.511Z"}}
