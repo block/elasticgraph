@@ -51,7 +51,7 @@ module ElasticGraph
       # - Drops an empty `aliases` hash. Empty and absent `aliases` both mean "no declared aliases", but the datastore
       #   doesn't consistently echo the key back, so we normalize to the absent form for stable comparisons.
       def self.normalize(index_config)
-        if index_config["aliases"] && index_config["aliases"].empty?
+        if (aliases = index_config["aliases"]) && aliases.empty?
           index_config = index_config.except("aliases")
         end
 
