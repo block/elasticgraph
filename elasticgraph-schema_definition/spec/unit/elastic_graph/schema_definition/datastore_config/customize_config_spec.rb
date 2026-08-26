@@ -130,7 +130,7 @@ module ElasticGraph
         expect(campaigns.dig("settings", "index.number_of_shards")).to eq(17)
         expect(campaigns.dig("settings", "index.sort.field")).to eq(["created_at", "id"])
 
-        expect(index&.settings).to include(
+        expect(index.settings).to include(
           "index.number_of_shards" => 1,
           "index.sort.field" => ["created_at"]
         )
