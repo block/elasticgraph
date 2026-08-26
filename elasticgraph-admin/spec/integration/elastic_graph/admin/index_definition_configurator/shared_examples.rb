@@ -37,7 +37,7 @@ module ElasticGraph
           end
         end
 
-        def simulate_presence_of_external_alias(alias_name)
+        def create_external_alias(alias_name)
           main_datastore_client.update_index_aliases(body: {"actions" => [
             {"add" => {"index" => unique_index_name, "alias" => alias_name}}
           ]})
@@ -316,13 +316,20 @@ module ElasticGraph
           }.to change { aliases_of(unique_index_name) }
             .from({read_alias => {}})
             .to({read_alias => {"filter" => {"term" => {"name" => "active"}}}})
+
+          # A changed definition fully replaces the existing one (the `filter` is dropped, not merged).
+          expect {
+            configure_index_definition(schema_def_with_aliases({read_alias => {}}))
+          }.to change { aliases_of(unique_index_name) }
+            .from({read_alias => {"filter" => {"term" => {"name" => "active"}}}})
+            .to({read_alias => {}})
         end
 
         it "leaves aliases it did not declare alone rather than removing them" do
           external_alias = "#{unique_index_name}_external"
 
           configure_index_definition(schema_def)
-          simulate_presence_of_external_alias(external_alias)
+          create_external_alias(external_alias)
 
           expect {
             configure_index_definition(schema_def)

@@ -25,6 +25,31 @@ module ElasticGraph
               .and log_warning(/Can't update non dynamic setting/)
           end
 
+          it "applies mapping updates before alias updates so that an alias filter can reference a newly declared field" do
+            nested_alias = "#{unique_index_name}_nested"
+            # The datastore rejects a `nested` alias filter when the path is not yet in the index mapping.
+            nested_filter = {"nested" => {"path" => "nested_options", "query" => {"term" => {"nested_options.size" => "large"}}}}
+
+            configure_index_definition(schema_def)
+
+            expect {
+              configure_index_definition(schema_def(
+                configure_widget: ->(t) {
+                  t.field "nested_options", "[WidgetOptions!]!" do |f|
+                    f.mapping type: "nested"
+                  end
+                },
+                configure_index: ->(index) {
+                  index.customize_config do |config|
+                    config["aliases"] = {nested_alias => {"filter" => nested_filter}}
+                  end
+                }
+              ))
+            }.to change { aliases_of(unique_index_name) }
+              .from({})
+              .to({nested_alias => {"filter" => nested_filter}})
+          end
+
           it "handles empty indexed types" do
             schema = schema_def(define_no_widget_fields: true)
 

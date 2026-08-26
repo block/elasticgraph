@@ -100,6 +100,15 @@ ElasticGraph.define_schema do |schema|
       i.route_with "league"
       i.rollover :yearly, "formed_on"
       i.has_had_multiple_sources!
+      # Exercises `customize_config` with both index aliases (plain and filtered) and a field alias.
+      i.customize_config do |config|
+        config["aliases"] = {
+          "teams_all" => {},
+          "teams_nfl" => {"filter" => {"term" => {"league" => "NFL"}}}
+        }
+
+        config["mappings"]["properties"]["formed"] = {"type" => "alias", "path" => "formed_on"}
+      end
     end
   end
 

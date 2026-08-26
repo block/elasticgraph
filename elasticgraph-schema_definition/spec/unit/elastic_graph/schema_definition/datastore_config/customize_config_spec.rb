@@ -104,26 +104,37 @@ module ElasticGraph
         expect(campaigns.dig("mappings", "properties", "created")).to eq({"type" => "alias", "path" => "created_at"})
       end
 
-      it "yields a defensive copy so that customization mutations cannot corrupt the config of other indices" do
-        campaigns, promotions = index_configs_for "campaigns", "promotions" do |s|
+      it "yields a defensive deep copy so that customization mutations cannot corrupt the index's own internal state" do
+        index = nil # : Indexing::Index?
+        sort_fields = ["created_at"]
+
+        campaigns = index_configs_for "campaigns" do |s|
           s.object_type "Campaign" do |t|
             t.field "id", "ID!"
+            t.field "created_at", "DateTime"
 
-            t.index "campaigns" do |i|
+            t.index "campaigns", sort: {field: sort_fields, order: ["asc"]} do |i|
+              index = i
+
               i.customize_config do |config|
-                config["mappings"]["properties"]["id"]["type"] = "text"
+                # Replacing a value one level down requires the copy to not be a bare `dup` of the config hash...
+                config["settings"]["index.number_of_shards"] = 17
+                # ...while mutating this array in place requires the copy to be recursive, since the array is the
+                # very one the caller passed to `sort:` above.
+                config["settings"]["index.sort.field"] << "id"
               end
             end
           end
+        end.first
 
-          s.object_type "Promotion" do |t|
-            t.field "id", "ID!"
-            t.index "promotions"
-          end
-        end
+        expect(campaigns.dig("settings", "index.number_of_shards")).to eq(17)
+        expect(campaigns.dig("settings", "index.sort.field")).to eq(["created_at", "id"])
 
-        expect(campaigns.dig("mappings", "properties", "id", "type")).to eq("text")
-        expect(promotions.dig("mappings", "properties", "id", "type")).to eq("keyword")
+        expect(index&.settings).to include(
+          "index.number_of_shards" => 1,
+          "index.sort.field" => ["created_at"]
+        )
+        expect(sort_fields).to eq(["created_at"])
       end
 
       it "raises a clear error when `customize_config` is called without a block" do

@@ -93,6 +93,8 @@ module ElasticGraph
         end
 
         def update_aliases
+          # An `add` action is an upsert: when the named alias already exists on the index, the
+          # datastore replaces its definition with the one provided here (rather than merging).
           actions = alias_updates.map do |name, definition|
             {"add" => definition.merge({"index" => @index.name, "alias" => name})}
           end

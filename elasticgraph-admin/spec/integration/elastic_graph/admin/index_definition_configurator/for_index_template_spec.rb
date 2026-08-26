@@ -68,7 +68,7 @@ module ElasticGraph
             end
           end
 
-          def simulate_presence_of_external_alias(alias_name)
+          def create_external_alias(alias_name)
             template = main_datastore_client.get_index_template(unique_index_name)
             template_body = template.fetch("template")
 
