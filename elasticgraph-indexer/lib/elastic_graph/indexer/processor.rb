@@ -65,11 +65,16 @@ module ElasticGraph
       private
 
       # Emits a single aggregate log line per batch when any records had their per-record validation
-      # skipped (via `skip_record_validation_for`). Skipping a safety check should never be silent, but
-      # per-record logging would be untenable at backfill scale (a `1.0` skip rate is one line per record),
-      # so we tally by type and log once. Mirrors the batch-level `ElasticGraphIndexingLatencies` log.
+      # skipped (via `skip_record_validation_percents_by_type`). Skipping a safety check should never be
+      # silent, but per-record logging would be untenable at backfill scale (a `100` percent is one line
+      # per record), so we tally by type and log once. Mirrors the batch-level
+      # `ElasticGraphIndexingLatencies` log.
+      #
+      # A skipped record that then failed is deliberately absent from the tally: `Operation::Factory`
+      # re-runs the skipped validation when building its operations raises, so such a record ended up
+      # validated after all, and is already reported as a failed event.
       def log_skipped_record_validations(factory_results)
-        counts_by_type = factory_results.filter_map(&:validation_skipped_for).tally
+        counts_by_type = factory_results.filter_map(&:type_with_skipped_validation).tally
         return if counts_by_type.empty?
 
         @logger.info({

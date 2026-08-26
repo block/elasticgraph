@@ -11,7 +11,7 @@ module ElasticGraph
         attr_reader record_preparer_factory: RecordPreparer::Factory
         attr_reader logger: ::Logger
         attr_reader skip_derived_indexing_type_updates: ::Hash[::String, ::Set[::String]]
-        attr_reader skip_record_validation_for: ::Hash[::String, ::Float]
+        attr_reader skip_record_validation_percents_by_type: ::Hash[::String, ::Float]
         attr_reader configure_record_validator: (^(validatorFactory) -> validatorFactory)?
 
         def initialize: (
@@ -20,7 +20,7 @@ module ElasticGraph
           record_preparer_factory: RecordPreparer::Factory,
           logger: ::Logger,
           skip_derived_indexing_type_updates: ::Hash[::String, ::Set[::String]],
-          skip_record_validation_for: ::Hash[::String, ::Float],
+          skip_record_validation_percents_by_type: ::Hash[::String, ::Float],
           configure_record_validator: (^(validatorFactory) -> validatorFactory)?
         ) -> void
 
@@ -30,7 +30,7 @@ module ElasticGraph
           ?record_preparer_factory: RecordPreparer::Factory,
           ?logger: ::Logger,
           ?skip_derived_indexing_type_updates: ::Hash[::String, ::Set[::String]],
-          ?skip_record_validation_for: ::Hash[::String, ::Float],
+          ?skip_record_validation_percents_by_type: ::Hash[::String, ::Float],
           ?configure_record_validator: (^(validatorFactory) -> validatorFactory)?
         ) -> instance
       end
@@ -48,6 +48,9 @@ module ElasticGraph
         def select_json_schema_version: (event) { (BuildResult) -> bot } -> (::Integer | bot)
         def prepare_event: (event) -> event
         def validate_record_returning_failure: (event, ::String, ::Integer) -> BuildResult?
+        def build_success_result: (event, ::Integer, type_with_skipped_validation: ::String?) -> BuildResult
+        def build_success_result_isolating_malformed_records: (event, ::String, ::Integer) -> BuildResult
+        CRC32_SPACE_PER_PERCENT: ::Float
         def skip_validation?: (::String, event) -> bool
         def build_failed_result: (event, ::String, ::String) -> BuildResult
         def build_all_operations_for: (event, _RecordPreparer) -> ::Array[_Operation]
@@ -57,17 +60,17 @@ module ElasticGraph
         class BuildResult
           attr_reader operations: ::Array[_Operation]
           attr_reader failed_event_error: FailedEventError?
-          attr_reader validation_skipped_for: ::String?
+          attr_reader type_with_skipped_validation: ::String?
 
           def initialize: (::Array[_Operation], FailedEventError?, ::String?) -> void
 
           def with: (
             ?operations: ::Array[_Operation],
             ?failed_event_error: FailedEventError?,
-            ?validation_skipped_for: ::String?
+            ?type_with_skipped_validation: ::String?
           ) -> BuildResult
 
-          def self.success: (::Array[_Operation], ?validation_skipped_for: ::String?) -> BuildResult
+          def self.success: (::Array[_Operation], ?type_with_skipped_validation: ::String?) -> BuildResult
           def self.failure: (FailedEventError) -> BuildResult
         end
       end

@@ -24,7 +24,7 @@ module ElasticGraph
         :record_preparer_factory,
         :logger,
         :skip_derived_indexing_type_updates,
-        :skip_record_validation_for,
+        :skip_record_validation_percents_by_type,
         :configure_record_validator
       )
         def build(event)
@@ -43,29 +43,42 @@ module ElasticGraph
           end
 
           graphql_type_name = event.fetch("type")
-          validation_skipped = skip_validation?(graphql_type_name, event)
 
-          unless validation_skipped
-            failed_result = validate_record_returning_failure(event, graphql_type_name, selected_json_schema_version)
-            return failed_result if failed_result
-          end
-
-          begin
-            BuildResult.success(
-              build_all_operations_for(event, record_preparer_factory.for_json_schema_version(selected_json_schema_version)),
-              validation_skipped_for: validation_skipped ? graphql_type_name : nil
-            )
-          rescue RecordPreparer::UnknownTypeError
-            # Safety net for `skip_record_validation_for`: when record validation is skipped, an
-            # event with a missing or unknown abstract-type `__typename` reaches `RecordPreparer`
-            # and raises. Convert it to a `FailedEventError` so callers see a structured failure
-            # rather than an exception leaking out of `Factory#build`. The message intentionally
-            # omits the offending value to avoid leaking record data.
-            build_failed_result(event, "#{graphql_type_name} record", "Missing or unknown `__typename` for an abstract-type field.")
+          if skip_validation?(graphql_type_name, event)
+            build_success_result_isolating_malformed_records(event, graphql_type_name, selected_json_schema_version)
+          else
+            validate_record_returning_failure(event, graphql_type_name, selected_json_schema_version) ||
+              build_success_result(event, selected_json_schema_version, type_with_skipped_validation: nil)
           end
         end
 
         private
+
+        def build_success_result(event, selected_json_schema_version, type_with_skipped_validation:)
+          BuildResult.success(
+            build_all_operations_for(event, record_preparer_factory.for_json_schema_version(selected_json_schema_version)),
+            type_with_skipped_validation: type_with_skipped_validation
+          )
+        end
+
+        # Builds the operations for an event whose per-record validation we skipped.
+        #
+        # Skipping validation means malformed data the schema walk would have rejected surfaces instead as
+        # an exception while we build the event's operations, and there is no bounded list of error types to
+        # enumerate. So we rescue anything and then run the validation we skipped: the validator tells us
+        # whether the data was actually bad, and if it was, hands the caller the same pinpointed message it
+        # would have gotten had we validated up front. A clean bill of health from the validator means the
+        # error was never about the data (a schema artifact defect, or a bug) and must not be swallowed.
+        def build_success_result_isolating_malformed_records(event, graphql_type_name, selected_json_schema_version)
+          build_success_result(event, selected_json_schema_version, type_with_skipped_validation: graphql_type_name)
+        rescue => exception
+          failed_result = validate_record_returning_failure(event, graphql_type_name, selected_json_schema_version)
+          # `raise` is overridden below to stop this class from *originating* an error instead of returning a
+          # `BuildResult`. Here we propagate one that already escaped a collaborator, which is exactly what
+          # happens without this rescue, so we deliberately bypass that guard.
+          ::Kernel.raise(exception) unless failed_result
+          failed_result
+        end
 
         def select_json_schema_version(event)
           available_json_schema_versions = schema_artifacts.available_json_schema_versions
@@ -144,16 +157,22 @@ module ElasticGraph
           end
         end
 
+        # `Zlib.crc32` returns a value in `[0, 2**32)`. Pre-dividing that space by 100 lets us test a
+        # configured percent with a single multiply instead of dividing on every event.
+        CRC32_SPACE_PER_PERCENT = (1 << 32) / 100.0
+
         # Decides whether to skip per-record validation for `event` of `type`. The decision is
-        # deterministic per event id: a stable `Zlib.crc32` of `EventID#to_s` puts each event in a
-        # bucket in `[0.0, 1.0)` that is compared against the configured skip rate. Same event id =>
-        # same decision across pods and retries, so retries do not flip records between
-        # validated/skipped. `String#hash` is unsuitable here: `RUBY_HASH_SEED` is per-process.
+        # deterministic per event id: a stable `Zlib.crc32` of `EventID#to_s` maps each event to a
+        # point in the CRC32 space, and we skip validation for the configured percentage of that
+        # space. Same event id => same decision across pods and retries, so retries never flip a
+        # record between validated and skipped. `String#hash` is unsuitable here, as `RUBY_HASH_SEED`
+        # is per-process. The `<= 0` and `>= 100` guards keep the endpoints exact, so no float
+        # boundary error can make a `0` percent skip a record or a `100` percent validate one.
         def skip_validation?(type, event)
-          rate = skip_record_validation_for[type]
-          return false if rate.nil? || rate <= 0.0
-          return true if rate >= 1.0
-          ::Zlib.crc32(EventID.from_event(event).to_s).fdiv(2**32) < rate
+          percent = skip_record_validation_percents_by_type[type]
+          return false if percent.nil? || percent <= 0
+          return true if percent >= 100
+          ::Zlib.crc32(EventID.from_event(event).to_s) < percent * CRC32_SPACE_PER_PERCENT
         end
 
         def build_failed_result(event, payload_description, validation_message)
@@ -238,12 +257,13 @@ module ElasticGraph
         # Return value from `build` that indicates what happened.
         # - If it was successful, `operations` will be a non-empty array of operations and `failed_event_error` will be nil.
         # - If there was a validation issue, `operations` will be an empty array and `failed_event_error` will be non-nil.
-        # - `validation_skipped_for` names the event's GraphQL type when per-record validation was skipped
-        #   (via `skip_record_validation_for`), and is nil otherwise. `Processor` aggregates this for observability.
-        BuildResult = ::Data.define(:operations, :failed_event_error, :validation_skipped_for) do
+        # - `type_with_skipped_validation` names the event's GraphQL type when per-record validation was skipped
+        #   (via `skip_record_validation_percents_by_type`), and is nil otherwise. `Processor` aggregates this
+        #   for observability.
+        BuildResult = ::Data.define(:operations, :failed_event_error, :type_with_skipped_validation) do
           # @implements BuildResult
-          def self.success(operations, validation_skipped_for: nil)
-            new(operations, nil, validation_skipped_for)
+          def self.success(operations, type_with_skipped_validation: nil)
+            new(operations, nil, type_with_skipped_validation)
           end
 
           def self.failure(failed_event_error)

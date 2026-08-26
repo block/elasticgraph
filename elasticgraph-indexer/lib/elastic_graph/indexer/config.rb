@@ -11,7 +11,7 @@ require "elastic_graph/support/config"
 
 module ElasticGraph
   class Indexer
-    class Config < Support::Config.define(:latency_slo_thresholds_by_timestamp_in_ms, :skip_derived_indexing_type_updates, :skip_record_validation_for, :extension_modules)
+    class Config < Support::Config.define(:latency_slo_thresholds_by_timestamp_in_ms, :skip_derived_indexing_type_updates, :skip_record_validation_percents_by_type, :extension_modules)
       json_schema at: "indexer",
         optional: false,
         description: "Configuration for indexing operations and metrics used by `elasticgraph-indexer`.",
@@ -43,31 +43,33 @@ module ElasticGraph
               {"WidgetWorkspace" => ["ABC12345678"]}
             ]
           },
-          skip_record_validation_for: {
-            description: "Note: only a missing or unknown `__typename` on an abstract-type field is guaranteed to " \
-              "fail in isolation (as a structured event failure) when validation is skipped. Other malformed data " \
-              "that per-record validation would normally catch (e.g. a value that can't be coerced to its expected " \
-              "type) may raise an unhandled error that fails the entire batch, not just the offending record.\n\n" \
-              "Map of GraphQL type names to the fraction of records (in `[0.0, 1.0]`) whose " \
-              "per-type JSON schema validation should be skipped. `0.0` (or an absent key) validates every record; " \
-              "`1.0` skips every record; values in between sample. The decision is deterministic per event id " \
-              "(`type:id@vversion`) so the same event makes the same skip decision on retry across indexer pods. " \
-              "The event envelope (op, id, type, version, json_schema_version, latency_timestamps) is always " \
-              "validated. Intended for backfills of trusted, pre-validated data where skipping the per-record " \
-              "schema walk yields meaningful ingest speedups, with a sampled fraction left validated as a canary " \
-              "for schema drift. Leave empty for live-traffic ingestion: the datastore mappings will not catch all " \
-              "the constraints (regex, enum, min/max, format, abstract-type discriminators) that the JSON schema " \
-              "enforces. A missing field needed to compute the document id, routing key, or rollover index suffix " \
-              "will likewise fail the entire batch. Since such a batch produces no partial-failure response, the " \
-              "queue will redeliver all of its events, and the malformed record will fail them again on each retry " \
-              "until it is drained to the dead letter queue.",
+          skip_record_validation_percents_by_type: {
+            description: "Map of GraphQL type names to the percentage of records of that type whose per-record " \
+              "JSON schema validation should be skipped. `0` (or an absent key) validates every record of the " \
+              "type; `100` skips every record; values in between sample, and may be fractional. The decision is " \
+              "deterministic per event id (`type:id@vversion`), so the same event makes the same choice on every " \
+              "retry and on every indexer pod. The event envelope (op, id, type, version, json_schema_version, " \
+              "latency_timestamps) is always validated, regardless of this setting.\n\n" \
+              "With a large schema the per-record schema walk consumes a significant share of indexing CPU: every " \
+              "record is checked against every regex, enum, min/max, format, and abstract-type discriminator " \
+              "defined for its type. Skipping it trades that check for throughput, which is worthwhile when " \
+              "backfilling data that was already validated upstream. Leaving a percentage of records validated " \
+              "keeps a canary in place so schema drift still surfaces.\n\n" \
+              "Note: skipping validation makes malformed-data detection later and less precise. A malformation " \
+              "found while building an event's operations is still reported as an isolated event failure, carrying " \
+              "the message validation itself would have produced. But one found only while serializing an " \
+              "operation for the datastore (an unparsable rollover index timestamp, or a missing custom routing " \
+              "field) raises an error that fails the entire batch, including the well-formed events in it. Since " \
+              "such a batch produces no partial-failure response, the queue redelivers all of its events, and the " \
+              "malformed record fails them again on each retry until it is drained to the dead letter queue. Leave " \
+              "this empty for live-traffic ingestion.",
             type: "object",
-            patternProperties: {/^[A-Z]\w*$/.source => {type: "number", minimum: 0, maximum: 1}},
+            patternProperties: {/^[A-Z]\w*$/.source => {type: "number", minimum: 0, maximum: 100}},
             additionalProperties: false,
             default: {}, # : untyped
             examples: [
               {}, # : untyped
-              {"Widget" => 0.9, "Component" => 1.0}
+              {"Widget" => 90, "Component" => 100}
             ]
           },
           extension_modules: Support::Config::EXTENSION_MODULE_SCHEMA
@@ -75,11 +77,11 @@ module ElasticGraph
 
       private
 
-      def convert_values(skip_derived_indexing_type_updates:, latency_slo_thresholds_by_timestamp_in_ms:, skip_record_validation_for:, extension_modules:)
+      def convert_values(skip_derived_indexing_type_updates:, latency_slo_thresholds_by_timestamp_in_ms:, skip_record_validation_percents_by_type:, extension_modules:)
         {
           skip_derived_indexing_type_updates: skip_derived_indexing_type_updates.transform_values(&:to_set),
           latency_slo_thresholds_by_timestamp_in_ms: latency_slo_thresholds_by_timestamp_in_ms,
-          skip_record_validation_for: skip_record_validation_for.transform_values(&:to_f),
+          skip_record_validation_percents_by_type: skip_record_validation_percents_by_type.transform_values(&:to_f),
           extension_modules: SchemaArtifacts::RuntimeMetadata::ExtensionLoader.load_component_extensions(extension_modules)
         }
       end

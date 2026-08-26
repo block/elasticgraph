@@ -32,29 +32,29 @@ module ElasticGraph
         expect(config.skip_derived_indexing_type_updates).to eq("WidgetCurrency" => ["USD"].to_set)
       end
 
-      it "coerces `skip_record_validation_for` rates to floats (so integer YAML values like `1` become `1.0`)" do
+      it "coerces `skip_record_validation_percents_by_type` percents to floats (so integer YAML values like `90` become `90.0`)" do
         config = Config.from_parsed_yaml("indexer" => {
           "latency_slo_thresholds_by_timestamp_in_ms" => {},
-          "skip_record_validation_for" => {
-            "Widget" => 1,
-            "Component" => 0.5
+          "skip_record_validation_percents_by_type" => {
+            "Widget" => 90,
+            "Component" => 99.5
           }
         })
 
-        expect(config.skip_record_validation_for).to eq("Widget" => 1.0, "Component" => 0.5)
-        expect(config.skip_record_validation_for.values).to all(be_a(::Float))
+        expect(config.skip_record_validation_percents_by_type).to eq("Widget" => 90.0, "Component" => 99.5)
+        expect(config.skip_record_validation_percents_by_type.values).to all(be_a(::Float))
       end
 
-      it "rejects `skip_record_validation_for` rates outside `[0.0, 1.0]`" do
+      it "rejects `skip_record_validation_percents_by_type` percents outside `[0, 100]`" do
         expect {
           Config.from_parsed_yaml("indexer" => {
-            "skip_record_validation_for" => {"Widget" => 1.5}
+            "skip_record_validation_percents_by_type" => {"Widget" => 100.5}
           })
         }.to raise_error Errors::ConfigError
 
         expect {
           Config.from_parsed_yaml("indexer" => {
-            "skip_record_validation_for" => {"Widget" => -0.1}
+            "skip_record_validation_percents_by_type" => {"Widget" => -0.1}
           })
         }.to raise_error Errors::ConfigError
       end

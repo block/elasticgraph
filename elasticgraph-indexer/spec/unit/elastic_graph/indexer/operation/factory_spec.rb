@@ -76,7 +76,7 @@ module ElasticGraph
           end
 
           # We deliberately construct the indexer here without going through `build_indexer`. The
-          # `skip_record_validation_for` knob is intentionally not exposed via spec helpers so that
+          # `skip_record_validation_percents_by_type` knob is intentionally not exposed via spec helpers so that
           # tests cannot silently weaken validation; enabling it must be a visible, deliberate choice
           # in each spec that exercises it.
           context "when the indexer is configured to skip record validation for some types" do
@@ -87,7 +87,7 @@ module ElasticGraph
                 config: Indexer::Config.new(
                   latency_slo_thresholds_by_timestamp_in_ms: {},
                   skip_derived_indexing_type_updates: {},
-                  skip_record_validation_for: {"Component" => 1.0}
+                  skip_record_validation_percents_by_type: {"Component" => 100}
                 )
               )
             end
@@ -111,7 +111,7 @@ module ElasticGraph
 
               result = indexer.operation_factory.build(event)
 
-              expect(result.validation_skipped_for).to eq("Component")
+              expect(result.type_with_skipped_validation).to eq("Component")
             end
 
             it "still validates record-level fields for types that are not in the skip list" do
@@ -126,7 +126,7 @@ module ElasticGraph
 
               result = indexer.operation_factory.build(event)
 
-              expect(result.validation_skipped_for).to be_nil
+              expect(result.type_with_skipped_validation).to be_nil
             end
 
             it "still applies envelope-level validation for skipped types" do
@@ -136,7 +136,7 @@ module ElasticGraph
             end
           end
 
-          context "when the indexer configures a fractional skip rate for a type" do
+          context "when the indexer configures a partial skip percent for a type" do
             let(:indexer) do
               datastore_core = build_datastore_core
               Indexer.new(
@@ -144,13 +144,13 @@ module ElasticGraph
                 config: Indexer::Config.new(
                   latency_slo_thresholds_by_timestamp_in_ms: {},
                   skip_derived_indexing_type_updates: {},
-                  skip_record_validation_for: {"Component" => 0.5}
+                  skip_record_validation_percents_by_type: {"Component" => 50}
                 )
               )
             end
 
-            it "skips validation when the event's stable bucket falls below the rate" do
-              # Stub crc32 so the bucket is 0.0 -- well below 0.5 -- forcing the "skip" branch.
+            it "skips validation when the event's point in the crc32 space falls in the skipped portion" do
+              # Stub crc32 to the bottom of the space -- well inside the skipped 50% -- forcing the "skip" branch.
               allow(::Zlib).to receive(:crc32).and_return(0)
 
               event = build_upsert_event(:component, id: "1", __version: 1)
@@ -161,8 +161,8 @@ module ElasticGraph
               }.not_to raise_error
             end
 
-            it "still validates when the event's stable bucket falls at or above the rate" do
-              # Stub crc32 to a value just above 0.5 * 2**32 so the bucket >= rate, forcing validation.
+            it "still validates when the event's point in the crc32 space falls outside the skipped portion" do
+              # Stub crc32 to 75% of the way through the space, past the skipped 50%, forcing validation.
               allow(::Zlib).to receive(:crc32).and_return((2**32 * 0.75).to_i)
 
               event = build_upsert_event(:component, id: "1", __version: 1)
@@ -183,7 +183,7 @@ module ElasticGraph
 
               expect(first.failed_event_error.nil?).to eq(second.failed_event_error.nil?)
               expect(first.operations.size).to eq(second.operations.size)
-              expect(first.validation_skipped_for).to eq(second.validation_skipped_for)
+              expect(first.type_with_skipped_validation).to eq(second.type_with_skipped_validation)
             end
           end
 
@@ -198,7 +198,7 @@ module ElasticGraph
                 config: Indexer::Config.new(
                   latency_slo_thresholds_by_timestamp_in_ms: {},
                   skip_derived_indexing_type_updates: {},
-                  skip_record_validation_for: {"Widget" => 1.0}
+                  skip_record_validation_percents_by_type: {"Widget" => 100}
                 )
               )
             end
@@ -221,10 +221,11 @@ module ElasticGraph
             end
           end
 
-          context "when validation is skipped and an abstract-type field carries an unknown `__typename`" do
-            # Widget has an `inventor` field whose type is the `Inventor` union. With validation
-            # skipped, `RecordPreparer` would normally raise on an unknown concrete subtype; the
-            # safety net in `Factory#build` converts that into a structured `FailedEventError`.
+          context "when building the operations for a record whose validation was skipped raises" do
+            # These specs cover the re-validation gate: an exception escaping operation building is
+            # answered by running the validation we skipped. If the validator faults the record, the
+            # caller gets the same failure it would have gotten had we validated up front. If the
+            # validator is happy, the error was never about the data and must not be swallowed.
             let(:indexer) do
               datastore_core = build_datastore_core
               Indexer.new(
@@ -232,19 +233,51 @@ module ElasticGraph
                 config: Indexer::Config.new(
                   latency_slo_thresholds_by_timestamp_in_ms: {},
                   skip_derived_indexing_type_updates: {},
-                  skip_record_validation_for: {"Widget" => 1.0}
+                  skip_record_validation_percents_by_type: {"Widget" => 100}
                 )
               )
             end
 
-            it "produces a FailedEventError instead of raising" do
+            it "reports a value the indexing preparers can't coerce as a failed event carrying the validator's message" do
+              event = build_upsert_event(:widget, id: "1", __version: 1)
+              # `IndexingPreparers::Integer` raises `Errors::IndexOperationError` on this; validation
+              # would have caught it first as a type mismatch on `amount_cents`.
+              event["record"]["cost"] = {"currency" => "USD", "amount_cents" => "not a number"}
+
+              message = expect_failed_event_error(event, "Malformed Widget record", "amount_cents")
+
+              expect(message).to exclude("IndexOperationError")
+            end
+
+            it "reports a missing or unknown abstract-type `__typename` as a failed event carrying the validator's message" do
+              # Widget's `inventor` field is the `Inventor` union, whose JSON schema requires
+              # `__typename` and pins a `const` discriminator on each concrete subtype. Both the
+              # missing and the unknown case therefore fail validation, which is why no dedicated
+              # error type is needed for them.
               event = build_upsert_event(:widget, id: "1", __version: 1)
               event["record"]["inventor"] = {"__typename" => "NotARealConcreteType", "name" => "anon"}
 
-              expect {
-                expect_failed_event_error(event, "Widget record", "__typename")
-              }.not_to raise_error
+              expect_failed_event_error(event, "Malformed Widget record", "inventor")
             end
+
+            it "re-raises an error the validator has no opinion about, so bugs are not hidden as data failures" do
+              event = build_upsert_event(:widget, id: "1", __version: 1)
+
+              # Asserting on class *and* message matters here: `raise` is overridden on
+              # `Operation::Factory` to reject raising from the class, so a bare `raise exception`
+              # would substitute the guard's own error and still satisfy a bare `raise_error`.
+              expect {
+                factory_whose_record_preparation_is_broken.build(event)
+              }.to raise_error(::KeyError, a_string_including("nameInIndex"))
+            end
+          end
+
+          it "does not rescue when validation was not skipped, so the validated path behaves exactly as before" do
+            event = build_upsert_event(:widget, id: "1", __version: 1)
+
+            expect {
+              factory_whose_record_preparation_is_broken.build(event)
+            }.to raise_error(::KeyError, a_string_including("nameInIndex"))
           end
 
           context "when an event is malformed in a way that also breaks building its operations", :expect_warning_logging do
@@ -273,6 +306,17 @@ module ElasticGraph
                 "error_class" => "KeyError"
               )])
             end
+          end
+
+          # A factory whose record preparation fails for a reason record validation cannot detect: a
+          # runtime metadata defect, standing in for any bug that is not about the data itself.
+          def factory_whose_record_preparation_is_broken
+            record_preparer_factory = instance_double(RecordPreparer::Factory)
+
+            allow(record_preparer_factory).to receive(:for_json_schema_version)
+              .and_raise(::KeyError, 'key not found: "nameInIndex"')
+
+            indexer.operation_factory.with(record_preparer_factory: record_preparer_factory)
           end
 
           it "generates a primary indexing operation for a single index with latency metrics" do

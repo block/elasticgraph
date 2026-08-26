@@ -387,7 +387,7 @@ module ElasticGraph
         end
 
         context "when the indexer skips per-record validation for some types" do
-          # `skip_record_validation_for` is intentionally not exposed via `build_indexer`, so we
+          # `skip_record_validation_percents_by_type` is intentionally not exposed via `build_indexer`, so we
           # construct the indexer directly (reusing the spec's router spy and clock) to enable it.
           let(:indexer) do
             Indexer.new(
@@ -395,7 +395,7 @@ module ElasticGraph
               config: Indexer::Config.new(
                 latency_slo_thresholds_by_timestamp_in_ms: {},
                 skip_derived_indexing_type_updates: {},
-                skip_record_validation_for: {"Component" => 1.0}
+                skip_record_validation_percents_by_type: {"Component" => 100}
               ),
               datastore_router: datastore_router,
               clock: clock
