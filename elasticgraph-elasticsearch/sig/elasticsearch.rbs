@@ -25,6 +25,7 @@ module Elasticsearch
         def create: (index: ::String, body: stringOrSymbolHash) -> Response
         def put_mapping: (index: ::String, body: stringOrSymbolHash) -> Response
         def put_settings: (index: ::String, body: stringOrSymbolHash) -> Response
+        def update_aliases: (body: stringOrSymbolHash) -> Response
         def delete: (index: ::Array[::String], ?ignore_unavailable: bool, ?allow_no_indices: bool) -> Response
       end
     end

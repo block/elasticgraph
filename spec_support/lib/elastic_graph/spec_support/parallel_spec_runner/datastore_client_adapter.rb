@@ -83,6 +83,16 @@ module ElasticGraph
         super(index: index_expression_for_test_env(index), body: body)
       end
 
+      def update_index_aliases(body:)
+        actions = body.fetch("actions").map do |action|
+          action.transform_values do |action_body|
+            action_body.merge("index" => index_expression_for_test_env(action_body.fetch("index")))
+          end
+        end
+
+        super(body: body.merge("actions" => actions))
+      end
+
       def delete_indices(*index_names)
         super(*index_names.map { |index_name| index_expression_for_test_env(index_name) })
       end

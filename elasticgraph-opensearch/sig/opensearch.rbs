@@ -25,6 +25,7 @@ module OpenSearch
         def create: (index: ::String, body: stringOrSymbolHash) -> void
         def put_mapping: (index: ::String, body: stringOrSymbolHash) -> void
         def put_settings: (index: ::String, body: stringOrSymbolHash) -> void
+        def update_aliases: (body: stringOrSymbolHash) -> void
         def delete: (index: ::Array[::String], ?ignore_unavailable: bool, ?allow_no_indices: bool) -> void
       end
     end

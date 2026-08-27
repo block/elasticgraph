@@ -158,6 +158,10 @@ module ElasticGraph
         transform_errors { |c| c.indices.put_settings(index: index, body: body).body }
       end
 
+      def update_index_aliases(body:)
+        transform_errors { |c| c.indices.update_aliases(body: body).body }
+      end
+
       def delete_indices(*index_names)
         # `allow_no_indices: true` is needed when we attempt to delete a non-existing index to avoid errors. For rollover indices,
         # when we delete the actual indices, we will always perform a wildcard deletion, and `allow_no_indices: true` is needed.

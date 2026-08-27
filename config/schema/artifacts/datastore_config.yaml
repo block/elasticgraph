@@ -6,7 +6,12 @@ index_templates:
     index_patterns:
     - teams_rollover__*
     template:
-      aliases: {}
+      aliases:
+        teams_all: {}
+        teams_nfl:
+          filter:
+            term:
+              league: NFL
       mappings:
         dynamic: strict
         properties:
@@ -1268,6 +1273,9 @@ index_templates:
           __typename:
             type: constant_keyword
             value: Team
+          formed:
+            type: alias
+            path: formed_on
         _routing:
           required: true
         _size:

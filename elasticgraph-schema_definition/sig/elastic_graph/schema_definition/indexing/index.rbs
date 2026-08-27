@@ -10,9 +10,11 @@ module ElasticGraph
         attr_reader indexed_type: indexableType
         attr_reader sourced_from_nested_paths_by_qualified_relationship: ::Hash[::String, ::Array[SchemaArtifacts::RuntimeMetadata::sourcedFromNestedPathSegment]]
         attr_reader schema_def_state: State
+        attr_reader config_customizations: ::Array[^(::Hash[::String, untyped]) -> void]
 
         def rollover: (::Symbol, ::String) -> void
         def route_with: (::String) -> void
+        def customize_config: () { (::Hash[::String, untyped]) -> void } -> void
         def uses_custom_routing?: () -> bool
         def to_index_config: () -> ::Hash[::String, untyped]
         def to_index_template_config: () -> ::Hash[::String, untyped]
@@ -21,6 +23,7 @@ module ElasticGraph
 
         private
 
+        def customized_config: (::Hash[::String, untyped]) -> ::Hash[::String, untyped]
         def public_field_path: (::String, explanation: ::String) -> SchemaElements::FieldPath
         def date_and_datetime_types: () -> ::Array[::String]
       end
