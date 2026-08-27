@@ -164,6 +164,12 @@ module ElasticGraph
         expect(client.put_index_settings(index: "my_index", body: {"settings" => "config"})).to eq("ok")
       end
 
+      it "supports `update_index_aliases`" do
+        client = build_client({update_index_aliases: "ok"})
+
+        expect(client.update_index_aliases(body: {"actions" => [{"add" => {"index" => "my_index", "alias" => "my_alias"}}]})).to eq("ok")
+      end
+
       it "supports `delete_indices`" do
         client = build_client({delete_indices_ind1_ind2: "ok"})
 

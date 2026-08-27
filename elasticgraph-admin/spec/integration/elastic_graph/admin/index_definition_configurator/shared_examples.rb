@@ -36,6 +36,12 @@ module ElasticGraph
             end
           end
         end
+
+        def create_external_alias(alias_name)
+          main_datastore_client.update_index_aliases(body: {"actions" => [
+            {"add" => {"index" => unique_index_name, "alias" => alias_name}}
+          ]})
+        end
       end
 
       RSpec.shared_examples_for IndexDefinitionConfigurator, :uses_datastore do
@@ -269,6 +275,111 @@ module ElasticGraph
             settings = get_index_definition_configuration(unique_index_name)["settings"] || {}
             [settings["index.sort.field"], settings["index.sort.order"]]
           }.from([nil, nil]).to([["created_at"], ["asc"]])
+        end
+
+        it "applies `customize_config` customizations when creating an index or index template, and reconciles them idempotently" do
+          read_alias = "#{unique_index_name}_read"
+          active_alias = "#{unique_index_name}_active"
+          schema = schema_def_with_aliases({
+            read_alias => {},
+            active_alias => {"filter" => {"term" => {"name" => "active"}}}
+          })
+
+          expect {
+            configure_index_definition(schema)
+          }.to change { aliases_of(unique_index_name) }
+            .from({})
+            .to({read_alias => {}, active_alias => {"filter" => {"term" => {"name" => "active"}}}})
+
+          expect {
+            configure_index_definition(schema)
+          }.to make_no_datastore_write_calls("main")
+        end
+
+        it "adds newly declared aliases to an existing index or index template, and updates aliases whose desired definition has changed" do
+          read_alias = "#{unique_index_name}_read"
+
+          configure_index_definition(schema_def)
+          output_io.string = +"" # use `+` so it is not a frozen string literal.
+
+          expect {
+            configure_index_definition(schema_def_with_aliases({read_alias => {}}))
+          }.to change { aliases_of(unique_index_name) }
+            .from({})
+            .to({read_alias => {}})
+            .and make_datastore_calls_to_update_aliases(unique_index_name)
+
+          expect(output_io.string).to include(read_alias)
+
+          expect {
+            configure_index_definition(schema_def_with_aliases({read_alias => {"filter" => {"term" => {"name" => "active"}}}}))
+          }.to change { aliases_of(unique_index_name) }
+            .from({read_alias => {}})
+            .to({read_alias => {"filter" => {"term" => {"name" => "active"}}}})
+
+          # A changed definition fully replaces the existing one (the `filter` is dropped, not merged).
+          expect {
+            configure_index_definition(schema_def_with_aliases({read_alias => {}}))
+          }.to change { aliases_of(unique_index_name) }
+            .from({read_alias => {"filter" => {"term" => {"name" => "active"}}}})
+            .to({read_alias => {}})
+        end
+
+        it "leaves aliases it did not declare alone rather than removing them" do
+          external_alias = "#{unique_index_name}_external"
+
+          configure_index_definition(schema_def)
+          create_external_alias(external_alias)
+
+          expect {
+            configure_index_definition(schema_def)
+          }.to maintain { aliases_of(unique_index_name) }
+            .from(a_hash_including(external_alias))
+            .and make_no_datastore_write_calls("main")
+        end
+
+        it "applies `customize_config` mapping customizations such as field aliases when creating an index or index template, and reconciles them onto existing ones" do
+          field_alias_mapping = {"type" => "alias", "path" => "created_at"}
+
+          configure_index_definition(schema_def_with_field_aliases("created"))
+          expect(mapping_properties_of(unique_index_name)).to include("created" => field_alias_mapping)
+
+          expect {
+            configure_index_definition(schema_def_with_field_aliases("created", "creation_time"))
+          }.to change { mapping_properties_of(unique_index_name)["creation_time"] }
+            .from(nil)
+            .to(field_alias_mapping)
+            .and make_datastore_calls_to_configure_index_def(unique_index_name, :mappings)
+
+          expect {
+            configure_index_definition(schema_def_with_field_aliases("created", "creation_time"))
+          }.to make_no_datastore_write_calls("main")
+        end
+
+        def schema_def_with_aliases(aliases)
+          schema_def(configure_index: ->(index) {
+            index.customize_config do |config|
+              config["aliases"] = aliases
+            end
+          })
+        end
+
+        def schema_def_with_field_aliases(*field_alias_names)
+          schema_def(configure_index: ->(index) {
+            index.customize_config do |config|
+              field_alias_names.each do |name|
+                config["mappings"]["properties"][name] = {"type" => "alias", "path" => "created_at"}
+              end
+            end
+          })
+        end
+
+        def aliases_of(index_definition_name)
+          get_index_definition_configuration(index_definition_name)["aliases"] || {}
+        end
+
+        def mapping_properties_of(index_definition_name)
+          get_index_definition_configuration(index_definition_name).dig("mappings", "properties") || {}
         end
 
         def schema_def(

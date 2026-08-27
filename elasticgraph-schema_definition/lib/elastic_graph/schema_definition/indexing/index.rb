@@ -42,6 +42,8 @@ module ElasticGraph
       #   @return [Hash<String, Array<SchemaArtifacts::RuntimeMetadata::ListPathSegment, SchemaArtifacts::RuntimeMetadata::ObjectPathSegment>>]
       #     map from a qualified (leaf) relationship to the path segments the painless script uses to navigate from this
       #     root index's documents down to the nested elements that receive `sourced_from` data
+      # @!attribute [r] config_customizations
+      #   @return [Array<Proc>] blocks registered via {#customize_config}, applied to the datastore configuration of this index
       class Index < Struct.new(
         :name,
         :default_sort_pairs,
@@ -51,7 +53,8 @@ module ElasticGraph
         :routing_field_path,
         :rollover_config,
         :has_had_multiple_sources_flag,
-        :sourced_from_nested_paths_by_qualified_relationship
+        :sourced_from_nested_paths_by_qualified_relationship,
+        :config_customizations
       )
         include Mixins::HasReadableToSAndInspect.new { |i| i.name }
 
@@ -69,7 +72,7 @@ module ElasticGraph
 
           settings = DEFAULT_SETTINGS.merge(Support::HashUtil.flatten_and_stringify_keys(settings, prefix: "index"))
 
-          super(name, [], settings, schema_def_state, indexed_type, nil, nil, false, {})
+          super(name, [], settings, schema_def_state, indexed_type, nil, nil, false, {}, [])
 
           schema_def_state.after_user_definition_complete do
             # `id` is the field Elasticsearch/OpenSearch use for routing by default:
@@ -233,6 +236,60 @@ module ElasticGraph
           self.has_had_multiple_sources_flag = true
         end
 
+        # Customizes the datastore configuration of this index (or of the index template, when {#rollover} is used) in ways
+        # ElasticGraph doesn't natively model. The customization block is yielded the index configuration--a hash containing
+        # `aliases`, `mappings`, and `settings`--and is expected to mutate it (the return value is ignored). The customized
+        # configuration is included in the `datastore_config.yaml` schema artifact, and `elasticgraph-admin` applies it to
+        # the datastore just like the rest of the index configuration.
+        #
+        # When {#rollover} is used, the customization applies to the index template body, so every concrete index created
+        # from the template (including rollover indices the datastore auto-creates at indexing time) gets the customized
+        # configuration.
+        #
+        # @note ElasticGraph does nothing with the customized configuration besides passing it through to the datastore,
+        #   and makes no claims about the safety or correctness of any customization. A customization the datastore
+        #   rejects surfaces as an error when `elasticgraph-admin` configures the cluster--after earlier configuration
+        #   steps have been applied--rather than when the schema is defined. Also note that {#rollover} affects what the
+        #   datastore accepts: the customization goes into the index template body, which the datastore validates
+        #   differently than a concrete index, so a customization that works without {#rollover} may be rejected with it.
+        #   **When you add or change a customization, apply it locally against the same datastore version you run in
+        #   production--via `bundle exec rake boot_locally`--to confirm it works as intended.**
+        #
+        # @yield [Hash<String, Object>] the datastore configuration of the index, to be mutated by the block
+        # @return [void]
+        #
+        # @example Define index aliases and a field alias on a `campaigns` index
+        #   ElasticGraph.define_schema do |schema|
+        #     schema.object_type "Campaign" do |t|
+        #       t.field "id", "ID!"
+        #       t.field "status", "String"
+        #       t.field "createdAt", "DateTime"
+        #
+        #       t.index "campaigns" do |i|
+        #         i.rollover :monthly, "createdAt"
+        #
+        #         i.customize_config do |config|
+        #           # Index aliases, so clients querying the datastore directly can use a stable name
+        #           # (`campaigns_read` fans out across all the rollover indices).
+        #           config["aliases"] = {
+        #             "campaigns_read" => {},
+        #             "campaigns_active" => {"filter" => {"term" => {"status" => "ACTIVE"}}}
+        #           }
+        #
+        #           # A field alias, so direct datastore queries can reference `created` as an alias of `createdAt`.
+        #           config["mappings"]["properties"]["created"] = {"type" => "alias", "path" => "createdAt"}
+        #         end
+        #       end
+        #     end
+        #   end
+        def customize_config(&customization_block)
+          if customization_block.nil?
+            raise Errors::SchemaError, "`customize_config` was called on the `#{name}` index without a block, but a block is required."
+          end
+
+          config_customizations << customization_block
+        end
+
         # @see #route_with
         # @return [Boolean] whether or not this index uses custom shard routing
         def uses_custom_routing?
@@ -241,22 +298,22 @@ module ElasticGraph
 
         # @return [Hash<String, Object>] datastore configuration for this index for when it does not use rollover
         def to_index_config
-          {
+          customized_config({
             "aliases" => {},
             "mappings" => mappings,
             "settings" => settings
-          }.compact
+          }.compact)
         end
 
         # @return [Hash<String, Object>] datastore configuration for the index template that will be defined if rollover is used
         def to_index_template_config
           {
             "index_patterns" => ["#{name}#{ROLLOVER_INDEX_INFIX_MARKER}*"],
-            "template" => {
+            "template" => customized_config({
               "aliases" => {},
               "mappings" => mappings,
               "settings" => settings
-            }
+            })
           }
         end
 
@@ -295,6 +352,16 @@ module ElasticGraph
           # 10K is the default: https://www.elastic.co/guide/en/elasticsearch/reference/8.17/index-modules.html#dynamic-index-settings
           "index.max_result_window" => 10000
         }
+
+        def customized_config(config)
+          return config if config_customizations.empty?
+
+          # Yield a defensive deep copy so that mutations made by customization blocks can't corrupt
+          # ElasticGraph's internal data structures (parts of `mappings` are shared across indices).
+          config = ::Marshal.load(::Marshal.dump(config))
+          config_customizations.each { |customization| customization.call(config) }
+          config
+        end
 
         def mappings
           field_mappings = indexed_type

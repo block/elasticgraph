@@ -68,6 +68,30 @@ module ElasticGraph
             end
           end
 
+          def create_external_alias(alias_name)
+            template = main_datastore_client.get_index_template(unique_index_name)
+            template_body = template.fetch("template")
+
+            # Note: we only include the writable template properties here, since the datastore rejects a
+            # `put_index_template` payload containing system-managed properties (such as `created_date`).
+            main_datastore_client.put_index_template(name: unique_index_name, body: {
+              "index_patterns" => template.fetch("index_patterns"),
+              "template" => template_body.merge(
+                "aliases" => (template_body["aliases"] || {}).merge(alias_name => {})
+              )
+            })
+          end
+
+          def make_datastore_calls_to_update_aliases(index_name)
+            # Besides updating the template itself, the newly declared alias gets added (via the `_aliases`
+            # API) to the concrete rollover index that already exists from the prior configuration run.
+            make_datastore_write_calls(
+              "main",
+              "PUT #{put_index_definition_url(index_name)}",
+              "POST /_aliases"
+            )
+          end
+
           def fetch_artifact_configuration(schema_artifacts, index_def_name)
             schema_artifacts.index_templates.fetch(index_def_name)
           end
@@ -123,6 +147,20 @@ module ElasticGraph
             # the jan_2020 index being generated from the template by another process concurrently indexing
             # a jan 2020 document.
             expect(index_def_creation_order).to eq([jan_2020_index_name, unique_index_name])
+          end
+
+          it "manages declared aliases on the concrete rollover indices created from the template" do
+            read_alias = "#{unique_index_name}_read"
+            now_index = concrete_index_name_for_now(unique_index_name)
+
+            # A concrete index created from the template config gets the declared aliases stamped at creation.
+            configure_index_definition(schema_def_with_aliases({read_alias => {}}))
+            expect(main_datastore_client.get_index(now_index).fetch("aliases")).to eq({read_alias => {}})
+
+            # A newly declared alias is reconciled onto concrete indices that already exist.
+            active_alias = "#{unique_index_name}_active"
+            configure_index_definition(schema_def_with_aliases({read_alias => {}, active_alias => {}}))
+            expect(main_datastore_client.get_index(now_index).fetch("aliases")).to eq({read_alias => {}, active_alias => {}})
           end
 
           context "when the settings do not force the creation of any concrete indices" do
