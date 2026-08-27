@@ -75,6 +75,250 @@ module ElasticGraph
             end
           end
 
+          # We deliberately construct the indexer here without going through `build_indexer`. The
+          # `skip_record_validation_percents_by_type` knob is intentionally not exposed via spec helpers so that
+          # tests cannot silently weaken validation; enabling it must be a visible, deliberate choice
+          # in each spec that exercises it.
+          context "when the indexer is configured to skip record validation for some types" do
+            let(:indexer) do
+              datastore_core = build_datastore_core
+              Indexer.new(
+                datastore_core: datastore_core,
+                config: Indexer::Config.new(
+                  latency_slo_thresholds_by_timestamp_in_ms: {},
+                  skip_derived_indexing_type_updates: {},
+                  skip_record_validation_percents_by_type: {"Component" => 100}
+                )
+              )
+            end
+
+            it "skips per-type record validation for the listed type but still builds operations" do
+              event = build_upsert_event(:component, id: "1", __version: 1)
+              event["record"]["name"] = 123 # would normally fail JSON schema validation
+
+              expect(build_expecting_success(event)).to eq([new_primary_indexing_operation({
+                "op" => "upsert",
+                "id" => "1",
+                "type" => "Component",
+                "version" => 1,
+                "record" => event["record"],
+                JSON_SCHEMA_VERSION_KEY => 1
+              })])
+            end
+
+            it "records the skipped type on the successful build result" do
+              event = build_upsert_event(:component, id: "1", __version: 1)
+
+              result = indexer.operation_factory.build(event)
+
+              expect(result.type_with_skipped_validation).to eq("Component")
+            end
+
+            it "still validates record-level fields for types that are not in the skip list" do
+              widget_event = build_upsert_event(:widget, id: "1", __version: 1)
+              widget_event["record"]["name"] = 123
+
+              expect_failed_event_error(widget_event, "Malformed Widget record", "name")
+            end
+
+            it "does not flag validated types on the successful build result" do
+              event = build_upsert_event(:widget, id: "1", __version: 1)
+
+              result = indexer.operation_factory.build(event)
+
+              expect(result.type_with_skipped_validation).to be_nil
+            end
+
+            it "still applies envelope-level validation for skipped types" do
+              event = build_upsert_event(:component, id: "1", __version: -1)
+
+              expect_failed_event_error(event, "/properties/version")
+            end
+          end
+
+          context "when the indexer configures a partial skip percent for a type" do
+            let(:indexer) do
+              datastore_core = build_datastore_core
+              Indexer.new(
+                datastore_core: datastore_core,
+                config: Indexer::Config.new(
+                  latency_slo_thresholds_by_timestamp_in_ms: {},
+                  skip_derived_indexing_type_updates: {},
+                  skip_record_validation_percents_by_type: {"Component" => 50}
+                )
+              )
+            end
+
+            it "skips validation when the event's point in the crc32 space falls in the skipped portion" do
+              # Stub crc32 to the bottom of the space -- well inside the skipped 50% -- forcing the "skip" branch.
+              allow(::Zlib).to receive(:crc32).and_return(0)
+
+              event = build_upsert_event(:component, id: "1", __version: 1)
+              event["record"]["name"] = 123 # would normally fail JSON schema validation
+
+              expect {
+                build_expecting_success(event)
+              }.not_to raise_error
+            end
+
+            it "still validates when the event's point in the crc32 space falls outside the skipped portion" do
+              # Stub crc32 to 75% of the way through the space, past the skipped 50%, forcing validation.
+              allow(::Zlib).to receive(:crc32).and_return((2**32 * 0.75).to_i)
+
+              event = build_upsert_event(:component, id: "1", __version: 1)
+              event["record"]["name"] = 123
+
+              expect_failed_event_error(event, "Malformed Component record", "name")
+            end
+
+            it "produces the same skip decision for the same event on retry" do
+              # No stubbing -- this exercises the real crc32 and locks in determinism without
+              # coupling to a specific hash output. Two builds of the same event must agree on
+              # whether to skip validation.
+              event = build_upsert_event(:component, id: "1", __version: 1)
+              event["record"]["name"] = 123 # would fail validation if not skipped
+
+              first = indexer.operation_factory.build(event)
+              second = indexer.operation_factory.build(event)
+
+              expect(first.failed_event_error.nil?).to eq(second.failed_event_error.nil?)
+              expect(first.operations.size).to eq(second.operations.size)
+              expect(first.type_with_skipped_validation).to eq(second.type_with_skipped_validation)
+            end
+          end
+
+          context "when record validation is skipped for a type that has derived-index update targets" do
+            # Widget has a `WidgetCurrency` derived index update target. With validation skipped,
+            # `build_all_operations_for` still has to traverse `Update.operations_for` and the
+            # schema artifacts. This spec locks in that skipping does not regress the derived path.
+            let(:indexer) do
+              datastore_core = build_datastore_core
+              Indexer.new(
+                datastore_core: datastore_core,
+                config: Indexer::Config.new(
+                  latency_slo_thresholds_by_timestamp_in_ms: {},
+                  skip_derived_indexing_type_updates: {},
+                  skip_record_validation_percents_by_type: {"Widget" => 100}
+                )
+              )
+            end
+
+            it "still emits both the primary and the derived-index update operations" do
+              event = build_upsert_event(:widget, id: "1", __version: 1)
+              formatted_event = {
+                "op" => "upsert",
+                "id" => "1",
+                "type" => "Widget",
+                "version" => 1,
+                "record" => event["record"],
+                JSON_SCHEMA_VERSION_KEY => 1
+              }
+
+              expect(build_expecting_success(event)).to contain_exactly(
+                new_primary_indexing_operation(formatted_event, index_def: index_def_named("widgets")),
+                widget_currency_derived_update_operation_for(formatted_event)
+              )
+            end
+          end
+
+          context "when building the operations for a record whose validation was skipped raises" do
+            # These specs cover the re-validation gate: an exception escaping operation building is
+            # answered by running the validation we skipped. If the validator faults the record, the
+            # caller gets the same failure it would have gotten had we validated up front. If the
+            # validator is happy, the error was never about the data and must not be swallowed.
+            let(:indexer) do
+              datastore_core = build_datastore_core
+              Indexer.new(
+                datastore_core: datastore_core,
+                config: Indexer::Config.new(
+                  latency_slo_thresholds_by_timestamp_in_ms: {},
+                  skip_derived_indexing_type_updates: {},
+                  skip_record_validation_percents_by_type: {"Widget" => 100}
+                )
+              )
+            end
+
+            it "reports a value the indexing preparers can't coerce as a failed event carrying the validator's message" do
+              event = build_upsert_event(:widget, id: "1", __version: 1)
+              # `IndexingPreparers::Integer` raises `Errors::IndexOperationError` on this; validation
+              # would have caught it first as a type mismatch on `amount_cents`.
+              event["record"]["cost"] = {"currency" => "USD", "amount_cents" => "not a number"}
+
+              message = expect_failed_event_error(event, "Malformed Widget record", "amount_cents")
+
+              expect(message).to exclude("IndexOperationError")
+            end
+
+            it "reports a missing or unknown abstract-type `__typename` as a failed event carrying the validator's message" do
+              # Widget's `inventor` field is the `Inventor` union, whose JSON schema requires
+              # `__typename` and pins a `const` discriminator on each concrete subtype. Both the
+              # missing and the unknown case therefore fail validation, which is why no dedicated
+              # error type is needed for them.
+              event = build_upsert_event(:widget, id: "1", __version: 1)
+              event["record"]["inventor"] = {"__typename" => "NotARealConcreteType", "name" => "anon"}
+
+              expect_failed_event_error(event, "Malformed Widget record", "inventor")
+            end
+
+            it "re-raises an error the validator has no opinion about, so bugs are not hidden as data failures" do
+              event = build_upsert_event(:widget, id: "1", __version: 1)
+
+              # Asserting on class *and* message matters here: `raise` is overridden on
+              # `Operation::Factory` to reject raising from the class, so a bare `raise exception`
+              # would substitute the guard's own error and still satisfy a bare `raise_error`.
+              expect {
+                factory_whose_record_preparation_is_broken.build(event)
+              }.to raise_error(::KeyError, a_string_including("nameInIndex"))
+            end
+          end
+
+          it "does not rescue when validation was not skipped, so the validated path behaves exactly as before" do
+            event = build_upsert_event(:widget, id: "1", __version: 1)
+
+            expect {
+              factory_whose_record_preparation_is_broken.build(event)
+            }.to raise_error(::KeyError, a_string_including("nameInIndex"))
+          end
+
+          context "when an event is malformed in a way that also breaks building its operations", :expect_warning_logging do
+            # `Widget` requires `cost`, and its derived `WidgetCurrency` update target sources its id
+            # from `cost.currency`, so a `Widget` with no `cost` both fails validation and breaks
+            # building the operations we attach to the `FailedEventError`. Reporting the malformation
+            # matters more than reporting operations we are never going to run, and
+            # `FailedEventError#operations` is documented as sometimes being empty for this reason.
+            let(:event) do
+              build_upsert_event(:widget, id: "1", __version: 1).tap { |e| e["record"].delete("cost") }
+            end
+
+            it "still reports what was malformed instead of letting the second failure mask the first" do
+              failure = indexer.operation_factory.build(event).failed_event_error
+
+              expect(failure).to be_an(FailedEventError)
+              expect(failure.operations).to be_empty
+              expect(failure.main_message).to include("Malformed Widget record", "cost").and exclude("Key not found")
+            end
+
+            it "logs the failure it swallowed, so a discarded operation-building error is still traceable" do
+              indexer.operation_factory.build(event)
+
+              expect(logged_jsons_of_type("FailedEventOperationBuildingFailure")).to match([a_hash_including(
+                "event_id" => "Widget:1@v1",
+                "error_class" => "KeyError"
+              )])
+            end
+          end
+
+          # A factory whose record preparation fails for a reason record validation cannot detect: a
+          # runtime metadata defect, standing in for any bug that is not about the data itself.
+          def factory_whose_record_preparation_is_broken
+            record_preparer_factory = instance_double(RecordPreparer::Factory)
+
+            allow(record_preparer_factory).to receive(:for_json_schema_version)
+              .and_raise(::KeyError, 'key not found: "nameInIndex"')
+
+            indexer.operation_factory.with(record_preparer_factory: record_preparer_factory)
+          end
+
           it "generates a primary indexing operation for a single index with latency metrics" do
             event = build_upsert_event(:component, id: "1", __version: 1)
             latency_timestamps = {"latency_timestamps" => {"created_in_esperanto_at" => "2012-04-23T18:25:43.511Z"}}

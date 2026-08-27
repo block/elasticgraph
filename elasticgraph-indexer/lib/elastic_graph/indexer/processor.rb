@@ -45,6 +45,8 @@ module ElasticGraph
 
         factory_results = factory_results_by_event.values
 
+        log_skipped_record_validations(factory_results)
+
         bulk_result = @datastore_router.bulk(factory_results.flat_map(&:operations), refresh: refresh_indices)
         successful_operations = bulk_result.successful_operations(check_failures: false)
 
@@ -61,6 +63,26 @@ module ElasticGraph
       end
 
       private
+
+      # Emits a single aggregate log line per batch when any records had their per-record validation
+      # skipped (via `skip_record_validation_percents_by_type`). Skipping a safety check should never be
+      # silent, but per-record logging would be untenable at backfill scale (a `100` percent is one line
+      # per record), so we tally by type and log once. Mirrors the batch-level
+      # `ElasticGraphIndexingLatencies` log.
+      #
+      # A skipped record that then failed is deliberately absent from the tally: `Operation::Factory`
+      # re-runs the skipped validation when building its operations raises, so such a record ended up
+      # validated after all, and is already reported as a failed event.
+      def log_skipped_record_validations(factory_results)
+        counts_by_type = factory_results.filter_map(&:type_with_skipped_validation).tally
+        return if counts_by_type.empty?
+
+        @logger.info({
+          "message_type" => "RecordValidationSkipped",
+          "count" => counts_by_type.values.sum,
+          "counts_by_type" => counts_by_type
+        })
+      end
 
       def categorize_failures(failures, events)
         source_event_versions_by_cluster_by_op = @datastore_router.source_event_versions_in_index(

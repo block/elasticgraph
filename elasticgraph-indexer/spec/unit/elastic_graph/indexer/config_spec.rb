@@ -32,6 +32,33 @@ module ElasticGraph
         expect(config.skip_derived_indexing_type_updates).to eq("WidgetCurrency" => ["USD"].to_set)
       end
 
+      it "coerces `skip_record_validation_percents_by_type` percents to floats (so integer YAML values like `90` become `90.0`)" do
+        config = Config.from_parsed_yaml("indexer" => {
+          "latency_slo_thresholds_by_timestamp_in_ms" => {},
+          "skip_record_validation_percents_by_type" => {
+            "Widget" => 90,
+            "Component" => 99.5
+          }
+        })
+
+        expect(config.skip_record_validation_percents_by_type).to eq("Widget" => 90.0, "Component" => 99.5)
+        expect(config.skip_record_validation_percents_by_type.values).to all(be_a(::Float))
+      end
+
+      it "rejects `skip_record_validation_percents_by_type` percents outside `[0, 100]`" do
+        expect {
+          Config.from_parsed_yaml("indexer" => {
+            "skip_record_validation_percents_by_type" => {"Widget" => 100.5}
+          })
+        }.to raise_error Errors::ConfigError
+
+        expect {
+          Config.from_parsed_yaml("indexer" => {
+            "skip_record_validation_percents_by_type" => {"Widget" => -0.1}
+          })
+        }.to raise_error Errors::ConfigError
+      end
+
       describe "#extension_modules", :in_temp_dir do
         it "loads the extension modules from disk" do
           File.write("eg_extension_module1.rb", <<~EOS)
