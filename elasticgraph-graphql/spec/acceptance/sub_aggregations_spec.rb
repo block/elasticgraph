@@ -16,14 +16,9 @@ module ElasticGraph
 
     with_both_casing_forms do
       shared_examples_for "sub-aggregation acceptance" do
-        it "returns the expected empty responses when the indices have not been configured or no documents have yet been indexed", :expect_search_routing do
+        it "returns the expected empty responses when no documents have yet been indexed", :expect_search_routing do
           main_datastore_client.delete_indices("team*")
-
-          expect_indices_not_configured_error { aggregate_teams_grouped_by_league(allow_errors: true) }
-          expect_indices_not_configured_error { aggregate_sibling_and_deeply_nested_counts(allow_errors: true) }
-          expect_indices_not_configured_error { aggregate_season_counts_grouped_by("year", "note", allow_errors: true) }
-
-          # Reconfigure the indices (but don't index any docs)
+          # Reconfigure the indices, but don't index any documents.
           admin.cluster_configurator.configure_cluster(StringIO.new)
 
           # Note: this is technically a "root" aggregations query (not sub-aggregations), but it's another case we need to
@@ -446,8 +441,8 @@ module ElasticGraph
         EOS
       end
 
-      def aggregate_sibling_and_deeply_nested_counts(allow_errors: false)
-        response = call_graphql_query(<<~EOS, allow_errors: allow_errors)
+      def aggregate_sibling_and_deeply_nested_counts
+        response = call_graphql_query(<<~EOS)
           query {
             team_aggregations {
               #{page_info_snippet}
@@ -503,8 +498,6 @@ module ElasticGraph
             upper_bound
           }
         EOS
-
-        return response if allow_errors
 
         team_node = get_single_aggregations_node_from(response, "team_aggregations", parent_field_name: "data")
         player_node = get_single_aggregations_node_from(team_node, "current_players_nested")
@@ -990,8 +983,8 @@ module ElasticGraph
         ]
       end
 
-      def aggregate_season_counts_grouped_by(*grouping_expressions, team_aggregations_args: {}, allow_errors: false, teams_has_next_page: false, seasons_has_next_page: false, **args)
-        response = call_graphql_query(<<~EOS, allow_errors: allow_errors)
+      def aggregate_season_counts_grouped_by(*grouping_expressions, team_aggregations_args: {}, teams_has_next_page: false, seasons_has_next_page: false, **args)
+        response = call_graphql_query(<<~EOS)
           query {
             team_aggregations#{graphql_args(team_aggregations_args)} {
               #{page_info_snippet}
@@ -1019,14 +1012,12 @@ module ElasticGraph
           }
         EOS
 
-        return response if allow_errors
-
         team_node = get_single_aggregations_node_from(response, "team_aggregations", parent_field_name: "data", has_next_page: teams_has_next_page)
         get_aggregations_nodes_from(team_node, "seasons_nested", has_next_page: seasons_has_next_page)
       end
 
-      def aggregate_teams_grouped_by_league(allow_errors: false)
-        response = call_graphql_query(<<~EOS, allow_errors: allow_errors)
+      def aggregate_teams_grouped_by_league
+        response = call_graphql_query(<<~EOS)
           query {
             team_aggregations {
               nodes {
@@ -1037,8 +1028,6 @@ module ElasticGraph
             }
           }
         EOS
-
-        return response if allow_errors
 
         response.dig("data", case_correctly("team_aggregations"), "nodes")
       end
