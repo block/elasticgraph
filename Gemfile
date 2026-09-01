@@ -12,13 +12,13 @@ source "https://rubygems.org", cooldown: 7
 group :development do
   gem "aws_lambda_ric", "~> 3.2"
   # graphql-c_parser is no longer a hard dependency, but we include it here for faster CI tests
-  gem "graphql-c_parser", "~> 1.1", platforms: :ruby
+  gem "graphql-c_parser", "~> 1.1", ">= 1.1.4", platforms: :ruby
   gem "benchmark-ips", "~> 2.15", ">= 2.15.1"
   gem "coderay", "~> 1.1", ">= 1.1.3"
   gem "factory_bot", "~> 6.6"
   gem "faker", "~> 3.8"
   gem "flatware-rspec", "~> 2.4", platforms: :ruby
-  gem "httpx", "~> 1.8"
+  gem "httpx", "~> 1.8", ">= 1.8.2"
   gem "memory_profiler", "~> 1.1"
   gem "nokogiri", "~> 1.19", ">= 1.19.4"
   gem "method_source", "~> 1.1"
@@ -34,7 +34,7 @@ group :development do
   # We are waiting to upgrade to >= 3.5 until standardrb compatibility with rubocop plugins is fixed:
   # https://github.com/standardrb/standard/issues/701
   gem "rubocop-rspec", "~> 3.10.2"
-  gem "simplecov", "~> 1.1"
+  gem "simplecov", "~> 1.1", ">= 1.1.1"
   gem "simplecov-console", "~> 0.9", ">= 0.9.5"
   gem "standard", "~> 1.56.0"
   gem "steep", "~> 2.0.0", platforms: :ruby
@@ -56,7 +56,7 @@ group :site do
     gem "redcarpet", "~> 3.6", ">= 3.6.1"
     gem "yard", "~> 0.9", ">= 0.9.45"
     gem "yard-doctest", "~> 0.1", ">= 0.1.17"
-    gem "yard-markdown", "~> 0.9"
+    gem "yard-markdown", "~> 0.9", ">= 0.9.1"
     gem "irb", "~> 1.18" # Needed for yard on Ruby 4.0
   end
 
