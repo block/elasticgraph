@@ -2,7 +2,7 @@ module ElasticGraph
   class Admin
     class DatastoreClientDryRunDecorator
       include DatastoreCore::_Client
-      def initialize: (DatastoreCore::_Client) -> void
+      def initialize: (DatastoreCore::client) -> void
     end
   end
 end

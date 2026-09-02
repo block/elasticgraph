@@ -31,6 +31,11 @@ module ElasticGraph
         def to_highlights_type: () -> SchemaElements::ObjectType?
         def new_non_empty_object_type: (::String) { (SchemaElements::ObjectType) -> void } -> SchemaElements::ObjectType?
       end
+
+      # `SupportsFilteringAndAggregation` alone doesn't satisfy `Hash::_Key` (it doesn't declare `hash`/`eql?`),
+      # but every real implementer is a Ruby object and gets those for free, so this alias is safe to use
+      # wherever a `SupportsFilteringAndAggregation` value is used as a hash key.
+      type filterableAndAggregatableType = SupportsFilteringAndAggregation & ::Object
     end
   end
 end

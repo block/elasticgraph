@@ -3,21 +3,21 @@ module ElasticGraph
     # Interface for routing indexing operations to a datastore (or alternative destination like S3).
     # Implemented by DatastoreIndexingRouter and WarehouseDumper.
     interface _DatastoreRouter
-      def bulk: (::Array[_Operation], ?refresh: bool) -> DatastoreIndexingRouter::BulkResult
-      def source_event_versions_in_index: (::Array[_Operation]) -> ::Hash[_Operation, ::Hash[::String, ::Array[::Integer]]]
+      def bulk: (::Array[operation], ?refresh: bool) -> DatastoreIndexingRouter::BulkResult
+      def source_event_versions_in_index: (::Array[operation]) -> ::Hash[operation, ::Hash[::String, ::Array[::Integer]]]
     end
 
     class DatastoreIndexingRouter
       include _DatastoreRouter
 
       def initialize: (
-        datastore_clients_by_name: ::Hash[::String, DatastoreCore::_Client],
+        datastore_clients_by_name: ::Hash[::String, DatastoreCore::client],
         logger: ::Logger
       ) -> void
 
       private
 
-      @datastore_clients_by_name: ::Hash[::String, DatastoreCore::_Client]
+      @datastore_clients_by_name: ::Hash[::String, DatastoreCore::client]
       @logger: ::Logger
 
       def opaque_id_parts_for_source_event_versions: (
@@ -25,37 +25,37 @@ module ElasticGraph
       ) -> ::Array[::String]
 
       class BulkResultSupertype
-        attr_reader ops_and_results_by_cluster: ::Hash[::String, ::Array[[_Operation, Operation::Result]]]
+        attr_reader ops_and_results_by_cluster: ::Hash[::String, ::Array[[operation, Operation::Result]]]
         attr_reader noop_results: ::Array[Operation::Result]
         attr_reader failure_results: ::Array[Operation::Result]
 
         def initialize: (
-          ops_and_results_by_cluster: ::Hash[::String, ::Array[[_Operation, Operation::Result]]],
+          ops_and_results_by_cluster: ::Hash[::String, ::Array[[operation, Operation::Result]]],
           noop_results: ::Array[Operation::Result],
           failure_results: ::Array[Operation::Result]
         ) -> void
 
         def with: (
-          ?ops_and_results_by_cluster: ::Hash[::String, ::Array[[_Operation, Operation::Result]]]
+          ?ops_and_results_by_cluster: ::Hash[::String, ::Array[[operation, Operation::Result]]]
         ) -> BulkResult
       end
 
       class BulkResult < BulkResultSupertype
         def self.new: (
-          ::Hash[::String, ::Array[[_Operation, Operation::Result]]]
+          ::Hash[::String, ::Array[[operation, Operation::Result]]]
         ) -> BulkResult
 
         def initialize: (
-          ops_and_results_by_cluster: ::Hash[::String, ::Array[[_Operation, Operation::Result]]]
+          ops_and_results_by_cluster: ::Hash[::String, ::Array[[operation, Operation::Result]]]
         ) -> void
 
         def successful_operations_by_cluster_name: (
           ?check_failures: bool
-        ) -> ::Hash[::String, ::Array[_Operation]]
+        ) -> ::Hash[::String, ::Array[operation]]
 
         def successful_operations: (
           ?check_failures: bool
-        ) -> ::Array[_Operation]
+        ) -> ::Array[operation]
       end
     end
   end

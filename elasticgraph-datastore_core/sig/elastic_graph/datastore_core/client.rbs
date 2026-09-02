@@ -37,6 +37,11 @@ module ElasticGraph
       def delete_all_documents: (?index: ::String) -> void
     end
 
+    # `_Client` alone doesn't satisfy `Hash::_Key` (it doesn't declare `hash`/`eql?`), but every real
+    # implementer is a Ruby object and gets those for free, so this alias is safe to use wherever a
+    # `_Client` value is used as a hash key.
+    type client = _Client & ::Object
+
     interface _ClientClass
       def new: (
         ::String,
@@ -44,7 +49,7 @@ module ElasticGraph
         ?faraday_adapter: ::Symbol?,
         ?retry_on_failure: ::Integer,
         ?logger: ::Logger?
-      ) ?{ (::Faraday::RackBuilder) -> void } -> _Client
+      ) ?{ (::Faraday::RackBuilder) -> void } -> client
     end
   end
 end

@@ -36,7 +36,8 @@ module ElasticGraph
 
           # Lazily groups each parent type's indexing fields by their fully-unwrapped field type name,
           # so `find_field_by_type` can look up candidate embedding fields without re-scanning per chain.
-          @indexing_fields_by_field_type_name_by_parent_type = ::Hash.new do |hash, parent_type|
+          @indexing_fields_by_field_type_name_by_parent_type = ::Hash.new do |hash, raw_parent_type|
+            parent_type = raw_parent_type # : indexableType
             hash[parent_type] = parent_type.indexing_fields_by_name_in_index.values.group_by do |field|
               field.type.fully_unwrapped.name
             end

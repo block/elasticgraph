@@ -62,7 +62,8 @@ module ElasticGraph
                 "A `FieldPath::Resolver` cannot be created before the user definition of the schema is complete."
             end
 
-            @indexing_fields_by_public_name_by_type = ::Hash.new do |hash, type|
+            @indexing_fields_by_public_name_by_type = ::Hash.new do |hash, raw_type|
+              type = raw_type # : indexableType
               hash[type] = type
                 .indexing_fields_by_name_in_index
                 .values

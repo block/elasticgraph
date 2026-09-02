@@ -5,12 +5,12 @@ module ElasticGraph
         type category = :failure | :noop | :success
 
         attr_reader category: category
-        attr_reader operation: _Operation
+        attr_reader operation: operation
         attr_reader description: ::String?
 
         def initialize: (
           category: category,
-          operation: _Operation,
+          operation: operation,
           description: ::String?) -> void
 
         attr_reader operation_type: operationType
@@ -18,9 +18,9 @@ module ElasticGraph
         attr_reader event_id: EventID
         attr_reader summary: ::String
 
-        def self.success_of: (_Operation) -> Result
-        def self.noop_of: (_Operation, ::String?) -> Result
-        def self.failure_of: (_Operation, ::String?) -> Result
+        def self.success_of: (operation) -> Result
+        def self.noop_of: (operation, ::String?) -> Result
+        def self.failure_of: (operation, ::String?) -> Result
       end
     end
   end

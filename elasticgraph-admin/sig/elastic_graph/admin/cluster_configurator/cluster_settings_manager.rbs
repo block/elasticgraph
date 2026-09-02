@@ -5,7 +5,7 @@ module ElasticGraph
         type clusterSpec = ::String | :all_clusters
 
         def initialize: (
-          datastore_clients_by_name: ::Hash[::String, DatastoreCore::_Client],
+          datastore_clients_by_name: ::Hash[::String, DatastoreCore::client],
           datastore_config: DatastoreCore::Config,
           logger: ::Logger) -> void
 
@@ -15,12 +15,12 @@ module ElasticGraph
 
         private
 
-        @datastore_clients_by_name: ::Hash[::String, DatastoreCore::_Client]
+        @datastore_clients_by_name: ::Hash[::String, DatastoreCore::client]
         @datastore_config: DatastoreCore::Config
         @logger: ::Logger
 
         def desired_cluster_settings: (::String, ?auto_create_index_patterns: ::Array[::String]) -> ::Hash[::String, untyped]
-        def datastore_client_named: (::String) -> DatastoreCore::_Client
+        def datastore_client_named: (::String) -> DatastoreCore::client
         def cluster_names_for: (clusterSpec) -> ::Array[::String]
       end
     end

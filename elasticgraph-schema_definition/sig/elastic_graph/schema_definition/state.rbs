@@ -24,7 +24,7 @@ module ElasticGraph
       attr_accessor built_in_types_customization_blocks: ::Array[^(SchemaElements::graphQLType) -> void]
       attr_accessor user_definition_complete: bool
       attr_accessor user_definition_complete_callbacks: ::Array[^() -> void]
-      attr_accessor sub_aggregation_paths_by_type: ::Hash[Mixins::SupportsFilteringAndAggregation, ::Array[SchemaElements::SubAggregationPath]]
+      attr_accessor sub_aggregation_paths_by_type: ::Hash[Mixins::filterableAndAggregatableType, ::Array[SchemaElements::SubAggregationPath]]
       attr_accessor type_refs_by_name: ::Hash[::String, SchemaElements::TypeReference]
       attr_reader type_namer: SchemaElements::TypeNamer
       attr_reader enum_value_namer: SchemaElements::EnumValueNamer
@@ -59,7 +59,7 @@ module ElasticGraph
         built_in_types_customization_blocks: ::Array[^(SchemaElements::graphQLType) -> void],
         user_definition_complete: bool,
         user_definition_complete_callbacks: ::Array[^() -> void],
-        sub_aggregation_paths_by_type: ::Hash[Mixins::SupportsFilteringAndAggregation, ::Array[SchemaElements::SubAggregationPath]],
+        sub_aggregation_paths_by_type: ::Hash[Mixins::filterableAndAggregatableType, ::Array[SchemaElements::SubAggregationPath]],
         type_refs_by_name: ::Hash[::String, SchemaElements::TypeReference],
         type_namer: SchemaElements::TypeNamer,
         enum_value_namer: SchemaElements::EnumValueNamer,
@@ -104,7 +104,7 @@ module ElasticGraph
       @enums_for_directly_queryable_types: SchemaElements::EnumsForDirectlyQueryableTypes?
       def enums_for_directly_queryable_types: () -> SchemaElements::EnumsForDirectlyQueryableTypes
 
-      def sub_aggregation_paths_for: (Mixins::SupportsFilteringAndAggregation) -> ::Array[SchemaElements::SubAggregationPath]
+      def sub_aggregation_paths_for: (Mixins::filterableAndAggregatableType) -> ::Array[SchemaElements::SubAggregationPath]
 
       @user_defined_field_references_by_type_name: ::Hash[::String, ::Array[SchemaElements::Field]]?
       def user_defined_field_references_by_type_name: () -> ::Hash[::String, ::Array[SchemaElements::Field]]

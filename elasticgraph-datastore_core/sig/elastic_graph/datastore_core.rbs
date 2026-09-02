@@ -12,7 +12,7 @@ module ElasticGraph
       config: Config,
       logger: ::Logger,
       schema_artifacts: schemaArtifacts,
-      ?clients_by_name: ::Hash[::String, _Client]?,
+      ?clients_by_name: ::Hash[::String, client]?,
       ?client_customization_block: (^(untyped) -> void)?
     ) -> void
 
@@ -22,8 +22,8 @@ module ElasticGraph
     @index_definitions_by_graphql_type: ::Hash[::String, ::Array[indexDefinition]]?
     def index_definitions_by_graphql_type: () -> ::Hash[::String, ::Array[indexDefinition]]
 
-    @clients_by_name: ::Hash[::String, _Client]?
-    def clients_by_name: () -> ::Hash[::String, _Client]
+    @clients_by_name: ::Hash[::String, client]?
+    def clients_by_name: () -> ::Hash[::String, client]
 
     private
 

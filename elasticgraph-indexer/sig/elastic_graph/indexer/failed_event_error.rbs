@@ -3,8 +3,8 @@ module ElasticGraph
     class FailedEventError < Errors::Error
       attr_reader main_message: ::String
       attr_reader event: ::Hash[::String, untyped]
-      attr_reader operations: ::Set[_Operation]
-      attr_reader versioned_operations: ::Array[_Operation]
+      attr_reader operations: ::Set[operation]
+      attr_reader versioned_operations: ::Array[operation]
       attr_reader id: ::String
       attr_reader full_id: ::String
       attr_reader op: ::String
@@ -14,12 +14,12 @@ module ElasticGraph
 
       def self.from_failed_operation_result: (
         Operation::Result,
-        ::Set[_Operation]
+        ::Set[operation]
       ) -> FailedEventError
 
       def initialize: (
         event: ::Hash[::String, untyped],
-        operations: ::Set[_Operation],
+        operations: ::Set[operation],
         main_message: ::String
       ) -> void
     end

@@ -5,7 +5,7 @@ module ElasticGraph
         attr_reader index: DatastoreCore::IndexDefinition::Index
 
         def initialize: (
-          DatastoreCore::_Client,
+          DatastoreCore::client,
           DatastoreCore::IndexDefinition::Index,
           ::Hash[::String, untyped],
           io
@@ -16,7 +16,7 @@ module ElasticGraph
 
         private
 
-        @datastore_client: DatastoreCore::_Client
+        @datastore_client: DatastoreCore::client
         @index: DatastoreCore::IndexDefinition::Index
         @env_agnostic_index_config: ::Hash[::String, untyped]
         @reporter: ClusterConfigurator::ActionReporter

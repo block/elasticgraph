@@ -5,7 +5,7 @@ module ElasticGraph
         attr_reader index_template: DatastoreCore::IndexDefinition::RolloverIndexTemplate
 
         def initialize: (
-          DatastoreCore::_Client,
+          DatastoreCore::client,
           DatastoreCore::IndexDefinition::RolloverIndexTemplate,
           ::Hash[::String, untyped],
           io,
@@ -17,7 +17,7 @@ module ElasticGraph
 
         private
 
-        @datastore_client: DatastoreCore::_Client
+        @datastore_client: DatastoreCore::client
         @index_template: DatastoreCore::IndexDefinition::RolloverIndexTemplate
         @env_agnostic_index_config_parent: ::Hash[::String, untyped]
         @env_agnostic_index_config: ::Hash[::String, untyped]
