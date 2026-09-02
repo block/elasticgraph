@@ -30,7 +30,7 @@ PATH
       apollo-federation (~> 3.10, >= 3.10.3)
       elasticgraph-graphql (= 1.2.1.pre)
       elasticgraph-support (= 1.2.1.pre)
-      graphql (~> 2.6.6)
+      graphql (~> 2.6.9)
 
 PATH
   remote: elasticgraph-datastore_core
@@ -68,7 +68,7 @@ PATH
       base64 (~> 0.3)
       elasticgraph-datastore_core (= 1.2.1.pre)
       elasticgraph-schema_artifacts (= 1.2.1.pre)
-      graphql (~> 2.6.6)
+      graphql (~> 2.6.9)
 
 PATH
   remote: elasticgraph-health_check
@@ -159,7 +159,7 @@ PATH
     elasticgraph-query_registry (1.2.1.pre)
       elasticgraph-graphql (= 1.2.1.pre)
       elasticgraph-support (= 1.2.1.pre)
-      graphql (~> 2.6.6)
+      graphql (~> 2.6.9)
       rake (~> 13.4, >= 13.4.2)
 
 PATH
@@ -183,7 +183,7 @@ PATH
       elasticgraph-indexer (= 1.2.1.pre)
       elasticgraph-schema_artifacts (= 1.2.1.pre)
       elasticgraph-support (= 1.2.1.pre)
-      graphql (~> 2.6.6)
+      graphql (~> 2.6.9)
       rake (~> 13.4, >= 13.4.2)
 
 PATH
@@ -361,7 +361,7 @@ GEM
       ffi (~> 1)
       ffi-compiler (~> 1)
       rake (~> 13.3)
-    graphql (2.6.6)
+    graphql (2.6.9)
       base64
       fiber-storage
       logger
@@ -816,7 +816,7 @@ CHECKSUMS
   google-protobuf (4.35.1) sha256=a3a6471331d918f58dfa4d014a8f6286f0af2cf4840216bde52fcf2ea3fe3726
   google-protobuf (4.35.1-arm64-darwin) sha256=d9c957df04fa89c749fa9a72a7b383eb4296efc9b2303dc6fd6fbe39c698ad6b
   google-protobuf (4.35.1-java) sha256=1ab134cb790939adea2da9bad8af249a0c2489900cdbb4913806b5171193e6f8
-  graphql (2.6.6) sha256=7438e2036b571c884377eb1529225470ba959365f26dc47152953c213bc38c31
+  graphql (2.6.9) sha256=afe7bc03164f1a61abc66a415744ffd315c5aca116c9f3438c57391a431e4fe5
   graphql-c_parser (1.1.3) sha256=a0a7e3221c091285ca03987de50ba8ad49846f66748b5fdd3780729482bbc358
   hana (1.3.7) sha256=5425db42d651fea08859811c29d20446f16af196308162894db208cac5ce9b0d
   hashdiff (1.2.1) sha256=9c079dbc513dfc8833ab59c0c2d8f230fa28499cc5efb4b8dd276cf931457cd1
