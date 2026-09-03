@@ -105,6 +105,10 @@ gems:
   version: '0'
   source:
     type: stdlib
+- name: delegate
+  version: '0'
+  source:
+    type: stdlib
 - name: diff-lcs
   version: '1.5'
   source:
@@ -366,6 +370,10 @@ gems:
   source:
     type: stdlib
 - name: timeout
+  version: '0'
+  source:
+    type: stdlib
+- name: tmpdir
   version: '0'
   source:
     type: stdlib

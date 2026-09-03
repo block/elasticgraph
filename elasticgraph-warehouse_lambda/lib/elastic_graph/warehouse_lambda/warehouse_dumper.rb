@@ -81,7 +81,7 @@ module ElasticGraph
 
         ops_and_results = operations.map do |op|
           [op, ::ElasticGraph::Indexer::Operation::Result.success_of(op)]
-        end # : ::Array[[::ElasticGraph::Indexer::_Operation, ::ElasticGraph::Indexer::Operation::Result]]
+        end # : ::Array[[::ElasticGraph::Indexer::operation, ::ElasticGraph::Indexer::Operation::Result]]
 
         ::ElasticGraph::Indexer::DatastoreIndexingRouter::BulkResult.new({"warehouse" => ops_and_results})
       end

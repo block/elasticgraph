@@ -53,24 +53,24 @@ module ElasticGraph
         CRC32_SPACE_PER_PERCENT: ::Float
         def skip_validation?: (::String, event) -> bool
         def build_failed_result: (event, ::String, ::String) -> BuildResult
-        def build_all_operations_for: (event, _RecordPreparer) -> ::Array[_Operation]
+        def build_all_operations_for: (event, _RecordPreparer) -> ::Array[operation]
         def index_definitions_for: (::String) -> ::Array[DatastoreCore::_IndexDefinition]
         def raise: (*untyped) -> void
 
         class BuildResult
-          attr_reader operations: ::Array[_Operation]
+          attr_reader operations: ::Array[operation]
           attr_reader failed_event_error: FailedEventError?
           attr_reader type_with_skipped_validation: ::String?
 
-          def initialize: (::Array[_Operation], FailedEventError?, ::String?) -> void
+          def initialize: (::Array[operation], FailedEventError?, ::String?) -> void
 
           def with: (
-            ?operations: ::Array[_Operation],
+            ?operations: ::Array[operation],
             ?failed_event_error: FailedEventError?,
             ?type_with_skipped_validation: ::String?
           ) -> BuildResult
 
-          def self.success: (::Array[_Operation], ?type_with_skipped_validation: ::String?) -> BuildResult
+          def self.success: (::Array[operation], ?type_with_skipped_validation: ::String?) -> BuildResult
           def self.failure: (FailedEventError) -> BuildResult
         end
       end

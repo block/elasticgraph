@@ -3,7 +3,7 @@ module ElasticGraph
     class ClusterConfigurator
       class ScriptConfigurator
         def initialize: (
-            datastore_client: DatastoreCore::_Client,
+            datastore_client: DatastoreCore::client,
             script_context: datastoreScriptContext,
             script_id: ::String,
             script: datastoreScriptScriptHash,
@@ -14,7 +14,7 @@ module ElasticGraph
 
         private
 
-        @datastore_client: DatastoreCore::_Client
+        @datastore_client: DatastoreCore::client
         @script_context: datastoreScriptContext
         @script_id: ::String
         @script: datastoreScriptScriptHash

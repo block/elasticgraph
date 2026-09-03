@@ -21,7 +21,8 @@ module ElasticGraph
             hash[type_name] = scalar_types_by_name[type_name]&.load_indexing_preparer&.extension_class
           end # : ::Hash[::String, SchemaArtifacts::RuntimeMetadata::extensionClass?]
 
-          @preparers_by_json_schema_version = ::Hash.new do |hash, version|
+          @preparers_by_json_schema_version = ::Hash.new do |hash, raw_version|
+            version = raw_version # : Integer
             hash[version] = RecordPreparer.new(
               indexing_preparer_by_scalar_type_name,
               build_type_metas_from(@schema_artifacts.json_schemas_for(version))

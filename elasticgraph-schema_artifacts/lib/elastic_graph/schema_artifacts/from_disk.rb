@@ -150,7 +150,8 @@ module ElasticGraph
       end
 
       def json_schemas_by_version
-        @json_schemas_by_version ||= ::Hash.new do |hash, json_schema_version|
+        @json_schemas_by_version ||= ::Hash.new do |hash, raw_json_schema_version|
+          json_schema_version = raw_json_schema_version # : Integer
           hash[json_schema_version] = load_json_schema(json_schema_version)
         end
       end

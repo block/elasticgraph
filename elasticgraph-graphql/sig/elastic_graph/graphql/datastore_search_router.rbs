@@ -2,7 +2,7 @@ module ElasticGraph
   class GraphQL
     class DatastoreSearchRouter
       def initialize: (
-        datastore_clients_by_name: ::Hash[::String, DatastoreCore::_Client],
+        datastore_clients_by_name: ::Hash[::String, DatastoreCore::client],
         logger: ::Logger,
         monotonic_clock: Support::MonotonicClock,
         config: Config

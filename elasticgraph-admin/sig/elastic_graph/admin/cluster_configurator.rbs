@@ -2,7 +2,7 @@ module ElasticGraph
   class Admin
     class ClusterConfigurator
       def initialize: (
-        datastore_clients_by_name: ::Hash[::String, DatastoreCore::_Client],
+        datastore_clients_by_name: ::Hash[::String, DatastoreCore::client],
         index_defs: ::Array[DatastoreCore::indexDefinition],
         index_configurations_by_name: ::Hash[::String, untyped],
         index_template_configurations_by_name: ::Hash[::String, untyped],
@@ -18,7 +18,7 @@ module ElasticGraph
 
       private
 
-      @datastore_clients_by_name: ::Hash[::String, DatastoreCore::_Client]
+      @datastore_clients_by_name: ::Hash[::String, DatastoreCore::client]
       @index_defs: ::Array[DatastoreCore::indexDefinition]
       @index_configurations_by_name: DatastoreCore::indexConfigHash
       @scripts_by_id: datastoreScriptsByIdHash

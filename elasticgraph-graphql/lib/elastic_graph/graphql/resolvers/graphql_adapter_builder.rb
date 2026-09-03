@@ -18,7 +18,8 @@ module ElasticGraph
         def initialize(runtime_metadata:, named_resolvers:, query_adapter:)
           @runtime_metadata = runtime_metadata
           @resolvers_by_name_and_field_config = named_resolvers.transform_values do |resolver_constructor|
-            ::Hash.new do |hash, field_config|
+            ::Hash.new do |hash, raw_field_config|
+              field_config = raw_field_config # : ::Hash[::Symbol, untyped]
               hash[field_config] = resolver_constructor.call(field_config)
             end
           end

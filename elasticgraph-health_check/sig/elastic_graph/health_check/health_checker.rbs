@@ -8,7 +8,7 @@ module ElasticGraph
         config: Config,
         datastore_search_router: GraphQL::DatastoreSearchRouter,
         datastore_query_builder: GraphQL::DatastoreQuery::Builder,
-        datastore_clients_by_name: ::Hash[::String, DatastoreCore::_Client],
+        datastore_clients_by_name: ::Hash[::String, DatastoreCore::client],
         clock: singleton(::Time),
         logger: ::Logger
       ) -> void
@@ -20,7 +20,7 @@ module ElasticGraph
       @schema: GraphQL::Schema
       @datastore_search_router: GraphQL::DatastoreSearchRouter
       @datastore_query_builder: GraphQL::DatastoreQuery::Builder
-      @datastore_clients_by_name: ::Hash[::String, DatastoreCore::_Client]
+      @datastore_clients_by_name: ::Hash[::String, DatastoreCore::client]
       @clock: singleton(::Time)
       @logger: ::Logger
       @indexed_document_types_by_name: ::Hash[::String, GraphQL::Schema::Type]

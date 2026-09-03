@@ -31,13 +31,13 @@ module ElasticGraph
       def env_index_config: () -> Configuration::IndexDefinition
       def env_agnostic_settings: () -> ::Hash[::String, untyped]
       def defined_clusters: () -> ::Set[::String]
-      def datastore_clients_by_name: () -> ::Hash[::String, DatastoreCore::_Client]
+      def datastore_clients_by_name: () -> ::Hash[::String, DatastoreCore::client]
       def rollover_index_template?: () -> bool
       def index_expression_for_search: () -> ::String
       def index_name_for_writes: (::Hash[::String, untyped], ?timestamp_field_path: ::String?) -> ::String
-      def mappings_in_datastore: (DatastoreCore::_Client) -> ::Hash[::String, untyped]
-      def related_rollover_indices: (DatastoreCore::_Client, ?only_if_exists: bool) -> ::Array[IndexDefinition::RolloverIndex]
-      def delete_from_datastore: (DatastoreCore::_Client) -> void
+      def mappings_in_datastore: (DatastoreCore::client) -> ::Hash[::String, untyped]
+      def related_rollover_indices: (DatastoreCore::client, ?only_if_exists: bool) -> ::Array[IndexDefinition::RolloverIndex]
+      def delete_from_datastore: (DatastoreCore::client) -> void
     end
 
     # Defines the full `_IndexDefinition` interface.
@@ -53,7 +53,7 @@ module ElasticGraph
         name: ::String,
         runtime_metadata: SchemaArtifacts::RuntimeMetadata::IndexDefinition,
         config: DatastoreCore::Config,
-        datastore_clients_by_name: ::Hash[::String, DatastoreCore::_Client],
+        datastore_clients_by_name: ::Hash[::String, DatastoreCore::client],
         schema_artifacts: schemaArtifacts
       ) -> indexDefinition
     end

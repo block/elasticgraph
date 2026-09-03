@@ -131,7 +131,8 @@ module ElasticGraph
         end
 
         def validator_factories_by_version
-          @validator_factories_by_version ||= ::Hash.new do |hash, json_schema_version|
+          @validator_factories_by_version ||= ::Hash.new do |hash, raw_json_schema_version|
+            json_schema_version = raw_json_schema_version # : Integer
             factory = Support::JSONSchema::ValidatorFactory.new(
               schema: schema_artifacts.json_schemas_for(json_schema_version),
               sanitize_pii: true
@@ -197,7 +198,7 @@ module ElasticGraph
               "error_class" => exception.class.name,
               "error_message" => exception.message
             })
-            [] # : ::Array[_Operation]
+            [] # : ::Array[operation]
           end
 
           BuildResult.failure(FailedEventError.new(event: event, operations: operations.to_set, main_message: message))

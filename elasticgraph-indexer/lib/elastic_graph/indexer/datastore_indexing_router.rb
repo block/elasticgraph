@@ -44,8 +44,8 @@ module ElasticGraph
       # It is the caller's responsibility to deal with any returned failures as this method does not
       # raise an exception in that case.
       def bulk(operations, refresh: false)
-        ops_by_client = ::Hash.new { |h, k| h[k] = [] } # : ::Hash[DatastoreCore::_Client, ::Array[_Operation]]
-        unsupported_ops = ::Set.new # : ::Set[_Operation]
+        ops_by_client = ::Hash.new { |h, k| h[k] = [] } # : ::Hash[DatastoreCore::client, ::Array[operation]]
+        unsupported_ops = ::Set.new # : ::Set[operation]
 
         operations.each do |op|
           # Note: this intentionally does not use `accessible_cluster_names_to_index_into`.
@@ -55,7 +55,7 @@ module ElasticGraph
 
           cluster_names.each do |cluster_name|
             if (client = @datastore_clients_by_name[cluster_name])
-              ops = ops_by_client[client] # : ::Array[::ElasticGraph::Indexer::_Operation]
+              ops = ops_by_client[client] # : ::Array[::ElasticGraph::Indexer::operation]
               ops << op
             else
               unsupported_ops << op
@@ -153,7 +153,7 @@ module ElasticGraph
       # This nested structure is necessary because a single operation can target more than one datastore
       # cluster, and a document may have different source event versions in different datastore clusters.
       def source_event_versions_in_index(operations)
-        ops_by_client_name = ::Hash.new { |h, k| h[k] = [] } # : ::Hash[::String, ::Array[_Operation]]
+        ops_by_client_name = ::Hash.new { |h, k| h[k] = [] } # : ::Hash[::String, ::Array[operation]]
         operations.each do |op|
           # Note: this intentionally does not use `accessible_cluster_names_to_index_into`.
           # We want to fail with clear error if any clusters are inaccessible instead of silently ignoring
@@ -163,7 +163,7 @@ module ElasticGraph
         end
 
         client_names_and_results = Support::Threading.parallel_map(ops_by_client_name) do |(client_name, all_ops)|
-          # @type block: [::String, ::Symbol, ::Array[untyped] | ::Hash[_Operation, ::Array[::Integer]]]
+          # @type block: [::String, ::Symbol, ::Array[untyped] | ::Hash[operation, ::Array[::Integer]]]
 
           ops, unversioned_ops = all_ops.partition(&:versioned?) # : [::Array[Operation::Update], ::Array[Operation::Update]]
 
@@ -252,7 +252,7 @@ module ElasticGraph
         if failures.empty?
           # All results are success and the third element of the tuple is a hash.
           # Assign the results to narrow down the type.
-          success_results = client_names_and_results # : ::Array[[::String, ::Symbol, ::Hash[_Operation, ::Array[::Integer]]]]
+          success_results = client_names_and_results # : ::Array[[::String, ::Symbol, ::Hash[operation, ::Array[::Integer]]]]
 
           success_results.each_with_object(_ = {}) do |(client_name, _success_or_failure, results), accum|
             results.each do |op, version|
