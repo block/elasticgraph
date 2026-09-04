@@ -63,6 +63,10 @@ module ElasticGraph
           resolve_subtypes.flat_map(&:current_sources)
         end
 
+        def source_excludes_paths(path_prefix = "", under_non_returnable_parent = false)
+          resolve_subtypes.flat_map { |t| t.source_excludes_paths(path_prefix, under_non_returnable_parent) }.uniq
+        end
+
         def index_field_runtime_metadata_tuples(
           path_prefix: "",
           parent_source: SELF_RELATIONSHIP_NAME,

@@ -19,15 +19,14 @@ module ElasticGraph
         end
 
         def resolve(field:, object:, args:, context:)
-          data =
+          value =
             case object
             when DatastoreResponse::Document
-              object.payload
+              object.value_at(field.path_in_index)
             else
-              object
+              Support::HashUtil.fetch_value_at_path(object, field.path_in_index) { nil }
             end
 
-          value = Support::HashUtil.fetch_value_at_path(data, field.path_in_index) { nil }
           value = [] if value.nil? && field.type.list?
 
           if field.type.relay_connection?
