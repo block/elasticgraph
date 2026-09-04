@@ -3,18 +3,44 @@ module ElasticGraph
     module SchemaDefinition
       module SchemaElements
         module EnumTypeExtension: ::ElasticGraph::SchemaDefinition::SchemaElements::EnumType
+          class ExternalProtoEnumSource
+            attr_reader proto_enum: untyped
+            attr_reader exclusions: ::Array[::String]
+            attr_reader expected_extras: ::Array[::String]
+            attr_reader name_transform: (^(::String) -> ::String)?
+
+            def self.new: (
+              proto_enum: untyped,
+              exclusions: ::Array[::String],
+              expected_extras: ::Array[::String],
+              name_transform: (^(::String) -> ::String)?
+            ) -> instance
+          end
+
+          class ExternalProtoEnumReference
+            attr_reader proto_name: ::String
+            attr_reader import: ::String
+
+            def self.new: (proto_name: ::String, import: ::String) -> instance
+          end
+
+          @external_proto_enum_sources: ::Array[ExternalProtoEnumSource]?
+          @external_proto_reference: ExternalProtoEnumReference?
           @proto_enum_value_prefix: ::String?
           @proto_zero_value: (::ElasticGraph::SchemaDefinition::SchemaElements::EnumValue & EnumValueExtension)?
           @proto_zero_value_name: ::String?
           @values_by_proto_name: ::Hash[::String, ::ElasticGraph::SchemaDefinition::SchemaElements::EnumValue & EnumValueExtension]?
 
+          def external_proto_enum: (untyped, ?exclusions: ::Array[::String | ::Symbol], ?expected_extras: ::Array[::String | ::Symbol], ?name_transform: (^(::String) -> ::String)?, ?proto: ::String?, ?import: ::String?) -> void
+          def external_proto_enum_sources: () -> ::Array[ExternalProtoEnumSource]
+          attr_reader external_proto_reference: ExternalProtoEnumReference?
           def value: (::String) ?{ (::ElasticGraph::SchemaDefinition::SchemaElements::EnumValue & EnumValueExtension) -> void } -> void
           def proto_name: () -> ::String
           def proto_type_reference: (::String package_name) -> ::String
-          def protobuf_import: () -> nil
+          def protobuf_import: () -> ::String?
           def protobuf_field_comment: () -> nil
           def proto_enum_value_prefix: () -> ::String
-          def to_proto: (Schema schema, ::String package_name) -> ::String
+          def to_proto: (Schema schema, ::String package_name) -> ::String?
           def referenced_proto_types: () -> ::Array[::ElasticGraph::SchemaDefinition::SchemaElements::graphQLType]
           def configure_derived_scalar_type: (::ElasticGraph::SchemaDefinition::SchemaElements::ScalarType) -> void
 
@@ -24,6 +50,12 @@ module ElasticGraph
           def proto_zero_value: () -> (::ElasticGraph::SchemaDefinition::SchemaElements::EnumValue & EnumValueExtension)
           def proto_zero_value_name: () -> ::String
           def values_by_proto_name: () -> ::Hash[::String, ::ElasticGraph::SchemaDefinition::SchemaElements::EnumValue & EnumValueExtension]
+          def proto_enum_value_name: (::String) -> ::String
+          def proto_enum_value_names: () -> ::Array[::String]
+          def enum_value_names_from_source: (ExternalProtoEnumSource) -> ::Array[::String]
+          def validate_external_proto_reference: (Schema) -> void
+          def enum_value_numbers_from_source: (ExternalProtoEnumSource) -> ::Hash[::String, ::Integer]
+          def read_enum_entries: (ExternalProtoEnumSource) -> ::Array[untyped]
         end
       end
     end
