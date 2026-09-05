@@ -111,7 +111,8 @@ module ElasticGraph
         end
 
         def validator_factories_by_version
-          @validator_factories_by_version ||= ::Hash.new do |hash, json_schema_version|
+          @validator_factories_by_version ||= ::Hash.new do |hash, raw_json_schema_version|
+            json_schema_version = raw_json_schema_version # : Integer
             factory = Support::JSONSchema::ValidatorFactory.new(
               schema: @schema_artifacts.json_schemas_for(json_schema_version),
               sanitize_pii: true
@@ -125,13 +126,13 @@ module ElasticGraph
           end
         end
 
-        # :nocov: -- this should not be called. Instead, it exists to guard against wrongly raising an error from this class.
+        # simplecov:disable -- this should not be called. Instead, it exists to guard against wrongly raising an error from this class.
         def raise(*args)
           super("`raise` was called on `IngestionAdapter::JSONEvents`, but should not. Instead, use " \
             "`yield ValidationResult.invalid(...)` so that we can accumulate all invalid events and allow " \
             "the valid events to still be processed.")
         end
-        # :nocov:
+        # simplecov:enable
       end
     end
   end

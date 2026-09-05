@@ -133,7 +133,6 @@ module ElasticGraph
             [] # : ::Array[operation]
           end
 
-
           BuildResult.failure(FailedEventError.new(event: event, operations: operations.to_set, main_message: message))
         end
 

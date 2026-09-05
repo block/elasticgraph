@@ -688,11 +688,8 @@ module ElasticGraph
               event = build_upsert_event(:component, id: "1", __version: 1)
 
               non_matching_adapter = instance_double(IngestionAdapter::Interface, handles_event?: false)
-              matching_adapter = instance_double(
-                IngestionAdapter::Interface,
-                handles_event?: true,
-                validate_event: IngestionAdapter::ValidationResult.valid(RecordPreparer::Identity)
-              )
+              matching_adapter = indexer.ingestion_adapters.first
+              allow(matching_adapter).to receive(:validate_event).and_call_original
 
               factory = indexer.operation_factory.with(ingestion_adapters: [non_matching_adapter, matching_adapter])
               result = factory.build(event)
