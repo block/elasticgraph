@@ -30,7 +30,8 @@ module ElasticGraph
           }
 
           # The schema version is optional, so include it only when the factory supplies one.
-          if (schema_version = record["__schema_version"] || record["__json_schema_version"])
+          schema_version = record.fetch("__schema_version") { record["__json_schema_version"] }
+          unless schema_version.nil?
             event[SCHEMA_VERSION_KEY] = schema_version
           end
 

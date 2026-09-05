@@ -8,12 +8,6 @@ module ElasticGraph
       ) -> void
 
       def decode: (::String) -> ::Array[::Hash[::String, untyped]]
-
-      private
-
-      def adapt_json_schema_version: (
-        ::Hash[::String, untyped]
-      ) -> ::Hash[::String, untyped]
     end
   end
 end

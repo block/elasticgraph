@@ -60,7 +60,10 @@ module ElasticGraph
           return ValidationResult.invalid(validation_target: "#{graphql_type_name} record", message: error_message)
         end
 
-        ValidationResult.valid(@record_preparer_factory.for_json_schema_version(selected_schema_version))
+        ValidationResult.valid(
+          @record_preparer_factory.for_json_schema_version(selected_schema_version),
+          event: event.except(JSON_SCHEMA_VERSION_KEY).merge(SCHEMA_VERSION_KEY => selected_schema_version)
+        )
       end
 
       private
@@ -81,7 +84,7 @@ module ElasticGraph
       # and the legacy JSON-specific `json_schema_version` key acts as a fallback. A `nil` result
       # means the event requests no particular version.
       def requested_schema_version_for(event)
-        event[SCHEMA_VERSION_KEY] || event[JSON_SCHEMA_VERSION_KEY]
+        event.fetch(SCHEMA_VERSION_KEY) { event[JSON_SCHEMA_VERSION_KEY] }
       end
 
       def select_schema_version(event)
