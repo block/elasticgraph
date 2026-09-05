@@ -106,10 +106,35 @@ end
 
 Beyond schema definition, this gem teaches `elasticgraph-indexer` how to ingest JSON events: it provides an
 ingestion adapter that validates each event against the JSON schema identified by the event's
-`json_schema_version` and prepares its record for indexing using that version's view of the schema.
+`schema_version` and prepares its record for indexing using that version's view of the schema.
 
-No configuration is needed: defining your schema with this gem's `SchemaDefinition::APIExtension` registers
-an indexer extension in your schema artifacts' runtime metadata, which the indexer applies when it boots.
+Defining your schema with this gem's `SchemaDefinition::APIExtension` registers an indexer extension in
+your generated runtime metadata. Install this gem in the indexer deployment and regenerate the artifacts
+to make the adapter available. Encoded transports also need the decoder configuration below.
+
+### Schema versions
+
+The adapter resolves the version of each event as follows:
+
+- The `schema_version` key selects the JSON schema version. When the exact version is unavailable, the
+  adapter selects the closest available version and logs `ElasticGraphMissingJSONSchemaVersion`.
+- The legacy `json_schema_version` key still works, so a publisher or an in-process caller that predates
+  the ingestion-format-neutral key needs no change. If both keys are present, `schema_version` wins
+  for both direct events and decoded payloads. A non-integer value such as `false` is rejected; a missing
+  or null version selects the latest schema.
+- An event that carries neither key gets the latest available JSON schema version. The adapter still
+  validates the event against that version, so a malformed event still fails.
+
+After validation, the adapter returns a normalized copy of the event with `schema_version` set to the
+version it selected and the legacy alias removed. Logs and warehouse partitions use that selected
+version, including when an event omitted its version or requested an unavailable one. The original
+event is not mutated; fallback logs retain both the requested and selected versions.
+
+Publishers should continue sending an explicit JSON schema version and deployments should retain the
+historical artifacts needed to process queued events. Omitting a version ties interpretation to the
+latest schema installed on each indexer. Replaying the same unversioned event after a rename, deletion,
+or validation change can produce a different result or fail validation. Optional versions are useful
+for prototyping; they do not provide the same schema-evolution guarantees as versioned events.
 
 This gem also provides the `be_a_valid_elastic_graph_event` RSpec matcher (via
 `require "elastic_graph/json_ingestion/spec_support/event_matcher"`) for testing that publisher events
@@ -128,7 +153,35 @@ indexer:
     require_path: elastic_graph/json_ingestion/indexing_event_decoder
 ```
 
+The decoder tags events with `ingestion_format: "json"` and leaves version resolution to the adapter.
+This also routes versionless JSON correctly when several adapters are installed. Untagged direct events
+continue to default to JSON; decoders and direct callers for other formats must set their format tag.
+An explicitly different format is never routed to JSON just because it is the only installed adapter.
+
 See the `elasticgraph-indexer` README for the decoder extension interface.
+
+## Upgrading an existing JSON deployment
+
+1. Include `elasticgraph-json_ingestion` in the indexer's runtime bundle, including both indexing and
+   warehouse Lambda packages. A dependency restricted to development or schema generation is insufficient.
+2. Enable `ElasticGraph::JSONIngestion::SchemaDefinition::APIExtension` in your schema definition if it
+   is not already enabled. Run `bundle exec rake schema_artifacts:dump` and deploy the regenerated
+   runtime metadata together with the matching gems. Older runtime metadata does not register the adapter.
+3. Add the `indexer.indexing_event_decoder` configuration shown above to each environment that consumes
+   encoded payloads, including both SQS Lambdas. Direct calls to `indexer.processor.process` do not need a decoder.
+4. Change matcher requires from `elastic_graph/indexer/spec_support/event_matcher` to
+   `elastic_graph/json_ingestion/spec_support/event_matcher`. Custom code that used
+   `indexer.record_preparer_factory` can construct `ElasticGraph::JSONIngestion::RecordPreparerFactory`
+   with `indexer.schema_artifacts` instead.
+5. Keep publishing `json_schema_version`; existing publisher envelopes and versioned JSON schema
+   artifacts remain supported. Latency and warehouse logs include the deprecated `json_schema_version`
+   alias alongside `schema_version`. Both now report the selected version. Warehouse JSON events that
+   omit a version use the selected version's partition; `unversioned` is reserved for genuinely
+   unversioned ingestion formats.
+
+Generated project templates include the decoder setting, but existing project settings are not
+rewritten automatically. Validate an existing publisher event through your deployed transport after
+upgrading, and check its schema version in the indexing or warehouse logs.
 
 ## Dependency Diagram
 

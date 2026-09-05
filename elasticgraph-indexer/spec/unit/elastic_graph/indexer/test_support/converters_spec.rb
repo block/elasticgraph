@@ -19,7 +19,7 @@ module ElasticGraph
               "id" => "1",
               "__version" => 1,
               "__typename" => "Widget",
-              "__json_schema_version" => 1,
+              "__schema_version" => 1,
               "field1" => "value1",
               "field2" => "value2"
             }
@@ -30,7 +30,52 @@ module ElasticGraph
               "version" => 1,
               "type" => "Widget",
               "record" => {"id" => "1", "field1" => "value1", "field2" => "value2"},
-              JSON_SCHEMA_VERSION_KEY => 1
+              SCHEMA_VERSION_KEY => 1
+            )
+          end
+
+          it "accepts the legacy `__json_schema_version` attribute, so factories from older projects keep working" do
+            factory_record = {
+              "id" => "1",
+              "__version" => 1,
+              "__typename" => "Widget",
+              "__json_schema_version" => 3,
+              "field1" => "value1"
+            }
+
+            expect(TestSupport::Converters.upsert_event_for(factory_record)).to eq(
+              "op" => "upsert",
+              "id" => "1",
+              "version" => 1,
+              "type" => "Widget",
+              "record" => {"id" => "1", "field1" => "value1"},
+              SCHEMA_VERSION_KEY => 3
+            )
+          end
+
+          it "preserves invalid versions for validation and gives the generic key precedence" do
+            record = {"id" => "1", "__version" => 1, "__typename" => "Widget", "__schema_version" => false, "__json_schema_version" => 3}
+
+            event = TestSupport::Converters.upsert_event_for(record)
+
+            expect(event.fetch(SCHEMA_VERSION_KEY)).to be false
+            expect(event.fetch("record")).to eq("id" => "1")
+          end
+
+          it "omits the schema version when the factory record supplies none, since the key is optional" do
+            factory_record = {
+              "id" => "1",
+              "__version" => 1,
+              "__typename" => "Widget",
+              "field1" => "value1"
+            }
+
+            expect(TestSupport::Converters.upsert_event_for(factory_record)).to eq(
+              "op" => "upsert",
+              "id" => "1",
+              "version" => 1,
+              "type" => "Widget",
+              "record" => {"id" => "1", "field1" => "value1"}
             )
           end
         end
@@ -41,7 +86,7 @@ module ElasticGraph
               "id" => "1",
               "__typename" => "Widget",
               "__version" => 1,
-              "__json_schema_version" => 1,
+              "__schema_version" => 1,
               "field1" => "value1",
               "field2" => "value2"
             }
@@ -50,7 +95,7 @@ module ElasticGraph
               "id" => "2",
               "__typename" => "Address",
               "__version" => 5,
-              "__json_schema_version" => 1,
+              "__schema_version" => 1,
               "field3" => "value5"
             }
 
@@ -63,7 +108,7 @@ module ElasticGraph
                 "version" => 1,
                 "type" => "Widget",
                 "record" => {"id" => "1", "field1" => "value1", "field2" => "value2"},
-                JSON_SCHEMA_VERSION_KEY => 1
+                SCHEMA_VERSION_KEY => 1
               },
               {
                 "op" => "upsert",
@@ -71,7 +116,7 @@ module ElasticGraph
                 "version" => 5,
                 "type" => "Address",
                 "record" => {"id" => "2", "field3" => "value5"},
-                JSON_SCHEMA_VERSION_KEY => 1
+                SCHEMA_VERSION_KEY => 1
               }
             ])
           end

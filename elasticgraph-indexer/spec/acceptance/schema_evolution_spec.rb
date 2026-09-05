@@ -96,7 +96,7 @@ module ElasticGraph
       end
 
       def build_widget(json_schema_version:)
-        event = build_upsert_event(:widget, __json_schema_version: json_schema_version)
+        event = build_upsert_event(:widget, __schema_version: json_schema_version)
         event.merge("record" => (yield event.fetch("record")))
       end
     end
@@ -116,7 +116,7 @@ module ElasticGraph
         write_address_schema_def(json_schema_version: 2, address_extras: "t.deleted_field 'deprecated'")
         dump_artifacts
 
-        event = build_upsert_event(:address, id: "abc", deprecated: "foo", __json_schema_version: 1)
+        event = build_upsert_event(:address, id: "abc", deprecated: "foo", __schema_version: 1)
         expect(event.dig("record", "deprecated")).to eq("foo")
 
         boot_indexer.processor.process([event], refresh_indices: true)
@@ -162,8 +162,8 @@ module ElasticGraph
         # included at that part of the JSON schema. So here we verify that the factory includes that.
         expect(build(:team_season)).to include(__typename: "TeamSeason")
 
-        v1_event = build_upsert_event(:team, __json_schema_version: 1)
-        v2_event = build_upsert_event(:team, __json_schema_version: 2)
+        v1_event = build_upsert_event(:team, __schema_version: 1)
+        v2_event = build_upsert_event(:team, __schema_version: 2)
           .then { |event| ::JSON.generate(event) }
           # Fix the event to align with the v2 schema, since `build_upsert_event` doesn't automatically
           # know that the `__typename` should be `SeasonOfATeam` instead of `TeamSeason`.
@@ -200,8 +200,8 @@ module ElasticGraph
           end
           dump_artifacts
 
-          v1_event = build_upsert_event(:team, __json_schema_version: 1)
-          v2_event = build_upsert_event(:team, __json_schema_version: 2)
+          v1_event = build_upsert_event(:team, __schema_version: 1)
+          v2_event = build_upsert_event(:team, __schema_version: 2)
 
           expect {
             boot_indexer.processor.process([v1_event, v2_event], refresh_indices: true)
@@ -244,9 +244,9 @@ module ElasticGraph
           end
           dump_artifacts
 
-          v1_event = build_upsert_event(:team, __json_schema_version: 1)
+          v1_event = build_upsert_event(:team, __schema_version: 1)
           v1_event = ::JSON.parse(::JSON.generate(v1_event).gsub('"name":', '"full_name":'))
-          v2_event = build_upsert_event(:team, __json_schema_version: 2)
+          v2_event = build_upsert_event(:team, __schema_version: 2)
 
           expect {
             boot_indexer.processor.process([v1_event, v2_event], refresh_indices: true)
@@ -288,7 +288,7 @@ module ElasticGraph
           end
           dump_artifacts
 
-          v1_event = build_upsert_event(:team, __json_schema_version: 1)
+          v1_event = build_upsert_event(:team, __schema_version: 1)
 
           expect {
             boot_indexer.processor.process([v1_event], refresh_indices: true)
@@ -323,7 +323,7 @@ module ElasticGraph
           write_address_schema_def(json_schema_version: 2, schema_extras: 'schema.deleted_type "Team"')
           dump_artifacts
 
-          v1_event = build_upsert_event(:team, __json_schema_version: 1)
+          v1_event = build_upsert_event(:team, __schema_version: 1)
           boot_indexer.processor.process([v1_event], refresh_indices: true)
 
           expect(search_for_ids("teams")).to be_empty

@@ -25,16 +25,17 @@ module ElasticGraph
       end
 
       class ValidationResultSupertype < ::Data
+        attr_reader event: event?
         attr_reader record_preparer: _RecordPreparer?
         attr_reader failure: Failure?
 
-        def initialize: (record_preparer: _RecordPreparer?, failure: Failure?) -> void
-        def self.new: (record_preparer: _RecordPreparer?, failure: Failure?) -> instance
+        def initialize: (event: event?, record_preparer: _RecordPreparer?, failure: Failure?) -> void
+        def self.new: (event: event?, record_preparer: _RecordPreparer?, failure: Failure?) -> instance
         def self.members: () -> ::Array[::Symbol]
       end
 
       class ValidationResult < ValidationResultSupertype
-        def self.valid: (_RecordPreparer) -> ValidationResult
+        def self.valid: (_RecordPreparer, event: event) -> ValidationResult
         def self.invalid: (payload_description: ::String, message: ::String) -> ValidationResult
       end
     end

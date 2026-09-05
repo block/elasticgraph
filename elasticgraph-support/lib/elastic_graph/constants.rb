@@ -137,6 +137,14 @@ module ElasticGraph
   # @private
   JSON_SCHEMA_VERSION_KEY = "json_schema_version"
 
+  # Name for field in indexing events that identifies the schema artifact version to use.
+  # @private
+  SCHEMA_VERSION_KEY = "schema_version"
+
+  # The key that identifies the ingestion format of a decoded event.
+  # @return [String]
+  INGESTION_FORMAT_KEY = "ingestion_format"
+
   # String that goes in the middle of a rollover index name, used to mark it as a rollover
   # index (and split on to parse a rollover index name).
   # @private
