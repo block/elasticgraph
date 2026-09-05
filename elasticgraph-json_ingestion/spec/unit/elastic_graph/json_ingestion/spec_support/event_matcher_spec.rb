@@ -6,7 +6,7 @@
 #
 # frozen_string_literal: true
 
-require "elastic_graph/indexer/spec_support/event_matcher"
+require "elastic_graph/json_ingestion/spec_support/event_matcher"
 require "rspec/matchers/fail_matchers"
 
 RSpec.describe "The `be_a_valid_elastic_graph_event` matcher", :builds_indexer, :factories, aggregate_failures: false do

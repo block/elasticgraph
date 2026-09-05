@@ -1,0 +1,8 @@
+module ElasticGraph
+  module JSONIngestion
+    module IndexerExtension : ::ElasticGraph::Indexer
+      @json_ingestion_adapters: ::Array[Indexer::IngestionAdapter::_Adapter]?
+      def ingestion_adapters: () -> ::Array[Indexer::IngestionAdapter::_Adapter]
+    end
+  end
+end
