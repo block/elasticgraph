@@ -52,14 +52,14 @@ module ElasticGraph
             :config_router
           end
         end
-        stub_const("ConfigExtensionModule", config_extension_module)
+        stub_const("IndexerConfigExtensionModule", config_extension_module)
 
         runtime_metadata_extension_module = Module.new do
           def monotonic_clock
             :runtime_metadata_clock
           end
         end
-        stub_const("RuntimeMetadataExtensionModule", runtime_metadata_extension_module)
+        stub_const("IndexerRuntimeMetadataExtensionModule", runtime_metadata_extension_module)
 
         extended_indexer = build_indexer(
           extension_modules: [config_extension_module],
