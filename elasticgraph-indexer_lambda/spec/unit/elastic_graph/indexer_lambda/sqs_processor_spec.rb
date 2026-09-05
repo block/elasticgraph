@@ -6,13 +6,13 @@
 #
 # frozen_string_literal: true
 
+require "aws-sdk-s3"
 require "elastic_graph/errors"
 require "elastic_graph/indexer/failed_event_error"
 require "elastic_graph/indexer/processor"
 require "elastic_graph/indexer_lambda/sqs_processor"
 require "elastic_graph/spec_support/lambda_function"
 require "json"
-require "aws-sdk-s3"
 
 module ElasticGraph
   module IndexerLambda
@@ -34,7 +34,7 @@ module ElasticGraph
           sqs_processor.process(lambda_event)
 
           expect(indexer_processor).to have_received(:process_returning_failures).with([
-            {"field1" => {}, "message_id" => "a"}
+            {"field1" => {}, "message_id" => "a", INGESTION_FORMAT_KEY => "json"}
           ], refresh_indices: false)
         end
 
@@ -50,9 +50,9 @@ module ElasticGraph
           sqs_processor.process(lambda_event)
 
           expect(indexer_processor).to have_received(:process_returning_failures).with([
-            {"field1" => {}, "message_id" => "a"},
-            {"field2" => {}, "message_id" => "b"},
-            {"field3" => {}, "message_id" => "c"}
+            {"field1" => {}, "message_id" => "a", INGESTION_FORMAT_KEY => "json"},
+            {"field2" => {}, "message_id" => "b", INGESTION_FORMAT_KEY => "json"},
+            {"field3" => {}, "message_id" => "c", INGESTION_FORMAT_KEY => "json"}
           ], refresh_indices: false)
         end
 
@@ -67,11 +67,11 @@ module ElasticGraph
           sqs_processor.process(lambda_event)
 
           expect(indexer_processor).to have_received(:process_returning_failures).with([
-            {"field1" => {}, "message_id" => "a"},
-            {"field2" => {}, "message_id" => "a"},
-            {"field3" => {}, "message_id" => "b"},
-            {"field4" => {}, "message_id" => "b"},
-            {"field5" => {}, "message_id" => "b"}
+            {"field1" => {}, "message_id" => "a", INGESTION_FORMAT_KEY => "json"},
+            {"field2" => {}, "message_id" => "a", INGESTION_FORMAT_KEY => "json"},
+            {"field3" => {}, "message_id" => "b", INGESTION_FORMAT_KEY => "json"},
+            {"field4" => {}, "message_id" => "b", INGESTION_FORMAT_KEY => "json"},
+            {"field5" => {}, "message_id" => "b", INGESTION_FORMAT_KEY => "json"}
           ], refresh_indices: false)
         end
 
@@ -147,7 +147,7 @@ module ElasticGraph
           sqs_processor.process(lambda_event)
 
           expect(indexer_processor).to have_received(:process_returning_failures).with(
-            [event_payload.merge("message_id" => "a")],
+            [event_payload.merge("message_id" => "a", INGESTION_FORMAT_KEY => "json")],
             refresh_indices: false
           )
         end

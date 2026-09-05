@@ -10,6 +10,7 @@ require "elastic_graph/constants"
 require "elastic_graph/indexer"
 require "elastic_graph/indexer/ingestion_adapter"
 require "elastic_graph/indexer/operation/factory"
+require "elastic_graph/json_ingestion/indexing_event_decoder"
 require "elastic_graph/spec_support/builds_indexer_operation"
 require "json"
 

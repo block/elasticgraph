@@ -9,8 +9,8 @@
 require "aws-sdk-s3"
 require "elastic_graph/indexer/operation/update"
 require "elastic_graph/warehouse_lambda/warehouse_dumper"
-require "support/builds_warehouse_lambda"
 require "elastic_graph/spec_support/builds_indexer_operation"
+require "support/builds_warehouse_lambda"
 
 module ElasticGraph
   class WarehouseLambda
@@ -33,6 +33,22 @@ module ElasticGraph
           SCHEMA_VERSION_KEY => 1,
           "record" => {"id" => "1", "dayOfWeek" => "MON", "created_at" => "2024-09-15T12:30:12Z", "workspace_id" => "ws-1"}
         })
+      end
+
+      it "partitions legacy, versionless, and fallback JSON events by the schema actually selected", :factories do
+        legacy = build_upsert_event(:component, id: "legacy").except(SCHEMA_VERSION_KEY).merge(JSON_SCHEMA_VERSION_KEY => 1)
+        versionless = build_upsert_event(:component, id: "versionless").except(SCHEMA_VERSION_KEY)
+        fallback = build_upsert_event(:component, id: "fallback").merge(SCHEMA_VERSION_KEY => 99)
+
+        warehouse_lambda.processor.process([legacy, versionless, fallback])
+
+        uploads = s3_client.api_requests.select { |request| request[:operation_name] == :put_object }
+        expect(uploads.size).to eq(1)
+        expect(uploads.first.fetch(:params).fetch(:key)).to start_with("Data0001/Component/v1/")
+        expect(logged_jsons_of_type(WarehouseDumper::LOG_MSG_DUMPED_FILE)).to match [
+          a_hash_including(SCHEMA_VERSION_KEY => 1, "record_count" => 3)
+        ]
+        expect(logged_jsons_of_type("ElasticGraphIndexingLatencies")).to all include(SCHEMA_VERSION_KEY => 1)
       end
 
       it "writes operations to S3 as gzipped JSONL files and returns success results" do
