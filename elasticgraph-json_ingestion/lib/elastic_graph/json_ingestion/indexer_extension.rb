@@ -19,7 +19,9 @@ module ElasticGraph
       #
       # @return [Array<Object>] the available ingestion adapters
       def ingestion_adapters
-        @ingestion_adapters ||= super + [IngestionAdapter.new(schema_artifacts: schema_artifacts, logger: logger)]
+        @json_ingestion_adapters ||= super + [
+          IngestionAdapter.new(schema_artifacts: schema_artifacts, logger: logger)
+        ]
       end
     end
   end

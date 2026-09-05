@@ -138,13 +138,13 @@ module ElasticGraph
         end
       end
 
-      # :nocov: -- this should not be called. Instead, it exists to guard against wrongly raising an error from this class.
+      # simplecov:disable -- this should not be called. Instead, it exists to guard against wrongly raising an error from this class.
       def raise(*args)
         super("`raise` was called on `JSONIngestion::IngestionAdapter`, but should not. Instead, use " \
           "`yield ValidationResult.invalid(...)` so that we can accumulate all invalid events and allow " \
           "the valid events to still be processed.")
       end
-      # :nocov:
+      # simplecov:enable
     end
   end
 end

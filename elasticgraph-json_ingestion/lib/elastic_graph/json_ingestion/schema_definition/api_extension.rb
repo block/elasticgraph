@@ -31,7 +31,8 @@ module ElasticGraph
 
           # Register the indexer extension so that any schema defined with JSON ingestion support
           # automatically gets JSON event ingestion at indexing time.
-          require(indexer_extension_require_path = "elastic_graph/json_ingestion/indexer_extension")
+          indexer_extension_require_path = "elastic_graph/json_ingestion/indexer_extension"
+          require indexer_extension_require_path
           api.register_indexer_extension(IndexerExtension, defined_at: indexer_extension_require_path)
 
           api.on_built_in_types do |type|
