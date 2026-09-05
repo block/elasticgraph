@@ -9,6 +9,7 @@
 require "elastic_graph/constants"
 require "elastic_graph/indexer"
 require "elastic_graph/indexer/operation/factory"
+require "elastic_graph/json_ingestion/indexing_event_decoder"
 require "elastic_graph/json_ingestion/record_preparer_factory"
 require "elastic_graph/spec_support/builds_indexer_operation"
 require "json"
@@ -471,6 +472,44 @@ module ElasticGraph
           end
 
           context "when multiple ingestion adapters are available" do
+            it "routes tagged formats independently of adapter order and schema version" do
+              other_adapter = Class.new do
+                def handles_event?(event)
+                  event[INGESTION_FORMAT_KEY] == "other"
+                end
+
+                def validate_event(event, skip_record_validation: false)
+                  IngestionAdapter::ValidationResult.valid(RecordPreparer::Identity, event: event)
+                end
+              end.new
+              json_adapter = indexer.ingestion_adapters.first
+              allow(other_adapter).to receive(:validate_event).and_call_original
+              decoder = JSONIngestion::IndexingEventDecoder.new(config: {}, schema_artifacts: indexer.schema_artifacts, logger: indexer.logger)
+              versionless_event = build_upsert_event(:component).except(SCHEMA_VERSION_KEY)
+              json_events = [versionless_event, decoder.decode(::JSON.generate(versionless_event)).first]
+              other_events = [versionless_event, versionless_event.merge(SCHEMA_VERSION_KEY => 7)].map do |event|
+                event.merge(INGESTION_FORMAT_KEY => "other")
+              end
+
+              [json_adapter, other_adapter].permutation.each do |adapters|
+                factory = indexer.operation_factory.with(ingestion_adapters: adapters)
+
+                json_events.each do |event|
+                  result = factory.build(event)
+                  expect(result.failed_event_error).to be nil
+                  expect(result.operations.first.event.fetch(SCHEMA_VERSION_KEY)).to eq(1)
+                end
+
+                other_events.each do |event|
+                  result = factory.build(event)
+                  expect(result.failed_event_error).to be nil
+                  expect(result.operations.first.event).to eq(event)
+                end
+              end
+
+              expect(other_adapter).to have_received(:validate_event).exactly(4).times
+            end
+
             it "routes each event to the first adapter that recognizes it" do
               event = build_upsert_event(:component, id: "1", __version: 1)
 
@@ -501,6 +540,12 @@ module ElasticGraph
           end
 
           context "when a single ingestion adapter is available" do
+            it "rejects an explicitly different format instead of sending it to the sole adapter" do
+              event = build_upsert_event(:component).merge(INGESTION_FORMAT_KEY => "other")
+
+              expect_failed_event_error(event, "No available ingestion adapter recognized this event.")
+            end
+
             it "routes all events to it, even ones it does not recognize, so that its more specific failure messages are used" do
               event = build_upsert_event(:component, id: "1", __version: 1)
 

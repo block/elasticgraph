@@ -38,20 +38,14 @@ module ElasticGraph
         @record_preparer_factory = RecordPreparerFactory.new(schema_artifacts)
       end
 
-      # Indicates whether this adapter recognizes the given event as one of its own, based on the
-      # presence of a schema version in the event envelope. The JSON Lines decoder maps the
-      # publisher's `json_schema_version` onto the ingestion-format-neutral `schema_version` key,
-      # and the legacy key counts as well.
-      #
-      # An event that carries no schema version is still valid JSON input, but this adapter cannot
-      # tell it apart from the event of another format, so it does not claim it here. The indexer
-      # routes such an event to the sole available adapter, which covers every single-format
-      # deployment.
+      # Recognizes events tagged as JSON by the decoder. Untagged events default to JSON for
+      # compatibility with existing in-process callers, including those that omit a schema version.
+      # Other formats must identify themselves with `ingestion_format`.
       #
       # @param event [Hash<String, Object>] an ElasticGraph indexing event
       # @return [Boolean] whether this adapter handles the event
       def handles_event?(event)
-        event.key?(SCHEMA_VERSION_KEY) || event.key?(JSON_SCHEMA_VERSION_KEY)
+        event.fetch(INGESTION_FORMAT_KEY, "json") == "json"
       end
 
       # Validates the given event and resolves the record preparer appropriate for the event's
@@ -76,7 +70,10 @@ module ElasticGraph
           return ValidationResult.invalid(payload_description: "#{graphql_type_name} record", message: error_message)
         end
 
-        ValidationResult.valid(@record_preparer_factory.for_json_schema_version(selected_schema_version))
+        ValidationResult.valid(
+          @record_preparer_factory.for_json_schema_version(selected_schema_version),
+          event: event.except(JSON_SCHEMA_VERSION_KEY).merge(SCHEMA_VERSION_KEY => selected_schema_version)
+        )
       end
 
       private
@@ -89,7 +86,7 @@ module ElasticGraph
       # its version, since the envelope schema requires the key.
       def event_for_json_schema_validation(event, selected_schema_version)
         event
-          .except(SCHEMA_VERSION_KEY, JSON_SCHEMA_VERSION_KEY)
+          .except(INGESTION_FORMAT_KEY, SCHEMA_VERSION_KEY, JSON_SCHEMA_VERSION_KEY)
           .merge(JSON_SCHEMA_VERSION_KEY => selected_schema_version)
       end
 
@@ -97,7 +94,7 @@ module ElasticGraph
       # and the legacy JSON-specific `json_schema_version` key acts as a fallback. A `nil` result
       # means the event requests no particular version.
       def requested_schema_version_for(event)
-        event[SCHEMA_VERSION_KEY] || event[JSON_SCHEMA_VERSION_KEY]
+        event.fetch(SCHEMA_VERSION_KEY) { event[JSON_SCHEMA_VERSION_KEY] }
       end
 
       def select_schema_version(event)

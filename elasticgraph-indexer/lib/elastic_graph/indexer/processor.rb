@@ -41,21 +41,24 @@ module ElasticGraph
       # Like `process`, but returns failures instead of raising an exception.
       # The caller is responsible for handling the failures.
       def process_returning_failures(events, refresh_indices: false)
-        factory_results_by_event = events.to_h { |event| [event, @operation_factory.build(event)] }
-
-        factory_results = factory_results_by_event.values
+        factory_results = events.uniq.map { |event| @operation_factory.build(event) }
+        operations = factory_results.flat_map(&:operations)
 
         log_skipped_record_validations(factory_results)
 
-        bulk_result = @datastore_router.bulk(factory_results.flat_map(&:operations), refresh: refresh_indices)
+        bulk_result = @datastore_router.bulk(operations, refresh: refresh_indices)
         successful_operations = bulk_result.successful_operations(check_failures: false)
 
         calculate_latency_metrics(successful_operations, bulk_result.noop_results)
 
+        # Adapters may normalize event envelopes, so correlate failures using the events on the
+        # operations rather than the original input hashes.
+        operations_by_event = operations.group_by(&:event)
+
         all_failures =
           factory_results.map(&:failed_event_error).compact +
           bulk_result.failure_results.map do |result|
-            all_operations_for_event = factory_results_by_event.fetch(result.event).operations
+            all_operations_for_event = operations_by_event.fetch(result.event)
             FailedEventError.from_failed_operation_result(result, all_operations_for_event.to_set)
           end
 

@@ -15,9 +15,9 @@ module ElasticGraph
     # ([JSON Lines](https://jsonlines.org/)). Configure it via the `indexer.indexing_event_decoder`
     # setting of `elasticgraph-indexer`.
     #
-    # Publishers identify the schema of each event with `json_schema_version`. The decoder maps that
-    # to the ingestion-format-neutral `schema_version` key that the rest of the indexing pipeline
-    # uses, so that formats without JSON schemas are not forced to speak in JSON schema versions.
+    # Tags decoded events with `ingestion_format: "json"` so that the indexer can route them
+    # independently of their schema version. The JSON ingestion adapter resolves version aliases
+    # and selects the schema, consistently for decoded payloads and direct in-process events.
     class IndexingEventDecoder
       # @param config [Hash<String, Object>] configuration from the `indexing_event_decoder.config` setting
       # @param schema_artifacts [SchemaArtifacts::FromDisk] the schema artifacts
@@ -30,16 +30,8 @@ module ElasticGraph
       # @return [Array<Hash<String, Object>>] the decoded ElasticGraph indexing events
       def decode(payload)
         payload.split("\n").map do |event_json|
-          adapt_json_schema_version(JSON.parse(event_json))
+          JSON.parse(event_json).merge(INGESTION_FORMAT_KEY => "json")
         end
-      end
-
-      private
-
-      def adapt_json_schema_version(event)
-        return event unless event.key?(JSON_SCHEMA_VERSION_KEY)
-
-        event.except(JSON_SCHEMA_VERSION_KEY).merge(SCHEMA_VERSION_KEY => event.fetch(JSON_SCHEMA_VERSION_KEY))
       end
     end
   end

@@ -6,6 +6,7 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/constants"
 require "elastic_graph/indexer/event_id"
 require "elastic_graph/indexer/failed_event_error"
 require "elastic_graph/indexer/operation/update"
@@ -38,6 +39,7 @@ module ElasticGraph
             return build_failed_result(event, failure.payload_description, failure.message)
           end
 
+          event = validation_result.event # : event
           record_preparer = validation_result.record_preparer # : _RecordPreparer
           if skip_record_validation
             build_success_result_isolating_malformed_records(event, record_preparer, adapter)
@@ -75,10 +77,10 @@ module ElasticGraph
         end
 
         # Routes the event to the first ingestion adapter that recognizes it. When exactly one
-        # adapter is available, it receives all events--including unrecognizable ones--so that
+        # adapter is available, it receives all untagged events--including unrecognizable ones--so that
         # its more specific validation failure messages are used.
         def ingestion_adapter_for(event)
-          return ingestion_adapters.first if ingestion_adapters.one?
+          return ingestion_adapters.first if ingestion_adapters.one? && !event.key?(INGESTION_FORMAT_KEY)
 
           ingestion_adapters.find { |adapter| adapter.handles_event?(event) }
         end

@@ -23,7 +23,7 @@ module ElasticGraph
 
         # Indicates whether this adapter recognizes the given event as one of its own. When multiple
         # adapters are available, the indexer routes each event to the first adapter that returns
-        # `true`. (When exactly one adapter is available, it receives all events.)
+        # `true`. (When exactly one adapter is available, it receives all untagged events.)
         #
         # @param event [Hash<String, Object>] an ElasticGraph indexing event
         # @return [Boolean] whether this adapter handles the event
@@ -34,7 +34,9 @@ module ElasticGraph
         end
 
         # Validates the given event and resolves the record preparer appropriate for the event's
-        # schema version.
+        # schema version. The successful result carries a normalized copy of the event, including
+        # the selected `schema_version` when the format is versioned. Preserve event identity,
+        # record data, and transport metadata; do not mutate the caller's event.
         #
         # The event's `schema_version` is optional, because an ingestion format may have no versions
         # at all. Each adapter decides what a missing version means for its own format.
@@ -44,7 +46,7 @@ module ElasticGraph
         # @return [ValidationResult] the result of validating the event
         def validate_event(event, skip_record_validation: false)
           # simplecov:disable -- must return a result to satisfy Steep type checking but never called
-          ValidationResult.valid(RecordPreparer::Identity)
+          ValidationResult.valid(RecordPreparer::Identity, event: event)
           # simplecov:enable
         end
       end
@@ -58,22 +60,25 @@ module ElasticGraph
       Failure = ::Data.define(:payload_description, :message)
 
       # Returned by {Interface#validate_event}. Either `failure` is non-nil (the event was invalid)
-      # or `record_preparer` is non-nil (the event was valid and its record can be prepared for
+      # or `event` and `record_preparer` are non-nil (the event was valid and its record can be prepared for
       # indexing with the given preparer).
       #
+      # @!attribute [r] event
+      #   @return [Hash<String, Object>, nil] normalized event, when validation succeeds
       # @!attribute [r] record_preparer
       #   @return [Object, nil] preparer for the event's record, when the event is valid
       # @!attribute [r] failure
       #   @return [Failure, nil] description of the validation problem, when the event is invalid
-      ValidationResult = ::Data.define(:record_preparer, :failure) do
+      ValidationResult = ::Data.define(:event, :record_preparer, :failure) do
         # @implements ValidationResult
 
         # Builds a result for a valid event.
         #
+        # @param event [Hash<String, Object>] normalized event
         # @param record_preparer [Object] preparer for the event's record
         # @return [ValidationResult]
-        def self.valid(record_preparer)
-          new(record_preparer: record_preparer, failure: nil)
+        def self.valid(record_preparer, event:)
+          new(event: event, record_preparer: record_preparer, failure: nil)
         end
 
         # Builds a result for an invalid event.
@@ -82,7 +87,7 @@ module ElasticGraph
         # @param message [String] detailed validation failure message
         # @return [ValidationResult]
         def self.invalid(payload_description:, message:)
-          new(record_preparer: nil, failure: Failure.new(payload_description: payload_description, message: message))
+          new(event: nil, record_preparer: nil, failure: Failure.new(payload_description: payload_description, message: message))
         end
       end
     end
