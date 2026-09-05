@@ -96,7 +96,31 @@ module ElasticGraph
           end
         end
 
+        it "correlates datastore failures after an adapter normalizes the event envelope" do
+          event = build_upsert_event(:widget, component_ids: ["c1", "c2"]).except(SCHEMA_VERSION_KEY).merge(JSON_SCHEMA_VERSION_KEY => 1)
+          allow(datastore_router).to receive(:bulk) do |ops, **options|
+            DatastoreIndexingRouter::BulkResult.new({"main" => ops.map { |op| [op, Operation::Result.failure_of(op, "overloaded!")] }})
+          end
+
+          failures = process_returning_failures([event])
+
+          expect(failures).not_to be_empty
+          expect(failures.map(&:event)).to all eq(event.except(JSON_SCHEMA_VERSION_KEY).merge(SCHEMA_VERSION_KEY => 1))
+          expect(failures.map(&:operations)).to all eq(failures.first.operations)
+          expect(failures.first.operations.size).to be > 1
+        end
+
         describe "latency metrics" do
+          it "preserves legacy callers' schema versions in latency logs" do
+            component = upsert_event_with_latency_timestamps(:component, 36, 72).except(SCHEMA_VERSION_KEY).merge(JSON_SCHEMA_VERSION_KEY => 1)
+            process([component])
+
+            expect(logged_jsons_of_type("ElasticGraphIndexingLatencies").first).to include(
+              SCHEMA_VERSION_KEY => 1,
+              JSON_SCHEMA_VERSION_KEY => 1
+            )
+          end
+
           it "extracts latency metrics from events" do
             component = upsert_event_with_latency_timestamps(:component, 36, 72)
             address = upsert_event_with_latency_timestamps(:address, 108, 144)
@@ -142,13 +166,13 @@ module ElasticGraph
             )
           end
 
-          it "logs a nil schema version for an event that carries none, since the key is optional" do
+          it "logs the selected JSON schema version when the event requests none" do
             component = upsert_event_with_latency_timestamps(:component, 36, 72).except(SCHEMA_VERSION_KEY)
             process([component])
 
             expect(logged_jsons_of_type("ElasticGraphIndexingLatencies").first).to include(
-              SCHEMA_VERSION_KEY => nil,
-              JSON_SCHEMA_VERSION_KEY => nil
+              SCHEMA_VERSION_KEY => 1,
+              JSON_SCHEMA_VERSION_KEY => 1
             )
           end
 

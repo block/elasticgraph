@@ -53,6 +53,15 @@ module ElasticGraph
             )
           end
 
+          it "preserves invalid versions for validation and gives the generic key precedence" do
+            record = {"id" => "1", "__version" => 1, "__typename" => "Widget", "__schema_version" => false, "__json_schema_version" => 3}
+
+            event = TestSupport::Converters.upsert_event_for(record)
+
+            expect(event.fetch(SCHEMA_VERSION_KEY)).to be false
+            expect(event.fetch("record")).to eq("id" => "1")
+          end
+
           it "omits the schema version when the factory record supplies none, since the key is optional" do
             factory_record = {
               "id" => "1",

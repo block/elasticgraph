@@ -21,16 +21,16 @@ module ElasticGraph
         JSONL
 
         expect(decoder.decode(payload)).to eq([
-          {"op" => "upsert", "id" => "1"},
-          {"op" => "upsert", "id" => "2"}
+          {"op" => "upsert", "id" => "1", INGESTION_FORMAT_KEY => "json"},
+          {"op" => "upsert", "id" => "2", INGESTION_FORMAT_KEY => "json"}
         ])
       end
 
-      it "maps `json_schema_version` to the generic `schema_version` key" do
+      it "preserves version keys for the ingestion adapter to resolve" do
         decoder = IndexingEventDecoder.new(config: {}, schema_artifacts: nil, logger: nil) # args are not used
 
-        expect(decoder.decode('{"op":"upsert","id":"1","json_schema_version":3}')).to eq([
-          {"op" => "upsert", "id" => "1", SCHEMA_VERSION_KEY => 3}
+        expect(decoder.decode('{"op":"upsert","id":"1","json_schema_version":3,"schema_version":2}')).to eq([
+          {"op" => "upsert", "id" => "1", JSON_SCHEMA_VERSION_KEY => 3, SCHEMA_VERSION_KEY => 2, INGESTION_FORMAT_KEY => "json"}
         ])
       end
 
