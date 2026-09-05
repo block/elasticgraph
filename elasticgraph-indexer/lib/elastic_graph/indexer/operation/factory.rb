@@ -78,8 +78,9 @@ module ElasticGraph
         # adapter is available, it receives all events--including unrecognizable ones--so that
         # its more specific validation failure messages are used.
         def ingestion_adapter_for(event)
-          ingestion_adapters.find { |adapter| adapter.handles_event?(event) } ||
-            (ingestion_adapters.first if ingestion_adapters.size == 1)
+          return ingestion_adapters.first if ingestion_adapters.one?
+
+          ingestion_adapters.find { |adapter| adapter.handles_event?(event) }
         end
 
         # This copies the `id` from event into the actual record
@@ -182,7 +183,7 @@ module ElasticGraph
         # simplecov:disable -- this should not be called. Instead, it exists to guard against wrongly raising an error from this class.
         def raise(*args)
           super("`raise` was called on `Operation::Factory`, but should not. Instead, use " \
-            "`yield build_failed_result(...)` so that we can accumulate all invalid events and allow " \
+            "`return build_failed_result(...)` so that we can accumulate all invalid events and allow " \
             "the valid events to still be processed.")
         end
         # simplecov:enable

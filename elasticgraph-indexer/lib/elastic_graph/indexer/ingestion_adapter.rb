@@ -28,9 +28,9 @@ module ElasticGraph
         # @param event [Hash<String, Object>] an ElasticGraph indexing event
         # @return [Boolean] whether this adapter handles the event
         def handles_event?(event)
-          # :nocov: -- must return a boolean to satisfy Steep type checking but never called
+          # simplecov:disable -- must return a boolean to satisfy Steep type checking but never called
           false
-          # :nocov:
+          # simplecov:enable
         end
 
         # Validates the given event and resolves the record preparer appropriate for the event's
@@ -40,9 +40,9 @@ module ElasticGraph
         # @param skip_record_validation [Boolean] whether to skip record validation; the event envelope must still be validated
         # @return [ValidationResult] the result of validating the event
         def validate_event(event, skip_record_validation: false)
-          # :nocov: -- must return a result to satisfy Steep type checking but never called
+          # simplecov:disable -- must return a result to satisfy Steep type checking but never called
           ValidationResult.valid(RecordPreparer::Identity)
-          # :nocov:
+          # simplecov:enable
         end
       end
 
