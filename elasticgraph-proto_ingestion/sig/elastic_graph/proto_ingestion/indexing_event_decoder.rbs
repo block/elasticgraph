@@ -1,0 +1,17 @@
+module ElasticGraph
+  module ProtoIngestion
+    class IndexingEventDecoder
+      @schema: RuntimeSchema
+      @format: String
+      @encoding: String
+      @metadata_fields: Hash[String, String]
+      @pool: Google::Protobuf::DescriptorPool
+      @batch_class: untyped
+      def initialize: (config: Hash[Symbol | String, untyped], schema_artifacts: schemaArtifacts, logger: Logger) -> void
+      def decode: (String) -> Array[Hash[String, untyped]]
+      def decode_with_metadata: (String, metadata: Hash[String, untyped]) -> Array[Hash[String, untyped]]
+      private
+      def message_class: (String?) -> untyped
+    end
+  end
+end

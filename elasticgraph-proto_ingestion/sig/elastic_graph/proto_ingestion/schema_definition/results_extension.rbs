@@ -2,6 +2,8 @@ module ElasticGraph
   module ProtoIngestion
     module SchemaDefinition
       module ResultsExtension : ::ElasticGraph::SchemaDefinition::Results
+        def runtime_metadata: () -> SchemaArtifacts::RuntimeMetadata::Schema
+        def proto_envelope_schema: () -> String
         def proto_schema: () -> ::String
         def proto_field_number_mappings: () -> ::Hash[::String, untyped]
 

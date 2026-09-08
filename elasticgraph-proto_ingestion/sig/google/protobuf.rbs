@@ -1,0 +1,17 @@
+# These generated descriptor message accessors are absent from rbs_collection.
+module Google
+  module Protobuf
+    class FileDescriptorSet
+      def self.decode: (String) -> instance
+      def file: () -> Array[FileDescriptorProto]
+    end
+    class FileDescriptorProto
+      def self.encode: (instance) -> String
+      def package: () -> String
+      def message_type: () -> Array[DescriptorProto]
+    end
+    class DescriptorProto
+      def name: () -> String
+    end
+  end
+end

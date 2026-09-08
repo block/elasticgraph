@@ -81,6 +81,19 @@ module ElasticGraph
             nil
           end
 
+          # Internal indexing metadata, kept out of the public wire schema.
+          # @return [Hash<String, Object>]
+          def proto_indexing_metadata
+            if abstract?
+              abstract_type = _ = self
+              {"subtypes" => abstract_type.recursively_resolve_subtypes.map(&:name)}
+            else
+              {"fields" => proto_fields.to_h do |schema_field, field|
+                [schema_field.name, {"type" => field.type.name, "name_in_index" => field.name_in_index}]
+              end}
+            end
+          end
+
           private
 
           def render_proto_message(schema, message_name, package_name)
@@ -111,11 +124,12 @@ module ElasticGraph
             end
             field_definitions << "  // Next field number: #{schema.next_field_number_for(message_name)}"
 
-            <<~PROTO.chomp
+            definition = <<~PROTO.chomp
               #{documentation}message #{message_name} {
               #{field_definitions.join("\n")}
               }
             PROTO
+            [definition, *proto_list_wrapper_definitions(package_name)].join("\n\n")
           end
 
           def render_proto_oneof(schema, message_name, package_name)
@@ -175,17 +189,43 @@ module ElasticGraph
             doc_lines + ["  //"] + format_lines
           end
 
+          def proto_list_wrapper_name(field_name, level)
+            wrapper_name = "#{name}_#{field_name}_List#{level}"
+            if schema_def_state.types_by_name.key?(wrapper_name)
+              raise Errors::SchemaError, "Generated protobuf list wrapper `#{wrapper_name}` conflicts with a schema type. Rename that type."
+            end
+            wrapper_name
+          end
+
+          def proto_list_wrapper_definitions(package_name)
+            proto_fields.flat_map do |schema_field, field|
+              depth, base_type = ObjectInterfaceAndUnionExtension.list_depth_and_base_type(field.type)
+              (1...depth).map do |level|
+                proto_base_type = _ = base_type.resolved
+                element_type = if level == depth - 1
+                  proto_base_type.proto_type_reference(package_name)
+                else
+                  ".#{package_name}.#{proto_list_wrapper_name(schema_field.name, level + 1)}"
+                end
+                <<~PROTO.chomp
+                  message #{proto_list_wrapper_name(schema_field.name, level)} {
+                    repeated #{element_type} values = 1;
+                  }
+                PROTO
+              end
+            end
+          end
+
           def proto_field_type_for(type_ref, package_name:, context_field_name:)
             list_depth, base_type_ref = ObjectInterfaceAndUnionExtension.list_depth_and_base_type(type_ref)
 
-            if list_depth > 1
-              raise Errors::SchemaError, "Field `#{name}.#{context_field_name}` has type `#{type_ref.name}`, " \
-                "but Protocol Buffers cannot represent lists of lists directly. " \
-                "`elasticgraph-proto_ingestion` supports fields with at most one list level."
-            end
-
             proto_type = _ = base_type_ref.resolved
-            [list_depth == 1, proto_type.proto_type_reference(package_name), proto_type.protobuf_field_comment]
+            field_type = if list_depth > 1
+              ".#{package_name}.#{proto_list_wrapper_name(context_field_name, 1)}"
+            else
+              proto_type.proto_type_reference(package_name)
+            end
+            [list_depth >= 1, field_type, proto_type.protobuf_field_comment]
           end
         end
       end

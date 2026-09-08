@@ -1,9 +1,8 @@
 # ElasticGraph::ProtoIngestion
 
 An ElasticGraph extension that supports ingesting Protocol Buffer data into ElasticGraph.
-Currently it generates Protocol Buffers schema artifacts from ElasticGraph schemas: it emits
-`proto3` by default and can emit `proto2`, and supports arbitrary file-level header lines (such
-as `option` declarations).
+It generates protobuf schemas and ingests binary events through the shared indexing pipeline.
+It supports `proto3` (default) and `proto2`, both independently of JSON ingestion and alongside it.
 
 ## Dependency Diagram
 
@@ -14,9 +13,16 @@ graph LR;
     classDef externalGemStyle fill:#E0EFFF,stroke:#70A1D7,color:#2980B9;
     elasticgraph-proto_ingestion["elasticgraph-proto_ingestion"];
     class elasticgraph-proto_ingestion targetGemStyle;
+    elasticgraph-indexer["elasticgraph-indexer"];
+    elasticgraph-proto_ingestion --> elasticgraph-indexer;
+    class elasticgraph-indexer otherEgGemStyle;
     elasticgraph-support["elasticgraph-support"];
     elasticgraph-proto_ingestion --> elasticgraph-support;
     class elasticgraph-support otherEgGemStyle;
+    google-protobuf["google-protobuf"];
+    elasticgraph-proto_ingestion --> google-protobuf;
+    class google-protobuf externalGemStyle;
+    click google-protobuf href "https://rubygems.org/gems/google-protobuf" "Open on RubyGems.org" _blank;
 ```
 
 ## Usage
@@ -76,6 +82,112 @@ end
 
 After running `bundle exec rake schema_artifacts:dump`, ElasticGraph will generate a `schema.proto`
 schema artifact, and will maintain a `proto_field_numbers.yaml` file alongside your schema definition.
+
+## Runtime Ingestion
+
+The schema definition extension registers the protobuf ingestion adapter automatically. It also
+generates `indexing_events.proto`, with an `ElasticGraphEventEnvelope` containing event metadata
+and a `oneof record` of concrete ingestible types, and an `ElasticGraphEventBatch` containing
+repeated envelopes. Domain messages remain in `schema.proto` and can be consumed independently.
+Envelope alternatives use names such as `record_widget`; their numbers are maintained in
+`proto_field_numbers.yaml`, including reservations when types are removed.
+
+Private field metadata lives in `runtime_metadata.yaml`. The protobuf adapter uses it to translate
+public names to index names, apply scalar indexing preparers, and reconstruct interface and union
+`__typename` values. No JSON schema artifacts or JSON schema version are required. Projects using
+only protobuf can omit the JSON ingestion schema definition extension and its `json_schema_version`
+and `json_schema` DSL calls.
+
+After dumping artifacts, compile both generated files into a descriptor set with imports. Use a
+standard `protoc` version supporting proto3 optional fields (3.15 or newer):
+
+```bash
+bundle exec rake schema_artifacts:dump
+protoc --proto_path=config/schema/artifacts --include_imports \
+  --descriptor_set_out=config/schema/artifacts/schema.pb \
+  schema.proto indexing_events.proto
+```
+
+Add further `--proto_path` arguments for any imported custom scalar definitions. Package the
+resulting `schema.pb` with the matching schema artifacts in the indexer deployment. The runtime
+uses the `google-protobuf` gem and an isolated descriptor pool; it does not run `protoc` or load
+generated Ruby constants into a shared global pool.
+
+Configure the decoder in your application settings:
+
+```yaml
+indexer:
+  indexing_event_decoder:
+    name: ElasticGraph::ProtoIngestion::IndexingEventDecoder
+    require_path: elastic_graph/proto_ingestion/indexing_event_decoder
+    config:
+      descriptor_set_file: config/schema/artifacts/schema.pb
+      format: envelope
+      encoding: base64
+```
+
+### Batched envelopes
+
+With `format: envelope`, the payload is one serialized `ElasticGraphEventBatch`. Each envelope has
+`op` (`upsert`), `id`, a positive `int64 version` for ordering updates, optional
+`latency_timestamps` (a string-to-ISO-8601-string map), and one `record_<type>` alternative.
+The envelope's `id` takes precedence over an ID in the record. This format keeps per-event metadata
+with each record when batching or archiving payloads.
+
+Use `encoding: base64` for SQS message bodies, which carry text. Use `encoding: binary` (the default)
+for binary transports or direct calls to `indexer.indexing_event_decoder.decode(payload)`.
+Send the decoded events to `indexer.processor.process(events)`. The SQS Lambda integration invokes
+the decoder and processor automatically, including for S3-offloaded payloads.
+
+### Raw domain messages
+
+With `format: raw`, the payload contains one serialized domain message. Call the decoder's
+`decode_with_metadata(payload, metadata: properties)` method with these UTF-8 string properties,
+then pass the resulting events to the processor:
+
+| Property | Meaning |
+|----------|---------|
+| `eg_op` | `upsert` |
+| `eg_type` | Concrete ElasticGraph type name, without the protobuf package |
+| `eg_id` | Record identifier |
+| `eg_version` | Positive decimal integer for update ordering |
+
+Kafka consumers can supply record headers; Pulsar consumers can supply message properties. The
+SQS integration supplies `messageAttributes` automatically for metadata-aware decoders. An optional
+`metadata_fields` configuration maps canonical names (`op`, `type`, `id`, `version`) to alternate
+transport property names. The format is explicitly configured; the decoder does not guess from bytes.
+
+### Validation and wire semantics
+
+Protobuf decoding enforces wire types. The adapter checks the event envelope and ElasticGraph's
+additional constraints, including non-null fields, known enum values, scalar ranges, dates, times,
+and time zones. It uses no JSON Schema validation. `skip_record_validation_percents_by_type` controls
+semantic record validation, while envelope validation and record conversion always run.
+Custom scalars retain their configured indexing preparers; external message-valued scalars decode
+to their standard ProtoJSON representation before preparation. Custom scalar semantic constraints
+must be implemented by the application's ingestion code; `field_comment` is documentation.
+
+Singular fields use explicit presence in both proto2 and proto3: an omitted value becomes `nil`,
+while an explicitly supplied `false`, `0`, or empty string is retained. Older proto3 publishers that
+omit default values cannot convey that distinction; regenerate publisher code to preserve presence.
+An enum's generated `UNSPECIFIED` value and an empty abstract-type `oneof` become `nil`, which is
+rejected when the corresponding ElasticGraph field is non-null.
+
+Repeated fields decode as arrays, with absent fields becoming `[]`. Protobuf repeated fields cannot
+represent a null list or null list elements. Nested lists use generated `values` wrapper messages;
+an empty wrapper represents an empty inner list. Applications requiring a null/empty distinction
+should model that distinction as an explicit object instead of a repeated field.
+
+Unknown protobuf fields are ignored. Unknown envelope alternatives remain invalid events rather
+than being silently acknowledged. Corrupt protobuf/base64 payloads fail decoding, causing the
+transport invocation to retry; decoded events with invalid envelopes or record values are isolated
+by the processor and participate in SQS partial-batch failure reporting.
+
+Protobuf schema versions are not selected: field numbers define compatibility. `schema_version`
+and the legacy `json_schema_version` are omitted from normalized protobuf events, and warehouse
+files use an `unversioned` partition. Keep descriptor sets and private runtime metadata together
+when deploying schema changes. Breaking-change detection with Buf and versioned protobuf artifact
+archives remain separate work; additive changes and field renames retain their existing numbers.
 
 ## Schema Definition API
 
@@ -190,7 +302,7 @@ A `PhoneNumber` field then renders as:
 
 ```protobuf
 // Must be an E.164 phone number.
-string phone_number = 1;
+optional string phone_number = 1;
 ```
 
 The comment goes above the field, below the field's own doc comment, because proto compilers
@@ -246,9 +358,8 @@ Additionally:
   ElasticGraph types they carry, so generated fields of these types document the expected format
   in a comment above the field (e.g. `// Must be formatted as an ISO 8601 date, e.g. "2024-11-25".`).
   Values are validated when events are ingested, just as with JSON ingestion.
-- List types become `repeated` fields.
-- Lists of lists (e.g. `[[Float!]!]!`) are not supported because Protocol Buffers cannot represent
-  them directly. Schema artifact generation raises an error identifying the unsupported field.
+- List types become `repeated` fields. Lists of lists use generated wrapper messages, each with a
+  repeated `values` field. Wrapper names include the owning type, public field name, and list level.
 - Enum types generate `enum` definitions whose values are prefixed with the enum type name in `UPPER_SNAKE_CASE`, including a zero-valued `*_UNSPECIFIED` entry.
 
 ## Stable Field Numbers
@@ -314,3 +425,11 @@ enums:
       BLUE: 2
     next_number: 3
 ```
+
+## Development checks
+
+The indexer integration suites run against both JSON and protobuf. Protobuf-specific integration
+tests cover proto2/proto3, both naming styles, raw and batch decoding, live datastore indexing and
+GraphQL reads, SQS metadata and partial failures, and unversioned warehouse output. They compile
+the generated public schemas with `protoc`; set `PROTOC` to an alternate compiler executable when
+needed. CI installs the standard protobuf compiler.

@@ -6,6 +6,7 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/proto_ingestion/indexer_extension"
 require "elastic_graph/proto_ingestion/schema_definition/schema"
 
 module ElasticGraph
@@ -26,7 +27,26 @@ module ElasticGraph
         def proto_field_number_mappings
           # Numbers get assigned as `schema.proto` renders, so we must render before reading them.
           proto_schema
+          proto_envelope_schema
           protobuf_schema_generator.field_number_mappings_for_artifact
+        end
+
+        # Generated protobuf envelope and batch definitions.
+        # @return [String]
+        def proto_envelope_schema
+          protobuf_schema_generator.envelope_schema
+        end
+
+        # Adds private protobuf field metadata to the registered runtime extension.
+        # @return [SchemaArtifacts::RuntimeMetadata::Schema]
+        def runtime_metadata
+          metadata = super
+          extension = SchemaArtifacts::RuntimeMetadata::ComponentExtension.new({
+            "name" => "ElasticGraph::ProtoIngestion::IndexerExtension",
+            "require_path" => "elastic_graph/proto_ingestion/indexer_extension",
+            "config" => protobuf_schema_generator.ingestion_metadata
+          })
+          metadata.with(indexer_extension_modules: metadata.indexer_extension_modules + [extension])
         end
 
         private
@@ -40,7 +60,8 @@ module ElasticGraph
             Schema.new(
               state: extension_state,
               all_types: all_types,
-              ingestion_state: extension_state.proto_ingestion_state
+              ingestion_state: extension_state.proto_ingestion_state,
+              sourced_type_names: sourced_update_targets_by_source_type_name.keys
             )
           end
         end

@@ -93,6 +93,27 @@ module ElasticGraph
           ], refresh_indices: false)
         end
 
+        it "passes transport attributes to metadata-aware decoders" do
+          decoder_class = Class.new do
+            def decode_with_metadata(payload, metadata:)
+            end
+          end
+          custom_decoder = instance_spy(decoder_class, decode_with_metadata: [{"field1" => {}}])
+          message = sqs_message("a", "protobuf-payload").merge("messageAttributes" => {
+            "eg_type" => {"stringValue" => "Widget", "dataType" => "String"},
+            "eg_version" => {"stringValue" => "7", "dataType" => "Number"}
+          })
+
+          build_sqs_processor(indexing_event_decoder: custom_decoder).process({"Records" => [message]})
+
+          expect(custom_decoder).to have_received(:decode_with_metadata).with(
+            "protobuf-payload", metadata: {"eg_type" => "Widget", "eg_version" => "7"}
+          )
+          expect(indexer_processor).to have_received(:process_returning_failures).with([
+            {"field1" => {}, "message_id" => "a"}
+          ], refresh_indices: false)
+        end
+
         it "logs the SQS message ids received in the lambda event and the `sqs_received_at` if available" do
           sent_timestamp_millis = "796010423456"
           sent_timestamp_iso8601 = "1995-03-24T02:00:23.456Z"

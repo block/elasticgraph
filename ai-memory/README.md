@@ -372,3 +372,14 @@ The `script/` directory contains various scripts for development, maintenance, a
 -   `list_eg_gems.rb`: A Ruby script that lists all ElasticGraph-specific gems within the repository.
 -   `enable_custom_gemfile`: Manages the use of a custom Gemfile for development, potentially by symlinking or copying `Gemfile-custom.example`.
 -   `ci_parts/`: This subdirectory (seen in the initial file listing) likely contains helper scripts that are executed as part of the CI pipeline.
+
+### Protobuf ingestion
+
+`elasticgraph-proto_ingestion` registers a runtime ingestion adapter through generated runtime metadata.
+Public domain messages live in `schema.proto`; `indexing_events.proto` adds stable-numbered `oneof`
+envelopes and batches. Deployments compile both with `protoc --include_imports` and configure an isolated
+descriptor-set decoder for raw messages with transport metadata or envelope batches. Proto ingestion
+uses no JSON schema artifacts or schema-version selection. SQS supplies attributes through the optional
+`decode_with_metadata` capability; existing `decode(payload)` implementations remain compatible.
+Singular fields preserve presence; repeated fields use protobuf's empty-list semantics. Nested lists
+use generated wrappers. Indexer integration specs run both JSON and protobuf wire formats.

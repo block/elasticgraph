@@ -8,6 +8,7 @@ module ElasticGraph
             ::ElasticGraph::SchemaDefinition::Indexing::Field
           ]]?
 
+          def proto_indexing_metadata: () -> Hash[String, untyped]
           def proto_name: () -> ::String
           def proto_type_reference: (::String package_name) -> ::String
           def protobuf_import: () -> nil
@@ -27,6 +28,8 @@ module ElasticGraph
             ::ElasticGraph::SchemaDefinition::Indexing::Field
           ]]
           def field_comment_lines_for: (::String? doc_comment, ::String? field_comment) -> ::Array[::String]
+          def proto_list_wrapper_name: (String, Integer) -> String
+          def proto_list_wrapper_definitions: (String) -> Array[String]
           def proto_field_type_for: (
             ::ElasticGraph::SchemaDefinition::SchemaElements::TypeReference,
             package_name: ::String,

@@ -1,0 +1,10 @@
+module ElasticGraph
+  module ProtoIngestion
+    class RuntimeSchema
+      attr_reader types: Hash[String, untyped]
+      attr_reader package_name: String
+      attr_reader record_preparer: Indexer::RecordPreparer
+      def initialize: (schemaArtifacts) -> void
+    end
+  end
+end

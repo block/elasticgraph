@@ -144,7 +144,9 @@ PATH
   remote: elasticgraph-proto_ingestion
   specs:
     elasticgraph-proto_ingestion (1.2.1.pre)
+      elasticgraph-indexer (= 1.2.1.pre)
       elasticgraph-support (= 1.2.1.pre)
+      google-protobuf (~> 4.31)
 
 PATH
   remote: elasticgraph-query_interceptor

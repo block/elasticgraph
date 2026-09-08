@@ -41,7 +41,8 @@ module ElasticGraph
 
           base_artifacts + [
             proto_field_numbers_artifact,
-            new_raw_artifact(PROTO_SCHEMA_FILE, proto_schema.chomp, comment_prefix: "//")
+            new_raw_artifact(PROTO_SCHEMA_FILE, proto_schema.chomp, comment_prefix: "//"),
+            new_raw_artifact("indexing_events.proto", protobuf_schema_definition_results.proto_envelope_schema.chomp, comment_prefix: "//")
           ]
         end
 
