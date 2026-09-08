@@ -3,6 +3,10 @@ module ElasticGraph
     type indexingEventDecoder = IndexingEventDecoder::Interface
 
     module IndexingEventDecoder
+      interface _MetadataAwareDecoder
+        def decode_with_metadata: (::String, metadata: ::Hash[::String, untyped]) -> ::Array[event]
+      end
+
       class Interface
         def initialize: (
           config: ::Hash[::Symbol | ::String, untyped],

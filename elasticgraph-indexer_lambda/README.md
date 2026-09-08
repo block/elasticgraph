@@ -33,6 +33,11 @@ decoded by the decoder configured via the `indexer.indexing_event_decoder` setti
 README for details). For example, with `ElasticGraph::JSONIngestion::IndexingEventDecoder` (provided by
 `elasticgraph-json_ingestion`), messages use [JSON Lines](https://jsonlines.org/) format to encode indexing events.
 
+A decoder can also implement `decode_with_metadata(payload, metadata:)` to receive SQS message attributes.
+The `metadata` hash maps attribute names to their `stringValue` values, including number attributes encoded as strings.
+It is empty when a message has no attributes. Attributes are passed alongside the fetched body for S3-offloaded messages.
+Decoders that only implement `decode(payload)` continue to receive the payload as before.
+
 JSON lines format contains individual JSON objects
 delimited by a newline control character (not the `\n` string sequence), such as:
 

@@ -24,7 +24,7 @@ module ElasticGraph
       S3_OFFLOADING_INDICATOR: String
       def extract_sqs_metadata: (::Hash[String, untyped]) -> ::Hash[::String, untyped]
       def millis_to_iso8601: (::String) -> ::String?
-      def decoded_events_from: (::String) -> ::Array[::Hash[::String, untyped]]
+      def decoded_events_from: (::String, metadata: ::Hash[::String, untyped]) -> ::Array[::Hash[::String, untyped]]
       def get_payload_from_s3: (::String) -> ::String
       def s3_client: () -> Aws::S3::Client
       def format_response: (
