@@ -93,6 +93,38 @@ module ElasticGraph
           ], refresh_indices: false)
         end
 
+        it "passes transport attributes to metadata-aware decoders for direct and S3-offloaded payloads" do
+          decoder_class = Class.new do
+            def decode_with_metadata(payload, metadata:)
+            end
+          end
+          custom_decoder = instance_spy(decoder_class, decode_with_metadata: [{"field1" => {}}])
+          message = sqs_message("a", "protobuf-payload").merge("messageAttributes" => {
+            "eg_type" => {"stringValue" => "Widget", "dataType" => "String"},
+            "eg_version" => {"stringValue" => "7", "dataType" => "Number"}
+          })
+
+          offloaded_message = message.merge("messageId" => "b", "body" => JSON.generate([
+            "software.amazon.payloadoffloading.PayloadS3Pointer", {"s3BucketName" => "events", "s3Key" => "payload"}
+          ]))
+          s3_client.stub_responses(:get_object, body: "protobuf-payload")
+          message_without_attributes = message.except("messageAttributes").merge("messageId" => "c")
+
+          build_sqs_processor(indexing_event_decoder: custom_decoder).process({
+            "Records" => [message, offloaded_message, message_without_attributes]
+          })
+
+          expect(custom_decoder).to have_received(:decode_with_metadata).with(
+            "protobuf-payload", metadata: {"eg_type" => "Widget", "eg_version" => "7"}
+          ).twice
+          expect(custom_decoder).to have_received(:decode_with_metadata).with("protobuf-payload", metadata: {})
+          expect(indexer_processor).to have_received(:process_returning_failures).with([
+            {"field1" => {}, "message_id" => "a"},
+            {"field1" => {}, "message_id" => "b"},
+            {"field1" => {}, "message_id" => "c"}
+          ], refresh_indices: false)
+        end
+
         it "logs the SQS message ids received in the lambda event and the `sqs_received_at` if available" do
           sent_timestamp_millis = "796010423456"
           sent_timestamp_iso8601 = "1995-03-24T02:00:23.456Z"
