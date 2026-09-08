@@ -81,6 +81,19 @@ module ElasticGraph
             nil
           end
 
+          # Internal indexing metadata, kept out of the public wire schema.
+          # @return [Hash<String, Object>]
+          def proto_indexing_metadata
+            if abstract?
+              abstract_type = _ = self
+              {"subtypes" => abstract_type.recursively_resolve_subtypes.map(&:name)}
+            else
+              {"fields" => proto_fields.to_h do |schema_field, field|
+                [schema_field.name, {"type" => field.type.name, "name_in_index" => field.name_in_index}]
+              end}
+            end
+          end
+
           private
 
           def render_proto_message(schema, message_name, package_name)

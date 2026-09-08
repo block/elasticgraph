@@ -1,0 +1,12 @@
+module ElasticGraph
+  module ProtoIngestion
+    class RecordConverter
+      @types: Hash[String, untyped]
+      def initialize: (Hash[String, untyped]) -> void
+      def convert: (String, untyped) -> untyped
+      private
+      def convert_typed_value: (String, untyped, untyped) -> untyped
+      def convert_value: (String, untyped, untyped) -> untyped
+    end
+  end
+end

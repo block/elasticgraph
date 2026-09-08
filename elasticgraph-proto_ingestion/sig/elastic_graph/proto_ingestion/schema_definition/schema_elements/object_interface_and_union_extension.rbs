@@ -8,6 +8,7 @@ module ElasticGraph
             ::ElasticGraph::SchemaDefinition::Indexing::Field
           ]]?
 
+          def proto_indexing_metadata: () -> Hash[String, untyped]
           def proto_name: () -> ::String
           def proto_type_reference: (::String package_name) -> ::String
           def protobuf_import: () -> nil
