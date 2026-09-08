@@ -77,7 +77,7 @@ end
 After running `bundle exec rake schema_artifacts:dump`, ElasticGraph will generate a `schema.proto`
 schema artifact, and will maintain a `proto_field_numbers.yaml` file alongside your schema definition.
 
-Compile generated schemas with a standard `protoc` version supporting proto3 optional fields (3.15 or newer). Publishers must regenerate code to distinguish omitted scalar fields from explicitly supplied default values.
+Compiling generated schemas requires `protoc` 3.15 or newer for proto3 optional field support.
 
 ## Schema Definition API
 
