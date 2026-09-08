@@ -64,9 +64,10 @@ module ElasticGraph
         # @param state [ElasticGraph::SchemaDefinition::State]
         # @param all_types [Array<ElasticGraph::SchemaDefinition::SchemaElements::graphQLType>]
         # @param ingestion_state [ProtoIngestionState] this extension's configured schema definition state
-        def initialize(state:, all_types:, ingestion_state:)
+        def initialize(state:, all_types:, ingestion_state:, sourced_type_names: [])
           @state = state
           @all_types = all_types
+          @sourced_type_names = sourced_type_names
           @package_name = ingestion_state.package_name
           @syntax = self.class.validate_syntax(ingestion_state.syntax)
           @header_lines = self.class.validate_header_lines(ingestion_state.header_lines)
@@ -123,30 +124,23 @@ module ElasticGraph
         # Returns the label prefix (including its trailing space) that a field declaration needs
         # under the configured syntax, or an empty string when the field takes no label.
         #
-        # `proto2` requires an explicit label on every field, so non-repeated fields get
-        # `optional `; `proto3` labels repeated fields only. Note that `oneof` alternatives never
+        # Non-repeated fields use `optional` in both syntaxes so that absence is distinct from
+        # an explicitly supplied zero, false, or empty string. `oneof` alternatives never
         # get a label under either syntax -- protoc rejects one -- so the `oneof` renderer in
         # `ObjectInterfaceAndUnionExtension` does not call this.
         #
         # @api private
         def field_label_prefix(repeated:)
           return "repeated " if repeated
-          proto2? ? "optional " : ""
-        end
-
-        # Indicates whether the generator emits `proto2` rather than `proto3`.
-        #
-        # @api private
-        def proto2?
-          @syntax == "proto2"
+          "optional "
         end
 
         private
 
-        # Selects the indexed root types and every type transitively referenced by their protobuf
+        # Selects indexed and source-only root types and every type referenced by their protobuf
         # representations. All traversal state is local so repeated calls are independent.
         def proto_types
-          types_to_visit = _ = @state.indexed_types_by_index_name.values.dup
+          types_to_visit = _ = @state.indexed_types_by_index_name.values + @sourced_type_names.map { |name| @state.types_by_name.fetch(name) }
           type_names_to_render = ::Set.new
 
           while (type = types_to_visit.shift)

@@ -77,6 +77,8 @@ end
 After running `bundle exec rake schema_artifacts:dump`, ElasticGraph will generate a `schema.proto`
 schema artifact, and will maintain a `proto_field_numbers.yaml` file alongside your schema definition.
 
+Compile generated schemas with a standard `protoc` version supporting proto3 optional fields (3.15 or newer). Publishers must regenerate code to distinguish omitted scalar fields from explicitly supplied default values.
+
 ## Schema Definition API
 
 ### Protobuf Syntax (`proto2` / `proto3`)
@@ -247,8 +249,10 @@ Additionally:
   in a comment above the field (e.g. `// Must be formatted as an ISO 8601 date, e.g. "2024-11-25".`).
   Values are validated when events are ingested, just as with JSON ingestion.
 - List types become `repeated` fields.
-- Lists of lists (e.g. `[[Float!]!]!`) are not supported because Protocol Buffers cannot represent
-  them directly. Schema artifact generation raises an error identifying the unsupported field.
+- Nested lists use generated wrapper messages with a repeated `values` field at each inner level.
+- Singular fields use `optional` in proto2 and proto3, preserving explicit zero, false, and empty string values.
+- Repeated fields cannot distinguish a null list from an empty list or represent null elements. An empty wrapper represents an empty inner list.
+- Types that supply `sourced_from` fields are included even when they do not have their own index.
 - Enum types generate `enum` definitions whose values are prefixed with the enum type name in `UPPER_SNAKE_CASE`, including a zero-valued `*_UNSPECIFIED` entry.
 
 ## Stable Field Numbers

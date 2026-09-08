@@ -40,7 +40,8 @@ module ElasticGraph
             Schema.new(
               state: extension_state,
               all_types: all_types,
-              ingestion_state: extension_state.proto_ingestion_state
+              ingestion_state: extension_state.proto_ingestion_state,
+              sourced_type_names: sourced_update_targets_by_source_type_name.keys
             )
           end
         end
