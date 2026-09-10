@@ -10,7 +10,6 @@ require "elastic_graph/constants"
 require "elastic_graph/indexer"
 require "elastic_graph/indexer/ingestion_adapter"
 require "elastic_graph/indexer/operation/factory"
-require "elastic_graph/json_ingestion/indexing_event_decoder"
 require "elastic_graph/spec_support/builds_indexer_operation"
 require "json"
 
@@ -38,7 +37,7 @@ module ElasticGraph
               "type" => "Widget",
               "version" => 1,
               "record" => event["record"],
-              SCHEMA_VERSION_KEY => 1
+              JSON_SCHEMA_VERSION_KEY => 1
             }
 
             expect(build_expecting_success(event)).to contain_exactly(
@@ -104,7 +103,7 @@ module ElasticGraph
                 "type" => "Component",
                 "version" => 1,
                 "record" => event["record"],
-                SCHEMA_VERSION_KEY => 1
+                JSON_SCHEMA_VERSION_KEY => 1
               })])
             end
 
@@ -213,7 +212,7 @@ module ElasticGraph
                 "type" => "Widget",
                 "version" => 1,
                 "record" => event["record"],
-                SCHEMA_VERSION_KEY => 1
+                JSON_SCHEMA_VERSION_KEY => 1
               }
 
               expect(build_expecting_success(event)).to contain_exactly(
@@ -336,7 +335,7 @@ module ElasticGraph
               "type" => "Component",
               "version" => 1,
               "record" => event["record"],
-              SCHEMA_VERSION_KEY => 1
+              JSON_SCHEMA_VERSION_KEY => 1
             }.merge(latency_timestamps))])
           end
 
@@ -346,7 +345,7 @@ module ElasticGraph
               "id" => "1",
               "type" => "MyOwnInvalidGraphQlType",
               "version" => 1,
-              SCHEMA_VERSION_KEY => 1,
+              JSON_SCHEMA_VERSION_KEY => 1,
               "record" => {"field1" => "value1", "field2" => "value2", "id" => "1"}
             }
 
@@ -360,7 +359,7 @@ module ElasticGraph
               "id" => "1",
               "type" => "WidgetOptions",
               "version" => 1,
-              SCHEMA_VERSION_KEY => 1,
+              JSON_SCHEMA_VERSION_KEY => 1,
               "record" => {"field1" => "value1", "field2" => "value2", "id" => "1"}
             }
 
@@ -377,17 +376,17 @@ module ElasticGraph
             expect_failed_event_error(event, "missing_keys", "type", expect_no_ops: true)
           end
 
-          it "builds operations for an event that carries no `#{SCHEMA_VERSION_KEY}`, since the key is optional" do
-            event = build_upsert_event(:component).except(SCHEMA_VERSION_KEY)
+          it "notifies an error on missing `#{JSON_SCHEMA_VERSION_KEY}`" do
+            event = build_upsert_event(:component).except(JSON_SCHEMA_VERSION_KEY)
 
-            expect(build_expecting_success(event)).not_to be_empty
+            expect_failed_event_error(event, JSON_SCHEMA_VERSION_KEY)
           end
 
           it "notifies an error on wrong field types" do
             event = {
               "op" => "upsert",
               "id" => 1,
-              SCHEMA_VERSION_KEY => 1,
+              JSON_SCHEMA_VERSION_KEY => 1,
               "type" => [],
               "version" => "1",
               "record" => ""

@@ -90,22 +90,13 @@ module MyCompany
 end
 ```
 
-A decoded event hash may carry a `schema_version` to request a specific schema artifact version. The
-key is optional, because an ingestion format may have no versions at all. Each ingestion adapter
-decides what a missing version means for its own format. `elasticgraph-json_ingestion` uses the latest
-available JSON schema version.
+### Ingestion schema versions
 
-Decoders identify their format with an `ingestion_format` key (for example, `"json"`). Adapters use
-that tag to route events independently of whether the format has schema versions. Untagged events
-remain compatible with JSON callers; other formats must supply a tag. A sole adapter receives all
-untagged events so it can provide detailed validation errors, but must still recognize an explicit tag.
+Each ingestion adapter owns its format's schema version requirements, validation, and record preparation.
+The shared indexing pipeline does not require a schema version or translate format-specific version fields.
+JSON publishers must continue to provide `json_schema_version`; the JSON adapter selects the appropriate
+JSON schema and record preparer. Other formats need not adopt JSON's versioning scheme.
 
-A successful ingestion adapter result supplies both a record preparer and a normalized event through
-`IngestionAdapter::ValidationResult.valid(record_preparer, event: normalized_event)`. The normalized
-event must preserve the event's identity, record, and transport metadata without mutating the input.
-For versioned formats, set `schema_version` to the artifact version actually selected for validation
-and preparation. Formats without versions may omit it. Operations, latency logs, and warehouse
-partitions use this normalized envelope.
-
-See [the JSON ingestion upgrade guide](../elasticgraph-json_ingestion/README.md#upgrading-an-existing-json-deployment)
-when upgrading an existing deployment.
+`ElasticGraphIndexingLatencies` logs identify events by type, ID, event version, and message ID;
+they no longer include `json_schema_version`. JSON version fallback diagnostics remain in
+`ElasticGraphMissingJSONSchemaVersion` logs emitted by the JSON adapter.
