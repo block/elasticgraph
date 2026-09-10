@@ -51,3 +51,14 @@ indexer = ElasticGraph::Indexer.from_yaml_file("config/settings/local.yaml")
 events = [] # JSON events read from an async datastream
 indexer.processor.process(events)
 ```
+
+## Ingestion schema versions
+
+Each ingestion adapter owns its format's schema version requirements, validation, and record preparation.
+The shared indexing pipeline does not require a schema version or translate format-specific version fields.
+JSON publishers must continue to provide `json_schema_version`; the JSON adapter selects the appropriate
+JSON schema and record preparer. Other formats need not adopt JSON's versioning scheme.
+
+`ElasticGraphIndexingLatencies` logs identify events by type, ID, event version, and message ID;
+they no longer include `json_schema_version`. JSON version fallback diagnostics remain in
+`ElasticGraphMissingJSONSchemaVersion` logs emitted by the JSON adapter.

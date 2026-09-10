@@ -106,25 +106,32 @@ end
 
 Beyond schema definition, this gem provides an adapter used by `elasticgraph-indexer` to ingest JSON events. The
 adapter validates each event against the JSON schema identified by the event's
-`schema_version` and prepares its record for indexing using that version's view of the schema.
+`json_schema_version` and prepares its record for indexing using that version's view of the schema.
 
 JSON ingestion is enabled automatically for schemas defined with this gem's `SchemaDefinition::APIExtension`;
 no indexer configuration is needed.
 
-### Schema versions
-
-The adapter resolves the version of each event as follows:
-
-- The `schema_version` key selects the JSON schema version. When the exact version is unavailable, the
-  adapter selects the closest available version and logs `ElasticGraphMissingJSONSchemaVersion`.
-- The legacy `json_schema_version` key still works, so a publisher or an in-process caller that predates
-  the ingestion-format-neutral key needs no change.
-- An event that carries neither key gets the latest available JSON schema version. The adapter still
-  validates the event against that version, so a malformed event still fails.
-
 This gem also provides the `be_a_valid_elastic_graph_event` RSpec matcher (via
 `require "elastic_graph/json_ingestion/spec_support/event_matcher"`) for testing that publisher events
 conform to your schema.
+
+## Upgrading an existing JSON deployment
+
+1. Include `elasticgraph-json_ingestion` in the indexer's runtime bundle, including both indexing and
+   warehouse Lambda packages. A dependency restricted to development or schema generation is insufficient.
+2. Enable `ElasticGraph::JSONIngestion::SchemaDefinition::APIExtension` in your schema definition if it
+   is not already enabled. Run `bundle exec rake schema_artifacts:dump` and deploy the regenerated
+   runtime metadata together with the matching gems. Older runtime metadata does not register the adapter.
+3. Change matcher requires from `elastic_graph/indexer/spec_support/event_matcher` to
+   `elastic_graph/json_ingestion/spec_support/event_matcher`. Custom code that used
+   `indexer.record_preparer_factory` can construct `ElasticGraph::JSONIngestion::RecordPreparerFactory`
+   with `indexer.schema_artifacts` instead.
+4. Keep publishing the required `json_schema_version`. The JSON adapter owns schema validation and
+   selects the closest available JSON schema if the requested version is unavailable. Warehouse
+   partitions retain their existing JSON version keys. Indexing latency logs no longer include
+   `json_schema_version`; JSON version fallback diagnostics remain adapter-owned.
+
+Validate an existing publisher event through your deployed transport after upgrading.
 
 ## Dependency Diagram
 
