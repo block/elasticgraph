@@ -51,7 +51,6 @@ module ElasticGraph
             build_failed_result(event, failure.validation_target, failure.message)
           else
             record_preparer = validation_result.record_preparer or raise
-            event = validation_result.event or raise
             if skip_record_validation
               build_success_result_isolating_malformed_records(event, record_preparer, adapter)
             else
