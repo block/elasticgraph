@@ -6,6 +6,7 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/indexer/event"
 require "json"
 
 module ElasticGraph
@@ -22,9 +23,9 @@ module ElasticGraph
       end
 
       # @param payload [String] a raw payload from the transport
-      # @return [Array<Hash<String, Object>>] the decoded ElasticGraph indexing events
+      # @return [Array<Indexer::Event>] the decoded ElasticGraph indexing events
       def decode(payload)
-        payload.split("\n").map { |event| JSON.parse(event) }
+        payload.split("\n").map { |event| Indexer::Event.from(JSON.parse(event)) }
       end
     end
   end

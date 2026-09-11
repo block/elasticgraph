@@ -8,6 +8,7 @@
 
 require "elastic_graph/constants"
 require "elastic_graph/errors"
+require "elastic_graph/indexer/event"
 require "elastic_graph/indexer/event_id"
 require "elastic_graph/indexer/operation/count_accumulator"
 require "elastic_graph/indexer/operation/result"
@@ -17,7 +18,23 @@ require "elastic_graph/support/memoizable_data"
 module ElasticGraph
   class Indexer
     module Operation
-      class Update < Support::MemoizableData.define(:event, :prepared_record, :destination_index_def, :update_target, :doc_id, :destination_index_mapping)
+      UpdateSupertype = Support::MemoizableData.define(:event, :prepared_record, :destination_index_def, :update_target, :doc_id, :destination_index_mapping) do
+        # @implements UpdateSupertype
+        def initialize(event:, prepared_record:, destination_index_def:, update_target:, doc_id:, destination_index_mapping:)
+          attributes = {
+            event: Event.from(event),
+            prepared_record: prepared_record,
+            destination_index_def: destination_index_def,
+            update_target: update_target,
+            doc_id: doc_id,
+            destination_index_mapping: destination_index_mapping
+          } # : ::Hash[::Symbol, untyped]
+          super(**attributes)
+        end
+      end
+      private_constant :UpdateSupertype
+
+      class Update < UpdateSupertype
         # @dynamic event, destination_index_def, doc_id
 
         def self.operations_for(
@@ -27,9 +44,10 @@ module ElasticGraph
           update_target:,
           destination_index_mapping:
         )
+          event = Event.from(event)
           prepared_record = record_preparer.prepare_for_index(
-            event["type"],
-            event["record"] || {"id" => event["id"]},
+            event.type,
+            event.record || {"id" => event.id},
             destination_index_mapping.fetch("properties")
           )
 
@@ -37,7 +55,16 @@ module ElasticGraph
             .fetch_leaf_values_at_path(prepared_record, update_target.id_source.split("."))
             .reject { |id| id.to_s.strip.empty? }
             .uniq
-            .map { |doc_id| new(event, prepared_record, destination_index_def, update_target, doc_id, destination_index_mapping) }
+            .map do |doc_id|
+              new(
+                event: event,
+                prepared_record: prepared_record,
+                destination_index_def: destination_index_def,
+                update_target: update_target,
+                doc_id: doc_id,
+                destination_index_mapping: destination_index_mapping
+              )
+            end
         end
 
         def to_datastore_bulk
@@ -78,10 +105,10 @@ module ElasticGraph
         end
 
         def description
-          if update_target.type == event.fetch("type")
+          if update_target.type == event.type
             "#{update_target.type} update"
           else
-            "#{update_target.type} update (from #{event.fetch("type")})"
+            "#{update_target.type} update (from #{event.type})"
           end
         end
 
@@ -141,7 +168,7 @@ module ElasticGraph
         def script_params
           initial_params = update_target.params_for(
             doc_id: doc_id,
-            event: event,
+            event: event.to_h,
             prepared_record: prepared_record
           )
 

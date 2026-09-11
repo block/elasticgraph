@@ -76,7 +76,7 @@ module ElasticGraph
           },
           extension_modules: Support::Config::EXTENSION_MODULE_SCHEMA,
           indexing_event_decoder: {
-            description: "Extension object used to decode raw indexing payloads into ElasticGraph indexing event hashes. " \
+            description: "Extension object used to decode raw indexing payloads into ElasticGraph indexing event values. " \
               "Required when using a transport that delivers encoded payloads (such as the SQS lambdas). Ingestion " \
               "format gems provide decoder implementations.",
             type: ["object", "null"],

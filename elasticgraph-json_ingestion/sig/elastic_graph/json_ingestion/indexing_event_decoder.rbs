@@ -7,7 +7,7 @@ module ElasticGraph
         logger: ::Logger
       ) -> void
 
-      def decode: (::String) -> ::Array[::Hash[::String, untyped]]
+      def decode: (::String) -> ::Array[Indexer::Event]
     end
   end
 end

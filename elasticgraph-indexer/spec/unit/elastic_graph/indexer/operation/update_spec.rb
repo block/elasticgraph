@@ -614,6 +614,7 @@ module ElasticGraph
         end
 
         def be_an_update_result_with(**attributes)
+          attributes[:event] = Event.from(attributes[:event]) if attributes.key?(:event)
           be_a(Result).and have_attributes(operation_type: :update, **attributes)
         end
 

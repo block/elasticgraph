@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/errors"
+require "elastic_graph/indexer/event"
 require "elastic_graph/indexer/indexing_failures_error"
 require "json"
 
@@ -75,7 +76,8 @@ module ElasticGraph
 
           metadata = (record["messageAttributes"] || {}).transform_values { |attribute| attribute["stringValue"] }
           decoded_events_from(record.fetch("body"), metadata: metadata).map do |event|
-            ElasticGraph::Support::HashUtil.deep_merge(event, sqs_metadata)
+            event = Indexer::Event.from(event)
+            Indexer::Event.from(ElasticGraph::Support::HashUtil.deep_merge(event.to_h, sqs_metadata))
           end
         end.tap do
           @logger.info({
@@ -143,8 +145,8 @@ module ElasticGraph
       # Formats the response, including any failures, based on
       # https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html#services-sqs-batchfailurereporting
       def format_response(failures)
-        failure_ids = failures.map do |failure| # $ {"itemIdentifier" => String}
-          {"itemIdentifier" => failure.event["message_id"]}
+        failure_ids = failures.map do |failure| # $ {"itemIdentifier" => String?}
+          {"itemIdentifier" => Indexer::Event.from(failure.event).message_id}
         end
 
         if failure_ids.any? { |f| f.fetch("itemIdentifier").nil? }
@@ -153,7 +155,8 @@ module ElasticGraph
           raise Errors::MessageIdsMissingError, "Unexpected: some failures did not have a `message_id`, so we are raising an exception instead of returning `batchItemFailures`."
         end
 
-        {"batchItemFailures" => failure_ids}
+        non_nil_failure_ids = failure_ids # : ::Array[{"itemIdentifier" => ::String}]
+        {"batchItemFailures" => non_nil_failure_ids}
       end
     end
   end

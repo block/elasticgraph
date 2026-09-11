@@ -120,7 +120,7 @@ conform to your schema.
 ## Indexing Event Decoding
 
 This gem also provides `ElasticGraph::JSONIngestion::IndexingEventDecoder`, which decodes JSON Lines payloads
-into ElasticGraph indexing event hashes. Configure it as your indexer's indexing event decoder (generated
+into `ElasticGraph::Indexer::Event` values. Configure it as your indexer's indexing event decoder (generated
 ElasticGraph projects include this configuration):
 
 ```yaml

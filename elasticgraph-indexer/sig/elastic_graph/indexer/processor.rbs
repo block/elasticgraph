@@ -9,8 +9,8 @@ module ElasticGraph
         ?clock: singleton(::Time)
       ) -> void
 
-      def process: (::Array[event], ?refresh_indices: bool) -> void
-      def process_returning_failures: (::Array[event], ?refresh_indices: bool) -> ::Array[FailedEventError]
+      def process: (::Array[event | ::Hash[::String, untyped]], ?refresh_indices: bool) -> void
+      def process_returning_failures: (::Array[event | ::Hash[::String, untyped]], ?refresh_indices: bool) -> ::Array[FailedEventError]
 
       private
 

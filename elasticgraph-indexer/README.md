@@ -53,7 +53,7 @@ indexer.processor.process(events)
 
 Ingesting encoded payloads from a transport (such as the SQS lambdas) requires an indexing event decoder extension,
 configured via the `indexer.indexing_event_decoder` setting. Decoders turn raw payload strings into ElasticGraph
-indexing event hashes before the normal validation and indexing pipeline runs. Ingestion format gems provide decoder
+`Indexer::Event` values before the normal validation and indexing pipeline runs. Ingestion format gems provide decoder
 implementations, or you can define your own:
 
 ```yaml
@@ -83,7 +83,8 @@ module MyCompany
       end
 
       def decode(payload)
-        # Must return an array of ElasticGraph indexing event hashes.
+        # Must return an array of `::ElasticGraph::Indexer::Event` values. Build each one with
+        # `::ElasticGraph::Indexer::Event.from(decoded_event_hash)`.
       end
     end
   end

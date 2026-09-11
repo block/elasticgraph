@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/errors"
+require "elastic_graph/indexer/event"
 require "elastic_graph/indexer/event_id"
 require "elastic_graph/indexer/indexing_failures_error"
 require "time"
@@ -33,6 +34,7 @@ module ElasticGraph
       # still be written to the datastore. No attempt is made to provide atomic "all or nothing"
       # behavior.
       def process(events, refresh_indices: false)
+        events = events.map { |event| Event.from(event) }
         failures = process_returning_failures(events, refresh_indices: refresh_indices)
         return if failures.empty?
         raise IndexingFailuresError.for(failures: failures, events: events)
@@ -41,6 +43,7 @@ module ElasticGraph
       # Like `process`, but returns failures instead of raising an exception.
       # The caller is responsible for handling the failures.
       def process_returning_failures(events, refresh_indices: false)
+        events = events.map { |event| Event.from(event) }
         factory_results_by_event = events.to_h { |event| [event, @operation_factory.build(event)] }
 
         factory_results = factory_results_by_event.values
@@ -126,10 +129,11 @@ module ElasticGraph
         all_operations_events = successful_events + noop_events
 
         all_operations_events.each do |event|
+          event = Event.from(event)
           latencies_in_ms_from = {} # : Hash[String, Integer]
           slo_results = {} # : Hash[String, String]
 
-          latency_timestamps = event.fetch("latency_timestamps", _ = {})
+          latency_timestamps = event.latency_timestamps || {}
           latency_timestamps.each do |ts_name, ts_value|
             metric_value = ((current_time - Time.iso8601(ts_value)) * 1000).round
 
@@ -144,8 +148,8 @@ module ElasticGraph
 
           @logger.info({
             "message_type" => "ElasticGraphIndexingLatencies",
-            "message_id" => event["message_id"],
-            "event_type" => event.fetch("type"),
+            "message_id" => event.message_id,
+            "event_type" => event.type,
             "event_id" => EventID.from_event(event).to_s,
             "latencies_in_ms_from" => latencies_in_ms_from,
             "slo_results" => slo_results,
