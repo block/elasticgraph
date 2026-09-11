@@ -6,8 +6,9 @@
 #
 # frozen_string_literal: true
 
-require "elastic_graph/indexer"
 require "elastic_graph/constants"
+require "elastic_graph/indexer"
+require "elastic_graph/indexer/ingestion_adapter/json_events"
 require "elastic_graph/indexer/operation/factory"
 require "elastic_graph/spec_support/builds_indexer_operation"
 require "json"
@@ -311,12 +312,17 @@ module ElasticGraph
           # A factory whose record preparation fails for a reason record validation cannot detect: a
           # runtime metadata defect, standing in for any bug that is not about the data itself.
           def factory_whose_record_preparation_is_broken
-            record_preparer_factory = instance_double(RecordPreparer::Factory)
+            record_preparer = instance_double(RecordPreparer)
 
-            allow(record_preparer_factory).to receive(:for_json_schema_version)
+            allow(record_preparer).to receive(:prepare_for_index)
               .and_raise(::KeyError, 'key not found: "nameInIndex"')
 
-            indexer.operation_factory.with(record_preparer_factory: record_preparer_factory)
+            adapter = indexer.ingestion_adapters_by_format.fetch("json")
+            allow(adapter).to receive(:validate_event).and_wrap_original do |original, *args, **kwargs|
+              original.call(*args, **kwargs).with(record_preparer: record_preparer)
+            end
+
+            indexer.operation_factory
           end
 
           it "generates a primary indexing operation for a single index with latency metrics" do
@@ -677,6 +683,45 @@ module ElasticGraph
             end
           end
 
+          it "uses a registered non-JSON adapter for events in that alternate format" do
+            event = build_upsert_event(:component, id: "1", __version: 1).merge(INGESTION_FORMAT_KEY => "other")
+            other_adapter = instance_spy(
+              IngestionAdapter::Interface,
+              validate_event: IngestionAdapter::ValidationResult.valid(RecordPreparer::Identity)
+            )
+            factory = indexer.operation_factory.with(ingestion_adapters_by_format: {"other" => other_adapter})
+
+            expect(factory.build(event).operations).not_to be_empty
+
+            expect(other_adapter).to have_received(:validate_event).with(event, skip_record_validation: false)
+          end
+
+          it "fails with an actionable message when no adapter is registered for the format" do
+            event = build_upsert_event(:component, id: "1", __version: 1).merge(INGESTION_FORMAT_KEY => "proto")
+            adapter = instance_spy(IngestionAdapter::Interface)
+            factory = indexer.operation_factory.with(ingestion_adapters_by_format: {"json" => adapter})
+
+            expect_failed_event_error(
+              event,
+              "No ingestion adapter is registered for format \"proto\"",
+              "Available formats: json",
+              factory: factory
+            )
+            expect(adapter).not_to have_received(:validate_event)
+          end
+
+          it "accepts explicitly tagged JSON events" do
+            event = build_upsert_event(:component, id: "1", __version: 1).merge(INGESTION_FORMAT_KEY => "json")
+
+            expect(build_expecting_success(event)).not_to be_empty
+          end
+
+          it "treats an untagged event as JSON for backwards compatibility" do
+            event = build_upsert_event(:component, id: "1", __version: 1)
+
+            expect(build_expecting_success(event)).not_to be_empty
+          end
+
           def expect_failed_event_error(event, *error_message_snippets, factory: indexer.operation_factory, expect_no_ops: false)
             result = factory.build(event)
 
@@ -718,12 +763,22 @@ module ElasticGraph
         end
 
         def build_expecting_success(event, **options, &configure_record_validator)
-          result = indexer
-            .operation_factory
-            .with(configure_record_validator: configure_record_validator)
-            .build(event, **options)
+          factory = indexer.operation_factory
 
-          raise result.failed_event_error if result.failed_event_error
+          if configure_record_validator
+            json_events_adapter = IngestionAdapter::JSONEvents.new(
+              schema_artifacts: indexer.schema_artifacts,
+              logger: indexer.logger,
+              configure_record_validator: configure_record_validator
+            )
+
+            factory = factory.with(ingestion_adapters_by_format: {"json" => json_events_adapter})
+          end
+
+          result = factory.build(event, **options)
+
+          failure = result.failed_event_error
+          raise failure if failure
           result.operations
         end
 

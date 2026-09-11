@@ -68,6 +68,11 @@ module ElasticGraph
                   "description" => "The version of the JSON schema the publisher was using when the event was published. ElasticGraph will use the JSON schema matching this version to process the event.",
                   "const" => json_schema_version
                 },
+                INGESTION_FORMAT_KEY => {
+                  "description" => "The format used to encode this event.",
+                  "type" => "string",
+                  "default" => "json"
+                },
                 "message_id" => {
                   "description" => "The optional ID of the message containing this event from whatever messaging system is being used between the publisher and the ElasticGraph indexer.",
                   "type" => "string"

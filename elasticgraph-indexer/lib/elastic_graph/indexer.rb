@@ -30,6 +30,7 @@ module ElasticGraph
       config:,
       datastore_core:,
       datastore_router: nil,
+      ingestion_adapters_by_format: nil,
       monotonic_clock: nil,
       clock: nil
     )
@@ -37,6 +38,7 @@ module ElasticGraph
       @datastore_core = datastore_core
       @logger = datastore_core.logger
       @datastore_router = datastore_router
+      @ingestion_adapters_by_format = ingestion_adapters_by_format
       @schema_artifacts = @datastore_core.schema_artifacts
       @monotonic_clock = monotonic_clock
       @clock = clock || ::Time
@@ -63,6 +65,16 @@ module ElasticGraph
       end
     end
 
+    # The ingestion adapters available for processing events, keyed by the format tag used by
+    # their events. For now, only the JSON events adapter is available; indexer extension modules
+    # will be able to contribute additional adapters as alternate ingestion formats are supported.
+    def ingestion_adapters_by_format
+      @ingestion_adapters_by_format ||= begin
+        require "elastic_graph/indexer/ingestion_adapter/json_events"
+        {"json" => IngestionAdapter::JSONEvents.new(schema_artifacts: schema_artifacts, logger: logger)}
+      end
+    end
+
     def processor
       @processor ||= begin
         require "elastic_graph/indexer/processor"
@@ -82,11 +94,10 @@ module ElasticGraph
         Operation::Factory.new(
           schema_artifacts: schema_artifacts,
           index_definitions_by_graphql_type: datastore_core.index_definitions_by_graphql_type,
-          record_preparer_factory: record_preparer_factory,
+          ingestion_adapters_by_format: ingestion_adapters_by_format,
           logger: datastore_core.logger,
           skip_derived_indexing_type_updates: config.skip_derived_indexing_type_updates,
-          skip_record_validation_percents_by_type: config.skip_record_validation_percents_by_type,
-          configure_record_validator: nil
+          skip_record_validation_percents_by_type: config.skip_record_validation_percents_by_type
         )
       end
     end

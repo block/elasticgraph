@@ -152,7 +152,8 @@ module ElasticGraph
         def build_expecting_success(event, **options)
           result = operation_factory.build(event, **options)
           # simplecov:disable -- our norm is to have no failure
-          raise result.failed_event_error if result.failed_event_error
+          failure = result.failed_event_error
+          raise failure if failure
           # simplecov:enable
           result.operations
         end
