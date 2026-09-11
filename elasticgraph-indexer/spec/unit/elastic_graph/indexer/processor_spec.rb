@@ -134,9 +134,12 @@ module ElasticGraph
             component = upsert_event_with_latency_timestamps(:component, 36, 72).except(JSON_SCHEMA_VERSION_KEY)
             adapter = instance_double(IngestionAdapter::Interface,
               validate_event: IngestionAdapter::ValidationResult.valid(RecordPreparer::Identity))
-            allow(indexer).to receive(:ingestion_adapters).and_return([adapter])
+            indexer_with_adapter = build_indexer_with(
+              latency_thresholds: {},
+              ingestion_adapters_by_format: {"json" => adapter}
+            )
 
-            process([component])
+            indexer_with_adapter.processor.process([component], refresh_indices: true)
 
             expect(logged_jsons_of_type("ElasticGraphIndexingLatencies")).to contain_exactly(a_hash_including(
               "event_type" => "Component",
