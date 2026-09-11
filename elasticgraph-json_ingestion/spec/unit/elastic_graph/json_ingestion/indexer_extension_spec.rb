@@ -22,6 +22,13 @@ module ElasticGraph
         expect(result.failed_event_error).to be nil
         expect(result.operations).not_to be_empty
       end
+
+      it "preserves an explicitly injected ingestion adapter registry" do
+        adapters = {"custom" => Object.new}
+        indexer = build_indexer(ingestion_adapters_by_format: adapters)
+
+        expect(indexer.ingestion_adapters_by_format).to be(adapters)
+      end
     end
   end
 end
