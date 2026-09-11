@@ -6,10 +6,14 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/spec_support/json_record_preparation"
+
 module ElasticGraph
   module SpecSupport
     # Provides test support for building primary indexing operations.
     module BuildsIndexerOperation
+      include JSONRecordPreparation
+
       # Builds a primary indexing operation (Indexer::Operation::Update) for the given event.
       #
       # @param event [Hash] The event hash containing "type", "id", and "record"
@@ -32,7 +36,7 @@ module ElasticGraph
 
         Indexer::Operation::Update.new(
           event: event,
-          prepared_record: idxr.record_preparer_factory.for_latest_json_schema_version.prepare_for_index(
+          prepared_record: latest_json_record_preparer_for(idxr).prepare_for_index(
             event.fetch("type"),
             event.fetch("record"),
             idxr.schema_artifacts.index_mappings_by_index_def_name.fetch(index_def.name).fetch("properties")

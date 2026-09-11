@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/datastore_core"
+require "elastic_graph/errors"
 require "elastic_graph/indexer/config"
 require "elastic_graph/support/from_yaml_file"
 
@@ -58,21 +59,10 @@ module ElasticGraph
       end
     end
 
-    def record_preparer_factory
-      @record_preparer_factory ||= begin
-        require "elastic_graph/indexer/record_preparer"
-        RecordPreparer::Factory.new(schema_artifacts)
-      end
-    end
-
-    # The ingestion adapters available for processing events, keyed by the format tag used by
-    # their events. For now, only the JSON events adapter is available; indexer extension modules
-    # will be able to contribute additional adapters as alternate ingestion formats are supported.
+    # The ingestion adapters available for processing events, keyed by format. An injected registry
+    # replaces the defaults contributed by ingestion format extensions.
     def ingestion_adapters_by_format
-      @ingestion_adapters_by_format ||= begin
-        require "elastic_graph/indexer/ingestion_adapter/json_events"
-        {"json" => IngestionAdapter::JSONEvents.new(schema_artifacts: schema_artifacts, logger: logger)}
-      end
+      @ingestion_adapters_by_format ||= default_ingestion_adapters_by_format
     end
 
     def processor
@@ -90,6 +80,11 @@ module ElasticGraph
 
     def operation_factory
       @operation_factory ||= begin
+        if ingestion_adapters_by_format.empty?
+          raise Errors::ConfigError, "No ingestion adapters are available. Enable an ingestion format extension " \
+            "in your schema definition and regenerate the schema artifacts, or configure `indexer.extension_modules`."
+        end
+
         require "elastic_graph/indexer/operation/factory"
         Operation::Factory.new(
           schema_artifacts: schema_artifacts,
@@ -107,6 +102,13 @@ module ElasticGraph
         require "elastic_graph/support/monotonic_clock"
         Support::MonotonicClock.new
       end
+    end
+
+    private
+
+    # Ingestion format extensions override this hook to contribute default adapters via `super`.
+    def default_ingestion_adapters_by_format
+      {}
     end
   end
 end

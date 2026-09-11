@@ -20,9 +20,6 @@ module ElasticGraph
     @datastore_router: Indexer::_DatastoreRouter?
     def datastore_router: () -> Indexer::_DatastoreRouter
 
-    @record_preparer_factory: RecordPreparer::Factory?
-    def record_preparer_factory: () -> RecordPreparer::Factory
-
     @processor: Processor?
     def processor: () -> Processor
 
@@ -36,6 +33,8 @@ module ElasticGraph
     def monotonic_clock: () -> Support::MonotonicClock
 
     private
+
+    def default_ingestion_adapters_by_format: () -> ::Hash[::String, IngestionAdapter::_Adapter]
 
     @clock: singleton(::Time)
   end

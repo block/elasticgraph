@@ -41,9 +41,9 @@ target :elasticgraph_gems do
     elasticgraph-graphql/lib/elastic_graph/graphql/schema/type.rb
   ])
 
-  # elasticgraph-indexer: existing files that don't type check yet.
+  # elasticgraph-json_ingestion: RSpec matcher DSL that doesn't type check.
   ignore(*%w[
-    elasticgraph-indexer/lib/elastic_graph/indexer/spec_support/event_matcher.rb
+    elasticgraph-json_ingestion/lib/elastic_graph/json_ingestion/spec_support/event_matcher.rb
   ])
 
   # elasticgraph-local: existing files that don't type check yet.

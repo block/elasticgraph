@@ -29,7 +29,7 @@ RSpec.shared_context "indexing preparer support", :json_ingestion_schema_definit
       schema.object_type "Object" do |t|
         t.field "scalar", scalar_type
       end
-    end).record_preparer_factory.for_latest_json_schema_version
+    end).then { |indexer| latest_json_record_preparer_for(indexer) }
   end
 
   def prepare_scalar_value(value)

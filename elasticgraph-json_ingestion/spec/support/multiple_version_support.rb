@@ -9,11 +9,11 @@
 require "elastic_graph/spec_support/schema_definition_helpers"
 
 module ElasticGraph
-  class Indexer
+  module JSONIngestion
     ::RSpec.shared_context "MultipleVersionSupport", :json_ingestion_schema_definition do
       include_context "SchemaDefinitionHelpers"
 
-      def build_indexer_with_multiple_schema_versions(schema_versions:)
+      def build_schema_artifacts_with_multiple_versions(schema_versions:)
         results_by_version = schema_versions.to_h do |json_schema_version, prior_def|
           results = define_schema(schema_element_name_form: :snake_case, json_schema_version: json_schema_version, &prior_def)
           [json_schema_version, results]
@@ -31,7 +31,7 @@ module ElasticGraph
           json_schemas_by_version.fetch(version)
         end
 
-        build_indexer(schema_artifacts: artifacts)
+        artifacts
       end
     end
   end
