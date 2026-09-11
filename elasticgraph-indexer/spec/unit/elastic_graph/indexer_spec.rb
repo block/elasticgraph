@@ -116,8 +116,8 @@ module ElasticGraph
         expect(decoder.schema_artifacts).to be(indexer.schema_artifacts)
         expect(decoder.logger).to be(indexer.logger)
         expect(decoder.decode("one|two")).to eq([
-          {"value" => "one"},
-          {"value" => "two"}
+          Indexer::Event.from("value" => "one"),
+          Indexer::Event.from("value" => "two")
         ])
       end
 

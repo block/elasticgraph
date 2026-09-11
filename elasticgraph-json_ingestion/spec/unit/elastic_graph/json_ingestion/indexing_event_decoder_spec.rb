@@ -21,8 +21,8 @@ module ElasticGraph
         JSONL
 
         expect(decoder.decode(payload)).to eq([
-          {"op" => "upsert", "id" => "1"},
-          {"op" => "upsert", "id" => "2"}
+          Indexer::Event.from("op" => "upsert", "id" => "1"),
+          Indexer::Event.from("op" => "upsert", "id" => "2")
         ])
       end
 

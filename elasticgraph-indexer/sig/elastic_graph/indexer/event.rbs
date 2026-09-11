@@ -1,0 +1,26 @@
+module ElasticGraph
+  class Indexer
+    class EventSupertype < ::Data
+      attr_reader payload: ::Hash[::String, untyped]
+
+      def initialize: (payload: ::Hash[::String, untyped]) -> void
+      def self.new: (payload: ::Hash[::String, untyped]) -> instance
+      def self.members: () -> ::Array[::Symbol]
+    end
+
+    class Event < EventSupertype
+      def self.from: (Event | ::Hash[::String, untyped]) -> Event
+
+      def op: () -> ::String
+      def type: () -> ::String
+      def id: () -> ::String
+      def version: () -> ::Integer
+      def record: () -> untyped
+      def ingestion_format: () -> ::String?
+      def message_id: () -> ::String?
+      def latency_timestamps: () -> ::Hash[::String, ::String]?
+      def with_payload: (::Hash[::String, untyped]) -> Event
+      def to_h: () -> ::Hash[::String, untyped]
+    end
+  end
+end

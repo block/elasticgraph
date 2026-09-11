@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/errors"
+require "elastic_graph/indexer/event"
 require "elastic_graph/indexer/event_id"
 
 module ElasticGraph
@@ -38,7 +39,7 @@ module ElasticGraph
 
       def initialize(event:, operations:, main_message:)
         @main_message = main_message
-        @event = event
+        @event = Event.from(event)
         @operations = operations
 
         super("#{full_id}: #{main_message}")
@@ -52,7 +53,7 @@ module ElasticGraph
 
       def full_id
         event_id = EventID.from_event(event).to_s
-        if (message_id = event["message_id"])
+        if (message_id = event.message_id)
           "#{event_id} (message_id: #{message_id})"
         else
           event_id
@@ -60,23 +61,23 @@ module ElasticGraph
       end
 
       def id
-        event["id"]
+        event.id
       end
 
       def op
-        event["op"]
+        event.op
       end
 
       def type
-        event["type"]
+        event.type
       end
 
       def version
-        event["version"]
+        event.version
       end
 
       def record
-        event["record"]
+        event.record
       end
     end
   end

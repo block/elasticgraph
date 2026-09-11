@@ -18,7 +18,7 @@ module ElasticGraph
         # Validates the given event and resolves the record preparer appropriate for the event's
         # ingestion schema version. The indexer selects this adapter from the event's format tag.
         #
-        # @param event [Hash<String, Object>] an ElasticGraph indexing event
+        # @param event [Event] an ElasticGraph indexing event
         # @param skip_record_validation [Boolean] whether to skip record validation; the event envelope must still be validated
         # @return [ValidationResult] the result of validating the event
         def validate_event(event, skip_record_validation: false)

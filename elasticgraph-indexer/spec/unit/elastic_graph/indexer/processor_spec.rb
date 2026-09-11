@@ -68,7 +68,7 @@ module ElasticGraph
 
           before do
             allow(datastore_router).to receive(:bulk) do |ops, **options|
-              expect(ops.map(&:event)).to eq([component1, component2, component3])
+              expect(ops.map { |op| op.event.to_h }).to eq([component1, component2, component3])
 
               DatastoreIndexingRouter::BulkResult.new({"main" => [
                 [ops[0], Operation::Result.success_of(ops[0])],
@@ -187,7 +187,7 @@ module ElasticGraph
               # simulate the update with id == `no_op_update` being an ignored event due to the version not increasing
               ops_and_results = ops.map do |op|
                 result =
-                  if op.event.fetch("id") == "no_op_update"
+                  if op.event.id == "no_op_update"
                     Operation::Result.noop_of(op, "was a noop")
                   else
                     Operation::Result.success_of(op)

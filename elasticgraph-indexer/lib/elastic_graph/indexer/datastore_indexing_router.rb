@@ -8,6 +8,7 @@
 
 require "elastic_graph/constants"
 require "elastic_graph/errors"
+require "elastic_graph/indexer/event"
 require "elastic_graph/indexer/event_id"
 require "elastic_graph/indexer/indexing_failures_error"
 require "elastic_graph/support/opaque_id"
@@ -269,7 +270,7 @@ module ElasticGraph
 
       def opaque_id_parts_for_source_event_versions(operations)
         type_counts = operations
-          .group_by { |op| op.event.fetch("type") }
+          .group_by { |op| Event.from(op.event).type }
           .sort_by(&:first)
           .map { |type_name, ops| "#{type_name}:#{ops.size}" }
 

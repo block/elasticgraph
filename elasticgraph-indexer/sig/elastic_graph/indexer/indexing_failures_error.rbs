@@ -3,7 +3,7 @@ module ElasticGraph
     class IndexingFailuresError < Errors::Error
       def self.for: (
         failures: ::Array[Indexer::FailedEventError],
-        events: ::Array[::Hash[::String, untyped]]
+        events: ::Array[event]
       ) -> IndexingFailuresError
     end
   end

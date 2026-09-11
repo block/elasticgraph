@@ -6,6 +6,8 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/indexer/event"
+
 class ExampleIndexingEventDecoder
   attr_reader :config, :schema_artifacts, :logger
 
@@ -16,7 +18,7 @@ class ExampleIndexingEventDecoder
   end
 
   def decode(payload)
-    payload.split(config.fetch("delimiter")).map { |value| {"value" => value} }
+    payload.split(config.fetch("delimiter")).map { |value| ElasticGraph::Indexer::Event.from("value" => value) }
   end
 end
 

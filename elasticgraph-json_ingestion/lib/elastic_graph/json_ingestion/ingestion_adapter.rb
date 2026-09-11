@@ -36,24 +36,25 @@ module ElasticGraph
       # Validates the given event and resolves the record preparer appropriate for the event's
       # JSON schema version.
       #
-      # @param event [Hash<String, Object>] an ElasticGraph indexing event
+      # @param event [Indexer::Event] an ElasticGraph indexing event
       # @param skip_record_validation [Boolean] whether to skip record validation; the event envelope must still be validated
       # @return [Indexer::IngestionAdapter::ValidationResult] the result of validating the event
       def validate_event(event, skip_record_validation: false)
+        event = Indexer::Event.from(event)
         selected_json_schema_version = select_json_schema_version(event) { |failure| return failure }
 
         # Because the `select_json_schema_version` picks the closest-matching json schema version, the incoming
         # event might not match the expected json_schema_version value in the json schema (which is a `const` field).
         # This is by design, since we're picking a schema based on best-effort, so to avoid that by-design validation error,
         # performing the envelope validation on a "patched" version of the event.
-        event_with_patched_envelope = event.except(INGESTION_FORMAT_KEY).merge({JSON_SCHEMA_VERSION_KEY => selected_json_schema_version})
+        event_with_patched_envelope = event.to_h.except(INGESTION_FORMAT_KEY).merge({JSON_SCHEMA_VERSION_KEY => selected_json_schema_version})
 
         if (error_message = validator(EVENT_ENVELOPE_JSON_SCHEMA_NAME, selected_json_schema_version).validate_with_error_message(event_with_patched_envelope))
           return ValidationResult.invalid(validation_target: "event payload", message: error_message)
         end
 
-        record = event.fetch("record")
-        graphql_type_name = event.fetch("type")
+        record = event.record
+        graphql_type_name = event.type
 
         if !skip_record_validation && (error_message = validator(graphql_type_name, selected_json_schema_version).validate_with_error_message(record))
           return ValidationResult.invalid(validation_target: "#{graphql_type_name} record", message: error_message)
@@ -67,10 +68,10 @@ module ElasticGraph
       def select_json_schema_version(event)
         available_json_schema_versions = @schema_artifacts.available_json_schema_versions
 
-        requested_json_schema_version = event[JSON_SCHEMA_VERSION_KEY]
+        requested_json_schema_version = event.to_h[JSON_SCHEMA_VERSION_KEY]
 
         # First check that a valid value has been requested (a positive integer)
-        if !event.key?(JSON_SCHEMA_VERSION_KEY)
+        if !event.to_h.key?(JSON_SCHEMA_VERSION_KEY)
           yield ValidationResult.invalid(validation_target: JSON_SCHEMA_VERSION_KEY, message: "Event lacks a `#{JSON_SCHEMA_VERSION_KEY}`")
         elsif !requested_json_schema_version.is_a?(Integer) || requested_json_schema_version < 1
           yield ValidationResult.invalid(validation_target: JSON_SCHEMA_VERSION_KEY, message: "#{JSON_SCHEMA_VERSION_KEY} (#{requested_json_schema_version}) must be a positive integer.")
@@ -90,9 +91,9 @@ module ElasticGraph
         if selected_json_schema_version != requested_json_schema_version
           @logger.info({
             "message_type" => "ElasticGraphMissingJSONSchemaVersion",
-            "message_id" => event["message_id"],
+            "message_id" => event.message_id,
             "event_id" => Indexer::EventID.from_event(event),
-            "event_type" => event["type"],
+            "event_type" => event.type,
             "requested_json_schema_version" => requested_json_schema_version,
             "selected_json_schema_version" => selected_json_schema_version
           })
@@ -101,7 +102,7 @@ module ElasticGraph
         if selected_json_schema_version.nil?
           yield ValidationResult.invalid(
             validation_target: JSON_SCHEMA_VERSION_KEY,
-            message: "Failed to select json schema version. Requested version: #{event[JSON_SCHEMA_VERSION_KEY]}. \
+            message: "Failed to select json schema version. Requested version: #{event.to_h[JSON_SCHEMA_VERSION_KEY]}. \
             Available json schema versions: #{available_json_schema_versions.sort.join(", ")}"
           )
         end

@@ -1,8 +1,8 @@
 module ElasticGraph
   class Indexer
     module Operation
-      class UpdateSupertype
-        attr_reader event: event
+      class UpdateSupertype < ::Data
+        attr_reader event: Event
         attr_reader prepared_record: ::Hash[::String, untyped]
         attr_reader destination_index_def: DatastoreCore::_IndexDefinition
         attr_reader update_target: SchemaArtifacts::RuntimeMetadata::UpdateTarget
@@ -10,16 +10,25 @@ module ElasticGraph
         attr_reader destination_index_mapping: ::Hash[::String, untyped]
 
         def initialize: (
-          event,
-          ::Hash[::String, untyped],
-          DatastoreCore::_IndexDefinition,
-          SchemaArtifacts::RuntimeMetadata::UpdateTarget,
-          ::String,
-          ::Hash[::String, untyped]
+          event: Event | ::Hash[::String, untyped],
+          prepared_record: ::Hash[::String, untyped],
+          destination_index_def: DatastoreCore::_IndexDefinition,
+          update_target: SchemaArtifacts::RuntimeMetadata::UpdateTarget,
+          doc_id: ::String,
+          destination_index_mapping: ::Hash[::String, untyped]
         ) -> void
 
+        def self.new: (
+          event: Event | ::Hash[::String, untyped],
+          prepared_record: ::Hash[::String, untyped],
+          destination_index_def: DatastoreCore::_IndexDefinition,
+          update_target: SchemaArtifacts::RuntimeMetadata::UpdateTarget,
+          doc_id: ::String,
+          destination_index_mapping: ::Hash[::String, untyped]
+        ) -> instance
+
         def self.with: (
-          event: event,
+          event: Event | ::Hash[::String, untyped],
           prepared_record: ::Hash[::String, untyped],
           destination_index_def: DatastoreCore::_IndexDefinition,
           update_target: SchemaArtifacts::RuntimeMetadata::UpdateTarget,
@@ -28,7 +37,7 @@ module ElasticGraph
         ) -> Update
 
         def with: (
-          ?event: event,
+          ?event: Event | ::Hash[::String, untyped],
           ?prepared_record: ::Hash[::String, untyped],
           ?destination_index_def: DatastoreCore::_IndexDefinition,
           ?update_target: SchemaArtifacts::RuntimeMetadata::UpdateTarget,

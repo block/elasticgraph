@@ -35,9 +35,9 @@ module ElasticGraph
 
           sqs_processor.process(lambda_event)
 
-          expect(indexer_processor).to have_received(:process_returning_failures).with([
+          expect(indexer_processor).to have_received(:process_returning_failures).with(events(
             {"field1" => {}, "message_id" => "a"}
-          ], refresh_indices: false)
+          ), refresh_indices: false)
         end
 
         it "processes a lambda event containing multiple SQS messages" do
@@ -51,11 +51,11 @@ module ElasticGraph
 
           sqs_processor.process(lambda_event)
 
-          expect(indexer_processor).to have_received(:process_returning_failures).with([
+          expect(indexer_processor).to have_received(:process_returning_failures).with(events(
             {"field1" => {}, "message_id" => "a"},
             {"field2" => {}, "message_id" => "b"},
             {"field3" => {}, "message_id" => "c"}
-          ], refresh_indices: false)
+          ), refresh_indices: false)
         end
 
         it "processes a lambda event containing multiple ElasticGraph events in the SQS messages" do
@@ -68,13 +68,13 @@ module ElasticGraph
 
           sqs_processor.process(lambda_event)
 
-          expect(indexer_processor).to have_received(:process_returning_failures).with([
+          expect(indexer_processor).to have_received(:process_returning_failures).with(events(
             {"field1" => {}, "message_id" => "a"},
             {"field2" => {}, "message_id" => "a"},
             {"field3" => {}, "message_id" => "b"},
             {"field4" => {}, "message_id" => "b"},
             {"field5" => {}, "message_id" => "b"}
-          ], refresh_indices: false)
+          ), refresh_indices: false)
         end
 
         it "uses the configured indexing event decoder" do
@@ -88,9 +88,9 @@ module ElasticGraph
           build_sqs_processor(indexing_event_decoder: custom_decoder).process(lambda_event)
 
           expect(custom_decoder).to have_received(:decode).with("not-json")
-          expect(indexer_processor).to have_received(:process_returning_failures).with([
+          expect(indexer_processor).to have_received(:process_returning_failures).with(events(
             {"field1" => {}, "message_id" => "a"}
-          ], refresh_indices: false)
+          ), refresh_indices: false)
         end
 
         it "passes transport attributes to metadata-aware decoders for direct and S3-offloaded payloads" do
@@ -118,11 +118,11 @@ module ElasticGraph
             "protobuf-payload", metadata: {"eg_type" => "Widget", "eg_version" => "7"}
           ).twice
           expect(custom_decoder).to have_received(:decode_with_metadata).with("protobuf-payload", metadata: {})
-          expect(indexer_processor).to have_received(:process_returning_failures).with([
+          expect(indexer_processor).to have_received(:process_returning_failures).with(events(
             {"field1" => {}, "message_id" => "a"},
             {"field1" => {}, "message_id" => "b"},
             {"field1" => {}, "message_id" => "c"}
-          ], refresh_indices: false)
+          ), refresh_indices: false)
         end
 
         it "logs the SQS message ids received in the lambda event and the `sqs_received_at` if available" do
@@ -197,7 +197,7 @@ module ElasticGraph
           sqs_processor.process(lambda_event)
 
           expect(indexer_processor).to have_received(:process_returning_failures).with(
-            [event_payload.merge("message_id" => "a")],
+            events(event_payload.merge("message_id" => "a")),
             refresh_indices: false
           )
         end
@@ -243,12 +243,12 @@ module ElasticGraph
           sqs_processor.process(lambda_event)
 
           expect(indexer_processor).to have_received(:process_returning_failures) do |events|
-            expect(events.first["latency_timestamps"].size).to eq(2)
+            expect(events.first.latency_timestamps.size).to eq(2)
             expect(
-              events.first["latency_timestamps"]["processing_first_attempted_at"]
+              events.first.latency_timestamps["processing_first_attempted_at"]
             ).to eq(approximate_first_receive_timestamp_iso8601)
             expect(
-              events.first["latency_timestamps"]["sqs_received_at"]
+              events.first.latency_timestamps["sqs_received_at"]
             ).to eq(sent_timestamp_iso8601)
           end
         end
@@ -272,15 +272,15 @@ module ElasticGraph
           sqs_processor.process(lambda_event)
 
           expect(indexer_processor).to have_received(:process_returning_failures) do |events|
-            expect(events.first["latency_timestamps"].size).to eq(3)
+            expect(events.first.latency_timestamps.size).to eq(3)
             expect(
-              events.first["latency_timestamps"]["processing_first_attempted_at"]
+              events.first.latency_timestamps["processing_first_attempted_at"]
             ).to eq(approximate_first_receive_timestamp_iso8601)
             expect(
-              events.first["latency_timestamps"]["sqs_received_at"]
+              events.first.latency_timestamps["sqs_received_at"]
             ).to eq(sent_timestamp_iso8601)
             expect(
-              events.first["latency_timestamps"]["field1"]
+              events.first.latency_timestamps["field1"]
             ).to eq("value1")
           end
         end
@@ -316,7 +316,7 @@ module ElasticGraph
             sqs_processor.process(lambda_event)
 
             expect(indexer_processor).to have_received(:process_returning_failures) do |events|
-              expect(events.map { |e| e.fetch("latency_timestamps", {}).keys }).to eq [
+              expect(events.map { |event| (event.latency_timestamps || {}).keys }).to eq [
                 ["field1"],
                 ["processing_first_attempted_at", "sqs_received_at"],
                 [],
@@ -424,6 +424,10 @@ module ElasticGraph
 
       def jsonl(*items)
         items.map { |i| ::JSON.generate(i) }.join("\n")
+      end
+
+      def events(*payloads)
+        payloads.map { |payload| Indexer::Event.from(payload) }
       end
 
       def build_sqs_processor(**options)

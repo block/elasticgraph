@@ -2,7 +2,7 @@ module ElasticGraph
   class Indexer
     class FailedEventError < Errors::Error
       attr_reader main_message: ::String
-      attr_reader event: ::Hash[::String, untyped]
+      attr_reader event: event
       attr_reader operations: ::Set[operation]
       attr_reader versioned_operations: ::Array[operation]
       attr_reader id: ::String
@@ -18,7 +18,7 @@ module ElasticGraph
       ) -> FailedEventError
 
       def initialize: (
-        event: ::Hash[::String, untyped],
+        event: event | ::Hash[::String, untyped],
         operations: ::Set[operation],
         main_message: ::String
       ) -> void

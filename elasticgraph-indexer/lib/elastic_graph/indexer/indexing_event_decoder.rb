@@ -6,10 +6,12 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/indexer/event"
+
 module ElasticGraph
   class Indexer
     # Namespace for indexing event decoders, which turn raw payload strings from a transport into
-    # ElasticGraph indexing event hashes. The decoder to use is configured via the
+    # {Event} values. The decoder to use is configured via the
     # `indexer.indexing_event_decoder` setting. A decoder may additionally implement
     # `decode_with_metadata(payload, metadata:)` to receive transport headers/properties.
     # The SQS integration uses this optional capability to pass message attribute string values;
@@ -25,7 +27,7 @@ module ElasticGraph
         end
 
         # @param payload [String] a raw payload from the transport
-        # @return [Array<Hash<String, Object>>] the decoded ElasticGraph indexing events
+        # @return [Array<Event>] the decoded ElasticGraph indexing events
         def decode(payload)
           # :nocov: -- must return an array to satisfy Steep type checking but never called
           []
