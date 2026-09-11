@@ -253,6 +253,43 @@ module ElasticGraph
           reserved_numbers_by_name(value_numbers, active_value_names)
         end
 
+        # Returns the previously pinned numbers for a protobuf enum.
+        #
+        # @param enum_name [String]
+        # @return [Hash<String, Integer>]
+        def pinned_enum_value_numbers(enum_name)
+          @enum_mappings_by_name[enum_name]&.value_numbers_by_name || {}
+        end
+
+        # Records numbers an external proto enum already owns, verbatim.
+        #
+        # Unlike {#enum_value_numbers_for}, this allocates nothing -- the external enum is the
+        # authority on its own numbers. Recording them keeps the artifact a complete record of the
+        # wire format, so that an enum which later stops being referenced externally is generated
+        # locally with the same numbers instead of being silently renumbered from 1.
+        #
+        # @param enum_name [String]
+        # @param numbers_by_name [Hash<String, Integer>]
+        # @return [void]
+        def pin_enum_value_numbers(enum_name, numbers_by_name)
+          numbers_by_name.each do |value_name, number|
+            unless number.is_a?(::Integer) && number >= 0 && number <= MAX_ENUM_VALUE_NUMBER
+              raise Errors::SchemaError, "External proto enum `#{enum_name}` assigns `#{value_name}` the number " \
+                "#{number.inspect}, which is not a valid protobuf enum value number (0..#{MAX_ENUM_VALUE_NUMBER})."
+            end
+          end
+
+          enum_mapping = enum_mapping_for(enum_name)
+          updated_value_numbers = enum_mapping.value_numbers_by_name.merge(numbers_by_name)
+          @enum_mappings_by_name = @enum_mappings_by_name.merge(
+            enum_name => enum_mapping.with(
+              value_numbers_by_name: updated_value_numbers,
+              next_number: [enum_mapping.next_number, updated_value_numbers.values.max.to_i + 1].max
+            )
+          )
+          nil
+        end
+
         # Serializes the mappings back to the `proto_field_numbers.yaml` artifact format, with
         # messages and enums sorted by name and their fields and values sorted by number.
         #

@@ -14,6 +14,16 @@ module ElasticGraph
     module SchemaSupport
       include ElasticGraph::SchemaDefinition::TestSupport
 
+      # A proto enum entry with a name and a number, for tests that exercise referenced enums.
+      ProtoEnumEntry = ::Data.define(:name, :number)
+
+      # A proto enum entry with only a name, for tests that exercise sourced (non-referenced) enums
+      # or the "entries must expose .number" error.
+      ProtoEnumEntryNameOnly = ::Data.define(:name)
+
+      # A simple proto enum type whose `.enums` returns the given entries.
+      ProtoEnum = ::Data.define(:enums)
+
       def define_proto_schema(**options, &block)
         define_proto_schema_results(**options, &block).proto_schema
       end
