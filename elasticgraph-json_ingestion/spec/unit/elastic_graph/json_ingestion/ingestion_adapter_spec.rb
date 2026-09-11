@@ -16,15 +16,6 @@ module ElasticGraph
       let(:adapter) { build_adapter }
 
       describe "#validate_event" do
-        it "ignores events tagged for another format" do
-          event = build_upsert_event(:component).merge(INGESTION_FORMAT_KEY => "proto")
-
-          result = adapter.validate_event(event)
-
-          expect(result.failure).to be nil
-          expect(result.record_preparer).to be nil
-        end
-
         it "accepts events explicitly tagged as JSON" do
           event = build_upsert_event(:component).merge(INGESTION_FORMAT_KEY => "json")
 

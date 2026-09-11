@@ -80,7 +80,7 @@ module ElasticGraph
 
     def operation_factory
       @operation_factory ||= begin
-        if ingestion_adapters.empty?
+        if ingestion_adapters_by_format.empty?
           raise Errors::ConfigError, "No ingestion adapters are available to process events. Ingestion format gems " \
             "make an adapter available by registering an indexer extension (via `register_indexer_extension`) during " \
             "schema definition; ensure your schema definition uses an ingestion format extension and regenerate your " \

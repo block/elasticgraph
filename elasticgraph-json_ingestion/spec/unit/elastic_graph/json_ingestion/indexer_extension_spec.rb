@@ -14,8 +14,8 @@ module ElasticGraph
       it "makes the JSON ingestion adapter available to indexers built for schemas defined with JSON ingestion support, with no configuration needed" do
         indexer = build_indexer
 
-        expect(indexer.ingestion_adapters).to contain_exactly(an_instance_of(IngestionAdapter))
-        expect(indexer.ingestion_adapters).to be(indexer.ingestion_adapters), "expected the adapters to be memoized"
+        expect(indexer.ingestion_adapters_by_format).to match("json" => an_instance_of(IngestionAdapter))
+        expect(indexer.ingestion_adapters_by_format).to be(indexer.ingestion_adapters_by_format), "expected the adapters to be memoized"
 
         result = indexer.operation_factory.build(build_upsert_event(:component))
 

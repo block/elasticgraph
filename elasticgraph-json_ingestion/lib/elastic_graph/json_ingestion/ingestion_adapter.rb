@@ -34,14 +34,12 @@ module ElasticGraph
       end
 
       # Validates the given event and resolves the record preparer appropriate for the event's
-      # JSON schema version. Events tagged for another format are ignored.
+      # JSON schema version.
       #
       # @param event [Hash<String, Object>] an ElasticGraph indexing event
       # @param skip_record_validation [Boolean] whether to skip record validation; the event envelope must still be validated
       # @return [Indexer::IngestionAdapter::ValidationResult] the result of validating the event
       def validate_event(event, skip_record_validation: false)
-        return ValidationResult.ignored unless event.fetch(INGESTION_FORMAT_KEY, "json") == "json"
-
         selected_json_schema_version = select_json_schema_version(event) { |failure| return failure }
 
         # Because the `select_json_schema_version` picks the closest-matching json schema version, the incoming
