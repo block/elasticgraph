@@ -291,6 +291,44 @@ module ElasticGraph
       expect(doc.dig("nested_fields", "max_widget_cost")).to eq(large_value)
     end
 
+    it "derives min/max `Float` values without truncating their fractional parts" do
+      light = widget("SMALL", "RED", "USD", name: "light", tags: [], weight_in_grams: 2.9)
+      heavy = widget("LARGE", "RED", "USD", name: "heavy", tags: [], weight_in_grams: 2.4)
+
+      index_records(light)
+      index_records(heavy)
+
+      doc = fetch_from_index("WidgetCurrency", "USD")
+      expect(doc.fetch("min_weight_in_grams")).to eq(2.4)
+      expect(doc.fetch("max_weight_in_grams")).to eq(2.9)
+    end
+
+    it "derives min/max `Float` values when an integral value is indexed before a fractional value" do
+      # JSON `2` parses as an `Integer` while JSON `2.9` parses as a `Double`, so this exercises
+      # comparisons between mixed numeric types (which cannot be compared with `compareTo`).
+      integral = widget("SMALL", "RED", "USD", name: "integral", tags: [], weight_in_grams: 2)
+      fractional = widget("LARGE", "RED", "USD", name: "fractional", tags: [], weight_in_grams: 2.9)
+
+      index_records(integral)
+      index_records(fractional)
+
+      doc = fetch_from_index("WidgetCurrency", "USD")
+      expect(doc.fetch("min_weight_in_grams")).to eq(2)
+      expect(doc.fetch("max_weight_in_grams")).to eq(2.9)
+    end
+
+    it "derives min/max `Float` values when a fractional value is indexed before an integral value" do
+      integral = widget("SMALL", "RED", "USD", name: "integral", tags: [], weight_in_grams: 2)
+      fractional = widget("LARGE", "RED", "USD", name: "fractional", tags: [], weight_in_grams: 2.9)
+
+      index_records(fractional)
+      index_records(integral)
+
+      doc = fetch_from_index("WidgetCurrency", "USD")
+      expect(doc.fetch("min_weight_in_grams")).to eq(2)
+      expect(doc.fetch("max_weight_in_grams")).to eq(2.9)
+    end
+
     def expect_payload_from_lookup_and_search(payload)
       doc = fetch_from_index("WidgetCurrency", payload.fetch("id"))
       expect(doc).to include(payload)

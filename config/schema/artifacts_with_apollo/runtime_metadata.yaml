@@ -739,6 +739,14 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: voltage
+      weight_in_grams_ASC:
+        sort_field:
+          direction: asc
+          field_path: weight_in_grams
+      weight_in_grams_DESC:
+        sort_field:
+          direction: desc
+          field_path: weight_in_grams
       weight_in_ng_ASC:
         sort_field:
           direction: asc
@@ -1093,6 +1101,14 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: introduced_on
+      max_weight_in_grams_ASC:
+        sort_field:
+          direction: asc
+          field_path: max_weight_in_grams
+      max_weight_in_grams_DESC:
+        sort_field:
+          direction: desc
+          field_path: max_weight_in_grams
       max_weight_in_ng_ASC:
         sort_field:
           direction: asc
@@ -1101,6 +1117,14 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: max_weight_in_ng
+      min_weight_in_grams_ASC:
+        sort_field:
+          direction: asc
+          field_path: min_weight_in_grams
+      min_weight_in_grams_DESC:
+        sort_field:
+          direction: desc
+          field_path: min_weight_in_grams
       name_ASC:
         sort_field:
           direction: asc
@@ -1431,6 +1455,14 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: timestamps.created_at
+      weight_in_grams_ASC:
+        sort_field:
+          direction: asc
+          field_path: weight_in_grams
+      weight_in_grams_DESC:
+        sort_field:
+          direction: desc
+          field_path: weight_in_grams
       weight_in_ng_ASC:
         sort_field:
           direction: asc
@@ -1745,6 +1777,14 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: the_opts.the_sighs
+      weight_in_grams_ASC:
+        sort_field:
+          direction: asc
+          field_path: weight_in_grams
+      weight_in_grams_DESC:
+        sort_field:
+          direction: desc
+          field_path: weight_in_grams
       weight_in_ng_ASC:
         sort_field:
           direction: asc
@@ -2983,7 +3023,11 @@ index_definitions_by_name:
         source: __self
       introduced_on:
         source: __self
+      max_weight_in_grams:
+        source: __self
       max_weight_in_ng:
+        source: __self
+      min_weight_in_grams:
         source: __self
       name:
         source: __self
@@ -3129,6 +3173,8 @@ index_definitions_by_name:
       the_opts.size:
         source: __self
       the_opts.the_sighs:
+        source: __self
+      weight_in_grams:
         source: __self
       weight_in_ng:
         source: __self
@@ -5242,6 +5288,9 @@ object_types_by_name:
       voltage:
         resolver:
           name: get_record_field_value
+      weight_in_grams:
+        resolver:
+          name: get_record_field_value
       weight_in_ng:
         resolver:
           name: get_record_field_value
@@ -5395,6 +5444,9 @@ object_types_by_name:
         resolver:
           name: object_with_lookahead
       voltage:
+        resolver:
+          name: object_with_lookahead
+      weight_in_grams:
         resolver:
           name: object_with_lookahead
       weight_in_ng:
@@ -5609,6 +5661,9 @@ object_types_by_name:
         resolver:
           name: object_with_lookahead
       voltage:
+        resolver:
+          name: object_with_lookahead
+      weight_in_grams:
         resolver:
           name: object_with_lookahead
       weight_in_ng:
@@ -8156,6 +8211,9 @@ object_types_by_name:
         name_in_index: the_opts
         resolver:
           name: get_record_field_value
+      weight_in_grams:
+        resolver:
+          name: get_record_field_value
       weight_in_ng:
         resolver:
           name: get_record_field_value
@@ -8175,7 +8233,7 @@ object_types_by_name:
     - id_source: cost.currency
       rollover_timestamp_value_source: cost_currency_introduced_on
       routing_value_source: cost_currency_primary_continent
-      script_id: update_WidgetCurrency_from_Widget_e72813bd1a8767343222b77bf53be31c
+      script_id: update_WidgetCurrency_from_Widget_514248e200403f9ab1766130a517439a
       top_level_fields_params:
         cost.amount_cents:
           cardinality: many
@@ -8200,6 +8258,8 @@ object_types_by_name:
         options.size:
           cardinality: many
         tags:
+          cardinality: many
+        weight_in_grams:
           cardinality: many
         weight_in_ng:
           cardinality: many
@@ -8276,6 +8336,8 @@ object_types_by_name:
         tags:
           cardinality: one
         the_opts:
+          cardinality: one
+        weight_in_grams:
           cardinality: one
         weight_in_ng:
           cardinality: one
@@ -8408,6 +8470,9 @@ object_types_by_name:
         name_in_index: the_opts
         resolver:
           name: object_with_lookahead
+      weight_in_grams:
+        resolver:
+          name: object_with_lookahead
       weight_in_ng:
         resolver:
           name: object_with_lookahead
@@ -8481,7 +8546,13 @@ object_types_by_name:
       introduced_on:
         resolver:
           name: get_record_field_value
+      max_weight_in_grams:
+        resolver:
+          name: get_record_field_value
       max_weight_in_ng:
+        resolver:
+          name: get_record_field_value
+      min_weight_in_grams:
         resolver:
           name: get_record_field_value
       name:
@@ -8533,7 +8604,11 @@ object_types_by_name:
           cardinality: one
         introduced_on:
           cardinality: one
+        max_weight_in_grams:
+          cardinality: one
         max_weight_in_ng:
+          cardinality: one
+        min_weight_in_grams:
           cardinality: one
         name:
           cardinality: one
@@ -8563,7 +8638,13 @@ object_types_by_name:
       introduced_on:
         resolver:
           name: object_with_lookahead
+      max_weight_in_grams:
+        resolver:
+          name: object_with_lookahead
       max_weight_in_ng:
+        resolver:
+          name: object_with_lookahead
+      min_weight_in_grams:
         resolver:
           name: object_with_lookahead
       name:
@@ -8667,7 +8748,13 @@ object_types_by_name:
       introduced_on:
         resolver:
           name: object_with_lookahead
+      max_weight_in_grams:
+        resolver:
+          name: object_with_lookahead
       max_weight_in_ng:
+        resolver:
+          name: object_with_lookahead
+      min_weight_in_grams:
         resolver:
           name: object_with_lookahead
       name:
@@ -8843,6 +8930,9 @@ object_types_by_name:
           name: object_with_lookahead
       the_options:
         name_in_index: the_opts
+        resolver:
+          name: object_with_lookahead
+      weight_in_grams:
         resolver:
           name: object_with_lookahead
       weight_in_ng:
@@ -9155,6 +9245,9 @@ object_types_by_name:
       timestamps:
         resolver:
           name: get_record_field_value
+      weight_in_grams:
+        resolver:
+          name: get_record_field_value
       weight_in_ng:
         resolver:
           name: get_record_field_value
@@ -9271,6 +9364,9 @@ object_types_by_name:
         resolver:
           name: object_with_lookahead
       timestamps:
+        resolver:
+          name: object_with_lookahead
+      weight_in_grams:
         resolver:
           name: object_with_lookahead
       weight_in_ng:
@@ -9458,6 +9554,9 @@ object_types_by_name:
         resolver:
           name: object_with_lookahead
       timestamps:
+        resolver:
+          name: object_with_lookahead
+      weight_in_grams:
         resolver:
           name: object_with_lookahead
       weight_in_ng:

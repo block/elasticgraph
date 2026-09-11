@@ -16,6 +16,7 @@ module ElasticGraph
 
       describe "for a derived indexing type" do
         include_context "widget currency script support", expected_function_defs: [
+          Indexing::DerivedFields::MinOrMaxValue::COMPARE_VALUES,
           Indexing::DerivedFields::AppendOnlySet::IDEMPOTENTLY_INSERT_VALUE,
           Indexing::DerivedFields::AppendOnlySet::IDEMPOTENTLY_INSERT_VALUES,
           Indexing::DerivedFields::ImmutableValue::IDEMPOTENTLY_SET_VALUE,

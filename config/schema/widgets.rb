@@ -135,6 +135,7 @@ ElasticGraph.define_schema do |schema|
     t.field "named_inventor", "NamedInventor"
     t.field "weight_in_ng_str", "LongString!" # Weight in nanograms, to exercise Long support.
     t.field "weight_in_ng", "JsonSafeLong!" # Weight in nanograms, to exercise Long support.
+    t.field "weight_in_grams", "Float" # Weight in grams, to exercise Float support (e.g. in min/max derived fields).
     t.field "tags", "[String!]!", sortable: false, singular: "tag"
     t.field "amounts", "[Int!]!", sortable: false do |f|
       f.mapping index: false
@@ -187,6 +188,8 @@ ElasticGraph.define_schema do |schema|
       derive.append_only_set "widget_fee_currencies", from: "fees.currency"
       derive.max_value "nested_fields.max_widget_cost", from: "cost.amount_cents"
       derive.max_value "max_weight_in_ng", from: "weight_in_ng"
+      derive.min_value "min_weight_in_grams", from: "weight_in_grams"
+      derive.max_value "max_weight_in_grams", from: "weight_in_grams"
       derive.min_value "oldest_widget_created_at", from: "created_at"
     end
   end
@@ -219,6 +222,8 @@ ElasticGraph.define_schema do |schema|
     t.field "nested_fields", "WidgetCurrencyNestedFields"
     t.field "oldest_widget_created_at", "DateTime"
     t.field "max_weight_in_ng", "JsonSafeLong"
+    t.field "min_weight_in_grams", "Float"
+    t.field "max_weight_in_grams", "Float"
     t.index "widget_currencies" do |i|
       i.rollover :yearly, "introduced_on"
       i.route_with "primary_continent"

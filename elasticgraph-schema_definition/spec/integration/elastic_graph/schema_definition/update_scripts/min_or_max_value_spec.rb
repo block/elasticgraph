@@ -16,6 +16,7 @@ module ElasticGraph
 
       context "for just a `max_value` field" do
         include_context "widget currency script support", expected_function_defs: [
+          Indexing::DerivedFields::MinOrMaxValue::COMPARE_VALUES,
           Indexing::DerivedFields::MinOrMaxValue.function_def(:max)
         ]
 
@@ -64,6 +65,7 @@ module ElasticGraph
 
       context "for just a `min_value` field" do
         include_context "widget currency script support", expected_function_defs: [
+          Indexing::DerivedFields::MinOrMaxValue::COMPARE_VALUES,
           Indexing::DerivedFields::MinOrMaxValue.function_def(:min)
         ]
 
@@ -112,6 +114,7 @@ module ElasticGraph
 
       context "for both a `min_value` and `max_value` field" do
         include_context "widget currency script support", expected_function_defs: [
+          Indexing::DerivedFields::MinOrMaxValue::COMPARE_VALUES,
           Indexing::DerivedFields::MinOrMaxValue.function_def(:max),
           Indexing::DerivedFields::MinOrMaxValue.function_def(:min)
         ]
