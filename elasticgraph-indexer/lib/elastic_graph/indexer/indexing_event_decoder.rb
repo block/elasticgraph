@@ -10,7 +10,10 @@ module ElasticGraph
   class Indexer
     # Namespace for indexing event decoders, which turn raw payload strings from a transport into
     # ElasticGraph indexing event hashes. The decoder to use is configured via the
-    # `indexer.indexing_event_decoder` setting.
+    # `indexer.indexing_event_decoder` setting. A decoder may additionally implement
+    # `decode_with_metadata(payload, metadata:)` to receive transport headers/properties.
+    # The SQS integration uses this optional capability to pass message attribute string values;
+    # decoders implementing only `decode(payload)` remain supported.
     module IndexingEventDecoder
       # Defines the indexing event decoder interface, which our extension loader will validate against.
       class Interface
