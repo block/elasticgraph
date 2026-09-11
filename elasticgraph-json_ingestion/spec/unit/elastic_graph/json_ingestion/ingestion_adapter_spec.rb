@@ -8,6 +8,7 @@
 
 require "elastic_graph/constants"
 require "elastic_graph/json_ingestion/ingestion_adapter"
+require "support/multiple_version_support"
 
 module ElasticGraph
   module JSONIngestion
@@ -22,14 +23,41 @@ module ElasticGraph
           expect(adapter.validate_event(event).record_preparer).not_to be nil
         end
 
-        it "returns a valid result with a record preparer for the event's JSON schema version" do
-          event = build_upsert_event(:component)
+        context "when record preparation differs between schema versions" do
+          include_context "MultipleVersionSupport"
 
-          result = adapter.validate_event(event)
+          let(:schema_artifacts) do
+            build_schema_artifacts_with_multiple_versions(schema_versions: [2, 4].to_h do |version|
+              [version, lambda do |schema|
+                schema.object_type "Component" do |t|
+                  t.field "id", "ID!"
+                  t.field "name", "String", name_in_index: "name_v#{version}"
+                  t.index "components"
+                end
+              end]
+            end)
+          end
 
-          expect(result.failure).to be nil
-          expect(result.record_preparer.prepare_for_index("Component", {"id" => "1", "unknown_field" => 3}, {}))
-            .to eq({"id" => "1"})
+          {2 => 2, 4 => 4, 3 => 4}.each do |requested_version, selected_version|
+            it "prepares version #{requested_version} events using schema version #{selected_version} without changing the event" do
+              event = {
+                "op" => "upsert",
+                "id" => "1",
+                "type" => "Component",
+                "version" => 1,
+                JSON_SCHEMA_VERSION_KEY => requested_version,
+                "record" => {"id" => "1", "name" => "example"}
+              }
+              original_event = Marshal.load(Marshal.dump(event))
+
+              result = adapter.validate_event(event)
+
+              expect(result.failure).to be nil
+              expect(result.record_preparer.prepare_for_index("Component", event.fetch("record"), {}))
+                .to eq({"id" => "1", "name_v#{selected_version}" => "example"})
+              expect(event).to eq(original_event)
+            end
+          end
         end
 
         it "notifies an error when latency metrics contain keys that violate regex \"^\\w+_at$\"" do

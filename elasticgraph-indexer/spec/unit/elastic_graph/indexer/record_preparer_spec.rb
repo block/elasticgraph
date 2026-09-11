@@ -7,7 +7,6 @@
 # frozen_string_literal: true
 
 require "elastic_graph/indexer/record_preparer"
-require "elastic_graph/json_ingestion/record_preparer_factory"
 
 module ElasticGraph
   class Indexer
@@ -457,7 +456,7 @@ module ElasticGraph
 
       def build_preparer_with_artifacts(**config_overrides, &schema_definition)
         indexer = build_indexer(schema_definition: schema_definition, **config_overrides)
-        preparer = JSONIngestion::RecordPreparerFactory.new(indexer.schema_artifacts).for_latest_json_schema_version
+        preparer = latest_json_record_preparer_for(indexer)
         [preparer, indexer.schema_artifacts]
       end
     end

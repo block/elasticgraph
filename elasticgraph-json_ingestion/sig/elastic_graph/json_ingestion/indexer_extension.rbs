@@ -1,8 +1,9 @@
 module ElasticGraph
   module JSONIngestion
     module IndexerExtension : ::ElasticGraph::Indexer
-      @json_ingestion_adapters_by_format: ::Hash[::String, Indexer::IngestionAdapter::_Adapter]?
-      def ingestion_adapters_by_format: () -> ::Hash[::String, Indexer::IngestionAdapter::_Adapter]
+      private
+
+      def default_ingestion_adapters_by_format: () -> ::Hash[::String, Indexer::IngestionAdapter::_Adapter]
     end
   end
 end

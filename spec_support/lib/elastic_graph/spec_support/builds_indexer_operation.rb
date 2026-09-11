@@ -6,10 +6,14 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/spec_support/json_record_preparation"
+
 module ElasticGraph
   module SpecSupport
     # Provides test support for building primary indexing operations.
     module BuildsIndexerOperation
+      include JSONRecordPreparation
+
       # Builds a primary indexing operation (Indexer::Operation::Update) for the given event.
       #
       # @param event [Hash] The event hash containing "type", "id", and "record"

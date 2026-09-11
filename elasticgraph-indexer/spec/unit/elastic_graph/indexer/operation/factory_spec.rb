@@ -10,7 +10,6 @@ require "elastic_graph/constants"
 require "elastic_graph/indexer"
 require "elastic_graph/indexer/ingestion_adapter"
 require "elastic_graph/indexer/operation/factory"
-require "elastic_graph/json_ingestion/record_preparer_factory"
 require "elastic_graph/spec_support/builds_indexer_operation"
 require "json"
 
@@ -561,7 +560,7 @@ module ElasticGraph
           operations = Update.operations_for(
             event: event,
             destination_index_def: index_def_named("widget_currencies"),
-            record_preparer: JSONIngestion::RecordPreparerFactory.new(indexer.schema_artifacts).for_latest_json_schema_version,
+            record_preparer: latest_json_record_preparer_for(indexer),
             update_target: indexer.schema_artifacts.runtime_metadata.object_types_by_name.fetch("Widget").update_targets.first,
             destination_index_mapping: indexer.schema_artifacts.index_mappings_by_index_def_name.fetch("widget_currencies")
           )

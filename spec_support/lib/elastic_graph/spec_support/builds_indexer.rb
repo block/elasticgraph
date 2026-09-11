@@ -6,13 +6,15 @@
 #
 # frozen_string_literal: true
 
-require "elastic_graph/spec_support/builds_datastore_core"
 require "elastic_graph/indexer"
 require "elastic_graph/indexer/config"
+require "elastic_graph/spec_support/builds_datastore_core"
+require "elastic_graph/spec_support/json_record_preparation"
 
 module ElasticGraph
   module BuildsIndexer
     include BuildsDatastoreCore
+    include SpecSupport::JSONRecordPreparation
 
     def build_indexer(
       datastore_core: nil,

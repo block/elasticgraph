@@ -16,7 +16,7 @@ module ElasticGraph
       include_context "MultipleVersionSupport"
 
       let(:factory_with_multiple_versions) do
-        build_indexer_with_multiple_schema_versions(schema_versions: {
+        build_schema_artifacts_with_multiple_versions(schema_versions: {
           1 => lambda do |schema|
             schema.object_type "MyType" do |t|
               t.field "id", "ID!"
@@ -32,7 +32,7 @@ module ElasticGraph
               t.index "my_type"
             end
           end
-        }).then { |indexer| RecordPreparerFactory.new(indexer.schema_artifacts) }
+        }).then { |artifacts| RecordPreparerFactory.new(artifacts) }
       end
 
       describe "#for_json_schema_version" do

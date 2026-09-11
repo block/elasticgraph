@@ -10,19 +10,15 @@ require "elastic_graph/json_ingestion/ingestion_adapter"
 
 module ElasticGraph
   module JSONIngestion
-    # Indexer extension module that makes the JSON {IngestionAdapter} available to the indexer.
-    # {SchemaDefinition::APIExtension} registers this extension during schema definition, so any
-    # schema defined with JSON ingestion support automatically gets JSON event ingestion at
-    # indexing time--no configuration needed.
+    # Provides the default JSON adapter. Registered by {SchemaDefinition::APIExtension}.
     module IndexerExtension
-      # Registers the JSON {IngestionAdapter} under the `json` format.
-      #
-      # @return [Hash<String, Object>] the available ingestion adapters by format
-      def ingestion_adapters_by_format
-        adapters = @ingestion_adapters_by_format
-        return adapters if adapters
+      private
 
-        @json_ingestion_adapters_by_format ||= super.merge(
+      def default_ingestion_adapters_by_format
+        adapters = super
+        return adapters if adapters.key?("json")
+
+        adapters.merge(
           "json" => IngestionAdapter.new(schema_artifacts: schema_artifacts, logger: logger)
         )
       end

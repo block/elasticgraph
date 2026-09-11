@@ -8,8 +8,9 @@
 
 require "digest/md5"
 require "elastic_graph/elasticsearch/client"
-require "elastic_graph/indexer/test_support/converters"
 require "elastic_graph/indexer/operation/update"
+require "elastic_graph/indexer/test_support/converters"
+require "elastic_graph/spec_support/json_record_preparation"
 require "elastic_graph/support/hash_util"
 require "logger"
 require "yaml"
@@ -152,6 +153,8 @@ class DisallowUnsupportedAWSOperations
 end
 
 RSpec.shared_context "datastore support", :capture_logs do
+  include ElasticGraph::SpecSupport::JSONRecordPreparation
+
   # Provides a unique index name, so that a test can have an index that no other test interacts with.
   # The index name is derived from the unique id RSpec assigns to each example.
   #

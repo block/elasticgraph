@@ -59,10 +59,10 @@ module ElasticGraph
       end
     end
 
-    # The ingestion adapters available for processing events, keyed by format. Returns an empty
-    # hash by default; ingestion format gems contribute adapters via indexer extension modules.
+    # The ingestion adapters available for processing events, keyed by format. An injected registry
+    # replaces the defaults contributed by ingestion format extensions.
     def ingestion_adapters_by_format
-      @ingestion_adapters_by_format || {}
+      @ingestion_adapters_by_format ||= default_ingestion_adapters_by_format
     end
 
     def processor
@@ -81,10 +81,8 @@ module ElasticGraph
     def operation_factory
       @operation_factory ||= begin
         if ingestion_adapters_by_format.empty?
-          raise Errors::ConfigError, "No ingestion adapters are available to process events. Ingestion format gems " \
-            "make an adapter available by registering an indexer extension (via `register_indexer_extension`) during " \
-            "schema definition; ensure your schema definition uses an ingestion format extension and regenerate your " \
-            "schema artifacts (or configure an extension via the `indexer.extension_modules` setting)."
+          raise Errors::ConfigError, "No ingestion adapters are available. Enable an ingestion format extension " \
+            "in your schema definition and regenerate the schema artifacts, or configure `indexer.extension_modules`."
         end
 
         require "elastic_graph/indexer/operation/factory"
@@ -104,6 +102,13 @@ module ElasticGraph
         require "elastic_graph/support/monotonic_clock"
         Support::MonotonicClock.new
       end
+    end
+
+    private
+
+    # Ingestion format extensions override this hook to contribute default adapters via `super`.
+    def default_ingestion_adapters_by_format
+      {}
     end
   end
 end

@@ -26,7 +26,7 @@ module ElasticGraph
 
     # Steep weirdly expects them here...
     # @dynamic initialize, config, datastore_core, schema_artifacts, datastore_router, monotonic_clock
-    # @dynamic processor, operation_factory, ingestion_adapters_by_format, logger
+    # @dynamic processor, operation_factory, ingestion_adapters_by_format, default_ingestion_adapters_by_format, logger
     # @dynamic self.from_parsed_yaml
   end
 end

@@ -110,6 +110,8 @@ ingestion adapter that validates each event against the JSON schema identified b
 
 No configuration is needed: defining your schema with this gem's `SchemaDefinition::APIExtension` registers
 an indexer extension in your schema artifacts' runtime metadata, which the indexer applies when it boots.
+The extension preserves a custom JSON adapter supplied by another extension. Passing an explicit
+`ingestion_adapters_by_format` registry to the indexer replaces all default adapters.
 
 This gem also provides the `be_a_valid_elastic_graph_event` RSpec matcher (via
 `require "elastic_graph/json_ingestion/spec_support/event_matcher"`) for testing that publisher events
