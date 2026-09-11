@@ -130,6 +130,24 @@ module ElasticGraph
             ])
           end
 
+          it "logs latency metrics for a format with no JSON schema version" do
+            component = upsert_event_with_latency_timestamps(:component, 36, 72).except(JSON_SCHEMA_VERSION_KEY)
+            adapter = instance_double(IngestionAdapter::Interface,
+              validate_event: IngestionAdapter::ValidationResult.valid(RecordPreparer::Identity))
+            indexer_with_adapter = build_indexer_with(
+              latency_thresholds: {},
+              ingestion_adapters_by_format: {"json" => adapter}
+            )
+
+            indexer_with_adapter.processor.process([component], refresh_indices: true)
+
+            expect(logged_jsons_of_type("ElasticGraphIndexingLatencies")).to contain_exactly(a_hash_including(
+              "event_type" => "Component",
+              "result" => "success",
+              "latencies_in_ms_from" => {"originated_at" => 36000, "touched_by_foo_at" => 72000}
+            ))
+          end
+
           it "fully identifies each event and message in the logged `ElasticGraphIndexingLatencies` message" do
             component = upsert_event_with_latency_timestamps(:component, 36, 72).merge("message_id" => "m1")
             process([component])

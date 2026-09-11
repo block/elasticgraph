@@ -132,6 +132,28 @@ indexer:
 
 See the `elasticgraph-indexer` README for the decoder extension interface.
 
+## Upgrading an existing JSON deployment
+
+1. Include `elasticgraph-json_ingestion` in the indexer's runtime bundle, including both indexing and
+   warehouse Lambda packages. A dependency restricted to development or schema generation is insufficient.
+2. Enable `ElasticGraph::JSONIngestion::SchemaDefinition::APIExtension` in your schema definition if it
+   is not already enabled. Run `bundle exec rake schema_artifacts:dump` and deploy the regenerated
+   runtime metadata together with the matching gems. Older runtime metadata does not register the adapter.
+3. Add the `indexer.indexing_event_decoder` configuration shown above to each environment that consumes
+   encoded payloads, including both SQS Lambdas. Direct calls to `indexer.processor.process` do not need a decoder.
+4. Change matcher requires from `elastic_graph/indexer/spec_support/event_matcher` to
+   `elastic_graph/json_ingestion/spec_support/event_matcher`. Custom code that used
+   `indexer.record_preparer_factory` can construct `ElasticGraph::JSONIngestion::RecordPreparerFactory`
+   with `indexer.schema_artifacts` instead.
+5. Keep publishing the required `json_schema_version`. The JSON adapter owns schema validation and
+   selects the closest available JSON schema if the requested version is unavailable. Warehouse
+   partitions retain their existing JSON version keys. Indexing latency logs no longer include
+   `json_schema_version`; JSON version fallback diagnostics remain adapter-owned.
+
+Generated project templates include the decoder setting, but existing project settings are not
+rewritten automatically. Validate an existing publisher event through your deployed transport after
+upgrading.
+
 ## Dependency Diagram
 
 ```mermaid
