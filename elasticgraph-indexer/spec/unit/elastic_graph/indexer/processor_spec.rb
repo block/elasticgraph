@@ -8,6 +8,7 @@
 
 require "elastic_graph/indexer"
 require "elastic_graph/indexer/datastore_indexing_router"
+require "elastic_graph/indexer/ingestion_adapter"
 require "elastic_graph/indexer/processor"
 require "elastic_graph/indexer/test_support/converters"
 require "elastic_graph/spec_support/builds_indexer_operation"
