@@ -328,6 +328,41 @@ module ElasticGraph
         expect(response).to eq error_with("No query string was present")
       end
 
+      describe "with a custom body serializer block" do
+        it "passes the result hash to the block and uses its return value as the response body" do
+          captured = nil
+          custom_body = ::Object.new
+
+          response = process(
+            http_method: :post,
+            headers: {"Content-Type" => "application/json"},
+            body: ::JSON.generate("query" => "query { widgets { __typename } }")
+          ) do |result_hash|
+            captured = result_hash
+            custom_body
+          end
+
+          expect(response.status_code).to eq(200)
+          expect(response.headers).to include("Content-Type" => "application/json")
+          expect(response.body).to be(custom_body)
+          expect(captured).to eq("data" => {"widgets" => {"__typename" => "WidgetConnection"}})
+        end
+
+        it "does not invoke the block when the request fails before query execution" do
+          body_serializer = ::Kernel.method(:raise)
+
+          response = process(
+            http_method: :post,
+            headers: {"Content-Type" => "application/json"},
+            body: "not json",
+            &body_serializer
+          )
+
+          expect(response.status_code).to eq(400)
+          expect(::JSON.parse(response.body)).to eq error_with("Request body is invalid JSON.")
+        end
+      end
+
       def process_expecting(status_code, ...)
         response = process(...)
 
@@ -337,9 +372,9 @@ module ElasticGraph
         ::JSON.parse(response.body)
       end
 
-      def process(http_method:, url: "http://foo.test/bar", body: nil, headers: {}, extra_headers: {}, **options)
+      def process(http_method:, url: "http://foo.test/bar", body: nil, headers: {}, extra_headers: {}, **options, &block)
         request = HTTPRequest.new(url: url, http_method: http_method, body: body, headers: headers.merge(extra_headers))
-        graphql.graphql_http_endpoint.process(request, **options)
+        graphql.graphql_http_endpoint.process(request, **options, &block)
       end
 
       def error_with(message)
