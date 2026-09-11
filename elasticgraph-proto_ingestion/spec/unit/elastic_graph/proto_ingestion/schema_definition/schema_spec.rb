@@ -48,16 +48,16 @@ module ElasticGraph
             // An account in the system.
             message Account {
               // The account's unique identifier.
-              string id = 1;
-              .elasticgraph.Status status = 2;
-              .elasticgraph.Address address = 3;
+              optional string id = 1;
+              optional .elasticgraph.Status status = 2;
+              optional .elasticgraph.Address address = 3;
               repeated string tags = 4;
               // Next field number: 5
             }
 
             message Address {
-              string street = 1;
-              string city = 2;
+              optional string street = 1;
+              optional string city = 2;
               // Next field number: 3
             }
 
@@ -301,20 +301,33 @@ module ElasticGraph
           PROTO
         end
 
-        it "rejects lists of lists" do
+        it "represents lists of lists with generated wrapper messages" do
+          proto = define_proto_schema do |s|
+            s.object_type "Matrix" do |t|
+              t.field "id", "ID"
+              t.field "values", "[[Float!]!]!"
+              t.index "matrices"
+            end
+          end
+          expect(proto).to include("repeated .elasticgraph.Matrix_values_List1 values = 2;")
+          expect(proto_type_def_from(proto, "Matrix_values_List1")).to eq(<<~PROTO.strip)
+            message Matrix_values_List1 {
+              repeated double values = 1;
+            }
+          PROTO
+        end
+
+        it "rejects collisions between generated list wrappers and user-defined types" do
           expect {
             define_proto_schema do |s|
+              s.object_type("Matrix_values_List1") { |t| t.field "value", "Int" }
               s.object_type "Matrix" do |t|
                 t.field "id", "ID"
-                t.field "values", "[[Float!]!]!"
+                t.field "values", "[[Int!]!]!"
                 t.index "matrices"
               end
             end
-          }.to raise_error(Errors::SchemaError, a_string_including(
-            "Field `Matrix.values` has type `[[Float!]!]!`",
-            "Protocol Buffers cannot represent lists of lists directly",
-            "at most one list level"
-          ))
+          }.to raise_error(Errors::SchemaError, /Generated protobuf list wrapper `Matrix_values_List1` conflicts/)
         end
 
         it "uses custom proto scalar mappings" do
