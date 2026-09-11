@@ -67,6 +67,7 @@ module ElasticGraph
                   "patternProperties" => {"^\\w+_at$" => {"type" => "string", "format" => "date-time"}}
                 },
                 JSON_SCHEMA_VERSION_KEY => {"const" => 42},
+                INGESTION_FORMAT_KEY => {"type" => "string", "default" => "json"},
                 "message_id" => {"type" => "string"}
               },
               "additionalProperties" => false,

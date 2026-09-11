@@ -6,12 +6,10 @@
 #
 # frozen_string_literal: true
 
-require "elastic_graph/constants"
 require "elastic_graph/indexer/event_id"
 require "elastic_graph/indexer/failed_event_error"
 require "elastic_graph/indexer/operation/update"
 require "elastic_graph/indexer/record_preparer"
-require "elastic_graph/support/json_schema/validator_factory"
 require "elastic_graph/support/memoizable_data"
 require "zlib"
 
@@ -21,42 +19,49 @@ module ElasticGraph
       class Factory < Support::MemoizableData.define(
         :schema_artifacts,
         :index_definitions_by_graphql_type,
-        :record_preparer_factory,
+        :ingestion_adapters_by_format,
         :logger,
         :skip_derived_indexing_type_updates,
-        :skip_record_validation_percents_by_type,
-        :configure_record_validator
+        :skip_record_validation_percents_by_type
       )
         def build(event)
           event = prepare_event(event)
+          format = event.fetch(INGESTION_FORMAT_KEY, "json")
+          adapter = ingestion_adapters_by_format[format]
 
-          selected_json_schema_version = select_json_schema_version(event) { |failure| return failure }
-
-          # Because the `select_json_schema_version` picks the closest-matching json schema version, the incoming
-          # event might not match the expected json_schema_version value in the json schema (which is a `const` field).
-          # This is by design, since we're picking a schema based on best-effort, so to avoid that by-design validation error,
-          # performing the envelope validation on a "patched" version of the event.
-          event_with_patched_envelope = event.merge({JSON_SCHEMA_VERSION_KEY => selected_json_schema_version})
-
-          if (error_message = validator(EVENT_ENVELOPE_JSON_SCHEMA_NAME, selected_json_schema_version).validate_with_error_message(event_with_patched_envelope))
-            return build_failed_result(event, "event payload", error_message)
+          unless adapter
+            return build_failed_result(
+              event,
+              "event payload",
+              "No ingestion adapter is registered for format #{format.inspect}. " \
+                "Available formats: #{ingestion_adapters_by_format.keys.sort.join(", ")}."
+            )
           end
 
-          graphql_type_name = event.fetch("type")
-
-          if skip_validation?(graphql_type_name, event)
-            build_success_result_isolating_malformed_records(event, graphql_type_name, selected_json_schema_version)
-          else
-            validate_record_returning_failure(event, graphql_type_name, selected_json_schema_version) ||
-              build_success_result(event, selected_json_schema_version, type_with_skipped_validation: nil)
-          end
+          build_for_adapter(event, adapter)
         end
 
         private
 
-        def build_success_result(event, selected_json_schema_version, type_with_skipped_validation:)
+        def build_for_adapter(event, adapter)
+          skip_record_validation = skip_validation?(event["type"], event)
+          validation_result = adapter.validate_event(event, skip_record_validation: skip_record_validation)
+
+          if (failure = validation_result.failure)
+            build_failed_result(event, failure.validation_target, failure.message)
+          else
+            record_preparer = validation_result.record_preparer or raise
+            if skip_record_validation
+              build_success_result_isolating_malformed_records(event, record_preparer, adapter)
+            else
+              build_success_result(event, record_preparer, type_with_skipped_validation: nil)
+            end
+          end
+        end
+
+        def build_success_result(event, record_preparer, type_with_skipped_validation:)
           BuildResult.success(
-            build_all_operations_for(event, record_preparer_factory.for_json_schema_version(selected_json_schema_version)),
+            build_all_operations_for(event, record_preparer),
             type_with_skipped_validation: type_with_skipped_validation
           )
         end
@@ -69,77 +74,15 @@ module ElasticGraph
         # whether the data was actually bad, and if it was, hands the caller the same pinpointed message it
         # would have gotten had we validated up front. A clean bill of health from the validator means the
         # error was never about the data (a schema artifact defect, or a bug) and must not be swallowed.
-        def build_success_result_isolating_malformed_records(event, graphql_type_name, selected_json_schema_version)
-          build_success_result(event, selected_json_schema_version, type_with_skipped_validation: graphql_type_name)
+        def build_success_result_isolating_malformed_records(event, record_preparer, adapter)
+          build_success_result(event, record_preparer, type_with_skipped_validation: event.fetch("type"))
         rescue => exception
-          failed_result = validate_record_returning_failure(event, graphql_type_name, selected_json_schema_version)
+          failure = adapter.validate_event(event).failure
           # `raise` is overridden below to stop this class from *originating* an error instead of returning a
           # `BuildResult`. Here we propagate one that already escaped a collaborator, which is exactly what
           # happens without this rescue, so we deliberately bypass that guard.
-          ::Kernel.raise(exception) unless failed_result
-          failed_result
-        end
-
-        def select_json_schema_version(event)
-          available_json_schema_versions = schema_artifacts.available_json_schema_versions
-
-          requested_json_schema_version = event[JSON_SCHEMA_VERSION_KEY]
-
-          # First check that a valid value has been requested (a positive integer)
-          if !event.key?(JSON_SCHEMA_VERSION_KEY)
-            yield build_failed_result(event, JSON_SCHEMA_VERSION_KEY, "Event lacks a `#{JSON_SCHEMA_VERSION_KEY}`")
-          elsif !requested_json_schema_version.is_a?(Integer) || requested_json_schema_version < 1
-            yield build_failed_result(event, JSON_SCHEMA_VERSION_KEY, "#{JSON_SCHEMA_VERSION_KEY} (#{requested_json_schema_version}) must be a positive integer.")
-          end
-
-          # The requested version might not necessarily be available (if the publisher is deployed ahead of the indexer, or an old schema
-          # version is removed prematurely, or an indexer deployment is rolled back). So the behavior is to always pick the closest-available
-          # version. If there's an exact match, great. Even if not an exact match, if the incoming event payload conforms to the closest match,
-          # the event can still be indexed.
-          #
-          # This min_by block will take the closest version in the list. If a tie occurs, the first value in the list wins. The desired
-          # behavior is in the event of a tie (highly unlikely, there shouldn't be a gap in available json schema versions), the higher version
-          # should be selected. So to get that behavior, the list is sorted in descending order.
-          #
-          selected_json_schema_version = available_json_schema_versions.sort.reverse.min_by { |version| (requested_json_schema_version - version).abs }
-
-          if selected_json_schema_version != requested_json_schema_version
-            logger.info({
-              "message_type" => "ElasticGraphMissingJSONSchemaVersion",
-              "message_id" => event["message_id"],
-              "event_id" => EventID.from_event(event),
-              "event_type" => event["type"],
-              "requested_json_schema_version" => requested_json_schema_version,
-              "selected_json_schema_version" => selected_json_schema_version
-            })
-          end
-
-          if selected_json_schema_version.nil?
-            yield build_failed_result(
-              event, JSON_SCHEMA_VERSION_KEY,
-              "Failed to select json schema version. Requested version: #{event[JSON_SCHEMA_VERSION_KEY]}. \
-              Available json schema versions: #{available_json_schema_versions.sort.join(", ")}"
-            )
-          end
-
-          selected_json_schema_version
-        end
-
-        def validator(type, selected_json_schema_version)
-          factory = validator_factories_by_version[selected_json_schema_version] # : Support::JSONSchema::ValidatorFactory
-          factory.validator_for(type)
-        end
-
-        def validator_factories_by_version
-          @validator_factories_by_version ||= ::Hash.new do |hash, raw_json_schema_version|
-            json_schema_version = raw_json_schema_version # : Integer
-            factory = Support::JSONSchema::ValidatorFactory.new(
-              schema: schema_artifacts.json_schemas_for(json_schema_version),
-              sanitize_pii: true
-            )
-            factory = configure_record_validator.call(factory) if configure_record_validator
-            hash[json_schema_version] = factory
-          end
+          ::Kernel.raise(exception) unless failure
+          build_failed_result(event, failure.validation_target, failure.message)
         end
 
         # This copies the `id` from event into the actual record
@@ -147,15 +90,6 @@ module ElasticGraph
         def prepare_event(event)
           return event unless event["record"].is_a?(::Hash) && event["id"]
           event.merge("record" => event["record"].merge("id" => event.fetch("id")))
-        end
-
-        def validate_record_returning_failure(event, graphql_type_name, selected_json_schema_version)
-          record = event.fetch("record")
-          validator = validator(graphql_type_name, selected_json_schema_version)
-
-          if (error_message = validator.validate_with_error_message(record))
-            build_failed_result(event, "#{graphql_type_name} record", error_message)
-          end
         end
 
         # `Zlib.crc32` returns a value in `[0, 2**32)`. Pre-dividing that space by 100 lets us test a
@@ -176,12 +110,12 @@ module ElasticGraph
           ::Zlib.crc32(EventID.from_event(event).to_s) < percent * CRC32_SPACE_PER_PERCENT
         end
 
-        def build_failed_result(event, payload_description, validation_message)
-          message = "Malformed #{payload_description}. #{validation_message}"
+        def build_failed_result(event, validation_target, validation_message)
+          message = "Malformed #{validation_target}. #{validation_message}"
 
-          # Here we use the `RecordPreparer::Identity` record preparer because we may not have a valid JSON schema
-          # version number in this case (which is usually required to get a `RecordPreparer` from the factory), and
-          # we won't wind up using the record preparer for real on these operations, anyway.
+          # Here we use the `RecordPreparer::Identity` record preparer because the event failed validation, so
+          # no adapter-provided record preparer is available, and we won't wind up using the record preparer
+          # for real on these operations, anyway.
           #
           # Building operations for an event we already know is malformed can itself fail--for example, when the
           # record omits a field an update target derives its id from. Reporting what was malformed matters more
@@ -250,17 +184,12 @@ module ElasticGraph
         # simplecov:disable -- this should not be called. Instead, it exists to guard against wrongly raising an error from this class.
         def raise(*args)
           super("`raise` was called on `Operation::Factory`, but should not. Instead, use " \
-            "`yield build_failed_result(...)` so that we can accumulate all invalid events and allow " \
+            "`return build_failed_result(...)` so that we can accumulate all invalid events and allow " \
             "the valid events to still be processed.")
         end
         # simplecov:enable
 
-        # Return value from `build` that indicates what happened.
-        # - If it was successful, `operations` will be a non-empty array of operations and `failed_event_error` will be nil.
-        # - If there was a validation issue, `operations` will be an empty array and `failed_event_error` will be non-nil.
-        # - `type_with_skipped_validation` names the event's GraphQL type when per-record validation was skipped
-        #   (via `skip_record_validation_percents_by_type`), and is nil otherwise. `Processor` aggregates this
-        #   for observability.
+        # Return value from `build` for one event and its sole matching adapter.
         BuildResult = ::Data.define(:operations, :failed_event_error, :type_with_skipped_validation) do
           # @implements BuildResult
           def self.success(operations, type_with_skipped_validation: nil)

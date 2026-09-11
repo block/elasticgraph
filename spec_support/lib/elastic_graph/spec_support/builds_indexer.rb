@@ -20,6 +20,7 @@ module ElasticGraph
       skip_derived_indexing_type_updates: {},
       extension_modules: [],
       datastore_router: nil,
+      ingestion_adapters_by_format: nil,
       clock: nil,
       monotonic_clock: nil,
       **datastore_core_options,
@@ -37,6 +38,7 @@ module ElasticGraph
         datastore_core: datastore_core || build_datastore_core(**datastore_core_options, &customize_datastore_config),
         config: config,
         datastore_router: datastore_router,
+        ingestion_adapters_by_format: ingestion_adapters_by_format,
         clock: clock,
         monotonic_clock: monotonic_clock
       )

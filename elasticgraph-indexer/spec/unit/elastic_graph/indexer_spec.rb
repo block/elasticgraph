@@ -14,6 +14,12 @@ module ElasticGraph
       expect_to_return_non_nil_values_from_all_attributes(build_indexer)
     end
 
+    it "accepts injected ingestion adapters by format" do
+      adapters = {"test" => Object.new}
+
+      expect(build_indexer(ingestion_adapters_by_format: adapters).ingestion_adapters_by_format).to be(adapters)
+    end
+
     describe ".from_parsed_yaml" do
       it "builds an Indexer instance from the contents of a YAML settings file" do
         customization_block = lambda { |conn| }

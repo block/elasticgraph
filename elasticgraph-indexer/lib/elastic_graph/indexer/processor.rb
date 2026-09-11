@@ -53,7 +53,7 @@ module ElasticGraph
         calculate_latency_metrics(successful_operations, bulk_result.noop_results)
 
         all_failures =
-          factory_results.map(&:failed_event_error).compact +
+          factory_results.filter_map(&:failed_event_error) +
           bulk_result.failure_results.map do |result|
             all_operations_for_event = factory_results_by_event.fetch(result.event).operations
             FailedEventError.from_failed_operation_result(result, all_operations_for_event.to_set)

@@ -7,11 +7,11 @@
 # frozen_string_literal: true
 
 require "elastic_graph/indexer"
-require "elastic_graph/indexer/test_support/converters"
-require "elastic_graph/indexer/processor"
 require "elastic_graph/indexer/datastore_indexing_router"
-require "elastic_graph/support/hash_util"
+require "elastic_graph/indexer/processor"
+require "elastic_graph/indexer/test_support/converters"
 require "elastic_graph/spec_support/builds_indexer_operation"
+require "elastic_graph/support/hash_util"
 require "json"
 
 module ElasticGraph
@@ -418,6 +418,24 @@ module ElasticGraph
             )
           end
 
+          it "counts a skipped event when multiple adapters are registered" do
+            adapter = indexer.ingestion_adapters_by_format.fetch("json")
+            unused_adapter = instance_double(IngestionAdapter::Interface)
+            indexer_with_adapters = Indexer.new(
+              datastore_core: indexer.datastore_core,
+              config: indexer.config,
+              datastore_router: datastore_router,
+              ingestion_adapters_by_format: {"other" => unused_adapter, "json" => adapter},
+              clock: clock
+            )
+
+            indexer_with_adapters.processor.process([build_upsert_event(:component, id: "c1", __version: 1)], refresh_indices: true)
+
+            expect(logged_jsons_of_type("RecordValidationSkipped")).to contain_exactly(
+              a_hash_including("count" => 1, "counts_by_type" => {"Component" => 1})
+            )
+          end
+
           it "logs nothing when no records in the batch had validation skipped" do
             address = build_upsert_event(:address, id: "a1", __version: 1)
 
@@ -427,10 +445,11 @@ module ElasticGraph
           end
         end
 
-        def build_indexer_with(latency_thresholds:)
+        def build_indexer_with(latency_thresholds:, ingestion_adapters_by_format: nil)
           build_indexer(
             clock: clock,
             datastore_router: datastore_router,
+            ingestion_adapters_by_format: ingestion_adapters_by_format,
             latency_slo_thresholds_by_timestamp_in_ms: latency_thresholds
           )
         end
