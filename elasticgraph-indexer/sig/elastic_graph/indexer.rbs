@@ -29,6 +29,9 @@ module ElasticGraph
     @ingestion_adapters_by_format: ::Hash[::String, IngestionAdapter::_Adapter]?
     def ingestion_adapters_by_format: () -> ::Hash[::String, IngestionAdapter::_Adapter]
 
+    @indexing_event_decoder: indexingEventDecoder?
+    def indexing_event_decoder: () -> indexingEventDecoder
+
     @monotonic_clock: Support::MonotonicClock?
     def monotonic_clock: () -> Support::MonotonicClock
 
