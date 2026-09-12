@@ -19,6 +19,8 @@ for gem in $gems_to_build_with_datastore_booted; do
   script/run_gem_specs $gem
 done
 
+bash script/ci_parts/check_field_retrieval
+
 halt_datastore_daemon
 
 for gem in $gems_to_build_with_datastore_halted; do

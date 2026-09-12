@@ -9,8 +9,9 @@
 require "elastic_graph/errors"
 require "elastic_graph/graphql/aggregation/query"
 require "elastic_graph/graphql/aggregation/query_optimizer"
-require "elastic_graph/graphql/decoded_cursor"
 require "elastic_graph/graphql/datastore_response/search_response"
+require "elastic_graph/graphql/decoded_cursor"
+require "elastic_graph/graphql/field_retrieval_plan"
 require "elastic_graph/graphql/filtering/filter_interpreter"
 require "elastic_graph/support/memoizable_data"
 
@@ -29,7 +30,7 @@ module ElasticGraph
     class DatastoreQuery < Support::MemoizableData.define(
       :total_document_count_needed, :aggregations, :logger, :filter_interpreter, :routing_picker,
       :index_expression_builder, :default_page_size, :initial_search_index_definitions, :max_page_size,
-      :typename_filter, :index_definitions_by_type_name,
+      :typename_filter, :index_definitions_by_type_name, :field_retrieval_planner,
       :client_filters, :internal_filters, :sort, :document_pagination,
       :requested_fields, :request_all_fields, :requested_highlights, :request_all_highlights,
       :individual_docs_needed, :size_multiplier, :monotonic_clock_deadline, :schema_element_names
@@ -72,7 +73,7 @@ module ElasticGraph
         end
 
         empty_responses.merge(responses_by_query).each_with_object({}) do |(query, response), hash|
-          hash[query] = DatastoreResponse::SearchResponse.build(response, decoded_cursor_factory: query.send(:decoded_cursor_factory))
+          hash[query] = DatastoreResponse::SearchResponse.build(response, decoded_cursor_factory: query.send(:decoded_cursor_factory), field_retrieval_plan: query.field_retrieval_plan)
         end.tap do |responses_hash|
           # Callers expect this `perform` method to provide an invariant: the returned hash MUST contain one entry
           # for each of the `queries` passed in the args. In practice, violating this invariant primarily causes a
@@ -278,6 +279,16 @@ module ElasticGraph
         client_filters + internal_filters
       end
 
+      # The complete selection is available here, including fields added by query merging.
+      def field_retrieval_plan
+        @field_retrieval_plan ||= field_retrieval_planner.plan(
+          requested_fields: requested_fields.to_a,
+          request_all_fields: request_all_fields,
+          highlighting: request_all_highlights || !requested_highlights.empty?,
+          index_definitions: narrowed_search_index_definitions
+        )
+      end
+
       private
 
       def merge_attribute(attribute, other_value)
@@ -324,7 +335,8 @@ module ElasticGraph
       def to_datastore_body
         @to_datastore_body ||= aggregations_datastore_body
           .merge(document_paginator.to_datastore_body)
-          .merge({highlight: highlight, query: filter_interpreter.build_query(all_filters), _source: source}.compact)
+          .merge({highlight: highlight, query: filter_interpreter.build_query(all_filters)}.compact)
+          .merge(field_retrieval_plan.to_datastore_body)
       end
 
       def aggregations_datastore_body
@@ -336,19 +348,6 @@ module ElasticGraph
 
           aggs.empty? ? {} : {aggs: aggs}
         end
-      end
-
-      # Make our query as efficient as possible by limiting what parts of `_source` we fetch.
-      # For an id-only query (or a query that has no requested fields) we don't need to fetch `_source`
-      # at all--which means the datastore can avoid decompressing the _source field. Otherwise,
-      # we only ask for the fields we need to return.
-      def source
-        return true if request_all_fields
-        requested_source_fields = requested_fields - ["id"]
-        return false if requested_source_fields.empty?
-        # Merging in requested_fields as _source:{includes:} based on Elasticsearch documentation:
-        # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-source-field.html#include-exclude
-        {includes: requested_source_fields.to_a}
       end
 
       def highlight
@@ -366,7 +365,7 @@ module ElasticGraph
 
       # Encapsulates dependencies of `Query`, giving us something we can expose off of `application`
       # to build queries when desired.
-      class Builder < Support::MemoizableData.define(:runtime_metadata, :logger, :filter_interpreter, :filter_node_interpreter, :default_page_size, :max_page_size, :index_definitions_by_type_name)
+      class Builder < Support::MemoizableData.define(:runtime_metadata, :logger, :filter_interpreter, :filter_node_interpreter, :default_page_size, :max_page_size, :index_definitions_by_type_name, :field_retrieval_planner)
         def routing_picker
           @routing_picker ||= RoutingPicker.new(
             filter_node_interpreter: filter_node_interpreter,
@@ -437,7 +436,8 @@ module ElasticGraph
             monotonic_clock_deadline: monotonic_clock_deadline,
             filter_interpreter: filter_interpreter,
             default_page_size: default_page_size,
-            max_page_size: max_page_size
+            max_page_size: max_page_size,
+            field_retrieval_planner: field_retrieval_planner
           )
         end
       end

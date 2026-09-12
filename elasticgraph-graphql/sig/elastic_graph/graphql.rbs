@@ -17,6 +17,7 @@ module ElasticGraph
       datastore_core: DatastoreCore,
       ?graphql_adapter: Resolvers::graphQLAdapter?,
       ?datastore_search_router: DatastoreSearchRouter?,
+      ?field_retrieval_planner: FieldRetrieval::_Planner?,
       ?filter_interpreter: Filtering::FilterInterpreter?,
       ?sub_aggregation_grouping_adapter: Aggregation::groupingAdapter?,
       ?monotonic_clock: Support::MonotonicClock?,
@@ -37,6 +38,9 @@ module ElasticGraph
 
     @datastore_query_builder: DatastoreQuery::Builder?
     def datastore_query_builder: () -> DatastoreQuery::Builder
+
+    @field_retrieval_planner: FieldRetrieval::_Planner?
+    def field_retrieval_planner: () -> FieldRetrieval::_Planner
 
     @graphql_gem_plugins: ::Hash[::Class, ::Hash[::Symbol, untyped]]?
     def graphql_gem_plugins: () -> ::Hash[::Class, ::Hash[::Symbol, untyped]]

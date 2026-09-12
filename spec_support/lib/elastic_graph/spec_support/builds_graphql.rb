@@ -6,9 +6,9 @@
 #
 # frozen_string_literal: true
 
-require "elastic_graph/spec_support/builds_datastore_core"
 require "elastic_graph/graphql"
 require "elastic_graph/graphql/config"
+require "elastic_graph/spec_support/builds_datastore_core"
 
 module ElasticGraph
   module BuildsGraphQL
@@ -20,11 +20,13 @@ module ElasticGraph
       slow_query_latency_warning_threshold_in_ms: 30000,
       max_page_size: 500,
       default_page_size: 50,
+      experimental_field_retrieval: "source",
       datastore_core: nil,
       graphql_adapter: nil,
       monotonic_clock: nil,
       clock: ::Time,
       datastore_search_router: nil,
+      field_retrieval_planner: nil,
       filter_interpreter: nil,
       sub_aggregation_grouping_adapter: nil,
       client_resolver: nil,
@@ -32,6 +34,7 @@ module ElasticGraph
       &customize_datastore_config
     )
       config = GraphQL::Config.new(
+        experimental_field_retrieval: experimental_field_retrieval,
         max_page_size: max_page_size,
         default_page_size: default_page_size,
         slow_query_latency_warning_threshold_in_ms: slow_query_latency_warning_threshold_in_ms
@@ -49,6 +52,7 @@ module ElasticGraph
         config: config,
         graphql_adapter: graphql_adapter,
         datastore_search_router: datastore_search_router,
+        field_retrieval_planner: field_retrieval_planner,
         filter_interpreter: filter_interpreter,
         sub_aggregation_grouping_adapter: sub_aggregation_grouping_adapter,
         monotonic_clock: monotonic_clock,
