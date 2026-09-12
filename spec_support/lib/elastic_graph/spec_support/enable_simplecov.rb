@@ -130,6 +130,19 @@ SimpleCov.start do
 
   coverage_dir tmp_coverage_dir
 
+  # SimpleCov's default `test_frameworks` profile excludes files under a `spec/` (or `test/`, etc).
+  # We enforce coverage on all files (including `spec` files), so we need to delete the filter.
+  #
+  # This deletion is a bit brittle-if the filter changes in SimpleCov by a single character, it'll
+  # fail to match and leave the updated filter in place. If that were to happen, we'd silently start
+  # skipping measurement of `spec` coverage. To avoid that, we fail loudly if no filter is removed.
+  # The filter comes from here:
+  #
+  # https://github.com/simplecov-ruby/simplecov/blob/v1.1.1/lib/simplecov/profiles/test_frameworks.rb#L4
+  unless remove_filter(%r{\A(test|features|spec|autotest)/})
+    raise "SimpleCov's `test_frameworks` filter regex has changed; update it above so spec files are still measured for coverage."
+  end
+
   skip "/bundle"
 
   skip "/elastic_graph/project_template/"
