@@ -123,27 +123,20 @@ module ElasticGraph
         # Returns the label prefix (including its trailing space) that a field declaration needs
         # under the configured syntax, or an empty string when the field takes no label.
         #
-        # `proto2` requires an explicit label on every field, so non-repeated fields get
-        # `optional `; `proto3` labels repeated fields only. Note that `oneof` alternatives never
+        # Non-repeated fields use `optional` in both syntaxes so that absence is distinct from
+        # an explicitly supplied zero, false, or empty string. `oneof` alternatives never
         # get a label under either syntax -- protoc rejects one -- so the `oneof` renderer in
         # `ObjectInterfaceAndUnionExtension` does not call this.
         #
         # @api private
         def field_label_prefix(repeated:)
           return "repeated " if repeated
-          proto2? ? "optional " : ""
-        end
-
-        # Indicates whether the generator emits `proto2` rather than `proto3`.
-        #
-        # @api private
-        def proto2?
-          @syntax == "proto2"
+          "optional "
         end
 
         private
 
-        # Selects the indexed root types and every type transitively referenced by their protobuf
+        # Selects indexed root types and every type transitively referenced by their protobuf
         # representations. All traversal state is local so repeated calls are independent.
         def proto_types
           types_to_visit = _ = @state.indexed_types_by_index_name.values.dup

@@ -367,6 +367,7 @@ GEM
       logger
     graphql-c_parser (1.1.4)
       graphql (>= 2.2.10)
+    grpc-tools (1.83.1)
     hana (1.3.7)
     hashdiff (1.2.1)
     hashery (2.1.2)
@@ -702,6 +703,7 @@ DEPENDENCIES
   filewatcher (~> 3.0, >= 3.0.1)
   flatware-rspec (~> 2.4)
   graphql-c_parser (~> 1.1, >= 1.1.4)
+  grpc-tools (~> 1.83)
   html-proofer (~> 5.2, >= 5.2.2)
   httpx (~> 1.8, >= 1.8.3)
   irb (~> 1.18)
@@ -822,6 +824,7 @@ CHECKSUMS
   google-protobuf (4.36.0-java) sha256=fb5afe7a4a48ba082d7e7c557a2298b6a9a6cecadfd56e604c22060ba0d28f24
   graphql (2.6.9) sha256=afe7bc03164f1a61abc66a415744ffd315c5aca116c9f3438c57391a431e4fe5
   graphql-c_parser (1.1.4) sha256=8d3bf769ae935373ada877fe003036892b45be98c2fbcc6731dd82af2c3e0656
+  grpc-tools (1.83.1) sha256=d523499333d1b589520c16d3cec4e0527cd87d70de359d25c4261b5bdb032469
   hana (1.3.7) sha256=5425db42d651fea08859811c29d20446f16af196308162894db208cac5ce9b0d
   hashdiff (1.2.1) sha256=9c079dbc513dfc8833ab59c0c2d8f230fa28499cc5efb4b8dd276cf931457cd1
   hashery (2.1.2) sha256=d239cc2310401903f6b79d458c2bbef5bf74c46f3f974ae9c1061fb74a404862

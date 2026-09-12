@@ -32,9 +32,9 @@ module ElasticGraph
             import "google/protobuf/timestamp.proto";
 
             message Event {
-              string id = 1;
-              google.protobuf.Timestamp created_at = 2;
-              google.protobuf.Timestamp updated_at = 3;
+              optional string id = 1;
+              optional google.protobuf.Timestamp created_at = 2;
+              optional google.protobuf.Timestamp updated_at = 3;
               // Next field number: 4
             }
           PROTO
@@ -61,9 +61,9 @@ module ElasticGraph
             package elasticgraph;
 
             message Event {
-              string id = 1;
+              optional string id = 1;
               // Must be formatted as an ISO 8601 timestamp.
-              string created_at = 2;
+              optional string created_at = 2;
               // Next field number: 3
             }
           PROTO
@@ -91,8 +91,8 @@ module ElasticGraph
             import "google/type/date.proto";
 
             message Event {
-              string id = 1;
-              google.type.Date occurred_on = 2;
+              optional string id = 1;
+              optional google.type.Date occurred_on = 2;
               // Next field number: 3
             }
           PROTO
@@ -172,13 +172,13 @@ module ElasticGraph
 
           expect(proto_type_def_from(proto, "Person")).to eq(<<~PROTO.strip)
             message Person {
-              string id = 1;
+              optional string id = 1;
               // The dates that matter to this person.
               //
               // Must be formatted as an ISO 8601 date, e.g. "2024-11-25".
               repeated string important_dates = 2;
               // Must be an IANA time zone identifier, e.g. "America/Los_Angeles".
-              string time_zone = 3;
+              optional string time_zone = 3;
               // Next field number: 4
             }
           PROTO
@@ -199,7 +199,7 @@ module ElasticGraph
           end
 
           expect(proto).to include('import "my-app/types/v1.money.proto";')
-          expect(proto).to include("  // Amount and currency.\n  myapp.types.Money total = 2;")
+          expect(proto).to include("  // Amount and currency.\n  optional myapp.types.Money total = 2;")
         end
 
         it "rejects an `import:` that is not the path of a `.proto` file" do
@@ -246,13 +246,13 @@ module ElasticGraph
 
           expect(proto_type_def_from(proto, "Order")).to eq(<<~PROTO.strip)
             message Order {
-              string id = 1;
+              optional string id = 1;
               // What the customer owes.
               //
               // Must be an amount and a currency.
               //
               // The amount is in minor units.
-              string total = 2;
+              optional string total = 2;
               // Next field number: 3
             }
           PROTO

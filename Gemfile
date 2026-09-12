@@ -13,6 +13,8 @@ group :development do
   gem "aws_lambda_ric", "~> 3.2"
   # graphql-c_parser is no longer a hard dependency, but we include it here for faster CI tests
   gem "graphql-c_parser", "~> 1.1", ">= 1.1.4", platforms: :ruby
+  # Vendors precompiled `protoc` binaries, so neither CI nor contributors need a system `protoc` install.
+  gem "grpc-tools", "~> 1.83"
   gem "benchmark-ips", "~> 2.15", ">= 2.15.1"
   gem "coderay", "~> 1.1", ">= 1.1.3"
   gem "factory_bot", "~> 6.6"

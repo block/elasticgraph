@@ -48,16 +48,16 @@ module ElasticGraph
             // An account in the system.
             message Account {
               // The account's unique identifier.
-              string id = 1;
-              .elasticgraph.Status status = 2;
-              .elasticgraph.Address address = 3;
+              optional string id = 1;
+              optional .elasticgraph.Status status = 2;
+              optional .elasticgraph.Address address = 3;
               repeated string tags = 4;
               // Next field number: 5
             }
 
             message Address {
-              string street = 1;
-              string city = 2;
+              optional string street = 1;
+              optional string city = 2;
               // Next field number: 3
             }
 
@@ -301,20 +301,26 @@ module ElasticGraph
           PROTO
         end
 
-        it "rejects lists of lists" do
-          expect {
-            define_proto_schema do |s|
-              s.object_type "Matrix" do |t|
-                t.field "id", "ID"
-                t.field "values", "[[Float!]!]!"
-                t.index "matrices"
-              end
+        it "represents lists of lists with generated wrapper messages" do
+          proto = define_proto_schema do |s|
+            s.object_type "Matrix" do |t|
+              t.field "id", "ID"
+              t.field "values", "[[Float!]!]!"
+              t.index "matrices"
             end
-          }.to raise_error(Errors::SchemaError, a_string_including(
-            "Field `Matrix.values` has type `[[Float!]!]!`",
-            "Protocol Buffers cannot represent lists of lists directly",
-            "at most one list level"
-          ))
+          end
+
+          expect(proto_type_def_from(proto, "Matrix")).to eq(<<~PROTO.strip)
+            message Matrix {
+              optional string id = 1;
+              repeated .elasticgraph.Matrix.ValuesList values = 2;
+              // Next field number: 3
+
+              message ValuesList {
+                repeated double values = 1;
+              }
+            }
+          PROTO
         end
 
         it "uses custom proto scalar mappings" do
