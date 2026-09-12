@@ -98,7 +98,7 @@ module ElasticGraph
             outer_accum + queries_and_responses.reduce(0) do |inner_accum, (query, response)|
               shards_total = response.dig("_shards", "total")
 
-              if shards_total == 0 && !query.excluding_indices?
+              if shards_total == 0 && !query.searches_only_deleted_indices?
                 raise ::GraphQL::ExecutionError, INDICES_NOT_CONFIGURED_MESSAGE
               end
 

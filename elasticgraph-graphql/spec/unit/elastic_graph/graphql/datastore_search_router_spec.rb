@@ -33,6 +33,11 @@ module ElasticGraph
               i.rollover :yearly, "created_at"
             end
           end
+
+          schema.object_type "NonRolloverWidget" do |t|
+            t.field "id", "ID!"
+            t.index "non_rollover_widgets"
+          end
         end
       end
 
@@ -69,13 +74,13 @@ module ElasticGraph
         let(:query1) { new_widgets_query(default_page_size: 10, individual_docs_needed: true) }
         let(:query2) { new_widgets_query(default_page_size: 3, individual_docs_needed: true) }
 
-        it "passes a set of empty headers along with each search body to the datastore, since it requires that for msearch" do
+        it "passes index options along with each search body to the datastore" do
           router.msearch([query1, query2])
 
           expect(main_datastore_client).to have_received(:msearch).with(a_hash_including(body: [
-            {index: "widgets_rollover__*"},
+            {index: "widgets_rollover__*", ignore_unavailable: true},
             a_hash_including(sort: sort_list_with_missing_option_for(sort_list), size: a_value_within(1).of(10)),
-            {index: "widgets_rollover__*"},
+            {index: "widgets_rollover__*", ignore_unavailable: true},
             a_hash_including(sort: sort_list_with_missing_option_for(sort_list), size: a_value_within(1).of(3))
           ]))
         end
@@ -206,7 +211,7 @@ module ElasticGraph
           expect {
             router.msearch([query1, query2])
           }.to raise_error(Errors::SearchFailedError, a_string_including(
-            "2) ", '{"index":"widgets_rollover__*"}', '{"bad stuff" => "happened"}'
+            "2) ", '{"index":"widgets_rollover__*","ignore_unavailable":true}', '{"bad stuff" => "happened"}'
           ).and(excluding(
             # These are parts of the body of the request, which we don't want included because it could contain PII!
             "track_total_hits", "size",
@@ -241,7 +246,8 @@ module ElasticGraph
           )
         end
 
-        it "raises `::GraphQL::ExecutionError` if a search queries no shards without excluding any indices as that indicates the indices have not been configured" do
+        it "raises `::GraphQL::ExecutionError` if a search queries no shards from an unconfigured rollover index" do
+          allow(main_datastore_client).to receive(:list_indices_matching).with("widgets_rollover__*").and_return([])
           allow(main_datastore_client).to receive(:msearch).and_return("took" => 10, "responses" => [
             empty_response,
             no_shards_searched_response
@@ -252,6 +258,70 @@ module ElasticGraph
           }.to raise_error ::GraphQL::ExecutionError, a_string_including(
             "The datastore indices have not been configured. They must be configured before ElasticGraph can serve queries."
           )
+        end
+
+        it "raises `::GraphQL::ExecutionError` if a search queries no shards from an unconfigured non-rollover index" do
+          allow(main_datastore_client).to receive(:msearch).and_return("took" => 10, "responses" => [
+            no_shards_searched_response
+          ])
+
+          expect {
+            router.msearch([new_non_rollover_widgets_query])
+          }.to raise_error ::GraphQL::ExecutionError, a_string_including(
+            "The datastore indices have not been configured. They must be configured before ElasticGraph can serve queries."
+          )
+        end
+
+        it "uses `__typename`-narrowed index definitions to identify an unconfigured non-rollover index" do
+          allow(main_datastore_client).to receive(:msearch).and_return("took" => 10, "responses" => [
+            no_shards_searched_response
+          ])
+
+          widgets_def = graphql.datastore_core.index_definitions_by_name.fetch("widgets")
+          non_rollover_widgets_def = graphql.datastore_core.index_definitions_by_name.fetch("non_rollover_widgets")
+          narrowed_query = datastore_query_builder.new_query(
+            initial_search_index_definitions: [widgets_def, non_rollover_widgets_def],
+            client_filters: [{"__typename" => {"equal_to_any_of" => ["NonRolloverWidget"]}}],
+            requested_fields: ["id"]
+          )
+          expect(narrowed_query.search_index_expression).to eq("non_rollover_widgets")
+
+          expect {
+            router.msearch([narrowed_query])
+          }.to raise_error ::GraphQL::ExecutionError, a_string_including(
+            "The datastore indices have not been configured. They must be configured before ElasticGraph can serve queries."
+          )
+        end
+
+        it "raises `::GraphQL::ExecutionError` if a mixed search includes an unconfigured non-rollover index" do
+          allow(main_datastore_client).to receive(:msearch).and_return("took" => 10, "responses" => [
+            no_shards_searched_response
+          ])
+
+          widgets_def = graphql.datastore_core.index_definitions_by_name.fetch("widgets")
+          non_rollover_widgets_def = graphql.datastore_core.index_definitions_by_name.fetch("non_rollover_widgets")
+          mixed_query = datastore_query_builder.new_query(
+            initial_search_index_definitions: [widgets_def, non_rollover_widgets_def],
+            requested_fields: ["id"]
+          )
+          expect(mixed_query.search_index_expression).to eq("non_rollover_widgets,widgets_rollover__*")
+
+          expect {
+            router.msearch([mixed_query])
+          }.to raise_error ::GraphQL::ExecutionError, a_string_including(
+            "The datastore indices have not been configured. They must be configured before ElasticGraph can serve queries."
+          )
+        end
+
+        it "returns no results if no shards are searched after all cached rollover indices are deleted" do
+          allow(main_datastore_client).to receive(:msearch).and_return("took" => 10, "responses" => [
+            no_shards_searched_response
+          ])
+
+          expect(query1.search_index_expression).to eq("widgets_rollover__*")
+
+          responses_by_query = router.msearch([query1])
+          expect(responses_by_query.fetch(query1).documents).to eq([])
         end
 
         it "returns no results if a search queries no shards while excluding indices as that indicates the indices have been configured" do
@@ -265,6 +335,12 @@ module ElasticGraph
 
           responses_by_query = router.msearch([query1, query_excluding_indices])
           expect(responses_by_query.values.map(&:documents)).to eq [[], []]
+          expect(main_datastore_client).to have_received(:msearch).with(a_hash_including(body: [
+            {index: "widgets_rollover__*", ignore_unavailable: true},
+            anything,
+            {index: "widgets_rollover__*,-widgets_rollover__2024", ignore_unavailable: true},
+            anything
+          ]))
         end
 
         it "logs warning if a query has failed shards" do
@@ -399,6 +475,13 @@ module ElasticGraph
           }.merge(args)
 
           datastore_query_builder.with(default_page_size: default_page_size).new_query(**options)
+        end
+
+        def new_non_rollover_widgets_query
+          datastore_query_builder.new_query(
+            initial_search_index_definitions: [graphql.datastore_core.index_definitions_by_name.fetch("non_rollover_widgets")],
+            requested_fields: ["id"]
+          )
         end
       end
 
