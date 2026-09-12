@@ -7,5 +7,5 @@
 # frozen_string_literal: true
 
 require "elastic_graph/spec_support/builds_indexer"
-require "elastic_graph/spec_support/json_ingestion_schema_definition"
+require "elastic_graph/spec_support/json_ingestion_support"
 require "elastic_graph/spec_support/uses_datastore"

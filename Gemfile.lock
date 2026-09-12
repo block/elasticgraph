@@ -109,6 +109,8 @@ PATH
   remote: elasticgraph-json_ingestion
   specs:
     elasticgraph-json_ingestion (1.2.1.pre)
+      elasticgraph-indexer (= 1.2.1.pre)
+      elasticgraph-schema_definition (= 1.2.1.pre)
       elasticgraph-support (= 1.2.1.pre)
 
 PATH

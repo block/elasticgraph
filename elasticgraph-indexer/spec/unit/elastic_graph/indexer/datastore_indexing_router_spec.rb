@@ -15,7 +15,7 @@ require "elastic_graph/spec_support/builds_indexer_operation"
 
 module ElasticGraph
   class Indexer
-    RSpec.describe DatastoreIndexingRouter, :json_ingestion_schema_definition, :capture_logs do
+    RSpec.describe DatastoreIndexingRouter, :json_ingestion_support, :capture_logs do
       include SpecSupport::BuildsIndexerOperation
 
       let(:main_datastore_client) { instance_spy(Elasticsearch::Client, cluster_name: "main") }
@@ -601,7 +601,7 @@ module ElasticGraph
 
         arguments = {
           event: event,
-          prepared_record: indexer.record_preparer_factory.for_latest_json_schema_version.prepare_for_index(
+          prepared_record: latest_json_record_preparer_for(indexer).prepare_for_index(
             event.fetch("type"),
             event.fetch("record"),
             destination_index_mapping.fetch("properties")

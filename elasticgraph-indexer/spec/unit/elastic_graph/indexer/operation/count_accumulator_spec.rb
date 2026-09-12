@@ -12,7 +12,7 @@ require "elastic_graph/indexer/operation/update"
 module ElasticGraph
   class Indexer
     module Operation
-      RSpec.describe CountAccumulator do
+      RSpec.describe CountAccumulator, :json_ingestion_support do
         describe "counts indexed on the root document" do
           it "includes counts for each list field" do
             counts = root_counts_for_team_event({"past_names" => ["a", "b", "c"], "seasons_object" => []})
@@ -300,7 +300,7 @@ module ElasticGraph
           update = Update.new(
             event: {"type" => source_type, "record" => data},
             destination_index_def: destination_index_def,
-            prepared_record: indexer.record_preparer_factory.for_latest_json_schema_version.prepare_for_index(
+            prepared_record: latest_json_record_preparer_for(indexer).prepare_for_index(
               source_type,
               data,
               destination_index_mapping.fetch("properties")

@@ -8,8 +8,8 @@
 
 module ElasticGraph
   class Indexer
-    # Namespace for ingestion adapters. An ingestion adapter teaches the indexer how to handle
-    # events of a particular ingestion format: it validates each event and provides the
+    # Namespace for ingestion adapters. An ingestion adapter handles events of a particular
+    # ingestion format: it validates each event and provides the
     # version-appropriate machinery to prepare the event's record for indexing.
     module IngestionAdapter
       # Defines the ingestion adapter interface. Adapter classes are not required to subclass this,

@@ -48,5 +48,6 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "aws_lambda_ric", "~> 3.2"
   spec.add_development_dependency "elasticgraph-elasticsearch", ElasticGraph::VERSION
+  spec.add_development_dependency "elasticgraph-json_ingestion", ElasticGraph::VERSION
   spec.add_development_dependency "elasticgraph-opensearch", ElasticGraph::VERSION
 end

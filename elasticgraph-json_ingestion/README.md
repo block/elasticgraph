@@ -102,6 +102,19 @@ ElasticGraph.define_schema do |schema|
 end
 ```
 
+## Indexing Support
+
+Beyond schema definition, this gem provides an adapter used by `elasticgraph-indexer` to ingest JSON events. The
+adapter validates each event against the JSON schema identified by the event's
+`json_schema_version` and prepares its record for indexing using that version's view of the schema.
+
+JSON ingestion is enabled automatically for schemas defined with this gem's `SchemaDefinition::APIExtension`;
+no indexer configuration is needed.
+
+This gem also provides the `be_a_valid_elastic_graph_event` RSpec matcher (via
+`require "elastic_graph/json_ingestion/spec_support/event_matcher"`) for testing that publisher events
+conform to your schema.
+
 ## Dependency Diagram
 
 ```mermaid
@@ -111,7 +124,13 @@ graph LR;
     classDef externalGemStyle fill:#E0EFFF,stroke:#70A1D7,color:#2980B9;
     elasticgraph-json_ingestion["elasticgraph-json_ingestion"];
     class elasticgraph-json_ingestion targetGemStyle;
+    elasticgraph-indexer["elasticgraph-indexer"];
+    elasticgraph-json_ingestion --> elasticgraph-indexer;
+    class elasticgraph-indexer otherEgGemStyle;
     elasticgraph-support["elasticgraph-support"];
     elasticgraph-json_ingestion --> elasticgraph-support;
     class elasticgraph-support otherEgGemStyle;
+    elasticgraph-schema_definition["elasticgraph-schema_definition"];
+    elasticgraph-json_ingestion --> elasticgraph-schema_definition;
+    class elasticgraph-schema_definition otherEgGemStyle;
 ```

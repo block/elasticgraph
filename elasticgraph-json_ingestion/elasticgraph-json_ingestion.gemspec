@@ -34,10 +34,12 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = [">= 3.4", "< 4.1"]
 
+  spec.add_dependency "elasticgraph-indexer", ElasticGraph::VERSION
   spec.add_dependency "elasticgraph-support", ElasticGraph::VERSION
 
-  # This gem's schema-definition extension code references `elasticgraph-schema_definition`, but
-  # applications load it through schema-definition tasks after `elasticgraph-schema_definition` is already
-  # available. Keeping this as a development dependency avoids a runtime dependency cycle.
-  spec.add_development_dependency "elasticgraph-schema_definition", ElasticGraph::VERSION
+  spec.add_dependency "elasticgraph-schema_definition", ElasticGraph::VERSION
+
+  # Indexer specs use real datastore client classes.
+  spec.add_development_dependency "elasticgraph-elasticsearch", ElasticGraph::VERSION
+  spec.add_development_dependency "elasticgraph-opensearch", ElasticGraph::VERSION
 end
