@@ -6,7 +6,7 @@ module ElasticGraph
 
       attr_reader indexer: ::ElasticGraph::Indexer
 
-      def initialize: (indexer: ::ElasticGraph::Indexer) -> void
+      def initialize: (::ElasticGraph::Indexer) -> void
 
       def config: () -> ::ElasticGraph::Indexer::Config
       def datastore_core: () -> DatastoreCore
