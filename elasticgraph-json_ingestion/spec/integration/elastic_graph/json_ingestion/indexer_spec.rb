@@ -12,7 +12,7 @@ require "json"
 module ElasticGraph
   module JSONIngestion
     RSpec.describe Indexer, :ingests_json_data, :factories do
-      let(:indexer) { Indexer.new(indexer: build_indexer) }
+      let(:indexer) { Indexer.new(build_indexer) }
 
       it "decodes and processes a JSON Lines payload" do
         event = build_upsert_event(:component, id: "json-indexer-process", name: "processed")
