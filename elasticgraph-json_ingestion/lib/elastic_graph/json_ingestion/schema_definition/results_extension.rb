@@ -76,7 +76,7 @@ module ElasticGraph
 
         def json_ingestion_json_schema_builder
           @json_ingestion_json_schema_builder ||= begin
-            # Resolve `sourced_from` update targets before touching `all_types` so that `sourced_from`
+            # Resolve `sourced_from` update targets (via `ingestible_types_by_name`) before touching `all_types` so that `sourced_from`
             # validation errors take precedence over any errors raised while generating derived types.
             ingestible_types = ingestible_types_by_name
 
