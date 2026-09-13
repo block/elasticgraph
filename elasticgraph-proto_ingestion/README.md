@@ -77,17 +77,6 @@ end
 After running `bundle exec rake schema_artifacts:dump`, ElasticGraph will generate a `schema.proto`
 schema artifact, and will maintain a `proto_field_numbers.yaml` file alongside your schema definition.
 
-### Which Types Get a Message
-
-`schema.proto` contains a message for each type you can publish events for, and for each type they
-reference:
-
-- Indexed types. An indexed abstract type also gets a `oneof` wrapper message.
-- `sourced_from` source types. A source type needs no index of its own.
-
-Derived indexing types get no message. ElasticGraph builds their documents from the events of other
-types, so a publisher never sends one.
-
 ## Schema Definition API
 
 ### Protobuf Syntax (`proto2` / `proto3`)

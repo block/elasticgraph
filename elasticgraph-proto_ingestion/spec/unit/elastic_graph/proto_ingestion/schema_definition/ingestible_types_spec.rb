@@ -116,8 +116,7 @@ module ElasticGraph
             end
           end
 
-          expect(proto_type_def_from(proto, "Widget")).not_to be nil
-          expect(proto_type_def_from(proto, "WidgetWorkspace")).to be nil
+          expect(proto_types_defined_in(proto)).to contain_exactly("Widget")
         end
 
         it "generates no message for a type that no ingestible type references" do
@@ -133,7 +132,7 @@ module ElasticGraph
             end
           end
 
-          expect(proto_type_def_from(proto, "Unreferenced")).to be nil
+          expect(proto_types_defined_in(proto)).to contain_exactly("Widget")
         end
 
         # Defines an indexed type with a top-level `sourced_from` field fed by `ComponentDesign`.
