@@ -4,7 +4,7 @@ module ElasticGraph
   type datastoreScriptScriptHash = {"lang" => datastoreScriptLanguage, "source" => ::String}
   type datastoreScriptPayloadHash = {"context" => datastoreScriptContext, "script" => datastoreScriptScriptHash}
   type datastoreScriptsByIdHash = ::Hash[::String, datastoreScriptPayloadHash]
-  type schemaArtifacts = _SchemaArtifacts & SchemaArtifacts::ArtifactsHelperMethods
+  type schemaArtifacts = _SchemaArtifacts & SchemaArtifacts::ArtifactsHelperMethods & ::Object
 
   interface _SchemaArtifacts
     def graphql_schema_string: () -> ::String

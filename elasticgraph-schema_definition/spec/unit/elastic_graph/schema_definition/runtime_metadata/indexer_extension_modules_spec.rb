@@ -14,12 +14,10 @@ module ElasticGraph
       include_context "RuntimeMetadata support"
 
       it "includes any modules registered during schema definition" do
-        extension_module1 = Module.new
-        extension_module2 = Module.new
-
-        metadata = define_schema do |s|
-          s.register_indexer_extension extension_module1, defined_at: __FILE__
-          s.register_indexer_extension extension_module2, defined_at: __FILE__
+        metadata = define_schema(extension_modules: []) do |s|
+          s.register_indexer_extension TestSupport::IndexerExtension,
+            defined_at: "elastic_graph/schema_definition/test_support"
+          s.register_indexer_extension Enumerable, defined_at: "set"
 
           s.object_type "Widget" do |t|
             t.field "id", "ID!"
@@ -29,12 +27,53 @@ module ElasticGraph
 
         expect(metadata.indexer_extension_modules).to eq [
           SchemaArtifacts::RuntimeMetadata::ComponentExtension.new(
-            SchemaArtifacts::RuntimeMetadata::Extension.new(extension_module1, __FILE__, {}).to_dumpable_hash
+            SchemaArtifacts::RuntimeMetadata::Extension.new(
+              TestSupport::IndexerExtension,
+              "elastic_graph/schema_definition/test_support",
+              {}
+            ).to_dumpable_hash
           ),
           SchemaArtifacts::RuntimeMetadata::ComponentExtension.new(
-            SchemaArtifacts::RuntimeMetadata::Extension.new(extension_module2, __FILE__, {}).to_dumpable_hash
+            SchemaArtifacts::RuntimeMetadata::Extension.new(Enumerable, "set", {}).to_dumpable_hash
           )
         ]
+      end
+
+      it "rejects indexed schemas that have no registered indexer extension" do
+        expect {
+          define_schema(extension_modules: []) do |s|
+            s.object_type "Widget" do |t|
+              t.field "id", "ID!"
+              t.index "widgets"
+            end
+          end.runtime_metadata
+        }.to raise_error Errors::SchemaError, a_string_including(
+          "defines indexed types but does not register an indexer extension",
+          "Add an ingestion format extension"
+        )
+      end
+
+      it "rejects indexed schemas whose indexer extensions do not provide ingestion adapters" do
+        expect {
+          define_schema(extension_modules: []) do |s|
+            s.register_indexer_extension Enumerable, defined_at: "set"
+
+            s.object_type "Widget" do |t|
+              t.field "id", "ID!"
+              t.index "widgets"
+            end
+          end.runtime_metadata
+        }.to raise_error Errors::SchemaError, a_string_including("provides `ingestion_adapters_by_format`")
+      end
+
+      it "allows schemas with no indexed types to omit an indexer extension" do
+        expect {
+          define_schema(extension_modules: []) do |s|
+            s.object_type "Widget" do |t|
+              t.field "id", "ID!"
+            end
+          end.runtime_metadata
+        }.not_to raise_error
       end
     end
   end

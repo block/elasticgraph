@@ -34,7 +34,10 @@ module ElasticGraph
 
         define_schema(
           schema_element_name_form: :snake_case,
-          extension_modules: [SchemaDefinition::APIExtension],
+          extension_modules: [
+            ElasticGraph::SchemaDefinition::TestSupport::APIExtension,
+            SchemaDefinition::APIExtension
+          ],
           **options
         ) do |schema|
           schema.state.proto_ingestion_state.field_number_mappings = mappings if mappings

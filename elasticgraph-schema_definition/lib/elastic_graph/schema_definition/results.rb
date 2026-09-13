@@ -170,6 +170,8 @@ module ElasticGraph
       end
 
       def verify_runtime_metadata(runtime_metadata)
+        verify_indexer_extension_modules(runtime_metadata)
+
         registered_resolvers = runtime_metadata.graphql_resolvers_by_name
 
         fields_by_resolvers = ::Hash.new { |h, k| h[k] = [] } # : ::Hash[::Symbol, ::Array[::String]]
@@ -213,6 +215,19 @@ module ElasticGraph
               - #{registered_resolvers.keys.map(&:inspect).sort.join("\n  - ")}
           EOS
         end
+      end
+
+      def verify_indexer_extension_modules(runtime_metadata)
+        return if runtime_metadata.index_definitions_by_name.empty?
+        return if runtime_metadata.indexer_extension_modules.any? do |extension|
+          extension.load_extension.extension_class.public_method_defined?(:ingestion_adapters_by_format)
+        end
+
+        raise Errors::SchemaError, <<~EOS.strip
+          This schema defines indexed types but does not register an indexer extension that provides `ingestion_adapters_by_format`.
+
+          Add an ingestion format extension to your schema definition Rake tasks and regenerate the schema artifacts.
+        EOS
       end
 
       def strip_trailing_whitespace(string)

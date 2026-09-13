@@ -18,7 +18,6 @@ module ElasticGraph
       def define_schema(**options, &block)
         super(
           schema_element_name_form: "snake_case",
-          extension_modules: [],
           **options,
           &block
         )

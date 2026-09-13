@@ -35,6 +35,7 @@ module ElasticGraph
       def build_runtime_metadata: () -> SchemaArtifacts::RuntimeMetadata::Schema
       def generate_sdl: () -> ::String
       def verify_runtime_metadata: (SchemaArtifacts::RuntimeMetadata::Schema) -> void
+      def verify_indexer_extension_modules: (SchemaArtifacts::RuntimeMetadata::Schema) -> void
       def strip_trailing_whitespace: (::String) -> ::String
       def check_for_circular_dependencies!: () -> void
       def recursively_add_referenced_types_to: (SchemaElements::TypeReference, ::Hash[::String, ::Set[::String]]) -> void
