@@ -123,22 +123,18 @@ conform to your schema.
 require "elastic_graph/json_ingestion/indexer"
 
 indexer = ElasticGraph::JSONIngestion::Indexer.from_yaml_file("config/settings/local.yaml")
-json_lines_payload = $stdin.read
-indexer.process(json_lines_payload) unless json_lines_payload.empty?
+indexer.process(json_lines_payload)
 ```
 
 Use `#process_returning_failures` when individual failures must be handled by the caller. Transports that need to
 add metadata or combine several payloads into one bulk operation can call `#decode`, then pass the resulting events
-to `indexer.processor`.
+to `#processor`.
 
 The wrapper accepts an existing `ElasticGraph::Indexer`, so independent JSON and protobuf wrappers can share the
 same format-neutral indexer and its datastore clients:
 
 ```ruby
-require "elastic_graph/json_ingestion/indexer"
-
-base_indexer = ElasticGraph::Indexer.from_yaml_file("config/settings/local.yaml")
-json_indexer = ElasticGraph::JSONIngestion::Indexer.new(base_indexer)
+json_indexer = ElasticGraph::JSONIngestion::Indexer.new(indexer: base_indexer)
 ```
 
 ## Dependency Diagram

@@ -379,7 +379,7 @@ module ElasticGraph
 
       def build_sqs_processor(**options)
         indexer = JSONIngestion::Indexer.new(
-          instance_double(
+          indexer: instance_double(
             Indexer,
             logger: logger,
             processor: indexer_processor

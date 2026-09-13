@@ -6,10 +6,13 @@ module ElasticGraph
 
       attr_reader indexer: ::ElasticGraph::Indexer
 
-      def initialize: (::ElasticGraph::Indexer) -> void
+      def initialize: (indexer: ::ElasticGraph::Indexer) -> void
 
+      def config: () -> ::ElasticGraph::Indexer::Config
+      def datastore_core: () -> DatastoreCore
       def logger: () -> ::Logger
       def processor: () -> ::ElasticGraph::Indexer::Processor
+      def schema_artifacts: () -> schemaArtifacts
 
       def process: (::String, ?refresh_indices: bool) -> void
       def process_returning_failures: (::String, ?refresh_indices: bool) -> ::Array[::ElasticGraph::Indexer::FailedEventError]

@@ -1,8 +1,14 @@
 module ElasticGraph
   module IndexerLambda
     class SqsProcessor
+      interface _Indexer
+        def decode: (::String) -> ::Array[::Hash[::String, untyped]]
+        def logger: () -> ::Logger
+        def processor: () -> ::ElasticGraph::Indexer::Processor
+      end
+
       def initialize: (
-        JSONIngestion::Indexer,
+        _Indexer,
         ignore_sqs_latency_timestamps_from_arns: ::Set[::String],
         ?s3_client: Aws::S3::Client?,
       ) -> void
@@ -11,7 +17,7 @@ module ElasticGraph
 
       private
 
-      @indexer: JSONIngestion::Indexer
+      @indexer: _Indexer
       @logger: ::Logger
       @s3_client: Aws::S3::Client?
 

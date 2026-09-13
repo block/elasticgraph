@@ -27,7 +27,7 @@ module ElasticGraph
         ignore_sqs_latency_timestamps_from_arns = ::JSON.parse(ENV.fetch("IGNORE_SQS_LATENCY_TIMESTAMPS_FROM_ARNS", "[]")).to_set
 
         @sqs_processor = IndexerLambda::SqsProcessor.new(
-          JSONIngestion::Indexer.new(warehouse_lambda.indexer),
+          JSONIngestion::Indexer.new(indexer: warehouse_lambda.indexer),
           ignore_sqs_latency_timestamps_from_arns: ignore_sqs_latency_timestamps_from_arns
         )
       end

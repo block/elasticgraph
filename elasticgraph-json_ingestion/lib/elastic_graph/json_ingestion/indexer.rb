@@ -20,11 +20,20 @@ module ElasticGraph
       # @dynamic indexer
       attr_reader :indexer
 
+      # @return [ElasticGraph::Indexer::Config]
+      def config = indexer.config
+
+      # @return [DatastoreCore]
+      def datastore_core = indexer.datastore_core
+
       # @return [Logger]
       def logger = indexer.logger
 
       # @return [ElasticGraph::Indexer::Processor]
       def processor = indexer.processor
+
+      # @return [SchemaArtifacts::FromDisk]
+      def schema_artifacts = indexer.schema_artifacts
 
       # Builds a JSON-aware indexer from parsed YAML configuration.
       #
@@ -32,31 +41,27 @@ module ElasticGraph
       # @yield [Datastore::Client] optional block to customize the datastore client
       # @return [Indexer]
       def self.from_parsed_yaml(parsed_yaml, &datastore_client_customization_block)
-        new(ElasticGraph::Indexer.from_parsed_yaml(parsed_yaml, &datastore_client_customization_block))
+        new(indexer: ElasticGraph::Indexer.from_parsed_yaml(parsed_yaml, &datastore_client_customization_block))
       end
 
       # @param indexer [ElasticGraph::Indexer] the format-neutral indexer to wrap
-      def initialize(indexer)
+      def initialize(indexer:)
         @indexer = indexer
       end
 
-      # Decodes and processes one JSON Lines payload containing multiple indexing events.
-      #
-      # If any events are invalid, an exception is raised, but valid events are still written to the datastore.
-      # No attempt is made to provide atomic "all or nothing" behavior.
+      # Decodes and processes one JSON Lines payload.
       #
       # @param payload [String] newline-delimited JSON indexing events
-      # @param refresh_indices [Boolean] whether to synchronously refresh affected indices (intended for tests: this is dangerous to use in production)
+      # @param refresh_indices [Boolean] whether to refresh affected indices
       # @return [void]
       def process(payload, refresh_indices: false)
         processor.process(decode(payload), refresh_indices: refresh_indices)
       end
 
-      # Decodes and processes one JSON Lines payload containing multiple events, returning individual failures.
-      # The caller is responsible for handling the failures.
+      # Decodes and processes one JSON Lines payload, returning individual failures.
       #
       # @param payload [String] newline-delimited JSON indexing events
-      # @param refresh_indices [Boolean] whether to synchronously refresh affected indices (intended for tests: this is dangerous to use in production)
+      # @param refresh_indices [Boolean] whether to refresh affected indices
       # @return [Array<ElasticGraph::Indexer::FailedEventError>]
       def process_returning_failures(payload, refresh_indices: false)
         processor.process_returning_failures(decode(payload), refresh_indices: refresh_indices)
@@ -69,7 +74,7 @@ module ElasticGraph
       # @param payload [String] newline-delimited JSON indexing events
       # @return [Array<Hash<String, Object>>] decoded indexing events
       def decode(payload)
-        payload.split("\n").map { |event| ::JSON.parse(event) }
+        payload.split("\n").map { |event| JSON.parse(event) }
       end
     end
   end
