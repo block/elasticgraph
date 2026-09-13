@@ -20,20 +20,11 @@ module ElasticGraph
       # @dynamic indexer
       attr_reader :indexer
 
-      # @return [ElasticGraph::Indexer::Config]
-      def config = indexer.config
-
-      # @return [DatastoreCore]
-      def datastore_core = indexer.datastore_core
-
       # @return [Logger]
       def logger = indexer.logger
 
       # @return [ElasticGraph::Indexer::Processor]
       def processor = indexer.processor
-
-      # @return [SchemaArtifacts::FromDisk]
-      def schema_artifacts = indexer.schema_artifacts
 
       # Builds a JSON-aware indexer from parsed YAML configuration.
       #
