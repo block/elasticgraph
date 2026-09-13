@@ -16,12 +16,14 @@ module ElasticGraph
         @all_types: ::Array[::ElasticGraph::SchemaDefinition::SchemaElements::graphQLType]
         @package_name: ::String
         @field_number_mappings: FieldNumberMappings
+        @ingestible_types_by_name: ::Hash[::String, ::ElasticGraph::SchemaDefinition::indexableType]
         @previous_field_names_by_type_name_and_field_name: ::Hash[::String, ::Hash[::String, ::Array[::String]]]?
 
         def initialize: (
           state: ::ElasticGraph::SchemaDefinition::State,
           all_types: ::Array[::ElasticGraph::SchemaDefinition::SchemaElements::graphQLType],
-          ingestion_state: ProtoIngestionState
+          ingestion_state: ProtoIngestionState,
+          ingestible_types_by_name: ::Hash[::String, ::ElasticGraph::SchemaDefinition::indexableType]
         ) -> void
 
         def to_proto: () -> ::String

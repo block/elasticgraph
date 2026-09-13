@@ -17,11 +17,11 @@ module ElasticGraph
       #
       # @private
       class JSONSchemaBuilder
-        def initialize(state:, all_types:, derived_indexing_type_names:, sourced_from_source_type_names:)
+        def initialize(state:, all_types:, derived_indexing_type_names:, ingestible_types_by_name:)
           @state = state
           @all_types = all_types
           @derived_indexing_type_names = derived_indexing_type_names
-          @sourced_from_source_type_names = sourced_from_source_type_names
+          @ingestible_types_by_name = ingestible_types_by_name
         end
 
         def public_json_schema
@@ -45,14 +45,9 @@ module ElasticGraph
 
         private
 
-        # The types the indexer can ingest events for: indexed document types plus `sourced_from` source types
-        # (which need not be indexed themselves). Derived indexing types are excluded because their documents
-        # are built from other types' events rather than ingested directly.
+        # JSON events identify a concrete type; abstract types have no event envelope entry.
         def ingestible_type_names
-          @state.object_types_by_name.values
-            .select { |type| type.root_document_type? || @sourced_from_source_type_names.include?(type.name) }
-            .reject { |type| type.abstract? || @derived_indexing_type_names.include?(type.name) }
-            .map(&:name)
+          @ingestible_types_by_name.values.reject(&:abstract?).map(&:name)
         end
 
         def definitions_by_name

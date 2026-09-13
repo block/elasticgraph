@@ -88,6 +88,10 @@ module ElasticGraph
         end
       end
 
+      def proto_types_defined_in(proto)
+        proto.scan(/^(?:enum|message) (\w+) \{/).flatten
+      end
+
       def proto_type_def_from(proto, type)
         lines = proto.lines
         definition_start = /^(?:enum|message) #{Regexp.escape(type)} \{/

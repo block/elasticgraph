@@ -6,7 +6,7 @@ module ElasticGraph
           state: ::ElasticGraph::SchemaDefinition::State & StateExtension,
           all_types: ::Array[::ElasticGraph::SchemaDefinition::SchemaElements::graphQLType],
           derived_indexing_type_names: ::Set[::String],
-          sourced_from_source_type_names: ::Set[::String]
+          ingestible_types_by_name: ::Hash[::String, ::ElasticGraph::SchemaDefinition::indexableType]
         ) -> void
 
         def public_json_schema: () -> ::Hash[::String, untyped]
@@ -17,7 +17,7 @@ module ElasticGraph
         @state: ::ElasticGraph::SchemaDefinition::State & StateExtension
         @all_types: ::Array[::ElasticGraph::SchemaDefinition::SchemaElements::graphQLType]
         @derived_indexing_type_names: ::Set[::String]
-        @sourced_from_source_type_names: ::Set[::String]
+        @ingestible_types_by_name: ::Hash[::String, ::ElasticGraph::SchemaDefinition::indexableType]
         @indexing_field_types_by_name: ::Hash[::String, Indexing::_JSONFieldType]?
 
         def ingestible_type_names: () -> ::Array[::String]

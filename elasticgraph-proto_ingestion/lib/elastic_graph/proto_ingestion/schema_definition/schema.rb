@@ -64,9 +64,16 @@ module ElasticGraph
         # @param state [ElasticGraph::SchemaDefinition::State]
         # @param all_types [Array<ElasticGraph::SchemaDefinition::SchemaElements::graphQLType>]
         # @param ingestion_state [ProtoIngestionState] this extension's configured schema definition state
-        def initialize(state:, all_types:, ingestion_state:)
+        # @param ingestible_types_by_name [Hash<String, Object>] ingestible schema types, including abstract types
+        def initialize(
+          state:,
+          all_types:,
+          ingestion_state:,
+          ingestible_types_by_name:
+        )
           @state = state
           @all_types = all_types
+          @ingestible_types_by_name = ingestible_types_by_name
           @package_name = ingestion_state.package_name
           @syntax = self.class.validate_syntax(ingestion_state.syntax)
           @header_lines = self.class.validate_header_lines(ingestion_state.header_lines)
@@ -136,10 +143,12 @@ module ElasticGraph
 
         private
 
-        # Selects indexed root types and every type transitively referenced by their protobuf
+        # Selects the ingestible types and every type transitively referenced by their protobuf
         # representations. All traversal state is local so repeated calls are independent.
         def proto_types
-          types_to_visit = _ = @state.indexed_types_by_index_name.values.dup
+          # Types gain proto methods through instance extensions that Steep cannot see.
+          # @type var types_to_visit: ::Array[untyped]
+          types_to_visit = @ingestible_types_by_name.values
           type_names_to_render = ::Set.new
 
           while (type = types_to_visit.shift)

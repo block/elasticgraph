@@ -135,7 +135,8 @@ module ElasticGraph
           generator = Schema.new(
             state: results.state,
             all_types: results.send(:all_types),
-            ingestion_state: results.state.proto_ingestion_state
+            ingestion_state: results.state.proto_ingestion_state,
+            ingestible_types_by_name: results.ingestible_types_by_name
           )
 
           first_generation = generator.to_proto

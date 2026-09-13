@@ -37,10 +37,15 @@ module ElasticGraph
             # runtime in {APIExtension.extended}.
             extension_state = state # : ElasticGraph::SchemaDefinition::State & StateExtension
 
+            # Resolve `sourced_from` update targets (via `ingestible_types_by_name`) before touching `all_types` so that `sourced_from`
+            # validation errors take precedence over any errors raised while generating derived types.
+            ingestible_types = ingestible_types_by_name
+
             Schema.new(
               state: extension_state,
               all_types: all_types,
-              ingestion_state: extension_state.proto_ingestion_state
+              ingestion_state: extension_state.proto_ingestion_state,
+              ingestible_types_by_name: ingestible_types
             )
           end
         end
