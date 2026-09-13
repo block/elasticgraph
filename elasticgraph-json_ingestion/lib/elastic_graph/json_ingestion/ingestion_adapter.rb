@@ -20,7 +20,7 @@ module ElasticGraph
     # {IndexerExtension} that {SchemaDefinition::APIExtension} registers.
     class IngestionAdapter
       # Shorthand for the result type defined by the indexer's ingestion adapter interface.
-      ValidationResult = Indexer::IngestionAdapter::ValidationResult
+      ValidationResult = ElasticGraph::Indexer::IngestionAdapter::ValidationResult
       private_constant :ValidationResult
 
       # @param schema_artifacts [SchemaArtifacts::FromDisk] the schema artifacts
@@ -38,7 +38,7 @@ module ElasticGraph
       #
       # @param event [Hash<String, Object>] an ElasticGraph indexing event
       # @param skip_record_validation [Boolean] whether to skip record validation; the event envelope must still be validated
-      # @return [Indexer::IngestionAdapter::ValidationResult] the result of validating the event
+      # @return [ElasticGraph::Indexer::IngestionAdapter::ValidationResult] the result of validating the event
       def validate_event(event, skip_record_validation: false)
         selected_json_schema_version = select_json_schema_version(event) { |failure| return failure }
 
@@ -91,7 +91,7 @@ module ElasticGraph
           @logger.info({
             "message_type" => "ElasticGraphMissingJSONSchemaVersion",
             "message_id" => event["message_id"],
-            "event_id" => Indexer::EventID.from_event(event),
+            "event_id" => ElasticGraph::Indexer::EventID.from_event(event),
             "event_type" => event["type"],
             "requested_json_schema_version" => requested_json_schema_version,
             "selected_json_schema_version" => selected_json_schema_version

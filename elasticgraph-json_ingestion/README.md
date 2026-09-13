@@ -115,6 +115,32 @@ This gem also provides the `be_a_valid_elastic_graph_event` RSpec matcher (via
 `require "elastic_graph/json_ingestion/spec_support/event_matcher"`) for testing that publisher events
 conform to your schema.
 
+## Processing JSON Lines Payloads
+
+`ElasticGraph::JSONIngestion::Indexer` wraps the format-neutral `ElasticGraph::Indexer` with JSON Lines decoding:
+
+```ruby
+require "elastic_graph/json_ingestion/indexer"
+
+indexer = ElasticGraph::JSONIngestion::Indexer.from_yaml_file("config/settings/local.yaml")
+json_lines_payload = $stdin.read
+indexer.process(json_lines_payload) unless json_lines_payload.empty?
+```
+
+Use `#process_returning_failures` when individual failures must be handled by the caller. Transports that need to
+add metadata or combine several payloads into one bulk operation can call `#decode`, then pass the resulting events
+to `indexer.processor`.
+
+The wrapper accepts an existing `ElasticGraph::Indexer`, so independent JSON and protobuf wrappers can share the
+same format-neutral indexer and its datastore clients:
+
+```ruby
+require "elastic_graph/json_ingestion/indexer"
+
+base_indexer = ElasticGraph::Indexer.from_yaml_file("config/settings/local.yaml")
+json_indexer = ElasticGraph::JSONIngestion::Indexer.new(base_indexer)
+```
+
 ## Dependency Diagram
 
 ```mermaid
@@ -133,4 +159,7 @@ graph LR;
     elasticgraph-schema_definition["elasticgraph-schema_definition"];
     elasticgraph-json_ingestion --> elasticgraph-schema_definition;
     class elasticgraph-schema_definition otherEgGemStyle;
+    elasticgraph-indexer_lambda["elasticgraph-indexer_lambda"];
+    elasticgraph-indexer_lambda --> elasticgraph-json_ingestion;
+    class elasticgraph-indexer_lambda otherEgGemStyle;
 ```

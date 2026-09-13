@@ -40,6 +40,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "elasticgraph-schema_definition", ElasticGraph::VERSION
 
   # Indexer specs use real datastore client classes.
+  spec.add_development_dependency "elasticgraph-admin", ElasticGraph::VERSION
   spec.add_development_dependency "elasticgraph-elasticsearch", ElasticGraph::VERSION
   spec.add_development_dependency "elasticgraph-opensearch", ElasticGraph::VERSION
 end

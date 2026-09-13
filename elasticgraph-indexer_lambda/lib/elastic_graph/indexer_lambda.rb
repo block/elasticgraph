@@ -6,15 +6,15 @@
 #
 # frozen_string_literal: true
 
-require "elastic_graph/indexer"
+require "elastic_graph/json_ingestion/indexer"
 require "elastic_graph/lambda_support"
 
 module ElasticGraph
   # @private
   module IndexerLambda
-    # Builds an `ElasticGraph::Indexer` instance from our lambda ENV vars.
+    # Builds a JSON-aware indexer instance from our lambda ENV vars.
     def self.indexer_from_env
-      LambdaSupport.build_from_env(Indexer)
+      LambdaSupport.build_from_env(JSONIngestion::Indexer)
     end
   end
 end

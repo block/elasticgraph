@@ -1,5 +1,5 @@
 module ElasticGraph
   module IndexerLambda
-    def self.indexer_from_env: () -> Indexer
+    def self.indexer_from_env: () -> JSONIngestion::Indexer
   end
 end

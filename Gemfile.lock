@@ -94,6 +94,7 @@ PATH
     elasticgraph-indexer_lambda (1.2.1.pre)
       aws-sdk-s3 (~> 1.229)
       elasticgraph-indexer (= 1.2.1.pre)
+      elasticgraph-json_ingestion (= 1.2.1.pre)
       elasticgraph-lambda_support (= 1.2.1.pre)
 
 PATH

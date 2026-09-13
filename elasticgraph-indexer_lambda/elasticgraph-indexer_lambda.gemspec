@@ -42,8 +42,7 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = [">= 3.4", "< 4.1"]
 
   spec.add_dependency "elasticgraph-indexer", ElasticGraph::VERSION
+  spec.add_dependency "elasticgraph-json_ingestion", ElasticGraph::VERSION
   spec.add_dependency "elasticgraph-lambda_support", ElasticGraph::VERSION
   spec.add_dependency "aws-sdk-s3", "~> 1.229"
-
-  spec.add_development_dependency "elasticgraph-json_ingestion", ElasticGraph::VERSION
 end

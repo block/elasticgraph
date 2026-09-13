@@ -1,0 +1,19 @@
+module ElasticGraph
+  module JSONIngestion
+    class Indexer
+      extend _BuildableFromParsedYaml[Indexer]
+      extend Support::FromYamlFile[Indexer]
+
+      attr_reader indexer: ::ElasticGraph::Indexer
+
+      def initialize: (::ElasticGraph::Indexer) -> void
+
+      def logger: () -> ::Logger
+      def processor: () -> ::ElasticGraph::Indexer::Processor
+
+      def process: (::String, ?refresh_indices: bool) -> void
+      def process_returning_failures: (::String, ?refresh_indices: bool) -> ::Array[::ElasticGraph::Indexer::FailedEventError]
+      def decode: (::String) -> ::Array[::Hash[::String, untyped]]
+    end
+  end
+end

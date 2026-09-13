@@ -14,7 +14,7 @@ module ElasticGraph
     module IndexerExtension
       # Returns the configured ingestion adapters with the built-in JSON adapter registered.
       #
-      # @return [Hash<String, Indexer::IngestionAdapter::Interface>]
+      # @return [Hash<String, ElasticGraph::Indexer::IngestionAdapter::Interface>]
       def ingestion_adapters_by_format
         @ingestion_adapters_by_format ||= super.merge(
           "json" => IngestionAdapter.new(schema_artifacts: schema_artifacts, logger: logger)

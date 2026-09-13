@@ -10,6 +10,7 @@ require "elastic_graph/errors"
 require "elastic_graph/indexer/failed_event_error"
 require "elastic_graph/indexer/processor"
 require "elastic_graph/indexer_lambda/sqs_processor"
+require "elastic_graph/json_ingestion/indexer"
 require "elastic_graph/spec_support/lambda_function"
 require "json"
 require "aws-sdk-s3"
@@ -377,9 +378,16 @@ module ElasticGraph
       end
 
       def build_sqs_processor(**options)
+        indexer = JSONIngestion::Indexer.new(
+          instance_double(
+            Indexer,
+            logger: logger,
+            processor: indexer_processor
+          )
+        )
+
         SqsProcessor.new(
-          indexer_processor,
-          logger: logger,
+          indexer,
           ignore_sqs_latency_timestamps_from_arns: ignore_sqs_latency_timestamps_from_arns,
           **options
         )

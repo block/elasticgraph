@@ -3,15 +3,15 @@ module ElasticGraph
     class RecordPreparerFactory
       def initialize: (schemaArtifacts) -> void
 
-      def for_json_schema_version: (::Integer) -> Indexer::RecordPreparer
-      def for_latest_json_schema_version: () -> Indexer::RecordPreparer
+      def for_json_schema_version: (::Integer) -> ::ElasticGraph::Indexer::RecordPreparer
+      def for_latest_json_schema_version: () -> ::ElasticGraph::Indexer::RecordPreparer
 
       private
 
       @schema_artifacts: schemaArtifacts
-      @preparers_by_json_schema_version: ::Hash[::Integer, Indexer::RecordPreparer]
+      @preparers_by_json_schema_version: ::Hash[::Integer, ::ElasticGraph::Indexer::RecordPreparer]
 
-      def build_type_metas_from: (::Hash[::String, untyped]) -> ::Array[Indexer::RecordPreparer::TypeMetadata]
+      def build_type_metas_from: (::Hash[::String, untyped]) -> ::Array[::ElasticGraph::Indexer::RecordPreparer::TypeMetadata]
     end
   end
 end
