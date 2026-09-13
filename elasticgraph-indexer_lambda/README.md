@@ -14,6 +14,9 @@ graph LR;
     elasticgraph-indexer["elasticgraph-indexer"];
     elasticgraph-indexer_lambda --> elasticgraph-indexer;
     class elasticgraph-indexer otherEgGemStyle;
+    elasticgraph-json_ingestion["elasticgraph-json_ingestion"];
+    elasticgraph-indexer_lambda --> elasticgraph-json_ingestion;
+    class elasticgraph-json_ingestion otherEgGemStyle;
     elasticgraph-lambda_support["elasticgraph-lambda_support"];
     elasticgraph-indexer_lambda --> elasticgraph-lambda_support;
     class elasticgraph-lambda_support otherEgGemStyle;
@@ -28,8 +31,9 @@ graph LR;
 
 ## SQS Message Payload Format
 
-This gem is designed to run in an AWS lambda that consumes from an SQS queue. Messages in the SQS queue should use
-[JSON Lines](https://jsonlines.org/) format to encode indexing events.
+This gem is designed to run in an AWS lambda that consumes from an SQS queue. It uses
+`ElasticGraph::JSONIngestion::Indexer`, so messages in the SQS queue use [JSON Lines](https://jsonlines.org/) format
+to encode indexing events.
 
 JSON lines format contains individual JSON objects
 delimited by a newline control character (not the `\n` string sequence), such as:

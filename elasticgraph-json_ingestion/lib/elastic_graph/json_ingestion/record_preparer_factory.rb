@@ -11,7 +11,7 @@ require "elastic_graph/indexer/record_preparer"
 
 module ElasticGraph
   module JSONIngestion
-    # Provides the ability to get an `Indexer::RecordPreparer` for a specific JSON schema version,
+    # Provides the ability to get an `ElasticGraph::Indexer::RecordPreparer` for a specific JSON schema version,
     # deriving each version's per-type field metadata from that version's JSON schemas.
     class RecordPreparerFactory
       # @param schema_artifacts [SchemaArtifacts::FromDisk] the schema artifacts
@@ -25,25 +25,25 @@ module ElasticGraph
 
         @preparers_by_json_schema_version = ::Hash.new do |hash, raw_version|
           version = raw_version # : Integer
-          hash[version] = Indexer::RecordPreparer.new(
+          hash[version] = ElasticGraph::Indexer::RecordPreparer.new(
             indexing_preparer_by_scalar_type_name,
             build_type_metas_from(@schema_artifacts.json_schemas_for(version))
           )
         end
       end
 
-      # Gets the `Indexer::RecordPreparer` for the given JSON schema version.
+      # Gets the `ElasticGraph::Indexer::RecordPreparer` for the given JSON schema version.
       #
       # @param json_schema_version [Integer] the JSON schema version
-      # @return [Indexer::RecordPreparer] the record preparer for the given version
+      # @return [ElasticGraph::Indexer::RecordPreparer] the record preparer for the given version
       def for_json_schema_version(json_schema_version)
-        @preparers_by_json_schema_version[json_schema_version] # : Indexer::RecordPreparer
+        @preparers_by_json_schema_version[json_schema_version] # : ElasticGraph::Indexer::RecordPreparer
       end
 
-      # Gets the `Indexer::RecordPreparer` for the latest JSON schema version. Intended primarily
+      # Gets the `ElasticGraph::Indexer::RecordPreparer` for the latest JSON schema version. Intended primarily
       # for use in tests for convenience.
       #
-      # @return [Indexer::RecordPreparer] the record preparer for the latest version
+      # @return [ElasticGraph::Indexer::RecordPreparer] the record preparer for the latest version
       def for_latest_json_schema_version
         for_json_schema_version(@schema_artifacts.latest_json_schema_version)
       end
@@ -63,7 +63,7 @@ module ElasticGraph
             [prop_name, eg_meta] if eg_meta
           end.to_h
 
-          Indexer::RecordPreparer::TypeMetadata.new(
+          ElasticGraph::Indexer::RecordPreparer::TypeMetadata.new(
             name: type,
             eg_meta_by_field_name: eg_meta_by_field_name
           )

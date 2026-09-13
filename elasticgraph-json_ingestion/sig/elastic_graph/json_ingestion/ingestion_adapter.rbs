@@ -1,9 +1,9 @@
 module ElasticGraph
   module JSONIngestion
     class IngestionAdapter
-      include Indexer::IngestionAdapter::_Adapter
+      include ::ElasticGraph::Indexer::IngestionAdapter::_Adapter
 
-      ValidationResult: singleton(Indexer::IngestionAdapter::ValidationResult)
+      ValidationResult: singleton(::ElasticGraph::Indexer::IngestionAdapter::ValidationResult)
 
       def initialize: (
         schema_artifacts: schemaArtifacts,
@@ -18,7 +18,7 @@ module ElasticGraph
 
       private
 
-      def select_json_schema_version: (Indexer::event) { (Indexer::IngestionAdapter::ValidationResult) -> bot } -> (::Integer | bot)
+      def select_json_schema_version: (::ElasticGraph::Indexer::event) { (::ElasticGraph::Indexer::IngestionAdapter::ValidationResult) -> bot } -> (::Integer | bot)
       def validator: (::String, ::Integer) -> Support::JSONSchema::Validator
 
       @validator_factories_by_version: ::Hash[::Integer, Support::JSONSchema::ValidatorFactory]?

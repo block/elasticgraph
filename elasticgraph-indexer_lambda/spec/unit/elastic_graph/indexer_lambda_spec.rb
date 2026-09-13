@@ -17,7 +17,7 @@ module ElasticGraph
       around { |ex| with_lambda_env_vars(&ex) }
 
       it "builds an indexer instance" do
-        expect(IndexerLambda.indexer_from_env).to be_a(Indexer)
+        expect(IndexerLambda.indexer_from_env).to be_a(JSONIngestion::Indexer)
       end
     end
   end
