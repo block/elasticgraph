@@ -16,7 +16,7 @@ require "json"
 
 module ElasticGraph
   class Indexer
-    RSpec.describe Processor do
+    RSpec.describe Processor, :json_ingestion_support do
       describe ".process", :factories, :capture_logs do
         include SpecSupport::BuildsIndexerOperation
 

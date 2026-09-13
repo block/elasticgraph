@@ -14,7 +14,7 @@ require "elastic_graph/spec_support/builds_indexer_operation"
 
 module ElasticGraph
   class WarehouseLambda
-    RSpec.describe WarehouseDumper, :capture_logs do
+    RSpec.describe WarehouseDumper, :json_ingestion_support, :capture_logs do
       include BuildsWarehouseLambda
       include SpecSupport::BuildsIndexerOperation
 

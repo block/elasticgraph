@@ -6,18 +6,27 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/json_ingestion/record_preparer_factory"
 require "elastic_graph/json_ingestion/schema_definition/api_extension"
 require "elastic_graph/json_ingestion/schema_definition/test_support"
 
 module ElasticGraph
-  # Wires the JSON ingestion schema definition support into specs tagged
-  # `:json_ingestion_schema_definition`. Mixing in
-  # {JSONIngestion::SchemaDefinition::TestSupport} overrides `define_schema` /
+  # Wires the JSON ingestion support a spec needs into examples tagged `:json_ingestion_support`.
+  # Everything here is specific to the JSON ingestion format, so a spec gets it by declaring that
+  # dependency rather than from a format-agnostic helper like `BuildsIndexer`.
+  #
+  # Mixing in {JSONIngestion::SchemaDefinition::TestSupport} overrides `define_schema` /
   # `define_schema_with_schema_elements` to inject `APIExtension` and default the JSON schema version.
   # `generate_schema_artifacts` is handled separately below because it calls `TestSupport.define_schema`
   # as a module method (which the instance-level mixin doesn't reach).
-  module JSONIngestionSchemaDefinition
+  module JSONIngestionSupport
     include JSONIngestion::SchemaDefinition::TestSupport
+
+    # Reuses JSON record preparers within an example, keyed by schema artifacts.
+    def latest_json_record_preparer_for(indexer)
+      preparers = @latest_json_record_preparers_by_schema_artifacts ||= {}
+      preparers[indexer.schema_artifacts] ||= JSONIngestion::RecordPreparerFactory.new(indexer.schema_artifacts).for_latest_json_schema_version
+    end
 
     def generate_schema_artifacts(extension_modules: [], **options)
       super(extension_modules: json_ingestion_schema_definition_extension_modules(extension_modules), **options) do |schema|
@@ -40,6 +49,6 @@ module ElasticGraph
   end
 
   RSpec.configure do |config|
-    config.include JSONIngestionSchemaDefinition, :json_ingestion_schema_definition
+    config.include JSONIngestionSupport, :json_ingestion_support
   end
 end

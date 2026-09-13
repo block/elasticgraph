@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/datastore_core"
+require "elastic_graph/errors"
 require "elastic_graph/indexer/config"
 require "elastic_graph/support/from_yaml_file"
 
@@ -38,7 +39,7 @@ module ElasticGraph
       @datastore_core = datastore_core
       @logger = datastore_core.logger
       @datastore_router = datastore_router
-      @ingestion_adapters_by_format = ingestion_adapters_by_format
+      @injected_ingestion_adapters_by_format = ingestion_adapters_by_format
       @schema_artifacts = @datastore_core.schema_artifacts
       @monotonic_clock = monotonic_clock
       @clock = clock || ::Time
@@ -58,21 +59,9 @@ module ElasticGraph
       end
     end
 
-    def record_preparer_factory
-      @record_preparer_factory ||= begin
-        require "elastic_graph/indexer/record_preparer"
-        RecordPreparer::Factory.new(schema_artifacts)
-      end
-    end
-
-    # The ingestion adapters available for processing events, keyed by the format tag used by
-    # their events. For now, only the JSON events adapter is available; indexer extension modules
-    # will be able to contribute additional adapters as alternate ingestion formats are supported.
+    # The ingestion adapters available for processing events, keyed by format.
     def ingestion_adapters_by_format
-      @ingestion_adapters_by_format ||= begin
-        require "elastic_graph/indexer/ingestion_adapter/json_events"
-        {"json" => IngestionAdapter::JSONEvents.new(schema_artifacts: schema_artifacts, logger: logger)}
-      end
+      @ingestion_adapters_by_format ||= @injected_ingestion_adapters_by_format || {}
     end
 
     def processor
@@ -90,6 +79,12 @@ module ElasticGraph
 
     def operation_factory
       @operation_factory ||= begin
+        if ingestion_adapters_by_format.empty?
+          raise Errors::ConfigError, "No ingestion adapters are available. Enable an ingestion format extension " \
+            "in your schema definition and regenerate the schema artifacts, or configure `indexer.extension_modules` " \
+            "with an extension module that registers an ingestion adapter."
+        end
+
         require "elastic_graph/indexer/operation/factory"
         Operation::Factory.new(
           schema_artifacts: schema_artifacts,
