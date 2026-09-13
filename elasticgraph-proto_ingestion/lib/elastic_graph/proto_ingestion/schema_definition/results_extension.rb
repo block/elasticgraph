@@ -39,14 +39,13 @@ module ElasticGraph
 
             # Resolve `sourced_from` update targets before touching `all_types` so that `sourced_from`
             # validation errors take precedence over any errors raised while generating derived types.
-            sourced_from_source_type_names = sourced_update_targets_by_source_type_name.keys.to_set
+            ingestible_types = ingestible_types_by_name
 
             Schema.new(
               state: extension_state,
               all_types: all_types,
               ingestion_state: extension_state.proto_ingestion_state,
-              sourced_from_source_type_names: sourced_from_source_type_names,
-              derived_indexing_type_names: derived_indexing_type_names
+              ingestible_types_by_name: ingestible_types
             )
           end
         end

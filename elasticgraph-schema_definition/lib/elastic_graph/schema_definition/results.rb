@@ -46,6 +46,24 @@ module ElasticGraph
       # @private
       STATIC_SCRIPT_REPO = Scripting::FileSystemRepository.new(::File.join(__dir__.to_s, "scripting", "scripts"))
 
+      # The indexed document types and `sourced_from` source types, excluding derived indexing
+      # types whose documents are built from other types' events. Abstract types are included
+      # when they declare an index or act as a source, but not merely for inheriting an index.
+      # Each ingestion format decides how to represent them.
+      #
+      # @private
+      def ingestible_types_by_name
+        @ingestible_types_by_name ||= begin
+          source_type_names = sourced_update_targets_by_source_type_name.keys.to_set
+
+          state.object_types_by_name.select do |name, type|
+            indexed = type.abstract? ? type.has_own_index_def? : type.root_document_type?
+            (indexed || source_type_names.include?(name)) &&
+              !derived_indexing_type_names.include?(name)
+          end
+        end
+      end
+
       # @private
       def derived_indexing_type_names
         @derived_indexing_type_names ||= state
