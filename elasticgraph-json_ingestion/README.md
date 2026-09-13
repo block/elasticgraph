@@ -123,7 +123,8 @@ conform to your schema.
 require "elastic_graph/json_ingestion/indexer"
 
 indexer = ElasticGraph::JSONIngestion::Indexer.from_yaml_file("config/settings/local.yaml")
-indexer.process(json_lines_payload)
+json_lines_payload = "" # JSON Lines payload read from an async datastream
+indexer.decode(json_lines_payload)
 ```
 
 Use `#process_returning_failures` when individual failures must be handled by the caller. Transports that need to
@@ -134,6 +135,10 @@ The wrapper accepts an existing `ElasticGraph::Indexer`, so independent JSON and
 same format-neutral indexer and its datastore clients:
 
 ```ruby
+require "elastic_graph/indexer"
+require "elastic_graph/json_ingestion/indexer"
+
+base_indexer = ElasticGraph::Indexer.from_yaml_file("config/settings/local.yaml")
 json_indexer = ElasticGraph::JSONIngestion::Indexer.new(indexer: base_indexer)
 ```
 
