@@ -600,7 +600,7 @@ module ElasticGraph
         destination_index_mapping = indexer.schema_artifacts.index_mappings_by_index_def_name.fetch(index_def.name)
 
         arguments = {
-          event: event,
+          event: Event.from(event),
           prepared_record: latest_json_record_preparer_for(indexer).prepare_for_index(
             event.fetch("type"),
             event.fetch("record"),

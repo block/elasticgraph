@@ -338,7 +338,7 @@ module ElasticGraph
         end
 
         def failure_of(id, message: "boom", event: {})
-          instance_double(Indexer::FailedEventError, id: id, message: message, event: event)
+          instance_double(Indexer::FailedEventError, id: id, message: message, event: Indexer::Event.from(event))
         end
 
         def build_sqs_processor(**options)

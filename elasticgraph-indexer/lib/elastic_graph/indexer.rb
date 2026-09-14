@@ -9,6 +9,7 @@
 require "elastic_graph/datastore_core"
 require "elastic_graph/errors"
 require "elastic_graph/indexer/config"
+require "elastic_graph/indexer/event"
 require "elastic_graph/support/from_yaml_file"
 
 module ElasticGraph

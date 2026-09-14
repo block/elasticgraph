@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/errors"
+require "elastic_graph/indexer/event"
 
 module ElasticGraph
   class Indexer
@@ -16,7 +17,8 @@ module ElasticGraph
     EventID = ::Data.define(:type, :id, :version) do
       # @implements EventID
       def self.from_event(event)
-        new(type: event["type"], id: event["id"], version: event["version"])
+        event = Event.from(event)
+        new(type: event.type, id: event.id, version: event.version)
       end
 
       def to_s

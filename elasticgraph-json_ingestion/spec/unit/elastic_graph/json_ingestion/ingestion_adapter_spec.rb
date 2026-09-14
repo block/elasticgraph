@@ -32,7 +32,7 @@ module ElasticGraph
           event["record"]["name"] = 123
 
           adapter = indexer.ingestion_adapters_by_format.fetch("json")
-          result = adapter.validate_event(event)
+          result = adapter.validate_event(ElasticGraph::Indexer::Event.from(event))
 
           expect(result.record_preparer).to be nil
           expect(result.failure.validation_target).to eq("Component record")
@@ -68,7 +68,7 @@ module ElasticGraph
 
               expect(result.failed_event_error).to be nil
               expect(result.operations.map(&:prepared_record)).to eq [{"id" => "1", "name_v#{selected_version}" => "example"}]
-              expect(result.operations.map { |op| op.event[JSON_SCHEMA_VERSION_KEY] }).to eq [requested_version]
+              expect(result.operations.map { |op| op.event.to_h[JSON_SCHEMA_VERSION_KEY] }).to eq [requested_version]
               expect(event).to eq(original_event)
             end
           end
@@ -168,10 +168,10 @@ module ElasticGraph
           event_with_extra_field = build_upsert_event(:widget, extra_field: 17)
           event_with_extra_field["record"]["extra_field"] = 17
 
-          expect(build_adapter.validate_event(event_with_extra_field).failure).to be nil
+          expect(build_adapter.validate_event(ElasticGraph::Indexer::Event.from(event_with_extra_field)).failure).to be nil
 
           configured_adapter = build_adapter { |v| v.with_unknown_properties_disallowed }
-          failure = configured_adapter.validate_event(event_with_extra_field).failure
+          failure = configured_adapter.validate_event(ElasticGraph::Indexer::Event.from(event_with_extra_field)).failure
 
           expect(failure.message).to include("extra_field")
         end

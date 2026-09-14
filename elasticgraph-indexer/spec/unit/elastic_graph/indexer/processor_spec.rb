@@ -45,11 +45,11 @@ module ElasticGraph
           end
         end
 
-        it "calls router.bulk" do
+        it "processes both event objects and hashes through router.bulk" do
           component = build_upsert_event(:component, id: "123", __version: 1)
           address = build_upsert_event(:address, id: "123", __version: 1)
 
-          process([component, address])
+          process([Event.from(component), address])
 
           expect(datastore_router).to have_received(:bulk).with(
             [
@@ -67,7 +67,7 @@ module ElasticGraph
 
           before do
             allow(datastore_router).to receive(:bulk) do |ops, **options|
-              expect(ops.map(&:event)).to eq([component1, component2, component3])
+              expect(ops.map { |op| op.event.to_h }).to eq([component1, component2, component3])
 
               DatastoreIndexingRouter::BulkResult.new({"main" => [
                 [ops[0], Operation::Result.success_of(ops[0])],
@@ -101,7 +101,7 @@ module ElasticGraph
             component = upsert_event_with_latency_timestamps(:component, 36, 72)
             address = upsert_event_with_latency_timestamps(:address, 108, 144)
 
-            process([component, address])
+            process([Event.from(component), address])
 
             expect(logged_jsons_of_type("ElasticGraphIndexingLatencies")).to match([
               a_hash_including(
@@ -127,6 +127,26 @@ module ElasticGraph
                 }
               )
             ])
+          end
+
+          it "logs latency metrics for a format with no JSON schema version" do
+            component = upsert_event_with_latency_timestamps(:component, 36, 72)
+              .except(JSON_SCHEMA_VERSION_KEY)
+              .merge(INGESTION_FORMAT_KEY => "unversioned")
+            adapter = instance_double(IngestionAdapter::Interface,
+              validate_event: IngestionAdapter::ValidationResult.valid(RecordPreparer::Identity))
+            indexer_with_adapter = build_indexer_with(
+              latency_thresholds: {},
+              ingestion_adapters_by_format: {"unversioned" => adapter}
+            )
+
+            indexer_with_adapter.processor.process([component], refresh_indices: true)
+
+            expect(logged_jsons_of_type("ElasticGraphIndexingLatencies")).to contain_exactly(a_hash_including(
+              "event_type" => "Component",
+              "result" => "success",
+              "latencies_in_ms_from" => {"originated_at" => 36000, "touched_by_foo_at" => 72000}
+            ))
           end
 
           it "fully identifies each event and message in the logged `ElasticGraphIndexingLatencies` message" do
@@ -168,7 +188,7 @@ module ElasticGraph
               # simulate the update with id == `no_op_update` being an ignored event due to the version not increasing
               ops_and_results = ops.map do |op|
                 result =
-                  if op.event.fetch("id") == "no_op_update"
+                  if op.event.id == "no_op_update"
                     Operation::Result.noop_of(op, "was a noop")
                   else
                     Operation::Result.success_of(op)

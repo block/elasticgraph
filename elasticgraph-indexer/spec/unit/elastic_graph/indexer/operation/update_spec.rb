@@ -458,7 +458,7 @@ module ElasticGraph
             index_defs_by_name = indexer.datastore_core.index_definitions_by_name
 
             Update.operations_for(
-              event: event,
+              event: Event.from(event),
               destination_index_def: index_defs_by_name.fetch(destination_index),
               record_preparer: latest_json_record_preparer_for(indexer),
               update_target: update_target,
@@ -614,12 +614,13 @@ module ElasticGraph
         end
 
         def be_an_update_result_with(**attributes)
+          attributes[:event] = Event.from(attributes.fetch(:event))
           be_a(Result).and have_attributes(operation_type: :update, **attributes)
         end
 
         def update_with_update_target(update_target, doc_id: event.fetch("id"))
           Update.new(
-            event: event,
+            event: Event.from(event),
             prepared_record: nil,
             destination_index_def: nil,
             update_target: update_target,

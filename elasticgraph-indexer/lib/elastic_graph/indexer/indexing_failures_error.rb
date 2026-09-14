@@ -16,7 +16,7 @@ module ElasticGraph
         summary = "Got #{failures.size} failure(s) from #{events.size} event(s):"
         failure_details = failures.map.with_index { |failure, index| "#{index + 1}) #{failure.message}" }
 
-        message_ids = failures.filter_map { |f| f.event["message_id"] }.uniq
+        message_ids = failures.filter_map { |failure| failure.event.message_id }.uniq
         if message_ids.any?
           message_details = "These failures came from #{message_ids.size} message(s): #{message_ids.join(", ")}."
         end

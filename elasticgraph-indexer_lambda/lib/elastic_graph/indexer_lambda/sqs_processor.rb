@@ -137,7 +137,7 @@ module ElasticGraph
       # https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html#services-sqs-batchfailurereporting
       def format_response(failures)
         failure_ids = failures.map do |failure| # $ {"itemIdentifier" => String}
-          {"itemIdentifier" => failure.event["message_id"]}
+          {"itemIdentifier" => failure.event.message_id}
         end
 
         if failure_ids.any? { |f| f.fetch("itemIdentifier").nil? }

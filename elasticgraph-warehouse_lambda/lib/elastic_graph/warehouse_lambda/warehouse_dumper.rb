@@ -40,7 +40,10 @@ module ElasticGraph
       # @param refresh [Boolean] ignored (included for interface compatibility with DatastoreIndexingRouter)
       # @return [BulkResult] result containing success status for all operations
       def bulk(operations, refresh: false)
-        operations_by_type_and_json_schema_version = operations.group_by { |op| [op.event.fetch("type"), op.event.fetch(JSON_SCHEMA_VERSION_KEY)] }
+        operations_by_type_and_json_schema_version = operations.group_by do |op|
+          event = op.event
+          [event.type, event.to_h.fetch(JSON_SCHEMA_VERSION_KEY)]
+        end
 
         @logger.info({
           "message_type" => LOG_MSG_RECEIVED_BATCH,
@@ -113,7 +116,7 @@ module ElasticGraph
       def build_jsonl_file_from(operations)
         operation_payloads = operations.filter_map do |op|
           # Only include operations where the update target matches the event type (excludes derived indices)
-          next nil if op.update_target.type != op.event.fetch("type")
+          next nil if op.update_target.type != op.event.type
 
           params = op.to_datastore_bulk[1].fetch(:script).fetch(:params)
           data = params.fetch("topLevelFields").merge({

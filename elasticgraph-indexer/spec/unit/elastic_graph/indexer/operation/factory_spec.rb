@@ -423,7 +423,7 @@ module ElasticGraph
             operations = build_expecting_success(event).select { |op| op.is_a?(Operation::Update) && op.update_target.type == "Component" }
 
             expect(operations.size).to eq(3)
-            expect(operations.map(&:event)).to all eq event
+            expect(operations.map(&:event)).to all eq Event.from(event)
             expect(operations.map(&:destination_index_def)).to all eq index_def_named("components")
             expect(operations.map(&:doc_id)).to contain_exactly("c1", "c2", "c3")
           end
@@ -480,7 +480,7 @@ module ElasticGraph
 
             expect(factory.build(event).operations).not_to be_empty
 
-            expect(other_adapter).to have_received(:validate_event).with(event, skip_record_validation: false)
+            expect(other_adapter).to have_received(:validate_event).with(Event.from(event), skip_record_validation: false)
           end
 
           it "fails with an actionable message when no adapter is registered for the format" do
@@ -512,7 +512,7 @@ module ElasticGraph
           def expect_failed_event_error(event, *error_message_snippets, factory: indexer.operation_factory, expect_no_ops: false)
             result = factory.build(event)
 
-            error_operations = factory.send(:build_all_operations_for, event, RecordPreparer::Identity)
+            error_operations = factory.send(:build_all_operations_for, Event.from(event), RecordPreparer::Identity)
 
             # We expect/want `build_all_operations_for` to return operations in nearly all cases.
             # There are a few cases where it can't return any operations, so we make the test pass
@@ -529,7 +529,7 @@ module ElasticGraph
             failure = result.failed_event_error
 
             expect(failure).to be_an(FailedEventError)
-            expect(failure.event).to eq(event)
+            expect(failure.event).to eq(Event.from(event))
             expect(failure.operations).to match_array(error_operations)
             expect(failure.message).to include(event_id_from(event), *error_message_snippets)
             expect(failure.main_message).to include(*error_message_snippets).and exclude(event_id_from(event))
@@ -558,7 +558,7 @@ module ElasticGraph
 
         def widget_currency_derived_update_operation_for(event)
           operations = Update.operations_for(
-            event: event,
+            event: Event.from(event),
             destination_index_def: index_def_named("widget_currencies"),
             record_preparer: latest_json_record_preparer_for(indexer),
             update_target: indexer.schema_artifacts.runtime_metadata.object_types_by_name.fetch("Widget").update_targets.first,
