@@ -39,8 +39,9 @@ module ElasticGraph
 
       # @param indexer [ElasticGraph::Indexer] the format-neutral indexer to wrap
       def initialize(indexer)
-        unless indexer.ingestion_adapters_by_format.key?("json") &&
-            indexer.schema_artifacts.available_json_schema_versions.any?
+        unless indexer.schema_artifacts.extension_artifacts.key?("json") &&
+            indexer.ingestion_adapters_by_format.key?("json") &&
+            indexer.schema_artifacts.extension_artifacts.fetch("json").available_json_schema_versions.any?
           raise Errors::ConfigError, "`ElasticGraph::JSONIngestion::Indexer` requires JSON schema artifacts and a `json` ingestion adapter. " \
             "Add `ElasticGraph::JSONIngestion::SchemaDefinition::APIExtension` to the extension modules for your schema definition Rake tasks, " \
             "then regenerate the schema artifacts."

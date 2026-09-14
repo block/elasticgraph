@@ -16,7 +16,7 @@ module ElasticGraph
     class RecordPreparerFactory
       # @param schema_artifacts [SchemaArtifacts::FromDisk] the schema artifacts
       def initialize(schema_artifacts)
-        @schema_artifacts = schema_artifacts
+        @schema_artifacts = schema_artifacts.extension_artifacts.fetch("json")
 
         scalar_types_by_name = schema_artifacts.runtime_metadata.scalar_types_by_name
         indexing_preparer_by_scalar_type_name = ::Hash.new do |hash, type_name|

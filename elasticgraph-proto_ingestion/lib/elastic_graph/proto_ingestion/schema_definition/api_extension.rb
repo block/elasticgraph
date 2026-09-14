@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/proto_ingestion"
+require "elastic_graph/proto_ingestion/artifacts"
 require "elastic_graph/proto_ingestion/schema_definition/factory_extension"
 require "elastic_graph/proto_ingestion/schema_definition/identifier"
 require "elastic_graph/proto_ingestion/schema_definition/schema"
@@ -29,6 +30,7 @@ module ElasticGraph
         def self.extended(api)
           api.state.extend(StateExtension)
           api.factory.extend(FactoryExtension)
+          api.register_schema_artifact_extension "proto", Artifacts, defined_at: "elastic_graph/proto_ingestion/artifacts"
         end
 
         # Configures protobuf artifact generation behavior.

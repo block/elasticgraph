@@ -131,7 +131,7 @@ module ElasticGraph
           expect(v1_merge_result.missing_fields).to be_empty
           expect(v1_merge_result.missing_types).to be_empty
 
-          allow(v2_results).to receive(:json_schemas_for).with(1).and_return(v1_merge_result.json_schema)
+          allow(v2_results.extension_artifacts.fetch("json")).to receive(:json_schemas_for).with(1).and_return(v1_merge_result.json_schema)
 
           RecordPreparerFactory.new(v2_results).for_json_schema_version(1)
         end
