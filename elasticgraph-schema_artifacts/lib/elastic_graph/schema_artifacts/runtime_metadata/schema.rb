@@ -35,6 +35,7 @@ module ElasticGraph
         :graphql_extension_modules,
         :graphql_resolvers_by_name,
         :indexer_extension_modules,
+        :schema_artifact_extensions,
         :static_script_ids_by_scoped_name
       )
         # @private
@@ -55,6 +56,8 @@ module ElasticGraph
         GRAPHQL_RESOLVERS_BY_NAME = "graphql_resolvers_by_name"
         # @private
         INDEXER_EXTENSION_MODULES = "indexer_extension_modules"
+        # @private
+        SCHEMA_ARTIFACT_EXTENSIONS = "schema_artifact_extensions"
         # @private
         STATIC_SCRIPT_IDS_BY_NAME = "static_script_ids_by_scoped_name"
 
@@ -105,6 +108,10 @@ module ElasticGraph
               ComponentExtension.from_hash(ext_mod_hash)
             end || []
 
+          schema_artifact_extensions = hash[SCHEMA_ARTIFACT_EXTENSIONS]&.transform_values do |extension_hash|
+            ComponentExtension.from_hash(extension_hash)
+          end || {}
+
           static_script_ids_by_scoped_name = hash[STATIC_SCRIPT_IDS_BY_NAME] || {}
 
           new(
@@ -117,6 +124,7 @@ module ElasticGraph
             graphql_extension_modules: graphql_extension_modules,
             graphql_resolvers_by_name: graphql_resolvers_by_name,
             indexer_extension_modules: indexer_extension_modules,
+            schema_artifact_extensions: schema_artifact_extensions,
             static_script_ids_by_scoped_name: static_script_ids_by_scoped_name
           )
         end
@@ -135,6 +143,7 @@ module ElasticGraph
             INDEXER_EXTENSION_MODULES => indexer_extension_modules.map(&:to_dumpable_hash),
             OBJECT_TYPES_BY_NAME => HashDumper.dump_hash(object_types_by_name, &:to_dumpable_hash),
             SCALAR_TYPES_BY_NAME => HashDumper.dump_hash(scalar_types_by_name, &:to_dumpable_hash),
+            SCHEMA_ARTIFACT_EXTENSIONS => HashDumper.dump_hash(schema_artifact_extensions, &:to_dumpable_hash),
             SCHEMA_ELEMENT_NAMES => schema_element_names.to_dumpable_hash,
             STATIC_SCRIPT_IDS_BY_NAME => static_script_ids_by_scoped_name
           })

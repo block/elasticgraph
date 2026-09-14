@@ -9870,6 +9870,11 @@ scalar_types_by_name:
     indexing_preparer:
       name: ElasticGraph::Indexer::IndexingPreparers::NoOp
       require_path: elastic_graph/indexer/indexing_preparers/no_op
+schema_artifact_extensions:
+  json:
+    extension_ref:
+      name: ElasticGraph::JSONIngestion::Artifacts
+      require_path: elastic_graph/json_ingestion/artifacts
 schema_element_names:
   form: snake_case
 static_script_ids_by_scoped_name:

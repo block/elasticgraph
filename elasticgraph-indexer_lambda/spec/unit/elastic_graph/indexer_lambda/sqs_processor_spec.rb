@@ -23,7 +23,7 @@ module ElasticGraph
           Indexer,
           ingestion_adapters_by_format: {"json" => nil},
           logger: logger,
-          schema_artifacts: instance_double(SchemaArtifacts::FromDisk, available_json_schema_versions: [1])
+          schema_artifacts: stock_schema_artifacts
         )).tap do |json_indexer|
           allow(json_indexer).to receive(:process_returning_failures).and_return([])
         end

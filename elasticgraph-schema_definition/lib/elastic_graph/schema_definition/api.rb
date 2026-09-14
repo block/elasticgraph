@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/errors"
+require "elastic_graph/schema_artifacts/extension_artifacts"
 require "elastic_graph/schema_artifacts/runtime_metadata/extension"
 require "elastic_graph/schema_artifacts/runtime_metadata/graphql_resolver"
 require "elastic_graph/schema_definition/mixins/has_readable_to_s_and_inspect"
@@ -347,6 +348,28 @@ module ElasticGraph
       def register_graphql_extension(extension_module, defined_at:, **config)
         extension = SchemaArtifacts::RuntimeMetadata::Extension.new(extension_module, defined_at, config)
         @state.graphql_extension_modules << SchemaArtifacts::RuntimeMetadata::ComponentExtension.new(extension.to_dumpable_hash)
+        nil
+      end
+
+      # Registers an extension-owned schema artifact provider for both disk and in-memory use.
+      # The extension implements `from_disk(artifacts_dir, config:)` and
+      # `from_schema_definition(results, config:)`, returning providers with matching APIs.
+      # Its require path must be available in applications that access this provider.
+      #
+      # @param name [String] unique name used by `schema_artifacts.extension_artifacts.fetch`
+      # @param extension_module [Module] factory implementing {SchemaArtifacts::ExtensionArtifacts::Factory}
+      # @param defined_at [String] require path for the factory
+      # @param config [Hash] configuration passed to both factory methods
+      # @return [void]
+      # @raise [Errors::SchemaError] when the name has already been registered
+      def register_schema_artifact_extension(name, extension_module, defined_at:, **config)
+        if @state.schema_artifact_extensions.key?(name)
+          raise Errors::SchemaError, "A schema artifact extension is already registered as `#{name}`. Choose a unique name for each extension."
+        end
+
+        extension = SchemaArtifacts::RuntimeMetadata::Extension.new(extension_module, defined_at, config)
+        extension.verify_against!(SchemaArtifacts::ExtensionArtifacts::Factory)
+        @state.schema_artifact_extensions[name] = SchemaArtifacts::RuntimeMetadata::ComponentExtension.new(extension.to_dumpable_hash)
         nil
       end
 

@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/constants"
+require "elastic_graph/json_ingestion/artifacts"
 require "elastic_graph/json_ingestion/schema_definition/factory_extension"
 require "elastic_graph/json_ingestion/schema_definition/state_extension"
 
@@ -28,6 +29,7 @@ module ElasticGraph
           state = api.state.extend(StateExtension) # : ElasticGraph::SchemaDefinition::State & StateExtension
           state.reserved_type_names << EVENT_ENVELOPE_JSON_SCHEMA_NAME
           api.factory.extend(FactoryExtension)
+          api.register_schema_artifact_extension "json", Artifacts, defined_at: "elastic_graph/json_ingestion/artifacts"
 
           # Register the indexer extension so that any schema defined with JSON ingestion support
           # automatically gets JSON event ingestion at indexing time.
