@@ -60,10 +60,12 @@ module ElasticGraph
 
           fields_by_name = properties.filter_map do |prop_name, prop|
             if (eg_meta = prop["ElasticGraph"])
-              [prop_name, ElasticGraph::Indexer::RecordPreparer::FieldMetadata.new(
+              field_meta = ElasticGraph::Indexer::RecordPreparer::FieldMetadata.new(
                 type: eg_meta.fetch("type"),
                 name_in_index: eg_meta.fetch("nameInIndex")
-              )]
+              )
+
+              [prop_name, field_meta]
             end
           end.to_h
 

@@ -450,8 +450,8 @@ module ElasticGraph
         end
       end
 
-      context "when built directly from ingestion-format-neutral metadata" do
-        it "prepares records without any JSON schema, so other ingestion formats can supply their own field metadata" do
+      context "when constructed directly from TypeMetadata/FieldMetadata value objects" do
+        it "prepares records using the caller-supplied field metadata, independent of any ingestion format" do
           preparer = RecordPreparer.new({}, [
             RecordPreparer::TypeMetadata.new(
               name: "MyType",
