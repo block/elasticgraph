@@ -182,15 +182,15 @@ module ElasticGraph
             # Tests will then specify the desired json_schema_version in the event payload to test the schema-choosing
             # behavior of the adapter.
             schemas = {
-              2 => schema_artifacts.json_schemas_for(1),
-              4 => ::Marshal.load(::Marshal.dump(schema_artifacts.json_schemas_for(1))).tap do |schema|
+              2 => schema_artifacts.extension_artifacts.fetch("json").json_schemas_for(1),
+              4 => ::Marshal.load(::Marshal.dump(schema_artifacts.extension_artifacts.fetch("json").json_schemas_for(1))).tap do |schema|
                 schema["$defs"]["Color"]["enum"] << "YELLOW"
               end
             }
 
-            allow(schema_artifacts).to receive(:available_json_schema_versions).and_return(schemas.keys.to_set)
-            allow(schema_artifacts).to receive(:latest_json_schema_version).and_return(schemas.keys.max)
-            allow(schema_artifacts).to receive(:json_schemas_for) do |version|
+            allow(schema_artifacts.extension_artifacts.fetch("json")).to receive(:available_json_schema_versions).and_return(schemas.keys.to_set)
+            allow(schema_artifacts.extension_artifacts.fetch("json")).to receive(:latest_json_schema_version).and_return(schemas.keys.max)
+            allow(schema_artifacts.extension_artifacts.fetch("json")).to receive(:json_schemas_for) do |version|
               ::Marshal.load(::Marshal.dump(schemas.fetch(version))).tap do |schema|
                 schema[JSON_SCHEMA_VERSION_KEY] = version
                 schema["$defs"]["ElasticGraphEventEnvelope"]["properties"][JSON_SCHEMA_VERSION_KEY]["const"] = version
@@ -267,7 +267,7 @@ module ElasticGraph
         end
 
         it "notifies an error if it's unable to select a json_schema_version" do
-          allow(schema_artifacts).to receive(:available_json_schema_versions).and_return(Set[])
+          allow(schema_artifacts.extension_artifacts.fetch("json")).to receive(:available_json_schema_versions).and_return(Set[])
 
           event = build_upsert_event(:component, id: "1", __version: 1)
 

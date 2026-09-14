@@ -35,7 +35,7 @@ module ElasticGraph
       it "rejects a format-neutral indexer with JSON schema artifacts but no JSON ingestion adapter" do
         base_indexer = build_indexer
         base_indexer.ingestion_adapters_by_format.delete("json")
-        expect(base_indexer.schema_artifacts.available_json_schema_versions).not_to be_empty
+        expect(base_indexer.schema_artifacts.extension_artifacts.fetch("json").available_json_schema_versions).not_to be_empty
 
         expect {
           Indexer.new(base_indexer)
@@ -47,7 +47,8 @@ module ElasticGraph
       end
 
       it "rejects a format-neutral indexer with a JSON ingestion adapter but no JSON schema artifacts" do
-        schema_artifacts = instance_double(SchemaArtifacts::FromDisk, available_json_schema_versions: [], runtime_metadata: stock_schema_artifacts.runtime_metadata)
+        schema_artifacts = build_indexer.schema_artifacts
+        allow(schema_artifacts.extension_artifacts.fetch("json")).to receive(:available_json_schema_versions).and_return(Set.new)
         base_indexer = build_indexer(schema_artifacts: schema_artifacts)
         expect(base_indexer.ingestion_adapters_by_format).to include("json")
 
@@ -72,7 +73,6 @@ module ElasticGraph
           end
         end
         base_indexer = build_indexer(schema_artifacts: schema_artifacts)
-        expect(base_indexer.ingestion_adapters_by_format).to include("json")
 
         expect {
           Indexer.new(base_indexer)

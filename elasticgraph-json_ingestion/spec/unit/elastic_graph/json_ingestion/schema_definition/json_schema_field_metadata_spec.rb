@@ -124,7 +124,7 @@ module ElasticGraph
 
           amount_path = ["$defs", "Money", "properties", "amount"]
 
-          expect(results.json_schemas_for(1).dig(*amount_path)).to eq({
+          expect(results.extension_artifacts.fetch("json").json_schemas_for(1).dig(*amount_path)).to eq({
             "anyOf" => [{"$ref" => "#/$defs/Int"}, {"type" => "null"}],
             "ElasticGraph" => {"nameInIndex" => "amount", "type" => "Int"}
           })

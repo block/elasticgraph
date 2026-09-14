@@ -384,7 +384,7 @@ module ElasticGraph
             ingestion_adapters_by_format: {"json" => nil},
             logger: logger,
             processor: indexer_processor,
-            schema_artifacts: instance_double(SchemaArtifacts::FromDisk, available_json_schema_versions: [1])
+            schema_artifacts: stock_schema_artifacts
           )
         )
 
