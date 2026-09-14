@@ -381,8 +381,10 @@ module ElasticGraph
         indexer = JSONIngestion::Indexer.new(
           instance_double(
             Indexer,
+            ingestion_adapters_by_format: {"json" => nil},
             logger: logger,
-            processor: indexer_processor
+            processor: indexer_processor,
+            schema_artifacts: instance_double(SchemaArtifacts::FromDisk, available_json_schema_versions: [1])
           )
         )
 

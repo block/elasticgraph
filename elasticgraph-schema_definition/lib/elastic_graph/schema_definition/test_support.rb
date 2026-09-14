@@ -18,12 +18,27 @@ module ElasticGraph
     module TestSupport
       extend self
 
+      # Provides the minimum indexer extension contract for format-neutral test schemas.
+      module IndexerExtension
+        # @return [Hash<String, Object>] an empty ingestion adapter registry
+        def ingestion_adapters_by_format = {}
+      end
+
+      # Registers {IndexerExtension} on format-neutral test schemas.
+      module APIExtension
+        # @param api [API] schema definition API under test
+        # @return [void]
+        def self.extended(api)
+          api.register_indexer_extension IndexerExtension, defined_at: __FILE__
+        end
+      end
+
       def define_schema(
         schema_element_name_form:,
         schema_element_name_overrides: {},
         index_document_sizes: true,
         path_to_schema: nil,
-        extension_modules: [],
+        extension_modules: [APIExtension],
         derived_type_name_formats: {},
         type_name_overrides: {},
         enum_value_overrides_by_type: {},
@@ -52,7 +67,7 @@ module ElasticGraph
         schema_elements,
         index_document_sizes: true,
         path_to_schema: nil,
-        extension_modules: [],
+        extension_modules: [APIExtension],
         derived_type_name_formats: {},
         type_name_overrides: {},
         enum_value_overrides_by_type: {},
