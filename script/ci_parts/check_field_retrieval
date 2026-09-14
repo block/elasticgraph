@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# These experiment checks live outside gem spec paths. Keep their coverage separate
+# from the per-gem coverage requirements, and run them on each supported datastore.
+env -u COVERAGE bundle exec rspec --options /dev/null benchmarks/field_retrieval/benchmark_spec.rb benchmarks/field_retrieval/verify_indices_spec.rb
+env -u COVERAGE bundle exec rspec -I elasticgraph-graphql/spec benchmarks/field_retrieval/graphql_benchmark_spec.rb

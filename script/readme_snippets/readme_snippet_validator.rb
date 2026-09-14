@@ -14,6 +14,8 @@ require_relative "snippet"
 require_relative "ruby_snippet_validator"
 require_relative "diff_snippet_validator"
 require_relative "bash_snippet_validator"
+require_relative "json_snippet_validator"
+require_relative "sh_snippet_validator"
 require_relative "yaml_snippet_validator"
 require_relative "text_snippet_validator"
 require_relative "mermaid_snippet_validator"
@@ -201,6 +203,8 @@ class ReadmeSnippetValidator
         "ruby" => RubySnippetValidator.new(project, verbose_output),
         "diff" => DiffSnippetValidator.new(project, verbose_output),
         "bash" => BashSnippetValidator.new(project, verbose_output),
+        "json" => JsonSnippetValidator.new(project, verbose_output),
+        "sh" => ShSnippetValidator.new(project, verbose_output),
         "yaml" => YamlSnippetValidator.new(project, verbose_output),
         "text" => TextSnippetValidator.new(project, verbose_output),
         "mermaid" => MermaidSnippetValidator.new(project, verbose_output),

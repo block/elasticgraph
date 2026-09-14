@@ -6,9 +6,9 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/constants"
 require "elastic_graph/datastore_core"
 require "elastic_graph/graphql/config"
-require "elastic_graph/constants"
 require "elastic_graph/support/from_yaml_file"
 require "elastic_graph/support/graphql_gem_loader"
 
@@ -38,6 +38,7 @@ module ElasticGraph
       datastore_core:,
       graphql_adapter: nil,
       datastore_search_router: nil,
+      field_retrieval_planner: nil,
       filter_interpreter: nil,
       sub_aggregation_grouping_adapter: nil,
       monotonic_clock: nil,
@@ -47,6 +48,7 @@ module ElasticGraph
       @datastore_core = datastore_core
       @graphql_adapter = graphql_adapter
       @datastore_search_router = datastore_search_router
+      @field_retrieval_planner = field_retrieval_planner
       @filter_interpreter = filter_interpreter
       @sub_aggregation_grouping_adapter = sub_aggregation_grouping_adapter
       @monotonic_clock = monotonic_clock
@@ -126,8 +128,18 @@ module ElasticGraph
           logger:,
           index_definitions_by_type_name: @datastore_core.index_definitions_by_graphql_type,
           default_page_size: @config.default_page_size,
-          max_page_size: @config.max_page_size
+          max_page_size: @config.max_page_size,
+          field_retrieval_planner:
         )
+      end
+    end
+
+    # @private
+    def field_retrieval_planner
+      @field_retrieval_planner ||= begin
+        require "elastic_graph/graphql/field_retrieval"
+        planner_class = (@config.experimental_field_retrieval == "automatic") ? FieldRetrieval::Automatic : FieldRetrieval::Source
+        planner_class.new.freeze
       end
     end
 

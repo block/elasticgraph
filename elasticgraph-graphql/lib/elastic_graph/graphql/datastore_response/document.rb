@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/graphql/decoded_cursor"
+require "elastic_graph/graphql/field_retrieval_plan"
 require "elastic_graph/support/memoizable_data"
 require "forwardable"
 
@@ -22,9 +23,13 @@ module ElasticGraph
 
         def_delegators :payload, :[], :fetch
 
-        def self.build(raw_data, decoded_cursor_factory: DecodedCursor::Factory::Null)
-          source = raw_data.fetch("_source") do
-            {} # : ::Hash[::String, untyped]
+        def self.build(raw_data, decoded_cursor_factory: DecodedCursor::Factory::Null, field_retrieval_plan: FieldRetrievalPlan::SOURCE)
+          source = if field_retrieval_plan.docvalue_fields.empty?
+            raw_data.fetch("_source") do
+              {} # : ::Hash[::String, untyped]
+            end
+          else
+            field_retrieval_plan.decode(raw_data)
           end
 
           new(
