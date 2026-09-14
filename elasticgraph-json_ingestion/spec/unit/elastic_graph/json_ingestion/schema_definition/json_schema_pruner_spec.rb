@@ -119,9 +119,9 @@ module ElasticGraph
 
         def dump_schema(&schema_definition)
           schema_definition_results = define_schema(schema_element_name_form: "snake_case", &schema_definition)
-          latest_json_schema_version = schema_definition_results.latest_json_schema_version
+          latest_json_schema_version = schema_definition_results.extension_artifacts.fetch("json").latest_json_schema_version
 
-          schema_definition_results.json_schemas_for(latest_json_schema_version)
+          schema_definition_results.extension_artifacts.fetch("json").json_schemas_for(latest_json_schema_version)
         end
       end
     end

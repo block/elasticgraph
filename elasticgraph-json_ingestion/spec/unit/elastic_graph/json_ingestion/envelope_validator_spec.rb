@@ -145,7 +145,7 @@ module ElasticGraph
         end
 
         it "notifies an error if it's unable to select a json_schema_version" do
-          allow(schema_artifacts).to receive(:available_json_schema_versions).and_return(Set[])
+          allow(schema_artifacts.extension_artifacts.fetch("json")).to receive(:available_json_schema_versions).and_return(Set[])
 
           event = build_upsert_event_hash(:component, id: "1", __version: 1)
 
