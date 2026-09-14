@@ -43,6 +43,32 @@ module ElasticGraph
         @runtime_metadata ||= build_runtime_metadata
       end
 
+      # JSON ingestion extensions override this to expose the schemas they generate.
+      #
+      # @param version [Integer] the desired JSON schema version
+      # @return [Hash<String, Object>] the JSON schema for the requested version
+      # @raise [Errors::MissingSchemaArtifactError] when JSON ingestion is not enabled
+      def json_schemas_for(version)
+        raise Errors::MissingSchemaArtifactError, "The requested JSON schema version (#{version}) is not available. " \
+          "Add `ElasticGraph::JSONIngestion::SchemaDefinition::APIExtension` to your schema definition extension modules."
+      end
+
+      # JSON ingestion extensions override this to report the versions they generate.
+      #
+      # @return [Set<Integer>] an empty set when JSON ingestion is not enabled
+      def available_json_schema_versions
+        ::Set.new
+      end
+
+      # JSON ingestion extensions override this to report the version they generate.
+      #
+      # @return [Integer] the latest JSON schema version
+      # @raise [Errors::MissingSchemaArtifactError] when JSON ingestion is not enabled
+      def latest_json_schema_version
+        raise Errors::MissingSchemaArtifactError, "No JSON schema versions are available. " \
+          "Add `ElasticGraph::JSONIngestion::SchemaDefinition::APIExtension` to your schema definition extension modules."
+      end
+
       # @private
       STATIC_SCRIPT_REPO = Scripting::FileSystemRepository.new(::File.join(__dir__.to_s, "scripting", "scripts"))
 

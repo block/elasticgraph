@@ -9,6 +9,7 @@
 require "elastic_graph/indexer/config"
 require "elastic_graph/indexer/malformed_event_error"
 require "elastic_graph/json_ingestion/indexer"
+require "elastic_graph/schema_definition/test_support"
 
 module ElasticGraph
   module JSONIngestion
@@ -49,6 +50,29 @@ module ElasticGraph
 
       it "rejects a format-neutral indexer with a JSON ingestion adapter but no JSON schema artifacts" do
         schema_artifacts = instance_double(SchemaArtifacts::FromDisk, available_json_schema_versions: [], runtime_metadata: stock_schema_artifacts.runtime_metadata)
+        base_indexer = build_indexer(schema_artifacts: schema_artifacts)
+        expect(base_indexer.ingestion_adapters_by_format).to include("json")
+
+        expect {
+          Indexer.new(base_indexer)
+        }.to raise_error Errors::ConfigError, a_string_including(
+          "requires JSON schema artifacts and a `json` ingestion adapter",
+          "ElasticGraph::JSONIngestion::SchemaDefinition::APIExtension",
+          "regenerate the schema artifacts"
+        )
+      end
+
+      it "rejects in-memory artifacts without JSON support even when a JSON adapter is registered" do
+        schema_artifacts = ElasticGraph::SchemaDefinition::TestSupport.define_schema(
+          schema_element_name_form: :snake_case,
+          extension_modules: []
+        ) do |schema|
+          schema.register_indexer_extension IndexerExtension, defined_at: "elastic_graph/json_ingestion/indexer_extension"
+          schema.object_type "Widget" do |type|
+            type.field "id", "ID!"
+            type.index "widgets"
+          end
+        end
         base_indexer = build_indexer(schema_artifacts: schema_artifacts)
         expect(base_indexer.ingestion_adapters_by_format).to include("json")
 
