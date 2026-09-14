@@ -1,0 +1,23 @@
+module ElasticGraph
+  module ProtoIngestion
+    module Artifacts
+      def self.from_disk: (::String, config: ::Hash[::Symbol | ::String, untyped]) -> FromDisk
+      def self.from_schema_definition: (untyped, config: ::Hash[::Symbol | ::String, untyped]) -> FromSchemaDefinition
+      class FromDiskSupertype
+        attr_reader artifacts_dir: ::String
+        def initialize: (::String) -> void
+      end
+      class FromDisk < FromDiskSupertype
+        def proto_schema: () -> ::String
+        @proto_schema: ::String?
+      end
+      class FromSchemaDefinitionSupertype
+        attr_reader results: ::ElasticGraph::SchemaDefinition::Results & SchemaDefinition::ResultsExtension
+        def initialize: (::ElasticGraph::SchemaDefinition::Results & SchemaDefinition::ResultsExtension) -> void
+      end
+      class FromSchemaDefinition < FromSchemaDefinitionSupertype
+        def proto_schema: () -> ::String
+      end
+    end
+  end
+end

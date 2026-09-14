@@ -102,9 +102,8 @@ RSpec.shared_examples "an ElasticGraph project" do |repo_root: Dir.pwd, settings
 
   all_type_names, event_types = Dir.chdir(repo_root) do
     schema_artifacts = ::ElasticGraph::SchemaArtifacts.from_yaml_file(settings_yaml_file_to_use)
-    all_defs = schema_artifacts
-      .json_schemas_for(schema_artifacts.latest_json_schema_version)
-      .fetch("$defs")
+    json = schema_artifacts.extension_artifacts.fetch("json")
+    all_defs = json.json_schemas_for(json.latest_json_schema_version).fetch("$defs")
 
     event_types = all_defs
       .fetch("ElasticGraphEventEnvelope")

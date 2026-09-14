@@ -3037,7 +3037,7 @@ module ElasticGraph
         it "sets json_schema_version to the specified (valid) value" do
           result = define_schema(schema_element_name_form: "snake_case") do |s|
             s.json_schema_version 1
-          end.json_schemas_for(1)
+          end.extension_artifacts.fetch("json").json_schemas_for(1)
 
           expect(result[JSON_SCHEMA_VERSION_KEY]).to eq(1)
         end
@@ -3086,7 +3086,7 @@ module ElasticGraph
 
         it "fails if json_schema_version is left unset" do
           expect {
-            define_schema(schema_element_name_form: "snake_case", json_schema_version: nil) {}.available_json_schema_versions
+            define_schema(schema_element_name_form: "snake_case", json_schema_version: nil) {}.extension_artifacts.fetch("json").available_json_schema_versions
           }.to raise_error(Errors::SchemaError, a_string_including("must be specified in the schema"))
         end
 
@@ -3103,8 +3103,8 @@ module ElasticGraph
           expect {
             define_schema(schema_element_name_form: "snake_case") do |s|
               s.json_schema_version 1
-            end.json_schemas_for(2)
-          }.to raise_error(Errors::NotFoundError, a_string_including("The requested json schema version (2) is not available", "Available versions: 1"))
+            end.extension_artifacts.fetch("json").json_schemas_for(2)
+          }.to raise_error(Errors::MissingSchemaArtifactError, a_string_including("The requested json schema version (2) is not available", "Available versions: 1"))
         end
 
         it "ignores runtime fields during json schema generation" do
