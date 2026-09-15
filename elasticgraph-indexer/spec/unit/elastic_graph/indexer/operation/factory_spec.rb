@@ -110,7 +110,7 @@ module ElasticGraph
             it "records the skipped type on the successful build result" do
               event = build_upsert_event(:component, id: "1", __version: 1)
 
-              result = indexer.operation_factory.build(event)
+              result = indexer.operation_factory.build(Event.from_hash(event))
 
               expect(result.type_with_skipped_validation).to eq("Component")
             end
@@ -125,7 +125,7 @@ module ElasticGraph
             it "does not flag validated types on the successful build result" do
               event = build_upsert_event(:widget, id: "1", __version: 1)
 
-              result = indexer.operation_factory.build(event)
+              result = indexer.operation_factory.build(Event.from_hash(event))
 
               expect(result.type_with_skipped_validation).to be_nil
             end
@@ -179,8 +179,8 @@ module ElasticGraph
               event = build_upsert_event(:component, id: "1", __version: 1)
               event["record"]["name"] = 123 # would fail validation if not skipped
 
-              first = indexer.operation_factory.build(event)
-              second = indexer.operation_factory.build(event)
+              first = indexer.operation_factory.build(Event.from_hash(event))
+              second = indexer.operation_factory.build(Event.from_hash(event))
 
               expect(first.failed_event_error.nil?).to eq(second.failed_event_error.nil?)
               expect(first.operations.size).to eq(second.operations.size)
@@ -268,7 +268,7 @@ module ElasticGraph
               # `Operation::Factory` to reject raising from the class, so a bare `raise exception`
               # would substitute the guard's own error and still satisfy a bare `raise_error`.
               expect {
-                factory_whose_record_preparation_is_broken.build(event)
+                factory_whose_record_preparation_is_broken.build(Event.from_hash(event))
               }.to raise_error(::KeyError, a_string_including("nameInIndex"))
             end
           end
@@ -277,7 +277,7 @@ module ElasticGraph
             event = build_upsert_event(:widget, id: "1", __version: 1)
 
             expect {
-              factory_whose_record_preparation_is_broken.build(event)
+              factory_whose_record_preparation_is_broken.build(Event.from_hash(event))
             }.to raise_error(::KeyError, a_string_including("nameInIndex"))
           end
 
@@ -292,7 +292,7 @@ module ElasticGraph
             end
 
             it "still reports what was malformed instead of letting the second failure mask the first" do
-              failure = indexer.operation_factory.build(event).failed_event_error
+              failure = indexer.operation_factory.build(Event.from_hash(event)).failed_event_error
 
               expect(failure).to be_an(FailedEventError)
               expect(failure.operations).to be_empty
@@ -300,7 +300,7 @@ module ElasticGraph
             end
 
             it "logs the failure it swallowed, so a discarded operation-building error is still traceable" do
-              indexer.operation_factory.build(event)
+              indexer.operation_factory.build(Event.from_hash(event))
 
               expect(logged_jsons_of_type("FailedEventOperationBuildingFailure")).to match([a_hash_including(
                 "event_id" => "Widget:1@v1",
@@ -423,7 +423,7 @@ module ElasticGraph
             operations = build_expecting_success(event).select { |op| op.is_a?(Operation::Update) && op.update_target.type == "Component" }
 
             expect(operations.size).to eq(3)
-            expect(operations.map(&:event)).to all eq Event.from(event)
+            expect(operations.map(&:event)).to all eq Event.from_hash(event)
             expect(operations.map(&:destination_index_def)).to all eq index_def_named("components")
             expect(operations.map(&:doc_id)).to contain_exactly("c1", "c2", "c3")
           end
@@ -478,9 +478,9 @@ module ElasticGraph
             )
             factory = indexer.operation_factory.with(ingestion_adapters_by_format: {"other" => other_adapter})
 
-            expect(factory.build(event).operations).not_to be_empty
+            expect(factory.build(Event.from_hash(event)).operations).not_to be_empty
 
-            expect(other_adapter).to have_received(:validate_event).with(Event.from(event), skip_record_validation: false)
+            expect(other_adapter).to have_received(:validate_event).with(Event.from_hash(event), skip_record_validation: false)
           end
 
           it "fails with an actionable message when no adapter is registered for the format" do
@@ -510,9 +510,9 @@ module ElasticGraph
           end
 
           def expect_failed_event_error(event, *error_message_snippets, factory: indexer.operation_factory, expect_no_ops: false)
-            result = factory.build(event)
+            result = factory.build(Event.from_hash(event))
 
-            error_operations = factory.send(:build_all_operations_for, Event.from(event), RecordPreparer::Identity)
+            error_operations = factory.send(:build_all_operations_for, Event.from_hash(event), RecordPreparer::Identity)
 
             # We expect/want `build_all_operations_for` to return operations in nearly all cases.
             # There are a few cases where it can't return any operations, so we make the test pass
@@ -529,7 +529,7 @@ module ElasticGraph
             failure = result.failed_event_error
 
             expect(failure).to be_an(FailedEventError)
-            expect(failure.event).to eq(Event.from(event))
+            expect(failure.event).to eq(Event.from_hash(event))
             expect(failure.operations).to match_array(error_operations)
             expect(failure.message).to include(event_id_from(event), *error_message_snippets)
             expect(failure.main_message).to include(*error_message_snippets).and exclude(event_id_from(event))
@@ -545,12 +545,12 @@ module ElasticGraph
           end
 
           def event_id_from(event)
-            Indexer::EventID.from_event(event).to_s
+            Indexer::EventID.from_event(Event.from_hash(event)).to_s
           end
         end
 
         def build_expecting_success(event, **options)
-          result = indexer.operation_factory.build(event, **options)
+          result = indexer.operation_factory.build(Event.from_hash(event), **options)
 
           expect(result.failed_event_error).to be nil
           result.operations
@@ -558,7 +558,7 @@ module ElasticGraph
 
         def widget_currency_derived_update_operation_for(event)
           operations = Update.operations_for(
-            event: Event.from(event),
+            event: Event.from_hash(event),
             destination_index_def: index_def_named("widget_currencies"),
             record_preparer: latest_json_record_preparer_for(indexer),
             update_target: indexer.schema_artifacts.runtime_metadata.object_types_by_name.fetch("Widget").update_targets.first,

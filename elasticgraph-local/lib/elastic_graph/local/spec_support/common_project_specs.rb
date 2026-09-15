@@ -152,7 +152,7 @@ RSpec.shared_examples "an ElasticGraph project" do |repo_root: Dir.pwd, settings
             # greater confidence), but we don't expect the datastore to be booted and available when these tests
             # are running, and we don't want to have to manage cleaning up datastore state as part of these
             # tests. Still, it's a potential further step we could take with this in the future.
-            indexer.operation_factory.build(event).operations.each(&:to_datastore_bulk)
+            indexer.operation_factory.build(::ElasticGraph::Indexer::Event.from_hash(event)).operations.each(&:to_datastore_bulk)
           end
         end
       end

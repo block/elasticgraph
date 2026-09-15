@@ -31,7 +31,7 @@ module ElasticGraph
       end
 
       class Factory < FactorySupertype
-        def build: (event | ::Hash[::String, untyped]) -> BuildResult
+        def build: (event) -> BuildResult
 
         private
 

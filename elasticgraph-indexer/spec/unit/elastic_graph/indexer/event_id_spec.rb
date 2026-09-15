@@ -14,7 +14,7 @@ module ElasticGraph
       describe ".from_event", :factories do
         it "builds it from an event payload" do
           event = build_upsert_event(:widget, id: "abc", __version: 12)
-          event_id = EventID.from_event(event)
+          event_id = EventID.from_event(Event.from_hash(event))
 
           expect(event_id.type).to eq "Widget"
           expect(event_id.id).to eq "abc"

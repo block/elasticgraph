@@ -177,7 +177,8 @@ module ElasticGraph
 
         # Updated widget, which wrongly tries to change the currency symbol of USD.
         widget_v2 = widget("LARGE", "RED", "USD", cost_currency_symbol: "US$", id: "w1", workspace_id: "wid23", __version: widget_v1.fetch(:__version) + 1)
-        widget_v2_event_id = Indexer::EventID.from_event(Indexer::TestSupport::Converters.upsert_events_for_records([widget_v2]).first).to_s
+        widget_v2_event = Indexer::Event.from_hash(Indexer::TestSupport::Converters.upsert_events_for_records([widget_v2]).first)
+        widget_v2_event_id = Indexer::EventID.from_event(widget_v2_event).to_s
 
         # Later updated widget, which does not try to change the currency symbol.
         widget_v3 = widget("LARGE", "RED", "USD", cost_currency_symbol: "$", id: "w1", workspace_id: "wid23", __version: widget_v1.fetch(:__version) + 2, name: "3rd version")

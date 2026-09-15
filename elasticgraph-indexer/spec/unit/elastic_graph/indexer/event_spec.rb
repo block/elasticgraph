@@ -38,7 +38,6 @@ module ElasticGraph
         )
         expect(event.to_h).to equal(payload)
         expect(event.source).to equal(payload)
-        expect(Event.from(event)).to equal(event)
       end
 
       it "can be built directly from a format's native values without a hash payload" do

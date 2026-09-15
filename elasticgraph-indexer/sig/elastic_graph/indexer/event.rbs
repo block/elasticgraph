@@ -36,7 +36,6 @@ module ElasticGraph
       def self.members: () -> ::Array[::Symbol]
 
       def self.from_hash: (::Hash[::String, untyped]) -> Event
-      def self.from: (Event | ::Hash[::String, untyped]) -> Event
 
       def with: (**untyped) -> Event
       def to_h: () -> ::Hash[::String, untyped]

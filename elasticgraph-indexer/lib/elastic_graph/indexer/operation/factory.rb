@@ -26,7 +26,6 @@ module ElasticGraph
         :skip_record_validation_percents_by_type
       )
         def build(event)
-          event = Event.from(event)
           event = prepare_event(event)
           format = event.ingestion_format
           adapter = ingestion_adapters_by_format[format]

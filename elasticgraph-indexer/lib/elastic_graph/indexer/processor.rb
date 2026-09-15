@@ -32,8 +32,8 @@ module ElasticGraph
       # Processes the given events, writing them to the datastore. If any events are invalid, an
       # exception will be raised indicating why the events were invalid, but the valid events will
       # still be written to the datastore. No attempt is made to provide atomic "all or nothing"
-      # behavior. Decoded hashes and Event objects are both accepted; transport metadata should
-      # be merged into hashes before passing them to the processor.
+      # behavior. Decoded hashes and Event objects are both accepted at this public boundary;
+      # transport metadata should be merged into hashes before passing them to the processor.
       def process(events, refresh_indices: false)
         failures = process_returning_failures(events, refresh_indices: refresh_indices)
         return if failures.empty?
@@ -43,7 +43,7 @@ module ElasticGraph
       # Like `process`, but returns failures instead of raising an exception.
       # The caller is responsible for handling the failures.
       def process_returning_failures(events, refresh_indices: false)
-        events = events.map { |event| Event.from(event) }
+        events = events.map { |event| event.is_a?(Event) ? event : Event.from_hash(event) }
         factory_results_by_event = events.to_h { |event| [event, @operation_factory.build(event)] }
 
         factory_results = factory_results_by_event.values

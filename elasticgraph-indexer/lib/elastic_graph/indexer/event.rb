@@ -69,14 +69,6 @@ module ElasticGraph
         )
       end
 
-      # Normalizes a decoded hash or returns an existing event unchanged.
-      #
-      # @param value [Event, Hash<String, Object>] an event or decoded event payload
-      # @return [Event]
-      def self.from(value)
-        value.is_a?(Event) ? value : from_hash(value)
-      end
-
       # Returns a copy with the given fields replaced. When the source is a hash, its corresponding
       # fields are also replaced so format-specific validation sees the same values.
       #

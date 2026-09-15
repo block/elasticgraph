@@ -17,7 +17,7 @@ module ElasticGraph
         expect(indexer.ingestion_adapters_by_format).to match("json" => an_instance_of(IngestionAdapter))
         expect(indexer.ingestion_adapters_by_format).to be(indexer.ingestion_adapters_by_format), "expected the adapters to be memoized"
 
-        result = indexer.operation_factory.build(build_upsert_event(:component))
+        result = indexer.operation_factory.build(::ElasticGraph::Indexer::Event.from_hash(build_upsert_event(:component)))
 
         expect(result.failed_event_error).to be nil
         expect(result.operations).not_to be_empty

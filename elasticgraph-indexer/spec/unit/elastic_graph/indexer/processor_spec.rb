@@ -49,7 +49,7 @@ module ElasticGraph
           component = build_upsert_event(:component, id: "123", __version: 1)
           address = build_upsert_event(:address, id: "123", __version: 1)
 
-          process([Event.from(component), address])
+          process([Event.from_hash(component), address])
 
           expect(datastore_router).to have_received(:bulk).with(
             [
@@ -101,7 +101,7 @@ module ElasticGraph
             component = upsert_event_with_latency_timestamps(:component, 36, 72)
             address = upsert_event_with_latency_timestamps(:address, 108, 144)
 
-            process([Event.from(component), address])
+            process([Event.from_hash(component), address])
 
             expect(logged_jsons_of_type("ElasticGraphIndexingLatencies")).to match([
               a_hash_including(

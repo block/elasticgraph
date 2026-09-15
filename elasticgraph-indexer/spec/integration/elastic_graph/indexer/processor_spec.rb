@@ -89,7 +89,7 @@ module ElasticGraph
               process_batches([make_valid(malformed_event, version_offset: 1)])
               expect { process_batches([malformed_event]) }.to log_warning a_string_including(
                 "Ignoring 1 malformed event",
-                EventID.from_event(malformed_event).to_s
+                EventID.from_event(Event.from_hash(malformed_event)).to_s
               )
 
               response = search
@@ -106,7 +106,7 @@ module ElasticGraph
 
               expect { process_batches([superseded_invalid_widget]) }.to log_warning a_string_including(
                 "Ignoring 1 malformed event",
-                EventID.from_event(superseded_invalid_widget).to_s
+                EventID.from_event(Event.from_hash(superseded_invalid_widget)).to_s
               )
             end
 

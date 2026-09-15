@@ -19,7 +19,7 @@ module ElasticGraph
         it "accepts events explicitly tagged as JSON" do
           event = build_upsert_event(:component, id: "1").merge(INGESTION_FORMAT_KEY => "json")
 
-          result = indexer.operation_factory.build(event)
+          result = indexer.operation_factory.build(::ElasticGraph::Indexer::Event.from_hash(event))
 
           expect(result.failed_event_error).to be nil
           expect(result.operations.map(&:doc_id)).to include("1")
@@ -32,7 +32,7 @@ module ElasticGraph
           event["record"]["name"] = 123
 
           adapter = indexer.ingestion_adapters_by_format.fetch("json")
-          result = adapter.validate_event(ElasticGraph::Indexer::Event.from(event))
+          result = adapter.validate_event(ElasticGraph::Indexer::Event.from_hash(event))
 
           expect(result.record_preparer).to be nil
           expect(result.failure.validation_target).to eq("Component record")
@@ -64,7 +64,7 @@ module ElasticGraph
               event = component_event(requested_version)
               original_event = Marshal.load(Marshal.dump(event))
 
-              result = indexer.operation_factory.build(event)
+              result = indexer.operation_factory.build(::ElasticGraph::Indexer::Event.from_hash(event))
 
               expect(result.failed_event_error).to be nil
               expect(result.operations.map(&:prepared_record)).to eq [{"id" => "1", "name_v#{selected_version}" => "example"}]
@@ -168,10 +168,10 @@ module ElasticGraph
           event_with_extra_field = build_upsert_event(:widget, extra_field: 17)
           event_with_extra_field["record"]["extra_field"] = 17
 
-          expect(build_adapter.validate_event(ElasticGraph::Indexer::Event.from(event_with_extra_field)).failure).to be nil
+          expect(build_adapter.validate_event(ElasticGraph::Indexer::Event.from_hash(event_with_extra_field)).failure).to be nil
 
           configured_adapter = build_adapter { |v| v.with_unknown_properties_disallowed }
-          failure = configured_adapter.validate_event(ElasticGraph::Indexer::Event.from(event_with_extra_field)).failure
+          failure = configured_adapter.validate_event(ElasticGraph::Indexer::Event.from_hash(event_with_extra_field)).failure
 
           expect(failure.message).to include("extra_field")
         end
@@ -210,7 +210,7 @@ module ElasticGraph
             event = build_upsert_event(:widget, id: "1", __version: 1, __json_schema_version: 4)
             event["record"]["options"]["color"] = "YELLOW"
 
-            expect(indexer.operation_factory.build(event).failed_event_error).to be nil
+            expect(indexer.operation_factory.build(::ElasticGraph::Indexer::Event.from_hash(event)).failed_event_error).to be nil
           end
 
           it "validates against the closest version if the requested version is newer than what's available" do
@@ -218,7 +218,7 @@ module ElasticGraph
             event = build_upsert_event(:widget, id: "1", __version: 1, __json_schema_version: 5)
             event["record"]["options"]["color"] = "YELLOW"
 
-            expect(indexer.operation_factory.build(event).failed_event_error).to be nil
+            expect(indexer.operation_factory.build(::ElasticGraph::Indexer::Event.from_hash(event)).failed_event_error).to be nil
 
             expect(logged_jsons_of_type("ElasticGraphMissingJSONSchemaVersion").last).to include(
               "event_id" => "Widget:1@v1",
@@ -249,7 +249,7 @@ module ElasticGraph
             event = build_upsert_event(:widget, id: "1", __version: 1, __json_schema_version: 3)
             event["record"]["options"]["color"] = "YELLOW"
 
-            expect(indexer.operation_factory.build(event).failed_event_error).to be nil
+            expect(indexer.operation_factory.build(::ElasticGraph::Indexer::Event.from_hash(event)).failed_event_error).to be nil
 
             expect(logged_jsons_of_type("ElasticGraphMissingJSONSchemaVersion").last).to include(
               "event_id" => "Widget:1@v1",
@@ -275,7 +275,7 @@ module ElasticGraph
         end
 
         def expect_invalid(event, validation_target:, message_including:)
-          error = indexer.operation_factory.build(event).failed_event_error
+          error = indexer.operation_factory.build(::ElasticGraph::Indexer::Event.from_hash(event)).failed_event_error
 
           expect(error.message).to include("Malformed #{validation_target}.", *message_including)
 

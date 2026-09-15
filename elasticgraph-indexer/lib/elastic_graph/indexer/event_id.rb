@@ -17,7 +17,6 @@ module ElasticGraph
     EventID = ::Data.define(:type, :id, :version) do
       # @implements EventID
       def self.from_event(event)
-        event = Event.from(event)
         new(type: event.type, id: event.id, version: event.version)
       end
 
