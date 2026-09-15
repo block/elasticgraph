@@ -3,15 +3,15 @@ module ElasticGraph
     type eventIDString = ::String
 
     class EventID
-      attr_reader type: ::String
-      attr_reader id: ::String
-      attr_reader version: ::Integer
+      attr_reader type: ::Object?
+      attr_reader id: ::Object?
+      attr_reader version: ::Object?
 
-      def initialize: (type: ::String, id: ::String, version: ::Integer) -> void
+      def initialize: (type: ::Object?, id: ::Object?, version: ::Object?) -> void
       def self.new:
-        (type: ::String, id: ::String, version: ::Integer) -> EventID
-        | (::String, ::String, ::Integer) -> EventID
-      def self.from_event: (event) -> EventID
+        (type: ::Object?, id: ::Object?, version: ::Object?) -> EventID
+        | (::Object?, ::Object?, ::Object?) -> EventID
+      def self.from_event: (anyEvent) -> EventID
     end
   end
 end

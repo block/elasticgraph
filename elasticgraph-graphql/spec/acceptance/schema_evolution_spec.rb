@@ -23,7 +23,7 @@ module ElasticGraph
 
     it "treats a new list field as having a count of `0` on documents that were indexed before the field was defined" do
       dump_schema_artifacts(json_schema_version: 1)
-      boot(Indexer).processor.process([build_upsert_event(:team, id: "t1", owners: [])], refresh_indices: true)
+      process_events([build_upsert_event(:team, id: "t1", owners: [])], via: boot(Indexer))
 
       dump_schema_artifacts(json_schema_version: 2, team_extras: <<~EOS)
         t.field 'owners', '[String!]!' do |f|

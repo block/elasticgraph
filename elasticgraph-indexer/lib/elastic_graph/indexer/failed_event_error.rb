@@ -52,7 +52,7 @@ module ElasticGraph
 
       def full_id
         event_id = EventID.from_event(event).to_s
-        if (message_id = event["message_id"])
+        if (message_id = event.message_id)
           "#{event_id} (message_id: #{message_id})"
         else
           event_id
@@ -60,23 +60,23 @@ module ElasticGraph
       end
 
       def id
-        event["id"]
+        event.id
       end
 
       def op
-        event["op"]
+        event.op
       end
 
       def type
-        event["type"]
+        event.type
       end
 
       def version
-        event["version"]
+        event.version
       end
 
       def record
-        event["record"]
+        event.record
       end
     end
   end

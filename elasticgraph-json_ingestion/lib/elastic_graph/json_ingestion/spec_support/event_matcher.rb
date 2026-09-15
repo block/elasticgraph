@@ -6,6 +6,7 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/indexer/event"
 require "elastic_graph/json_ingestion/ingestion_adapter"
 require "json"
 
@@ -21,7 +22,7 @@ require "json"
     result = for_indexer
       .operation_factory
       .with(ingestion_adapters_by_format: {"json" => ingestion_adapter})
-      .build(event)
+      .build(ElasticGraph::Indexer::Event.from_hash(event))
 
     @validation_failure = result.failed_event_error
     !@validation_failure

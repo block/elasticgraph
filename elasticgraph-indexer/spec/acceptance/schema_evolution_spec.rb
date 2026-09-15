@@ -25,13 +25,13 @@ module ElasticGraph
         address_1_event = build_address_event_without_geolocation
         address_2_event = build_address_event_without_geolocation
 
-        boot_indexer.processor.process([address_1_event], refresh_indices: true)
+        process_events([address_1_event], via: boot_indexer)
 
         write_address_schema_def(json_schema_version: 2, address_extras: "t.field 'geo_location', 'GeoLocation'")
         dump_artifacts
 
         indexer_with_geo_location = boot_indexer
-        indexer_with_geo_location.processor.process([address_2_event], refresh_indices: true)
+        process_events([address_2_event], via: indexer_with_geo_location)
 
         expect(search_for_ids("addresses")).to contain_exactly(
           address_1_event.fetch("id"),
@@ -91,7 +91,7 @@ module ElasticGraph
         end
 
         expect {
-          boot_indexer.processor.process([v1_event, v2_event], refresh_indices: true)
+          process_events([v1_event, v2_event], via: boot_indexer)
         }.not_to raise_error
       end
 
@@ -119,7 +119,7 @@ module ElasticGraph
         event = build_upsert_event(:address, id: "abc", deprecated: "foo", __json_schema_version: 1)
         expect(event.dig("record", "deprecated")).to eq("foo")
 
-        boot_indexer.processor.process([event], refresh_indices: true)
+        process_events([event], via: boot_indexer)
 
         expect(get_address_payload("abc")).to include("id" => "abc").and exclude("deprecated")
       end
@@ -171,7 +171,7 @@ module ElasticGraph
           .then { |json| ::JSON.parse(json) }
 
         expect {
-          boot_indexer.processor.process([v1_event, v2_event], refresh_indices: true)
+          process_events([v1_event, v2_event], via: boot_indexer)
         }.not_to raise_error
       end
     end
@@ -204,7 +204,7 @@ module ElasticGraph
           v2_event = build_upsert_event(:team, __json_schema_version: 2)
 
           expect {
-            boot_indexer.processor.process([v1_event, v2_event], refresh_indices: true)
+            process_events([v1_event, v2_event], via: boot_indexer)
           }.not_to raise_error
         end
       end
@@ -249,7 +249,7 @@ module ElasticGraph
           v2_event = build_upsert_event(:team, __json_schema_version: 2)
 
           expect {
-            boot_indexer.processor.process([v1_event, v2_event], refresh_indices: true)
+            process_events([v1_event, v2_event], via: boot_indexer)
           }.not_to raise_error
         end
       end
@@ -291,7 +291,7 @@ module ElasticGraph
           v1_event = build_upsert_event(:team, __json_schema_version: 1)
 
           expect {
-            boot_indexer.processor.process([v1_event], refresh_indices: true)
+            process_events([v1_event], via: boot_indexer)
           }.not_to raise_error
         end
       end
@@ -324,7 +324,7 @@ module ElasticGraph
           dump_artifacts
 
           v1_event = build_upsert_event(:team, __json_schema_version: 1)
-          boot_indexer.processor.process([v1_event], refresh_indices: true)
+          process_events([v1_event], via: boot_indexer)
 
           expect(search_for_ids("teams")).to be_empty
         end

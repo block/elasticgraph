@@ -29,7 +29,7 @@ module ElasticGraph
 
         failures = indexer.process_returning_failures(json_lines(invalid_event))
 
-        expect(failures.map(&:event)).to contain_exactly(invalid_event)
+        expect(failures.map(&:event)).to contain_exactly(::ElasticGraph::Indexer::Event.from_hash(invalid_event))
       end
 
       def json_lines(*events)

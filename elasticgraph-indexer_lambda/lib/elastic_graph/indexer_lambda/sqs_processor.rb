@@ -73,7 +73,8 @@ module ElasticGraph
           end
 
           decoded_events_from(record.fetch("body")).map do |event|
-            ElasticGraph::Support::HashUtil.deep_merge(event, sqs_metadata)
+            merged_source = ElasticGraph::Support::HashUtil.deep_merge(event.to_h, sqs_metadata)
+            Indexer::Event.from_hash(merged_source)
           end
         end.tap do
           @logger.info({
@@ -137,13 +138,13 @@ module ElasticGraph
       # https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html#services-sqs-batchfailurereporting
       def format_response(failures)
         failure_ids = failures.map do |failure| # $ {"itemIdentifier" => String}
-          {"itemIdentifier" => failure.event["message_id"]}
-        end
-
-        if failure_ids.any? { |f| f.fetch("itemIdentifier").nil? }
-          # If we are not able to identify one or more failed events, then we must raise an exception instead of
-          # returning `batchItemFailures`. Otherwise, the unidentified failed events will not get retried.
-          raise Errors::MessageIdsMissingError, "Unexpected: some failures did not have a `message_id`, so we are raising an exception instead of returning `batchItemFailures`."
+          message_id = failure.event.message_id
+          unless message_id.is_a?(::String)
+            # If we are not able to identify one or more failed events, then we must raise an exception instead of
+            # returning `batchItemFailures`. Otherwise, the unidentified failed events will not get retried.
+            raise Errors::MessageIdsMissingError, "Unexpected: some failures did not have a `message_id`, so we are raising an exception instead of returning `batchItemFailures`."
+          end
+          {"itemIdentifier" => message_id}
         end
 
         {"batchItemFailures" => failure_ids}

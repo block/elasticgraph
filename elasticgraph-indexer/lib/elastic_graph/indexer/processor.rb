@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/errors"
+require "elastic_graph/indexer/event"
 require "elastic_graph/indexer/event_id"
 require "elastic_graph/indexer/indexing_failures_error"
 require "time"
@@ -31,7 +32,8 @@ module ElasticGraph
       # Processes the given events, writing them to the datastore. If any events are invalid, an
       # exception will be raised indicating why the events were invalid, but the valid events will
       # still be written to the datastore. No attempt is made to provide atomic "all or nothing"
-      # behavior.
+      # behavior. Callers must decode payloads and attach transport metadata before passing
+      # Event objects to the processor.
       def process(events, refresh_indices: false)
         failures = process_returning_failures(events, refresh_indices: refresh_indices)
         return if failures.empty?
@@ -90,6 +92,9 @@ module ElasticGraph
         )
 
         superseded_failures, outstanding_failures = failures.partition do |failure|
+          failure_version = failure.version
+          next false unless failure_version.is_a?(::Integer)
+
           failure.versioned_operations.size > 0 && failure.versioned_operations.all? do |op|
             # Under normal conditions, we expect to get back only one version per operation per cluster.
             # However, when a field used for routing or index rollover has mutated, we can wind up with
@@ -104,7 +109,7 @@ module ElasticGraph
 
             # We only consider an event to be superseded if the document version in the datastore
             # for all its versioned operations is greater than the version of the failing event.
-            max_version_per_cluster.all? { |v| v && v > failure.version }
+            max_version_per_cluster.all? { |v| v && v > failure_version }
           end
         end
 
@@ -129,8 +134,7 @@ module ElasticGraph
           latencies_in_ms_from = {} # : Hash[String, Integer]
           slo_results = {} # : Hash[String, String]
 
-          latency_timestamps = event.fetch("latency_timestamps", _ = {})
-          latency_timestamps.each do |ts_name, ts_value|
+          event.latency_timestamps.each do |ts_name, ts_value|
             metric_value = ((current_time - Time.iso8601(ts_value)) * 1000).round
 
             latencies_in_ms_from[ts_name] = metric_value
@@ -144,10 +148,9 @@ module ElasticGraph
 
           @logger.info({
             "message_type" => "ElasticGraphIndexingLatencies",
-            "message_id" => event["message_id"],
-            "event_type" => event.fetch("type"),
+            "message_id" => event.message_id,
+            "event_type" => event.type,
             "event_id" => EventID.from_event(event).to_s,
-            JSON_SCHEMA_VERSION_KEY => event.fetch(JSON_SCHEMA_VERSION_KEY),
             "latencies_in_ms_from" => latencies_in_ms_from,
             "slo_results" => slo_results,
             "result" => result

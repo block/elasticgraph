@@ -6,6 +6,7 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/indexer/event"
 require "elastic_graph/indexer/event_id"
 require "elastic_graph/indexer/failed_event_error"
 require "elastic_graph/indexer/operation/update"
@@ -26,7 +27,7 @@ module ElasticGraph
       )
         def build(event)
           event = prepare_event(event)
-          format = event.fetch(INGESTION_FORMAT_KEY, "json")
+          format = event.ingestion_format
           adapter = ingestion_adapters_by_format[format]
 
           unless adapter
@@ -44,12 +45,13 @@ module ElasticGraph
         private
 
         def build_for_adapter(event, adapter)
-          skip_record_validation = skip_validation?(event["type"], event)
+          skip_record_validation = skip_validation?(event.type, event)
           validation_result = adapter.validate_event(event, skip_record_validation: skip_record_validation)
 
           if (failure = validation_result.failure)
-            build_failed_result(event, failure.validation_target, failure.message)
+            build_failed_result(validation_result.event || event, failure.validation_target, failure.message)
           else
+            event = validation_result.event or raise
             record_preparer = validation_result.record_preparer or raise
             if skip_record_validation
               build_success_result_isolating_malformed_records(event, record_preparer, adapter)
@@ -75,7 +77,7 @@ module ElasticGraph
         # would have gotten had we validated up front. A clean bill of health from the validator means the
         # error was never about the data (a schema artifact defect, or a bug) and must not be swallowed.
         def build_success_result_isolating_malformed_records(event, record_preparer, adapter)
-          build_success_result(event, record_preparer, type_with_skipped_validation: event.fetch("type"))
+          build_success_result(event, record_preparer, type_with_skipped_validation: event.type)
         rescue => exception
           failure = adapter.validate_event(event).failure
           # `raise` is overridden below to stop this class from *originating* an error instead of returning a
@@ -88,8 +90,8 @@ module ElasticGraph
         # This copies the `id` from event into the actual record
         # This is necessary because we want to index `id` as part of the record so that the datastore will include `id` in returned search payloads.
         def prepare_event(event)
-          return event unless event["record"].is_a?(::Hash) && event["id"]
-          event.merge("record" => event["record"].merge("id" => event.fetch("id")))
+          return event unless event.record.is_a?(::Hash) && event.id
+          event.with(record: event.record.merge("id" => event.id))
         end
 
         # `Zlib.crc32` returns a value in `[0, 2**32)`. Pre-dividing that space by 100 lets us test a
@@ -104,6 +106,7 @@ module ElasticGraph
         # is per-process. The `<= 0` and `>= 100` guards keep the endpoints exact, so no float
         # boundary error can make a `0` percent skip a record or a `100` percent validate one.
         def skip_validation?(type, event)
+          return false unless type.is_a?(::String)
           percent = skip_record_validation_percents_by_type[type]
           return false if percent.nil? || percent <= 0
           return true if percent >= 100
@@ -122,16 +125,20 @@ module ElasticGraph
           # than reporting the operations we would have run, and `FailedEventError#operations` is documented to
           # sometimes be empty for exactly this reason, so we fall back to no operations rather than let a second
           # failure mask the first.
-          operations = begin
-            build_all_operations_for(event, RecordPreparer::Identity)
-          rescue => exception
-            logger.warn({
-              "message_type" => "FailedEventOperationBuildingFailure",
-              "message_id" => event["message_id"],
-              "event_id" => EventID.from_event(event).to_s,
-              "error_class" => exception.class.name,
-              "error_message" => exception.message
-            })
+          operations = if event.is_a?(Event::Validated)
+            begin
+              build_all_operations_for(event, RecordPreparer::Identity)
+            rescue => exception
+              logger.warn({
+                "message_type" => "FailedEventOperationBuildingFailure",
+                "message_id" => event.message_id,
+                "event_id" => EventID.from_event(event).to_s,
+                "error_class" => exception.class.name,
+                "error_message" => exception.message
+              })
+              [] # : ::Array[operation]
+            end
+          else
             [] # : ::Array[operation]
           end
 
@@ -139,10 +146,10 @@ module ElasticGraph
         end
 
         def build_all_operations_for(event, record_preparer)
-          # If `type` is missing or is not a known type (as indicated by `runtime_metadata` being nil)
-          # then we can't build a derived indexing type update operation. That case will only happen when we build
-          # operations for an `FailedEventError` rather than to execute.
-          return [] unless (type = event["type"])
+          # If `type` is not known (as indicated by `runtime_metadata` being nil), we can't build a derived
+          # indexing type update operation. That case will only happen when we build operations for a
+          # `FailedEventError` rather than to execute.
+          type = event.type
           return [] unless (runtime_metadata = schema_artifacts.runtime_metadata.object_types_by_name[type])
 
           runtime_metadata.update_targets.flat_map do |update_target|
@@ -162,7 +169,7 @@ module ElasticGraph
                   if skipped
                     logger.info({
                       "message_type" => "SkippingUpdate",
-                      "message_id" => event["message_id"],
+                      "message_id" => event.message_id,
                       "update_target" => update_target.type,
                       "id" => op.doc_id,
                       "event_id" => EventID.from_event(event).to_s

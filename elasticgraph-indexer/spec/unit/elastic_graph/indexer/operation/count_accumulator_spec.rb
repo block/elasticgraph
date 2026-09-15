@@ -298,7 +298,7 @@ module ElasticGraph
           destination_index_mapping = indexer.schema_artifacts.index_mappings_by_index_def_name.fetch(destination_index_def.name)
 
           update = Update.new(
-            event: {"type" => source_type, "record" => data},
+            event: Event.from_hash({"type" => source_type, "record" => data}),
             destination_index_def: destination_index_def,
             prepared_record: latest_json_record_preparer_for(indexer).prepare_for_index(
               source_type,

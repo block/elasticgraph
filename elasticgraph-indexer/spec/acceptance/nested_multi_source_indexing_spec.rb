@@ -25,9 +25,9 @@ module ElasticGraph
       gm_profile = gm_profile_event(300, id: "prof-gm1", version: 13)
 
       # `coach_profile_1` arrives BEFORE the team exists (out-of-order buffer path); the rest arrive after.
-      indexer.processor.process([coach_profile_1], refresh_indices: true)
-      indexer.processor.process([team], refresh_indices: true)
-      indexer.processor.process([coach_profile_2, gm_profile], refresh_indices: true)
+      process_events([coach_profile_1], via: indexer)
+      process_events([team], via: indexer)
+      process_events([coach_profile_2, gm_profile], via: indexer)
 
       source = fetch_team_source("t1")
 
@@ -74,14 +74,14 @@ module ElasticGraph
       coaches = [build(:coach, id: "c1", name: "Alice"), build(:coach, id: "c2", name: "Bob")]
       gm = build(:general_manager, id: "gm1", name: "Casey")
 
-      indexer.processor.process([coach_profile_event("c1", 100, version: 1)], refresh_indices: true)
-      indexer.processor.process([team_event(version: 1, coaches: coaches, general_manager: gm)], refresh_indices: true)
+      process_events([coach_profile_event("c1", 100, version: 1)], via: indexer)
+      process_events([team_event(version: 1, coaches: coaches, general_manager: gm)], via: indexer)
 
       expect(coaches_by_id_in(fetch_team_source("t1")).fetch("c1")).to eq("id" => "c1", "name" => "Alice", "salary" => 100)
 
       # The re-indexed team re-sends `staff.coaches` without `salary` (publishers don't know about sourced
       # fields), overwriting the nested array; the buffered sourced data must be re-applied so it survives.
-      indexer.processor.process([team_event(version: 2, coaches: coaches, general_manager: gm)], refresh_indices: true)
+      process_events([team_event(version: 2, coaches: coaches, general_manager: gm)], via: indexer)
 
       source = fetch_team_source("t1")
       coaches_by_id = coaches_by_id_in(source)
@@ -96,12 +96,12 @@ module ElasticGraph
     it "ignores a stale (event.version <= stored.version) source event for an already-sourced nested element" do
       team = team_event(version: 1, coaches: [build(:coach, id: "c1", name: "Alice"), build(:coach, id: "c2", name: "Bob")])
 
-      indexer.processor.process([team], refresh_indices: true)
-      indexer.processor.process([coach_profile_event("c1", 200, id: "prof-c1", version: 5)], refresh_indices: true)
-      indexer.processor.process([
+      process_events([team], via: indexer)
+      process_events([coach_profile_event("c1", 200, id: "prof-c1", version: 5)], via: indexer)
+      process_events([
         coach_profile_event("c1", 100, id: "prof-c1", version: 2), # ignored since 2 <= 5
         coach_profile_event("c1", 300, id: "prof-c1", version: 5)  # ignored since 5 <= 5
-      ], refresh_indices: true)
+      ], via: indexer)
 
       source = fetch_team_source("t1")
       coaches_by_id = coaches_by_id_in(source)
@@ -115,14 +115,14 @@ module ElasticGraph
     it "clears an already-sourced nested field when a newer source event drops the value upstream" do
       team = team_event(version: 1, coaches: [build(:coach, id: "c1", name: "Alice"), build(:coach, id: "c2", name: "Bob")])
 
-      indexer.processor.process([team], refresh_indices: true)
-      indexer.processor.process([coach_profile_event("c1", 100, version: 1)], refresh_indices: true)
+      process_events([team], via: indexer)
+      process_events([coach_profile_event("c1", 100, version: 1)], via: indexer)
 
       expect(coaches_by_id_in(fetch_team_source("t1")).fetch("c1")).to eq("id" => "c1", "name" => "Alice", "salary" => 100)
 
       # A newer profile for the same coach omits `salary` (e.g. it was deleted upstream). It arrives as a non-empty
       # map with a null value, so re-applying it overwrites `salary` with null rather than leaving the v1 value.
-      indexer.processor.process([coach_profile_event("c1", nil, version: 2)], refresh_indices: true)
+      process_events([coach_profile_event("c1", nil, version: 2)], via: indexer)
 
       coaches_by_id = coaches_by_id_in(fetch_team_source("t1"))
       expect(coaches_by_id.fetch("c1")).to eq("id" => "c1", "name" => "Alice", "salary" => nil)
@@ -130,19 +130,19 @@ module ElasticGraph
       expect(coaches_by_id.fetch("c2")).to eq("id" => "c2", "name" => "Bob")
 
       # A still-newer profile restores the value, confirming clearing isn't permanent.
-      indexer.processor.process([coach_profile_event("c1", 150, version: 3)], refresh_indices: true)
+      process_events([coach_profile_event("c1", 150, version: 3)], via: indexer)
 
       expect(coaches_by_id_in(fetch_team_source("t1")).fetch("c1")).to eq("id" => "c1", "name" => "Alice", "salary" => 150)
     end
 
     it "rejects a mutation of the relationship used by a nested `sourced_from` field" do
-      indexer.processor.process([team_event(version: 1)], refresh_indices: true)
-      indexer.processor.process([coach_profile_event("c1", 100, id: "prof-a", version: 1)], refresh_indices: true)
+      process_events([team_event(version: 1)], via: indexer)
+      process_events([coach_profile_event("c1", 100, id: "prof-a", version: 1)], via: indexer)
 
       # A different source id for the same coach is a relationship mutation, which breaks out-of-order guarantees.
       # The newer version shows it's the id change (not staleness) that triggers the rejection.
       expect {
-        indexer.processor.process([coach_profile_event("c1", 200, id: "prof-b", version: 2)], refresh_indices: true)
+        process_events([coach_profile_event("c1", 200, id: "prof-b", version: 2)], via: indexer)
       }.to raise_error Indexer::IndexingFailuresError, a_string_including(
         "apparently changed", "mutations of relationships used with `sourced_from` are not supported"
       )
@@ -152,15 +152,15 @@ module ElasticGraph
       alice = build(:coach, id: "c1", name: "Alice")
       bob = build(:coach, id: "c2", name: "Bob")
 
-      indexer.processor.process([team_event(version: 1, coaches: [alice, bob])], refresh_indices: true)
-      indexer.processor.process([coach_profile_event("c1", 100, version: 1)], refresh_indices: true)
+      process_events([team_event(version: 1, coaches: [alice, bob])], via: indexer)
+      process_events([coach_profile_event("c1", 100, version: 1)], via: indexer)
 
       # A re-indexed team drops `c1`, orphaning its buffer entry.
-      indexer.processor.process([team_event(version: 2, coaches: [bob])], refresh_indices: true)
+      process_events([team_event(version: 2, coaches: [bob])], via: indexer)
       expect(coaches_by_id_in(fetch_team_source("t1")).keys).to contain_exactly("c2")
 
       # A later re-index re-adds `c1`; its salary re-applies from the surviving buffer entry.
-      indexer.processor.process([team_event(version: 3, coaches: [alice, bob])], refresh_indices: true)
+      process_events([team_event(version: 3, coaches: [alice, bob])], via: indexer)
 
       expect(coaches_by_id_in(fetch_team_source("t1")).fetch("c1")).to eq("id" => "c1", "name" => "Alice", "salary" => 100)
     end
@@ -170,13 +170,13 @@ module ElasticGraph
       bob = build(:coach, id: "c2", name: "Bob")
       dana = build(:coach, id: "c3", name: "Dana")
 
-      indexer.processor.process([team_event(version: 1, coaches: [alice, bob])], refresh_indices: true)
+      process_events([team_event(version: 1, coaches: [alice, bob])], via: indexer)
 
       # The team has no `c3` coach, so this profile's salary is buffered but applied to nothing.
-      indexer.processor.process([coach_profile_event("c3", 300, version: 1)], refresh_indices: true)
+      process_events([coach_profile_event("c3", 300, version: 1)], via: indexer)
       expect(coaches_by_id_in(fetch_team_source("t1")).keys).to contain_exactly("c1", "c2")
 
-      indexer.processor.process([team_event(version: 2, coaches: [alice, bob, dana])], refresh_indices: true)
+      process_events([team_event(version: 2, coaches: [alice, bob, dana])], via: indexer)
 
       expect(coaches_by_id_in(fetch_team_source("t1")).fetch("c3")).to eq("id" => "c3", "name" => "Dana", "salary" => 300)
     end
@@ -184,7 +184,7 @@ module ElasticGraph
     it "materializes an incomplete document from a source event targeting a singleton object path" do
       # The GM profile arrives before the team exists at all, materializing an incomplete document with the
       # GM's salary buffered through the object path segments.
-      indexer.processor.process([gm_profile_event(300, id: "prof-gm1", version: 1)], refresh_indices: true)
+      process_events([gm_profile_event(300, id: "prof-gm1", version: 1)], via: indexer)
 
       # The incomplete document has no `staff` (or any other team field) yet--just the identity, bookkeeping,
       # and the buffered salary awaiting its target element.
@@ -197,7 +197,7 @@ module ElasticGraph
       )
 
       team = team_event(version: 1, general_manager: build(:general_manager, id: "gm1", name: "Casey"))
-      indexer.processor.process([team], refresh_indices: true)
+      process_events([team], via: indexer)
 
       expect(fetch_team_source("t1").fetch("staff").fetch("general_manager")).to eq("id" => "gm1", "name" => "Casey", "salary" => 300)
     end
@@ -208,8 +208,8 @@ module ElasticGraph
       adversarial_id = "3:x|"
       mallory = build(:coach, id: adversarial_id, name: "Mallory")
 
-      indexer.processor.process([team_event(version: 1, coaches: [mallory])], refresh_indices: true)
-      indexer.processor.process([coach_profile_event(adversarial_id, 400, id: "prof-mallory", version: 1)], refresh_indices: true)
+      process_events([team_event(version: 1, coaches: [mallory])], via: indexer)
+      process_events([coach_profile_event(adversarial_id, 400, id: "prof-mallory", version: 1)], via: indexer)
 
       source = fetch_team_source("t1")
       expect(coaches_by_id_in(source).fetch(adversarial_id)).to eq("id" => adversarial_id, "name" => "Mallory", "salary" => 400)

@@ -13,7 +13,7 @@ module ElasticGraph
 
       def process: (::String, ?refresh_indices: bool) -> void
       def process_returning_failures: (::String, ?refresh_indices: bool) -> ::Array[::ElasticGraph::Indexer::FailedEventError]
-      def decode: (::String) -> ::Array[::Hash[::String, untyped]]
+      def decode: (::String) -> ::Array[::ElasticGraph::Indexer::Event]
     end
   end
 end

@@ -67,9 +67,9 @@ module ElasticGraph
       # This supports transports that must add metadata or combine several payloads before one bulk operation.
       #
       # @param payload [String] newline-delimited JSON indexing events
-      # @return [Array<Hash<String, Object>>] decoded indexing events
+      # @return [Array<ElasticGraph::Indexer::Event>] decoded indexing events
       def decode(payload)
-        payload.split("\n").map { |event| ::JSON.parse(event) }
+        payload.split("\n").map { |event| ElasticGraph::Indexer::Event.from_hash(::JSON.parse(event)) }
       end
     end
   end

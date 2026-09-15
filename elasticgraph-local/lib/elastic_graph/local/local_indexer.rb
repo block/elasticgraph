@@ -16,7 +16,7 @@ module ElasticGraph
       def initialize(local_config_yaml, fake_data_batch_generator, output:)
         @local_indexer = ElasticGraph::Indexer.from_yaml_file(local_config_yaml)
         @indexing_coordinator = IndexingCoordinator.new(fake_data_batch_generator, output: output) do |batch|
-          @local_indexer.processor.process(batch)
+          @local_indexer.processor.process(batch.map { |event| ElasticGraph::Indexer::Event.from_hash(event) })
         end
       end
 

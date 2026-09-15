@@ -31,7 +31,7 @@ module ElasticGraph
         index_def ||= idxr.datastore_core.index_definitions_by_graphql_type.fetch(event.fetch("type")).first
 
         Indexer::Operation::Update.new(
-          event: event,
+          event: Indexer::Event.from_hash(event),
           prepared_record: latest_json_record_preparer_for(idxr).prepare_for_index(
             event.fetch("type"),
             event.fetch("record"),

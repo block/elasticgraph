@@ -112,7 +112,7 @@ events = records_by_type.flat_map do |type_name, records|
   end
 
   ElasticGraph::Indexer::TestSupport::Converters.upsert_events_for_records(records)
-end
+end.map { |event| ElasticGraph::Indexer::Event.from_hash(event) }
 
 indexer.processor.process(events, refresh_indices: true)
 

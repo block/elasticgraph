@@ -36,7 +36,7 @@ module ElasticGraph
       end
 
       it "can decode a payload without processing it" do
-        expect(indexer.decode(payload)).to eq(events)
+        expect(indexer.decode(payload).map(&:to_h)).to eq(events)
       end
     end
   end
