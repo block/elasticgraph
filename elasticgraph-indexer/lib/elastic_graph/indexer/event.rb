@@ -10,83 +10,115 @@ require "elastic_graph/constants"
 
 module ElasticGraph
   class Indexer
-    # A decoded indexing event. This gives the format-neutral indexing pipeline named accessors
-    # for the event envelope while preserving the format-specific payload for adapter validation.
-    # Accessors return unvalidated values, including missing or malformed fields; validation
-    # belongs to the ingestion adapter. JSON decoding and transport metadata merging use hashes.
-    # The processor and operation factory wrap those hashes when they enter the shared pipeline.
-    #
-    # @!attribute [r] payload
-    #   @return [Hash<String, Object>] the decoded, format-specific event payload
-    Event = ::Data.define(:payload) do
+    # A decoded indexing event. This gives the format-neutral indexing pipeline named envelope
+    # fields while preserving the format-specific source for adapter validation. Hash-based
+    # decoders can use {.from_hash}; other decoders can construct an event directly from their
+    # native representation. Field values remain unvalidated until an ingestion adapter accepts
+    # the event.
+    Event = ::Data.define(
+      :op,
+      :type,
+      :id,
+      :version,
+      :record,
+      :ingestion_format,
+      :message_id,
+      :latency_timestamps,
+      :source
+    ) do
       # @implements Event
 
-      # Wraps `value` as an event, leaving existing events unchanged.
+      # @param op [String, nil] the requested operation (e.g. "upsert")
+      # @param type [String, nil] the GraphQL type of the record
+      # @param id [String, nil] the record identifier
+      # @param version [Integer, nil] the event version
+      # @param record [Object, nil] the record supplied by the publisher
+      # @param ingestion_format [String] the ingestion format tag
+      # @param message_id [String, nil] the transport message identifier
+      # @param latency_timestamps [Hash<String, String>] timestamps used to measure indexing latency
+      # @param source [Object, nil] the decoded, format-specific source used for adapter validation
+      def initialize(
+        op:,
+        type:,
+        id:,
+        version:,
+        record:,
+        ingestion_format: "json",
+        message_id: nil,
+        latency_timestamps: {},
+        source: nil
+      )
+        super
+      end
+
+      # Builds an event from a decoded string-keyed hash.
       #
-      # @param value [Event, Hash<String, Object>] a decoded event or its raw payload
+      # @param payload [Hash<String, Object>] a decoded event payload
+      # @return [Event]
+      def self.from_hash(payload)
+        new(
+          op: payload["op"],
+          type: payload["type"],
+          id: payload["id"],
+          version: payload["version"],
+          record: payload["record"],
+          ingestion_format: payload[INGESTION_FORMAT_KEY] || "json",
+          message_id: payload["message_id"],
+          latency_timestamps: payload["latency_timestamps"] || {},
+          source: payload
+        )
+      end
+
+      # Normalizes a decoded hash or returns an existing event unchanged.
+      #
+      # @param value [Event, Hash<String, Object>] an event or decoded event payload
       # @return [Event]
       def self.from(value)
-        case value
-        when Event
-          value
-        else
-          new(payload: value)
-        end
+        value.is_a?(Event) ? value : from_hash(value)
       end
 
-      # @return [String, nil] the requested operation (e.g. "upsert")
-      def op
-        payload["op"]
-      end
-
-      # @return [String, nil] the GraphQL type of the record
-      def type
-        payload["type"]
-      end
-
-      # @return [String, nil] the record identifier
-      def id
-        payload["id"]
-      end
-
-      # @return [Integer, nil] the event version
-      def version
-        payload["version"]
-      end
-
-      # @return [Object, nil] the record supplied by the publisher
-      def record
-        payload["record"]
-      end
-
-      # @return [String] the ingestion format tag
-      def ingestion_format
-        payload[INGESTION_FORMAT_KEY] || "json"
-      end
-
-      # @return [String, nil] the transport message identifier
-      def message_id
-        payload["message_id"]
-      end
-
-      # @return [Hash<String, String>] timestamps used to measure indexing latency
-      def latency_timestamps
-        payload["latency_timestamps"] || {}
-      end
-
-      # Returns a copy with the given payload fields replaced.
+      # Returns a copy with the given fields replaced. When the source is a hash, its corresponding
+      # fields are also replaced so format-specific validation sees the same values.
       #
-      # @param fields [Hash<String, Object>] replacement payload fields
       # @return [Event]
-      def with_payload(fields)
-        self.class.new(payload: payload.merge(fields))
+      def with(**changes)
+        attributes = self.class.members.to_h { |member| [member, public_send(member)] }
+        attributes = attributes.merge(changes)
+        updated_source = if source.is_a?(::Hash)
+          source.merge(changes.to_h { |member, value| [member.to_s, value] })
+        else
+          source
+        end
+
+        self.class.new(
+          op: attributes.fetch(:op),
+          type: attributes.fetch(:type),
+          id: attributes.fetch(:id),
+          version: attributes.fetch(:version),
+          record: attributes.fetch(:record),
+          ingestion_format: attributes.fetch(:ingestion_format),
+          message_id: attributes.fetch(:message_id),
+          latency_timestamps: attributes.fetch(:latency_timestamps),
+          source: updated_source
+        )
       end
 
-      # Returns the format-specific payload for adapter validation.
+      # Returns the hash representation used by hash-based adapters and datastore scripts.
       #
       # @return [Hash<String, Object>]
       def to_h
-        payload
+        return source if source.is_a?(::Hash)
+
+        {
+          "op" => op,
+          "type" => type,
+          "id" => id,
+          "version" => version,
+          "record" => record,
+          INGESTION_FORMAT_KEY => ingestion_format,
+          "message_id" => message_id,
+          "latency_timestamps" => latency_timestamps
+        }.compact
       end
     end
 

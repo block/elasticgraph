@@ -91,7 +91,7 @@ module ElasticGraph
         # This is necessary because we want to index `id` as part of the record so that the datastore will include `id` in returned search payloads.
         def prepare_event(event)
           return event unless event.record.is_a?(::Hash) && event.id
-          event.with_payload("record" => event.record.merge("id" => event.id))
+          event.with(record: event.record.merge("id" => event.id))
         end
 
         # `Zlib.crc32` returns a value in `[0, 2**32)`. Pre-dividing that space by 100 lets us test a

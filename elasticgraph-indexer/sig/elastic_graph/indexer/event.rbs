@@ -1,25 +1,44 @@
 module ElasticGraph
   class Indexer
     class Event < ::Data
-      attr_reader payload: ::Hash[::String, untyped]
+      attr_reader op: untyped
+      attr_reader type: untyped
+      attr_reader id: untyped
+      attr_reader version: untyped
+      attr_reader record: untyped
+      attr_reader ingestion_format: untyped
+      attr_reader message_id: untyped
+      attr_reader latency_timestamps: untyped
+      attr_reader source: untyped
 
-      def initialize: (payload: ::Hash[::String, untyped]) -> void
-      def self.new: (payload: ::Hash[::String, untyped]) -> instance
+      def initialize: (
+        op: untyped,
+        type: untyped,
+        id: untyped,
+        version: untyped,
+        record: untyped,
+        ?ingestion_format: untyped,
+        ?message_id: untyped,
+        ?latency_timestamps: untyped,
+        ?source: untyped
+      ) -> void
+      def self.new: (
+        op: untyped,
+        type: untyped,
+        id: untyped,
+        version: untyped,
+        record: untyped,
+        ?ingestion_format: untyped,
+        ?message_id: untyped,
+        ?latency_timestamps: untyped,
+        ?source: untyped
+      ) -> instance
       def self.members: () -> ::Array[::Symbol]
 
+      def self.from_hash: (::Hash[::String, untyped]) -> Event
       def self.from: (Event | ::Hash[::String, untyped]) -> Event
 
-      # Accessors expose unvalidated publisher values, including absent or malformed fields.
-      # Adapters validate the payload before the indexing pipeline uses these values.
-      def op: () -> untyped
-      def type: () -> untyped
-      def id: () -> untyped
-      def version: () -> untyped
-      def record: () -> untyped
-      def ingestion_format: () -> untyped
-      def message_id: () -> untyped
-      def latency_timestamps: () -> untyped
-      def with_payload: (::Hash[::String, untyped]) -> Event
+      def with: (**untyped) -> Event
       def to_h: () -> ::Hash[::String, untyped]
     end
   end
