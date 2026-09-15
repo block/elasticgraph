@@ -39,7 +39,7 @@ module ElasticGraph
         expect(Event.from(event)).to equal(event)
       end
 
-      it "returns nil for missing envelope fields so an adapter can report all validation failures" do
+      it "returns defaults for optional fields and nil for missing required fields" do
         event = Event.from({})
 
         expect(event).to have_attributes(
@@ -48,9 +48,9 @@ module ElasticGraph
           id: nil,
           version: nil,
           record: nil,
-          ingestion_format: nil,
+          ingestion_format: "json",
           message_id: nil,
-          latency_timestamps: nil
+          latency_timestamps: {}
         )
       end
 

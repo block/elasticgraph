@@ -34,22 +34,22 @@ module ElasticGraph
         end
       end
 
-      # @return [Object, nil] the requested operation
+      # @return [String, nil] the requested operation (e.g. "upsert")
       def op
         payload["op"]
       end
 
-      # @return [Object, nil] the GraphQL type of the record
+      # @return [String, nil] the GraphQL type of the record
       def type
         payload["type"]
       end
 
-      # @return [Object, nil] the record identifier
+      # @return [String, nil] the record identifier
       def id
         payload["id"]
       end
 
-      # @return [Object, nil] the event version
+      # @return [Integer, nil] the event version
       def version
         payload["version"]
       end
@@ -59,19 +59,19 @@ module ElasticGraph
         payload["record"]
       end
 
-      # @return [Object, nil] the ingestion format tag
+      # @return [String] the ingestion format tag
       def ingestion_format
-        payload[INGESTION_FORMAT_KEY]
+        payload[INGESTION_FORMAT_KEY] || "json"
       end
 
-      # @return [Object, nil] the transport message identifier
+      # @return [String, nil] the transport message identifier
       def message_id
         payload["message_id"]
       end
 
-      # @return [Object, nil] timestamps used to measure indexing latency
+      # @return [Hash<String, String>] timestamps used to measure indexing latency
       def latency_timestamps
-        payload["latency_timestamps"]
+        payload["latency_timestamps"] || {}
       end
 
       # Returns a copy with the given payload fields replaced.

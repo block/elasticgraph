@@ -28,7 +28,7 @@ module ElasticGraph
         def build(event)
           event = Event.from(event)
           event = prepare_event(event)
-          format = event.ingestion_format || "json"
+          format = event.ingestion_format
           adapter = ingestion_adapters_by_format[format]
 
           unless adapter

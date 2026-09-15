@@ -614,8 +614,8 @@ module ElasticGraph
         end
 
         def be_an_update_result_with(**attributes)
-          attributes[:event] = Event.from(attributes.fetch(:event))
-          be_a(Result).and have_attributes(operation_type: :update, **attributes)
+          expected_attributes = attributes.merge(event: Event.from(attributes.fetch(:event)))
+          be_a(Result).and have_attributes(operation_type: :update, **expected_attributes)
         end
 
         def update_with_update_target(update_target, doc_id: event.fetch("id"))

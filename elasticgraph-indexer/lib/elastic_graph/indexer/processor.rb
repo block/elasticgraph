@@ -132,8 +132,7 @@ module ElasticGraph
           latencies_in_ms_from = {} # : Hash[String, Integer]
           slo_results = {} # : Hash[String, String]
 
-          latency_timestamps = event.latency_timestamps || {}
-          latency_timestamps.each do |ts_name, ts_value|
+          event.latency_timestamps.each do |ts_name, ts_value|
             metric_value = ((current_time - Time.iso8601(ts_value)) * 1000).round
 
             latencies_in_ms_from[ts_name] = metric_value
