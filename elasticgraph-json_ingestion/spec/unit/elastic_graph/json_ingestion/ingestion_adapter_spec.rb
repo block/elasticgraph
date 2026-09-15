@@ -26,6 +26,19 @@ module ElasticGraph
           expect(result.operations.map(&:doc_id)).to include("1")
         end
 
+        it "copies the envelope id into the JSON record after validating the envelope" do
+          event = build_upsert_event(:component, id: "1")
+          event.fetch("record").delete("id")
+
+          result = indexer.ingestion_adapters_by_format.fetch("json").validate_event(
+            ElasticGraph::Indexer::Event.from_hash(event)
+          )
+
+          expect(result.failure).to be nil
+          expect(result.event.record).to include("id" => "1")
+          expect(event.fetch("record")).not_to include("id")
+        end
+
         # The factory replaces an adapter's missing preparer with an identity preparer while
         # building its failed result, so this adapter contract must be asserted directly.
         it "returns no record preparer, plus the part of the event at fault, for an event it rejects" do

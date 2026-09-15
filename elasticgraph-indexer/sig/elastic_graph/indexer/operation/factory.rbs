@@ -38,7 +38,6 @@ module ElasticGraph
         private
 
         def build_for_adapter: (unvalidatedEvent, IngestionAdapter::_Adapter) -> BuildResult
-        def prepare_event: (unvalidatedEvent) -> unvalidatedEvent
         def build_success_result: (event, _RecordPreparer, type_with_skipped_validation: ::String?) -> BuildResult
         def build_success_result_isolating_malformed_records: (event, _RecordPreparer, IngestionAdapter::_Adapter) -> BuildResult
         CRC32_SPACE_PER_PERCENT: ::Float
