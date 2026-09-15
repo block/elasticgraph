@@ -417,8 +417,13 @@ RSpec.shared_context "datastore support", :capture_logs do
 
   def index_records(*records)
     events = ElasticGraph::Indexer::TestSupport::Converters.upsert_events_for_records(records)
-    indexer.processor.process(events, refresh_indices: true)
+    process_events(events, via: indexer)
     events
+  end
+
+  def process_events(events, via: indexer)
+    decoded_events = events.map { |event| ElasticGraph::Indexer::Event.from_hash(event) }
+    via.processor.process(decoded_events, refresh_indices: true)
   end
 
   # Helper method that forces the `known_related_query_rollover_indices` to be computed and cached. This is

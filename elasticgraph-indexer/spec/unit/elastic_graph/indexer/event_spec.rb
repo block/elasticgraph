@@ -95,6 +95,21 @@ module ElasticGraph
         expect(updated.to_h).to eq("id" => "new", "type" => "Widget")
         expect(original.to_h).to eq("id" => "old", "type" => "Widget")
       end
+
+      it "represents an adapter-validated envelope with strict fields but the same value identity" do
+        event = Event.from_hash({
+          "op" => "upsert",
+          "type" => "Widget",
+          "id" => "w1",
+          "version" => 3,
+          "record" => {"name" => "A widget"}
+        })
+
+        validated_event = Event::Validated.from(event)
+
+        expect(validated_event).to be_a(Event::Validated).and eq(event)
+        expect(validated_event.hash).to eq(event.hash)
+      end
     end
   end
 end

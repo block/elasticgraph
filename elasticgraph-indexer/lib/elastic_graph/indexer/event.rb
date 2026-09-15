@@ -10,6 +10,9 @@ require "elastic_graph/constants"
 
 module ElasticGraph
   class Indexer
+    EMPTY_LATENCY_TIMESTAMPS = {} # : Hash[String, String]
+    private_constant :EMPTY_LATENCY_TIMESTAMPS
+
     # A decoded indexing event. This gives the format-neutral indexing pipeline named envelope
     # fields while preserving the format-specific source for adapter validation. Hash-based
     # decoders can use {.from_hash}; other decoders can construct an event directly from their
@@ -45,7 +48,7 @@ module ElasticGraph
         record:,
         ingestion_format: "json",
         message_id: nil,
-        latency_timestamps: {},
+        latency_timestamps: EMPTY_LATENCY_TIMESTAMPS,
         source: nil
       )
         super
@@ -111,6 +114,90 @@ module ElasticGraph
           "message_id" => message_id,
           "latency_timestamps" => latency_timestamps
         }.compact
+      end
+
+      # Compares event values without treating validation state as part of their identity.
+      #
+      # @param other [Object] another value
+      # @return [Boolean]
+      def ==(other)
+        (other.is_a?(Event) || other.is_a?(Event::Validated)) &&
+          Event.members.all? { |member| public_send(member) == other.public_send(member) }
+      end
+      alias_method :eql?, :==
+
+      # Returns a hash based on event values without including validation state.
+      #
+      # @return [Integer]
+      def hash
+        Event.members.map { |member| public_send(member) }.hash
+      end
+    end
+
+    # An event whose adapter has validated its required envelope fields. Shared indexing code
+    # uses this subtype after the adapter boundary so required values have concrete types.
+    Event::Validated = ::Data.define(*Event.members) do
+      # @implements Event::Validated
+
+      # Builds a validated view of an event after its adapter has accepted the envelope.
+      #
+      # @param event [Event] the adapter-validated event
+      # @return [Validated]
+      def self.from(event)
+        op = event.op # : String
+        type = event.type # : String
+        id = event.id # : String
+        version = event.version # : Integer
+        ingestion_format = event.ingestion_format # : String
+        message_id = event.message_id # : String?
+        latency_timestamps = event.latency_timestamps # : Hash[String, String]
+
+        new(
+          op: op,
+          type: type,
+          id: id,
+          version: version,
+          record: event.record,
+          ingestion_format: ingestion_format,
+          message_id: message_id,
+          latency_timestamps: latency_timestamps,
+          source: event.source
+        )
+      end
+
+      # Returns the hash representation used by hash-based adapters and datastore scripts.
+      #
+      # @return [Hash<String, Object>]
+      def to_h
+        return source if source.is_a?(::Hash)
+
+        {
+          "op" => op,
+          "type" => type,
+          "id" => id,
+          "version" => version,
+          "record" => record,
+          INGESTION_FORMAT_KEY => ingestion_format,
+          "message_id" => message_id,
+          "latency_timestamps" => latency_timestamps
+        }.compact
+      end
+
+      # Compares event values without treating validation state as part of their identity.
+      #
+      # @param other [Object] another value
+      # @return [Boolean]
+      def ==(other)
+        (other.is_a?(Event) || other.is_a?(Event::Validated)) &&
+          Event.members.all? { |member| public_send(member) == other.public_send(member) }
+      end
+      alias_method :eql?, :==
+
+      # Returns a hash based on event values without including validation state.
+      #
+      # @return [Integer]
+      def hash
+        Event.members.map { |member| public_send(member) }.hash
       end
     end
 

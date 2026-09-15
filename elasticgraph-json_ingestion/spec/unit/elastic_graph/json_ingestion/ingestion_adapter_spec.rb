@@ -22,6 +22,7 @@ module ElasticGraph
           result = indexer.operation_factory.build(::ElasticGraph::Indexer::Event.from_hash(event))
 
           expect(result.failed_event_error).to be nil
+          expect(result.operations.map(&:event)).to all be_a(ElasticGraph::Indexer::Event::Validated)
           expect(result.operations.map(&:doc_id)).to include("1")
         end
 

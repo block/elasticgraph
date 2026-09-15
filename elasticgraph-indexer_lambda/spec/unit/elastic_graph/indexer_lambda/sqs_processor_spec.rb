@@ -34,9 +34,10 @@ module ElasticGraph
 
           sqs_processor.process(lambda_event)
 
-          expect(indexer_processor).to have_received(:process_returning_failures).with([
+          expected_events = events_from(
             {"field1" => {}, "message_id" => "a"}
-          ], refresh_indices: false)
+          )
+          expect(indexer_processor).to have_received(:process_returning_failures).with(expected_events, refresh_indices: false)
         end
 
         it "processes a lambda event containing multiple SQS messages" do
@@ -50,11 +51,12 @@ module ElasticGraph
 
           sqs_processor.process(lambda_event)
 
-          expect(indexer_processor).to have_received(:process_returning_failures).with([
+          expected_events = events_from(
             {"field1" => {}, "message_id" => "a"},
             {"field2" => {}, "message_id" => "b"},
             {"field3" => {}, "message_id" => "c"}
-          ], refresh_indices: false)
+          )
+          expect(indexer_processor).to have_received(:process_returning_failures).with(expected_events, refresh_indices: false)
         end
 
         it "processes a lambda event containing multiple ElasticGraph events in the SQS messages" do
@@ -67,13 +69,14 @@ module ElasticGraph
 
           sqs_processor.process(lambda_event)
 
-          expect(indexer_processor).to have_received(:process_returning_failures).with([
+          expected_events = events_from(
             {"field1" => {}, "message_id" => "a"},
             {"field2" => {}, "message_id" => "a"},
             {"field3" => {}, "message_id" => "b"},
             {"field4" => {}, "message_id" => "b"},
             {"field5" => {}, "message_id" => "b"}
-          ], refresh_indices: false)
+          )
+          expect(indexer_processor).to have_received(:process_returning_failures).with(expected_events, refresh_indices: false)
         end
 
         it "logs the SQS message ids received in the lambda event and the `sqs_received_at` if available" do
@@ -148,7 +151,7 @@ module ElasticGraph
           sqs_processor.process(lambda_event)
 
           expect(indexer_processor).to have_received(:process_returning_failures).with(
-            [event_payload.merge("message_id" => "a")],
+            events_from(event_payload.merge("message_id" => "a")),
             refresh_indices: false
           )
         end
@@ -194,12 +197,12 @@ module ElasticGraph
           sqs_processor.process(lambda_event)
 
           expect(indexer_processor).to have_received(:process_returning_failures) do |events|
-            expect(events.first["latency_timestamps"].size).to eq(2)
+            expect(events.first.latency_timestamps.size).to eq(2)
             expect(
-              events.first["latency_timestamps"]["processing_first_attempted_at"]
+              events.first.latency_timestamps["processing_first_attempted_at"]
             ).to eq(approximate_first_receive_timestamp_iso8601)
             expect(
-              events.first["latency_timestamps"]["sqs_received_at"]
+              events.first.latency_timestamps["sqs_received_at"]
             ).to eq(sent_timestamp_iso8601)
           end
         end
@@ -223,15 +226,15 @@ module ElasticGraph
           sqs_processor.process(lambda_event)
 
           expect(indexer_processor).to have_received(:process_returning_failures) do |events|
-            expect(events.first["latency_timestamps"].size).to eq(3)
+            expect(events.first.latency_timestamps.size).to eq(3)
             expect(
-              events.first["latency_timestamps"]["processing_first_attempted_at"]
+              events.first.latency_timestamps["processing_first_attempted_at"]
             ).to eq(approximate_first_receive_timestamp_iso8601)
             expect(
-              events.first["latency_timestamps"]["sqs_received_at"]
+              events.first.latency_timestamps["sqs_received_at"]
             ).to eq(sent_timestamp_iso8601)
             expect(
-              events.first["latency_timestamps"]["field1"]
+              events.first.latency_timestamps["field1"]
             ).to eq("value1")
           end
         end
@@ -267,7 +270,7 @@ module ElasticGraph
             sqs_processor.process(lambda_event)
 
             expect(indexer_processor).to have_received(:process_returning_failures) do |events|
-              expect(events.map { |e| e.fetch("latency_timestamps", {}).keys }).to eq [
+              expect(events.map { |event| (event.latency_timestamps || {}).keys }).to eq [
                 ["field1"],
                 ["processing_first_attempted_at", "sqs_received_at"],
                 [],
@@ -343,6 +346,10 @@ module ElasticGraph
 
         def build_sqs_processor(**options)
           super(s3_client: s3_client, **options)
+        end
+
+        def events_from(*hashes)
+          hashes.map { |hash| Indexer::Event.from_hash(hash) }
         end
       end
 

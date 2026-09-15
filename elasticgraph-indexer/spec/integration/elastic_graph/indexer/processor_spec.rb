@@ -187,7 +187,8 @@ module ElasticGraph
 
       def process_batches(*batches, via: indexer)
         batches.each do |batch|
-          via.processor.process(batch, refresh_indices: true)
+          events = batch.map { |event| Event.from_hash(event) }
+          via.processor.process(events, refresh_indices: true)
         end
       end
 

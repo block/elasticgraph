@@ -45,11 +45,11 @@ module ElasticGraph
           end
         end
 
-        it "processes both event objects and hashes through router.bulk" do
+        it "processes event objects through router.bulk" do
           component = build_upsert_event(:component, id: "123", __version: 1)
           address = build_upsert_event(:address, id: "123", __version: 1)
 
-          process([Event.from_hash(component), address])
+          process([Event.from_hash(component), Event.from_hash(address)])
 
           expect(datastore_router).to have_received(:bulk).with(
             [
@@ -133,14 +133,16 @@ module ElasticGraph
             component = upsert_event_with_latency_timestamps(:component, 36, 72)
               .except(JSON_SCHEMA_VERSION_KEY)
               .merge(INGESTION_FORMAT_KEY => "unversioned")
-            adapter = instance_double(IngestionAdapter::Interface,
-              validate_event: IngestionAdapter::ValidationResult.valid(RecordPreparer::Identity))
+            adapter = instance_double(IngestionAdapter::Interface)
+            allow(adapter).to receive(:validate_event) do |event, **|
+              IngestionAdapter::ValidationResult.valid(Event::Validated.from(event), RecordPreparer::Identity)
+            end
             indexer_with_adapter = build_indexer_with(
               latency_thresholds: {},
               ingestion_adapters_by_format: {"unversioned" => adapter}
             )
 
-            indexer_with_adapter.processor.process([component], refresh_indices: true)
+            indexer_with_adapter.processor.process([Event.from_hash(component)], refresh_indices: true)
 
             expect(logged_jsons_of_type("ElasticGraphIndexingLatencies")).to contain_exactly(a_hash_including(
               "event_type" => "Component",
@@ -297,7 +299,8 @@ module ElasticGraph
               "originated_at" => 150_000
             })
 
-            indexer.processor.process([no_outliers, originated_at_outlier, touched_by_foo_outlier, both_exact_outliers], refresh_indices: true)
+            events = [no_outliers, originated_at_outlier, touched_by_foo_outlier, both_exact_outliers].map { |event| Event.from_hash(event) }
+            indexer.processor.process(events, refresh_indices: true)
 
             logged_jsons = logged_jsons_of_type("ElasticGraphIndexingLatencies")
 
@@ -449,7 +452,8 @@ module ElasticGraph
               clock: clock
             )
 
-            indexer_with_adapters.processor.process([build_upsert_event(:component, id: "c1", __version: 1)], refresh_indices: true)
+            event = Event.from_hash(build_upsert_event(:component, id: "c1", __version: 1))
+            indexer_with_adapters.processor.process([event], refresh_indices: true)
 
             expect(logged_jsons_of_type("RecordValidationSkipped")).to contain_exactly(
               a_hash_including("count" => 1, "counts_by_type" => {"Component" => 1})
@@ -474,12 +478,13 @@ module ElasticGraph
           )
         end
 
-        def process(*events)
-          indexer.processor.process(*events, refresh_indices: true)
+        def process(events)
+          indexer.processor.process(events.map { |event| event.is_a?(Event) ? event : Event.from_hash(event) }, refresh_indices: true)
         end
 
-        def process_returning_failures(*events)
-          indexer.processor.process_returning_failures(*events, refresh_indices: true)
+        def process_returning_failures(events)
+          normalized_events = events.map { |event| event.is_a?(Event) ? event : Event.from_hash(event) }
+          indexer.processor.process_returning_failures(normalized_events, refresh_indices: true)
         end
       end
     end

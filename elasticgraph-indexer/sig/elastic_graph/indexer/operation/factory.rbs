@@ -1,6 +1,8 @@
 module ElasticGraph
   class Indexer
-    type event = Event
+    type event = Event::Validated
+    type unvalidatedEvent = Event
+    type anyEvent = Event | Event::Validated
 
     module Operation
       class FactorySupertype
@@ -31,17 +33,17 @@ module ElasticGraph
       end
 
       class Factory < FactorySupertype
-        def build: (event) -> BuildResult
+        def build: (unvalidatedEvent) -> BuildResult
 
         private
 
-        def build_for_adapter: (event, IngestionAdapter::_Adapter) -> BuildResult
-        def prepare_event: (event) -> event
+        def build_for_adapter: (unvalidatedEvent, IngestionAdapter::_Adapter) -> BuildResult
+        def prepare_event: (unvalidatedEvent) -> unvalidatedEvent
         def build_success_result: (event, _RecordPreparer, type_with_skipped_validation: ::String?) -> BuildResult
         def build_success_result_isolating_malformed_records: (event, _RecordPreparer, IngestionAdapter::_Adapter) -> BuildResult
         CRC32_SPACE_PER_PERCENT: ::Float
-        def skip_validation?: (::String, event) -> bool
-        def build_failed_result: (event, ::String, ::String) -> BuildResult
+        def skip_validation?: (::Object?, unvalidatedEvent) -> bool
+        def build_failed_result: (anyEvent, ::String, ::String) -> BuildResult
         def build_all_operations_for: (event, _RecordPreparer) -> ::Array[operation]
         def index_definitions_for: (::String) -> ::Array[DatastoreCore::_IndexDefinition]
         def raise: (*untyped) -> bot

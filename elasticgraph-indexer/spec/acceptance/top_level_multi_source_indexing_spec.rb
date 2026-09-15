@@ -23,19 +23,19 @@ module ElasticGraph
       component3 = build_upsert_event(:component, id: "c78", __version: 3, name: "E", tags: ["a", "b"], part_ids: ["p1"])
 
       # ingest component1 before the related widget
-      indexer.processor.process([component1], refresh_indices: true)
+      process_events([component1], via: indexer)
 
       # ingest widget after related component1 but before related component2
-      indexer.processor.process([widget_v7], refresh_indices: true)
+      process_events([widget_v7], via: indexer)
 
       # ingest an updated widget (with a changed name)
-      indexer.processor.process([widget_v8], refresh_indices: true)
+      process_events([widget_v8], via: indexer)
 
       # ingest component2 after related widget, and ingest standalone component3
-      indexer.processor.process([component2, component3], refresh_indices: true)
+      process_events([component2, component3], via: indexer)
 
       # ingest an old version of the widget (with a different name); it should be ignored
-      indexer.processor.process([old_widget], refresh_indices: true)
+      process_events([old_widget], via: indexer)
 
       components = search_components
 
@@ -137,10 +137,10 @@ module ElasticGraph
       widget1 = build_upsert_event(:widget, id: "w1", component_ids: ["c23"])
       widget2 = build_upsert_event(:widget, id: "w2", component_ids: ["c23"])
 
-      indexer.processor.process([widget1], refresh_indices: true)
+      process_events([widget1], via: indexer)
 
       expect {
-        indexer.processor.process([widget2], refresh_indices: true)
+        process_events([widget2], via: indexer)
       }.to raise_error Indexer::IndexingFailuresError, a_string_including(
         "Cannot update document c23 with data from related widget w2 because the related widget has apparently changed (was: [w1]), " \
         "but mutations of relationships used with `sourced_from` are not supported because allowing it could break ElasticGraph's " \
@@ -156,7 +156,7 @@ module ElasticGraph
 
       # `design1` arrives BEFORE its component exists, materializing an incomplete document containing
       # just the identity, bookkeeping, and the sourced field.
-      indexer.processor.process([design1], refresh_indices: true)
+      process_events([design1], via: indexer)
 
       expect(component_source("c1")).to eq(
         "id" => "c1",
@@ -166,10 +166,10 @@ module ElasticGraph
         "designer_name" => "Alice"
       )
 
-      indexer.processor.process([component1, component2], refresh_indices: true)
+      process_events([component1, component2], via: indexer)
 
       # `design2` arrives AFTER its component was indexed.
-      indexer.processor.process([design2], refresh_indices: true)
+      process_events([design2], via: indexer)
 
       component1_source = component_source("c1")
       expect(component1_source).to include("id" => "c1", "name" => "C1", "designer_name" => "Alice")
@@ -203,7 +203,7 @@ module ElasticGraph
         created_at: timestamp_in_2023
       })
 
-      indexer.processor.process([widget, workspace], refresh_indices: true)
+      process_events([widget, workspace], via: indexer)
 
       indexed_widget_source = search("widgets").dig(0, "_source")
       expect(indexed_widget_source).to include({

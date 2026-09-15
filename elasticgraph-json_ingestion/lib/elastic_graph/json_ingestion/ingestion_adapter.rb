@@ -52,14 +52,15 @@ module ElasticGraph
           return ValidationResult.invalid(validation_target: "event payload", message: error_message)
         end
 
-        record = event.record
-        graphql_type_name = event.type
+        validated_event = ElasticGraph::Indexer::Event::Validated.from(event)
+        record = validated_event.record
+        graphql_type_name = validated_event.type
 
         if !skip_record_validation && (error_message = validator(graphql_type_name, selected_json_schema_version).validate_with_error_message(record))
-          return ValidationResult.invalid(validation_target: "#{graphql_type_name} record", message: error_message)
+          return ValidationResult.invalid(validation_target: "#{graphql_type_name} record", message: error_message, event: validated_event)
         end
 
-        ValidationResult.valid(@record_preparer_factory.for_json_schema_version(selected_json_schema_version))
+        ValidationResult.valid(validated_event, @record_preparer_factory.for_json_schema_version(selected_json_schema_version))
       end
 
       private

@@ -1,37 +1,39 @@
 module ElasticGraph
   class Indexer
+    EMPTY_LATENCY_TIMESTAMPS: ::Hash[::String, ::String]
+
     class Event < ::Data
-      attr_reader op: untyped
-      attr_reader type: untyped
-      attr_reader id: untyped
-      attr_reader version: untyped
-      attr_reader record: untyped
-      attr_reader ingestion_format: untyped
-      attr_reader message_id: untyped
-      attr_reader latency_timestamps: untyped
-      attr_reader source: untyped
+      attr_reader op: ::Object?
+      attr_reader type: ::Object?
+      attr_reader id: ::Object?
+      attr_reader version: ::Object?
+      attr_reader record: ::Object?
+      attr_reader ingestion_format: ::Object?
+      attr_reader message_id: ::Object?
+      attr_reader latency_timestamps: ::Object?
+      attr_reader source: ::Object?
 
       def initialize: (
-        op: untyped,
-        type: untyped,
-        id: untyped,
-        version: untyped,
-        record: untyped,
-        ?ingestion_format: untyped,
-        ?message_id: untyped,
-        ?latency_timestamps: untyped,
-        ?source: untyped
+        op: ::Object?,
+        type: ::Object?,
+        id: ::Object?,
+        version: ::Object?,
+        record: ::Object?,
+        ?ingestion_format: ::Object?,
+        ?message_id: ::Object?,
+        ?latency_timestamps: ::Object?,
+        ?source: ::Object?
       ) -> void
       def self.new: (
-        op: untyped,
-        type: untyped,
-        id: untyped,
-        version: untyped,
-        record: untyped,
-        ?ingestion_format: untyped,
-        ?message_id: untyped,
-        ?latency_timestamps: untyped,
-        ?source: untyped
+        op: ::Object?,
+        type: ::Object?,
+        id: ::Object?,
+        version: ::Object?,
+        record: ::Object?,
+        ?ingestion_format: ::Object?,
+        ?message_id: ::Object?,
+        ?latency_timestamps: ::Object?,
+        ?source: ::Object?
       ) -> instance
       def self.members: () -> ::Array[::Symbol]
 
@@ -39,6 +41,51 @@ module ElasticGraph
 
       def with: (**untyped) -> Event
       def to_h: () -> ::Hash[::String, untyped]
+      def ==: (::Object) -> bool
+      alias eql? ==
+      def hash: () -> ::Integer
+
+      class Validated < ::Data
+        attr_reader op: ::String
+        attr_reader type: ::String
+        attr_reader id: ::String
+        attr_reader version: ::Integer
+        attr_reader record: untyped
+        attr_reader ingestion_format: ::String
+        attr_reader message_id: ::String?
+        attr_reader latency_timestamps: ::Hash[::String, ::String]
+        attr_reader source: untyped
+
+        def initialize: (
+          op: ::String,
+          type: ::String,
+          id: ::String,
+          version: ::Integer,
+          record: untyped,
+          ingestion_format: ::String,
+          message_id: ::String?,
+          latency_timestamps: ::Hash[::String, ::String],
+          source: untyped
+        ) -> void
+        def self.new: (
+          op: ::String,
+          type: ::String,
+          id: ::String,
+          version: ::Integer,
+          record: untyped,
+          ingestion_format: ::String,
+          message_id: ::String?,
+          latency_timestamps: ::Hash[::String, ::String],
+          source: untyped
+        ) -> instance
+        def self.members: () -> ::Array[::Symbol]
+        def self.from: (anyEvent) -> Validated
+
+        def to_h: () -> ::Hash[::String, untyped]
+        def ==: (::Object) -> bool
+        alias eql? ==
+        def hash: () -> ::Integer
+      end
     end
   end
 end

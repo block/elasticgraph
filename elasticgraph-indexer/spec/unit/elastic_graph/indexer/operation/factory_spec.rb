@@ -133,7 +133,7 @@ module ElasticGraph
             it "still applies envelope-level validation for skipped types" do
               event = build_upsert_event(:component, id: "1", __version: -1)
 
-              expect_failed_event_error(event, "/properties/version")
+              expect_failed_event_error(event, "/properties/version", expect_no_ops: true)
             end
           end
 
@@ -379,7 +379,7 @@ module ElasticGraph
           it "notifies an error on missing `#{JSON_SCHEMA_VERSION_KEY}`" do
             event = build_upsert_event(:component).except(JSON_SCHEMA_VERSION_KEY)
 
-            expect_failed_event_error(event, JSON_SCHEMA_VERSION_KEY)
+            expect_failed_event_error(event, JSON_SCHEMA_VERSION_KEY, expect_no_ops: true)
           end
 
           it "notifies an error on wrong field types" do
@@ -472,10 +472,10 @@ module ElasticGraph
 
           it "uses a registered non-JSON adapter for events in that alternate format" do
             event = build_upsert_event(:component, id: "1", __version: 1).merge(INGESTION_FORMAT_KEY => "other")
-            other_adapter = instance_spy(
-              IngestionAdapter::Interface,
-              validate_event: IngestionAdapter::ValidationResult.valid(RecordPreparer::Identity)
-            )
+            other_adapter = instance_spy(IngestionAdapter::Interface)
+            allow(other_adapter).to receive(:validate_event) do |event, **|
+              IngestionAdapter::ValidationResult.valid(Event::Validated.from(event), RecordPreparer::Identity)
+            end
             factory = indexer.operation_factory.with(ingestion_adapters_by_format: {"other" => other_adapter})
 
             expect(factory.build(Event.from_hash(event)).operations).not_to be_empty
@@ -492,7 +492,8 @@ module ElasticGraph
               event,
               "No ingestion adapter is registered for format \"proto\"",
               "Available formats: json",
-              factory: factory
+              factory: factory,
+              expect_no_ops: true
             )
             expect(adapter).not_to have_received(:validate_event)
           end
@@ -512,16 +513,14 @@ module ElasticGraph
           def expect_failed_event_error(event, *error_message_snippets, factory: indexer.operation_factory, expect_no_ops: false)
             result = factory.build(Event.from_hash(event))
 
-            error_operations = factory.send(:build_all_operations_for, Event.from_hash(event), RecordPreparer::Identity)
-
-            # We expect/want `build_all_operations_for` to return operations in nearly all cases.
-            # There are a few cases where it can't return any operations, so we make the test pass
-            # `expect_no_ops` to opt-in to allowing that here.
-            if expect_no_ops
-              expect(error_operations).to be_empty
+            error_operations = if expect_no_ops
+              []
             else
-              expect(error_operations).not_to be_empty
+              validated_event = Event::Validated.from(Event.from_hash(event))
+              factory.send(:build_all_operations_for, validated_event, RecordPreparer::Identity)
             end
+
+            expect(error_operations).not_to be_empty unless expect_no_ops
 
             # When the event is invalid it should return an empty list of operations.
             expect(result.operations).to eq([])

@@ -23,7 +23,7 @@ module ElasticGraph
         # @return [ValidationResult] the result of validating the event
         def validate_event(event, skip_record_validation: false)
           # simplecov:disable -- must return a result to satisfy Steep type checking but never called
-          ValidationResult.valid(RecordPreparer::Identity)
+          ValidationResult.valid(Event::Validated.from(event), RecordPreparer::Identity)
           # simplecov:enable
         end
       end
@@ -36,31 +36,36 @@ module ElasticGraph
       #   @return [String] detailed validation failure message
       Failure = ::Data.define(:validation_target, :message)
 
-      # Returned by {Interface#validate_event}. A non-nil `failure` indicates an invalid event,
-      # and a non-nil `record_preparer` indicates a valid event.
+      # Returned by {Interface#validate_event}. A non-nil `failure` indicates an invalid event.
+      # Non-nil `event` and `record_preparer` values indicate a valid event.
+      #
+      # @!attribute [r] event
+      #   @return [Event::Validated, nil] the event with a validated envelope
       #
       # @!attribute [r] record_preparer
       #   @return [Object, nil] preparer for the event's record, when the event is valid
       # @!attribute [r] failure
       #   @return [Failure, nil] description of the validation problem, when the event is invalid
-      ValidationResult = ::Data.define(:record_preparer, :failure) do
+      ValidationResult = ::Data.define(:event, :record_preparer, :failure) do
         # @implements ValidationResult
 
         # Builds a result for a valid event.
         #
+        # @param event [Event::Validated] event whose envelope has been validated
         # @param record_preparer [Object] preparer for the event's record
         # @return [ValidationResult]
-        def self.valid(record_preparer)
-          new(record_preparer: record_preparer, failure: nil)
+        def self.valid(event, record_preparer)
+          new(event: event, record_preparer: record_preparer, failure: nil)
         end
 
         # Builds a result for an invalid event.
         #
+        # @param event [Event::Validated, nil] the event when its envelope passed validation
         # @param validation_target [String] brief description of the part of the event that was invalid
         # @param message [String] detailed validation failure message
         # @return [ValidationResult]
-        def self.invalid(validation_target:, message:)
-          new(record_preparer: nil, failure: Failure.new(validation_target: validation_target, message: message))
+        def self.invalid(validation_target:, message:, event: nil)
+          new(event: event, record_preparer: nil, failure: Failure.new(validation_target: validation_target, message: message))
         end
       end
     end

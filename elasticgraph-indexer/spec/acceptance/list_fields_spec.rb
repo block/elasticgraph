@@ -48,7 +48,7 @@ module ElasticGraph
         sponsors: [build(:sponsor)]
       )
 
-      indexer.processor.process([team], refresh_indices: true)
+      process_events([team], via: indexer)
 
       team_counts = indexed_team_counts.fetch("t1")
 

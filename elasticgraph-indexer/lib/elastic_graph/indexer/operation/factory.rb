@@ -49,8 +49,9 @@ module ElasticGraph
           validation_result = adapter.validate_event(event, skip_record_validation: skip_record_validation)
 
           if (failure = validation_result.failure)
-            build_failed_result(event, failure.validation_target, failure.message)
+            build_failed_result(validation_result.event || event, failure.validation_target, failure.message)
           else
+            event = validation_result.event or raise
             record_preparer = validation_result.record_preparer or raise
             if skip_record_validation
               build_success_result_isolating_malformed_records(event, record_preparer, adapter)
@@ -105,6 +106,7 @@ module ElasticGraph
         # is per-process. The `<= 0` and `>= 100` guards keep the endpoints exact, so no float
         # boundary error can make a `0` percent skip a record or a `100` percent validate one.
         def skip_validation?(type, event)
+          return false unless type.is_a?(::String)
           percent = skip_record_validation_percents_by_type[type]
           return false if percent.nil? || percent <= 0
           return true if percent >= 100
@@ -123,16 +125,20 @@ module ElasticGraph
           # than reporting the operations we would have run, and `FailedEventError#operations` is documented to
           # sometimes be empty for exactly this reason, so we fall back to no operations rather than let a second
           # failure mask the first.
-          operations = begin
-            build_all_operations_for(event, RecordPreparer::Identity)
-          rescue => exception
-            logger.warn({
-              "message_type" => "FailedEventOperationBuildingFailure",
-              "message_id" => event.message_id,
-              "event_id" => EventID.from_event(event).to_s,
-              "error_class" => exception.class.name,
-              "error_message" => exception.message
-            })
+          operations = if event.is_a?(Event::Validated)
+            begin
+              build_all_operations_for(event, RecordPreparer::Identity)
+            rescue => exception
+              logger.warn({
+                "message_type" => "FailedEventOperationBuildingFailure",
+                "message_id" => event.message_id,
+                "event_id" => EventID.from_event(event).to_s,
+                "error_class" => exception.class.name,
+                "error_message" => exception.message
+              })
+              [] # : ::Array[operation]
+            end
+          else
             [] # : ::Array[operation]
           end
 
