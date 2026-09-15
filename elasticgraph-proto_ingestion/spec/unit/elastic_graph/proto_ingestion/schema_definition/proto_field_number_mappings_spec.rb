@@ -86,6 +86,10 @@ module ElasticGraph
                   "name" => 2
                 },
                 "next_number" => 3
+              },
+              "ElasticGraphEventEnvelope" => {
+                "fields" => {"op" => 1, "id" => 2, "version" => 3, "latency_timestamps" => 4, "record_account" => 5},
+                "next_number" => 6
               }
             }
           })
@@ -125,6 +129,10 @@ module ElasticGraph
                   "name" => 3
                 },
                 "next_number" => 4
+              },
+              "ElasticGraphEventEnvelope" => {
+                "fields" => {"op" => 1, "id" => 2, "version" => 3, "latency_timestamps" => 4, "record_account" => 5},
+                "next_number" => 6
               }
             }
           })
@@ -205,6 +213,10 @@ module ElasticGraph
                   "display_name" => 1
                 },
                 "next_number" => 3
+              },
+              "ElasticGraphEventEnvelope" => {
+                "fields" => {"op" => 1, "id" => 2, "version" => 3, "latency_timestamps" => 4, "record_account" => 5},
+                "next_number" => 6
               }
             }
           })

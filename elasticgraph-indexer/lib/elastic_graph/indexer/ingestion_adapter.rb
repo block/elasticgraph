@@ -43,15 +43,18 @@ module ElasticGraph
       #   @return [Object, nil] preparer for the event's record, when the event is valid
       # @!attribute [r] failure
       #   @return [Failure, nil] description of the validation problem, when the event is invalid
-      ValidationResult = ::Data.define(:record_preparer, :failure) do
+      # @!attribute [r] event
+      #   @return [Hash<String, Object>, nil] normalized event, or nil to keep the original event
+      ValidationResult = ::Data.define(:record_preparer, :failure, :event) do
         # @implements ValidationResult
 
         # Builds a result for a valid event.
         #
         # @param record_preparer [Object] preparer for the event's record
+        # @param event [Hash<String, Object>, nil] normalized event for operation construction
         # @return [ValidationResult]
-        def self.valid(record_preparer)
-          new(record_preparer: record_preparer, failure: nil)
+        def self.valid(record_preparer, event: nil)
+          new(record_preparer: record_preparer, failure: nil, event: event)
         end
 
         # Builds a result for an invalid event.
@@ -60,7 +63,7 @@ module ElasticGraph
         # @param message [String] detailed validation failure message
         # @return [ValidationResult]
         def self.invalid(validation_target:, message:)
-          new(record_preparer: nil, failure: Failure.new(validation_target: validation_target, message: message))
+          new(record_preparer: nil, failure: Failure.new(validation_target: validation_target, message: message), event: nil)
         end
       end
     end

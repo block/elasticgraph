@@ -72,7 +72,8 @@ module ElasticGraph
             sqs_metadata = sqs_metadata.except("latency_timestamps")
           end
 
-          decoded_events_from(record.fetch("body")).map do |event|
+          metadata = (record["messageAttributes"] || {}).transform_values { |attribute| attribute["stringValue"] }
+          decoded_events_from(record.fetch("body"), metadata: metadata).map do |event|
             ElasticGraph::Support::HashUtil.deep_merge(event, sqs_metadata)
           end
         end.tap do
@@ -85,12 +86,12 @@ module ElasticGraph
 
       S3_OFFLOADING_INDICATOR = '["software.amazon.payloadoffloading.PayloadS3Pointer"'
 
-      def decoded_events_from(payload)
+      def decoded_events_from(payload, metadata:)
         if payload.start_with?(S3_OFFLOADING_INDICATOR)
           payload = get_payload_from_s3(payload)
         end
 
-        @indexer.decode(payload)
+        @indexer.decode(payload, metadata: metadata)
       end
 
       def extract_sqs_metadata(record)

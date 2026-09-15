@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/errors"
+require "elastic_graph/graphql/scalar_coercion_adapters/valid_time_zones"
 require "elastic_graph/proto_ingestion/schema_definition/field_number_mappings"
 require "elastic_graph/proto_ingestion/schema_definition/schema_elements/enum_type_extension"
 require "elastic_graph/proto_ingestion/schema_definition/schema_elements/object_interface_and_union_extension"
@@ -139,6 +140,69 @@ module ElasticGraph
         def field_label_prefix(repeated:)
           return "repeated " if repeated
           "optional "
+        end
+
+        # Metadata for decoding public protobuf fields and preparing private index fields.
+        # @return [Hash<String, Object>]
+        def ingestion_metadata
+          {
+            "package_name" => @package_name,
+            "types" => proto_types.to_h do |type|
+              metadata = if type.respond_to?(:proto_indexing_metadata)
+                type.proto_indexing_metadata
+              elsif type.respond_to?(:values_by_name)
+                {"enum_values" => type.values_by_name.values.to_h { |value| [value.proto_name(type.proto_enum_value_prefix), value.name] }}
+              else
+                scalar = type.type_ref.with_reverted_override.name
+                {"scalar" => scalar, "proto_type" => type.proto_name}.tap do |scalar_metadata|
+                  scalar_metadata["allowed_values"] = GraphQL::ScalarCoercionAdapters::VALID_TIME_ZONES.to_a if scalar == "TimeZone"
+                end
+              end
+              [type.name, metadata]
+            end
+          }
+        end
+
+        # Generates the self-contained batch transport while leaving domain messages reusable.
+        # @return [String]
+        def envelope_schema
+          roots = @ingestible_types_by_name.values
+          return "" if roots.empty?
+          variant_names = roots.map { |type| Support::Casing.to_upper_snake(type.name).downcase }
+          if variant_names.uniq.size != variant_names.size
+            raise Errors::SchemaError, "Ingestible type names must remain distinct when converted to snake_case for protobuf envelope fields."
+          end
+          fields = {"op" => "string", "id" => "string", "version" => "int64"}.map do |name, type|
+            number = field_number_for(message_name: "ElasticGraphEventEnvelope", type_name: "ElasticGraphEventEnvelope", public_field_name: name)
+            "  optional #{type} #{name} = #{number};"
+          end
+          active_names = %w[op id version latency_timestamps]
+          latency_number = field_number_for(message_name: "ElasticGraphEventEnvelope", type_name: "ElasticGraphEventEnvelope", public_field_name: "latency_timestamps")
+          fields << "  map<string, string> latency_timestamps = #{latency_number};"
+          alternatives = roots.sort_by(&:name).map do |type|
+            name = "record_#{Support::Casing.to_upper_snake(type.name).downcase}"
+            active_names << name
+            number = field_number_for(message_name: "ElasticGraphEventEnvelope", type_name: "ElasticGraphEventEnvelope", public_field_name: name)
+            "    .#{@package_name}.#{type.name} #{name} = #{number};"
+          end
+          reserved = reserved_field_numbers_for("ElasticGraphEventEnvelope", active_names).map { |name, number| "  reserved #{number}; // Previously used by #{name}." }
+          <<~PROTO
+            syntax = "#{@syntax}";
+            package #{@package_name};
+            import "schema.proto";
+
+            message ElasticGraphEventEnvelope {
+            #{fields.join("\n")}
+              oneof record {
+            #{alternatives.join("\n")}
+              }
+            #{reserved.join("\n")}
+            }
+
+            message ElasticGraphEventBatch {
+              repeated ElasticGraphEventEnvelope events = 1;
+            }
+          PROTO
         end
 
         private

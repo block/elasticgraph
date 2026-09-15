@@ -1,0 +1,16 @@
+module ElasticGraph
+  module ProtoIngestion
+    class IngestionAdapter
+      include ::ElasticGraph::Indexer::IngestionAdapter::_Adapter
+      @schema: RuntimeSchema
+      @converter: RecordConverter
+      @validator: RecordValidator
+      @ingestible_types: Array[String]
+      @envelope_types: Array[String]
+      def initialize: (schema_artifacts: schemaArtifacts) -> void
+      private
+      def invalid: (String, String) -> ::ElasticGraph::Indexer::IngestionAdapter::ValidationResult
+      def envelope_error: (Hash[String, untyped]) -> String?
+    end
+  end
+end

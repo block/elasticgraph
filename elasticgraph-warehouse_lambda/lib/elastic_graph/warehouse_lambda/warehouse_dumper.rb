@@ -35,12 +35,13 @@ module ElasticGraph
 
       # Processes a batch of indexing operations by dumping them to S3 as gzipped JSONL files.
       # Operations are grouped by GraphQL type and JSON schema version, with each group written to a separate file.
+      # Formats without a JSON schema version use an `unversioned` partition.
       #
       # @param operations [Array<Operation>] the indexing operations to process
       # @param refresh [Boolean] ignored (included for interface compatibility with DatastoreIndexingRouter)
       # @return [BulkResult] result containing success status for all operations
       def bulk(operations, refresh: false)
-        operations_by_type_and_json_schema_version = operations.group_by { |op| [op.event.fetch("type"), op.event.fetch(JSON_SCHEMA_VERSION_KEY)] }
+        operations_by_type_and_json_schema_version = operations.group_by { |op| [op.event.fetch("type"), op.event[JSON_SCHEMA_VERSION_KEY]] }
 
         @logger.info({
           "message_type" => LOG_MSG_RECEIVED_BATCH,
@@ -104,7 +105,7 @@ module ElasticGraph
         [
           @s3_file_prefix,
           type,
-          "v#{json_schema_version}",
+          json_schema_version ? "v#{json_schema_version}" : "unversioned",
           date,
           "#{uuid}.jsonl.gz"
         ].join("/")
