@@ -52,7 +52,9 @@ module ElasticGraph
           return ValidationResult.invalid(validation_target: "event payload", message: error_message)
         end
 
-        validated_event = ElasticGraph::Indexer::Event::Validated.from(event)
+        record = event.record # : Hash[String, untyped]
+        id = event.id # : String
+        validated_event = ElasticGraph::Indexer::Event::Validated.from(event.with(record: record.merge("id" => id)))
         record = validated_event.record
         graphql_type_name = validated_event.type
 
