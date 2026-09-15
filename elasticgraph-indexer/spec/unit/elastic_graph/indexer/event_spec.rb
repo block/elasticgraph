@@ -57,7 +57,7 @@ module ElasticGraph
           latency_timestamps: {},
           source: source
         )
-        expect(event.to_h).to eq(
+        expected_hash = {
           "op" => "upsert",
           "type" => "Widget",
           "id" => "w1",
@@ -65,7 +65,9 @@ module ElasticGraph
           "record" => record,
           INGESTION_FORMAT_KEY => "proto",
           "latency_timestamps" => {}
-        )
+        }
+        expect(event.to_h).to eq(expected_hash)
+        expect(Event::Validated.from(event).to_h).to eq(expected_hash)
 
         updated_record = Object.new
         expect(event.with(record: updated_record)).to have_attributes(record: updated_record, source: source)

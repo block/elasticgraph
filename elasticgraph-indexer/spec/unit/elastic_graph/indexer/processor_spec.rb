@@ -49,7 +49,7 @@ module ElasticGraph
           component = build_upsert_event(:component, id: "123", __version: 1)
           address = build_upsert_event(:address, id: "123", __version: 1)
 
-          process([Event.from_hash(component), Event.from_hash(address)])
+          indexer.processor.process([Event.from_hash(component), Event.from_hash(address)], refresh_indices: true)
 
           expect(datastore_router).to have_received(:bulk).with(
             [
@@ -101,7 +101,7 @@ module ElasticGraph
             component = upsert_event_with_latency_timestamps(:component, 36, 72)
             address = upsert_event_with_latency_timestamps(:address, 108, 144)
 
-            process([Event.from_hash(component), address])
+            process([component, address])
 
             expect(logged_jsons_of_type("ElasticGraphIndexingLatencies")).to match([
               a_hash_including(
@@ -402,6 +402,14 @@ module ElasticGraph
             )
           end
 
+          it "does not try to supersede a failure with an invalid event version" do
+            invalid_event = good_component.merge("version" => "not-an-integer")
+
+            failures = process_returning_failures([invalid_event])
+
+            expect(failures).to contain_exactly(have_attributes(version: "not-an-integer"))
+          end
+
           def make_component_bad(component)
             component.merge("record" => component["record"].merge(
               "name" => 17 # must be a string
@@ -479,11 +487,11 @@ module ElasticGraph
         end
 
         def process(events)
-          indexer.processor.process(events.map { |event| event.is_a?(Event) ? event : Event.from_hash(event) }, refresh_indices: true)
+          indexer.processor.process(events.map { |event| Event.from_hash(event) }, refresh_indices: true)
         end
 
         def process_returning_failures(events)
-          normalized_events = events.map { |event| event.is_a?(Event) ? event : Event.from_hash(event) }
+          normalized_events = events.map { |event| Event.from_hash(event) }
           indexer.processor.process_returning_failures(normalized_events, refresh_indices: true)
         end
       end
