@@ -25,6 +25,18 @@ module ElasticGraph
           expect(result.operations.map(&:doc_id)).to include("1")
         end
 
+        it "copies the envelope `id` into the record so that the datastore includes `id` in search payloads" do
+          event = build_upsert_event(:component, id: "1")
+          event.fetch("record").delete("id")
+
+          result = indexer.operation_factory.build(event)
+
+          expect(result.failed_event_error).to be nil
+          expect(result.operations.size).to eq 1
+          expect(result.operations.map(&:prepared_record)).to all include("id" => "1")
+          expect(event.fetch("record")).to exclude("id")
+        end
+
         # The factory replaces an adapter's missing preparer with an identity preparer while
         # building its failed result, so this adapter contract must be asserted directly.
         it "returns no record preparer, plus the part of the event at fault, for an event it rejects" do

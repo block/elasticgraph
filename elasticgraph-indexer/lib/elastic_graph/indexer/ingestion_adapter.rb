@@ -17,13 +17,15 @@ module ElasticGraph
       class Interface
         # Validates the given event and resolves the record preparer appropriate for the event's
         # ingestion schema version. The indexer selects this adapter from the event's format tag.
+        # The indexer builds operations from the event in the returned result, so an adapter can
+        # return a prepared copy of the event.
         #
         # @param event [Hash<String, Object>] an ElasticGraph indexing event
         # @param skip_record_validation [Boolean] whether to skip record validation; the event envelope must still be validated
         # @return [ValidationResult] the result of validating the event
         def validate_event(event, skip_record_validation: false)
           # simplecov:disable -- must return a result to satisfy Steep type checking but never called
-          ValidationResult.valid(RecordPreparer::Identity)
+          ValidationResult.valid(event, RecordPreparer::Identity)
           # simplecov:enable
         end
       end
@@ -39,19 +41,22 @@ module ElasticGraph
       # Returned by {Interface#validate_event}. A non-nil `failure` indicates an invalid event,
       # and a non-nil `record_preparer` indicates a valid event.
       #
+      # @!attribute [r] event
+      #   @return [Hash<String, Object>, nil] the event to build operations from, when the event is valid
       # @!attribute [r] record_preparer
       #   @return [Object, nil] preparer for the event's record, when the event is valid
       # @!attribute [r] failure
       #   @return [Failure, nil] description of the validation problem, when the event is invalid
-      ValidationResult = ::Data.define(:record_preparer, :failure) do
+      ValidationResult = ::Data.define(:event, :record_preparer, :failure) do
         # @implements ValidationResult
 
         # Builds a result for a valid event.
         #
+        # @param event [Hash<String, Object>] the event to build operations from; an adapter may return a prepared copy
         # @param record_preparer [Object] preparer for the event's record
         # @return [ValidationResult]
-        def self.valid(record_preparer)
-          new(record_preparer: record_preparer, failure: nil)
+        def self.valid(event, record_preparer)
+          new(event: event, record_preparer: record_preparer, failure: nil)
         end
 
         # Builds a result for an invalid event.
@@ -60,7 +65,7 @@ module ElasticGraph
         # @param message [String] detailed validation failure message
         # @return [ValidationResult]
         def self.invalid(validation_target:, message:)
-          new(record_preparer: nil, failure: Failure.new(validation_target: validation_target, message: message))
+          new(event: nil, record_preparer: nil, failure: Failure.new(validation_target: validation_target, message: message))
         end
       end
     end
