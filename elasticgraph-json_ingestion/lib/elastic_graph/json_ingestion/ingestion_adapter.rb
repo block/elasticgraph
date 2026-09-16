@@ -52,14 +52,15 @@ module ElasticGraph
           return ValidationResult.invalid(validation_target: "event payload", message: error_message)
         end
 
-        record = event.fetch("record")
+        # The datastore includes `id` in search payloads only when it is part of the indexed record.
+        record = event.fetch("record").merge("id" => event.fetch("id"))
         graphql_type_name = event.fetch("type")
 
         if !skip_record_validation && (error_message = validator(graphql_type_name, selected_json_schema_version).validate_with_error_message(record))
           return ValidationResult.invalid(validation_target: "#{graphql_type_name} record", message: error_message)
         end
 
-        ValidationResult.valid(@record_preparer_factory.for_json_schema_version(selected_json_schema_version))
+        ValidationResult.valid(event.merge("record" => record), @record_preparer_factory.for_json_schema_version(selected_json_schema_version))
       end
 
       private
