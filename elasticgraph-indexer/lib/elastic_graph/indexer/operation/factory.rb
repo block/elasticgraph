@@ -25,7 +25,6 @@ module ElasticGraph
         :skip_record_validation_percents_by_type
       )
         def build(event)
-          event = prepare_event(event)
           format = event.fetch(INGESTION_FORMAT_KEY, "json")
           adapter = ingestion_adapters_by_format[format]
 
@@ -50,7 +49,8 @@ module ElasticGraph
           if (failure = validation_result.failure)
             build_failed_result(event, failure.validation_target, failure.message)
           else
-            record_preparer = validation_result.record_preparer or raise
+            record_preparer = validation_result.record_preparer # : _RecordPreparer
+            event = validation_result.event # : event
             if skip_record_validation
               build_success_result_isolating_malformed_records(event, record_preparer, adapter)
             else
@@ -83,13 +83,6 @@ module ElasticGraph
           # happens without this rescue, so we deliberately bypass that guard.
           ::Kernel.raise(exception) unless failure
           build_failed_result(event, failure.validation_target, failure.message)
-        end
-
-        # This copies the `id` from event into the actual record
-        # This is necessary because we want to index `id` as part of the record so that the datastore will include `id` in returned search payloads.
-        def prepare_event(event)
-          return event unless event["record"].is_a?(::Hash) && event["id"]
-          event.merge("record" => event["record"].merge("id" => event.fetch("id")))
         end
 
         # `Zlib.crc32` returns a value in `[0, 2**32)`. Pre-dividing that space by 100 lets us test a
