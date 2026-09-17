@@ -23,7 +23,7 @@ module ElasticGraph
 
       it "inspects nicely, but redacts filters since they could contain PII" do
         expect(new_query(client_filters: [{"ssn" => {"equal_to_any_of" => ["123-45-6789"]}}], individual_docs_needed: true).inspect).to eq(<<~EOS.strip)
-          #<ElasticGraph::GraphQL::DatastoreQuery index="widgets_rollover__*" size=#{default_page_size + 1} sort=[{"id" => {"order" => "asc", "missing" => "_first"}}] track_total_hits=false query=<REDACTED> _source=false>
+          #<ElasticGraph::GraphQL::DatastoreQuery index="widgets_rollover__*" ignore_unavailable=true size=#{default_page_size + 1} sort=[{"id" => {"order" => "asc", "missing" => "_first"}}] track_total_hits=false query=<REDACTED> _source=false>
         EOS
       end
     end
