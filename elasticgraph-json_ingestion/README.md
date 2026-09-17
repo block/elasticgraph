@@ -105,8 +105,9 @@ end
 ## Indexing Support
 
 Beyond schema definition, this gem provides an adapter used by `elasticgraph-indexer` to ingest JSON events. The
-adapter validates each event against the JSON schema identified by the event's
-`json_schema_version` and prepares its record for indexing using that version's view of the schema.
+adapter validates each event envelope against the JSON schema identified by the event's `json_schema_version`,
+builds an `ElasticGraph::Indexer::Event` for each valid envelope, validates each record, and prepares records for
+indexing using that version's view of the schema.
 
 JSON ingestion is enabled automatically for schemas defined with this gem's `SchemaDefinition::APIExtension`;
 no indexer configuration is needed.
@@ -128,8 +129,8 @@ indexer.process(json_lines_payload) unless json_lines_payload.empty?
 ```
 
 Use `#process_returning_failures` when individual failures must be handled by the caller. Transports that need to
-add metadata or combine several payloads into one bulk operation can call `#decode`, then pass the resulting events
-to `indexer.processor`.
+add metadata or combine several payloads into one bulk operation can call `#decode`, then pass the resulting decoded
+events to `#process_decoded_returning_failures`.
 
 The wrapper accepts an existing `ElasticGraph::Indexer`, so independent JSON and protobuf wrappers can share the
 same format-neutral indexer and its datastore clients:

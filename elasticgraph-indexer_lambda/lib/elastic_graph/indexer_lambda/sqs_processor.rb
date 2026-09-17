@@ -28,11 +28,11 @@ module ElasticGraph
 
       # Processes the ElasticGraph events in the given `lambda_event`, indexing the data in the datastore.
       def process(lambda_event, refresh_indices: false)
-        events = events_from(lambda_event)
-        failures = @indexer.processor.process_returning_failures(events, refresh_indices: refresh_indices)
+        decoded_events = decoded_events_from(lambda_event)
+        failures = @indexer.process_decoded_returning_failures(decoded_events, refresh_indices: refresh_indices)
 
         if failures.any?
-          failures_error = Indexer::IndexingFailuresError.for(failures: failures, events: events)
+          failures_error = Indexer::IndexingFailuresError.for(failures: failures, event_count: decoded_events.size)
           @logger.error(failures_error.message)
         end
 
@@ -41,7 +41,7 @@ module ElasticGraph
 
       private
 
-      # Given a lambda event payload, returns an array of raw ElasticGraph indexing events.
+      # Given a lambda event payload, returns an array of decoded ElasticGraph indexing events.
       #
       # The SQS payload is wrapped in the following format already:
       # See https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html#example-standard-queue-message-event for more details
@@ -59,7 +59,10 @@ module ElasticGraph
       # We also want to do our own batching in order to cram more into a given payload
       # and issue fewer SQS entries and Lambda invocations when possible. The format-specific indexer
       # determines the payload format (JSON Lines for the built-in indexer lambda).
-      def events_from(lambda_event)
+      #
+      # SQS metadata is merged into each decoded event before envelope validation, so that a
+      # malformed event can still be reported against its SQS message.
+      def decoded_events_from(lambda_event)
         sqs_received_at_by_message_id = {} # : Hash[String, String]
         lambda_event.fetch("Records").flat_map do |record|
           sqs_metadata = extract_sqs_metadata(record)
@@ -72,8 +75,8 @@ module ElasticGraph
             sqs_metadata = sqs_metadata.except("latency_timestamps")
           end
 
-          decoded_events_from(record.fetch("body")).map do |event|
-            ElasticGraph::Support::HashUtil.deep_merge(event, sqs_metadata)
+          decode(record.fetch("body")).map do |decoded_event|
+            ElasticGraph::Support::HashUtil.deep_merge(decoded_event, sqs_metadata)
           end
         end.tap do
           @logger.info({
@@ -85,7 +88,7 @@ module ElasticGraph
 
       S3_OFFLOADING_INDICATOR = '["software.amazon.payloadoffloading.PayloadS3Pointer"'
 
-      def decoded_events_from(payload)
+      def decode(payload)
         if payload.start_with?(S3_OFFLOADING_INDICATOR)
           payload = get_payload_from_s3(payload)
         end
@@ -136,17 +139,15 @@ module ElasticGraph
       # Formats the response, including any failures, based on
       # https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html#services-sqs-batchfailurereporting
       def format_response(failures)
-        failure_ids = failures.map do |failure| # $ {"itemIdentifier" => String}
-          {"itemIdentifier" => failure.event["message_id"]}
-        end
+        message_ids = failures.filter_map(&:message_id)
 
-        if failure_ids.any? { |f| f.fetch("itemIdentifier").nil? }
+        if message_ids.size < failures.size
           # If we are not able to identify one or more failed events, then we must raise an exception instead of
           # returning `batchItemFailures`. Otherwise, the unidentified failed events will not get retried.
           raise Errors::MessageIdsMissingError, "Unexpected: some failures did not have a `message_id`, so we are raising an exception instead of returning `batchItemFailures`."
         end
 
-        {"batchItemFailures" => failure_ids}
+        {"batchItemFailures" => message_ids.map { |message_id| {"itemIdentifier" => message_id} }}
       end
     end
   end

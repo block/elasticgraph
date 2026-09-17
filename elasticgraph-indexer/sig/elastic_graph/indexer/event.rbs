@@ -1,0 +1,56 @@
+module ElasticGraph
+  class Indexer
+    type event = Event[untyped]
+
+    class Event[R] < ::Data
+      attr_reader op: ::String
+      attr_reader type: ::String
+      attr_reader id: ::String
+      attr_reader version: ::Integer
+      attr_reader record: R
+      attr_reader schema_version: ::Integer
+      attr_reader ingestion_format: ::String
+      attr_reader message_id: ::String?
+      attr_reader latency_timestamps: ::Hash[::String, ::String]
+
+      def initialize: (
+        op: ::String,
+        type: ::String,
+        id: ::String,
+        version: ::Integer,
+        record: R,
+        schema_version: ::Integer,
+        ingestion_format: ::String,
+        ?message_id: ::String?,
+        ?latency_timestamps: ::Hash[::String, ::String]
+      ) -> void
+
+      def self.new: [R] (
+        op: ::String,
+        type: ::String,
+        id: ::String,
+        version: ::Integer,
+        record: R,
+        schema_version: ::Integer,
+        ingestion_format: ::String,
+        ?message_id: ::String?,
+        ?latency_timestamps: ::Hash[::String, ::String]
+      ) -> Event[R]
+
+      def with: (
+        ?op: ::String,
+        ?type: ::String,
+        ?id: ::String,
+        ?version: ::Integer,
+        ?record: R,
+        ?schema_version: ::Integer,
+        ?ingestion_format: ::String,
+        ?message_id: ::String?,
+        ?latency_timestamps: ::Hash[::String, ::String]
+      ) -> Event[R]
+
+      def self.from_validated_hash: (::Hash[::String, untyped]) -> Event[::Hash[::String, untyped]]
+      def self.members: () -> ::Array[::Symbol]
+    end
+  end
+end

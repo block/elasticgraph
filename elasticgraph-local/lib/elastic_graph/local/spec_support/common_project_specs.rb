@@ -11,6 +11,7 @@ require "elastic_graph/graphql"
 require "elastic_graph/indexer"
 require "elastic_graph/indexer/test_support/converters"
 require "elastic_graph/json_ingestion/spec_support/event_matcher"
+require "elastic_graph/support/hash_util"
 require "elastic_graph/support/json_schema/validator"
 require "factory_bot"
 require "json_schemer"
@@ -138,10 +139,10 @@ RSpec.shared_examples "an ElasticGraph project" do |repo_root: Dir.pwd, settings
           # good data usually and bad data rarely, we generate 100 events and verify that they
           # are all valid.
           factory_iterations.times do
-            record = ::FactoryBot.build(factory_name)
-            event = ::ElasticGraph::Indexer::TestSupport::Converters.upsert_events_for_records([record]).first
+            record = ::ElasticGraph::Support::HashUtil.stringify_keys(::FactoryBot.build(factory_name))
+            event_hash = ::ElasticGraph::Indexer::TestSupport::Converters.upsert_event_hash_for(record)
 
-            expect(event).to be_a_valid_elastic_graph_event(for_indexer: indexer) { |v| v.with_unknown_properties_disallowed }
+            expect(event_hash).to be_a_valid_elastic_graph_event(for_indexer: indexer) { |v| v.with_unknown_properties_disallowed }
 
             # Also try building a datastore bulk operation for each event. Occasionally we've seen bugs in
             # elasticgraph-indexer that only manifest in specific schema situations that our main ElasticGraph
@@ -152,6 +153,7 @@ RSpec.shared_examples "an ElasticGraph project" do |repo_root: Dir.pwd, settings
             # greater confidence), but we don't expect the datastore to be booted and available when these tests
             # are running, and we don't want to have to manage cleaning up datastore state as part of these
             # tests. Still, it's a potential further step we could take with this in the future.
+            event = ::ElasticGraph::Indexer::TestSupport::Converters.upsert_event_for(record)
             indexer.operation_factory.build(event).operations.each(&:to_datastore_bulk)
           end
         end

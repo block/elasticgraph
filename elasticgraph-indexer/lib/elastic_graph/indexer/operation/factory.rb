@@ -25,7 +25,7 @@ module ElasticGraph
         :skip_record_validation_percents_by_type
       )
         def build(event)
-          format = event.fetch(INGESTION_FORMAT_KEY, "json")
+          format = event.ingestion_format
           adapter = ingestion_adapters_by_format[format]
 
           unless adapter
@@ -43,13 +43,13 @@ module ElasticGraph
         private
 
         def build_for_adapter(event, adapter)
-          skip_record_validation = skip_validation?(event["type"], event)
+          skip_record_validation = skip_validation?(event)
           validation_result = adapter.validate_event(event, skip_record_validation: skip_record_validation)
 
           if (failure = validation_result.failure)
             build_failed_result(event, failure.validation_target, failure.message)
           else
-            record_preparer = validation_result.record_preparer # : _RecordPreparer
+            record_preparer = validation_result.record_preparer # : _RecordPreparer[untyped]
             event = validation_result.event # : event
             if skip_record_validation
               build_success_result_isolating_malformed_records(event, record_preparer, adapter)
@@ -75,7 +75,7 @@ module ElasticGraph
         # would have gotten had we validated up front. A clean bill of health from the validator means the
         # error was never about the data (a schema artifact defect, or a bug) and must not be swallowed.
         def build_success_result_isolating_malformed_records(event, record_preparer, adapter)
-          build_success_result(event, record_preparer, type_with_skipped_validation: event.fetch("type"))
+          build_success_result(event, record_preparer, type_with_skipped_validation: event.type)
         rescue => exception
           failure = adapter.validate_event(event).failure
           # `raise` is overridden below to stop this class from *originating* an error instead of returning a
@@ -89,15 +89,15 @@ module ElasticGraph
         # configured percent with a single multiply instead of dividing on every event.
         CRC32_SPACE_PER_PERCENT = (1 << 32) / 100.0
 
-        # Decides whether to skip per-record validation for `event` of `type`. The decision is
+        # Decides whether to skip per-record validation for `event`. The decision is
         # deterministic per event id: a stable `Zlib.crc32` of `EventID#to_s` maps each event to a
         # point in the CRC32 space, and we skip validation for the configured percentage of that
         # space. Same event id => same decision across pods and retries, so retries never flip a
         # record between validated and skipped. `String#hash` is unsuitable here, as `RUBY_HASH_SEED`
         # is per-process. The `<= 0` and `>= 100` guards keep the endpoints exact, so no float
         # boundary error can make a `0` percent skip a record or a `100` percent validate one.
-        def skip_validation?(type, event)
-          percent = skip_record_validation_percents_by_type[type]
+        def skip_validation?(event)
+          percent = skip_record_validation_percents_by_type[event.type]
           return false if percent.nil? || percent <= 0
           return true if percent >= 100
           ::Zlib.crc32(EventID.from_event(event).to_s) < percent * CRC32_SPACE_PER_PERCENT
@@ -120,7 +120,7 @@ module ElasticGraph
           rescue => exception
             logger.warn({
               "message_type" => "FailedEventOperationBuildingFailure",
-              "message_id" => event["message_id"],
+              "message_id" => event.message_id,
               "event_id" => EventID.from_event(event).to_s,
               "error_class" => exception.class.name,
               "error_message" => exception.message
@@ -132,11 +132,10 @@ module ElasticGraph
         end
 
         def build_all_operations_for(event, record_preparer)
-          # If `type` is missing or is not a known type (as indicated by `runtime_metadata` being nil)
+          # If `type` is not a known type (as indicated by `runtime_metadata` being nil)
           # then we can't build a derived indexing type update operation. That case will only happen when we build
           # operations for an `FailedEventError` rather than to execute.
-          return [] unless (type = event["type"])
-          return [] unless (runtime_metadata = schema_artifacts.runtime_metadata.object_types_by_name[type])
+          return [] unless (runtime_metadata = schema_artifacts.runtime_metadata.object_types_by_name[event.type])
 
           runtime_metadata.update_targets.flat_map do |update_target|
             ids_to_skip = skip_derived_indexing_type_updates.fetch(update_target.type, ::Set.new)
@@ -155,7 +154,7 @@ module ElasticGraph
                   if skipped
                     logger.info({
                       "message_type" => "SkippingUpdate",
-                      "message_id" => event["message_id"],
+                      "message_id" => event.message_id,
                       "update_target" => update_target.type,
                       "id" => op.doc_id,
                       "event_id" => EventID.from_event(event).to_s

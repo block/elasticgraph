@@ -48,6 +48,8 @@ require "elastic_graph/indexer"
 
 indexer = ElasticGraph::Indexer.from_yaml_file("config/settings/local.yaml")
 
-events = [] # JSON events read from an async datastream
+# `ElasticGraph::Indexer::Event` instances, built by an ingestion adapter such as the one
+# in `elasticgraph-json_ingestion` after it validates the event envelope.
+events = []
 indexer.processor.process(events)
 ```

@@ -56,8 +56,16 @@ RSpec.shared_context "factories" do
   end
 
   def build_upsert_event(type, **attributes)
-    record = ElasticGraph::Support::HashUtil.stringify_keys(build(type, **attributes))
-    ElasticGraph::Indexer::TestSupport::Converters.upsert_event_for(record)
+    ElasticGraph::Indexer::TestSupport::Converters.upsert_event_for(build_stringified_record(type, **attributes))
+  end
+
+  # Builds the JSON hash of an `upsert` event, for specs that exercise JSON envelope handling.
+  def build_upsert_event_hash(type, **attributes)
+    ElasticGraph::Indexer::TestSupport::Converters.upsert_event_hash_for(build_stringified_record(type, **attributes))
+  end
+
+  def build_stringified_record(type, **attributes)
+    ElasticGraph::Support::HashUtil.stringify_keys(build(type, **attributes))
   end
 end
 

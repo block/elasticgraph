@@ -3,6 +3,9 @@ module ElasticGraph
     class IngestionAdapter
       include ::ElasticGraph::Indexer::IngestionAdapter::_Adapter
 
+      type decodedEvent = ::Hash[::String, untyped]
+      type jsonEvent = ::ElasticGraph::Indexer::Event[decodedEvent]
+
       ValidationResult: singleton(::ElasticGraph::Indexer::IngestionAdapter::ValidationResult)
 
       def initialize: (
@@ -16,9 +19,15 @@ module ElasticGraph
       @configure_record_validator: (^(Support::JSONSchema::ValidatorFactory) -> Support::JSONSchema::ValidatorFactory)?
       @record_preparer_factory: RecordPreparerFactory
 
+      def events_from: (::Array[decodedEvent]) -> [::Array[jsonEvent], ::Array[::ElasticGraph::Indexer::MalformedEventError]]
+
       private
 
-      def select_json_schema_version: (::ElasticGraph::Indexer::event) { (::ElasticGraph::Indexer::IngestionAdapter::ValidationResult) -> bot } -> (::Integer | bot)
+      def event_from: (decodedEvent) -> jsonEvent
+      def envelope_failure_for: (decodedEvent) -> ::ElasticGraph::Indexer::MalformedEventError?
+      def malformed: (decodedEvent, validation_target: ::String, message: ::String) -> ::ElasticGraph::Indexer::MalformedEventError
+      def event_id_for: (decodedEvent) -> ::String
+      def closest_available_json_schema_version: (::Integer) -> ::Integer?
       def validator: (::String, ::Integer) -> Support::JSONSchema::Validator
 
       @validator_factories_by_version: ::Hash[::Integer, Support::JSONSchema::ValidatorFactory]?
