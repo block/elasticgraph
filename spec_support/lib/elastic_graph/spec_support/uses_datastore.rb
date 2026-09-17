@@ -315,11 +315,11 @@ RSpec.shared_context "datastore support", :capture_logs do
         .schema_artifacts
         .runtime_metadata
         .object_types_by_name
-        .fetch(event.fetch("type"))
+        .fetch(event.type)
         .update_targets
-        .find { |t| t.type == event.fetch("type") }
+        .find { |t| t.type == event.type }
 
-      indexer.datastore_core.index_definitions_by_graphql_type.fetch(event.fetch("type")).map do |index_def|
+      indexer.datastore_core.index_definitions_by_graphql_type.fetch(event.type).map do |index_def|
         if !index_def.name.include?(unique_index_name) && index_def.rollover_index_template?
           expect(index_def.frequency).to eq(:yearly),
             "Expected #{index_def} to have :yearly rollover frequency, but had #{index_def.frequency}. " \
@@ -332,13 +332,13 @@ RSpec.shared_context "datastore support", :capture_logs do
         ElasticGraph::Indexer::Operation::Update.new(
           event: event,
           prepared_record: latest_json_record_preparer_for(indexer).prepare_for_index(
-            event.fetch("type"),
-            event.fetch("record"),
+            event.type,
+            event.record,
             destination_index_mapping.fetch("properties")
           ),
           destination_index_def: index_def,
           update_target: update_target,
-          doc_id: event.fetch("id"),
+          doc_id: event.id,
           destination_index_mapping: destination_index_mapping
         )
       end

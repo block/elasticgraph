@@ -35,7 +35,7 @@ module ElasticGraph
       def process(events, refresh_indices: false)
         failures = process_returning_failures(events, refresh_indices: refresh_indices)
         return if failures.empty?
-        raise IndexingFailuresError.for(failures: failures, events: events)
+        raise IndexingFailuresError.for(failures: failures, event_count: events.size)
       end
 
       # Like `process`, but returns failures instead of raising an exception.
@@ -129,7 +129,7 @@ module ElasticGraph
           latencies_in_ms_from = {} # : Hash[String, Integer]
           slo_results = {} # : Hash[String, String]
 
-          latency_timestamps = event.fetch("latency_timestamps", _ = {})
+          latency_timestamps = event.latency_timestamps
           latency_timestamps.each do |ts_name, ts_value|
             metric_value = ((current_time - Time.iso8601(ts_value)) * 1000).round
 
@@ -144,10 +144,10 @@ module ElasticGraph
 
           @logger.info({
             "message_type" => "ElasticGraphIndexingLatencies",
-            "message_id" => event["message_id"],
-            "event_type" => event.fetch("type"),
+            "message_id" => event.message_id,
+            "event_type" => event.type,
             "event_id" => EventID.from_event(event).to_s,
-            JSON_SCHEMA_VERSION_KEY => event.fetch(JSON_SCHEMA_VERSION_KEY),
+            "schema_version" => event.schema_version,
             "latencies_in_ms_from" => latencies_in_ms_from,
             "slo_results" => slo_results,
             "result" => result

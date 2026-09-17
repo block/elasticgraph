@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/constants"
+require "elastic_graph/indexer/event"
 require "elastic_graph/json_ingestion/ingestion_adapter"
 require "support/multiple_version_support"
 
@@ -15,39 +16,192 @@ module ElasticGraph
     RSpec.describe IngestionAdapter, :capture_logs, :factories, :builds_indexer do
       let(:schema_artifacts) { stock_schema_artifacts }
       let(:indexer) { build_indexer(schema_artifacts: schema_artifacts) }
-      describe "#validate_event" do
-        it "accepts events explicitly tagged as JSON" do
-          event = build_upsert_event(:component, id: "1").merge(INGESTION_FORMAT_KEY => "json")
+      let(:adapter) { indexer.ingestion_adapters_by_format.fetch("json") }
 
-          result = indexer.operation_factory.build(event)
+      describe "#events_from" do
+        it "builds an event from each decoded JSON event with a valid envelope, keeping the format tag" do
+          tagged = build_upsert_event_hash(:component, id: "1").merge(INGESTION_FORMAT_KEY => "json")
+          untagged = build_upsert_event_hash(:component, id: "2")
 
-          expect(result.failed_event_error).to be nil
-          expect(result.operations.map(&:doc_id)).to include("1")
+          events, failures = adapter.events_from([tagged, untagged])
+
+          expect(failures).to be_empty
+          expect(events).to eq [
+            ElasticGraph::Indexer::Event.from_validated_hash(tagged),
+            ElasticGraph::Indexer::Event.from_validated_hash(untagged)
+          ]
+          expect(events.map(&:ingestion_format)).to eq ["json", "json"]
         end
 
+        it "returns a `MalformedEventError` for each decoded event with an invalid envelope, alongside the valid events" do
+          valid = build_upsert_event_hash(:component, id: "1")
+          missing_op = build_upsert_event_hash(:component, id: "2", __version: 3).except("op").merge("message_id" => "m2")
+          missing_version = build_upsert_event_hash(:component, id: "3").except("version")
+
+          events, failures = adapter.events_from([missing_op, valid, missing_version])
+
+          expect(events).to eq [ElasticGraph::Indexer::Event.from_validated_hash(valid)]
+          expect(failures.map(&:class)).to eq [ElasticGraph::Indexer::MalformedEventError, ElasticGraph::Indexer::MalformedEventError]
+          expect(failures.map(&:payload)).to eq [missing_op, missing_version]
+          expect(failures.map(&:message_id)).to eq ["m2", nil]
+          expect(failures.first.message).to include("Component:2@v3 (message_id: m2): Malformed event payload.", "missing_keys", "op")
+          expect(failures.last.message).to start_with("Component:3@v: Malformed event payload.")
+        end
+
+        it "notifies an error when latency metrics contain keys that violate regex \"^\\w+_at$\"" do
+          event = build_upsert_event_hash(:component, id: "1", __version: 1).merge({
+            "latency_timestamps" => {
+              "created_in_esperanto_at" => "2012-04-23T18:25:43.511Z",
+              "bad metric with spaces _at" => "2012-04-20T18:25:43.511Z",
+              "bad_metric" => "2012-04-20T18:25:43.511Z"
+            }
+          })
+
+          expect_malformed(event, validation_target: "event payload", message_including: ["/latency_timestamps/bad_metric", "bad metric with spaces _at"])
+        end
+
+        it "notifies an error when latency metrics contain values that are not ISO8601 date-time" do
+          event = build_upsert_event_hash(:component, id: "1", __version: 1).merge({
+            "latency_timestamps" => {
+              "created_in_esperanto_at" => "2012-04-23T18:25:43.511Z",
+              "bad_metric_at" => "malformed datetime"
+            }
+          })
+
+          expect_malformed(event, validation_target: "event payload", message_including: ["/latency_timestamps/bad_metric"])
+        end
+
+        it "notifies an error on version number less than 1" do
+          event = build_upsert_event_hash(:widget, __version: -1)
+
+          expect_malformed(event, validation_target: "event payload", message_including: ["/properties/version"])
+        end
+
+        it "notifies an error on version number greater than 2^63 - 1" do
+          event = build_upsert_event_hash(:widget, __version: 2**64)
+
+          expect_malformed(event, validation_target: "event payload", message_including: ["/properties/version"])
+        end
+
+        it "notifies an error on invalid operation" do
+          event = build_upsert_event_hash(:widget).merge("op" => "invalid_op")
+
+          expect_malformed(event, validation_target: "event payload", message_including: ["/properties/op"])
+        end
+
+        it "notifies an error on missing record for upsert" do
+          event = build_upsert_event_hash(:component).except("record")
+
+          expect_malformed(event, validation_target: "event payload", message_including: ["/then"])
+        end
+
+        it "notifies an error on missing id" do
+          event = build_upsert_event_hash(:component).except("id")
+
+          expect_malformed(event, validation_target: "event payload", message_including: ["missing_keys", "id"])
+        end
+
+        it "notifies an error on missing type" do
+          event = build_upsert_event_hash(:component).except("type")
+
+          expect_malformed(event, validation_target: "event payload", message_including: ["missing_keys", "type"])
+        end
+
+        it "notifies an error on unknown graphql type" do
+          event = build_upsert_event_hash(:component).merge("type" => "MyOwnInvalidGraphQlType")
+
+          expect_malformed(event, validation_target: "event payload", message_including: ["/properties/type"])
+        end
+
+        it "notifies an error on a graphql type that is not ingestible" do
+          event = build_upsert_event_hash(:component).merge("type" => "WidgetOptions")
+
+          expect(indexer.datastore_core.index_definitions_by_graphql_type.fetch("WidgetOptions", [])).to be_empty
+          expect_malformed(event, validation_target: "event payload", message_including: ["/properties/type"])
+        end
+
+        it "notifies an error on wrong field types" do
+          event = {
+            "op" => "upsert",
+            "id" => 1,
+            JSON_SCHEMA_VERSION_KEY => 1,
+            "type" => [],
+            "version" => "1",
+            "record" => ""
+          }
+
+          expect_malformed(event, validation_target: "event payload", message_including: ["/properties/type", "/properties/id", "/properties/version", "/properties/record"])
+        end
+
+        it "notifies an error on missing `#{JSON_SCHEMA_VERSION_KEY}`" do
+          event = build_upsert_event_hash(:component).except(JSON_SCHEMA_VERSION_KEY)
+
+          expect_malformed(event, validation_target: JSON_SCHEMA_VERSION_KEY, message_including: ["Event lacks a `#{JSON_SCHEMA_VERSION_KEY}`"])
+        end
+
+        it "notifies an error if an invalid (e.g. negative) json_schema_version is specified" do
+          event = build_upsert_event_hash(:widget, id: "1", __version: 1, __json_schema_version: -1)
+
+          expect_malformed(event, validation_target: JSON_SCHEMA_VERSION_KEY, message_including: ["must be a positive integer", "(-1)"])
+        end
+
+        it "notifies an error if it's unable to select a json_schema_version" do
+          allow(schema_artifacts).to receive(:available_json_schema_versions).and_return(Set[])
+
+          event = build_upsert_event_hash(:component, id: "1", __version: 1)
+
+          expect_malformed(event, validation_target: JSON_SCHEMA_VERSION_KEY, message_including: ["Failed to select json schema version"])
+        end
+
+        def expect_malformed(decoded_event, validation_target:, message_including:)
+          events, failures = adapter.events_from([decoded_event])
+
+          expect(events).to be_empty
+          expect(failures.size).to eq 1
+          expect(failures.first.message).to include("Malformed #{validation_target}.", *message_including)
+        end
+      end
+
+      describe "#validate_event" do
         it "copies the envelope `id` into the record so that the datastore includes `id` in search payloads" do
           event = build_upsert_event(:component, id: "1")
-          event.fetch("record").delete("id")
+          event = event.with(record: event.record.except("id"))
 
           result = indexer.operation_factory.build(event)
 
           expect(result.failed_event_error).to be nil
           expect(result.operations.size).to eq 1
           expect(result.operations.map(&:prepared_record)).to all include("id" => "1")
-          expect(event.fetch("record")).to exclude("id")
+          expect(event.record).to exclude("id")
         end
 
         # The factory replaces an adapter's missing preparer with an identity preparer while
         # building its failed result, so this adapter contract must be asserted directly.
         it "returns no record preparer, plus the part of the event at fault, for an event it rejects" do
-          event = build_upsert_event(:component, id: "1", __version: 1)
-          event["record"]["name"] = 123
+          event = build_upsert_event(:component, id: "1", __version: 1, name: 123)
 
-          adapter = indexer.ingestion_adapters_by_format.fetch("json")
           result = adapter.validate_event(event)
 
           expect(result.record_preparer).to be nil
           expect(result.failure.validation_target).to eq("Component record")
+        end
+
+        it "notifies an error when given a record that does not satisfy the type's JSON schema, while avoiding revealing PII" do
+          event = build_upsert_event(:component, id: "1", __version: 1, name: 123)
+
+          message = expect_invalid_record(event, validation_target: "Component record", message_including: ["name"])
+          expect(message).to exclude("123")
+        end
+
+        it "allows the record validator to be configured with a block" do
+          event_with_extra_field = build_upsert_event(:widget, extra_field: 17)
+
+          expect(build_adapter.validate_event(event_with_extra_field).failure).to be nil
+
+          configured_adapter = build_adapter { |v| v.with_unknown_properties_disallowed }
+          failure = configured_adapter.validate_event(event_with_extra_field).failure
+
+          expect(failure.message).to include("extra_field")
         end
 
         context "when record preparation differs between schema versions" do
@@ -73,15 +227,15 @@ module ElasticGraph
             "below the available range" => [1, 2]
           }.each do |case_description, (requested_version, selected_version)|
             it "prepares an event requesting a version that is #{case_description} using schema version #{selected_version}, while leaving the requested version on the event" do
-              event = component_event(requested_version)
-              original_event = Marshal.load(Marshal.dump(event))
+              decoded_event = component_event(requested_version)
+              original_decoded_event = Marshal.load(Marshal.dump(decoded_event))
 
-              result = indexer.operation_factory.build(event)
+              result = build_from_decoded(decoded_event)
 
               expect(result.failed_event_error).to be nil
               expect(result.operations.map(&:prepared_record)).to eq [{"id" => "1", "name_v#{selected_version}" => "example"}]
-              expect(result.operations.map { |op| op.event[JSON_SCHEMA_VERSION_KEY] }).to eq [requested_version]
-              expect(event).to eq(original_event)
+              expect(result.operations.map { |op| op.event.schema_version }).to eq [requested_version]
+              expect(decoded_event).to eq(original_decoded_event)
             end
           end
 
@@ -95,97 +249,6 @@ module ElasticGraph
               "record" => {"id" => "1", "name" => "example"}
             }
           end
-        end
-
-        it "notifies an error when latency metrics contain keys that violate regex \"^\\w+_at$\"" do
-          event = build_upsert_event(:component, id: "1", __version: 1).merge({
-            "latency_timestamps" => {
-              "created_in_esperanto_at" => "2012-04-23T18:25:43.511Z",
-              "bad metric with spaces _at" => "2012-04-20T18:25:43.511Z",
-              "bad_metric" => "2012-04-20T18:25:43.511Z"
-            }
-          })
-
-          expect_invalid(event, validation_target: "event payload", message_including: ["/latency_timestamps/bad_metric", "bad metric with spaces _at"])
-        end
-
-        it "notifies an error when latency metrics contain values that are not ISO8601 date-time" do
-          event = build_upsert_event(:component, id: "1", __version: 1).merge({
-            "latency_timestamps" => {
-              "created_in_esperanto_at" => "2012-04-23T18:25:43.511Z",
-              "bad_metric_at" => "malformed datetime"
-            }
-          })
-
-          expect_invalid(event, validation_target: "event payload", message_including: ["/latency_timestamps/bad_metric"])
-        end
-
-        it "notifies an error on version number less than 1" do
-          event = build_upsert_event(:widget, __version: -1)
-
-          expect_invalid(event, validation_target: "event payload", message_including: ["/properties/version"])
-        end
-
-        it "notifies an error on version number greater than 2^63 - 1" do
-          event = build_upsert_event(:widget, __version: 2**64)
-
-          expect_invalid(event, validation_target: "event payload", message_including: ["/properties/version"])
-        end
-
-        it "notifies an error on invalid operation" do
-          event = build_upsert_event(:widget).merge("op" => "invalid_op")
-
-          expect_invalid(event, validation_target: "event payload", message_including: ["/properties/op"])
-        end
-
-        it "notifies an error on missing operation" do
-          event = build_upsert_event(:widget).except("op")
-
-          expect_invalid(event, validation_target: "event payload", message_including: ["missing_keys", "op"])
-        end
-
-        it "notifies an error on missing record for upsert" do
-          event = build_upsert_event(:component).except("record")
-
-          expect_invalid(event, validation_target: "event payload", message_including: ["/then"])
-        end
-
-        it "notifies an error on missing id" do
-          event = build_upsert_event(:component).except("id")
-
-          expect_invalid(event, validation_target: "event payload", message_including: ["missing_keys", "id"])
-        end
-
-        it "notifies an error on missing version" do
-          event = build_upsert_event(:component).except("version")
-
-          expect_invalid(event, validation_target: "event payload", message_including: ["missing_keys", "version"])
-        end
-
-        it "notifies an error on missing `#{JSON_SCHEMA_VERSION_KEY}`" do
-          event = build_upsert_event(:component).except(JSON_SCHEMA_VERSION_KEY)
-
-          expect_invalid(event, validation_target: JSON_SCHEMA_VERSION_KEY, message_including: ["Event lacks a `#{JSON_SCHEMA_VERSION_KEY}`"])
-        end
-
-        it "notifies an error when given a record that does not satisfy the type's JSON schema, while avoiding revealing PII" do
-          event = build_upsert_event(:component, id: "1", __version: 1)
-          event["record"]["name"] = 123
-
-          message = expect_invalid(event, validation_target: "Component record", message_including: ["name"])
-          expect(message).to exclude("123")
-        end
-
-        it "allows the record validator to be configured with a block" do
-          event_with_extra_field = build_upsert_event(:widget, extra_field: 17)
-          event_with_extra_field["record"]["extra_field"] = 17
-
-          expect(build_adapter.validate_event(event_with_extra_field).failure).to be nil
-
-          configured_adapter = build_adapter { |v| v.with_unknown_properties_disallowed }
-          failure = configured_adapter.validate_event(event_with_extra_field).failure
-
-          expect(failure.message).to include("extra_field")
         end
 
         context "when the adapter has json schemas v2 and v4 (v4 adds yellow color)" do
@@ -212,25 +275,22 @@ module ElasticGraph
 
           it "validates against an older version of a json schema if specified" do
             # YELLOW doesn't exist in schema version 2. So expect an error when json_schema_version is set to 2.
-            event = build_upsert_event(:widget, id: "1", __version: 1, __json_schema_version: 2)
-            event["record"]["options"]["color"] = "YELLOW"
+            event = yellow_widget_event(__json_schema_version: 2)
 
-            expect_invalid(event, validation_target: "Widget record", message_including: ["/options/color"])
+            expect(build_from_decoded(event).failed_event_error.message).to include("Malformed Widget record.", "/options/color")
           end
 
           it "validates against the latest version of a json schema if specified" do
-            event = build_upsert_event(:widget, id: "1", __version: 1, __json_schema_version: 4)
-            event["record"]["options"]["color"] = "YELLOW"
+            event = yellow_widget_event(__json_schema_version: 4)
 
-            expect(indexer.operation_factory.build(event).failed_event_error).to be nil
+            expect(build_from_decoded(event).failed_event_error).to be nil
           end
 
           it "validates against the closest version if the requested version is newer than what's available" do
             # 5 is closest to "4", validation should match behavior from version "4" - YELLOW should pass validation.
-            event = build_upsert_event(:widget, id: "1", __version: 1, __json_schema_version: 5)
-            event["record"]["options"]["color"] = "YELLOW"
+            event = yellow_widget_event(__json_schema_version: 5)
 
-            expect(indexer.operation_factory.build(event).failed_event_error).to be nil
+            expect(build_from_decoded(event).failed_event_error).to be nil
 
             expect(logged_jsons_of_type("ElasticGraphMissingJSONSchemaVersion").last).to include(
               "event_id" => "Widget:1@v1",
@@ -242,11 +302,10 @@ module ElasticGraph
 
           it "validates against the closest version if the requested version is older than what's available" do
             # 1 is closest to "2", validation should match behavior from version "2" - YELLOW should fail validation.
-            event = build_upsert_event(:widget, id: "1", __version: 1, __json_schema_version: 1).merge("message_id" => "m123")
-            event["record"]["options"]["color"] = "YELLOW"
+            event = yellow_widget_event(__json_schema_version: 1).merge("message_id" => "m123")
 
             # Should fail, but should still log the version mismatch as well.
-            expect_invalid(event, validation_target: "Widget record", message_including: ["/options/color"])
+            expect(build_from_decoded(event).failed_event_error.message).to include("Malformed Widget record.", "/options/color")
 
             expect(logged_jsons_of_type("ElasticGraphMissingJSONSchemaVersion").last).to include(
               "event_id" => "Widget:1@v1",
@@ -258,10 +317,9 @@ module ElasticGraph
           end
 
           it "validates against a version newer than what's requested, if the requested version is equidistant from two available versions" do
-            event = build_upsert_event(:widget, id: "1", __version: 1, __json_schema_version: 3)
-            event["record"]["options"]["color"] = "YELLOW"
+            event = yellow_widget_event(__json_schema_version: 3)
 
-            expect(indexer.operation_factory.build(event).failed_event_error).to be nil
+            expect(build_from_decoded(event).failed_event_error).to be nil
 
             expect(logged_jsons_of_type("ElasticGraphMissingJSONSchemaVersion").last).to include(
               "event_id" => "Widget:1@v1",
@@ -271,27 +329,27 @@ module ElasticGraph
             )
           end
 
-          it "notifies an error if an invalid (e.g. negative) json_schema_version is specified" do
-            event = build_upsert_event(:widget, id: "1", __version: 1, __json_schema_version: -1)
-
-            expect_invalid(event, validation_target: JSON_SCHEMA_VERSION_KEY, message_including: ["must be a positive integer", "(-1)"])
+          def yellow_widget_event(**attributes)
+            event = build_upsert_event_hash(:widget, id: "1", __version: 1, **attributes)
+            event.merge("record" => event.fetch("record").merge("options" => event.fetch("record").fetch("options").merge("color" => "YELLOW")))
           end
         end
 
-        it "notifies an error if it's unable to select a json_schema_version" do
-          allow(schema_artifacts).to receive(:available_json_schema_versions).and_return(Set[])
-
-          event = build_upsert_event(:component, id: "1", __version: 1)
-
-          expect_invalid(event, validation_target: JSON_SCHEMA_VERSION_KEY, message_including: ["Failed to select json schema version"])
-        end
-
-        def expect_invalid(event, validation_target:, message_including:)
+        def expect_invalid_record(event, validation_target:, message_including:)
           error = indexer.operation_factory.build(event).failed_event_error
 
           expect(error.message).to include("Malformed #{validation_target}.", *message_including)
 
           error.message
+        end
+
+        # Runs a decoded JSON event through envelope validation and then operation building.
+        def build_from_decoded(decoded_event)
+          events, failures = adapter.events_from([decoded_event])
+          expect(failures).to be_empty
+          expect(events.size).to eq 1
+
+          indexer.operation_factory.build(events.first)
         end
       end
 

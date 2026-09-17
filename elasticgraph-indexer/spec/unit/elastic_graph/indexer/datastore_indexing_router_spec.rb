@@ -10,6 +10,7 @@ require "elastic_graph/indexer"
 require "elastic_graph/constants"
 require "elastic_graph/elasticsearch/client"
 require "elastic_graph/indexer/datastore_indexing_router"
+require "elastic_graph/indexer/event"
 require "elastic_graph/indexer/operation/factory"
 require "elastic_graph/spec_support/builds_indexer_operation"
 
@@ -32,11 +33,11 @@ module ElasticGraph
 
         let(:requested_docs_by_client) { ::Hash.new { |h, k| h[k] = [] } }
         let(:stubbed_versions_by_index_and_id) { {} }
-        let(:widget_primary_indexing_op) { new_primary_indexing_operation({"type" => "Widget", "id" => "1", "version" => 1, "record" => {"id" => "1", "some_field" => "value", "created_at" => "2021-08-24T23:30:00Z", "workspace_id" => "ws123"}}) }
-        let(:component_primary_indexing_op) { new_primary_indexing_operation({"type" => "Component", "id" => "7", "version" => 1, "record" => {"id" => "1", "some_field" => "value"}}) }
+        let(:widget_primary_indexing_op) { new_primary_indexing_operation(event_for(type: "Widget", id: "1", version: 1, record: {"id" => "1", "some_field" => "value", "created_at" => "2021-08-24T23:30:00Z", "workspace_id" => "ws123"})) }
+        let(:component_primary_indexing_op) { new_primary_indexing_operation(event_for(type: "Component", id: "7", version: 1, record: {"id" => "1", "some_field" => "value"})) }
         let(:widget_derived_update_op) do
           new_operation(
-            {"type" => "Widget", "id" => "4", "version" => 1, "record" => {"id" => "1", "currency" => "USD", "name" => "thing1"}},
+            event_for(type: "Widget", id: "4", version: 1, record: {"id" => "1", "currency" => "USD", "name" => "thing1"}),
             destination_index_def: indexer.datastore_core.index_definitions_by_name.fetch("widget_currencies"),
             update_target: indexer.schema_artifacts.runtime_metadata.object_types_by_name.fetch("Widget").update_targets.first,
             doc_id: "USD"
@@ -207,7 +208,7 @@ module ElasticGraph
 
         let(:widget_derived_update_op) do
           new_operation(
-            {"type" => "Widget", "id" => "1", "version" => 1, "record" => {"id" => "1", "currency" => "USD", "name" => "thing1"}},
+            event_for(type: "Widget", id: "1", version: 1, record: {"id" => "1", "currency" => "USD", "name" => "thing1"}),
             destination_index_def: indexer.datastore_core.index_definitions_by_name.fetch("widget_currencies"),
             update_target: indexer.schema_artifacts.runtime_metadata.object_types_by_name.fetch("Widget").update_targets.reject(&:for_normal_indexing?).first,
             doc_id: "USD"
@@ -216,9 +217,9 @@ module ElasticGraph
 
         let(:operations) do
           [
-            new_operation({"type" => "Widget", "id" => "1", "version" => 1, "record" => {"id" => "1", "some_field" => "value"}}),
-            new_operation({"type" => "Widget", "id" => "2", "version" => 1, "record" => {"id" => "2", "some_field" => "value"}}),
-            new_operation({"type" => "Component", "id" => "1", "version" => 1, "record" => {"id" => "1", "some_field" => "value"}}),
+            new_operation(event_for(type: "Widget", id: "1", version: 1, record: {"id" => "1", "some_field" => "value"})),
+            new_operation(event_for(type: "Widget", id: "2", version: 1, record: {"id" => "2", "some_field" => "value"})),
+            new_operation(event_for(type: "Component", id: "1", version: 1, record: {"id" => "1", "some_field" => "value"})),
             widget_derived_update_op
           ]
         end
@@ -492,8 +493,8 @@ module ElasticGraph
           end
 
           it "successfully runs operations using multiple clients" do
-            component_op = new_operation({"type" => "Component", "id" => "1", "version" => 1, "record" => {"id" => "1", "some_field" => "value"}})
-            widget_op = new_operation({"type" => "Widget", "id" => "1", "version" => 1, "record" => {"id" => "1", "some_field" => "value"}})
+            component_op = new_operation(event_for(type: "Component", id: "1", version: 1, record: {"id" => "1", "some_field" => "value"}))
+            widget_op = new_operation(event_for(type: "Widget", id: "1", version: 1, record: {"id" => "1", "some_field" => "value"}))
             successful_ops = router.bulk([component_op, widget_op], refresh: true).successful_operations_by_cluster_name
 
             expect(successful_ops.keys).to contain_exactly("main", "other")
@@ -512,8 +513,8 @@ module ElasticGraph
 
             allow(other_datastore_client).to receive(:bulk).and_return(other_fake_resp)
 
-            component_op = new_operation({"type" => "Component", "id" => "1", "version" => 1, "record" => {"id" => "1", "some_field" => "value"}})
-            widget_op = new_operation({"type" => "Widget", "id" => "1", "version" => 1, "record" => {"id" => "1", "some_field" => "value"}})
+            component_op = new_operation(event_for(type: "Component", id: "1", version: 1, record: {"id" => "1", "some_field" => "value"}))
+            widget_op = new_operation(event_for(type: "Widget", id: "1", version: 1, record: {"id" => "1", "some_field" => "value"}))
 
             result = router.bulk([component_op, widget_op], refresh: true)
             successful_ops = result.successful_operations_by_cluster_name
@@ -552,10 +553,10 @@ module ElasticGraph
         end
 
         def expect_inaccessible_error
-          component_op1 = new_operation({"type" => "Component", "id" => "1", "version" => 1, "record" => {"id" => "1", "some_field" => "value"}})
-          component_op2 = new_operation({"type" => "Component", "id" => "2", "version" => 1, "record" => {"id" => "2", "some_field" => "value"}})
-          widget_op1 = new_operation({"type" => "Widget", "id" => "1", "version" => 1, "record" => {"id" => "1", "some_field" => "value"}})
-          widget_op2 = new_operation({"type" => "Widget", "id" => "2", "version" => 1, "record" => {"id" => "2", "some_field" => "value"}})
+          component_op1 = new_operation(event_for(type: "Component", id: "1", version: 1, record: {"id" => "1", "some_field" => "value"}))
+          component_op2 = new_operation(event_for(type: "Component", id: "2", version: 1, record: {"id" => "2", "some_field" => "value"}))
+          widget_op1 = new_operation(event_for(type: "Widget", id: "1", version: 1, record: {"id" => "1", "some_field" => "value"}))
+          widget_op2 = new_operation(event_for(type: "Widget", id: "2", version: 1, record: {"id" => "2", "some_field" => "value"}))
 
           expect {
             router.bulk([widget_op1, component_op1, component_op2, widget_op2], refresh: true)
@@ -579,21 +580,25 @@ module ElasticGraph
         end
       end
 
+      def event_for(type:, id:, version:, record:)
+        Event.new(op: "upsert", type: type, id: id, version: version, record: record, schema_version: 1, ingestion_format: "json")
+      end
+
       def new_operation(event, update_target: nil, **overrides)
         update_target ||= begin
           update_targets = indexer
             .schema_artifacts
             .runtime_metadata
             .object_types_by_name
-            .fetch(event.fetch("type"))
+            .fetch(event.type)
             .update_targets
-            .select { |ut| ut.type == event.fetch("type") }
+            .select { |ut| ut.type == event.type }
 
           expect(update_targets.size).to eq(1)
           update_targets.first
         end
 
-        index_defs = indexer.datastore_core.index_definitions_by_graphql_type.fetch(event.fetch("type"))
+        index_defs = indexer.datastore_core.index_definitions_by_graphql_type.fetch(event.type)
         expect(index_defs.size).to eq 1
         index_def = index_defs.first
 
@@ -602,13 +607,13 @@ module ElasticGraph
         arguments = {
           event: event,
           prepared_record: latest_json_record_preparer_for(indexer).prepare_for_index(
-            event.fetch("type"),
-            event.fetch("record"),
+            event.type,
+            event.record,
             destination_index_mapping.fetch("properties")
           ),
           destination_index_def: index_def,
           update_target: update_target,
-          doc_id: event.fetch("id"),
+          doc_id: event.id,
           destination_index_mapping: destination_index_mapping
         }.merge(overrides)
 

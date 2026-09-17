@@ -13,18 +13,20 @@ module ElasticGraph
   class Indexer
     module TestSupport
       RSpec.describe Converters, :factories do
-        describe ".upsert_event_for" do
-          it "can build an `upsert` operation based on a factory-produced record" do
-            factory_record = {
-              "id" => "1",
-              "__version" => 1,
-              "__typename" => "Widget",
-              "__json_schema_version" => 1,
-              "field1" => "value1",
-              "field2" => "value2"
-            }
+        let(:widget_record) do
+          {
+            "id" => "1",
+            "__version" => 1,
+            "__typename" => "Widget",
+            "__json_schema_version" => 1,
+            "field1" => "value1",
+            "field2" => "value2"
+          }
+        end
 
-            expect(TestSupport::Converters.upsert_event_for(factory_record)).to eq(
+        describe ".upsert_event_hash_for" do
+          it "builds the JSON hash of an `upsert` event from a factory-produced record" do
+            expect(Converters.upsert_event_hash_for(widget_record)).to eq(
               "op" => "upsert",
               "id" => "1",
               "version" => 1,
@@ -35,44 +37,43 @@ module ElasticGraph
           end
         end
 
+        describe ".upsert_event_for" do
+          it "builds an `upsert` event from a factory-produced record" do
+            expect(Converters.upsert_event_for(widget_record)).to eq(Event.new(
+              op: "upsert",
+              id: "1",
+              version: 1,
+              type: "Widget",
+              record: {"id" => "1", "field1" => "value1", "field2" => "value2"},
+              schema_version: 1,
+              ingestion_format: "json"
+            ))
+          end
+        end
+
         describe ".upsert_events_for_records" do
-          it "converts an array of factory-produced records into an array of operations for upserting" do
-            record1 = {
-              "id" => "1",
-              "__typename" => "Widget",
-              "__version" => 1,
-              "__json_schema_version" => 1,
-              "field1" => "value1",
-              "field2" => "value2"
+          it "converts an array of factory-produced records, with string or symbol keys, into `upsert` events" do
+            address_record = {
+              id: "2",
+              __typename: "Address",
+              __version: 5,
+              __json_schema_version: 1,
+              field3: "value5"
             }
 
-            record2 = {
-              "id" => "2",
-              "__typename" => "Address",
-              "__version" => 5,
-              "__json_schema_version" => 1,
-              "field3" => "value5"
-            }
+            events = Converters.upsert_events_for_records([widget_record, address_record])
 
-            event = TestSupport::Converters.upsert_events_for_records([record1, record2])
-
-            expect(event).to eq([
-              {
-                "op" => "upsert",
-                "id" => "1",
-                "version" => 1,
-                "type" => "Widget",
-                "record" => {"id" => "1", "field1" => "value1", "field2" => "value2"},
-                JSON_SCHEMA_VERSION_KEY => 1
-              },
-              {
-                "op" => "upsert",
-                "id" => "2",
-                "version" => 5,
-                "type" => "Address",
-                "record" => {"id" => "2", "field3" => "value5"},
-                JSON_SCHEMA_VERSION_KEY => 1
-              }
+            expect(events).to eq([
+              Converters.upsert_event_for(widget_record),
+              Event.new(
+                op: "upsert",
+                id: "2",
+                version: 5,
+                type: "Address",
+                record: {"id" => "2", "field3" => "value5"},
+                schema_version: 1,
+                ingestion_format: "json"
+              )
             ])
           end
         end

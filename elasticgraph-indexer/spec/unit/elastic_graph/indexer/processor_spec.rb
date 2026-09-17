@@ -53,8 +53,8 @@ module ElasticGraph
 
           expect(datastore_router).to have_received(:bulk).with(
             [
-              new_primary_indexing_operation(component.merge("record" => component["record"].merge("id" => component.fetch("id")))),
-              new_primary_indexing_operation(address.merge("record" => address["record"].merge("id" => address.fetch("id"))))
+              new_primary_indexing_operation(component.with(record: component.record.merge("id" => component.id))),
+              new_primary_indexing_operation(address.with(record: address.record.merge("id" => address.id)))
             ],
             refresh: true
           )
@@ -130,11 +130,11 @@ module ElasticGraph
           end
 
           it "fully identifies each event and message in the logged `ElasticGraphIndexingLatencies` message" do
-            component = upsert_event_with_latency_timestamps(:component, 36, 72).merge("message_id" => "m1")
+            component = upsert_event_with_latency_timestamps(:component, 36, 72).with(message_id: "m1")
             process([component])
 
             expect(logged_jsons_of_type("ElasticGraphIndexingLatencies").first).to include(
-              "event_id" => "Component:#{component.fetch("id")}@v#{component.fetch("version")}",
+              "event_id" => "Component:#{component.id}@v#{component.version}",
               "message_id" => "m1"
             )
           end
@@ -168,7 +168,7 @@ module ElasticGraph
               # simulate the update with id == `no_op_update` being an ignored event due to the version not increasing
               ops_and_results = ops.map do |op|
                 result =
-                  if op.event.fetch("id") == "no_op_update"
+                  if op.event.id == "no_op_update"
                     Operation::Result.noop_of(op, "was a noop")
                   else
                     Operation::Result.success_of(op)
@@ -313,11 +313,9 @@ module ElasticGraph
           end
 
           def upsert_event_with_latency_timestamps(entity_type, originated_at_offset, touched_by_foo_at_offset, **options)
-            build_upsert_event(entity_type, **options).merge({
-              "latency_timestamps" => {
-                "originated_at" => (clock.now - originated_at_offset).iso8601,
-                "touched_by_foo_at" => (clock.now - touched_by_foo_at_offset).iso8601
-              }
+            build_upsert_event(entity_type, **options).with(latency_timestamps: {
+              "originated_at" => (clock.now - originated_at_offset).iso8601,
+              "touched_by_foo_at" => (clock.now - touched_by_foo_at_offset).iso8601
             })
           end
         end
@@ -329,9 +327,9 @@ module ElasticGraph
           let(:events) do
             [
               good_component,
-              make_component_bad(good_component).merge("id" => "234"),
+              make_component_bad(good_component).with(id: "234"),
               good_address,
-              good_address.merge("type" => "Color", "id" => "345") # Color is not a valid `type`
+              good_address.with(id: "345", record: good_address.record.merge("full_address" => 17)) # must be a string
             ]
           end
 
@@ -341,7 +339,7 @@ module ElasticGraph
             }.to raise_error IndexingFailuresError, a_string_including(
               "2 failure(s) from 4 event(s)",
               "1) Component:234@v1: Malformed Component record",
-              "2) Color:345@v1: Malformed event payload"
+              "2) Address:345@v1: Malformed Address record"
             )
 
             expect(datastore_router).to have_received(:bulk).with(
@@ -355,12 +353,12 @@ module ElasticGraph
 
           it "mentions the `message_id` in the exception message if it's available" do
             expect {
-              events_with_msg_ids = events.map.with_index(1) { |e, index| e.merge("message_id" => "m#{index}") }
+              events_with_msg_ids = events.map.with_index(1) { |e, index| e.with(message_id: "m#{index}") }
               process(events_with_msg_ids)
             }.to raise_error IndexingFailuresError, a_string_including(
               "2 failure(s) from 4 event(s)",
               "1) Component:234@v1 (message_id: m2): Malformed Component record",
-              "2) Color:345@v1 (message_id: m4): Malformed event payload"
+              "2) Address:345@v1 (message_id: m4): Malformed Address record"
             )
           end
 
@@ -380,9 +378,7 @@ module ElasticGraph
           end
 
           def make_component_bad(component)
-            component.merge("record" => component["record"].merge(
-              "name" => 17 # must be a string
-            ))
+            component.with(record: component.record.merge("name" => 17)) # must be a string
           end
         end
 

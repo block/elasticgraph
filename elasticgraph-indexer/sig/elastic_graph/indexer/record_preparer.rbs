@@ -1,17 +1,19 @@
 module ElasticGraph
   class Indexer
-    interface _RecordPreparer
-      def prepare_for_index: [T < ::Object] (::String, T, ::Hash[::String, untyped]) -> T
+    # Prepares a record of type `R` for indexing. `R` is the record type of the ingestion format
+    # the preparer serves (a `Hash` for JSON).
+    interface _RecordPreparer[R]
+      def prepare_for_index: (::String, R, ::Hash[::String, untyped]) -> R
     end
 
     class RecordPreparer
       type fieldsByNameHash = ::Hash[::String, FieldMetadata]
       type fieldsByNameByTypeHash = ::Hash[::String, fieldsByNameHash]
 
-      include _RecordPreparer
+      def prepare_for_index: [T < ::Object] (::String, T, ::Hash[::String, untyped]) -> T
 
       module Identity
-        extend _RecordPreparer
+        extend _RecordPreparer[untyped]
       end
 
       def initialize: (

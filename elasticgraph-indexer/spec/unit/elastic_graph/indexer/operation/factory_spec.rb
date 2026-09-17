@@ -31,18 +31,10 @@ module ElasticGraph
 
           it "also generates derived index update operations for an upsert event for the source type of a derived indexing type" do
             event = build_upsert_event(:widget, id: "1", __version: 1)
-            formatted_event = {
-              "op" => "upsert",
-              "id" => "1",
-              "type" => "Widget",
-              "version" => 1,
-              "record" => event["record"],
-              JSON_SCHEMA_VERSION_KEY => 1
-            }
 
             expect(build_expecting_success(event)).to contain_exactly(
-              new_primary_indexing_operation(formatted_event, index_def: index_def_named("widgets")),
-              widget_currency_derived_update_operation_for(formatted_event)
+              new_primary_indexing_operation(event, index_def: index_def_named("widgets")),
+              widget_currency_derived_update_operation_for(event)
             )
           end
 
@@ -94,17 +86,9 @@ module ElasticGraph
             end
 
             it "skips per-type record validation for the listed type but still builds operations" do
-              event = build_upsert_event(:component, id: "1", __version: 1)
-              event["record"]["name"] = 123 # would normally fail JSON schema validation
+              event = build_upsert_event(:component, id: "1", __version: 1, name: 123) # would normally fail JSON schema validation
 
-              expect(build_expecting_success(event)).to eq([new_primary_indexing_operation({
-                "op" => "upsert",
-                "id" => "1",
-                "type" => "Component",
-                "version" => 1,
-                "record" => event["record"],
-                JSON_SCHEMA_VERSION_KEY => 1
-              })])
+              expect(build_expecting_success(event)).to eq([new_primary_indexing_operation(event)])
             end
 
             it "records the skipped type on the successful build result" do
@@ -116,8 +100,7 @@ module ElasticGraph
             end
 
             it "still validates record-level fields for types that are not in the skip list" do
-              widget_event = build_upsert_event(:widget, id: "1", __version: 1)
-              widget_event["record"]["name"] = 123
+              widget_event = build_upsert_event(:widget, id: "1", __version: 1, name: 123)
 
               expect_failed_event_error(widget_event, "Malformed Widget record", "name")
             end
@@ -128,12 +111,6 @@ module ElasticGraph
               result = indexer.operation_factory.build(event)
 
               expect(result.type_with_skipped_validation).to be_nil
-            end
-
-            it "still applies envelope-level validation for skipped types" do
-              event = build_upsert_event(:component, id: "1", __version: -1)
-
-              expect_failed_event_error(event, "/properties/version")
             end
           end
 
@@ -154,8 +131,7 @@ module ElasticGraph
               # Stub crc32 to the bottom of the space -- well inside the skipped 50% -- forcing the "skip" branch.
               allow(::Zlib).to receive(:crc32).and_return(0)
 
-              event = build_upsert_event(:component, id: "1", __version: 1)
-              event["record"]["name"] = 123 # would normally fail JSON schema validation
+              event = build_upsert_event(:component, id: "1", __version: 1, name: 123) # would normally fail JSON schema validation
 
               expect {
                 build_expecting_success(event)
@@ -166,8 +142,7 @@ module ElasticGraph
               # Stub crc32 to 75% of the way through the space, past the skipped 50%, forcing validation.
               allow(::Zlib).to receive(:crc32).and_return((2**32 * 0.75).to_i)
 
-              event = build_upsert_event(:component, id: "1", __version: 1)
-              event["record"]["name"] = 123
+              event = build_upsert_event(:component, id: "1", __version: 1, name: 123)
 
               expect_failed_event_error(event, "Malformed Component record", "name")
             end
@@ -176,8 +151,7 @@ module ElasticGraph
               # No stubbing -- this exercises the real crc32 and locks in determinism without
               # coupling to a specific hash output. Two builds of the same event must agree on
               # whether to skip validation.
-              event = build_upsert_event(:component, id: "1", __version: 1)
-              event["record"]["name"] = 123 # would fail validation if not skipped
+              event = build_upsert_event(:component, id: "1", __version: 1, name: 123) # would fail validation if not skipped
 
               first = indexer.operation_factory.build(event)
               second = indexer.operation_factory.build(event)
@@ -206,18 +180,10 @@ module ElasticGraph
 
             it "still emits both the primary and the derived-index update operations" do
               event = build_upsert_event(:widget, id: "1", __version: 1)
-              formatted_event = {
-                "op" => "upsert",
-                "id" => "1",
-                "type" => "Widget",
-                "version" => 1,
-                "record" => event["record"],
-                JSON_SCHEMA_VERSION_KEY => 1
-              }
 
               expect(build_expecting_success(event)).to contain_exactly(
-                new_primary_indexing_operation(formatted_event, index_def: index_def_named("widgets")),
-                widget_currency_derived_update_operation_for(formatted_event)
+                new_primary_indexing_operation(event, index_def: index_def_named("widgets")),
+                widget_currency_derived_update_operation_for(event)
               )
             end
           end
@@ -240,10 +206,9 @@ module ElasticGraph
             end
 
             it "reports a value the indexing preparers can't coerce as a failed event carrying the validator's message" do
-              event = build_upsert_event(:widget, id: "1", __version: 1)
               # `IndexingPreparers::Integer` raises `Errors::IndexOperationError` on this; validation
               # would have caught it first as a type mismatch on `amount_cents`.
-              event["record"]["cost"] = {"currency" => "USD", "amount_cents" => "not a number"}
+              event = build_upsert_event(:widget, id: "1", __version: 1, cost: {currency: "USD", amount_cents: "not a number"})
 
               message = expect_failed_event_error(event, "Malformed Widget record", "amount_cents")
 
@@ -255,8 +220,7 @@ module ElasticGraph
               # `__typename` and pins a `const` discriminator on each concrete subtype. Both the
               # missing and the unknown case therefore fail validation, which is why no dedicated
               # error type is needed for them.
-              event = build_upsert_event(:widget, id: "1", __version: 1)
-              event["record"]["inventor"] = {"__typename" => "NotARealConcreteType", "name" => "anon"}
+              event = build_upsert_event(:widget, id: "1", __version: 1, inventor: {"__typename" => "NotARealConcreteType", "name" => "anon"})
 
               expect_failed_event_error(event, "Malformed Widget record", "inventor")
             end
@@ -288,7 +252,8 @@ module ElasticGraph
             # matters more than reporting operations we are never going to run, and
             # `FailedEventError#operations` is documented as sometimes being empty for this reason.
             let(:event) do
-              build_upsert_event(:widget, id: "1", __version: 1).tap { |e| e["record"].delete("cost") }
+              event = build_upsert_event(:widget, id: "1", __version: 1)
+              event.with(record: event.record.except("cost"))
             end
 
             it "still reports what was malformed instead of letting the second failure mask the first" do
@@ -327,78 +292,13 @@ module ElasticGraph
 
           it "generates a primary indexing operation for a single index with latency metrics" do
             event = build_upsert_event(:component, id: "1", __version: 1)
-            latency_timestamps = {"latency_timestamps" => {"created_in_esperanto_at" => "2012-04-23T18:25:43.511Z"}}
+            event = event.with(latency_timestamps: {"created_in_esperanto_at" => "2012-04-23T18:25:43.511Z"})
 
-            expect(build_expecting_success(event.merge(latency_timestamps))).to eq([new_primary_indexing_operation({
-              "op" => "upsert",
-              "id" => "1",
-              "type" => "Component",
-              "version" => 1,
-              "record" => event["record"],
-              JSON_SCHEMA_VERSION_KEY => 1
-            }.merge(latency_timestamps))])
-          end
-
-          it "notifies an error on unknown graphql type" do
-            event = {
-              "op" => "upsert",
-              "id" => "1",
-              "type" => "MyOwnInvalidGraphQlType",
-              "version" => 1,
-              JSON_SCHEMA_VERSION_KEY => 1,
-              "record" => {"field1" => "value1", "field2" => "value2", "id" => "1"}
-            }
-
-            # We can't build any operations when the `type` is unknown. We don't know what index to target!
-            expect_failed_event_error(event, "/properties/type", expect_no_ops: true)
-          end
-
-          it "notifies an error on a graphql type that is not ingestible" do
-            event = {
-              "op" => "upsert",
-              "id" => "1",
-              "type" => "WidgetOptions",
-              "version" => 1,
-              JSON_SCHEMA_VERSION_KEY => 1,
-              "record" => {"field1" => "value1", "field2" => "value2", "id" => "1"}
-            }
-
-            expect(indexer.datastore_core.index_definitions_by_graphql_type.fetch(event.fetch("type"), [])).to be_empty
-
-            # We can't build any operations when the `type` isn't an ingestible type
-            expect_failed_event_error(event, "/properties/type", expect_no_ops: true)
-          end
-
-          it "notifies an error on missing type" do
-            event = build_upsert_event(:component).except("type")
-
-            # We can't build any operations when the `type` isn't in the event. We don't know what index to target!
-            expect_failed_event_error(event, "missing_keys", "type", expect_no_ops: true)
-          end
-
-          it "notifies an error on missing `#{JSON_SCHEMA_VERSION_KEY}`" do
-            event = build_upsert_event(:component).except(JSON_SCHEMA_VERSION_KEY)
-
-            expect_failed_event_error(event, JSON_SCHEMA_VERSION_KEY)
-          end
-
-          it "notifies an error on wrong field types" do
-            event = {
-              "op" => "upsert",
-              "id" => 1,
-              JSON_SCHEMA_VERSION_KEY => 1,
-              "type" => [],
-              "version" => "1",
-              "record" => ""
-            }
-
-            # This event is too malformed to build any operations for.
-            expect_failed_event_error(event, "/properties/type", "/properties/id", "/properties/version", "/properties/record", expect_no_ops: true)
+            expect(build_expecting_success(event)).to eq([new_primary_indexing_operation(event)])
           end
 
           it "notifies an error when given a record that does not satisfy the type's JSON schema, while avoiding revealing PII" do
-            event = build_upsert_event(:component, id: "1", __version: 1)
-            event["record"]["name"] = 123
+            event = build_upsert_event(:component, id: "1", __version: 1, name: 123)
 
             message = expect_failed_event_error(event, "Malformed", "Component", "name")
             expect(message).to include("Malformed").and exclude("123")
@@ -453,14 +353,14 @@ module ElasticGraph
             end
 
             it "builds only the `sourced_from` update operations since the source type has no index of its own" do
-              event = {
+              event = Event.from_validated_hash({
                 "op" => "upsert",
                 "id" => "w1",
                 "type" => "Widget",
                 "version" => 1,
                 JSON_SCHEMA_VERSION_KEY => 1,
                 "record" => {"id" => "w1", "name" => "Widgy", "component_ids" => ["c1", "c2"]}
-              }
+              })
 
               operations = build_expecting_success(event)
 
@@ -471,8 +371,8 @@ module ElasticGraph
           end
 
           it "uses a registered non-JSON adapter for events in that alternate format, building operations from the event the adapter returns" do
-            event = build_upsert_event(:component, id: "1", __version: 1).merge(INGESTION_FORMAT_KEY => "other")
-            prepared_event = event.merge("record" => event.fetch("record").merge("name" => "prepared by adapter"))
+            event = build_upsert_event(:component, id: "1", __version: 1).with(ingestion_format: "other")
+            prepared_event = event.with(record: event.record.merge("name" => "prepared by adapter"))
             other_adapter = instance_spy(
               IngestionAdapter::Interface,
               validate_event: IngestionAdapter::ValidationResult.valid(prepared_event, RecordPreparer::Identity)
@@ -487,7 +387,7 @@ module ElasticGraph
           end
 
           it "fails with an actionable message when no adapter is registered for the format" do
-            event = build_upsert_event(:component, id: "1", __version: 1).merge(INGESTION_FORMAT_KEY => "proto")
+            event = build_upsert_event(:component, id: "1", __version: 1).with(ingestion_format: "proto")
             adapter = instance_spy(IngestionAdapter::Interface)
             factory = indexer.operation_factory.with(ingestion_adapters_by_format: {"json" => adapter})
 
@@ -501,7 +401,7 @@ module ElasticGraph
           end
 
           it "accepts explicitly tagged JSON events" do
-            event = build_upsert_event(:component, id: "1", __version: 1).merge(INGESTION_FORMAT_KEY => "json")
+            event = build_upsert_event(:component, id: "1", __version: 1).with(ingestion_format: "json")
 
             expect(build_expecting_success(event)).not_to be_empty
           end
@@ -512,19 +412,14 @@ module ElasticGraph
             expect(build_expecting_success(event)).not_to be_empty
           end
 
-          def expect_failed_event_error(event, *error_message_snippets, factory: indexer.operation_factory, expect_no_ops: false)
+          def expect_failed_event_error(event, *error_message_snippets, factory: indexer.operation_factory)
             result = factory.build(event)
 
             error_operations = factory.send(:build_all_operations_for, event, RecordPreparer::Identity)
 
-            # We expect/want `build_all_operations_for` to return operations in nearly all cases.
-            # There are a few cases where it can't return any operations, so we make the test pass
-            # `expect_no_ops` to opt-in to allowing that here.
-            if expect_no_ops
-              expect(error_operations).to be_empty
-            else
-              expect(error_operations).not_to be_empty
-            end
+            # We expect `build_all_operations_for` to return operations in these cases: the event's
+            # `type` is always known and ingestible, since only record validation fails here now.
+            expect(error_operations).not_to be_empty
 
             # When the event is invalid it should return an empty list of operations.
             expect(result.operations).to eq([])
@@ -537,11 +432,11 @@ module ElasticGraph
             expect(failure.message).to include(event_id_from(event), *error_message_snippets)
             expect(failure.main_message).to include(*error_message_snippets).and exclude(event_id_from(event))
             expect(failure).to have_attributes(
-              id: event["id"],
-              type: event["type"],
-              op: event["op"],
-              version: event["version"],
-              record: event["record"]
+              id: event.id,
+              type: event.type,
+              op: event.op,
+              version: event.version,
+              record: event.record
             )
 
             failure.message # to allow the caller to assert on the message further

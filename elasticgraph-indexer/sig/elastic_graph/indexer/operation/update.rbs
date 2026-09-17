@@ -43,7 +43,7 @@ module ElasticGraph
         def self.operations_for: (
           event:  event,
           destination_index_def: DatastoreCore::_IndexDefinition,
-          record_preparer: _RecordPreparer,
+          record_preparer: _RecordPreparer[untyped],
           update_target: SchemaArtifacts::RuntimeMetadata::UpdateTarget,
           destination_index_mapping: ::Hash[::String, untyped]
         ) -> ::Array[Update]
