@@ -35,7 +35,7 @@ module ElasticGraph
       def process(events, refresh_indices: false)
         failures = process_returning_failures(events, refresh_indices: refresh_indices)
         return if failures.empty?
-        raise IndexingFailuresError.for(failures: failures, events: events)
+        raise IndexingFailuresError.for(failures: failures, event_count: events.size)
       end
 
       # Like `process`, but returns failures instead of raising an exception.

@@ -1,9 +1,15 @@
 module ElasticGraph
   class Indexer
+    # A failure to index one event, in a form `IndexingFailuresError` can report.
+    interface _IndexingFailure
+      def message: () -> ::String
+      def message_id: () -> ::String?
+    end
+
     class IndexingFailuresError < Errors::Error
       def self.for: (
-        failures: ::Array[Indexer::FailedEventError],
-        events: ::Array[::Hash[::String, untyped]]
+        failures: ::Array[_IndexingFailure],
+        event_count: ::Integer
       ) -> IndexingFailuresError
     end
   end

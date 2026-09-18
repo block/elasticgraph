@@ -32,7 +32,7 @@ module ElasticGraph
         failures = @indexer.processor.process_returning_failures(events, refresh_indices: refresh_indices)
 
         if failures.any?
-          failures_error = Indexer::IndexingFailuresError.for(failures: failures, events: events)
+          failures_error = Indexer::IndexingFailuresError.for(failures: failures, event_count: events.size)
           @logger.error(failures_error.message)
         end
 
@@ -136,17 +136,15 @@ module ElasticGraph
       # Formats the response, including any failures, based on
       # https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html#services-sqs-batchfailurereporting
       def format_response(failures)
-        failure_ids = failures.map do |failure| # $ {"itemIdentifier" => String}
-          {"itemIdentifier" => failure.event["message_id"]}
-        end
+        message_ids = failures.filter_map(&:message_id)
 
-        if failure_ids.any? { |f| f.fetch("itemIdentifier").nil? }
+        if message_ids.size < failures.size
           # If we are not able to identify one or more failed events, then we must raise an exception instead of
           # returning `batchItemFailures`. Otherwise, the unidentified failed events will not get retried.
           raise Errors::MessageIdsMissingError, "Unexpected: some failures did not have a `message_id`, so we are raising an exception instead of returning `batchItemFailures`."
         end
 
-        {"batchItemFailures" => failure_ids}
+        {"batchItemFailures" => message_ids.map { |message_id| {"itemIdentifier" => message_id} }}
       end
     end
   end
