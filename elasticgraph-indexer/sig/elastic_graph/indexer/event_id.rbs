@@ -11,7 +11,7 @@ module ElasticGraph
       def self.new:
         (type: ::String, id: ::String, version: ::Integer) -> EventID
         | (::String, ::String, ::Integer) -> EventID
-      def self.from_event: (event) -> EventID
+      def self.from_decoded_hash: (::Hash[::String, untyped]) -> EventID
     end
   end
 end

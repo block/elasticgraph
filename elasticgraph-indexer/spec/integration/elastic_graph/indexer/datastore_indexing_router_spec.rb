@@ -50,7 +50,7 @@ module ElasticGraph
           versions_by_cluster_by_op = router.source_event_versions_in_index([op2])
 
           expect(versions_by_cluster_by_op.keys).to contain_exactly(op2)
-          expect(versions_by_cluster_by_op[op2]).to eq("main" => [op1.event.fetch("version")])
+          expect(versions_by_cluster_by_op[op2]).to eq("main" => [op1.event.version])
         end
 
         it "finds the document on any index, even if it differs from the operation's target index" do
@@ -63,12 +63,12 @@ module ElasticGraph
           versions_by_cluster_by_op = router.source_event_versions_in_index([op2])
 
           expect(versions_by_cluster_by_op.keys).to contain_exactly(op2)
-          expect(versions_by_cluster_by_op[op2]).to eq("main" => [op1.event.fetch("version")])
+          expect(versions_by_cluster_by_op[op2]).to eq("main" => [op1.event.version])
         end
 
         it "logs a warning and returns all versions if multiple copies of the document are found" do
           op1 = build_primary_indexing_op(:widget, id: "mutated_routing_and_timestamp", workspace_id: "wid1", created_at: "2019-12-03T00:00:00Z")
-          op2 = build_primary_indexing_op(:widget, id: "mutated_routing_and_timestamp", workspace_id: "wid2", created_at: "2023-12-03T00:00:00Z", __version: op1.event.fetch("version") + 1)
+          op2 = build_primary_indexing_op(:widget, id: "mutated_routing_and_timestamp", workspace_id: "wid2", created_at: "2023-12-03T00:00:00Z", __version: op1.event.version + 1)
 
           results = router.bulk([op1, op2], refresh: true)
           expect(results.successful_operations_by_cluster_name).to match("main" => a_collection_containing_exactly(op1, op2))
@@ -77,15 +77,15 @@ module ElasticGraph
             versions_by_cluster_by_op = router.source_event_versions_in_index([op1])
             expect(versions_by_cluster_by_op.keys).to contain_exactly(op1)
             expect(versions_by_cluster_by_op[op1]).to match("main" => a_collection_containing_exactly(
-              op1.event.fetch("version"),
-              op2.event.fetch("version")
+              op1.event.version,
+              op2.event.version
             ))
 
             versions_by_cluster_by_op = router.source_event_versions_in_index([op2])
             expect(versions_by_cluster_by_op.keys).to contain_exactly(op2)
             expect(versions_by_cluster_by_op[op2]).to match("main" => a_collection_containing_exactly(
-              op1.event.fetch("version"),
-              op2.event.fetch("version")
+              op1.event.version,
+              op2.event.version
             ))
           }.to log_warning a_string_including("IdentifyDocumentVersionsGotMultipleResults")
 
@@ -113,7 +113,7 @@ module ElasticGraph
 
           versions_by_cluster_by_op = router.source_event_versions_in_index([derived_update, self_update])
           expect(versions_by_cluster_by_op.keys).to contain_exactly(derived_update, self_update)
-          expect(versions_by_cluster_by_op[self_update]).to eq("main" => [derived_update.event.fetch("version")])
+          expect(versions_by_cluster_by_op[self_update]).to eq("main" => [derived_update.event.version])
 
           # The derived document doesn't keep track of `__versions` so it doesn't have a version it can return.
           expect(versions_by_cluster_by_op[derived_update]).to eq("main" => [])
@@ -144,8 +144,8 @@ module ElasticGraph
 
           versions_by_cluster_by_op = router.source_event_versions_in_index([op1, op2, op3])
           expect(versions_by_cluster_by_op.keys).to contain_exactly(op1, op2, op3)
-          expect(versions_by_cluster_by_op[op1]).to eq("main" => [op1.event.fetch("version")])
-          expect(versions_by_cluster_by_op[op2]).to eq("main" => [op2.event.fetch("version")])
+          expect(versions_by_cluster_by_op[op1]).to eq("main" => [op1.event.version])
+          expect(versions_by_cluster_by_op[op2]).to eq("main" => [op2.event.version])
           expect(versions_by_cluster_by_op[op3]).to eq("main" => [])
         end
 

@@ -6,11 +6,13 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/indexer/config"
+require "elastic_graph/indexer/malformed_event_error"
 require "elastic_graph/json_ingestion/indexer"
 
 module ElasticGraph
   module JSONIngestion
-    RSpec.describe Indexer, :builds_indexer do
+    RSpec.describe Indexer, :builds_indexer, :factories do
       let(:indexer) { Indexer.new(build_indexer) }
       let(:payload) do
         <<~JSONL
@@ -37,6 +39,32 @@ module ElasticGraph
 
       it "can decode a payload without processing it" do
         expect(indexer.decode(payload)).to eq(events)
+      end
+
+      # We deliberately construct the wrapped indexer here without going through `build_indexer`. The
+      # `skip_record_validation_percents_by_type` knob is intentionally not exposed via spec helpers so that
+      # tests cannot silently weaken validation; enabling it must be a visible, deliberate choice
+      # in each spec that exercises it.
+      context "when the indexer is configured to skip record validation for a type" do
+        let(:indexer) do
+          Indexer.new(ElasticGraph::Indexer.new(
+            datastore_core: build_datastore_core,
+            config: ElasticGraph::Indexer::Config.new(
+              latency_slo_thresholds_by_timestamp_in_ms: {},
+              skip_derived_indexing_type_updates: {},
+              skip_record_validation_percents_by_type: {"Component" => 100}
+            )
+          ))
+        end
+
+        it "still applies envelope-level validation, since skipping record validation does not bypass envelope validation" do
+          event = build_upsert_event_hash(:component, id: "1", __version: -1)
+
+          failures = indexer.process_returning_failures([event])
+
+          expect(failures.map(&:class)).to eq [ElasticGraph::Indexer::MalformedEventError]
+          expect(failures.first.message).to include("/properties/version")
+        end
       end
     end
   end
