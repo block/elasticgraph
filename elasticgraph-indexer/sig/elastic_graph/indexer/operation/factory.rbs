@@ -36,12 +36,12 @@ module ElasticGraph
         private
 
         def build_for_adapter: (event, IngestionAdapter::_Adapter) -> BuildResult
-        def build_success_result: (event, _RecordPreparer, type_with_skipped_validation: ::String?) -> BuildResult
-        def build_success_result_isolating_malformed_records: (event, _RecordPreparer, IngestionAdapter::_Adapter) -> BuildResult
+        def build_success_result: (event, _RecordPreparer[untyped], type_with_skipped_validation: ::String?) -> BuildResult
+        def build_success_result_isolating_malformed_records: (event, _RecordPreparer[untyped], IngestionAdapter::_Adapter) -> BuildResult
         CRC32_SPACE_PER_PERCENT: ::Float
         def skip_validation?: (::String, event) -> bool
         def build_failed_result: (event, ::String, ::String) -> BuildResult
-        def build_all_operations_for: (event, _RecordPreparer) -> ::Array[operation]
+        def build_all_operations_for: (event, _RecordPreparer[untyped]) -> ::Array[operation]
         def index_definitions_for: (::String) -> ::Array[DatastoreCore::_IndexDefinition]
         def raise: (*untyped) -> bot
 
