@@ -21,7 +21,7 @@ load "#{project_root}/config/site/Rakefile"
 
 test_port = "#{project_root}/config/settings/test.yaml.template"
   .then { |f| ::YAML.safe_load_file(f, aliases: true).fetch("datastore").fetch("clusters").fetch("main").fetch("url") }
-  .then { |url| Integer(url[/localhost:(\d+)$/, 1]) }
+  .then { |url| Integer(url[/:(\d+)\z/, 1]) }
 
 schema_def_output = ::SimpleDelegator.new($stdout)
 def schema_def_output.puts(*objects)
