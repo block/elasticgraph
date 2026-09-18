@@ -36,6 +36,36 @@ module ElasticGraph
           index_records(manufacturer1, manufacturer2, address1, address2, part1, part2, part3, component1, component2, component3, component4, widget1, widget2)
         end
 
+        it "aggregates over a relationship regardless of how many foreign key ids the parent holds", :expect_search_routing do
+          # `widget2` has a single `component_ids` entry while `widget1` has 3. Both must aggregate
+          # against the datastore: the `id`-only synthesized response optimization has no aggregations
+          # on it, so it must not be used for an aggregations query.
+          results = call_graphql_query(<<~QUERY).dig("data", case_correctly("widgets"), "nodes")
+            query {
+              widgets(#{case_correctly("order_by")}: [#{case_correctly("amount_cents")}_ASC]) {
+                nodes {
+                  name
+                  #{case_correctly("component_aggregations")} {
+                    nodes {
+                      count
+                    }
+                  }
+                }
+              }
+            }
+          QUERY
+
+          expect(results).to eq [
+            {"name" => "widget1", case_correctly("component_aggregations") => {"nodes" => [{"count" => 3}]}},
+            {"name" => "widget2", case_correctly("component_aggregations") => {"nodes" => [{"count" => 1}]}}
+          ]
+
+          expect_to_have_routed_to_shards_with("main",
+            ["widgets_rollover__*", nil],
+            ["components", widget1.fetch(case_correctly(:component_ids)).sort.join(",")],
+            ["components", widget2.fetch(case_correctly(:component_ids)).sort.join(",")])
+        end
+
         it "supports filtering relationships with additional filter conditions" do
           component_args = {filter: {name: {equal_to_any_of: %w[comp1]}}}
           results = query_components_and_dollar_widgets(component_args: component_args)
