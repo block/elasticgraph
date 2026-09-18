@@ -73,7 +73,7 @@ index 963f4f9..16eb063 100644
      main:
 -      backend: opensearch
 +      backend: elasticsearch
-       url: http://localhost:9200
+       url: http://127.0.0.1:9200
        settings: {}
    index_definitions:
 ```

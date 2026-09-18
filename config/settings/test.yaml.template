@@ -4,7 +4,7 @@ datastore:
     require: httpx/adapters/faraday
   clusters:
     main:
-      url: http://localhost:9234
+      url: http://127.0.0.1:9234
       backend: "%{datastore_backend}"
       settings:
         # We set this to be quite high, in order to support a parallel test suite runner. When we run specs in parallel we
@@ -13,16 +13,16 @@ datastore:
         # machines, we've increased this from 1000 (the default) to 16000.
         cluster.max_shards_per_node: 16000
     other1:
-      url: http://localhost:9234
+      url: http://127.0.0.1:9234
       backend: "opensearch"
       settings:
         cluster.max_shards_per_node: 16001 # to be different from the above; a spec asserts on this.
     other2:
-      url: http://localhost:9234
+      url: http://127.0.0.1:9234
       backend: "%{datastore_backend}"
       settings: {}
     other3:
-      url: http://localhost:9234
+      url: http://127.0.0.1:9234
       backend: "%{datastore_backend}"
       settings: {}
   index_definitions:
