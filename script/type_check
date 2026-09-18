@@ -13,10 +13,25 @@ set -o nounset
 # pipeline exit successfully.
 set -o pipefail
 
-# Print a trace of simple commands.
-# Verbose form of `set -x`.
-set -o xtrace
-
 # Unfortunately, one of steep's dependencies crashes when you use frozen string literals,
 # so we disable that flag when running it here.
-RUBYOPT=--disable-frozen-string-literal bundle exec steep check
+#
+# Steep's background typecheck workers can log an `ERROR:` diagnostic (e.g. a recovered
+# RBS/subtyping crash) without that affecting the process exit status, so `steep check`
+# can exit 0 even though it hit a real problem. Tee its output to a log (so progress still
+# streams live) and fail explicitly if any such line shows up, so those warnings can't
+# silently pass CI.
+log=$(mktemp)
+trap 'rm -f "$log"' EXIT
+
+RUBYOPT=--disable-frozen-string-literal bundle exec steep check 2>&1 | tee "$log"
+status="${PIPESTATUS[0]}"
+
+if [ "$status" -ne 0 ]; then
+  exit "$status"
+fi
+
+if grep -q "ERROR:" "$log"; then
+  echo "script/type_check: steep logged an ERROR diagnostic; treating it as a failure." >&2
+  exit 1
+fi
