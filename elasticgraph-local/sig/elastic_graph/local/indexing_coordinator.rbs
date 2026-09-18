@@ -4,11 +4,11 @@ module ElasticGraph
       PARALLELISM: ::Integer
 
       @fake_data_batch_generator: fakeDataBatchGenerator
-      @publish_batch: ^(::Array[::Hash[::String, untyped]]) -> void
+      @publish_batch: ^(::Array[Indexer::event]) -> void
       @output: io
 
       def initialize: (fakeDataBatchGenerator, ?output: io) {
-        (::Array[::Hash[::String, untyped]]) -> void
+        (::Array[Indexer::event]) -> void
       } -> void
 
       def index_fake_data: (::Integer) -> void

@@ -12,9 +12,9 @@ require "rspec/matchers/fail_matchers"
 RSpec.describe "The `be_a_valid_elastic_graph_event` matcher", :builds_indexer, :factories, aggregate_failures: false do
   include ::RSpec::Matchers::FailMatchers
 
-  let(:valid_event) { build_upsert_event(:widget) }
+  let(:valid_event) { build_upsert_event_hash(:widget) }
   let(:invalid_event) { valid_event.merge("type" => "Unknown") }
-  let(:event_with_extra_field) { build_upsert_event(:widget, extra1: 3) }
+  let(:event_with_extra_field) { build_upsert_event_hash(:widget, extra1: 3) }
 
   shared_examples "common matcher examples" do
     it "passes when positively matched against a valid event" do

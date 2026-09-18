@@ -48,7 +48,7 @@ module ElasticGraph
         end
 
         def event_id
-          EventID.from_event(event)
+          event.event_id
         end
 
         def summary

@@ -14,7 +14,7 @@ module ElasticGraph
           description: ::String?) -> void
 
         attr_reader operation_type: operationType
-        attr_reader event: ::Hash[::String, untyped]
+        attr_reader event: event
         attr_reader event_id: EventID
         attr_reader summary: ::String
 

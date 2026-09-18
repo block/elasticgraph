@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/constants"
+require "elastic_graph/indexer/event"
 require "elastic_graph/indexer/event_id"
 require "elastic_graph/indexer/malformed_event_error"
 require "elastic_graph/support/json_schema/validator_factory"
@@ -26,10 +27,11 @@ module ElasticGraph
         @configure_record_validator = configure_record_validator
       end
 
-      # Validates the envelope of each decoded JSON event.
+      # Validates the envelope of each decoded JSON event and builds an {ElasticGraph::Indexer::Event}
+      # for each valid one.
       #
       # @param decoded_events [Array<Hash<String, Object>>] decoded JSON indexing events
-      # @return [Array(Array<Hash<String, Object>>, Array<ElasticGraph::Indexer::MalformedEventError>)]
+      # @return [Array(Array<ElasticGraph::Indexer::Event>, Array<ElasticGraph::Indexer::MalformedEventError>)]
       #   the events with a valid envelope, and a failure for each event with a malformed envelope
       def events_from(decoded_events)
         envelope_failures = decoded_events.map { |decoded_event| envelope_failure_for(decoded_event) }
@@ -69,7 +71,7 @@ module ElasticGraph
       # JSON has no integer type, so a publisher can encode `version` as `3.0`, which the envelope
       # schema accepts. The event needs an `Integer` version.
       def event_from(decoded_event)
-        decoded_event.merge("version" => decoded_event.fetch("version").to_i)
+        ElasticGraph::Indexer::Event.from_validated_hash(decoded_event.merge("version" => decoded_event.fetch("version").to_i))
       end
 
       def envelope_failure_for(decoded_event)
@@ -97,7 +99,7 @@ module ElasticGraph
           @logger.info({
             "message_type" => "ElasticGraphMissingJSONSchemaVersion",
             "message_id" => decoded_event["message_id"],
-            "event_id" => ElasticGraph::Indexer::EventID.from_event(decoded_event),
+            "event_id" => ElasticGraph::Indexer::EventID.from_decoded_hash(decoded_event),
             "event_type" => decoded_event["type"],
             "requested_json_schema_version" => requested_json_schema_version,
             "selected_json_schema_version" => selected_json_schema_version
@@ -120,7 +122,7 @@ module ElasticGraph
       def malformed(decoded_event, validation_target:, message:)
         ElasticGraph::Indexer::MalformedEventError.new(
           payload: decoded_event,
-          event_id: ElasticGraph::Indexer::EventID.from_event(decoded_event).to_s,
+          event_id: ElasticGraph::Indexer::EventID.from_decoded_hash(decoded_event).to_s,
           message_id: decoded_event["message_id"],
           main_message: "Malformed #{validation_target}. #{message}"
         )
