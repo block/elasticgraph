@@ -25,7 +25,7 @@ module ElasticGraph
       def get_payload_from_s3: (::String) -> ::String
       def s3_client: () -> Aws::S3::Client
       def format_response: (
-        ::Array[Indexer::FailedEventError]
+        ::Array[Indexer::_IndexingFailure]
       ) -> {"batchItemFailures" => ::Array[{"itemIdentifier" => ::String}]}
     end
   end

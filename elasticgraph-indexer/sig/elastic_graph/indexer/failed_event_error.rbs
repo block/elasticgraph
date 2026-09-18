@@ -1,6 +1,8 @@
 module ElasticGraph
   class Indexer
     class FailedEventError < Errors::Error
+      include _IndexingFailure
+
       attr_reader main_message: ::String
       attr_reader event: ::Hash[::String, untyped]
       attr_reader operations: ::Set[operation]

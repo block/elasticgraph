@@ -282,8 +282,8 @@ module ElasticGraph
 
           it "indicates which SQS messages had failures in the lambda response so that only those messages are retried (while still logging the errors)" do
             allow(indexer_processor).to receive(:process_returning_failures).and_return([
-              failure_of("id1", message: "boom1", event: {"id" => "id1", "message_id" => "12"}),
-              failure_of("id7", message: "boom7", event: {"id" => "id7", "message_id" => "67"})
+              failure_of(message: "boom1", message_id: "12"),
+              failure_of(message: "boom7", message_id: "67")
             ])
 
             lambda_event = {
@@ -312,8 +312,8 @@ module ElasticGraph
 
           it "falls back to raising an `IndexingFailuresError` if the SQS id of an event cannot be determined" do
             allow(indexer_processor).to receive(:process_returning_failures).and_return([
-              failure_of("id1", message: "boom1", event: {"id" => "id1"}),
-              failure_of("id7", message: "boom7", event: {"id" => "id7", "message_id" => "67"})
+              failure_of(message: "boom1", message_id: nil),
+              failure_of(message: "boom7", message_id: "67")
             ])
 
             lambda_event = {
@@ -337,8 +337,8 @@ module ElasticGraph
           end
         end
 
-        def failure_of(id, message: "boom", event: {})
-          instance_double(Indexer::FailedEventError, id: id, message: message, event: event)
+        def failure_of(message:, message_id:)
+          instance_double(Indexer::FailedEventError, message: message, message_id: message_id)
         end
 
         def build_sqs_processor(**options)
