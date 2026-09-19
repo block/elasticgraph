@@ -9,6 +9,7 @@
 require "elastic_graph/proto_ingestion"
 require "elastic_graph/proto_ingestion/schema_definition/api_extension"
 require "elastic_graph/schema_definition/rake_tasks"
+require "elastic_graph/spec_support/example_extensions/ingestion"
 require "yaml"
 
 module ElasticGraph
@@ -136,7 +137,8 @@ module ElasticGraph
               index_document_sizes: false,
               path_to_schema: "schema.rb",
               schema_artifacts_directory: "config/schema/artifacts",
-              extension_modules: [SchemaDefinition::APIExtension],
+              # Replace the example extension when the proto API extension registers its ingestion adapter.
+              extension_modules: [SchemaDefinition::APIExtension, SpecSupport::ExampleIngestion::APIExtension],
               output: output
             )
           end
