@@ -1,0 +1,20 @@
+module ElasticGraph
+  module ProtoIngestion
+    class Indexer
+      @decoder: IndexingEventDecoder
+      extend _BuildableFromParsedYaml[Indexer]
+      extend Support::FromYamlFile[Indexer]
+
+      attr_reader indexer: ::ElasticGraph::Indexer
+
+      def initialize: (::ElasticGraph::Indexer, config: Hash[String, untyped]) -> void
+
+      def logger: () -> ::Logger
+      def processor: () -> ::ElasticGraph::Indexer::Processor
+
+      def process: (::String, ?metadata: Hash[String, String], ?refresh_indices: bool) -> void
+      def process_returning_failures: (::String, ?metadata: Hash[String, String], ?refresh_indices: bool) -> ::Array[::ElasticGraph::Indexer::FailedEventError]
+      def decode: (::String, ?metadata: Hash[String, String]) -> ::Array[::Hash[::String, untyped]]
+    end
+  end
+end

@@ -8,14 +8,15 @@
 
 require "elastic_graph/proto_ingestion/schema_definition/api_extension"
 require "elastic_graph/schema_definition/test_support"
+require "elastic_graph/spec_support/protoc"
 require "open3"
-require "rbconfig"
 require "tempfile"
 
 module ElasticGraph
   module ProtoIngestion
     module SchemaSupport
       include ElasticGraph::SchemaDefinition::TestSupport
+      include SpecSupport::Protoc
 
       def define_proto_schema(**options, &block)
         define_proto_schema_results(**options, &block).proto_schema
@@ -41,33 +42,6 @@ module ElasticGraph
           block.call(schema)
         end
       end
-
-      # The `grpc-tools` gem vendors precompiled `protoc` binaries under `bin/<arch>-<os>/`.
-      # Locate the binary directly because its Ruby wrapper conflicts with JRuby's `PLATFORM` constant.
-      # simplecov:disable -- only one platform's branches can execute in any given run.
-      PROTOC_BINARY = begin
-        arch =
-          if RbConfig::CONFIG["host_os"].match?(/darwin/)
-            "x86_64" # Apple Silicon uses the x86_64 binary under Rosetta; the gem ships no arm64 build.
-          elsif RbConfig::CONFIG["host_cpu"].match?(/x86_64|amd64/)
-            "x86_64"
-          else
-            "x86"
-          end
-
-        os =
-          case RbConfig::CONFIG["host_os"]
-          when /darwin/ then "macos"
-          when /mswin|mingw|cygwin/ then "windows"
-          else "linux"
-          end
-
-        bin_dir = ::File.expand_path("bin/#{arch}-#{os}", Gem.loaded_specs.fetch("grpc-tools").full_gem_path)
-        ::File.join(bin_dir, "protoc#{RbConfig::CONFIG["EXEEXT"]}").tap do |binary|
-          raise "`grpc-tools` ships no `protoc` for #{arch}-#{os}; expected it at #{binary}." unless ::File.exist?(binary)
-        end
-      end
-      # simplecov:enable
 
       def run_protoc(proto_schema, operation, input)
         Tempfile.create(["schema", ".proto"]) do |schema_file|

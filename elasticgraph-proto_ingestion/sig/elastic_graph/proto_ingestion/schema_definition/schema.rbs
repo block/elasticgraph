@@ -26,6 +26,8 @@ module ElasticGraph
           ingestible_types_by_name: ::Hash[::String, ::ElasticGraph::SchemaDefinition::indexableType]
         ) -> void
 
+        def ingestion_metadata: () -> Hash[String, untyped]
+        def envelope_schema: () -> String
         def to_proto: () -> ::String
         def field_number_mappings_for_artifact: () -> ::Hash[::String, untyped]
         def field_number_for: (
