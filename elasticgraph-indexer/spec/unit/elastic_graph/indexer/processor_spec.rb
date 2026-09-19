@@ -331,7 +331,7 @@ module ElasticGraph
               good_component,
               make_component_bad(good_component).merge("id" => "234"),
               good_address,
-              good_address.merge("type" => "Color", "id" => "345") # Color is not a valid `type`
+              good_address.merge("id" => "345", "record" => good_address.fetch("record").merge("full_address" => 17)) # must be a string
             ]
           end
 
@@ -341,7 +341,7 @@ module ElasticGraph
             }.to raise_error IndexingFailuresError, a_string_including(
               "2 failure(s) from 4 event(s)",
               "1) Component:234@v1: Malformed Component record",
-              "2) Color:345@v1: Malformed event payload"
+              "2) Address:345@v1: Malformed Address record"
             )
 
             expect(datastore_router).to have_received(:bulk).with(
@@ -360,7 +360,7 @@ module ElasticGraph
             }.to raise_error IndexingFailuresError, a_string_including(
               "2 failure(s) from 4 event(s)",
               "1) Component:234@v1 (message_id: m2): Malformed Component record",
-              "2) Color:345@v1 (message_id: m4): Malformed event payload"
+              "2) Address:345@v1 (message_id: m4): Malformed Address record"
             )
           end
 

@@ -129,12 +129,6 @@ module ElasticGraph
 
               expect(result.type_with_skipped_validation).to be_nil
             end
-
-            it "still applies envelope-level validation for skipped types" do
-              event = build_upsert_event(:component, id: "1", __version: -1)
-
-              expect_failed_event_error(event, "/properties/version")
-            end
           end
 
           context "when the indexer configures a partial skip percent for a type" do
@@ -339,63 +333,6 @@ module ElasticGraph
             }.merge(latency_timestamps))])
           end
 
-          it "notifies an error on unknown graphql type" do
-            event = {
-              "op" => "upsert",
-              "id" => "1",
-              "type" => "MyOwnInvalidGraphQlType",
-              "version" => 1,
-              JSON_SCHEMA_VERSION_KEY => 1,
-              "record" => {"field1" => "value1", "field2" => "value2", "id" => "1"}
-            }
-
-            # We can't build any operations when the `type` is unknown. We don't know what index to target!
-            expect_failed_event_error(event, "/properties/type", expect_no_ops: true)
-          end
-
-          it "notifies an error on a graphql type that is not ingestible" do
-            event = {
-              "op" => "upsert",
-              "id" => "1",
-              "type" => "WidgetOptions",
-              "version" => 1,
-              JSON_SCHEMA_VERSION_KEY => 1,
-              "record" => {"field1" => "value1", "field2" => "value2", "id" => "1"}
-            }
-
-            expect(indexer.datastore_core.index_definitions_by_graphql_type.fetch(event.fetch("type"), [])).to be_empty
-
-            # We can't build any operations when the `type` isn't an ingestible type
-            expect_failed_event_error(event, "/properties/type", expect_no_ops: true)
-          end
-
-          it "notifies an error on missing type" do
-            event = build_upsert_event(:component).except("type")
-
-            # We can't build any operations when the `type` isn't in the event. We don't know what index to target!
-            expect_failed_event_error(event, "missing_keys", "type", expect_no_ops: true)
-          end
-
-          it "notifies an error on missing `#{JSON_SCHEMA_VERSION_KEY}`" do
-            event = build_upsert_event(:component).except(JSON_SCHEMA_VERSION_KEY)
-
-            expect_failed_event_error(event, JSON_SCHEMA_VERSION_KEY)
-          end
-
-          it "notifies an error on wrong field types" do
-            event = {
-              "op" => "upsert",
-              "id" => 1,
-              JSON_SCHEMA_VERSION_KEY => 1,
-              "type" => [],
-              "version" => "1",
-              "record" => ""
-            }
-
-            # This event is too malformed to build any operations for.
-            expect_failed_event_error(event, "/properties/type", "/properties/id", "/properties/version", "/properties/record", expect_no_ops: true)
-          end
-
           it "notifies an error when given a record that does not satisfy the type's JSON schema, while avoiding revealing PII" do
             event = build_upsert_event(:component, id: "1", __version: 1)
             event["record"]["name"] = 123
@@ -512,19 +449,14 @@ module ElasticGraph
             expect(build_expecting_success(event)).not_to be_empty
           end
 
-          def expect_failed_event_error(event, *error_message_snippets, factory: indexer.operation_factory, expect_no_ops: false)
+          def expect_failed_event_error(event, *error_message_snippets, factory: indexer.operation_factory)
             result = factory.build(event)
 
             error_operations = factory.send(:build_all_operations_for, event, RecordPreparer::Identity)
 
-            # We expect/want `build_all_operations_for` to return operations in nearly all cases.
-            # There are a few cases where it can't return any operations, so we make the test pass
-            # `expect_no_ops` to opt-in to allowing that here.
-            if expect_no_ops
-              expect(error_operations).to be_empty
-            else
-              expect(error_operations).not_to be_empty
-            end
+            # We expect `build_all_operations_for` to return operations in these cases: the event's
+            # `type` is always known and ingestible, since only record validation fails here now.
+            expect(error_operations).not_to be_empty
 
             # When the event is invalid it should return an empty list of operations.
             expect(result.operations).to eq([])
