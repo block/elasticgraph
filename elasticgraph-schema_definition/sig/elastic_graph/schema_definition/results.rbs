@@ -11,6 +11,8 @@ module ElasticGraph
       def graphql_schema_string: () -> ::String
       def datastore_config: () -> ::Hash[::String, untyped]
       def runtime_metadata: () -> SchemaArtifacts::RuntimeMetadata::Schema
+      def extension_artifacts: () -> SchemaArtifacts::ExtensionArtifacts
+      @extension_artifacts: SchemaArtifacts::ExtensionArtifacts?
       @ingestible_types_by_name: ::Hash[::String, indexableType]?
       def ingestible_types_by_name: () -> ::Hash[::String, indexableType]
 

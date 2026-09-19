@@ -19,27 +19,6 @@ module ElasticGraph
       #
       # @private
       module ResultsExtension
-        # @param version [Integer] desired JSON schema version
-        # @return [Hash<String, Object>] the JSON schema for the requested version, if available
-        # @raise [Errors::NotFoundError] if the requested JSON schema version is not available
-        def json_schemas_for(version)
-          unless available_json_schema_versions.include?(version)
-            raise Errors::NotFoundError, "The requested json schema version (#{version}) is not available. Available versions: #{available_json_schema_versions.to_a.join(", ")}."
-          end
-
-          @latest_versioned_json_schema ||= merge_field_metadata_into_json_schema(current_public_json_schema).json_schema
-        end
-
-        # @return [Set<Integer>] set of available JSON schema versions
-        def available_json_schema_versions
-          @available_json_schema_versions ||= Set[latest_json_schema_version]
-        end
-
-        # @return [Integer] the current JSON schema version
-        def latest_json_schema_version
-          current_public_json_schema[JSON_SCHEMA_VERSION_KEY]
-        end
-
         # @private
         def json_schema_version_setter_location
           json_ingestion_state.json_schema_version_setter_location

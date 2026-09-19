@@ -1,0 +1,39 @@
+module ElasticGraph
+  module JSONIngestion
+    module Artifacts
+      interface _Provider
+        def json_schemas_for: (::Integer) -> ::Hash[::String, untyped]
+        def available_json_schema_versions: () -> ::Set[::Integer]
+        def latest_json_schema_version: () -> ::Integer
+      end
+
+      def self.from_disk: (::String, config: ::Hash[::Symbol | ::String, untyped]) -> FromDisk
+      def self.from_schema_definition: (untyped, config: ::Hash[::Symbol | ::String, untyped]) -> FromSchemaDefinition
+
+      class FromDiskSupertype
+        attr_reader artifacts_dir: ::String
+        def initialize: (::String) -> void
+      end
+      class FromDisk < FromDiskSupertype
+        include _Provider
+        @available_json_schema_versions: ::Set[::Integer]?
+        @latest_json_schema_version: ::Integer?
+        private
+        def parsed_yaml_from: (::String) -> ::Hash[::String, untyped]
+        @json_schemas_by_version: ::Hash[::Integer, ::Hash[::String, untyped]]?
+        def json_schemas_by_version: () -> ::Hash[::Integer, ::Hash[::String, untyped]]
+        def load_json_schema: (::Integer) -> ::Hash[::String, untyped]
+      end
+
+      class FromSchemaDefinitionSupertype
+        attr_reader results: ::ElasticGraph::SchemaDefinition::Results & SchemaDefinition::ResultsExtension
+        def initialize: (::ElasticGraph::SchemaDefinition::Results & SchemaDefinition::ResultsExtension) -> void
+      end
+      class FromSchemaDefinition < FromSchemaDefinitionSupertype
+        include _Provider
+        @latest_versioned_json_schema: ::Hash[::String, untyped]?
+        @available_json_schema_versions: ::Set[::Integer]?
+      end
+    end
+  end
+end

@@ -9,6 +9,7 @@
 require "elastic_graph/constants"
 require "elastic_graph/errors"
 require "elastic_graph/schema_artifacts/artifacts_helper_methods"
+require "elastic_graph/schema_artifacts/extension_artifacts"
 require "elastic_graph/schema_artifacts/runtime_metadata/schema"
 require "elastic_graph/schema_definition/indexing/sourced_from_update_targets_resolver"
 require "elastic_graph/schema_definition/mixins/has_readable_to_s_and_inspect"
@@ -41,6 +42,13 @@ module ElasticGraph
       # @return [Hash<String, Object>] runtime metadata used by other parts of ElasticGraph and dumped as `runtime_metadata.yaml`
       def runtime_metadata
         @runtime_metadata ||= build_runtime_metadata
+      end
+
+      # @return [SchemaArtifacts::ExtensionArtifacts] lazily constructed extension-owned artifact providers
+      def extension_artifacts
+        @extension_artifacts ||= SchemaArtifacts::ExtensionArtifacts.new(state.schema_artifact_extensions) do |factory, config|
+          factory.from_schema_definition(self, config: config)
+        end
       end
 
       # @private
@@ -151,6 +159,7 @@ module ElasticGraph
           graphql_extension_modules: state.graphql_extension_modules,
           graphql_resolvers_by_name: state.graphql_resolvers_by_name,
           indexer_extension_modules: state.indexer_extension_modules,
+          schema_artifact_extensions: state.schema_artifact_extensions,
           static_script_ids_by_scoped_name: STATIC_SCRIPT_REPO.script_ids_by_scoped_name
         ).tap { |rm| verify_runtime_metadata(rm) }
       end
