@@ -2,6 +2,7 @@ module ElasticGraph
   module ProtoIngestion
     module SchemaDefinition
       class FieldNumberMappings
+        extend _BuildableFromParsedYaml[FieldNumberMappings]
         extend Support::FromYamlFile[FieldNumberMappings]
 
         type fieldNumbersByName = ::Hash[::String, ::Integer]
@@ -31,7 +32,6 @@ module ElasticGraph
         @message_mappings_by_name: ::Hash[::String, MessageMapping]
         @enum_mappings_by_name: ::Hash[::String, EnumMapping]
 
-        def self.from_parsed_yaml: (::Hash[::String, untyped]?) ?{ (untyped) -> void } -> instance
         def self.parse_messages: (::Hash[::String, untyped]) -> ::Hash[::String, MessageMapping]
         def self.parse_enums: (::Hash[::String, untyped]) -> ::Hash[::String, EnumMapping]
         def self.verify_next_number_is_after_mapped_numbers: (::String, ::Integer, fieldNumbersByName) -> void
