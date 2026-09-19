@@ -8,7 +8,6 @@
 
 require "elastic_graph/errors"
 require "elastic_graph/indexer/failed_event_error"
-require "elastic_graph/indexer/processor"
 require "elastic_graph/indexer_lambda/sqs_processor"
 require "elastic_graph/json_ingestion/indexer"
 require "elastic_graph/spec_support/lambda_function"
@@ -19,7 +18,11 @@ module ElasticGraph
   module IndexerLambda
     RSpec.describe SqsProcessor, :capture_logs do
       let(:ignore_sqs_latency_timestamps_from_arns) { [] }
-      let(:indexer_processor) { instance_double(Indexer::Processor, process_returning_failures: []) }
+      let(:json_indexer) do
+        JSONIngestion::Indexer.new(instance_double(Indexer, logger: logger)).tap do |json_indexer|
+          allow(json_indexer).to receive(:process_returning_failures).and_return([])
+        end
+      end
 
       describe "#process" do
         let(:s3_client) { Aws::S3::Client.new(stub_responses: true) }
@@ -34,7 +37,7 @@ module ElasticGraph
 
           sqs_processor.process(lambda_event)
 
-          expect(indexer_processor).to have_received(:process_returning_failures).with([
+          expect(json_indexer).to have_received(:process_returning_failures).with([
             {"field1" => {}, "message_id" => "a"}
           ], refresh_indices: false)
         end
@@ -50,7 +53,7 @@ module ElasticGraph
 
           sqs_processor.process(lambda_event)
 
-          expect(indexer_processor).to have_received(:process_returning_failures).with([
+          expect(json_indexer).to have_received(:process_returning_failures).with([
             {"field1" => {}, "message_id" => "a"},
             {"field2" => {}, "message_id" => "b"},
             {"field3" => {}, "message_id" => "c"}
@@ -67,7 +70,7 @@ module ElasticGraph
 
           sqs_processor.process(lambda_event)
 
-          expect(indexer_processor).to have_received(:process_returning_failures).with([
+          expect(json_indexer).to have_received(:process_returning_failures).with([
             {"field1" => {}, "message_id" => "a"},
             {"field2" => {}, "message_id" => "a"},
             {"field3" => {}, "message_id" => "b"},
@@ -107,7 +110,7 @@ module ElasticGraph
             sqs_processor.process(lambda_event)
           }.to raise_error(KeyError, a_string_including("Records"))
 
-          expect(indexer_processor).not_to have_received(:process_returning_failures)
+          expect(json_indexer).not_to have_received(:process_returning_failures)
         end
 
         it "raises a clear error if the SQS messages lack a `body` as expected" do
@@ -123,7 +126,7 @@ module ElasticGraph
             sqs_processor.process(lambda_event)
           }.to raise_error(KeyError, a_string_including("body"))
 
-          expect(indexer_processor).not_to have_received(:process_returning_failures)
+          expect(json_indexer).not_to have_received(:process_returning_failures)
         end
 
         it "retrieves large messages from s3 when an ElasticGraph event was offloaded there" do
@@ -147,7 +150,7 @@ module ElasticGraph
 
           sqs_processor.process(lambda_event)
 
-          expect(indexer_processor).to have_received(:process_returning_failures).with(
+          expect(json_indexer).to have_received(:process_returning_failures).with(
             [event_payload.merge("message_id" => "a")],
             refresh_indices: false
           )
@@ -193,7 +196,7 @@ module ElasticGraph
 
           sqs_processor.process(lambda_event)
 
-          expect(indexer_processor).to have_received(:process_returning_failures) do |events|
+          expect(json_indexer).to have_received(:process_returning_failures) do |events|
             expect(events.first["latency_timestamps"].size).to eq(2)
             expect(
               events.first["latency_timestamps"]["processing_first_attempted_at"]
@@ -222,7 +225,7 @@ module ElasticGraph
 
           sqs_processor.process(lambda_event)
 
-          expect(indexer_processor).to have_received(:process_returning_failures) do |events|
+          expect(json_indexer).to have_received(:process_returning_failures) do |events|
             expect(events.first["latency_timestamps"].size).to eq(3)
             expect(
               events.first["latency_timestamps"]["processing_first_attempted_at"]
@@ -266,7 +269,7 @@ module ElasticGraph
 
             sqs_processor.process(lambda_event)
 
-            expect(indexer_processor).to have_received(:process_returning_failures) do |events|
+            expect(json_indexer).to have_received(:process_returning_failures) do |events|
               expect(events.map { |e| e.fetch("latency_timestamps", {}).keys }).to eq [
                 ["field1"],
                 ["processing_first_attempted_at", "sqs_received_at"],
@@ -281,7 +284,7 @@ module ElasticGraph
           let(:sqs_processor) { build_sqs_processor }
 
           it "indicates which SQS messages had failures in the lambda response so that only those messages are retried (while still logging the errors)" do
-            allow(indexer_processor).to receive(:process_returning_failures).and_return([
+            allow(json_indexer).to receive(:process_returning_failures).and_return([
               failure_of(message: "boom1", message_id: "12"),
               failure_of(message: "boom7", message_id: "67")
             ])
@@ -311,7 +314,7 @@ module ElasticGraph
           end
 
           it "falls back to raising an `IndexingFailuresError` if the SQS id of an event cannot be determined" do
-            allow(indexer_processor).to receive(:process_returning_failures).and_return([
+            allow(json_indexer).to receive(:process_returning_failures).and_return([
               failure_of(message: "boom1", message_id: nil),
               failure_of(message: "boom7", message_id: "67")
             ])
@@ -378,16 +381,8 @@ module ElasticGraph
       end
 
       def build_sqs_processor(**options)
-        indexer = JSONIngestion::Indexer.new(
-          instance_double(
-            Indexer,
-            logger: logger,
-            processor: indexer_processor
-          )
-        )
-
         SqsProcessor.new(
-          indexer,
+          json_indexer,
           ignore_sqs_latency_timestamps_from_arns: ignore_sqs_latency_timestamps_from_arns,
           **options
         )

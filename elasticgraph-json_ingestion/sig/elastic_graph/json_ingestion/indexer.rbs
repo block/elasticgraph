@@ -12,8 +12,8 @@ module ElasticGraph
       def processor: () -> ::ElasticGraph::Indexer::Processor
 
       def process: (::String, ?refresh_indices: bool) -> void
-      def process_returning_failures: (::String, ?refresh_indices: bool) -> ::Array[::ElasticGraph::Indexer::FailedEventError]
-      def decode: (::String) -> ::Array[::Hash[::String, untyped]]
+      def process_returning_failures: (::Array[EnvelopeValidator::decodedEvent], ?refresh_indices: bool) -> ::Array[::ElasticGraph::Indexer::_IndexingFailure]
+      def decode: (::String) -> ::Array[EnvelopeValidator::decodedEvent]
     end
   end
 end
