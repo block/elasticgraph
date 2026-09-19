@@ -64,6 +64,12 @@ module ElasticGraph
           # If the client is requesting any fields besides `id`, we can't do this.
           return nil unless (query.requested_fields - ONLY_ID).empty?
 
+          # Aggregations must be computed by the datastore. A synthesized response has no aggregations
+          # on it, so returning one here would silently give the client empty aggregation results.
+          # Note: `requested_fields` is always empty for an aggregations query (the requested fields
+          # query adapter ignores aggregation fields), so the check above does not cover this case.
+          return nil unless query.aggregations.empty?
+
           pagination = query.document_paginator.to_datastore_body
           search_after = pagination.dig(:search_after, 0)
           ids = Array(id_or_ids)
