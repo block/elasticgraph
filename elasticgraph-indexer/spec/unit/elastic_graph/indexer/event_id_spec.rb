@@ -11,14 +11,19 @@ require "elastic_graph/indexer/event_id"
 module ElasticGraph
   class Indexer
     RSpec.describe EventID do
-      describe ".from_event", :factories do
-        it "builds it from an event payload" do
-          event = build_upsert_event(:widget, id: "abc", __version: 12)
-          event_id = EventID.from_event(event)
+      describe ".from_decoded_hash" do
+        it "builds it from a decoded payload" do
+          event_id = EventID.from_decoded_hash({"type" => "Widget", "id" => "abc", "version" => 12})
 
-          expect(event_id.type).to eq "Widget"
-          expect(event_id.id).to eq "abc"
-          expect(event_id.version).to eq 12
+          expect(event_id).to eq EventID.new(type: "Widget", id: "abc", version: 12)
+        end
+
+        # The payload it describes failed envelope validation, so any envelope field can be absent.
+        it "leaves out the envelope fields the payload omits" do
+          event_id = EventID.from_decoded_hash({"type" => "Widget"})
+
+          expect(event_id).to eq EventID.new(type: "Widget", id: nil, version: nil)
+          expect(event_id.to_s).to eq "Widget:@v"
         end
       end
 

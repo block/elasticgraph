@@ -12,7 +12,7 @@ module ElasticGraph
     module BuildsIndexerOperation
       # Builds a primary indexing operation (Indexer::Operation::Update) for the given event.
       #
-      # @param event [Hash] The event hash containing "type", "id", and "record"
+      # @param event [Indexer::Event] The event
       # @param index_def [DatastoreCore::IndexDefinition, nil] The index definition to use.
       #   If not provided, it will be looked up automatically from the indexer.
       # @param idxr [Indexer, nil] The indexer instance to use. Defaults to `indexer` method.
@@ -22,24 +22,24 @@ module ElasticGraph
           .schema_artifacts
           .runtime_metadata
           .object_types_by_name
-          .fetch(event.fetch("type"))
+          .fetch(event.type)
           .update_targets
-          .select { |ut| ut.type == event.fetch("type") }
+          .select { |ut| ut.type == event.type }
 
         expect(update_targets.size).to eq(1)
 
-        index_def ||= idxr.datastore_core.index_definitions_by_graphql_type.fetch(event.fetch("type")).first
+        index_def ||= idxr.datastore_core.index_definitions_by_graphql_type.fetch(event.type).first
 
         Indexer::Operation::Update.new(
           event: event,
           prepared_record: latest_json_record_preparer_for(idxr).prepare_for_index(
-            event.fetch("type"),
-            event.fetch("record"),
+            event.type,
+            event.record,
             idxr.schema_artifacts.index_mappings_by_index_def_name.fetch(index_def.name).fetch("properties")
           ),
           destination_index_def: index_def,
           update_target: update_targets.first,
-          doc_id: event.fetch("id"),
+          doc_id: event.id,
           destination_index_mapping: idxr.schema_artifacts.index_mappings_by_index_def_name.fetch(index_def.name)
         )
       end

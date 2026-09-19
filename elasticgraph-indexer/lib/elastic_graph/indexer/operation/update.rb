@@ -28,8 +28,8 @@ module ElasticGraph
           destination_index_mapping:
         )
           prepared_record = record_preparer.prepare_for_index(
-            event["type"],
-            event["record"] || {"id" => event["id"]},
+            event.type,
+            event.record,
             destination_index_mapping.fetch("properties")
           )
 
@@ -78,15 +78,15 @@ module ElasticGraph
         end
 
         def description
-          if update_target.type == event.fetch("type")
+          if update_target.type == event.type
             "#{update_target.type} update"
           else
-            "#{update_target.type} update (from #{event.fetch("type")})"
+            "#{update_target.type} update (from #{event.type})"
           end
         end
 
         def inspect
-          "#<#{self.class.name} event=#{EventID.from_event(event)} target=#{update_target.type}>"
+          "#<#{self.class.name} event=#{event.event_id} target=#{update_target.type}>"
         end
         alias_method :to_s, :inspect
 
@@ -141,7 +141,7 @@ module ElasticGraph
         def script_params
           initial_params = update_target.params_for(
             doc_id: doc_id,
-            event: event,
+            event: event.to_h.transform_keys(&:to_s),
             prepared_record: prepared_record
           )
 

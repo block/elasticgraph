@@ -8,6 +8,7 @@
 
 require "elastic_graph/errors"
 require "elastic_graph/indexer/event_id"
+require "forwardable"
 
 module ElasticGraph
   class Indexer
@@ -15,7 +16,9 @@ module ElasticGraph
     # failed due to a validation issue before we even attempted to write it to the datastore, or it
     # could have failed in the datastore itself.
     class FailedEventError < Errors::Error
-      # @dynamic main_message, event, operations, message_id, message
+      extend ::Forwardable
+
+      # @dynamic main_message, event, operations, id, op, type, version, record, message_id, message
 
       # The "main" part of the error message (without the `full_id` portion).
       attr_reader :main_message
@@ -51,37 +54,15 @@ module ElasticGraph
       end
 
       def full_id
-        event_id = EventID.from_event(event).to_s
-        if (message_id = self.message_id)
+        event_id = event.event_id.to_s
+        if (message_id = event.message_id)
           "#{event_id} (message_id: #{message_id})"
         else
           event_id
         end
       end
 
-      def id
-        event["id"]
-      end
-
-      def op
-        event["op"]
-      end
-
-      def type
-        event["type"]
-      end
-
-      def version
-        event["version"]
-      end
-
-      def record
-        event["record"]
-      end
-
-      def message_id
-        event["message_id"]
-      end
+      def_delegators :event, :id, :op, :type, :version, :record, :message_id
     end
   end
 end

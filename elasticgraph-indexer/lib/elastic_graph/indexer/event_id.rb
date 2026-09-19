@@ -15,8 +15,14 @@ module ElasticGraph
     # easy to put these ids in a comma-separated list.
     EventID = ::Data.define(:type, :id, :version) do
       # @implements EventID
-      def self.from_event(event)
-        new(type: event["type"], id: event["id"], version: event["version"])
+
+      # Builds an id from a decoded payload whose envelope is not yet known to be valid, so no
+      # {Event} exists for it. Use {Event#event_id} for a validated event.
+      #
+      # @param hash [Hash<String, Object>] a decoded indexing payload
+      # @return [EventID]
+      def self.from_decoded_hash(hash)
+        new(type: hash["type"], id: hash["id"], version: hash["version"])
       end
 
       def to_s

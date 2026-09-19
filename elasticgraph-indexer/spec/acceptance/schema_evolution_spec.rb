@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/indexer"
+require "elastic_graph/indexer/event"
 require "elastic_graph/schema_definition/rake_tasks"
 
 module ElasticGraph
@@ -34,15 +35,15 @@ module ElasticGraph
         indexer_with_geo_location.processor.process([address_2_event], refresh_indices: true)
 
         expect(search_for_ids("addresses")).to contain_exactly(
-          address_1_event.fetch("id"),
-          address_2_event.fetch("id")
+          address_1_event.id,
+          address_2_event.id
         )
       end
 
       def build_address_event_without_geolocation
         build_upsert_event(:address, __exclude_fields: [:geo_location]).tap do |event|
           # Verify that our `__exclude_fields` option worked correctly since the correctness of this test depends on it.
-          expect(event.fetch("record").keys).to exclude("geo_location")
+          expect(event.record.keys).to exclude("geo_location")
         end
       end
     end
@@ -97,7 +98,7 @@ module ElasticGraph
 
       def build_widget(json_schema_version:)
         event = build_upsert_event(:widget, __json_schema_version: json_schema_version)
-        event.merge("record" => (yield event.fetch("record")))
+        event.with(record: (yield event.record))
       end
     end
 
@@ -117,7 +118,7 @@ module ElasticGraph
         dump_artifacts
 
         event = build_upsert_event(:address, id: "abc", deprecated: "foo", __json_schema_version: 1)
-        expect(event.dig("record", "deprecated")).to eq("foo")
+        expect(event.record.fetch("deprecated")).to eq("foo")
 
         boot_indexer.processor.process([event], refresh_indices: true)
 
@@ -163,12 +164,12 @@ module ElasticGraph
         expect(build(:team_season)).to include(__typename: "TeamSeason")
 
         v1_event = build_upsert_event(:team, __json_schema_version: 1)
-        v2_event = build_upsert_event(:team, __json_schema_version: 2)
+        v2_event = build_upsert_event_hash(:team, __json_schema_version: 2)
           .then { |event| ::JSON.generate(event) }
           # Fix the event to align with the v2 schema, since `build_upsert_event` doesn't automatically
           # know that the `__typename` should be `SeasonOfATeam` instead of `TeamSeason`.
           .then { |json| json.gsub("TeamSeason", "SeasonOfATeam") }
-          .then { |json| ::JSON.parse(json) }
+          .then { |json| Indexer::Event.from_validated_hash(::JSON.parse(json)) }
 
         expect {
           boot_indexer.processor.process([v1_event, v2_event], refresh_indices: true)
@@ -244,8 +245,8 @@ module ElasticGraph
           end
           dump_artifacts
 
-          v1_event = build_upsert_event(:team, __json_schema_version: 1)
-          v1_event = ::JSON.parse(::JSON.generate(v1_event).gsub('"name":', '"full_name":'))
+          v1_event = build_upsert_event_hash(:team, __json_schema_version: 1)
+          v1_event = Indexer::Event.from_validated_hash(::JSON.parse(::JSON.generate(v1_event).gsub('"name":', '"full_name":')))
           v2_event = build_upsert_event(:team, __json_schema_version: 2)
 
           expect {

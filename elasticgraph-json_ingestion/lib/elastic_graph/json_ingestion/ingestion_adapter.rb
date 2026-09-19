@@ -41,22 +41,21 @@ module ElasticGraph
       # Validates the record of the given event and resolves the record preparer appropriate for
       # the event's JSON schema version.
       #
-      # @param event [Hash<String, Object>] an ElasticGraph indexing event
+      # @param event [ElasticGraph::Indexer::Event] an ElasticGraph indexing event
       # @param skip_record_validation [Boolean] whether to skip record validation
       # @return [ElasticGraph::Indexer::IngestionAdapter::ValidationResult] the result of validating the event
       def validate_event(event, skip_record_validation: false)
         # Envelope validation has already confirmed that a version can be selected for this event.
-        selected_json_schema_version = @envelope_validator.closest_available_json_schema_version(event.fetch(JSON_SCHEMA_VERSION_KEY)) # : ::Integer
+        selected_json_schema_version = @envelope_validator.closest_available_json_schema_version(event.schema_version) # : ::Integer
 
         # The datastore includes `id` in search payloads only when it is part of the indexed record.
-        record = event.fetch("record").merge("id" => event.fetch("id"))
-        graphql_type_name = event.fetch("type")
+        record = event.record.merge("id" => event.id)
 
-        if !skip_record_validation && (error_message = @envelope_validator.validator(graphql_type_name, selected_json_schema_version).validate_with_error_message(record))
-          return ValidationResult.invalid(validation_target: "#{graphql_type_name} record", message: error_message)
+        if !skip_record_validation && (error_message = @envelope_validator.validator(event.type, selected_json_schema_version).validate_with_error_message(record))
+          return ValidationResult.invalid(validation_target: "#{event.type} record", message: error_message)
         end
 
-        ValidationResult.valid(event.merge("record" => record), @record_preparer_factory.for_json_schema_version(selected_json_schema_version))
+        ValidationResult.valid(event.with(record: record), @record_preparer_factory.for_json_schema_version(selected_json_schema_version))
       end
 
       private

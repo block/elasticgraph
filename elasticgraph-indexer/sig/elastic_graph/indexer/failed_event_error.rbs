@@ -1,10 +1,11 @@
 module ElasticGraph
   class Indexer
     class FailedEventError < Errors::Error
+      extend ::Forwardable
       include _IndexingFailure
 
       attr_reader main_message: ::String
-      attr_reader event: ::Hash[::String, untyped]
+      attr_reader event: event
       attr_reader operations: ::Set[operation]
       attr_reader versioned_operations: ::Array[operation]
       attr_reader id: ::String
@@ -12,7 +13,7 @@ module ElasticGraph
       attr_reader op: ::String
       attr_reader type: ::String
       attr_reader version: ::Integer
-      attr_reader record: ::Hash[::String, untyped]?
+      attr_reader record: untyped
 
       def self.from_failed_operation_result: (
         Operation::Result,
@@ -20,7 +21,7 @@ module ElasticGraph
       ) -> FailedEventError
 
       def initialize: (
-        event: ::Hash[::String, untyped],
+        event: event,
         operations: ::Set[operation],
         main_message: ::String
       ) -> void

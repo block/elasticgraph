@@ -8,6 +8,7 @@
 
 require "elastic_graph/constants"
 require "elastic_graph/indexer"
+require "elastic_graph/indexer/event"
 require "elastic_graph/indexer/operation/update"
 require "elastic_graph/spec_support/runtime_metadata_support"
 require "json"
@@ -20,12 +21,12 @@ module ElasticGraph
 
         let(:indexer) { build_indexer }
         let(:event) do
-          {
-            "op" => "upsert",
-            "id" => "3",
-            "type" => "Widget",
-            "version" => 1,
-            "record" => {
+          Event.new(
+            op: "upsert",
+            id: "3",
+            type: "Widget",
+            version: 1,
+            record: {
               "workspace_id" => "17",
               "workspace_ids" => ["17", "18", "19", "17", "17"],
               "name" => "thing1",
@@ -35,8 +36,10 @@ module ElasticGraph
                 "workspace_id" => "embedded_workspace_id",
                 "name" => "embedded_name"
               }
-            }
-          }
+            },
+            schema_version: 1,
+            ingestion_format: "json"
+          )
         end
 
         describe "#versioned?" do
@@ -121,13 +124,15 @@ module ElasticGraph
 
           it "passes the nested `sourced_from` params through to the script, sourcing field values from the source event and the nested paths from the index's registered configuration" do
             indexer = indexer_with_nested_sourced_from_schema
-            stat_line_event = {
-              "op" => "upsert",
-              "id" => "stat_line1",
-              "type" => "StatLine",
-              "version" => 1,
-              "record" => {"id" => "stat_line1", "team_id" => "team1", "player_id" => "player1", "goals" => 50}
-            }
+            stat_line_event = Event.new(
+              op: "upsert",
+              id: "stat_line1",
+              type: "StatLine",
+              version: 1,
+              record: {"id" => "stat_line1", "team_id" => "team1", "player_id" => "player1", "goals" => 50},
+              schema_version: 1,
+              ingestion_format: "json"
+            )
             operations = operations_for_indexer(indexer, event: stat_line_event, source_type: "StatLine", destination_type: "Team", destination_index: "teams")
 
             expect(operations.size).to eq(1)
@@ -161,7 +166,7 @@ module ElasticGraph
               # no customization
             end
 
-            operations = operations_for_indexer(indexer, event: event.merge("record" => event.fetch("record").merge("workspace_id" => nil)))
+            operations = operations_for_indexer(indexer, event: event.with(record: event.record.merge("workspace_id" => nil)))
 
             expect(operations).to eq []
           end
@@ -171,7 +176,7 @@ module ElasticGraph
               # no customization
             end
 
-            operations = operations_for_indexer(indexer, event: event.merge("record" => event.fetch("record").merge("workspace_id" => "")))
+            operations = operations_for_indexer(indexer, event: event.with(record: event.record.merge("workspace_id" => "")))
 
             expect(operations).to eq []
           end
@@ -181,7 +186,7 @@ module ElasticGraph
               # no customization
             end
 
-            operations = operations_for_indexer(indexer, event: event.merge("record" => event.fetch("record").merge("workspace_id" => "  ")))
+            operations = operations_for_indexer(indexer, event: event.with(record: event.record.merge("workspace_id" => "  ")))
 
             expect(operations).to eq []
           end
@@ -191,7 +196,7 @@ module ElasticGraph
               # no customization
             end
 
-            operations = operations_for_indexer(indexer, event: event.merge("record" => event.fetch("record").merge("name" => nil)))
+            operations = operations_for_indexer(indexer, event: event.with(record: event.record.merge("name" => nil)))
 
             expect(operations.size).to eq(1)
             expect(operations.flat_map(&:to_datastore_bulk)).to eq [
@@ -299,8 +304,8 @@ module ElasticGraph
               # no customization
             end
 
-            operations = operations_for_indexer(indexer, event: event.merge(
-              "record" => event.fetch("record").merge(
+            operations = operations_for_indexer(indexer, event: event.with(
+              record: event.record.merge(
                 "size" => 4.0
               )
             ))
@@ -370,7 +375,7 @@ module ElasticGraph
           context "when the derived index is a rollover index" do
             let(:event) do
               base = super()
-              base.merge("record" => base.fetch("record").merge(
+              base.with(record: base.record.merge(
                 "workspace_created_at" => "1995-04-23T00:23:45Z"
               ))
             end
@@ -393,7 +398,7 @@ module ElasticGraph
           context "when the derived index uses custom routing" do
             let(:event) do
               base = super()
-              base.merge("record" => base.fetch("record").merge(
+              base.with(record: base.record.merge(
                 "num" => 3.0 # an integer-valued-float that the record preparer normalizes
               ))
             end
@@ -617,7 +622,7 @@ module ElasticGraph
           be_a(Result).and have_attributes(operation_type: :update, **attributes)
         end
 
-        def update_with_update_target(update_target, doc_id: event.fetch("id"))
+        def update_with_update_target(update_target, doc_id: event.id)
           Update.new(
             event: event,
             prepared_record: nil,

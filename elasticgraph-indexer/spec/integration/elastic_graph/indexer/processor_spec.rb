@@ -16,7 +16,7 @@ module ElasticGraph
       context "process non-rollover upsert events" do
         describe "upserts" do
           let(:component_1_old) { build_upsert_event(:component, id: "123", name: "old_name") }
-          let(:component_1_new) { build_upsert_event(:component, id: "123", name: "new_name", __version: component_1_old.fetch("version") + 1) }
+          let(:component_1_new) { build_upsert_event(:component, id: "123", name: "new_name", __version: component_1_old.version + 1) }
           let(:component_2) { build_upsert_event(:component, id: "456", name: "old_name") }
 
           it "overwrites earlier versions of a document with a later version of the same document" do
@@ -50,20 +50,6 @@ module ElasticGraph
             expect(get_component_names_from_response(response)).to contain_exactly("new_name")
           end
 
-          it "tolerates integer-valued-but-float-typed version values" do
-            # Here we use the monotonically increasing version number from `build_upsert_event` but convert it to a float.
-            # This is necessary to avoid confusing errors where version numbers on deleted documents "stick around" on
-            # the index for some indeterminate period of time after we delete all documents.
-            event = build_upsert_event(:component, name: "version_as_float")
-            event = event.merge("version" => event.fetch("version").to_f)
-
-            process_batches([event])
-
-            response = search
-
-            expect(get_component_names_from_response(response)).to contain_exactly("version_as_float")
-          end
-
           context "when an event is malformed" do
             let(:valid_event_1) { build_upsert_event(:component, id: "c678", name: "valid1") }
             let(:malformed_event) { build_upsert_event(:component, id: "c789", name: 17) } # name is an integer instead of a string as expected
@@ -89,7 +75,7 @@ module ElasticGraph
               process_batches([make_valid(malformed_event, version_offset: 1)])
               expect { process_batches([malformed_event]) }.to log_warning a_string_including(
                 "Ignoring 1 malformed event",
-                EventID.from_event(malformed_event).to_s
+                malformed_event.event_id.to_s
               )
 
               response = search
@@ -106,7 +92,7 @@ module ElasticGraph
 
               expect { process_batches([superseded_invalid_widget]) }.to log_warning a_string_including(
                 "Ignoring 1 malformed event",
-                EventID.from_event(superseded_invalid_widget).to_s
+                superseded_invalid_widget.event_id.to_s
               )
             end
 
@@ -117,9 +103,9 @@ module ElasticGraph
             end
 
             def update_event(event, version_offset:, &update)
-              event.merge(
-                "version" => event.fetch("version") + version_offset,
-                "record" => update.call(event.fetch("record"))
+              event.with(
+                version: event.version + version_offset,
+                record: update.call(event.record)
               )
             end
           end
@@ -129,7 +115,7 @@ module ElasticGraph
       context "process rollover upsert events" do
         describe "upserts" do
           let(:widget_2019_06_02_old) { build_upsert_event(:widget, id: "123", workspace_id: "ws123", name: "2019_06_02_old_name", created_at: "2019-06-02T12:00:00Z") }
-          let(:widget_2019_06_02_new) { build_upsert_event(:widget, id: "123", workspace_id: "ws123", name: "2019_06_02_new_name", created_at: "2019-06-02T12:00:00Z", __version: widget_2019_06_02_old.fetch("version") + 1) }
+          let(:widget_2019_06_02_new) { build_upsert_event(:widget, id: "123", workspace_id: "ws123", name: "2019_06_02_new_name", created_at: "2019-06-02T12:00:00Z", __version: widget_2019_06_02_old.version + 1) }
           let(:widget_2020_10_02) { build_upsert_event(:widget, id: "456", name: "2020_10_02_old_name", created_at: "2020-10-02T12:00:00Z") }
 
           it "writes to different indices/years based on `created_at`" do

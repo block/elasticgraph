@@ -15,13 +15,13 @@ module ElasticGraph
       # Defines the ingestion adapter interface. Adapter classes are not required to subclass this,
       # but must implement these methods.
       class Interface
-        # Validates the given event and resolves the record preparer appropriate for the event's
-        # ingestion schema version. The indexer selects this adapter from the event's format tag.
-        # The indexer builds operations from the event in the returned result, so an adapter can
-        # return a prepared copy of the event.
+        # Validates the record of the given event and resolves the record preparer appropriate for
+        # the event's ingestion schema version. The indexer selects this adapter from the event's
+        # format tag. The indexer builds operations from the event in the returned result, so an
+        # adapter can return a prepared copy of the event.
         #
-        # @param event [Hash<String, Object>] an ElasticGraph indexing event
-        # @param skip_record_validation [Boolean] whether to skip record validation; the event envelope must still be validated
+        # @param event [Event] an ElasticGraph indexing event with a validated envelope
+        # @param skip_record_validation [Boolean] whether to skip record validation
         # @return [ValidationResult] the result of validating the event
         def validate_event(event, skip_record_validation: false)
           # simplecov:disable -- must return a result to satisfy Steep type checking but never called
@@ -42,7 +42,7 @@ module ElasticGraph
       # and a non-nil `record_preparer` indicates a valid event.
       #
       # @!attribute [r] event
-      #   @return [Hash<String, Object>, nil] the event to build operations from, when the event is valid
+      #   @return [Event, nil] the event to build operations from, when the event is valid
       # @!attribute [r] record_preparer
       #   @return [Object, nil] preparer for the event's record, when the event is valid
       # @!attribute [r] failure
@@ -52,7 +52,7 @@ module ElasticGraph
 
         # Builds a result for a valid event.
         #
-        # @param event [Hash<String, Object>] the event to build operations from; an adapter may return a prepared copy
+        # @param event [Event] the event to build operations from; an adapter may return a prepared copy
         # @param record_preparer [Object] preparer for the event's record
         # @return [ValidationResult]
         def self.valid(event, record_preparer)

@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/constants"
+require "elastic_graph/indexer/event"
 require "elastic_graph/json_ingestion/ingestion_adapter"
 require "support/multiple_version_support"
 
@@ -20,21 +21,20 @@ module ElasticGraph
       describe "#validate_event" do
         it "copies the envelope `id` into the record so that the datastore includes `id` in search payloads" do
           event = build_upsert_event(:component, id: "1")
-          event["record"].delete("id")
+          event = event.with(record: event.record.except("id"))
 
           result = indexer.operation_factory.build(event)
 
           expect(result.failed_event_error).to be nil
           expect(result.operations.size).to eq 1
           expect(result.operations.map(&:prepared_record)).to all include("id" => "1")
-          expect(event.fetch("record")).to exclude("id")
+          expect(event.record).to exclude("id")
         end
 
         # The factory replaces an adapter's missing preparer with an identity preparer while
         # building its failed result, so this adapter contract must be asserted directly.
         it "returns no record preparer, plus the part of the event at fault, for an event it rejects" do
-          event = build_upsert_event(:component, id: "1", __version: 1)
-          event["record"]["name"] = 123
+          event = build_upsert_event(:component, id: "1", __version: 1, name: 123)
 
           result = adapter.validate_event(event)
 
@@ -43,8 +43,7 @@ module ElasticGraph
         end
 
         it "notifies an error when given a record that does not satisfy the type's JSON schema, while avoiding revealing PII" do
-          event = build_upsert_event(:component, id: "1", __version: 1)
-          event["record"]["name"] = 123
+          event = build_upsert_event(:component, id: "1", __version: 1, name: 123)
 
           message = expect_invalid_record(event, validation_target: "Component record", message_including: ["name"])
           expect(message).to exclude("123")
@@ -52,7 +51,6 @@ module ElasticGraph
 
         it "allows the record validator to be configured with a block" do
           event_with_extra_field = build_upsert_event(:widget, extra_field: 17)
-          event_with_extra_field["record"]["extra_field"] = 17
 
           expect(build_adapter.validate_event(event_with_extra_field).failure).to be nil
 
@@ -85,15 +83,15 @@ module ElasticGraph
             "below the available range" => [1, 2]
           }.each do |case_description, (requested_version, selected_version)|
             it "prepares an event requesting a version that is #{case_description} using schema version #{selected_version}, while leaving the requested version on the event" do
-              event = component_event(requested_version)
-              original_event = Marshal.load(Marshal.dump(event))
+              decoded_event = component_event(requested_version)
+              original_decoded_event = Marshal.load(Marshal.dump(decoded_event))
 
-              result = indexer.operation_factory.build(event)
+              result = build_from_decoded(decoded_event)
 
               expect(result.failed_event_error).to be nil
               expect(result.operations.map(&:prepared_record)).to eq [{"id" => "1", "name_v#{selected_version}" => "example"}]
-              expect(result.operations.map { |op| op.event[JSON_SCHEMA_VERSION_KEY] }).to eq [requested_version]
-              expect(event).to eq(original_event)
+              expect(result.operations.map { |op| op.event.schema_version }).to eq [requested_version]
+              expect(decoded_event).to eq(original_decoded_event)
             end
           end
 
@@ -188,7 +186,7 @@ module ElasticGraph
           end
 
           def yellow_widget_event(**attributes)
-            event = build_upsert_event(:widget, id: "1", __version: 1, **attributes)
+            event = build_upsert_event_hash(:widget, id: "1", __version: 1, **attributes)
             event.merge("record" => event.fetch("record").merge("options" => event.fetch("record").fetch("options").merge("color" => "YELLOW")))
           end
         end
