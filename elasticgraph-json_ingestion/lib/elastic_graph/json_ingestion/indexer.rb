@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/indexer"
+require "elastic_graph/indexer/indexing_failures_error"
 require "elastic_graph/support/from_yaml_file"
 require "json"
 
@@ -49,22 +50,27 @@ module ElasticGraph
       # @param refresh_indices [Boolean] whether to synchronously refresh affected indices (intended for tests: this is dangerous to use in production)
       # @return [void]
       def process(payload, refresh_indices: false)
-        processor.process(decode(payload), refresh_indices: refresh_indices)
+        decoded_events = decode(payload)
+        failures = process_returning_failures(decoded_events, refresh_indices: refresh_indices)
+        return if failures.empty?
+        raise ElasticGraph::Indexer::IndexingFailuresError.for(failures: failures, event_count: decoded_events.size)
       end
 
-      # Decodes and processes one JSON Lines payload containing multiple events, returning individual failures.
-      # The caller is responsible for handling the failures.
+      # Processes already-decoded events, returning individual failures. The caller is responsible
+      # for handling the failures.
       #
-      # @param payload [String] newline-delimited JSON indexing events
+      # This supports transports that must add metadata or combine several payloads before one bulk operation.
+      #
+      # @param decoded_events [Array<Hash<String, Object>>] decoded indexing events, as returned by {#decode}
       # @param refresh_indices [Boolean] whether to synchronously refresh affected indices (intended for tests: this is dangerous to use in production)
-      # @return [Array<ElasticGraph::Indexer::FailedEventError>]
-      def process_returning_failures(payload, refresh_indices: false)
-        processor.process_returning_failures(decode(payload), refresh_indices: refresh_indices)
+      # @return [Array<ElasticGraph::Indexer::FailedEventError, ElasticGraph::Indexer::MalformedEventError>]
+      def process_returning_failures(decoded_events, refresh_indices: false)
+        adapter = indexer.ingestion_adapters_by_format.fetch("json") # : ::ElasticGraph::JSONIngestion::IngestionAdapter
+        events, malformed_failures = adapter.envelope_validator.events_from(decoded_events)
+        processor.process_returning_failures(events, refresh_indices: refresh_indices) + malformed_failures
       end
 
       # Decodes one JSON Lines payload without processing it.
-      #
-      # This supports transports that must add metadata or combine several payloads before one bulk operation.
       #
       # @param payload [String] newline-delimited JSON indexing events
       # @return [Array<Hash<String, Object>>] decoded indexing events

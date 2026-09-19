@@ -9,21 +9,23 @@
 require "elastic_graph/json_ingestion/ingestion_adapter"
 require "json"
 
-# Defines an RSpec matcher that can be used to validate ElasticGraph JSON events.
+# Defines an RSpec matcher that can be used to validate decoded ElasticGraph JSON events.
 ::RSpec::Matchers.define :be_a_valid_elastic_graph_event do |for_indexer:|
-  match do |event|
+  match do |decoded_event|
     ingestion_adapter = ElasticGraph::JSONIngestion::IngestionAdapter.new(
       schema_artifacts: for_indexer.schema_artifacts,
       logger: for_indexer.logger,
       configure_record_validator: block_arg
     )
 
-    result = for_indexer
+    events, malformed_failures = ingestion_adapter.envelope_validator.events_from([decoded_event])
+
+    @validation_failure = malformed_failures.first || for_indexer
       .operation_factory
       .with(ingestion_adapters_by_format: {"json" => ingestion_adapter})
-      .build(event)
+      .build(events.first)
+      .failed_event_error
 
-    @validation_failure = result.failed_event_error
     !@validation_failure
   end
 
@@ -31,21 +33,21 @@ require "json"
     "be a valid ElasticGraph event"
   end
 
-  failure_message do |event|
+  failure_message do |decoded_event|
     <<~EOS
       expected the event[1] to #{description}, but it was invalid[2].
 
-      [1] #{::JSON.pretty_generate(event)}
+      [1] #{::JSON.pretty_generate(decoded_event)}
 
       [2] #{@validation_failure.message}
     EOS
   end
 
-  failure_message_when_negated do |event|
+  failure_message_when_negated do |decoded_event|
     <<~EOS
       expected the event[1] not to #{description}, but it was valid.
 
-      [1] #{::JSON.pretty_generate(event)}
+      [1] #{::JSON.pretty_generate(decoded_event)}
     EOS
   end
 end

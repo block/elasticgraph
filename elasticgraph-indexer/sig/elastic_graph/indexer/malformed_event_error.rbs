@@ -1,0 +1,21 @@
+module ElasticGraph
+  class Indexer
+    class MalformedEventError[P] < Errors::Error
+      include _IndexingFailure
+
+      @message_id: ::String?
+
+      attr_reader payload: P
+      attr_reader event_id: ::String
+      attr_reader main_message: ::String
+      attr_reader full_id: ::String
+
+      def initialize: (
+        payload: P,
+        event_id: ::String,
+        message_id: ::String?,
+        main_message: ::String
+      ) -> void
+    end
+  end
+end
