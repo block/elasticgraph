@@ -470,16 +470,19 @@ module ElasticGraph
             end
           end
 
-          it "uses a registered non-JSON adapter for events in that alternate format" do
+          it "uses a registered non-JSON adapter for events in that alternate format, building operations from the event the adapter returns" do
             event = build_upsert_event(:component, id: "1", __version: 1).merge(INGESTION_FORMAT_KEY => "other")
+            prepared_event = event.merge("record" => event.fetch("record").merge("name" => "prepared by adapter"))
             other_adapter = instance_spy(
               IngestionAdapter::Interface,
-              validate_event: IngestionAdapter::ValidationResult.valid(RecordPreparer::Identity)
+              validate_event: IngestionAdapter::ValidationResult.valid(prepared_event, RecordPreparer::Identity)
             )
             factory = indexer.operation_factory.with(ingestion_adapters_by_format: {"other" => other_adapter})
 
-            expect(factory.build(event).operations).not_to be_empty
+            operations = factory.build(event).operations
 
+            expect(operations.size).to eq 1
+            expect(operations.map(&:event)).to eq [prepared_event]
             expect(other_adapter).to have_received(:validate_event).with(event, skip_record_validation: false)
           end
 
