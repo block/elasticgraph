@@ -127,9 +127,24 @@ json_lines_payload = $stdin.read
 indexer.process(json_lines_payload) unless json_lines_payload.empty?
 ```
 
-Use `#process_returning_failures` when individual failures must be handled by the caller. Transports that need to
-add metadata or combine several payloads into one bulk operation can call `#decode`, then pass the resulting events
-to `indexer.processor`.
+Use `#process_returning_failures` when individual failures must be handled by the caller. It accepts decoded
+events, so a transport that must add metadata or combine several payloads into one bulk operation can call
+`#decode` first, adjust the decoded events, and then process them:
+
+```ruby
+require "elastic_graph/json_ingestion/indexer"
+
+indexer = ElasticGraph::JSONIngestion::Indexer.from_yaml_file("config/settings/local.yaml")
+
+# One JSON Lines payload per blank-line-delimited chunk.
+payloads = $stdin.read.split("\n\n")
+decoded_events = payloads.flat_map { |payload| indexer.decode(payload) }
+
+unless decoded_events.empty?
+  failures = indexer.process_returning_failures(decoded_events)
+  abort "#{failures.size} of #{decoded_events.size} event(s) failed." if failures.any?
+end
+```
 
 The wrapper accepts an existing `ElasticGraph::Indexer`, so independent JSON and protobuf wrappers can share the
 same format-neutral indexer and its datastore clients:

@@ -5,24 +5,17 @@ module ElasticGraph
 
       ValidationResult: singleton(::ElasticGraph::Indexer::IngestionAdapter::ValidationResult)
 
+      attr_reader envelope_validator: EnvelopeValidator
+
       def initialize: (
         schema_artifacts: schemaArtifacts,
         logger: ::Logger,
         ?configure_record_validator: (^(Support::JSONSchema::ValidatorFactory) -> Support::JSONSchema::ValidatorFactory)?
       ) -> void
 
-      @schema_artifacts: schemaArtifacts
-      @logger: ::Logger
-      @configure_record_validator: (^(Support::JSONSchema::ValidatorFactory) -> Support::JSONSchema::ValidatorFactory)?
       @record_preparer_factory: RecordPreparerFactory
 
       private
-
-      def select_json_schema_version: (::ElasticGraph::Indexer::event) { (::ElasticGraph::Indexer::IngestionAdapter::ValidationResult) -> bot } -> (::Integer | bot)
-      def validator: (::String, ::Integer) -> Support::JSONSchema::Validator
-
-      @validator_factories_by_version: ::Hash[::Integer, Support::JSONSchema::ValidatorFactory]?
-      def validator_factories_by_version: () -> ::Hash[::Integer, Support::JSONSchema::ValidatorFactory]
 
       def raise: (*untyped) -> bot
     end

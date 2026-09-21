@@ -132,10 +132,10 @@ module ElasticGraph
         end
 
         def build_all_operations_for(event, record_preparer)
-          # If `type` is missing or is not a known type (as indicated by `runtime_metadata` being nil)
+          # If `type` is not a known type (as indicated by `runtime_metadata` being nil)
           # then we can't build a derived indexing type update operation. That case will only happen when we build
           # operations for an `FailedEventError` rather than to execute.
-          return [] unless (type = event["type"])
+          type = event.fetch("type")
           return [] unless (runtime_metadata = schema_artifacts.runtime_metadata.object_types_by_name[type])
 
           runtime_metadata.update_targets.flat_map do |update_target|
