@@ -71,7 +71,9 @@ module ElasticGraph
           "sizes" => ["LARGE", "SMALL"]
         },
         "nested_fields" => {
-          "max_widget_cost" => ([w1] + widgets).select { |w| w.record.dig("cost", "currency") == "USD" }.map { |w| w.record.fetch("cost").fetch("amount_cents") }.max
+          "max_widget_cost" => ([w1] + widgets).filter_map do |w|
+            w.record.fetch("cost").fetch("amount_cents") if w.record.dig("cost", "currency") == "USD"
+          end.max
         },
         # Without DateTime normalization, this would incorrectly be "2023-11-01T10:30:00.531Z"
         # because ".53Z" > ".531Z" in string comparison ('Z' > '1').
