@@ -10,6 +10,7 @@ require "elastic_graph/constants"
 require "elastic_graph/errors"
 require "elastic_graph/indexer/event_id"
 require "elastic_graph/indexer/indexing_failures_error"
+require "elastic_graph/indexer/version_lookup"
 require "elastic_graph/support/opaque_id"
 require "elastic_graph/support/threading"
 
@@ -153,7 +154,7 @@ module ElasticGraph
       # This nested structure is necessary because a single operation can target more than one datastore
       # cluster, and a document may have different source event versions in different datastore clusters.
       def source_event_versions_in_index(operations)
-        ops_by_client_name = ::Hash.new { |h, k| h[k] = [] } # : ::Hash[::String, ::Array[operation]]
+        ops_by_client_name = ::Hash.new { |h, k| h[k] = [] } # : ::Hash[::String, ::Array[versionLookup]]
         operations.each do |op|
           # Note: this intentionally does not use `accessible_cluster_names_to_index_into`.
           # We want to fail with clear error if any clusters are inaccessible instead of silently ignoring
@@ -163,9 +164,9 @@ module ElasticGraph
         end
 
         client_names_and_results = Support::Threading.parallel_map(ops_by_client_name) do |(client_name, all_ops)|
-          # @type block: [::String, ::Symbol, ::Array[untyped] | ::Hash[operation, ::Array[::Integer]]]
+          # @type block: [::String, ::Symbol, ::Array[untyped] | ::Hash[versionLookup, ::Array[::Integer]]]
 
-          ops, unversioned_ops = all_ops.partition(&:versioned?) # : [::Array[Operation::Update], ::Array[Operation::Update]]
+          ops, unversioned_ops = all_ops.partition(&:versioned?) # : [::Array[Operation::Update | VersionLookup], ::Array[Operation::Update | VersionLookup]]
 
           msearch_response =
             if (client = @datastore_clients_by_name[client_name]) && ops.any?
@@ -206,7 +207,7 @@ module ElasticGraph
 
           if errors.empty?
             # We assume the size of the ops and the other array is the same and it cannot have `nil`.
-            zip = ops.zip(msearch_response.fetch("responses")) # : ::Array[[Operation::Update, ::Hash[::String, ::Hash[::String, untyped]]]]
+            zip = ops.zip(msearch_response.fetch("responses")) # : ::Array[[Operation::Update | VersionLookup, ::Hash[::String, ::Hash[::String, untyped]]]]
 
             versions_by_op = zip.to_h do |(op, response)|
               hits = response.fetch("hits").fetch("hits")
@@ -230,7 +231,7 @@ module ElasticGraph
             end
 
             unversioned_ops_hash = unversioned_ops.to_h do |op|
-              [op, []] # : [Operation::Update, ::Array[::Integer]]
+              [op, []] # : [versionLookup, ::Array[::Integer]]
             end
 
             [client_name, :success, versions_by_op.merge(unversioned_ops_hash)]
@@ -252,7 +253,7 @@ module ElasticGraph
         if failures.empty?
           # All results are success and the third element of the tuple is a hash.
           # Assign the results to narrow down the type.
-          success_results = client_names_and_results # : ::Array[[::String, ::Symbol, ::Hash[operation, ::Array[::Integer]]]]
+          success_results = client_names_and_results # : ::Array[[::String, ::Symbol, ::Hash[versionLookup, ::Array[::Integer]]]]
 
           success_results.each_with_object(_ = {}) do |(client_name, _success_or_failure, results), accum|
             results.each do |op, version|
@@ -269,7 +270,7 @@ module ElasticGraph
 
       def opaque_id_parts_for_source_event_versions(operations)
         type_counts = operations
-          .group_by { |op| op.event.type }
+          .group_by { |op| op.is_a?(VersionLookup) ? op.source_event_type : op.event.type }
           .sort_by(&:first)
           .map { |type_name, ops| "#{type_name}:#{ops.size}" }
 

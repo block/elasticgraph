@@ -6,12 +6,32 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/indexer/malformed_event_error"
 require "elastic_graph/indexer/processor"
 
 module ElasticGraph
   class Indexer
     RSpec.describe Processor, :ingests_json_data, :factories, :capture_logs do
       let(:indexer) { build_indexer }
+
+      it "checks rejected payload candidates without indexing them and returns the original failure until superseded" do
+        event = build_upsert_event(:component, name: "replacement")
+        failure = MalformedEventError.new(payload: {}, event_id: event.event_id.to_s,
+          message_id: "rejected-message", main_message: "Malformed envelope")
+        targets = indexer.operation_factory.version_lookups_for(event.event_id, {"id" => event.id})
+        candidate = SupersessionCandidate.new(failure, event.event_id, targets)
+
+        failures = indexer.processor.process_returning_failures([], supersession_candidates: [candidate])
+        expect(failures).to eq([failure])
+        expect(get_component_names_from_response(search)).to be_empty
+
+        newer = event.with(version: event.version + 1)
+        expect {
+          expect(indexer.processor.process_returning_failures([newer], refresh_indices: true,
+            supersession_candidates: [candidate])).to be_empty
+        }.to log_warning a_string_including("Ignoring 1 malformed event", event.event_id.to_s)
+        expect(get_component_names_from_response(search)).to eq(["replacement"])
+      end
 
       context "process non-rollover upsert events" do
         describe "upserts" do

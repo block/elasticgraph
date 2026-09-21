@@ -1,0 +1,14 @@
+module ElasticGraph
+  class Indexer
+    type versionLookup = operation | VersionLookup
+
+    class VersionLookup < ::Data
+      attr_reader source_event_type: ::String
+      attr_reader destination_index_def: DatastoreCore::_IndexDefinition
+      attr_reader update_target: SchemaArtifacts::RuntimeMetadata::UpdateTarget
+      attr_reader doc_id: ::String
+      def self.new: (::String, DatastoreCore::_IndexDefinition, SchemaArtifacts::RuntimeMetadata::UpdateTarget, ::String) -> instance
+      def versioned?: () -> bool
+    end
+  end
+end

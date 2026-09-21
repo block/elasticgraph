@@ -10,6 +10,7 @@ require "elastic_graph/indexer/event_id"
 require "elastic_graph/indexer/failed_event_error"
 require "elastic_graph/indexer/operation/update"
 require "elastic_graph/indexer/record_preparer"
+require "elastic_graph/indexer/version_lookup"
 require "elastic_graph/support/memoizable_data"
 require "zlib"
 
@@ -38,6 +39,32 @@ module ElasticGraph
           end
 
           build_for_adapter(event, adapter)
+        end
+
+        # Builds read-only version lookups for a rejected payload with a validated identity.
+        #
+        # @param identity [EventID] the validated source identity
+        # @param record [Object] the rejected record; malformed target paths yield no lookups
+        # @return [Array<VersionLookup>] targets used only for supersession checks
+        def version_lookups_for(identity, record)
+          runtime_metadata = schema_artifacts.runtime_metadata.object_types_by_name[identity.type]
+          return [] unless runtime_metadata
+
+          runtime_metadata.update_targets.select(&:for_normal_indexing?).flat_map do |target|
+            ids_to_skip = skip_derived_indexing_type_updates.fetch(target.type, ::Set.new)
+            ids = Update.document_ids_for(record, target).reject { |id| ids_to_skip.include?(id) }
+            index_definitions_for(target.type).flat_map do |index|
+              ids.map { |id| VersionLookup.new(identity.type, index, target, id) }
+            end
+          end
+        rescue => exception
+          logger.warn({
+            "message_type" => "FailedEventOperationBuildingFailure",
+            "event_id" => identity.to_s,
+            "error_class" => exception.class.name,
+            "error_message" => exception.message
+          })
+          []
         end
 
         private

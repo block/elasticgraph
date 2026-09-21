@@ -15,6 +15,7 @@ module ElasticGraph
       @configure_record_validator: (^(Support::JSONSchema::ValidatorFactory) -> Support::JSONSchema::ValidatorFactory)?
 
       def events_from: (::Array[decodedEvent]) -> [::Array[jsonEvent], ::Array[::ElasticGraph::Indexer::MalformedEventError[decodedEvent]]]
+      def identity_for_supersession: (decodedEvent) -> ::ElasticGraph::Indexer::EventID?
       def closest_available_json_schema_version: (::Integer) -> ::Integer?
       def validator: (::String, ::Integer) -> Support::JSONSchema::Validator
 

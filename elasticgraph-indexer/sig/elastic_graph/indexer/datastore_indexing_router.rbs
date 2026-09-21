@@ -4,7 +4,7 @@ module ElasticGraph
     # Implemented by DatastoreIndexingRouter and WarehouseDumper.
     interface _DatastoreRouter
       def bulk: (::Array[operation], ?refresh: bool) -> DatastoreIndexingRouter::BulkResult
-      def source_event_versions_in_index: (::Array[operation]) -> ::Hash[operation, ::Hash[::String, ::Array[::Integer]]]
+      def source_event_versions_in_index: (::Array[versionLookup]) -> ::Hash[versionLookup, ::Hash[::String, ::Array[::Integer]]]
     end
 
     class DatastoreIndexingRouter
@@ -21,7 +21,7 @@ module ElasticGraph
       @logger: ::Logger
 
       def opaque_id_parts_for_source_event_versions: (
-        ::Array[Operation::Update]
+        ::Array[versionLookup]
       ) -> ::Array[::String]
 
       class BulkResultSupertype

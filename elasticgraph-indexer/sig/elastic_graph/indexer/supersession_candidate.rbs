@@ -1,0 +1,13 @@
+module ElasticGraph
+  class Indexer
+    type supersedableFailure = FailedEventError | SupersessionCandidate
+
+    class SupersessionCandidate < ::Data
+      attr_reader failure: MalformedEventError[untyped]
+      attr_reader event_id: EventID
+      attr_reader versioned_operations: ::Array[VersionLookup]
+      def self.new: (MalformedEventError[untyped], EventID, ::Array[VersionLookup]) -> instance
+      def version: () -> ::Integer
+    end
+  end
+end

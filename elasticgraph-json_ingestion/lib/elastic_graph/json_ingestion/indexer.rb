@@ -8,6 +8,7 @@
 
 require "elastic_graph/indexer"
 require "elastic_graph/indexer/indexing_failures_error"
+require "elastic_graph/indexer/supersession_candidate"
 require "elastic_graph/support/from_yaml_file"
 require "json"
 
@@ -67,7 +68,20 @@ module ElasticGraph
       def process_returning_failures(decoded_events, refresh_indices: false)
         adapter = indexer.ingestion_adapters_by_format.fetch("json") # : ::ElasticGraph::JSONIngestion::IngestionAdapter
         events, malformed_failures = adapter.envelope_validator.events_from(decoded_events)
-        processor.process_returning_failures(events, refresh_indices: refresh_indices) + malformed_failures
+        candidates = [] # : Array[::ElasticGraph::Indexer::SupersessionCandidate]
+        unidentified_failures = [] # : Array[::ElasticGraph::Indexer::MalformedEventError[EnvelopeValidator::decodedEvent]]
+        malformed_failures.each do |failure|
+          if (identity = adapter.envelope_validator.identity_for_supersession(failure.payload))
+            record = failure.payload["record"] || {}
+            record = record.merge("id" => identity.id) if record.is_a?(::Hash)
+            targets = indexer.operation_factory.version_lookups_for(identity, record)
+            candidates << ElasticGraph::Indexer::SupersessionCandidate.new(failure, identity, targets)
+          else
+            unidentified_failures << failure
+          end
+        end
+
+        processor.process_returning_failures(events, refresh_indices: refresh_indices, supersession_candidates: candidates) + unidentified_failures
       end
 
       # Decodes one JSON Lines payload without processing it.

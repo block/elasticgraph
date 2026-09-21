@@ -11,8 +11,8 @@ require "elastic_graph/errors"
 module ElasticGraph
   class Indexer
     # Indicates a payload that an ingestion adapter could not turn into an {Event} because its
-    # envelope is malformed. No operations can be built for such a payload, so unlike a
-    # {FailedEventError} it is never superseded by a later version of the same entity.
+    # envelope is malformed. When the adapter can validate its identity separately, a
+    # {SupersessionCandidate} can check whether a newer indexed version supersedes this failure.
     class MalformedEventError < Errors::Error
       # @dynamic payload, event_id, message_id, main_message, message
 

@@ -70,6 +70,49 @@ module ElasticGraph
         }.to raise_error(ElasticGraph::Indexer::IndexingFailuresError, a_string_including("Got 1 failure(s) from 2 event(s)", "Malformed event payload"))
       end
 
+      it "supersedes an invalid envelope only after a strictly newer event is indexed" do
+        valid = build_upsert_event_hash(:component, name: "corrected")
+        malformed = valid.merge("record" => valid.fetch("record").merge("id" => "conflicting-record-id"),
+          "latency_timestamps" => {"published_at" => "invalid"})
+
+        failures = indexer.process_returning_failures([malformed], refresh_indices: true)
+        expect(failures.map(&:payload)).to eq([malformed])
+        expect(indexed_component_names).to be_empty
+
+        failures = indexer.process_returning_failures([malformed, valid], refresh_indices: true)
+        expect(failures.size).to eq(1)
+        expect(failures.first).to be_a(ElasticGraph::Indexer::MalformedEventError)
+        expect(failures.first.payload).to eq(malformed)
+
+        newer = valid.merge("version" => valid.fetch("version") + 1)
+        expect {
+          expect(indexer.process_returning_failures([malformed, newer], refresh_indices: true)).to be_empty
+        }.to log_warning a_string_including("Ignoring 1 malformed event")
+
+        expect(indexed_component_names).to include("corrected")
+      end
+
+      it "retains the original failure when no versioned targets can be identified" do
+        malformed = build_upsert_event_hash(:component).merge("record" => "not an object")
+
+        failures = nil
+        expect {
+          failures = indexer.process_returning_failures([malformed])
+        }.to log_warning a_string_including("FailedEventOperationBuildingFailure")
+
+        expect(failures.map(&:payload)).to eq([malformed])
+      end
+
+      it "can supersede a missing record using the validated envelope id" do
+        valid = build_upsert_event_hash(:component)
+        malformed = valid.except("record")
+        newer = valid.merge("version" => valid.fetch("version") + 1)
+
+        expect {
+          expect(indexer.process_returning_failures([malformed, newer], refresh_indices: true)).to be_empty
+        }.to log_warning a_string_including("Ignoring 1 malformed event")
+      end
+
       def json_lines(*events)
         events.map { |event| ::JSON.generate(event) }.join("\n")
       end

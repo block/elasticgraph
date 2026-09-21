@@ -30,6 +30,7 @@ module ElasticGraph
 
       class Factory < FactorySupertype
         def build: (event) -> BuildResult
+        def version_lookups_for: (EventID, untyped) -> ::Array[VersionLookup]
 
         private
 

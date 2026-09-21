@@ -9,6 +9,7 @@
 require "elastic_graph/errors"
 require "elastic_graph/indexer/event_id"
 require "elastic_graph/indexer/indexing_failures_error"
+require "elastic_graph/indexer/supersession_candidate"
 require "time"
 
 module ElasticGraph
@@ -39,8 +40,9 @@ module ElasticGraph
       end
 
       # Like `process`, but returns failures instead of raising an exception.
-      # The caller is responsible for handling the failures.
-      def process_returning_failures(events, refresh_indices: false)
+      # The caller is responsible for handling the failures. Supersession candidates carry only
+      # recovery information for rejected payloads; their targets are never passed to bulk indexing.
+      def process_returning_failures(events, refresh_indices: false, supersession_candidates: [])
         factory_results_by_event = events.to_h { |event| [event, @operation_factory.build(event)] }
 
         factory_results = factory_results_by_event.values
@@ -53,13 +55,15 @@ module ElasticGraph
         calculate_latency_metrics(successful_operations, bulk_result.noop_results)
 
         all_failures =
-          factory_results.filter_map(&:failed_event_error) +
+          supersession_candidates + factory_results.filter_map(&:failed_event_error) +
           bulk_result.failure_results.map do |result|
             all_operations_for_event = factory_results_by_event.fetch(result.event).operations
             FailedEventError.from_failed_operation_result(result, all_operations_for_event.to_set)
           end
 
-        categorize_failures(all_failures, events)
+        categorize_failures(all_failures, events).map do |failure|
+          failure.is_a?(SupersessionCandidate) ? failure.failure : failure
+        end
       end
 
       private
@@ -109,7 +113,7 @@ module ElasticGraph
         end
 
         if superseded_failures.any?
-          superseded_ids = superseded_failures.map { |f| f.event.event_id.to_s }
+          superseded_ids = superseded_failures.map { |f| f.event_id.to_s }
           @logger.warn(
             "Ignoring #{superseded_ids.size} malformed event(s) because they have been superseded " \
             "by corrected events targeting the same id: #{superseded_ids.join(", ")}."

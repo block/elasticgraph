@@ -33,11 +33,17 @@ module ElasticGraph
             destination_index_mapping.fetch("properties")
           )
 
-          Support::HashUtil
-            .fetch_leaf_values_at_path(prepared_record, update_target.id_source.split("."))
+          document_ids_for(prepared_record, update_target)
+            .map { |doc_id| new(event, prepared_record, destination_index_def, update_target, doc_id, destination_index_mapping) }
+        end
+
+        # @param record [Hash<String, Object>] a record in indexing field names
+        # @param update_target [SchemaArtifacts::RuntimeMetadata::UpdateTarget] the target to identify
+        # @return [Array<String>] distinct nonblank document ids
+        def self.document_ids_for(record, update_target)
+          Support::HashUtil.fetch_leaf_values_at_path(record, update_target.id_source.split("."))
             .reject { |id| id.to_s.strip.empty? }
             .uniq
-            .map { |doc_id| new(event, prepared_record, destination_index_def, update_target, doc_id, destination_index_mapping) }
         end
 
         def to_datastore_bulk

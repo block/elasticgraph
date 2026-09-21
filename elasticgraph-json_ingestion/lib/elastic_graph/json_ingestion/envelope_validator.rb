@@ -47,6 +47,29 @@ module ElasticGraph
         [events, failures]
       end
 
+      # Extracts only the identity needed to check supersession from a malformed payload.
+      # This never makes a malformed event eligible to be indexed.
+      #
+      # @param decoded_event [Hash<String, Object>] a decoded JSON event that failed envelope validation
+      # @return [ElasticGraph::Indexer::EventID, nil] validated identity, if available
+      def identity_for_supersession(decoded_event)
+        requested_version = decoded_event[JSON_SCHEMA_VERSION_KEY]
+        version = if requested_version.is_a?(::Integer)
+          closest_available_json_schema_version(requested_version)
+        else
+          @schema_artifacts.available_json_schema_versions.max
+        end
+        return unless version
+
+        envelope_schema = validator(EVENT_ENVELOPE_JSON_SCHEMA_NAME, version).schema
+        identity = decoded_event.slice("op", "type", "id", "version")
+        return unless %w[op type id version].all? do |field|
+          identity.key?(field) && envelope_schema.ref("#/$defs/#{EVENT_ENVELOPE_JSON_SCHEMA_NAME}/properties/#{field}").valid?(identity.fetch(field))
+        end
+
+        ElasticGraph::Indexer::EventID.new(type: identity.fetch("type"), id: identity.fetch("id"), version: identity.fetch("version").to_i)
+      end
+
       # The requested version might not necessarily be available (if the publisher is deployed ahead of the indexer, or an old schema
       # version is removed prematurely, or an indexer deployment is rolled back). So the behavior is to always pick the closest-available
       # version. If there's an exact match, great. Even if not an exact match, if the incoming event payload conforms to the closest match,

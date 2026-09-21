@@ -6,6 +6,7 @@ module ElasticGraph
 
       attr_reader main_message: ::String
       attr_reader event: event
+      attr_reader event_id: EventID
       attr_reader operations: ::Set[operation]
       attr_reader versioned_operations: ::Array[operation]
       attr_reader id: ::String

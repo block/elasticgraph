@@ -38,6 +38,7 @@ module ElasticGraph
       end
 
       class Update < UpdateSupertype
+        def self.document_ids_for: (untyped, SchemaArtifacts::RuntimeMetadata::UpdateTarget) -> ::Array[::String]
         include _Operation
 
         def self.operations_for: (

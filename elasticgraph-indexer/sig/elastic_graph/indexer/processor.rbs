@@ -10,7 +10,7 @@ module ElasticGraph
       ) -> void
 
       def process: (::Array[event], ?refresh_indices: bool) -> void
-      def process_returning_failures: (::Array[event], ?refresh_indices: bool) -> ::Array[FailedEventError]
+      def process_returning_failures: (::Array[event], ?refresh_indices: bool, ?supersession_candidates: ::Array[SupersessionCandidate]) -> ::Array[_IndexingFailure]
 
       private
 
@@ -21,7 +21,7 @@ module ElasticGraph
       @clock: singleton(::Time)
 
       def log_skipped_record_validations: (::Array[Operation::Factory::BuildResult]) -> void
-      def categorize_failures: (::Array[FailedEventError], ::Array[event]) -> ::Array[FailedEventError]
+      def categorize_failures: (::Array[supersedableFailure], ::Array[event]) -> ::Array[supersedableFailure]
       def calculate_latency_metrics: (::Array[operation], ::Array[Operation::Result]) -> void
     end
   end

@@ -17,6 +17,47 @@ module ElasticGraph
   class Indexer
     module Operation
       RSpec.describe Factory, :json_ingestion_support, :capture_logs do
+        describe "#version_lookups_for", :factories do
+          let(:indexer) { build_indexer }
+
+          it "matches versioned update targets while omitting derived-index writes" do
+            event = build_upsert_event(:widget)
+            factory = indexer.operation_factory
+            operations = factory.build(event).operations
+            expect(operations.reject(&:versioned?)).not_to be_empty
+
+            lookups = factory.version_lookups_for(event.event_id, event.record)
+            expected = operations.select(&:versioned?).map do |op|
+              [op.destination_index_def, op.update_target, op.doc_id]
+            end
+
+            expect(lookups.map { |lookup| [lookup.destination_index_def, lookup.update_target, lookup.doc_id] }).to match_array(expected)
+            expect(lookups).to all be_a(VersionLookup)
+            expect(lookups).to all satisfy { |lookup| !lookup.respond_to?(:to_datastore_bulk) && !lookup.respond_to?(:event) }
+          end
+
+          it "returns no targets for an unknown source type" do
+            identity = EventID.new(type: "Unknown", id: "1", version: 1)
+
+            expect(indexer.operation_factory.version_lookups_for(identity, {"id" => "1"})).to be_empty
+          end
+
+          it "honors configured skipped destination ids" do
+            event = build_upsert_event(:component)
+            factory = indexer.operation_factory.with(skip_derived_indexing_type_updates: {"Component" => Set[event.id]})
+
+            expect(factory.version_lookups_for(event.event_id, event.record)).to be_empty
+          end
+
+          it "leaves failures outstanding when malformed records prevent target identification" do
+            event = build_upsert_event(:widget)
+
+            expect {
+              expect(indexer.operation_factory.version_lookups_for(event.event_id, "not an object")).to be_empty
+            }.to log_warning a_string_including("FailedEventOperationBuildingFailure")
+          end
+        end
+
         describe "#build", :factories do
           include SpecSupport::BuildsIndexerOperation
 

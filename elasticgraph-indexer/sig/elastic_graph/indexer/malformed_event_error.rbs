@@ -1,6 +1,6 @@
 module ElasticGraph
   class Indexer
-    class MalformedEventError[P] < Errors::Error
+    class MalformedEventError[out P] < Errors::Error
       include _IndexingFailure
 
       @message_id: ::String?

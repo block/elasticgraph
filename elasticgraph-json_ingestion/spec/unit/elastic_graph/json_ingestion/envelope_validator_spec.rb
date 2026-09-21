@@ -17,6 +17,32 @@ module ElasticGraph
       let(:indexer) { build_indexer(schema_artifacts: schema_artifacts) }
       let(:envelope_validator) { indexer.ingestion_adapters_by_format.fetch("json").envelope_validator }
 
+      describe "#identity_for_supersession" do
+        it "requires valid identity fields before attempting supersession" do
+          event = build_upsert_event_hash(:component)
+          invalid_events = [event.except("id"), event.merge("id" => 12),
+            event.merge("type" => "Unknown"), event.merge("op" => "delete"),
+            event.merge("version" => -1), event.merge("version" => 1.5)]
+
+          expect(invalid_events.map { |value| envelope_validator.identity_for_supersession(value) }).to all be_nil
+        end
+
+        it "identifies events even when the schema version is missing, normalizing integral float versions" do
+          event = build_upsert_event_hash(:component, __version: 3).except(JSON_SCHEMA_VERSION_KEY).merge("version" => 3.0)
+
+          result = envelope_validator.identity_for_supersession(event)
+
+          expect(result).to eq(ElasticGraph::Indexer::EventID.new(type: event.fetch("type"), id: event.fetch("id"), version: 3))
+          expect(result.version).to be_a(Integer)
+        end
+
+        it "cannot validate identity when no schema versions are available" do
+          allow(schema_artifacts).to receive(:available_json_schema_versions).and_return(Set[])
+
+          expect(envelope_validator.identity_for_supersession(build_upsert_event_hash(:component))).to be_nil
+        end
+      end
+
       describe "#events_from" do
         it "builds an event from each decoded JSON event with a valid envelope, keeping the format tag" do
           tagged = build_upsert_event_hash(:component, id: "1").merge(INGESTION_FORMAT_KEY => "json")

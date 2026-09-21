@@ -18,7 +18,7 @@ module ElasticGraph
     class FailedEventError < Errors::Error
       extend ::Forwardable
 
-      # @dynamic main_message, event, operations, id, op, type, version, record, message_id, message
+      # @dynamic main_message, event, operations, event_id, id, op, type, version, record, message_id, message
 
       # The "main" part of the error message (without the `full_id` portion).
       attr_reader :main_message
@@ -62,7 +62,7 @@ module ElasticGraph
         end
       end
 
-      def_delegators :event, :id, :op, :type, :version, :record, :message_id
+      def_delegators :event, :event_id, :id, :op, :type, :version, :record, :message_id
     end
   end
 end
