@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "aws-sdk-s3"
+require "elastic_graph/indexer/event"
 require "elastic_graph/indexer/operation/update"
 require "elastic_graph/warehouse_lambda/warehouse_dumper"
 require "support/builds_warehouse_lambda"
@@ -26,18 +27,18 @@ module ElasticGraph
       let(:indexer) { warehouse_lambda.indexer }
 
       let(:widget_primary_indexing_op) do
-        new_primary_indexing_operation({
+        new_primary_indexing_operation(upsert_event({
           "type" => "Widget",
           "id" => "1",
           "version" => 3,
           "json_schema_version" => 1,
           "record" => {"id" => "1", "dayOfWeek" => "MON", "created_at" => "2024-09-15T12:30:12Z", "workspace_id" => "ws-1"}
-        })
+        }))
       end
 
       it "writes operations to S3 as gzipped JSONL files and returns success results" do
-        op1 = new_primary_indexing_operation({"type" => "Widget", "id" => "1", "version" => 3, "json_schema_version" => 1, "record" => {"id" => "1", "dayOfWeek" => "MON", "created_at" => "2024-09-15T12:30:12Z", "workspace_id" => "ws-1"}})
-        op2 = new_primary_indexing_operation({"type" => "Widget", "id" => "2", "version" => 5, "json_schema_version" => 2, "record" => {"id" => "2", "dayOfWeek" => "TUE", "created_at" => "2024-09-15T13:30:12Z", "workspace_id" => "ws-2"}})
+        op1 = new_primary_indexing_operation(upsert_event({"type" => "Widget", "id" => "1", "version" => 3, "json_schema_version" => 1, "record" => {"id" => "1", "dayOfWeek" => "MON", "created_at" => "2024-09-15T12:30:12Z", "workspace_id" => "ws-1"}}))
+        op2 = new_primary_indexing_operation(upsert_event({"type" => "Widget", "id" => "2", "version" => 5, "json_schema_version" => 2, "record" => {"id" => "2", "dayOfWeek" => "TUE", "created_at" => "2024-09-15T13:30:12Z", "workspace_id" => "ws-2"}}))
         operations = [op1, op2]
 
         results = warehouse_dumper.bulk(operations)
@@ -99,8 +100,8 @@ module ElasticGraph
       end
 
       it "writes operations of different types to separate S3 files" do
-        widget_op = new_primary_indexing_operation({"type" => "Widget", "id" => "1", "version" => 3, "json_schema_version" => 1, "record" => {"id" => "1", "dayOfWeek" => "MON", "created_at" => "2024-09-15T12:30:12Z", "workspace_id" => "ws-1"}})
-        component_op = new_primary_indexing_operation({"type" => "Component", "id" => "c1", "version" => 2, "json_schema_version" => 1, "record" => {"id" => "c1", "created_at" => "2024-09-15T12:30:12Z"}})
+        widget_op = new_primary_indexing_operation(upsert_event({"type" => "Widget", "id" => "1", "version" => 3, "json_schema_version" => 1, "record" => {"id" => "1", "dayOfWeek" => "MON", "created_at" => "2024-09-15T12:30:12Z", "workspace_id" => "ws-1"}}))
+        component_op = new_primary_indexing_operation(upsert_event({"type" => "Component", "id" => "c1", "version" => 2, "json_schema_version" => 1, "record" => {"id" => "c1", "created_at" => "2024-09-15T12:30:12Z"}}))
         operations = [widget_op, component_op]
 
         warehouse_dumper.bulk(operations)
@@ -113,8 +114,8 @@ module ElasticGraph
       end
 
       it "logs structured information about received batch and dumped files" do
-        widget_op = new_primary_indexing_operation({"type" => "Widget", "id" => "1", "version" => 3, "json_schema_version" => 1, "record" => {"id" => "1", "dayOfWeek" => "MON", "created_at" => "2024-09-15T12:30:12Z", "workspace_id" => "ws-1"}})
-        component_op = new_primary_indexing_operation({"type" => "Component", "id" => "c1", "version" => 2, "json_schema_version" => 1, "record" => {"id" => "c1", "created_at" => "2024-09-15T12:30:12Z"}})
+        widget_op = new_primary_indexing_operation(upsert_event({"type" => "Widget", "id" => "1", "version" => 3, "json_schema_version" => 1, "record" => {"id" => "1", "dayOfWeek" => "MON", "created_at" => "2024-09-15T12:30:12Z", "workspace_id" => "ws-1"}}))
+        component_op = new_primary_indexing_operation(upsert_event({"type" => "Component", "id" => "c1", "version" => 2, "json_schema_version" => 1, "record" => {"id" => "c1", "created_at" => "2024-09-15T12:30:12Z"}}))
         operations = [widget_op, component_op]
 
         warehouse_dumper.bulk(operations)
@@ -179,13 +180,13 @@ module ElasticGraph
 
       it "skips S3 upload when all operations are filtered out (derived index operations)" do
         # Create an operation where update_target.type != event type (simulates derived index)
-        widget_op = new_primary_indexing_operation({
+        widget_op = new_primary_indexing_operation(upsert_event({
           "type" => "Widget",
           "id" => "1",
           "version" => 3,
           "json_schema_version" => 1,
           "record" => {"id" => "1", "dayOfWeek" => "MON", "created_at" => "2024-09-15T12:30:12Z", "workspace_id" => "ws-1"}
-        })
+        }))
 
         # Stub the update_target to return a different type
         derived_update_target = instance_double("ElasticGraph::SchemaArtifacts::RuntimeMetadata::UpdateTarget", type: "WidgetDerived")
@@ -195,6 +196,10 @@ module ElasticGraph
 
         # Should not create any S3 files when all operations are filtered
         expect(s3_client.api_requests).to be_empty
+      end
+
+      def upsert_event(decoded_event)
+        Indexer::Event.from_validated_hash(decoded_event.merge("op" => "upsert"))
       end
     end
   end

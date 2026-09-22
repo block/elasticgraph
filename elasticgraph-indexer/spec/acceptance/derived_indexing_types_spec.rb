@@ -36,7 +36,7 @@ module ElasticGraph
           "sizes" => ["LARGE"]
         },
         "nested_fields" => {
-          "max_widget_cost" => w1.fetch("record").fetch("cost").fetch("amount_cents")
+          "max_widget_cost" => w1.record.fetch("cost").fetch("amount_cents")
         },
         "oldest_widget_created_at" => "2023-11-01T10:30:00.531Z"
       })
@@ -71,7 +71,9 @@ module ElasticGraph
           "sizes" => ["LARGE", "SMALL"]
         },
         "nested_fields" => {
-          "max_widget_cost" => ([w1] + widgets).select { |w| w.dig("record", "cost", "currency") == "USD" }.map { |w| w.fetch("record").fetch("cost").fetch("amount_cents") }.max
+          "max_widget_cost" => ([w1] + widgets).filter_map do |w|
+            w.record.fetch("cost").fetch("amount_cents") if w.record.dig("cost", "currency") == "USD"
+          end.max
         },
         # Without DateTime normalization, this would incorrectly be "2023-11-01T10:30:00.531Z"
         # because ".53Z" > ".531Z" in string comparison ('Z' > '1').
@@ -177,7 +179,7 @@ module ElasticGraph
 
         # Updated widget, which wrongly tries to change the currency symbol of USD.
         widget_v2 = widget("LARGE", "RED", "USD", cost_currency_symbol: "US$", id: "w1", workspace_id: "wid23", __version: widget_v1.fetch(:__version) + 1)
-        widget_v2_event_id = Indexer::EventID.from_event(Indexer::TestSupport::Converters.upsert_events_for_records([widget_v2]).first).to_s
+        widget_v2_event_id = Indexer::TestSupport::Converters.upsert_events_for_records([widget_v2]).first.event_id.to_s
 
         # Later updated widget, which does not try to change the currency symbol.
         widget_v3 = widget("LARGE", "RED", "USD", cost_currency_symbol: "$", id: "w1", workspace_id: "wid23", __version: widget_v1.fetch(:__version) + 2, name: "3rd version")

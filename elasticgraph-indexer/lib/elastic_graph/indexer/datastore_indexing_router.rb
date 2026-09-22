@@ -68,7 +68,7 @@ module ElasticGraph
         unless unsupported_ops.empty?
           raise IndexingFailuresError,
             "The index definitions for #{unsupported_ops.size} operations " \
-            "(#{unsupported_ops.map { |o| Indexer::EventID.from_event(o.event) }.join(", ")}) " \
+            "(#{unsupported_ops.map { |o| o.event.event_id }.join(", ")}) " \
             "were configured to be inaccessible. Check the configuration, or avoid sending " \
             "events of this type to this ElasticGraph indexer."
         end
@@ -269,7 +269,7 @@ module ElasticGraph
 
       def opaque_id_parts_for_source_event_versions(operations)
         type_counts = operations
-          .group_by { |op| op.event.fetch("type") }
+          .group_by { |op| op.event.type }
           .sort_by(&:first)
           .map { |type_name, ops| "#{type_name}:#{ops.size}" }
 

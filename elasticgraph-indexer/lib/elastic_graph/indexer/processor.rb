@@ -109,7 +109,7 @@ module ElasticGraph
         end
 
         if superseded_failures.any?
-          superseded_ids = superseded_failures.map { |f| EventID.from_event(f.event).to_s }
+          superseded_ids = superseded_failures.map { |f| f.event.event_id.to_s }
           @logger.warn(
             "Ignoring #{superseded_ids.size} malformed event(s) because they have been superseded " \
             "by corrected events targeting the same id: #{superseded_ids.join(", ")}."
@@ -129,7 +129,7 @@ module ElasticGraph
           latencies_in_ms_from = {} # : Hash[String, Integer]
           slo_results = {} # : Hash[String, String]
 
-          latency_timestamps = event.fetch("latency_timestamps", _ = {})
+          latency_timestamps = event.latency_timestamps
           latency_timestamps.each do |ts_name, ts_value|
             metric_value = ((current_time - Time.iso8601(ts_value)) * 1000).round
 
@@ -144,10 +144,10 @@ module ElasticGraph
 
           @logger.info({
             "message_type" => "ElasticGraphIndexingLatencies",
-            "message_id" => event["message_id"],
-            "event_type" => event.fetch("type"),
-            "event_id" => EventID.from_event(event).to_s,
-            JSON_SCHEMA_VERSION_KEY => event.fetch(JSON_SCHEMA_VERSION_KEY),
+            "message_id" => event.message_id,
+            "event_type" => event.type,
+            "event_id" => event.event_id.to_s,
+            "schema_version" => event.schema_version,
             "latencies_in_ms_from" => latencies_in_ms_from,
             "slo_results" => slo_results,
             "result" => result

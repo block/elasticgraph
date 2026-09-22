@@ -2,6 +2,7 @@ module ElasticGraph
   module JSONIngestion
     class EnvelopeValidator
       type decodedEvent = ::Hash[::String, untyped]
+      type jsonEvent = ::ElasticGraph::Indexer::Event[decodedEvent]
 
       def initialize: (
         schema_artifacts: schemaArtifacts,
@@ -13,13 +14,13 @@ module ElasticGraph
       @logger: ::Logger
       @configure_record_validator: (^(Support::JSONSchema::ValidatorFactory) -> Support::JSONSchema::ValidatorFactory)?
 
-      def events_from: (::Array[decodedEvent]) -> [::Array[decodedEvent], ::Array[::ElasticGraph::Indexer::MalformedEventError[decodedEvent]]]
+      def events_from: (::Array[decodedEvent]) -> [::Array[jsonEvent], ::Array[::ElasticGraph::Indexer::MalformedEventError[decodedEvent]]]
       def closest_available_json_schema_version: (::Integer) -> ::Integer?
       def validator: (::String, ::Integer) -> Support::JSONSchema::Validator
 
       private
 
-      def event_from: (decodedEvent) -> decodedEvent
+      def event_from: (decodedEvent) -> jsonEvent
       def envelope_failure_for: (decodedEvent) -> ::ElasticGraph::Indexer::MalformedEventError[decodedEvent]?
       def malformed: (decodedEvent, validation_target: ::String, message: ::String) -> ::ElasticGraph::Indexer::MalformedEventError[decodedEvent]
 
