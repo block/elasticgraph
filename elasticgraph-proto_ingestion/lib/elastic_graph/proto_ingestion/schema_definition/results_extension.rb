@@ -26,7 +26,14 @@ module ElasticGraph
         def proto_field_number_mappings
           # Numbers get assigned as `schema.proto` renders, so we must render before reading them.
           proto_schema
+          proto_envelope_schema
           protobuf_schema_generator.field_number_mappings_for_artifact
+        end
+
+        # Generated protobuf envelope and batch definitions.
+        # @return [String]
+        def proto_envelope_schema
+          protobuf_schema_generator.envelope_schema
         end
 
         private

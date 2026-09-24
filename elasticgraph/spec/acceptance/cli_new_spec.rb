@@ -129,7 +129,10 @@ module ElasticGraph
       allow(::Bundler).to receive(:with_unbundled_env)
 
       eg_project_dir = ::File.join(::Dir.pwd, "tmp", "eg_project")
-      run_new(eg_project_dir)
+      # Git's background maintenance can outlive the command and race with temporary directory cleanup.
+      with_env("GIT_CONFIG_COUNT" => "1", "GIT_CONFIG_KEY_0" => "gc.auto", "GIT_CONFIG_VALUE_0" => "0") do
+        run_new(eg_project_dir)
+      end
 
       expect(::Dir.children(eg_project_dir)).to include(
         "Gemfile",
