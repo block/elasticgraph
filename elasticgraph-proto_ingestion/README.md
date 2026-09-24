@@ -1,9 +1,8 @@
 # ElasticGraph::ProtoIngestion
 
-An ElasticGraph extension that supports ingesting Protocol Buffer data into ElasticGraph.
-Currently it generates Protocol Buffers schema artifacts from ElasticGraph schemas: it emits
-`proto3` by default and can emit `proto2`, and supports arbitrary file-level header lines (such
-as `option` declarations).
+An ElasticGraph extension that generates protobuf schemas and ingests binary events through the
+shared indexing pipeline. It supports `proto3` (default) and `proto2`, both independently of JSON
+ingestion and alongside it.
 
 ## Dependency Diagram
 
@@ -83,6 +82,34 @@ end
 
 After running `bundle exec rake schema_artifacts:dump`, ElasticGraph will generate a `schema.proto`
 schema artifact, and will maintain a `proto_field_numbers.yaml` file alongside your schema definition.
+
+## Runtime Ingestion
+
+After dumping schema artifacts, compile `schema.proto` and `indexing_events.proto` with `protoc`.
+Pass `--include_imports` and `--descriptor_set_out=config/schema/artifacts/schema.pb`, with
+`config/schema/artifacts` as the proto include path. Deploy this descriptor set with the matching schema artifacts.
+
+Add the descriptor set's location to your indexer's settings:
+
+```yaml
+proto_ingestion:
+  descriptor_set_file: config/schema/artifacts/schema.pb
+```
+
+Require `elastic_graph/proto_ingestion/indexer`, then load your settings using
+`ElasticGraph::ProtoIngestion::Indexer.from_yaml_file`. Its `process` method accepts a serialized
+`ElasticGraphEventBatch`. Each batch contains `ElasticGraphEventEnvelope` messages with `op`, `id`,
+`version`, optional `latency_timestamps`, and a `record_<type>` field containing the domain message.
+Protobuf ingestion validates nullability, enum values, and ElasticGraph scalar constraints before indexing.
+
+For an existing publisher that sends domain messages directly, set `format: raw`. Pass `eg_op`,
+`eg_type`, `eg_id`, and `eg_version` through the `metadata:` argument to `process` or `decode`.
+`metadata_fields` can map these event fields to different transport attribute names.
+Use `encoding: base64` for text transports; otherwise payloads use binary encoding.
+
+`process` raises if any events fail validation, after indexing valid events. Use
+`process_returning_failures` to handle those failures individually. Protobuf events do not include a
+JSON schema version; compatibility depends on preserving the generated field numbers.
 
 ## Schema Definition API
 
