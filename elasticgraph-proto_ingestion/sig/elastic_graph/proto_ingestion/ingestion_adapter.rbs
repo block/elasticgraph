@@ -1,0 +1,19 @@
+module ElasticGraph
+  module ProtoIngestion
+    class IngestionAdapter
+      include ::ElasticGraph::Indexer::IngestionAdapter::_Adapter
+      ValidationResult: singleton(::ElasticGraph::Indexer::IngestionAdapter::ValidationResult)
+      @schema: RuntimeSchema
+      @converter: RecordConverter
+      @validator: RecordValidator
+      @ingestible_types: Array[String]
+      @envelope_types: Array[String]
+      def initialize: (schema_artifacts: schemaArtifacts) -> void
+      def events_from: (Array[Hash[String, untyped]]) -> [Array[::ElasticGraph::Indexer::event], Array[::ElasticGraph::Indexer::MalformedEventError[Hash[String, untyped]]]]
+      private
+      def invalid: (String, String) -> ::ElasticGraph::Indexer::IngestionAdapter::ValidationResult
+      def malformed: (Hash[String, untyped], String) -> ::ElasticGraph::Indexer::MalformedEventError[Hash[String, untyped]]
+      def envelope_error: (Hash[String, untyped]) -> String?
+    end
+  end
+end

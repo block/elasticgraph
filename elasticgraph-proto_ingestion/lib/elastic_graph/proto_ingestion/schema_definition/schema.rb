@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/errors"
+require "elastic_graph/graphql/scalar_coercion_adapters/valid_time_zones"
 require "elastic_graph/proto_ingestion/schema_definition/field_number_mappings"
 require "elastic_graph/proto_ingestion/schema_definition/schema_elements/enum_type_extension"
 require "elastic_graph/proto_ingestion/schema_definition/schema_elements/object_interface_and_union_extension"
@@ -147,6 +148,27 @@ module ElasticGraph
         def field_label_prefix(repeated:)
           return "repeated " if repeated
           "optional "
+        end
+
+        # Metadata for decoding public protobuf fields and preparing private index fields.
+        # @return [Hash<String, Object>]
+        def ingestion_metadata
+          {
+            "package_name" => @package_name,
+            "types" => proto_types.to_h do |type|
+              metadata = if type.respond_to?(:proto_indexing_metadata)
+                type.proto_indexing_metadata
+              elsif type.respond_to?(:values_by_name)
+                {"enum_values" => type.values_by_name.values.to_h { |value| [value.proto_name(type.proto_enum_value_prefix), value.name] }}
+              else
+                scalar = type.type_ref.with_reverted_override.name
+                {"scalar" => scalar, "proto_type" => type.proto_name}.tap do |scalar_metadata|
+                  scalar_metadata["allowed_values"] = GraphQL::ScalarCoercionAdapters::VALID_TIME_ZONES.to_a if scalar == "TimeZone"
+                end
+              end
+              [type.name, metadata]
+            end
+          }
         end
 
         # Generates the self-contained batch transport while leaving domain messages reusable.

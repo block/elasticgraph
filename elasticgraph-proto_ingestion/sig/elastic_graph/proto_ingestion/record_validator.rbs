@@ -1,0 +1,13 @@
+module ElasticGraph
+  module ProtoIngestion
+    class RecordValidator
+      @types: Hash[String, untyped]
+      def self.valid_date?: (untyped) -> bool
+      def self.valid_timestamp?: (untyped) -> bool
+      def initialize: (Hash[String, untyped]) -> void
+      def error_for: (String, untyped, ?String) -> String?
+      private
+      def valid_scalar?: (String, String, untyped) -> bool
+    end
+  end
+end
