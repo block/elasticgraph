@@ -61,6 +61,19 @@ module ElasticGraph
             latency_timestamps: {}
           ))
         end
+
+        it "allows an event without a JSON schema version" do
+          event = Event.from_validated_hash({
+            "op" => "upsert",
+            "type" => "Widget",
+            "id" => "w1",
+            "version" => 3,
+            "record" => {"id" => "w1"},
+            INGESTION_FORMAT_KEY => "proto"
+          })
+
+          expect(event.schema_version).to be_nil
+        end
       end
 
       describe "#event_id" do
