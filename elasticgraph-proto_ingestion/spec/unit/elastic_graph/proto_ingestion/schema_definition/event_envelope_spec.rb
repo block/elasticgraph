@@ -17,6 +17,42 @@ module ElasticGraph
           expect(results.proto_envelope_schema).to eq("")
         end
 
+        %w[proto2 proto3].each do |syntax|
+          it "renders metadata, sorted record alternatives, and a batch using #{syntax}" do
+            results = define_proto_schema_results do |schema|
+              schema.proto_schema_artifacts package_name: "catalog", syntax: syntax
+              %w[Pear Apple].each do |name|
+                schema.object_type(name) do |type|
+                  type.field "id", "ID!"
+                  type.index name.downcase
+                end
+              end
+            end
+
+            expect(results.proto_envelope_schema).to eq(<<~PROTO)
+              syntax = "#{syntax}";
+              package catalog;
+              import "schema.proto";
+
+              message ElasticGraphEventEnvelope {
+                optional string op = 1;
+                optional string id = 2;
+                optional int64 version = 3;
+                map<string, string> latency_timestamps = 4;
+                oneof record {
+                  .catalog.Apple record_apple = 5;
+                  .catalog.Pear record_pear = 6;
+                }
+
+              }
+
+              message ElasticGraphEventBatch {
+                repeated ElasticGraphEventEnvelope events = 1;
+              }
+            PROTO
+          end
+        end
+
         it "reserves removed envelope variants and reuses their numbers when restored" do
           define_types = lambda do |schema, names|
             names.each do |name|
@@ -44,7 +80,9 @@ module ElasticGraph
               end
             end
           end
-          expect { results.proto_envelope_schema }.to raise_error(Errors::SchemaError, /distinct.*snake_case/)
+          expect { results.proto_envelope_schema }.to raise_error(Errors::SchemaError,
+            "Ingestible types `MyProduct` and `My_Product` map to the same protobuf envelope field `record_my_product`. " \
+            "Type names must remain distinct when converted to snake_case.")
         end
       end
     end

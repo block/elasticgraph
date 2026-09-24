@@ -6,6 +6,7 @@ module ElasticGraph
 
         SUPPORTED_SYNTAXES: ::Array[::String]
         DEFAULT_SYNTAX: ::String
+        ENVELOPE_METADATA_FIELDS: ::Hash[::String, ::String]
 
         def self.validate_syntax: ((::Symbol | ::String)) -> ::String
         def self.validate_header_lines: (::Array[::String]) -> ::Array[::String]
@@ -43,8 +44,9 @@ module ElasticGraph
 
         private
 
-        def envelope_record_field_name: (::ElasticGraph::SchemaDefinition::indexableType) -> ::String
-        def envelope_field_number: (::String) -> ::Integer
+        def envelope_record_fields: () -> ::Hash[::String, ::String]
+        def render_envelope_fields: (::Hash[::String, ::String], indent: ::String) -> ::String
+        def render_reserved_envelope_fields: (::Array[::String]) -> ::String
         def proto_types: () -> ::Array[untyped]
         def render_definitions: (::Array[untyped] types) -> ::String
         def render_imports: (::Array[untyped] types) -> ::Array[::String]
