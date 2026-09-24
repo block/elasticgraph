@@ -122,6 +122,7 @@ FactoryBot.define do
     named_inventor { inventor }
     weight_in_ng { Faker::Number.between(from: 2**51, to: (2**53) - 1) }
     weight_in_ng_str { Faker::Number.between(from: 2**60, to: 2**61) }
+    weight_in_grams { Faker::Number.between(from: 1.0, to: 100.0) }
     tags { Array.new(Faker::Number.between(from: 0, to: 4)) { Faker::Alphanumeric.alpha(number: 6) } }
     amounts { Array.new(Faker::Number.between(from: 0, to: 4)) { Faker::Number.between(from: 100, to: 10000) } }
     fees { build_list(:money, Faker::Number.between(from: 0, to: 4)) }

@@ -33,7 +33,7 @@ module ElasticGraph
 
           # @return [Array<String>] painless functions required by a min or max value field.
           def function_definitions
-            [MinOrMaxValue.function_def(min_or_max)]
+            [COMPARE_VALUES, MinOrMaxValue.function_def(min_or_max)]
           end
 
           # @param min_or_max [:min, :max] which type of function to generate.
@@ -44,33 +44,52 @@ module ElasticGraph
             <<~EOS
               boolean #{min_or_max}Value_idempotentlyUpdateValue(List values, def parentObject, String fieldName) {
                 def currentFieldValue = parentObject[fieldName];
-                // Normalize incoming list numerics to long to avoid Integer/Long class cast issues
-                List coercedValues = new ArrayList();
-                for (def v : values) {
-                  if (v != null) {
-                    if (v instanceof Number) {
-                      coercedValues.add(((Number)v).longValue());
-                    } else {
-                      coercedValues.add(v);
-                    }
+
+                // Track the winning value itself (rather than a coerced copy of it) so that the exact value
+                // from the source event or existing document gets stored, with no coercion applied.
+                def #{min_or_max}Value = currentFieldValue;
+                boolean updated = false;
+
+                for (def value : values) {
+                  if (value != null && (#{min_or_max}Value == null || minOrMaxValue_compareValues(value, #{min_or_max}Value) #{operator} 0)) {
+                    #{min_or_max}Value = value;
+                    updated = true;
                   }
                 }
-                def #{min_or_max}NewValue = coercedValues.isEmpty() ? null : Collections.#{min_or_max}(coercedValues);
 
-                def coercedCurrentFieldValue = null;
-                if (currentFieldValue != null) {
-                  coercedCurrentFieldValue = (currentFieldValue instanceof Number) ? ((Number)currentFieldValue).longValue() : currentFieldValue;
+                if (updated) {
+                  parentObject[fieldName] = #{min_or_max}Value;
                 }
 
-                if (#{min_or_max}NewValue != null && (coercedCurrentFieldValue == null || #{min_or_max}NewValue.compareTo(coercedCurrentFieldValue) #{operator} 0)) {
-                  parentObject[fieldName] = #{min_or_max}NewValue;
-                  return true;
-                }
-
-                return false;
+                return updated;
               }
             EOS
           end
+
+          private
+
+          # Painless function which compares two values of a min or max field, coercing numeric values as needed.
+          COMPARE_VALUES = <<~EOS
+            // Compares two values of a min or max field, coercing numeric values as needed.
+            //
+            // Different `Number` implementations (e.g. `Integer` vs `Long`, or `Long` vs `Double`) cannot be
+            // compared with `compareTo` (it throws a `ClassCastException`), and JSON parsing can produce any
+            // of them for the same field (e.g. `2` parses as an `Integer` while `2.9` parses as a `Double`).
+            // Integral values are compared as `long`s to preserve full precision (a `double` cannot exactly
+            // represent all integral values above 2^53), while comparisons involving a floating point value
+            // are performed as `double`s to avoid truncating fractional parts.
+            int minOrMaxValue_compareValues(def value1, def value2) {
+              if (value1 instanceof Number && value2 instanceof Number) {
+                if (value1 instanceof Float || value1 instanceof Double || value2 instanceof Float || value2 instanceof Double) {
+                  return Double.compare(((Number)value1).doubleValue(), ((Number)value2).doubleValue());
+                }
+
+                return Long.compare(((Number)value1).longValue(), ((Number)value2).longValue());
+              }
+
+              return value1.compareTo(value2);
+            }
+          EOS
         end
       end
     end
