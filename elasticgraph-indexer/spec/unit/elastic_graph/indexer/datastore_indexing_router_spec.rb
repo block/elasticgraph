@@ -32,6 +32,7 @@ module ElasticGraph
         end
 
         let(:requested_docs_by_client) { ::Hash.new { |h, k| h[k] = [] } }
+        let(:requested_docs_mutex) { ::Mutex.new }
         let(:stubbed_versions_by_index_and_id) { {} }
         let(:widget_primary_indexing_op) { new_primary_indexing_operation(event_for(type: "Widget", id: "1", version: 1, record: {"id" => "1", "some_field" => "value", "created_at" => "2021-08-24T23:30:00Z", "workspace_id" => "ws123"})) }
         let(:component_primary_indexing_op) { new_primary_indexing_operation(event_for(type: "Component", id: "7", version: 1, record: {"id" => "1", "some_field" => "value"})) }
@@ -160,7 +161,9 @@ module ElasticGraph
               OPAQUE_ID_HEADER => "elasticgraph-indexer;purpose=source_event_versions;operation_count=#{requested_docs.size};type_counts=#{type_counts.join(",")}"
             )
 
-            requested_docs_by_client[client_name].concat(requested_docs)
+            requested_docs_mutex.synchronize do
+              requested_docs_by_client[client_name].concat(requested_docs)
+            end
 
             responses = requested_docs.map do |(index, id)|
               version = stubbed_versions_by_index_and_id[[index, id]]
