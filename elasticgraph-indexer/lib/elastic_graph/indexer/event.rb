@@ -26,7 +26,7 @@ module ElasticGraph
     # @!attribute [r] record
     #   @return [Object] the record payload, in the ingestion adapter's native type
     # @!attribute [r] schema_version
-    #   @return [Integer] the version of the ingestion schema the publisher used
+    #   @return [Integer, nil] the version of the ingestion schema the publisher used, when versioned
     # @!attribute [r] ingestion_format
     #   @return [String] the format tag that selects the ingestion adapter
     # @!attribute [r] message_id
@@ -58,7 +58,7 @@ module ElasticGraph
           id: hash.fetch("id"),
           version: hash.fetch("version"),
           record: hash.fetch("record"),
-          schema_version: hash.fetch(JSON_SCHEMA_VERSION_KEY),
+          schema_version: hash[JSON_SCHEMA_VERSION_KEY],
           ingestion_format: hash.fetch(INGESTION_FORMAT_KEY, "json"),
           message_id: hash["message_id"],
           latency_timestamps: latency_timestamps

@@ -46,7 +46,8 @@ module ElasticGraph
       # @return [ElasticGraph::Indexer::IngestionAdapter::ValidationResult] the result of validating the event
       def validate_event(event, skip_record_validation: false)
         # Envelope validation has already confirmed that a version can be selected for this event.
-        selected_json_schema_version = @envelope_validator.closest_available_json_schema_version(event.schema_version) # : ::Integer
+        schema_version = event.schema_version # : ::Integer
+        selected_json_schema_version = @envelope_validator.closest_available_json_schema_version(schema_version) # : ::Integer
 
         # The datastore includes `id` in search payloads only when it is part of the indexed record.
         record = event.record.merge("id" => event.id)

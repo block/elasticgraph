@@ -8,7 +8,7 @@ module ElasticGraph
       attr_reader id: ::String
       attr_reader version: ::Integer
       attr_reader record: R
-      attr_reader schema_version: ::Integer
+      attr_reader schema_version: ::Integer?
       attr_reader ingestion_format: ::String
       attr_reader message_id: ::String?
       attr_reader latency_timestamps: ::Hash[::String, ::String]
@@ -19,7 +19,7 @@ module ElasticGraph
         id: ::String,
         version: ::Integer,
         record: R,
-        schema_version: ::Integer,
+        schema_version: ::Integer?,
         ingestion_format: ::String,
         ?message_id: ::String?,
         ?latency_timestamps: ::Hash[::String, ::String]
@@ -31,7 +31,7 @@ module ElasticGraph
         id: ::String,
         version: ::Integer,
         record: R,
-        schema_version: ::Integer,
+        schema_version: ::Integer?,
         ingestion_format: ::String,
         ?message_id: ::String?,
         ?latency_timestamps: ::Hash[::String, ::String]
@@ -43,7 +43,7 @@ module ElasticGraph
         ?id: ::String,
         ?version: ::Integer,
         ?record: R,
-        ?schema_version: ::Integer,
+        ?schema_version: ::Integer?,
         ?ingestion_format: ::String,
         ?message_id: ::String?,
         ?latency_timestamps: ::Hash[::String, ::String]
