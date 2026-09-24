@@ -18,37 +18,20 @@ module ElasticGraph
 
         expect_artifacts_to_load_and_be_valid(artifacts)
         expect(artifacts.datastore_scripts.values.first).to include("context", "script")
+        expect(artifacts.extension_artifacts.key?("json")).to be true
       end
 
-      context "with multiple json schemas", :in_temp_dir do
-        let(:artifacts) { FromDisk.new(Dir.pwd) }
+      it "loads an extension provider from its runtime metadata", :in_temp_dir do
+        registration = RuntimeMetadata::ComponentExtension.new(extension_ref: {
+          "name" => "ElasticGraph::Extensions::ArtifactFactory",
+          "require_path" => "support/example_extensions/artifact_factory"
+        })
+        artifacts = FromDisk.new(Dir.pwd)
+        allow(artifacts).to receive(:runtime_metadata).and_return(
+          instance_double(RuntimeMetadata::Schema, schema_artifact_extensions: {"example" => registration})
+        )
 
-        before do
-          ::FileUtils.mkdir_p(JSON_SCHEMAS_BY_VERSION_DIRECTORY)
-          ::File.write(::File.join(JSON_SCHEMAS_BY_VERSION_DIRECTORY, "v1.yaml"), ::YAML.dump(JSON_SCHEMA_VERSION_KEY => 1))
-          ::File.write(::File.join(JSON_SCHEMAS_BY_VERSION_DIRECTORY, "v2.yaml"), ::YAML.dump(JSON_SCHEMA_VERSION_KEY => 2))
-        end
-
-        it "retrieves the specified version of the json_schema" do
-          expect(artifacts.json_schemas_for(1)).to include(JSON_SCHEMA_VERSION_KEY => 1)
-          expect(artifacts.json_schemas_for(2)).to include(JSON_SCHEMA_VERSION_KEY => 2)
-        end
-
-        it "lists the available json_schema_versions" do
-          available_versions = artifacts.available_json_schema_versions
-          expect(available_versions).to include(1, 2) # We don't want test to keep breaking as new versions are added, so don't assert an exact match.
-          expect(available_versions).not_to include(nil) # No `nil` values should be present.
-        end
-
-        it "raises if an unavailable json_schema version is requested" do
-          expect {
-            artifacts.json_schemas_for(9999)
-          }.to raise_error Errors::MissingSchemaArtifactError, a_string_including("is not available", "Available versions: 1, 2")
-        end
-
-        it "returns the largest JSON schema version as the `latest_json_schema_version`" do
-          expect(artifacts.latest_json_schema_version).to eq 2
-        end
+        expect(artifacts.extension_artifacts.fetch("example")).to eq [Dir.pwd, {}]
       end
 
       context "before any artifacts have been dumped", :in_temp_dir do
@@ -59,14 +42,6 @@ module ElasticGraph
           expect { artifacts.indices }.to raise_missing_artifacts_error
           expect { artifacts.datastore_scripts }.to raise_missing_artifacts_error
           expect { artifacts.runtime_metadata }.to raise_missing_artifacts_error
-        end
-
-        it "returns an empty set from `available_json_schema_versions`" do
-          expect(artifacts.available_json_schema_versions).to eq Set.new
-        end
-
-        it "raises an error from `latest_json_schema_version`" do
-          expect { artifacts.latest_json_schema_version }.to raise_missing_artifacts_error
         end
 
         def raise_missing_artifacts_error
@@ -101,7 +76,6 @@ module ElasticGraph
 
       def expect_artifacts_to_load_and_be_valid(artifacts)
         expect(artifacts.graphql_schema_string).to include("type Query {")
-        expect(artifacts.json_schemas_for(1)).to include("$schema" => JSON_META_SCHEMA)
         expect(artifacts.datastore_config).to include("indices", "index_templates", "scripts")
         expect(artifacts.runtime_metadata).to be_a RuntimeMetadata::Schema
 

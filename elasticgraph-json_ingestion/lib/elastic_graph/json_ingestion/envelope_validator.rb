@@ -22,7 +22,7 @@ module ElasticGraph
       # @param logger [Logger] the ElasticGraph logger
       # @param configure_record_validator [Proc, nil] optional callback to further configure the record validator
       def initialize(schema_artifacts:, logger:, configure_record_validator: nil)
-        @schema_artifacts = schema_artifacts
+        @schema_artifacts = schema_artifacts.extension_artifacts.fetch("json")
         @logger = logger
         @configure_record_validator = configure_record_validator
       end
