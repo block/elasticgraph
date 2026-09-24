@@ -1,0 +1,7 @@
+module ElasticGraph
+  module ProtoIngestion
+    module IndexerExtension : ::ElasticGraph::Indexer
+      def ingestion_adapters_by_format: () -> Hash[String, ::ElasticGraph::Indexer::IngestionAdapter::_Adapter]
+    end
+  end
+end
