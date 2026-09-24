@@ -74,6 +74,7 @@ module ElasticGraph
             expect(parsed_proto_field_numbers).to eq({
               "enums" => {},
               "messages" => {
+                "ElasticGraphEventEnvelope" => {"fields" => {"op" => 1, "id" => 2, "version" => 3, "latency_timestamps" => 4, "record_product" => 5}, "next_number" => 6},
                 "Product" => {
                   "fields" => {
                     "id" => 1,

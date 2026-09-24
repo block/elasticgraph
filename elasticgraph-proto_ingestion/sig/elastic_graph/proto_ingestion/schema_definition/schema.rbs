@@ -26,6 +26,7 @@ module ElasticGraph
           ingestible_types_by_name: ::Hash[::String, ::ElasticGraph::SchemaDefinition::indexableType]
         ) -> void
 
+        def envelope_schema: () -> String
         def to_proto: () -> ::String
         def field_number_mappings_for_artifact: () -> ::Hash[::String, untyped]
         def field_number_for: (
@@ -42,6 +43,8 @@ module ElasticGraph
 
         private
 
+        def envelope_record_field_name: (::ElasticGraph::SchemaDefinition::indexableType) -> ::String
+        def envelope_field_number: (::String) -> ::Integer
         def proto_types: () -> ::Array[untyped]
         def render_definitions: (::Array[untyped] types) -> ::String
         def render_imports: (::Array[untyped] types) -> ::Array[::String]

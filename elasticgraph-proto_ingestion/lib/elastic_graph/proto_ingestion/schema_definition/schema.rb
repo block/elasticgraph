@@ -141,7 +141,58 @@ module ElasticGraph
           "optional "
         end
 
+        # Generates the self-contained batch transport while leaving domain messages reusable.
+        # @return [String]
+        def envelope_schema
+          types = @ingestible_types_by_name.values.sort_by(&:name)
+          return "" if types.empty?
+
+          records = types.to_h { |type| [envelope_record_field_name(type), type] }
+          if records.size != types.size
+            raise Errors::SchemaError, "Ingestible type names must remain distinct when converted to snake_case for protobuf envelope fields."
+          end
+
+          fields = [
+            "  optional string op = #{envelope_field_number("op")};",
+            "  optional string id = #{envelope_field_number("id")};",
+            "  optional int64 version = #{envelope_field_number("version")};",
+            "  map<string, string> latency_timestamps = #{envelope_field_number("latency_timestamps")};"
+          ]
+          alternatives = records.map do |name, type|
+            "    .#{@package_name}.#{type.name} #{name} = #{envelope_field_number(name)};"
+          end
+          reserved = reserved_field_numbers_for("ElasticGraphEventEnvelope", %w[op id version latency_timestamps] + records.keys).map do |name, number|
+            "  reserved #{number}; // Previously used by #{name}."
+          end
+
+          <<~PROTO
+            syntax = "#{@syntax}";
+            package #{@package_name};
+            import "schema.proto";
+
+            message ElasticGraphEventEnvelope {
+            #{fields.join("\n")}
+              oneof record {
+            #{alternatives.join("\n")}
+              }
+            #{reserved.join("\n")}
+            }
+
+            message ElasticGraphEventBatch {
+              repeated ElasticGraphEventEnvelope events = 1;
+            }
+          PROTO
+        end
+
         private
+
+        def envelope_record_field_name(type)
+          "record_#{Support::Casing.to_upper_snake(type.name).downcase}"
+        end
+
+        def envelope_field_number(name)
+          field_number_for(message_name: "ElasticGraphEventEnvelope", type_name: "ElasticGraphEventEnvelope", public_field_name: name)
+        end
 
         # Selects the ingestible types and every type transitively referenced by their protobuf
         # representations. All traversal state is local so repeated calls are independent.

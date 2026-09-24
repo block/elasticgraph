@@ -29,6 +29,7 @@ module ElasticGraph
         def self.extended(api)
           api.state.extend(StateExtension)
           api.factory.extend(FactoryExtension)
+          api.state.reserved_type_names.merge(%w[ElasticGraphEventEnvelope ElasticGraphEventBatch])
         end
 
         # Configures protobuf artifact generation behavior.
