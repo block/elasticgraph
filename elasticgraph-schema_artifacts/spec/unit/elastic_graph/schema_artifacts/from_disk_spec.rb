@@ -18,6 +18,20 @@ module ElasticGraph
 
         expect_artifacts_to_load_and_be_valid(artifacts)
         expect(artifacts.datastore_scripts.values.first).to include("context", "script")
+        expect(artifacts.extension_artifacts.key?("json")).to be true
+      end
+
+      it "loads an extension provider from its runtime metadata", :in_temp_dir do
+        registration = RuntimeMetadata::ComponentExtension.new(extension_ref: {
+          "name" => "ElasticGraph::Extensions::ArtifactFactory",
+          "require_path" => "support/example_extensions/artifact_factory"
+        })
+        artifacts = FromDisk.new(Dir.pwd)
+        allow(artifacts).to receive(:runtime_metadata).and_return(
+          instance_double(RuntimeMetadata::Schema, schema_artifact_extensions: {"example" => registration})
+        )
+
+        expect(artifacts.extension_artifacts.fetch("example")).to eq [Dir.pwd, {}]
       end
 
       context "before any artifacts have been dumped", :in_temp_dir do
