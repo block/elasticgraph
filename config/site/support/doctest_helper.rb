@@ -104,6 +104,37 @@ module ElasticGraph
       end
     end
 
+    doctest.before "ElasticGraph::ProtoIngestion::SchemaDefinition::SchemaElements::EnumTypeExtension#external_proto_enum" do
+      # The examples source enum values from an app-defined proto enum class; provide one here.
+      # We define real constants instead of using rspec-mocks stub_const, because the mock
+      # lifecycle (setup/verify/teardown) is not run for individual doctests and the stubs
+      # would leak to every later doctest in the process.
+      proto_enum_entry = ::Data.define(:name, :number)
+
+      ::Object.const_set(:MyApp, ::Module.new) unless defined?(MyApp)
+      MyApp.const_set(:Protos, ::Module.new) unless MyApp.const_defined?(:Protos)
+
+      MyApp::Protos.const_set(:Currency, ::Class.new)
+      MyApp::Protos::Currency.define_singleton_method(:enums) do
+        [:CURRENCY_UNKNOWN_DO_NOT_USE, :CURRENCY_USD, :CURRENCY_CAD].each_with_index.map do |name, number|
+          proto_enum_entry.new(name: name, number: number)
+        end
+      end
+
+      # Its names match an ElasticGraph enum exactly, so it can be referenced rather than sourced.
+      MyApp::Protos.const_set(:CurrencyCode, ::Class.new)
+      MyApp::Protos::CurrencyCode.define_singleton_method(:enums) do
+        [proto_enum_entry.new(name: :USD, number: 1), proto_enum_entry.new(name: :CAD, number: 2)]
+      end
+    end
+
+    doctest.after "ElasticGraph::ProtoIngestion::SchemaDefinition::SchemaElements::EnumTypeExtension#external_proto_enum" do
+      MyApp::Protos.send(:remove_const, :Currency)
+      MyApp::Protos.send(:remove_const, :CurrencyCode)
+      MyApp.send(:remove_const, :Protos)
+      ::Object.send(:remove_const, :MyApp)
+    end
+
     doctest.before "ElasticGraph::SchemaDefinition::SchemaElements::ScalarType#coerce_with" do
       ::FileUtils.mkdir_p "coercion_adapters"
       ::File.write("coercion_adapters/phone_number.rb", <<~EOS)
