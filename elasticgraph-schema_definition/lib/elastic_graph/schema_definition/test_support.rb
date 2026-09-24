@@ -20,8 +20,8 @@ module ElasticGraph
 
       # Provides the minimum indexer extension contract for format-neutral test schemas.
       module IndexerExtension
-        # @return [Hash<String, Object>] an empty ingestion adapter registry
-        def ingestion_adapters_by_format = {}
+        # @return [Hash<String, Object>] the ingestion adapters registered by other extensions
+        def ingestion_adapters_by_format = super
       end
 
       # Registers {IndexerExtension} on format-neutral test schemas.
@@ -29,7 +29,7 @@ module ElasticGraph
         # @param api [API] schema definition API under test
         # @return [void]
         def self.extended(api)
-          api.register_indexer_extension IndexerExtension, defined_at: __FILE__
+          api.register_indexer_extension IndexerExtension, defined_at: "elastic_graph/schema_definition/test_support"
         end
       end
 

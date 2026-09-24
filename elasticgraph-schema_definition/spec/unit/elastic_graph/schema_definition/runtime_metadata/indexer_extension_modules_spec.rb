@@ -14,10 +14,8 @@ module ElasticGraph
       include_context "RuntimeMetadata support"
 
       it "includes any modules registered during schema definition" do
-        test_support_path = File.expand_path("../../../../../lib/elastic_graph/schema_definition/test_support.rb", __dir__)
         metadata = define_schema(extension_modules: []) do |s|
-          s.register_indexer_extension TestSupport::IndexerExtension,
-            defined_at: test_support_path
+          s.register_indexer_extension TestSupport::IndexerExtension, defined_at: "elastic_graph/schema_definition/test_support"
           s.register_indexer_extension Enumerable, defined_at: "set"
 
           s.object_type "Widget" do |t|
@@ -28,11 +26,7 @@ module ElasticGraph
 
         expect(metadata.indexer_extension_modules).to eq [
           SchemaArtifacts::RuntimeMetadata::ComponentExtension.new(
-            SchemaArtifacts::RuntimeMetadata::Extension.new(
-              TestSupport::IndexerExtension,
-              test_support_path,
-              {}
-            ).to_dumpable_hash
+            SchemaArtifacts::RuntimeMetadata::Extension.new(TestSupport::IndexerExtension, "elastic_graph/schema_definition/test_support", {}).to_dumpable_hash
           ),
           SchemaArtifacts::RuntimeMetadata::ComponentExtension.new(
             SchemaArtifacts::RuntimeMetadata::Extension.new(Enumerable, "set", {}).to_dumpable_hash
