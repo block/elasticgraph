@@ -68,12 +68,16 @@ module ElasticGraph
           parent_source: SELF_RELATIONSHIP_NAME,
           list_counts_state: SchemaElements::ListCountsState::INITIAL
         )
-          resolve_subtypes.flat_map do |t|
+          tuples = resolve_subtypes.flat_map do |t|
             t.index_field_runtime_metadata_tuples(
               path_prefix: path_prefix,
               parent_source: parent_source,
               list_counts_state: list_counts_state
             )
+          end
+
+          tuples.group_by(&:first).map do |path, entries|
+            [path, entries.last.last.with(doc_values_eligible: entries.all? { |_, field| field.doc_values_eligible })]
           end
         end
 
