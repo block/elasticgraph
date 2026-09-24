@@ -11,6 +11,9 @@ module ElasticGraph
       def graphql_schema_string: () -> ::String
       def datastore_config: () -> ::Hash[::String, untyped]
       def runtime_metadata: () -> SchemaArtifacts::RuntimeMetadata::Schema
+      def json_schemas_for: (::Integer) -> ::Hash[::String, untyped]
+      def available_json_schema_versions: () -> ::Set[::Integer]
+      def latest_json_schema_version: () -> ::Integer
       @ingestible_types_by_name: ::Hash[::String, indexableType]?
       def ingestible_types_by_name: () -> ::Hash[::String, indexableType]
 
@@ -35,6 +38,7 @@ module ElasticGraph
       def build_runtime_metadata: () -> SchemaArtifacts::RuntimeMetadata::Schema
       def generate_sdl: () -> ::String
       def verify_runtime_metadata: (SchemaArtifacts::RuntimeMetadata::Schema) -> void
+      def verify_indexer_extension_modules: (SchemaArtifacts::RuntimeMetadata::Schema) -> void
       def strip_trailing_whitespace: (::String) -> ::String
       def check_for_circular_dependencies!: () -> void
       def recursively_add_referenced_types_to: (SchemaElements::TypeReference, ::Hash[::String, ::Set[::String]]) -> void

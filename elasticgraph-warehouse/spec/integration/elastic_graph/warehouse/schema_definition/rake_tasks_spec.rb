@@ -8,6 +8,7 @@
 
 require "elastic_graph/constants"
 require "elastic_graph/schema_definition/rake_tasks"
+require "elastic_graph/spec_support/example_extensions/ingestion"
 require "elastic_graph/warehouse/schema_definition/api_extension"
 require "yaml"
 
@@ -182,7 +183,7 @@ module ElasticGraph
               index_document_sizes: false,
               path_to_schema: "schema.rb",
               schema_artifacts_directory: "config/schema/artifacts",
-              extension_modules: [Warehouse::SchemaDefinition::APIExtension],
+              extension_modules: [Warehouse::SchemaDefinition::APIExtension, SpecSupport::ExampleIngestion::APIExtension],
               output: output
             )
           end
