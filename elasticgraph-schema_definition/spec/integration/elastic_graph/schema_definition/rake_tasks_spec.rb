@@ -8,6 +8,7 @@
 
 require "bundler"
 require "elastic_graph/constants"
+require "elastic_graph/indexer/event"
 require "elastic_graph/json_ingestion/schema_definition/api_extension"
 require "elastic_graph/schema_definition/rake_tasks"
 require "elastic_graph/schema_definition/schema_elements/type_namer"
@@ -45,10 +46,10 @@ module ElasticGraph
           run_rake("schema_artifacts:dump")
 
           indexer = build_indexer(schema_artifacts: SchemaArtifacts::FromDisk.new("config/schema/artifacts"))
-          result = indexer.operation_factory.build({
-            INGESTION_FORMAT_KEY => "example", "op" => "upsert", "type" => "Widget",
-            "id" => "1", "version" => 1, "record" => {"id" => "1"}
-          })
+          result = indexer.operation_factory.build(Indexer::Event.new(
+            ingestion_format: "example", op: "upsert", type: "Widget",
+            id: "1", version: 1, schema_version: 1, record: {"id" => "1"}
+          ))
 
           expect(result.failed_event_error).to be nil
           expect(result.operations.map(&:prepared_record)).to eq([{"id" => "1"}])

@@ -15,7 +15,7 @@ module ElasticGraph
     module ExampleIngestion
       class Adapter
         def validate_event(event, skip_record_validation: false)
-          Indexer::IngestionAdapter::ValidationResult.valid(Indexer::RecordPreparer::Identity)
+          Indexer::IngestionAdapter::ValidationResult.valid(event, Indexer::RecordPreparer::Identity)
         end
       end
 
