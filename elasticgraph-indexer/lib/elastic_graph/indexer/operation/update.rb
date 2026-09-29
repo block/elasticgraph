@@ -17,7 +17,7 @@ require "elastic_graph/support/memoizable_data"
 module ElasticGraph
   class Indexer
     module Operation
-      class Update < Support::MemoizableData.define(:event, :prepared_record, :destination_index_def, :update_target, :doc_id, :destination_index_mapping)
+      class Update < Support::MemoizableData.define(:event, :prepared_record, :destination_index_def, :update_target, :doc_id, :destination_index_mapping, :conflict_retries)
         # @dynamic event, destination_index_def, doc_id
 
         def self.operations_for(
@@ -25,7 +25,8 @@ module ElasticGraph
           destination_index_def:,
           record_preparer:,
           update_target:,
-          destination_index_mapping:
+          destination_index_mapping:,
+          conflict_retries:
         )
           prepared_record = record_preparer.prepare_for_index(
             event.type,
@@ -37,7 +38,7 @@ module ElasticGraph
             .fetch_leaf_values_at_path(prepared_record, update_target.id_source.split("."))
             .reject { |id| id.to_s.strip.empty? }
             .uniq
-            .map { |doc_id| new(event, prepared_record, destination_index_def, update_target, doc_id, destination_index_mapping) }
+            .map { |doc_id| new(event, prepared_record, destination_index_def, update_target, doc_id, destination_index_mapping, conflict_retries) }
         end
 
         def to_datastore_bulk
@@ -98,9 +99,6 @@ module ElasticGraph
 
         private
 
-        # The number of retries of the update script we'll have the datastore attempt on concurrent modification conflicts.
-        CONFLICT_RETRIES = 5
-
         def metadata
           {
             _index: destination_index_def.index_name_for_writes(prepared_record, timestamp_field_path: update_target.rollover_timestamp_value_source),
@@ -110,7 +108,7 @@ module ElasticGraph
               route_with_path: update_target.routing_value_source,
               id_path: update_target.id_source
             ),
-            retry_on_conflict: CONFLICT_RETRIES
+            retry_on_conflict: conflict_retries
           }.compact
         end
 

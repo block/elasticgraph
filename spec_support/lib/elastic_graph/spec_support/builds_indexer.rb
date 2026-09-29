@@ -18,6 +18,8 @@ module ElasticGraph
       datastore_core: nil,
       latency_slo_thresholds_by_timestamp_in_ms: {},
       skip_derived_indexing_type_updates: {},
+      conflict_retries: 5,
+      conflict_retries_by_type: {},
       extension_modules: [],
       datastore_router: nil,
       ingestion_adapters_by_format: nil,
@@ -28,7 +30,9 @@ module ElasticGraph
     )
       config = Indexer::Config.new(
         latency_slo_thresholds_by_timestamp_in_ms: latency_slo_thresholds_by_timestamp_in_ms,
-        skip_derived_indexing_type_updates: skip_derived_indexing_type_updates
+        skip_derived_indexing_type_updates: skip_derived_indexing_type_updates,
+        conflict_retries: conflict_retries,
+        conflict_retries_by_type: conflict_retries_by_type
       )
 
       # This config setting must bypass the JSON schema validation so we provide it via `with`.

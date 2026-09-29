@@ -59,6 +59,54 @@ module ElasticGraph
         }.to raise_error Errors::ConfigError
       end
 
+      describe "#conflict_retries" do
+        it "defaults to 5, preserving the value ElasticGraph used before it was configurable" do
+          config = Config.from_parsed_yaml("indexer" => {})
+
+          expect(config.conflict_retries).to eq(5)
+        end
+
+        it "can be configured" do
+          config = Config.from_parsed_yaml("indexer" => {"conflict_retries" => 15})
+
+          expect(config.conflict_retries).to eq(15)
+        end
+
+        it "rejects negative and non-integer values" do
+          expect {
+            Config.from_parsed_yaml("indexer" => {"conflict_retries" => -1})
+          }.to raise_error Errors::ConfigError
+
+          expect {
+            Config.from_parsed_yaml("indexer" => {"conflict_retries" => 2.5})
+          }.to raise_error Errors::ConfigError
+        end
+      end
+
+      describe "#conflict_retries_by_type" do
+        it "defaults to an empty map" do
+          config = Config.from_parsed_yaml("indexer" => {})
+
+          expect(config.conflict_retries_by_type).to eq({})
+        end
+
+        it "can be configured per type" do
+          config = Config.from_parsed_yaml("indexer" => {"conflict_retries_by_type" => {"Widget" => 15}})
+
+          expect(config.conflict_retries_by_type).to eq("Widget" => 15)
+        end
+
+        it "rejects negative values and keys that are not type names" do
+          expect {
+            Config.from_parsed_yaml("indexer" => {"conflict_retries_by_type" => {"Widget" => -1}})
+          }.to raise_error Errors::ConfigError
+
+          expect {
+            Config.from_parsed_yaml("indexer" => {"conflict_retries_by_type" => {"widget" => 15}})
+          }.to raise_error Errors::ConfigError
+        end
+      end
+
       describe "#extension_modules", :in_temp_dir do
         it "loads the extension modules from disk" do
           File.write("eg_extension_module1.rb", <<~EOS)

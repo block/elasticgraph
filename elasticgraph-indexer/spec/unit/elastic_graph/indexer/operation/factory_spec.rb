@@ -38,6 +38,33 @@ module ElasticGraph
             )
           end
 
+          context "when the indexer is configured with a custom `conflict_retries`" do
+            let(:indexer) { build_indexer(conflict_retries: 15) }
+
+            it "applies it to every operation it builds, both primary indexing and derived index updates" do
+              event = build_upsert_event(:widget, id: "1", __version: 1)
+
+              operations = build_expecting_success(event)
+
+              expect(operations.size).to eq(2)
+              expect(operations.map { |op| op.to_datastore_bulk.first.fetch(:update).fetch(:retry_on_conflict) }).to all eq(15)
+            end
+          end
+
+          context "when the indexer is configured with `conflict_retries_by_type`" do
+            let(:indexer) { build_indexer(conflict_retries: 5, conflict_retries_by_type: {"WidgetCurrency" => 15}) }
+
+            it "applies the per-type value to updates of that destination type and the default to everything else" do
+              event = build_upsert_event(:widget, id: "1", __version: 1)
+
+              retries_by_type = build_expecting_success(event).to_h do |op|
+                [op.update_target.type, op.to_datastore_bulk.first.fetch(:update).fetch(:retry_on_conflict)]
+              end
+
+              expect(retries_by_type).to eq("Widget" => 5, "WidgetCurrency" => 15)
+            end
+          end
+
           context "when the indexer is configured to skip updates for certain derived indexing types and ids" do
             let(:indexer) do
               build_indexer(skip_derived_indexing_type_updates: {
@@ -460,7 +487,8 @@ module ElasticGraph
             destination_index_def: index_def_named("widget_currencies"),
             record_preparer: latest_json_record_preparer_for(indexer),
             update_target: indexer.schema_artifacts.runtime_metadata.object_types_by_name.fetch("Widget").update_targets.first,
-            destination_index_mapping: indexer.schema_artifacts.index_mappings_by_index_def_name.fetch("widget_currencies")
+            destination_index_mapping: indexer.schema_artifacts.index_mappings_by_index_def_name.fetch("widget_currencies"),
+            conflict_retries: indexer.config.conflict_retries
           )
 
           expect(operations.size).to be < 2

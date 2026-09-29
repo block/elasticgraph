@@ -34,6 +34,16 @@ module ElasticGraph
 
         expect(indexer).to be_a(Indexer)
       end
+
+      it "passes the configured conflict retry settings through to the operation factory" do
+        indexer = Indexer.from_parsed_yaml(parsed_test_settings_yaml.merge("indexer" => {
+          "conflict_retries" => 7,
+          "conflict_retries_by_type" => {"Widget" => 9}
+        }))
+
+        expect(indexer.operation_factory.conflict_retries).to eq(7)
+        expect(indexer.operation_factory.conflict_retries_by_type).to eq("Widget" => 9)
+      end
     end
 
     describe "#operation_factory" do

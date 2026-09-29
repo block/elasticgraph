@@ -11,7 +11,7 @@ require "elastic_graph/support/config"
 
 module ElasticGraph
   class Indexer
-    class Config < Support::Config.define(:latency_slo_thresholds_by_timestamp_in_ms, :skip_derived_indexing_type_updates, :skip_record_validation_percents_by_type, :extension_modules)
+    class Config < Support::Config.define(:latency_slo_thresholds_by_timestamp_in_ms, :skip_derived_indexing_type_updates, :skip_record_validation_percents_by_type, :conflict_retries, :conflict_retries_by_type, :extension_modules)
       json_schema at: "indexer",
         optional: false,
         description: "Configuration for indexing operations and metrics used by `elasticgraph-indexer`.",
@@ -72,16 +72,45 @@ module ElasticGraph
               {"Widget" => 90, "Component" => 100}
             ]
           },
+          conflict_retries: {
+            description: "Number of times the datastore retries an update when another write modifies the " \
+              "target document between the update's read and its write (the `retry_on_conflict` parameter of " \
+              "the bulk update API). An update that exhausts its retries fails with a version conflict and is " \
+              "reported as a failed event.\n\n" \
+              "A higher value can help when many events update the same document concurrently, such as derived " \
+              "indexing or `sourced_from` fields fed by many source events. Each retry re-reads the document and " \
+              "re-runs the update script, though, so the datastore work spent on a contended document grows with " \
+              "this value.",
+            type: "integer",
+            minimum: 0,
+            default: 5,
+            examples: [5, 15]
+          },
+          conflict_retries_by_type: {
+            description: "Overrides `conflict_retries` for updates to documents of the named types. Keys are the " \
+              "type of the document being updated, which for derived indexing and `sourced_from` is the destination " \
+              "type rather than the type of the event. Types not listed use `conflict_retries`.",
+            type: "object",
+            patternProperties: {/^[A-Z]\w*$/.source => {type: "integer", minimum: 0}},
+            additionalProperties: false,
+            default: {}, # : untyped
+            examples: [
+              {}, # : untyped
+              {"Widget" => 15}
+            ]
+          },
           extension_modules: Support::Config::EXTENSION_MODULE_SCHEMA
         }
 
       private
 
-      def convert_values(skip_derived_indexing_type_updates:, latency_slo_thresholds_by_timestamp_in_ms:, skip_record_validation_percents_by_type:, extension_modules:)
+      def convert_values(skip_derived_indexing_type_updates:, latency_slo_thresholds_by_timestamp_in_ms:, skip_record_validation_percents_by_type:, conflict_retries:, conflict_retries_by_type:, extension_modules:)
         {
           skip_derived_indexing_type_updates: skip_derived_indexing_type_updates.transform_values(&:to_set),
           latency_slo_thresholds_by_timestamp_in_ms: latency_slo_thresholds_by_timestamp_in_ms,
           skip_record_validation_percents_by_type: skip_record_validation_percents_by_type.transform_values(&:to_f),
+          conflict_retries: conflict_retries,
+          conflict_retries_by_type: conflict_retries_by_type,
           extension_modules: SchemaArtifacts::RuntimeMetadata::ExtensionLoader.load_component_extensions(extension_modules)
         }
       end

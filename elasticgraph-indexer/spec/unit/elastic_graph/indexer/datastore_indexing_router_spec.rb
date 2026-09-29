@@ -614,7 +614,8 @@ module ElasticGraph
           destination_index_def: index_def,
           update_target: update_target,
           doc_id: event.id,
-          destination_index_mapping: destination_index_mapping
+          destination_index_mapping: destination_index_mapping,
+          conflict_retries: indexer.config.conflict_retries
         }.merge(overrides)
 
         Operation::Update.new(**arguments)
