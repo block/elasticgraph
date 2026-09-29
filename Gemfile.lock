@@ -20,10 +20,10 @@ PATH
   remote: elasticgraph-apollo
   specs:
     elasticgraph-apollo (0.19.3.1.pre)
-      apollo-federation (~> 3.10, >= 3.10.1)
+      apollo-federation (~> 3.10, >= 3.10.3)
       elasticgraph-graphql (= 0.19.3.1.pre)
       elasticgraph-support (= 0.19.3.1.pre)
-      graphql (~> 2.5.4)
+      graphql (~> 2.6.6)
 
 PATH
   remote: elasticgraph-datastore_core
@@ -55,7 +55,7 @@ PATH
       base64 (~> 0.2)
       elasticgraph-datastore_core (= 0.19.3.1.pre)
       elasticgraph-schema_artifacts (= 0.19.3.1.pre)
-      graphql (~> 2.5.4)
+      graphql (~> 2.6.6)
       graphql-c_parser (~> 1.1, >= 1.1.2)
 
 PATH
@@ -145,7 +145,7 @@ PATH
     elasticgraph-query_registry (0.19.3.1.pre)
       elasticgraph-graphql (= 0.19.3.1.pre)
       elasticgraph-support (= 0.19.3.1.pre)
-      graphql (~> 2.5.4)
+      graphql (~> 2.6.6)
       graphql-c_parser (~> 1.1, >= 1.1.2)
       rake (~> 13.2, >= 13.2.1)
 
@@ -171,7 +171,7 @@ PATH
       elasticgraph-json_schema (= 0.19.3.1.pre)
       elasticgraph-schema_artifacts (= 0.19.3.1.pre)
       elasticgraph-support (= 0.19.3.1.pre)
-      graphql (~> 2.5.4)
+      graphql (~> 2.6.6)
       graphql-c_parser (~> 1.1, >= 1.1.2)
       rake (~> 13.2, >= 13.2.1)
 
@@ -209,7 +209,7 @@ GEM
       public_suffix (>= 2.0.2, < 7.0)
     afm (0.2.2)
     ansi (1.5.0)
-    apollo-federation (3.10.1)
+    apollo-federation (3.10.3)
       google-protobuf (< 5)
       graphql
     ast (2.4.3)
@@ -317,7 +317,7 @@ GEM
     google-protobuf (4.30.2-arm64-darwin)
       bigdecimal
       rake (>= 13)
-    graphql (2.5.4)
+    graphql (2.6.11)
       base64
       fiber-storage
       logger
