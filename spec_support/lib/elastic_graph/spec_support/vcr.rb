@@ -139,8 +139,12 @@ RSpec.configure do |config|
       ex.metadata[:cassette_file] = cassette.file
       ex.run
 
-      # Notify the cassette if we got an error, so it honors `record_on_error: false`.
-      cassette.run_failed! if ex.exception && exceptions_to_retry.none? { |ex_class| ex_class === ex.exception }
+      # Notify the cassette if we got an error, so it honors `record_on_error: false`. RSpec stores the expected
+      # failure of a pending example as its `pending_exception` (rather than its `exception`), so we check that too.
+      # Otherwise, a pending example would record its failed run, and replaying that cassette would keep the example
+      # failing (hiding that it has been fixed) after the functionality it is pending on is implemented.
+      failure = ex.exception || ex.execution_result.pending_exception
+      cassette.run_failed! if failure && exceptions_to_retry.none? { |ex_class| ex_class === failure }
     end
   end
 end
