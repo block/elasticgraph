@@ -1,4 +1,4 @@
-# Copyright 2024 - 2025 Block, Inc.
+# Copyright 2024 - 2026 Block, Inc.
 #
 # Use of this source code is governed by an MIT-style
 # license that can be found in the LICENSE file or at
@@ -10,7 +10,7 @@ source "https://rubygems.org"
 
 # Gems needed by the test suite and other CI checks.
 group :development do
-  gem "aws_lambda_ric", "~> 3.0"
+  gem "aws_lambda_ric", "~> 3.2"
   gem "benchmark-ips", "~> 2.14"
   gem "coderay", "~> 1.1", ">= 1.1.3"
   gem "factory_bot", "~> 6.5", ">= 6.5.1"
