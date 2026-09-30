@@ -45,6 +45,8 @@ module ElasticGraph
 
             package elasticgraph;
 
+            import "google/protobuf/timestamp.proto";
+
             // An account in the system.
             message Account {
               // The account's unique identifier.
@@ -59,6 +61,21 @@ module ElasticGraph
               optional string street = 1;
               optional string city = 2;
               // Next field number: 3
+            }
+
+            message ElasticGraphEventBatch {
+              repeated ElasticGraphEventEnvelope events = 1;
+            }
+
+            message ElasticGraphEventEnvelope {
+              optional string op = 1;
+              optional string id = 2;
+              optional int64 version = 3;
+              map<string, google.protobuf.Timestamp> latency_timestamps = 4;
+
+              oneof record {
+                .elasticgraph.Account account = 5;
+              }
             }
 
             // The status of an account.
@@ -99,7 +116,7 @@ module ElasticGraph
             end
           end
 
-          expect(proto.scan(/^(?:enum|message) (\w+) \{/).flatten).to eq(%w[Alpha Beta Yak Zulu])
+          expect(proto.scan(/^(?:enum|message) (\w+) \{/).flatten).to eq(%w[Alpha Beta ElasticGraphEventBatch ElasticGraphEventEnvelope Yak Zulu])
         end
 
         it "represents lists of lists with generated wrapper messages" do

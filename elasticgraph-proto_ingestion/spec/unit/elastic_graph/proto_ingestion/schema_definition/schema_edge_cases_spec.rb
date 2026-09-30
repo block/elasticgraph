@@ -158,17 +158,15 @@ module ElasticGraph
         it "raises when a hand-edited mappings artifact is invalid" do
           # An invalid artifact can only arise from hand-editing (a prior dump is always valid),
           # so this test must seed raw mappings instead of results from a prior dump.
-          results = define_proto_schema_results(proto_field_number_mappings: {
-            "messages" => {"Account" => {"fields" => {"id" => 0}}}
-          }) do |s|
-            s.object_type "Account" do |t|
-              t.field "id", "ID"
-              t.index "accounts"
-            end
-          end
-
           expect {
-            results.proto_schema
+            define_proto_schema_results(proto_field_number_mappings: {
+              "messages" => {"Account" => {"fields" => {"id" => 0}}}
+            }) do |s|
+              s.object_type "Account" do |t|
+                t.field "id", "ID"
+                t.index "accounts"
+              end
+            end
           }.to raise_error(Errors::SchemaError, a_string_including(
             "Invalid protobuf field-number mappings", "/messages/Account/fields/id", "less than: 1"
           ))

@@ -19,17 +19,17 @@ module ElasticGraph
             before(:context) do
               @proto = define_proto_schema do |s|
                 s.proto_schema_artifacts package_name: "elasticgraph", syntax: syntax
-                s.object_type "Record" do |t|
+                s.object_type "Product" do |t|
                   t.field "id", "ID!"
                   t.field "name", "String"
                   t.field "enabled", "Boolean"
                   t.field "quantity", "Int"
                   t.field "matrix", "[[Int!]!]!"
                   t.field "cube", "[[[Int!]!]!]!"
-                  t.field "details", "RecordDetails"
-                  t.index "records"
+                  t.field "details", "ProductDetails"
+                  t.index "products"
                 end
-                s.object_type("RecordDetails") { |t| t.field "label", "String" }
+                s.object_type("ProductDetails") { |t| t.field "label", "String" }
               end
             end
 
@@ -65,12 +65,19 @@ module ElasticGraph
             it "roundtrips an empty message" do
               expect(encode_and_decode("")).to eq("")
             end
+
+            it "round trips timestamp metadata and a record through protoc" do
+              input = 'latency_timestamps { key: "published" value { seconds: 1709251199 nanos: 123456789 } } product { id: "p1" }'
+              encoded = run_protoc(proto, "--encode=elasticgraph.ElasticGraphEventEnvelope", input)
+              decoded = run_protoc(proto, "--decode=elasticgraph.ElasticGraphEventEnvelope", encoded)
+              expect(decoded).to include('key: "published"', "seconds: 1709251199", "nanos: 123456789", 'id: "p1"')
+            end
           end
         end
 
         def encode_and_decode(text_formatted_message)
-          encoded = run_protoc(proto, "--encode=elasticgraph.Record", text_formatted_message)
-          run_protoc(proto, "--decode=elasticgraph.Record", encoded)
+          encoded = run_protoc(proto, "--encode=elasticgraph.Product", text_formatted_message)
+          run_protoc(proto, "--decode=elasticgraph.Product", encoded)
         end
       end
     end

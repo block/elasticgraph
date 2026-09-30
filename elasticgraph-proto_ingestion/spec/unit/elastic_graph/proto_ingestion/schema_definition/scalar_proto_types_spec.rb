@@ -24,13 +24,8 @@ module ElasticGraph
             end
           end
 
-          expect(proto).to eq(<<~PROTO)
-            syntax = "proto3";
-
-            package elasticgraph;
-
-            import "google/protobuf/timestamp.proto";
-
+          expect(proto.lines.grep(/\Aimport /).map(&:chomp)).to eq([%(import "google/protobuf/timestamp.proto";)])
+          expect(proto_type_def_from(proto, "Event")).to eq(<<~PROTO.strip)
             message Event {
               optional string id = 1;
               optional google.protobuf.Timestamp created_at = 2;
@@ -44,7 +39,7 @@ module ElasticGraph
           proto = define_proto_schema do |s|
             s.on_built_in_types do |type|
               # `protobuf` replaces the full configuration, so omitting `import:` here drops the
-              # built-in `google/protobuf/timestamp.proto` import.
+              # scalar's import. The envelope still requires `google/protobuf/timestamp.proto`.
               type.protobuf type: "string", field_comment: "Must be formatted as an ISO 8601 timestamp." if type.name == "DateTime"
             end
 
@@ -55,11 +50,7 @@ module ElasticGraph
             end
           end
 
-          expect(proto).to eq(<<~PROTO)
-            syntax = "proto3";
-
-            package elasticgraph;
-
+          expect(proto_type_def_from(proto, "Event")).to eq(<<~PROTO.strip)
             message Event {
               optional string id = 1;
               // Must be formatted as an ISO 8601 timestamp.
@@ -83,13 +74,8 @@ module ElasticGraph
             end
           end
 
-          expect(proto).to eq(<<~PROTO)
-            syntax = "proto3";
-
-            package elasticgraph;
-
-            import "google/type/date.proto";
-
+          expect(proto).to include('import "google/type/date.proto";')
+          expect(proto_type_def_from(proto, "Event")).to eq(<<~PROTO.strip)
             message Event {
               optional string id = 1;
               optional google.type.Date occurred_on = 2;
@@ -126,6 +112,7 @@ module ElasticGraph
 
           expect(proto.lines.grep(/\Aimport /).map(&:chomp)).to eq([
             %(import "a/types.proto";),
+            %(import "google/protobuf/timestamp.proto";),
             %(import "z/types.proto";)
           ])
         end
@@ -155,7 +142,7 @@ module ElasticGraph
             end
           end
 
-          expect(proto.lines.grep(/\Aimport /).map(&:chomp)).to eq([%(import "used.proto";)])
+          expect(proto.lines.grep(/\Aimport /).map(&:chomp)).to eq([%(import "google/protobuf/timestamp.proto";), %(import "used.proto";)])
         end
 
         it "renders the field comment above the field, after any doc comment" do
