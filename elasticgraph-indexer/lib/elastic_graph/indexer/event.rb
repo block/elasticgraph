@@ -26,7 +26,7 @@ module ElasticGraph
     # @!attribute [r] record
     #   @return [Object] the record payload, in the ingestion adapter's native type
     # @!attribute [r] schema_version
-    #   @return [Integer] the version of the ingestion schema the publisher used
+    #   @return [Integer, nil] the version of the ingestion schema the publisher used, when versioned
     # @!attribute [r] ingestion_format
     #   @return [String] the format tag that selects the ingestion adapter
     # @!attribute [r] message_id
